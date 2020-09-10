@@ -2,115 +2,89 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46F08C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:41:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20CC5C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:45:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94A2020829
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:41:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C05620665
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:45:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ltHJSp0c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94A2020829
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iEnqcx0x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C05620665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGJ53-0001gz-Iw
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 05:41:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35166)
+	id 1kGJ98-0003wS-11
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 05:45:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37132)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1kGJ17-000268-3J; Thu, 10 Sep 2020 05:37:21 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21740)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1kGJ12-0003RB-2D; Thu, 10 Sep 2020 05:37:20 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 08A9WE0M037848; Thu, 10 Sep 2020 05:37:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=S6SzECKH5JU2Foafyqoxbj8o4JcCBBC9/OlmJtTNwPo=;
- b=ltHJSp0cUL/bzx59RAUDqao1/Me7BUG1c9Z3VmE1sijg0rkZU/iEGO+PqIiA2yUk+DDx
- Wa/+gKM4nyy1ap9suoJsjvQuiFXSikC7ETkHTERo0y4RinLQ7hjEy29b+Edq/wVt48Ar
- DJ9CCgBv21L9P006tFKmgUjnDfdLk7WV4CtDUdQMPfRqFlAETTr1gIIwlDJ9esZdWKM0
- QqqycMm+PTzGEl8OJzzjsk7/AkW7ovx8tkfrlfVivvZCg3B15cpJt17NsX4DBdx/MK/l
- nbiDZbQyxC/yJtgZC2FqhAK3Yz4W9KTcZdBoYxt9EZApPmxj6QaSblpvwi854RV/BU8x 2A== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33fgkfacd6-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 10 Sep 2020 05:37:14 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08A9Wijh039457;
- Thu, 10 Sep 2020 05:37:14 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33fgkfaccr-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 10 Sep 2020 05:37:14 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08A9WKOo020313;
- Thu, 10 Sep 2020 09:37:13 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
- [9.57.198.26]) by ppma03dal.us.ibm.com with ESMTP id 33c2a9fww7-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 10 Sep 2020 09:37:13 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
- [9.57.199.109])
- by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 08A9bCaG16057088
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 10 Sep 2020 09:37:12 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 675F1112062;
- Thu, 10 Sep 2020 09:37:12 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 140C6112063;
- Thu, 10 Sep 2020 09:37:12 +0000 (GMT)
-Received: from localhost.localdomain.com (unknown [9.85.156.134])
- by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
- Thu, 10 Sep 2020 09:37:11 +0000 (GMT)
-From: Collin Walling <walling@linux.ibm.com>
-To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
-Subject: [PATCH v5 6/8] s390/sclp: add extended-length sccb support for kvm
- guest
-Date: Thu, 10 Sep 2020 05:36:53 -0400
-Message-Id: <20200910093655.255774-7-walling@linux.ibm.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200910093655.255774-1-walling@linux.ibm.com>
-References: <20200910093655.255774-1-walling@linux.ibm.com>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kGJ8Y-0003UM-PD
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 05:45:02 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49905
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kGJ8V-0004VT-N2
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 05:45:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599731097;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=bGa7uuTKrniryse7b6RfRiHvGWqP43tAL7Cv37d0EU8=;
+ b=iEnqcx0xKmqoI7Q+XGU87HldLuPE6kpccrhajMilMlSnw7FXPuzoXzzVonEFcUvjoVgVzV
+ URjizPWroOsbNgxJscyEzoesNrJJqlS9WlTPveXUx50h+I38/FTOKMAM84u+A2moiw33PN
+ CvMXx36BFtNmGzh9Qwa4S1YkSm3m4F0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-400-bqllOOGpO1WwWzTlBNWy8w-1; Thu, 10 Sep 2020 05:44:56 -0400
+X-MC-Unique: bqllOOGpO1WwWzTlBNWy8w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F74310082E6
+ for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 09:44:55 +0000 (UTC)
+Received: from work-vm (ovpn-113-128.ams2.redhat.com [10.36.113.128])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C4CD73A40;
+ Thu, 10 Sep 2020 09:44:50 +0000 (UTC)
+Date: Thu, 10 Sep 2020 10:44:47 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH v2 5/6] migration: Maintain postcopy faulted addresses
+Message-ID: <20200910094447.GB2814@work-vm>
+References: <20200908203022.341615-1-peterx@redhat.com>
+ <20200908203022.341615-6-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-09-10_01:2020-09-10,
- 2020-09-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0
- malwarescore=0 adultscore=0 mlxlogscore=999 phishscore=0
- lowpriorityscore=0 clxscore=1015 spamscore=0 mlxscore=0 bulkscore=0
- suspectscore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2006250000 definitions=main-2009100085
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=walling@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 05:37:13
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
+In-Reply-To: <20200908203022.341615-6-peterx@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 01:44:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -123,207 +97,243 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, frankja@linux.ibm.com, david@redhat.com,
- cohuck@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com, mst@redhat.com,
- pbonzini@redhat.com, sumanthk@linux.ibm.com, mihajlov@linux.ibm.com,
- rth@twiddle.net
+Cc: Xiaohui Li <xiaohli@redhat.com>, qemu-devel@nongnu.org,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As more features and facilities are added to the Read SCP Info (RSCPI)
-response, more space is required to store them. The space used to store
-these new features intrudes on the space originally used to store CPU
-entries. This means as more features and facilities are added to the
-RSCPI response, less space can be used to store CPU entries.
+* Peter Xu (peterx@redhat.com) wrote:
+> Maintain a list of faulted addresses on the destination host for which we're
+> waiting on.  This is implemented using a GTree rather than a real list to make
+> sure even there're plenty of vCPUs/threads that are faulting, the lookup will
+> still be fast with O(log(N)) (because we'll do that after placing each page).
+> It should bring a slight overhead, but ideally that shouldn't be a big problem
+> simply because in most cases the requested page list will be short.
+> 
+> Actually we did similar things for postcopy blocktime measurements.  This patch
+> didn't use that simply because:
+> 
+>   (1) blocktime measurement is towards vcpu threads only, but here we need to
+>       record all faulted addresses, including main thread and external
+>       thread (like, DPDK via vhost-user).
+> 
+>   (2) blocktime measurement will require UFFD_FEATURE_THREAD_ID, but here we
+>       don't want to add that extra dependency on the kernel version since not
+>       necessary.  E.g., we don't need to know which thread faulted on which
+>       page, we also don't care about multiple threads faulting on the same
+>       page.  But we only care about what addresses are faulted so waiting for a
+>       page copying from src.
+> 
+>   (3) blocktime measurement is not enabled by default.  However we need this by
+>       default especially for postcopy recover.
+> 
+> Another thing to mention is that this patch introduced a new mutex to serialize
+> the receivedmap and the page_requested tree, however that serialization does
+> not cover other procedures like UFFDIO_COPY.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-With the Extended-Length SCCB (ELS) facility, a KVM guest can execute
-the RSCPI command and determine if the SCCB is large enough to store a
-complete reponse. If it is not large enough, then the required length
-will be set in the SCCB header.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-The caller of the SCLP command is responsible for creating a
-large-enough SCCB to store a complete response. Proper checking should
-be in place, and the caller should execute the command once-more with
-the large-enough SCCB.
-
-This facility also enables an extended SCCB for the Read CPU Info
-(RCPUI) command.
-
-When this facility is enabled, the boundary violation response cannot
-be a result from the RSCPI, RSCPI Forced, or RCPUI commands.
-
-In order to tolerate kernels that do not yet have full support for this
-feature, a "fixed" offset to the start of the CPU Entries within the
-Read SCP Info struct is set to allow for the original 248 max entries
-when this feature is disabled.
-
-Additionally, this is introduced as a CPU feature to protect the guest
-from migrating to a machine that does not support storing an extended
-SCCB. This could otherwise hinder the VM from being able to read all
-available CPU entries after migration (such as during re-ipl).
-
-Signed-off-by: Collin Walling <walling@linux.ibm.com>
----
- hw/s390x/sclp.c                     | 43 +++++++++++++++++++++++++----
- include/hw/s390x/sclp.h             |  1 +
- target/s390x/cpu_features_def.h.inc |  1 +
- target/s390x/gen-features.c         |  1 +
- target/s390x/kvm.c                  |  8 ++++++
- 5 files changed, 48 insertions(+), 6 deletions(-)
-
-diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index 803fdd5ed4..87d468087b 100644
---- a/hw/s390x/sclp.c
-+++ b/hw/s390x/sclp.c
-@@ -49,13 +49,30 @@ static inline bool sclp_command_code_valid(uint32_t code)
-     return false;
- }
- 
--static bool sccb_verify_boundary(uint64_t sccb_addr, uint16_t len)
-+static bool sccb_verify_boundary(uint64_t sccb_addr, uint16_t len,
-+                                 uint32_t code)
- {
-     uint64_t sccb_max_addr = sccb_addr + be16_to_cpu(len) - 1;
-     uint64_t sccb_boundary = (sccb_addr & PAGE_MASK) + PAGE_SIZE;
- 
--    if (sccb_max_addr < sccb_boundary) {
--        return true;
-+    switch (code & SCLP_CMD_CODE_MASK) {
-+    case SCLP_CMDW_READ_SCP_INFO:
-+    case SCLP_CMDW_READ_SCP_INFO_FORCED:
-+    case SCLP_CMDW_READ_CPU_INFO:
-+        /*
-+         * An extended-length SCCB is only allowed for Read SCP/CPU Info and
-+         * is allowed to exceed the 4k boundary. The respective commands will
-+         * set the length field to the required length if an insufficient
-+         * SCCB length is provided.
-+         */
-+        if (s390_has_feat(S390_FEAT_EXTENDED_LENGTH_SCCB)) {
-+            return true;
-+        }
-+        /* fallthrough */
-+    default:
-+        if (sccb_max_addr < sccb_boundary) {
-+            return true;
-+        }
-     }
- 
-     return false;
-@@ -80,6 +97,12 @@ static void prepare_cpu_entries(MachineState *ms, CPUEntry *entry, int *count)
- 
- #define SCCB_REQ_LEN(s, max_cpus) (sizeof(s) + max_cpus * sizeof(CPUEntry))
- 
-+static inline bool ext_len_sccb_supported(SCCBHeader header)
-+{
-+    return s390_has_feat(S390_FEAT_EXTENDED_LENGTH_SCCB) &&
-+           header.control_mask[2] & SCLP_VARIABLE_LENGTH_RESPONSE;
-+}
-+
- /* Provide information about the configuration, CPUs and storage */
- static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
- {
-@@ -89,10 +112,15 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
-     int rnsize, rnmax;
-     IplParameterBlock *ipib = s390_ipl_get_iplb();
-     int required_len = SCCB_REQ_LEN(ReadInfo, machine->possible_cpus->len);
--    int offset_cpu = offsetof(ReadInfo, entries);
-+    int offset_cpu = s390_has_feat(S390_FEAT_EXTENDED_LENGTH_SCCB) ?
-+                     offsetof(ReadInfo, entries) :
-+                     SCLP_READ_SCP_INFO_FIXED_CPU_OFFSET;
-     CPUEntry *entries_start = (void *)sccb + offset_cpu;
- 
-     if (be16_to_cpu(sccb->h.length) < required_len) {
-+        if (ext_len_sccb_supported(sccb->h)) {
-+            sccb->h.length = cpu_to_be16(required_len);
-+        }
-         sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
-         return;
-     }
-@@ -153,6 +181,9 @@ static void sclp_read_cpu_info(SCLPDevice *sclp, SCCB *sccb)
-     int required_len = SCCB_REQ_LEN(ReadCpuInfo, machine->possible_cpus->len);
- 
-     if (be16_to_cpu(sccb->h.length) < required_len) {
-+        if (ext_len_sccb_supported(sccb->h)) {
-+            sccb->h.length = cpu_to_be16(required_len);
-+        }
-         sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
-         return;
-     }
-@@ -249,7 +280,7 @@ int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
-         goto out_write;
-     }
- 
--    if (!sccb_verify_boundary(sccb, work_sccb->h.length)) {
-+    if (!sccb_verify_boundary(sccb, work_sccb->h.length, code)) {
-         work_sccb->h.response_code = cpu_to_be16(SCLP_RC_SCCB_BOUNDARY_VIOLATION);
-         goto out_write;
-     }
-@@ -303,7 +334,7 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
-         goto out_write;
-     }
- 
--    if (!sccb_verify_boundary(sccb, work_sccb->h.length)) {
-+    if (!sccb_verify_boundary(sccb, work_sccb->h.length, code)) {
-         work_sccb->h.response_code = cpu_to_be16(SCLP_RC_SCCB_BOUNDARY_VIOLATION);
-         goto out_write;
-     }
-diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
-index 98c4727984..141e57f765 100644
---- a/include/hw/s390x/sclp.h
-+++ b/include/hw/s390x/sclp.h
-@@ -110,6 +110,7 @@ typedef struct CPUEntry {
-     uint8_t reserved1;
- } QEMU_PACKED CPUEntry;
- 
-+#define SCLP_READ_SCP_INFO_FIXED_CPU_OFFSET     128
- typedef struct ReadInfo {
-     SCCBHeader h;
-     uint16_t rnmax;
-diff --git a/target/s390x/cpu_features_def.h.inc b/target/s390x/cpu_features_def.h.inc
-index 5942f81f16..1c04cc18f4 100644
---- a/target/s390x/cpu_features_def.h.inc
-+++ b/target/s390x/cpu_features_def.h.inc
-@@ -97,6 +97,7 @@ DEF_FEAT(GUARDED_STORAGE, "gs", STFL, 133, "Guarded-storage facility")
- DEF_FEAT(VECTOR_PACKED_DECIMAL, "vxpd", STFL, 134, "Vector packed decimal facility")
- DEF_FEAT(VECTOR_ENH, "vxeh", STFL, 135, "Vector enhancements facility")
- DEF_FEAT(MULTIPLE_EPOCH, "mepoch", STFL, 139, "Multiple-epoch facility")
-+DEF_FEAT(EXTENDED_LENGTH_SCCB, "els", STFL, 140, "Extended-length SCCB facility")
- DEF_FEAT(TEST_PENDING_EXT_INTERRUPTION, "tpei", STFL, 144, "Test-pending-external-interruption facility")
- DEF_FEAT(INSERT_REFERENCE_BITS_MULT, "irbm", STFL, 145, "Insert-reference-bits-multiple facility")
- DEF_FEAT(MSA_EXT_8, "msa8-base", STFL, 146, "Message-security-assist-extension-8 facility (excluding subfunctions)")
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index 8ddeebc544..6857f657fb 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -522,6 +522,7 @@ static uint16_t full_GEN12_GA1[] = {
-     S390_FEAT_AP_QUEUE_INTERRUPT_CONTROL,
-     S390_FEAT_AP_FACILITIES_TEST,
-     S390_FEAT_AP,
-+    S390_FEAT_EXTENDED_LENGTH_SCCB,
- };
- 
- static uint16_t full_GEN12_GA2[] = {
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index f2f75d2a57..a2d5ad78f6 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -2456,6 +2456,14 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
-         KVM_S390_VM_CRYPTO_ENABLE_APIE)) {
-         set_bit(S390_FEAT_AP, model->features);
-     }
-+
-+    /*
-+     * Extended-Length SCCB is handled entirely within QEMU.
-+     * For PV guests this is completely fenced by the Ultravisor, as Service
-+     * Call error checking and STFLE interpretation are handled via SIE.
-+     */
-+    set_bit(S390_FEAT_EXTENDED_LENGTH_SCCB, model->features);
-+
-     /* strip of features that are not part of the maximum model */
-     bitmap_and(model->features, model->features, model->def->full_feat,
-                S390_FEAT_MAX);
+> ---
+>  migration/migration.c    | 44 +++++++++++++++++++++++++++++++++++++++-
+>  migration/migration.h    | 19 ++++++++++++++++-
+>  migration/postcopy-ram.c | 18 +++++++++++++---
+>  migration/trace-events   |  2 ++
+>  4 files changed, 78 insertions(+), 5 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 6e06b6f4e6..3a12378429 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -143,6 +143,13 @@ static int migration_maybe_pause(MigrationState *s,
+>                                   int new_state);
+>  static void migrate_fd_cancel(MigrationState *s);
+>  
+> +static gint page_request_addr_cmp(gconstpointer ap, gconstpointer bp)
+> +{
+> +    uint64_t a = (uint64_t) ap, b = (uint64_t) bp;
+> +
+> +    return (a > b) - (a < b);
+> +}
+> +
+>  void migration_object_init(void)
+>  {
+>      MachineState *ms = MACHINE(qdev_get_machine());
+> @@ -165,6 +172,8 @@ void migration_object_init(void)
+>      qemu_event_init(&current_incoming->main_thread_load_event, false);
+>      qemu_sem_init(&current_incoming->postcopy_pause_sem_dst, 0);
+>      qemu_sem_init(&current_incoming->postcopy_pause_sem_fault, 0);
+> +    qemu_mutex_init(&current_incoming->page_request_mutex);
+> +    current_incoming->page_requested = g_tree_new(page_request_addr_cmp);
+>  
+>      if (!migration_object_check(current_migration, &err)) {
+>          error_report_err(err);
+> @@ -238,6 +247,11 @@ void migration_incoming_state_destroy(void)
+>          mis->postcopy_remote_fds = NULL;
+>      }
+>  
+> +    if (mis->page_requested) {
+> +        g_tree_destroy(mis->page_requested);
+> +        mis->page_requested = NULL;
+> +    }
+> +
+>      if (mis->socket_address_list) {
+>          qapi_free_SocketAddressList(mis->socket_address_list);
+>          mis->socket_address_list = NULL;
+> @@ -247,6 +261,7 @@ void migration_incoming_state_destroy(void)
+>      qemu_sem_destroy(&mis->postcopy_pause_sem_dst);
+>      qemu_sem_destroy(&mis->postcopy_pause_sem_fault);
+>      qemu_mutex_destroy(&mis->rp_mutex);
+> +    qemu_mutex_destroy(&mis->page_request_mutex);
+>  }
+>  
+>  static void migrate_generate_event(int new_state)
+> @@ -357,8 +372,35 @@ int migrate_send_rp_message_req_pages(MigrationIncomingState *mis,
+>  }
+>  
+>  int migrate_send_rp_req_pages(MigrationIncomingState *mis,
+> -                              RAMBlock *rb, ram_addr_t start)
+> +                              RAMBlock *rb, ram_addr_t start, uint64_t haddr)
+>  {
+> +    uint64_t aligned = haddr & (-qemu_target_page_size());
+> +    bool received;
+> +
+> +    WITH_QEMU_LOCK_GUARD(&mis->page_request_mutex) {
+> +        received = ramblock_recv_bitmap_test_byte_offset(rb, start);
+> +        if (!received && !g_tree_lookup(mis->page_requested,
+> +                                        (gpointer) aligned)) {
+> +            /*
+> +             * The page has not been received, and it's not yet in the page
+> +             * request list.  Queue it.  Set the value of element to 1, so that
+> +             * things like g_tree_lookup() will return TRUE (1) when found.
+> +             */
+> +            g_tree_insert(mis->page_requested, (gpointer) aligned,
+> +                          (gpointer) 1);
+> +            mis->page_requested_count++;
+> +            trace_postcopy_page_req_add(aligned, mis->page_requested_count);
+> +        }
+> +    }
+> +
+> +    /*
+> +     * If the page is there, skip sending the message.  We don't even need the
+> +     * lock because as long as the page arrived, it'll be there forever.
+> +     */
+> +    if (received) {
+> +        return 0;
+> +    }
+> +
+>      return migrate_send_rp_message_req_pages(mis, rb, start);
+>  }
+>  
+> diff --git a/migration/migration.h b/migration/migration.h
+> index f552725305..81311dc154 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -103,6 +103,23 @@ struct MigrationIncomingState {
+>  
+>      /* List of listening socket addresses  */
+>      SocketAddressList *socket_address_list;
+> +
+> +    /* A tree of pages that we requested to the source VM */
+> +    GTree *page_requested;
+> +    /* For debugging purpose only, but would be nice to keep */
+> +    int page_requested_count;
+> +    /*
+> +     * The mutex helps to maintain the requested pages that we sent to the
+> +     * source, IOW, to guarantee coherent between the page_requests tree and
+> +     * the per-ramblock receivedmap.  Note! This does not guarantee consistency
+> +     * of the real page copy procedures (using UFFDIO_[ZERO]COPY).  E.g., even
+> +     * if one bit in receivedmap is cleared, UFFDIO_COPY could have happened
+> +     * for that page already.  This is intended so that the mutex won't
+> +     * serialize and blocked by slow operations like UFFDIO_* ioctls.  However
+> +     * this should be enough to make sure the page_requested tree always
+> +     * contains valid information.
+> +     */
+> +    QemuMutex page_request_mutex;
+>  };
+>  
+>  MigrationIncomingState *migration_incoming_get_current(void);
+> @@ -329,7 +346,7 @@ void migrate_send_rp_shut(MigrationIncomingState *mis,
+>  void migrate_send_rp_pong(MigrationIncomingState *mis,
+>                            uint32_t value);
+>  int migrate_send_rp_req_pages(MigrationIncomingState *mis, RAMBlock *rb,
+> -                              ram_addr_t start);
+> +                              ram_addr_t start, uint64_t haddr);
+>  int migrate_send_rp_message_req_pages(MigrationIncomingState *mis,
+>                                        RAMBlock *rb, ram_addr_t start);
+>  void migrate_send_rp_recv_bitmap(MigrationIncomingState *mis,
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index d333c3fd0e..a30627e838 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -684,7 +684,7 @@ int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
+>                                          qemu_ram_get_idstr(rb), rb_offset);
+>          return postcopy_wake_shared(pcfd, client_addr, rb);
+>      }
+> -    migrate_send_rp_req_pages(mis, rb, aligned_rbo);
+> +    migrate_send_rp_req_pages(mis, rb, aligned_rbo, client_addr);
+>      return 0;
+>  }
+>  
+> @@ -979,7 +979,8 @@ retry:
+>               * Send the request to the source - we want to request one
+>               * of our host page sizes (which is >= TPS)
+>               */
+> -            ret = migrate_send_rp_req_pages(mis, rb, rb_offset);
+> +            ret = migrate_send_rp_req_pages(mis, rb, rb_offset,
+> +                                            msg.arg.pagefault.address);
+>              if (ret) {
+>                  /* May be network failure, try to wait for recovery */
+>                  if (ret == -EIO && postcopy_pause_fault_thread(mis)) {
+> @@ -1149,10 +1150,21 @@ static int qemu_ufd_copy_ioctl(MigrationIncomingState *mis, void *host_addr,
+>          ret = ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
+>      }
+>      if (!ret) {
+> +        qemu_mutex_lock(&mis->page_request_mutex);
+>          ramblock_recv_bitmap_set_range(rb, host_addr,
+>                                         pagesize / qemu_target_page_size());
+> +        /*
+> +         * If this page resolves a page fault for a previous recorded faulted
+> +         * address, take a special note to maintain the requested page list.
+> +         */
+> +        if (g_tree_lookup(mis->page_requested, (gconstpointer)host_addr)) {
+> +            g_tree_remove(mis->page_requested, (gconstpointer)host_addr);
+> +            mis->page_requested_count--;
+> +            trace_postcopy_page_req_del((uint64_t)host_addr,
+> +                                        mis->page_requested_count);
+> +        }
+> +        qemu_mutex_unlock(&mis->page_request_mutex);
+>          mark_postcopy_blocktime_end((uintptr_t)host_addr);
+> -
+>      }
+>      return ret;
+>  }
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 4ab0a503d2..b89ce02cb0 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -157,6 +157,7 @@ postcopy_pause_return_path(void) ""
+>  postcopy_pause_return_path_continued(void) ""
+>  postcopy_pause_continued(void) ""
+>  postcopy_start_set_run(void) ""
+> +postcopy_page_req_add(uint64_t addr, int count) "new page req 0x%lx total %d"
+>  source_return_path_thread_bad_end(void) ""
+>  source_return_path_thread_end(void) ""
+>  source_return_path_thread_entry(void) ""
+> @@ -267,6 +268,7 @@ postcopy_ram_incoming_cleanup_blocktime(uint64_t total) "total blocktime %" PRIu
+>  postcopy_request_shared_page(const char *sharer, const char *rb, uint64_t rb_offset) "for %s in %s offset 0x%"PRIx64
+>  postcopy_request_shared_page_present(const char *sharer, const char *rb, uint64_t rb_offset) "%s already %s offset 0x%"PRIx64
+>  postcopy_wake_shared(uint64_t client_addr, const char *rb) "at 0x%"PRIx64" in %s"
+> +postcopy_page_req_del(uint64_t addr, int count) "resolved page req 0x%lx total %d"
+>  
+>  get_mem_fault_cpu_index(int cpu, uint32_t pid) "cpu: %d, pid: %u"
+>  
+> -- 
+> 2.26.2
+> 
 -- 
-2.26.2
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
