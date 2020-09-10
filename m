@@ -2,70 +2,81 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,
-	DATE_IN_FUTURE_06_12,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBBD5C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 06:15:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 500BDC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 06:21:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29A1E206D4
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 06:15:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29A1E206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 64F88207EA
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 06:21:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64F88207EA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54450 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGFrn-0008DA-5w
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 02:15:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51162)
+	id 1kGFxJ-0002Dr-8P
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 02:21:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52454)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jin.yu@intel.com>) id 1kGFrD-0007lX-0K
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 02:14:55 -0400
-Received: from mga06.intel.com ([134.134.136.31]:1173)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jin.yu@intel.com>) id 1kGFr9-0004bF-Tm
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 02:14:54 -0400
-IronPort-SDR: BlgkQLSe2wEwYAkB4vsoJAx4Tj2o4jijndEvAYRv+3Nb/yyRXPmpEvJLbuZ7aI8hLLw66r2uCy
- JSKKUfXfXpKA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9739"; a="220034573"
-X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="220034573"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 09 Sep 2020 23:14:45 -0700
-IronPort-SDR: BTC/yktDs7aoQ/3SEde8007XchjckOVetglJhnMLk2oS5rGrt2HV+t/044qWt+NHc2Yy2FxsHy
- /vGpBxncqu9A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="505724534"
-Received: from storage36.sh.intel.com ([10.67.111.10])
- by fmsmga005.fm.intel.com with ESMTP; 09 Sep 2020 23:14:43 -0700
-From: Jin Yu <jin.yu@intel.com>
-To: mst@redhat.com, raphael.norwitz@nutanix.com, kwolf@redhat.com,
- mreitz@redhat.com
-Subject: [PATCH] vhost-blk: set features before setting inflight feature
-Date: Thu, 10 Sep 2020 21:48:51 +0800
-Message-Id: <20200910134851.7817-1-jin.yu@intel.com>
-X-Mailer: git-send-email 2.17.2
-Received-SPF: pass client-ip=134.134.136.31; envelope-from=jin.yu@intel.com;
- helo=mga06.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 02:14:45
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -22
-X-Spam_score: -2.3
-X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DATE_IN_FUTURE_06_12=1.947,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kGFwm-0001oV-Bf
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 02:20:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55866)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kGFwk-0005OE-Df
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 02:20:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kGFwi-0006an-Li
+ for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 06:20:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id A31C42E80E7
+ for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 06:20:36 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 10 Sep 2020 06:10:39 -0000
+From: Laurent Vivier <1895053@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: laurent-vivier petunia2000
+X-Launchpad-Bug-Reporter: Petunia (petunia2000)
+X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
+References: <159968542073.11462.1191604929312152807.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159971824000.18435.11692238543911113727.launchpad@soybean.canonical.com>
+Subject: [Bug 1895053] Re: Cannot nspawn raspbian 10 [FAILED] Failed to start
+ Journal Service.
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="90a5703803d95539bdb5c0b289b1675630569e1e"; Instance="production"
+X-Launchpad-Hash: dc14ecfd469543b443d564222eb0ce8522324b8f
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 02:20:37
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -74,80 +85,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jin Yu <jin.yu@intel.com>, qemu-devel@nongnu.org
+Reply-To: Bug 1895053 <1895053@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Virtqueue has split and packed, so before setting inflight,
-you need to inform the back-end virtqueue format.
+** Tags added: linux-user
 
-Signed-off-by: Jin Yu <jin.yu@intel.com>
----
- hw/block/vhost-user-blk.c |  6 ++++++
- hw/virtio/vhost.c         | 18 ++++++++++++++++++
- include/hw/virtio/vhost.h |  1 +
- 3 files changed, 25 insertions(+)
+-- =
 
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index 39aec42dae..9e0e9ebec0 100644
---- a/hw/block/vhost-user-blk.c
-+++ b/hw/block/vhost-user-blk.c
-@@ -131,6 +131,12 @@ static int vhost_user_blk_start(VirtIODevice *vdev)
- 
-     s->dev.acked_features = vdev->guest_features;
- 
-+    ret = vhost_dev_prepare_inflight(&s->dev);
-+    if (ret < 0) {
-+        error_report("Error set inflight format: %d", -ret);
-+        goto err_guest_notifiers;
-+    }
-+
-     if (!s->inflight->addr) {
-         ret = vhost_dev_get_inflight(&s->dev, s->queue_size, s->inflight);
-         if (ret < 0) {
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 1a1384e7a6..4027c11886 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -1616,6 +1616,24 @@ int vhost_dev_load_inflight(struct vhost_inflight *inflight, QEMUFile *f)
-     return 0;
- }
- 
-+int vhost_dev_prepare_inflight(struct vhost_dev *hdev)
-+{
-+    int r;
-+ 
-+    if (hdev->vhost_ops->vhost_get_inflight_fd == NULL ||
-+        hdev->vhost_ops->vhost_set_inflight_fd == NULL) {
-+        return 0;
-+    }
-+ 
-+    r = vhost_dev_set_features(hdev, hdev->log_enabled);
-+    if (r < 0) {
-+        VHOST_OPS_DEBUG("vhost_dev_prepare_inflight failed");
-+        return r;
-+    }
-+
-+    return 0;
-+}
-+
- int vhost_dev_set_inflight(struct vhost_dev *dev,
-                            struct vhost_inflight *inflight)
- {
-diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
-index 767a95ec0b..4e2fc75528 100644
---- a/include/hw/virtio/vhost.h
-+++ b/include/hw/virtio/vhost.h
-@@ -140,6 +140,7 @@ void vhost_dev_reset_inflight(struct vhost_inflight *inflight);
- void vhost_dev_free_inflight(struct vhost_inflight *inflight);
- void vhost_dev_save_inflight(struct vhost_inflight *inflight, QEMUFile *f);
- int vhost_dev_load_inflight(struct vhost_inflight *inflight, QEMUFile *f);
-+int vhost_dev_prepare_inflight(struct vhost_dev *hdev);
- int vhost_dev_set_inflight(struct vhost_dev *dev,
-                            struct vhost_inflight *inflight);
- int vhost_dev_get_inflight(struct vhost_dev *dev, uint16_t queue_size,
--- 
-2.17.2
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1895053
 
+Title:
+  Cannot nspawn raspbian 10 [FAILED] Failed to start Journal Service.
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi, I'm using nspawn and asked the question @systemd-devel. They redirect=
+ed me to you, guessing that nspawn calls a syscall or ioctl qemu isnt aware=
+ of and can't implement properly?
+  They were like: "Sorry, that's not my department." ^^
+
+  Maybe you can reproduce the issue or help me investigating whats wrong
+  or put the ball right back into their court? :D
+
+  Testscript:
+  wget https://downloads.raspberrypi.org/raspios_lite_armhf_latest -o r.zip
+  unzip r.zip
+  LOOP=3D$(losetup --show -Pf *raspios-buster-armhf-lite.img)
+  mount ${LOOP}p2 /mnt
+  mount ${LOOP}p1 /mnt/boot
+  systemd-nspawn --bind /usr/bin/qemu-arm-static --boot --directory=3D/mnt =
+-- systemd.log_level=3Ddebug
+
+  Output:
+  see attachment
+
+  System:
+  uname -a
+  Linux MArch 5.8.7-arch1-1 #1 SMP PREEMPT Sat, 05 Sep 2020 12:31:32 +0000
+  x86_64 GNU/Linux
+
+  qemu-arm-static --version
+  qemu-arm version 5.1.0
+
+  systemd-nspawn --version
+  systemd 246 (246.4-1-arch)
+  +PAM +AUDIT -SELINUX -IMA -APPARMOR +SMACK -SYSVINIT +UTMP +LIBCRYPTSETUP
+  +GCRYPT +GNUTLS +ACL +XZ +LZ4 +ZSTD +SECCOMP +BLKID +ELFUTILS +KMOD +IDN2=
+ -IDN
+  +PCRE2 default-hierarchy=3Dhybrid
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1895053/+subscriptions
 
