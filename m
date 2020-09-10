@@ -7,78 +7,75 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCC76C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:22:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 629B4C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:22:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B8722076C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:22:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AFB74207EA
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:22:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="n4G/bSZr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B8722076C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="dw+MndgC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFB74207EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGRD9-00065X-0Z
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 14:22:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57250)
+	id 1kGRDb-00073U-FR
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 14:22:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56998)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=515d47f05=alistair.francis@wdc.com>)
- id 1kGRBd-0004Be-CW
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:20:45 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:28245)
+ id 1kGRBK-0003ed-Ak; Thu, 10 Sep 2020 14:20:26 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:28254)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=515d47f05=alistair.francis@wdc.com>)
- id 1kGRBb-0002iJ-5Q
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:20:44 -0400
+ id 1kGRBH-0002kZ-R0; Thu, 10 Sep 2020 14:20:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1599762042; x=1631298042;
+ t=1599762023; x=1631298023;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=X+EkLTge760E+RaPCXwiMO6C6k1oJWh6jTaQjwKLj7g=;
- b=n4G/bSZrYsd3Y/A7lJk1yVo7EykEgm15LpFx+ctVBlEmFmbTqgRGFrwl
- bVkDg2X+KJqfK7DmbJWoLeyfkO53jHHt9V+4o/o3I0/FdHZ88EfI3Axcy
- XcduLpbrubqU/FyLWv9uqaWejEGVxu3YS5xkDn6oEosWip1gAI9NardOM
- rBkOgn3yeU4fuMAYIFhtyXSDqy+rU1CTQOwCuaxBbDw+RW2r+vUH40yJw
- JK7ABZoRqtEqXpPP72h/seOmai4r8QB/7c9NDINGS6GT8mltvZaXXqq6/
- izZYtI4fFEEw8K58bGOYDb/Uc0+AbsLgOdLwI8dU4VsDo2iD8bLXD427G g==;
-IronPort-SDR: /duqkYYr9twEa3AjHGR1sv+IdAg16zyju0M1WtpHEE+X4EkgOhPrkR3nFzPib9TLA7WxSPE3xB
- WyRjba/U/L5HvuDlcNW4Sx22jKL5IlDgq/KntTuBdrSyUW0k2yzKQ0Vn1bjz7OM0RpNhjYTkX6
- BdM65mDgvVrc3+f11BqZ71Y+qK3zgb1yzNjNIGvsI/qL7W/HWWrQm/qmZqM7JH+pK+kFvW9vdY
- 23IQ5vsVGDLQITGo5RSX05ihA9HV01dltyDrRm9RVYe2kpOqY6IF95oM830qhXEVg6cBnZhVsW
- 8ow=
-X-IronPort-AV: E=Sophos;i="5.76,413,1592841600"; d="scan'208";a="146979231"
+ bh=KB3dWLk2WQBSmIbfJFgcXf3TDb7sLydLaxLIXsEB1Bo=;
+ b=dw+MndgCNvEo1cB+1GmVs00HUgFyyv5kc5ijT9NHBc/WWWgediIcv/VE
+ UDxE2GW65rrlantaqxP1MY17NKakbeZ6i8dDxJT8xb7ljiT6JWpKeLRC1
+ zld2MFVWqhGKVXGiOn3sXmjSxi6w+x3BolZW7ssrCKPPIiJoRFh23jLkW
+ aTsRGvzCkos2SfZu4T9/EsE/Ks2nHsxt9o1OZIZ2iFrOfjbrAgBtX4b1f
+ xteHEK1S2/csELkt+aZqNMsOkksjug+GByulKT0O42bRsSml0Ty7RAIQe
+ UTLnfJtQIsqreYQMq1Rc98wUJzYT9oc0dXt2xsNJfOFSX0z0EgmnyxZXm Q==;
+IronPort-SDR: BqeGeAppZrm0Dr2Ig0RYZT6wyz4WUk4VCbdgAS6v75wDfo+ftvSWty1//OHz6TmVi5DgvCkgO7
+ YNjrkeuYYcUS3zH1RV6RXnspZw2F0UU8hiCMg9xzuSk38RL49ch3nC5DCELtjXOzUeAQ34gBBA
+ w92IXjDQscWoCg51X/eL2bLtOYJi5QKXXU5c+wUWUZFxTdNLICvucAK3GXo5vfeqrLIDmKfoTR
+ m1EmQ5ByDG2rG9R4ebfxSN5LcKJPK9JMbwS1KLQTmMbZgnKazK0JAF5/yNjiC1J8NOO/3VUeHT
+ Soo=
+X-IronPort-AV: E=Sophos;i="5.76,413,1592841600"; d="scan'208";a="146979204"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 11 Sep 2020 02:20:18 +0800
-IronPort-SDR: OAygfP0Eyx339KpVQKiaLMGea58xaNDfYVNw5/6OCTseZ88KbZTCgD+DCoGxyu05fcCEfgBDpg
- YXHW5jBU8hXw==
+ by ob1.hgst.iphmx.com with ESMTP; 11 Sep 2020 02:20:14 +0800
+IronPort-SDR: c0ADv9N1XqY5NRYGiQEQbjsC04XV0GwK2zMKQbLPwRdBizLjeNZk3PsBERh8JNk5cBEUaylxjK
+ zTncfUcSW6uQ==
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 10 Sep 2020 11:07:35 -0700
-IronPort-SDR: VqDL/9PMDiUi/0HXZv6BcVzuDw6DFmZVkkm7Im9LnaAA+quezsPYOOO+DkZEmStkD9X/iUFSt9
- LJk8flnGNLhg==
+ 10 Sep 2020 11:07:31 -0700
+IronPort-SDR: jpES+eWP0NDgFF7j+sACicub7+b+v1O+hfee4qgfvwLUnpAQSgfPdk+ZHXip4YsuKY/VKdJsVX
+ ZTNAa4L4L8Dw==
 WDCIronportException: Internal
 Received: from fwvkpc2.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.59.152])
- by uls-op-cesaip01.wdc.com with ESMTP; 10 Sep 2020 11:20:18 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 10 Sep 2020 11:20:14 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL 13/30] hw/net: cadence_gem: Add a new 'phy-addr' property
-Date: Thu, 10 Sep 2020 11:09:21 -0700
-Message-Id: <20200910180938.584205-14-alistair.francis@wdc.com>
+Subject: [PULL 02/30] riscv: sifive_test: Allow 16-bit writes to memory region
+Date: Thu, 10 Sep 2020 11:09:10 -0700
+Message-Id: <20200910180938.584205-3-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200910180938.584205-1-alistair.francis@wdc.com>
 References: <20200910180938.584205-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=216.71.154.42;
  envelope-from=prvs=515d47f05=alistair.francis@wdc.com;
@@ -104,74 +101,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, alistair23@gmail.com,
- Bin Meng <bin.meng@windriver.com>, Alistair Francis <alistair.francis@wdc.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: alistair23@gmail.com, Nathan Chancellor <natechancellor@gmail.com>,
+ Alistair Francis <alistair.francis@wdc.com>, qemu-stable@nongnu.org,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Bin Meng <bin.meng@windriver.com>
+From: Nathan Chancellor <natechancellor@gmail.com>
 
-At present the PHY address of the PHY connected to GEM is hard-coded
-to either 23 (BOARD_PHY_ADDRESS) or 0. This might not be the case for
-all boards. Add a new 'phy-addr' property so that board can specify
-the PHY address for each GEM instance.
+When shutting down the machine running a mainline Linux kernel, the
+following error happens:
 
-Signed-off-by: Bin Meng <bin.meng@windriver.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+$ build/riscv64-softmmu/qemu-system-riscv64 -bios default -M virt \
+    -display none -initrd rootfs.cpio -kernel Image -m 512m \
+    -nodefaults -serial mon:stdio
+...
+Requesting system poweroff
+[    4.999630] reboot: Power down
+sbi_trap_error: hart0: trap handler failed (error -2)
+sbi_trap_error: hart0: mcause=0x0000000000000007 mtval=0x0000000000100000
+sbi_trap_error: hart0: mepc=0x000000008000d4cc mstatus=0x0000000000001822
+sbi_trap_error: hart0: ra=0x000000008000999e sp=0x0000000080015c78
+sbi_trap_error: hart0: gp=0xffffffe000e76610 tp=0xffffffe0081b89c0
+sbi_trap_error: hart0: s0=0x0000000080015c88 s1=0x0000000000000040
+sbi_trap_error: hart0: a0=0x0000000000000000 a1=0x0000000080004024
+sbi_trap_error: hart0: a2=0x0000000080004024 a3=0x0000000080004024
+sbi_trap_error: hart0: a4=0x0000000000100000 a5=0x0000000000005555
+sbi_trap_error: hart0: a6=0x0000000000004024 a7=0x0000000080011158
+sbi_trap_error: hart0: s2=0x0000000000000000 s3=0x0000000080016000
+sbi_trap_error: hart0: s4=0x0000000000000000 s5=0x0000000000000000
+sbi_trap_error: hart0: s6=0x0000000000000001 s7=0x0000000000000000
+sbi_trap_error: hart0: s8=0x0000000000000000 s9=0x0000000000000000
+sbi_trap_error: hart0: s10=0x0000000000000000 s11=0x0000000000000008
+sbi_trap_error: hart0: t0=0x0000000000000000 t1=0x0000000000000000
+sbi_trap_error: hart0: t2=0x0000000000000000 t3=0x0000000000000000
+sbi_trap_error: hart0: t4=0x0000000000000000 t5=0x0000000000000000
+sbi_trap_error: hart0: t6=0x0000000000000000
+
+The kernel does a 16-bit write when powering off the machine, which
+was allowed before commit 5d971f9e67 ("memory: Revert "memory: accept
+mismatching sizes in memory_region_access_valid""). Make min_access_size
+match reality so that the machine can shut down properly now.
+
+Cc: qemu-stable@nongnu.org
+Fixes: 88a07990fa ("SiFive RISC-V Test Finisher")
+Fixes: 5d971f9e67 ("memory: Revert "memory: accept mismatching sizes in memory_region_access_valid"")
+Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-Id: <1598924352-89526-12-git-send-email-bmeng.cn@gmail.com>
+Message-Id: <20200901055822.2721209-1-natechancellor@gmail.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- include/hw/net/cadence_gem.h | 2 ++
- hw/net/cadence_gem.c         | 5 +++--
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ hw/riscv/sifive_test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/hw/net/cadence_gem.h b/include/hw/net/cadence_gem.h
-index 54e646ff79..01c6189a24 100644
---- a/include/hw/net/cadence_gem.h
-+++ b/include/hw/net/cadence_gem.h
-@@ -73,6 +73,8 @@ typedef struct CadenceGEMState {
-     /* Mask of register bits which are write 1 to clear */
-     uint32_t regs_w1c[CADENCE_GEM_MAXREG];
- 
-+    /* PHY address */
-+    uint8_t phy_addr;
-     /* PHY registers backing store */
-     uint16_t phy_regs[32];
- 
-diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-index a93b5c07ce..d80096bbe8 100644
---- a/hw/net/cadence_gem.c
-+++ b/hw/net/cadence_gem.c
-@@ -1446,7 +1446,7 @@ static uint64_t gem_read(void *opaque, hwaddr offset, unsigned size)
-             uint32_t phy_addr, reg_num;
- 
-             phy_addr = (retval & GEM_PHYMNTNC_ADDR) >> GEM_PHYMNTNC_ADDR_SHFT;
--            if (phy_addr == BOARD_PHY_ADDRESS || phy_addr == 0) {
-+            if (phy_addr == s->phy_addr || phy_addr == 0) {
-                 reg_num = (retval & GEM_PHYMNTNC_REG) >> GEM_PHYMNTNC_REG_SHIFT;
-                 retval &= 0xFFFF0000;
-                 retval |= gem_phy_read(s, reg_num);
-@@ -1569,7 +1569,7 @@ static void gem_write(void *opaque, hwaddr offset, uint64_t val,
-             uint32_t phy_addr, reg_num;
- 
-             phy_addr = (val & GEM_PHYMNTNC_ADDR) >> GEM_PHYMNTNC_ADDR_SHFT;
--            if (phy_addr == BOARD_PHY_ADDRESS || phy_addr == 0) {
-+            if (phy_addr == s->phy_addr || phy_addr == 0) {
-                 reg_num = (val & GEM_PHYMNTNC_REG) >> GEM_PHYMNTNC_REG_SHIFT;
-                 gem_phy_write(s, reg_num, val);
-             }
-@@ -1682,6 +1682,7 @@ static Property gem_properties[] = {
-     DEFINE_NIC_PROPERTIES(CadenceGEMState, conf),
-     DEFINE_PROP_UINT32("revision", CadenceGEMState, revision,
-                        GEM_MODID_VALUE),
-+    DEFINE_PROP_UINT8("phy-addr", CadenceGEMState, phy_addr, BOARD_PHY_ADDRESS),
-     DEFINE_PROP_UINT8("num-priority-queues", CadenceGEMState,
-                       num_priority_queues, 1),
-     DEFINE_PROP_UINT8("num-type1-screeners", CadenceGEMState,
+diff --git a/hw/riscv/sifive_test.c b/hw/riscv/sifive_test.c
+index 0c78fb2c93..8c70dd69df 100644
+--- a/hw/riscv/sifive_test.c
++++ b/hw/riscv/sifive_test.c
+@@ -59,7 +59,7 @@ static const MemoryRegionOps sifive_test_ops = {
+     .write = sifive_test_write,
+     .endianness = DEVICE_NATIVE_ENDIAN,
+     .valid = {
+-        .min_access_size = 4,
++        .min_access_size = 2,
+         .max_access_size = 4
+     }
+ };
 -- 
 2.28.0
 
