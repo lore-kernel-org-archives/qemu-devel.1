@@ -2,60 +2,90 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25F97C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 20:17:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D566C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 20:34:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D43020829
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 20:17:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D43020829
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kamp.de
+	by mail.kernel.org (Postfix) with ESMTPS id B1098206E9
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 20:34:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AUbfBMYh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1098206E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGT0X-0000rT-Lc
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 16:17:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60178)
+	id 1kGTGc-0003uD-HZ
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 16:34:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35398)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pl@kamp.de>)
- id 1kGSzq-0000Fu-UF; Thu, 10 Sep 2020 16:16:42 -0400
-Received: from kerio.kamp.de ([195.62.97.192]:41169)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pl@kamp.de>)
- id 1kGSzn-00040t-UJ; Thu, 10 Sep 2020 16:16:42 -0400
-X-Footer: a2FtcC5kZQ==
-Received: from [172.20.250.33] ([172.20.250.33])
- (authenticated user pl@kamp.de) by kerio.kamp.de with ESMTPSA
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits));
- Thu, 10 Sep 2020 22:16:26 +0200
-From: Peter Lieven <pl@kamp.de>
-Message-Id: <90DDF8F4-4AC0-42E8-85DA-4CC38C066F45@kamp.de>
-Content-Type: multipart/alternative;
- boundary="Apple-Mail=_7AB19365-29EE-47F1-BD4E-4240272F41A4"
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
-Subject: Re: [PATCH v7 03/25] block: Fixes nfs compiling error on msys2/mingw
-Date: Thu, 10 Sep 2020 22:16:27 +0200
-In-Reply-To: <20200910103059.987-4-luoyonggang@gmail.com>
-To: Yonggang Luo <luoyonggang@gmail.com>
-References: <20200910103059.987-1-luoyonggang@gmail.com>
- <20200910103059.987-4-luoyonggang@gmail.com>
-X-Mailer: Apple Mail (2.3608.120.23.2.1)
-Received-SPF: pass client-ip=195.62.97.192; envelope-from=pl@kamp.de;
- helo=kerio.kamp.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 16:03:26
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kGTG1-0003Hk-9m
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 16:33:25 -0400
+Received: from mail-ej1-x630.google.com ([2a00:1450:4864:20::630]:43483)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kGTFz-00064J-D1
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 16:33:24 -0400
+Received: by mail-ej1-x630.google.com with SMTP id o8so10658843ejb.10
+ for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 13:33:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=756uFswCWvT28CT6c6OZFSD181Q6rr/qdR8Xu8qm6ZA=;
+ b=AUbfBMYh49ooAVL/Lo+BgRLaSpOB6H0OSLuF+A9m4O0VIicDw0SsZvJzZQstMfBjse
+ Z/FOiheH5MWMO+GHuAFpJUkKcINbDiURq8TdMNKcbhpYT6+mzLn/c3ZC16MRKWfTfBfk
+ 1ZOxWAPmLWj/azjQ/IqS3bBPokzSFzmw/JQadcyA8fF5Fn6f1dR6adrdMD8ZvCcJphQk
+ RUl3dUJqxeXbgZHY7Hy+ICATpXkQrrJ1NxP29Psi3QfwJsbkmTIVPRh49HYLSnvTv4DP
+ bBlH34osqIG1Rw+Cj6xou9Yh14MEiTFwaNpMzi4K9DuT/iQVIRdPs/bPfVuk+amq13MB
+ rH3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=756uFswCWvT28CT6c6OZFSD181Q6rr/qdR8Xu8qm6ZA=;
+ b=cqNKLEpILtvVpZ04JzBu0SfDSXQEpWlUkn3MWy+p0DkvjjVnMauX5i5cS40l0lwy91
+ M4cKt9N3mDixj4w2LbV26i/+GnFzZNqhr3EClniY/IqLaNKDsizutsJa4/4TzkPVo+Gq
+ P+D92YEvQg9PrTXhYv/DfYV2IbRNY5omfpvzpxiGy/gcla90rDyY54SoUn9b8H2PltZ3
+ ZZ96KFnJwVS/CfQibebSxd3D/gBDRG6Pc3b+jsYmO03TVG0qQHFq4J/Rmd7K5Q9/9idl
+ edaHzKxRWs3Sq0dJiux+H9IxBWGry0qv+R1E8Wvebzu4aa2F6C73V1kVrc/t0iClwR79
+ KFbw==
+X-Gm-Message-State: AOAM531YSd9orfUzYP+zv9F+7oVdkSAhB3oHKMZT67I0WTQJ5ysDlro3
+ hJj+DerpABEwnD/y8D2djCpRihyGKNM3dBp5supBGg==
+X-Google-Smtp-Source: ABdhPJxWSdCYbamgDA+JZD02Hl55/CJ8D7y8uOlVGlWr1XM09WSO/Db880WNSZSudvFOyCDlkUBo72FxvxE2WuGSpm8=
+X-Received: by 2002:a17:906:d936:: with SMTP id
+ rn22mr10812323ejb.4.1599770001755; 
+ Thu, 10 Sep 2020 13:33:21 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200910131504.11341-1-alex.bennee@linaro.org>
+ <20200910131504.11341-7-alex.bennee@linaro.org>
+In-Reply-To: <20200910131504.11341-7-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 10 Sep 2020 21:33:10 +0100
+Message-ID: <CAFEAcA9E6sGNGn6aYy8DxCVZDYeot9EjRvKLEQ2CzAxUkGyBzg@mail.gmail.com>
+Subject: Re: [PULL 06/10] configure: don't enable ppc64abi32-linux-user by
+ default
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::630;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x630.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -68,778 +98,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu block <qemu-block@nongnu.org>,
- Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>,
- Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, 10 Sep 2020 at 14:15, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+> The user can still enable this explicitly but they will get a warning
+> at the end of configure for their troubles. This also drops any builds
+> of ppc64abi32 from our CI tests.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Message-Id: <20200909112742.25730-7-alex.bennee@linaro.org>
 
---Apple-Mail=_7AB19365-29EE-47F1-BD4E-4240272F41A4
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
+I know this is in a pullreq at this point, but I just got round
+to looking at it, and it has some odd logic in it so I figured
+I'd give my review comments anyway.
 
+> +if test -z "$target_list_exclude" -a -z "$target_list"; then
+> +    # if the user doesn't specify anything lets skip deprecating stuff
+> +    target_list_exclude=3Dppc64abi32-linux-user
 
+Doesn't this have the slightly curious logic
+that if we have more than one deprecated target then
+configure with --target-list-exclude=3Dsomething-else
+will actually build more targets than configure without that
+exclude option (because it will exclude the something-else
+but stop excluding the deprecated targets)? I would have
+expected the deprecated targets to be not compiled unless
+the user explicitly enabled them. I think that would be
+something more like
 
-> Am 10.09.2020 um 12:30 schrieb Yonggang Luo <luoyonggang@gmail.com>:
->=20
-> These compiling errors are fixed:
-> ../block/nfs.c:27:10: fatal error: poll.h: No such file or directory
->   27 | #include <poll.h>
->      |          ^~~~~~~~
-> compilation terminated.
->=20
-> ../block/nfs.c:63:5: error: unknown type name 'blkcnt_t'
->   63 |     blkcnt_t st_blocks;
->      |     ^~~~~~~~
-> ../block/nfs.c: In function 'nfs_client_open':
-> ../block/nfs.c:550:27: error: 'struct _stat64' has no member named =
-'st_blocks'
->  550 |     client->st_blocks =3D st.st_blocks;
->      |                           ^
-> ../block/nfs.c: In function 'nfs_get_allocated_file_size':
-> ../block/nfs.c:751:41: error: 'struct _stat64' has no member named =
-'st_blocks'
->  751 |     return (task.ret < 0 ? task.ret : st.st_blocks * 512);
->      |                                         ^
-> ../block/nfs.c: In function 'nfs_reopen_prepare':
-> ../block/nfs.c:805:31: error: 'struct _stat64' has no member named =
-'st_blocks'
->  805 |         client->st_blocks =3D st.st_blocks;
->      |                               ^
-> ../block/nfs.c: In function 'nfs_get_allocated_file_size':
-> ../block/nfs.c:752:1: error: control reaches end of non-void function =
-[-Werror=3Dreturn-type]
->  752 | }
->      | ^
->=20
-> On msys2/mingw, there is no st_blocks in struct _stat64, so we use =
-consistence st_size instead.
->=20
-> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> ---
-> block/nfs.c | 32 +++++++++++++++++++++++++-------
-> 1 file changed, 25 insertions(+), 7 deletions(-)
->=20
-> diff --git a/block/nfs.c b/block/nfs.c
-> index 61a249a9fc..db6d8c2d2b 100644
-> --- a/block/nfs.c
-> +++ b/block/nfs.c
-> @@ -24,7 +24,9 @@
->=20
-> #include "qemu/osdep.h"
->=20
-> +#if !defined(_WIN32)
-> #include <poll.h>
-> +#endif
-> #include "qemu/config-file.h"
-> #include "qemu/error-report.h"
-> #include "qapi/error.h"
-> @@ -51,6 +53,13 @@
-> #define QEMU_NFS_MAX_PAGECACHE_SIZE (8388608 / NFS_BLKSIZE)
-> #define QEMU_NFS_MAX_DEBUG_LEVEL 2
->=20
-> +#if defined (_WIN32)
-> +#define nfs_stat __stat64
-> +typedef long long blkcnt_t;
-> +#else
-> +#define nfs_stat stat
-> +#endif
+   deprecated_targets_list=3Dppc64abi32-linux-user
+   if test -z "$target_list"; then
+       target_list_exclude=3D"$target_list_exclude,$deprecated_targets_list=
+"
+   fi
+
+I suppose we would ideally like an "enable all including
+the deprecated stuff", and that gets messy because there's
+no way to do it except listing everything explicitly I think...
+
+> +fi
 > +
-> typedef struct NFSClient {
->     struct nfs_context *context;
->     struct nfsfh *fh;
-> @@ -70,7 +79,7 @@ typedef struct NFSRPC {
->     int ret;
->     int complete;
->     QEMUIOVector *iov;
-> -    struct stat *st;
-> +    struct nfs_stat *st;
->     Coroutine *co;
->     NFSClient *client;
-> } NFSRPC;
-> @@ -415,11 +424,20 @@ static void nfs_file_close(BlockDriverState *bs)
->     nfs_client_close(client);
-> }
->=20
-> +static blkcnt_t nfs_get_st_blocks(const struct nfs_stat *st)
-> +{
-> +#if defined(_WIN32)
-> +    return (st->st_size + 511) / 512;
-> +#else
-> +    return st->st_blocks;
-> +#endif
-> +}
+> +exclude_list=3D$(echo "$target_list_exclude" | sed -e 's/,/ /g')
+> +for config in $mak_wilds; do
+> +    target=3D"$(basename "$config" .mak)"
+> +    exclude=3D"no"
+> +    for excl in $exclude_list; do
+> +        if test "$excl" =3D "$target"; then
+> +            exclude=3D"yes"
+> +            break;
+>          fi
+>      done
+> -fi
+> +    if test "$exclude" =3D "no"; then
+> +        default_target_list=3D"${default_target_list} $target"
+> +    fi
+> +done
+>
+>  # Enumerate public trace backends for --help output
+>  trace_backend_list=3D$(echo $(grep -le '^PUBLIC =3D True$' "$source_path=
+"/scripts/tracetool/backend/*.py | sed -e 's/^.*\/\(.*\)\.py$/\1/'))
+> @@ -7557,7 +7558,7 @@ TARGET_SYSTBL=3D""
+>  case "$target_name" in
+>    i386)
+>      mttcg=3D"yes"
+> -       gdb_xml_files=3D"i386-32bit.xml"
+> +    gdb_xml_files=3D"i386-32bit.xml"
+>      TARGET_SYSTBL_ABI=3Di386
+>      TARGET_SYSTBL=3Dsyscall_32.tbl
+>    ;;
+
+(unrelated change ;-))
+
+> @@ -7667,6 +7668,7 @@ case "$target_name" in
+>      TARGET_SYSTBL_ABI=3Dcommon,nospu,32
+>      echo "TARGET_ABI32=3Dy" >> $config_target_mak
+>      gdb_xml_files=3D"power64-core.xml power-fpu.xml power-altivec.xml po=
+wer-spe.xml power-vsx.xml"
+> +    deprecated_features=3D"ppc64abi32 ${deprecated_features}"
+
+Maybe prefer
+    add_to deprecated_features ppc64abi32
+
+?
+
+>    ;;
+>    riscv32)
+>      TARGET_BASE_ARCH=3Driscv
+
+If we just made the deprecation warning be printed by
+generic logic whenever a deprecated target ended up in
+the enabled list then it would be easier to add other deprecated
+targets to the list, as you wouldn't thae also have to find some
+other part of configure like this to set a deprecated_features variable.
+
+(I'll send a patch to add lm32-softmmu,tilegx-linux-user,unicore32-softmmu
+to the deprecated-target list later once we have the mechanism in place.)
+
+> @@ -8011,6 +8013,12 @@ fi
+>  touch ninjatool.stamp
+>  fi
+>
+> +if test -n "${deprecated_features}"; then
+> +    echo "Warning, deprecated features enabled."
+> +    echo "Please see docs/system/deprecated.rst"
+> +    echo "  features: ${deprecated_features}"
+> +fi
 > +
-> static int64_t nfs_client_open(NFSClient *client, BlockdevOptionsNfs =
-*opts,
->                                int flags, int open_flags, Error =
-**errp)
-> {
->     int64_t ret =3D -EINVAL;
-> -    struct stat st;
-> +    struct nfs_stat st;
->     char *file =3D NULL, *strp =3D NULL;
->=20
->     qemu_mutex_init(&client->mutex);
-> @@ -545,7 +563,7 @@ static int64_t nfs_client_open(NFSClient *client, =
-BlockdevOptionsNfs *opts,
->     }
->=20
->     ret =3D DIV_ROUND_UP(st.st_size, BDRV_SECTOR_SIZE);
-> -    client->st_blocks =3D st.st_blocks;
-> +    client->st_blocks =3D nfs_get_st_blocks(&st);
->     client->has_zero_init =3D S_ISREG(st.st_mode);
->     *strp =3D '/';
->     goto out;
-> @@ -729,7 +747,7 @@ static int64_t =
-nfs_get_allocated_file_size(BlockDriverState *bs)
-> {
->     NFSClient *client =3D bs->opaque;
->     NFSRPC task =3D {0};
-> -    struct stat st;
-> +    struct nfs_stat st;
->=20
->     if (bdrv_is_read_only(bs) &&
->         !(bs->open_flags & BDRV_O_NOCACHE)) {
-> @@ -746,7 +764,7 @@ static int64_t =
-nfs_get_allocated_file_size(BlockDriverState *bs)
->     nfs_set_events(client);
->     BDRV_POLL_WHILE(bs, !task.complete);
->=20
-> -    return (task.ret < 0 ? task.ret : st.st_blocks * 512);
-> +    return (task.ret < 0 ? task.ret : nfs_get_st_blocks(&st) * 512);
-> }
->=20
-> static int coroutine_fn
-> @@ -778,7 +796,7 @@ static int nfs_reopen_prepare(BDRVReopenState =
-*state,
->                               BlockReopenQueue *queue, Error **errp)
-> {
->     NFSClient *client =3D state->bs->opaque;
-> -    struct stat st;
-> +    struct nfs_stat st;
->     int ret =3D 0;
->=20
->     if (state->flags & BDRV_O_RDWR && bdrv_is_read_only(state->bs)) {
-> @@ -800,7 +818,7 @@ static int nfs_reopen_prepare(BDRVReopenState =
-*state,
->                        nfs_get_error(client->context));
->             return ret;
->         }
-> -        client->st_blocks =3D st.st_blocks;
-> +        client->st_blocks =3D nfs_get_st_blocks(&st);
->     }
->=20
->     return 0;
-> --=20
-> 2.28.0.windows.1
+>  # Save the configure command line for later reuse.
+>  cat <<EOD >config.status
+>  #!/bin/sh
+> --
 
-
-You still implement nfs_get_allocated_file_size without actually =
-returning the allocated file size on WIN32.=20
-I would simply do this:
-
-diff --git a/block/nfs.c b/block/nfs.c
-index 61a249a..0983143 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -24,7 +24,9 @@
-=20
- #include "qemu/osdep.h"
-=20
-+#if !defined(_WIN32)
- #include <poll.h>
-+#endif
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
-@@ -58,7 +60,9 @@ typedef struct NFSClient {
-     bool has_zero_init;
-     AioContext *aio_context;
-     QemuMutex mutex;
-+#if !defined(_WIN32)
-     blkcnt_t st_blocks;
-+#endif
-     bool cache_used;
-     NFSServer *server;
-     char *path;
-@@ -545,7 +549,9 @@ static int64_t nfs_client_open(NFSClient *client, =
-BlockdevOptionsNfs *opts,
-     }
-=20
-     ret =3D DIV_ROUND_UP(st.st_size, BDRV_SECTOR_SIZE);
-+#if !defined(_WIN32)
-     client->st_blocks =3D st.st_blocks;
-+#endif
-     client->has_zero_init =3D S_ISREG(st.st_mode);
-     *strp =3D '/';
-     goto out;
-@@ -706,6 +712,8 @@ static int nfs_has_zero_init(BlockDriverState *bs)
-     return client->has_zero_init;
- }
-=20
-+
-+#if !defined(_WIN32)
- /* Called (via nfs_service) with QemuMutex held.  */
- static void
- nfs_get_allocated_file_size_cb(int ret, struct nfs_context *nfs, void =
-*data,
-@@ -748,6 +756,7 @@ static int64_t =
-nfs_get_allocated_file_size(BlockDriverState *bs)
-=20
-     return (task.ret < 0 ? task.ret : st.st_blocks * 512);
- }
-+#endif
-=20
- static int coroutine_fn
- nfs_file_co_truncate(BlockDriverState *bs, int64_t offset, bool exact,
-@@ -792,6 +801,7 @@ static int nfs_reopen_prepare(BDRVReopenState =
-*state,
-         return -EINVAL;
-     }
-=20
-+#if !defined(_WIN32)
-     /* Update cache for read-only reopens */
-     if (!(state->flags & BDRV_O_RDWR)) {
-         ret =3D nfs_fstat(client->context, client->fh, &st);
-@@ -802,6 +812,7 @@ static int nfs_reopen_prepare(BDRVReopenState =
-*state,
-         }
-         client->st_blocks =3D st.st_blocks;
-     }
-+#endif
-=20
-     return 0;
- }
-@@ -869,7 +880,9 @@ static BlockDriver bdrv_nfs =3D {
-     .create_opts                    =3D &nfs_create_opts,
-=20
-     .bdrv_has_zero_init             =3D nfs_has_zero_init,
-+#if !defined(_WIN32)
-     .bdrv_get_allocated_file_size   =3D nfs_get_allocated_file_size,
-+#endif
-     .bdrv_co_truncate               =3D nfs_file_co_truncate,
-=20
-     .bdrv_file_open                 =3D nfs_file_open,
-
-
-Best,
-Peter
-
-
---Apple-Mail=_7AB19365-29EE-47F1-BD4E-4240272F41A4
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/html;
-	charset=us-ascii
-
-<html><head><meta http-equiv=3D"Content-Type" content=3D"text/html; =
-charset=3Dus-ascii"></head><body style=3D"word-wrap: break-word; =
--webkit-nbsp-mode: space; line-break: after-white-space;" class=3D""><br =
-class=3D""><div><br class=3D""><blockquote type=3D"cite" class=3D""><div =
-class=3D"">Am 10.09.2020 um 12:30 schrieb Yonggang Luo &lt;<a =
-href=3D"mailto:luoyonggang@gmail.com" =
-class=3D"">luoyonggang@gmail.com</a>&gt;:</div><br =
-class=3D"Apple-interchange-newline"><div class=3D""><div class=3D"">These =
-compiling errors are fixed:<br class=3D"">../block/nfs.c:27:10: fatal =
-error: poll.h: No such file or directory<br class=3D""> &nbsp;&nbsp;27 | =
-#include &lt;poll.h&gt;<br class=3D""> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| =
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^~~~~~~~<br =
-class=3D"">compilation terminated.<br class=3D""><br =
-class=3D"">../block/nfs.c:63:5: error: unknown type name 'blkcnt_t'<br =
-class=3D""> &nbsp;&nbsp;63 | &nbsp;&nbsp;&nbsp;&nbsp;blkcnt_t =
-st_blocks;<br class=3D""> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| =
-&nbsp;&nbsp;&nbsp;&nbsp;^~~~~~~~<br class=3D"">../block/nfs.c: In =
-function 'nfs_client_open':<br class=3D"">../block/nfs.c:550:27: error: =
-'struct _stat64' has no member named 'st_blocks'<br class=3D""> =
-&nbsp;550 | &nbsp;&nbsp;&nbsp;&nbsp;client-&gt;st_blocks =3D =
-st.st_blocks;<br class=3D""> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| =
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
-p;&nbsp;^<br class=3D"">../block/nfs.c: In function =
-'nfs_get_allocated_file_size':<br class=3D"">../block/nfs.c:751:41: =
-error: 'struct _stat64' has no member named 'st_blocks'<br class=3D""> =
-&nbsp;751 | &nbsp;&nbsp;&nbsp;&nbsp;return (task.ret &lt; 0 ? task.ret : =
-st.st_blocks * 512);<br class=3D""> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| =
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
-p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
-&nbsp;&nbsp;&nbsp;^<br class=3D"">../block/nfs.c: In function =
-'nfs_reopen_prepare':<br class=3D"">../block/nfs.c:805:31: error: =
-'struct _stat64' has no member named 'st_blocks'<br class=3D""> =
-&nbsp;805 | =
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;client-&gt;st_blocks =3D =
-st.st_blocks;<br class=3D""> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| =
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
-p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^<br class=3D"">../block/nfs.c: In =
-function 'nfs_get_allocated_file_size':<br =
-class=3D"">../block/nfs.c:752:1: error: control reaches end of non-void =
-function [-Werror=3Dreturn-type]<br class=3D""> &nbsp;752 | }<br =
-class=3D""> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| ^<br class=3D""><br =
-class=3D"">On msys2/mingw, there is no st_blocks in struct _stat64, so =
-we use consistence st_size instead.<br class=3D""><br =
-class=3D"">Signed-off-by: Yonggang Luo &lt;<a =
-href=3D"mailto:luoyonggang@gmail.com" =
-class=3D"">luoyonggang@gmail.com</a>&gt;<br class=3D"">---<br class=3D""> =
-block/nfs.c | 32 +++++++++++++++++++++++++-------<br class=3D""> 1 file =
-changed, 25 insertions(+), 7 deletions(-)<br class=3D""><br =
-class=3D"">diff --git a/block/nfs.c b/block/nfs.c<br class=3D"">index =
-61a249a9fc..db6d8c2d2b 100644<br class=3D"">--- a/block/nfs.c<br =
-class=3D"">+++ b/block/nfs.c<br class=3D"">@@ -24,7 +24,9 @@<br =
-class=3D""><br class=3D""> #include "qemu/osdep.h"<br class=3D""><br =
-class=3D"">+#if !defined(_WIN32)<br class=3D""> #include =
-&lt;poll.h&gt;<br class=3D"">+#endif<br class=3D""> #include =
-"qemu/config-file.h"<br class=3D""> #include "qemu/error-report.h"<br =
-class=3D""> #include "qapi/error.h"<br class=3D"">@@ -51,6 +53,13 @@<br =
-class=3D""> #define QEMU_NFS_MAX_PAGECACHE_SIZE (8388608 / =
-NFS_BLKSIZE)<br class=3D""> #define QEMU_NFS_MAX_DEBUG_LEVEL 2<br =
-class=3D""><br class=3D"">+#if defined (_WIN32)<br class=3D"">+#define =
-nfs_stat __stat64<br class=3D"">+typedef long long blkcnt_t;<br =
-class=3D"">+#else<br class=3D"">+#define nfs_stat stat<br =
-class=3D"">+#endif<br class=3D"">+<br class=3D""> typedef struct =
-NFSClient {<br class=3D""> &nbsp;&nbsp;&nbsp;&nbsp;struct nfs_context =
-*context;<br class=3D""> &nbsp;&nbsp;&nbsp;&nbsp;struct nfsfh *fh;<br =
-class=3D"">@@ -70,7 +79,7 @@ typedef struct NFSRPC {<br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;int ret;<br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;int complete;<br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;QEMUIOVector *iov;<br class=3D"">- =
-&nbsp;&nbsp;&nbsp;struct stat *st;<br class=3D"">+ =
-&nbsp;&nbsp;&nbsp;struct nfs_stat *st;<br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;Coroutine *co;<br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;NFSClient *client;<br class=3D""> } NFSRPC;<br =
-class=3D"">@@ -415,11 +424,20 @@ static void =
-nfs_file_close(BlockDriverState *bs)<br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;nfs_client_close(client);<br class=3D""> }<br =
-class=3D""><br class=3D"">+static blkcnt_t nfs_get_st_blocks(const =
-struct nfs_stat *st)<br class=3D"">+{<br class=3D"">+#if =
-defined(_WIN32)<br class=3D"">+ &nbsp;&nbsp;&nbsp;return (st-&gt;st_size =
-+ 511) / 512;<br class=3D"">+#else<br class=3D"">+ =
-&nbsp;&nbsp;&nbsp;return st-&gt;st_blocks;<br class=3D"">+#endif<br =
-class=3D"">+}<br class=3D"">+<br class=3D""> static int64_t =
-nfs_client_open(NFSClient *client, BlockdevOptionsNfs *opts,<br =
-class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
-p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int flags, int open_flags, Error =
-**errp)<br class=3D""> {<br class=3D""> &nbsp;&nbsp;&nbsp;&nbsp;int64_t =
-ret =3D -EINVAL;<br class=3D"">- &nbsp;&nbsp;&nbsp;struct stat st;<br =
-class=3D"">+ &nbsp;&nbsp;&nbsp;struct nfs_stat st;<br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;char *file =3D NULL, *strp =3D NULL;<br =
-class=3D""><br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;qemu_mutex_init(&amp;client-&gt;mutex);<br =
-class=3D"">@@ -545,7 +563,7 @@ static int64_t nfs_client_open(NFSClient =
-*client, BlockdevOptionsNfs *opts,<br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;}<br class=3D""><br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;ret =3D DIV_ROUND_UP(st.st_size, =
-BDRV_SECTOR_SIZE);<br class=3D"">- =
-&nbsp;&nbsp;&nbsp;client-&gt;st_blocks =3D st.st_blocks;<br class=3D"">+ =
-&nbsp;&nbsp;&nbsp;client-&gt;st_blocks =3D =
-nfs_get_st_blocks(&amp;st);<br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;client-&gt;has_zero_init =3D =
-S_ISREG(st.st_mode);<br class=3D""> &nbsp;&nbsp;&nbsp;&nbsp;*strp =3D =
-'/';<br class=3D""> &nbsp;&nbsp;&nbsp;&nbsp;goto out;<br class=3D"">@@ =
--729,7 +747,7 @@ static int64_t =
-nfs_get_allocated_file_size(BlockDriverState *bs)<br class=3D""> {<br =
-class=3D""> &nbsp;&nbsp;&nbsp;&nbsp;NFSClient *client =3D =
-bs-&gt;opaque;<br class=3D""> &nbsp;&nbsp;&nbsp;&nbsp;NFSRPC task =3D =
-{0};<br class=3D"">- &nbsp;&nbsp;&nbsp;struct stat st;<br class=3D"">+ =
-&nbsp;&nbsp;&nbsp;struct nfs_stat st;<br class=3D""><br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;if (bdrv_is_read_only(bs) &amp;&amp;<br =
-class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;!(bs-&gt;open_flags =
-&amp; BDRV_O_NOCACHE)) {<br class=3D"">@@ -746,7 +764,7 @@ static =
-int64_t nfs_get_allocated_file_size(BlockDriverState *bs)<br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;nfs_set_events(client);<br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;BDRV_POLL_WHILE(bs, !task.complete);<br =
-class=3D""><br class=3D"">- &nbsp;&nbsp;&nbsp;return (task.ret &lt; 0 ? =
-task.ret : st.st_blocks * 512);<br class=3D"">+ &nbsp;&nbsp;&nbsp;return =
-(task.ret &lt; 0 ? task.ret : nfs_get_st_blocks(&amp;st) * 512);<br =
-class=3D""> }<br class=3D""><br class=3D""> static int coroutine_fn<br =
-class=3D"">@@ -778,7 +796,7 @@ static int =
-nfs_reopen_prepare(BDRVReopenState *state,<br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
-p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BlockReopenQueue *queue, Error =
-**errp)<br class=3D""> {<br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;NFSClient *client =3D =
-state-&gt;bs-&gt;opaque;<br class=3D"">- &nbsp;&nbsp;&nbsp;struct stat =
-st;<br class=3D"">+ &nbsp;&nbsp;&nbsp;struct nfs_stat st;<br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;int ret =3D 0;<br class=3D""><br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;if (state-&gt;flags &amp; BDRV_O_RDWR &amp;&amp; =
-bdrv_is_read_only(state-&gt;bs)) {<br class=3D"">@@ -800,7 +818,7 @@ =
-static int nfs_reopen_prepare(BDRVReopenState *state,<br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nfs_get_er=
-ror(client-&gt;context));<br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;re=
-turn ret;<br class=3D""> =
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br class=3D"">- =
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;client-&gt;st_blocks =3D =
-st.st_blocks;<br class=3D"">+ =
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;client-&gt;st_blocks =3D =
-nfs_get_st_blocks(&amp;st);<br class=3D""> &nbsp;&nbsp;&nbsp;&nbsp;}<br =
-class=3D""><br class=3D""> &nbsp;&nbsp;&nbsp;&nbsp;return 0;<br =
-class=3D"">-- <br class=3D"">2.28.0.windows.1<br =
-class=3D""></div></div></blockquote><div><br class=3D""></div><div><br =
-class=3D""></div>You still implement nfs_get_allocated_file_size without =
-actually returning the allocated file size on WIN32.&nbsp;</div><div>I =
-would simply do this:</div><div><br class=3D""></div><div><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D""><b class=3D"">diff --git a/block/nfs.c =
-b/block/nfs.c</b></span></div><div style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(0, 0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D""><b class=3D"">index 61a249a..0983143 =
-100644</b></span></div><div style=3D"margin: 0px; font-stretch: normal; =
-font-size: 11px; line-height: normal; font-family: Menlo; color: rgb(0, =
-0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D""><b class=3D"">--- =
-a/block/nfs.c</b></span></div><div style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(0, 0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D""><b class=3D"">+++ =
-b/block/nfs.c</b></span></div><div style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(56, 185, 199);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">@@ -24,7 +24,9 @@</span></div><p =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0); =
-min-height: 13px;" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">&nbsp;</span><br =
-class=3D"webkit-block-placeholder"></p><div style=3D"margin: 0px; =
-font-stretch: normal; font-size: 11px; line-height: normal; font-family: =
-Menlo; color: rgb(0, 0, 0);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;#include "qemu/osdep.h"</span></div><p style=3D"margin: =
-0px; font-stretch: normal; font-size: 11px; line-height: normal; =
-font-family: Menlo; color: rgb(0, 0, 0); min-height: 13px;" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;</span><br class=3D"webkit-block-placeholder"></p><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(57, 192, 38);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">+#if !defined(_WIN32)</span></div><div style=3D"margin: 0px; =
-font-stretch: normal; font-size: 11px; line-height: normal; font-family: =
-Menlo; color: rgb(0, 0, 0);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;#include &lt;poll.h&gt;</span></div><div style=3D"margin:=
- 0px; font-stretch: normal; font-size: 11px; line-height: normal; =
-font-family: Menlo; color: rgb(57, 192, 38);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">+#endif</span></div><div style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(0, 0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">&nbsp;#include =
-"qemu/config-file.h"</span></div><div style=3D"margin: 0px; =
-font-stretch: normal; font-size: 11px; line-height: normal; font-family: =
-Menlo; color: rgb(0, 0, 0);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;#include "qemu/error-report.h"</span></div><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;#include "qapi/error.h"</span></div><div style=3D"margin:=
- 0px; font-stretch: normal; font-size: 11px; line-height: normal; =
-font-family: Menlo; color: rgb(0, 0, 0);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures; color: #38b9c7" =
-class=3D"">@@ -58,7 +60,9 @@</span><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D""> typedef struct NFSClient =
-{</span></div><div style=3D"margin: 0px; font-stretch: normal; =
-font-size: 11px; line-height: normal; font-family: Menlo; color: rgb(0, =
-0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">&nbsp;&nbsp; &nbsp; bool =
-has_zero_init;</span></div><div style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(0, 0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">&nbsp;&nbsp; &nbsp; AioContext =
-*aio_context;</span></div><div style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(0, 0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">&nbsp;&nbsp; &nbsp; QemuMutex =
-mutex;</span></div><div style=3D"margin: 0px; font-stretch: normal; =
-font-size: 11px; line-height: normal; font-family: Menlo; color: rgb(57, =
-192, 38);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">+#if !defined(_WIN32)</span></div><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;&nbsp; &nbsp; blkcnt_t st_blocks;</span></div><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(57, 192, 38);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">+#endif</span></div><div style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(0, 0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">&nbsp;&nbsp; &nbsp; bool =
-cache_used;</span></div><div style=3D"margin: 0px; font-stretch: normal; =
-font-size: 11px; line-height: normal; font-family: Menlo; color: rgb(0, =
-0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">&nbsp;&nbsp; &nbsp; NFSServer =
-*server;</span></div><div style=3D"margin: 0px; font-stretch: normal; =
-font-size: 11px; line-height: normal; font-family: Menlo; color: rgb(0, =
-0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">&nbsp;&nbsp; &nbsp; char =
-*path;</span></div><div style=3D"margin: 0px; font-stretch: normal; =
-font-size: 11px; line-height: normal; font-family: Menlo; color: rgb(0, =
-0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures; color: #38b9c7" class=3D"">@@ -545,7 +549,9 =
-@@</span><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D""> static int64_t nfs_client_open(NFSClient *client, =
-BlockdevOptionsNfs *opts,</span></div><div style=3D"margin: 0px; =
-font-stretch: normal; font-size: 11px; line-height: normal; font-family: =
-Menlo; color: rgb(0, 0, 0);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;&nbsp; &nbsp; }</span></div><p style=3D"margin: 0px; =
-font-stretch: normal; font-size: 11px; line-height: normal; font-family: =
-Menlo; color: rgb(0, 0, 0); min-height: 13px;" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;</span><br class=3D"webkit-block-placeholder"></p><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;&nbsp; &nbsp; ret =3D DIV_ROUND_UP(st.st_size, =
-BDRV_SECTOR_SIZE);</span></div><div style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(57, 192, 38);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">+#if !defined(_WIN32)</span></div><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;&nbsp; &nbsp; client-&gt;st_blocks =3D =
-st.st_blocks;</span></div><div style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(57, 192, 38);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">+#endif</span></div><div style=3D"margin: =
-0px; font-stretch: normal; font-size: 11px; line-height: normal; =
-font-family: Menlo; color: rgb(0, 0, 0);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;&nbsp; &nbsp; client-&gt;has_zero_init =3D =
-S_ISREG(st.st_mode);</span></div><div style=3D"margin: 0px; =
-font-stretch: normal; font-size: 11px; line-height: normal; font-family: =
-Menlo; color: rgb(0, 0, 0);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;&nbsp; &nbsp; *strp =3D '/';</span></div><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;&nbsp; &nbsp; goto out;</span></div><div style=3D"margin:=
- 0px; font-stretch: normal; font-size: 11px; line-height: normal; =
-font-family: Menlo; color: rgb(0, 0, 0);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures; color: #38b9c7" =
-class=3D"">@@ -706,6 +712,8 @@</span><span =
-style=3D"font-variant-ligatures: no-common-ligatures" class=3D""> static =
-int nfs_has_zero_init(BlockDriverState *bs)</span></div><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;&nbsp; &nbsp; return =
-client-&gt;has_zero_init;</span></div><div style=3D"margin: 0px; =
-font-stretch: normal; font-size: 11px; line-height: normal; font-family: =
-Menlo; color: rgb(0, 0, 0);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;}</span></div><p style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(0, 0, 0); min-height: 13px;" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;</span><br class=3D"webkit-block-placeholder"></p><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(57, 192, 38);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">+</span></div><div style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(57, 192, 38);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">+#if !defined(_WIN32)</span></div><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;/* Called (via nfs_service) with QemuMutex held.&nbsp; =
-*/</span></div><div style=3D"margin: 0px; font-stretch: normal; =
-font-size: 11px; line-height: normal; font-family: Menlo; color: rgb(0, =
-0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">&nbsp;static void</span></div><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;nfs_get_allocated_file_size_cb(int ret, struct =
-nfs_context *nfs, void *data,</span></div><div style=3D"margin: 0px; =
-font-stretch: normal; font-size: 11px; line-height: normal; font-family: =
-Menlo; color: rgb(0, 0, 0);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures; color: #38b9c7" =
-class=3D"">@@ -748,6 +756,7 @@</span><span =
-style=3D"font-variant-ligatures: no-common-ligatures" class=3D""> static =
-int64_t nfs_get_allocated_file_size(BlockDriverState *bs)</span></div><p =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0); =
-min-height: 13px;" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">&nbsp;</span><br =
-class=3D"webkit-block-placeholder"></p><div style=3D"margin: 0px; =
-font-stretch: normal; font-size: 11px; line-height: normal; font-family: =
-Menlo; color: rgb(0, 0, 0);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;&nbsp; &nbsp; return (task.ret &lt; 0 ? task.ret : =
-st.st_blocks * 512);</span></div><div style=3D"margin: 0px; =
-font-stretch: normal; font-size: 11px; line-height: normal; font-family: =
-Menlo; color: rgb(0, 0, 0);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;}</span></div><div style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(57, 192, 38);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">+#endif</span></div><p style=3D"margin: =
-0px; font-stretch: normal; font-size: 11px; line-height: normal; =
-font-family: Menlo; color: rgb(0, 0, 0); min-height: 13px;" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;</span><br class=3D"webkit-block-placeholder"></p><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;static int coroutine_fn</span></div><div style=3D"margin:=
- 0px; font-stretch: normal; font-size: 11px; line-height: normal; =
-font-family: Menlo; color: rgb(0, 0, 0);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;nfs_file_co_truncate(BlockDriverState *bs, int64_t =
-offset, bool exact,</span></div><div style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(0, 0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures; color: #38b9c7" class=3D"">@@ -792,6 +801,7 =
-@@</span><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D""> static int nfs_reopen_prepare(BDRVReopenState =
-*state,</span></div><div style=3D"margin: 0px; font-stretch: normal; =
-font-size: 11px; line-height: normal; font-family: Menlo; color: rgb(0, =
-0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; return =
--EINVAL;</span></div><div style=3D"margin: 0px; font-stretch: normal; =
-font-size: 11px; line-height: normal; font-family: Menlo; color: rgb(0, =
-0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">&nbsp;&nbsp; &nbsp; }</span></div><p =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0); =
-min-height: 13px;" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">&nbsp;</span><br =
-class=3D"webkit-block-placeholder"></p><div style=3D"margin: 0px; =
-font-stretch: normal; font-size: 11px; line-height: normal; font-family: =
-Menlo; color: rgb(57, 192, 38);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" class=3D"">+#if =
-!defined(_WIN32)</span></div><div style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(0, 0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">&nbsp;&nbsp; &nbsp; /* Update cache for =
-read-only reopens */</span></div><div style=3D"margin: 0px; =
-font-stretch: normal; font-size: 11px; line-height: normal; font-family: =
-Menlo; color: rgb(0, 0, 0);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;&nbsp; &nbsp; if (!(state-&gt;flags &amp; BDRV_O_RDWR)) =
-{</span></div><div style=3D"margin: 0px; font-stretch: normal; =
-font-size: 11px; line-height: normal; font-family: Menlo; color: rgb(0, =
-0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; ret =3D =
-nfs_fstat(client-&gt;context, client-&gt;fh, &amp;st);</span></div><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures; =
-color: #38b9c7" class=3D"">@@ -802,6 +812,7 @@</span><span =
-style=3D"font-variant-ligatures: no-common-ligatures" class=3D""> static =
-int nfs_reopen_prepare(BDRVReopenState *state,</span></div><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; }</span></div><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; client-&gt;st_blocks =3D =
-st.st_blocks;</span></div><div style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(0, 0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">&nbsp;&nbsp; &nbsp; }</span></div><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(57, 192, 38);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">+#endif</span></div><p style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(0, 0, 0); min-height: 13px;" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;</span><br class=3D"webkit-block-placeholder"></p><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;&nbsp; &nbsp; return 0;</span></div><div style=3D"margin:=
- 0px; font-stretch: normal; font-size: 11px; line-height: normal; =
-font-family: Menlo; color: rgb(0, 0, 0);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;}</span></div><div style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(0, 0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures; color: #38b9c7" class=3D"">@@ -869,7 +880,9 =
-@@</span><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D""> static BlockDriver bdrv_nfs =3D {</span></div><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;&nbsp; &nbsp; .create_opts&nbsp; &nbsp; &nbsp; &nbsp; =
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =3D =
-&amp;nfs_create_opts,</span></div><p style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(0, 0, 0); min-height: 13px;" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;</span><br class=3D"webkit-block-placeholder"></p><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;&nbsp; &nbsp; .bdrv_has_zero_init &nbsp; &nbsp; &nbsp; =
-&nbsp; &nbsp; &nbsp; =3D nfs_has_zero_init,</span></div><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(57, 192, 38);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">+#if !defined(_WIN32)</span></div><div style=3D"margin: 0px; =
-font-stretch: normal; font-size: 11px; line-height: normal; font-family: =
-Menlo; color: rgb(0, 0, 0);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;&nbsp; &nbsp; .bdrv_get_allocated_file_size &nbsp; =3D =
-nfs_get_allocated_file_size,</span></div><div style=3D"margin: 0px; =
-font-stretch: normal; font-size: 11px; line-height: normal; font-family: =
-Menlo; color: rgb(57, 192, 38);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">+#endif</span></div><div style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(0, 0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">&nbsp;&nbsp; &nbsp; .bdrv_co_truncate =
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =3D =
-nfs_file_co_truncate,</span></div><p style=3D"margin: 0px; font-stretch: =
-normal; font-size: 11px; line-height: normal; font-family: Menlo; color: =
-rgb(0, 0, 0); min-height: 13px;" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;</span><br class=3D"webkit-block-placeholder"></p><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">&nbsp;&nbsp; &nbsp; .bdrv_file_open &nbsp; &nbsp; &nbsp; =
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =3D nfs_file_open,</span></div><div =
-style=3D"margin: 0px; font-stretch: normal; font-size: 11px; =
-line-height: normal; font-family: Menlo; color: rgb(0, 0, 0);" =
-class=3D""><span style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D""><br class=3D""></span></div><div style=3D"margin: 0px; =
-font-stretch: normal; font-size: 11px; line-height: normal; font-family: =
-Menlo; color: rgb(0, 0, 0);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" class=3D""><br =
-class=3D""></span></div><div style=3D"margin: 0px; font-stretch: normal; =
-font-size: 11px; line-height: normal; font-family: Menlo; color: rgb(0, =
-0, 0);" class=3D""><span style=3D"font-variant-ligatures: =
-no-common-ligatures" class=3D"">Best,</span></div><div style=3D"margin: =
-0px; font-stretch: normal; font-size: 11px; line-height: normal; =
-font-family: Menlo; color: rgb(0, 0, 0);" class=3D""><span =
-style=3D"font-variant-ligatures: no-common-ligatures" =
-class=3D"">Peter</span></div></div><br class=3D""></body></html>=
-
---Apple-Mail=_7AB19365-29EE-47F1-BD4E-4240272F41A4--
-
+thanks
+-- PMM
 
