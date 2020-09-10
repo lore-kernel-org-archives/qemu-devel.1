@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D4E6C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 19:50:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE569C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 19:50:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBB3921556
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 19:50:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 63A4A221EB
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 19:50:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ym1CDDt/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBB3921556
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jUN7gcrO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63A4A221EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGSaD-0004gw-Qd
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 15:50:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54082)
+	id 1kGSaI-0004sS-3y
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 15:50:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54096)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kGSZO-00036m-1Z
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 15:49:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44486
- helo=us-smtp-1.mimecast.com)
+ id 1kGSZQ-0003AF-0Z
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 15:49:24 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32867
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kGSZM-0000Zc-Hm
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 15:49:21 -0400
+ id 1kGSZO-0000Zg-Eb
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 15:49:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599767359;
+ s=mimecast20190719; t=1599767361;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gvsBQu3DI4XVEHjUAoI1cF91AFkzecmjdcKRXIM09Is=;
- b=Ym1CDDt/Mv9TKfML+8U/GENcJKd9DmK5j9zmNIl8I4RHU9go7U7/sh4RpkqPEtL+RL1Tnn
- Ab/6Vqeu0Hss5puwop9JST+FpWfC2c3wbwEg2crvMWmfEYYYiGE1/1RhkCW75TV0OwRl8I
- c+5jwW4j/WHr2O0NXuTMTwo7GHjOIgg=
+ bh=NEbuGLWmXSZT1rnL/wrgI6AbsDI0NcVYdH+yo7NF+Kc=;
+ b=jUN7gcrO/vaVRpzBgUpaX6da7xJd52i+Ebe3IY1hNF0DhGCfVdkwYBRzYPSb+FFTuSOSGY
+ 4+5+BuOfoz57Gdns6Y8DpdtSVTqhBCZDlnWdtkQWJVxOLyf/mg5i6hq2WqMIDMpUldW8UT
+ uw6Gptc24A6v2vgymi5ANAp0fs3AxR0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-502-wAYbjAnYOYq7YwcULULqNA-1; Thu, 10 Sep 2020 15:49:17 -0400
-X-MC-Unique: wAYbjAnYOYq7YwcULULqNA-1
+ us-mta-271-OlLIUpCuOIiGicyzktWjAg-1; Thu, 10 Sep 2020 15:49:18 -0400
+X-MC-Unique: OlLIUpCuOIiGicyzktWjAg-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05C5E185A0F8;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8D6E100670D;
  Thu, 10 Sep 2020 19:49:17 +0000 (UTC)
 Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E2C547E8FD;
- Thu, 10 Sep 2020 19:49:10 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B4D687ED65;
+ Thu, 10 Sep 2020 19:49:17 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 01/18] chardev: Move PARALLEL_CHARDEV macro to common code
-Date: Thu, 10 Sep 2020 15:48:46 -0400
-Message-Id: <20200910194903.4104696-2-ehabkost@redhat.com>
+Subject: [PATCH 02/18] chardev: Move ParallelChardev typedef to common code
+Date: Thu, 10 Sep 2020 15:48:47 -0400
+Message-Id: <20200910194903.4104696-3-ehabkost@redhat.com>
 In-Reply-To: <20200910194903.4104696-1-ehabkost@redhat.com>
 References: <20200910194903.4104696-1-ehabkost@redhat.com>
 MIME-Version: 1.0
@@ -73,9 +73,9 @@ X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 09:07:42
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 08:38:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -105,48 +105,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The macro is exactly the same for both Linux and BSD, so move its
-definition outside the host OS #ifdef blocks.
+The struct itself may have a different definition on each OS, but
+we can define the typedef in common code, outside the host OS #ifdefs.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- chardev/char-parallel.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ chardev/char-parallel.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/chardev/char-parallel.c b/chardev/char-parallel.c
-index 05e7efbd6c..390d03506c 100644
+index 390d03506c..e32aa2d226 100644
 --- a/chardev/char-parallel.c
 +++ b/chardev/char-parallel.c
-@@ -47,6 +47,9 @@
+@@ -47,16 +47,17 @@
  #include "chardev/char-fd.h"
  #include "chardev/char-parallel.h"
  
-+#define PARALLEL_CHARDEV(obj) \
-+    OBJECT_CHECK(ParallelChardev, (obj), TYPE_CHARDEV_PARALLEL)
-+
++typedef struct ParallelChardev ParallelChardev;
+ #define PARALLEL_CHARDEV(obj) \
+     OBJECT_CHECK(ParallelChardev, (obj), TYPE_CHARDEV_PARALLEL)
+ 
  #if defined(__linux__)
  
- typedef struct {
-@@ -55,9 +58,6 @@ typedef struct {
+-typedef struct {
++struct ParallelChardev {
+     Chardev parent;
+     int fd;
      int mode;
- } ParallelChardev;
+-} ParallelChardev;
++};
  
--#define PARALLEL_CHARDEV(obj) \
--    OBJECT_CHECK(ParallelChardev, (obj), TYPE_CHARDEV_PARALLEL)
--
  static int pp_hw_mode(ParallelChardev *s, uint16_t mode)
  {
-     if (s->mode != mode) {
-@@ -182,9 +182,6 @@ typedef struct {
-     int fd;
- } ParallelChardev;
+@@ -177,10 +178,10 @@ static void qemu_chr_open_pp_fd(Chardev *chr,
  
--#define PARALLEL_CHARDEV(obj)                                   \
--    OBJECT_CHECK(ParallelChardev, (obj), TYPE_CHARDEV_PARALLEL)
--
+ #if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__DragonFly__)
+ 
+-typedef struct {
++struct ParallelChardev {
+     Chardev parent;
+     int fd;
+-} ParallelChardev;
++};
+ 
  static int pp_ioctl(Chardev *chr, int cmd, void *arg)
  {
-     ParallelChardev *drv = PARALLEL_CHARDEV(chr);
 -- 
 2.26.2
 
