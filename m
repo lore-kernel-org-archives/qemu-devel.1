@@ -2,84 +2,115 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E8EC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 16:18:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA0C0C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 16:20:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F59920BED
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 16:18:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C96320672
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 16:20:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ey9ydOUe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F59920BED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SdVLgOiM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C96320672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGPH6-0001jp-Eg
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 12:18:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53728)
+	id 1kGPJa-0003dT-EM
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 12:20:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54128)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kGPGP-0001Bd-QS
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 12:17:35 -0400
-Received: from mail-ed1-x52a.google.com ([2a00:1450:4864:20::52a]:40408)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kGPGM-00079x-PZ
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 12:17:33 -0400
-Received: by mail-ed1-x52a.google.com with SMTP id t16so6901723edw.7
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 09:17:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=d1zXZOEgjCvDqH4TQTfV6VGTaNJ2HtR22eSSv5aQpQI=;
- b=ey9ydOUeMz6AnjSZymN2hY/+r4tmd0diLawBfjwdFXVYz3anLyOdzd2kSRhqC63nTX
- SaCSr0qklDWHfwyvyi036fQ6G9atqBFN+PNEvvo/+lSKYONNa0VmB1gkqGhbljztujE1
- RvEL+k7RieKlVcT7+g6AxWO/mSn5N9xsobPOAh4ThxXDXgqJPTw+eQ3pdBzuE+mqTIBy
- /7l3fZijyWfTs6HGZEPb3BO4k4FL9GEuOKuNfbIyw4tZvltduV2I8AFF6GVmzqjfWo/4
- 4SaVXdsnM292LRtep5ZPIPUvA/6nd1fVNGSElCC/H9V5SzWI7NBXrJXaVfvNgOyPPYMH
- YSng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=d1zXZOEgjCvDqH4TQTfV6VGTaNJ2HtR22eSSv5aQpQI=;
- b=WCpC3Rxmt2RomnfqUEvg+LmWd3izKSc7XCO3umgRmlz/0iULS4+asRHmomx0gn6zBV
- PjTg0N2q3bd8N0P5fcq1o+SX/jiPd6eWNES7n0f6CnkG9A9ZaAMpNqdLDOdozSrBr0Xo
- ZOKijfdvtsIHejb+VD2y5TR5uSZT8V1Nm4gLn8zllmRUlxLUvXAc4b639XI8W7UM11s2
- MinvMMPds5o9xZ/htTGDO9ZbtLe0cA+0v/pZh585tUcGZhqgDOd8wBK3b3yTo+lJDzVJ
- qh2n5jqDTxwcREdaN4McdgOBemza0uP3Hm5heBOBH3V8qYwwwA2R8mjlBqioCzakMzRH
- sdFQ==
-X-Gm-Message-State: AOAM5300FTKzztdOJTnFiJvOANDD2MBUSOY5PNd2zIP9XdEaD44aOCjy
- nZGAlny+z3jqoQobYcegXBhdAcTE1nr5W+pqwUVzgw==
-X-Google-Smtp-Source: ABdhPJxkb3Z1wBFO4ZU32wnRsE1JVVA6ovzVttRJFzCBtrERAZl954led5+jkm3N3+TJznIcjLknnItLY1mpcPmkLaU=
-X-Received: by 2002:a50:f28b:: with SMTP id f11mr9948499edm.44.1599754649067; 
- Thu, 10 Sep 2020 09:17:29 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGPId-0002gm-Gd
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 12:19:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54181
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGPIb-0007Lr-Tr
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 12:19:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599754788;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=I6aplNWvcoP03iiNRCYX+JhOVxr/iwfsWaJXuC412So=;
+ b=SdVLgOiMEJQwjcA+k+U5c2862OuR0nArvK83PsVJ2kD8TMJb28EwSk1h+HIRuK1NKplMJk
+ RXCvXXPcaIGE6o+5xTv/KAUVCTzHnG+73ltfyfDSRyrdtvQc6bwxNqFdSx05PqKn35ESX4
+ 6UInpWqEcw7KtFOQ5zwEikH75HLsUfM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-554-Rc9FwniaMy-xtfOf5YU3lA-1; Thu, 10 Sep 2020 12:19:43 -0400
+X-MC-Unique: Rc9FwniaMy-xtfOf5YU3lA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BABA47A1C2;
+ Thu, 10 Sep 2020 16:19:39 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-112-197.ams2.redhat.com
+ [10.36.112.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7339881C49;
+ Thu, 10 Sep 2020 16:19:38 +0000 (UTC)
+Subject: Re: [PATCH v2] block/vhdx: Support vhdx image only with 512 bytes
+ logical sector size
+To: Swapnil Ingle <swapnil.ingle@nutanix.com>, qemu-devel@nongnu.org
+References: <1596794594-44531-1-git-send-email-swapnil.ingle@nutanix.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <5391b3b2-e5fe-4e5a-19c9-15786b1403f9@redhat.com>
+Date: Thu, 10 Sep 2020 18:19:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <CAJoBWHwtE+HWkoj3a2pdYHOkPpG7ya=+-RRFvUp-SXwuTWvm5g@mail.gmail.com>
-In-Reply-To: <CAJoBWHwtE+HWkoj3a2pdYHOkPpG7ya=+-RRFvUp-SXwuTWvm5g@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 10 Sep 2020 17:17:17 +0100
-Message-ID: <CAFEAcA8spQVin2vj2V5DJYQCR_BizqrRneoRMKhqKAzFv8EiMg@mail.gmail.com>
-Subject: Re: Master cannot execute MTE instructions
-To: Derrick McKee <derrick.mckee@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::52a;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x52a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <1596794594-44531-1-git-send-email-swapnil.ingle@nutanix.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 09:07:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -56
+X-Spam_score: -5.7
+X-Spam_bar: -----
+X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-3.576, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,23 +123,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:ARM" <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Jeff Cody <codyprime@gmail.com>, Kevin Wolf <kwolf@redhat.com>,
+ philmd@redhat.com, "open list:VHDX" <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 10 Sep 2020 at 16:06, Derrick McKee <derrick.mckee@gmail.com> wrote:
->
-> Hi,
->
-> As of commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a compiled with the default configuration, softmmu-aarch64 issues an illegal instruction fault when executing a memory tag instruction.  Below is a minimal code example that triggers the bug.
+On 07.08.20 12:03, Swapnil Ingle wrote:
+> block/vhdx uses qemu block layer where sector size is always 512 bytes.
+> This may have issues  with 4K logical sector sized vhdx image.
+> 
+> For e.g qemu-img convert on such images fails with following assert:
+> 
+> $qemu-img convert -f vhdx -O raw 4KTest1.vhdx test.raw
+> qemu-img: util/iov.c:388: qiov_slice: Assertion `offset + len <=
+> qiov->size' failed.
+> Aborted
+> 
+> This patch adds an check to return ENOTSUP for vhdx images which
+> have logical sector size other than 512 bytes.
+> 
+> Signed-off-by: Swapnil Ingle <swapnil.ingle@nutanix.com>
+> ---
+> v2: Fixed commit message, suggested by Philippe Mathieu-Daude
+> ---
+>  block/vhdx.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 
-What QEMU command line are you using to run this?
-In particular, MTE is not enabled by default, so you need
-"-cpu max,mte=on" or similar, is not enabled for any
-board except 'virt', and doesn't work with KVM, only TCG.
+Oh, sorry, yes.  Thanks!
 
-thanks
--- PMM
+Applied to my block branch:
+
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+
+Max
+
+
+(Further information for others: The vhdx code assumes all over the
+place that the vhdx sectors have the same size as “block layer sectors”.
+ Fixing this seems by no means trivial.  I assume images with 4k sectors
+have never worked, so this commit doesn’t remove support, it just makes
+the vhdx driver safely exit before it can do something wrong.)
+
 
