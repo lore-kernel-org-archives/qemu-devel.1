@@ -2,82 +2,85 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4181FC43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:17:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 071BDC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:19:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7AD5207DE
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:17:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 60D0B21941
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:19:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A8TEpczK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7AD5207DE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BAXQ83qL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60D0B21941
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGIhR-0001Ob-Mj
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 05:17:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45384)
+	id 1kGIjz-0003gB-7O
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 05:19:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49872)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kGIg9-0008Gr-5J
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 05:15:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50632
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kGIj9-00033l-Lc
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 05:18:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22254
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kGIg6-0005f8-3C
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 05:15:40 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kGIj5-00072e-Ud
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 05:18:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599729337;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
+ s=mimecast20190719; t=1599729522;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=W4LhbyuqlF5S6rmEVd7X2hXE/FDCj8fqPB7MayxFhdk=;
- b=A8TEpczKA1ro7p6GoZA1IxbfYh2K71LzX6OvH1UJ0vN5PMLaDX+lpTP4g5cPqWnR/XJoub
- 8zgjEYSSScAi+rMWqQXFj6LaMtfIBgV3kDYc51d8hEMuL28KoTXlon0jm43lRYp7EbwTSF
- 8OEPWd/Yn62qy8LwUTv8+Rq1Z/7qza4=
+ bh=uzE2BQxbH+WqIhzfhK97g2ym6oIhgiFzVgIEVTbVPvE=;
+ b=BAXQ83qL7ovrKubJDIeq5C8/N+5CZ+zxQZjJGzFml4NWrk1M/D8g1afpWYXZ3ap5rue2GY
+ P/AzuFtxgptZ65JB/K1tn9UJFSSv5+Yj6Qfx5fOP3JglN+4S1p6LGWe+1MVXcccyqXckcx
+ NdPXkVbpYMWW2J8TOdBPp2jfgZ//KFs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-494-j17T7367PC2YHoZh06ZP8g-1; Thu, 10 Sep 2020 05:15:09 -0400
-X-MC-Unique: j17T7367PC2YHoZh06ZP8g-1
+ us-mta-401-50YMkbwWNdG6P5nHSMGpeA-1; Thu, 10 Sep 2020 05:18:41 -0400
+X-MC-Unique: 50YMkbwWNdG6P5nHSMGpeA-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A0481091061;
- Thu, 10 Sep 2020 09:15:07 +0000 (UTC)
-Received: from redhat.com (ovpn-112-4.ams2.redhat.com [10.36.112.4])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EA18960C07;
- Thu, 10 Sep 2020 09:14:56 +0000 (UTC)
-Date: Thu, 10 Sep 2020 10:14:54 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH 5/6] hw/pci-host/q35: Rename PCI 'black hole as '(memory)
- hole'
-Message-ID: <20200910091454.GE1083348@redhat.com>
-References: <20200910070131.435543-1-philmd@redhat.com>
- <20200910070131.435543-6-philmd@redhat.com>
- <7dbdef90-1ca6-bf27-7084-af0c716d01d9@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1126618BA28F;
+ Thu, 10 Sep 2020 09:18:40 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-112-29.ams2.redhat.com [10.36.112.29])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 22BC260BF1;
+ Thu, 10 Sep 2020 09:18:34 +0000 (UTC)
+Date: Thu, 10 Sep 2020 11:18:33 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH 1/4] docs: lift block-core.json rST header into parents
+Message-ID: <20200910091833.GD7100@linux.fritz.box>
+References: <20200908093113.47564-2-stefanha@redhat.com>
+ <f5de1038-5bf3-8bd4-d664-45d6f201ae9b@redhat.com>
+ <20200908142308.GD8175@linux.fritz.box>
+ <87h7s7z9g4.fsf@dusky.pond.sub.org>
+ <20200909075222.GA5219@linux.fritz.box>
+ <87v9gnw3q2.fsf@dusky.pond.sub.org>
+ <20200909132225.GE5219@linux.fritz.box>
+ <87y2ljt1fi.fsf@dusky.pond.sub.org>
+ <20200909153859.GF5219@linux.fritz.box>
+ <87pn6uryzj.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7dbdef90-1ca6-bf27-7084-af0c716d01d9@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
+In-Reply-To: <87pn6uryzj.fsf@dusky.pond.sub.org>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 01:23:25
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 03:02:23
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -98,69 +101,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Marcelo Tosatti <mtosatti@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Andrew Jeffery <andrew@aj.id.au>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Jason Wang <jasowang@redhat.com>, Alistair Francis <alistair@alistair23.me>,
- qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, Kashyap Chamarthy <kchamart@redhat.com>,
+ afrosi@redhat.com, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 10, 2020 at 09:15:02AM +0200, Thomas Huth wrote:
-> On 10/09/2020 09.01, Philippe Mathieu-Daudé wrote:
-> > In order to use inclusive terminology, rename "blackhole"
-> > as "(memory)hole".
+Am 10.09.2020 um 07:18 hat Markus Armbruster geschrieben:
+> Kevin Wolf <kwolf@redhat.com> writes:
 > 
-> A black hole is a well-known astronomical term, which is simply named
-> that way since it absorbes all light. I doubt that anybody could get
-> upset by this term?
+> > Am 09.09.2020 um 17:28 hat Markus Armbruster geschrieben:
+> >> Kevin Wolf <kwolf@redhat.com> writes:
+> >> 
+> >> > Am 09.09.2020 um 14:10 hat Markus Armbruster geschrieben:
+> >> >> Kevin Wolf <kwolf@redhat.com> writes:
+> [...]
+> >> >> > There are orders that I can't get this way.
+> >> >> 
+> >> >> You're right, ordering by first include is not completely general.
+> >> >> 
+> >> >> >                                             For example, if I want to
+> >> >> > have "Block devices" documented before "Background jobs", there is no
+> >> >> > way to add includes to actually get this order without having
+> >> >> > "Background jobs" as a subsection in "Block devices".
+> >> >> 
+> >> >> "Background jobs" is job.json.
+> >> >> 
+> >> >> "Block devices" is block.json, which includes block-core.json, which
+> >> >> includes job.json.
+> >> >> 
+> >> >> To be able to put "Block devices" first, you'd have to break the chain
+> >> >> from block.json to job.json.  Which might even be an improvement:
+> >> >> 
+> >> >> $ wc -l qapi/*.json | awk '$1 >= 1000 { print }'
+> >> >>   5527 qapi/block-core.json
+> >> >>   1722 qapi/migration.json
+> >> >>   1617 qapi/misc.json
+> >> >>   1180 qapi/ui.json
+> >> >>  17407 total
+> >> >> 
+> >> >> Could we split block-core.json into several cohesive parts?
+> >> >
+> >> > Possibly. However, while it would be an improvement generally speaking,
+> >> > how does this change the specific problem? All of the smaller files will
+> >> > be included by block.json (or whatever file provides the "Block devices"
+> >> > chapter in the documentation) and at least one of them will still have
+> >> > to include job.json.
+> >> 
+> >> Splitting block-core.json can help only if other modules then use less
+> >> than all the parts.  In particular, as long as block.json includes the
+> >> same stuff, it'll surely still include jobs.json.  Could it include
+> >> less?
+> >
+> > Not if the documentation wants to have a single chapter for the block
+> > layer instead of many small block related top-level chapters.
+> >
+> > Otherwise we could include some things directly from qapi-schema.json,
+> > but obviously, that would still have to be after job.json for some
+> > parts.
+> 
+> You're right.
+> 
+> Being unable to talk about something before you define it may not be all
+> bad, though :)
 
-In this particular case I think the change is the right thing to do
-simply because the astronomical analogy is not adding any value in
-understanding. Calling it a "memoryhole" is more descriptive in what
-is actually is.
+Yes, as long as the resulting order is what we want anyway, this is not
+a problem.
 
-> 
-> > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> > ---
-> >  include/hw/pci-host/q35.h |  4 ++--
-> >  hw/pci-host/q35.c         | 38 +++++++++++++++++++-------------------
-> >  tests/qtest/q35-test.c    |  2 +-
-> >  3 files changed, 22 insertions(+), 22 deletions(-)
-> > 
-> > diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
-> > index 070305f83df..0fb90aca18b 100644
-> > --- a/include/hw/pci-host/q35.h
-> > +++ b/include/hw/pci-host/q35.h
-> > @@ -48,8 +48,8 @@ typedef struct MCHPCIState {
-> >      PAMMemoryRegion pam_regions[13];
-> >      MemoryRegion smram_region, open_high_smram;
-> >      MemoryRegion smram, low_smram, high_smram;
-> > -    MemoryRegion tseg_blackhole, tseg_window;
-> > -    MemoryRegion smbase_blackhole, smbase_window;
-> > +    MemoryRegion tseg_hole, tseg_window;
-> > +    MemoryRegion smbase_hole, smbase_window;
-> 
-> Maybe rather use smbase_memhole and tseg_memhole?
-> 
->  Thomas
-> 
-> 
+I'm just not sure if we will always be aware of the include structure
+without tool support so that we would always declare the dependencies
+first. Nobody checks the headlines in the documentation after making
+schema changes.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Kevin
 
 
