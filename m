@@ -2,106 +2,121 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6D19C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 14:05:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3413C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 14:09:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57C5821941
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 14:05:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F0B9221D6C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 14:09:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JkCIa70Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57C5821941
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ccY47oBy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0B9221D6C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGNCA-0006zl-EP
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 10:05:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46840)
+	id 1kGNGN-0000LE-VJ
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 10:09:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47708)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGNBS-0006Lv-Q8
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 10:04:18 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51367
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kGNFh-0008De-27
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 10:08:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47222
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGNBQ-0004eV-MD
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 10:04:18 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kGNFf-0005A3-0d
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 10:08:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599746655;
+ s=mimecast20190719; t=1599746918;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=TrBdBnylWWghUXLtT1XljL/KCSy0FSx6mjRaFwgnxCU=;
- b=JkCIa70Z9/dmHEGP9lIdnd6xVMbCWZNdRrdiHn7JAKlu3Nj5cnbv5ACiF96uvgzE9KyIEH
- U27Qci59LysltdIhHx//A45EbF9Ry1i6j+Hgn9DYPTXF01rqXlMcAoNTLAw+tYJzmQpfn7
- wPjzifUlnM5hGv4x0+aMKOtRwD6p0Ic=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-Ih1MbqtpPoGejE4Wmb0AmQ-1; Thu, 10 Sep 2020 10:04:13 -0400
-X-MC-Unique: Ih1MbqtpPoGejE4Wmb0AmQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32E2818BA283;
- Thu, 10 Sep 2020 14:04:12 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-197.ams2.redhat.com
- [10.36.112.197])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4D5755D9F3;
- Thu, 10 Sep 2020 14:04:11 +0000 (UTC)
-Subject: Re: [PATCH 21/29] block/export: Add BLOCK_EXPORT_DELETED event
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200907182011.521007-1-kwolf@redhat.com>
- <20200907182011.521007-22-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <80a964fc-5f4d-cebc-3b40-5bea512b0fbf@redhat.com>
-Date: Thu, 10 Sep 2020 16:04:09 +0200
+ bh=t9rwAF9aA7tjqUjoLtzS1fgHPnMnB5K89LDcUIfAi6U=;
+ b=ccY47oByGfoXT8DMOOXvwVmLRzUbsQC8hRxrlDMcWi9u/lMb8IjsfBwmpmAZtXu1s3w5lA
+ 7glm31zNsfmhGDLhyx4EHZ+QHUYvUmHnDoFhFKdF93gcahLXqOZBMdEVyst0N/IwwxB/Xn
+ fl6IWFJ5PXQ7fz4YlX/OpAiVUcYnoJ8=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-547-yFY8UbJxPbyMz7cmNcXMwg-1; Thu, 10 Sep 2020 10:08:34 -0400
+X-MC-Unique: yFY8UbJxPbyMz7cmNcXMwg-1
+Received: by mail-wr1-f72.google.com with SMTP id 33so2313674wre.0
+ for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 07:08:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=t9rwAF9aA7tjqUjoLtzS1fgHPnMnB5K89LDcUIfAi6U=;
+ b=s57Q/r8ea6kf68drh+WIjXE0ixOijuDGCUSFDsy7vdnhnx9eub4ZvPEYmENrBzgwvX
+ zFZ67Bsi4mT29kxlDc1S/BnKDhaVCebYCBxo+WJOdRPONX8lHTrnWDWuaZtDMzOU8lOg
+ 6cSf0H7rcC7ctCHi+UmzECzJFJgckd2g3XuyrJmwR4kQ33woh8ZMkJMEpmFaDLpVdY4l
+ UTfNM1egoa81mlhqsNsq+cFW/ksdFW2b9f2t8iTCff1kblz2A7OatnCVa4jlQBwv4kR3
+ 6BWO7ejCX/OHR/mVxTlGFsqPT7AEY9jHxGoJ9hABl20gtVlJxNnXwhuvj9GCNzSOzFy0
+ ADVQ==
+X-Gm-Message-State: AOAM532532WfQzalGLDfWdn/LBnuSjD3xAiJnhisMgSW8qXGDbVKU9OB
+ AkF/69y0aHDPH6z05+CtUzimm1uZ5SxhXIWjKGeqkhTUZ8U1ihXGEyXdLWLbBtGZyoLmlwn6HPz
+ 1vhexoHsIOf60t0k=
+X-Received: by 2002:adf:f986:: with SMTP id f6mr8936160wrr.270.1599746913569; 
+ Thu, 10 Sep 2020 07:08:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyb/XH1Rbc33nv9hvMzIYNE3wGeTHU/ESahDwHvPTi6vUNsVBh9PEvDZIbvVjZBBv1vmkxBGA==
+X-Received: by 2002:adf:f986:: with SMTP id f6mr8936130wrr.270.1599746913282; 
+ Thu, 10 Sep 2020 07:08:33 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id c14sm8900181wrv.12.2020.09.10.07.08.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 10 Sep 2020 07:08:32 -0700 (PDT)
+Subject: Re: [PATCH v2 0/2] hw/timer/hpet: Trivial format string fix
+To: qemu-devel@nongnu.org, Dov Murik <dovmurik@linux.vnet.ibm.com>
+References: <20200910135852.516809-1-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <35c826f7-bfbf-9e74-ad86-ef2d3262828f@redhat.com>
+Date: Thu, 10 Sep 2020 16:08:31 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200907182011.521007-22-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200910135852.516809-1-philmd@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="GTZemc3e7NBOFkiY5bi8yFqZ3wysayZOZ"
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 08:38:09
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 08:35:50
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -56
 X-Spam_score: -5.7
@@ -122,55 +137,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GTZemc3e7NBOFkiY5bi8yFqZ3wysayZOZ
-Content-Type: multipart/mixed; boundary="0hcnN8uLlaaGqM9AHHdGH3cY9tIH2ndnN"
+On 9/10/20 3:58 PM, Philippe Mathieu-Daudé wrote:
+> Fix a format string and remove dead code.
+> 
+> Since v1:
+> - Addressed Dov comments (fix format string + style):
+>   https://www.mail-archive.com/qemu-devel@nongnu.org/msg739239.html
 
---0hcnN8uLlaaGqM9AHHdGH3cY9tIH2ndnN
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Dov, since you sent the same patches/code and sign them with
+your S-o-b, I added them here too, is that OK with you?
 
-On 07.09.20 20:20, Kevin Wolf wrote:
-> Clients may want to know when an export has finally disappeard
-> (block-export-del returns earlier than that in the general case), so add
-> a QAPI event for it.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  qapi/block-export.json     | 12 ++++++++++++
->  block/export/export.c      |  2 ++
->  tests/qemu-iotests/140.out |  1 +
->  tests/qemu-iotests/223.out |  4 ++++
->  4 files changed, 19 insertions(+)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---0hcnN8uLlaaGqM9AHHdGH3cY9tIH2ndnN--
-
---GTZemc3e7NBOFkiY5bi8yFqZ3wysayZOZ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9aMlkACgkQ9AfbAGHV
-z0Ci+Qf+O2R0k6mSUoL8Pj7R+/c22iSnlYxA8kBxQT+N703nhQbc4DLjfrHJhuqh
-OFAAlPlDHgGd6p6b8HqynHG/KGJDd85EtEymVPkrLiQQMpUIqxlf716cmzTc9+jC
-oZPNJN2OuCgcrxhj3ROr+dQyjaBYiz0LW8NKjaow6NrHxylRXuFl7YzbR+/6dpPJ
-Cc2S+qhpTgRavs5uEp0aarghgGpLEwh/JqChzWMVu1utVSlC6WSuPpsDu825MZDQ
-CMsX/ZyzhE82MMwgo63A7p0XN6v9crhZ/RJDxaQgY2MmenO5wnl7xTwkXwa1h7mR
-h5R3MfFhKuz06GObG7E17odN216aUQ==
-=Voo1
------END PGP SIGNATURE-----
-
---GTZemc3e7NBOFkiY5bi8yFqZ3wysayZOZ--
+> 
+> Philippe Mathieu-Daudé (2):
+>   hw/timer/hpet: Remove dead code
+>   hw/timer/hpet: Fix DPRINTF format string
+> 
+>  hw/timer/hpet.c | 23 ++++++-----------------
+>  1 file changed, 6 insertions(+), 17 deletions(-)
+> 
 
 
