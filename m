@@ -7,83 +7,83 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B55FC2D0A7
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 19:57:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 952ADC2D0A7
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 19:58:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1870F208E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 19:57:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1386620882
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 19:58:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DpOy/iCI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1870F208E4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DMkhvXWW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1386620882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGShS-0002lm-45
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 15:57:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54490)
+	id 1kGSiY-0005a2-4S
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 15:58:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54538)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kGSai-0006ZY-05
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 15:50:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40318
- helo=us-smtp-1.mimecast.com)
+ id 1kGSaq-0006rY-Mv
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 15:50:52 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37793
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kGSaf-0000lT-LU
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 15:50:43 -0400
+ id 1kGSan-0000nx-DX
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 15:50:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599767440;
+ s=mimecast20190719; t=1599767448;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nlA62odmh2HZphdCDpVBp6BSdOLXWunBO2fvyN59ZUk=;
- b=DpOy/iCI9w+y6/i1fgWbgmSgLoYXkhRrHaOKwQ98gSyjbbEg7jfl//YLfaCnVw5lpwslhT
- fNbz+dm4zOQrRqiFrRXziCbkvNVCD9JWUZWRPtdKTYp3+I6qYS6Lq+wLh5aTgzdD/GW1jF
- haufTUopy8GZy64iDPTbZvAKwW9Jv1k=
+ bh=meSyVk5F9C2UK8oJsE6YKKdolkeEEIbEB3IIlhaqprI=;
+ b=DMkhvXWWVNiTc6k+Bc7+JQZ0wRtH0j1+QanoSjYvAW3c3dgvabr3SmJ7aXLHRJ/hyCyK6/
+ 2EOD8uH951Sd2ImqCKq8FpGgI3nIGOgk+g1j+cgKArifm0+dKZXiTp99+GbGSxsoKRCo5Y
+ Rt/hOyGSB8s8EDB+bQZJoHoJK7ApCfU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-OSLEgkZ3P3OoN4F4IxhaUA-1; Thu, 10 Sep 2020 15:50:39 -0400
-X-MC-Unique: OSLEgkZ3P3OoN4F4IxhaUA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-380-mWlgypEPOqC7YQji-mn0Ww-1; Thu, 10 Sep 2020 15:50:46 -0400
+X-MC-Unique: mWlgypEPOqC7YQji-mn0Ww-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2AA0E1074640;
- Thu, 10 Sep 2020 19:50:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04191425D1;
+ Thu, 10 Sep 2020 19:50:46 +0000 (UTC)
 Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 64BD55C1BD;
- Thu, 10 Sep 2020 19:50:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DBB2B7E8F9;
+ Thu, 10 Sep 2020 19:50:39 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 16/18] chardev: Rename WCTABLET_CHARDEV to CHARDEV_WCTABLET
-Date: Thu, 10 Sep 2020 15:49:01 -0400
-Message-Id: <20200910194903.4104696-17-ehabkost@redhat.com>
+Subject: [PATCH 18/18] chardev: Rename WIN_STDIO_CHARDEV to CHARDEV_WIN_STDIO
+Date: Thu, 10 Sep 2020 15:49:03 -0400
+Message-Id: <20200910194903.4104696-19-ehabkost@redhat.com>
 In-Reply-To: <20200910194903.4104696-1-ehabkost@redhat.com>
 References: <20200910194903.4104696-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 09:07:42
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 09:07:44
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,67 +111,74 @@ TYPE_CHARDEV_* constant names and the QOM type name strings
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- chardev/wctablet.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ chardev/char-win-stdio.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/chardev/wctablet.c b/chardev/wctablet.c
-index 95e005f5a5..c5b0be0451 100644
---- a/chardev/wctablet.c
-+++ b/chardev/wctablet.c
-@@ -86,7 +86,7 @@ struct TabletChardev {
- typedef struct TabletChardev TabletChardev;
+diff --git a/chardev/char-win-stdio.c b/chardev/char-win-stdio.c
+index a4771ab82e..46f715afb1 100644
+--- a/chardev/char-win-stdio.c
++++ b/chardev/char-win-stdio.c
+@@ -40,13 +40,13 @@ struct WinStdioChardev {
+ };
+ typedef struct WinStdioChardev WinStdioChardev;
  
- #define TYPE_CHARDEV_WCTABLET "chardev-wctablet"
--DECLARE_INSTANCE_CHECKER(TabletChardev, WCTABLET_CHARDEV,
-+DECLARE_INSTANCE_CHECKER(TabletChardev, CHARDEV_WCTABLET,
-                          TYPE_CHARDEV_WCTABLET)
+-DECLARE_INSTANCE_CHECKER(WinStdioChardev, WIN_STDIO_CHARDEV,
++DECLARE_INSTANCE_CHECKER(WinStdioChardev, CHARDEV_WIN_STDIO,
+                          TYPE_CHARDEV_WIN_STDIO)
  
- 
-@@ -187,7 +187,7 @@ static QemuInputHandler wctablet_handler = {
- 
- static void wctablet_chr_accept_input(Chardev *chr)
+ static void win_stdio_wait_func(void *opaque)
  {
--    TabletChardev *tablet = WCTABLET_CHARDEV(chr);
-+    TabletChardev *tablet = CHARDEV_WCTABLET(chr);
-     int len, canWrite;
+     Chardev *chr = CHARDEV(opaque);
+-    WinStdioChardev *stdio = WIN_STDIO_CHARDEV(opaque);
++    WinStdioChardev *stdio = CHARDEV_WIN_STDIO(opaque);
+     INPUT_RECORD       buf[4];
+     int                ret;
+     DWORD              dwSize;
+@@ -79,7 +79,7 @@ static void win_stdio_wait_func(void *opaque)
  
-     canWrite = qemu_chr_be_can_write(chr);
-@@ -208,7 +208,7 @@ static void wctablet_chr_accept_input(Chardev *chr)
- static int wctablet_chr_write(struct Chardev *chr,
-                               const uint8_t *buf, int len)
+ static DWORD WINAPI win_stdio_thread(LPVOID param)
  {
--    TabletChardev *tablet = WCTABLET_CHARDEV(chr);
-+    TabletChardev *tablet = CHARDEV_WCTABLET(chr);
-     unsigned int i, clen;
-     char *pos;
+-    WinStdioChardev *stdio = WIN_STDIO_CHARDEV(param);
++    WinStdioChardev *stdio = CHARDEV_WIN_STDIO(param);
+     int                ret;
+     DWORD              dwSize;
  
-@@ -297,7 +297,7 @@ static int wctablet_chr_write(struct Chardev *chr,
- 
- static int wctablet_chr_ioctl(Chardev *chr, int cmd, void *arg)
+@@ -118,7 +118,7 @@ static DWORD WINAPI win_stdio_thread(LPVOID param)
+ static void win_stdio_thread_wait_func(void *opaque)
  {
--    TabletChardev *tablet = WCTABLET_CHARDEV(chr);
-+    TabletChardev *tablet = CHARDEV_WCTABLET(chr);
-     QEMUSerialSetParams *ssp;
+     Chardev *chr = CHARDEV(opaque);
+-    WinStdioChardev *stdio = WIN_STDIO_CHARDEV(opaque);
++    WinStdioChardev *stdio = CHARDEV_WIN_STDIO(opaque);
  
-     switch (cmd) {
-@@ -317,7 +317,7 @@ static int wctablet_chr_ioctl(Chardev *chr, int cmd, void *arg)
+     if (qemu_chr_be_can_write(chr)) {
+         qemu_chr_be_write(chr, &stdio->win_stdio_buf, 1);
+@@ -129,7 +129,7 @@ static void win_stdio_thread_wait_func(void *opaque)
  
- static void wctablet_chr_finalize(Object *obj)
+ static void qemu_chr_set_echo_win_stdio(Chardev *chr, bool echo)
  {
--    TabletChardev *tablet = WCTABLET_CHARDEV(obj);
-+    TabletChardev *tablet = CHARDEV_WCTABLET(obj);
+-    WinStdioChardev *stdio = WIN_STDIO_CHARDEV(chr);
++    WinStdioChardev *stdio = CHARDEV_WIN_STDIO(chr);
+     DWORD              dwMode = 0;
  
-     qemu_input_handler_unregister(tablet->hs);
-     g_free(tablet);
-@@ -328,7 +328,7 @@ static void wctablet_chr_open(Chardev *chr,
-                               bool *be_opened,
-                               Error **errp)
+     GetConsoleMode(stdio->hStdIn, &dwMode);
+@@ -146,7 +146,7 @@ static void qemu_chr_open_stdio(Chardev *chr,
+                                 bool *be_opened,
+                                 Error **errp)
  {
--    TabletChardev *tablet = WCTABLET_CHARDEV(chr);
-+    TabletChardev *tablet = CHARDEV_WCTABLET(chr);
+-    WinStdioChardev *stdio = WIN_STDIO_CHARDEV(chr);
++    WinStdioChardev *stdio = CHARDEV_WIN_STDIO(chr);
+     DWORD              dwMode;
+     int                is_console = 0;
  
-     *be_opened = true;
+@@ -213,7 +213,7 @@ err1:
  
+ static void char_win_stdio_finalize(Object *obj)
+ {
+-    WinStdioChardev *stdio = WIN_STDIO_CHARDEV(obj);
++    WinStdioChardev *stdio = CHARDEV_WIN_STDIO(obj);
+ 
+     if (stdio->hInputReadyEvent != INVALID_HANDLE_VALUE) {
+         CloseHandle(stdio->hInputReadyEvent);
 -- 
 2.26.2
 
