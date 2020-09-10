@@ -2,79 +2,118 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B30FC43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:52:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB672C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:54:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF21920872
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:52:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF21920872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 345B820C09
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:54:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LkuA7wUx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 345B820C09
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGKBV-0000aJ-NH
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 06:52:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55018)
+	id 1kGKDi-0002vc-9J
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 06:54:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kGKA9-0006uG-AP
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:50:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57694)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kGKA6-0005RF-6A
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:50:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kGKA3-000245-Kj
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 10:50:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 83E842E80DC
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 10:50:39 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGKDA-0002O8-Aq
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:53:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26599)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGKD8-0005rU-PV
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:53:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599735229;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=CKxNoenD4vadztZO7HTMtPEOAQMffdaqY6lPZ5A+y0g=;
+ b=LkuA7wUxlxklpo6+hRlkUNlgLZRLc2nDIXaJaPp3SHrZIiKxb4X3nPwlbYcm+sOR38hlCH
+ HwF2J37a+tuZmDsFRcGkNR8vAOVDjTsUXlCO04gfRSo4PDKqD91iAc+Ll4GB71tLmDSruh
+ bSFp5X3mWszS6PUqH9chzNhZ+yZJPdU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-121-SKWcQ_EHMISVYg5McuNSLw-1; Thu, 10 Sep 2020 06:53:47 -0400
+X-MC-Unique: SKWcQ_EHMISVYg5McuNSLw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D0558030C7;
+ Thu, 10 Sep 2020 10:53:46 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-112-197.ams2.redhat.com
+ [10.36.112.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 95F239CBA;
+ Thu, 10 Sep 2020 10:53:45 +0000 (UTC)
+Subject: Re: [PATCH 07/29] block/export: Remove magic from block-export-add
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200907182011.521007-1-kwolf@redhat.com>
+ <20200907182011.521007-8-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <65fdd8a4-03c8-6220-1280-8081e7a98980@redhat.com>
+Date: Thu, 10 Sep 2020 12:53:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 10 Sep 2020 10:41:12 -0000
-From: Yonggang Luo <1895122@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: luoyonggang
-X-Launchpad-Bug-Reporter: Yonggang Luo (luoyonggang)
-X-Launchpad-Bug-Modifier: Yonggang Luo (luoyonggang)
-Message-Id: <159973447247.11849.9583651644725576217.malonedeb@chaenomeles.canonical.com>
-Subject: [Bug 1895122] [NEW] qemu on wsl tests failed,
- this configured with debug
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="90a5703803d95539bdb5c0b289b1675630569e1e"; Instance="production"
-X-Launchpad-Hash: f262d234f7785095c007c616b4bebf887923f7e7
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 06:50:40
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200907182011.521007-8-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="jOGxOtasyKNZCupWcqVvxNKypdDGu4KJx"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 00:49:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -56
+X-Spam_score: -5.7
+X-Spam_bar: -----
+X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-3.576, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,150 +122,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1895122 <1895122@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jOGxOtasyKNZCupWcqVvxNKypdDGu4KJx
+Content-Type: multipart/mixed; boundary="iuUoPUWlpPPjZqNwijsoFbhepdlnG4hrJ"
+
+--iuUoPUWlpPPjZqNwijsoFbhepdlnG4hrJ
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 07.09.20 20:19, Kevin Wolf wrote:
+> nbd-server-add tries to be convenient and adds two questionable
+> features that we don't want to share in block-export-add, even for NBD
+> exports:
+>=20
+> 1. When requesting a writable export of a read-only device, the export
+>    is silently downgraded to read-only. This should be an error in the
+>    context of block-export-add.
+>=20
+> 2. When using a BlockBackend name, unplugging the device from the guest
+>    will automatically stop the NBD server, too. This may sometimes be
+>    what you want, but it could also be very surprising. Let's keep
+>    things explicit with block-export-add. If the user wants to stop the
+>    export, they should tell us so.
+>=20
+> Move these things into the nbd-server-add QMP command handler so that
+> they apply only there.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  include/block/export.h |  2 ++
+>  include/block/nbd.h    |  3 ++-
+>  block/export/export.c  | 13 +++++++++---
+>  blockdev-nbd.c         | 47 +++++++++++++++++++++++++++++++++++-------
+>  nbd/server.c           | 20 +++++++++++-------
+>  qemu-nbd.c             |  3 +--
+>  6 files changed, 67 insertions(+), 21 deletions(-)
+
+[...]
+
+> +    if (bdrv_is_read_only(bs)) {
+> +        export_opts.u.nbd.has_writable =3D true;
+
+Ah, yes, setting that might be nice. :)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
-../configure --enable-debug-info --enable-debug
+--iuUoPUWlpPPjZqNwijsoFbhepdlnG4hrJ--
 
-**
-ERROR:../tests/test-util-filemonitor.c:704:test_file_monitor_events: assert=
-ion failed: (err =3D=3D 0)
-Aborted (core dumped)
+--jOGxOtasyKNZCupWcqVvxNKypdDGu4KJx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
-  TEST    iotest-qcow2: 271 [fail]
-QEMU          -- "/home/lygstate/work/qemu/build/tests/qemu-iotests/../../q=
-emu-system-x86_64" -nodefaults -display none -accel qtest
-QEMU_IMG      -- "/home/lygstate/work/qemu/build/tests/qemu-iotests/../../q=
-emu-img" =
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9aBbcACgkQ9AfbAGHV
+z0Ck/wgAoN1MLCcdwrNyq7BlBlhghHsDwdoQ5ERU8miUN/iQpM42RueQzexnN4pj
+DIsKhTAAiWcP6ZUj6LZcMMmqDe1ZBwfGO7i+SwKQTi1kr2PMsHdci3vtXSgV/LIE
+lHQuli4/i584VN3MxPueUWAI8Slc99Xx4T1/otTSpQ+3DRNmz9o4ArUIYPqx30eA
+ZKYqL9rcN7F6UT4tQg1kAHiJk0p/X1xpwiKruj5EUv/VjFWx+dhZr9GfwIHUjZ7Z
+PyaJ4UOa06aS8+0m2Yx4Z4Sf8TNFqyNBFjLHtvliP+T2geJlYjNSwkT539q5w98p
+LvF7fTQmx2OTFarAogWbFduFeYtOJQ==
+=Gnh6
+-----END PGP SIGNATURE-----
 
-QEMU_IO       -- "/home/lygstate/work/qemu/build/tests/qemu-iotests/../../q=
-emu-io"  --cache writeback --aio threads -f qcow2
-QEMU_NBD      -- "/home/lygstate/work/qemu/build/tests/qemu-iotests/../../q=
-emu-nbd" =
+--jOGxOtasyKNZCupWcqVvxNKypdDGu4KJx--
 
-IMGFMT        -- qcow2 (compat=3D1.1)
-IMGPROTO      -- file
-PLATFORM      -- Linux/x86_64 DESKTOP-BLLJ03T 4.4.0-19041-Microsoft
-TEST_DIR      -- /home/lygstate/work/qemu/build/tests/qemu-iotests/scratch
-SOCK_DIR      -- /tmp/tmp.eyVcw8nLNQ
-SOCKET_SCM_HELPER -- /home/lygstate/work/qemu/build/tests/qemu-iotests/sock=
-et_scm_helper
-
---- /home/lygstate/work/qemu/tests/qemu-iotests/271.out	2020-09-10 15:00:58=
-.190763400 +0800
-+++ /home/lygstate/work/qemu/build/tests/qemu-iotests/271.out.bad	2020-09-1=
-0 18:38:25.625090800 +0800
-@@ -37,6 +37,7 @@
- write -q -P PATTERN 0 64k
- L2 entry #0: 0x8000000000050000 00000000ffffffff
- discard -q 0 64k
-+Content mismatch at offset 0!
- L2 entry #0: 0x0000000000000000 ffffffff00000000
- write -q -c -P PATTERN 0 64k
- L2 entry #0: 0x4000000000050000 0000000000000000
-@@ -79,6 +80,7 @@
- write -q -P PATTERN 0 64k
- L2 entry #0: 0x8000000000050000 00000000ffffffff
- discard -q 0 64k
-+Content mismatch at offset 0!
- L2 entry #0: 0x0000000000000000 ffffffff00000000
- write -q -c -P PATTERN 0 64k
- L2 entry #0: 0x4000000000050000 0000000000000000
-  TEST    iotest-qcow2: 283
-  TEST    iotest-qcow2: 287
-  TEST    iotest-qcow2: 290
-  TEST    iotest-qcow2: 292
-  TEST    iotest-qcow2: 299
-Not run: 060 181 220 259
-Failures: 271
-Failed 1 of 118 iotests
-make: [/home/lygstate/work/qemu/tests/Makefile.include:144: check-block] Er=
-ror 1 (ignored)
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1895122
-
-Title:
-  qemu on wsl tests failed, this configured with debug
-
-Status in QEMU:
-  New
-
-Bug description:
-  =
-
-  ../configure --enable-debug-info --enable-debug
-
-  **
-  ERROR:../tests/test-util-filemonitor.c:704:test_file_monitor_events: asse=
-rtion failed: (err =3D=3D 0)
-  Aborted (core dumped)
-
-  =
-
-    TEST    iotest-qcow2: 271 [fail]
-  QEMU          -- "/home/lygstate/work/qemu/build/tests/qemu-iotests/../..=
-/qemu-system-x86_64" -nodefaults -display none -accel qtest
-  QEMU_IMG      -- "/home/lygstate/work/qemu/build/tests/qemu-iotests/../..=
-/qemu-img" =
-
-  QEMU_IO       -- "/home/lygstate/work/qemu/build/tests/qemu-iotests/../..=
-/qemu-io"  --cache writeback --aio threads -f qcow2
-  QEMU_NBD      -- "/home/lygstate/work/qemu/build/tests/qemu-iotests/../..=
-/qemu-nbd" =
-
-  IMGFMT        -- qcow2 (compat=3D1.1)
-  IMGPROTO      -- file
-  PLATFORM      -- Linux/x86_64 DESKTOP-BLLJ03T 4.4.0-19041-Microsoft
-  TEST_DIR      -- /home/lygstate/work/qemu/build/tests/qemu-iotests/scratch
-  SOCK_DIR      -- /tmp/tmp.eyVcw8nLNQ
-  SOCKET_SCM_HELPER -- /home/lygstate/work/qemu/build/tests/qemu-iotests/so=
-cket_scm_helper
-
-  --- /home/lygstate/work/qemu/tests/qemu-iotests/271.out	2020-09-10 15:00:=
-58.190763400 +0800
-  +++ /home/lygstate/work/qemu/build/tests/qemu-iotests/271.out.bad	2020-09=
--10 18:38:25.625090800 +0800
-  @@ -37,6 +37,7 @@
-   write -q -P PATTERN 0 64k
-   L2 entry #0: 0x8000000000050000 00000000ffffffff
-   discard -q 0 64k
-  +Content mismatch at offset 0!
-   L2 entry #0: 0x0000000000000000 ffffffff00000000
-   write -q -c -P PATTERN 0 64k
-   L2 entry #0: 0x4000000000050000 0000000000000000
-  @@ -79,6 +80,7 @@
-   write -q -P PATTERN 0 64k
-   L2 entry #0: 0x8000000000050000 00000000ffffffff
-   discard -q 0 64k
-  +Content mismatch at offset 0!
-   L2 entry #0: 0x0000000000000000 ffffffff00000000
-   write -q -c -P PATTERN 0 64k
-   L2 entry #0: 0x4000000000050000 0000000000000000
-    TEST    iotest-qcow2: 283
-    TEST    iotest-qcow2: 287
-    TEST    iotest-qcow2: 290
-    TEST    iotest-qcow2: 292
-    TEST    iotest-qcow2: 299
-  Not run: 060 181 220 259
-  Failures: 271
-  Failed 1 of 118 iotests
-  make: [/home/lygstate/work/qemu/tests/Makefile.include:144: check-block] =
-Error 1 (ignored)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1895122/+subscriptions
 
