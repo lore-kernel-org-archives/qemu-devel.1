@@ -2,85 +2,75 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86134C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 19:25:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBEA9C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 19:26:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A47F206DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 19:25:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JR2WK7rO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A47F206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 21EBF207DE
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 19:26:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21EBF207DE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGSC4-0007yJ-8r
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 15:25:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48298)
+	id 1kGSDY-0000q4-5B
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 15:26:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48550)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kGSBW-0007WK-Dw
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 15:24:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49255
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kGSBU-0005UD-Gr
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 15:24:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599765879;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=5I0JQweHgQgqSkas9R5kURK6i+vauSLOW8LMu4xZTq0=;
- b=JR2WK7rOiFbyeuRYPJs77+20ppSIvlJzbWaUbBj6CWkxZ73zKsSs/QGsyM6hqYUxtZXxYw
- 2C1NuNf/m8e6t8LMoaD+w+4F5WDjx6EfrAxW4n1FAV4JpOg3mTqqboasNJxqaWQy7yFjpq
- NlC/LuNOwNpM0QKnw7qMt2cSRUSGsRE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-155-vHVPvbwjN3mYuw29ukb0fQ-1; Thu, 10 Sep 2020 15:24:37 -0400
-X-MC-Unique: vHVPvbwjN3mYuw29ukb0fQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9ED591902ECE;
- Thu, 10 Sep 2020 19:24:30 +0000 (UTC)
-Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 457665D9CA;
- Thu, 10 Sep 2020 19:24:22 +0000 (UTC)
-Date: Thu, 10 Sep 2020 15:24:21 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH 02/63] chardev: Rename TYPE_CHARDEV_* to TYPE_*_CHARDEV
-Message-ID: <20200910192421.GO1618070@habkost.net>
-References: <20200902224311.1321159-1-ehabkost@redhat.com>
- <20200902224311.1321159-3-ehabkost@redhat.com>
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kGSCi-00005m-Qd; Thu, 10 Sep 2020 15:25:56 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:32825)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kGSCg-0005h3-BJ; Thu, 10 Sep 2020 15:25:56 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.156.35])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 1B47359BDFDA;
+ Thu, 10 Sep 2020 21:25:42 +0200 (CEST)
+Received: from kaod.org (37.59.142.95) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 10 Sep
+ 2020 21:25:40 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-95G001c7ff4359-2a02-48c5-be83-c4d2a64ddcce,
+ 8FE11AEDAF16247B821E16C08928A26F58BE1972) smtp.auth=clg@kaod.org
+Subject: Re: [PATCH 1/6] hw/ssi/aspeed_smc: Rename max_slaves as max_devices
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ <qemu-devel@nongnu.org>
+References: <20200910070131.435543-1-philmd@redhat.com>
+ <20200910070131.435543-2-philmd@redhat.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <6ed7ad28-107a-65a2-489d-1cd15cd372dd@kaod.org>
+Date: Thu, 10 Sep 2020 21:25:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200902224311.1321159-3-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 08:35:50
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+In-Reply-To: <20200910070131.435543-2-philmd@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [37.59.142.95]
+X-ClientProxiedBy: DAG9EX1.mxp5.local (172.16.2.81) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: e9a3d5e1-decd-4ded-bacf-ec1395775ed2
+X-Ovh-Tracer-Id: 9058427701944224528
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudehjedgudefudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgihesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeejkeduueduveelgeduueegkeelffevledujeetffeivdelvdfgkeeufeduheehfeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehphhhilhhmugesrhgvughhrghtrdgtohhm
+Received-SPF: pass client-ip=178.32.125.2; envelope-from=clg@kaod.org;
+ helo=smtpout1.mo529.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 15:25:43
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -54
+X-Spam_score: -5.5
+X-Spam_bar: -----
+X-Spam_report: (-5.5 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-3.576,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -95,27 +85,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
+ Jason Wang <jasowang@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ qemu-trivial@nongnu.org, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 02, 2020 at 06:42:10PM -0400, Eduardo Habkost wrote:
-> This will make the TYPE_* constants consistent with the name of
-> most type checking macros we have today.
+On 9/10/20 9:01 AM, Philippe Mathieu-Daudé wrote:
+> In order to use inclusive terminology, rename max_slaves
+> as max_devices.>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+
+
+
+
+> ---
+>  include/hw/ssi/aspeed_smc.h |  2 +-
+>  hw/ssi/aspeed_smc.c         | 40 ++++++++++++++++++-------------------
+>  2 files changed, 21 insertions(+), 21 deletions(-)
 > 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-
-I will drop this and send a separate patch to rename the type
-checking macros instead, because that would make all identifiers
-match the actual QOM type name strings ("chardev-*").
-
--- 
-Eduardo
+> diff --git a/include/hw/ssi/aspeed_smc.h b/include/hw/ssi/aspeed_smc.h
+> index 6fbbb238f15..52ae34e38d1 100644
+> --- a/include/hw/ssi/aspeed_smc.h
+> +++ b/include/hw/ssi/aspeed_smc.h
+> @@ -42,7 +42,7 @@ typedef struct AspeedSMCController {
+>      uint8_t r_timings;
+>      uint8_t nregs_timings;
+>      uint8_t conf_enable_w0;
+> -    uint8_t max_slaves;
+> +    uint8_t max_devices;
+>      const AspeedSegments *segments;
+>      hwaddr flash_window_base;
+>      uint32_t flash_window_size;
+> diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+> index 795784e5f36..8219272016c 100644
+> --- a/hw/ssi/aspeed_smc.c
+> +++ b/hw/ssi/aspeed_smc.c
+> @@ -259,7 +259,7 @@ static const AspeedSMCController controllers[] = {
+>          .r_timings         = R_TIMINGS,
+>          .nregs_timings     = 1,
+>          .conf_enable_w0    = CONF_ENABLE_W0,
+> -        .max_slaves        = 1,
+> +        .max_devices       = 1,
+>          .segments          = aspeed_segments_legacy,
+>          .flash_window_base = ASPEED_SOC_SMC_FLASH_BASE,
+>          .flash_window_size = 0x6000000,
+> @@ -275,7 +275,7 @@ static const AspeedSMCController controllers[] = {
+>          .r_timings         = R_TIMINGS,
+>          .nregs_timings     = 1,
+>          .conf_enable_w0    = CONF_ENABLE_W0,
+> -        .max_slaves        = 5,
+> +        .max_devices       = 5,
+>          .segments          = aspeed_segments_fmc,
+>          .flash_window_base = ASPEED_SOC_FMC_FLASH_BASE,
+>          .flash_window_size = 0x10000000,
+> @@ -293,7 +293,7 @@ static const AspeedSMCController controllers[] = {
+>          .r_timings         = R_SPI_TIMINGS,
+>          .nregs_timings     = 1,
+>          .conf_enable_w0    = SPI_CONF_ENABLE_W0,
+> -        .max_slaves        = 1,
+> +        .max_devices       = 1,
+>          .segments          = aspeed_segments_spi,
+>          .flash_window_base = ASPEED_SOC_SPI_FLASH_BASE,
+>          .flash_window_size = 0x10000000,
+> @@ -309,7 +309,7 @@ static const AspeedSMCController controllers[] = {
+>          .r_timings         = R_TIMINGS,
+>          .nregs_timings     = 1,
+>          .conf_enable_w0    = CONF_ENABLE_W0,
+> -        .max_slaves        = 3,
+> +        .max_devices       = 3,
+>          .segments          = aspeed_segments_ast2500_fmc,
+>          .flash_window_base = ASPEED_SOC_FMC_FLASH_BASE,
+>          .flash_window_size = 0x10000000,
+> @@ -327,7 +327,7 @@ static const AspeedSMCController controllers[] = {
+>          .r_timings         = R_TIMINGS,
+>          .nregs_timings     = 1,
+>          .conf_enable_w0    = CONF_ENABLE_W0,
+> -        .max_slaves        = 2,
+> +        .max_devices       = 2,
+>          .segments          = aspeed_segments_ast2500_spi1,
+>          .flash_window_base = ASPEED_SOC_SPI_FLASH_BASE,
+>          .flash_window_size = 0x8000000,
+> @@ -343,7 +343,7 @@ static const AspeedSMCController controllers[] = {
+>          .r_timings         = R_TIMINGS,
+>          .nregs_timings     = 1,
+>          .conf_enable_w0    = CONF_ENABLE_W0,
+> -        .max_slaves        = 2,
+> +        .max_devices       = 2,
+>          .segments          = aspeed_segments_ast2500_spi2,
+>          .flash_window_base = ASPEED_SOC_SPI2_FLASH_BASE,
+>          .flash_window_size = 0x8000000,
+> @@ -359,7 +359,7 @@ static const AspeedSMCController controllers[] = {
+>          .r_timings         = R_TIMINGS,
+>          .nregs_timings     = 1,
+>          .conf_enable_w0    = CONF_ENABLE_W0,
+> -        .max_slaves        = 3,
+> +        .max_devices       = 3,
+>          .segments          = aspeed_segments_ast2600_fmc,
+>          .flash_window_base = ASPEED26_SOC_FMC_FLASH_BASE,
+>          .flash_window_size = 0x10000000,
+> @@ -377,7 +377,7 @@ static const AspeedSMCController controllers[] = {
+>          .r_timings         = R_TIMINGS,
+>          .nregs_timings     = 2,
+>          .conf_enable_w0    = CONF_ENABLE_W0,
+> -        .max_slaves        = 2,
+> +        .max_devices       = 2,
+>          .segments          = aspeed_segments_ast2600_spi1,
+>          .flash_window_base = ASPEED26_SOC_SPI_FLASH_BASE,
+>          .flash_window_size = 0x10000000,
+> @@ -395,7 +395,7 @@ static const AspeedSMCController controllers[] = {
+>          .r_timings         = R_TIMINGS,
+>          .nregs_timings     = 3,
+>          .conf_enable_w0    = CONF_ENABLE_W0,
+> -        .max_slaves        = 3,
+> +        .max_devices       = 3,
+>          .segments          = aspeed_segments_ast2600_spi2,
+>          .flash_window_base = ASPEED26_SOC_SPI2_FLASH_BASE,
+>          .flash_window_size = 0x10000000,
+> @@ -476,7 +476,7 @@ static bool aspeed_smc_flash_overlap(const AspeedSMCState *s,
+>      AspeedSegments seg;
+>      int i;
+>  
+> -    for (i = 0; i < s->ctrl->max_slaves; i++) {
+> +    for (i = 0; i < s->ctrl->max_devices; i++) {
+>          if (i == cs) {
+>              continue;
+>          }
+> @@ -537,7 +537,7 @@ static void aspeed_smc_flash_set_segment(AspeedSMCState *s, int cs,
+>       */
+>      if ((s->ctrl->segments == aspeed_segments_ast2500_spi1 ||
+>           s->ctrl->segments == aspeed_segments_ast2500_spi2) &&
+> -        cs == s->ctrl->max_slaves &&
+> +        cs == s->ctrl->max_devices &&
+>          seg.addr + seg.size != s->ctrl->segments[cs].addr +
+>          s->ctrl->segments[cs].size) {
+>          qemu_log_mask(LOG_GUEST_ERROR,
+> @@ -948,7 +948,7 @@ static void aspeed_smc_reset(DeviceState *d)
+>      }
+>  
+>      /* setup the default segment register values and regions for all */
+> -    for (i = 0; i < s->ctrl->max_slaves; ++i) {
+> +    for (i = 0; i < s->ctrl->max_devices; ++i) {
+>          aspeed_smc_flash_set_segment_region(s, i,
+>                      s->ctrl->segment_to_reg(s, &s->ctrl->segments[i]));
+>      }
+> @@ -995,8 +995,8 @@ static uint64_t aspeed_smc_read(void *opaque, hwaddr addr, unsigned int size)
+>          (s->ctrl->has_dma && addr == R_DMA_DRAM_ADDR) ||
+>          (s->ctrl->has_dma && addr == R_DMA_LEN) ||
+>          (s->ctrl->has_dma && addr == R_DMA_CHECKSUM) ||
+> -        (addr >= R_SEG_ADDR0 && addr < R_SEG_ADDR0 + s->ctrl->max_slaves) ||
+> -        (addr >= s->r_ctrl0 && addr < s->r_ctrl0 + s->ctrl->max_slaves)) {
+> +        (addr >= R_SEG_ADDR0 && addr < R_SEG_ADDR0 + s->ctrl->max_devices) ||
+> +        (addr >= s->r_ctrl0 && addr < s->r_ctrl0 + s->ctrl->max_devices)) {
+>  
+>          trace_aspeed_smc_read(addr, size, s->regs[addr]);
+>  
+> @@ -1270,7 +1270,7 @@ static void aspeed_smc_write(void *opaque, hwaddr addr, uint64_t data,
+>          int cs = addr - s->r_ctrl0;
+>          aspeed_smc_flash_update_ctrl(&s->flashes[cs], value);
+>      } else if (addr >= R_SEG_ADDR0 &&
+> -               addr < R_SEG_ADDR0 + s->ctrl->max_slaves) {
+> +               addr < R_SEG_ADDR0 + s->ctrl->max_devices) {
+>          int cs = addr - R_SEG_ADDR0;
+>  
+>          if (value != s->regs[R_SEG_ADDR0 + cs]) {
+> @@ -1341,10 +1341,10 @@ static void aspeed_smc_realize(DeviceState *dev, Error **errp)
+>      s->conf_enable_w0 = s->ctrl->conf_enable_w0;
+>  
+>      /* Enforce some real HW limits */
+> -    if (s->num_cs > s->ctrl->max_slaves) {
+> +    if (s->num_cs > s->ctrl->max_devices) {
+>          qemu_log_mask(LOG_GUEST_ERROR, "%s: num_cs cannot exceed: %d\n",
+> -                      __func__, s->ctrl->max_slaves);
+> -        s->num_cs = s->ctrl->max_slaves;
+> +                      __func__, s->ctrl->max_devices);
+> +        s->num_cs = s->ctrl->max_devices;
+>      }
+>  
+>      /* DMA irq. Keep it first for the initialization in the SoC */
+> @@ -1376,7 +1376,7 @@ static void aspeed_smc_realize(DeviceState *dev, Error **errp)
+>                            s->ctrl->flash_window_size);
+>      sysbus_init_mmio(sbd, &s->mmio_flash);
+>  
+> -    s->flashes = g_new0(AspeedSMCFlash, s->ctrl->max_slaves);
+> +    s->flashes = g_new0(AspeedSMCFlash, s->ctrl->max_devices);
+>  
+>      /*
+>       * Let's create a sub memory region for each possible slave. All
+> @@ -1385,7 +1385,7 @@ static void aspeed_smc_realize(DeviceState *dev, Error **errp)
+>       * module behind to handle the memory accesses. This depends on
+>       * the board configuration.
+>       */
+> -    for (i = 0; i < s->ctrl->max_slaves; ++i) {
+> +    for (i = 0; i < s->ctrl->max_devices; ++i) {
+>          AspeedSMCFlash *fl = &s->flashes[i];
+>  
+>          snprintf(name, sizeof(name), "%s.%d", s->ctrl->name, i);
+> 
 
 
