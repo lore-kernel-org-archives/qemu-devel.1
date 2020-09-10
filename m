@@ -2,114 +2,91 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A63F0C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:39:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1A71C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:40:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1983E207EA
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:39:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D48620758
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:40:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="h21AW+JG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1983E207EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DeZp8Gh8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D48620758
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGJ3N-0006wq-UT
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 05:39:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35236)
+	id 1kGJ4D-00006E-AM
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 05:40:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1kGJ1B-0002Ji-Kg; Thu, 10 Sep 2020 05:37:25 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57210)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1kGJ18-0003Sk-Ha; Thu, 10 Sep 2020 05:37:25 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 08A9Xt5B085973; Thu, 10 Sep 2020 05:37:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=FcGuP/jUD8lNTSAOuOJChyl2Ny2cXN6+D51sFQfrki0=;
- b=h21AW+JGHKSLv33Cr2MuZLn5WeB0zMiUHjHOHDuE7Quv8+OWO9noayfxzw7iJnSglZ13
- 7NjaKeMTIWjGKY8hWq3TC3dtoPPNXUUVaZJAH3WOooxphblyNtZhXwj/TEPc24aYzW0q
- YhQHDTljrJM07t+8V4P72ev3pZvobyoOc1fI32WXsNJoXEM9Ailrf0fFh5MlOK6jY00p
- vF0FXBJHJ1obTM2gqt/2SC8UXbQPGivj4N3N9j8tE7LG86CTp0xkm0jmbeG+x59uWRY2
- MxVHDNmJ2I2OS4Fl+p9HiYn+KqPfGX/qP5bn4CGYuiNNEFil/uC3H53qRPYswT0D8kZT ow== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33fgmn1rhn-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 10 Sep 2020 05:37:20 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08A9XvSJ086038;
- Thu, 10 Sep 2020 05:37:18 -0400
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.26])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33fgmn1rdj-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 10 Sep 2020 05:37:18 -0400
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
- by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08A9Vbc4005703;
- Thu, 10 Sep 2020 09:37:13 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
- [9.57.198.26]) by ppma04wdc.us.ibm.com with ESMTP id 33c2a968u6-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 10 Sep 2020 09:37:13 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
- [9.57.199.109])
- by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 08A9bC0k16057096
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 10 Sep 2020 09:37:12 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id B5BC5112066;
- Thu, 10 Sep 2020 09:37:12 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6D0AF112064;
- Thu, 10 Sep 2020 09:37:12 +0000 (GMT)
-Received: from localhost.localdomain.com (unknown [9.85.156.134])
- by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
- Thu, 10 Sep 2020 09:37:12 +0000 (GMT)
-From: Collin Walling <walling@linux.ibm.com>
-To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
-Subject: [PATCH v5 7/8] s390/kvm: header sync for diag318
-Date: Thu, 10 Sep 2020 05:36:54 -0400
-Message-Id: <20200910093655.255774-8-walling@linux.ibm.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200910093655.255774-1-walling@linux.ibm.com>
-References: <20200910093655.255774-1-walling@linux.ibm.com>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kGJ3B-0006sY-A4
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 05:39:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55988)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kGJ37-0003fr-QF
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 05:39:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599730763;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=UJMJyRzObNSzgsm7nKTBhtIdlUcnnERbJ5o1q7a0ciI=;
+ b=DeZp8Gh8p6cl+FugftWunwKCqm0B2RXcWnNJpBW/W0j5Wsc4Lwtt9IknBbW714cp219AOw
+ BFtl9u7ITf0As+0o2ysFim6VBeYHraEb8e6XGnua8FJcp6ixDb1kAIzoCD+zM9g6lB5Wyj
+ qucI3wJf32sIV3FRwXLBm07dbN5f2Pg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-122-uRVKf8UVNO6_we5Y9MFxTQ-1; Thu, 10 Sep 2020 05:39:19 -0400
+X-MC-Unique: uRVKf8UVNO6_we5Y9MFxTQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 890321008542;
+ Thu, 10 Sep 2020 09:39:18 +0000 (UTC)
+Received: from redhat.com (ovpn-112-4.ams2.redhat.com [10.36.112.4])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 347F65D9E8;
+ Thu, 10 Sep 2020 09:39:13 +0000 (UTC)
+Date: Thu, 10 Sep 2020 10:39:10 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [RFC] QEMU as Xcode project on macOS
+Message-ID: <20200910093910.GG1083348@redhat.com>
+References: <2764135.D4k31Gy3CM@silver> <1695914.5EixHECA2G@silver>
+ <20200910073710.GA1083348@redhat.com> <2421928.3WNMogbLRJ@silver>
 MIME-Version: 1.0
+In-Reply-To: <2421928.3WNMogbLRJ@silver>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-09-10_01:2020-09-10,
- 2020-09-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 suspectscore=0
- adultscore=0 priorityscore=1501 mlxlogscore=999 phishscore=0 spamscore=0
- bulkscore=0 lowpriorityscore=0 clxscore=1015 impostorscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009100088
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=walling@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 05:37:13
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 02:38:59
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -122,62 +99,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, frankja@linux.ibm.com, david@redhat.com,
- cohuck@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com, mst@redhat.com,
- pbonzini@redhat.com, sumanthk@linux.ibm.com, mihajlov@linux.ibm.com,
- rth@twiddle.net
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Liviu Ionescu <ilg@livius.net>, qemu-devel@nongnu.org,
+ G 3 <programmingkidx@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Collin Walling <walling@linux.ibm.com>
----
- linux-headers/asm-s390/kvm.h | 7 +++++--
- linux-headers/linux/kvm.h    | 1 +
- 2 files changed, 6 insertions(+), 2 deletions(-)
+On Thu, Sep 10, 2020 at 11:32:35AM +0200, Christian Schoenebeck wrote:
+> On Donnerstag, 10. September 2020 09:37:10 CEST Daniel P. Berrangé wrote:
+> > I don't think we want to be adding more 3rd party deps as submodules, quite
+> > the opposite, we want to remove more submodules we currently have.
+> > 
+> > Bundling every important dep we use as a submodule and providing build
+> > rules, means we're effectively re-inventing Homebrew / MacPorts and this is
+> > not a sane use of our time.
+> 
+> Well, that's actually the whole point of this thread: saving developers' time. 
+> And I think the submodule solution is the most sane one.
+>
+> Frankly if you compile FOSS software on Mac that asks you to "just" install 
+> dependencies with Homebrew and co, it feels like you have 2 jobs: a software 
+> developer, and a distribution maintainer. The difference to the submodule 
+> though: a much larger amount of developers have to do that maintainer job 
+> (manually resolving conflicts & crashes, rollbacks, etc.).
 
-diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
-index 0138ccb0d8..f053b8304a 100644
---- a/linux-headers/asm-s390/kvm.h
-+++ b/linux-headers/asm-s390/kvm.h
-@@ -231,11 +231,13 @@ struct kvm_guest_debug_arch {
- #define KVM_SYNC_GSCB   (1UL << 9)
- #define KVM_SYNC_BPBC   (1UL << 10)
- #define KVM_SYNC_ETOKEN (1UL << 11)
-+#define KVM_SYNC_DIAG318 (1UL << 12)
- 
- #define KVM_SYNC_S390_VALID_FIELDS \
- 	(KVM_SYNC_PREFIX | KVM_SYNC_GPRS | KVM_SYNC_ACRS | KVM_SYNC_CRS | \
- 	 KVM_SYNC_ARCH0 | KVM_SYNC_PFAULT | KVM_SYNC_VRS | KVM_SYNC_RICCB | \
--	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN)
-+	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN | \
-+	 KVM_SYNC_DIAG318)
- 
- /* length and alignment of the sdnx as a power of two */
- #define SDNXC 8
-@@ -264,7 +266,8 @@ struct kvm_sync_regs {
- 	__u8 reserved2 : 7;
- 	__u8 padding1[51];	/* riccb needs to be 64byte aligned */
- 	__u8 riccb[64];		/* runtime instrumentation controls block */
--	__u8 padding2[192];	/* sdnx needs to be 256byte aligned */
-+	__u64 diag318;		/* diagnose 0x318 info */
-+	__u8 padding2[184];	/* sdnx needs to be 256byte aligned */
- 	union {
- 		__u8 sdnx[SDNXL];  /* state description annex */
- 		struct {
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index a28c366737..a789bfb5a2 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -1031,6 +1031,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_PPC_SECURE_GUEST 181
- #define KVM_CAP_HALT_POLL 182
- #define KVM_CAP_ASYNC_PF_INT 183
-+#define KVM_CAP_S390_DIAG318 184
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
+
+I don't think it saves time. If you look at the bigger picture across
+multiple project it costs time. Every project that depends on glib or
+gtk or gnutls or etc  reinvents the wheel figuring out a suitable
+recipe for bundling & building these dependencies. Worse is that they
+will all do it slightly differently, or use a variety of versions, and
+so users get a worse experiance too with different features available
+and different things broken. Projects like HomeBrew exist precisely to
+save developer time because these build steps can be figured out once,
+and every project can now just rely on the well maintained HomeBrew
+packages.
+
+Regards,
+Daniel
 -- 
-2.26.2
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
