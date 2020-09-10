@@ -2,89 +2,118 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0C08C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 12:19:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 636C6C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 12:37:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E49E42074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 12:19:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9743E208FE
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 12:37:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="m6ENsihf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E49E42074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ayTC9MkX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9743E208FE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGLY1-00037j-Ue
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 08:19:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45666)
+	id 1kGLp5-0002VM-D4
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 08:37:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50870)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1kGLWu-0002Gk-7k; Thu, 10 Sep 2020 08:18:20 -0400
-Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:53448)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1kGLWo-0007xH-O0; Thu, 10 Sep 2020 08:18:18 -0400
-Received: from vla1-fdfb804fb3f3.qloud-c.yandex.net
- (vla1-fdfb804fb3f3.qloud-c.yandex.net
- [IPv6:2a02:6b8:c0d:3199:0:640:fdfb:804f])
- by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id C9AE62E14D7;
- Thu, 10 Sep 2020 15:18:04 +0300 (MSK)
-Received: from vla1-81430ab5870b.qloud-c.yandex.net
- (vla1-81430ab5870b.qloud-c.yandex.net [2a02:6b8:c0d:35a1:0:640:8143:ab5])
- by vla1-fdfb804fb3f3.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
- 1fZAh1M1ws-I3wWr21i; Thu, 10 Sep 2020 15:18:04 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1599740284; bh=VU7W4E9NMFZfNHUyK5DYUhYN+Ntk0a6HIlqhx4vtOp0=;
- h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
- b=m6ENsihf7Qe7j+wtRjTUCg2RB1CUWVi5rDBngk3Qqiecc2DUWnCiHSlG87R7EWugQ
- BOAJCUv8boC3TgOkA0bIP/r+B/zIOdJfrt7SVMqMvdlUjGLmF+PDI9B/FoAilblWCk
- A2sNuDnKvBD7iq6fOfdkgHhHybCtw14hVJ4k54kw=
-Authentication-Results: vla1-fdfb804fb3f3.qloud-c.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
- [2a02:6b8:b080:8008::1:e])
- by vla1-81430ab5870b.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- jeEfcVEErX-I3l8m9vx; Thu, 10 Sep 2020 15:18:03 +0300
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (Client certificate not present)
-Date: Thu, 10 Sep 2020 15:18:02 +0300
-From: Dima Stepanov <dimastep@yandex-team.ru>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Subject: Re: [PATCH v4 1/7] vhost: recheck dev state in the
- vhost_migration_log routine
-Message-ID: <20200910121802.GA7201@dimastep-nix>
-References: <cover.1599211479.git.dimastep@yandex-team.ru>
- <a1b11c7dcad14542d0f313e3eddd57656dc4a6c8.1599211479.git.dimastep@yandex-team.ru>
- <20200908142520.GC7154@stefanha-x1.localdomain>
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGLnu-00010a-SZ
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 08:35:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53764
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGLns-00018f-5i
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 08:35:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599741351;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=NLS+XmFfEGFjRoUQxwOURKHs6EFOfm6wpugyraktcgA=;
+ b=ayTC9MkX3ZH2Y94Y1PUVLU1lHXoNjQsKsN/FxKX13ZUDNYVjYRtb7Tjj8fw08VPfK4OFmY
+ qrozplGKDXuyyzmRUv4L7JY52VeyLCCN8RzG2a6CFti4FRlf0lBkIEtapRJsXiHMpBCpDn
+ jt1ZTG2Fih38EGt9Kq68VRYY6W4Zrnw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-487-unVh1NihPe20UGPWp_ynVQ-1; Thu, 10 Sep 2020 08:35:46 -0400
+X-MC-Unique: unVh1NihPe20UGPWp_ynVQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31E0E89140F;
+ Thu, 10 Sep 2020 12:35:39 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-112-197.ams2.redhat.com
+ [10.36.112.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B746981F4B;
+ Thu, 10 Sep 2020 12:35:37 +0000 (UTC)
+Subject: Re: [PATCH 15/29] block/export: Add node-name to BlockExportOptions
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200907182011.521007-1-kwolf@redhat.com>
+ <20200907182011.521007-16-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <17d8eb72-2c5e-82fd-1de7-1becf450f139@redhat.com>
+Date: Thu, 10 Sep 2020 14:35:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200908142520.GC7154@stefanha-x1.localdomain>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-Received-SPF: pass client-ip=77.88.29.217;
- envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1p.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 08:18:05
+In-Reply-To: <20200907182011.521007-16-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="RSjuQsFnDEi1N66nQLy6ze8RsSiBxS6GC"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 08:35:50
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -56
+X-Spam_score: -5.7
+X-Spam_bar: -----
+X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-3.576, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -93,148 +122,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, lvivier@redhat.com, thuth@redhat.com,
- qemu-block@nongnu.org, mst@redhat.com, jasowang@redhat.com,
- qemu-devel@nongnu.org, dgilbert@redhat.com, raphael.norwitz@nutanix.com,
- fengli@smartx.com, yc-core@yandex-team.ru, pbonzini@redhat.com,
- mreitz@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 08, 2020 at 03:25:20PM +0100, Stefan Hajnoczi wrote:
-> On Fri, Sep 04, 2020 at 12:31:13PM +0300, Dima Stepanov wrote:
-> > vhost-user devices can get a disconnect in the middle of the VHOST-USER
-> > handshake on the migration start. If disconnect event happened right
-> > before sending next VHOST-USER command, then the vhost_dev_set_log()
-> > call in the vhost_migration_log() function will return error. This error
-> > will lead to the assert() and close the QEMU migration source process.
-> > For the vhost-user devices the disconnect event should not break the
-> > migration process, because:
-> >   - the device will be in the stopped state, so it will not be changed
-> >     during migration
-> >   - if reconnect will be made the migration log will be reinitialized as
-> >     part of reconnect/init process:
-> >     #0  vhost_log_global_start (listener=0x563989cf7be0)
-> >     at hw/virtio/vhost.c:920
-> >     #1  0x000056398603d8bc in listener_add_address_space (listener=0x563989cf7be0,
-> >         as=0x563986ea4340 <address_space_memory>)
-> >     at softmmu/memory.c:2664
-> >     #2  0x000056398603dd30 in memory_listener_register (listener=0x563989cf7be0,
-> >         as=0x563986ea4340 <address_space_memory>)
-> >     at softmmu/memory.c:2740
-> >     #3  0x0000563985fd6956 in vhost_dev_init (hdev=0x563989cf7bd8,
-> >         opaque=0x563989cf7e30, backend_type=VHOST_BACKEND_TYPE_USER,
-> >         busyloop_timeout=0)
-> >     at hw/virtio/vhost.c:1385
-> >     #4  0x0000563985f7d0b8 in vhost_user_blk_connect (dev=0x563989cf7990)
-> >     at hw/block/vhost-user-blk.c:315
-> >     #5  0x0000563985f7d3f6 in vhost_user_blk_event (opaque=0x563989cf7990,
-> >         event=CHR_EVENT_OPENED)
-> >     at hw/block/vhost-user-blk.c:379
-> > Update the vhost-user-blk device with the internal started_vu field which
-> > will be used for initialization (vhost_user_blk_start) and clean up
-> > (vhost_user_blk_stop). This additional flag in the VhostUserBlk structure
-> > will be used to track whether the device really needs to be stopped and
-> > cleaned up on a vhost-user level.
-> > The disconnect event will set the overall VHOST device (not vhost-user) to
-> > the stopped state, so it can be used by the general vhost_migration_log
-> > routine.
-> > Such approach could be propogated to the other vhost-user devices, but
-> > better idea is just to make the same connect/disconnect code for all the
-> > vhost-user devices.
-> > 
-> > This migration issue was slightly discussed earlier:
-> >   - https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg01509.html
-> >   - https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg05241.html
-> > 
-> > Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
-> > Reviewed-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
-> > ---
-> >  hw/block/vhost-user-blk.c          | 19 ++++++++++++++++---
-> >  hw/virtio/vhost.c                  | 27 ++++++++++++++++++++++++---
-> >  include/hw/virtio/vhost-user-blk.h | 10 ++++++++++
-> >  3 files changed, 50 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-> > index 39aec42..a076b1e 100644
-> > --- a/hw/block/vhost-user-blk.c
-> > +++ b/hw/block/vhost-user-blk.c
-> > @@ -150,6 +150,7 @@ static int vhost_user_blk_start(VirtIODevice *vdev)
-> >          error_report("Error starting vhost: %d", -ret);
-> >          goto err_guest_notifiers;
-> >      }
-> > +    s->started_vu = true;
-> >  
-> >      /* guest_notifier_mask/pending not used yet, so just unmask
-> >       * everything here. virtio-pci will do the right thing by
-> > @@ -175,6 +176,11 @@ static void vhost_user_blk_stop(VirtIODevice *vdev)
-> >      VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
-> >      int ret;
-> >  
-> > +    if (!s->started_vu) {
-> > +        return;
-> > +    }
-> > +    s->started_vu = false;
-> > +
-> >      if (!k->set_guest_notifiers) {
-> >          return;
-> >      }
-> > @@ -341,9 +347,7 @@ static void vhost_user_blk_disconnect(DeviceState *dev)
-> >      }
-> >      s->connected = false;
-> >  
-> > -    if (s->dev.started) {
-> > -        vhost_user_blk_stop(vdev);
-> > -    }
-> > +    vhost_user_blk_stop(vdev);
-> >  
-> >      vhost_dev_cleanup(&s->dev);
-> >  }
-> > @@ -399,6 +403,15 @@ static void vhost_user_blk_event(void *opaque, QEMUChrEvent event)
-> >                      NULL, NULL, false);
-> >              aio_bh_schedule_oneshot(ctx, vhost_user_blk_chr_closed_bh, opaque);
-> >          }
-> > +
-> > +        /*
-> > +         * Move vhost device to the stopped state. The vhost-user device
-> > +         * will be clean up and disconnected in BH. This can be useful in
-> > +         * the vhost migration code. If disconnect was caught there is an
-> > +         * option for the general vhost code to get the dev state without
-> > +         * knowing its type (in this case vhost-user).
-> > +         */
-> > +        s->dev.started = false;
-> >          break;
-> >      case CHR_EVENT_BREAK:
-> >      case CHR_EVENT_MUX_IN:
-> 
-> Hi Dima,
-> Is it possible to move this logic into the vhost_*() API so that all
-> devices benefit from it? This seems like a generic vhost-user issue
-> rather than a vhost-user-blk issue.
-> 
-> In other words, it would be great if the vhost APIs in QEMU are designed
-> in a way so that the user doesn't need to think about this.
-> 
-> Stefan
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RSjuQsFnDEi1N66nQLy6ze8RsSiBxS6GC
+Content-Type: multipart/mixed; boundary="ccoJkAEyoUyVu9UBAKwsIQi9G6LbGYPc2"
 
-Hi Stefan,
+--ccoJkAEyoUyVu9UBAKwsIQi9G6LbGYPc2
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Yes, i also think that it is a right direction, to have some
-vhost/vhost-user API here. In this case we will be able to share the
-code between all the vhost-user devices, which is important.
+On 07.09.20 20:19, Kevin Wolf wrote:
+> Every block export needs a block node to export, so add a 'node-name'
+> option to BlockExportOptions and remove the replaced option 'device'
+> from BlockExportOptionsNbd.
+>=20
+> To maintain compatibility in nbd-server-add, BlockExportOptionsNbd needs
+> to be wrapped by a new type NbdServerAddOptions that adds 'device' back
+> because nbd-server-add doesn't use the BlockExportOptions base type at
+> all (so even without changing it to a 'node-name' option in
+> block-export-add, this compatibility code would be necessary).
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qapi/block-export.json         | 27 ++++++++++++++++-----
+>  block/monitor/block-hmp-cmds.c |  6 ++---
+>  blockdev-nbd.c                 | 44 +++++++++++++++++++++++++---------
+>  qemu-nbd.c                     |  2 +-
+>  4 files changed, 58 insertions(+), 21 deletions(-)
 
-We had the same conclusion in this e-mail thread:
-https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg06955.html
-When we backported the fix from the vhost-user-net device to
-vhost-user-blk and also provided some additional logic only for the
-vhost-user-blk device.
-So my idea is, first fix two issues:
-- vhost-user-blk reconnect issue (already merged)
-- vhost-user-blk migration issue (this patchset)
-After it try to review current implementation, so for example the unix
-socket logic could be shared between all the vhost-user devices. Maybe
-something else could be done here.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Dima.
+
+--ccoJkAEyoUyVu9UBAKwsIQi9G6LbGYPc2--
+
+--RSjuQsFnDEi1N66nQLy6ze8RsSiBxS6GC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9aHZcACgkQ9AfbAGHV
+z0AviggAnM9KZWhv873XRiojJuHU5fGevMNSzYRt3Hficrq3JZHKp4gIVSNYoTNc
+ba7LDJrfoZK1dvmU8USas58/cadbAYs+YVIF0XahJ29GaOl5ZZMRlvoIxfXICcod
+PyAoh6Elg6vKnDj4Yo4uz4wUOrQnWe4z/5xWZTuoOuF0urdj/nidd8Ctlvl2kuYy
+vFJBXTbLLUIf55E9TGtMSMox02zayjnAlsf70mqTZwfkjkR5jwzxN0yBlN2D6mY1
+PSdLRWx5arePQaKHPwVLTE7eT+lZH4lo6ZxJ59+0E00YZc2e+XwcEmUs4yY78gCj
+WGSDLoFLtrnFlSDXj12c6MyKmqsvWQ==
+=SFn3
+-----END PGP SIGNATURE-----
+
+--RSjuQsFnDEi1N66nQLy6ze8RsSiBxS6GC--
+
 
