@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95D51C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:28:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50E61C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:29:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12CEC207EA
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:28:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A84FD2087C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:29:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="qAOOvpSI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12CEC207EA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="BolboGPc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A84FD2087C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGRJ7-00087a-15
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 14:28:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57414)
+	id 1kGRJs-0000Qb-Lw
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 14:29:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57096)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=515d47f05=alistair.francis@wdc.com>)
- id 1kGRBr-0004gA-BZ
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:20:59 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:28256)
+ id 1kGRBN-0003lh-25
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:20:29 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:28259)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=515d47f05=alistair.francis@wdc.com>)
- id 1kGRBo-0002lX-Kq
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:20:58 -0400
+ id 1kGRBK-0002ls-Bd
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:20:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1599762056; x=1631298056;
+ t=1599762026; x=1631298026;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=cXsVA5p/DqXijeQyHksD3R4PvZRbw0q4xEv/ESLL9bo=;
- b=qAOOvpSIxbARSwNf/m0veqytldE4giGTwEhJUdhHvfRXlzcGz1PkGlDA
- n04UT3/BIo0UzsKr2ENjQfi1MKQkguwKn+olFFoPeijhZSPvqncNFc+SH
- SARXs2UYfNYeOHh9aERj281SOR6eW9nntChMjfJWUfHV2TaXkIZJdjSWe
- J6KLAPp0BbuY8nd7rkyh0V2VWVfuPAs67Iv0jCRwv0fbAmiCciAZeyCTY
- LWcboPlDD20fPrhLmrTDgBgXLvHu/eIfTNEKIuK/nvs6qZeGx79pIRVG5
- 2io3E3o1rG9NyE+cqBdsQSQQ4aQt3LW3AjHy4KgBWrXRUKcXgLIL3+NWY A==;
-IronPort-SDR: D/T33LI68NV12au+pTtN4flNP5KqLXqMAZqQOZ7CrRttNsDO5PjRlhqtjHr8Y8kXwXB+YktQz5
- m94lG/0FhE5TGg3zc7MhitWacgYBjBDaC9K96HA1cnDBe/lwkLxJ10z+8AHdAbREp3bwPPb2Dx
- s+UGxJDi5GANOg6YqwY6IyN+JTe4qe3thhE5eroTMqt0XEU7DUKJqzxpcsDV/ROU/jMQCt8sTw
- ZB2hK1EXBx2SAxdVboXO5KPgcKDShk8IuzHTzfNaWTsIRdGDIyzeDIHH77bYZozSQlf/qI8nW0
- 3w8=
-X-IronPort-AV: E=Sophos;i="5.76,413,1592841600"; d="scan'208";a="146979240"
+ bh=8g6ysUWDe8MSOLkO84zV2OxLWGTJ+6uTo0iNbSo82Zc=;
+ b=BolboGPcKZH5MwJZI4qGlpmu2NTxu9e+4XETsrWrEZCGN08vPedR/BbG
+ PDlpk0QM2Bid0nQrUJQbjhTcQ/msuUcP+6fZQOZV1IHd1pjm/ITOrJB99
+ 4hdvZEs+/1VFE4dSXCqYyU8BrV7MBfl/s1ckR6J+gnVuftdAqR7QGjiFn
+ 7ZeYO+DdC7Nq779JRLygU5qCQCHl3AQWSbyFZHTUansFXDe4vVt3yKNvC
+ O1y84052aTLb/CKximOBE2gQS0ccXMFtQ/eMS3GgtilnNolXFCkfrA6s8
+ zhcATvhS2OHUB2v9zqJa4of4EXy9SnqWfGYuyCnGwM5nWktxZjg3cRPAf A==;
+IronPort-SDR: mtFcXNe5hgeQBpbZZ9fuia8Ri2f9tH5aI3mW/EYKYsMGf36WfiZEsNpA2R3wB+kj05f1NYglwn
+ ftnpLHx28O/tckB5RdrHHgipbrn8oCSa14R2lJqkVuPxfJsS1ZOdYXy6Eo8nhVEBtiF8wlxLBw
+ rvmewz2ekTya2IXDriEWjpP6Xh7ADBBESL40z6mZ0Ds5L1SNEEuzeoSJWexA7fxiLY3EyBu8do
+ 9VyPvbzKhuEzl+JoqLL6qsyYN72eqizfQ1pcdnQEfn+Sqh4Hs3h0HuLzCBWha5AEc4bXexQzaM
+ HcU=
+X-IronPort-AV: E=Sophos;i="5.76,413,1592841600"; d="scan'208";a="146979219"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 11 Sep 2020 02:20:19 +0800
-IronPort-SDR: avBAkphvHll9ghgUTclsszC62FpubjUnrSJDP/1GWNT+JnUO6Sh5TcTR3oIE6E1rf1ijGbIBTX
- vMbCFGaoGckg==
+ by ob1.hgst.iphmx.com with ESMTP; 11 Sep 2020 02:20:16 +0800
+IronPort-SDR: x6T6LkLY1GRnUjCiu3GD8LYlenUcX8c2aNX6GY5S8ZHyPfqswgFUvBpD9lvYlVchBP8sV5RJQQ
+ 0cxhYpC3KrKA==
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 10 Sep 2020 11:07:36 -0700
-IronPort-SDR: AvdKnmS5bTxuWgWV00DFpfywA3tjqP8Fp1SNCp01LRoQ2UMn5j8GtU+JD+REJU8KBpAR3q5x4c
- IctQGH/6GshQ==
+ 10 Sep 2020 11:07:33 -0700
+IronPort-SDR: c78/JohRjjFJBGYGHNctp96KRbfFyqknpJ9uFWusOTHC8xH19Fh45l8IG+8K8AAJ8MrKe+sBG0
+ LpuM2LnMfViQ==
 WDCIronportException: Internal
 Received: from fwvkpc2.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.59.152])
- by uls-op-cesaip01.wdc.com with ESMTP; 10 Sep 2020 11:20:19 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 10 Sep 2020 11:20:16 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL 18/30] hw/riscv: sifive_u: Connect a DMA controller
-Date: Thu, 10 Sep 2020 11:09:26 -0700
-Message-Id: <20200910180938.584205-19-alistair.francis@wdc.com>
+Subject: [PULL 07/30] hw/char: Add Microchip PolarFire SoC MMUART emulation
+Date: Thu, 10 Sep 2020 11:09:15 -0700
+Message-Id: <20200910180938.584205-8-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200910180938.584205-1-alistair.francis@wdc.com>
 References: <20200910180938.584205-1-alistair.francis@wdc.com>
@@ -111,144 +111,220 @@ Sender: "Qemu-devel"
 
 From: Bin Meng <bin.meng@windriver.com>
 
-SiFive FU540 SoC integrates a platform DMA controller with 4 DMA
-channels. This connects the exsiting SiFive PDMA model to the SoC,
-and adds its device tree data as well.
+Microchip PolarFire SoC MMUART is ns16550 compatible, with some
+additional registers. Create a simple MMUART model built on top
+of the existing ns16550 model.
 
 Signed-off-by: Bin Meng <bin.meng@windriver.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-Id: <1598924352-89526-17-git-send-email-bmeng.cn@gmail.com>
+Message-Id: <1598924352-89526-6-git-send-email-bmeng.cn@gmail.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- include/hw/riscv/sifive_u.h | 11 +++++++++++
- hw/riscv/sifive_u.c         | 30 ++++++++++++++++++++++++++++++
- hw/riscv/Kconfig            |  1 +
- 3 files changed, 42 insertions(+)
+ include/hw/char/mchp_pfsoc_mmuart.h | 61 ++++++++++++++++++++
+ hw/char/mchp_pfsoc_mmuart.c         | 86 +++++++++++++++++++++++++++++
+ MAINTAINERS                         |  2 +
+ hw/char/Kconfig                     |  3 +
+ hw/char/meson.build                 |  1 +
+ 5 files changed, 153 insertions(+)
+ create mode 100644 include/hw/char/mchp_pfsoc_mmuart.h
+ create mode 100644 hw/char/mchp_pfsoc_mmuart.c
 
-diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
-index d3c0c00d10..793000a2ed 100644
---- a/include/hw/riscv/sifive_u.h
-+++ b/include/hw/riscv/sifive_u.h
-@@ -19,6 +19,7 @@
- #ifndef HW_SIFIVE_U_H
- #define HW_SIFIVE_U_H
- 
-+#include "hw/dma/sifive_pdma.h"
- #include "hw/net/cadence_gem.h"
- #include "hw/riscv/riscv_hart.h"
- #include "hw/riscv/sifive_cpu.h"
-@@ -43,6 +44,7 @@ typedef struct SiFiveUSoCState {
-     SiFiveUPRCIState prci;
-     SIFIVEGPIOState gpio;
-     SiFiveUOTPState otp;
-+    SiFivePDMAState dma;
-     CadenceGEMState gem;
- 
-     uint32_t serial;
-@@ -72,6 +74,7 @@ enum {
-     SIFIVE_U_MROM,
-     SIFIVE_U_CLINT,
-     SIFIVE_U_L2CC,
-+    SIFIVE_U_PDMA,
-     SIFIVE_U_L2LIM,
-     SIFIVE_U_PLIC,
-     SIFIVE_U_PRCI,
-@@ -108,6 +111,14 @@ enum {
-     SIFIVE_U_GPIO_IRQ13 = 20,
-     SIFIVE_U_GPIO_IRQ14 = 21,
-     SIFIVE_U_GPIO_IRQ15 = 22,
-+    SIFIVE_U_PDMA_IRQ0 = 23,
-+    SIFIVE_U_PDMA_IRQ1 = 24,
-+    SIFIVE_U_PDMA_IRQ2 = 25,
-+    SIFIVE_U_PDMA_IRQ3 = 26,
-+    SIFIVE_U_PDMA_IRQ4 = 27,
-+    SIFIVE_U_PDMA_IRQ5 = 28,
-+    SIFIVE_U_PDMA_IRQ6 = 29,
-+    SIFIVE_U_PDMA_IRQ7 = 30,
-     SIFIVE_U_GEM_IRQ = 0x35
- };
- 
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 2bc3992989..79975372ef 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -14,6 +14,7 @@
-  * 4) GPIO (General Purpose Input/Output Controller)
-  * 5) OTP (One-Time Programmable) memory with stored serial number
-  * 6) GEM (Gigabit Ethernet Controller) and management block
-+ * 7) DMA (Direct Memory Access Controller)
-  *
-  * This board currently generates devicetree dynamically that indicates at least
-  * two harts and up to five harts.
-@@ -73,6 +74,7 @@ static const struct MemmapEntry {
-     [SIFIVE_U_MROM] =     {     0x1000,     0xf000 },
-     [SIFIVE_U_CLINT] =    {  0x2000000,    0x10000 },
-     [SIFIVE_U_L2CC] =     {  0x2010000,     0x1000 },
-+    [SIFIVE_U_PDMA] =     {  0x3000000,   0x100000 },
-     [SIFIVE_U_L2LIM] =    {  0x8000000,  0x2000000 },
-     [SIFIVE_U_PLIC] =     {  0xc000000,  0x4000000 },
-     [SIFIVE_U_PRCI] =     { 0x10000000,     0x1000 },
-@@ -303,6 +305,22 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-     qemu_fdt_setprop_string(fdt, nodename, "compatible", "gpio-restart");
-     g_free(nodename);
- 
-+    nodename = g_strdup_printf("/soc/dma@%lx",
-+        (long)memmap[SIFIVE_U_PDMA].base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_cell(fdt, nodename, "#dma-cells", 1);
-+    qemu_fdt_setprop_cells(fdt, nodename, "interrupts",
-+        SIFIVE_U_PDMA_IRQ0, SIFIVE_U_PDMA_IRQ1, SIFIVE_U_PDMA_IRQ2,
-+        SIFIVE_U_PDMA_IRQ3, SIFIVE_U_PDMA_IRQ4, SIFIVE_U_PDMA_IRQ5,
-+        SIFIVE_U_PDMA_IRQ6, SIFIVE_U_PDMA_IRQ7);
-+    qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle);
-+    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-+        0x0, memmap[SIFIVE_U_PDMA].base,
-+        0x0, memmap[SIFIVE_U_PDMA].size);
-+    qemu_fdt_setprop_string(fdt, nodename, "compatible",
-+                            "sifive,fu540-c000-pdma");
-+    g_free(nodename);
+diff --git a/include/hw/char/mchp_pfsoc_mmuart.h b/include/hw/char/mchp_pfsoc_mmuart.h
+new file mode 100644
+index 0000000000..f61990215f
+--- /dev/null
++++ b/include/hw/char/mchp_pfsoc_mmuart.h
+@@ -0,0 +1,61 @@
++/*
++ * Microchip PolarFire SoC MMUART emulation
++ *
++ * Copyright (c) 2020 Wind River Systems, Inc.
++ *
++ * Author:
++ *   Bin Meng <bin.meng@windriver.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
 +
-     nodename = g_strdup_printf("/soc/cache-controller@%lx",
-         (long)memmap[SIFIVE_U_L2CC].base);
-     qemu_fdt_add_subnode(fdt, nodename);
-@@ -627,6 +645,7 @@ static void sifive_u_soc_instance_init(Object *obj)
-     object_initialize_child(obj, "otp", &s->otp, TYPE_SIFIVE_U_OTP);
-     object_initialize_child(obj, "gem", &s->gem, TYPE_CADENCE_GEM);
-     object_initialize_child(obj, "gpio", &s->gpio, TYPE_SIFIVE_GPIO);
-+    object_initialize_child(obj, "pdma", &s->dma, TYPE_SIFIVE_PDMA);
- }
- 
- static void sifive_u_soc_realize(DeviceState *dev, Error **errp)
-@@ -730,6 +749,17 @@ static void sifive_u_soc_realize(DeviceState *dev, Error **errp)
-                                             SIFIVE_U_GPIO_IRQ0 + i));
-     }
- 
-+    /* PDMA */
-+    sysbus_realize(SYS_BUS_DEVICE(&s->dma), errp);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->dma), 0, memmap[SIFIVE_U_PDMA].base);
++#ifndef HW_MCHP_PFSOC_MMUART_H
++#define HW_MCHP_PFSOC_MMUART_H
 +
-+    /* Connect PDMA interrupts to the PLIC */
-+    for (i = 0; i < SIFIVE_PDMA_IRQS; i++) {
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->dma), i,
-+                           qdev_get_gpio_in(DEVICE(s->plic),
-+                                            SIFIVE_U_PDMA_IRQ0 + i));
++#include "hw/char/serial.h"
++
++#define MCHP_PFSOC_MMUART_REG_SIZE  52
++
++typedef struct MchpPfSoCMMUartState {
++    MemoryRegion iomem;
++    hwaddr base;
++    qemu_irq irq;
++
++    SerialMM *serial;
++
++    uint32_t reg[MCHP_PFSOC_MMUART_REG_SIZE / sizeof(uint32_t)];
++} MchpPfSoCMMUartState;
++
++/**
++ * mchp_pfsoc_mmuart_create - Create a Microchip PolarFire SoC MMUART
++ *
++ * This is a helper routine for board to create a MMUART device that is
++ * compatible with Microchip PolarFire SoC.
++ *
++ * @sysmem: system memory region to map
++ * @base: base address of the MMUART registers
++ * @irq: IRQ number of the MMUART device
++ * @chr: character device to associate to
++ *
++ * @return: a pointer to the device specific control structure
++ */
++MchpPfSoCMMUartState *mchp_pfsoc_mmuart_create(MemoryRegion *sysmem,
++    hwaddr base, qemu_irq irq, Chardev *chr);
++
++#endif /* HW_MCHP_PFSOC_MMUART_H */
+diff --git a/hw/char/mchp_pfsoc_mmuart.c b/hw/char/mchp_pfsoc_mmuart.c
+new file mode 100644
+index 0000000000..8a002b0a19
+--- /dev/null
++++ b/hw/char/mchp_pfsoc_mmuart.c
+@@ -0,0 +1,86 @@
++/*
++ * Microchip PolarFire SoC MMUART emulation
++ *
++ * Copyright (c) 2020 Wind River Systems, Inc.
++ *
++ * Author:
++ *   Bin Meng <bin.meng@windriver.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 or
++ * (at your option) version 3 of the License.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "chardev/char.h"
++#include "exec/address-spaces.h"
++#include "hw/char/mchp_pfsoc_mmuart.h"
++
++static uint64_t mchp_pfsoc_mmuart_read(void *opaque, hwaddr addr, unsigned size)
++{
++    MchpPfSoCMMUartState *s = opaque;
++
++    if (addr >= MCHP_PFSOC_MMUART_REG_SIZE) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: read: addr=0x%" HWADDR_PRIx "\n",
++                      __func__, addr);
++        return 0;
 +    }
 +
-     qdev_prop_set_uint32(DEVICE(&s->otp), "serial", s->serial);
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->otp), errp)) {
-         return;
-diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
-index 9032cb0cbd..e53ab1efa5 100644
---- a/hw/riscv/Kconfig
-+++ b/hw/riscv/Kconfig
-@@ -22,6 +22,7 @@ config SIFIVE_U
-     select CADENCE
-     select HART
-     select SIFIVE
-+    select SIFIVE_PDMA
-     select UNIMP
++    return s->reg[addr / sizeof(uint32_t)];
++}
++
++static void mchp_pfsoc_mmuart_write(void *opaque, hwaddr addr,
++                                    uint64_t value, unsigned size)
++{
++    MchpPfSoCMMUartState *s = opaque;
++    uint32_t val32 = (uint32_t)value;
++
++    if (addr >= MCHP_PFSOC_MMUART_REG_SIZE) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad write: addr=0x%" HWADDR_PRIx
++                      " v=0x%x\n", __func__, addr, val32);
++        return;
++    }
++
++    s->reg[addr / sizeof(uint32_t)] = val32;
++}
++
++static const MemoryRegionOps mchp_pfsoc_mmuart_ops = {
++    .read = mchp_pfsoc_mmuart_read,
++    .write = mchp_pfsoc_mmuart_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .impl = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++    },
++};
++
++MchpPfSoCMMUartState *mchp_pfsoc_mmuart_create(MemoryRegion *sysmem,
++    hwaddr base, qemu_irq irq, Chardev *chr)
++{
++    MchpPfSoCMMUartState *s;
++
++    s = g_new0(MchpPfSoCMMUartState, 1);
++
++    memory_region_init_io(&s->iomem, NULL, &mchp_pfsoc_mmuart_ops, s,
++                          "mchp.pfsoc.mmuart", 0x1000);
++
++    s->base = base;
++    s->irq = irq;
++
++    s->serial = serial_mm_init(sysmem, base, 2, irq, 399193, chr,
++                               DEVICE_LITTLE_ENDIAN);
++
++    memory_region_add_subregion(sysmem, base + 0x20, &s->iomem);
++
++    return s;
++}
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 9641ed37e2..d17b08fad9 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1321,7 +1321,9 @@ M: Bin Meng <bin.meng@windriver.com>
+ L: qemu-riscv@nongnu.org
+ S: Supported
+ F: hw/riscv/microchip_pfsoc.c
++F: hw/char/mchp_pfsoc_mmuart.c
+ F: include/hw/riscv/microchip_pfsoc.h
++F: include/hw/char/mchp_pfsoc_mmuart.h
  
- config SPIKE
+ RX Machines
+ -----------
+diff --git a/hw/char/Kconfig b/hw/char/Kconfig
+index b7e0e4d5fa..1d645554c7 100644
+--- a/hw/char/Kconfig
++++ b/hw/char/Kconfig
+@@ -52,3 +52,6 @@ config RENESAS_SCI
+ 
+ config AVR_USART
+     bool
++
++config MCHP_PFSOC_MMUART
++    bool
+diff --git a/hw/char/meson.build b/hw/char/meson.build
+index e888215145..ae27932d00 100644
+--- a/hw/char/meson.build
++++ b/hw/char/meson.build
+@@ -32,6 +32,7 @@ softmmu_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2835_aux.c'))
+ softmmu_ss.add(when: 'CONFIG_RENESAS_SCI', if_true: files('renesas_sci.c'))
+ softmmu_ss.add(when: 'CONFIG_SH4', if_true: files('sh_serial.c'))
+ softmmu_ss.add(when: 'CONFIG_STM32F2XX_USART', if_true: files('stm32f2xx_usart.c'))
++softmmu_ss.add(when: 'CONFIG_MCHP_PFSOC_MMUART', if_true: files('mchp_pfsoc_mmuart.c'))
+ 
+ specific_ss.add(when: 'CONFIG_TERMINAL3270', if_true: files('terminal3270.c'))
+ specific_ss.add(when: 'CONFIG_VIRTIO', if_true: files('virtio-serial-bus.c'))
 -- 
 2.28.0
 
