@@ -2,89 +2,95 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDFFEC07548
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:40:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFD47C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:42:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5464021D7E
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:40:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B52F214F1
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:42:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jo6CbrXD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5464021D7E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="g/0kVAuo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B52F214F1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGRUZ-0004yL-As
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 14:40:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57836)
+	id 1kGRWM-0007iQ-Ek
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 14:42:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57986)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kGRCN-0005Is-4f
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:21:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25589)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kGRCF-00032Q-98
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:21:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599762081;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7hrteQtPb4fP2DtxnJ0f5kT2tT98m3hNbWJovhD1H8g=;
- b=Jo6CbrXDusYsUMjO09VSLWTLqM/P48XpxCCGHPbMOe7We0aBlr5Opuap1RKtSSRAvOXgo3
- U56Z3tEnnI1wVqjfDcvv0ED4uURFVCQmV4pskOhtW6rEvy9MLhiXON9sGYjyC6CFq8ZpZR
- CyB9PAPNIo6+4kAyl4NDTzBM2kSrcFs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-454-FGSON9GXNDqSZ7pADIHGPg-1; Thu, 10 Sep 2020 14:21:18 -0400
-X-MC-Unique: FGSON9GXNDqSZ7pADIHGPg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6FD518BFECA;
- Thu, 10 Sep 2020 18:21:16 +0000 (UTC)
-Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 79BDA19C78;
- Thu, 10 Sep 2020 18:21:16 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 02/33] qom: make object_ref/unref use a void * instead of
- Object *.
-Date: Thu, 10 Sep 2020 14:20:41 -0400
-Message-Id: <20200910182112.4030917-3-ehabkost@redhat.com>
-In-Reply-To: <20200910182112.4030917-1-ehabkost@redhat.com>
-References: <20200910182112.4030917-1-ehabkost@redhat.com>
+ (Exim 4.90_1)
+ (envelope-from <prvs=515d47f05=alistair.francis@wdc.com>)
+ id 1kGRCZ-0005Tf-3l
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:21:43 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:28256)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=515d47f05=alistair.francis@wdc.com>)
+ id 1kGRCK-0002lX-Mg
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:21:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1599762088; x=1631298088;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=J90d8Q9PoN5u12oz1BG8t/RQ6CPBiX91YUZTE40VG6g=;
+ b=g/0kVAuop5O8B6kbRe2p+mAVwIk8hdTMM5vlPMzKfT5H9RtBry4DEot5
+ Ixjel4j23fmM4bAFPbHsGaLI8sV9KEkmKzrfxDZjZxBVg+phNMtzW92OP
+ 5PTiRfrZe175gUfUf7NiZpoNKWimbyTeNbgHkBWRMDj3Y5wcumdDdEgmc
+ pwWd8VbIOcT/JSVW6sMWvUPB26pjfQzbnPPSoheh+TqhxIYvET7cXqK2T
+ 0ASZDQDPJWN9LmcocwdjRQyR92d+qtQ/0zr3vXohdwippzXqS1XXuvyKa
+ o/cXrmVkfNfhR6T/Wz2KSmcW+U1Gac+jtKgBurqrIpawDmeWuKoiJ9yUx A==;
+IronPort-SDR: bgTGyrzE+Hkur7Zv+VseYDrkeQet/cwrwvWQjh5Bt9Cka9E74mbyDnlwHIwcROYVkTdM0Dtkej
+ T9VZ9V+BSiVDrqT+RZxdVmfp7l4AkLquxDIFTKR6Pv6Pnx2F1y40PycP7OiwRS90Pbd3Z39Mz2
+ LhBzJ5gBbCB7wqXPQ8M2L0SKffRKu6snNwSNge9gn91Gv9XBGK0lbTmA9fpEoRzQTmXj9sV8Di
+ Xg554eUU0FGeQHKYNx2kQ7FQAp2NRLdz03H1Y44Xx4VWm8KGV7JIVzTvtHDXLTBuWNKBJlxuej
+ Fp4=
+X-IronPort-AV: E=Sophos;i="5.76,413,1592841600"; d="scan'208";a="146979253"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 11 Sep 2020 02:20:22 +0800
+IronPort-SDR: RBdfgId9b6OfY0lVV8Gh9C3wBsVKuD1Cp0ktzwd1fH67O4zddj3QJ96zukOSgJsLJl+XyqgGOJ
+ emQZ6X9l99Tg==
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 10 Sep 2020 11:07:39 -0700
+IronPort-SDR: 3GWydOA5LkUGxQhtfuerNX78QV/hSX0nOOd4ziMVSk5PmHP5nvmxRkxl5IRYBgoR1DYjYS5Gzj
+ /dQTF0Sdo46Q==
+WDCIronportException: Internal
+Received: from fwvkpc2.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.59.152])
+ by uls-op-cesaip01.wdc.com with ESMTP; 10 Sep 2020 11:20:22 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: peter.maydell@linaro.org,
+	qemu-devel@nongnu.org
+Subject: [PULL 28/30] hw/riscv: Always build riscv_hart.c
+Date: Thu, 10 Sep 2020 11:09:36 -0700
+Message-Id: <20200910180938.584205-29-alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20200910180938.584205-1-alistair.francis@wdc.com>
+References: <20200910180938.584205-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 09:16:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=216.71.154.42;
+ envelope-from=prvs=515d47f05=alistair.francis@wdc.com;
+ helo=esa4.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 14:20:04
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,80 +103,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: alistair23@gmail.com, Bin Meng <bin.meng@windriver.com>,
+ Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Daniel P. Berrangé <berrange@redhat.com>
+From: Bin Meng <bin.meng@windriver.com>
 
-The object_ref/unref methods are intended for use with any subclass of
-the base Object. Using "Object *" in the signature is not adding any
-meaningful level of type safety, since callers simply use "OBJECT(ptr)"
-and this expands to an unchecked cast "(Object *)".
+Every RISC-V machine needs riscv_hart hence there is no need to
+have a dedicated Kconfig option for it. Drop the Kconfig option
+and always build riscv_hart.c.
 
-By using "void *" we enable the object_unref() method to be used to
-provide support for g_autoptr() with any subclass.
-
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200723181410.3145233-2-berrange@redhat.com>
-Message-Id: <20200831210740.126168-2-ehabkost@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Bin Meng <bin.meng@windriver.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-Id: <1599129623-68957-11-git-send-email-bmeng.cn@gmail.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- include/qom/object.h | 4 ++--
- qom/object.c         | 6 ++++--
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ hw/riscv/Kconfig     | 9 ---------
+ hw/riscv/meson.build | 2 +-
+ 2 files changed, 1 insertion(+), 10 deletions(-)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 0f3a60617c..1f8aa2d48e 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -1035,7 +1035,7 @@ GSList *object_class_get_list_sorted(const char *implements_type,
-  * as its reference count is greater than zero.
-  * Returns: @obj
-  */
--Object *object_ref(Object *obj);
-+Object *object_ref(void *obj);
+diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
+index 8e0710001b..7d017bc7c3 100644
+--- a/hw/riscv/Kconfig
++++ b/hw/riscv/Kconfig
+@@ -1,6 +1,3 @@
+-config HART
+-    bool
+-
+ config IBEX
+     bool
  
- /**
-  * object_unref:
-@@ -1044,7 +1044,7 @@ Object *object_ref(Object *obj);
-  * Decrease the reference count of a object.  A object cannot be freed as long
-  * as its reference count is greater than zero.
-  */
--void object_unref(Object *obj);
-+void object_unref(void *obj);
+@@ -10,7 +7,6 @@ config SIFIVE
  
- /**
-  * object_property_try_add:
-diff --git a/qom/object.c b/qom/object.c
-index 00fdf89b3b..b1822a2ef4 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -1124,8 +1124,9 @@ GSList *object_class_get_list_sorted(const char *implements_type,
-                         object_class_cmp);
- }
+ config SIFIVE_E
+     bool
+-    select HART
+     select SIFIVE
+     select SIFIVE_CLINT
+     select SIFIVE_GPIO
+@@ -22,7 +18,6 @@ config SIFIVE_E
+ config SIFIVE_U
+     bool
+     select CADENCE
+-    select HART
+     select SIFIVE
+     select SIFIVE_CLINT
+     select SIFIVE_GPIO
+@@ -35,7 +30,6 @@ config SIFIVE_U
  
--Object *object_ref(Object *obj)
-+Object *object_ref(void *objptr)
- {
-+    Object *obj = OBJECT(objptr);
-     if (!obj) {
-         return NULL;
-     }
-@@ -1133,8 +1134,9 @@ Object *object_ref(Object *obj)
-     return obj;
- }
+ config SPIKE
+     bool
+-    select HART
+     select HTIF
+     select SIFIVE
+     select SIFIVE_CLINT
+@@ -44,7 +38,6 @@ config SPIKE
+ config OPENTITAN
+     bool
+     select IBEX
+-    select HART
+     select UNIMP
  
--void object_unref(Object *obj)
-+void object_unref(void *objptr)
- {
-+    Object *obj = OBJECT(objptr);
-     if (!obj) {
-         return;
-     }
+ config RISCV_VIRT
+@@ -52,7 +45,6 @@ config RISCV_VIRT
+     imply PCI_DEVICES
+     imply TEST_DEVICES
+     select PCI
+-    select HART
+     select SERIAL
+     select GOLDFISH_RTC
+     select VIRTIO_MMIO
+@@ -65,7 +57,6 @@ config RISCV_VIRT
+ 
+ config MICROCHIP_PFSOC
+     bool
+-    select HART
+     select SIFIVE
+     select SIFIVE_CLINT
+     select UNIMP
+diff --git a/hw/riscv/meson.build b/hw/riscv/meson.build
+index f762623288..275c0f7eb7 100644
+--- a/hw/riscv/meson.build
++++ b/hw/riscv/meson.build
+@@ -1,7 +1,7 @@
+ riscv_ss = ss.source_set()
+ riscv_ss.add(files('boot.c'), fdt)
+ riscv_ss.add(files('numa.c'))
+-riscv_ss.add(when: 'CONFIG_HART', if_true: files('riscv_hart.c'))
++riscv_ss.add(files('riscv_hart.c'))
+ riscv_ss.add(when: 'CONFIG_OPENTITAN', if_true: files('opentitan.c'))
+ riscv_ss.add(when: 'CONFIG_RISCV_VIRT', if_true: files('virt.c'))
+ riscv_ss.add(when: 'CONFIG_SIFIVE_E', if_true: files('sifive_e.c'))
 -- 
-2.26.2
+2.28.0
 
 
