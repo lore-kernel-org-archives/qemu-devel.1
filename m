@@ -2,123 +2,92 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 079B6C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 12:55:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C979C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 13:08:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B7F8206D4
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 12:55:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F5A3207FB
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 13:08:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="CcyJajJa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B7F8206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MUAVACpK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F5A3207FB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGM6r-0005fe-CX
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 08:55:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55638)
+	id 1kGMJN-0000k2-BU
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 09:08:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59592)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dovmurik@linux.vnet.ibm.com>)
- id 1kGM5F-000568-O5
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 08:53:49 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37342)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dovmurik@linux.vnet.ibm.com>)
- id 1kGM5D-0003UQ-Mk
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 08:53:49 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 08ACliG5046329
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 08:53:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=nNGRKF90hFzrz5Xe3Mu2NWqjfW5sHByxjUFYF+wf25U=;
- b=CcyJajJa6sngTjeujDzOKdFSoFF/it37LO3a7RVnk69YnI2YctQzjQtF9hodZ/nIgcI7
- pIl9UsICgbkdFmno4gZt2FcItM0B86NNjJlPXZE0/tO5F9QImew6KYiHMkHSjzusBpaE
- CI2kxkzn+CLKSVv4UlAT+GVsQJiptil/40n9gQKqm8iTE8V7axpgk6ML30pln3HI6+QI
- sf9MbQHXhgLcezEXz2Qxigb8+HifeBp3T03KxO3/InTY0LqlrPLiQYI/JeoUu8vc21il
- HUAjSLrRqenfLwOmTYt650OE1Zia7MjJnpWDKRFOT23bAkmdMscQ8H8fsM8IYE3d2Lj5 +w== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33fm2ts9jy-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 08:53:44 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08AClnIJ046864
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 08:53:44 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33fm2ts9hy-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 10 Sep 2020 08:53:44 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
- by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08ACqtki009043;
- Thu, 10 Sep 2020 12:53:42 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com
- (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
- by ppma03ams.nl.ibm.com with ESMTP id 33c2a861s7-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 10 Sep 2020 12:53:42 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 08ACreJ036700470
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 10 Sep 2020 12:53:40 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 785D2A4059;
- Thu, 10 Sep 2020 12:53:40 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 80CF8A4040;
- Thu, 10 Sep 2020 12:53:38 +0000 (GMT)
-Received: from [9.65.222.171] (unknown [9.65.222.171])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 10 Sep 2020 12:53:38 +0000 (GMT)
-Subject: Re: [PATCH 0/2] hw/timer/hpet: Fix compiler errors with -DHPET_DEBUG
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200909083650.46771-1-dovmurik@linux.vnet.ibm.com>
- <8d9ae068-77cc-6152-7b90-a51bf70648a0@redhat.com>
-From: Dov Murik <dovmurik@linux.vnet.ibm.com>
-Message-ID: <4918b958-dbd4-bd18-bb75-da7386124886@linux.vnet.ibm.com>
-Date: Thu, 10 Sep 2020 15:53:35 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.1
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kGMIm-0008Sa-K3
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 09:07:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41297
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kGMIj-00059F-B6
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 09:07:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599743262;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=k3lUv8VXrAaHce+Szelc7Vfn0dwZoRA4F+d4EDKaqHY=;
+ b=MUAVACpK4iIZJy8omW/Xe9Y4+pRjfIrNu8HEG6jvrz3Gff8/Q8JqtwC/5QRH4OsD5z+kxd
+ H1H9t7in8qdA80ulq0F/NDkhNpywHB/RaEvSRvSDfACD3DKL0fZ2pRWaQaatsJrtAXVv6Q
+ F3QbPJOR6HoVdtSZvkdXVZwSFGJxu2Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-402-ua8JTMxFOu-dHm2m6EnDxg-1; Thu, 10 Sep 2020 09:07:26 -0400
+X-MC-Unique: ua8JTMxFOu-dHm2m6EnDxg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 216881882FBC;
+ Thu, 10 Sep 2020 13:07:25 +0000 (UTC)
+Received: from redhat.com (ovpn-112-4.ams2.redhat.com [10.36.112.4])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 22DAB5C3E2;
+ Thu, 10 Sep 2020 13:07:22 +0000 (UTC)
+Date: Thu, 10 Sep 2020 14:07:20 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH v6 0/8] block: improve error reporting for unsupported
+ O_DIRECT
+Message-ID: <20200910130720.GR1083348@redhat.com>
+References: <20200903152210.1917355-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <8d9ae068-77cc-6152-7b90-a51bf70648a0@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <20200903152210.1917355-1-berrange@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-09-10_03:2020-09-10,
- 2020-09-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 mlxlogscore=999
- malwarescore=0 impostorscore=0 priorityscore=1501 mlxscore=0 adultscore=0
- lowpriorityscore=0 suspectscore=0 phishscore=0 spamscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009100112
-Received-SPF: none client-ip=148.163.158.5;
- envelope-from=dovmurik@linux.vnet.ibm.com; helo=mx0b-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 08:53:45
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -62
-X-Spam_score: -6.3
-X-Spam_bar: ------
-X-Spam_report: (-6.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-3.576,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 09:07:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -131,44 +100,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/09/2020 20:24, Philippe Mathieu-Daudé wrote:
-> On 9/9/20 10:36 AM, Dov Murik wrote:
->> Fix several compiler errors when compiling withe -DHPET_DEBUG.
->>
->> Steps to reproduce the issue:
->>
->>      mkdir build
->>      cd build
->>      ../configure --target-list=x86_64-softmmu --extra-cflags=-DHPET_DEBUG
->>      make
->>
->> Dov Murik (2):
->>    hw/timer/hpet: Remove unused functions hpet_ram_readb, hpet_ram_readw
->>    hw/timer/hpet: Fix debug format strings
->>
->>   hw/timer/hpet.c | 27 +++++++--------------------
->>   1 file changed, 7 insertions(+), 20 deletions(-)
->>
+Kevin / Max,
+
+Could you confirm whether you're ok with me sending a pull request for
+this, or prefer to funnel it through the block tree for sanity checking.
+
+It changes error messages from the block file driver on non-win32
+platforms.
+
+I've tested qemu-iotests with -raw and -qcow2 and didn't see failures
+
+On Thu, Sep 03, 2020 at 04:22:02PM +0100, Daniel P. Berrangé wrote:
+> v1: https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg00269.html
+> v2: https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg00589.html
+> v3: https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg07098.html
+> v4: https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg05334.html
+> v5: https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg00947.html
 > 
-> I sent almost the same patches last week :)
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg736836.html
+> See patch commit messages for rationale
+> 
+> Ideally we would convert other callers of qemu_open_old to use
+> qemu_open, and eventually remove qemu_open_old entirely, so every
+> caller gets use of Error **errp.
+> 
+> Improved in v6:
+> 
+>  - Fix errno regression dup'ing FD
+>  - Move qapi header to correct patch
+>  - Fix whitespace and commit messages
+>  - Converted more use of qemu_open to qemu_open_old after rebase
+> 
+> Improved in v5:
+> 
+>  - Drop reporting of flags in failed open call
+>  - Split O_CLOEXEC handling off into separate helper
+>  - Refactor monitor FD set APIs to simplify their use
+> 
+> Improved in v4:
+> 
+>  - Use assert() for programmer mistakes
+>  - Split second patch into three distinct parts
+>  - Misc typos
+>  - Improve commit message
+> 
+> Improved in v3:
+> 
+>  - Re-arrange the patches series, so that the conversion to Error
+>    takes place first, then the improve O_DIRECT reporting
+>  - Rename existing method to qemu_open_old
+>  - Use a pair of new methods qemu_open + qemu_create to improve
+>    arg checking
+> 
+> Improved in v2:
+> 
+>  - Mention that qemu_open_err is preferred over qemu_open
+>  - Get rid of obsolete error_report call
+>  - Simplify O_DIRECT handling
+>  - Fixup iotests for changed error message text
+> 
+> Daniel P. Berrangé (8):
+>   monitor: simplify functions for getting a dup'd fdset entry
+>   util: split off a helper for dealing with O_CLOEXEC flag
+>   util: rename qemu_open() to qemu_open_old()
+>   util: refactor qemu_open_old to split off variadic args handling
+>   util: add Error object for qemu_open_internal error reporting
+>   util: introduce qemu_open and qemu_create with error reporting
+>   util: give a specific error message when O_DIRECT doesn't work
+>   block/file: switch to use qemu_open/qemu_create for improved errors
+> 
+>  accel/kvm/kvm-all.c            |   2 +-
+>  backends/rng-random.c          |   2 +-
+>  backends/tpm/tpm_passthrough.c |   8 +--
+>  block/file-posix.c             |  16 ++---
+>  block/file-win32.c             |   5 +-
+>  block/vvfat.c                  |   5 +-
+>  chardev/char-fd.c              |   2 +-
+>  chardev/char-pipe.c            |   6 +-
+>  chardev/char.c                 |   2 +-
+>  dump/dump.c                    |   2 +-
+>  hw/s390x/s390-skeys.c          |   2 +-
+>  hw/usb/host-libusb.c           |   2 +-
+>  hw/usb/u2f-passthru.c          |   4 +-
+>  hw/vfio/common.c               |   4 +-
+>  include/monitor/monitor.h      |   3 +-
+>  include/qemu/osdep.h           |   9 ++-
+>  io/channel-file.c              |   2 +-
+>  monitor/misc.c                 |  58 ++++++++----------
+>  net/vhost-vdpa.c               |   2 +-
+>  os-posix.c                     |   2 +-
+>  qga/channel-posix.c            |   4 +-
+>  qga/commands-posix.c           |   6 +-
+>  stubs/fdset.c                  |   8 +--
+>  target/arm/kvm.c               |   2 +-
+>  ui/console.c                   |   2 +-
+>  util/osdep.c                   | 104 +++++++++++++++++++++++----------
+>  util/oslib-posix.c             |   2 +-
+>  27 files changed, 150 insertions(+), 116 deletions(-)
+> 
+> -- 
+> 2.26.2
+> 
 
-Oops, missed that. You're right.
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-> You seem to fix a 4th format, can you rebase on top? (As these
-> patches have already been queued).
-
-Actually there's a small issue in one of your suggested fixes: you added 
-"0x" but kept the "%#".  I think it should be without the "#" (also 
-according to the coding style document).
-
-I suggest you fix this small issue, and also add any changes you wish 
-from this patchset; then we can throw my patchset to the bin.
-
--Dov
 
