@@ -2,78 +2,91 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EE93C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 03:56:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAEBBC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 04:49:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A83C621D81
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 03:56:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A83C621D81
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 1E1122076C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 04:49:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p8vCNV9g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E1122076C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGDh5-0005WW-Il
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 23:56:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57054)
+	id 1kGEWs-0005Hg-PF
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 00:49:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37402)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kGDgU-00050e-GV
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 23:55:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40988)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1kGEWA-0004kW-U2; Thu, 10 Sep 2020 00:49:06 -0400
+Received: from mail-oo1-xc43.google.com ([2607:f8b0:4864:20::c43]:36643)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kGDgS-0005lB-5D
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 23:55:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kGDgP-0001mz-BL
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 03:55:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0827F2E8105
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 03:55:37 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1kGEW9-0003dx-76; Thu, 10 Sep 2020 00:49:06 -0400
+Received: by mail-oo1-xc43.google.com with SMTP id z1so1133162ooj.3;
+ Wed, 09 Sep 2020 21:49:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=v0coHtFmd2WH92VLzMlbBd18OhUDKDk+wB/06ZjqDCA=;
+ b=p8vCNV9grQAzI0ifLWcSAvjhb2eVQZ0odU0HhD9s46pNfteWQpvsgL9cXEkWW00aoU
+ 0J0X1WAG17KDf4bTXmZKg05Awxv+6OyUftDE+obbim2Tvl3ZQ8iuTMpeHbeJAIcKNr1V
+ rv/3uafeffL88D1ELCI0NpArX/UbYvv9emR2rPh0fcKo4xdyj0KtYkaG5tQABtXqZHBw
+ G0YAI95ZmbENkSJDhZpt/11KWdE9IF1YJt42xJZJS+xqC4MniMD4k82Q+s8DjNqTD1pO
+ Bs8Pe6kE6/ZUogpmPDEH4FPFfcZaUbtrtUn/tg4+4yf5axtMqyeUC6ihmVDaKpSCNnYv
+ Q9mA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=v0coHtFmd2WH92VLzMlbBd18OhUDKDk+wB/06ZjqDCA=;
+ b=txAAjd6HrwKpUv6C4WRaP70iC6rPS7JbSv5yJ7SCxg/yS4llxgNyW78c5hJKlu25xs
+ acj+7k1F9vtEaCFbRK/yGE0mQqFqfa+q6WJTFOHTlUqL5N4qDYQTBgDZs/0Hdu8MinhP
+ LMdaOEm4bI1+CouIIB62PtNhHK7xVNtlVarHXvM/o4lRMeZag1zS1GXr/h+/b3Y8VHmz
+ J2SgNaaGADpjI0mOLMNIdTWtZh6vzDp6mONUwPQmurS2V2OoEO8BIvRcYl/7MlCjcj05
+ bUyRh3qcB9DPnByTT8UDJVTctcZFXt0WBT0iUQuYVjhD4BLulUaOxkk249XYy/x3Rwfk
+ 4W2w==
+X-Gm-Message-State: AOAM5303vZp0YHgzbg8pjjRkoaghYK4WhMF/6CXyF339sUk2PbhxSOTI
+ qLwUPL6RqEd/QJYcsA0Rv0EPjZy+/7I/iG0pV6U=
+X-Google-Smtp-Source: ABdhPJySdKt07tjbiP75k9Snb139kxT9Xdj4AHd/if9884uCtLRvbwAPxkNgBymBYccyFeP5swjpXy4eEVA58AAr2GI=
+X-Received: by 2002:a4a:4201:: with SMTP id h1mr3143741ooj.1.1599713343095;
+ Wed, 09 Sep 2020 21:49:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20200910023818.11880-1-pannengyuan@huawei.com>
+In-Reply-To: <20200910023818.11880-1-pannengyuan@huawei.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Thu, 10 Sep 2020 12:48:26 +0800
+Message-ID: <CAKXe6SKgAUn5R5TnTsjDZ0LEDjMoWP73LWYxTZDHnwsAPSNEkg@mail.gmail.com>
+Subject: Re: [PATCH] test-vmstate: remove unnecessary code in
+ match_interval_mapping_node
+To: Pan Nengyuan <pannengyuan@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 10 Sep 2020 03:46:21 -0000
-From: Hansni Bu <1895080@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: hansni
-X-Launchpad-Bug-Reporter: Hansni Bu (hansni)
-X-Launchpad-Bug-Modifier: Hansni Bu (hansni)
-Message-Id: <159970958159.31371.12301700684467003959.malonedeb@wampee.canonical.com>
-Subject: [Bug 1895080] [NEW] pgb_reserved_va: Assertion `addr == test' failed
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="90a5703803d95539bdb5c0b289b1675630569e1e"; Instance="production"
-X-Launchpad-Hash: a332120a5d9b48ef8c3971e7ccaf6f779a5bcfae
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 23:55:37
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c43;
+ envelope-from=liq3ea@gmail.com; helo=mail-oo1-xc43.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,124 +95,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1895080 <1895080@bugs.launchpad.net>
+Cc: Thomas Huth <thuth@redhat.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-trivial@nongnu.org,
+ Qemu Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ Auger Eric <eric.auger@redhat.com>, Chen Qun <kuhn.chenqun@huawei.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+Pan Nengyuan <pannengyuan@huawei.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=8810=E6=
+=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8A=E5=8D=8810:39=E5=86=99=E9=81=93=EF=BC=9A
+>
+> 'str' is not used in match_interval_mapping_node(), remove it.
+>
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
 
-This problem occurs on CentOS-7.5 (64-bit) with qemu-5.1.0, qemu head
-(commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a) for riscv32-linux-
-user.
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
 
-Firstly, compile fails:
-Compiling C object libqemu-riscv32-linux-user.fa.p/linux-user_strace.c.o
-../qemu.git/linux-user/strace.c:1210:18: error: =E2=80=98FALLOC_FL_KEEP_SIZ=
-E=E2=80=99 undeclared here (not in a function)
-     FLAG_GENERIC(FALLOC_FL_KEEP_SIZE),
-
-I have to add below include to linux-user/strace.c
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 11fea14fba..22e51d4a8a 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -7,6 +7,7 @@
- #include <sys/mount.h>
- #include <arpa/inet.h>
- #include <netinet/tcp.h>
-+#include <linux/falloc.h>
- #include <linux/if_packet.h>
- #include <linux/netlink.h>
- #include <sched.h>
-
-Then trying qemu-riscv32 with a simple ELF, I get:
-linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test' fa=
-iled.
-
-strace shows that:
-mmap(0x1000, 4294963200, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE=
-, -1, 0) =3D 0x10000
-write(2, "qemu-riscv32: ../qemu.git/linux-"..., 103qemu-riscv32: ../qemu.gi=
-t/linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test' =
-failed.
-) =3D 103
-
-The source code is in the function pgb_reserved_va (linux-
-user/elfload.c). I think mmap cannot guarantee that the returned pointer
-(test) equals to the parameter of addr. So is this a bug to assert (addr
-=3D=3D test)?
-
-Attached configure script and test ELF file.
-
-Thanks.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "config script and test ELF file"
-   https://bugs.launchpad.net/bugs/1895080/+attachment/5409254/+files/confi=
-g_and_elf.tar.xz
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1895080
-
-Title:
-  pgb_reserved_va: Assertion `addr =3D=3D test' failed
-
-Status in QEMU:
-  New
-
-Bug description:
-  This problem occurs on CentOS-7.5 (64-bit) with qemu-5.1.0, qemu head
-  (commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a) for riscv32-linux-
-  user.
-
-  Firstly, compile fails:
-  Compiling C object libqemu-riscv32-linux-user.fa.p/linux-user_strace.c.o
-  ../qemu.git/linux-user/strace.c:1210:18: error: =E2=80=98FALLOC_FL_KEEP_S=
-IZE=E2=80=99 undeclared here (not in a function)
-       FLAG_GENERIC(FALLOC_FL_KEEP_SIZE),
-
-  I have to add below include to linux-user/strace.c
-  diff --git a/linux-user/strace.c b/linux-user/strace.c
-  index 11fea14fba..22e51d4a8a 100644
-  --- a/linux-user/strace.c
-  +++ b/linux-user/strace.c
-  @@ -7,6 +7,7 @@
-   #include <sys/mount.h>
-   #include <arpa/inet.h>
-   #include <netinet/tcp.h>
-  +#include <linux/falloc.h>
-   #include <linux/if_packet.h>
-   #include <linux/netlink.h>
-   #include <sched.h>
-
-  Then trying qemu-riscv32 with a simple ELF, I get:
-  linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test' =
-failed.
-
-  strace shows that:
-  mmap(0x1000, 4294963200, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESER=
-VE, -1, 0) =3D 0x10000
-  write(2, "qemu-riscv32: ../qemu.git/linux-"..., 103qemu-riscv32: ../qemu.=
-git/linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test=
-' failed.
-  ) =3D 103
-
-  The source code is in the function pgb_reserved_va (linux-
-  user/elfload.c). I think mmap cannot guarantee that the returned
-  pointer (test) equals to the parameter of addr. So is this a bug to
-  assert (addr =3D=3D test)?
-
-  Attached configure script and test ELF file.
-
-  Thanks.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1895080/+subscriptions
+> ---
+>  tests/test-vmstate.c | 3 ---
+>  1 file changed, 3 deletions(-)
+>
+> diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+> index f8de709a0b..1c763015d0 100644
+> --- a/tests/test-vmstate.c
+> +++ b/tests/test-vmstate.c
+> @@ -1055,9 +1055,6 @@ static gboolean match_interval_mapping_node(gpointe=
+r key,
+>      TestGTreeMapping *map_a, *map_b;
+>      TestGTreeInterval *a, *b;
+>      struct match_node_data *d =3D (struct match_node_data *)data;
+> -    char *str =3D g_strdup_printf("dest");
+> -
+> -    g_free(str);
+>      a =3D (TestGTreeInterval *)key;
+>      b =3D (TestGTreeInterval *)d->key;
+>
+> --
+> 2.21.0.windows.1
+>
+>
+>
 
