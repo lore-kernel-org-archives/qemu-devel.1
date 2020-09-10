@@ -2,65 +2,66 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6DC0C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:53:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1053AC43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:55:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F94320C09
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:53:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A191B20C09
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:55:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fz5yiszF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F94320C09
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YfiSsPMi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A191B20C09
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGL8e-0006ts-Ae
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 07:53:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40290)
+	id 1kGLAJ-000873-Nb
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 07:54:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGL7g-0006Ga-Fk
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 07:52:16 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42424
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGL9m-0007b3-Gu
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 07:54:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23410
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGL7e-0004gr-U1
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 07:52:16 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGL9k-0004vM-S2
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 07:54:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599738734;
+ s=mimecast20190719; t=1599738863;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=dptIjhTMsT0261HUbr4TGiJpdY6oeTtvplecxtTLQRQ=;
- b=fz5yiszFK23wvw1dCEW9p+XDf+kZjPboq9oaIZZzHQXJg/tjbC4X3mt19FAm5u3ld+S484
- xAKf5QtXbSt1LuiVGwEEK2SdMc9jIrKlD5mOt0DOkNRAyv75LZ6F1KF7eSYxhf9Gi2ztF3
- OReHlgtL3yRtKCbjOX+rgVnYzBoKhAs=
+ bh=qpH3RzLEmYFxoiGSwixChabsvE+1N+3DekcDMNshWrE=;
+ b=YfiSsPMiWHy0IsEDX++J4DV6X5/Ixdooc75RmatVvv739Mi38cmedr9IN3htbZtz+AGixx
+ D4fDpRWsmIpW8l7Hvr8c3wOFMgDyeCbOFN2irDoHmINDENTk9KCMwsr2w5gXWaKEfHhb3D
+ rv21fvwGgqT2nAiDUzByMoziZcwITQ8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-315-9VtdkSR7OTOWfStEORbbtQ-1; Thu, 10 Sep 2020 07:52:07 -0400
-X-MC-Unique: 9VtdkSR7OTOWfStEORbbtQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-264-CvK6wUTNO4ueXK3Njb2Z2g-1; Thu, 10 Sep 2020 07:54:21 -0400
+X-MC-Unique: CvK6wUTNO4ueXK3Njb2Z2g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 280B5802B6B;
- Thu, 10 Sep 2020 11:52:06 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2DCC61DDFD;
+ Thu, 10 Sep 2020 11:54:20 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-112-197.ams2.redhat.com
  [10.36.112.197])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 66DAC9CBA;
- Thu, 10 Sep 2020 11:52:02 +0000 (UTC)
-Subject: Re: [PATCH 14/29] block/export: Move AioContext from NBDExport to
- BlockExport
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200907182011.521007-1-kwolf@redhat.com>
- <20200907182011.521007-15-kwolf@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 173E75D9E8;
+ Thu, 10 Sep 2020 11:54:18 +0000 (UTC)
+Subject: Re: [PULL v2] Block layer patches
+To: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+References: <20200908115322.325832-1-kwolf@redhat.com>
+ <CAFEAcA-wrgOC9oqdqBuVSTiidaRcwbgQWF08zD=TSetSwn_tjA@mail.gmail.com>
+ <480db253-9aa4-39c3-592f-bc5cfea1997b@redhat.com>
+ <20200910091323.GC7100@linux.fritz.box>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -86,23 +87,23 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <71f7acdc-e146-bc10-d94b-b1e02441f564@redhat.com>
-Date: Thu, 10 Sep 2020 13:52:00 +0200
+Message-ID: <1ca1c2d9-a89c-de6e-4ea4-2eae01b0b7c6@redhat.com>
+Date: Thu, 10 Sep 2020 13:54:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200907182011.521007-15-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200910091323.GC7100@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="B1bXdU3rrvPTc8Cz2GxY4LE7ujVKF97XW"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ boundary="8wbjxP5yjXBPTWnvApnjPbSH3MKmmm6lW"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 03:02:23
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 01:23:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -56
 X-Spam_score: -5.7
@@ -110,7 +111,7 @@ X-Spam_bar: -----
 X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  NICE_REPLY_A=-3.576, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -123,50 +124,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---B1bXdU3rrvPTc8Cz2GxY4LE7ujVKF97XW
-Content-Type: multipart/mixed; boundary="Ef6qAKk6oqbdycSIpbrRTuV9e9JyviBQM"
+--8wbjxP5yjXBPTWnvApnjPbSH3MKmmm6lW
+Content-Type: multipart/mixed; boundary="e9cC6tDTSxhcT2jgDeOF5aRHoqcPXaJKk"
 
---Ef6qAKk6oqbdycSIpbrRTuV9e9JyviBQM
+--e9cC6tDTSxhcT2jgDeOF5aRHoqcPXaJKk
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 07.09.20 20:19, Kevin Wolf wrote:
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  include/block/export.h |  3 +++
->  block/export/export.c  |  2 ++
->  nbd/server.c           | 26 +++++++++++++-------------
->  3 files changed, 18 insertions(+), 13 deletions(-)
+On 10.09.20 11:13, Kevin Wolf wrote:
+> Am 10.09.2020 um 00:09 hat Eric Blake geschrieben:
+>> On 9/9/20 4:55 PM, Peter Maydell wrote:
+>>
+>>>
+>>> This fails 'make check' on NetBSD and OpenBSD:
+>>>
+>>> ./check: line 47: realpath: command not found
+>>> ./check: line 60: /common.env: No such file or directory
+>>> check: failed to source common.env (make sure the qemu-iotests are run
+>>> from tests/qemu-iotests in the build tree)
+>>> gmake: *** [/home/qemu/qemu-test.vcb7nz/src/tests/Makefile.include:144:
+>>> check-block] Error 1
+>>
+>> BSD has 'readlink -f' (and so does coreutils on Linux), which does the s=
+ame
+>> thing as the Linux-only realpath.
+>=20
+> Thanks, I'll use that in v3.
+>=20
+> Max, if v3 doesn't go through either, please take over the pull request
+> as I will be on PTO until the 22th.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+OK, sure.
+
+(Enjoy your time off. :))
+
+Max
 
 
---Ef6qAKk6oqbdycSIpbrRTuV9e9JyviBQM--
+--e9cC6tDTSxhcT2jgDeOF5aRHoqcPXaJKk--
 
---B1bXdU3rrvPTc8Cz2GxY4LE7ujVKF97XW
+--8wbjxP5yjXBPTWnvApnjPbSH3MKmmm6lW
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9aE2AACgkQ9AfbAGHV
-z0DzMAf/TZQnU6SLw4w1qyQAwi+ALDHLxMCrCcWlu9Q86udg3gyfsGUjw8z3Rpos
-NXwvfGNr29C0SrsZDn4z8cR/VNKICox7Iwh2h4btyUZoQBCnCyyIL4nytInLa5Re
-A4E8lgrx2pyQe/Sl6wGuZcq72ftTuI2VdAHRpnsvk6RTeXUuewD6H0phAwQejlEo
-GUitft6nGGyMALyNmh6NoWYHCeCH8xvF5QJDV2XiEqh8WMDvjM2M1a/6P8I6gfTf
-X2tlKi9QwBexYtDI829fuwI8jB0UdZBS2VtUbv5DuFqzqHyHhGkv+NKhFxrQtLEA
-5Bm4piEftOh40nR6SAr5doLs5zIY+A==
-=9DXl
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9aE+kACgkQ9AfbAGHV
+z0Bx6wf9EJj+VXfxS2By1gpE/J9CS9v1H1292Smn6q23otNzdPylOg+j4F9yO1zD
+zCOsDKoWF8Gcso9FzpZ9VAwR38p/tKmhoxeD6leeWjq5RAapWPAAdo9J7mRBg7AV
+iqtg6+vCCmE1iCrsHZNGvbI4tkplTEd9oIwjls5NPHVpKsiv/Hanq+ZJEPwWiUza
+lIGoIecPP2u2QNiSS6GDJESaD9Y5spoPPeV9QEMyt0ncHXwrKNGAf/LfNI9n3r0l
+ZjSy+et0blxYcOhq+LSyL0aMtTosH1/L92G8qM9Y7fm8t0r3TjjD7cX/aENSltYm
+N/yeYnnrMzNR5TO2IY11zlzqwtsc2g==
+=j9Y2
 -----END PGP SIGNATURE-----
 
---B1bXdU3rrvPTc8Cz2GxY4LE7ujVKF97XW--
+--8wbjxP5yjXBPTWnvApnjPbSH3MKmmm6lW--
 
 
