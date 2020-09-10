@@ -2,88 +2,94 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E03A0C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:36:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B648C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:36:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B8F720855
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:36:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 99E9B21941
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:36:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TJMd5bPa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B8F720855
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="GKW3/D5Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99E9B21941
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGRQj-0006Fh-3N
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 14:36:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57922)
+	id 1kGRQr-0006b4-LV
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 14:36:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57252)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kGRCV-0005Lt-0X
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:21:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32431
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kGRCH-00032x-Cf
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:21:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599762084;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IKrAJ1lE8wDUKrGRDLZjEqdt41c0+h5LgFOaBdrpxUU=;
- b=TJMd5bPabQG8kbZOTrV/ZFNtv4ezEiVBo1swjv/qjiN+W6fE64xV7cY0TmiYgxyGaSDRLS
- bgkv5ZCha9nqSgJPusBpR1E8xrYdPnw/AKgfL8Q06J1qSWdQDjiMuLnMXMr/lmI1IusSzi
- xbeFAz0lMenDFL7jrNGAirrJB5wgA8Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-EHb4OODuNfC4wBJqWatKsQ-1; Thu, 10 Sep 2020 14:21:22 -0400
-X-MC-Unique: EHb4OODuNfC4wBJqWatKsQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4BAEA2FD04;
- Thu, 10 Sep 2020 18:21:21 +0000 (UTC)
-Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1105B5D9F3;
- Thu, 10 Sep 2020 18:21:20 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 06/33] qom: Make type checker functions accept const pointers
-Date: Thu, 10 Sep 2020 14:20:45 -0400
-Message-Id: <20200910182112.4030917-7-ehabkost@redhat.com>
-In-Reply-To: <20200910182112.4030917-1-ehabkost@redhat.com>
-References: <20200910182112.4030917-1-ehabkost@redhat.com>
+ (Exim 4.90_1)
+ (envelope-from <prvs=515d47f05=alistair.francis@wdc.com>)
+ id 1kGRBe-0004DK-8E
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:20:46 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:28256)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=515d47f05=alistair.francis@wdc.com>)
+ id 1kGRBZ-0002lX-Co
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:20:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1599762041; x=1631298041;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=73cjRU7ztozjQxYdLAFs7xrITXd+r2BXcfKyNF5PBiU=;
+ b=GKW3/D5Y+2XIw+YEGNU4nv9fIwAIn1FWGjITb1aXkvbQjcZTG0SHGhXu
+ 3BCrr+FTQXEPnt2eIZulwihKPbB8R+tm3+W+L5o6NUN9hCVhwDMVCQS4t
+ t0cp0qg0yRYJrdoWAx57KA8X6uwDHmZsUYTTeM10y9gfsNJUXEqmwjGkm
+ EEFrGjQyxbNkAkkVh9jql+x6Z/thkSJRrB7N0jz2UlUowjgMqoADUGWOt
+ 1cgPyUcE7gRCm4Y8Ugiq8M1jWInS9RLKk8gSEwXe6oIokF2mvTVd+zIXM
+ fyWfN9PZwqeSQFgMMCsz4pT2Ox4dpmfQtOA7M4Bknu3J+voq7VE9kxlIL Q==;
+IronPort-SDR: zGPmd45NZckG+anx9kEvvHJfyDFQTIGfzk3cJDfDsyy2+a3b9jCy2oqzahmA3ma1DxbZAD0bdc
+ O2m0Lpbh0O6XCrlQ8g5ZrcZXH/aBeIgVISPllA3V/FZ+GFyHELdxZoUfHispvEx9EOLJsPnG3B
+ j58B5sx9JU/UcpbKXF9dk+X5ZsiFqN8PmY0txANoH52qcJMHZH7GSoQKJisnJjJFB1+6KjPz6E
+ ohxxCA9CAeTWRveiyvJ0YqckSc3O2/2vw1I/R2U5oqlHN+8+CeijgKhkE+zT52rrLSnjgVehB8
+ +2Y=
+X-IronPort-AV: E=Sophos;i="5.76,413,1592841600"; d="scan'208";a="146979228"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 11 Sep 2020 02:20:17 +0800
+IronPort-SDR: 9+fVLfqhHgg6Y+wCyB5AtRLPbVqpIcT2FBvmkpu3J8lWc3G3UIrrRvDzF452Ed9oFFtzqgUX3c
+ ttP2i3CN1GJA==
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 10 Sep 2020 11:07:34 -0700
+IronPort-SDR: mKrlZ2BP5QBqiBYlItGSFGoSjYb+oFMPt35T5SdIswT7pSqZ86Rwc78i/H1PTOpTNRGsmI3QEo
+ +kXiTN62hTkQ==
+WDCIronportException: Internal
+Received: from fwvkpc2.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.59.152])
+ by uls-op-cesaip01.wdc.com with ESMTP; 10 Sep 2020 11:20:18 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: peter.maydell@linaro.org,
+	qemu-devel@nongnu.org
+Subject: [PULL 12/30] hw/riscv: microchip_pfsoc: Connect a DMA controller
+Date: Thu, 10 Sep 2020 11:09:20 -0700
+Message-Id: <20200910180938.584205-13-alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20200910180938.584205-1-alistair.francis@wdc.com>
+References: <20200910180938.584205-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 09:07:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+Received-SPF: pass client-ip=216.71.154.42;
+ envelope-from=prvs=515d47f05=alistair.francis@wdc.com;
+ helo=esa4.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 14:20:04
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,54 +103,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: alistair23@gmail.com, Bin Meng <bin.meng@windriver.com>,
+ Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The existing type check macros all unconditionally drop const
-qualifiers from their arguments.  Keep this behavior in the
-macros generated by DECLARE_*CHECKER* by now.
+From: Bin Meng <bin.meng@windriver.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20200831210740.126168-6-ehabkost@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+On the Icicle Kit board, the HSS firmware utilizes the on-chip DMA
+controller to move the 2nd stage bootloader in the system memory.
+Let's connect a DMA controller to Microchip PolarFire SoC.
+
+Signed-off-by: Bin Meng <bin.meng@windriver.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-Id: <1598924352-89526-11-git-send-email-bmeng.cn@gmail.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- include/qom/object.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ include/hw/riscv/microchip_pfsoc.h | 11 +++++++++++
+ hw/riscv/microchip_pfsoc.c         | 15 +++++++++++++++
+ hw/riscv/Kconfig                   |  1 +
+ 3 files changed, 27 insertions(+)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 4cd84998c2..3626ae3c65 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -567,7 +567,7 @@ struct Object
-  */
- #define DECLARE_INSTANCE_CHECKER(InstanceType, OBJ_NAME, TYPENAME) \
-     static inline G_GNUC_UNUSED InstanceType * \
--    OBJ_NAME(void *obj) \
-+    OBJ_NAME(const void *obj) \
-     { return OBJECT_CHECK(InstanceType, obj, TYPENAME); }
+diff --git a/include/hw/riscv/microchip_pfsoc.h b/include/hw/riscv/microchip_pfsoc.h
+index d810ee8484..63e786052a 100644
+--- a/include/hw/riscv/microchip_pfsoc.h
++++ b/include/hw/riscv/microchip_pfsoc.h
+@@ -23,6 +23,7 @@
+ #define HW_MICROCHIP_PFSOC_H
  
- /**
-@@ -584,11 +584,11 @@ struct Object
-  */
- #define DECLARE_CLASS_CHECKERS(ClassType, OBJ_NAME, TYPENAME) \
-     static inline G_GNUC_UNUSED ClassType * \
--    OBJ_NAME##_GET_CLASS(void *obj) \
-+    OBJ_NAME##_GET_CLASS(const void *obj) \
-     { return OBJECT_GET_CLASS(ClassType, obj, TYPENAME); } \
-     \
-     static inline G_GNUC_UNUSED ClassType * \
--    OBJ_NAME##_CLASS(void *klass) \
-+    OBJ_NAME##_CLASS(const void *klass) \
-     { return OBJECT_CLASS_CHECK(ClassType, klass, TYPENAME); }
+ #include "hw/char/mchp_pfsoc_mmuart.h"
++#include "hw/dma/sifive_pdma.h"
+ #include "hw/sd/cadence_sdhci.h"
  
- /**
+ typedef struct MicrochipPFSoCState {
+@@ -40,6 +41,7 @@ typedef struct MicrochipPFSoCState {
+     MchpPfSoCMMUartState *serial2;
+     MchpPfSoCMMUartState *serial3;
+     MchpPfSoCMMUartState *serial4;
++    SiFivePDMAState dma;
+     CadenceSDHCIState sdhci;
+ } MicrochipPFSoCState;
+ 
+@@ -71,6 +73,7 @@ enum {
+     MICROCHIP_PFSOC_BUSERR_UNIT4,
+     MICROCHIP_PFSOC_CLINT,
+     MICROCHIP_PFSOC_L2CC,
++    MICROCHIP_PFSOC_DMA,
+     MICROCHIP_PFSOC_L2LIM,
+     MICROCHIP_PFSOC_PLIC,
+     MICROCHIP_PFSOC_MMUART0,
+@@ -88,6 +91,14 @@ enum {
+ };
+ 
+ enum {
++    MICROCHIP_PFSOC_DMA_IRQ0 = 5,
++    MICROCHIP_PFSOC_DMA_IRQ1 = 6,
++    MICROCHIP_PFSOC_DMA_IRQ2 = 7,
++    MICROCHIP_PFSOC_DMA_IRQ3 = 8,
++    MICROCHIP_PFSOC_DMA_IRQ4 = 9,
++    MICROCHIP_PFSOC_DMA_IRQ5 = 10,
++    MICROCHIP_PFSOC_DMA_IRQ6 = 11,
++    MICROCHIP_PFSOC_DMA_IRQ7 = 12,
+     MICROCHIP_PFSOC_EMMC_SD_IRQ = 88,
+     MICROCHIP_PFSOC_MMUART0_IRQ = 90,
+     MICROCHIP_PFSOC_MMUART1_IRQ = 91,
+diff --git a/hw/riscv/microchip_pfsoc.c b/hw/riscv/microchip_pfsoc.c
+index 0b2e9ca175..d8ec973958 100644
+--- a/hw/riscv/microchip_pfsoc.c
++++ b/hw/riscv/microchip_pfsoc.c
+@@ -13,6 +13,7 @@
+  * 2) eNVM (Embedded Non-Volatile Memory)
+  * 3) MMUARTs (Multi-Mode UART)
+  * 4) Cadence eMMC/SDHC controller and an SD card connected to it
++ * 5) SiFive Platform DMA (Direct Memory Access Controller)
+  *
+  * This board currently generates devicetree dynamically that indicates at least
+  * two harts and up to five harts.
+@@ -71,6 +72,7 @@ static const struct MemmapEntry {
+     [MICROCHIP_PFSOC_BUSERR_UNIT4] =    {  0x1704000,     0x1000 },
+     [MICROCHIP_PFSOC_CLINT] =           {  0x2000000,    0x10000 },
+     [MICROCHIP_PFSOC_L2CC] =            {  0x2010000,     0x1000 },
++    [MICROCHIP_PFSOC_DMA] =             {  0x3000000,   0x100000 },
+     [MICROCHIP_PFSOC_L2LIM] =           {  0x8000000,  0x2000000 },
+     [MICROCHIP_PFSOC_PLIC] =            {  0xc000000,  0x4000000 },
+     [MICROCHIP_PFSOC_MMUART0] =         { 0x20000000,     0x1000 },
+@@ -114,6 +116,9 @@ static void microchip_pfsoc_soc_instance_init(Object *obj)
+                          TYPE_RISCV_CPU_SIFIVE_U54);
+     qdev_prop_set_uint64(DEVICE(&s->u_cpus), "resetvec", RESET_VECTOR);
+ 
++    object_initialize_child(obj, "dma-controller", &s->dma,
++                            TYPE_SIFIVE_PDMA);
++
+     object_initialize_child(obj, "sd-controller", &s->sdhci,
+                             TYPE_CADENCE_SDHCI);
+ }
+@@ -218,6 +223,16 @@ static void microchip_pfsoc_soc_realize(DeviceState *dev, Error **errp)
+         memmap[MICROCHIP_PFSOC_PLIC].size);
+     g_free(plic_hart_config);
+ 
++    /* DMA */
++    sysbus_realize(SYS_BUS_DEVICE(&s->dma), errp);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->dma), 0,
++                    memmap[MICROCHIP_PFSOC_DMA].base);
++    for (i = 0; i < SIFIVE_PDMA_IRQS; i++) {
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->dma), i,
++                           qdev_get_gpio_in(DEVICE(s->plic),
++                                            MICROCHIP_PFSOC_DMA_IRQ0 + i));
++    }
++
+     /* SYSREG */
+     create_unimplemented_device("microchip.pfsoc.sysreg",
+         memmap[MICROCHIP_PFSOC_SYSREG].base,
+diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
+index 7412db9ad7..9032cb0cbd 100644
+--- a/hw/riscv/Kconfig
++++ b/hw/riscv/Kconfig
+@@ -55,4 +55,5 @@ config MICROCHIP_PFSOC
+     select SIFIVE
+     select UNIMP
+     select MCHP_PFSOC_MMUART
++    select SIFIVE_PDMA
+     select CADENCE_SDHCI
 -- 
-2.26.2
+2.28.0
 
 
