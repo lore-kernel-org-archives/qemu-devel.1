@@ -8,76 +8,76 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBFDFC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:34:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED79C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:35:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BBEF20BED
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:34:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC4D920BED
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:35:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GImV80jL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BBEF20BED
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ns4QmS2I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC4D920BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGJuZ-0003ka-Fs
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 06:34:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50744)
+	id 1kGJvd-0005iS-Pc
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 06:35:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kGJs2-0007LY-CG; Thu, 10 Sep 2020 06:32:02 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:34345)
+ id 1kGJrm-0006vg-AD; Thu, 10 Sep 2020 06:31:46 -0400
+Received: from mail-pg1-x52f.google.com ([2607:f8b0:4864:20::52f]:35873)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kGJs0-00036w-IU; Thu, 10 Sep 2020 06:32:02 -0400
-Received: by mail-pf1-x443.google.com with SMTP id v196so4509088pfc.1;
- Thu, 10 Sep 2020 03:31:59 -0700 (PDT)
+ id 1kGJrk-000362-FN; Thu, 10 Sep 2020 06:31:46 -0400
+Received: by mail-pg1-x52f.google.com with SMTP id f2so1991165pgd.3;
+ Thu, 10 Sep 2020 03:31:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=fONA64XSdMINk4Pb3HJvl02BkTmqUfaoSQk6W/tx2aE=;
- b=GImV80jLHW3+a4KRC5pHEAmErZVwpIUDFMGKdVIyIAlynBGa+DeRvRdQs3+cTYBQBF
- BUOPAM59jIV+4rkLFPQ4tQZRwgEQ4yVUASkbv6TNYrU6Icta1RC1Oaj+F7thZjrFhrCj
- UBVU1mJpURyVc/eo/W2jNZXAG5EiBWlkaj/7GY+1mf6kWa0PpkAfZDEKmJa3vsj6fLo5
- e2l4W5SrVN4Tl/VqXUqboOPXVwtN1WSjkF5oagitGs5BF8Huf2OJyPi4nBqP3h47Z8Tc
- RXqN9wCsXjsS2a7N+V/7Z6w2c53TWowGpDSGhgeMySgBV33MSIAruMlG0Ly22LBO12s4
- RfLQ==
+ bh=/Q/d/vfX2r5ok5sWGBwNZjHxKJu0oUaT5gHBOiJ10fI=;
+ b=ns4QmS2IsnRySuQXjBp5ziFLlXrPQogKSSJJtJVmXGSjvZxfl+0Ve1FiiJLfOPe6fa
+ gkUj33aNZeE6TBnhY30Rv2Xe0Z3pE5ZJGZXOp0jIkypJJm7ynwLpI/1217QBHXNC+SMi
+ LiM25i3jcmD5lRKuEzhbkR3CALywcozV0/ezq+qq7sXnXqz4VkY70fkz5GJ9PmZYNS6I
+ U85093PaLTvwMt9wTX1h2zKwlm48UMpijAPwGbxpKt8iBdtD2t7vfLUkYpaFwqoSeSw8
+ JYxg7jTdXz6SYVI6ALvaO0bUZ/y3AZsEKLSQVtkR6IpWofM4tha37tDJQvY7Wz6JtmWx
+ F+Fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=fONA64XSdMINk4Pb3HJvl02BkTmqUfaoSQk6W/tx2aE=;
- b=oGGR+r6zOLGYWeHDFwuYNnmxrJ/8cbIiGAzbGeHcyCi5knBLU4ZY2ZlTYhycmk5v7b
- xodjG+EWKO80CPfwRyTChGKElONGgWjnfGWerG1U3UOzMP4xBv77pUfNB1EzEtxwfwh8
- m68f1Kq5FVtt1gaRZuT1mIjkHeTelMgYk4DnAqjcEixH9aA+Ssr/zGmGnwDwodoacZBs
- RgKFfE8Coi8vyOJF32tLggZPjnA731C1AAn4+mUIMTBCPiiDoripimuSDpVzuPuJ8G55
- /NAqqODf59Tc8lR+z9LH38iHFJGb7rmIGJcWVD8TH39e201Yar3Qf0DHzJ5/FaYmvhZw
- t56Q==
-X-Gm-Message-State: AOAM530CzDZZufA6QKtjNvS0vt6Irk5UVNsfuDkXjbFONpvVG3fLPyDX
- 9CuiHO9ldzXvhmLfv8OY1f3UXZcyerglTDyMiDY=
-X-Google-Smtp-Source: ABdhPJxEUJCb1e1P147oBfSxHAQDknFLO1M7FrbLTh+ivuZG/N1poxId6349BAOixxgRsTfdUJamWA==
-X-Received: by 2002:a63:e741:: with SMTP id j1mr3983590pgk.422.1599733918321; 
- Thu, 10 Sep 2020 03:31:58 -0700 (PDT)
+ bh=/Q/d/vfX2r5ok5sWGBwNZjHxKJu0oUaT5gHBOiJ10fI=;
+ b=ix8A/GPlBJ75LK5prTL8bR4YU5stXIeZ5nGi93uL0eyduWyaXURXMdi77+1wuOZhQd
+ J+mKcgWhCuzwd3J5qUFB+Yj/SgbjD51b2kJWTLv8viD5dyDTyN77ARJXHK8vTJrlHH9d
+ RCmq6U2xKZ8kc846Dr15RIe5BlxuBOsD00xw5UiN+mq8x/3oGkS8cVvZsyzqlvYDVaRj
+ WjCEQdtQ7x45lPATUwmq0270lAW4Y87p3OHMoyLsZZrafWAxaWEiu4SpNxo6F8EmNxyt
+ unST36frMdVEoGuJJKfIrU7jnXvMNpqUcaf5u89uskbxLa6Is2mogUe0V8w0/l268HON
+ tgFA==
+X-Gm-Message-State: AOAM532TT1Rn2DiqtJWjjt09EV/eeclSr67qn+BjUWNBu7l5NOz010M8
+ Qa8YXdliBfad68MFbSSictvECqnNIxM8RSMerYo=
+X-Google-Smtp-Source: ABdhPJxv8yQi8TLku5oEqgOsYkaUKBDDlK+5QV+s4yw5e9tgEms1QBayJaDSBeU3Ja2GEigXmHeTHg==
+X-Received: by 2002:a63:30c2:: with SMTP id w185mr3970567pgw.436.1599733901328; 
+ Thu, 10 Sep 2020 03:31:41 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id g21sm2000203pfh.30.2020.09.10.03.31.53
+ by smtp.googlemail.com with ESMTPSA id g21sm2000203pfh.30.2020.09.10.03.31.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 10 Sep 2020 03:31:57 -0700 (PDT)
+ Thu, 10 Sep 2020 03:31:40 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 07/25] curses: Fixes curses compiling errors.
-Date: Thu, 10 Sep 2020 18:30:41 +0800
-Message-Id: <20200910103059.987-8-luoyonggang@gmail.com>
+Subject: [PATCH v7 04/25] ci: fixes msys2 build by upgrading capstone to 4.0.2
+Date: Thu, 10 Sep 2020 18:30:38 +0800
+Message-Id: <20200910103059.987-5-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200910103059.987-1-luoyonggang@gmail.com>
 References: <20200910103059.987-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x443.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52f;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x52f.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -99,67 +99,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Ed Maste <emaste@freebsd.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>,
- Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Yonggang Luo <luoyonggang@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Wen Congyang <wencongyang2@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
+ Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>,
+ Peter Lieven <pl@kamp.de>, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>,
  Li-Wen Hsu <lwhsu@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is the compiling error:
-../ui/curses.c: In function 'curses_refresh':
-../ui/curses.c:256:5: error: 'next_maybe_keycode' may be used uninitialized in this function [-Werror=maybe-uninitialized]
-  256 |     curses2foo(_curses2keycode, _curseskey2keycode, chr, maybe_keycode)
-      |     ^~~~~~~~~~
-../ui/curses.c:302:32: note: 'next_maybe_keycode' was declared here
-  302 |             enum maybe_keycode next_maybe_keycode;
-      |                                ^~~~~~~~~~~~~~~~~~
-../ui/curses.c:256:5: error: 'maybe_keycode' may be used uninitialized in this function [-Werror=maybe-uninitialized]
-  256 |     curses2foo(_curses2keycode, _curseskey2keycode, chr, maybe_keycode)
-      |     ^~~~~~~~~~
-../ui/curses.c:265:24: note: 'maybe_keycode' was declared here
-  265 |     enum maybe_keycode maybe_keycode;
-      |                        ^~~~~~~~~~~~~
-cc1.exe: all warnings being treated as errors
+The currently random version capstone have the following compiling issue:
+  CC      /c/work/xemu/qemu/build/slirp/src/arp_table.o
+make[1]: *** No rule to make target “/c/work/xemu/qemu/build/capstone/capstone.lib”。 Stop.
 
-gcc version 10.2.0 (Rev1, Built by MSYS2 project)
+Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1 are the tagged version 4.0.2
+when upgrading to this version, the folder structure of include are changed to
+qemu\capstone\include
+│  platform.h
+│
+├─capstone
+│      arm.h
+│      arm64.h
+│      capstone.h
+│      evm.h
+│      m680x.h
+│      m68k.h
+│      mips.h
+│      platform.h
+│      ppc.h
+│      sparc.h
+│      systemz.h
+│      tms320c64x.h
+│      x86.h
+│      xcore.h
+│
+└─windowsce
+        intrin.h
+        stdint.h
+
+in capstone. so we need add extra include path -I${source_path}/capstone/include/capstone
+for directly #include <capstone.h>, and the exist include path should preserve, because
+in capstone code there something like #include "capstone/capstone.h"
+
+If only using
+    capstone_cflags="-I${source_path}/capstone/include/capstone"
+Then will cause the following compiling error:
+
+  CC      cs.o
+cs.c:17:10: fatal error: 'capstone/capstone.h' file not found
+#include <capstone/capstone.h>
+         ^~~~~~~~~~~~~~~~~~~~~
+1 error generated.
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- ui/curses.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ capstone  | 2 +-
+ configure | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/ui/curses.c b/ui/curses.c
-index 12bc682cf9..e4f9588c3e 100644
---- a/ui/curses.c
-+++ b/ui/curses.c
-@@ -262,7 +262,7 @@ static int curses2foo(const int _curses2foo[], const int _curseskey2foo[],
- static void curses_refresh(DisplayChangeListener *dcl)
- {
-     int chr, keysym, keycode, keycode_alt;
--    enum maybe_keycode maybe_keycode;
-+    enum maybe_keycode maybe_keycode = CURSES_KEYCODE;
+diff --git a/capstone b/capstone
+index 22ead3e0bf..1d23053284 160000
+--- a/capstone
++++ b/capstone
+@@ -1 +1 @@
+-Subproject commit 22ead3e0bfdb87516656453336160e0a37b066bf
++Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1
+diff --git a/configure b/configure
+index 4231d56bcc..f4f8bc3756 100755
+--- a/configure
++++ b/configure
+@@ -5156,7 +5156,7 @@ case "$capstone" in
+       LIBCAPSTONE=libcapstone.a
+     fi
+     capstone_libs="-Lcapstone -lcapstone"
+-    capstone_cflags="-I${source_path}/capstone/include"
++    capstone_cflags="-I${source_path}/capstone/include -I${source_path}/capstone/include/capstone"
+     ;;
  
-     curses_winch_check();
- 
-@@ -299,7 +299,7 @@ static void curses_refresh(DisplayChangeListener *dcl)
- 
-         /* alt or esc key */
-         if (keycode == 1) {
--            enum maybe_keycode next_maybe_keycode;
-+            enum maybe_keycode next_maybe_keycode = CURSES_KEYCODE;
-             int nextchr = console_getch(&next_maybe_keycode);
- 
-             if (nextchr != -1) {
+   system)
 -- 
 2.28.0.windows.1
 
