@@ -2,86 +2,84 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D282C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 13:16:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4552C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 13:16:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AE08207FB
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 13:16:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6CA7C207FB
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 13:16:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QWasbVzq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AE08207FB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lxZlN8kX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CA7C207FB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGMRF-0005cb-63
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 09:16:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33136)
+	id 1kGMRM-0005hH-Ai
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 09:16:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33164)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kGMPu-0003vy-5z
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 09:15:10 -0400
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:56040)
+ id 1kGMPw-0003yf-1I
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 09:15:12 -0400
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:39271)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kGMPs-00064g-E6
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 09:15:09 -0400
-Received: by mail-wm1-x334.google.com with SMTP id a65so5589184wme.5
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 06:15:07 -0700 (PDT)
+ id 1kGMPu-00066N-1Q
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 09:15:11 -0400
+Received: by mail-wr1-x42d.google.com with SMTP id a17so6661706wrn.6
+ for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 06:15:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=1IVujaGcl6Gaeb44XvH6utm7tpVyG1R70wAp2OwcHKE=;
- b=QWasbVzqGjmIb6mcq+bDGufK48YF9mzK9gFFvYiuOwKW3ujXXBOxSjepx841Qn0ERZ
- /NGAAdiT9EehL8SBgR2liB8AV52gnqC3/b0Vv+VfzbECCV2Lo/ofYQloJ8m6vcQI+U9Y
- ofxnEZpU8pazgX1neTq+rl94WBAPCd0UKmVAeXO7/EgPhQINzsRmKBgdE8ge+vIfAQFb
- k5r8Ht59wagjlSEeHMrvmuvhSWcCz8BU2W7hrjbC4fDIIBPulkD7GtNlVwQ5mlQkrgCi
- YZeh+u59VRRmX2zC1bA83NsVvgp0LfVt8AS3pT125u9KFeArja8YDXvNzC8pxSA+YTqS
- NTpA==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=etTkHB81m+vBMnLfUu95h/Yo/Aq1YAWNfTkFHGN6F6s=;
+ b=lxZlN8kXoduwhzouTpqnXzP3uYEdI8Ay+pigbL4Re5qXcM9wGFTRzCY5tjgB81Tkmg
+ bJBIHP2qpbJCLwsIKMVe70F/6/iL7qIOVp1WMDK03rpqBJQCMUiX3PiJfn/7YcSKKWLd
+ 6d6gGOrkaRNhzIhrBizC+M0+v98IFCIELXd2ys0d4jm6iDuRMbJCJqgDWYKOhoe/YAZ9
+ nFvWDmMXpG0me9b9mgoDkYzsM+BRKoBUUYvYPQWOcGWHqLvjIShhH1LHB16FeIyuawoh
+ T1n4U1dFobXbdiDTrUdK2pYm2b7sSmkdz1oXnGnAYLF2B2aoytf7cCCZrju7wmgoj2OX
+ rqJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=1IVujaGcl6Gaeb44XvH6utm7tpVyG1R70wAp2OwcHKE=;
- b=r/1sRu4DnLp+TLRfwwaLuKpzAnqf5EEuaaISpAfyZ2of5ZoakCsiCbm4WtwPtU44GN
- 0uzNFxdJk6L2MGbW0q+/KWDCZaDyFgclSkGNDeymPzqPu8m9BYXk9AJi+6FzjAnntmDy
- IpEut5VmMl5nMADxRMm14QDa53rDyKGo5urG7iBslqg5JS7gDbX3HTRx6rRk82RQGrwD
- CEuxVHWn6l1CXQl6/36PdqEkbfs9wI/annnqy/H3cdc6pfe8w4llJeVCMVBAbTz4BInA
- BjP0uX7eN7t6Mp/17Lijdg5JuZEatp1aOedeAnQ9n9yyeKcdhuwjQOI2aOFKwp3/w8+S
- XZjA==
-X-Gm-Message-State: AOAM533nmJypdCnqmd9pIFcjhxb6fXdGKdsg/t5qNfcHwo5I61p28RaW
- An1yOd+/DA8vf0vcHONJ3j82pw==
-X-Google-Smtp-Source: ABdhPJz5W4oHB5KcDDy1IcOmfNtvhSdSRWZxgKzsC1XVyKTiKLqcHa2boLy1lCaKs9bqzPqy119f2A==
-X-Received: by 2002:a1c:9a8d:: with SMTP id c135mr63339wme.58.1599743706263;
- Thu, 10 Sep 2020 06:15:06 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=etTkHB81m+vBMnLfUu95h/Yo/Aq1YAWNfTkFHGN6F6s=;
+ b=bvdAec6p6kPPBi/UmYfeMtuB+sjbpPcMryZRJ6HvylTxvsv9+ITA9Wk2smVhg3v++d
+ YF8s4wnkodoHqOU42+Pv/31Cjj5wKd6NKfGBQ7gMF3+iwT/mU5SryAmu/GrvCG32ACww
+ DOzLlkmFGrwy1CkyCFFDXJ35lbd/EwbP9/sYZA8Av/VTDP9jZPKLKn3+WPBFZZGIfB6g
+ 35+h7Hh7yJBE6lQzQt5+/do6ssBbQ/NrNuusnM0KHnRg8TjC5CLA6Kfq5qQrRm1vWMDY
+ qz7RC25coNZSt3x170so359LLLbCwWeAFD2L60jMCpDrjHSZqvlTv3PvisFTI7XNqaCR
+ D0XQ==
+X-Gm-Message-State: AOAM5326gUHSE9TL+G3IbTNgqaJFbJnS2wJJo9OhHlQ3PK+x64CrrLo9
+ p8UyUb7RVf9Rf466C1ErGNv/KQ==
+X-Google-Smtp-Source: ABdhPJwvtAhKTCXTrREzXZfch+ZC20uDwHUyBQkPPj/p9l/7vhRWNeks/7QjCDENo7wKckPQkQNS6Q==
+X-Received: by 2002:adf:f3c4:: with SMTP id g4mr9181956wrp.168.1599743707471; 
+ Thu, 10 Sep 2020 06:15:07 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id f1sm9030393wrt.20.2020.09.10.06.15.04
+ by smtp.gmail.com with ESMTPSA id r15sm3652440wmn.24.2020.09.10.06.15.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Thu, 10 Sep 2020 06:15:04 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 77C6B1FF87;
+ by zen.linaroharston (Postfix) with ESMTP id 621091FF7E;
  Thu, 10 Sep 2020 14:15:04 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 01/10] CODING_STYLE.rst: flesh out our naming conventions.
-Date: Thu, 10 Sep 2020 14:14:55 +0100
-Message-Id: <20200910131504.11341-2-alex.bennee@linaro.org>
+Subject: [PULL 00/10] testing and other mix fixes
+Date: Thu, 10 Sep 2020 14:14:54 +0100
+Message-Id: <20200910131504.11341-1-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200910131504.11341-1-alex.bennee@linaro.org>
-References: <20200910131504.11341-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::334;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x334.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42d;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,68 +101,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Mention a few of the more common naming conventions we follow in the
-code base including common variable names and function prefix and
-suffix examples.
+The following changes since commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a:
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20200909112742.25730-2-alex.bennee@linaro.org>
+  Merge remote-tracking branch 'remotes/kraxel/tags/sirius/ipxe-20200908-pull-request' into staging (2020-09-08 21:21:13 +0100)
 
-diff --git a/CODING_STYLE.rst b/CODING_STYLE.rst
-index 427699e0e42..8b13ef0669e 100644
---- a/CODING_STYLE.rst
-+++ b/CODING_STYLE.rst
-@@ -109,8 +109,41 @@ names are lower_case_with_underscores_ending_with_a_t, like the POSIX
- uint64_t and family.  Note that this last convention contradicts POSIX
- and is therefore likely to be changed.
- 
--When wrapping standard library functions, use the prefix ``qemu_`` to alert
--readers that they are seeing a wrapped version; otherwise avoid this prefix.
-+Variable Naming Conventions
-+---------------------------
-+
-+A number of short naming conventions exist for variables that use
-+common QEMU types. For example, the architecture independent CPUState
-+is often held as a ``cs`` pointer variable, whereas the concrete
-+CPUArchState is usually held in a pointer called ``env``.
-+
-+Likewise, in device emulation code the common DeviceState is usually
-+called ``dev``.
-+
-+Function Naming Conventions
-+---------------------------
-+
-+Wrapped version of standard library or GLib functions use a ``qemu_``
-+prefix to alert readers that they are seeing a wrapped version, for
-+example ``qemu_strtol`` or ``qemu_mutex_lock``.  Other utility functions
-+that are widely called from across the codebase should not have any
-+prefix, for example ``pstrcpy`` or bit manipulation functions such as
-+``find_first_bit``.
-+
-+The ``qemu_`` prefix is also used for functions that modify global
-+emulator state, for example ``qemu_add_vm_change_state_handler``.
-+However, if there is an obvious subsystem-specific prefix it should be
-+used instead.
-+
-+Public functions from a file or subsystem (declared in headers) tend
-+to have a consistent prefix to show where they came from. For example,
-+``tlb_`` for functions from ``cputlb.c`` or ``cpu_`` for functions
-+from cpus.c.
-+
-+If there are two versions of a function to be called with or without a
-+lock held, the function that expects the lock to be already held
-+usually uses the suffix ``_locked``.
-+
- 
- Block structure
- ===============
+are available in the Git repository at:
+
+  https://github.com/stsquad/qemu.git tags/pull-testing-fixes-100920-1
+
+for you to fetch changes up to c17a386b6afe608086aa4d260e29662865680b7f:
+
+  plugins: move the more involved plugins to contrib (2020-09-10 10:47:03 +0100)
+
+----------------------------------------------------------------
+Various misc and testing fixes:
+
+  - Expand CODING_STYLE.rst a little more
+  - usb-host build fix
+  - allow check-softfloat unit tests without TCG
+  - simplify mips imm_branch so compiler isn't confused
+  - mark ppc64abi32 for deprecation
+  - more compiler soothing in pch_rev_id
+  - allow acceptance to skip missing binaries
+  - more a bunch of plugins to contrib
+
+----------------------------------------------------------------
+Alex Bennée (7):
+      CODING_STYLE.rst: flesh out our naming conventions.
+      tests/meson.build: fp tests don't need CONFIG_TCG
+      target/mips: simplify gen_compute_imm_branch logic
+      docs/system/deprecated: mark ppc64abi32-linux-user for deprecation
+      configure: don't enable ppc64abi32-linux-user by default
+      hw/i386: make explicit clearing of pch_rev_id
+      plugins: move the more involved plugins to contrib
+
+Gerd Hoffmann (1):
+      usb-host: restrict workaround to new libusb versions
+
+Pavel Dovgaluk (1):
+      tests: bump avocado version
+
+Philippe Mathieu-Daudé (1):
+      tests/acceptance: Add Test.fetch_asset(cancel_on_missing=True)
+
+ docs/devel/tcg-plugins.rst                    | 146 ++++++++++++++++++++++++++
+ docs/system/deprecated.rst                    |   7 ++
+ CODING_STYLE.rst                              |  37 ++++++-
+ configure                                     |  48 +++++----
+ Makefile                                      |  11 ++
+ {tests/plugin => contrib/plugins}/hotblocks.c |   0
+ {tests/plugin => contrib/plugins}/hotpages.c  |   0
+ {tests/plugin => contrib/plugins}/howvec.c    |   0
+ {tests/plugin => contrib/plugins}/lockstep.c  |   0
+ hw/i386/pc_piix.c                             |   2 +-
+ hw/usb/host-libusb.c                          |   2 +-
+ target/mips/translate.c                       |  12 +--
+ .travis.yml                                   |   2 +-
+ MAINTAINERS                                   |   3 +-
+ contrib/plugins/Makefile                      |  42 ++++++++
+ tests/Makefile.include                        |   4 +-
+ tests/acceptance/avocado_qemu/__init__.py     |  12 +++
+ tests/meson.build                             |   3 +-
+ tests/plugin/meson.build                      |   4 +-
+ tests/requirements.txt                        |   2 +-
+ tests/tcg/Makefile.target                     |   3 +-
+ 21 files changed, 297 insertions(+), 43 deletions(-)
+ rename {tests/plugin => contrib/plugins}/hotblocks.c (100%)
+ rename {tests/plugin => contrib/plugins}/hotpages.c (100%)
+ rename {tests/plugin => contrib/plugins}/howvec.c (100%)
+ rename {tests/plugin => contrib/plugins}/lockstep.c (100%)
+ create mode 100644 contrib/plugins/Makefile
+
 -- 
 2.20.1
 
