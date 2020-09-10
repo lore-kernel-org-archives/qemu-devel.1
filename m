@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7B54C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:24:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13D16C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:24:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 299272076C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:24:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9144D2076C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:24:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="NtIq+q+4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 299272076C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="KhOpxxYH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9144D2076C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGRF8-0000rI-3m
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 14:24:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56960)
+	id 1kGRFJ-00017q-Hy
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 14:24:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57254)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=515d47f05=alistair.francis@wdc.com>)
- id 1kGRBJ-0003bR-Ia
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:20:25 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:28248)
+ id 1kGRBf-0004EX-03
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:20:47 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:28254)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=515d47f05=alistair.francis@wdc.com>)
- id 1kGRBF-0002j9-8a
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:20:25 -0400
+ id 1kGRBc-0002kZ-5u
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:20:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1599762021; x=1631298021;
+ t=1599762043; x=1631298043;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=jsyBOr6d4kpx/wa6iWDrWapk7zk9J6ee0j6qg7YbxLg=;
- b=NtIq+q+4ma68UzSxLAKY+X4rkNbIwdUZVT4NkMxjqQphcaG3e9e+rSYB
- 3uu43fjGih6tExFSjYWcV0k9dDy2Qrv/iVzBiC1BGy2Mcdh/byeRjdGR8
- fV42/Jmc3ENhj4+Cwf6JRLYUaSRfACK4OuqKM6/yMnJKbovnWauI50wl6
- djUV9gOtVdC7LA9aHM5ja8eTJRvVTuG7CJUtzKOu+3u8W2G9x1qAJ0mFY
- DQlzkPrIhfTohd1vX/8yEmQDY9jnGS8CxT/K33lhGlgDJAE7ylV1pb9rN
- hdGWQTsfcWt333AwL4IuiHeGwwPrY2vU5iByydFq4gbAQ15S30G2yf3XJ w==;
-IronPort-SDR: zKPryPBEB+HRIrJoP289x7h4IjoRlJxfAT0hjOrfmim/e0/g2jfRI3qMKDzTIyRWvPWbHf8cF+
- mx79VVvsHNqBtGBJf4qR+xfAdSA2gbK6i0X/NjFkQoLj7lUvWfqxgYkhIEvDNeTvoGV1JE6c7g
- uTDN4x5BBdQ8/9zyWxb5jOgNKo/zBuH8feQ3JARtzUkX+RJxDj37b9vsTkI8sdHvl4dHDl7f5I
- D/idpdK+R1Nem/2oCqlA0IhlS3MLY3Bs93cdDYEPFGZziwHFc9nv//IRnHKvQUPz+AX1hw0+uB
- 9aQ=
-X-IronPort-AV: E=Sophos;i="5.76,413,1592841600"; d="scan'208";a="146979202"
+ bh=HEhP4NQKlH459kbrtN12X8mfdwJiWZXFQOkseP2wUNU=;
+ b=KhOpxxYHqL5aZcdg9wovqEqe8JdM9pSj/wjU3uVcFON041YfNBBaYP2J
+ GgerjdZJdfCs2lBdVUYYhSnXtNHpAijO4Q67nsO2N9QItQd2AoKnMhw13
+ CKXBozSleBA2pJRbn7ALTX0GJjV4YPrv8GfG4KOwnlfiW5EKULU9hbvqW
+ 6deDxvkIQ5+X6g1cXdTBmWKy4K1vH7POLKZutKZey3PuqJO41HZYDD7gX
+ ytrOgE4O/Z1hJZd+OBVnGVjoIxaOXSO44o4Xgj5AHxdz4wnz+A9kBDhmg
+ hl5LwpDtPXaivZ3/rdyM8+07XwFFKSBf7kqFhspd0D/syUAnguaeqHLVN Q==;
+IronPort-SDR: pfyWzbDGXF0dnMUE2t6EY7Iv9FYNfRTGtGzm7CuXuhKbCR2cL0FrRRA7MBbNEgZIgKADczBcx5
+ SeS9wOn0thk0I/Rh8ukv9j/rwpePTLQ1w1KM/CXspOBWuTRJVCEouabW5Nov5swwyfZdnKUNMz
+ B5thDkgMNjhSa0Vt5Wx/d6esVXRaskgJh+auOx/0c3d1Twg+v0El28FEL6cfZQajF1j2EAIyYG
+ KYaI/svbmPm93HEohpcg9gr6eix5h8YuvENsbInEBLi6YYZGNNWev99VqnYjljLeDX/oLpcn+t
+ rc4=
+X-IronPort-AV: E=Sophos;i="5.76,413,1592841600"; d="scan'208";a="146979233"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 11 Sep 2020 02:20:14 +0800
-IronPort-SDR: QEY3Rza+coTol7Gv4FRLd5cqRiHsA4/hRCMVs5bow6UAN3t2u+c1gxtvA8A4ujgBFKYmlRsV9t
- o5zpUFn07kRA==
+ by ob1.hgst.iphmx.com with ESMTP; 11 Sep 2020 02:20:18 +0800
+IronPort-SDR: bN5ppWGHZuJCNjM+fJomnP+Mdgw33iibDosZNrVUOTd74BVBtws8vwn8CGSG4v0Om5SVyyzIBU
+ x85Wva9kTy6A==
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 10 Sep 2020 11:07:31 -0700
-IronPort-SDR: kKL8miW+kbcuMjIGPFf+MbhuXlvVrwz9CIxxlTlV7HN3CtllX5BKp1Hr40qmjglpPbQsy6Mj77
- mcr+KsiUFowA==
+ 10 Sep 2020 11:07:35 -0700
+IronPort-SDR: f4tmIlyjgYbCFMyZ5c5OiP1rv4UCi25mBy4HTqPbqUaUIizxThQ+Mzc2RYyJKpmjNgi8cWI5y+
+ YpjkUAfHXt6w==
 WDCIronportException: Internal
 Received: from fwvkpc2.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.59.152])
- by uls-op-cesaip01.wdc.com with ESMTP; 10 Sep 2020 11:20:14 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 10 Sep 2020 11:20:18 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL 01/30] target/riscv: Fix bug in getting trap cause name for
- trace_riscv_trap
-Date: Thu, 10 Sep 2020 11:09:09 -0700
-Message-Id: <20200910180938.584205-2-alistair.francis@wdc.com>
+Subject: [PULL 14/30] hw/arm: xlnx: Set all boards' GEM 'phy-addr' property
+ value to 23
+Date: Thu, 10 Sep 2020 11:09:22 -0700
+Message-Id: <20200910180938.584205-15-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200910180938.584205-1-alistair.francis@wdc.com>
 References: <20200910180938.584205-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=216.71.154.42;
  envelope-from=prvs=515d47f05=alistair.francis@wdc.com;
@@ -104,81 +105,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>,
- Yifei Jiang <jiangyifei@huawei.com>, Yipeng Yin <yinyipeng1@huawei.com>
+Cc: alistair23@gmail.com, Bin Meng <bin.meng@windriver.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yifei Jiang <jiangyifei@huawei.com>
+From: Bin Meng <bin.meng@windriver.com>
 
-When the cause number is equal to or greater than 23, print "(unknown)" in
-trace_riscv_trap. The max valid number of riscv_excp_names is 23, so the last
-excpetion "guest_store_page_fault" can not be printed.
+When cadence_gem model was created for Xilinx boards, the PHY address
+was hard-coded to 23 in the GEM model. Now that we have introduced a
+property we can use that to tell GEM model what our PHY address is.
+Change all boards' GEM 'phy-addr' property value to 23, and set the
+PHY address default value to 0 in the GEM model.
 
-In addition, the current check of cause is invalid for riscv_intr_names. So
-introduce riscv_cpu_get_trap_name to get the trap cause name.
-
-Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
-Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
+Signed-off-by: Bin Meng <bin.meng@windriver.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-Id: <20200814035819.1214-1-jiangyifei@huawei.com>
+Message-Id: <1598924352-89526-13-git-send-email-bmeng.cn@gmail.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/cpu.h        |  1 +
- target/riscv/cpu.c        | 11 +++++++++++
- target/riscv/cpu_helper.c |  4 ++--
- 3 files changed, 14 insertions(+), 2 deletions(-)
+ hw/arm/xilinx_zynq.c | 1 +
+ hw/arm/xlnx-versal.c | 1 +
+ hw/arm/xlnx-zynqmp.c | 2 ++
+ hw/net/cadence_gem.c | 6 +++---
+ 4 files changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 383808bf88..d3589ae6ea 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -312,6 +312,7 @@ extern const char * const riscv_fpr_regnames[];
- extern const char * const riscv_excp_names[];
- extern const char * const riscv_intr_names[];
- 
-+const char *riscv_cpu_get_trap_name(target_ulong cause, bool async);
- void riscv_cpu_do_interrupt(CPUState *cpu);
- int riscv_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
- int riscv_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 228b9bdb5d..bcdce85c5e 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -96,6 +96,17 @@ const char * const riscv_intr_names[] = {
-     "reserved"
- };
- 
-+const char *riscv_cpu_get_trap_name(target_ulong cause, bool async)
-+{
-+    if (async) {
-+        return (cause < ARRAY_SIZE(riscv_intr_names)) ?
-+               riscv_intr_names[cause] : "(unknown)";
-+    } else {
-+        return (cause < ARRAY_SIZE(riscv_excp_names)) ?
-+               riscv_excp_names[cause] : "(unknown)";
-+    }
-+}
-+
- static void set_misa(CPURISCVState *env, target_ulong misa)
- {
-     env->misa_mask = env->misa = misa;
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index dc7ae3e7b1..005880627e 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -892,8 +892,8 @@ void riscv_cpu_do_interrupt(CPUState *cs)
-         }
+diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
+index 969ef0727c..9ffcc5606f 100644
+--- a/hw/arm/xilinx_zynq.c
++++ b/hw/arm/xilinx_zynq.c
+@@ -119,6 +119,7 @@ static void gem_init(NICInfo *nd, uint32_t base, qemu_irq irq)
+         qemu_check_nic_model(nd, TYPE_CADENCE_GEM);
+         qdev_set_nic_properties(dev, nd);
      }
++    object_property_set_int(OBJECT(dev), "phy-addr", 23, &error_abort);
+     s = SYS_BUS_DEVICE(dev);
+     sysbus_realize_and_unref(s, &error_fatal);
+     sysbus_mmio_map(s, 0, base);
+diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
+index e3aa4bd1e5..12ba6c4eba 100644
+--- a/hw/arm/xlnx-versal.c
++++ b/hw/arm/xlnx-versal.c
+@@ -165,6 +165,7 @@ static void versal_create_gems(Versal *s, qemu_irq *pic)
+             qemu_check_nic_model(nd, "cadence_gem");
+             qdev_set_nic_properties(dev, nd);
+         }
++        object_property_set_int(OBJECT(dev), "phy-addr", 23, &error_abort);
+         object_property_set_int(OBJECT(dev), "num-priority-queues", 2,
+                                 &error_abort);
+         object_property_set_link(OBJECT(dev), "dma", OBJECT(&s->mr_ps),
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index c435b9d52a..7885bb1774 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -460,6 +460,8 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+         }
+         object_property_set_int(OBJECT(&s->gem[i]), "revision", GEM_REVISION,
+                                 &error_abort);
++        object_property_set_int(OBJECT(&s->gem[i]), "phy-addr", 23,
++                                &error_abort);
+         object_property_set_int(OBJECT(&s->gem[i]), "num-priority-queues", 2,
+                                 &error_abort);
+         if (!sysbus_realize(SYS_BUS_DEVICE(&s->gem[i]), errp)) {
+diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+index d80096bbe8..7a534691f1 100644
+--- a/hw/net/cadence_gem.c
++++ b/hw/net/cadence_gem.c
+@@ -250,7 +250,7 @@
+ #define GEM_PHYMNTNC_REG_SHIFT 18
  
--    trace_riscv_trap(env->mhartid, async, cause, env->pc, tval, cause < 23 ?
--        (async ? riscv_intr_names : riscv_excp_names)[cause] : "(unknown)");
-+    trace_riscv_trap(env->mhartid, async, cause, env->pc, tval,
-+        riscv_cpu_get_trap_name(cause, async));
+ /* Marvell PHY definitions */
+-#define BOARD_PHY_ADDRESS    23 /* PHY address we will emulate a device at */
++#define BOARD_PHY_ADDRESS    0 /* PHY address we will emulate a device at */
  
-     if (env->priv <= PRV_S &&
-             cause < TARGET_LONG_BITS && ((deleg >> cause) & 1)) {
+ #define PHY_REG_CONTROL      0
+ #define PHY_REG_STATUS       1
+@@ -1446,7 +1446,7 @@ static uint64_t gem_read(void *opaque, hwaddr offset, unsigned size)
+             uint32_t phy_addr, reg_num;
+ 
+             phy_addr = (retval & GEM_PHYMNTNC_ADDR) >> GEM_PHYMNTNC_ADDR_SHFT;
+-            if (phy_addr == s->phy_addr || phy_addr == 0) {
++            if (phy_addr == s->phy_addr) {
+                 reg_num = (retval & GEM_PHYMNTNC_REG) >> GEM_PHYMNTNC_REG_SHIFT;
+                 retval &= 0xFFFF0000;
+                 retval |= gem_phy_read(s, reg_num);
+@@ -1569,7 +1569,7 @@ static void gem_write(void *opaque, hwaddr offset, uint64_t val,
+             uint32_t phy_addr, reg_num;
+ 
+             phy_addr = (val & GEM_PHYMNTNC_ADDR) >> GEM_PHYMNTNC_ADDR_SHFT;
+-            if (phy_addr == s->phy_addr || phy_addr == 0) {
++            if (phy_addr == s->phy_addr) {
+                 reg_num = (val & GEM_PHYMNTNC_REG) >> GEM_PHYMNTNC_REG_SHIFT;
+                 gem_phy_write(s, reg_num, val);
+             }
 -- 
 2.28.0
 
