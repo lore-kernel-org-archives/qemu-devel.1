@@ -2,81 +2,79 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFDFFC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 13:46:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E19C2C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 13:52:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6303021D6C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 13:46:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4090E20809
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 13:52:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ugdsSy2j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6303021D6C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bc/n8qyu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4090E20809
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGMtm-0006yl-GU
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 09:46:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40784)
+	id 1kGN0F-0000id-8c
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 09:52:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43354)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kele.hwang@gmail.com>)
- id 1kGHG3-0004Ly-Q5
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 03:44:39 -0400
-Received: from mail-pf1-x42f.google.com ([2607:f8b0:4864:20::42f]:47065)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kGMzh-0000Hc-EA
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 09:52:09 -0400
+Received: from mail-oo1-xc42.google.com ([2607:f8b0:4864:20::c42]:35055)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <kele.hwang@gmail.com>)
- id 1kGHG0-00070I-F8
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 03:44:39 -0400
-Received: by mail-pf1-x42f.google.com with SMTP id b124so4116911pfg.13
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 00:44:36 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kGMzf-0002zY-DD
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 09:52:09 -0400
+Received: by mail-oo1-xc42.google.com with SMTP id k13so1456810oor.2
+ for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 06:52:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=j05rnkItkh3LOypPRmy7aeVBelO22zvkXc9fsKS4afE=;
- b=ugdsSy2jYGkiuvSEbSIifSm8BhKhBYgXSKvXiCg2ZIWKGpzjuDC8/xh45J7yDNFw35
- Skxk+HJZPRbbMHXJ5sZplWTkYqfk8oUyXkF7f2neEeQXADvn0RFhrSPo+w2vpSga+iPM
- t/x4V4DgIOfBoj0RasQDzxeXgnTLzJgt2TLnQi1tz/Y+FVwWV9BxtXjchODQUpBCf5Oa
- 48H/AcebEjdxjjxwcHZz0w8DC5BPwfYmlO2CNV2028ukA2ICT9GAP7VNLuSd/MebUXMb
- BojSYD7tskilTbfkQrX57Pn++3Kv/RS4Yd7n8KEeV6jxsf25HOMack1YcmBHRwmjDwwD
- tzrA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=mzDBYvodRm+e+86XyfVYVf24djpJnE4nBPT6E3yvd1g=;
+ b=bc/n8qyu2NwhqOZoRFy9WCQcy03c7J1cdFSYTYxK04p95yU9BE0ZuPpC5kfsLatJ+b
+ ZJs7uv91QmSiBgn5xNPjXwXSdWiyVlr6F187fO8Bx4dr54bSaIXWtZfgzOM5J/p59tnQ
+ IuV6Au+ZZY8aEeblIuTvvPVuJ8KNbiEFzh9/6CbA7Ua9PjVrq8y6YnhyPrb/ayePl01F
+ brkRLcxGjThd28Dy65X+C4HA+zTck4xPKFPeylDdAY7fsqtpRJM+71Y9DG4jmq6m8TaY
+ tzmtNti2uQ/udiUqPm5cKVe4cz6Sek1R+s+makfihTvKKzACQMwGE1JioF82XG4/ou8k
+ bNsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=j05rnkItkh3LOypPRmy7aeVBelO22zvkXc9fsKS4afE=;
- b=TgX+EMBdCbMv5POb4ye7SwO3eghBUI5ov3zsDjb3/FR+hFxc9aWdJxX7F3/Pj9z/56
- JvKSruMXKwcQf89NrUKj70Gdvv4ZQ2ctR36MdLN5Xq741ALiepAjrqDK5enG1a22XZwJ
- zij6PrwYv58mBrNckMFtkO+fSJmV2gxo/i1h9Dbv3BlJUx7GRyBSo7NdixVuJsG+lQIi
- vl2q9JSoPBSbTGtFXSIE2JmMy5OUKnngSIJrko/aBV97Th32pURmqvlHg8UHH0i+wE4g
- Q0ooKY5pmsO9zw1YOurV6Shf9riAAeuvKj/EdSlvepXylzK7Z9tUsWFqG69ZwgolNHvY
- C+xQ==
-X-Gm-Message-State: AOAM530HilP2GepVFmioBnDy2l5Gzze/a+LpN9CTAINiroetBP0M2fJ6
- Y9mW05PGY+hDwY+06AKCH6s/QWzCcZ2gPBAud40jyQ==
-X-Google-Smtp-Source: ABdhPJz7Bv/G6LeQrsPfKkmNUXK/3hTfPe3ONlpyW0C1jGyOv5o/pooVjlO6mAxXlAvIY76q7bcAdA==
-X-Received: by 2002:a63:4923:: with SMTP id w35mr3421322pga.368.1599723874714; 
- Thu, 10 Sep 2020 00:44:34 -0700 (PDT)
-Received: from carbon.loongson.cn ([52.229.162.29])
- by smtp.gmail.com with ESMTPSA id n67sm3995337pgn.14.2020.09.10.00.44.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 10 Sep 2020 00:44:34 -0700 (PDT)
-From: Kele Huang <kele.hwang@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/1] accel/tcg: Fix computing is_write for mips
-Date: Thu, 10 Sep 2020 15:43:42 +0800
-Message-Id: <20200910074342.20421-2-kele.hwang@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200910074342.20421-1-kele.hwang@gmail.com>
-References: <503406>
- <20200910074342.20421-1-kele.hwang@gmail.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::42f;
- envelope-from=kele.hwang@gmail.com; helo=mail-pf1-x42f.google.com
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=mzDBYvodRm+e+86XyfVYVf24djpJnE4nBPT6E3yvd1g=;
+ b=dFJEFWPk0pXxKNEvmzcnhXd59BMbNfKXtP8A1UtvK809/d6mF/HEjy84tT9Kvr+jfL
+ jtw/5mNrKJZpggGEefkqouzxu4fl60FJ0Y4axOOjavUB7RP9DgKHxIICDK+nYA9Hr1BG
+ LqEFDDGF6IG5fRA2/5ZNgPXo70qAyHaIBxoT1xj8JOZURL/8Z1qzNWlfffVv90Zf1g6T
+ KWLX/pXjMVBcXdsqO8IXEW46cdOGWhEALutu8swGkRLxwJfR1PZj8Z2p+P/psW+fnFS6
+ sSrvJots3zcKJdmkd2nmjL64YtbW8uYHo/oh6v5lrlf+JU8/3IuiSaeZN14Qr3B86rJA
+ 0NTQ==
+X-Gm-Message-State: AOAM530uNIKK9GrylgvG60HgGo0qnHlwteFJ56of6HDR/bXZTZbTcA/w
+ FMSrwVojGf0+bPEApyuC57WOqB4xS7Eg0cJBDW4=
+X-Google-Smtp-Source: ABdhPJyATVeTPFdHq+PnAgmgB+7yi7XXWqMX5yKhBV0a+0Z7yAyYR4aG+pax8zawHEGnh0/HXhoSN6QzduSU6Ix3zjo=
+X-Received: by 2002:a4a:5a06:: with SMTP id v6mr4538633ooa.22.1599745926141;
+ Thu, 10 Sep 2020 06:52:06 -0700 (PDT)
+MIME-Version: 1.0
+References: <1599661096-127913-1-git-send-email-zhengchuan@huawei.com>
+ <1599661096-127913-7-git-send-email-zhengchuan@huawei.com>
+In-Reply-To: <1599661096-127913-7-git-send-email-zhengchuan@huawei.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Thu, 10 Sep 2020 21:51:30 +0800
+Message-ID: <CAKXe6SJBwKU-hFvEOCnE-N4mqT5+iBHA+220HBbxX5C-F9b0Gw@mail.gmail.com>
+Subject: Re: [PATCH v7 06/12] migration/dirtyrate: Record hash results for
+ each sampled page
+To: Chuan Zheng <zhengchuan@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c42;
+ envelope-from=liq3ea@gmail.com; helo=mail-oo1-xc42.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -87,7 +85,6 @@ X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
-X-Mailman-Approved-At: Thu, 10 Sep 2020 09:42:38 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,52 +96,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kele Huang <kele.hwang@gmail.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>, dme@dme.org,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, xiexiangyou@huawei.com,
+ Qemu Developers <qemu-devel@nongnu.org>, AlexChen <alex.chen@huawei.com>,
+ ann.zhuangyanying@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Detect mips store instructions SWXC1 and SDXC1 for MIPS64 since
-MIPS64r1, and MIPS32 since MIPS32r2.
+Chuan Zheng <zhengchuan@huawei.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=889=E6=97=
+=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=8810:14=E5=86=99=E9=81=93=EF=BC=9A
+>
+> Record hash results for each sampled page, crc32 is taken to calculate
+> hash results for each sampled length in TARGET_PAGE_SIZE.
+>
+> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+> Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
+> Reviewed-by: David Edmondson <david.edmondson@oracle.com>
+> ---
+>  migration/dirtyrate.c | 125 ++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  1 file changed, 125 insertions(+)
+>
+> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+> index d56cd93..bc87269 100644
+> --- a/migration/dirtyrate.c
+> +++ b/migration/dirtyrate.c
+> @@ -10,6 +10,7 @@
+>   * See the COPYING file in the top-level directory.
+>   */
+>
+> +#include <zlib.h>
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+>  #include "cpu.h"
+> @@ -68,6 +69,130 @@ static void update_dirtyrate(uint64_t msec)
+>      DirtyStat.dirty_rate =3D dirtyrate;
+>  }
+>
+> +/*
+> + * get hash result for the sampled memory with length of TARGET_PAGE_SIZ=
+E
+> + * in ramblock, which starts from ramblock base address.
+> + */
+> +static uint32_t get_ramblock_vfn_hash(struct RamblockDirtyInfo *info,
+> +                                      uint64_t vfn)
+> +{
+> +    uint32_t crc;
+> +
+> +    crc =3D crc32(0, (info->ramblock_addr +
+> +                vfn * TARGET_PAGE_SIZE), TARGET_PAGE_SIZE);
+> +
+> +    return crc;
+> +}
+> +
+> +static int save_ramblock_hash(struct RamblockDirtyInfo *info)
+> +{
+> +    unsigned int sample_pages_count;
+> +    int i;
+> +    GRand *rand;
+> +
+> +    sample_pages_count =3D info->sample_pages_count;
+> +
+> +    /* ramblock size less than one page, return success to skip this ram=
+block */
+> +    if (unlikely(info->ramblock_pages =3D=3D 0 || sample_pages_count =3D=
+=3D 0)) {
+> +        return 0;
+> +    }
+> +
+> +    info->hash_result =3D g_try_malloc0_n(sample_pages_count,
+> +                                        sizeof(uint32_t));
+> +    if (!info->hash_result) {
+> +        return -1;
+> +    }
+> +
+> +    info->sample_page_vfn =3D g_try_malloc0_n(sample_pages_count,
+> +                                            sizeof(uint64_t));
+> +    if (!info->sample_page_vfn) {
+> +        g_free(info->hash_result);
+> +        return -1;
+> +    }
+> +
+> +    rand  =3D g_rand_new();
+> +    for (i =3D 0; i < sample_pages_count; i++) {
+> +        info->sample_page_vfn[i] =3D g_rand_int_range(rand, 0,
+> +                                                    info->ramblock_pages=
+ - 1);
+> +        info->hash_result[i] =3D get_ramblock_vfn_hash(info,
+> +                                                     info->sample_page_v=
+fn[i]);
+> +    }
+> +    g_rand_free(rand);
+> +
+> +    return 0;
+> +}
+> +
+> +static void get_ramblock_dirty_info(RAMBlock *block,
+> +                                    struct RamblockDirtyInfo *info,
+> +                                    struct DirtyRateConfig *config)
+> +{
+> +    uint64_t sample_pages_per_gigabytes =3D config->sample_pages_per_gig=
+abytes;
+> +
+> +    /* Right shift 30 bits to calc ramblock size in GB */
+> +    info->sample_pages_count =3D (qemu_ram_get_used_length(block) *
+> +                                sample_pages_per_gigabytes) >> 30;
+> +    /* Right shift TARGET_PAGE_BITS to calc page count */
+> +    info->ramblock_pages =3D qemu_ram_get_used_length(block) >>
+> +                           TARGET_PAGE_BITS;
+> +    info->ramblock_addr =3D qemu_ram_get_host_addr(block);
+> +    strcpy(info->idstr, qemu_ram_get_idstr(block));
+> +}
+> +
+> +static struct RamblockDirtyInfo *
+> +alloc_ramblock_dirty_info(int *block_index,
+> +                          struct RamblockDirtyInfo *block_dinfo)
+> +{
+> +    struct RamblockDirtyInfo *info =3D NULL;
+> +    int index =3D *block_index;
+> +
+> +    if (!block_dinfo) {
+> +        index =3D 0;
+> +        block_dinfo =3D g_try_new(struct RamblockDirtyInfo, 1);
+> +    } else {
+> +        index++;
+> +        block_dinfo =3D g_try_realloc(block_dinfo, (index + 1) *
+> +                                    sizeof(struct RamblockDirtyInfo));
+> +    }
+> +    if (!block_dinfo) {
+> +        return NULL;
 
-Signed-off-by: Kele Huang <kele.hwang@gmail.com>
----
- accel/tcg/user-exec.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+What if this case happens the 'index' has been increased?  but the
+allocation is failed.
 
-diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-index bb039eb32d..e69b4d8780 100644
---- a/accel/tcg/user-exec.c
-+++ b/accel/tcg/user-exec.c
-@@ -712,6 +712,27 @@ int cpu_signal_handler(int host_signum, void *pinfo,
- 
-     /* XXX: compute is_write */
-     is_write = 0;
-+
-+    /*
-+     * Detect store instructions. Required in all versions of MIPS64
-+     * since MIPS64r1. Not available in MIPS32r1. Required by MIPS32r2
-+     * and subsequent versions of MIPS32.
-+     */
-+    switch ((insn >> 3) & 0x7) {
-+        case 0x1:
-+            switch (insn & 0x7) {
-+            case 0x0: /* SWXC1 */
-+            case 0x1: /* SDXC1 */
-+                is_write = 1;
-+                break;
-+            default:
-+                break;
-+            }
-+            break;
-+        default:
-+            break;
-+    }
-+
-     return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
- }
- 
--- 
-2.17.1
+> +    }
+> +
+> +    info =3D &block_dinfo[index];
+> +    *block_index =3D index;
+> +    memset(info, 0, sizeof(struct RamblockDirtyInfo));
+> +
+> +    return block_dinfo;
+> +}
+> +
+> +static int record_ramblock_hash_info(struct RamblockDirtyInfo **block_di=
+nfo,
+> +                                     struct DirtyRateConfig config,
+> +                                     int *block_index)
+> +{
+> +    struct RamblockDirtyInfo *info =3D NULL;
+> +    struct RamblockDirtyInfo *dinfo =3D NULL;
+> +    RAMBlock *block =3D NULL;
+> +    int index =3D 0;
+> +
+> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+> +        dinfo =3D alloc_ramblock_dirty_info(&index, dinfo);
 
+Here for every migratable block, you call 'alloc_ramblock_dirty_info'.
+This also complicates the 'alloc_ramblock_dirty_info' itself as:
+1. you need to differentiate the first and other element.
+2. you need to use two out parameter which seems can make confusion.
+
+Could we allocates this array at onetime.  This maybe two iteration
+the ram block list.
+But I think may make the code more simple and clean.
+
+Thank,s
+Li Qiang
+
+> +        if (dinfo =3D=3D NULL) {
+> +            return -1;
+> +        }
+> +        info =3D &dinfo[index];
+> +        get_ramblock_dirty_info(block, info, &config);
+> +        if (save_ramblock_hash(info) < 0) {
+> +            *block_dinfo =3D dinfo;
+> +            *block_index =3D index;
+
+As the first comment, here 'index' seems not right?
+
+
+Thanks,
+Li Qiang
+> +            return -1;
+> +        }
+> +    }
+> +
+> +    *block_dinfo =3D dinfo;
+> +    *block_index =3D index;
+> +
+> +    return 0;
+> +}
+> +
+>  static void calculate_dirtyrate(struct DirtyRateConfig config)
+>  {
+>      /* todo */
+> --
+> 1.8.3.1
+>
+>
 
