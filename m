@@ -2,71 +2,113 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5E4AC43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:34:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDA71C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:38:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA546207EA
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:34:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 232C1207EA
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:38:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="M2+jWwGi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA546207EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jUDYdGAL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 232C1207EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGIyb-0000QY-Br
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 05:34:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60914)
+	id 1kGJ21-0003hr-42
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 05:38:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35064)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kGIwg-0006Yd-6I
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 05:32:46 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:60739)
+ (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
+ id 1kGJ13-00022W-CW; Thu, 10 Sep 2020 05:37:17 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:15570)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kGIwb-0002Va-8G
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 05:32:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=r4jlAeKMxz4zmcg9GTziYtnLyqQInHTBPUmMMvEbGZI=; b=M2+jWwGi2wJM9Edsh0XlV3to98
- vWy+ySi2+CM6H5DaIjYRsMSy5neSblQnzeiHbeQjLNmoZ/24sYnWMGiruO6DnAo2z1jf0NQB60yDf
- sinNh+mcs0yYK9rvuhvrf7VcB8PxTLfeV6CPiL9YW/ieVoRb1j6HOpTHVwk4caQ5zFtTalsrPGQ27
- HYIBmfRh3DUeFIfo6PK8mHm9TwPxklewoyObHcJQjkW29yuERnYR5GHYBDt8bAe4vBTf0k+HfZ6sU
- 5wFCn0ZHvN8+/c05S/Jndc9aIaWRl+WL58I050jHOOLTYrszvYv4vrcT+Sswbm6PxTe9uFvUZkCH1
- cQDwkNQw==;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>, Liviu Ionescu <ilg@livius.net>,
- G 3 <programmingkidx@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
-Subject: Re: [RFC] QEMU as Xcode project on macOS
-Date: Thu, 10 Sep 2020 11:32:35 +0200
-Message-ID: <2421928.3WNMogbLRJ@silver>
-In-Reply-To: <20200910073710.GA1083348@redhat.com>
-References: <2764135.D4k31Gy3CM@silver> <1695914.5EixHECA2G@silver>
- <20200910073710.GA1083348@redhat.com>
+ (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
+ id 1kGJ11-0003Qq-3S; Thu, 10 Sep 2020 05:37:17 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 08A9Zu7K106608; Thu, 10 Sep 2020 05:37:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=s3UdhajvrPAmsDLb+7RgLwyerWtlM1eOhwUZzh7OpUI=;
+ b=jUDYdGALvrRpR4TBjIZiTrKUTciRtR6GNu8uIiCHNxbZEF4OsoucXLnIkqZ/Qu82NRAk
+ az/C2Y13LRMbXUARI0Oje2dKjNToFL8If/+qq6WTLhTRUISTnAWU6/KGgC13LF8XZxSw
+ 4N+/mmEItoJqroUpGRs5bYKIqYLixvOZqpqak/qoEWvHMCyaymqT/Nd6mZvJdz6IA/zq
+ 4uiShyLOvh8VkyqEkmrZbKbshkKdYa59l0vbBvW/P2YzzyhPwQ7Uq5C+MknnELpRkQVz
+ mlYsi5a96ymDwaNs69On04JVEUvicJtbTDTHmnXGoufqRQ3Mgxo2FJC6yPYtEo38ox0/ Xg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33fhgx84au-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 10 Sep 2020 05:37:12 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08A9bCtM109606;
+ Thu, 10 Sep 2020 05:37:12 -0400
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
+ [169.63.121.186])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33fhgx84af-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 10 Sep 2020 05:37:12 -0400
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+ by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08A9bAWX004235;
+ Thu, 10 Sep 2020 09:37:11 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com
+ [9.57.198.25]) by ppma03wdc.us.ibm.com with ESMTP id 33cebv2m86-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 10 Sep 2020 09:37:11 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
+ [9.57.199.109])
+ by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 08A9bAMY31260946
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 10 Sep 2020 09:37:10 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 920DE112066;
+ Thu, 10 Sep 2020 09:37:10 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5EE5A112065;
+ Thu, 10 Sep 2020 09:37:10 +0000 (GMT)
+Received: from localhost.localdomain.com (unknown [9.85.156.134])
+ by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+ Thu, 10 Sep 2020 09:37:10 +0000 (GMT)
+From: Collin Walling <walling@linux.ibm.com>
+To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+Subject: [PATCH v5 1/8] s390/sclp: get machine once during read scp/cpu info
+Date: Thu, 10 Sep 2020 05:36:48 -0400
+Message-Id: <20200910093655.255774-2-walling@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200910093655.255774-1-walling@linux.ibm.com>
+References: <20200910093655.255774-1-walling@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
-Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 05:32:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-10_01:2020-09-10,
+ 2020-09-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxlogscore=999 mlxscore=0
+ bulkscore=0 priorityscore=1501 lowpriorityscore=0 phishscore=0
+ malwarescore=0 impostorscore=0 spamscore=0 clxscore=1015 adultscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009100085
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=walling@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 05:37:13
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -80,34 +122,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: thuth@redhat.com, frankja@linux.ibm.com, david@redhat.com,
+ cohuck@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com, mst@redhat.com,
+ pbonzini@redhat.com, sumanthk@linux.ibm.com, mihajlov@linux.ibm.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Donnerstag, 10. September 2020 09:37:10 CEST Daniel P. Berrang=E9 wrote:
-> I don't think we want to be adding more 3rd party deps as submodules, qui=
-te
-> the opposite, we want to remove more submodules we currently have.
->=20
-> Bundling every important dep we use as a submodule and providing build
-> rules, means we're effectively re-inventing Homebrew / MacPorts and this =
-is
-> not a sane use of our time.
+Functions within read scp/cpu info will need access to the machine
+state. Let's make a call to retrieve the machine state once and
+pass the appropriate data to the respective functions.
 
-Well, that's actually the whole point of this thread: saving developers' ti=
-me.=20
-And I think the submodule solution is the most sane one.
+Signed-off-by: Collin Walling <walling@linux.ibm.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+---
+ hw/s390x/sclp.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-=46rankly if you compile FOSS software on Mac that asks you to "just" insta=
-ll=20
-dependencies with Homebrew and co, it feels like you have 2 jobs: a softwar=
-e=20
-developer, and a distribution maintainer. The difference to the submodule=20
-though: a much larger amount of developers have to do that maintainer job=20
-(manually resolving conflicts & crashes, rollbacks, etc.).
-
-Best regards,
-Christian Schoenebeck
-
+diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+index a0ce444b4b..28b973de8f 100644
+--- a/hw/s390x/sclp.c
++++ b/hw/s390x/sclp.c
+@@ -49,9 +49,8 @@ static inline bool sclp_command_code_valid(uint32_t code)
+     return false;
+ }
+ 
+-static void prepare_cpu_entries(SCLPDevice *sclp, CPUEntry *entry, int *count)
++static void prepare_cpu_entries(MachineState *ms, CPUEntry *entry, int *count)
+ {
+-    MachineState *ms = MACHINE(qdev_get_machine());
+     uint8_t features[SCCB_CPU_FEATURE_LEN] = { 0 };
+     int i;
+ 
+@@ -77,7 +76,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+     IplParameterBlock *ipib = s390_ipl_get_iplb();
+ 
+     /* CPU information */
+-    prepare_cpu_entries(sclp, read_info->entries, &cpu_count);
++    prepare_cpu_entries(machine, read_info->entries, &cpu_count);
+     read_info->entries_cpu = cpu_to_be16(cpu_count);
+     read_info->offset_cpu = cpu_to_be16(offsetof(ReadInfo, entries));
+     read_info->highest_cpu = cpu_to_be16(machine->smp.max_cpus - 1);
+@@ -132,10 +131,11 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+ /* Provide information about the CPU */
+ static void sclp_read_cpu_info(SCLPDevice *sclp, SCCB *sccb)
+ {
++    MachineState *machine = MACHINE(qdev_get_machine());
+     ReadCpuInfo *cpu_info = (ReadCpuInfo *) sccb;
+     int cpu_count;
+ 
+-    prepare_cpu_entries(sclp, cpu_info->entries, &cpu_count);
++    prepare_cpu_entries(machine, cpu_info->entries, &cpu_count);
+     cpu_info->nr_configured = cpu_to_be16(cpu_count);
+     cpu_info->offset_configured = cpu_to_be16(offsetof(ReadCpuInfo, entries));
+     cpu_info->nr_standby = cpu_to_be16(0);
+-- 
+2.26.2
 
 
