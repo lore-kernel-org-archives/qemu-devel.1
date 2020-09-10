@@ -4,55 +4,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72468C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:02:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46BFBC43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:02:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01C3E20720
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:02:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01C3E20720
+	by mail.kernel.org (Postfix) with ESMTPS id B158320720
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:02:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B158320720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGKLa-0007t1-0M
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 07:02:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55960)
+	id 1kGKLh-0008Bw-OF
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 07:02:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56164)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
- id 1kGKEQ-0003u4-5t
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:55:10 -0400
-Received: from mga03.intel.com ([134.134.136.65]:26671)
+ id 1kGKF4-0004g4-9o
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:55:51 -0400
+Received: from mga03.intel.com ([134.134.136.65]:26688)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
- id 1kGKEO-0005xE-4E
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:55:09 -0400
-IronPort-SDR: usZ5OwJuPo0lp3G3BESTwXB+Z1CzC2L3a8znvFzpOg+HNmiHSbIj/PX+rmGUfntbuj+hWHjMcc
- ZsTZy6D64SLw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9739"; a="158545486"
-X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="158545486"
+ id 1kGKF2-0005xR-2x
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:55:50 -0400
+IronPort-SDR: I8jPqjSsFtp5TBYkEGLRC4m8UOeuzEEvl2I3TvbFyQxhuJRQySy9NbvYW7pSF+Eoh8d5uoMA/N
+ V8q3sbmNnDlg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9739"; a="158545507"
+X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="158545507"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
  10 Sep 2020 03:54:40 -0700
-IronPort-SDR: mKdvn83Plwe/RFcK17KsPNCB2uv1Za3rCq/uvW/TAZLG0CAS+n/NNCEbB/8ybDOMWqHm5zEysv
- gKd1APzIrL4Q==
+IronPort-SDR: jAwDGzH1gtLmVcQj8p9K9e9taEs9HlfsJVNvfcFF6aCZF26mjDJumkBTvqXG8OZl4GFeWUfuKz
+ FFwByJ85IK4A==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="334140064"
+X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="334140085"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
- by orsmga008.jf.intel.com with ESMTP; 10 Sep 2020 03:54:39 -0700
+ by orsmga008.jf.intel.com with ESMTP; 10 Sep 2020 03:54:40 -0700
 From: Liu Yi L <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org, alex.williamson@redhat.com, peterx@redhat.com,
  jasowang@redhat.com
-Subject: [RFC v10 10/25] intel_iommu: add set/unset_iommu_context callback
-Date: Thu, 10 Sep 2020 03:56:23 -0700
-Message-Id: <1599735398-6829-11-git-send-email-yi.l.liu@intel.com>
+Subject: [RFC v10 17/25] intel_iommu: sync IOMMU nesting cap info for assigned
+ devices
+Date: Thu, 10 Sep 2020 03:56:30 -0700
+Message-Id: <1599735398-6829-18-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1599735398-6829-1-git-send-email-yi.l.liu@intel.com>
 References: <1599735398-6829-1-git-send-email-yi.l.liu@intel.com>
@@ -78,9 +79,8 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: jean-philippe@linaro.org, kevin.tian@intel.com, yi.l.liu@intel.com,
- Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
- eric.auger@redhat.com, yi.y.sun@intel.com,
+ Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
+ jun.j.tian@intel.com, eric.auger@redhat.com, yi.y.sun@intel.com,
  Jacob Pan <jacob.jun.pan@linux.intel.com>, pbonzini@redhat.com,
  hao.wu@intel.com, Richard Henderson <rth@twiddle.net>,
  david@gibson.dropbear.id.au
@@ -88,10 +88,19 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds set/unset_iommu_context() impelementation in Intel
-vIOMMU. PCIe devices (VFIO case) sets HostIOMMUContext to vIOMMU as
-an ack of vIOMMU's "want_nested" attribute. Thus vIOMMU could build
-DMA protection based on nested paging of host IOMMU.
+For assigned devices, Intel vIOMMU which wants to build DMA protection
+based on physical IOMMU nesting paging should check the IOMMU nesting
+support in host side. The host will return IOMMU nesting cap info to
+user-space (e.g. VFIO returns IOMMU nesting cap info for nesting type
+IOMMU). vIOMMU needs to check:
+a) IOMMU model
+b) 1st-level page table supports
+c) address width
+d) pasid support
+
+This patch syncs the IOMMU nesting cap info when PCIe device (VFIO case)
+sets HostIOMMUContext to vIOMMU. If the host IOMMU nesting support is not
+compatible, vIOMMU should return failure to PCIe device.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
@@ -99,169 +108,215 @@ Cc: Peter Xu <peterx@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- hw/i386/intel_iommu.c         | 71 ++++++++++++++++++++++++++++++++++++++++---
- include/hw/i386/intel_iommu.h | 21 ++++++++++---
- 2 files changed, 83 insertions(+), 9 deletions(-)
+ hw/i386/intel_iommu.c          | 105 +++++++++++++++++++++++++++++++++++++++++
+ hw/i386/intel_iommu_internal.h |  18 +++++++
+ include/hw/i386/intel_iommu.h  |   4 ++
+ 3 files changed, 127 insertions(+)
 
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 333f172..bf496f7 100644
+index 1fce772..af17b36 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -3358,23 +3358,33 @@ static const MemoryRegionOps vtd_mem_ir_ops = {
-     },
- };
- 
--VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
-+/**
-+ * Fetch a VTDBus instance for given PCIBus. If no existing instance,
-+ * allocate one.
-+ */
-+static VTDBus *vtd_find_add_bus(IntelIOMMUState *s, PCIBus *bus)
- {
-     uintptr_t key = (uintptr_t)bus;
-     VTDBus *vtd_bus = g_hash_table_lookup(s->vtd_as_by_busptr, &key);
--    VTDAddressSpace *vtd_dev_as;
--    char name[128];
- 
-     if (!vtd_bus) {
-         uintptr_t *new_key = g_malloc(sizeof(*new_key));
-         *new_key = (uintptr_t)bus;
-         /* No corresponding free() */
--        vtd_bus = g_malloc0(sizeof(VTDBus) + sizeof(VTDAddressSpace *) * \
--                            PCI_DEVFN_MAX);
-+        vtd_bus = g_malloc0(sizeof(VTDBus));
-         vtd_bus->bus = bus;
-         g_hash_table_insert(s->vtd_as_by_busptr, new_key, vtd_bus);
-     }
-+    return vtd_bus;
-+}
- 
-+VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
-+{
-+    VTDBus *vtd_bus;
-+    VTDAddressSpace *vtd_dev_as;
-+    char name[128];
-+
-+    vtd_bus = vtd_find_add_bus(s, bus);
-     vtd_dev_as = vtd_bus->dev_as[devfn];
- 
-     if (!vtd_dev_as) {
-@@ -3462,6 +3472,55 @@ static int vtd_dev_get_iommu_attr(PCIBus *bus, void *opaque, int32_t devfn,
+@@ -4103,6 +4103,82 @@ static int vtd_dev_get_iommu_attr(PCIBus *bus, void *opaque, int32_t devfn,
      return ret;
  }
  
-+static int vtd_dev_set_iommu_context(PCIBus *bus, void *opaque,
-+                                     int devfn,
-+                                     HostIOMMUContext *iommu_ctx)
++
++static bool vtd_check_nesting_info(IntelIOMMUState *s,
++                                   struct iommu_nesting_info *info,
++                                   struct iommu_nesting_info_vtd *vtd)
 +{
-+    IntelIOMMUState *s = opaque;
-+    VTDBus *vtd_bus;
-+    VTDHostIOMMUContext *vtd_dev_icx;
-+
-+    assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
-+
-+    vtd_bus = vtd_find_add_bus(s, bus);
-+
-+    vtd_iommu_lock(s);
-+
-+    vtd_dev_icx = vtd_bus->dev_icx[devfn];
-+
-+    assert(!vtd_dev_icx);
-+
-+    vtd_bus->dev_icx[devfn] = vtd_dev_icx =
-+                    g_malloc0(sizeof(VTDHostIOMMUContext));
-+    vtd_dev_icx->vtd_bus = vtd_bus;
-+    vtd_dev_icx->devfn = (uint8_t)devfn;
-+    vtd_dev_icx->iommu_state = s;
-+    vtd_dev_icx->iommu_ctx = iommu_ctx;
-+
-+    vtd_iommu_unlock(s);
-+
-+    return 0;
++    return !((s->aw_bits != info->addr_width) ||
++             ((s->host_cap ^ vtd->cap_reg) & VTD_CAP_MASK & s->host_cap) ||
++             ((s->host_ecap ^ vtd->ecap_reg) & VTD_ECAP_MASK & s->host_ecap) ||
++             (VTD_GET_PSS(s->host_ecap) != (info->pasid_bits - 1)));
 +}
 +
-+static void vtd_dev_unset_iommu_context(PCIBus *bus, void *opaque, int devfn)
++/* Caller should hold iommu lock. */
++static bool vtd_sync_nesting_info(IntelIOMMUState *s,
++                                  struct iommu_nesting_info *info)
 +{
-+    IntelIOMMUState *s = opaque;
-+    VTDBus *vtd_bus;
-+    VTDHostIOMMUContext *vtd_dev_icx;
++    struct iommu_nesting_info_vtd *vtd;
++    uint64_t cap, ecap;
 +
-+    assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
++    vtd =  (struct iommu_nesting_info_vtd *) &info->vendor.vtd;
 +
-+    vtd_bus = vtd_find_add_bus(s, bus);
++    if (s->cap_finalized) {
++        return vtd_check_nesting_info(s, info, vtd);
++    }
 +
-+    vtd_iommu_lock(s);
++    if (s->aw_bits > info->addr_width) {
++        error_report("User aw-bits: %u > host address width: %u",
++                      s->aw_bits, info->addr_width);
++        return false;
++    }
 +
-+    vtd_dev_icx = vtd_bus->dev_icx[devfn];
-+    g_free(vtd_dev_icx);
-+    vtd_bus->dev_icx[devfn] = NULL;
++    cap = s->host_cap & vtd->cap_reg & VTD_CAP_MASK;
++    s->host_cap &= ~VTD_CAP_MASK;
++    s->host_cap |= cap;
 +
-+    vtd_iommu_unlock(s);
++    ecap = s->host_ecap & vtd->ecap_reg & VTD_ECAP_MASK;
++    s->host_ecap &= ~VTD_ECAP_MASK;
++    s->host_ecap |= ecap;
++
++    if ((VTD_ECAP_PASID & s->host_ecap) && info->pasid_bits &&
++        (VTD_GET_PSS(s->host_ecap) > (info->pasid_bits - 1))) {
++        s->host_ecap &= ~VTD_ECAP_PSS_MASK;
++        s->host_ecap |= VTD_ECAP_PSS(info->pasid_bits - 1);
++    }
++    return true;
 +}
 +
- static uint64_t get_naturally_aligned_size(uint64_t start,
-                                            uint64_t size, int gaw)
- {
-@@ -3758,6 +3817,8 @@ static AddressSpace *vtd_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
- static PCIIOMMUOps vtd_iommu_ops = {
-     .get_address_space = vtd_host_dma_iommu,
-     .get_iommu_attr = vtd_dev_get_iommu_attr,
-+    .set_iommu_context = vtd_dev_set_iommu_context,
-+    .unset_iommu_context = vtd_dev_unset_iommu_context,
- };
++/*
++ * virtual VT-d which wants nested needs to check the host IOMMU
++ * nesting cap info behind the assigned devices. Thus that vIOMMU
++ * could bind guest page table to host.
++ */
++static bool vtd_check_iommu_ctx(IntelIOMMUState *s,
++                                HostIOMMUContext *iommu_ctx)
++{
++    struct iommu_nesting_info *info = iommu_ctx->info;
++    uint32_t minsz, size;
++
++    if (IOMMU_PASID_FORMAT_INTEL_VTD != info->format) {
++        error_report("Format is not compatible for nesting!!!");
++        return false;
++    }
++
++    size = sizeof(struct iommu_nesting_info_vtd);
++    minsz = endof(struct iommu_nesting_info, flags);
++    if (size > (info->argsz - minsz)) {
++        /*
++         * QEMU may have been using new linux-headers/iommu.h than
++         * kernel supports, hence fail it.
++         */
++        error_report("IOMMU nesting cap is not compatible!!!");
++        return false;
++    }
++
++    return vtd_sync_nesting_info(s, info);
++}
++
+ static int vtd_dev_set_iommu_context(PCIBus *bus, void *opaque,
+                                      int devfn,
+                                      HostIOMMUContext *iommu_ctx)
+@@ -4117,6 +4193,11 @@ static int vtd_dev_set_iommu_context(PCIBus *bus, void *opaque,
  
- static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+     vtd_iommu_lock(s);
+ 
++    if (!vtd_check_iommu_ctx(s, iommu_ctx)) {
++        vtd_iommu_unlock(s);
++        return -ENOENT;
++    }
++
+     vtd_dev_icx = vtd_bus->dev_icx[devfn];
+ 
+     assert(!vtd_dev_icx);
+@@ -4372,6 +4453,14 @@ static void vtd_init(IntelIOMMUState *s)
+         s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
+     }
+ 
++    if (!s->cap_finalized) {
++        s->host_cap = s->cap;
++        s->host_ecap = s->ecap;
++    } else {
++        s->cap = s->host_cap;
++        s->ecap = s->host_ecap;
++    }
++
+     vtd_reset_caches(s);
+ 
+     /* Define registers with default values and bit semantics */
+@@ -4505,6 +4594,12 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+     return true;
+ }
+ 
++static void vtd_refresh_capability_reg(IntelIOMMUState *s)
++{
++    vtd_set_quad(s, DMAR_CAP_REG, s->cap);
++    vtd_set_quad(s, DMAR_ECAP_REG, s->ecap);
++}
++
+ static int vtd_machine_done_notify_one(Object *child, void *unused)
+ {
+     IntelIOMMUState *iommu = INTEL_IOMMU_DEVICE(x86_iommu_get_default());
+@@ -4518,6 +4613,15 @@ static int vtd_machine_done_notify_one(Object *child, void *unused)
+         vtd_panic_require_caching_mode();
+     }
+ 
++    vtd_iommu_lock(iommu);
++    iommu->cap = iommu->host_cap & iommu->cap;
++    iommu->ecap = iommu->host_ecap & iommu->ecap;
++    if (!iommu->cap_finalized) {
++        iommu->cap_finalized = true;
++    }
++
++    vtd_refresh_capability_reg(iommu);
++    vtd_iommu_unlock(iommu);
+     return 0;
+ }
+ 
+@@ -4549,6 +4653,7 @@ static void vtd_realize(DeviceState *dev, Error **errp)
+     QLIST_INIT(&s->vtd_as_with_notifiers);
+     QLIST_INIT(&s->vtd_dev_icx_list);
+     qemu_mutex_init(&s->iommu_lock);
++    s->cap_finalized = false;
+     memset(s->vtd_as_by_bus_num, 0, sizeof(s->vtd_as_by_bus_num));
+     memory_region_init_io(&s->csrmem, OBJECT(s), &vtd_mem_ops, s,
+                           "intel_iommu", DMAR_REG_SIZE);
+diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+index 1829f3a..a57ef3d 100644
+--- a/hw/i386/intel_iommu_internal.h
++++ b/hw/i386/intel_iommu_internal.h
+@@ -199,6 +199,24 @@
+ #define VTD_ECAP_SMTS               (1ULL << 43)
+ #define VTD_ECAP_SLTS               (1ULL << 46)
+ 
++/* 1st level related caps */
++#define VTD_CAP_FL1GP               (1ULL << 56)
++#define VTD_CAP_FL5LP               (1ULL << 60)
++#define VTD_ECAP_PRS                (1ULL << 29)
++#define VTD_ECAP_ERS                (1ULL << 30)
++#define VTD_ECAP_SRS                (1ULL << 31)
++#define VTD_ECAP_EAFS               (1ULL << 34)
++#define VTD_ECAP_PSS(val)           (((val) & 0x1fULL) << 35)
++#define VTD_ECAP_PASID              (1ULL << 40)
++
++#define VTD_GET_PSS(val)            (((val) >> 35) & 0x1f)
++#define VTD_ECAP_PSS_MASK           (0x1fULL << 35)
++
++#define VTD_CAP_MASK                (VTD_CAP_FL1GP | VTD_CAP_FL5LP)
++#define VTD_ECAP_MASK               (VTD_ECAP_PRS | VTD_ECAP_ERS | \
++                                    VTD_ECAP_SRS | VTD_ECAP_EAFS | \
++                                    VTD_ECAP_PASID)
++
+ /* CAP_REG */
+ /* (offset >> 4) << 24 */
+ #define VTD_CAP_FRO                 (DMAR_FRCD_REG_OFFSET << 20)
 diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-index 3870052..b5fefb9 100644
+index 626c1cd..1aab882 100644
 --- a/include/hw/i386/intel_iommu.h
 +++ b/include/hw/i386/intel_iommu.h
-@@ -64,6 +64,7 @@ typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
- typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
- typedef struct VTDPASIDDirEntry VTDPASIDDirEntry;
- typedef struct VTDPASIDEntry VTDPASIDEntry;
-+typedef struct VTDHostIOMMUContext VTDHostIOMMUContext;
+@@ -284,6 +284,9 @@ struct IntelIOMMUState {
+     uint64_t cap;                   /* The value of capability reg */
+     uint64_t ecap;                  /* The value of extended capability reg */
  
- /* Context-Entry */
- struct VTDContextEntry {
-@@ -112,10 +113,20 @@ struct VTDAddressSpace {
-     IOVATree *iova_tree;          /* Traces mapped IOVA ranges */
- };
- 
-+struct VTDHostIOMMUContext {
-+    VTDBus *vtd_bus;
-+    uint8_t devfn;
-+    HostIOMMUContext *iommu_ctx;
-+    IntelIOMMUState *iommu_state;
-+};
++    uint64_t host_cap;              /* The value of host capability reg */
++    uint64_t host_ecap;             /* The value of host ext-capability reg */
 +
- struct VTDBus {
--    PCIBus* bus;		/* A reference to the bus to provide translation for */
-+    /* A reference to the bus to provide translation for */
-+    PCIBus *bus;
-     /* A table of VTDAddressSpace objects indexed by devfn */
--    VTDAddressSpace *dev_as[];
-+    VTDAddressSpace *dev_as[PCI_DEVFN_MAX];
-+    /* A table of VTDHostIOMMUContext objects indexed by devfn */
-+    VTDHostIOMMUContext *dev_icx[PCI_DEVFN_MAX];
- };
+     uint32_t context_cache_gen;     /* Should be in [1,MAX] */
+     GHashTable *iotlb;              /* IOTLB */
  
- struct VTDIOTLBEntry {
-@@ -269,8 +280,10 @@ struct IntelIOMMUState {
-     bool dma_drain;                 /* Whether DMA r/w draining enabled */
+@@ -310,6 +313,7 @@ struct IntelIOMMUState {
+     uint64_t vccap;                 /* The value of vcmd capability reg */
+     uint64_t vcrsp;                 /* Current value of VCMD RSP REG */
  
++    bool cap_finalized;             /* Whether VTD capability finalized */
      /*
--     * Protects IOMMU states in general.  Currently it protects the
--     * per-IOMMU IOTLB cache, and context entry cache in VTDAddressSpace.
-+     * iommu_lock protects below:
-+     * - per-IOMMU IOTLB caches
-+     * - context entry cache in VTDAddressSpace
-+     * - HostIOMMUContext pointer cached in vIOMMU
-      */
-     QemuMutex iommu_lock;
- };
+      * iommu_lock protects below:
+      * - per-IOMMU IOTLB caches
 -- 
 2.7.4
 
