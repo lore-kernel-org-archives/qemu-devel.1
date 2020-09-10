@@ -2,88 +2,94 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D67ECC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 13:12:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D282C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 13:16:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56CF7207FB
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 13:12:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1AE08207FB
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 13:16:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WQ8w3F6b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56CF7207FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QWasbVzq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AE08207FB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGMNd-0002wP-7e
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 09:12:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60688)
+	id 1kGMRF-0005cb-63
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 09:16:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33136)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kGMN4-0002Oh-9W
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 09:12:14 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53425
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kGMN2-0005lL-8l
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 09:12:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599743531;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=kmvf/8+TJT7nZ+M/vgiAaGWat+FnAUtOVuwZjsObNgk=;
- b=WQ8w3F6b/bMyFTaW0xrPdwz/3jKNlcYf/uLLVmGEeZv+vFI3ec8SYwP+b/kPHnAbXRsGum
- YZKhNLuO2asQbCe+BhDVlpG5rsOv9IdcbbriU18SGK0P1btXf1cTAk15pjkpA5sQWgoLtW
- oFUdzE+X/pvFocbxOwSrfmPM8IFMluQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-539-tMRhBOh5PSWrnilBhmOzRw-1; Thu, 10 Sep 2020 09:11:56 -0400
-X-MC-Unique: tMRhBOh5PSWrnilBhmOzRw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 23FCE1084C80;
- Thu, 10 Sep 2020 13:11:55 +0000 (UTC)
-Received: from redhat.com (ovpn-112-4.ams2.redhat.com [10.36.112.4])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 583895C1DC;
- Thu, 10 Sep 2020 13:11:52 +0000 (UTC)
-Date: Thu, 10 Sep 2020 14:11:49 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Chuan Zheng <zhengchuan@huawei.com>
-Subject: Re: [PATCH v1 1/7] migration/tls: save hostname into MigrationState
-Message-ID: <20200910131149.GS1083348@redhat.com>
-References: <1599663177-53993-1-git-send-email-zhengchuan@huawei.com>
- <1599663177-53993-2-git-send-email-zhengchuan@huawei.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kGMPu-0003vy-5z
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 09:15:10 -0400
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:56040)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kGMPs-00064g-E6
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 09:15:09 -0400
+Received: by mail-wm1-x334.google.com with SMTP id a65so5589184wme.5
+ for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 06:15:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=1IVujaGcl6Gaeb44XvH6utm7tpVyG1R70wAp2OwcHKE=;
+ b=QWasbVzqGjmIb6mcq+bDGufK48YF9mzK9gFFvYiuOwKW3ujXXBOxSjepx841Qn0ERZ
+ /NGAAdiT9EehL8SBgR2liB8AV52gnqC3/b0Vv+VfzbECCV2Lo/ofYQloJ8m6vcQI+U9Y
+ ofxnEZpU8pazgX1neTq+rl94WBAPCd0UKmVAeXO7/EgPhQINzsRmKBgdE8ge+vIfAQFb
+ k5r8Ht59wagjlSEeHMrvmuvhSWcCz8BU2W7hrjbC4fDIIBPulkD7GtNlVwQ5mlQkrgCi
+ YZeh+u59VRRmX2zC1bA83NsVvgp0LfVt8AS3pT125u9KFeArja8YDXvNzC8pxSA+YTqS
+ NTpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=1IVujaGcl6Gaeb44XvH6utm7tpVyG1R70wAp2OwcHKE=;
+ b=r/1sRu4DnLp+TLRfwwaLuKpzAnqf5EEuaaISpAfyZ2of5ZoakCsiCbm4WtwPtU44GN
+ 0uzNFxdJk6L2MGbW0q+/KWDCZaDyFgclSkGNDeymPzqPu8m9BYXk9AJi+6FzjAnntmDy
+ IpEut5VmMl5nMADxRMm14QDa53rDyKGo5urG7iBslqg5JS7gDbX3HTRx6rRk82RQGrwD
+ CEuxVHWn6l1CXQl6/36PdqEkbfs9wI/annnqy/H3cdc6pfe8w4llJeVCMVBAbTz4BInA
+ BjP0uX7eN7t6Mp/17Lijdg5JuZEatp1aOedeAnQ9n9yyeKcdhuwjQOI2aOFKwp3/w8+S
+ XZjA==
+X-Gm-Message-State: AOAM533nmJypdCnqmd9pIFcjhxb6fXdGKdsg/t5qNfcHwo5I61p28RaW
+ An1yOd+/DA8vf0vcHONJ3j82pw==
+X-Google-Smtp-Source: ABdhPJz5W4oHB5KcDDy1IcOmfNtvhSdSRWZxgKzsC1XVyKTiKLqcHa2boLy1lCaKs9bqzPqy119f2A==
+X-Received: by 2002:a1c:9a8d:: with SMTP id c135mr63339wme.58.1599743706263;
+ Thu, 10 Sep 2020 06:15:06 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id f1sm9030393wrt.20.2020.09.10.06.15.04
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 10 Sep 2020 06:15:04 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 77C6B1FF87;
+ Thu, 10 Sep 2020 14:15:04 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Subject: [PULL 01/10] CODING_STYLE.rst: flesh out our naming conventions.
+Date: Thu, 10 Sep 2020 14:14:55 +0100
+Message-Id: <20200910131504.11341-2-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200910131504.11341-1-alex.bennee@linaro.org>
+References: <20200910131504.11341-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1599663177-53993-2-git-send-email-zhengchuan@huawei.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.003
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 08:38:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::334;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x334.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,77 +103,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, yuxiating@huawei.com,
- dgilbert@redhat.com, xiexiangyou@huawei.com, qemu-devel@nongnu.org,
- alex.chen@huawei.com, jinyan12@huawei.com
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 09, 2020 at 10:52:51PM +0800, Chuan Zheng wrote:
-> hostname is need in multifd-tls, save hostname into MigrationState
-> 
-> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-> Signed-off-by: Yan Jin <jinyan12@huawei.com>
-> ---
->  migration/channel.c   | 5 +++++
->  migration/migration.c | 1 +
->  migration/migration.h | 5 +++++
->  3 files changed, 11 insertions(+)
-> 
-> diff --git a/migration/channel.c b/migration/channel.c
-> index 20e4c8e..2af3069 100644
-> --- a/migration/channel.c
-> +++ b/migration/channel.c
-> @@ -66,6 +66,11 @@ void migration_channel_connect(MigrationState *s,
->      trace_migration_set_outgoing_channel(
->          ioc, object_get_typename(OBJECT(ioc)), hostname, error);
->  
-> +    /* Save hostname into MigrationState for handshake */
-> +    if (hostname) {
-> +        s->hostname = g_strdup(hostname);
-> +    }
-> +
->      if (!error) {
->          if (s->parameters.tls_creds &&
->              *s->parameters.tls_creds &&
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 58a5452..e20b778 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1883,6 +1883,7 @@ void migrate_init(MigrationState *s)
->      s->migration_thread_running = false;
->      error_free(s->error);
->      s->error = NULL;
-> +    s->hostname = NULL;
->  
->      migrate_set_state(&s->state, MIGRATION_STATUS_NONE, MIGRATION_STATUS_SETUP);
->  
-> diff --git a/migration/migration.h b/migration/migration.h
-> index ae497bd..758f803 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -261,6 +261,11 @@ struct MigrationState
->       * (which is in 4M chunk).
->       */
->      uint8_t clear_bitmap_shift;
-> +
-> +    /*
-> +     * This save hostname when out-going migration starts
-> +     */
-> +    char *hostname;
->  };
+Mention a few of the more common naming conventions we follow in the
+code base including common variable names and function prefix and
+suffix examples.
 
-Something needs to free(hostname) at the appropriate time, otherwise
-well have a memory leak if we run migration multiple times.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20200909112742.25730-2-alex.bennee@linaro.org>
 
-
-Regards,
-Daniel
+diff --git a/CODING_STYLE.rst b/CODING_STYLE.rst
+index 427699e0e42..8b13ef0669e 100644
+--- a/CODING_STYLE.rst
++++ b/CODING_STYLE.rst
+@@ -109,8 +109,41 @@ names are lower_case_with_underscores_ending_with_a_t, like the POSIX
+ uint64_t and family.  Note that this last convention contradicts POSIX
+ and is therefore likely to be changed.
+ 
+-When wrapping standard library functions, use the prefix ``qemu_`` to alert
+-readers that they are seeing a wrapped version; otherwise avoid this prefix.
++Variable Naming Conventions
++---------------------------
++
++A number of short naming conventions exist for variables that use
++common QEMU types. For example, the architecture independent CPUState
++is often held as a ``cs`` pointer variable, whereas the concrete
++CPUArchState is usually held in a pointer called ``env``.
++
++Likewise, in device emulation code the common DeviceState is usually
++called ``dev``.
++
++Function Naming Conventions
++---------------------------
++
++Wrapped version of standard library or GLib functions use a ``qemu_``
++prefix to alert readers that they are seeing a wrapped version, for
++example ``qemu_strtol`` or ``qemu_mutex_lock``.  Other utility functions
++that are widely called from across the codebase should not have any
++prefix, for example ``pstrcpy`` or bit manipulation functions such as
++``find_first_bit``.
++
++The ``qemu_`` prefix is also used for functions that modify global
++emulator state, for example ``qemu_add_vm_change_state_handler``.
++However, if there is an obvious subsystem-specific prefix it should be
++used instead.
++
++Public functions from a file or subsystem (declared in headers) tend
++to have a consistent prefix to show where they came from. For example,
++``tlb_`` for functions from ``cputlb.c`` or ``cpu_`` for functions
++from cpus.c.
++
++If there are two versions of a function to be called with or without a
++lock held, the function that expects the lock to be already held
++usually uses the suffix ``_locked``.
++
+ 
+ Block structure
+ ===============
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.20.1
 
 
