@@ -2,95 +2,96 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2656C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:24:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDDAEC43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:26:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 209C420BED
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:24:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4136720BED
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:26:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D1GJcvAI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 209C420BED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eyvSCQLV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4136720BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGOQm-0005NG-5o
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 11:24:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40548)
+	id 1kGOSW-00085b-CT
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 11:26:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kGOPR-0003bz-U5
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:22:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55263)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kGOPf-000429-Oi
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:23:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29350)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kGOPQ-00080x-6o
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:22:49 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kGOPc-000822-2n
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:23:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599751366;
+ s=mimecast20190719; t=1599751379;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=dDjdg4NaV1TOAf05UegZkRDyMykfNBAit7VI0GRtTmU=;
- b=D1GJcvAIfeiK9LManWQDh/riTYiaDeCxBoDGTItrL16/DqPy9J4QSzTrtK1f8Z6kpIANT+
- NPZhuo1lhAuejBJ4a67c+HpQ+K+hPR5FaaNYQ07LIvz6nd+f7EeLst+xyv3Bm7AyE+B6l2
- ghOAdRGTvUjDfob/HK3f8wMtTrNR8jI=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-113-FHksd_DoPFGmJpTWksjIxw-1; Thu, 10 Sep 2020 11:22:43 -0400
-X-MC-Unique: FHksd_DoPFGmJpTWksjIxw-1
-Received: by mail-wm1-f71.google.com with SMTP id b73so135796wmb.0
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 08:22:43 -0700 (PDT)
+ bh=FpCgzu6mcK7sdp0O+Mr3gYtNAyvGrtXlO6APHB+3gcE=;
+ b=eyvSCQLVsCtjcRXehIuEpxOrwR6m7ZB9jgTcKLqB3MtgW/5TyxGYnDBWzG2dCwAs/hyV9z
+ XKgv7fE9chyTadWxwQKRImRpFZ5tgBI2+crHrLb7d3dOeGrry6qSoNoNj/gZ+rft9kMico
+ z1PvV4XY+Z3RGe07uejOVkRBU4w1Qe8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-444-Gw760FUmOCq45HI1lIiOzw-1; Thu, 10 Sep 2020 11:22:56 -0400
+X-MC-Unique: Gw760FUmOCq45HI1lIiOzw-1
+Received: by mail-wr1-f70.google.com with SMTP id r16so2363227wrm.18
+ for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 08:22:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=dDjdg4NaV1TOAf05UegZkRDyMykfNBAit7VI0GRtTmU=;
- b=a83tO4UO7oisRAt6jiBdBpLMdYbFLjfAC9w2xw/XesNYqS3CDPTa/9LhOorqylp/6C
- qncj92+rBAdDqBbGZAKlle0cKhZNxP9Qz6deC+gpJYX/EhcMvRcR1OCbVN5p5xrX5u24
- kVGzN8sbrudomUtEfQc96AzXKgpK9pa/ZjlDOPIdWphbICaP+GPpZpxMf0xZ5kZet/Zf
- Fda7ceQvdZxwKoNudZTM5p8WCGTmjl0CTKTAOuFCy6Lm4wVdsiBLC9ulZN5umq07auoj
- TLuA6ibfF3wLL9vQPfBpjCGRIiL8tWqGIRpdnO91frdIMSj9Is7cq1ygU/4oeLOvPeKv
- TZbw==
-X-Gm-Message-State: AOAM531dVuhcifzNmKdaJrNakv7B3/aUA3RaVPWde09RVDaoroEfKf4V
- k8247soubr+gMmV9XwfntFX2tXSnKKI6ZvlFk1eefCTgoLzT4P0XAbY80fhuvH0HbCzuGaG/tUZ
- ckrB+iLpQA2e50kI=
-X-Received: by 2002:adf:fa02:: with SMTP id m2mr9453805wrr.273.1599751359215; 
- Thu, 10 Sep 2020 08:22:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzjT6xwaX7TFu7sPVV/54s64ke7slvt0+SG8CSNkt1Wx2iaFlvuaIonX/DG014nME3Nnz3aTw==
-X-Received: by 2002:adf:fa02:: with SMTP id m2mr9453757wrr.273.1599751358857; 
- Thu, 10 Sep 2020 08:22:38 -0700 (PDT)
+ bh=FpCgzu6mcK7sdp0O+Mr3gYtNAyvGrtXlO6APHB+3gcE=;
+ b=FEG0ewVGgy3uC7hHSeADau4CKn+1B3BzaWgXpYDbQ/VAK9xELqPLec0iv4D2DtmiBd
+ UTzifg5DlKXJnBUSVMPXqwCcxUJeuQK4C1xmhZX/zisFX4Imw3KswhZQcHDP/8it11yK
+ DOOPP/V5vzk3wAXcQ3Iqz4HFT4CJhiR0nmnEQixbzfty9UR4Pm/qk+BX7vHXglEMtHCP
+ ZzqSFHIwBc0s1d+0hn53tflc47U3vZ+OHmgckgGJLXqv4E6IjcyvItxCkt3RaabwJakR
+ +MyM7MTkTGKColHJoNJK6O9rmA6Oq188KNo5mTpcIpuSPemMtLh0Qd4/rDEl2Yq2ycm8
+ B69g==
+X-Gm-Message-State: AOAM533zy4X6bdx8GaGzmU3QD9P4+jq/5MtaNJoDwW3mRJ1HtWUG9mjp
+ lmv4KzKAyHSKCSPoBB5i8+t5bjTouObLwjbKTjv2zE2Veq2r+GAz00TzN0+t75/Yqt44HFRoCD1
+ 8Q9+L9LcrQeAvm90=
+X-Received: by 2002:a7b:cc82:: with SMTP id p2mr533243wma.46.1599751375382;
+ Thu, 10 Sep 2020 08:22:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwr6CNd0m/SY1hOyvPzLF2OzlQ32afRSrbb2eF60n+n9Uco1vzNQkWO2zhsm1dZxnrO/K69kQ==
+X-Received: by 2002:a7b:cc82:: with SMTP id p2mr533220wma.46.1599751375186;
+ Thu, 10 Sep 2020 08:22:55 -0700 (PDT)
 Received: from x1w.redhat.com (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id f126sm4113114wmf.13.2020.09.10.08.22.37
+ by smtp.gmail.com with ESMTPSA id t203sm4113524wmg.43.2020.09.10.08.22.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 10 Sep 2020 08:22:38 -0700 (PDT)
+ Thu, 10 Sep 2020 08:22:54 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 2/9] qapi: Restrict LostTickPolicy enum to machine code
-Date: Thu, 10 Sep 2020 17:22:18 +0200
-Message-Id: <20200910152225.524322-3-philmd@redhat.com>
+Subject: [PATCH v4 5/9] qapi: Restrict query-vm-generation-id command to
+ machine code
+Date: Thu, 10 Sep 2020 17:22:21 +0200
+Message-Id: <20200910152225.524322-6-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200910152225.524322-1-philmd@redhat.com>
 References: <20200910152225.524322-1-philmd@redhat.com>
 MIME-Version: 1.0
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.003
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 08:38:09
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 09:16:38
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -126,140 +127,108 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Only qemu-system-FOO and qemu-storage-daemon provide QMP
+monitors, therefore such declarations and definitions are
+irrelevant for user-mode emulation.
+
+Restricting the query-vm-generation-id command to machine.json
+allows pulling less declarations/definitions to user-mode.
+
+Acked-by: Igor Mammedov <imammedo@redhat.com>
 Acked-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- qapi/machine.json            | 32 ++++++++++++++++++++++++++++++++
- qapi/misc.json               | 32 --------------------------------
- include/hw/rtc/mc146818rtc.h |  2 +-
- hw/core/qdev-properties.c    |  1 +
- hw/i386/kvm/i8254.c          |  2 +-
- 5 files changed, 35 insertions(+), 34 deletions(-)
+ qapi/machine.json | 20 ++++++++++++++++++++
+ qapi/misc.json    | 21 ---------------------
+ hw/acpi/vmgenid.c |  2 +-
+ stubs/vmgenid.c   |  2 +-
+ 4 files changed, 22 insertions(+), 23 deletions(-)
 
 diff --git a/qapi/machine.json b/qapi/machine.json
-index 47e9c0b1831..a80933c57be 100644
+index 870b8a53f21..ba61e6ccea4 100644
 --- a/qapi/machine.json
 +++ b/qapi/machine.json
-@@ -426,6 +426,38 @@
+@@ -426,6 +426,26 @@
  ##
  { 'command': 'query-target', 'returns': 'TargetInfo' }
  
 +##
-+# @LostTickPolicy:
++# @GuidInfo:
 +#
-+# Policy for handling lost ticks in timer devices.  Ticks end up getting
-+# lost when, for example, the guest is paused.
++# GUID information.
 +#
-+# @discard: throw away the missed ticks and continue with future injection
-+#           normally.  The guest OS will see the timer jump ahead by a
-+#           potentially quite significant amount all at once, as if the
-+#           intervening chunk of time had simply not existed; needless to
-+#           say, such a sudden jump can easily confuse a guest OS which is
-+#           not specifically prepared to deal with it.  Assuming the guest
-+#           OS can deal correctly with the time jump, the time in the guest
-+#           and in the host should now match.
++# @guid: the globally unique identifier
 +#
-+# @delay: continue to deliver ticks at the normal rate.  The guest OS will
-+#         not notice anything is amiss, as from its point of view time will
-+#         have continued to flow normally.  The time in the guest should now
-+#         be behind the time in the host by exactly the amount of time during
-+#         which ticks have been missed.
-+#
-+# @slew: deliver ticks at a higher rate to catch up with the missed ticks.
-+#        The guest OS will not notice anything is amiss, as from its point
-+#        of view time will have continued to flow normally.  Once the timer
-+#        has managed to catch up with all the missing ticks, the time in
-+#        the guest and in the host should match.
-+#
-+# Since: 2.0
++# Since: 2.9
 +##
-+{ 'enum': 'LostTickPolicy',
-+  'data': ['discard', 'delay', 'slew' ] }
++{ 'struct': 'GuidInfo', 'data': {'guid': 'str'} }
++
++##
++# @query-vm-generation-id:
++#
++# Show Virtual Machine Generation ID
++#
++# Since: 2.9
++##
++{ 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
 +
  ##
- # @NumaOptionsType:
+ # @LostTickPolicy:
  #
 diff --git a/qapi/misc.json b/qapi/misc.json
-index 8cf6ebe67cb..b21963a176d 100644
+index 7a14c50094d..edcc91e1060 100644
 --- a/qapi/misc.json
 +++ b/qapi/misc.json
-@@ -8,38 +8,6 @@
- 
- { 'include': 'common.json' }
- 
--##
--# @LostTickPolicy:
--#
--# Policy for handling lost ticks in timer devices.  Ticks end up getting
--# lost when, for example, the guest is paused.
--#
--# @discard: throw away the missed ticks and continue with future injection
--#           normally.  The guest OS will see the timer jump ahead by a
--#           potentially quite significant amount all at once, as if the
--#           intervening chunk of time had simply not existed; needless to
--#           say, such a sudden jump can easily confuse a guest OS which is
--#           not specifically prepared to deal with it.  Assuming the guest
--#           OS can deal correctly with the time jump, the time in the guest
--#           and in the host should now match.
--#
--# @delay: continue to deliver ticks at the normal rate.  The guest OS will
--#         not notice anything is amiss, as from its point of view time will
--#         have continued to flow normally.  The time in the guest should now
--#         be behind the time in the host by exactly the amount of time during
--#         which ticks have been missed.
--#
--# @slew: deliver ticks at a higher rate to catch up with the missed ticks.
--#        The guest OS will not notice anything is amiss, as from its point
--#        of view time will have continued to flow normally.  Once the timer
--#        has managed to catch up with all the missing ticks, the time in
--#        the guest and in the host should match.
--#
--# Since: 2.0
--##
--{ 'enum': 'LostTickPolicy',
--  'data': ['discard', 'delay', 'slew' ] }
--
- ##
- # @add_client:
+@@ -1479,24 +1479,3 @@
  #
-diff --git a/include/hw/rtc/mc146818rtc.h b/include/hw/rtc/mc146818rtc.h
-index 3713181b56f..9cd04f379ac 100644
---- a/include/hw/rtc/mc146818rtc.h
-+++ b/include/hw/rtc/mc146818rtc.h
-@@ -9,7 +9,7 @@
- #ifndef HW_RTC_MC146818RTC_H
- #define HW_RTC_MC146818RTC_H
- 
--#include "qapi/qapi-types-misc.h"
-+#include "qapi/qapi-types-machine.h"
- #include "qemu/queue.h"
- #include "qemu/timer.h"
- #include "hw/isa/isa.h"
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 098298c78e6..343c824da04 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -4,6 +4,7 @@
- #include "qapi/error.h"
- #include "hw/pci/pci.h"
- #include "qapi/qapi-types-block.h"
-+#include "qapi/qapi-types-machine.h"
- #include "qapi/qapi-types-misc.h"
- #include "qapi/qmp/qerror.h"
- #include "qemu/ctype.h"
-diff --git a/hw/i386/kvm/i8254.c b/hw/i386/kvm/i8254.c
-index 876f5aa6fa3..22ba6149b5f 100644
---- a/hw/i386/kvm/i8254.c
-+++ b/hw/i386/kvm/i8254.c
-@@ -25,7 +25,7 @@
+ ##
+ { 'command': 'xen-load-devices-state', 'data': {'filename': 'str'} }
+-
+-##
+-# @GuidInfo:
+-#
+-# GUID information.
+-#
+-# @guid: the globally unique identifier
+-#
+-# Since: 2.9
+-##
+-{ 'struct': 'GuidInfo', 'data': {'guid': 'str'} }
+-
+-##
+-# @query-vm-generation-id:
+-#
+-# Show Virtual Machine Generation ID
+-#
+-# Since: 2.9
+-##
+-{ 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
+-
+diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+index 2df7623d74d..2b26bacaf8f 100644
+--- a/hw/acpi/vmgenid.c
++++ b/hw/acpi/vmgenid.c
+@@ -12,7 +12,7 @@
  
  #include "qemu/osdep.h"
- #include <linux/kvm.h>
--#include "qapi/qapi-types-misc.h"
-+#include "qapi/qapi-types-machine.h"
  #include "qapi/error.h"
+-#include "qapi/qapi-commands-misc.h"
++#include "qapi/qapi-commands-machine.h"
  #include "qemu/module.h"
- #include "qemu/timer.h"
+ #include "hw/acpi/acpi.h"
+ #include "hw/acpi/aml-build.h"
+diff --git a/stubs/vmgenid.c b/stubs/vmgenid.c
+index 568e42b0648..bfad656c6cc 100644
+--- a/stubs/vmgenid.c
++++ b/stubs/vmgenid.c
+@@ -1,6 +1,6 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qapi/qapi-commands-misc.h"
++#include "qapi/qapi-commands-machine.h"
+ #include "qapi/qmp/qerror.h"
+ 
+ GuidInfo *qmp_query_vm_generation_id(Error **errp)
 -- 
 2.26.2
 
