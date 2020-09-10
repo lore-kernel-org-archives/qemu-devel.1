@@ -2,81 +2,114 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A951C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:06:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F4066C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:10:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69E642078B
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:06:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8178F2078B
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:10:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jq9VI7sf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69E642078B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ft7rkHdS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8178F2078B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGO9Z-0002mc-Ch
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 11:06:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35492)
+	id 1kGODF-0005G9-If
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 11:10:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36934)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <derrick.mckee@gmail.com>)
- id 1kGO8Q-0001kv-V3; Thu, 10 Sep 2020 11:05:14 -0400
-Received: from mail-qv1-xf33.google.com ([2607:f8b0:4864:20::f33]:46052)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <derrick.mckee@gmail.com>)
- id 1kGO8P-000583-C9; Thu, 10 Sep 2020 11:05:14 -0400
-Received: by mail-qv1-xf33.google.com with SMTP id cv8so3470934qvb.12;
- Thu, 10 Sep 2020 08:05:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to;
- bh=dygK7KtUneWiOqTSITgqg1vwJrAxyQ1Bgf3l5/fUDtA=;
- b=Jq9VI7sflU/3Fns7bIny1Mu5hVgpOwPNTOMqAvXs2b836KqVC+ZUEXzSH/g0yOOom/
- 8uWGX7QVi+nfIEe0CrT9hDEVOL2bTcWc7W00AWWSRs+cXBV+ne8n08/y4XrFUicsB4oq
- F7z5auhZfK9y9YWRsIAoTw164nzQLvgDw2YcrNQvNqE+n4iOLznxD93CphJzcOVbtsZD
- f94/SkzbmTXfmwOfQSsdzMJUPxgz3kD27/XIwQAHGU0CkhpQZltrKGHmI1XP5D+yWRrJ
- GCqqpKZ54TEvz+9T3Lpah6wfmvy8EZAjsdpE+374DB0KWYiByxC7DmhOvhxUuj7YnSrB
- fCjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=dygK7KtUneWiOqTSITgqg1vwJrAxyQ1Bgf3l5/fUDtA=;
- b=aEbh5z0ZrnPaFs/Ba5OJIWhnn8OgLVBeqPUiq5Mfp+Nvybx6qll7LvkicS9xLcVa6M
- 19SXF3piXdzdGOr5lu5rD9V+SCh+D/CnUo+TxXYHYSnPMlmnGKVvPSEdHgABC3Fm/J6L
- Xk6WUSbVm9fyGTeTdzli97WTGkMwCBbTx+jyhNpZIO+iyFTERTpOZmTtnQAYX6rqCXsK
- l/zr60VhP1FYFk+udJvRYc+uzi6vWsisl7Ga4G0D5U/q1nAaymCAwoKmlzPOAVsjW5iW
- CTxrL0V8xG91s8qbT+jYSLj5ayasm70vWr+CKt+RywqgTGKjF3gS4dE8wo2pDaJ2uWqg
- /6cA==
-X-Gm-Message-State: AOAM530k5BjeQt0HlEhITs28IjEtI2Pl7VC98hYrNChM4+RSwAOAdxWT
- qBNClgXwTQWbzqFiVLPa2qCBk3+ZqaqyITgfr4FQ16pPx57Bdw==
-X-Google-Smtp-Source: ABdhPJwKrZ4lGn0BmgVQ8fIHI91cZ701y2/wgzHgNc2ZNnRPad7jglY6CHGq+1GNluLvipMMiWvHWY/kuu45dqgDeQI=
-X-Received: by 2002:a05:6214:bcf:: with SMTP id
- ff15mr9160570qvb.39.1599750311019; 
- Thu, 10 Sep 2020 08:05:11 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGOCQ-0004cZ-Md
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:09:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39444
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGOCO-0005vs-CN
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:09:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599750558;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=RO1S7tTg1kWYnpyRuLBi508dUXodWyxr2/4uY+ghj3I=;
+ b=ft7rkHdSzJ64vz36NCHlCDDcDpzcYRMaa++x3eS0EgKUZNi3LDLZYD8ACvOi6qghNP9Hcq
+ Wr0Z4mxR31adCMD6WPOt0icxnXYKn1rAxNehckn4R7HCNZNNVHqCXv8CWFhHVoPM5J6C3s
+ 9WBJQ9M+Pgh/Vplj6I0PTT3mPnU+qKA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-292-X8WbG4KKMnmlVPH6zAryog-1; Thu, 10 Sep 2020 11:09:16 -0400
+X-MC-Unique: X8WbG4KKMnmlVPH6zAryog-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3FF87108E8A4;
+ Thu, 10 Sep 2020 15:09:15 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-112-197.ams2.redhat.com
+ [10.36.112.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F4D010027A4;
+ Thu, 10 Sep 2020 15:09:14 +0000 (UTC)
+Subject: Re: [PATCH 23/29] block/export: Create BlockBackend in blk_exp_add()
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200907182011.521007-1-kwolf@redhat.com>
+ <20200907182011.521007-24-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <976ac73b-96e3-2cc6-5ab5-23317911521c@redhat.com>
+Date: Thu, 10 Sep 2020 17:09:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-From: Derrick McKee <derrick.mckee@gmail.com>
-Date: Thu, 10 Sep 2020 11:05:00 -0400
-Message-ID: <CAJoBWHwtE+HWkoj3a2pdYHOkPpG7ya=+-RRFvUp-SXwuTWvm5g@mail.gmail.com>
-Subject: Master cannot execute MTE instructions
-To: qemu-devel@nongnu.org, "open list:ARM" <qemu-arm@nongnu.org>
-Content-Type: multipart/alternative; boundary="00000000000004888605aef6e599"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::f33;
- envelope-from=derrick.mckee@gmail.com; helo=mail-qv1-xf33.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200907182011.521007-24-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="OtgBhquJrIPk5KJN7ZgZ1bYkMkVGgJaVV"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 09:07:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -56
+X-Spam_score: -5.7
+X-Spam_bar: -----
+X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-3.576, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,77 +122,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000004888605aef6e599
-Content-Type: text/plain; charset="UTF-8"
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OtgBhquJrIPk5KJN7ZgZ1bYkMkVGgJaVV
+Content-Type: multipart/mixed; boundary="AoeEPoOhJWkqnavjNV8gvuQTGXFK8w1XX"
 
-Hi,
-
-As of commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a compiled with the
-default configuration, softmmu-aarch64 issues an illegal instruction fault
-when executing a memory tag instruction.  Below is a minimal code example
-that triggers the bug.
-
-#include <sys/mman.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-
-#define ADDRESS_TAG_START 56
-#define PROT_MTE 0x20 /* Taken from arm Linux commit
-df9d7a22dd21c926e8175ccc6e176cb45fc7cb09 */
-
-int main(int argc, char** argv) {
-uintptr_t m = (uintptr_t)mmap(NULL, 16, PROT_MTE | PROT_READ | PROT_WRITE,
-MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
-
-if(!m) {
-printf("mmap failed\n");
-exit(1);
-}
-
-uintptr_t tagged_addr = m | (1ul << ADDRESS_TAG_START);
-
-asm("stg %[tag], [%[addr]]"
-:
-: [tag] "r"(tagged_addr), [addr] "r"(m)
-:
-);
-
-printf("Tag completed\n");
-return 0;
-}
-
--- 
-Derrick McKee
-Phone: (703) 957-9362
-Email: derrick.mckee@gmail.com
-
---00000000000004888605aef6e599
-Content-Type: text/html; charset="UTF-8"
+--AoeEPoOhJWkqnavjNV8gvuQTGXFK8w1XX
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr"><div>Hi,</div><div><br></div><div>As of commit 9435a8b3dd3=
-5f1f926f1b9127e8a906217a5518a compiled with the default configuration, soft=
-mmu-aarch64 issues an illegal instruction fault when executing a memory tag=
- instruction.=C2=A0 Below is a minimal code example that triggers the bug.<=
-/div><div><br></div><div>#include &lt;sys/mman.h&gt;<br>#include &lt;stdio.=
-h&gt;<br>#include &lt;stdlib.h&gt;<br>#include &lt;stdint.h&gt;<br><br>#def=
-ine ADDRESS_TAG_START 56<br>#define PROT_MTE 0x20	/* Taken from arm Linux c=
-ommit df9d7a22dd21c926e8175ccc6e176cb45fc7cb09 */<br><br>int main(int argc,=
- char** argv) {<br>	uintptr_t m =3D (uintptr_t)mmap(NULL, 16, PROT_MTE | PR=
-OT_READ | PROT_WRITE, <br>			MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);<br><br>	if=
-(!m) {<br>		printf(&quot;mmap failed\n&quot;);<br>		exit(1);<br>	}<br><br>	=
-uintptr_t tagged_addr =3D m | (1ul &lt;&lt; ADDRESS_TAG_START);<br><br>	asm=
-(&quot;stg %[tag], [%[addr]]&quot;<br>		:<br>		: [tag] &quot;r&quot;(tagged=
-_addr), [addr] &quot;r&quot;(m)<br>		:<br>	);<br><br>	printf(&quot;Tag comp=
-leted\n&quot;);<br>	return 0;<br>}</div><div><br>-- <br><div dir=3D"ltr" cl=
-ass=3D"gmail_signature" data-smartmail=3D"gmail_signature">Derrick McKee<br=
->Phone: (703) 957-9362<br>Email: <a href=3D"mailto:derrick.mckee@gmail.com"=
- target=3D"_blank">derrick.mckee@gmail.com</a><br></div></div></div>
+On 07.09.20 20:20, Kevin Wolf wrote:
+> Every export type will need a BlockBackend, so creating it centrally in
+> blk_exp_add() instead of the .create driver callback avoids duplication.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  include/block/nbd.h   |  4 ++--
+>  block/export/export.c | 49 +++++++++++++++++++++++++++++++++++++++----
+>  blockdev-nbd.c        | 33 ++++-------------------------
+>  nbd/server.c          | 38 +++++++++++----------------------
+>  4 files changed, 63 insertions(+), 61 deletions(-)
 
---00000000000004888605aef6e599--
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--AoeEPoOhJWkqnavjNV8gvuQTGXFK8w1XX--
+
+--OtgBhquJrIPk5KJN7ZgZ1bYkMkVGgJaVV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9aQZgACgkQ9AfbAGHV
+z0C4pQgArotaaXdrGQagoiAq9n47jLnHU+qr8tAT5oqW3zAjUO56i39c7MFoezcG
+14sqEmZKcGz480F8SCcgnHLl5c6G8/xZ+p/T4r19Jv0O5DEiQKJPe5pC72sa/nqL
+2TXAFbmFxv+XD5GFydItnHWQZ0qy3/3zCvAeQgeEwPwGtjO78TOYx6qG9vaPF9Rn
+9veQNlo+m6LXK3MidyX+O/EBAgjL5I+bczlJBUzhdDg+S2/lB4PXlafaQ1k3KHmx
+2TNVsA0DY32gIOwhMmUz8hrputkvh/F4SfA+gtDBtcOoKKS34HGe+wvEj0LAJy7M
+jHnOa1vAiST1DNQMyImtEXdnNOUcBQ==
+=JXrr
+-----END PGP SIGNATURE-----
+
+--OtgBhquJrIPk5KJN7ZgZ1bYkMkVGgJaVV--
+
 
