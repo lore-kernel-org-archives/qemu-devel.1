@@ -4,55 +4,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82E2CC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:02:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72468C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:02:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A7B720720
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:02:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A7B720720
+	by mail.kernel.org (Postfix) with ESMTPS id 01C3E20720
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:02:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01C3E20720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGKLP-0007fY-U1
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 07:02:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55886)
+	id 1kGKLa-0007t1-0M
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 07:02:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55960)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
- id 1kGKEJ-0003eh-EZ
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:55:03 -0400
-Received: from mga03.intel.com ([134.134.136.65]:26657)
+ id 1kGKEQ-0003u4-5t
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:55:10 -0400
+Received: from mga03.intel.com ([134.134.136.65]:26671)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
- id 1kGKEE-0005wd-UC
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:55:03 -0400
-IronPort-SDR: KvVk+gOLcwidOX6ArLO7JN0NYsN7nZQ6/xYI84KCW6N/9sykN3erwJAe/gD+PmPGLGqOVnuwLj
- 7/xykAVMthSg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9739"; a="158545468"
-X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="158545468"
+ id 1kGKEO-0005xE-4E
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:55:09 -0400
+IronPort-SDR: usZ5OwJuPo0lp3G3BESTwXB+Z1CzC2L3a8znvFzpOg+HNmiHSbIj/PX+rmGUfntbuj+hWHjMcc
+ ZsTZy6D64SLw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9739"; a="158545486"
+X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="158545486"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 10 Sep 2020 03:54:39 -0700
-IronPort-SDR: pxsns5oHBcDU3RHDPe6ux8bXtsLTc/ZyyPBca7CIQjAul94JVVbovc1ThMWq121jabmFBvuaQd
- wxRj507KSjtg==
+ 10 Sep 2020 03:54:40 -0700
+IronPort-SDR: mKdvn83Plwe/RFcK17KsPNCB2uv1Za3rCq/uvW/TAZLG0CAS+n/NNCEbB/8ybDOMWqHm5zEysv
+ gKd1APzIrL4Q==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="334140042"
+X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="334140064"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
  by orsmga008.jf.intel.com with ESMTP; 10 Sep 2020 03:54:39 -0700
 From: Liu Yi L <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org, alex.williamson@redhat.com, peterx@redhat.com,
  jasowang@redhat.com
-Subject: [RFC v10 03/25] hw/pci: modify pci_setup_iommu() to set PCIIOMMUOps
-Date: Thu, 10 Sep 2020 03:56:16 -0700
-Message-Id: <1599735398-6829-4-git-send-email-yi.l.liu@intel.com>
+Subject: [RFC v10 10/25] intel_iommu: add set/unset_iommu_context callback
+Date: Thu, 10 Sep 2020 03:56:23 -0700
+Message-Id: <1599735398-6829-11-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1599735398-6829-1-git-send-email-yi.l.liu@intel.com>
 References: <1599735398-6829-1-git-send-email-yi.l.liu@intel.com>
@@ -78,502 +78,190 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: jean-philippe@linaro.org, kevin.tian@intel.com, yi.l.liu@intel.com,
- Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
- jun.j.tian@intel.com, eric.auger@redhat.com, yi.y.sun@intel.com,
+ Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
+ eric.auger@redhat.com, yi.y.sun@intel.com,
  Jacob Pan <jacob.jun.pan@linux.intel.com>, pbonzini@redhat.com,
- hao.wu@intel.com, david@gibson.dropbear.id.au
+ hao.wu@intel.com, Richard Henderson <rth@twiddle.net>,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch modifies pci_setup_iommu() to set PCIIOMMUOps
-instead of setting PCIIOMMUFunc. PCIIOMMUFunc is used to
-get an address space for a PCI device in vendor specific
-way. The PCIIOMMUOps still offers this functionality. But
-using PCIIOMMUOps leaves space to add more iommu related
-vendor specific operations.
+This patch adds set/unset_iommu_context() impelementation in Intel
+vIOMMU. PCIe devices (VFIO case) sets HostIOMMUContext to vIOMMU as
+an ack of vIOMMU's "want_nested" attribute. Thus vIOMMU could build
+DMA protection based on nested paging of host IOMMU.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Cc: Peter Xu <peterx@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
-rfcv9 -> rfcv10:
-*) Fix a bug in pci_device_iommu_address_space()
- +           iommu_bus->iommu_ops->get_address_space) &&
- =>
- +           !iommu_bus->iommu_ops->get_address_space) &&
----
- hw/alpha/typhoon.c       |  6 +++++-
- hw/arm/smmu-common.c     |  6 +++++-
- hw/hppa/dino.c           |  6 +++++-
- hw/i386/amd_iommu.c      |  6 +++++-
- hw/i386/intel_iommu.c    |  6 +++++-
- hw/pci-host/designware.c |  6 +++++-
- hw/pci-host/pnv_phb3.c   |  6 +++++-
- hw/pci-host/pnv_phb4.c   |  6 +++++-
- hw/pci-host/ppce500.c    |  6 +++++-
- hw/pci-host/prep.c       |  6 +++++-
- hw/pci-host/sabre.c      |  6 +++++-
- hw/pci/pci.c             | 18 +++++++++++++-----
- hw/ppc/ppc440_pcix.c     |  6 +++++-
- hw/ppc/spapr_pci.c       |  6 +++++-
- hw/s390x/s390-pci-bus.c  |  8 ++++++--
- hw/virtio/virtio-iommu.c |  6 +++++-
- include/hw/pci/pci.h     |  8 ++++++--
- include/hw/pci/pci_bus.h |  2 +-
- 18 files changed, 96 insertions(+), 24 deletions(-)
+ hw/i386/intel_iommu.c         | 71 ++++++++++++++++++++++++++++++++++++++++---
+ include/hw/i386/intel_iommu.h | 21 ++++++++++---
+ 2 files changed, 83 insertions(+), 9 deletions(-)
 
-diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
-index 29d44df..c4ac693 100644
---- a/hw/alpha/typhoon.c
-+++ b/hw/alpha/typhoon.c
-@@ -740,6 +740,10 @@ static AddressSpace *typhoon_pci_dma_iommu(PCIBus *bus, void *opaque, int devfn)
-     return &s->pchip.iommu_as;
- }
- 
-+static const PCIIOMMUOps typhoon_iommu_ops = {
-+    .get_address_space = typhoon_pci_dma_iommu,
-+};
-+
- static void typhoon_set_irq(void *opaque, int irq, int level)
- {
-     TyphoonState *s = opaque;
-@@ -897,7 +901,7 @@ PCIBus *typhoon_init(MemoryRegion *ram, ISABus **isa_bus, qemu_irq *p_rtc_irq,
-                              "iommu-typhoon", UINT64_MAX);
-     address_space_init(&s->pchip.iommu_as, MEMORY_REGION(&s->pchip.iommu),
-                        "pchip0-pci");
--    pci_setup_iommu(b, typhoon_pci_dma_iommu, s);
-+    pci_setup_iommu(b, &typhoon_iommu_ops, s);
- 
-     /* Pchip0 PCI special/interrupt acknowledge, 0x801.F800.0000, 64MB.  */
-     memory_region_init_io(&s->pchip.reg_iack, OBJECT(s), &alpha_pci_iack_ops,
-diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-index 3838db1..542d816 100644
---- a/hw/arm/smmu-common.c
-+++ b/hw/arm/smmu-common.c
-@@ -444,6 +444,10 @@ static AddressSpace *smmu_find_add_as(PCIBus *bus, void *opaque, int devfn)
-     return &sdev->as;
- }
- 
-+static const PCIIOMMUOps smmu_ops = {
-+    .get_address_space = smmu_find_add_as,
-+};
-+
- IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid)
- {
-     uint8_t bus_n, devfn;
-@@ -513,7 +517,7 @@ static void smmu_base_realize(DeviceState *dev, Error **errp)
-     s->smmu_pcibus_by_busptr = g_hash_table_new(NULL, NULL);
- 
-     if (s->primary_bus) {
--        pci_setup_iommu(s->primary_bus, smmu_find_add_as, s);
-+        pci_setup_iommu(s->primary_bus, &smmu_ops, s);
-     } else {
-         error_setg(errp, "SMMU is not attached to any PCI bus!");
-     }
-diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
-index 7f0c622..ca2dea4 100644
---- a/hw/hppa/dino.c
-+++ b/hw/hppa/dino.c
-@@ -459,6 +459,10 @@ static AddressSpace *dino_pcihost_set_iommu(PCIBus *bus, void *opaque,
-     return &s->bm_as;
- }
- 
-+static const PCIIOMMUOps dino_iommu_ops = {
-+    .get_address_space = dino_pcihost_set_iommu,
-+};
-+
- /*
-  * Dino interrupts are connected as shown on Page 78, Table 23
-  * (Little-endian bit numbers)
-@@ -580,7 +584,7 @@ PCIBus *dino_init(MemoryRegion *addr_space,
-     memory_region_add_subregion(&s->bm, 0xfff00000,
-                                 &s->bm_cpu_alias);
-     address_space_init(&s->bm_as, &s->bm, "pci-bm");
--    pci_setup_iommu(b, dino_pcihost_set_iommu, s);
-+    pci_setup_iommu(b, &dino_iommu_ops, s);
- 
-     *p_rtc_irq = qemu_allocate_irq(dino_set_timer_irq, s, 0);
-     *p_ser_irq = qemu_allocate_irq(dino_set_serial_irq, s, 0);
-diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-index 74a93a5..3676a20 100644
---- a/hw/i386/amd_iommu.c
-+++ b/hw/i386/amd_iommu.c
-@@ -1452,6 +1452,10 @@ static AddressSpace *amdvi_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
-     return &iommu_as[devfn]->as;
- }
- 
-+static const PCIIOMMUOps amdvi_iommu_ops = {
-+    .get_address_space = amdvi_host_dma_iommu,
-+};
-+
- static const MemoryRegionOps mmio_mem_ops = {
-     .read = amdvi_mmio_read,
-     .write = amdvi_mmio_write,
-@@ -1579,7 +1583,7 @@ static void amdvi_realize(DeviceState *dev, Error **errp)
- 
-     sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->mmio);
-     sysbus_mmio_map(SYS_BUS_DEVICE(s), 0, AMDVI_BASE_ADDR);
--    pci_setup_iommu(bus, amdvi_host_dma_iommu, s);
-+    pci_setup_iommu(bus, &amdvi_iommu_ops, s);
-     s->devid = object_property_get_int(OBJECT(&s->pci), "addr", &error_abort);
-     msi_init(&s->pci.dev, 0, 1, true, false, errp);
-     amdvi_init(s);
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 749eb6a..bf13d59 100644
+index 333f172..bf496f7 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -3733,6 +3733,10 @@ static AddressSpace *vtd_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
-     return &vtd_as->as;
+@@ -3358,23 +3358,33 @@ static const MemoryRegionOps vtd_mem_ir_ops = {
+     },
+ };
+ 
+-VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
++/**
++ * Fetch a VTDBus instance for given PCIBus. If no existing instance,
++ * allocate one.
++ */
++static VTDBus *vtd_find_add_bus(IntelIOMMUState *s, PCIBus *bus)
+ {
+     uintptr_t key = (uintptr_t)bus;
+     VTDBus *vtd_bus = g_hash_table_lookup(s->vtd_as_by_busptr, &key);
+-    VTDAddressSpace *vtd_dev_as;
+-    char name[128];
+ 
+     if (!vtd_bus) {
+         uintptr_t *new_key = g_malloc(sizeof(*new_key));
+         *new_key = (uintptr_t)bus;
+         /* No corresponding free() */
+-        vtd_bus = g_malloc0(sizeof(VTDBus) + sizeof(VTDAddressSpace *) * \
+-                            PCI_DEVFN_MAX);
++        vtd_bus = g_malloc0(sizeof(VTDBus));
+         vtd_bus->bus = bus;
+         g_hash_table_insert(s->vtd_as_by_busptr, new_key, vtd_bus);
+     }
++    return vtd_bus;
++}
+ 
++VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
++{
++    VTDBus *vtd_bus;
++    VTDAddressSpace *vtd_dev_as;
++    char name[128];
++
++    vtd_bus = vtd_find_add_bus(s, bus);
+     vtd_dev_as = vtd_bus->dev_as[devfn];
+ 
+     if (!vtd_dev_as) {
+@@ -3462,6 +3472,55 @@ static int vtd_dev_get_iommu_attr(PCIBus *bus, void *opaque, int32_t devfn,
+     return ret;
  }
  
-+static PCIIOMMUOps vtd_iommu_ops = {
-+    .get_address_space = vtd_host_dma_iommu,
-+};
++static int vtd_dev_set_iommu_context(PCIBus *bus, void *opaque,
++                                     int devfn,
++                                     HostIOMMUContext *iommu_ctx)
++{
++    IntelIOMMUState *s = opaque;
++    VTDBus *vtd_bus;
++    VTDHostIOMMUContext *vtd_dev_icx;
 +
++    assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
++
++    vtd_bus = vtd_find_add_bus(s, bus);
++
++    vtd_iommu_lock(s);
++
++    vtd_dev_icx = vtd_bus->dev_icx[devfn];
++
++    assert(!vtd_dev_icx);
++
++    vtd_bus->dev_icx[devfn] = vtd_dev_icx =
++                    g_malloc0(sizeof(VTDHostIOMMUContext));
++    vtd_dev_icx->vtd_bus = vtd_bus;
++    vtd_dev_icx->devfn = (uint8_t)devfn;
++    vtd_dev_icx->iommu_state = s;
++    vtd_dev_icx->iommu_ctx = iommu_ctx;
++
++    vtd_iommu_unlock(s);
++
++    return 0;
++}
++
++static void vtd_dev_unset_iommu_context(PCIBus *bus, void *opaque, int devfn)
++{
++    IntelIOMMUState *s = opaque;
++    VTDBus *vtd_bus;
++    VTDHostIOMMUContext *vtd_dev_icx;
++
++    assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
++
++    vtd_bus = vtd_find_add_bus(s, bus);
++
++    vtd_iommu_lock(s);
++
++    vtd_dev_icx = vtd_bus->dev_icx[devfn];
++    g_free(vtd_dev_icx);
++    vtd_bus->dev_icx[devfn] = NULL;
++
++    vtd_iommu_unlock(s);
++}
++
+ static uint64_t get_naturally_aligned_size(uint64_t start,
+                                            uint64_t size, int gaw)
+ {
+@@ -3758,6 +3817,8 @@ static AddressSpace *vtd_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+ static PCIIOMMUOps vtd_iommu_ops = {
+     .get_address_space = vtd_host_dma_iommu,
+     .get_iommu_attr = vtd_dev_get_iommu_attr,
++    .set_iommu_context = vtd_dev_set_iommu_context,
++    .unset_iommu_context = vtd_dev_unset_iommu_context,
+ };
+ 
  static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
- {
-     X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
-@@ -3844,7 +3848,7 @@ static void vtd_realize(DeviceState *dev, Error **errp)
-                                               g_free, g_free);
-     vtd_init(s);
-     sysbus_mmio_map(SYS_BUS_DEVICE(s), 0, Q35_HOST_BRIDGE_IOMMU_ADDR);
--    pci_setup_iommu(bus, vtd_host_dma_iommu, dev);
-+    pci_setup_iommu(bus, &vtd_iommu_ops, dev);
-     /* Pseudo address space under root PCI bus. */
-     x86ms->ioapic_as = vtd_host_dma_iommu(bus, s, Q35_PSEUDO_DEVFN_IOAPIC);
-     qemu_add_machine_init_done_notifier(&vtd_machine_done_notify);
-diff --git a/hw/pci-host/designware.c b/hw/pci-host/designware.c
-index 8492c18..6a1e1ae 100644
---- a/hw/pci-host/designware.c
-+++ b/hw/pci-host/designware.c
-@@ -645,6 +645,10 @@ static AddressSpace *designware_pcie_host_set_iommu(PCIBus *bus, void *opaque,
-     return &s->pci.address_space;
- }
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+index 3870052..b5fefb9 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -64,6 +64,7 @@ typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
+ typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
+ typedef struct VTDPASIDDirEntry VTDPASIDDirEntry;
+ typedef struct VTDPASIDEntry VTDPASIDEntry;
++typedef struct VTDHostIOMMUContext VTDHostIOMMUContext;
  
-+static const PCIIOMMUOps designware_iommu_ops = {
-+    .get_address_space = designware_pcie_host_set_iommu,
+ /* Context-Entry */
+ struct VTDContextEntry {
+@@ -112,10 +113,20 @@ struct VTDAddressSpace {
+     IOVATree *iova_tree;          /* Traces mapped IOVA ranges */
+ };
+ 
++struct VTDHostIOMMUContext {
++    VTDBus *vtd_bus;
++    uint8_t devfn;
++    HostIOMMUContext *iommu_ctx;
++    IntelIOMMUState *iommu_state;
 +};
 +
- static void designware_pcie_host_realize(DeviceState *dev, Error **errp)
- {
-     PCIHostState *pci = PCI_HOST_BRIDGE(dev);
-@@ -686,7 +690,7 @@ static void designware_pcie_host_realize(DeviceState *dev, Error **errp)
-     address_space_init(&s->pci.address_space,
-                        &s->pci.address_space_root,
-                        "pcie-bus-address-space");
--    pci_setup_iommu(pci->bus, designware_pcie_host_set_iommu, s);
-+    pci_setup_iommu(pci->bus, &designware_iommu_ops, s);
+ struct VTDBus {
+-    PCIBus* bus;		/* A reference to the bus to provide translation for */
++    /* A reference to the bus to provide translation for */
++    PCIBus *bus;
+     /* A table of VTDAddressSpace objects indexed by devfn */
+-    VTDAddressSpace *dev_as[];
++    VTDAddressSpace *dev_as[PCI_DEVFN_MAX];
++    /* A table of VTDHostIOMMUContext objects indexed by devfn */
++    VTDHostIOMMUContext *dev_icx[PCI_DEVFN_MAX];
+ };
  
-     qdev_realize(DEVICE(&s->root), BUS(pci->bus), &error_fatal);
- }
-diff --git a/hw/pci-host/pnv_phb3.c b/hw/pci-host/pnv_phb3.c
-index 82132c1..10dc2c8 100644
---- a/hw/pci-host/pnv_phb3.c
-+++ b/hw/pci-host/pnv_phb3.c
-@@ -961,6 +961,10 @@ static AddressSpace *pnv_phb3_dma_iommu(PCIBus *bus, void *opaque, int devfn)
-     return &ds->dma_as;
- }
+ struct VTDIOTLBEntry {
+@@ -269,8 +280,10 @@ struct IntelIOMMUState {
+     bool dma_drain;                 /* Whether DMA r/w draining enabled */
  
-+static PCIIOMMUOps pnv_phb3_iommu_ops = {
-+    .get_address_space = pnv_phb3_dma_iommu,
-+};
-+
- static void pnv_phb3_instance_init(Object *obj)
- {
-     PnvPHB3 *phb = PNV_PHB3(obj);
-@@ -1048,7 +1052,7 @@ static void pnv_phb3_realize(DeviceState *dev, Error **errp)
-                                      &phb->pci_mmio, &phb->pci_io,
-                                      0, 4, TYPE_PNV_PHB3_ROOT_BUS);
- 
--    pci_setup_iommu(pci->bus, pnv_phb3_dma_iommu, phb);
-+    pci_setup_iommu(pci->bus, &pnv_phb3_iommu_ops, phb);
- 
-     /* Add a single Root port */
-     qdev_prop_set_uint8(DEVICE(&phb->root), "chassis", phb->chip_id);
-diff --git a/hw/pci-host/pnv_phb4.c b/hw/pci-host/pnv_phb4.c
-index 75ad766..53aac37 100644
---- a/hw/pci-host/pnv_phb4.c
-+++ b/hw/pci-host/pnv_phb4.c
-@@ -1148,6 +1148,10 @@ static AddressSpace *pnv_phb4_dma_iommu(PCIBus *bus, void *opaque, int devfn)
-     return &ds->dma_as;
- }
- 
-+static PCIIOMMUOps pnv_phb4_iommu_ops = {
-+    .get_address_space = pnv_phb4_dma_iommu,
-+};
-+
- static void pnv_phb4_instance_init(Object *obj)
- {
-     PnvPHB4 *phb = PNV_PHB4(obj);
-@@ -1202,7 +1206,7 @@ static void pnv_phb4_realize(DeviceState *dev, Error **errp)
-                                      pnv_phb4_set_irq, pnv_phb4_map_irq, phb,
-                                      &phb->pci_mmio, &phb->pci_io,
-                                      0, 4, TYPE_PNV_PHB4_ROOT_BUS);
--    pci_setup_iommu(pci->bus, pnv_phb4_dma_iommu, phb);
-+    pci_setup_iommu(pci->bus, &pnv_phb4_iommu_ops, phb);
- 
-     /* Add a single Root port */
-     qdev_prop_set_uint8(DEVICE(&phb->root), "chassis", phb->chip_id);
-diff --git a/hw/pci-host/ppce500.c b/hw/pci-host/ppce500.c
-index 1a62b2f..26c19e0 100644
---- a/hw/pci-host/ppce500.c
-+++ b/hw/pci-host/ppce500.c
-@@ -439,6 +439,10 @@ static AddressSpace *e500_pcihost_set_iommu(PCIBus *bus, void *opaque,
-     return &s->bm_as;
- }
- 
-+static const PCIIOMMUOps ppce500_iommu_ops = {
-+    .get_address_space = e500_pcihost_set_iommu,
-+};
-+
- static void e500_pcihost_realize(DeviceState *dev, Error **errp)
- {
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-@@ -473,7 +477,7 @@ static void e500_pcihost_realize(DeviceState *dev, Error **errp)
-     memory_region_init(&s->bm, OBJECT(s), "bm-e500", UINT64_MAX);
-     memory_region_add_subregion(&s->bm, 0x0, &s->busmem);
-     address_space_init(&s->bm_as, &s->bm, "pci-bm");
--    pci_setup_iommu(b, e500_pcihost_set_iommu, s);
-+    pci_setup_iommu(b, &ppce500_iommu_ops, s);
- 
-     pci_create_simple(b, 0, "e500-host-bridge");
- 
-diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
-index 4b93fd2..3a74e79 100644
---- a/hw/pci-host/prep.c
-+++ b/hw/pci-host/prep.c
-@@ -213,6 +213,10 @@ static AddressSpace *raven_pcihost_set_iommu(PCIBus *bus, void *opaque,
-     return &s->bm_as;
- }
- 
-+static const PCIIOMMUOps raven_iommu_ops = {
-+    .get_address_space = raven_pcihost_set_iommu,
-+};
-+
- static void raven_change_gpio(void *opaque, int n, int level)
- {
-     PREPPCIState *s = opaque;
-@@ -301,7 +305,7 @@ static void raven_pcihost_initfn(Object *obj)
-     memory_region_add_subregion(&s->bm, 0         , &s->bm_pci_memory_alias);
-     memory_region_add_subregion(&s->bm, 0x80000000, &s->bm_ram_alias);
-     address_space_init(&s->bm_as, &s->bm, "raven-bm");
--    pci_setup_iommu(&s->pci_bus, raven_pcihost_set_iommu, s);
-+    pci_setup_iommu(&s->pci_bus, &raven_iommu_ops, s);
- 
-     h->bus = &s->pci_bus;
- 
-diff --git a/hw/pci-host/sabre.c b/hw/pci-host/sabre.c
-index 0cc6858..7170049 100644
---- a/hw/pci-host/sabre.c
-+++ b/hw/pci-host/sabre.c
-@@ -113,6 +113,10 @@ static AddressSpace *sabre_pci_dma_iommu(PCIBus *bus, void *opaque, int devfn)
-     return &is->iommu_as;
- }
- 
-+static const PCIIOMMUOps sabre_iommu_ops = {
-+    .get_address_space = sabre_pci_dma_iommu,
-+};
-+
- static void sabre_config_write(void *opaque, hwaddr addr,
-                                uint64_t val, unsigned size)
- {
-@@ -403,7 +407,7 @@ static void sabre_realize(DeviceState *dev, Error **errp)
-     /* IOMMU */
-     memory_region_add_subregion_overlap(&s->sabre_config, 0x200,
-                     sysbus_mmio_get_region(SYS_BUS_DEVICE(s->iommu), 0), 1);
--    pci_setup_iommu(phb->bus, sabre_pci_dma_iommu, s->iommu);
-+    pci_setup_iommu(phb->bus, &sabre_iommu_ops, s->iommu);
- 
-     /* APB secondary busses */
-     pci_dev = pci_new_multifunction(PCI_DEVFN(1, 0), true,
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index de0fae1..1967746 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -2665,7 +2665,13 @@ AddressSpace *pci_device_iommu_address_space(PCIDevice *dev)
-     PCIBus *iommu_bus = bus;
-     uint8_t devfn = dev->devfn;
- 
--    while (iommu_bus && !iommu_bus->iommu_fn && iommu_bus->parent_dev) {
-+    /*
-+     * get_address_space() callback is mandatory, so needs to ensure its
-+     * presence in the iommu_bus search.
-+     */
-+    while (iommu_bus && (!iommu_bus->iommu_ops ||
-+           !iommu_bus->iommu_ops->get_address_space) &&
-+           iommu_bus->parent_dev) {
-         PCIBus *parent_bus = pci_get_bus(iommu_bus->parent_dev);
- 
-         /*
-@@ -2704,15 +2710,17 @@ AddressSpace *pci_device_iommu_address_space(PCIDevice *dev)
- 
-         iommu_bus = parent_bus;
-     }
--    if (iommu_bus && iommu_bus->iommu_fn) {
--        return iommu_bus->iommu_fn(bus, iommu_bus->iommu_opaque, devfn);
-+    if (iommu_bus && iommu_bus->iommu_ops &&
-+                     iommu_bus->iommu_ops->get_address_space) {
-+        return iommu_bus->iommu_ops->get_address_space(bus,
-+                                 iommu_bus->iommu_opaque, devfn);
-     }
-     return &address_space_memory;
- }
- 
--void pci_setup_iommu(PCIBus *bus, PCIIOMMUFunc fn, void *opaque)
-+void pci_setup_iommu(PCIBus *bus, const PCIIOMMUOps *ops, void *opaque)
- {
--    bus->iommu_fn = fn;
-+    bus->iommu_ops = ops;
-     bus->iommu_opaque = opaque;
- }
- 
-diff --git a/hw/ppc/ppc440_pcix.c b/hw/ppc/ppc440_pcix.c
-index 2ee2d4f..7b17ee5 100644
---- a/hw/ppc/ppc440_pcix.c
-+++ b/hw/ppc/ppc440_pcix.c
-@@ -442,6 +442,10 @@ static AddressSpace *ppc440_pcix_set_iommu(PCIBus *b, void *opaque, int devfn)
-     return &s->bm_as;
- }
- 
-+static const PCIIOMMUOps ppc440_iommu_ops = {
-+    .get_address_space = ppc440_pcix_set_iommu,
-+};
-+
- /* The default pci_host_data_{read,write} functions in pci/pci_host.c
-  * deny access to registers without bit 31 set but our clients want
-  * this to work so we have to override these here */
-@@ -487,7 +491,7 @@ static void ppc440_pcix_realize(DeviceState *dev, Error **errp)
-     memory_region_init(&s->bm, OBJECT(s), "bm-ppc440-pcix", UINT64_MAX);
-     memory_region_add_subregion(&s->bm, 0x0, &s->busmem);
-     address_space_init(&s->bm_as, &s->bm, "pci-bm");
--    pci_setup_iommu(h->bus, ppc440_pcix_set_iommu, s);
-+    pci_setup_iommu(h->bus, &ppc440_iommu_ops, s);
- 
-     memory_region_init(&s->container, OBJECT(s), "pci-container", PCI_ALL_SIZE);
-     memory_region_init_io(&h->conf_mem, OBJECT(s), &pci_host_conf_le_ops,
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 0a418f1..756be5e 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -771,6 +771,10 @@ static AddressSpace *spapr_pci_dma_iommu(PCIBus *bus, void *opaque, int devfn)
-     return &phb->iommu_as;
- }
- 
-+static const PCIIOMMUOps spapr_iommu_ops = {
-+    .get_address_space = spapr_pci_dma_iommu,
-+};
-+
- static char *spapr_phb_vfio_get_loc_code(SpaprPhbState *sphb,  PCIDevice *pdev)
- {
-     char *path = NULL, *buf = NULL, *host = NULL;
-@@ -1956,7 +1960,7 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
-     memory_region_add_subregion(&sphb->iommu_root, SPAPR_PCI_MSI_WINDOW,
-                                 &sphb->msiwindow);
- 
--    pci_setup_iommu(bus, spapr_pci_dma_iommu, sphb);
-+    pci_setup_iommu(bus, &spapr_iommu_ops, sphb);
- 
-     pci_bus_set_route_irq_fn(bus, spapr_route_intx_pin_to_irq);
- 
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 92146a2..9634123 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -635,6 +635,10 @@ static AddressSpace *s390_pci_dma_iommu(PCIBus *bus, void *opaque, int devfn)
-     return &iommu->as;
- }
- 
-+static const PCIIOMMUOps s390_iommu_ops = {
-+    .get_address_space = s390_pci_dma_iommu,
-+};
-+
- static uint8_t set_ind_atomic(uint64_t ind_loc, uint8_t to_be_set)
- {
-     uint8_t expected, actual;
-@@ -749,7 +753,7 @@ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
-     b = pci_register_root_bus(dev, NULL, s390_pci_set_irq, s390_pci_map_irq,
-                               NULL, get_system_memory(), get_system_io(), 0,
-                               64, TYPE_PCI_BUS);
--    pci_setup_iommu(b, s390_pci_dma_iommu, s);
-+    pci_setup_iommu(b, &s390_iommu_ops, s);
- 
-     bus = BUS(b);
-     qbus_set_hotplug_handler(bus, OBJECT(dev));
-@@ -909,7 +913,7 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
- 
-         pdev = PCI_DEVICE(dev);
-         pci_bridge_map_irq(pb, dev->id, s390_pci_map_irq);
--        pci_setup_iommu(&pb->sec_bus, s390_pci_dma_iommu, s);
-+        pci_setup_iommu(&pb->sec_bus, &s390_iommu_ops, s);
- 
-         qbus_set_hotplug_handler(BUS(&pb->sec_bus), OBJECT(s));
- 
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 5d56865..377d663 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -236,6 +236,10 @@ static AddressSpace *virtio_iommu_find_add_as(PCIBus *bus, void *opaque,
-     return &sdev->as;
- }
- 
-+static const PCIIOMMUOps virtio_iommu_ops = {
-+    .get_address_space = virtio_iommu_find_add_as,
-+};
-+
- static int virtio_iommu_attach(VirtIOIOMMU *s,
-                                struct virtio_iommu_req_attach *req)
- {
-@@ -789,7 +793,7 @@ static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
-     s->as_by_busptr = g_hash_table_new_full(NULL, NULL, NULL, g_free);
- 
-     if (s->primary_bus) {
--        pci_setup_iommu(s->primary_bus, virtio_iommu_find_add_as, s);
-+        pci_setup_iommu(s->primary_bus, &virtio_iommu_ops, s);
-     } else {
-         error_setg(errp, "VIRTIO-IOMMU is not attached to any PCI bus!");
-     }
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index 4ca7258..7c46a78 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -487,10 +487,14 @@ void pci_bus_get_w64_range(PCIBus *bus, Range *range);
- 
- void pci_device_deassert_intx(PCIDevice *dev);
- 
--typedef AddressSpace *(*PCIIOMMUFunc)(PCIBus *, void *, int);
-+typedef struct PCIIOMMUOps PCIIOMMUOps;
-+struct PCIIOMMUOps {
-+    AddressSpace * (*get_address_space)(PCIBus *bus,
-+                                void *opaque, int32_t devfn);
-+};
- 
- AddressSpace *pci_device_iommu_address_space(PCIDevice *dev);
--void pci_setup_iommu(PCIBus *bus, PCIIOMMUFunc fn, void *opaque);
-+void pci_setup_iommu(PCIBus *bus, const PCIIOMMUOps *iommu_ops, void *opaque);
- 
- static inline void
- pci_set_byte(uint8_t *config, uint8_t val)
-diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
-index 347440d..b56f313 100644
---- a/include/hw/pci/pci_bus.h
-+++ b/include/hw/pci/pci_bus.h
-@@ -29,7 +29,7 @@ enum PCIBusFlags {
- struct PCIBus {
-     BusState qbus;
-     enum PCIBusFlags flags;
--    PCIIOMMUFunc iommu_fn;
-+    const PCIIOMMUOps *iommu_ops;
-     void *iommu_opaque;
-     uint8_t devfn_min;
-     uint32_t slot_reserved_mask;
+     /*
+-     * Protects IOMMU states in general.  Currently it protects the
+-     * per-IOMMU IOTLB cache, and context entry cache in VTDAddressSpace.
++     * iommu_lock protects below:
++     * - per-IOMMU IOTLB caches
++     * - context entry cache in VTDAddressSpace
++     * - HostIOMMUContext pointer cached in vIOMMU
+      */
+     QemuMutex iommu_lock;
+ };
 -- 
 2.7.4
 
