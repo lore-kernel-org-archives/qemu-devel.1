@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F4066C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:10:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7ACFC07548
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:11:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8178F2078B
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:10:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28711208CA
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:11:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ft7rkHdS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8178F2078B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cEOdBONX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28711208CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGODF-0005G9-If
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 11:10:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36934)
+	id 1kGOEf-0006PJ-0X
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 11:11:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37226)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGOCQ-0004cZ-Md
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:09:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39444
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGODp-0005pm-JS
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:10:49 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51415
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGOCO-0005vs-CN
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:09:21 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGODo-0006Dj-4p
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:10:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599750558;
+ s=mimecast20190719; t=1599750647;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=RO1S7tTg1kWYnpyRuLBi508dUXodWyxr2/4uY+ghj3I=;
- b=ft7rkHdSzJ64vz36NCHlCDDcDpzcYRMaa++x3eS0EgKUZNi3LDLZYD8ACvOi6qghNP9Hcq
- Wr0Z4mxR31adCMD6WPOt0icxnXYKn1rAxNehckn4R7HCNZNNVHqCXv8CWFhHVoPM5J6C3s
- 9WBJQ9M+Pgh/Vplj6I0PTT3mPnU+qKA=
+ bh=OzCm8OXJa1h4NLphkiMG0KfAQrLsC+1wLiK04KBZ3EA=;
+ b=cEOdBONXjfDOXBH9DZ13BwPWYRKyffF1cqzDkMYH1Fp4rwKTxXKR+7OqQzsVe6StxSLKqR
+ au1tnlate/9aFonJEBVSW4pSVS4CGHWdBIVztHlc3t7BPjChBA8RbuZ4LvmrwL6NNjgCHt
+ dkHfuJWEqp+IxpUpfWmmE/KbRiGu/kE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-292-X8WbG4KKMnmlVPH6zAryog-1; Thu, 10 Sep 2020 11:09:16 -0400
-X-MC-Unique: X8WbG4KKMnmlVPH6zAryog-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-451-TVO1LRlnP3OqOCXWI_cRvQ-1; Thu, 10 Sep 2020 11:10:44 -0400
+X-MC-Unique: TVO1LRlnP3OqOCXWI_cRvQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3FF87108E8A4;
- Thu, 10 Sep 2020 15:09:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E0A680EF9D;
+ Thu, 10 Sep 2020 15:10:43 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-112-197.ams2.redhat.com
  [10.36.112.197])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F4D010027A4;
- Thu, 10 Sep 2020 15:09:14 +0000 (UTC)
-Subject: Re: [PATCH 23/29] block/export: Create BlockBackend in blk_exp_add()
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A7EF85C1DC;
+ Thu, 10 Sep 2020 15:10:42 +0000 (UTC)
+Subject: Re: [PATCH 24/29] block/export: Add query-block-exports
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 References: <20200907182011.521007-1-kwolf@redhat.com>
- <20200907182011.521007-24-kwolf@redhat.com>
+ <20200907182011.521007-25-kwolf@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -85,23 +85,23 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <976ac73b-96e3-2cc6-5ab5-23317911521c@redhat.com>
-Date: Thu, 10 Sep 2020 17:09:12 +0200
+Message-ID: <89ff5e5a-ffd4-f046-dc6d-2606d8438285@redhat.com>
+Date: Thu, 10 Sep 2020 17:10:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200907182011.521007-24-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200907182011.521007-25-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="OtgBhquJrIPk5KJN7ZgZ1bYkMkVGgJaVV"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 09:07:42
+ boundary="h2upYU6cNGW2frxZihH4WYYG21DHDmORx"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 08:38:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -56
 X-Spam_score: -5.7
@@ -128,48 +128,45 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---OtgBhquJrIPk5KJN7ZgZ1bYkMkVGgJaVV
-Content-Type: multipart/mixed; boundary="AoeEPoOhJWkqnavjNV8gvuQTGXFK8w1XX"
+--h2upYU6cNGW2frxZihH4WYYG21DHDmORx
+Content-Type: multipart/mixed; boundary="xKUEZ3xuKZfYVoIw1keG7gRV1heWATEoH"
 
---AoeEPoOhJWkqnavjNV8gvuQTGXFK8w1XX
+--xKUEZ3xuKZfYVoIw1keG7gRV1heWATEoH
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 07.09.20 20:20, Kevin Wolf wrote:
-> Every export type will need a BlockBackend, so creating it centrally in
-> blk_exp_add() instead of the .create driver callback avoids duplication.
+> This adds a simple QMP command to query the list of block exports.
 >=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  include/block/nbd.h   |  4 ++--
->  block/export/export.c | 49 +++++++++++++++++++++++++++++++++++++++----
->  blockdev-nbd.c        | 33 ++++-------------------------
->  nbd/server.c          | 38 +++++++++++----------------------
->  4 files changed, 63 insertions(+), 61 deletions(-)
+>  qapi/block-export.json | 32 ++++++++++++++++++++++++++++++++
+>  block/export/export.c  | 23 +++++++++++++++++++++++
+>  2 files changed, 55 insertions(+)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---AoeEPoOhJWkqnavjNV8gvuQTGXFK8w1XX--
+--xKUEZ3xuKZfYVoIw1keG7gRV1heWATEoH--
 
---OtgBhquJrIPk5KJN7ZgZ1bYkMkVGgJaVV
+--h2upYU6cNGW2frxZihH4WYYG21DHDmORx
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9aQZgACgkQ9AfbAGHV
-z0C4pQgArotaaXdrGQagoiAq9n47jLnHU+qr8tAT5oqW3zAjUO56i39c7MFoezcG
-14sqEmZKcGz480F8SCcgnHLl5c6G8/xZ+p/T4r19Jv0O5DEiQKJPe5pC72sa/nqL
-2TXAFbmFxv+XD5GFydItnHWQZ0qy3/3zCvAeQgeEwPwGtjO78TOYx6qG9vaPF9Rn
-9veQNlo+m6LXK3MidyX+O/EBAgjL5I+bczlJBUzhdDg+S2/lB4PXlafaQ1k3KHmx
-2TNVsA0DY32gIOwhMmUz8hrputkvh/F4SfA+gtDBtcOoKKS34HGe+wvEj0LAJy7M
-jHnOa1vAiST1DNQMyImtEXdnNOUcBQ==
-=JXrr
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9aQfEACgkQ9AfbAGHV
+z0CcPwgAiBwvfxjOicxNFkexnmwpAv8rGC8j0XaVx7/YqPH1awlGwtALks43bpoE
+qym4C7e3fAl3nm3uYj4xo/0z+RuImEKtBAk0vtEdRuqkxlOkxuwyZS9UveNaqSj2
+jDy9OL4vKkMUN4DhCtAb+XEWcgOKBIQIpbKbEyQ7Yn+RaczcUk8N5dKZDLC0Z9vX
+hbuiATuAfPXSrQwUFOLNkDiPvbg3Z0qfYAqEApIBR7FIBwfw4kqHUn96Ee7wAsNZ
+zyXo++B/Rhur1udxcTlLsUHDPCeYY011SZeu81Hf3j3RcRPk0jNuWHYMjyFyrXPE
+R7qTaBvMAnZSx/ygg6lAjMw7dtCAoQ==
+=nzpi
 -----END PGP SIGNATURE-----
 
---OtgBhquJrIPk5KJN7ZgZ1bYkMkVGgJaVV--
+--h2upYU6cNGW2frxZihH4WYYG21DHDmORx--
 
 
