@@ -2,106 +2,94 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48A2DC43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 16:40:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8EB1C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 16:41:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D71562075A
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 16:40:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7799F20C09
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 16:41:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Tsr76kv2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D71562075A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NMbRABbM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7799F20C09
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGPcm-0002pA-QL
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 12:40:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59046)
+	id 1kGPdw-00041o-Jg
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 12:41:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59120)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kGPc4-0002MV-0U
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 12:39:56 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:59226)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kGPc1-000230-DP
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 12:39:55 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08AGdSSG074622;
- Thu, 10 Sep 2020 16:39:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : in-reply-to : references : date : message-id : mime-version :
- content-type; s=corp-2020-01-29;
- bh=Qz1QQcX/lBU9Vt/A3vo31FRa5/kLoZxLWaxetGC/uTM=;
- b=Tsr76kv2EvG6Nl+VsSOKeB/dwsbXVp4fWjRd4dNzD4HSc9clb6SLTIa3ZtOshu4/YxVw
- oiPALZeFzxvREjaLzWwsRjQHpRVwPFNYAg+OfrG3yi6lcz83GinVvaj4wzKOI+7czko+
- 0HZcY2AJteaMFzDmuU8x5E+OVRNtGMj4nEb4mBMyhSsZ8RaY0syhwX6UOctwami0fRbv
- +hzk5qxjUtxOW8FjdGiZeupGDSEYFBDXnt+4iKoQr2nD2fSlrk6Lx72/IvWpfCGYvwXZ
- EVqQu9k7/E2PSib+nYmtBbQKkFEFDKwK76WLw2yP+Q2EsZZsiw8u10ciWOb2z96nX+J7 UQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by userp2130.oracle.com with ESMTP id 33c23r9c7g-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Thu, 10 Sep 2020 16:39:51 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08AGZXNL175145;
- Thu, 10 Sep 2020 16:39:50 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by userp3020.oracle.com with ESMTP id 33cmev8hhb-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 10 Sep 2020 16:39:50 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 08AGdnlq032607;
- Thu, 10 Sep 2020 16:39:49 GMT
-Received: from starbug-mbp.localdomain (/79.97.215.145)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 10 Sep 2020 09:39:49 -0700
-Received: by starbug-mbp.localdomain (Postfix, from userid 501)
- id 23A9C1464ED6; Thu, 10 Sep 2020 17:39:46 +0100 (IST)
-From: Darren Kenny <darren.kenny@oracle.com>
-To: Alexander Bulekov <alxndr@bu.edu>
-Subject: Re: [PATCH] oss-fuzz: move linker arg to fix coverage-build
-In-Reply-To: <20200910163652.xveuge4b5zlywcpe@mozz.bu.edu>
-References: <20200909220516.614222-1-alxndr@bu.edu>
- <m2a6xx4ouu.fsf@oracle.com> <20200910163652.xveuge4b5zlywcpe@mozz.bu.edu>
-Date: Thu, 10 Sep 2020 17:39:45 +0100
-Message-ID: <m2ft7p4mcu.fsf@oracle.com>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kGPcT-0002kV-6Z
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 12:40:21 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40117
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kGPcR-00028t-5d
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 12:40:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599756018;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vEZhC8icudMXBaphx1/uzZwMhVlrPxsvLkUdIK3gbtA=;
+ b=NMbRABbMT4lazj4u9nO41PZViBorr3QEFqgUeI/7aS0TV223VFKD8BxAovEXTyf3nnfJjK
+ xKcY1Tdh4af7BebuQKBxQ/wXCmMZaNUr01mdGGyo1G9XkT1yVWqWKby4zYzyLHGgQc9kqj
+ dxX4gU46ScMNGDwE6QgBxV4ldJlxvfw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-435-d244PSCVPUGdQZSk2L1DIA-1; Thu, 10 Sep 2020 12:40:12 -0400
+X-MC-Unique: d244PSCVPUGdQZSk2L1DIA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 855B218B9EDC;
+ Thu, 10 Sep 2020 16:40:11 +0000 (UTC)
+Received: from redhat.com (ovpn-112-4.ams2.redhat.com [10.36.112.4])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 90FD45C221;
+ Thu, 10 Sep 2020 16:40:06 +0000 (UTC)
+Date: Thu, 10 Sep 2020 17:40:03 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH 08/10] pc-bios: refresh edk2 build artifacts for
+ edk2-stable202008
+Message-ID: <20200910164003.GH1083348@redhat.com>
+References: <20200908072939.30178-1-lersek@redhat.com>
+ <20200908072939.30178-9-lersek@redhat.com>
+ <b2037644-bf48-e86f-23e3-f2c68e7ddc1f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9740
- signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
- suspectscore=0 adultscore=0
- bulkscore=0 phishscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009100153
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9740
- signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- priorityscore=1501
- mlxlogscore=999 mlxscore=0 bulkscore=0 suspectscore=0 spamscore=0
- malwarescore=0 phishscore=0 lowpriorityscore=0 clxscore=1015
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009100154
-Received-SPF: pass client-ip=156.151.31.86;
- envelope-from=darren.kenny@oracle.com; helo=userp2130.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 12:39:52
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+In-Reply-To: <b2037644-bf48-e86f-23e3-f2c68e7ddc1f@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 08:38:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -114,125 +102,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, bsd@redhat.com, qemu-devel@nongnu.org,
- stefanha@redhat.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+ qemu devel list <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thursday, 2020-09-10 at 12:36:52 -04, Alexander Bulekov wrote:
-> On 200910 1645, Darren Kenny wrote:
->> Hi Alex,
->> 
->> I'm certainly not an expert in meson, but have some questions below...
->> 
->> On Wednesday, 2020-09-09 at 18:05:16 -04, Alexander Bulekov wrote:
->> > The order of the add_project_link_arguments calls impacts which
->> > arguments are placed between --start-group and --end-group.
->> > OSS-Fuzz coverage builds seem to just add these to CFLAGS:
->> > -fprofile-instr-generate -fcoverage-mapping pthread -Wl,--no-as-needed
->> > --Wl,-ldl -Wl,-lm Wno-unused-command-line-argument
->> >
->> > for some reason that is enough to shift the fork_fuzz.ld linker-script
->> > back into the linker group. Move the linker-script meson call before the
->> > other calls to mitigate this.
->> >
->> > Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
->> > ---
->> >  meson.build | 15 ++++++++-------
->> >  1 file changed, 8 insertions(+), 7 deletions(-)
->> >
->> > Good news! Standard oss-fuzz builds are working again:
->> > https://oss-fuzz-build-logs.storage.googleapis.com/log-2fa5122f-c98c-4e46-b3ff-e6835d9ecda6.txt
->> >
->> > Bad news: Coverage builds are still-broken:
->> > https://oss-fuzz-build-logs.storage.googleapis.com/log-dafece55-81f2-4d1d-a686-c5197cdd15c1.txt
->> >
->> > For some reason, just switching around the order of the
->> > add_project_arguments fixes this (i.e. the order of the calls impacts
->> > which arguments are placed between --start-group --end-group). I don't
->> > really like this because it makes this linker-script block even more
->> > visible in meson.build, by placing it directly beneath the "Compiler
->> > flags" heading. Paolo, do you have a better suggestion?
->> >
->> > diff --git a/meson.build b/meson.build
->> > index 5421eca66a..2ba1823ca3 100644
->> > --- a/meson.build
->> > +++ b/meson.build
->> > @@ -49,6 +49,14 @@ configure_file(input: files('scripts/ninjatool.py'),
->> >  # Compiler flags #
->> >  ##################
->> >  
->> > +# Specify linker-script with add_project_link_arguments so that it is not placed
->> > +# within a linker --start-group/--end-group pair
->> > +if 'CONFIG_FUZZ' in config_host
->> > +   add_project_link_arguments(['-Wl,-T,',
->> > +                               (meson.current_source_dir() / 'tests/qtest/fuzz/fork_fuzz.ld')],
->>
->
-> Hi Darren,
->
->> Why do you use an array here rather than a string concatenation? Looking
->> at the documentation, it suggests that each arg to
->> add_project_link_arguments() should be specified separately - and
->> doesn't mention anything about an argument being a list and what would
->> happen here.
->> 
->> What I'm wondering is how the array might be handled, as in would it be
->> like the Python equivalent of:
->> 
->>   "".join(['a', b'])   => 'ab'
->> 
->> or
->> 
->>   " ".join(['a', b'])   => 'a b'
->> 
->> It's not honestly clear, or at least I couldn't find anything that says
->> clearly what the result would be.
->> 
->> So, would it be more correct as either:
->> 
->>   add_project_link_arguments('-Wl,-T,' + (meson.current_source_dir() / 'tests/qtest/fuzz/fork_fuzz.ld'),
->> 
->> or
->> 
->>   add_project_link_arguments('-Wl,-T,', (meson.current_source_dir() / 'tests/qtest/fuzz/fork_fuzz.ld'),
->> 
->> I'm also wondering if this in any way would affect how meson moves the
->> linker arguments around later.
->
-> Good point. I tried that out, and everything still works.
-> Functionality-wise, I don't think it makes a big difference (for example
-> look at the other calls to add_project*arguments, which all pass in
-> arrays returned by split()), but its probably better to stick with what
-> is written in the official docs. I ran oss-fuzz builds with this change
-> and, unfortunately, the order of the calls to add_project_link_arguments
-> still makes a difference.
->
->> 
->> Alternatively, there is a link_args argument to the executable()
->> function, which is being used for adding @qemu.syms and @block.syms
->> around line 1017.
->> 
->> Would it work to add this linker-script at this point, in a conditional
->> block for CONFIG_FUZZ here instead?
->> 
->
-> I tried that when I was attempting to fix the original build-issue, but
-> to no avail... I don't have a good explanation. On one hand, the problem
-> was related to the fact that we were linking in libqos.a. Renaming it to
-> libqos.fa was part of the fix. On the other hand, we also needed to
-> specify the arguments as part of global project link arguments, rather
-> than the proper way with executable() link_args.
->
-> I think Paolo had a better understanding of the actual issue, and some
-> ideas about how to fix this within meson, rather than with the hacks
-> exemplified by this patch.
+On Thu, Sep 10, 2020 at 06:32:28PM +0200, Philippe Mathieu-Daudé wrote:
+> +GitLab team & Gerd (for building firmwares)
+> 
+> On 9/8/20 9:29 AM, Laszlo Ersek wrote:
 
-Fair enough, guess we'll see if Paolo has any better suggestions then :)
+> Now I remember why I kept that patch on hold.
+> 
+> The CI idea is to have reproducible builds if possible.
 
-Thanks,
+NB it isn't going to eb truly reproducible because the docker
+env we're building in is liable to change each time we run it,
+either because we've updated the base OS, or "apt update" pulls
+in different content set. At the least, we should likely record
+the full set of packages installed in the container, alongside
+the blob in qemu.git, so we have a strong record of the toolchain
+used.
 
-Darren.
+> When the submodule is updated (or the QEMU scripts containing the
+> -D defines), it triggers the 'build-edk2' job which produce these
+> same binaries.
+> My original idea was to push the tag on GitLab that triggers the
+> job, then download the produced binaries, test them, then commit
+> them.
+> 
+> With your series, I get these binaries:
+> https://gitlab.com/philmd/qemu/-/jobs/731618363/artifacts/browse/pc-bios/
+> 
+> However they differ with yours, for example:
+> 
+> 0000 6100: 00 00 00 00 00 00 00 00  00 00 00 00 2F 68 6F 6D  ........
+> ..../hom
+> 0000 6110: 65 2F 6C 61 63 6F 73 2F  73 72 63 2F 75 70 73 74  e/lacos/
+> src/upst
+> 0000 6120: 72 65 61 6D 2F 71 65 6D  75 2F 72 6F 6D 73 2F 65  ream/qem
+> u/roms/e
+> 0000 6130: 64 6B 32 2F 42 75 69 6C  64 2F 41 72 6D 56 69 72  dk2/Buil
+> d/ArmVir
+> 0000 6140: 74 51 65 6D 75 2D 41 41  52 43 48 36 34 2F 44 45  tQemu-AA
+> RCH64/DE
+> 0000 6150: 42 55 47 5F 47 43 43 35  2F 41 41 52 43 48 36 34  BUG_GCC5
+> /AARCH64
+> 0000 6160: 2F 41 72 6D 50 6C 61 74  66 6F 72 6D 50 6B 67 2F  /ArmPlat
+> formPkg/
+> 0000 6170: 50 72 65 50 65 69 43 6F  72 65 2F 50 72 65 50 65  PrePeiCo
+> re/PrePe
+> 0000 6180: 69 43 6F 72 65 55 6E 69  43 6F 72 65 2F 44 45 42  iCoreUni
+> Core/DEB
+> 0000 6190: 55 47 2F 41 72 6D 50 6C  61 74 66 6F 72 6D 50 72  UG/ArmPl
+> atformPr
+> 0000 61A0: 65 50 65 69 43 6F 72 65  2E 64 6C 6C 00 00 00 00  ePeiCore
+> .dll....
+> 
+> 0000 6100: 00 00 00 00 00 00 00 00  00 00 00 00 2F 62 75 69  ........
+> ..../bui
+> 0000 6110: 6C 64 73 2F 70 68 69 6C  6D 64 2F 71 65 6D 75 2F  lds/phil
+> md/qemu/
+> 0000 6120: 72 6F 6D 73 2F 65 64 6B  32 2F 42 75 69 6C 64 2F  roms/edk
+> 2/Build/
+> 0000 6130: 41 72 6D 56 69 72 74 51  65 6D 75 2D 41 41 52 43  ArmVirtQ
+> emu-AARC
+> 0000 6140: 48 36 34 2F 44 45 42 55  47 5F 47 43 43 35 2F 41  H64/DEBU
+> G_GCC5/A
+> 0000 6150: 41 52 43 48 36 34 2F 41  72 6D 50 6C 61 74 66 6F  ARCH64/A
+> rmPlatfo
+> 0000 6160: 72 6D 50 6B 67 2F 50 72  65 50 65 69 43 6F 72 65  rmPkg/Pr
+> ePeiCore
+> 0000 6170: 2F 50 72 65 50 65 69 43  6F 72 65 55 6E 69 43 6F  /PrePeiC
+> oreUniCo
+> 0000 6180: 72 65 2F 44 45 42 55 47  2F 41 72 6D 50 6C 61 74  re/DEBUG
+> /ArmPlat
+> 0000 6190: 66 6F 72 6D 50 72 65 50  65 69 43 6F 72 65 2E 64  formPreP
+> eiCore.d
+> 0000 61A0: 6C 6C 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ll......
+> ........
+> 
+> For now this is not a blocker, but we should consider switching to
+> this workflow at some point (caring about all the files that really
+> need to be archived, maybe debug symbols etc...).
+> 
+> w.r.t. your patch:
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> 
+> Regards,
+> 
+> Phil.
+> 
+> 
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
