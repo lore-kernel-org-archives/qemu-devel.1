@@ -2,82 +2,75 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E4CC43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 09:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 793E0C43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 10:05:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 354F92078B
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 09:51:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 354F92078B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id B3755214F1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 10:05:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="oAoNuiJU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3755214F1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGfiW-0006Rh-2l
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 05:51:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50730)
+	id 1kGfvy-0001Du-Pm
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 06:05:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54008)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kGfhg-0005Eu-8B
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 05:50:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60156)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1kGfvP-0000gp-Di; Fri, 11 Sep 2020 06:04:59 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:50520)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kGfhb-0003Sv-2t
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 05:50:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kGfhZ-0002T2-O1
- for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 09:50:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B49B52E804E
- for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 09:50:41 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1kGfvN-0005AF-IA; Fri, 11 Sep 2020 06:04:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=L3M85WFIyglAa81GENKXQSmyaI3tn8tdUSjlCX1r8uI=; 
+ b=oAoNuiJU/yCvW71md4EmeH/DDLK3O5yUfG2MHb/gpqrG5X+h0IYLzcOt7gXe+lDV9R1amE0mEwUmd51sekBKAjStVZGEniHraYi0Q95yzTNC4ZI05kPk1ptamCaCBOJOf28ZNNIOdubbsdt7XZvDh64pjG7EqNP1jQMuT1kSRr90uNpm7RLgINAVHfbSvaKfJoY0qtv+KcFPH2kZWhQIqgUCQNoGEMbnSRhIhPoHkr9B9Bp1PwCe0UlG4ZAu8HVO5rYtYTvoMOxTozJSz6rAG0+PL/oYBy+UeI+I7D1eHVhhve2VCB3WPBHM0pPvIP3fHl5HSf9vHyAId85Xu461ig==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1kGfvJ-0007a7-Jk; Fri, 11 Sep 2020 12:04:53 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1kGfvJ-0004Bl-9j; Fri, 11 Sep 2020 12:04:53 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Subject: Re: [PATCH v3 2/2] qcow2: Skip copy-on-write when allocating a zero
+ cluster
+In-Reply-To: <7f0ae868-07ca-2267-eb27-2787ff86e801@virtuozzo.com>
+References: <cover.1599759873.git.berto@igalia.com>
+ <0350dd55702eacd701e0aea924b101db7448a517.1599759873.git.berto@igalia.com>
+ <7f0ae868-07ca-2267-eb27-2787ff86e801@virtuozzo.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Fri, 11 Sep 2020 12:04:53 +0200
+Message-ID: <w51blichbne.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 11 Sep 2020 09:38:34 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <1895080@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee hansni laurent-vivier
-X-Launchpad-Bug-Reporter: Hansni Bu (hansni)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <159970958159.31371.12301700684467003959.malonedeb@wampee.canonical.com>
- <92de5ee0-629a-640a-d547-8c2d650742f2@vivier.eu> <87tuw4odwk.fsf@linaro.org>
-Message-Id: <87r1r8odph.fsf@linaro.org>
-Subject: Re: [Bug 1895080] [NEW] pgb_reserved_va: Assertion `addr == test'
- failed
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: aae59415d58b1c58d258706974770b092d117543
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 02:05:39
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain
+Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
+ helo=fanzine.igalia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 06:04:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,111 +79,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1895080 <1895080@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
-
-> Laurent Vivier <laurent@vivier.eu> writes:
+On Fri 11 Sep 2020 11:34:37 AM CEST, Vladimir Sementsov-Ogievskiy wrote:
+>> -        if (!is_zero_cow(bs, m)) {
+>> +        ret = is_zero_cow(bs, m);
+>> +        if (ret < 0) {
+>> +            return ret;
 >
-<snip>
->>> Then trying qemu-riscv32 with a simple ELF, I get:
->>> linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test=
-' failed.
->>> =
+> It's a common practice to treat block-status errors as "unknown"
+> status and not error-out immediately:
+>
+>   - really, it's not critical, we can continue assuming non-zero
+>   - if there are real problems with IO, we'll most probably fail on
+>   real read or write operation, and report its status, which seems
+>   better for user than block-status error
 
->>> strace shows that:
->>> mmap(0x1000, 4294963200, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORES=
-ERVE, -1, 0) =3D 0x10000
->>> write(2, "qemu-riscv32: ../qemu.git/linux-"..., 103qemu-riscv32: ../qem=
-u.git/linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D te=
-st' failed.
->>> ) =3D 103
->>> =
+But what's the problem exactly, does this complicate the code too much?
+:-?
 
->>> The source code is in the function pgb_reserved_va (linux-
->>> user/elfload.c). I think mmap cannot guarantee that the returned pointer
->>> (test) equals to the parameter of addr. So is this a bug to assert (addr
->>> =3D=3D test)?
->>
-> I'm assuming CentOS 7.5 actually has a definition for
-> MAP_FIXED_NOREPLACE which should ensure we get what we asked for -
-> otherwise we are in the position of hoping the kernel honours what we
-> asked for.
+> So, I'd keep existing logic in handle_alloc_space(). And, if you agree
+> and resend, probably good to split this patch into two, one for
+> block.h/io.c and one for qcow2.c (still, I'm OK with it as one patch).
 
-Doh re-reading I see it's not set in the strace output. Maybe we should
-promote the assert case to the failure leg so we have:
+Sure, I can split the patch if I have to resend it.
 
-    if (addr =3D=3D MAP_FAILED || addr !=3D test) {
-        error_report(...)
-    }
-
-so we at least fail with a user friendly error rather than an abort?
-
--- =
-
-Alex Benn=C3=A9e
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1895080
-
-Title:
-  pgb_reserved_va: Assertion `addr =3D=3D test' failed
-
-Status in QEMU:
-  New
-
-Bug description:
-  This problem occurs on CentOS-7.5 (64-bit) with qemu-5.1.0, qemu head
-  (commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a) for riscv32-linux-
-  user.
-
-  Firstly, compile fails:
-  Compiling C object libqemu-riscv32-linux-user.fa.p/linux-user_strace.c.o
-  ../qemu.git/linux-user/strace.c:1210:18: error: =E2=80=98FALLOC_FL_KEEP_S=
-IZE=E2=80=99 undeclared here (not in a function)
-       FLAG_GENERIC(FALLOC_FL_KEEP_SIZE),
-
-  I have to add below include to linux-user/strace.c
-  diff --git a/linux-user/strace.c b/linux-user/strace.c
-  index 11fea14fba..22e51d4a8a 100644
-  --- a/linux-user/strace.c
-  +++ b/linux-user/strace.c
-  @@ -7,6 +7,7 @@
-   #include <sys/mount.h>
-   #include <arpa/inet.h>
-   #include <netinet/tcp.h>
-  +#include <linux/falloc.h>
-   #include <linux/if_packet.h>
-   #include <linux/netlink.h>
-   #include <sched.h>
-
-  Then trying qemu-riscv32 with a simple ELF, I get:
-  linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test' =
-failed.
-
-  strace shows that:
-  mmap(0x1000, 4294963200, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESER=
-VE, -1, 0) =3D 0x10000
-  write(2, "qemu-riscv32: ../qemu.git/linux-"..., 103qemu-riscv32: ../qemu.=
-git/linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test=
-' failed.
-  ) =3D 103
-
-  The source code is in the function pgb_reserved_va (linux-
-  user/elfload.c). I think mmap cannot guarantee that the returned
-  pointer (test) equals to the parameter of addr. So is this a bug to
-  assert (addr =3D=3D test)?
-
-  Attached configure script and test ELF file.
-
-  Thanks.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1895080/+subscriptions
+Berto
 
