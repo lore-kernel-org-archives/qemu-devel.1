@@ -7,60 +7,61 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 240CCC43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:39:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DB3DC43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:41:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF892214F1
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:39:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF892214F1
+	by mail.kernel.org (Postfix) with ESMTPS id 1160221D6C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:41:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1160221D6C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGotk-0004fy-Lx
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 15:39:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44946)
+	id 1kGouv-0006eY-5w
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 15:41:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44812)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kGoo2-00031w-Tq; Fri, 11 Sep 2020 15:33:58 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:49519)
+ id 1kGonq-0002iY-TJ; Fri, 11 Sep 2020 15:33:46 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:49643)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kGoo0-0000qZ-TW; Fri, 11 Sep 2020 15:33:58 -0400
+ id 1kGonp-0000od-5h; Fri, 11 Sep 2020 15:33:46 -0400
 Received: from localhost.localdomain ([82.252.129.222]) by
  mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MMY9X-1jzQoC2fFH-00JYvd; Fri, 11 Sep 2020 21:33:52 +0200
+ id 1MfL5v-1kiRmY32Vf-00gt6v; Fri, 11 Sep 2020 21:33:42 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 15/18] hw/arm/pxa2xx: Add missing fallthrough comment
-Date: Fri, 11 Sep 2020 21:33:27 +0200
-Message-Id: <20200911193330.1148942-16-laurent@vivier.eu>
+Subject: [PULL 08/18] hw/net/e1000e: Remove overwritten read handler for
+ STATUS register
+Date: Fri, 11 Sep 2020 21:33:20 +0200
+Message-Id: <20200911193330.1148942-9-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200911193330.1148942-1-laurent@vivier.eu>
 References: <20200911193330.1148942-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:MFlSvULitaydFXZ1z6AuKK+Pklr0g/yjNEpPSc4suR87LECVFeI
- atTidlOQpKNbzZMiqsOsO5tFr1sFUQczA4QS7xKwGwYId64+JP3Ch0QfBdYXpVrNA+Ri3gp
- xXOs3Sx8Z8p3o/PzGcGfXnqazut3fQzJ4zYB0JT8Hl9gYjT3y/v3KOi4TglaUeLxRSGZtmP
- NEH/35ysKQgk52O/KnCkA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:NmYKcVDTjTA=:PpYvzJSdhmoF2gdezkJ8bD
- Ao9ZYhxovp4/4D3VW868TC+3L24gnsdwQ9pgHfiVDL5+fu77wouifgRkYUAVMscXHtxkC4oZy
- MmPP/ut4cEOWa5tQSIj9z1Ntxda9X75R1Gt2J1POznyG/C/LVLE7+8G5Os/pBxuoGlBRZifKM
- cYy0NUK0710tf+tGUR5t5FkYIIEr2AL0KhSvSYNlJeGv/yiq4o4aMWKdBalHbdmSmqzagFVFm
- sNKav4oQsilAkBtwX4gDOirv6HzHTIUCcOZhzCqpR716tAFrduVkyR6fDqlh1an14TzmjCkGM
- gp0deSCPYyv8EyToSF5GkofcBufUx3p2OTDcCEsAA3nq49NvofL8p5svwp6M9O/t5Vk+Hxip8
- FNzYfUrmjnTqQw9P6kyBfDitFMK0PB4QyP0oGhfKANdYFWYcNJVZp3/r1kxGa53fPNFg89BOt
- KyuKuJMxuziuXaKJB+97X8Wgzo/mVMHkeyKNlHDiQUFYpxc2aN5hg8oUpWmPFaKnjq69rzrN5
- kA0eZ7SZ+knX3nIo5g3RhNfZIrj5hGaDcCX4Yym6VGRSe7GD06z7LDPcVxdCB8rUQW0kok5yM
- w/JnTpWy/tEggdupV+arbY3rR6JqIiO122br2SiBO2lotQAUzBqGigozUi8eE4i+3gbdNP6Yu
- f070XiHEKePdoW4bNf7erMUBrsrfJUQnDkMoZ2zPoy2wWazOfNZOumf/Cy+trC+CrD4iYPzLi
- +o7I3pFi+9XmRjihiBun0vqKXf4N6TfV3nsekw7l8ZZvdgyvew2+xMmaCT5N642fgLakUdQPC
- rCQu1L9+f04vNpYNgC4ZzvxQJGiETctKoKsgTWo9A9IWtpO42bHIXCn88z/+p+9I7u5Gu9J
+X-Provags-ID: V03:K1:Sf2oOc/V610s/ecndz6lKV1wa7DBCekol9y2GpdW4qy79KRGsGA
+ P4HbYN2xNqrnT4JCb9+PPSgoiKP3nUYqFMw8sfJQ/7o3VxmjBcxopN1ESKI+2vVjVfa3n22
+ cuah/XcWonczpm19y1xphitMMHLIvfGVR8Mz+klSixHHcr9ThfIKaPUh6ZwdtIm+ISRLlxv
+ IvaCQKbLMAGgWlc1Tx0Rg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Uhy+ph77yhM=:8CKwEN7xgbgoPhuGsCWcET
+ vnNymzpcp2x+RCsejWFGQgH6UonEG6zbPl8b+V0Sfg3RmcHPgRhV/IygYlvbxaSpdceCKwrR6
+ WTteGS3MPOmGyEo+G7eW+VlKZ3mAMVVLsvjgS5IbzcKjsJFBEO6uJZsuJxe5L/iqcw0rx9ss1
+ JwTsHP7CQ8+exKse9YF6HHSCCc9jAHADuEdU2qcBAd79TfPACmpNbSGEimxVtrW/5y5EM3z/7
+ Vf1tpNp3KUEiq0ijh4bKODa6f7squxQw2N9ifPABA2U9BrlYW0jxY5A1yhsXMPygnfb9HLkHX
+ slC+W7qgB7x7rs5qOoHUoaQynNrn1LlbCMzXLwj/+lV7QxQT+cFEfNij6BuOBa9qTNiV5yCYp
+ GMIYq/HA/cVoYS1ilp/ZKzSr/Bk2kwQlxIbiUh80NXJoG6ROCy1138sPlgI4mAD/65S2AV3RH
+ D3bEg4m8IYQYvhmEjKZOorGCRi/1cKV7ZYu4DW00BpfkJWpzciDI9B7ZDYh9VAPPOzvIPFG4W
+ f9d4IL3SOGPUDhxCk4wo23xm5H9ufZVK3I1j+6n01R/HaA7x/k6477jTIDer1EO1h2tSIR8E4
+ /NBypvAol/CHuCmDxCgs9ToqmTavhH8d1XVmVzbBJU8JWWN9hPNQxCuZs0Toj4zD+1V9eHZ4D
+ G3paFfxzHcaYf31mF2FvGhkaKZ5S5u1ob+sFtLWbYHob8geqP1Ac8EKbD/csMa3dUDTPg/9xx
+ iRcokHOzDt/0cHYrhieVMldtOfFhw5YbQ1yx0JeIOOFOWKW/93cfQZ0hCjbZuyd/66yonXK2v
+ qaNkLTFgHPWQRjZoUK4mxlh+K85w5pqi+5MfLJC0ETEX2XPdDoPFd8biRQbYGeKmcNjLWF1
 Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 15:33:34
@@ -83,41 +84,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>,
+Cc: qemu-trivial@nongnu.org, Li Qiang <liq3ea@gmail.com>,
  Laurent Vivier <laurent@vivier.eu>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Let's make this file compilable with -Werror=implicit-fallthrough :
-Looking at the code, it seems like the fallthrough is intended here,
-so we should add the corresponding "/* fallthrough */" comment here.
+The STATUS register readop handler is initialized first with
+the generic e1000e_mac_readreg() handler:
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20200911121844.404434-1-thuth@redhat.com>
+  2861 #define e1000e_getreg(x)    [x] = e1000e_mac_readreg
+  2862 typedef uint32_t (*readops)(E1000ECore *, int);
+  2863 static const readops e1000e_macreg_readops[] = {
+  ....
+  2919     e1000e_getreg(STATUS),
+
+Then overwritten with the specific e1000e_get_status handler:
+
+  3018     [STATUS]  = e1000e_get_status,
+
+To avoid confusion, remove the overwritten initialization.
+
+6f3fbe4ed0 ("net: Introduce e1000e device emulation")
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Message-Id: <20200904131402.590055-2-f4bug@amsat.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/arm/pxa2xx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/net/e1000e_core.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
-index 76975d17a461..c1f45b2adfa0 100644
---- a/hw/arm/pxa2xx.c
-+++ b/hw/arm/pxa2xx.c
-@@ -443,7 +443,7 @@ static void pxa2xx_mm_write(void *opaque, hwaddr addr,
-             s->mm_regs[addr >> 2] = value;
-             break;
-         }
--
-+        /* fallthrough */
-     default:
-         qemu_log_mask(LOG_GUEST_ERROR,
-                       "%s: Bad write offset 0x%"HWADDR_PRIx"\n",
+diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+index bcd186cac524..5170e6a45633 100644
+--- a/hw/net/e1000e_core.c
++++ b/hw/net/e1000e_core.c
+@@ -2916,7 +2916,6 @@ static const readops e1000e_macreg_readops[] = {
+     e1000e_getreg(TSYNCRXCTL),
+     e1000e_getreg(TDH),
+     e1000e_getreg(LEDCTL),
+-    e1000e_getreg(STATUS),
+     e1000e_getreg(TCTL),
+     e1000e_getreg(TDBAL),
+     e1000e_getreg(TDLEN),
 -- 
 2.26.2
 
