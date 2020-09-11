@@ -2,92 +2,93 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70B2AC43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 10:08:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF41BC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 10:09:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4BD2221E5
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 10:08:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2242F221E5
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 10:09:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZakIuf6S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4BD2221E5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WIURRlee"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2242F221E5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGfzF-0003Ut-IO
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 06:08:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54648)
+	id 1kGfzb-00047h-7P
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 06:09:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54724)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1kGfyW-0002S5-OJ; Fri, 11 Sep 2020 06:08:12 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33066)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1kGfyU-0005Yc-UW; Fri, 11 Sep 2020 06:08:12 -0400
-Received: by mail-wm1-x342.google.com with SMTP id e11so3751113wme.0;
- Fri, 11 Sep 2020 03:08:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=QwXnKMZ6OYLtmDATXHlNcuEnLPm9sjav2g8IQnmUExw=;
- b=ZakIuf6SfKCR9cR/0UxwkLvKstwuZ/pJyJHeWeXVIB9Mvt2PidkIS0taUAUgHoWLOa
- kCfhKlqwkIXHM55tFaglW10PYSJs1m1KIYV7lGB6Qo86Cag7rLxAEhMP1djS93SqYHOl
- wou9+Q+pkrGPVrYqbhbXDh6CB0Vd+8Cl7vMGUQgZqVhx/HbiX5pzB28xRogCfRaXdXP3
- RV7/I1PmQvZkzDiFNRM5T5STuwj/V2V/iK2IszgtILFTzF5LUd8RQfTm6zl3msw2wqUo
- nn0P4MPGbhlJvICTmOwUM0fjJwt1vy/Rt3McMpxeIxolwBvuR62GNgVerGuPmFoHoDSu
- 0mHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=QwXnKMZ6OYLtmDATXHlNcuEnLPm9sjav2g8IQnmUExw=;
- b=IxKWq5qdCpyQy9oPWKbpGjLhr4W+PjId01qao8df1a0bdtBjI0txdKzc0ndK9qJEL4
- owM10Cb3pAKkTyhSQ5W6rqoxlNCzrCDS9KuecPa30lKhoFo7wsvPDJxMP3TGEhC/6gVI
- kf299S0FOjP6JNI1LVHTa6fWrGhxfaLCjxQwHBZtzksdPdPK7h9wY8zgqN1f/LoI/+Qr
- rskaMTXeXmK+MfXnGFdSsjvxswa0U+H6naHL9/zhcWu4bauk0OUpqWLpOEflM3oePhOQ
- q3yHu5tPlwWCvXPerjAUdS5NRJK85Zd27OBtHeh7vujfG4NfPTnOwUiSN15toun5EfV2
- ITbw==
-X-Gm-Message-State: AOAM531NqM8wkKL2sUBC4tzO50MN8DPaRHOvnXqMUDJgjiaP4j1/eucJ
- QQsEc5FztOqHhN/wDEn6V+0=
-X-Google-Smtp-Source: ABdhPJw0uvaKMhtTFWp9MkneHOviF8mNAaocxQa7yFA/Vs+Z/jjIvWjlkVs2bAZ+zpXC9NYKbzgqOA==
-X-Received: by 2002:a7b:c182:: with SMTP id y2mr1503013wmi.21.1599818888552;
- Fri, 11 Sep 2020 03:08:08 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id q12sm3438623wrs.48.2020.09.11.03.08.06
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 11 Sep 2020 03:08:07 -0700 (PDT)
-Date: Fri, 11 Sep 2020 11:08:05 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: duboisj@gmail.com
-Subject: Re: [PATCH] trace/simple: Enable tracing on startup only if the user
- specifies a trace option
-Message-ID: <20200911100805.GB81586@stefanha-x1.localdomain>
-References: <20200816174610.20253-1-josh@joshdubois.com>
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kGfyq-00032p-Ca
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 06:08:32 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53643
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kGfyo-0005cC-3P
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 06:08:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599818908;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fE3Kf3zYqfJZ/4wsBXRiLimBeYbxjKrLBoaL4yW+RT0=;
+ b=WIURRlee1JbTiNoJzBaCndjCqATyWeK1oNEXbMURSIGewnONmAnsPoV7o2y5LuVJVfr0SC
+ SyrlifTNx2CRkDVU1pdY8JahmdcIe1yJkneNAuizhhvmPysuCahIJebT04jwGOcnt4P3xM
+ ogkvfwcM0ioU3ExhPWC4Se2v15OlIZ4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-36-XEbbNeCzOuG9GWbDC9hrmA-1; Fri, 11 Sep 2020 06:08:26 -0400
+X-MC-Unique: XEbbNeCzOuG9GWbDC9hrmA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0287801AB9;
+ Fri, 11 Sep 2020 10:08:23 +0000 (UTC)
+Received: from gondolin (ovpn-112-170.ams2.redhat.com [10.36.112.170])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CDDA57E8F2;
+ Fri, 11 Sep 2020 10:08:09 +0000 (UTC)
+Date: Fri, 11 Sep 2020 12:08:06 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200911120806.5cfe203c.cohuck@redhat.com>
+In-Reply-To: <20200911005559.GA3932@joy-OptiPlex-7040>
+References: <20200825163925.1c19b0f0.cohuck@redhat.com>
+ <20200826064117.GA22243@joy-OptiPlex-7040>
+ <20200828154741.30cfc1a3.cohuck@redhat.com>
+ <8f5345be73ebf4f8f7f51d6cdc9c2a0d8e0aa45e.camel@redhat.com>
+ <20200831044344.GB13784@joy-OptiPlex-7040>
+ <20200908164130.2fe0d106.cohuck@redhat.com>
+ <20200909021308.GA1277@joy-OptiPlex-7040>
+ <20200910143822.2071eca4.cohuck@redhat.com>
+ <7cebcb6c8d1a1452b43e8358ee6ee18a150a0238.camel@redhat.com>
+ <20200910120244.71e7b630@w520.home>
+ <20200911005559.GA3932@joy-OptiPlex-7040>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="aVD9QWMuhilNxW9f"
-Content-Disposition: inline
-In-Reply-To: <20200816174610.20253-1-josh@joshdubois.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=stefanha@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 03:40:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,60 +101,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org,
- Josh DuBois <josh@joshdubois.com>, armbru@redhat.com
+Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
+ eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
+ openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
+ kevin.tian@intel.com, Parav Pandit <parav@mellanox.com>,
+ jian-feng.ding@intel.com, dgilbert@redhat.com, zhenyuw@linux.intel.com,
+ hejie.xu@intel.com, bao.yumeng@zte.com.cn,
+ Alex Williamson <alex.williamson@redhat.com>, Sean Mooney <smooney@redhat.com>,
+ intel-gvt-dev@lists.freedesktop.org,
+ Daniel =?UTF-8?B?UC5CZXJyYW5nw6k=?= <berrange@redhat.com>, eskultet@redhat.com,
+ Jiri Pirko <jiri@mellanox.com>, dinechin@redhat.com, devel@ovirt.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, 11 Sep 2020 08:56:00 +0800
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
---aVD9QWMuhilNxW9f
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Thu, Sep 10, 2020 at 12:02:44PM -0600, Alex Williamson wrote:
+> > On Thu, 10 Sep 2020 13:50:11 +0100
+> > Sean Mooney <smooney@redhat.com> wrote:
+> >  =20
+> > > On Thu, 2020-09-10 at 14:38 +0200, Cornelia Huck wrote: =20
+> > > > On Wed, 9 Sep 2020 10:13:09 +0800
+> > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > >    =20
+> > > > > > > still, I'd like to put it more explicitly to make ensure it's=
+ not missed:
+> > > > > > > the reason we want to specify compatible_type as a trait and =
+check
+> > > > > > > whether target compatible_type is the superset of source
+> > > > > > > compatible_type is for the consideration of backward compatib=
+ility.
+> > > > > > > e.g.
+> > > > > > > an old generation device may have a mdev type xxx-v4-yyy, whi=
+le a newer
+> > > > > > > generation  device may be of mdev type xxx-v5-yyy.
+> > > > > > > with the compatible_type traits, the old generation device is=
+ still
+> > > > > > > able to be regarded as compatible to newer generation device =
+even their
+> > > > > > > mdev types are not equal.     =20
+> > > > > >=20
+> > > > > > If you want to support migration from v4 to v5, can't the (pres=
+umably
+> > > > > > newer) driver that supports v5 simply register the v4 type as w=
+ell, so
+> > > > > > that the mdev can be created as v4? (Just like QEMU versioned m=
+achine
+> > > > > > types work.)     =20
+> > > > >=20
+> > > > > yes, it should work in some conditions.
+> > > > > but it may not be that good in some cases when v5 and v4 in the n=
+ame string
+> > > > > of mdev type identify hardware generation (e.g. v4 for gen8, and =
+v5 for
+> > > > > gen9)
+> > > > >=20
+> > > > > e.g.
+> > > > > (1). when src mdev type is v4 and target mdev type is v5 as
+> > > > > software does not support it initially, and v4 and v5 identify ha=
+rdware
+> > > > > differences.   =20
+> > > >=20
+> > > > My first hunch here is: Don't introduce types that may be compatible
+> > > > later. Either make them compatible, or make them distinct by design,
+> > > > and possibly add a different, compatible type later.
+> > > >    =20
+> > > > > then after software upgrade, v5 is now compatible to v4, should t=
+he
+> > > > > software now downgrade mdev type from v5 to v4?
+> > > > > not sure if moving hardware generation info into a separate attri=
+bute
+> > > > > from mdev type name is better. e.g. remove v4, v5 in mdev type, w=
+hile use
+> > > > > compatible_pci_ids to identify compatibility.   =20
+> > > >=20
+> > > > If the generations are compatible, don't mention it in the mdev typ=
+e.
+> > > > If they aren't, use distinct types, so that management software doe=
+sn't
+> > > > have to guess. At least that would be my naive approach here. =20
 
-On Sun, Aug 16, 2020 at 12:46:10PM -0500, duboisj@gmail.com wrote:
-> From: Josh DuBois <josh@joshdubois.com>
+[*]
+ =20
+> > > yep that is what i would prefer to see too. =20
+> > > >    =20
+> > > > >=20
+> > > > > (2) name string of mdev type is composed by "driver_name + type_n=
+ame".
+> > > > > in some devices, e.g. qat, different generations of devices are b=
+inding to
+> > > > > drivers of different names, e.g. "qat-v4", "qat-v5".
+> > > > > then though type_name is equal, mdev type is not equal. e.g.
+> > > > > "qat-v4-type1", "qat-v5-type1".   =20
+> > > >=20
+> > > > I guess that shows a shortcoming of that "driver_name + type_name"
+> > > > approach? Or maybe I'm just confused.   =20
+> > > yes i really dont like haveing the version in the mdev-type name=20
+> > > i would stongly perfger just qat-type-1 wehere qat is just there as a=
+ way of namespacing.
+> > > although symmetric-cryto, asymmetric-cryto and compression woudl be a=
+ better name then type-1, type-2, type-3 if
+> > > that is what they would end up mapping too. e.g. qat-compression or q=
+at-aes is a much better name then type-1
+> > > higher layers of software are unlikely to parse the mdev names but as=
+ a human looking at them its much eaiser to
+> > > understand if the names are meaningful. the qat prefix i think is imp=
+ortant however to make sure that your mdev-types
+> > > dont colide with other vendeors mdev types. so i woudl encurage all v=
+endors to prefix there mdev types with etiher the
+> > > device name or the vendor. =20
+> >=20
+> > +1 to all this, the mdev type is meant to indicate a software
+> > compatible interface, if different hardware versions can be software
+> > compatible, then don't make the job of finding a compatible device
+> > harder.  The full type is a combination of the vendor driver name plus
+> > the vendor provided type name specifically in order to provide a type
+> > namespace per vendor driver.  That's done at the mdev core level.
+> > Thanks, =20
 >=20
-> Tracing can be enabled at the command line or via the
-> monitor. Command-line trace options are recorded during
-> trace_opt_parse(), but tracing is not enabled until the various
-> front-ends later call trace_init_file(). If the user passes a trace
-> option on the command-line, remember that and enable tracing during
-> trace_init_file().  Otherwise, trace_init_file() should record the
-> trace file specified by the frontend and avoid enabling traces
-> until the user requests them via the monitor.
->=20
-> This fixes 1b7157be3a8c4300fc8044d40f4b2e64a152a1b4 and also
-> db25d56c014aa1a96319c663e0a60346a223b31e, by allowing the user
-> to enable traces on the command line and also avoiding
-> unwanted trace-<pid> files when the user has not asked for them.
->=20
-> Fixes: 1b7157be3a8c4300fc8044d40f4b2e64a152a1b4
-> Signed-off-by: Josh DuBois <josh@joshdubois.com>
-> ---
->  trace/control.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+> hi Alex,
+> got it. so do you suggest that vendors use consistent driver name over
+> generations of devices?
+> for qat, they create different modules for each generation. This
+> practice is not good if they want to support migration between devices
+> of different generations, right?
 
-Thanks, applied to my tracing-next tree:
-https://github.com/stefanha/qemu/commits/tracing-next
+Even if they create different modules, I'd assume that they have some
+kind of core with common functionality. I'd assume that as long they do
+any type registrations satisfying [*] in the core, they should be good.
 
-Stefan
+> and can I understand that we don't want support of migration between
+> different mdev types even in future ?
 
---aVD9QWMuhilNxW9f
-Content-Type: application/pgp-signature; name="signature.asc"
+=46rom my point of view, I don't see anything that migration between
+different mdev types would buy that is worth the complexity in finding
+out which mdev types are actually compatible.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9bTIUACgkQnKSrs4Gr
-c8hzBQf8D8XdsiArhw6Lnezf3Y5UQDheBWptZHGf6Swa6qLHjvD47gfllVNuFQgV
-ldlJsv4vLOmacGFuKoj6CONo4cPwGKSnODWy22D5DYSFegDaObVrBkySIwzlMe1+
-IAbCIy80yiO9AkG2+TZ0oRG95xV4nU4lLQ1/UMWwgwbLwKp66pjdx5MMhbInJpxX
-uDxn/lKDcnAIqko/hR9Elg8yXzAFKoX9Tq/yNK+NH16Pi04f+Oz0W7ta6v1UNJZK
-PaZMrMwT0C3V5vJe2mpmxuFNOFMgx/JlsUB8VJcvM4xC/zvSkVlyIqnGxMqD2iuA
-uoW7jRyNtyJ8EwfeeB/O+pfUm+KRVA==
-=Fi5B
------END PGP SIGNATURE-----
-
---aVD9QWMuhilNxW9f--
 
