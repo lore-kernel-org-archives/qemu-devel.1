@@ -2,94 +2,86 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 353FFC43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 14:54:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5D1DC43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 14:56:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93351222E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 14:54:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NbhPVgRU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93351222E7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0C09B22273
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 14:56:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C09B22273
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGkRm-0004ok-EF
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 10:54:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33702)
+	id 1kGkTa-0006qk-8M
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 10:56:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34498)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kGkQV-0002UQ-Fa
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 10:53:23 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21984
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kGkQS-000834-5D
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 10:53:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599835998;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IP/YmJQJF0be9cm1l05GgmwM888Ox1iI4rEGM7c49IY=;
- b=NbhPVgRULQnw25mxjWkCx2qT6yS+H9eL1TwtETjgq+sTrrqukNhQFPiK2NQ7EpX35ff6BN
- 7cSrnGggN4zpFiPg69b8dQvOrbOkLmYkYstMpdDhLgL9osdNWGifrNoPBYLOAIOrhZ5GI2
- 9UnH21roX4IrB2RP9sjYucqL2RgT+LU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-245-D6Vhj82iM0mpo66AnBNL7w-1; Fri, 11 Sep 2020 10:53:11 -0400
-X-MC-Unique: D6Vhj82iM0mpo66AnBNL7w-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 003C481CBDD;
- Fri, 11 Sep 2020 14:53:10 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-113-62.ams2.redhat.com
- [10.36.113.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 030B71002D42;
- Fri, 11 Sep 2020 14:53:04 +0000 (UTC)
-Subject: Re: PATCH: Increase System Firmware Max Size
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <CS1PR8401MB0327EF9D532330BA44257AFCF3240@CS1PR8401MB0327.NAMPRD84.PROD.OUTLOOK.COM>
- <20c5210f-8199-a9e7-9297-0bea06c4d9ae@redhat.com>
- <20200911083408.GA3310@work-vm>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <ae2d820e-78c6-da92-2fa6-73c1a7d10333@redhat.com>
-Date: Fri, 11 Sep 2020 16:53:04 +0200
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kGkSp-0006Ow-ER
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 10:55:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37854)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kGkSm-0008Uu-QD
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 10:55:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kGkSk-0007AX-AU
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 14:55:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 4DC582E80DB
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 14:55:42 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200911083408.GA3310@work-vm>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
-X-Mimecast-Spam-Score: 0.004
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=lersek@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 00:33:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 11 Sep 2020 14:47:00 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <1895080@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee hansni laurent-vivier
+X-Launchpad-Bug-Reporter: Hansni Bu (hansni)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
+References: <159970958159.31371.12301700684467003959.malonedeb@wampee.canonical.com>
+ <92de5ee0-629a-640a-d547-8c2d650742f2@vivier.eu> <87tuw4odwk.fsf@linaro.org>
+ <87r1r8odph.fsf@linaro.org>
+ <CAGTPX+DAoJcw2y9gPjkP6kGXEQW7=e1tohM8vND9j9Qtxuc5vw@mail.gmail.com>
+ <87o8mco7el.fsf@linaro.org>
+ <CAGTPX+Dacxwh8O7XE+6j5OE8gnFoN-2DYuCNDENVtWtbCkDa=Q@mail.gmail.com>
+Message-ID: <87k0x0nzff.fsf@linaro.org>
+Subject: Re: [Bug 1895080] [NEW] pgb_reserved_va: Assertion `addr == test'
+ failed
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: f2ec6b3ce5049dba468cf99f5ab36f87587d2ea4
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 02:05:39
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -98,201 +90,323 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "mst@redhat.com" <mst@redhat.com>,
- "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "McMillan,
- Erich" <erich.mcmillan@hp.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Reply-To: Bug 1895080 <1895080@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200911144700.SGbVjJSh0crxKXzrBXBsOwxhPWCCCyCPx5Xtv2I6OZ0@z>
 
-On 09/11/20 10:34, Dr. David Alan Gilbert wrote:
-> * Laszlo Ersek (lersek@redhat.com) wrote:
->> +Markus, Dave, Phil
+Hansni Bu <1895080@bugs.launchpad.net> writes:
+
+>> > No, it's not set by CentOS-7.5.
+>> > Does it mean that we just cannot run the ELF in such a case? I've tried
+>> > many times, the assert always fails. Maybe, we can blame CentOS-7.5.
 >>
->> On 09/11/20 03:45, McMillan, Erich wrote:
->>> Hi all,
->>>
->>> (this is my first Qemu patch submission, please let me know if my formatting/content needs to be fixed).
->>> We have a need for increased firmware size, currently we are building Qemu with the following change to test our Uefi Firmware and it works well for us. Hope that this change can be made to open source. Thank you.
->>> -------
->>> Increase allowed system firmware size to 16M per comment suggesting up to 18M is permissible.
->>>
->>>  Signed-off-by: Erich McMillan <erich.mcmillan@hp.com>
->>>
->>> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
->>> index b8d8ef59eb17c6ace8194fc69c3d27809becfbc0..f6f7cd744d0690cee0355fbd19ffdcdb71ea75ca 100644
->>> --- a/hw/i386/pc_sysfw.c
->>> +++ b/hw/i386/pc_sysfw.c
->>> @@ -46,7 +46,7 @@
->>>   * only 18MB-4KB below 4G. For now, restrict the cumulative mapping to 8MB in
->>>   * size.
->>>   */
->>> -#define FLASH_SIZE_LIMIT (8 * MiB)
->>> +#define FLASH_SIZE_LIMIT (16 * MiB)
->>>
->>>  #define FLASH_SECTOR_SIZE 4096
->>> -------
->>>
->>>
+>> The trouble is without MAP_FIXED_NOREPLACE we are at the mercy of the
+>> host kernel to allow the address request to be honoured. A plain
+>> MAP_FIXED won't do as it can clober existing mappings. In theory a
+>> suitable hole has been identified but sometimes the kernel makes a
+>> decision to offset the suggested mapping for it's own reasons.
 >>
->> (1) This is not a trivial change, so qemu-trivial: please ignore.
+>
+> MAP_FIXED_NOREPLACE is quite a new feature.
+>
+>
+>> > BTW: with the option "-p 65536", the case runs successfully.
 >>
->> (2) The comment has not been updated.
+>> Hmm interesting. I wonder if we are seeing a fail due to mmap_min_addr?
+>> What does:
 >>
->> (3) I'm almost certain that *if* we want to change this, it needs to be
->> turned into a machine type (or some device model) property, for
->> migration compatibility.
-> 
-> I'm missing what this constant exists for - why is the
-> check there at all  Is there something else that lives below this
-> address that we have to protect?
-
-Yes, some MMIOs that I'm at least aware of are IO_APIC_DEFAULT_ADDRESS
-(0xfec00000), TPM_PPI_ADDR_BASE (0xFED45000), APIC_DEFAULT_ADDRESS
-(0xfee00000).
-
-They are not directly adjacent with pflash; nor should they be.
-
-On one hand, the current FLASH_SIZE_LIMIT is meant to be  sufficient for
-a long time ("should be enough for anyone").
-
-On the other hand, if we have a really strong reason to increase the
-size limit, the current value is supposed to give us a safety margin, so
-that we can satisfy the immediate need at that point *first*, and start
-looking into (likely more intrusive) physical address map changes, to
-restore the safety margin.
-
-> My reading of the code is that increasing that constant doesn't change
-> the guests view at all, as long as the guest was given the same flash
-> files - so if the guests view doesn't change, then why would we tie
-> it to the machine type?
-
-If you increase the size limit (without tieing it to a machine type),
-then, with an upgraded QEMU and the same (old) machine type, you can
-start a guest with a larger-than-earlier (cumulative) flash size. Then,
-when you try to migrate this to an old QEMU (but same machine type),
-it's a bad surprise. I understand that backwards migration is not
-universally supported (or expected), but I don't want this problem to
-land on my desk *ever*.
-
-Furthermore, un-enumerable / platform-MMIO devices tend to pop up time
-after time. TPM_PPI_ADDR_BASE (0xFED45000) is a somewhat recent
-addition, for example. It's not like we're never going to need more
-address space up there.
-
-> 
->> (4) I feel we need much more justification for this change than just
->> "our firmware is larger than upstream OVMF".
+>>   /proc/sys/vm/mmap_min_addr
 >>
->> In the upstream 4MB unified OVMF build, there's *plenty* of free room.
->> Of course that's not to say that we're willing to *squander* that space
->> -- whenever we include anything new in the upstream OVMF platform(s),
->> there must be a very good reason for it --, just that, given the
->> upstream OVMF status, the proposed pflash increase in QEMU is staggering.
+>> give you on the system?
 >>
->> Considering upstream OVMF and QEMU, it should take *years* to even get
->> close to filling the 4MB unified flash image of OVMF (hint: link-time
->> optimization, LZMA compression), let alone to exhaust the twice as large
->> (8MB) QEMU allowance.
+>
+> It gives me 4096. And guest_base has this value. Maybe that's the strange
+> point. mmap_min_addr give us 0x1000. While we are requesting this address,
+> the kernel gives us 0x10000.
+
+Yeah the meaning of mmap_min_addr should be exactly that which is odd
+why the kernel doesn't honour the request. That said it seems to be a
+user tweakable knob so you could just up it.
+
 >>
->> Unless you are committed to open source your guest firmware too (maybe
->> as part of upstream edk2, maybe elsewhere), I seriously doubt we should
->> accommodate this use case in *upstream* QEMU. It complicates things
->> (minimally with regard to migration), and currently I don't see the
->> benefit to the upstream community.
+>> You can manually set the reserved_va and the base address using -R and
+>> -B although that is more of a developer work around. I think moving the
+>> assert to the condition above would be an improvement just because it
+>> tells us what the requested base address was and what the kernel decided
+>> to give us.
 >>
->> Clearly, for building your firmware image, you must have minimally
->> modified the DSC and FDF files in OVMF too, or created an entirely
->> separate firmware platform -- DSC and FDF both.
+>
+> Setting guest_base with -B to 0x10000 works. Tried some -R values, no luc=
+k.
+> Agree to print a more hintful message.
+
+OK - one other test you try is running inside a chroot which *does not*
+have visibility of /proc. That will cause it to fall back to the old
+probing technique of trying multiple mmap operations to find the hole. I
+suspect that works because the attempt to map 0x1000 would fail the
+check. The reason we default to probing /proc/self/map now is that brute
+force technique falls over when trying to probe for a hole on 64 bit
+systems, especially when built with stack protection/clang debug
+instrumentation.
+
+In the meantime I'll spin up a patch to improve the failure mode.
+
+>
+>
 >>
->> If you are using your downstream OVMF build as a testbed for your
->> proprietary physical platform firmware, that's generally a use case that
->> we're mildly interested in not breaking in upstream OvmfPkg. But in
->> order to make me care for real (as an OvmfPkg co-maintainer), you'd need
->> to upstream your OVMF platform to edk2 (we already have Xen and --
->> recently added -- bhyve firmware platforms under OvmfPkg, not just
->> QEMU). You'd also have to offer long-term reviewership and testing for
->> that platform in edk2 (like the Xen and bhyve stake-holders do). Then we
->> could consider additional complexity in QEMU for booting that firmware
->> platform.
-> 
-> Our UEFI firmware is pretty sparse;
+>> >
+>> > On Fri, Sep 11, 2020 at 5:50 PM Alex Benn=C3=A9e <1895080@bugs.launchp=
+ad.net>
+>> > wrote:
+>> >
+>> >> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+>> >>
+>> >> > Laurent Vivier <laurent@vivier.eu> writes:
+>> >> >
+>> >> <snip>
+>> >> >>> Then trying qemu-riscv32 with a simple ELF, I get:
+>> >> >>> linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=
+=3D test'
+>> >> failed.
+>> >> >>>
+>> >> >>> strace shows that:
+>> >> >>> mmap(0x1000, 4294963200, PROT_NONE,
+>> >> MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE, -1, 0) =3D 0x10000
+>> >> >>> write(2, "qemu-riscv32: ../qemu.git/linux-"..., 103qemu-riscv32:
+>> >> ../qemu.git/linux-user/elfload.c:2341: pgb_reserved_va: Assertion `ad=
+dr
+>> =3D=3D
+>> >> test' failed.
+>> >> >>> ) =3D 103
+>> >> >>>
+>> >> >>> The source code is in the function pgb_reserved_va (linux-
+>> >> >>> user/elfload.c). I think mmap cannot guarantee that the returned
+>> >> pointer
+>> >> >>> (test) equals to the parameter of addr. So is this a bug to assert
+>> >> (addr
+>> >> >>> =3D=3D test)?
+>> >> >>
+>> >> > I'm assuming CentOS 7.5 actually has a definition for
+>> >> > MAP_FIXED_NOREPLACE which should ensure we get what we asked for -
+>> >> > otherwise we are in the position of hoping the kernel honours what =
+we
+>> >> > asked for.
+>> >>
+>> >> Doh re-reading I see it's not set in the strace output. Maybe we shou=
+ld
+>> >> promote the assert case to the failure leg so we have:
+>> >>
+>> >>     if (addr =3D=3D MAP_FAILED || addr !=3D test) {
+>> >>         error_report(...)
+>> >>     }
+>> >>
+>> >> so we at least fail with a user friendly error rather than an abort?
+>> >>
+>> >> --
+>> >> Alex Benn=C3=A9e
+>> >>
+>> >> --
+>> >> You received this bug notification because you are subscribed to the =
+bug
+>> >> report.
+>> >> https://bugs.launchpad.net/bugs/1895080
+>> >>
+>> >> Title:
+>> >>   pgb_reserved_va: Assertion `addr =3D=3D test' failed
+>> >>
+>> >> Status in QEMU:
+>> >>   New
+>> >>
+>> >> Bug description:
+>> >>   This problem occurs on CentOS-7.5 (64-bit) with qemu-5.1.0, qemu he=
+ad
+>> >>   (commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a) for riscv32-linux-
+>> >>   user.
+>> >>
+>> >>   Firstly, compile fails:
+>> >>   Compiling C object
+>> libqemu-riscv32-linux-user.fa.p/linux-user_strace.c.o
+>> >>   ../qemu.git/linux-user/strace.c:1210:18: error: =E2=80=98FALLOC_FL_=
+KEEP_SIZE=E2=80=99
+>> >> undeclared here (not in a function)
+>> >>        FLAG_GENERIC(FALLOC_FL_KEEP_SIZE),
+>> >>
+>> >>   I have to add below include to linux-user/strace.c
+>> >>   diff --git a/linux-user/strace.c b/linux-user/strace.c
+>> >>   index 11fea14fba..22e51d4a8a 100644
+>> >>   --- a/linux-user/strace.c
+>> >>   +++ b/linux-user/strace.c
+>> >>   @@ -7,6 +7,7 @@
+>> >>    #include <sys/mount.h>
+>> >>    #include <arpa/inet.h>
+>> >>    #include <netinet/tcp.h>
+>> >>   +#include <linux/falloc.h>
+>> >>    #include <linux/if_packet.h>
+>> >>    #include <linux/netlink.h>
+>> >>    #include <sched.h>
+>> >>
+>> >>   Then trying qemu-riscv32 with a simple ELF, I get:
+>> >>   linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D =
+test'
+>> >> failed.
+>> >>
+>> >>   strace shows that:
+>> >>   mmap(0x1000, 4294963200, PROT_NONE,
+>> >> MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE, -1, 0) =3D 0x10000
+>> >>   write(2, "qemu-riscv32: ../qemu.git/linux-"..., 103qemu-riscv32:
+>> >> ../qemu.git/linux-user/elfload.c:2341: pgb_reserved_va: Assertion `ad=
+dr
+>> =3D=3D
+>> >> test' failed.
+>> >>   ) =3D 103
+>> >>
+>> >>   The source code is in the function pgb_reserved_va (linux-
+>> >>   user/elfload.c). I think mmap cannot guarantee that the returned
+>> >>   pointer (test) equals to the parameter of addr. So is this a bug to
+>> >>   assert (addr =3D=3D test)?
+>> >>
+>> >>   Attached configure script and test ELF file.
+>> >>
+>> >>   Thanks.
+>> >>
+>> >> To manage notifications about this bug go to:
+>> >> https://bugs.launchpad.net/qemu/+bug/1895080/+subscriptions
+>> >>
+>>
+>>
+>> --
+>> Alex Benn=C3=A9e
+>>
+>> --
+>> You received this bug notification because you are subscribed to the bug
+>> report.
+>> https://bugs.launchpad.net/bugs/1895080
+>>
+>> Title:
+>>   pgb_reserved_va: Assertion `addr =3D=3D test' failed
+>>
+>> Status in QEMU:
+>>   New
+>>
+>> Bug description:
+>>   This problem occurs on CentOS-7.5 (64-bit) with qemu-5.1.0, qemu head
+>>   (commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a) for riscv32-linux-
+>>   user.
+>>
+>>   Firstly, compile fails:
+>>   Compiling C object libqemu-riscv32-linux-user.fa.p/linux-user_strace.c=
+.o
+>>   ../qemu.git/linux-user/strace.c:1210:18: error: =E2=80=98FALLOC_FL_KEE=
+P_SIZE=E2=80=99
+>> undeclared here (not in a function)
+>>        FLAG_GENERIC(FALLOC_FL_KEEP_SIZE),
+>>
+>>   I have to add below include to linux-user/strace.c
+>>   diff --git a/linux-user/strace.c b/linux-user/strace.c
+>>   index 11fea14fba..22e51d4a8a 100644
+>>   --- a/linux-user/strace.c
+>>   +++ b/linux-user/strace.c
+>>   @@ -7,6 +7,7 @@
+>>    #include <sys/mount.h>
+>>    #include <arpa/inet.h>
+>>    #include <netinet/tcp.h>
+>>   +#include <linux/falloc.h>
+>>    #include <linux/if_packet.h>
+>>    #include <linux/netlink.h>
+>>    #include <sched.h>
+>>
+>>   Then trying qemu-riscv32 with a simple ELF, I get:
+>>   linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D tes=
+t'
+>> failed.
+>>
+>>   strace shows that:
+>>   mmap(0x1000, 4294963200, PROT_NONE,
+>> MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE, -1, 0) =3D 0x10000
+>>   write(2, "qemu-riscv32: ../qemu.git/linux-"..., 103qemu-riscv32:
+>> ../qemu.git/linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =
+=3D=3D
+>> test' failed.
+>>   ) =3D 103
+>>
+>>   The source code is in the function pgb_reserved_va (linux-
+>>   user/elfload.c). I think mmap cannot guarantee that the returned
+>>   pointer (test) equals to the parameter of addr. So is this a bug to
+>>   assert (addr =3D=3D test)?
+>>
+>>   Attached configure script and test ELF file.
+>>
+>>   Thanks.
+>>
+>> To manage notifications about this bug go to:
+>> https://bugs.launchpad.net/qemu/+bug/1895080/+subscriptions
+>>
 
-Yes, in part because I strive to keep it that way. I fight to keep out
-all cruft that I can (at least by conditionalizing it) so that there is
-room for the stuff that I cannot keep out. (And I always strive to set
-expectations that flipping all possible build knobs in OVMF to "on" may
-very well cause an "out of space" error.)
 
-- I've made sure that PVSCSI_ENABLE and MPT_SCSI_ENABLE be stand-alone
-config knobs. The use case behind them is valid, the drivers are open
-source, but the use case is still niche, so they must be easy to keep out.
+-- =
 
-- I've made sure LSI_SCSI_ENABLE is a stand-alone config knob too (and
-it even defaults to FALSE). The QEMU device that the driver drives is
-obsolete / deprecated.
+Alex Benn=C3=A9e
 
-- If VMBus drivers are ever going to be contributed, they'll need a
-config knob.
+-- =
 
-- Current Xen code in OVMF is supposed to be separated completely to the
-new, dedicated XenPVH platform
-<https://bugzilla.tianocore.org/show_bug.cgi?id=2122>.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1895080
 
-- Bhyve support is a separate platform build.
+Title:
+  pgb_reserved_va: Assertion `addr =3D=3D test' failed
 
-- Capsule updates are not supported by OVMF, and if they will ever be,
-they're going to have to be a separate firmware platform. Datacenter
-virtualization has no use for capsule updates.
+Status in QEMU:
+  New
 
-- The next big thing I expect to have to keep out of OVMF is Redfish
-<https://en.wikipedia.org/wiki/Redfish_(specification)>. Libvirt,
-OpenStack, Cockpit, Kubernetes already handle that area *underneath* the
-guest, I believe. (It's OK to use OVMF for developing / testing Redfish;
-it's not OK to expect that the current OVMF firmware platform contain
-everything that it contains now *plus* Redfish.)
+Bug description:
+  This problem occurs on CentOS-7.5 (64-bit) with qemu-5.1.0, qemu head
+  (commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a) for riscv32-linux-
+  user.
 
-Sparse is *good*.
+  Firstly, compile fails:
+  Compiling C object libqemu-riscv32-linux-user.fa.p/linux-user_strace.c.o
+  ../qemu.git/linux-user/strace.c:1210:18: error: =E2=80=98FALLOC_FL_KEEP_S=
+IZE=E2=80=99 undeclared here (not in a function)
+       FLAG_GENERIC(FALLOC_FL_KEEP_SIZE),
 
-> it doesn't have any pretty graphics
-> or snazzy stuff,
+  I have to add below include to linux-user/strace.c
+  diff --git a/linux-user/strace.c b/linux-user/strace.c
+  index 11fea14fba..22e51d4a8a 100644
+  --- a/linux-user/strace.c
+  +++ b/linux-user/strace.c
+  @@ -7,6 +7,7 @@
+   #include <sys/mount.h>
+   #include <arpa/inet.h>
+   #include <netinet/tcp.h>
+  +#include <linux/falloc.h>
+   #include <linux/if_packet.h>
+   #include <linux/netlink.h>
+   #include <sched.h>
 
-Which is arguably completely superfluous on every possible platform one
-can imagine. On the other hand, if you want a real serial port on
-workstation class hardware, you may have to order a separate part (if
-you are lucky and you *can* order one). Serial-over-LAN is a complete
-non-replacement.
+  Then trying qemu-riscv32 with a simple ELF, I get:
+  linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test' =
+failed.
 
-The reason (should I say: excuse) for the firmware to exist is to (a)
-boot operating systems, (b) abstract away some ugly platform-specific
-hardware for OS runtime (by providing ACPI and SMBIOS descriptions, and
-a *small* set of runtime services). We can maybe add (c) "root of trust".
+  strace shows that:
+  mmap(0x1000, 4294963200, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESER=
+VE, -1, 0) =3D 0x10000
+  write(2, "qemu-riscv32: ../qemu.git/linux-"..., 103qemu-riscv32: ../qemu.=
+git/linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test=
+' failed.
+  ) =3D 103
 
-In practice, physical firmware is becoming the hw vendor's OS before
-(and under) your OS, one you cannot replace, and one whose updates can
-brick your hardware. Permitting the same feature creep on virtual
-platforms is wrong.
+  The source code is in the function pgb_reserved_va (linux-
+  user/elfload.c). I think mmap cannot guarantee that the returned
+  pointer (test) equals to the parameter of addr. So is this a bug to
+  assert (addr =3D=3D test)?
 
-> or have to survive configuring lots of hardware; also
-> I'm aware of other companies who are looking at putting big blobs
-> of stuff in firmware for open uses;
+  Attached configure script and test ELF file.
 
-Key term being "open uses". Let us see them.
+  Thanks.
 
-> so I don't see a problem with
-> changing this limit from the QEMU side of things.
-
-I do. Software and data always expand to consume all available space,
-and it's going to cause a conflict between UEFI features and platform
-MMIO sooner or later. Then I'll get the privilege of shuffling around
-the crap in OVMF (all of which is "indispensable" or course).
-
-If we ever go down this route, it needs to benefit open source directly
-and significantly.
-
-Laszlo
-
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1895080/+subscriptions
 
