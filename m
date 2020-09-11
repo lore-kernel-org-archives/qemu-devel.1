@@ -2,96 +2,88 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C85A0C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:57:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF408C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:58:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1485A2074B
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:57:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1FACD221E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:58:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wb6qvGAm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1485A2074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gt2ARY8S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FACD221E7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGmMP-00077Z-0M
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 12:57:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37994)
+	id 1kGmNb-0008ML-43
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 12:58:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38310)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kGmLK-0006dt-8z
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 12:56:10 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:46401)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kGmLF-0004QB-0H
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 12:56:09 -0400
-Received: by mail-pg1-x542.google.com with SMTP id 34so7036575pgo.13
- for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 09:56:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=mf6Y+QtinNuhqMxIoYaU/jIfaaDnMrYpAcDwSlwHGLY=;
- b=wb6qvGAmIoGXKwZzJfyJ0I03hVlCqbMsPSAPzyYpE43F1y7CkJE1zGlHgSVZwCFYux
- 52UaXdqvC0bkdF01Fn/HyxiKBqDc7TiOQspgICZxDJrJuLborxw+kKAiUZxUPmRrFUmJ
- hwMcTXsDlFcQfSuAaUntOFU0JaapYTwWtP0Q/co3yZQ5QJVKv8lhRX5sY2GIEURHqWg9
- nSFZY/2rwuzEY/SC82YaFCZehXH9Pu/eMtM1Udn0v00q1KDhWl7LpXT76vaCTvZIp6fr
- cXa3xD6GfLSTX7wL1EiHyujo98sTcbCOSRlgpXYrnqgJaYoyJ+OSMM9i0o3GG6YqvVLC
- +iZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=mf6Y+QtinNuhqMxIoYaU/jIfaaDnMrYpAcDwSlwHGLY=;
- b=J0+bEAB+fhsqGVSC378G3RrarmGJx9eiFulujSzL2rkW+RX5PWoaA7Cxqp6V7vQ8v+
- nlegIQ7P1An30G7kdLOB0pSFDpv31MTV8iyQ73hwtECf7axUe5kjJfysgvfqlIUR6beu
- fI+jJv9OeKxauCtQ+iuTsy7fLeOkXvKviVjE4W3Tvz6v0UTzG6Rq1gmO/w2srtl6Z5Be
- +vSUuRKjArwS9Keh4vj9yCVUQ4XeKhyM50nyKGTG2HdVSQGR5+NaW903tYVO0xIl0Yf2
- 2Pz3zao9OZCebjwZTcDLkX+w+9tM2k1pU7owPjT2yR+CwL2SYcRcGDT5wOmCfvrkuT2N
- oGbA==
-X-Gm-Message-State: AOAM530iEojv/r3eRdgp47PSEsMyknzZu+18USr70sdOSrYH7PcPp+ue
- eGO0BEd3yOscQHMnBK8iTDzro7aF3kHUEQ==
-X-Google-Smtp-Source: ABdhPJy9gZt5R5HbZ3XXw4roNDJWoVxqCa62sxOCvyIsgPCmklXZF/lEc52ZUV4M5mkKU1i1DtMunQ==
-X-Received: by 2002:a65:66c6:: with SMTP id c6mr2350449pgw.206.1599843362366; 
- Fri, 11 Sep 2020 09:56:02 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id v6sm2852778pfi.38.2020.09.11.09.56.00
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 11 Sep 2020 09:56:01 -0700 (PDT)
-Subject: Re: [PATCH 1/1] accel/tcg/user-exec: support computing is_write for
- mips32
-To: Peter Maydell <peter.maydell@linaro.org>, zou xu <iwatchnima@gmail.com>
-References: <CA+Lzsy=o9yshAAAacuTwcs3Hfr4MfWiX-SiUf5A2Fds3vGOrAQ@mail.gmail.com>
- <CAFEAcA9ap=c=1XZ6wpphiE=FYtCU+vdNCX8THW-m-hUp_XyGmg@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b384912c-0e62-604d-df0b-b5181c2e7f3d@linaro.org>
-Date: Fri, 11 Sep 2020 09:55:59 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kGmMl-0007hT-9X
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 12:57:39 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20706
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kGmMj-0004YI-KI
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 12:57:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599843457;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=R1WpKWd7y5j+0Gw8kD8awFNw7R/WDyhk6VcRgk467C0=;
+ b=gt2ARY8SfvX5cPisVnYatYZzdXrafnllX4FmopI33kLcLHpdavnx4E+m8LNyw0CD5jWYs/
+ 8rnkzoeF1Swl3CcNMjNTXSCAXq9EzAe6XO4A/XHdeSFi+HrQFraWfQ6TWOp2cEEIiUet3J
+ jJg9K9KpiwJWB+QrVkIfxC+FRBy0W7w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-513-aYY8iHe5MBy4FEWsQcZ7vg-1; Fri, 11 Sep 2020 12:57:35 -0400
+X-MC-Unique: aYY8iHe5MBy4FEWsQcZ7vg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2E33801F95;
+ Fri, 11 Sep 2020 16:57:33 +0000 (UTC)
+Received: from work-vm (ovpn-113-52.ams2.redhat.com [10.36.113.52])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 293267B7A0;
+ Fri, 11 Sep 2020 16:57:18 +0000 (UTC)
+Date: Fri, 11 Sep 2020 17:57:16 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Steve Sistare <steven.sistare@oracle.com>
+Subject: Re: [PATCH V1 04/32] savevm: HMP Command for cprsave
+Message-ID: <20200911165716.GL3310@work-vm>
+References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
+ <1596122076-341293-5-git-send-email-steven.sistare@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9ap=c=1XZ6wpphiE=FYtCU+vdNCX8THW-m-hUp_XyGmg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -45
-X-Spam_score: -4.6
-X-Spam_bar: ----
-X-Spam_report: (-4.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.469,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <1596122076-341293-5-git-send-email-steven.sistare@oracle.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 00:33:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,76 +97,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/11/20 3:41 AM, Peter Maydell wrote:
->> +    /* Detect store by reading the instruction at the program counter. */
->> +    uint32_t insn = *(uint32_t *)pc;
->> +    switch(insn>>29) {
->> +    case 0x5:
->> +        switch((insn>>26) & 0x7) {
+* Steve Sistare (steven.sistare@oracle.com) wrote:
+> Enable HMP access to the cprsave QMP command.
 > 
-> Here we mask to get a 3-bit field...
+> Usage: cprsave <filename> <mode>
 > 
->> +        case 0x0: /* SB */
->> +        case 0x1: /* SH */
->> +        case 0x2: /* SWL */
->> +        case 0x3: /* SW */
->> +        case 0x4: /* SDL */
->> +        case 0x5: /* SDR */
->> +        case 0x6: /* SWR */
->> +        case 0x7: /* CACHE */
->> +            is_write = 1;
+> Signed-off-by: Maran Wilson <maran.wilson@oracle.com>
+> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+
+I realise that the current mode is currently only 'reboot' - can you
+please give us a clue as to why you've got a mode argument that's
+currently only got one mode?
+
+Dave
+
+> ---
+>  hmp-commands.hx       | 18 ++++++++++++++++++
+>  include/monitor/hmp.h |  1 +
+>  monitor/hmp-cmds.c    | 10 ++++++++++
+>  3 files changed, 29 insertions(+)
 > 
-> ...but here all 8 cases are handled identically.
-> Is there a typo/logic error here, or should this
-> really just be
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index 60f395c..c8defd9 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -354,6 +354,24 @@ SRST
+>  ERST
+>  
+>      {
+> +        .name       = "cprsave",
+> +        .args_type  = "file:s,mode:s",
+> +        .params     = "file 'reboot'",
+> +        .help       = "create a checkpoint of the VM in file",
+> +        .cmd        = hmp_cprsave,
+> +    },
+> +
+> +SRST
+> +``cprsave`` *tag*
+> +  Stop VCPUs, create a checkpoint of the whole virtual machine and save it
+> +  in *file*.
+> +  If *mode* is 'reboot', the checkpoint can be cprload'ed after a host kexec
+> +  reboot.
+> +  exec() /usr/bin/qemu-exec if it exists, else exec /usr/bin/qemu-system-x86_64,
+> +  passing all the original command line arguments.  The VCPUs remain paused.
+> +ERST
+> +
+> +    {
+>          .name       = "delvm",
+>          .args_type  = "name:s",
+>          .params     = "tag",
+> diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
+> index c986cfd..af8ee23 100644
+> --- a/include/monitor/hmp.h
+> +++ b/include/monitor/hmp.h
+> @@ -59,6 +59,7 @@ void hmp_balloon(Monitor *mon, const QDict *qdict);
+>  void hmp_loadvm(Monitor *mon, const QDict *qdict);
+>  void hmp_savevm(Monitor *mon, const QDict *qdict);
+>  void hmp_delvm(Monitor *mon, const QDict *qdict);
+> +void hmp_cprsave(Monitor *mon, const QDict *qdict);
+>  void hmp_migrate_cancel(Monitor *mon, const QDict *qdict);
+>  void hmp_migrate_continue(Monitor *mon, const QDict *qdict);
+>  void hmp_migrate_incoming(Monitor *mon, const QDict *qdict);
+> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+> index ae4b6a4..59196ed 100644
+> --- a/monitor/hmp-cmds.c
+> +++ b/monitor/hmp-cmds.c
+> @@ -1139,6 +1139,16 @@ void hmp_announce_self(Monitor *mon, const QDict *qdict)
+>      qapi_free_AnnounceParameters(params);
+>  }
+>  
+> +void hmp_cprsave(Monitor *mon, const QDict *qdict)
+> +{
+> +    Error *err = NULL;
+> +
+> +    qmp_cprsave(qdict_get_try_str(qdict, "file"),
+> +                qdict_get_try_str(qdict, "mode"),
+> +                &err);
+> +    hmp_handle_error(mon, err);
+> +}
+> +
+>  void hmp_migrate_cancel(Monitor *mon, const QDict *qdict)
+>  {
+>      qmp_migrate_cancel(NULL);
+> -- 
+> 1.8.3.1
 > 
->     case 0x5:
->         /* SB, SH, SWL, SW, SDL, SDR, SWR, CACHE */
->         is_write = 1;
-> 
-> ?
-> 
-> Is CACHE really a write insn ?
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-Indeed not.  However, it's also illegal for user-mode, so we cannot arrive here
-with SIGSEGV by executing it.  So we could ignore that case and not decode this
-field.
-
->> +    case 0x7:
->> +        switch((insn>>26) & 0x7) {
->> +        case 0x0: /* SC */
->> +        case 0x1: /* SWC1 */
->> +        case 0x2: /* SWC2 */
->> +        case 0x4: /* SCD */
->> +        case 0x5: /* SDC1 */
->> +        case 0x6: /* SDC2 */
->> +        case 0x7: /* SD */
->> +            is_write = 1;
-
-Well, the unconditional check of SWC2/SDC2 is not quite right. MIPS64R6 removes
-them and replaces them with some compact branches.  That's easy enough to
-include here, using
-
-#if !defined(__mips_isa_rev) || __mips_isa_rev < 6
-    case 2: /* SWC2 */
-    case 6: /* SDC2 */
-#endif
-
-We should also add
-
-#if defined(__mips16) || defined(__mips_micromips)
-# error "Unsupported encoding"
-#endif
-
-I see no upstream compiler support for nanomips at all, so there's no point in
-checking for that encoding.  (Indeed, I wonder at the code in target/mips...
-how could it be tested?)
-
-
-r~
 
