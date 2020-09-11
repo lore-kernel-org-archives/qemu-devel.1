@@ -2,78 +2,80 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1A8FC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:35:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86E2EC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:36:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 626AD206F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:35:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 626AD206F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id EB6812075A
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:36:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB6812075A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGeWp-0003R3-Gz
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 04:35:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32784)
+	id 1kGeXu-0004xw-VM
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 04:36:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32958)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kGeW6-0002Tb-5C; Fri, 11 Sep 2020 04:34:46 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:50647)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kGeW3-0001Sv-Pw; Fri, 11 Sep 2020 04:34:45 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.109.156.98])
- by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 488326067AB5;
- Fri, 11 Sep 2020 10:34:39 +0200 (CEST)
-Received: from kaod.org (37.59.142.98) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Fri, 11 Sep
- 2020 10:34:38 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-98R00224bd067e-23a0-447f-bf6b-e09b54b5dfab,
- 864FBEA0465FE1F0C66A9C6AC37977A76827B8ED) smtp.auth=groug@kaod.org
-Date: Fri, 11 Sep 2020 10:34:37 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH 08/14] blockjob: return status from block_job_set_speed()
-Message-ID: <20200911103437.39ba59e7@bahia.lan>
-In-Reply-To: <20200909185930.26524-9-vsementsov@virtuozzo.com>
-References: <20200909185930.26524-1-vsementsov@virtuozzo.com>
- <20200909185930.26524-9-vsementsov@virtuozzo.com>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kGeWx-0003sy-IM
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 04:35:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35044)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kGeWv-0001bu-Ak
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 04:35:39 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kGeWt-0004QJ-BT
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 08:35:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 558D52E80AB
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 08:35:35 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.98]
-X-ClientProxiedBy: DAG1EX2.mxp5.local (172.16.2.2) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: a025a0a2-29ac-4e72-bccd-afda911e9646
-X-Ovh-Tracer-Id: 3935864600211855803
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudehledgtdejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefuddtieejjeevheekieeltefgleetkeetheettdeifeffvefhffelffdtfeeljeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehkfiholhhfsehrvgguhhgrthdrtghomh
-Received-SPF: pass client-ip=79.137.123.220; envelope-from=groug@kaod.org;
- helo=smtpout1.mo804.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 04:34:40
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 11 Sep 2020 08:30:15 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <1895080@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee hansni laurent-vivier
+X-Launchpad-Bug-Reporter: Hansni Bu (hansni)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
+References: <159970958159.31371.12301700684467003959.malonedeb@wampee.canonical.com>
+Message-Id: <159981301514.17958.6383374661853049832.malone@soybean.canonical.com>
+Subject: [Bug 1895080] Re: pgb_reserved_va: Assertion `addr == test' failed
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: 8d967eaec65f65cd9735f108c59561101cc67803
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 02:05:39
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,95 +84,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berto@igalia.com, pavel.dovgaluk@ispras.ru,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com,
- stefanha@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, jsnow@redhat.com,
- ari@tuxera.com
+Reply-To: Bug 1895080 <1895080@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed,  9 Sep 2020 21:59:24 +0300
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
+Have you got a static version of the test binary (or a mini rootfs with
+the libraries it needs)?
 
-> Better to return status together with setting errp. It allows to avoid
-> error propagation in the caller.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
+-- =
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1895080
 
->  include/block/blockjob.h |  2 +-
->  blockjob.c               | 18 ++++++++----------
->  2 files changed, 9 insertions(+), 11 deletions(-)
-> 
-> diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-> index 35faa3aa26..d200f33c10 100644
-> --- a/include/block/blockjob.h
-> +++ b/include/block/blockjob.h
-> @@ -139,7 +139,7 @@ bool block_job_has_bdrv(BlockJob *job, BlockDriverState *bs);
->   * Set a rate-limiting parameter for the job; the actual meaning may
->   * vary depending on the job type.
->   */
-> -void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp);
-> +bool block_job_set_speed(BlockJob *job, int64_t speed, Error **errp);
->  
->  /**
->   * block_job_query:
-> diff --git a/blockjob.c b/blockjob.c
-> index 470facfd47..afddf7a1fb 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -254,28 +254,30 @@ static bool job_timer_pending(Job *job)
->      return timer_pending(&job->sleep_timer);
->  }
->  
-> -void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp)
-> +bool block_job_set_speed(BlockJob *job, int64_t speed, Error **errp)
->  {
->      int64_t old_speed = job->speed;
->  
-> -    if (job_apply_verb(&job->job, JOB_VERB_SET_SPEED, errp)) {
-> -        return;
-> +    if (job_apply_verb(&job->job, JOB_VERB_SET_SPEED, errp) < 0) {
-> +        return false;
->      }
->      if (speed < 0) {
->          error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "speed",
->                     "a non-negative value");
-> -        return;
-> +        return false;
->      }
->  
->      ratelimit_set_speed(&job->limit, speed, BLOCK_JOB_SLICE_TIME);
->  
->      job->speed = speed;
->      if (speed && speed <= old_speed) {
-> -        return;
-> +        return true;
->      }
->  
->      /* kick only if a timer is pending */
->      job_enter_cond(&job->job, job_timer_pending);
-> +
-> +    return true;
->  }
->  
->  int64_t block_job_ratelimit_get_delay(BlockJob *job, uint64_t n)
-> @@ -448,12 +450,8 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
->  
->      /* Only set speed when necessary to avoid NotSupported error */
->      if (speed != 0) {
-> -        Error *local_err = NULL;
-> -
-> -        block_job_set_speed(job, speed, &local_err);
-> -        if (local_err) {
-> +        if (!block_job_set_speed(job, speed, errp)) {
->              job_early_fail(&job->job);
-> -            error_propagate(errp, local_err);
->              return NULL;
->          }
->      }
+Title:
+  pgb_reserved_va: Assertion `addr =3D=3D test' failed
 
+Status in QEMU:
+  New
+
+Bug description:
+  This problem occurs on CentOS-7.5 (64-bit) with qemu-5.1.0, qemu head
+  (commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a) for riscv32-linux-
+  user.
+
+  Firstly, compile fails:
+  Compiling C object libqemu-riscv32-linux-user.fa.p/linux-user_strace.c.o
+  ../qemu.git/linux-user/strace.c:1210:18: error: =E2=80=98FALLOC_FL_KEEP_S=
+IZE=E2=80=99 undeclared here (not in a function)
+       FLAG_GENERIC(FALLOC_FL_KEEP_SIZE),
+
+  I have to add below include to linux-user/strace.c
+  diff --git a/linux-user/strace.c b/linux-user/strace.c
+  index 11fea14fba..22e51d4a8a 100644
+  --- a/linux-user/strace.c
+  +++ b/linux-user/strace.c
+  @@ -7,6 +7,7 @@
+   #include <sys/mount.h>
+   #include <arpa/inet.h>
+   #include <netinet/tcp.h>
+  +#include <linux/falloc.h>
+   #include <linux/if_packet.h>
+   #include <linux/netlink.h>
+   #include <sched.h>
+
+  Then trying qemu-riscv32 with a simple ELF, I get:
+  linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test' =
+failed.
+
+  strace shows that:
+  mmap(0x1000, 4294963200, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESER=
+VE, -1, 0) =3D 0x10000
+  write(2, "qemu-riscv32: ../qemu.git/linux-"..., 103qemu-riscv32: ../qemu.=
+git/linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test=
+' failed.
+  ) =3D 103
+
+  The source code is in the function pgb_reserved_va (linux-
+  user/elfload.c). I think mmap cannot guarantee that the returned
+  pointer (test) equals to the parameter of addr. So is this a bug to
+  assert (addr =3D=3D test)?
+
+  Attached configure script and test ELF file.
+
+  Thanks.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1895080/+subscriptions
 
