@@ -2,85 +2,102 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47010C43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 14:59:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71449C43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 15:02:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B12C6223EA
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 14:59:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E5376223EA
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 15:02:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EP1Po4+4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B12C6223EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eoZzg66M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5376223EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGkVx-0000zy-RC
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 10:59:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35072)
+	id 1kGkZ7-0003KT-OV
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 11:02:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kGkVM-0000a0-SV
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 10:58:24 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46860)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kGkVL-0000I3-3D
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 10:58:24 -0400
-Received: by mail-oi1-x242.google.com with SMTP id u126so9658598oif.13
- for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 07:58:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=BrfhBORQn3/mQyfl4ULdvCNeqsrFdp2Cvw0z+3HV8Y4=;
- b=EP1Po4+4P0pjc/6eM5DGbwKwHEBGqmV9kIFbl5CDj3DL+0vF2nXV+tlg+6X/RWtnx6
- AznpX+TfTKv24EfwEKrqg0P28hM+quXdXVVpPjIcgZ3BlD2Q6z0eoSyArHOaTBP26r4D
- f1B50q8Df0GzlgyO9ekCz24JS+n5Vwrz8X32i3GucOHDoPZ7f3UK2ZpObdFu9mG//GBT
- AhO8G4FFa96CSeqQKwefIrGHKLY+VyLQiS07leFMadh4tqXtvk4E1VOTmEuMM9DKNBLW
- uNEjCoXYuppebgMsIv77jprYXJMKqNE9h93/tsNM7j3FfSIBZ6RMT1i5rZVz6+pIkZoP
- UVeA==
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kGkWl-0001lI-HO
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 10:59:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33544
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kGkWj-0000Qh-A1
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 10:59:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599836387;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=bUVJjcl1c/DCfV/bcjBuAt/Mg7FtgSHFyN5Xn3HBmuE=;
+ b=eoZzg66MrXEVTq3k5JjzewSGDtrwhXCJGQcdaTQptSdooHuraYraL8zwr0RbHOHOPETMGH
+ D6hOVO9mkOh3nAwlAOLKbymeqB2dQY5PyhhrIUyz6tCsa8HHZHXppK80fnqgh/Znkt86Ai
+ X5xYO/JLDtOq4p3tvIHLCmQzcounBmE=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-309-E3WZ4G3kNPG2BvlNDM8EcQ-1; Fri, 11 Sep 2020 10:59:46 -0400
+X-MC-Unique: E3WZ4G3kNPG2BvlNDM8EcQ-1
+Received: by mail-wr1-f69.google.com with SMTP id a12so3602269wrg.13
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 07:59:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=BrfhBORQn3/mQyfl4ULdvCNeqsrFdp2Cvw0z+3HV8Y4=;
- b=CpfWxHi2g0ZU+cgUesXIRikJ7UHMpUICZQg/jeZMquyXzE7u9/PBvwhiLXdmhUxqtb
- ILU7iICmeirW79tejw1CxZVv7EDSUCcIii1toXJQt633mFZXosA3jw0tA7tGPaxiyq46
- vR0fAwC+kPJkkxiifrNXRIGSXJ4gZbl/G1swhew813WlyjznkylHPE9n5qH+0WPVvZl/
- KX+kLZHQ/WnWqIn2XT6TzYZTiVV5AHU/doCdpMf/sIdKy/MuM8xskSBHgqAuF+PUbZxI
- gVMM/wDlqvTY+s9YYZT5Smd39N3H3jYfB/v0YqIF4sE+OHmbTUGlEbZv28dkR1PxydSI
- uxuA==
-X-Gm-Message-State: AOAM531j3FPygTjwkVgcGGjTQBnpSfzsNF34eTwe3CCvHajjqRi1Dq5A
- R4b/PqLdTjYH54UdgHiKdByppZS3f05yHIgtqzQ=
-X-Google-Smtp-Source: ABdhPJy2t2ls1ALA5Ho7kJB40ksBGs0RPTG+Uoo+2u0q8sZj5q4f8PuMqiqfL/Vx1C9t5JB6tagWyNMS1u4gmWpjrFc=
-X-Received: by 2002:aca:b454:: with SMTP id d81mr1441503oif.150.1599836301481; 
- Fri, 11 Sep 2020 07:58:21 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=bUVJjcl1c/DCfV/bcjBuAt/Mg7FtgSHFyN5Xn3HBmuE=;
+ b=PMq3uBKsYE2w+29eHq2YHsHv+/wSpd+NrXpoTo8L2LDYzA2oAA9sI6s7x+K9A30ynW
+ TMTtwX4MhsFxYDtGFHXKNRoLGQEtR2+hT1kKwvpfMmxcUHMQv7PK0V5C9HsAdAy2RPyZ
+ BPxK1jrlJhPH5oURQxflcj3K5wkLWXyQhmuY7huNkFupf+pFAfO+eQHySR/DXCO7a5km
+ 856+mGx77iqWb6rgLqtybanqGhVjvurVHjsaEZLQg2vVqeCaFBGb4Z0d+iBxHxhuzPTY
+ effR/HhG++r0T0r1LluBj+KfT/ofmLFfACVva5qOVS7WYnFSfLU+wMMMA5c2ssN4jFd6
+ gOyA==
+X-Gm-Message-State: AOAM533fqiWVqSuvXXSazR8eM73RbSz8xBXQ6OGMJUqns5TAmJKB08lw
+ sQgO6EXF7ZzZvLPv4+T8K6VkZM7zxvhiOc1oATcOfBDtibpmP6+TTupX5OogjEN4j3QMHFzmq36
+ rw/FwYSNRCphNBPc=
+X-Received: by 2002:a7b:c4d3:: with SMTP id g19mr2718379wmk.165.1599836385084; 
+ Fri, 11 Sep 2020 07:59:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz+Gmx9+EYkf6Y7tkqmA8xaXHEczNFlFDdwcecOsOue8mqWPynjW094UKqsA+P+RJipor0JKQ==
+X-Received: by 2002:a7b:c4d3:: with SMTP id g19mr2718362wmk.165.1599836384795; 
+ Fri, 11 Sep 2020 07:59:44 -0700 (PDT)
+Received: from redhat.com ([176.230.64.162])
+ by smtp.gmail.com with ESMTPSA id u66sm4979981wmg.44.2020.09.11.07.59.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 11 Sep 2020 07:59:44 -0700 (PDT)
+Date: Fri, 11 Sep 2020 10:59:41 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Ani Sinha <ani@anisinha.ca>
+Subject: Re: [PATCH v1 2/3] tests/acpi: unit test for
+ 'acpi-pci-hotplug-with-bridge-support' bridge flag
+Message-ID: <20200911105931-mutt-send-email-mst@kernel.org>
+References: <20200905103520.12626-1-ani@anisinha.ca>
+ <20200905103520.12626-3-ani@anisinha.ca>
+ <448ada27-1a94-44ed-89fa-001a70213ad7@Spark>
 MIME-Version: 1.0
-References: <20200911122703.126696-1-ppandit@redhat.com>
-In-Reply-To: <20200911122703.126696-1-ppandit@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Fri, 11 Sep 2020 22:57:45 +0800
-Message-ID: <CAKXe6SLFG1XMCw7yNM3bres29jiqJ5oLpJUgzXGjj8ay=NkwHQ@mail.gmail.com>
-Subject: Re: [PATCH] hw: usb: hcd-ohci: check len and frame_number variables
-To: P J P <ppandit@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=liq3ea@gmail.com; helo=mail-oi1-x242.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <448ada27-1a94-44ed-89fa-001a70213ad7@Spark>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 09:43:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,149 +111,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Prasad J Pandit <pjp@fedoraproject.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Yi Ren <yunye.ry@alibaba-inc.com>,
- Yongkang Jia <j_kangel@163.com>, Gaoning Pan <pgn@zju.edu.cn>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ jusual@redhat.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-P J P <ppandit@redhat.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=8811=E6=97=A5=E5=
-=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=888:30=E5=86=99=E9=81=93=EF=BC=9A
->
-> From: Prasad J Pandit <pjp@fedoraproject.org>
->
-> While servicing the OHCI transfer descriptors(TD), OHCI host
-> controller derives variables 'start_addr', 'end_addr', 'len'
-> etc. from values supplied by the host controller driver.
-> Host controller driver may supply values such that using
-> above variables leads to out-of-bounds access or loop issues.
-> Add checks to avoid them.
->
-> AddressSanitizer: stack-buffer-overflow on address 0x7ffd53af76a0
->   READ of size 2 at 0x7ffd53af76a0 thread T0
->   #0 ohci_service_iso_td ../hw/usb/hcd-ohci.c:734
->   #1 ohci_service_ed_list ../hw/usb/hcd-ohci.c:1180
->   #2 ohci_process_lists ../hw/usb/hcd-ohci.c:1214
->   #3 ohci_frame_boundary ../hw/usb/hcd-ohci.c:1257
->   #4 timerlist_run_timers ../util/qemu-timer.c:572
->   #5 qemu_clock_run_timers ../util/qemu-timer.c:586
->   #6 qemu_clock_run_all_timers ../util/qemu-timer.c:672
->   #7 main_loop_wait ../util/main-loop.c:527
->   #8 qemu_main_loop ../softmmu/vl.c:1676
->   #9 main ../softmmu/main.c:50
->
+On Thu, Sep 10, 2020 at 10:34:20PM +0530, Ani Sinha wrote:
+> On Sep 5, 2020, 16:05 +0530, Ani Sinha <ani@anisinha.ca>, wrote:
+> 
+>     This change adds a new unit test for the global flag
+> 
+>     'acpi-pci-hotplug-with-bridge-support' which is available for cold plugged
+>     pci
+> 
+>     bridges in i440fx. The flag can be used to turn off acpi based hotplug
+>     support
+> 
+>     for all the slots of the pci bus.
+> 
+> 
+> 
+>     Tested on the upstream qemu master branch on top of tag v5.1.0
+> 
+> 
+> Can someone please review this? 
+> 
+> 
+> 
+>     Signed-off-by: Ani Sinha <ani@anisinha.ca>
+> 
+> 
+> 
+> 
+I queues this.
 
-Hello Prasad,
-Could you also provide the reproducer?
+>     ---
+> 
+>     tests/qtest/bios-tables-test.c | 15 +++++++++++++++
+> 
+>     1 file changed, 15 insertions(+)
+> 
+> 
+> 
+>     diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/
+>     bios-tables-test.c
+> 
+>     index a2c0070306..e52a36e775 100644
+> 
+>     --- a/tests/qtest/bios-tables-test.c
+> 
+>     +++ b/tests/qtest/bios-tables-test.c
+> 
+>     @@ -723,6 +723,20 @@ static void test_acpi_piix4_root_hotplug(void)
+> 
+>     free_test_data(&data);
+> 
+>     }
+> 
+> 
+> 
+>     +static void test_acpi_piix4_bridge_hotplug(void)
+> 
+>     +{
+> 
+>     + test_data data;
+> 
+>     +
+> 
+>     + memset(&data, 0, sizeof(data));
+> 
+>     + data.machine = MACHINE_PC;
+> 
+>     + data.variant = ".hpbridge";
+> 
+>     + data.required_struct_types = base_required_struct_types;
+> 
+>     + data.required_struct_types_len = ARRAY_SIZE(base_required_struct_types);
+> 
+>     + test_acpi_one("-global PIIX4_PM.acpi-pci-hotplug-with-bridge-support=off
+>     "
+> 
+>     + "-device pci-bridge,chassis_nr=1", &data);
+> 
+>     + free_test_data(&data);
+> 
+>     +}
+> 
+>     +
+> 
+>     static void test_acpi_q35_tcg(void)
+> 
+>     {
+> 
+>     test_data data;
+> 
+>     @@ -1117,6 +1131,7 @@ int main(int argc, char *argv[])
+> 
+>     qtest_add_func("acpi/piix4", test_acpi_piix4_tcg);
+> 
+>     qtest_add_func("acpi/piix4/bridge", test_acpi_piix4_tcg_bridge);
+> 
+>     qtest_add_func("acpi/piix4/hotplug", test_acpi_piix4_root_hotplug);
+> 
+>     + qtest_add_func("acpi/piix4/brhotplug", test_acpi_piix4_bridge_hotplug);
+> 
+>     qtest_add_func("acpi/q35", test_acpi_q35_tcg);
+> 
+>     qtest_add_func("acpi/q35/bridge", test_acpi_q35_tcg_bridge);
+> 
+>     qtest_add_func("acpi/q35/mmio64", test_acpi_q35_tcg_mmio64);
+> 
+>     --
+> 
+>     2.17.1
+> 
+> 
+> 
 
-> Reported-by: Gaoning Pan <pgn@zju.edu.cn>
-> Reported-by: Yongkang Jia <j_kangel@163.com>
-> Reported-by: Yi Ren <yunye.ry@alibaba-inc.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> ---
->  hw/usb/hcd-ohci.c | 29 +++++++++++++++++++++++++++--
->  1 file changed, 27 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
-> index 1e6e85e86a..76fb9282e3 100644
-> --- a/hw/usb/hcd-ohci.c
-> +++ b/hw/usb/hcd-ohci.c
-> @@ -691,6 +691,11 @@ static int ohci_service_iso_td(OHCIState *ohci, stru=
-ct ohci_ed *ed,
->             the next ISO TD of the same ED */
->          trace_usb_ohci_iso_td_relative_frame_number_big(relative_frame_n=
-umber,
->                                                          frame_count);
-> +        if (OHCI_CC_DATAOVERRUN =3D=3D OHCI_BM(iso_td.flags, TD_CC)) {
-> +            /* avoid infinite loop */
-> +            return 1;
-> +        }
-
-I think it is better to split this patch to 2 or three as the infinite
-loop as the buffer overflow are independent.
-
-1. here the infinite loop
-
-> +
->          OHCI_SET_BM(iso_td.flags, TD_CC, OHCI_CC_DATAOVERRUN);
->          ed->head &=3D ~OHCI_DPTR_MASK;
->          ed->head |=3D (iso_td.next & OHCI_DPTR_MASK);
-> @@ -731,7 +736,11 @@ static int ohci_service_iso_td(OHCIState *ohci, stru=
-ct ohci_ed *ed,
->      }
->
->      start_offset =3D iso_td.offset[relative_frame_number];
-> -    next_offset =3D iso_td.offset[relative_frame_number + 1];
-> +    if (relative_frame_number < frame_count) {
-> +        next_offset =3D iso_td.offset[relative_frame_number + 1];
-> +    } else {
-> +        next_offset =3D iso_td.be;
-> +    }
-
-2. here the stack buffer overflow
-
->
->      if (!(OHCI_BM(start_offset, TD_PSW_CC) & 0xe) ||
->          ((relative_frame_number < frame_count) &&
-> @@ -764,7 +773,12 @@ static int ohci_service_iso_td(OHCIState *ohci, stru=
-ct ohci_ed *ed,
->          }
->      } else {
->          /* Last packet in the ISO TD */
-> -        end_addr =3D iso_td.be;
-> +        end_addr =3D next_offset;
-> +    }
-> +
-> +    if (start_addr > end_addr) {
-> +        trace_usb_ohci_iso_td_bad_cc_overrun(start_addr, end_addr);
-> +        return 1;
->      }
->
->      if ((start_addr & OHCI_PAGE_MASK) !=3D (end_addr & OHCI_PAGE_MASK)) =
-{
-> @@ -773,6 +787,9 @@ static int ohci_service_iso_td(OHCIState *ohci, struc=
-t ohci_ed *ed,
->      } else {
->          len =3D end_addr - start_addr + 1;
->      }
-> +    if (len > sizeof(ohci->usb_buf)) {
-> +        len =3D sizeof(ohci->usb_buf);
-> +    }
->
->      if (len && dir !=3D OHCI_TD_DIR_IN) {
->          if (ohci_copy_iso_td(ohci, start_addr, end_addr, ohci->usb_buf, =
-len,
-> @@ -975,8 +992,16 @@ static int ohci_service_td(OHCIState *ohci, struct o=
-hci_ed *ed)
->          if ((td.cbp & 0xfffff000) !=3D (td.be & 0xfffff000)) {
->              len =3D (td.be & 0xfff) + 0x1001 - (td.cbp & 0xfff);
->          } else {
-> +            if (td.cbp > td.be) {
-> +                trace_usb_ohci_iso_td_bad_cc_overrun(td.cbp, td.be);
-> +                ohci_die(ohci);
-> +                return 1;
-> +            }
->              len =3D (td.be - td.cbp) + 1;
->          }
-> +        if (len > sizeof(ohci->usb_buf)) {
-> +            len =3D sizeof(ohci->usb_buf);
-> +        }
->
-
-3. Then here is the heap overflow.
-
-
-So I think it can be more easier to review to split this to 3 patches.
-
-Thanks,
-Li Qiang
-
->          pktlen =3D len;
->          if (len && dir !=3D OHCI_TD_DIR_IN) {
-> --
-> 2.26.2
->
->
 
