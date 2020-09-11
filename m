@@ -2,78 +2,89 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6375C43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 15:26:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F1F4C43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 15:29:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 573B620770
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 15:26:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 573B620770
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 4981B20770
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 15:29:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f7BRYU2/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4981B20770
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGkws-00046W-IU
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 11:26:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44278)
+	id 1kGkzc-0005b8-9y
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 11:29:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44860)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kGkvs-0003Cu-N2
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 11:25:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42238)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kGkxs-0004fs-Om
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 11:27:52 -0400
+Received: from mail-oo1-xc2c.google.com ([2607:f8b0:4864:20::c2c]:36597)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kGkvm-0006dR-Pb
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 11:25:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kGkvj-0002FZ-5d
- for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 15:25:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 285542E80AB
- for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 15:25:39 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kGkxn-0006xQ-FQ
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 11:27:52 -0400
+Received: by mail-oo1-xc2c.google.com with SMTP id z1so2369123ooj.3
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 08:27:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=LvQPPPyxhSDdVmsdUdnoGbhJ6/LUlD0/ySFigPsgfww=;
+ b=f7BRYU2/l+sCMp/8+ver4kLCj/b2cecA7DXcN3fvOnLmdcbkM3HY7zZwnadsPq6glU
+ up+n4ksby2gN/RQCHzVbdx2JAPNYOsMMUmNAj/t5iwFt3TrKy/bXJ9IvK1zHiOhonoyW
+ wx+zpeViCtTBt4ncZpE6s54kCysfahfc0ZIZGEgHuKZ5COuwT7k5ligA6NqmUPu4RGYa
+ MqRuP776qht/j2S4LVPos1/PaUWMKMFZKcEy2k65UqacHMpnuBvRT6+W39oTx8hyTMDq
+ 3Mod0hcgJboi6N22xrdqWDh4BZdoJHKmivTR5Ez4llsweV30xSregNX+EStSJcu0xvHi
+ vgvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=LvQPPPyxhSDdVmsdUdnoGbhJ6/LUlD0/ySFigPsgfww=;
+ b=QOhCp5cObeeVAXCHgigLw0Qc7AYEJmM5HLl3NOLCv9oLrVvoQ29Xx6sNkZNO/1VMxL
+ K+5gk/Fr2fLly+Q3g+AzVO4FfD5gjTYnnVRMD5p+TRjRoAWNRptlgIjUM/8qMRjgbU3H
+ agYD+32HxOX6G2xY4DD5VEFRTOKyjiz2qHkM+M/nQxSAp9nobkfMohaNxqyxgrG9qOIA
+ FaHmNSA5v2+ATmaVS+NxCBdv1izqMBpRUAu7hYqBxof6CyswV+80QHOBvbrBHLP5GFnf
+ IXTk3u3gw+cTWJpfyMnMEp8jW8C9NV1DGnvyN/8biDs6nZ9PeF/azF0lhVLug3D8qBNC
+ +f7w==
+X-Gm-Message-State: AOAM530QxtPV+2Gs6Hn4vlwUa0EEf/m9+FobgdnftaX5wUGIvSLoQ+My
+ 6bf5dLVLYHDmMqYGvxtAaqOASvKDUP7ibycmt/Y=
+X-Google-Smtp-Source: ABdhPJwtqIEt8BacJbaaZDjj3VslRnDJRykTOSG1qYk22U4qa46JpWP6pgEzyGOHlEHDwhuQS3sOBAWB1ju/NDtKR3w=
+X-Received: by 2002:a4a:5a06:: with SMTP id v6mr2020136ooa.22.1599838066279;
+ Fri, 11 Sep 2020 08:27:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <nycvar.YSQ.7.78.906.2009111910280.36374@xnncv>
+In-Reply-To: <nycvar.YSQ.7.78.906.2009111910280.36374@xnncv>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Fri, 11 Sep 2020 23:27:10 +0800
+Message-ID: <CAKXe6SLEWJZU3a1ut9NL5drzTRX4YhD3waJ4JjyjJf2iWMU1Hw@mail.gmail.com>
+Subject: Re: About 'qemu-security' mailing list
+To: P J P <ppandit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 11 Sep 2020 15:20:08 -0000
-From: Alexander Bulekov <1895310@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
-Message-Id: <159983760940.22223.155030952574347545.malonedeb@wampee.canonical.com>
-Subject: [Bug 1895310] [NEW] Heap-overflow (read) in sd_erase
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: 10b9e75c9676aca661ab521efac6f4cf148d06c1
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 02:05:39
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c2c;
+ envelope-from=liq3ea@gmail.com; helo=mail-oo1-xc2c.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,636 +93,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1895310 <1895310@bugs.launchpad.net>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+P J P <ppandit@redhat.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=8811=E6=97=A5=E5=
+=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=8810:21=E5=86=99=E9=81=93=EF=BC=9A
+>
+>    Hello all,
+>
+> Recently while conversing with DanPB this point came up
+>
+>     -> https://www.qemu.org/contribute/security-process/
+>
+> * Currently QEMU security team is a handful of individual contacts which
+>    restricts community participation in dealing with these issues.
+>
+> * The Onus also lies with the individuals to inform the community about Q=
+EMU
+>    security issues, as they come in.
+>
+>
+> Proposal: (to address above limitations)
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> * We set up a new 'qemu-security' mailing list.
+>
+> * QEMU security issues are reported to this new list only.
+>
+> * Representatives from various communities subscribe to this list. (List =
+maybe
+>    moderated in the beginning.)
+>
+> * As QEMU issues come in, participants on the 'qemu-security' list shall
+>    discuss and decide about how to triage them further.
+>
+> Please kindly let us know your views about it. I'd appreciate if you have=
+ any
+> suggestions/inputs/comments about the same.
 
-Hello,
-One more bug in sd ...
+Hi Prasad,
+Great idea.
 
-cat << EOF | ./qemu-system-i386 -nodefaults \
--device sdhci-pci,sd-spec-version=3D3 \
--device sd-card,drive=3Dmydrive \
--drive if=3Dsd,index=3D0,file=3Dnull-co://,format=3Draw,id=3Dmydrive \
--nographic -qtest stdio -m 64m -trace 'sd*'
-outl 0xcf8 0x80001003
-outl 0xcfc 0xd735d735
-outl 0xcf8 0x80001011
-outl 0xcfc 0x3405064c
-write 0x5064c2c 0x1 0xd7
-write 0x5064c0f 0x1 0xf7
-write 0x5064c05 0x1 0xd7
-write 0x5064c0a 0x1 0x84
-write 0x5064c0b 0x1 0x4c
-write 0x5064c0c 0x1 0x11
-write 0x5064c0f 0x1 0xa9
-write 0x5064c0f 0x1 0x02
-write 0x5064c0f 0x1 0x03
-write 0x5064c0e 0x1 0x2c
-write 0x5064c0f 0x1 0x06
-write 0x5064c0f 0x1 0xe1
-write 0x5064c0f 0x1 0x60
-write 0x5064c0f 0x1 0x26
-EOF
+Like other project, sometimes they have two mailing lists.
+The first is 'security', this list should contains the core developers.
+The second is 'predisclosure', the organization can participate this
+lists and discuss the disclosure process.
 
-The crash:
-=3D=3D133840=3D=3DERROR: AddressSanitizer: heap-buffer-overflow on address =
-0x607000059e78 at pc 0x55abd1d761e6 bp 0x7ffc12800630 sp 0x7ffc12800628
-READ of size 8 at 0x607000059e78 thread T0
-=C2=A0=C2=A0=C2=A0=C2=A0#0 0x55abd1d761e5 in test_bit /home/alxndr/Developm=
-ent/qemu/general-fuzz/include/qemu/bitops.h:135:19
-=C2=A0=C2=A0=C2=A0=C2=A0#1 0x55abd1d6cb1e in sd_erase /home/alxndr/Developm=
-ent/qemu/general-fuzz/build/../hw/sd/sd.c:771:13
-=C2=A0=C2=A0=C2=A0=C2=A0#2 0x55abd1d4c893 in sd_normal_command /home/alxndr=
-/Development/qemu/general-fuzz/build/../hw/sd/sd.c:1412:13
-=C2=A0=C2=A0=C2=A0=C2=A0#3 0x55abd1d33c5d in sd_do_command /home/alxndr/Dev=
-elopment/qemu/general-fuzz/build/../hw/sd/sd.c:1724:17
-=C2=A0=C2=A0=C2=A0=C2=A0#4 0x55abd20117a4 in sdbus_do_command /home/alxndr/=
-Development/qemu/general-fuzz/build/../hw/sd/core.c:99:16
-=C2=A0=C2=A0=C2=A0=C2=A0#5 0x55abd27ecc90 in sdhci_send_command /home/alxnd=
-r/Development/qemu/general-fuzz/build/../hw/sd/sdhci.c:326:12
-=C2=A0=C2=A0=C2=A0=C2=A0#6 0x55abd27e16ed in sdhci_write /home/alxndr/Devel=
-opment/qemu/general-fuzz/build/../hw/sd/sdhci.c:1136:9
-=C2=A0=C2=A0=C2=A0=C2=A0#7 0x55abd43aacc0 in memory_region_write_accessor /=
-home/alxndr/Development/qemu/general-fuzz/build/../softmmu/memory.c:483:5
-=C2=A0=C2=A0=C2=A0=C2=A0#8 0x55abd43aa19d in access_with_adjusted_size /hom=
-e/alxndr/Development/qemu/general-fuzz/build/../softmmu/memory.c:544:18
-=C2=A0=C2=A0=C2=A0=C2=A0#9 0x55abd43a7e50 in memory_region_dispatch_write /=
-home/alxndr/Development/qemu/general-fuzz/build/../softmmu/memory.c:1466:16
-=C2=A0=C2=A0=C2=A0=C2=A0#10 0x55abd3de5dc6 in flatview_write_continue /home=
-/alxndr/Development/qemu/general-fuzz/build/../exec.c:3176:23
-=C2=A0=C2=A0=C2=A0=C2=A0#11 0x55abd3dced98 in flatview_write /home/alxndr/D=
-evelopment/qemu/general-fuzz/build/../exec.c:3216:14
-=C2=A0=C2=A0=C2=A0=C2=A0#12 0x55abd3dce8c8 in address_space_write /home/alx=
-ndr/Development/qemu/general-fuzz/build/../exec.c:3308:18
-=C2=A0=C2=A0=C2=A0=C2=A0#13 0x55abd3ffabbc in qtest_process_command /home/a=
-lxndr/Development/qemu/general-fuzz/build/../softmmu/qtest.c:567:9
-=C2=A0=C2=A0=C2=A0=C2=A0#14 0x55abd3feb8be in qtest_process_inbuf /home/alx=
-ndr/Development/qemu/general-fuzz/build/../softmmu/qtest.c:710:9
-=C2=A0=C2=A0=C2=A0=C2=A0#15 0x55abd3fea663 in qtest_read /home/alxndr/Devel=
-opment/qemu/general-fuzz/build/../softmmu/qtest.c:722:5
-=C2=A0=C2=A0=C2=A0=C2=A0#16 0x55abd51cb9a2 in qemu_chr_be_write_impl /home/=
-alxndr/Development/qemu/general-fuzz/build/../chardev/char.c:188:9
-=C2=A0=C2=A0=C2=A0=C2=A0#17 0x55abd51cbaea in qemu_chr_be_write /home/alxnd=
-r/Development/qemu/general-fuzz/build/../chardev/char.c:200:9
-=C2=A0=C2=A0=C2=A0=C2=A0#18 0x55abd51e6264 in fd_chr_read /home/alxndr/Deve=
-lopment/qemu/general-fuzz/build/../chardev/char-fd.c:68:9
-=C2=A0=C2=A0=C2=A0=C2=A0#19 0x55abd515bef6 in qio_channel_fd_source_dispatc=
-h /home/alxndr/Development/qemu/general-fuzz/build/../io/channel-watch.c:84=
-:12
-=C2=A0=C2=A0=C2=A0=C2=A0#20 0x7fd5d58bd4cd in g_main_context_dispatch (/usr=
-/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x504cd)
-=C2=A0=C2=A0=C2=A0=C2=A0#21 0x55abd54db327 in glib_pollfds_poll /home/alxnd=
-r/Development/qemu/general-fuzz/build/../util/main-loop.c:217:9
-=C2=A0=C2=A0=C2=A0=C2=A0#22 0x55abd54d8c27 in os_host_main_loop_wait /home/=
-alxndr/Development/qemu/general-fuzz/build/../util/main-loop.c:240:5
-=C2=A0=C2=A0=C2=A0=C2=A0#23 0x55abd54d8607 in main_loop_wait /home/alxndr/D=
-evelopment/qemu/general-fuzz/build/../util/main-loop.c:516:11
-=C2=A0=C2=A0=C2=A0=C2=A0#24 0x55abd3d55afd in qemu_main_loop /home/alxndr/D=
-evelopment/qemu/general-fuzz/build/../softmmu/vl.c:1676:9
-=C2=A0=C2=A0=C2=A0=C2=A0#25 0x55abd16df67c in main /home/alxndr/Development=
-/qemu/general-fuzz/build/../softmmu/main.c:50:5
-=C2=A0=C2=A0=C2=A0=C2=A0#26 0x7fd5d4ec0cc9 in __libc_start_main csu/../csu/=
-libc-start.c:308:16
-=C2=A0=C2=A0=C2=A0=C2=A0#27 0x55abd1634e59 in _start (/home/alxndr/Developm=
-ent/qemu/general-fuzz/build/qemu-system-i386+0x2d3ee59)
+But as for qemu, most of the security issues doesn't need an embargo date.
+I think one 'qemu-security' is ok.  I think this mailing lists can
+contain the currently individuals and the some qemu developer
+and also some organizations who uses qemu.
 
-0x607000059e78 is located 0 bytes to the right of 72-byte region [0x6070000=
-59e30,0x607000059e78)
-allocated by thread T0 here:
-=C2=A0=C2=A0=C2=A0=C2=A0#0 0x55abd16ad712 in calloc (/home/alxndr/Developme=
-nt/qemu/general-fuzz/build/qemu-system-i386+0x2db7712)
-=C2=A0=C2=A0=C2=A0=C2=A0#1 0x55abd1d75464 in bitmap_try_new /home/alxndr/De=
-velopment/qemu/general-fuzz/include/qemu/bitmap.h:96:12
-=C2=A0=C2=A0=C2=A0=C2=A0#2 0x55abd1d74bd4 in bitmap_new /home/alxndr/Develo=
-pment/qemu/general-fuzz/include/qemu/bitmap.h:101:26
-=C2=A0=C2=A0=C2=A0=C2=A0#3 0x55abd1d67b68 in sd_reset /home/alxndr/Developm=
-ent/qemu/general-fuzz/build/../hw/sd/sd.c:576:21
-=C2=A0=C2=A0=C2=A0=C2=A0#4 0x55abd47f34b2 in device_transitional_reset /hom=
-e/alxndr/Development/qemu/general-fuzz/build/../hw/core/qdev.c:1114:9
-=C2=A0=C2=A0=C2=A0=C2=A0#5 0x55abd47f8ca9 in resettable_phase_hold /home/al=
-xndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:182:13
-=C2=A0=C2=A0=C2=A0=C2=A0#6 0x55abd47afdbd in bus_reset_child_foreach /home/=
-alxndr/Development/qemu/general-fuzz/build/../hw/core/bus.c:94:9
-=C2=A0=C2=A0=C2=A0=C2=A0#7 0x55abd47fdac3 in resettable_child_foreach /home=
-/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-=C2=A0=C2=A0=C2=A0=C2=A0#8 0x55abd47f8685 in resettable_phase_hold /home/al=
-xndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-=C2=A0=C2=A0=C2=A0=C2=A0#9 0x55abd47ec5f8 in device_reset_child_foreach /ho=
-me/alxndr/Development/qemu/general-fuzz/build/../hw/core/qdev.c:358:9
-=C2=A0=C2=A0=C2=A0=C2=A0#10 0x55abd47fdac3 in resettable_child_foreach /hom=
-e/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-=C2=A0=C2=A0=C2=A0=C2=A0#11 0x55abd47f8685 in resettable_phase_hold /home/a=
-lxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-=C2=A0=C2=A0=C2=A0=C2=A0#12 0x55abd47afdbd in bus_reset_child_foreach /home=
-/alxndr/Development/qemu/general-fuzz/build/../hw/core/bus.c:94:9
-=C2=A0=C2=A0=C2=A0=C2=A0#13 0x55abd47fdac3 in resettable_child_foreach /hom=
-e/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-=C2=A0=C2=A0=C2=A0=C2=A0#14 0x55abd47f8685 in resettable_phase_hold /home/a=
-lxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-=C2=A0=C2=A0=C2=A0=C2=A0#15 0x55abd47ec5f8 in device_reset_child_foreach /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../hw/core/qdev.c:358:9
-=C2=A0=C2=A0=C2=A0=C2=A0#16 0x55abd47fdac3 in resettable_child_foreach /hom=
-e/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-=C2=A0=C2=A0=C2=A0=C2=A0#17 0x55abd47f8685 in resettable_phase_hold /home/a=
-lxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-=C2=A0=C2=A0=C2=A0=C2=A0#18 0x55abd47afdbd in bus_reset_child_foreach /home=
-/alxndr/Development/qemu/general-fuzz/build/../hw/core/bus.c:94:9
-=C2=A0=C2=A0=C2=A0=C2=A0#19 0x55abd47fdac3 in resettable_child_foreach /hom=
-e/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-=C2=A0=C2=A0=C2=A0=C2=A0#20 0x55abd47f8685 in resettable_phase_hold /home/a=
-lxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-=C2=A0=C2=A0=C2=A0=C2=A0#21 0x55abd47f6b28 in resettable_assert_reset /home=
-/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:60:5
-=C2=A0=C2=A0=C2=A0=C2=A0#22 0x55abd47f68cf in resettable_reset /home/alxndr=
-/Development/qemu/general-fuzz/build/../hw/core/resettable.c:45:5
-=C2=A0=C2=A0=C2=A0=C2=A0#23 0x55abd47fb779 in resettable_cold_reset_fn /hom=
-e/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:269:5
-=C2=A0=C2=A0=C2=A0=C2=A0#24 0x55abd47f67e5 in qemu_devices_reset /home/alxn=
-dr/Development/qemu/general-fuzz/build/../hw/core/reset.c:69:9
-=C2=A0=C2=A0=C2=A0=C2=A0#25 0x55abd35a5c1e in pc_machine_reset /home/alxndr=
-/Development/qemu/general-fuzz/build/../hw/i386/pc.c:1901:5
-=C2=A0=C2=A0=C2=A0=C2=A0#26 0x55abd3d52d9e in qemu_system_reset /home/alxnd=
-r/Development/qemu/general-fuzz/build/../softmmu/vl.c:1403:9
-=C2=A0=C2=A0=C2=A0=C2=A0#27 0x55abd3d67d2e in qemu_init /home/alxndr/Develo=
-pment/qemu/general-fuzz/build/../softmmu/vl.c:4458:5
-=C2=A0=C2=A0=C2=A0=C2=A0#28 0x55abd16df677 in main /home/alxndr/Development=
-/qemu/general-fuzz/build/../softmmu/main.c:49:5
-=C2=A0=C2=A0=C2=A0=C2=A0#29 0x7fd5d4ec0cc9 in __libc_start_main csu/../csu/=
-libc-start.c:308:16
+Thanks,
+Li Qiang
 
-SUMMARY: AddressSanitizer: heap-buffer-overflow
-/home/alxndr/Development/qemu/general-fuzz/include/qemu/bitops.h:135:19
-in test_bit
 
--Alex
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Description changed:
-
-  Hello,
-- One more bug in sd.c ...
-+ One more bug in sd ...
-  =
-
-  cat << EOF | ./qemu-system-i386 -nodefaults \
-  -device sdhci-pci,sd-spec-version=3D3 \
-  -device sd-card,drive=3Dmydrive \
-  -drive if=3Dsd,index=3D0,file=3Dnull-co://,format=3Draw,id=3Dmydrive \
-  -nographic -qtest stdio -m 64m -trace 'sd*'
-  outl 0xcf8 0x80001003
-  outl 0xcfc 0xd735d735
-  outl 0xcf8 0x80001011
-  outl 0xcfc 0x3405064c
-  write 0x5064c2c 0x1 0xd7
-  write 0x5064c0f 0x1 0xf7
-  write 0x5064c05 0x1 0xd7
-  write 0x5064c0a 0x1 0x84
-  write 0x5064c0b 0x1 0x4c
-  write 0x5064c0c 0x1 0x11
-  write 0x5064c0f 0x1 0xa9
-  write 0x5064c0f 0x1 0x02
-  write 0x5064c0f 0x1 0x03
-  write 0x5064c0e 0x1 0x2c
-  write 0x5064c0f 0x1 0x06
-  write 0x5064c0f 0x1 0xe1
-  write 0x5064c0f 0x1 0x60
-  write 0x5064c0f 0x1 0x26
-  EOF
-  =
-
-- =
-
-  The crash:
-  =3D=3D133840=3D=3DERROR: AddressSanitizer: heap-buffer-overflow on addres=
-s 0x607000059e78 at pc 0x55abd1d761e6 bp 0x7ffc12800630 sp 0x7ffc12800628
-  READ of size 8 at 0x607000059e78 thread T0
--     #0 0x55abd1d761e5 in test_bit /home/alxndr/Development/qemu/general-f=
-uzz/include/qemu/bitops.h:135:19
--     #1 0x55abd1d6cb1e in sd_erase /home/alxndr/Development/qemu/general-f=
-uzz/build/../hw/sd/sd.c:771:13
--     #2 0x55abd1d4c893 in sd_normal_command /home/alxndr/Development/qemu/=
-general-fuzz/build/../hw/sd/sd.c:1412:13
--     #3 0x55abd1d33c5d in sd_do_command /home/alxndr/Development/qemu/gene=
-ral-fuzz/build/../hw/sd/sd.c:1724:17
--     #4 0x55abd20117a4 in sdbus_do_command /home/alxndr/Development/qemu/g=
-eneral-fuzz/build/../hw/sd/core.c:99:16
--     #5 0x55abd27ecc90 in sdhci_send_command /home/alxndr/Development/qemu=
-/general-fuzz/build/../hw/sd/sdhci.c:326:12
--     #6 0x55abd27e16ed in sdhci_write /home/alxndr/Development/qemu/genera=
-l-fuzz/build/../hw/sd/sdhci.c:1136:9
--     #7 0x55abd43aacc0 in memory_region_write_accessor /home/alxndr/Develo=
-pment/qemu/general-fuzz/build/../softmmu/memory.c:483:5
--     #8 0x55abd43aa19d in access_with_adjusted_size /home/alxndr/Developme=
-nt/qemu/general-fuzz/build/../softmmu/memory.c:544:18
--     #9 0x55abd43a7e50 in memory_region_dispatch_write /home/alxndr/Develo=
-pment/qemu/general-fuzz/build/../softmmu/memory.c:1466:16
--     #10 0x55abd3de5dc6 in flatview_write_continue /home/alxndr/Developmen=
-t/qemu/general-fuzz/build/../exec.c:3176:23
--     #11 0x55abd3dced98 in flatview_write /home/alxndr/Development/qemu/ge=
-neral-fuzz/build/../exec.c:3216:14
--     #12 0x55abd3dce8c8 in address_space_write /home/alxndr/Development/qe=
-mu/general-fuzz/build/../exec.c:3308:18
--     #13 0x55abd3ffabbc in qtest_process_command /home/alxndr/Development/=
-qemu/general-fuzz/build/../softmmu/qtest.c:567:9
--     #14 0x55abd3feb8be in qtest_process_inbuf /home/alxndr/Development/qe=
-mu/general-fuzz/build/../softmmu/qtest.c:710:9
--     #15 0x55abd3fea663 in qtest_read /home/alxndr/Development/qemu/genera=
-l-fuzz/build/../softmmu/qtest.c:722:5
--     #16 0x55abd51cb9a2 in qemu_chr_be_write_impl /home/alxndr/Development=
-/qemu/general-fuzz/build/../chardev/char.c:188:9
--     #17 0x55abd51cbaea in qemu_chr_be_write /home/alxndr/Development/qemu=
-/general-fuzz/build/../chardev/char.c:200:9
--     #18 0x55abd51e6264 in fd_chr_read /home/alxndr/Development/qemu/gener=
-al-fuzz/build/../chardev/char-fd.c:68:9
--     #19 0x55abd515bef6 in qio_channel_fd_source_dispatch /home/alxndr/Dev=
-elopment/qemu/general-fuzz/build/../io/channel-watch.c:84:12
--     #20 0x7fd5d58bd4cd in g_main_context_dispatch (/usr/lib/x86_64-linux-=
-gnu/libglib-2.0.so.0+0x504cd)
--     #21 0x55abd54db327 in glib_pollfds_poll /home/alxndr/Development/qemu=
-/general-fuzz/build/../util/main-loop.c:217:9
--     #22 0x55abd54d8c27 in os_host_main_loop_wait /home/alxndr/Development=
-/qemu/general-fuzz/build/../util/main-loop.c:240:5
--     #23 0x55abd54d8607 in main_loop_wait /home/alxndr/Development/qemu/ge=
-neral-fuzz/build/../util/main-loop.c:516:11
--     #24 0x55abd3d55afd in qemu_main_loop /home/alxndr/Development/qemu/ge=
-neral-fuzz/build/../softmmu/vl.c:1676:9
--     #25 0x55abd16df67c in main /home/alxndr/Development/qemu/general-fuzz=
-/build/../softmmu/main.c:50:5
--     #26 0x7fd5d4ec0cc9 in __libc_start_main csu/../csu/libc-start.c:308:16
--     #27 0x55abd1634e59 in _start (/home/alxndr/Development/qemu/general-f=
-uzz/build/qemu-system-i386+0x2d3ee59)
-+ =C2=A0=C2=A0=C2=A0=C2=A0#0 0x55abd1d761e5 in test_bit /home/alxndr/Develo=
-pment/qemu/general-fuzz/include/qemu/bitops.h:135:19
-+ =C2=A0=C2=A0=C2=A0=C2=A0#1 0x55abd1d6cb1e in sd_erase /home/alxndr/Develo=
-pment/qemu/general-fuzz/build/../hw/sd/sd.c:771:13
-+ =C2=A0=C2=A0=C2=A0=C2=A0#2 0x55abd1d4c893 in sd_normal_command /home/alxn=
-dr/Development/qemu/general-fuzz/build/../hw/sd/sd.c:1412:13
-+ =C2=A0=C2=A0=C2=A0=C2=A0#3 0x55abd1d33c5d in sd_do_command /home/alxndr/D=
-evelopment/qemu/general-fuzz/build/../hw/sd/sd.c:1724:17
-+ =C2=A0=C2=A0=C2=A0=C2=A0#4 0x55abd20117a4 in sdbus_do_command /home/alxnd=
-r/Development/qemu/general-fuzz/build/../hw/sd/core.c:99:16
-+ =C2=A0=C2=A0=C2=A0=C2=A0#5 0x55abd27ecc90 in sdhci_send_command /home/alx=
-ndr/Development/qemu/general-fuzz/build/../hw/sd/sdhci.c:326:12
-+ =C2=A0=C2=A0=C2=A0=C2=A0#6 0x55abd27e16ed in sdhci_write /home/alxndr/Dev=
-elopment/qemu/general-fuzz/build/../hw/sd/sdhci.c:1136:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#7 0x55abd43aacc0 in memory_region_write_accessor=
- /home/alxndr/Development/qemu/general-fuzz/build/../softmmu/memory.c:483:5
-+ =C2=A0=C2=A0=C2=A0=C2=A0#8 0x55abd43aa19d in access_with_adjusted_size /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../softmmu/memory.c:544:18
-+ =C2=A0=C2=A0=C2=A0=C2=A0#9 0x55abd43a7e50 in memory_region_dispatch_write=
- /home/alxndr/Development/qemu/general-fuzz/build/../softmmu/memory.c:1466:=
-16
-+ =C2=A0=C2=A0=C2=A0=C2=A0#10 0x55abd3de5dc6 in flatview_write_continue /ho=
-me/alxndr/Development/qemu/general-fuzz/build/../exec.c:3176:23
-+ =C2=A0=C2=A0=C2=A0=C2=A0#11 0x55abd3dced98 in flatview_write /home/alxndr=
-/Development/qemu/general-fuzz/build/../exec.c:3216:14
-+ =C2=A0=C2=A0=C2=A0=C2=A0#12 0x55abd3dce8c8 in address_space_write /home/a=
-lxndr/Development/qemu/general-fuzz/build/../exec.c:3308:18
-+ =C2=A0=C2=A0=C2=A0=C2=A0#13 0x55abd3ffabbc in qtest_process_command /home=
-/alxndr/Development/qemu/general-fuzz/build/../softmmu/qtest.c:567:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#14 0x55abd3feb8be in qtest_process_inbuf /home/a=
-lxndr/Development/qemu/general-fuzz/build/../softmmu/qtest.c:710:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#15 0x55abd3fea663 in qtest_read /home/alxndr/Dev=
-elopment/qemu/general-fuzz/build/../softmmu/qtest.c:722:5
-+ =C2=A0=C2=A0=C2=A0=C2=A0#16 0x55abd51cb9a2 in qemu_chr_be_write_impl /hom=
-e/alxndr/Development/qemu/general-fuzz/build/../chardev/char.c:188:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#17 0x55abd51cbaea in qemu_chr_be_write /home/alx=
-ndr/Development/qemu/general-fuzz/build/../chardev/char.c:200:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#18 0x55abd51e6264 in fd_chr_read /home/alxndr/De=
-velopment/qemu/general-fuzz/build/../chardev/char-fd.c:68:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#19 0x55abd515bef6 in qio_channel_fd_source_dispa=
-tch /home/alxndr/Development/qemu/general-fuzz/build/../io/channel-watch.c:=
-84:12
-+ =C2=A0=C2=A0=C2=A0=C2=A0#20 0x7fd5d58bd4cd in g_main_context_dispatch (/u=
-sr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x504cd)
-+ =C2=A0=C2=A0=C2=A0=C2=A0#21 0x55abd54db327 in glib_pollfds_poll /home/alx=
-ndr/Development/qemu/general-fuzz/build/../util/main-loop.c:217:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#22 0x55abd54d8c27 in os_host_main_loop_wait /hom=
-e/alxndr/Development/qemu/general-fuzz/build/../util/main-loop.c:240:5
-+ =C2=A0=C2=A0=C2=A0=C2=A0#23 0x55abd54d8607 in main_loop_wait /home/alxndr=
-/Development/qemu/general-fuzz/build/../util/main-loop.c:516:11
-+ =C2=A0=C2=A0=C2=A0=C2=A0#24 0x55abd3d55afd in qemu_main_loop /home/alxndr=
-/Development/qemu/general-fuzz/build/../softmmu/vl.c:1676:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#25 0x55abd16df67c in main /home/alxndr/Developme=
-nt/qemu/general-fuzz/build/../softmmu/main.c:50:5
-+ =C2=A0=C2=A0=C2=A0=C2=A0#26 0x7fd5d4ec0cc9 in __libc_start_main csu/../cs=
-u/libc-start.c:308:16
-+ =C2=A0=C2=A0=C2=A0=C2=A0#27 0x55abd1634e59 in _start (/home/alxndr/Develo=
-pment/qemu/general-fuzz/build/qemu-system-i386+0x2d3ee59)
-  =
-
-  0x607000059e78 is located 0 bytes to the right of 72-byte region [0x60700=
-0059e30,0x607000059e78)
-  allocated by thread T0 here:
--     #0 0x55abd16ad712 in calloc (/home/alxndr/Development/qemu/general-fu=
-zz/build/qemu-system-i386+0x2db7712)
--     #1 0x55abd1d75464 in bitmap_try_new /home/alxndr/Development/qemu/gen=
-eral-fuzz/include/qemu/bitmap.h:96:12
--     #2 0x55abd1d74bd4 in bitmap_new /home/alxndr/Development/qemu/general=
--fuzz/include/qemu/bitmap.h:101:26
--     #3 0x55abd1d67b68 in sd_reset /home/alxndr/Development/qemu/general-f=
-uzz/build/../hw/sd/sd.c:576:21
--     #4 0x55abd47f34b2 in device_transitional_reset /home/alxndr/Developme=
-nt/qemu/general-fuzz/build/../hw/core/qdev.c:1114:9
--     #5 0x55abd47f8ca9 in resettable_phase_hold /home/alxndr/Development/q=
-emu/general-fuzz/build/../hw/core/resettable.c:182:13
--     #6 0x55abd47afdbd in bus_reset_child_foreach /home/alxndr/Development=
-/qemu/general-fuzz/build/../hw/core/bus.c:94:9
--     #7 0x55abd47fdac3 in resettable_child_foreach /home/alxndr/Developmen=
-t/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
--     #8 0x55abd47f8685 in resettable_phase_hold /home/alxndr/Development/q=
-emu/general-fuzz/build/../hw/core/resettable.c:173:5
--     #9 0x55abd47ec5f8 in device_reset_child_foreach /home/alxndr/Developm=
-ent/qemu/general-fuzz/build/../hw/core/qdev.c:358:9
--     #10 0x55abd47fdac3 in resettable_child_foreach /home/alxndr/Developme=
-nt/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
--     #11 0x55abd47f8685 in resettable_phase_hold /home/alxndr/Development/=
-qemu/general-fuzz/build/../hw/core/resettable.c:173:5
--     #12 0x55abd47afdbd in bus_reset_child_foreach /home/alxndr/Developmen=
-t/qemu/general-fuzz/build/../hw/core/bus.c:94:9
--     #13 0x55abd47fdac3 in resettable_child_foreach /home/alxndr/Developme=
-nt/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
--     #14 0x55abd47f8685 in resettable_phase_hold /home/alxndr/Development/=
-qemu/general-fuzz/build/../hw/core/resettable.c:173:5
--     #15 0x55abd47ec5f8 in device_reset_child_foreach /home/alxndr/Develop=
-ment/qemu/general-fuzz/build/../hw/core/qdev.c:358:9
--     #16 0x55abd47fdac3 in resettable_child_foreach /home/alxndr/Developme=
-nt/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
--     #17 0x55abd47f8685 in resettable_phase_hold /home/alxndr/Development/=
-qemu/general-fuzz/build/../hw/core/resettable.c:173:5
--     #18 0x55abd47afdbd in bus_reset_child_foreach /home/alxndr/Developmen=
-t/qemu/general-fuzz/build/../hw/core/bus.c:94:9
--     #19 0x55abd47fdac3 in resettable_child_foreach /home/alxndr/Developme=
-nt/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
--     #20 0x55abd47f8685 in resettable_phase_hold /home/alxndr/Development/=
-qemu/general-fuzz/build/../hw/core/resettable.c:173:5
--     #21 0x55abd47f6b28 in resettable_assert_reset /home/alxndr/Developmen=
-t/qemu/general-fuzz/build/../hw/core/resettable.c:60:5
--     #22 0x55abd47f68cf in resettable_reset /home/alxndr/Development/qemu/=
-general-fuzz/build/../hw/core/resettable.c:45:5
--     #23 0x55abd47fb779 in resettable_cold_reset_fn /home/alxndr/Developme=
-nt/qemu/general-fuzz/build/../hw/core/resettable.c:269:5
--     #24 0x55abd47f67e5 in qemu_devices_reset /home/alxndr/Development/qem=
-u/general-fuzz/build/../hw/core/reset.c:69:9
--     #25 0x55abd35a5c1e in pc_machine_reset /home/alxndr/Development/qemu/=
-general-fuzz/build/../hw/i386/pc.c:1901:5
--     #26 0x55abd3d52d9e in qemu_system_reset /home/alxndr/Development/qemu=
-/general-fuzz/build/../softmmu/vl.c:1403:9
--     #27 0x55abd3d67d2e in qemu_init /home/alxndr/Development/qemu/general=
--fuzz/build/../softmmu/vl.c:4458:5
--     #28 0x55abd16df677 in main /home/alxndr/Development/qemu/general-fuzz=
-/build/../softmmu/main.c:49:5
--     #29 0x7fd5d4ec0cc9 in __libc_start_main csu/../csu/libc-start.c:308:16
-+ =C2=A0=C2=A0=C2=A0=C2=A0#0 0x55abd16ad712 in calloc (/home/alxndr/Develop=
-ment/qemu/general-fuzz/build/qemu-system-i386+0x2db7712)
-+ =C2=A0=C2=A0=C2=A0=C2=A0#1 0x55abd1d75464 in bitmap_try_new /home/alxndr/=
-Development/qemu/general-fuzz/include/qemu/bitmap.h:96:12
-+ =C2=A0=C2=A0=C2=A0=C2=A0#2 0x55abd1d74bd4 in bitmap_new /home/alxndr/Deve=
-lopment/qemu/general-fuzz/include/qemu/bitmap.h:101:26
-+ =C2=A0=C2=A0=C2=A0=C2=A0#3 0x55abd1d67b68 in sd_reset /home/alxndr/Develo=
-pment/qemu/general-fuzz/build/../hw/sd/sd.c:576:21
-+ =C2=A0=C2=A0=C2=A0=C2=A0#4 0x55abd47f34b2 in device_transitional_reset /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../hw/core/qdev.c:1114:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#5 0x55abd47f8ca9 in resettable_phase_hold /home/=
-alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:182:13
-+ =C2=A0=C2=A0=C2=A0=C2=A0#6 0x55abd47afdbd in bus_reset_child_foreach /hom=
-e/alxndr/Development/qemu/general-fuzz/build/../hw/core/bus.c:94:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#7 0x55abd47fdac3 in resettable_child_foreach /ho=
-me/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#8 0x55abd47f8685 in resettable_phase_hold /home/=
-alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-+ =C2=A0=C2=A0=C2=A0=C2=A0#9 0x55abd47ec5f8 in device_reset_child_foreach /=
-home/alxndr/Development/qemu/general-fuzz/build/../hw/core/qdev.c:358:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#10 0x55abd47fdac3 in resettable_child_foreach /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#11 0x55abd47f8685 in resettable_phase_hold /home=
-/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-+ =C2=A0=C2=A0=C2=A0=C2=A0#12 0x55abd47afdbd in bus_reset_child_foreach /ho=
-me/alxndr/Development/qemu/general-fuzz/build/../hw/core/bus.c:94:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#13 0x55abd47fdac3 in resettable_child_foreach /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#14 0x55abd47f8685 in resettable_phase_hold /home=
-/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-+ =C2=A0=C2=A0=C2=A0=C2=A0#15 0x55abd47ec5f8 in device_reset_child_foreach =
-/home/alxndr/Development/qemu/general-fuzz/build/../hw/core/qdev.c:358:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#16 0x55abd47fdac3 in resettable_child_foreach /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#17 0x55abd47f8685 in resettable_phase_hold /home=
-/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-+ =C2=A0=C2=A0=C2=A0=C2=A0#18 0x55abd47afdbd in bus_reset_child_foreach /ho=
-me/alxndr/Development/qemu/general-fuzz/build/../hw/core/bus.c:94:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#19 0x55abd47fdac3 in resettable_child_foreach /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#20 0x55abd47f8685 in resettable_phase_hold /home=
-/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-+ =C2=A0=C2=A0=C2=A0=C2=A0#21 0x55abd47f6b28 in resettable_assert_reset /ho=
-me/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:60:5
-+ =C2=A0=C2=A0=C2=A0=C2=A0#22 0x55abd47f68cf in resettable_reset /home/alxn=
-dr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:45:5
-+ =C2=A0=C2=A0=C2=A0=C2=A0#23 0x55abd47fb779 in resettable_cold_reset_fn /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:269:5
-+ =C2=A0=C2=A0=C2=A0=C2=A0#24 0x55abd47f67e5 in qemu_devices_reset /home/al=
-xndr/Development/qemu/general-fuzz/build/../hw/core/reset.c:69:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#25 0x55abd35a5c1e in pc_machine_reset /home/alxn=
-dr/Development/qemu/general-fuzz/build/../hw/i386/pc.c:1901:5
-+ =C2=A0=C2=A0=C2=A0=C2=A0#26 0x55abd3d52d9e in qemu_system_reset /home/alx=
-ndr/Development/qemu/general-fuzz/build/../softmmu/vl.c:1403:9
-+ =C2=A0=C2=A0=C2=A0=C2=A0#27 0x55abd3d67d2e in qemu_init /home/alxndr/Deve=
-lopment/qemu/general-fuzz/build/../softmmu/vl.c:4458:5
-+ =C2=A0=C2=A0=C2=A0=C2=A0#28 0x55abd16df677 in main /home/alxndr/Developme=
-nt/qemu/general-fuzz/build/../softmmu/main.c:49:5
-+ =C2=A0=C2=A0=C2=A0=C2=A0#29 0x7fd5d4ec0cc9 in __libc_start_main csu/../cs=
-u/libc-start.c:308:16
-  =
-
-  SUMMARY: AddressSanitizer: heap-buffer-overflow
-  /home/alxndr/Development/qemu/general-fuzz/include/qemu/bitops.h:135:19
-  in test_bit
-  =
-
-  -Alex
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1895310
-
-Title:
-  Heap-overflow (read) in sd_erase
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-  One more bug in sd ...
-
-  cat << EOF | ./qemu-system-i386 -nodefaults \
-  -device sdhci-pci,sd-spec-version=3D3 \
-  -device sd-card,drive=3Dmydrive \
-  -drive if=3Dsd,index=3D0,file=3Dnull-co://,format=3Draw,id=3Dmydrive \
-  -nographic -qtest stdio -m 64m -trace 'sd*'
-  outl 0xcf8 0x80001003
-  outl 0xcfc 0xd735d735
-  outl 0xcf8 0x80001011
-  outl 0xcfc 0x3405064c
-  write 0x5064c2c 0x1 0xd7
-  write 0x5064c0f 0x1 0xf7
-  write 0x5064c05 0x1 0xd7
-  write 0x5064c0a 0x1 0x84
-  write 0x5064c0b 0x1 0x4c
-  write 0x5064c0c 0x1 0x11
-  write 0x5064c0f 0x1 0xa9
-  write 0x5064c0f 0x1 0x02
-  write 0x5064c0f 0x1 0x03
-  write 0x5064c0e 0x1 0x2c
-  write 0x5064c0f 0x1 0x06
-  write 0x5064c0f 0x1 0xe1
-  write 0x5064c0f 0x1 0x60
-  write 0x5064c0f 0x1 0x26
-  EOF
-
-  The crash:
-  =3D=3D133840=3D=3DERROR: AddressSanitizer: heap-buffer-overflow on addres=
-s 0x607000059e78 at pc 0x55abd1d761e6 bp 0x7ffc12800630 sp 0x7ffc12800628
-  READ of size 8 at 0x607000059e78 thread T0
-  =C2=A0=C2=A0=C2=A0=C2=A0#0 0x55abd1d761e5 in test_bit /home/alxndr/Develo=
-pment/qemu/general-fuzz/include/qemu/bitops.h:135:19
-  =C2=A0=C2=A0=C2=A0=C2=A0#1 0x55abd1d6cb1e in sd_erase /home/alxndr/Develo=
-pment/qemu/general-fuzz/build/../hw/sd/sd.c:771:13
-  =C2=A0=C2=A0=C2=A0=C2=A0#2 0x55abd1d4c893 in sd_normal_command /home/alxn=
-dr/Development/qemu/general-fuzz/build/../hw/sd/sd.c:1412:13
-  =C2=A0=C2=A0=C2=A0=C2=A0#3 0x55abd1d33c5d in sd_do_command /home/alxndr/D=
-evelopment/qemu/general-fuzz/build/../hw/sd/sd.c:1724:17
-  =C2=A0=C2=A0=C2=A0=C2=A0#4 0x55abd20117a4 in sdbus_do_command /home/alxnd=
-r/Development/qemu/general-fuzz/build/../hw/sd/core.c:99:16
-  =C2=A0=C2=A0=C2=A0=C2=A0#5 0x55abd27ecc90 in sdhci_send_command /home/alx=
-ndr/Development/qemu/general-fuzz/build/../hw/sd/sdhci.c:326:12
-  =C2=A0=C2=A0=C2=A0=C2=A0#6 0x55abd27e16ed in sdhci_write /home/alxndr/Dev=
-elopment/qemu/general-fuzz/build/../hw/sd/sdhci.c:1136:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#7 0x55abd43aacc0 in memory_region_write_accessor=
- /home/alxndr/Development/qemu/general-fuzz/build/../softmmu/memory.c:483:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#8 0x55abd43aa19d in access_with_adjusted_size /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../softmmu/memory.c:544:18
-  =C2=A0=C2=A0=C2=A0=C2=A0#9 0x55abd43a7e50 in memory_region_dispatch_write=
- /home/alxndr/Development/qemu/general-fuzz/build/../softmmu/memory.c:1466:=
-16
-  =C2=A0=C2=A0=C2=A0=C2=A0#10 0x55abd3de5dc6 in flatview_write_continue /ho=
-me/alxndr/Development/qemu/general-fuzz/build/../exec.c:3176:23
-  =C2=A0=C2=A0=C2=A0=C2=A0#11 0x55abd3dced98 in flatview_write /home/alxndr=
-/Development/qemu/general-fuzz/build/../exec.c:3216:14
-  =C2=A0=C2=A0=C2=A0=C2=A0#12 0x55abd3dce8c8 in address_space_write /home/a=
-lxndr/Development/qemu/general-fuzz/build/../exec.c:3308:18
-  =C2=A0=C2=A0=C2=A0=C2=A0#13 0x55abd3ffabbc in qtest_process_command /home=
-/alxndr/Development/qemu/general-fuzz/build/../softmmu/qtest.c:567:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#14 0x55abd3feb8be in qtest_process_inbuf /home/a=
-lxndr/Development/qemu/general-fuzz/build/../softmmu/qtest.c:710:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#15 0x55abd3fea663 in qtest_read /home/alxndr/Dev=
-elopment/qemu/general-fuzz/build/../softmmu/qtest.c:722:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#16 0x55abd51cb9a2 in qemu_chr_be_write_impl /hom=
-e/alxndr/Development/qemu/general-fuzz/build/../chardev/char.c:188:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#17 0x55abd51cbaea in qemu_chr_be_write /home/alx=
-ndr/Development/qemu/general-fuzz/build/../chardev/char.c:200:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#18 0x55abd51e6264 in fd_chr_read /home/alxndr/De=
-velopment/qemu/general-fuzz/build/../chardev/char-fd.c:68:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#19 0x55abd515bef6 in qio_channel_fd_source_dispa=
-tch /home/alxndr/Development/qemu/general-fuzz/build/../io/channel-watch.c:=
-84:12
-  =C2=A0=C2=A0=C2=A0=C2=A0#20 0x7fd5d58bd4cd in g_main_context_dispatch (/u=
-sr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x504cd)
-  =C2=A0=C2=A0=C2=A0=C2=A0#21 0x55abd54db327 in glib_pollfds_poll /home/alx=
-ndr/Development/qemu/general-fuzz/build/../util/main-loop.c:217:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#22 0x55abd54d8c27 in os_host_main_loop_wait /hom=
-e/alxndr/Development/qemu/general-fuzz/build/../util/main-loop.c:240:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#23 0x55abd54d8607 in main_loop_wait /home/alxndr=
-/Development/qemu/general-fuzz/build/../util/main-loop.c:516:11
-  =C2=A0=C2=A0=C2=A0=C2=A0#24 0x55abd3d55afd in qemu_main_loop /home/alxndr=
-/Development/qemu/general-fuzz/build/../softmmu/vl.c:1676:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#25 0x55abd16df67c in main /home/alxndr/Developme=
-nt/qemu/general-fuzz/build/../softmmu/main.c:50:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#26 0x7fd5d4ec0cc9 in __libc_start_main csu/../cs=
-u/libc-start.c:308:16
-  =C2=A0=C2=A0=C2=A0=C2=A0#27 0x55abd1634e59 in _start (/home/alxndr/Develo=
-pment/qemu/general-fuzz/build/qemu-system-i386+0x2d3ee59)
-
-  0x607000059e78 is located 0 bytes to the right of 72-byte region [0x60700=
-0059e30,0x607000059e78)
-  allocated by thread T0 here:
-  =C2=A0=C2=A0=C2=A0=C2=A0#0 0x55abd16ad712 in calloc (/home/alxndr/Develop=
-ment/qemu/general-fuzz/build/qemu-system-i386+0x2db7712)
-  =C2=A0=C2=A0=C2=A0=C2=A0#1 0x55abd1d75464 in bitmap_try_new /home/alxndr/=
-Development/qemu/general-fuzz/include/qemu/bitmap.h:96:12
-  =C2=A0=C2=A0=C2=A0=C2=A0#2 0x55abd1d74bd4 in bitmap_new /home/alxndr/Deve=
-lopment/qemu/general-fuzz/include/qemu/bitmap.h:101:26
-  =C2=A0=C2=A0=C2=A0=C2=A0#3 0x55abd1d67b68 in sd_reset /home/alxndr/Develo=
-pment/qemu/general-fuzz/build/../hw/sd/sd.c:576:21
-  =C2=A0=C2=A0=C2=A0=C2=A0#4 0x55abd47f34b2 in device_transitional_reset /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../hw/core/qdev.c:1114:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#5 0x55abd47f8ca9 in resettable_phase_hold /home/=
-alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:182:13
-  =C2=A0=C2=A0=C2=A0=C2=A0#6 0x55abd47afdbd in bus_reset_child_foreach /hom=
-e/alxndr/Development/qemu/general-fuzz/build/../hw/core/bus.c:94:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#7 0x55abd47fdac3 in resettable_child_foreach /ho=
-me/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#8 0x55abd47f8685 in resettable_phase_hold /home/=
-alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#9 0x55abd47ec5f8 in device_reset_child_foreach /=
-home/alxndr/Development/qemu/general-fuzz/build/../hw/core/qdev.c:358:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#10 0x55abd47fdac3 in resettable_child_foreach /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#11 0x55abd47f8685 in resettable_phase_hold /home=
-/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#12 0x55abd47afdbd in bus_reset_child_foreach /ho=
-me/alxndr/Development/qemu/general-fuzz/build/../hw/core/bus.c:94:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#13 0x55abd47fdac3 in resettable_child_foreach /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#14 0x55abd47f8685 in resettable_phase_hold /home=
-/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#15 0x55abd47ec5f8 in device_reset_child_foreach =
-/home/alxndr/Development/qemu/general-fuzz/build/../hw/core/qdev.c:358:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#16 0x55abd47fdac3 in resettable_child_foreach /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#17 0x55abd47f8685 in resettable_phase_hold /home=
-/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#18 0x55abd47afdbd in bus_reset_child_foreach /ho=
-me/alxndr/Development/qemu/general-fuzz/build/../hw/core/bus.c:94:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#19 0x55abd47fdac3 in resettable_child_foreach /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#20 0x55abd47f8685 in resettable_phase_hold /home=
-/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#21 0x55abd47f6b28 in resettable_assert_reset /ho=
-me/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:60:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#22 0x55abd47f68cf in resettable_reset /home/alxn=
-dr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:45:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#23 0x55abd47fb779 in resettable_cold_reset_fn /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:269:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#24 0x55abd47f67e5 in qemu_devices_reset /home/al=
-xndr/Development/qemu/general-fuzz/build/../hw/core/reset.c:69:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#25 0x55abd35a5c1e in pc_machine_reset /home/alxn=
-dr/Development/qemu/general-fuzz/build/../hw/i386/pc.c:1901:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#26 0x55abd3d52d9e in qemu_system_reset /home/alx=
-ndr/Development/qemu/general-fuzz/build/../softmmu/vl.c:1403:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#27 0x55abd3d67d2e in qemu_init /home/alxndr/Deve=
-lopment/qemu/general-fuzz/build/../softmmu/vl.c:4458:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#28 0x55abd16df677 in main /home/alxndr/Developme=
-nt/qemu/general-fuzz/build/../softmmu/main.c:49:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#29 0x7fd5d4ec0cc9 in __libc_start_main csu/../cs=
-u/libc-start.c:308:16
-
-  SUMMARY: AddressSanitizer: heap-buffer-overflow
-  /home/alxndr/Development/qemu/general-
-  fuzz/include/qemu/bitops.h:135:19 in test_bit
-
-  -Alex
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1895310/+subscriptions
+>
+>
+> Thank you.
+> --
+> Prasad J Pandit / Red Hat Product Security Team
+> 8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+>
+>
 
