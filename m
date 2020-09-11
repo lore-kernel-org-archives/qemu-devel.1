@@ -2,114 +2,94 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5758C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:32:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB98EC43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:33:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 314EB206F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:32:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2198D206F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:33:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="esn4PEJH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 314EB206F4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jRJQA4qh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2198D206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGeTZ-0000XC-Rz
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 04:32:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60384)
+	id 1kGeUQ-0001SL-1X
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 04:33:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60596)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGeSv-0008SD-KL
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 04:31:29 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37507
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kGeTr-0000xf-Ud
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 04:32:27 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49152
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGeSt-00018A-Gd
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 04:31:29 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kGeTq-0001Gf-41
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 04:32:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599813085;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=0bVxKIUYAv+Rcx3MbhxI432bqgJWWZnG/6CREdHSjTQ=;
- b=esn4PEJH6PhaFgwz+Sg8tjNNpi8BtH7Da9ULCAv9ycC72WQ6ITWLjaQXXrqjWYQZBMmGLo
- s95EF8tYekjpyEB8gj64DnHEQUQajO1SNgymNePBUW2ASnbwDBuPPgPnKwkUlcCbEr7457
- /mRNIA1nxEfYqu5+IA772oCjiD0WiDQ=
+ s=mimecast20190719; t=1599813145;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=HUkjyhSH9Qnyzcwq/QT8k8RDpUudKeT0g+T6+xfMQag=;
+ b=jRJQA4qhVeSRFDPUy3StzF5xMbdwkRamV1sINOn78wwKxW+HIss6gj/nag1Kwm7MVDxdhu
+ RnJOPE6miL1whdf2KKdM7u3Yxe6W4OQLbpIhNb8x3sVaapFfW+rp8rIMTnA8Is3mtWnwRL
+ XuhTsJemsOJEA0zg/V6cUujUf+hg6Lw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-142-OGUuFWvmPU2saa9hWEVvPw-1; Fri, 11 Sep 2020 04:31:23 -0400
-X-MC-Unique: OGUuFWvmPU2saa9hWEVvPw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-463-GE6hNmsoMxunt2sfhWeQFQ-1; Fri, 11 Sep 2020 04:32:20 -0400
+X-MC-Unique: GE6hNmsoMxunt2sfhWeQFQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F32D10BBECE;
- Fri, 11 Sep 2020 08:31:22 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-148.ams2.redhat.com
- [10.36.113.148])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4EBEE60BFA;
- Fri, 11 Sep 2020 08:31:21 +0000 (UTC)
-Subject: Re: [PATCH] qemu-img: Support bitmap --merge into backing image
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200909123358.1244744-1-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <32a96bcc-78de-a13e-c090-ad00c3b4c4ad@redhat.com>
-Date: Fri, 11 Sep 2020 10:31:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8874E1882FC5;
+ Fri, 11 Sep 2020 08:32:19 +0000 (UTC)
+Received: from redhat.com (ovpn-113-229.ams2.redhat.com [10.36.113.229])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A25757838A;
+ Fri, 11 Sep 2020 08:32:13 +0000 (UTC)
+Date: Fri, 11 Sep 2020 09:32:10 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Subject: Re: [PATCH 00/18] chardev: QOM cleanups
+Message-ID: <20200911083210.GB1203593@redhat.com>
+References: <20200910194903.4104696-1-ehabkost@redhat.com>
+ <CAJ+F1CLLKesMvZo4DJcC=f387d_fN8g--qX8YEQGu8Thf1qotA@mail.gmail.com>
+ <20200911081018.GA1203593@redhat.com>
+ <CAJ+F1C+T9mgwWSsxzhBZyUiYNwhd+ATie3i=8Bari5VQUAfxoQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200909123358.1244744-1-eblake@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <CAJ+F1C+T9mgwWSsxzhBZyUiYNwhd+ATie3i=8Bari5VQUAfxoQ@mail.gmail.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="aqqpdLzvAcAdfFU0AVaJ5i5d26uki6wPc"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 03:40:15
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 00:33:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -56
-X-Spam_score: -5.7
-X-Spam_bar: -----
-X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-3.576, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -122,104 +102,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eyal Shenitzky <eshenitz@redhat.com>,
- qemu-block@nongnu.org
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aqqpdLzvAcAdfFU0AVaJ5i5d26uki6wPc
-Content-Type: multipart/mixed; boundary="gV7FH1UhGR1z1zDqNt72qOyUtnsP4LBX1"
+On Fri, Sep 11, 2020 at 12:19:08PM +0400, Marc-André Lureau wrote:
+> Hi
+> 
+> On Fri, Sep 11, 2020 at 12:10 PM Daniel P. Berrangé <berrange@redhat.com>
+> wrote:
+> 
+> > On Fri, Sep 11, 2020 at 12:07:27PM +0400, Marc-André Lureau wrote:
+> > > Hi
+> > >
+> > > On Thu, Sep 10, 2020 at 11:50 PM Eduardo Habkost <ehabkost@redhat.com>
+> > > wrote:
+> > >
+> > > > Some chardev QOM cleanup patches had to be dropped from my queue
+> > > > due to build erros introduced by code movements across ifdef
+> > > > boundaries at char-parallel.c.  This series redo the changes from
+> > > > those patches, but the macro renames are now a little different:
+> > > >
+> > > > In this version I have decided to rename the type checking macros
+> > > > from *_CHARDEV to CHARDEV_* instead of renaming tye
+> > > > TYPE_CHARDEV_* constants to TYPE_*_CHARDEV, to make the
+> > > > identifiers actually match the QOM type name strings
+> > > > ("chardev-*").
+> > > >
+> > >
+> > > Sounds reasonable to me, but it loses the matching with the
+> > > structure/object type name though.
+> > >
+> > > - MuxChardev *d = MUX_CHARDEV(s);
+> > > + MuxChardev *d = CHARDEV_MUX(s);
+> > >
+> > > I have a preference for the first. Unless we rename all the chardev types
+> > > too...
+> >
+> > I tend to think the structs should be renamed too - I've always considerd
+> > them to be backwards.
+> >
+> > > Imho, the QOM type name is mostly an internal detail, the C type name is
+> > > dominant in the code.
+> >
+> > Err it is the reverse. The QOM type name is exposed public API via QOM
+> > commands, while the C struct names are a internal private detail.
+> >
+> 
+> Yes, but without the chardev- prefix (unless you try object-add which I
+> don't think will work with chardev)
 
---gV7FH1UhGR1z1zDqNt72qOyUtnsP4LBX1
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Sure, that's just the way it had to be wired into the -chardev arg
+syntax, but from the POV of exposed QOM type information the canonical
+type name has the full chardev- prefix.
 
-On 09.09.20 14:33, Eric Blake wrote:
-> If you have the chain 'base.qcow2 <- top.qcow2' and want to merge a
-> bitmap from top into base, qemu-img was failing with:
->=20
-> qemu-img: Could not open 'top.qcow2': Could not open backing file: Failed=
- to get shared "write" lock
-> Is another process using the image [base.qcow2]?
->=20
-> The easiest fix is to not open the entire backing chain of the source
-> image, so that we aren't worrying about competing BDS visiting the
-> backing image as both a read-only backing of the source and the
-> writeable destination.
->=20
-> Fixes: http://bugzilla.redhat.com/1877209
-> Reported-by: Eyal Shenitzky <eshenitz@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  qemu-img.c                 |  3 +-
->  tests/qemu-iotests/291     | 12 ++++++++
->  tests/qemu-iotests/291.out | 56 ++++++++++++++++++++++++++++++++++++++
->  3 files changed, 70 insertions(+), 1 deletion(-)
->=20
-> diff --git a/qemu-img.c b/qemu-img.c
-> index eb2fc1f86243..b15098a2f9b3 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -4755,7 +4755,8 @@ static int img_bitmap(int argc, char **argv)
->      }
->      bs =3D blk_bs(blk);
->      if (src_filename) {
-> -        src =3D img_open(false, src_filename, src_fmt, 0, false, false, =
-false);
-> +        src =3D img_open(false, src_filename, src_fmt, BDRV_O_NO_BACKING=
-,
-> +                       false, false, false);
-
-Why not do the same for the destination BB?
-
->          if (!src) {
->              goto out;
->          }
-> diff --git a/tests/qemu-iotests/291 b/tests/qemu-iotests/291
-> index 1e0bb76959bb..4f837b205655 100755
-> --- a/tests/qemu-iotests/291
-> +++ b/tests/qemu-iotests/291
-
-[...]
-
-> @@ -107,6 +116,9 @@ $QEMU_IMG map --output=3Djson --image-opts \
->  nbd_server_start_unix_socket -r -f qcow2 -B b2 "$TEST_IMG"
->  $QEMU_IMG map --output=3Djson --image-opts \
->      "$IMG,x-dirty-bitmap=3Dqemu:dirty-bitmap:b2" | _filter_qemu_img_map
-> +nbd_server_start_unix_socket -r -f qcow2 -B b3 "$TEST_IMG"
-
-Why not look into $TEST_IMG.base to see specifically whether the bitmap
-is there?
-
-(I also am quite surprised that it=E2=80=99s even possible to export bitmap=
-s
-from backing nodes, but, well.)
-
-Max
-
-
---gV7FH1UhGR1z1zDqNt72qOyUtnsP4LBX1--
-
---aqqpdLzvAcAdfFU0AVaJ5i5d26uki6wPc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9bNdcACgkQ9AfbAGHV
-z0AvRQf+JBSuUlqxdRTLCAKVX1SKBAiCCvShsDCKEUJPQmqHo9LuC8xY0NOkey8w
-K8O4wq9B97lYqi6PCtSqg3sNk1v/RGtdOUsstSKMrSBdgn61IBrou+4h090RUOxp
-Z3p2Bm2Ugg/zJAv8At+ZKrHBOZm1Sfni3kNvTLYHHc6OsBIwPYy3pE9zMZt1rooC
-tqbR5skzQKzw8XsSWLLqBlpxxGw8kRi/owAfMY7TZnd8LEP/c3sTGAQgWy9Tn99u
-raMoemfcyJ82PLvk5GC/RNUk2UGYJgu4V9qO+yaI0g84TY+7v8n1D+hQtE9pRKeX
-JLIVbLp0KNDzzFS3PhDR5F4bKnb/kg==
-=ny26
------END PGP SIGNATURE-----
-
---aqqpdLzvAcAdfFU0AVaJ5i5d26uki6wPc--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
