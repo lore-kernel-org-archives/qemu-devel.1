@@ -2,81 +2,82 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66E4AC43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 00:58:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 660E0C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 01:13:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B33DB208FE
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 00:58:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B33DB208FE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id A0B802083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 01:13:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uJykHANL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0B802083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGXOE-0006CL-E8
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 20:58:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60610)
+	id 1kGXdP-0003m8-MY
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 21:13:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35124)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1kGXNM-0005mL-FP
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 20:57:17 -0400
-Received: from mga07.intel.com ([134.134.136.100]:5586)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1kGXNJ-0005Xi-8y
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 20:57:15 -0400
-IronPort-SDR: PxQE/0sGmuiEyv9jqV/hm9W9yzIjzZea7f2TFDkxklTlE2H3Dg5/+jiLIQ5d/JjEkIGpb5FL5l
- MumHvJRWgADw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9740"; a="222866151"
-X-IronPort-AV: E=Sophos;i="5.76,413,1592895600"; d="scan'208";a="222866151"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 10 Sep 2020 17:57:07 -0700
-IronPort-SDR: wEaes0t1JUF1+JRg83PT+AuKW2T0+i+m5Tw+HlOmyZYCycW14clh/UZyAcInoSfvgV57x5vsXO
- IQI6/6NUTH5A==
-X-IronPort-AV: E=Sophos;i="5.76,413,1592895600"; d="scan'208";a="481112652"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 10 Sep 2020 17:57:01 -0700
-Date: Fri, 11 Sep 2020 08:56:00 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200911005559.GA3932@joy-OptiPlex-7040>
-References: <20200825163925.1c19b0f0.cohuck@redhat.com>
- <20200826064117.GA22243@joy-OptiPlex-7040>
- <20200828154741.30cfc1a3.cohuck@redhat.com>
- <8f5345be73ebf4f8f7f51d6cdc9c2a0d8e0aa45e.camel@redhat.com>
- <20200831044344.GB13784@joy-OptiPlex-7040>
- <20200908164130.2fe0d106.cohuck@redhat.com>
- <20200909021308.GA1277@joy-OptiPlex-7040>
- <20200910143822.2071eca4.cohuck@redhat.com>
- <7cebcb6c8d1a1452b43e8358ee6ee18a150a0238.camel@redhat.com>
- <20200910120244.71e7b630@w520.home>
+ (Exim 4.90_1) (envelope-from <iwatchnima@gmail.com>)
+ id 1kGXcb-0002sc-Ks
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 21:13:01 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:44226)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <iwatchnima@gmail.com>)
+ id 1kGXcZ-0007Ol-Rj
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 21:13:01 -0400
+Received: by mail-wr1-x430.google.com with SMTP id s12so9668314wrw.11
+ for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 18:12:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=xjjfcLp/S/DgiOyjX0IQjWV/kOCJXMeNKU/CADeSptg=;
+ b=uJykHANL5uzh/L0O6eji3tu1EdCXiTKOx+Nfxa90x7TrS/c4Xef3dPTygZR7kwvI5S
+ 4Ix22/ArujtZAN5xPDWQjuA+cVoHMBFKj7Y/fZRpD9g2kqO0V4t46sljWNJ5FSYJCc9B
+ YNNNPWsz0CoKPkqYfKOTtAKIoBgSclGRlJSTOCl601noIil0hydz6iKLdd0KHbd8aGrx
+ WVi+g+3qdBC4GJS8IreB7tHfZkAzui8jKlXn5g+3tRONlK1XicVmQp7vuUS/R81prNhp
+ iZoxV8Jcsr7RGSAyyIheTLKwEcqxrwnL+HNTL9Tu2jpenIbxgvWwuZp555G5TCvse0bD
+ wTdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=xjjfcLp/S/DgiOyjX0IQjWV/kOCJXMeNKU/CADeSptg=;
+ b=fFYpYZAFtChBRI+IS8Nqo4ROkmDMwqbXFlyI6yrQLVPi0N0Idfi01yKPhkJEVNnqUH
+ 0G2vpK7EESqI0au3tcwGcfnDtRfbI0/HEzjnxQ3Fc/A5AHHfuKKc4xg2J3DJhVGvfJTX
+ LbTE0h2O/mnEs2t2so4AMFysI1DJRnrv2eOSKbjCSmy+A/fss3kt2u9Jz1rWomIw+OK2
+ cSpRRUFq3ilgVontbUwp0xNKRKJrWUD5DaFw1pwl+MJB2M643nELk57oQWMBMKIDsXzS
+ csLgpvbsVX3geEQB+dCbot54WaoJJ1f0DSvp/FVZ0ergAk02CYZCD8goObUsM804Xi6W
+ WBsg==
+X-Gm-Message-State: AOAM5308NN0V0YVDgaxng6s+y/xujco2vm6Qkkq5k7uH/bxcEp0GzlvR
+ PaMB8I0pS/JBL9yo7/9TOt7Dq9VU0vnUcFegxAL3g0t7uVq8Rs1H
+X-Google-Smtp-Source: ABdhPJzYbp7F2N6OwHaRcbDsOOJyQtTS7eD6zb3t3/VhGh4/VdYa/l/xm/ixuOXiTQv9EvOOa5+KYvaEyZCf/OTdgjA=
+X-Received: by 2002:a5d:5042:: with SMTP id h2mr11752297wrt.409.1599786777617; 
+ Thu, 10 Sep 2020 18:12:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200910120244.71e7b630@w520.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: pass client-ip=134.134.136.100;
- envelope-from=yan.y.zhao@intel.com; helo=mga07.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 20:57:08
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+From: zou xu <iwatchnima@gmail.com>
+Date: Fri, 11 Sep 2020 09:12:41 +0800
+Message-ID: <CA+Lzsy=o9yshAAAacuTwcs3Hfr4MfWiX-SiUf5A2Fds3vGOrAQ@mail.gmail.com>
+Subject: [PATCH 1/1] accel/tcg/user-exec: support computing is_write for mips32
+To: qemu-devel@nongnu.org
+Content-Type: multipart/alternative; boundary="00000000000098aa3305aeff62d5"
+Received-SPF: pass client-ip=2a00:1450:4864:20::430;
+ envelope-from=iwatchnima@gmail.com; helo=mail-wr1-x430.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,108 +90,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
- eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
- openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
- kevin.tian@intel.com, Parav Pandit <parav@mellanox.com>,
- jian-feng.ding@intel.com, dgilbert@redhat.com, zhenyuw@linux.intel.com,
- hejie.xu@intel.com, bao.yumeng@zte.com.cn, Jiri Pirko <jiri@mellanox.com>,
- eskultet@redhat.com, Sean Mooney <smooney@redhat.com>,
- intel-gvt-dev@lists.freedesktop.org,
- Daniel =?iso-8859-1?Q?P=2EBerrang=E9?= <berrange@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, dinechin@redhat.com, devel@ovirt.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 10, 2020 at 12:02:44PM -0600, Alex Williamson wrote:
-> On Thu, 10 Sep 2020 13:50:11 +0100
-> Sean Mooney <smooney@redhat.com> wrote:
-> 
-> > On Thu, 2020-09-10 at 14:38 +0200, Cornelia Huck wrote:
-> > > On Wed, 9 Sep 2020 10:13:09 +0800
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > >   
-> > > > > > still, I'd like to put it more explicitly to make ensure it's not missed:
-> > > > > > the reason we want to specify compatible_type as a trait and check
-> > > > > > whether target compatible_type is the superset of source
-> > > > > > compatible_type is for the consideration of backward compatibility.
-> > > > > > e.g.
-> > > > > > an old generation device may have a mdev type xxx-v4-yyy, while a newer
-> > > > > > generation  device may be of mdev type xxx-v5-yyy.
-> > > > > > with the compatible_type traits, the old generation device is still
-> > > > > > able to be regarded as compatible to newer generation device even their
-> > > > > > mdev types are not equal.    
-> > > > > 
-> > > > > If you want to support migration from v4 to v5, can't the (presumably
-> > > > > newer) driver that supports v5 simply register the v4 type as well, so
-> > > > > that the mdev can be created as v4? (Just like QEMU versioned machine
-> > > > > types work.)    
-> > > > 
-> > > > yes, it should work in some conditions.
-> > > > but it may not be that good in some cases when v5 and v4 in the name string
-> > > > of mdev type identify hardware generation (e.g. v4 for gen8, and v5 for
-> > > > gen9)
-> > > > 
-> > > > e.g.
-> > > > (1). when src mdev type is v4 and target mdev type is v5 as
-> > > > software does not support it initially, and v4 and v5 identify hardware
-> > > > differences.  
-> > > 
-> > > My first hunch here is: Don't introduce types that may be compatible
-> > > later. Either make them compatible, or make them distinct by design,
-> > > and possibly add a different, compatible type later.
-> > >   
-> > > > then after software upgrade, v5 is now compatible to v4, should the
-> > > > software now downgrade mdev type from v5 to v4?
-> > > > not sure if moving hardware generation info into a separate attribute
-> > > > from mdev type name is better. e.g. remove v4, v5 in mdev type, while use
-> > > > compatible_pci_ids to identify compatibility.  
-> > > 
-> > > If the generations are compatible, don't mention it in the mdev type.
-> > > If they aren't, use distinct types, so that management software doesn't
-> > > have to guess. At least that would be my naive approach here.  
-> > yep that is what i would prefer to see too.
-> > >   
-> > > > 
-> > > > (2) name string of mdev type is composed by "driver_name + type_name".
-> > > > in some devices, e.g. qat, different generations of devices are binding to
-> > > > drivers of different names, e.g. "qat-v4", "qat-v5".
-> > > > then though type_name is equal, mdev type is not equal. e.g.
-> > > > "qat-v4-type1", "qat-v5-type1".  
-> > > 
-> > > I guess that shows a shortcoming of that "driver_name + type_name"
-> > > approach? Or maybe I'm just confused.  
-> > yes i really dont like haveing the version in the mdev-type name 
-> > i would stongly perfger just qat-type-1 wehere qat is just there as a way of namespacing.
-> > although symmetric-cryto, asymmetric-cryto and compression woudl be a better name then type-1, type-2, type-3 if
-> > that is what they would end up mapping too. e.g. qat-compression or qat-aes is a much better name then type-1
-> > higher layers of software are unlikely to parse the mdev names but as a human looking at them its much eaiser to
-> > understand if the names are meaningful. the qat prefix i think is important however to make sure that your mdev-types
-> > dont colide with other vendeors mdev types. so i woudl encurage all vendors to prefix there mdev types with etiher the
-> > device name or the vendor.
-> 
-> +1 to all this, the mdev type is meant to indicate a software
-> compatible interface, if different hardware versions can be software
-> compatible, then don't make the job of finding a compatible device
-> harder.  The full type is a combination of the vendor driver name plus
-> the vendor provided type name specifically in order to provide a type
-> namespace per vendor driver.  That's done at the mdev core level.
-> Thanks,
+--00000000000098aa3305aeff62d5
+Content-Type: text/plain; charset="UTF-8"
 
-hi Alex,
-got it. so do you suggest that vendors use consistent driver name over
-generations of devices?
-for qat, they create different modules for each generation. This
-practice is not good if they want to support migration between devices
-of different generations, right?
+From 533ed02427bdaf0265f62fcb4f961854a41b7037 Mon Sep 17 00:00:00 2001
+From: ZouXu <iwatchnima@gmail.com>
+Date: Wed, 9 Sep 2020 21:59:13 +0800
+Subject: [PATCH 1/1] accel/tcg/user-exec: support computing is_write for
+ mips32
 
-and can I understand that we don't want support of migration between
-different mdev types even in future ?
+Those MIPS32 instructions can cause store operation:
+SB/SH/SW/SD/SWL/SWR/SDL/SDR/CACHE
+SC/SCD/SWC1/SWC2/SDC1/SDC2
+---
+ accel/tcg/user-exec.c | 34 +++++++++++++++++++++++++++++++---
+ 1 file changed, 31 insertions(+), 3 deletions(-)
 
-Thanks
-Yan
+diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
+index bb039eb32d..b5ad721aa5 100644
+--- a/accel/tcg/user-exec.c
++++ b/accel/tcg/user-exec.c
+@@ -708,10 +708,38 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+     siginfo_t *info = pinfo;
+     ucontext_t *uc = puc;
+     greg_t pc = uc->uc_mcontext.pc;
+-    int is_write;
++    int is_write = 0;
++
++    /* Detect store by reading the instruction at the program counter. */
++    uint32_t insn = *(uint32_t *)pc;
++    switch(insn>>29) {
++    case 0x5:
++        switch((insn>>26) & 0x7) {
++        case 0x0: /* SB */
++        case 0x1: /* SH */
++        case 0x2: /* SWL */
++        case 0x3: /* SW */
++        case 0x4: /* SDL */
++        case 0x5: /* SDR */
++        case 0x6: /* SWR */
++        case 0x7: /* CACHE */
++            is_write = 1;
++        }
++        break;
++    case 0x7:
++        switch((insn>>26) & 0x7) {
++        case 0x0: /* SC */
++        case 0x1: /* SWC1 */
++        case 0x2: /* SWC2 */
++        case 0x4: /* SCD */
++        case 0x5: /* SDC1 */
++        case 0x6: /* SDC2 */
++        case 0x7: /* SD */
++            is_write = 1;
++        }
++        break;
++    }
 
+-    /* XXX: compute is_write */
+-    is_write = 0;
+     return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
+ }
+
+-- 
+2.25.1
+
+--00000000000098aa3305aeff62d5
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">From 533ed02427bdaf0265f62fcb4f961854a41b7037 Mon Sep 17 0=
+0:00:00 2001<br>From: ZouXu &lt;<a href=3D"mailto:iwatchnima@gmail.com">iwa=
+tchnima@gmail.com</a>&gt;<br>Date: Wed, 9 Sep 2020 21:59:13 +0800<br>Subjec=
+t: [PATCH 1/1] accel/tcg/user-exec: support computing is_write for<br>=C2=
+=A0mips32<br><br>Those MIPS32 instructions can cause store operation:<br>SB=
+/SH/SW/SD/SWL/SWR/SDL/SDR/CACHE<br>SC/SCD/SWC1/SWC2/SDC1/SDC2<br>---<br>=C2=
+=A0accel/tcg/user-exec.c | 34 +++++++++++++++++++++++++++++++---<br>=C2=A01=
+ file changed, 31 insertions(+), 3 deletions(-)<br><br>diff --git a/accel/t=
+cg/user-exec.c b/accel/tcg/user-exec.c<br>index bb039eb32d..b5ad721aa5 1006=
+44<br>--- a/accel/tcg/user-exec.c<br>+++ b/accel/tcg/user-exec.c<br>@@ -708=
+,10 +708,38 @@ int cpu_signal_handler(int host_signum, void *pinfo,<br>=C2=
+=A0 =C2=A0 =C2=A0siginfo_t *info =3D pinfo;<br>=C2=A0 =C2=A0 =C2=A0ucontext=
+_t *uc =3D puc;<br>=C2=A0 =C2=A0 =C2=A0greg_t pc =3D uc-&gt;uc_mcontext.pc;=
+<br>- =C2=A0 =C2=A0int is_write;<br>+ =C2=A0 =C2=A0int is_write =3D 0;<br>+=
+ =C2=A0 <br>+ =C2=A0 =C2=A0/* Detect store by reading the instruction at th=
+e program counter. */<br>+ =C2=A0 =C2=A0uint32_t insn =3D *(uint32_t *)pc;<=
+br>+ =C2=A0 =C2=A0switch(insn&gt;&gt;29) {<br>+ =C2=A0 =C2=A0case 0x5:<br>+=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0switch((insn&gt;&gt;26) &amp; 0x7) {<br>+ =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0case 0x0: /* SB */<br>+ =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+case 0x1: /* SH */<br>+ =C2=A0 =C2=A0 =C2=A0 =C2=A0case 0x2: /* SWL */<br>+=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0case 0x3: /* SW */<br>+ =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0case 0x4: /* SDL */<br>+ =C2=A0 =C2=A0 =C2=A0 =C2=A0case 0x5: /* SDR =
+*/<br>+ =C2=A0 =C2=A0 =C2=A0 =C2=A0case 0x6: /* SWR */<br>+ =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0case 0x7: /* CACHE */<br>+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0is_write =3D 1;<br>+ =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>+ =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0break;<br>+ =C2=A0 =C2=A0case 0x7:<br>+ =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0switch((insn&gt;&gt;26) &amp; 0x7) {<br>+ =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+case 0x0: /* SC */<br>+ =C2=A0 =C2=A0 =C2=A0 =C2=A0case 0x1: /* SWC1 */<br>=
++ =C2=A0 =C2=A0 =C2=A0 =C2=A0case 0x2: /* SWC2 */<br>+ =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0case 0x4: /* SCD */<br>+ =C2=A0 =C2=A0 =C2=A0 =C2=A0case 0x5: /* SDC=
+1 */<br>+ =C2=A0 =C2=A0 =C2=A0 =C2=A0case 0x6: /* SDC2 */<br>+ =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0case 0x7: /* SD */<br>+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0is_write =3D 1;<br>+ =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>+ =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0break;<br>+ =C2=A0 =C2=A0}<br>=C2=A0<br>- =C2=A0 =C2=A0/* XXX=
+: compute is_write */<br>- =C2=A0 =C2=A0is_write =3D 0;<br>=C2=A0 =C2=A0 =
+=C2=A0return handle_cpu_signal(pc, info, is_write, &amp;uc-&gt;uc_sigmask);=
+<br>=C2=A0}<br>=C2=A0<br>-- <br>2.25.1<br><br></div>
+
+--00000000000098aa3305aeff62d5--
 
