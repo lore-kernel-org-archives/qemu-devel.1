@@ -2,110 +2,60 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C1B3C43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 15:43:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF302C43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 15:45:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECD29206F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 15:43:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cmdZE+Ke"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECD29206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 10DCE206F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 15:45:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10DCE206F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGlCr-0003Z5-QP
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 11:43:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48624)
+	id 1kGlES-0005Yb-VL
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 11:45:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48650)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kGlAr-0001yz-MK
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 11:41:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24229
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kGlAp-000174-Hb
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 11:41:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599838874;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=REVACPM0Uu7i9touFnN874v73TvchaKvsz2iiCqQ5+w=;
- b=cmdZE+Ke/5SzOaOYIqGxAQXrzb4KgaJdnyoSLsNTeRtpPKg/R2evSeE0VquhbDT26YVtMf
- zL7HjD4S8+v7yRZKzWpsBAgA3iUJAr98YPjHJHmvDcjya5O1VhvjC+e/ZdYMi44ugpskRl
- dH3+imnm7U3uQ7UuTjxz+FBgcWAh7JU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-157-kaTHJMwrNRyUQGcXUC08Rw-1; Fri, 11 Sep 2020 11:41:12 -0400
-X-MC-Unique: kaTHJMwrNRyUQGcXUC08Rw-1
-Received: by mail-wm1-f72.google.com with SMTP id k12so1998678wmj.1
- for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 08:41:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=REVACPM0Uu7i9touFnN874v73TvchaKvsz2iiCqQ5+w=;
- b=Gd9Wsmy9AgwOisbrx+8+ZiAzFJTRK7wep1Yxt6CDgYAzKncY4rVdE6o/4hXGh6Kk08
- TSZxvXkHPZRK4h9rFTJf/H8Li3GnytMRnOSQfnoHuDkoIi3hM0BdlJAJ+ifclgsZmZPo
- 8Bl3/AZD+tVbCIqG9TAMdT3tW5MMvbRzrn2+lg6miJaPpXuesYf4ntrfHyw19VnSzOT0
- +7P6B8tXOxeMSkxZ5YO3m8KFoBbGRmo+wh+5I/3gOb5PdqsW3p25agtP9uq2Ao8G4iys
- vy5+DbXs/HLmUgiSsvirG0dovWobyPK8yj+/vaRXvrpKAoJHSbje7NP/eCw3xi4Pmt7l
- xdwA==
-X-Gm-Message-State: AOAM533gpSGdgkPicGSlyDQBNtGxrg2URTyrcM0bqDjVb4qBeUbtfLVS
- LWIZQ8JBzV+8qZIE4QmY/lD3uDmEKsafabcRQdg4F4duJ440enlVS8xX/ZH/rFKsFS1VTyb1esc
- 78BNSzKr+Dge34Sw=
-X-Received: by 2002:a5d:51ce:: with SMTP id n14mr2625010wrv.8.1599838871486;
- Fri, 11 Sep 2020 08:41:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz6tu+RHCKUT/BOG9BrlHWsbGVlTwJphdINvWdvv6a84KhN0F1dRM8tMfIATla8va+D3SIIzA==
-X-Received: by 2002:a5d:51ce:: with SMTP id n14mr2624998wrv.8.1599838871252;
- Fri, 11 Sep 2020 08:41:11 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5568:7f99:4893:a5b6?
- ([2001:b07:6468:f312:5568:7f99:4893:a5b6])
- by smtp.gmail.com with ESMTPSA id 70sm5501805wme.15.2020.09.11.08.41.10
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 11 Sep 2020 08:41:10 -0700 (PDT)
-Subject: Re: [PATCH] WHPX: vmware cpuid leaf for tsc and apic frequency
-To: Sunil Muthuswamy <sunilmut@microsoft.com>,
- Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
-References: <SN4PR2101MB08808DFDDC3F442BBEAADFF4C0710@SN4PR2101MB0880.namprd21.prod.outlook.com>
- <SN4PR2101MB0880639FEAA957A1A3FE26ECC0510@SN4PR2101MB0880.namprd21.prod.outlook.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <47a5e03d-914b-9753-f1e4-54118caccd9e@redhat.com>
-Date: Fri, 11 Sep 2020 17:41:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kGlAu-000231-IW
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 11:41:20 -0400
+Received: from relay64.bu.edu ([128.197.228.104]:34171)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kGlAs-00017K-SP
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 11:41:20 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 08BFet0h024855
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Fri, 11 Sep 2020 11:40:59 -0400
+Date: Fri, 11 Sep 2020 11:40:55 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: P J P <ppandit@redhat.com>
+Subject: Re: About 'qemu-security' mailing list
+Message-ID: <20200911154055.hnh6wgqpc5pdcyjl@mozz.bu.edu>
+References: <nycvar.YSQ.7.78.906.2009111910280.36374@xnncv>
 MIME-Version: 1.0
-In-Reply-To: <SN4PR2101MB0880639FEAA957A1A3FE26ECC0510@SN4PR2101MB0880.namprd21.prod.outlook.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 09:43:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -45
-X-Spam_score: -4.6
-X-Spam_bar: ----
-X-Spam_report: (-4.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.469, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <nycvar.YSQ.7.78.906.2009111910280.36374@xnncv>
+Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
+ helo=relay64.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 11:41:17
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -31
+X-Spam_score: -3.2
+X-Spam_bar: ---
+X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=0.999, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,240 +68,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Weil <sw@weilnetz.de>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/09/20 01:32, Sunil Muthuswamy wrote:
-> Can I please get some eyes on this?
+Hi Prasad,
+A couple questions:
+ * I'm guessing this will be a closed list with some application/vetting
+   procedure for the participants? (Maybe this is what you mean by
+   "moderated" ?)
+ * How will the communication be encrypted?
+ * Will secalert still be subscribed (for managing CVE ID assignments)?
+ * Assuming PGP will be gone, will it be possible to make the "This bug
+   is a security vulnerability" button work on Launchpad?
+Thanks!
+-Alex
 
-Yes, sorry about the bad timing (5.1 freeze + Meson conversion +
-parental leave).
-
-Paolo
-
->> -----Original Message-----
->> From: Sunil Muthuswamy
->> Sent: Thursday, July 30, 2020 3:11 PM
->> To: Paolo Bonzini <pbonzini@redhat.com>; Richard Henderson <rth@twiddle.net>; Eduardo Habkost <ehabkost@redhat.com>
->> Cc: qemu-devel@nongnu.org; Stefan Weil <sw@weilnetz.de>
->> Subject: [PATCH] WHPX: vmware cpuid leaf for tsc and apic frequency
->>
->> Newer versions of WHPX provide the capability to query the tsc
->> and apic frequency. Expose these through the vmware cpuid leaf.
->> This patch doesnt support setting the tsc frequency; that will
->> come as a separate fix.
->>
->> Signed-off-by: Sunil Muthuswamy <sunilmut@microsoft.com>
->> ---
->>  target/i386/whp-dispatch.h |  3 +-
->>  target/i386/whpx-all.c     | 94 ++++++++++++++++++++++++++++++++++----
->>  2 files changed, 86 insertions(+), 11 deletions(-)
->>
->> diff --git a/target/i386/whp-dispatch.h b/target/i386/whp-dispatch.h
->> index e4695c349f..b18aba20ed 100644
->> --- a/target/i386/whp-dispatch.h
->> +++ b/target/i386/whp-dispatch.h
->> @@ -2,10 +2,11 @@
->>  #define WHP_DISPATCH_H
->>
->>  #include <windows.h>
->> -
->>  #include <WinHvPlatform.h>
->>  #include <WinHvEmulation.h>
->>
->> +#define WHV_E_UNKNOWN_CAPABILITY 0x80370300L
->> +
->>  #define LIST_WINHVPLATFORM_FUNCTIONS(X) \
->>    X(HRESULT, WHvGetCapability, (WHV_CAPABILITY_CODE CapabilityCode, VOID* CapabilityBuffer, UINT32
->> CapabilityBufferSizeInBytes, UINT32* WrittenSizeInBytes)) \
->>    X(HRESULT, WHvCreatePartition, (WHV_PARTITION_HANDLE* Partition)) \
->> diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
->> index c78baac6df..da4c135925 100644
->> --- a/target/i386/whpx-all.c
->> +++ b/target/i386/whpx-all.c
->> @@ -27,6 +27,8 @@
->>  #include <WinHvPlatform.h>
->>  #include <WinHvEmulation.h>
->>
->> +#define HYPERV_APIC_BUS_FREQUENCY      (200000000ULL)
->> +
->>  struct whpx_state {
->>      uint64_t mem_quota;
->>      WHV_PARTITION_HANDLE partition;
->> @@ -1061,6 +1063,18 @@ static int whpx_vcpu_run(CPUState *cpu)
->>              cpu_x86_cpuid(env, cpuid_fn, 0, (UINT32 *)&rax, (UINT32 *)&rbx,
->>                  (UINT32 *)&rcx, (UINT32 *)&rdx);
->>              switch (cpuid_fn) {
->> +            case 0x40000000:
->> +                /* Expose the vmware cpu frequency cpuid leaf */
->> +                rax = 0x40000010;
->> +                rbx = rcx = rdx = 0;
->> +                break;
->> +
->> +            case 0x40000010:
->> +                rax = env->tsc_khz;
->> +                rbx = env->apic_bus_freq / 1000; /* Hz to KHz */
->> +                rcx = rdx = 0;
->> +                break;
->> +
->>              case 0x80000001:
->>                  /* Remove any support of OSVW */
->>                  rcx &= ~CPUID_EXT3_OSVW;
->> @@ -1193,6 +1207,10 @@ int whpx_init_vcpu(CPUState *cpu)
->>      struct whpx_state *whpx = &whpx_global;
->>      struct whpx_vcpu *vcpu;
->>      Error *local_error = NULL;
->> +    struct CPUX86State *env = (CPUArchState *)(cpu->env_ptr);
->> +    X86CPU *x86_cpu = X86_CPU(cpu);
->> +    UINT64 freq = 0;
->> +    int ret;
->>
->>      /* Add migration blockers for all unsupported features of the
->>       * Windows Hypervisor Platform
->> @@ -1207,7 +1225,8 @@ int whpx_init_vcpu(CPUState *cpu)
->>              error_report_err(local_error);
->>              migrate_del_blocker(whpx_migration_blocker);
->>              error_free(whpx_migration_blocker);
->> -            return -EINVAL;
->> +            ret = -EINVAL;
->> +            goto error;
->>          }
->>      }
->>
->> @@ -1215,7 +1234,8 @@ int whpx_init_vcpu(CPUState *cpu)
->>
->>      if (!vcpu) {
->>          error_report("WHPX: Failed to allocte VCPU context.");
->> -        return -ENOMEM;
->> +        ret = -ENOMEM;
->> +        goto error;
->>      }
->>
->>      hr = whp_dispatch.WHvEmulatorCreateEmulator(
->> @@ -1224,8 +1244,8 @@ int whpx_init_vcpu(CPUState *cpu)
->>      if (FAILED(hr)) {
->>          error_report("WHPX: Failed to setup instruction completion support,"
->>                       " hr=%08lx", hr);
->> -        g_free(vcpu);
->> -        return -EINVAL;
->> +        ret = -EINVAL;
->> +        goto error;
->>      }
->>
->>      hr = whp_dispatch.WHvCreateVirtualProcessor(
->> @@ -1234,17 +1254,72 @@ int whpx_init_vcpu(CPUState *cpu)
->>          error_report("WHPX: Failed to create a virtual processor,"
->>                       " hr=%08lx", hr);
->>          whp_dispatch.WHvEmulatorDestroyEmulator(vcpu->emulator);
->> -        g_free(vcpu);
->> -        return -EINVAL;
->> +        ret = -EINVAL;
->> +        goto error;
->>      }
->>
->> -    vcpu->interruptable = true;
->> +    /*
->> +     * vcpu's TSC frequency is either specified by user, or use the value
->> +     * provided by Hyper-V if the former is not present. In the latter case, we
->> +     * query it from Hyper-V and record in env->tsc_khz, so that vcpu's TSC
->> +     * frequency can be migrated later via this field.
->> +     */
->> +    if (!env->tsc_khz) {
->> +        hr = whp_dispatch.WHvGetCapability(
->> +            WHvCapabilityCodeProcessorClockFrequency, &freq, sizeof(freq),
->> +                NULL);
->> +        if (hr != WHV_E_UNKNOWN_CAPABILITY) {
->> +            if (FAILED(hr)) {
->> +                printf("WHPX: Failed to query tsc frequency, hr=0x%08lx\n", hr);
->> +            } else {
->> +                env->tsc_khz = freq / 1000; /* Hz to KHz */
->> +            }
->> +        }
->> +    }
->>
->> +    env->apic_bus_freq = HYPERV_APIC_BUS_FREQUENCY;
->> +    hr = whp_dispatch.WHvGetCapability(
->> +        WHvCapabilityCodeInterruptClockFrequency, &freq, sizeof(freq), NULL);
->> +    if (hr != WHV_E_UNKNOWN_CAPABILITY) {
->> +        if (FAILED(hr)) {
->> +            printf("WHPX: Failed to query apic bus frequency hr=0x%08lx\n", hr);
->> +        } else {
->> +            env->apic_bus_freq = freq;
->> +        }
->> +    }
->> +
->> +    /*
->> +     * If the vmware cpuid frequency leaf option is set, and we have a valid
->> +     * tsc value, trap the corresponding cpuid's.
->> +     */
->> +    if (x86_cpu->vmware_cpuid_freq && env->tsc_khz) {
->> +        UINT32 cpuidExitList[] = {1, 0x80000001, 0x40000000, 0x40000010};
->> +
->> +        hr = whp_dispatch.WHvSetPartitionProperty(
->> +                whpx->partition,
->> +                WHvPartitionPropertyCodeCpuidExitList,
->> +                cpuidExitList,
->> +                RTL_NUMBER_OF(cpuidExitList) * sizeof(UINT32));
->> +
->> +        if (FAILED(hr)) {
->> +            error_report("WHPX: Failed to set partition CpuidExitList hr=%08lx",
->> +                        hr);
->> +            ret = -EINVAL;
->> +            goto error;
->> +        }
->> +    }
->> +
->> +    vcpu->interruptable = true;
->>      cpu->vcpu_dirty = true;
->>      cpu->hax_vcpu = (struct hax_vcpu_state *)vcpu;
->>      qemu_add_vm_change_state_handler(whpx_cpu_update_state, cpu->env_ptr);
->>
->>      return 0;
->> +
->> +error:
->> +    g_free(vcpu);
->> +
->> +    return ret;
->>  }
->>
->>  int whpx_vcpu_exec(CPUState *cpu)
->> @@ -1493,6 +1568,7 @@ static int whpx_accel_init(MachineState *ms)
->>      WHV_CAPABILITY whpx_cap;
->>      UINT32 whpx_cap_size;
->>      WHV_PARTITION_PROPERTY prop;
->> +    UINT32 cpuidExitList[] = {1, 0x80000001};
->>
->>      whpx = &whpx_global;
->>
->> @@ -1551,7 +1627,6 @@ static int whpx_accel_init(MachineState *ms)
->>          goto error;
->>      }
->>
->> -    UINT32 cpuidExitList[] = {1, 0x80000001};
->>      hr = whp_dispatch.WHvSetPartitionProperty(
->>          whpx->partition,
->>          WHvPartitionPropertyCodeCpuidExitList,
->> @@ -1579,14 +1654,13 @@ static int whpx_accel_init(MachineState *ms)
->>      printf("Windows Hypervisor Platform accelerator is operational\n");
->>      return 0;
->>
->> -  error:
->> +error:
->>
->>      if (NULL != whpx->partition) {
->>          whp_dispatch.WHvDeletePartition(whpx->partition);
->>          whpx->partition = NULL;
->>      }
->>
->> -
->>      return ret;
->>  }
->>
->> --
->> 2.25.1
+On 200911 1950, P J P wrote:
+>   Hello all,
 > 
-
+> Recently while conversing with DanPB this point came up
+> 
+>    -> https://www.qemu.org/contribute/security-process/
+> 
+> * Currently QEMU security team is a handful of individual contacts which
+>   restricts community participation in dealing with these issues.
+> 
+> * The Onus also lies with the individuals to inform the community about QEMU
+>   security issues, as they come in.
+> 
+> 
+> Proposal: (to address above limitations)
+> =========
+> 
+> * We set up a new 'qemu-security' mailing list.
+> 
+> * QEMU security issues are reported to this new list only.
+> 
+> * Representatives from various communities subscribe to this list. (List maybe
+>   moderated in the beginning.)
+> 
+> * As QEMU issues come in, participants on the 'qemu-security' list shall
+>   discuss and decide about how to triage them further.
+> 
+> Please kindly let us know your views about it. I'd appreciate if you have
+> any suggestions/inputs/comments about the same.
+> 
+> 
+> Thank you.
+> --
+> Prasad J Pandit / Red Hat Product Security Team
+> 8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+> 
+> 
 
