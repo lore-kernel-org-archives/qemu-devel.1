@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69931C43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:39:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 240CCC43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:39:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2444E214F1
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:39:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2444E214F1
+	by mail.kernel.org (Postfix) with ESMTPS id AF892214F1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:39:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF892214F1
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGot3-0003QZ-7d
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 15:39:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44926)
+	id 1kGotk-0004fy-Lx
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 15:39:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44946)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kGoo1-0002ym-Rg; Fri, 11 Sep 2020 15:33:57 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:60437)
+ id 1kGoo2-00031w-Tq; Fri, 11 Sep 2020 15:33:58 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:49519)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kGonx-0000pl-F7; Fri, 11 Sep 2020 15:33:57 -0400
+ id 1kGoo0-0000qZ-TW; Fri, 11 Sep 2020 15:33:58 -0400
 Received: from localhost.localdomain ([82.252.129.222]) by
  mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1N94FT-1kcuQm0rXb-0164xR; Fri, 11 Sep 2020 21:33:47 +0200
+ id 1MMY9X-1jzQoC2fFH-00JYvd; Fri, 11 Sep 2020 21:33:52 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 12/18] hw: hyperv: vmbus: Fix 32bit compilation
-Date: Fri, 11 Sep 2020 21:33:24 +0200
-Message-Id: <20200911193330.1148942-13-laurent@vivier.eu>
+Subject: [PULL 15/18] hw/arm/pxa2xx: Add missing fallthrough comment
+Date: Fri, 11 Sep 2020 21:33:27 +0200
+Message-Id: <20200911193330.1148942-16-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200911193330.1148942-1-laurent@vivier.eu>
 References: <20200911193330.1148942-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:K4gAqu5gqDOiQPAt7j4PednT7s9z+df7zh63luO3srHDbESqqmT
- L+y+/SRIztKLnUXqISo/RraJQtbT5tflDaY8iECxMMThzbZjApz2N4MviXBpT6+8LQXi8qr
- +N2/XFRJjwSUGmGusH03HMwGa4Id5GmcyRXEYEGnWJfMqqMtySWVQknAnZKzEYK58XUjC5w
- yZzNh1ZtQkVu4KY3P1euQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:uM8ICdled2c=:Hmcc8M85HnqHFY9KCqnI6g
- 2NzWChgIn3HsxHpKenpsY3xeohG/MCDgH3Jv/PX0ru10hLoZgzCKeTmqN5Slphj1P47T6Z57/
- HOKV/78J6xq76EXQcvXWUw4AMvFmAWgJ7MjjqsGL3d8KRt2kiqHJL2hrhfVPWyHIlxT4B5N0z
- r//cPCITfvg8PL9NzvSpvIxVbn0rH4Bi9kkdYAbTV2DNznX3RlMNtEkee+r8kgSmX4KYaovRo
- Al9qHs2mCD5nzFI+zAUGjkYJx5wTOSItA1/8fDjDilK0TYWqZr5ihRbpSIEjSLiBPXPc8dhtl
- o9VPg25mK0htLfUXCTde77TScwdcFkpezkBBlPKpJbM5wo5Fd6eCF35wDauXJ3s+IrwSdBlyy
- YBudl6Aifuv/GsyzNK0t5e1X9iS0zYa5IswaIf/M8wzZz4Eg3WEPt0rrTRvysjeKCucv2suie
- xqaYESAgdzhNdalqlJ+emSD7MIj3BqbE7nT6FTf+iXzTvZELmvkAIBjtMUz0YwRSQTa9f61+V
- bbr7dlFZYYNS4U4B0ZPJZBkN/icFWIzxikKnU0pDprf1slQ9xB/5/7NuMxKEDJf1+68KVEzP+
- ebobamn/ZhmeEG+uNOViXFLQUViSmp+w0bR1dMN3yUP/RoFSUQ0wjWnWFJWNpyENm6RLspuRJ
- m52To9fFbuso9JHfEFwStUtJIVh2OGyOh1vohET1lsKkFDSZqPwSdJw0WUw3ijuTRfq7+0Q6W
- y0hNahPRkBLJObgsuR8mv5mfX0+sF/ue8hxg632CS+AOaMzEwi6Z+zNjj2yMmfq9cB/zYrb4Z
- Y7q57PnUrj60L5V5YRoP5zq85AtjmZmDAIzz1lZ2FBgI+vj6M/touSuEN5K27WSHsDc55Rg
-Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:MFlSvULitaydFXZ1z6AuKK+Pklr0g/yjNEpPSc4suR87LECVFeI
+ atTidlOQpKNbzZMiqsOsO5tFr1sFUQczA4QS7xKwGwYId64+JP3Ch0QfBdYXpVrNA+Ri3gp
+ xXOs3Sx8Z8p3o/PzGcGfXnqazut3fQzJ4zYB0JT8Hl9gYjT3y/v3KOi4TglaUeLxRSGZtmP
+ NEH/35ysKQgk52O/KnCkA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:NmYKcVDTjTA=:PpYvzJSdhmoF2gdezkJ8bD
+ Ao9ZYhxovp4/4D3VW868TC+3L24gnsdwQ9pgHfiVDL5+fu77wouifgRkYUAVMscXHtxkC4oZy
+ MmPP/ut4cEOWa5tQSIj9z1Ntxda9X75R1Gt2J1POznyG/C/LVLE7+8G5Os/pBxuoGlBRZifKM
+ cYy0NUK0710tf+tGUR5t5FkYIIEr2AL0KhSvSYNlJeGv/yiq4o4aMWKdBalHbdmSmqzagFVFm
+ sNKav4oQsilAkBtwX4gDOirv6HzHTIUCcOZhzCqpR716tAFrduVkyR6fDqlh1an14TzmjCkGM
+ gp0deSCPYyv8EyToSF5GkofcBufUx3p2OTDcCEsAA3nq49NvofL8p5svwp6M9O/t5Vk+Hxip8
+ FNzYfUrmjnTqQw9P6kyBfDitFMK0PB4QyP0oGhfKANdYFWYcNJVZp3/r1kxGa53fPNFg89BOt
+ KyuKuJMxuziuXaKJB+97X8Wgzo/mVMHkeyKNlHDiQUFYpxc2aN5hg8oUpWmPFaKnjq69rzrN5
+ kA0eZ7SZ+knX3nIo5g3RhNfZIrj5hGaDcCX4Yym6VGRSe7GD06z7LDPcVxdCB8rUQW0kok5yM
+ w/JnTpWy/tEggdupV+arbY3rR6JqIiO122br2SiBO2lotQAUzBqGigozUi8eE4i+3gbdNP6Yu
+ f070XiHEKePdoW4bNf7erMUBrsrfJUQnDkMoZ2zPoy2wWazOfNZOumf/Cy+trC+CrD4iYPzLi
+ +o7I3pFi+9XmRjihiBun0vqKXf4N6TfV3nsekw7l8ZZvdgyvew2+xMmaCT5N642fgLakUdQPC
+ rCQu1L9+f04vNpYNgC4ZzvxQJGiETctKoKsgTWo9A9IWtpO42bHIXCn88z/+p+9I7u5Gu9J
+Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 15:33:41
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 15:33:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -83,48 +83,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Laurent Vivier <laurent@vivier.eu>, Jon Doron <arilou@gmail.com>
+Cc: qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jon Doron <arilou@gmail.com>
+From: Thomas Huth <thuth@redhat.com>
 
-Fix 32-bit build error for vmbus:
+Let's make this file compilable with -Werror=implicit-fallthrough :
+Looking at the code, it seems like the fallthrough is intended here,
+so we should add the corresponding "/* fallthrough */" comment here.
 
-  hw/hyperv/vmbus.c: In function ‘gpadl_iter_io’:
-  hw/hyperv/vmbus.c:383:13: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
-  383 |         p = (void *)(((uintptr_t)iter->map & TARGET_PAGE_MASK) | off_in_page);
-      |             ^
-  cc1: all warnings being treated as errors
-
-Fixes: 0d71f7082d7 ("vmbus: vmbus implementation")
-Signed-off-by: Jon Doron <arilou@gmail.com>
-Tested-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Message-Id: <20200715084326.678715-3-arilou@gmail.com>
-[lv: updated with commit description from <20200906050113.2783642-1-richard.henderson@linaro.org>]
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20200911121844.404434-1-thuth@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/hyperv/vmbus.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/arm/pxa2xx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/hyperv/vmbus.c b/hw/hyperv/vmbus.c
-index 75af6b83dde7..6ef895bc352b 100644
---- a/hw/hyperv/vmbus.c
-+++ b/hw/hyperv/vmbus.c
-@@ -380,7 +380,8 @@ static ssize_t gpadl_iter_io(GpadlIter *iter, void *buf, uint32_t len)
-             }
+diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
+index 76975d17a461..c1f45b2adfa0 100644
+--- a/hw/arm/pxa2xx.c
++++ b/hw/arm/pxa2xx.c
+@@ -443,7 +443,7 @@ static void pxa2xx_mm_write(void *opaque, hwaddr addr,
+             s->mm_regs[addr >> 2] = value;
+             break;
          }
- 
--        p = (void *)(((uintptr_t)iter->map & TARGET_PAGE_MASK) | off_in_page);
-+        p = (void *)(uintptr_t)(((uintptr_t)iter->map & TARGET_PAGE_MASK) |
-+                off_in_page);
-         if (iter->dir == DMA_DIRECTION_FROM_DEVICE) {
-             memcpy(p, buf, cplen);
-         } else {
+-
++        /* fallthrough */
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "%s: Bad write offset 0x%"HWADDR_PRIx"\n",
 -- 
 2.26.2
 
