@@ -7,63 +7,62 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D564DC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:38:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 256BFC43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:39:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E16A214F1
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:38:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E16A214F1
+	by mail.kernel.org (Postfix) with ESMTPS id CB548214F1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:39:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB548214F1
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGosN-00028I-AF
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 15:38:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44870)
+	id 1kGot0-0003Gh-L4
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 15:39:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44772)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kGonz-0002rF-71; Fri, 11 Sep 2020 15:33:55 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:37531)
+ id 1kGonp-0002eP-7w; Fri, 11 Sep 2020 15:33:45 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:37177)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kGonx-0000pt-Fv; Fri, 11 Sep 2020 15:33:54 -0400
+ id 1kGonm-0000o6-VQ; Fri, 11 Sep 2020 15:33:44 -0400
 Received: from localhost.localdomain ([82.252.129.222]) by
  mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MlbPO-1kyAJM1Ox0-00ikm8; Fri, 11 Sep 2020 21:33:46 +0200
+ id 1MTfgb-1k6ccT0kJR-00TzJf; Fri, 11 Sep 2020 21:33:40 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 11/18] kconfig: fix comment referring to old Makefiles
-Date: Fri, 11 Sep 2020 21:33:23 +0200
-Message-Id: <20200911193330.1148942-12-laurent@vivier.eu>
+Subject: [PULL 06/18] Makefile: Drop extra phony cscope
+Date: Fri, 11 Sep 2020 21:33:18 +0200
+Message-Id: <20200911193330.1148942-7-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200911193330.1148942-1-laurent@vivier.eu>
 References: <20200911193330.1148942-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:JbJE6hEwoNqmKtwsTiUeACjKP1Ty9bABu8wpcMB39zJV4Adg3Zl
- R61wQJXshlbM+sFknRYk2vENeeISaH2LWRgiqFpLxLJHyBQJcGZ0B5e6figS8bv6XGbnQ90
- 04dHuzj/dv1JxIs99Dn+E2nUc5MnMvbi5dBz2+qTFZi7aaK787Vv7Sr5GOkQqenXLu5m4jz
- C2jvGwUaK9cigc5Gx0alg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:x3n0pGJDLXE=:/fJJsH/gGymy+uK8sdmUsY
- YMpZ79v9YnR0kWkcBu2z7lxAulZfR5N3sgLTR6tRbT5X8G8caWLJdFlUbwbBl1rborGqywzV/
- HTBNWEAO/r3apyhM2QRiBcFFMFDt8eTIyM7NeROrAe5gIcQgzkeAl+dWwiFFGl0loml2BlGwD
- 7U1qQAEydUwHUGNN0Aa6kikNFf2D1DNicdXFjmDux73f8rdp34KbrCFaYQHGI+IiSdrpDroXg
- jBBlDZtEgEw4wOjoI6H8erd7ON03Zlp7ydX8tjNNXrZJ3g06m73rnUsGtg0QYFViYRa2SAm43
- I+In2SOt1FVFaEdMDyOyCkg/P7a7ywzwDcll60GuVpB2C8gQD81b8S0B5N9KFIm4zQ24eyisy
- zXo/FJ0TvDRRZ6WkaTL1IMnKNAjnpBf+AU4i7wJlROYHZSRJ7j7qDjvrhMp4EGSy72FKoKRiU
- ZbOM57YnOrPFS5u/8Q+VZOe+THSdMlPp5ZhL1E2EjcVS/3D0RfN3nfks3FPSBWDRCBmcSvK9S
- yJ2eVK/FfrDapObuaeSb3GpTllRUOMde3Fxtbxvh8gr24w1xnoU3PkZ/CQ60rGzkYnr1Gqydo
- swkePXB98/+tqxtAHhcGOLR1e4FZjw8+g9tRL++lrr38cBykEB98doIkFQY9CFMpbvoLARnEd
- LuvrHmBbPHDO92W8QCW99nyVCu9P643cuKU9NGR1MxmXBK1ndN9ZOoDqHLSGfaFC7Ne7JC/pj
- Wbm1NZA+zSImOVPGqarygZxuHyLC/rfaExUkK41W3dSCZ7hyjALqVLM2mcX8yi3yCIftqBTHd
- zs8QHIIOT6KU4I21w5I2Havluoueh1IcPYjJ0G4cS8+/OKTAh21mT96TVPWW1TQpbzKn9Rn
-Received-SPF: none client-ip=212.227.126.187; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:P5pbF6IVxKRfx62q1+IVYkTf7lX5zxdS1J31WHZ31XgHpvkRr3t
+ 9DwdSrl2dydc/G7L5Z5cOanPIXJaNoUeJW4M5pKGGRHflj6IP0JQyApGCuh5QGQhEaBzDpI
+ Ai/6dbMVDTeIIGVtXcLMoFZM/6TZ7w8SaFTsNYy/Bs9j52MeTZd+/mGEYF5rbAVZ6Xn3JfG
+ uOIlSN0jaRLAgIfDBU+dA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:XFLQPU2ZFIA=:tiUAQFxOIGEtCOB5CD4FVY
+ gPRzC9sU/5ZPA9jdXdwaUaTnxSyWAIy08dn0XxOW1lycDpmdIhfQRQfxcj43K/bW0IqInCNp6
+ X/o08Ol7oKWNxoLlYbHHe6pqPhNcVpC0uqvwPBgYXbp0wQrZJlARBI9DoqIMdISpF4Jglds80
+ sWItSllXpF+kZ1G9HJ/feLcqOxAPs1KRlcTLYcZQLof0mhlAaGXidQLDuISTMzk09IH1b+tRJ
+ P03d7BsokXbvI/pToT3EfQZlmDAIeuTvp7NHKpG7Fu6yVnfXilIGVvuqtzFJydipC8hshwH83
+ 65O7XGBUsn53omTBJ952Upep8+CnhOa6mXIqE4CEJN93yHx1zFIkX07bqs3q3COooaTbaZXbE
+ lTE6qzQuFLT1m/lEQiAXjMupsjizE3X3XTbzZhqp/F2LTf45IdQpIBy7hFy9eAuwLZOzLJp2Q
+ 12R/2q3TTStgb+yCzjDpvVVsj7CTprcsWMRY6nZx9NwRM7J6xqaObcmGBs28xY5ygUlGdRXCd
+ 9oE4/9fw8Ue8cT1eZ1bTb1mVWEtiaq5ZcVCU6v7Ltrmmf2Or8rLFBtJ2UyZNDBDr298msOdR5
+ K4BcvO76i/bngvGEFiWTxj8sdK9qwei2QwAuGj2R48EWP1bZpDPETjZt8kacD//GCCEAmh6iC
+ xz5iRFh1Z/AveWu9e1PsCW81BjUjStcO+ZrnyVdpeSWgKzOVl54pTCIItvgRZXjs1ET+u67Wz
+ bNwSgv2e1wzyQBgHSc4HV7Hnh6kKgdJ4aZYPTCypCVT/1cdDxM3JWTsheSs0wDatOxEh1TlTh
+ QGgupdjbrcigIpPiXw8kdQQPaPjVmb4asSUE8gFYlJtZsdpayfJemSGh7LYBxKOFTyp4lJ7
+Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 15:33:45
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 15:33:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -83,36 +82,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-trivial@nongnu.org, Laurent Vivier <laurent@vivier.eu>,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+From: Greg Kurz <groug@kaod.org>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200908094244.26327-1-pbonzini@redhat.com>
+Commit d79864058a64 added a dedicated phony line for cscope.
+
+Fixes: d79864058a64 ("Makefile: Add back TAGS/ctags/cscope rules")
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <159916246865.691541.16619858522304817323.stgit@bahia.lan>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- Kconfig.host | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Kconfig.host b/Kconfig.host
-index a6d871c399d0..4af19bf70ef9 100644
---- a/Kconfig.host
-+++ b/Kconfig.host
-@@ -1,6 +1,6 @@
- # These are "proxy" symbols used to pass config-host.mak values
--# down to Kconfig.  See also MINIKCONF_ARGS in the Makefile:
--# these two need to be kept in sync.
-+# down to Kconfig.  See also kconfig_external_symbols in
-+# meson.build: these two need to be kept in sync.
+diff --git a/Makefile b/Makefile
+index d6c5c9fdef1a..83bc40b255db 100644
+--- a/Makefile
++++ b/Makefile
+@@ -128,7 +128,7 @@ build.ninja: config-host.mak
+ Makefile: ;
+ configure: ;
  
- config LINUX
-     bool
+-.PHONY: all clean cscope distclean install \
++.PHONY: all clean distclean install \
+ 	recurse-all dist msi FORCE
+ 
+ SUBDIR_MAKEFLAGS=$(if $(V),,--no-print-directory --quiet)
 -- 
 2.26.2
 
