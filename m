@@ -2,81 +2,78 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2A83C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 10:47:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43331C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 10:48:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45E56221ED
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 10:47:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 91AB9221ED
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 10:48:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L16nb1+O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45E56221ED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g8Md3AXH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91AB9221ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGgas-0002pN-Cm
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 06:47:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36062)
+	id 1kGgbj-0003io-Hk
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 06:48:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36230)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kGgaA-0002OA-9V
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 06:47:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26543
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kGgbD-0003Hm-M1
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 06:48:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41722
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kGga8-00035S-Fz
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 06:47:05 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kGgbB-00038j-6h
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 06:48:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599821223;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1599821288;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XJgnqXlYM1vI+NXJ7IH/8t1QKqck5Q9rsixPNLnIXyE=;
- b=L16nb1+OccwoqahBqphPALsClsKbPHqLLgj6gbq/NlGyJogSfkFt2igtqJjuB4OWXPvNlh
- XdOyi2+/xFmbWWqfuVACfR1cUBSF1GuebVbJkmmqZ1wsUaV3c2Wm91OUxbim30y81gmg+j
- QwMPI+eboEzRq8cnalh69FrgKM3tPmU=
+ bh=rUUozAIkJhpSeGhpSaJB2N5abyWeXj6mSrtB3JTAQjc=;
+ b=g8Md3AXHZetgeecC40MYkZC8wZn0YtqcTpGMPvUrb2WyklBvuw7Z/u/tJ7VlzuN+ICmw5H
+ knPo4tRojKgM3NYltUOBPKMhxqitJT7gTgd2iKH4HSMzwvuEbah921VYeURqc8mGad+XHY
+ meglHOkmALN3dd3hFr048BwLIW82MJY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-435-WoTPb_xCOPKg_1_uLDZiLQ-1; Fri, 11 Sep 2020 06:46:53 -0400
-X-MC-Unique: WoTPb_xCOPKg_1_uLDZiLQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-199-8tgPid77Ma-biEuiDFMYGQ-1; Fri, 11 Sep 2020 06:48:07 -0400
+X-MC-Unique: 8tgPid77Ma-biEuiDFMYGQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 23962801AC4;
- Fri, 11 Sep 2020 10:46:52 +0000 (UTC)
-Received: from redhat.com (ovpn-113-229.ams2.redhat.com [10.36.113.229])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 954D81A914;
- Fri, 11 Sep 2020 10:46:44 +0000 (UTC)
-Date: Fri, 11 Sep 2020 11:46:42 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: marcandre.lureau@redhat.com
-Subject: Re: [PATCH] PoC: Rust binding for QAPI (qemu-ga only, for now)
-Message-ID: <20200911104642.GE1203593@redhat.com>
-References: <20200910174850.716104-1-marcandre.lureau@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 384BF801AEA;
+ Fri, 11 Sep 2020 10:48:05 +0000 (UTC)
+Received: from gondolin (ovpn-112-170.ams2.redhat.com [10.36.112.170])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E91CA5D9F7;
+ Fri, 11 Sep 2020 10:47:56 +0000 (UTC)
+Date: Fri, 11 Sep 2020 12:47:54 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Collin Walling <walling@linux.ibm.com>
+Subject: Re: [PATCH v5 6/8] s390/sclp: add extended-length sccb support for
+ kvm guest
+Message-ID: <20200911124754.1a6c6cba.cohuck@redhat.com>
+In-Reply-To: <20200910093655.255774-7-walling@linux.ibm.com>
+References: <20200910093655.255774-1-walling@linux.ibm.com>
+ <20200910093655.255774-7-walling@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200910174850.716104-1-marcandre.lureau@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 03:28:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -86,7 +83,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,96 +96,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: slp@redhat.com, stefanha@gmail.com, qemu-devel@nongnu.org,
- armbru@redhat.com, pbonzini@redhat.com, jsnow@redhat.com
+Cc: thuth@redhat.com, frankja@linux.ibm.com, mst@redhat.com, david@redhat.com,
+ qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ qemu-s390x@nongnu.org, pbonzini@redhat.com, sumanthk@linux.ibm.com,
+ mihajlov@linux.ibm.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 10, 2020 at 09:48:50PM +0400, marcandre.lureau@redhat.com wrote:
-> From: Marc-André Lureau <marcandre.lureau@redhat.com>
-> 
-> Hi,
-> 
-> Among the QEMU developers, there is a desire to use Rust. (see previous
-> thread from Stefan "Why QEMU should move from C to Rust", the rust-vmm
-> related projects and other experiments).
-> 
-> Thanks to our QAPI type system and the associate code generator, it is
-> relatively straightforward to create Rust bindings for the generated C
-> types (also called sys/ffi binding) and functions. (rust-bindgen could
-> probably do a similar job, but it would probably bring other issues).
-> This provides an important internal API already.
-> 
-> Slightly more complicated is to expose a Rust API for those, and provide
-> convenient conversions C<->Rust. Taking inspiration from glib-rs
-> binding, I implemented a simplified version of the FromGlib/ToGlib
-> traits, with simpler ownership model, sufficient for QAPI needs.
-> 
-> The usage is relatively simple:
-> 
-> - from_qemu_none(ptr: *const sys::P) -> T
->   Return a Rust type T for a const ffi pointer P.
-> 
-> - from_qemu_full(ptr: *mut sys::P) -> T
->   Return a Rust type T for a ffi pointer P, taking ownership.
-> 
-> - T::to_qemu_none() -> Stash<P>
->   Returns a borrowed ffi pointer P (using a Stash to destroy "glue"
->   storage data, if any).
-> 
-> - T::to_qemu_full() -> P
->   Returns a ffi pointer P. (P resources are leaked/passed to C/ffi)
-> 
-> With those traits, it's relatively easy to implement the QMP callbacks.
-> With enough interest, we could eventually start rewriting QGA in
-> Rust, as it is a simple service. See qga/qmp.rs for some examples.
-> We could also try to tackle qemu itself.
-> 
-> Finally, given that the QAPI types are easy to serialize, it was simple
-> to use "serde" on them, and provide a D-Bus interface for QMP with zbus.
-> (a similar approach could probably be taken for other protocols, that
-> could be dynamically loaded... anyone like protobuf better?)
-> 
-> This PoC modifies qemu-ga to provide the interface on the session bus:
-> $ qga/qemu-ga -m unix-listen -p /tmp/qga.sock -t /tmp -v
-> $ busctl --user introspect org.qemu.qga /org/qemu/qga org.qemu.QgaQapi
-> ...
-> $ busctl --user call org.qemu.qga /org/qemu/qga org.qemu.QgaQapi
-> GuestSetVcpus aa\{sv\} 1 2 logical-id x 0 online b 1
-> ...
-> 
-> Note: the generated code doesn't work with the qemu schema, there is a
-> couple of fixme/todo left.
-> 
-> Shameful pain point: meson & cargo don't play nicely together.
+On Thu, 10 Sep 2020 05:36:53 -0400
+Collin Walling <walling@linux.ibm.com> wrote:
 
-Do we actually need/want it to be in the same monolithic repo
-as qemu, as opposed to a qemu-qapi-rust repo ?
+> As more features and facilities are added to the Read SCP Info (RSCPI)
+> response, more space is required to store them. The space used to store
+> these new features intrudes on the space originally used to store CPU
+> entries. This means as more features and facilities are added to the
+> RSCPI response, less space can be used to store CPU entries.
+> 
+> With the Extended-Length SCCB (ELS) facility, a KVM guest can execute
+> the RSCPI command and determine if the SCCB is large enough to store a
+> complete reponse. If it is not large enough, then the required length
+> will be set in the SCCB header.
+> 
+> The caller of the SCLP command is responsible for creating a
+> large-enough SCCB to store a complete response. Proper checking should
+> be in place, and the caller should execute the command once-more with
+> the large-enough SCCB.
+> 
+> This facility also enables an extended SCCB for the Read CPU Info
+> (RCPUI) command.
+> 
+> When this facility is enabled, the boundary violation response cannot
+> be a result from the RSCPI, RSCPI Forced, or RCPUI commands.
+> 
+> In order to tolerate kernels that do not yet have full support for this
+> feature, a "fixed" offset to the start of the CPU Entries within the
+> Read SCP Info struct is set to allow for the original 248 max entries
+> when this feature is disabled.
+> 
+> Additionally, this is introduced as a CPU feature to protect the guest
+> from migrating to a machine that does not support storing an extended
+> SCCB. This could otherwise hinder the VM from being able to read all
+> available CPU entries after migration (such as during re-ipl).
+> 
+> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> ---
+>  hw/s390x/sclp.c                     | 43 +++++++++++++++++++++++++----
+>  include/hw/s390x/sclp.h             |  1 +
+>  target/s390x/cpu_features_def.h.inc |  1 +
+>  target/s390x/gen-features.c         |  1 +
+>  target/s390x/kvm.c                  |  8 ++++++
+>  5 files changed, 48 insertions(+), 6 deletions(-)
 
-Trying to weld together different build systems is never that
-attractive. The language specific build systems generally are
-much simpler if they're self contained. From a distro POV it
-can be better if the language bindings are self contained, as
-you don't neccessarily want to build the language binding in
-the same environment as the main app. For example with modules
-in Fedora or RHEL, there can be multiple parallel versions of
-a language runtime, and thus language bindings would be built
-separately from QEMU.
-
-IIUC, you're generating stuff from the QEMU schemas. One way
-we can deal with this is to actually install the QEMU schemas
-into /usr/share. Distros would have an "qemu-devel" package
-that provided the schemas and the QAPI base tools which
-can then be used by separate bindings.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Acked-by: Cornelia Huck <cohuck@redhat.com>
 
 
