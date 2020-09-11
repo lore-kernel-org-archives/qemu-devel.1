@@ -2,103 +2,84 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 845FFC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 11:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84DD2C43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 12:01:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3D57204FD
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 11:55:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qso0HxCV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3D57204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9DDC922204
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 12:01:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DDC922204
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGheO-0002um-U5
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 07:55:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52182)
+	id 1kGhkW-0004zs-Ch
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 08:01:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53750)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kGhdf-0002F7-S8
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 07:54:47 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40563)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kGhje-0004Yy-KF
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 08:00:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58260)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kGhdd-0003zx-MF
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 07:54:47 -0400
-Received: by mail-wr1-x442.google.com with SMTP id j2so11193540wrx.7
- for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 04:54:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=VFoByf3PGihN1goL6ZvA0tVV1xMv374D+1AeJJt5zEA=;
- b=Qso0HxCVaDQSBn24j4wojHz0Md1wLVlP/dfoZxSJbugpvYVlbocbWgooRaFpwqEwrz
- dGuCUkJWkpXCRd5yIUdqow9BLZ8MkgRoyvw6ZV3/WP456SotF27lM5lvkDuDt6wrynKY
- n99/g4GYt9QFaL5m7GLvIeWDhF+omjFLLmbfDwRNngNUo73lsuBnZV6U80btWujgkEsU
- 2maz9Q78CsLGxXVJJaIQz19lJmAJBLJGIF1d9FOfK6aF7m+sB9h/YH8VE+p3P/LesUlM
- DKxeKB+NMpOkSJKvD192XhH/4mwQY430S9T+B9M3JcJ8HcQveMYPhuxEln4ye5dNP4D+
- wxhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=VFoByf3PGihN1goL6ZvA0tVV1xMv374D+1AeJJt5zEA=;
- b=pDwb4HOayBEMNmwF24105y2j7rwqpzcjaHIm6efeHsyhOFjjAjwsh1En/z9S6RwaBd
- 6ICB79k+rdcpgTrX6u3q8sSYW90CTkQ/pwJeysnl52SdKFfc75ifnNID5etkY2vK1B25
- u8W8IyAulWjOEfLFd5VuV0OFxAGFjVvBKU4DELc49t2cwUaoQB7+gfiCvxf9tK6r4tho
- vw9Xn1rIqYSSdfk44d25v32XyUCwcS6Lzo7NrnD3tyQ+Di9aa1przB/S89sXk21hh9og
- k4rjIFFz4oHdwddsXJwOOTeS+XLFRe1fc/lRDPEyI/GFrD9e8/JJkhXobISiVvvLQOU2
- hgjQ==
-X-Gm-Message-State: AOAM531uvCZCS/d6KefLMSrQuGasL8fsR+On0OcGFONz1zPhMki+JcCD
- yzP+x0uY/cBdchWjW0f5oav4HA==
-X-Google-Smtp-Source: ABdhPJyBUNDi2sD7TcOrddCOjdElcn+sdzDE5WWsVCI/hJvmIPtY0E7JHiGnEIH1187xUxoFe36HHA==
-X-Received: by 2002:adf:ff90:: with SMTP id j16mr1853174wrr.105.1599825284160; 
- Fri, 11 Sep 2020 04:54:44 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id t22sm4745118wmt.1.2020.09.11.04.54.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 11 Sep 2020 04:54:42 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 53D111FF7E;
- Fri, 11 Sep 2020 12:54:42 +0100 (BST)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kGhjb-0004uK-Sv
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 08:00:58 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kGhjZ-0000GZ-TC
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 12:00:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 93B722E80EC
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 12:00:53 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 11 Sep 2020 11:54:42 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <1895080@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee hansni laurent-vivier
+X-Launchpad-Bug-Reporter: Hansni Bu (hansni)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
 References: <159970958159.31371.12301700684467003959.malonedeb@wampee.canonical.com>
- <92de5ee0-629a-640a-d547-8c2d650742f2@vivier.eu>
- <87tuw4odwk.fsf@linaro.org> <87r1r8odph.fsf@linaro.org>
+ <92de5ee0-629a-640a-d547-8c2d650742f2@vivier.eu> <87tuw4odwk.fsf@linaro.org>
+ <87r1r8odph.fsf@linaro.org>
  <CAGTPX+DAoJcw2y9gPjkP6kGXEQW7=e1tohM8vND9j9Qtxuc5vw@mail.gmail.com>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Bug 1895080 <1895080@bugs.launchpad.net>
+Message-ID: <87o8mco7el.fsf@linaro.org>
 Subject: Re: [Bug 1895080] [NEW] pgb_reserved_va: Assertion `addr == test'
  failed
-In-reply-to: <CAGTPX+DAoJcw2y9gPjkP6kGXEQW7=e1tohM8vND9j9Qtxuc5vw@mail.gmail.com>
-Date: Fri, 11 Sep 2020 12:54:42 +0100
-Message-ID: <87o8mco7el.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: ea9e47830665da6789d1f21d14ee05645d0f86df
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 02:05:39
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -107,11 +88,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Reply-To: Bug 1895080 <1895080@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-
+Message-ID: <20200911115442.V8E42AkwQe9pssgPWO-iEVhO1faqXftL58DWz2LJXXU@z>
 
 Hansni Bu <1895080@bugs.launchpad.net> writes:
 
@@ -123,7 +104,8 @@ The trouble is without MAP_FIXED_NOREPLACE we are at the mercy of the
 host kernel to allow the address request to be honoured. A plain
 MAP_FIXED won't do as it can clober existing mappings. In theory a
 suitable hole has been identified but sometimes the kernel makes a
-decision to offset the suggested mapping for it's own reasons.=20
+decision to offset the suggested mapping for it's own reasons. =
+
 
 > BTW: with the option "-p 65536", the case runs successfully.
 
@@ -254,6 +236,68 @@ t'
 >>
 
 
---=20
+-- =
+
 Alex Benn=C3=A9e
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1895080
+
+Title:
+  pgb_reserved_va: Assertion `addr =3D=3D test' failed
+
+Status in QEMU:
+  New
+
+Bug description:
+  This problem occurs on CentOS-7.5 (64-bit) with qemu-5.1.0, qemu head
+  (commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a) for riscv32-linux-
+  user.
+
+  Firstly, compile fails:
+  Compiling C object libqemu-riscv32-linux-user.fa.p/linux-user_strace.c.o
+  ../qemu.git/linux-user/strace.c:1210:18: error: =E2=80=98FALLOC_FL_KEEP_S=
+IZE=E2=80=99 undeclared here (not in a function)
+       FLAG_GENERIC(FALLOC_FL_KEEP_SIZE),
+
+  I have to add below include to linux-user/strace.c
+  diff --git a/linux-user/strace.c b/linux-user/strace.c
+  index 11fea14fba..22e51d4a8a 100644
+  --- a/linux-user/strace.c
+  +++ b/linux-user/strace.c
+  @@ -7,6 +7,7 @@
+   #include <sys/mount.h>
+   #include <arpa/inet.h>
+   #include <netinet/tcp.h>
+  +#include <linux/falloc.h>
+   #include <linux/if_packet.h>
+   #include <linux/netlink.h>
+   #include <sched.h>
+
+  Then trying qemu-riscv32 with a simple ELF, I get:
+  linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test' =
+failed.
+
+  strace shows that:
+  mmap(0x1000, 4294963200, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESER=
+VE, -1, 0) =3D 0x10000
+  write(2, "qemu-riscv32: ../qemu.git/linux-"..., 103qemu-riscv32: ../qemu.=
+git/linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test=
+' failed.
+  ) =3D 103
+
+  The source code is in the function pgb_reserved_va (linux-
+  user/elfload.c). I think mmap cannot guarantee that the returned
+  pointer (test) equals to the parameter of addr. So is this a bug to
+  assert (addr =3D=3D test)?
+
+  Attached configure script and test ELF file.
+
+  Thanks.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1895080/+subscriptions
 
