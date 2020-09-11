@@ -2,61 +2,90 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AD58C43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:01:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B64A4C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:06:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C7AB21D47
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:01:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C7AB21D47
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id B7FBF206CA
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:06:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="BxUDwBQv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7FBF206CA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGlUa-00035y-2R
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 12:01:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52498)
+	id 1kGlZQ-0001tI-IL
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 12:06:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54482)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kGlSm-0001jg-8D
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 11:59:48 -0400
-Received: from relay64.bu.edu ([128.197.228.104]:34973)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kGlSj-0003dZ-Gp
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 11:59:47 -0400
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 08BFwfQm007813
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Fri, 11 Sep 2020 11:58:44 -0400
-Date: Fri, 11 Sep 2020 11:58:41 -0400
-From: Alexander Bulekov <alxndr@bu.edu>
-To: P J P <ppandit@redhat.com>
-Subject: Re: About 'qemu-security' mailing list
-Message-ID: <20200911155841.yjkkep7zfneoi3jb@mozz.bu.edu>
-References: <nycvar.YSQ.7.78.906.2009111910280.36374@xnncv>
- <20200911154055.hnh6wgqpc5pdcyjl@mozz.bu.edu>
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kGlYl-0001Rb-8d
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 12:05:59 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53795)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kGlYi-0005Ik-Nj
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 12:05:58 -0400
+Received: by mail-wm1-x342.google.com with SMTP id x23so4927539wmi.3
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 09:05:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=O6wSjc2hLJXpa/SdIjFlh9hFkOpPt/tgCbPWyRd7W50=;
+ b=BxUDwBQvVE734kwtCaWvUGG/MsW/ekRCBGUmqhABxGsL1WGWpcPlI1NyrBKqfpl7+J
+ mj8X5bPNiWIePG9s3InAX8MVtbzMXwaAS6IWLekNvBAE6C/ftHxF0G2gHpRxBboRMomt
+ pmVbqeBb2K/KUQLEdK2S4tcL2+EeO/IysFuuBO+FbhWyjcG8+TXraaMicfdumqxOWVIi
+ Toqv33e0zn/PsGWKWfEuNmWhha+Qx2z9VjfWnH/oHhIfYVHfjDRAeCD49PpDXRRwbV8R
+ gLSdiHKWGdKlaRD6DnVv91o9GDvSHvZCUHqQuXHxu9v3+YpMyOt4vJeflfwCHhh/Dzug
+ IWnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=O6wSjc2hLJXpa/SdIjFlh9hFkOpPt/tgCbPWyRd7W50=;
+ b=Q/6hFmS40Eb6IhO5d6DPwxRbFKpU+8INaISb0/WwYAkVS4PNE7EOHy8uko1GF8kAwg
+ vZWXToBxz2VSYREuR0Z6qZqUu9oT8lXA4XGbC7V83inkJnOxfHSQi1lArU4tZp2gFdcq
+ ry4Sotj37RNSIX5gwNQ4f82P3IE8cLIWHb5X9KFUjzOCObB1VrbilWK0Oqdj2obMPkR+
+ 9zXK/Yt+NzZaOVrHm8VDtDp/ozxJedZ+wGASGqpI52hxnWAS38aKnpbwUrP9R90/Gmor
+ cMS+4UZqnW4v2Txp+7Ps+Bt/qMuabg8P4NIl0Y/pz9woHjhDp7GkdHymLc9OehsJJ7jm
+ YW7w==
+X-Gm-Message-State: AOAM532s/ZjuRJABN8zT+MU+dvZ2oVbYk691LWr8LqvN3YwRRRVt2rMI
+ ahVHMtp8zC6XnkweWDEQOFQN817B6MU7sCugBgcaVg==
+X-Google-Smtp-Source: ABdhPJwFVpbnhX1sj2MhvgMK4IphTNTP9DtCm96/arVAzn4XkcUB9L87MBIb+ym06cZ2rKg6CaU94blwqkawR842xDw=
+X-Received: by 2002:a1c:7405:: with SMTP id p5mr2922377wmc.35.1599840353939;
+ Fri, 11 Sep 2020 09:05:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200911154055.hnh6wgqpc5pdcyjl@mozz.bu.edu>
-Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
- helo=relay64.bu.edu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 11:41:17
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Spam_score_int: -31
-X-Spam_score: -3.2
-X-Spam_bar: ---
-X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- HK_RANDOM_FROM=0.999, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200904161000.12115-1-ani@anisinha.ca>
+ <CAMDeoFVQWeWArPty2z4rNbdmS7O2X66SaONqiKzFqFpaKwuNDg@mail.gmail.com>
+ <98b26cfa-3ff7-4302-9fc2-0e6672cfbd08@Spark>
+ <a6c38469-356d-4629-be12-92129e1b1b96@Spark>
+ <20200911115138-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200911115138-mutt-send-email-mst@kernel.org>
+From: Ani Sinha <ani@anisinha.ca>
+Date: Fri, 11 Sep 2020 21:35:42 +0530
+Message-ID: <CAARzgwyKccWaPDSwsAg7bW7=F7DxAsf7Lw=TvqOkp_i6tdXZow@mail.gmail.com>
+Subject: Re: [PATCH v3] i440fx/acpi: do not add hotplug related amls for cold
+ plugged bridges
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: none client-ip=2a00:1450:4864:20::342;
+ envelope-from=ani@anisinha.ca; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -69,72 +98,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Julia Suvorova <jusual@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-And I forgot to mention that I think it is a great idea :) . Over the past
-couple months, I reported a few dozen bugs on launchpad. Even though
-many of them are memory-corruptions and might fall under the
-"security-bug" label, they could be fixed faster simply because the
-reports can reach the maintainer, without a manual triage process.
-With more eyes available, it could be possible to report fuzzing bugs,
-while sticking to the security process. It would be especially useful as
-we are ramping up automated fuzzing on google's oss-fuzz and thinking
-about how to handle those reports.
--Alex
+On Fri, Sep 11, 2020 at 9:22 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Thu, Sep 10, 2020 at 12:19:19AM +0530, Ani Sinha wrote:
+> > On Sep 10, 2020, 00:00 +0530, Ani Sinha <ani@anisinha.ca>, wrote:
+> >
+> >     On Sep 9, 2020, 23:20 +0530, Julia Suvorova <jusual@redhat.com>, wr=
+ote:
+> >
+> >         On Fri, Sep 4, 2020 at 6:10 PM Ani Sinha <ani@anisinha.ca> wrot=
+e:
+> >
+> >
+> >
+> >             Cold plugged bridges are not hot unpluggable, even when the=
+ir
+> >             hotplug
+> >
+> >             property (acpi-pci-hotplug-with-bridge-support) is turned o=
+ff.
+> >             Please see
+> >
+> >             the function acpi_pcihp_pc_no_hotplug() (thanks Julia). How=
+ever,
+> >             with
+> >
+> >             the current implementaton, windows would try to hot-unplug =
+a pci
+> >             bridge when
+> >
+> >             it's hotplug switch is off. This is regardless of whether t=
+here are
+> >             devices
+> >
+> >             attached to the bridge. This is because we add amls like _E=
+J0 etc
+> >             for the
+> >
+> >             pci slot where the bridge is cold plugged. We have a demo v=
+ideo
+> >             here:
+> >
+> >             https://youtu.be/pME2sjyQweo
+> >
+> >
+> >
+> >             In this fix, we identify a cold plugged bridge and for cold=
+ plugged
+> >             bridges,
+> >
+> >             we do not add the appropriate amls and acpi methods that ar=
+e used
+> >             by the OS
+> >
+> >             to identify a hot-pluggable/unpluggable pci device. After t=
+his
+> >             change, Windows
+> >
+> >             does not show an option to eject the PCI bridge. A demo vid=
+eo is
+> >             here:
+> >
+> >             https://youtu.be/kbgej5B9Hgs
+> >
+> >
+> >
+> >             While at it, I have also updated a stale comment.
+> >
+> >
+> >
+> >             This change is tested with a Windows 2012R2 guest image and=
+ Windows
+> >             2019 server
+> >
+> >             guest image running on Ubuntu 18.04 host. This change is ba=
+sed off
+> >             of upstream
+> >
+> >             qemu master branch tag v5.1.0.
+> >
+> >
+> >
+> >             Signed-off-by: Ani Sinha <ani@anisinha.ca>
+> >
+> >
+> >
+> >         Reviewed-by: Julia Suvorova <jusual@redhat.com>
+> >
+> >
+> >
+> >         BTW, aren't all bridges handled in build_append_pci_bus_devices=
+()
+> >         cold-plugged?
+> >
+> >
+> >
+> >     Yes they are.
+> >
+> >
+> > Maybe as an improvement we can simply identify a bridge instead of a co=
+ld
+> > plugged bridge. However let=E2=80=99s have that improvement as a separa=
+te patch on top
+> > of this. Also let=E2=80=99s see what Igor thinks.
+>
+> Well this changes acpi tables so I don't see how this will pass
+> the unit tests. Did you test this change?
 
-On 200911 1140, Alexander Bulekov wrote:
-> Hi Prasad,
-> A couple questions:
->  * I'm guessing this will be a closed list with some application/vetting
->    procedure for the participants? (Maybe this is what you mean by
->    "moderated" ?)
->  * How will the communication be encrypted?
->  * Will secalert still be subscribed (for managing CVE ID assignments)?
->  * Assuming PGP will be gone, will it be possible to make the "This bug
->    is a security vulnerability" button work on Launchpad?
-> Thanks!
-> -Alex
-> 
-> On 200911 1950, P J P wrote:
-> >   Hello all,
-> > 
-> > Recently while conversing with DanPB this point came up
-> > 
-> >    -> https://www.qemu.org/contribute/security-process/
-> > 
-> > * Currently QEMU security team is a handful of individual contacts which
-> >   restricts community participation in dealing with these issues.
-> > 
-> > * The Onus also lies with the individuals to inform the community about QEMU
-> >   security issues, as they come in.
-> > 
-> > 
-> > Proposal: (to address above limitations)
-> > =========
-> > 
-> > * We set up a new 'qemu-security' mailing list.
-> > 
-> > * QEMU security issues are reported to this new list only.
-> > 
-> > * Representatives from various communities subscribe to this list. (List maybe
-> >   moderated in the beginning.)
-> > 
-> > * As QEMU issues come in, participants on the 'qemu-security' list shall
-> >   discuss and decide about how to triage them further.
-> > 
-> > Please kindly let us know your views about it. I'd appreciate if you have
-> > any suggestions/inputs/comments about the same.
-> > 
-> > 
-> > Thank you.
-> > --
-> > Prasad J Pandit / Red Hat Product Security Team
-> > 8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
-> > 
-> > 
-> 
+There were no unit tests to cover this bridge flag. I have added the
+unit tests. It's the same one you have queued.
+
+>
+>
+> >
+> >
+> >
+> >             ---
+> >
+> >             hw/i386/acpi-build.c | 12 ++++++------
+> >
+> >             1 file changed, 6 insertions(+), 6 deletions(-)
+> >
+> >
+> >
+> >             changelog:
+> >
+> >             v3: commit log updates providing more accurate information =
+as
+> >             received from Julia.
+> >
+> >             v2: cosmetic commit log updates with patch testing informat=
+ion.
+> >
+> >             v1: initial patch.
+> >
+> >
+> >
+> >
+> >
+> >             diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> >
+> >             index b7bcbbbb2a..90b863f4ec 100644
+> >
+> >             --- a/hw/i386/acpi-build.c
+> >
+> >             +++ b/hw/i386/acpi-build.c
+> >
+> >             @@ -359,6 +359,7 @@ static void build_append_pci_bus_device=
+s(Aml
+> >             *parent_scope, PCIBus *bus,
+> >
+> >             int slot =3D PCI_SLOT(i);
+> >
+> >             bool hotplug_enabled_dev;
+> >
+> >             bool bridge_in_acpi;
+> >
+> >             + bool cold_plugged_bridge;
+> >
+> >
+> >
+> >             if (!pdev) {
+> >
+> >             if (bsel) { /* add hotplug slots for non present devices */
+> >
+> >             @@ -380,15 +381,14 @@ static void build_append_pci_bus_devi=
+ces(Aml
+> >             *parent_scope, PCIBus *bus,
+> >
+> >             pc =3D PCI_DEVICE_GET_CLASS(pdev);
+> >
+> >             dc =3D DEVICE_GET_CLASS(pdev);
+> >
+> >
+> >
+> >             - /* When hotplug for bridges is enabled, bridges are
+> >
+> >             - * described in ACPI separately (see build_pci_bus_end).
+> >
+> >             - * In this case they aren't themselves hot-pluggable.
+> >
+> >             + /*
+> >
+> >             + * Cold plugged bridges aren't themselves hot-pluggable.
+> >
+> >             * Hotplugged bridges *are* hot-pluggable.
+> >
+> >             */
+> >
+> >             - bridge_in_acpi =3D pc->is_bridge && pcihp_bridge_en &&
+> >
+> >             - !DEVICE(pdev)->hotplugged;
+> >
+> >             + cold_plugged_bridge =3D pc->is_bridge && !DEVICE(pdev)->h=
+otplugged;
+> >
+> >             + bridge_in_acpi =3D cold_plugged_bridge && pcihp_bridge_en=
+;
+> >
+> >
+> >
+> >             - hotplug_enabled_dev =3D bsel && dc->hotpluggable && !
+> >             bridge_in_acpi;
+> >
+> >             + hotplug_enabled_dev =3D bsel && dc->hotpluggable && !
+> >             cold_plugged_bridge;
+> >
+> >
+> >
+> >             if (pc->class_id =3D=3D PCI_CLASS_BRIDGE_ISA) {
+> >
+> >             continue;
+> >
+> >             --
+> >
+> >             2.17.1
+> >
+> >
+> >
+> >
+> >
+>
 
