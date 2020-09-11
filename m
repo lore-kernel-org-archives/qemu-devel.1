@@ -2,88 +2,155 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF550C43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 12:55:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDCB6C43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 13:09:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5139A2224D
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 12:55:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D2B7622284
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 13:09:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HGyrdX3a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5139A2224D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b2b9fBJC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2B7622284
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGiaA-0007uE-DG
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 08:55:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39846)
+	id 1kGinl-0003up-Mp
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 09:09:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44698)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kGiZW-0007Qn-Hh
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 08:54:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49667)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kGiZU-0004CR-QD
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 08:54:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599828871;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=TAXkZF+SMVhxruDhqRYtQ9eRcaGQuy136bNW2EJdttk=;
- b=HGyrdX3aI5lnu9wlw+NthDM8RTmPpuYhh2qoq9DsD0BAN0KKe4gSMnPxUDOWgUGgRH/1v5
- uycP5izOChKAQpEpG8cuApouhh4Pdd8hdnaxdbEYVCghFy34DgM6Mq3M8t0xzycBr2XMv9
- Fw9l5EV9cgCcx+2nG2btWFDdCARLYPo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-379-Q7d567GoNBe-5kuNxYUN7w-1; Fri, 11 Sep 2020 08:54:17 -0400
-X-MC-Unique: Q7d567GoNBe-5kuNxYUN7w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 672548015A4;
- Fri, 11 Sep 2020 12:54:16 +0000 (UTC)
-Received: from localhost (ovpn-113-177.ams2.redhat.com [10.36.113.177])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 60C865C1BD;
- Fri, 11 Sep 2020 12:54:04 +0000 (UTC)
-Date: Fri, 11 Sep 2020 13:54:03 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>, jasowang@redhat.com
-Subject: Re: VHOST_USER_PROTOCOL_F_VDPA
-Message-ID: <20200911125403.GL94280@stefanha-x1.localdomain>
-References: <20200821110822.GA205318@stefanha-x1.localdomain>
- <ea150955-fc89-147f-0fdc-1ff60b35a6e6@redhat.com>
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1kGimi-0003Tq-8K
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 09:08:12 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:42102)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1kGima-0006FI-Qj
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 09:08:12 -0400
+Received: by mail-ed1-x541.google.com with SMTP id l63so9860254edl.9
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 06:08:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:from:to:cc:references:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=bX4HZTUNwBKMljlBQRHGojBPG9GR6cIU9U2qYBsbvQo=;
+ b=b2b9fBJCc0H2+jbifsUZV7dCv6QeC0rlgNCaurRri4YTX5uqsRAY34mt/A0cmX6Fpf
+ gQnyZ3JRKJ8XERLTbgIQNOFAqeqQKYwicQeacdOOWaQt/QKs7dVpI1vAvMQE7iTs0QeS
+ L7zRNHAvvlbGM4wGV6FW2+CcBgjeLPzrebRGXgqTchcFbjirBodHIT+o/DmU0+zqgpxs
+ 4VNmE4RCyFingyvlv1ubXRybwgp97XXqnIn/326+q2hrdwPtplLRfOtZ2//Gz0oVe2C1
+ WVuDwjy0bRIyoLaLDLUvYYweRt8iONrzZo5p4wR+LO6JajTmbIxwt9v8LbTMxOO5iJbH
+ l9tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:from:to:cc:references:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=bX4HZTUNwBKMljlBQRHGojBPG9GR6cIU9U2qYBsbvQo=;
+ b=lfkZwgeSS7aTKecjokKhII0ck8qabVicyWo+N+hmvrdXOxA+jNTfdus34Rn+NHDO25
+ esDzvrZF05GsgMUSLCuiKx0GM3mVAJUyfeI1Bno+xQTuawsXNQrPmPYrtZXoYnfRIR1C
+ B+pv2a9fmKqnhfeTRCDpDem746BFNr0xUBATO5od2HF086HiJ+cHzJMMGmwsw6YEz4He
+ qBYCdzfWsH2T30abexeYJx6DaCxf863QQto9L2nstIiZHfB9w/BymZj19I5SnFzBaiBz
+ idd1CAvZKI1McAr0hjv1QG1f6uQzoPiLotm8pZ0hL/g+hUPjOxeZsY/B1HZVKPfEm5b5
+ NF4A==
+X-Gm-Message-State: AOAM533/elxJFKK7x97nm64Itue7RyU6lqzHaeXY4+kihOPnPCCLE3P4
+ T5/8iJjgcD6wEtW2oH27XPE=
+X-Google-Smtp-Source: ABdhPJw2W6gnH+bgAaaflT17Wi/BbAeMFWhUwLjJTrKq/GZniMbe89UI1R54W93YvIEYROsRE7jO/g==
+X-Received: by 2002:aa7:dd0d:: with SMTP id i13mr1931375edv.314.1599829682908; 
+ Fri, 11 Sep 2020 06:08:02 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5568:7f99:4893:a5b6?
+ ([2001:b07:6468:f312:5568:7f99:4893:a5b6])
+ by smtp.googlemail.com with ESMTPSA id
+ ec11sm1564364ejb.123.2020.09.11.06.08.01
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 11 Sep 2020 06:08:02 -0700 (PDT)
+Subject: Re: [PATCH] PoC: Rust binding for QAPI (qemu-ga only, for now)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Marc-Andre Lureau <marcandre.lureau@redhat.com>
+References: <20200910174850.716104-1-marcandre.lureau@redhat.com>
+ <eeead7ec-ebde-637d-de06-31c9b343b3b8@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+ uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
+Message-ID: <399aad6c-5d86-8988-a44a-e91d650e7273@redhat.com>
+Date: Fri, 11 Sep 2020 15:08:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <ea150955-fc89-147f-0fdc-1ff60b35a6e6@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0.326
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="CgTrtGVSVGoxAIFj"
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 23:26:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <eeead7ec-ebde-637d-de06-31c9b343b3b8@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::541;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-ed1-x541.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -39
+X-Spam_score: -4.0
+X-Spam_bar: ----
+X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-2.469,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,79 +163,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chenbo Xia <chenbo.xia@intel.com>, Cindy Lu <lulu@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Raphael Norwitz <raphael.norwitz@nutanix.com>, kraxel@redhat.com,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Changpeng Liu <changpeng.liu@intel.com>
+Cc: "P. Berrange, Daniel" <berrange@redhat.com>,
+ Sergio Lopez Pascual <slp@redhat.com>, "Hajnoczi, Stefan" <stefanha@gmail.com>,
+ qemu-devel <qemu-devel@nongnu.org>, "Armbruster, Markus" <armbru@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---CgTrtGVSVGoxAIFj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On 11/09/20 12:24, Paolo Bonzini wrote:
+>>
+>> - from_qemu_none(ptr: *const sys::P) -> T
+>>   Return a Rust type T for a const ffi pointer P.
+>>
+>> - from_qemu_full(ptr: *mut sys::P) -> T
+>>   Return a Rust type T for a ffi pointer P, taking ownership.
+>>
+>> - T::to_qemu_none() -> Stash<P>
+>>   Returns a borrowed ffi pointer P (using a Stash to destroy "glue"
+>>   storage data, if any).
+>>
+>> - T::to_qemu_full() -> P
+>>   Returns a ffi pointer P. (P resources are leaked/passed to C/ffi)
+>
+> I know these come from glib-rs, but still the names are awful. :)
 
-On Thu, Sep 10, 2020 at 10:55:00AM +0200, Maxime Coquelin wrote:
-> I understand the need and like the idea.
+After studying a bit I managed to give a rational explanation of the
+above gut feeling.  Conversions in Rust usually follow this naming
+convention:
 
-If no one plans to work on this within the next 6 months it could be an
-internship project since the Outreachy December-March round is coming
-up.
+	Name		  Type			Price
+	--------	  --------------------	-----------
+	as_*, borrow	  Borrowed -> Borrowed	Cheap
+	to_*, constructor Borrowed -> Owned	Expensive
+	from, into_*	  Owned -> Owned	Any
 
-The time requirement is typically ~5 hours per week from the mentor.
+and we have
 
-Jason, Maxime, Cindy, Michael: Are you interested in mentoring this
-project idea?
+	from_qemu_none	  Borrowed -> Owned
+	to_qemu_none	  Borrowed -> Borrowed
+	from_qemu_full	  Owned -> Owned
+	to_qemu_full	  Owned -> Owned
 
-Internships focus mostly implementing existing designs since the intern
-doesn't have enough background knowledge or time to design some of this
-complexity from scratch.
+So
 
-As a starting point, the vhost-user protocol can be extended with all
-the vDPA messages. Redundant vhost-user messages from the existing
-protocol can be dropped/deprecated (i.e. device-specific messages that
-were introduced to work around the lack of the VIRTIO device lifecycle).
+- from_qemu_none should be a "to_*" or "constructor" conversion (I used
+new_from_foreign)
 
-Fully embracing the vDPA/VIRTIO lifecycle eliminates the need for
-per-type QEMU devices (vhost-user-net, vhost-user-blk, etc). Instead
-per-transport devices are needed (-device vdpa-user-{pci,ccw,mmio}).
-This means new device types can be added later without writing all the
-boilerplate -device vhost-user-foo-{pci,ccw,mmio} code!
+- to_qemu_none, even though in some cases it can be expensive, should be
+an "as_*" conversion (as_foreign).
 
-The internship could focus on implementing -device vdpa-user-pci and a
-libvdpa-user test/example. The vhost-user spec changes should probably
-be agreed by the community beforehand so the intern doesn't need to
-worry about the protocol design (there's plenty of implementation work
-to do!).
+- from_qemu_full and to_qemu_full should be "from" or "into_*"
 
-This is one way to break this down into an internship project, but there
-are other approaches. Maybe you prefer to extend vhost-user more
-gradually (e.g. no -device vdpa-user-pci and the existing per-type
-device approach is continued) while still adding the vDPA protocol
-messages...
+to_qemu_full() could also be split into a more expensive but flexible
+"to" variant and the cheaper "into" variant.  Just for the sake of
+example, I updated my demo by replacing the IntoRaw trait with these two:
 
-Anyway, if you'd like to mentor this project in Outreachy December-March
-please add a project idea to the QEMU wiki:
-https://wiki.qemu.org/Outreachy_2020_DecemberMarch
+    trait ToForeign<T> {
+        fn to_foreign(&self) -> *mut T;
+    }
 
-Stefan
+    trait IntoForeign<T> {
+        fn into_foreign(self) -> *mut T;
+    }
 
---CgTrtGVSVGoxAIFj
-Content-Type: application/pgp-signature; name="signature.asc"
+where the example implementations show the different cost quite clearly:
 
------BEGIN PGP SIGNATURE-----
+    impl ToForeign<c_char> for String {
+        fn to_foreign(&self) -> *mut c_char {
+            unsafe { libc::strndup(self.as_ptr() as *const c_char,
+                                   self.len() as size_t) }
+        }
+    }
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9bc2sACgkQnKSrs4Gr
-c8gwrAf+KRZ+0DYK/lvPS8flDuMZG8JnLPFbn4TQjetpWw1Ct6rz0a1kRCheq38L
-6uiBxgZ4fM9xXUzkz3L+UMLJyEEZziuAPdCb5z1kMR0R8DFaMKU+qxB3bClTkcUs
-CIY+Kk6/brn8gx2tV2L/4bNESTOCknBV9qdNRUVNAChbauGps0pHImiL8ByWtH+K
-YU+8k9bkF97U8JHRVMn+DH3X3W7z34dsST8ixnk9iyyCcxSv0OXEGL+YB3vNCaO+
-A5OZ22vS8NLQoFky8ce3sjZ36Q79RrfsRdI3wQ9VWN9EknMDX31qA1W7YenbsaiF
-8Yf7300nkY0dUKqqA67SdF5XIWnCDw==
-=kvXD
------END PGP SIGNATURE-----
+    impl IntoForeign<c_char> for String {
+        fn into_foreign(self) -> *mut c_char {
+            let ptr = self.as_ptr();
+            forget(self);
+            ptr as *mut _
+        }
+    }
 
---CgTrtGVSVGoxAIFj--
+Thanks,
 
+Paolo
 
