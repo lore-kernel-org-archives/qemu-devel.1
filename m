@@ -2,112 +2,93 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F399AC43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EA8AC43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:52:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DDBC207FB
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:51:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 34B82207FB
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:52:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="px8RiqAf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DDBC207FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JbyQZ6nF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34B82207FB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGmGy-0003HE-FH
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 12:51:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36346)
+	id 1kGmI8-0004gG-Dw
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 12:52:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36894)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
- id 1kGmEj-0000Gw-2p; Fri, 11 Sep 2020 12:49:21 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52816
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
- id 1kGmEf-0003PC-RO; Fri, 11 Sep 2020 12:49:20 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 08BGUwws044679; Fri, 11 Sep 2020 12:49:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=from : to : cc : subject
- : date : message-id : in-reply-to : references; s=pp1;
- bh=4Eg2wW13Wd9tQtL4q7jKrrhQ1xgwGrhl67oxKF5OuhQ=;
- b=px8RiqAfOWxeRurLU2/7MP+yya+NmHXJNwWRb3qQm1qb6UqDzbDkouxCb8i1D7vQzDPb
- 27zo67NpeCWps+E1AencLZZGag0w8SrlIvq0HDueR3oablKNj1wTc7meNhy9OMEnUhcA
- BRF9JHxohlsAZrrxMpqYQCADBFy8IgHybC0SW4vqbuf8QQuXct2+Rq+joWuIe99Ib6AW
- BMjtcqpfs2Li6HXlHbkSELF639/orRbl5y2HSsV80t9kR3NPmccRUfR9VVbgjEnoxy7G
- 9Ge4JGyx+v5udZhyDYUkls26UJIfNsiQ779uWo44FtjTxcOpNxq0HjoUrBeXQ/f+sJ0u UA== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 33gc3p1nty-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 11 Sep 2020 12:49:16 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08BGVAAh045432;
- Fri, 11 Sep 2020 12:49:16 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
- [169.63.121.186])
- by mx0b-001b2d01.pphosted.com with ESMTP id 33gc3p1ntn-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 11 Sep 2020 12:49:16 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
- by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08BGlDPZ022868;
- Fri, 11 Sep 2020 16:49:15 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com
- (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
- by ppma03wdc.us.ibm.com with ESMTP id 33cebvdj7h-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 11 Sep 2020 16:49:15 +0000
-Received: from b03ledav003.gho.boulder.ibm.com
- (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
- by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 08BGnEJf64028930
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 11 Sep 2020 16:49:14 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 560456A051;
- Fri, 11 Sep 2020 16:49:14 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4A59E6A04D;
- Fri, 11 Sep 2020 16:49:13 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.211.91.207])
- by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
- Fri, 11 Sep 2020 16:49:13 +0000 (GMT)
-From: Matthew Rosato <mjrosato@linux.ibm.com>
-To: alex.williamson@redhat.com, cohuck@redhat.com
-Subject: [PATCH 2/3] s390x/pci: Honor DMA limits set by vfio
-Date: Fri, 11 Sep 2020 12:49:06 -0400
-Message-Id: <1599842947-4051-3-git-send-email-mjrosato@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1599842947-4051-1-git-send-email-mjrosato@linux.ibm.com>
-References: <1599842947-4051-1-git-send-email-mjrosato@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-09-11_08:2020-09-10,
- 2020-09-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 mlxscore=0
- suspectscore=2 adultscore=0 mlxlogscore=999 priorityscore=1501
- lowpriorityscore=0 bulkscore=0 phishscore=0 clxscore=1015 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009110131
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=mjrosato@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 09:50:13
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kGmHW-0004AY-F1
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 12:52:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51738
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kGmHU-0003lp-Kn
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 12:52:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599843131;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=KdqJbrxL/AwxVkgJA8HBG/XJzgdBc1MfdvhlV2cP3Dw=;
+ b=JbyQZ6nFL3tB+ZYirLcB8/NIrYALP0Fx4N7stEtA4gGUVkUzOWXkvhFizL8Ub0D3Y8KrLt
+ wjI/Nv25cqZaDOLiBdg6NEWehLpXxgBsRRbUuYeLdBggts8n4QEh7n5MXz/avD3P4vfGrS
+ MRNakwudCVwul0lNcrmwO3c8XuZQKJg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-394-lwu8TFuRNAqRRRXD3Uldyg-1; Fri, 11 Sep 2020 12:52:09 -0400
+X-MC-Unique: lwu8TFuRNAqRRRXD3Uldyg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7B881074643;
+ Fri, 11 Sep 2020 16:52:06 +0000 (UTC)
+Received: from w520.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1151F1A8AC;
+ Fri, 11 Sep 2020 16:51:57 +0000 (UTC)
+Date: Fri, 11 Sep 2020 10:51:55 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200911105155.184e32a0@w520.home>
+In-Reply-To: <20200911005559.GA3932@joy-OptiPlex-7040>
+References: <20200825163925.1c19b0f0.cohuck@redhat.com>
+ <20200826064117.GA22243@joy-OptiPlex-7040>
+ <20200828154741.30cfc1a3.cohuck@redhat.com>
+ <8f5345be73ebf4f8f7f51d6cdc9c2a0d8e0aa45e.camel@redhat.com>
+ <20200831044344.GB13784@joy-OptiPlex-7040>
+ <20200908164130.2fe0d106.cohuck@redhat.com>
+ <20200909021308.GA1277@joy-OptiPlex-7040>
+ <20200910143822.2071eca4.cohuck@redhat.com>
+ <7cebcb6c8d1a1452b43e8358ee6ee18a150a0238.camel@redhat.com>
+ <20200910120244.71e7b630@w520.home>
+ <20200911005559.GA3932@joy-OptiPlex-7040>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Received-SPF: pass client-ip=205.139.110.120;
+ envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 03:28:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -121,275 +102,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com,
- schnelle@linux.ibm.com, qemu-devel@nongnu.org, pasic@linux.ibm.com,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
+Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
+ eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
+ openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
+ kevin.tian@intel.com, Parav Pandit <parav@mellanox.com>,
+ jian-feng.ding@intel.com, dgilbert@redhat.com, zhenyuw@linux.intel.com,
+ hejie.xu@intel.com, bao.yumeng@zte.com.cn, Jiri Pirko <jiri@mellanox.com>,
+ eskultet@redhat.com, Sean Mooney <smooney@redhat.com>,
+ intel-gvt-dev@lists.freedesktop.org,
+ Daniel =?UTF-8?B?UC5CZXJyYW5nw6k=?= <berrange@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, dinechin@redhat.com, devel@ovirt.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When an s390 guest is using lazy unmapping, it can result in a very
-large number of oustanding DMA requests, far beyond the default
-limit configured for vfio.  Let's track DMA usage similar to vfio
-in the host, and trigger the guest to flush their DMA mappings
-before vfio runs out.
+On Fri, 11 Sep 2020 08:56:00 +0800
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
----
- hw/s390x/s390-pci-bus.c  | 56 +++++++++++++++++++++++++++++++++++++++++++-----
- hw/s390x/s390-pci-bus.h  |  9 ++++++++
- hw/s390x/s390-pci-inst.c | 29 +++++++++++++++++++------
- hw/s390x/s390-pci-inst.h |  3 +++
- 4 files changed, 86 insertions(+), 11 deletions(-)
+> On Thu, Sep 10, 2020 at 12:02:44PM -0600, Alex Williamson wrote:
+> > On Thu, 10 Sep 2020 13:50:11 +0100
+> > Sean Mooney <smooney@redhat.com> wrote:
+> >   
+> > > On Thu, 2020-09-10 at 14:38 +0200, Cornelia Huck wrote:  
+> > > > On Wed, 9 Sep 2020 10:13:09 +0800
+> > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > >     
+> > > > > > > still, I'd like to put it more explicitly to make ensure it's not missed:
+> > > > > > > the reason we want to specify compatible_type as a trait and check
+> > > > > > > whether target compatible_type is the superset of source
+> > > > > > > compatible_type is for the consideration of backward compatibility.
+> > > > > > > e.g.
+> > > > > > > an old generation device may have a mdev type xxx-v4-yyy, while a newer
+> > > > > > > generation  device may be of mdev type xxx-v5-yyy.
+> > > > > > > with the compatible_type traits, the old generation device is still
+> > > > > > > able to be regarded as compatible to newer generation device even their
+> > > > > > > mdev types are not equal.      
+> > > > > > 
+> > > > > > If you want to support migration from v4 to v5, can't the (presumably
+> > > > > > newer) driver that supports v5 simply register the v4 type as well, so
+> > > > > > that the mdev can be created as v4? (Just like QEMU versioned machine
+> > > > > > types work.)      
+> > > > > 
+> > > > > yes, it should work in some conditions.
+> > > > > but it may not be that good in some cases when v5 and v4 in the name string
+> > > > > of mdev type identify hardware generation (e.g. v4 for gen8, and v5 for
+> > > > > gen9)
+> > > > > 
+> > > > > e.g.
+> > > > > (1). when src mdev type is v4 and target mdev type is v5 as
+> > > > > software does not support it initially, and v4 and v5 identify hardware
+> > > > > differences.    
+> > > > 
+> > > > My first hunch here is: Don't introduce types that may be compatible
+> > > > later. Either make them compatible, or make them distinct by design,
+> > > > and possibly add a different, compatible type later.
+> > > >     
+> > > > > then after software upgrade, v5 is now compatible to v4, should the
+> > > > > software now downgrade mdev type from v5 to v4?
+> > > > > not sure if moving hardware generation info into a separate attribute
+> > > > > from mdev type name is better. e.g. remove v4, v5 in mdev type, while use
+> > > > > compatible_pci_ids to identify compatibility.    
+> > > > 
+> > > > If the generations are compatible, don't mention it in the mdev type.
+> > > > If they aren't, use distinct types, so that management software doesn't
+> > > > have to guess. At least that would be my naive approach here.    
+> > > yep that is what i would prefer to see too.  
+> > > >     
+> > > > > 
+> > > > > (2) name string of mdev type is composed by "driver_name + type_name".
+> > > > > in some devices, e.g. qat, different generations of devices are binding to
+> > > > > drivers of different names, e.g. "qat-v4", "qat-v5".
+> > > > > then though type_name is equal, mdev type is not equal. e.g.
+> > > > > "qat-v4-type1", "qat-v5-type1".    
+> > > > 
+> > > > I guess that shows a shortcoming of that "driver_name + type_name"
+> > > > approach? Or maybe I'm just confused.    
+> > > yes i really dont like haveing the version in the mdev-type name 
+> > > i would stongly perfger just qat-type-1 wehere qat is just there as a way of namespacing.
+> > > although symmetric-cryto, asymmetric-cryto and compression woudl be a better name then type-1, type-2, type-3 if
+> > > that is what they would end up mapping too. e.g. qat-compression or qat-aes is a much better name then type-1
+> > > higher layers of software are unlikely to parse the mdev names but as a human looking at them its much eaiser to
+> > > understand if the names are meaningful. the qat prefix i think is important however to make sure that your mdev-types
+> > > dont colide with other vendeors mdev types. so i woudl encurage all vendors to prefix there mdev types with etiher the
+> > > device name or the vendor.  
+> > 
+> > +1 to all this, the mdev type is meant to indicate a software
+> > compatible interface, if different hardware versions can be software
+> > compatible, then don't make the job of finding a compatible device
+> > harder.  The full type is a combination of the vendor driver name plus
+> > the vendor provided type name specifically in order to provide a type
+> > namespace per vendor driver.  That's done at the mdev core level.
+> > Thanks,  
+> 
+> hi Alex,
+> got it. so do you suggest that vendors use consistent driver name over
+> generations of devices?
+> for qat, they create different modules for each generation. This
+> practice is not good if they want to support migration between devices
+> of different generations, right?
+> 
+> and can I understand that we don't want support of migration between
+> different mdev types even in future ?
 
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 92146a2..ab20d34 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -24,6 +24,8 @@
- #include "qemu/error-report.h"
- #include "qemu/module.h"
- 
-+#include "hw/vfio/pci.h"
-+
- #ifndef DEBUG_S390PCI_BUS
- #define DEBUG_S390PCI_BUS  0
- #endif
-@@ -737,6 +739,42 @@ static void s390_pci_iommu_free(S390pciState *s, PCIBus *bus, int32_t devfn)
-     object_unref(OBJECT(iommu));
- }
- 
-+static S390PCIDMACount *s390_start_dma_count(S390pciState *s, VFIODevice *vdev)
-+{
-+    int id = vdev->group->container->fd;
-+    S390PCIDMACount *cnt;
-+
-+    if (vdev->group->container->dma_limit == 0) {
-+        return NULL;
-+    }
-+
-+    QTAILQ_FOREACH(cnt, &s->zpci_dma_limit, link) {
-+        if (cnt->id  == id) {
-+            cnt->users++;
-+            return cnt;
-+        }
-+    }
-+
-+    cnt = g_new0(S390PCIDMACount, 1);
-+    cnt->id = id;
-+    cnt->users = 1;
-+    cnt->avail = vdev->group->container->dma_limit;
-+    QTAILQ_INSERT_TAIL(&s->zpci_dma_limit, cnt, link);
-+    return cnt;
-+}
-+
-+static void s390_end_dma_count(S390pciState *s, S390PCIDMACount *cnt)
-+{
-+    if (cnt == NULL) {
-+        return;
-+    }
-+
-+    cnt->users--;
-+    if (cnt->users == 0) {
-+        QTAILQ_REMOVE(&s->zpci_dma_limit, cnt, link);
-+    }
-+}
-+
- static void s390_pcihost_realize(DeviceState *dev, Error **errp)
- {
-     PCIBus *b;
-@@ -764,6 +802,7 @@ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
-     s->bus_no = 0;
-     QTAILQ_INIT(&s->pending_sei);
-     QTAILQ_INIT(&s->zpci_devs);
-+    QTAILQ_INIT(&s->zpci_dma_limit);
- 
-     css_register_io_adapters(CSS_IO_ADAPTER_PCI, true, false,
-                              S390_ADAPTER_SUPPRESSIBLE, errp);
-@@ -902,6 +941,7 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
- {
-     S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
-     PCIDevice *pdev = NULL;
-+    VFIOPCIDevice *vpdev = NULL;
-     S390PCIBusDevice *pbdev = NULL;
- 
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
-@@ -941,17 +981,20 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-             }
-         }
- 
-+        pbdev->pdev = pdev;
-+        pbdev->iommu = s390_pci_get_iommu(s, pci_get_bus(pdev), pdev->devfn);
-+        pbdev->iommu->pbdev = pbdev;
-+        pbdev->state = ZPCI_FS_DISABLED;
-+
-         if (object_dynamic_cast(OBJECT(dev), "vfio-pci")) {
-             pbdev->fh |= FH_SHM_VFIO;
-+            vpdev = container_of(pbdev->pdev, VFIOPCIDevice, pdev);
-+            pbdev->iommu->dma_limit = s390_start_dma_count(s,
-+                                                           &vpdev->vbasedev);
-         } else {
-             pbdev->fh |= FH_SHM_EMUL;
-         }
- 
--        pbdev->pdev = pdev;
--        pbdev->iommu = s390_pci_get_iommu(s, pci_get_bus(pdev), pdev->devfn);
--        pbdev->iommu->pbdev = pbdev;
--        pbdev->state = ZPCI_FS_DISABLED;
--
-         if (s390_pci_msix_init(pbdev)) {
-             error_setg(errp, "MSI-X support is mandatory "
-                        "in the S390 architecture");
-@@ -1004,6 +1047,9 @@ static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-         pbdev->fid = 0;
-         QTAILQ_REMOVE(&s->zpci_devs, pbdev, link);
-         g_hash_table_remove(s->zpci_table, &pbdev->idx);
-+        if (pbdev->iommu->dma_limit) {
-+            s390_end_dma_count(s, pbdev->iommu->dma_limit);
-+        }
-         qdev_unrealize(dev);
-     }
- }
-diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
-index 550f3cc..a588aa8 100644
---- a/hw/s390x/s390-pci-bus.h
-+++ b/hw/s390x/s390-pci-bus.h
-@@ -265,6 +265,13 @@ typedef struct S390IOTLBEntry {
-     uint64_t perm;
- } S390IOTLBEntry;
- 
-+typedef struct S390PCIDMACount {
-+    int id;
-+    int users;
-+    uint32_t avail;
-+    QTAILQ_ENTRY(S390PCIDMACount) link;
-+} S390PCIDMACount;
-+
- typedef struct S390PCIBusDevice S390PCIBusDevice;
- typedef struct S390PCIIOMMU {
-     Object parent_obj;
-@@ -277,6 +284,7 @@ typedef struct S390PCIIOMMU {
-     uint64_t pba;
-     uint64_t pal;
-     GHashTable *iotlb;
-+    S390PCIDMACount *dma_limit;
- } S390PCIIOMMU;
- 
- typedef struct S390PCIIOMMUTable {
-@@ -352,6 +360,7 @@ typedef struct S390pciState {
-     GHashTable *zpci_table;
-     QTAILQ_HEAD(, SeiContainer) pending_sei;
-     QTAILQ_HEAD(, S390PCIBusDevice) zpci_devs;
-+    QTAILQ_HEAD(, S390PCIDMACount) zpci_dma_limit;
- } S390pciState;
- 
- S390pciState *s390_get_phb(void);
-diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index 2f7a7d7..6af9af4 100644
---- a/hw/s390x/s390-pci-inst.c
-+++ b/hw/s390x/s390-pci-inst.c
-@@ -32,6 +32,9 @@
-         }                                                          \
-     } while (0)
- 
-+#define INC_DMA_AVAIL(iommu) if (iommu->dma_limit) iommu->dma_limit->avail++;
-+#define DEC_DMA_AVAIL(iommu) if (iommu->dma_limit) iommu->dma_limit->avail--;
-+
- static void s390_set_status_code(CPUS390XState *env,
-                                  uint8_t r, uint64_t status_code)
- {
-@@ -572,7 +575,8 @@ int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2, uintptr_t ra)
-     return 0;
- }
- 
--static void s390_pci_update_iotlb(S390PCIIOMMU *iommu, S390IOTLBEntry *entry)
-+static uint32_t s390_pci_update_iotlb(S390PCIIOMMU *iommu,
-+                                      S390IOTLBEntry *entry)
- {
-     S390IOTLBEntry *cache = g_hash_table_lookup(iommu->iotlb, &entry->iova);
-     IOMMUTLBEntry notify = {
-@@ -585,14 +589,15 @@ static void s390_pci_update_iotlb(S390PCIIOMMU *iommu, S390IOTLBEntry *entry)
- 
-     if (entry->perm == IOMMU_NONE) {
-         if (!cache) {
--            return;
-+            goto out;
-         }
-         g_hash_table_remove(iommu->iotlb, &entry->iova);
-+        INC_DMA_AVAIL(iommu);
-     } else {
-         if (cache) {
-             if (cache->perm == entry->perm &&
-                 cache->translated_addr == entry->translated_addr) {
--                return;
-+                goto out;
-             }
- 
-             notify.perm = IOMMU_NONE;
-@@ -606,9 +611,13 @@ static void s390_pci_update_iotlb(S390PCIIOMMU *iommu, S390IOTLBEntry *entry)
-         cache->len = PAGE_SIZE;
-         cache->perm = entry->perm;
-         g_hash_table_replace(iommu->iotlb, &cache->iova, cache);
-+        DEC_DMA_AVAIL(iommu);
-     }
- 
-     memory_region_notify_iommu(&iommu->iommu_mr, 0, notify);
-+
-+out:
-+    return iommu->dma_limit ? iommu->dma_limit->avail : 1;
- }
- 
- int rpcit_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2, uintptr_t ra)
-@@ -620,6 +629,7 @@ int rpcit_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2, uintptr_t ra)
-     S390PCIIOMMU *iommu;
-     S390IOTLBEntry entry;
-     hwaddr start, end;
-+    uint32_t dma_avail;
- 
-     if (env->psw.mask & PSW_MASK_PSTATE) {
-         s390_program_interrupt(env, PGM_PRIVILEGED, ra);
-@@ -675,8 +685,9 @@ int rpcit_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2, uintptr_t ra)
-         }
- 
-         start += entry.len;
--        while (entry.iova < start && entry.iova < end) {
--            s390_pci_update_iotlb(iommu, &entry);
-+        dma_avail = 1; /* Assume non-zero dma_avail to start */
-+        while (entry.iova < start && entry.iova < end && dma_avail > 0) {
-+            dma_avail = s390_pci_update_iotlb(iommu, &entry);
-             entry.iova += PAGE_SIZE;
-             entry.translated_addr += PAGE_SIZE;
-         }
-@@ -689,7 +700,13 @@ err:
-         s390_pci_generate_error_event(error, pbdev->fh, pbdev->fid, start, 0);
-     } else {
-         pbdev->fmb.counter[ZPCI_FMB_CNT_RPCIT]++;
--        setcc(cpu, ZPCI_PCI_LS_OK);
-+        if (dma_avail > 0) {
-+            setcc(cpu, ZPCI_PCI_LS_OK);
-+        } else {
-+            /* vfio DMA mappings are exhausted, trigger a RPCIT */
-+            setcc(cpu, ZPCI_PCI_LS_ERR);
-+            s390_set_status_code(env, r1, ZPCI_RPCIT_ST_INSUFF_RES);
-+        }
-     }
-     return 0;
- }
-diff --git a/hw/s390x/s390-pci-inst.h b/hw/s390x/s390-pci-inst.h
-index fa3bf8b..8ee3a3c 100644
---- a/hw/s390x/s390-pci-inst.h
-+++ b/hw/s390x/s390-pci-inst.h
-@@ -254,6 +254,9 @@ typedef struct ClpReqRspQueryPciGrp {
- #define ZPCI_STPCIFC_ST_INVAL_DMAAS   28
- #define ZPCI_STPCIFC_ST_ERROR_RECOVER 40
- 
-+/* Refresh PCI Translations status codes */
-+#define ZPCI_RPCIT_ST_INSUFF_RES      16
-+
- /* FIB function controls */
- #define ZPCI_FIB_FC_ENABLED     0x80
- #define ZPCI_FIB_FC_ERROR       0x40
--- 
-1.8.3.1
+You need to balance your requirements here.  If you're creating
+different drivers per generation, that suggests different device APIs,
+which is a legitimate use case for different mdev types.  However if
+you're expecting migration compatibility, that must be seamless to the
+guest, therefore the device API must be identical.  That suggests that
+migration between different types doesn't make much sense.  If a new
+generation device wants to expose a new mdev type with new features or
+device API, yet also support migration with an older mdev type, why
+wouldn't it simply expose both the old and the new type?  It seems much
+more supportable to simply instantiate an instance of the older type
+than to create an instance of the new type, which by the contents of
+the migration stream is configured to behave as the older type.  The
+latter sounds very difficult to test.
+
+A challenge when we think about migration between different types,
+particularly across different vendor drivers, is that the migration
+stream is opaque, it's device and vendor specific.  Therefore it's not
+only difficult for userspace to understand the compatibility matrix, but
+also to actually support it in software, maintaining version and bug
+compatibility across different drivers.  It's clearly much, much easier
+when the same code base (and thus the same mdev type) is producing and
+consuming the migration data.  Thanks,
+
+Alex
 
 
