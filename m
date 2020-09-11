@@ -2,91 +2,99 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7108C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 11:53:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 845FFC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 11:55:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 047E9221E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 11:53:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F3D57204FD
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 11:55:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ITnu0NmS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 047E9221E7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qso0HxCV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3D57204FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGhcf-0001kp-RK
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 07:53:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51868)
+	id 1kGheO-0002um-U5
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 07:55:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kGhc7-0001HL-8n
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 07:53:11 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57607
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kGhc4-0003sE-7S
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 07:53:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599825186;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bm9kxq90U8Au3LKx3RZe6tHGfXscSktIeG7368KtnR8=;
- b=ITnu0NmSWrsc7oWlX98CRolyekwmpHMTagMqiFWRHg84X9veDYbZqHr+Fb0m80cQ9C4rJJ
- OPhRZQpfRV/6hFxljAJ5La4HQ1/ricqUIKHh7iQDBBVkO7jYwUgNSL+skZsCgSMpenqrvw
- aP2mghwe5NvQqvPcjXmd5E8Dfpgq9fo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-142-Xzq8s0P8NkWZgv-OTHzblg-1; Fri, 11 Sep 2020 07:52:11 -0400
-X-MC-Unique: Xzq8s0P8NkWZgv-OTHzblg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1794981F007;
- Fri, 11 Sep 2020 11:52:10 +0000 (UTC)
-Received: from work-vm (ovpn-113-52.ams2.redhat.com [10.36.113.52])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7556060C07;
- Fri, 11 Sep 2020 11:52:07 +0000 (UTC)
-Date: Fri, 11 Sep 2020 12:52:04 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: [PATCH v3 0/7] migration: bring improved savevm/loadvm/delvm to
- QMP
-Message-ID: <20200911115204.GF3310@work-vm>
-References: <20200827111606.1408275-1-berrange@redhat.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kGhdf-0002F7-S8
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 07:54:47 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40563)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kGhdd-0003zx-MF
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 07:54:47 -0400
+Received: by mail-wr1-x442.google.com with SMTP id j2so11193540wrx.7
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 04:54:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=VFoByf3PGihN1goL6ZvA0tVV1xMv374D+1AeJJt5zEA=;
+ b=Qso0HxCVaDQSBn24j4wojHz0Md1wLVlP/dfoZxSJbugpvYVlbocbWgooRaFpwqEwrz
+ dGuCUkJWkpXCRd5yIUdqow9BLZ8MkgRoyvw6ZV3/WP456SotF27lM5lvkDuDt6wrynKY
+ n99/g4GYt9QFaL5m7GLvIeWDhF+omjFLLmbfDwRNngNUo73lsuBnZV6U80btWujgkEsU
+ 2maz9Q78CsLGxXVJJaIQz19lJmAJBLJGIF1d9FOfK6aF7m+sB9h/YH8VE+p3P/LesUlM
+ DKxeKB+NMpOkSJKvD192XhH/4mwQY430S9T+B9M3JcJ8HcQveMYPhuxEln4ye5dNP4D+
+ wxhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=VFoByf3PGihN1goL6ZvA0tVV1xMv374D+1AeJJt5zEA=;
+ b=pDwb4HOayBEMNmwF24105y2j7rwqpzcjaHIm6efeHsyhOFjjAjwsh1En/z9S6RwaBd
+ 6ICB79k+rdcpgTrX6u3q8sSYW90CTkQ/pwJeysnl52SdKFfc75ifnNID5etkY2vK1B25
+ u8W8IyAulWjOEfLFd5VuV0OFxAGFjVvBKU4DELc49t2cwUaoQB7+gfiCvxf9tK6r4tho
+ vw9Xn1rIqYSSdfk44d25v32XyUCwcS6Lzo7NrnD3tyQ+Di9aa1przB/S89sXk21hh9og
+ k4rjIFFz4oHdwddsXJwOOTeS+XLFRe1fc/lRDPEyI/GFrD9e8/JJkhXobISiVvvLQOU2
+ hgjQ==
+X-Gm-Message-State: AOAM531uvCZCS/d6KefLMSrQuGasL8fsR+On0OcGFONz1zPhMki+JcCD
+ yzP+x0uY/cBdchWjW0f5oav4HA==
+X-Google-Smtp-Source: ABdhPJyBUNDi2sD7TcOrddCOjdElcn+sdzDE5WWsVCI/hJvmIPtY0E7JHiGnEIH1187xUxoFe36HHA==
+X-Received: by 2002:adf:ff90:: with SMTP id j16mr1853174wrr.105.1599825284160; 
+ Fri, 11 Sep 2020 04:54:44 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id t22sm4745118wmt.1.2020.09.11.04.54.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 11 Sep 2020 04:54:42 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 53D111FF7E;
+ Fri, 11 Sep 2020 12:54:42 +0100 (BST)
+References: <159970958159.31371.12301700684467003959.malonedeb@wampee.canonical.com>
+ <92de5ee0-629a-640a-d547-8c2d650742f2@vivier.eu>
+ <87tuw4odwk.fsf@linaro.org> <87r1r8odph.fsf@linaro.org>
+ <CAGTPX+DAoJcw2y9gPjkP6kGXEQW7=e1tohM8vND9j9Qtxuc5vw@mail.gmail.com>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Bug 1895080 <1895080@bugs.launchpad.net>
+Subject: Re: [Bug 1895080] [NEW] pgb_reserved_va: Assertion `addr == test'
+ failed
+In-reply-to: <CAGTPX+DAoJcw2y9gPjkP6kGXEQW7=e1tohM8vND9j9Qtxuc5vw@mail.gmail.com>
+Date: Fri, 11 Sep 2020 12:54:42 +0100
+Message-ID: <87o8mco7el.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200827111606.1408275-1-berrange@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0.004
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 03:40:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,196 +107,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin:
-  While we're still arguing about details of the last commit; can we get
-the first few commits in - they seem to be generally nice cleanups/error
-handling.
 
-Dave
+Hansni Bu <1895080@bugs.launchpad.net> writes:
 
-* Daniel P. Berrangé (berrange@redhat.com) wrote:
->  v1: https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg00866.html
->  v2: https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg07523.html
-> 
-> When QMP was first introduced some 10+ years ago now, the snapshot
-> related commands (savevm/loadvm/delvm) were not converted. This was
-> primarily because their implementation causes blocking of the thread
-> running the monitor commands. This was (and still is) considered
-> undesirable behaviour both in HMP and QMP.
-> 
-> In theory someone was supposed to fix this flaw at some point in the
-> past 10 years and bring them into the QMP world. Sadly, thus far it
-> hasn't happened as people always had more important things to work
-> on. Enterprise apps were much more interested in external snapshots
-> than internal snapshots as they have many more features.
-> 
-> Meanwhile users still want to use internal snapshots as there is
-> a certainly simplicity in having everything self-contained in one
-> image, even though it has limitations. Thus the apps that end up
-> executing the savevm/loadvm/delvm via the "human-monitor-command"
-> QMP command.
-> 
-> IOW, the problematic blocking behaviour that was one of the reasons
-> for not having savevm/loadvm/delvm in QMP is experienced by applications
-> regardless. By not portting the commands to QMP due to one design flaw,
-> we've forced apps and users to suffer from other design flaws of HMP (
-> bad error reporting, strong type checking of args, no introspection) for
-> an additional 10 years. This feels rather sub-optimal :-(
-> 
-> In practice users don't appear to care strongly about the fact that these
-> commands block the VM while they run. I might have seen one bug report
-> about it, but it certainly isn't something that comes up as a frequent
-> topic except among us QEMU maintainers. Users do care about having
-> access to the snapshot feature.
-> 
-> Where I am seeing frequent complaints is wrt the use of OVMF combined
-> with snapshots which has some serious pain points. This is getting worse
-> as the push to ditch legacy BIOS in favour of UEFI gain momentum both
-> across OS vendors and mgmt apps. Solving it requires new parameters to
-> the commands, but doing this in HMP is super unappealing.
-> 
-> After 10 years, I think it is time for us to be a little pragmatic about
-> our handling of snapshots commands. My desire is that libvirt should never
-> use "human-monitor-command" under any circumstances, because of the
-> inherant flaws in HMP as a protocol for machine consumption.
-> 
-> Thus in this series I'm proposing a fairly direct mapping of the existing
-> HMP commands for savevm/loadvm/delvm into QMP as a first step. This does
-> not solve the blocking thread problem, but it does put in a place a
-> design using the jobs framework which can facilitate solving it later.
-> It does also solve the error reporting, type checking and introspection
-> problems inherant to HMP. So we're winning on 3 out of the 4 problems,
-> and pushed apps to a QMP design that will let us solve the last
-> remaining problem.
-> 
-> With a QMP variant, we reasonably deal with the problems related to OVMF:
-> 
->  - The logic to pick which disk to store the vmstate in is not
->    satsifactory.
-> 
->    The first block driver state cannot be assumed to be the root disk
->    image, it might be OVMF varstore and we don't want to store vmstate
->    in there.
-> 
->  - The logic to decide which disks must be snapshotted is hardwired
->    to all disks which are writable
-> 
->    Again with OVMF there might be a writable varstore, but this can be
->    raw rather than qcow2 format, and thus unable to be snapshotted.
->    While users might wish to snapshot their varstore, in some/many/most
->    cases it is entirely uneccessary. Users are blocked from snapshotting
->    their VM though due to this varstore.
-> 
-> These are solved by adding two parameters to the commands. The first is
-> a block device node name that identifies the image to store vmstate in,
-> and the second is a list of node names to include for the snapshots.
-> If the list of nodes isn't given, it falls back to the historical
-> behaviour of using all disks matching some undocumented criteria.
-> 
-> In the block code I've only dealt with node names for block devices, as
-> IIUC, this is all that libvirt should need in the -blockdev world it now
-> lives in. IOW, I've made not attempt to cope with people wanting to use
-> these QMP commands in combination with -drive args, as libvirt will
-> never use -drive with a QEMU new enough to have these new commands.
-> 
-> The main limitations of this current impl
-> 
->  - The snapshot process runs serialized in the main thread. ie QEMU
->    guest execution is blocked for the duration. The job framework
->    lets us fix this in future without changing the QMP semantics
->    exposed to the apps.
-> 
->  - Most vmstate loading errors just go to stderr, as they are not
->    using Error **errp reporting. Thus the job framework just
->    reports a fairly generic message
-> 
->      "Error -22 while loading VM state"
-> 
->    Again this can be fixed later without changing the QMP semantics
->    exposed to apps.
-> 
-> I've done some minimal work in libvirt to start to make use of the new
-> commands to validate their functionality, but this isn't finished yet.
-> 
-> My ultimate goal is to make the GNOME Boxes maintainer happy again by
-> having internal snapshots work with OVMF:
-> 
->   https://gitlab.gnome.org/GNOME/gnome-boxes/-/commit/c486da262f6566326fbcb5e=
-> f45c5f64048f16a6e
-> 
-> Changed in v3:
-> 
->  - Schedule a bottom half to escape from coroutine context in
->    the jobs. This is needed because the locking in the snapshot
->    code goes horribly wrong when run from a background coroutine
->    instead of the main event thread.
-> 
->  - Re-factor way we iterate over devices, so that we correctly
->    report non-existant devices passed by the user over QMP.
-> 
->  - Add QAPI docs notes about limitations wrt vmstate error
->    reporting (it all goes to stderr not an Error **errp)
->    so QMP only gets a fairly generic error message currently.
-> 
->  - Add I/O test to validate many usage scenarios / errors
-> 
->  - Add I/O test helpers to handle QMP events with a deterministic
->    ordering
-> 
->  - Ensure 'delete-snapshot' reports an error if requesting
->    delete from devices that don't support snapshot, instead of
->    silently succeeding with no erro.
-> 
-> Changed in v2:
-> 
->  - Use new command names "snapshot-{load,save,delete}" to make it
->    clear that these are different from the "savevm|loadvm|delvm"
->    as they use the Job framework
-> 
->  - Use an include list for block devs, not an exclude list
-> 
-> Daniel P. Berrang=C3=A9 (7):
->   migration: improve error reporting of block driver state name
->   block: push error reporting into bdrv_all_*_snapshot functions
->   migration: stop returning errno from load_snapshot()
->   block: add ability to specify list of blockdevs during snapshot
->   block: allow specifying name of block device for vmstate storage
->   iotests: add support for capturing and matching QMP events
->   migration: introduce snapshot-{save,load,delete} QMP commands
-> 
->  block/monitor/block-hmp-cmds.c |   7 +-
->  block/snapshot.c               | 233 ++++++++++++++-------
->  include/block/snapshot.h       |  19 +-
->  include/migration/snapshot.h   |  10 +-
->  migration/savevm.c             | 258 +++++++++++++++++++----
->  monitor/hmp-cmds.c             |  11 +-
->  qapi/job.json                  |   9 +-
->  qapi/migration.json            | 135 ++++++++++++
->  replay/replay-snapshot.c       |   4 +-
->  softmmu/vl.c                   |   2 +-
->  tests/qemu-iotests/267.out     |  14 +-
->  tests/qemu-iotests/310         | 255 +++++++++++++++++++++++
->  tests/qemu-iotests/310.out     | 369 +++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/common.qemu | 107 +++++++++-
->  tests/qemu-iotests/group       |   1 +
->  15 files changed, 1289 insertions(+), 145 deletions(-)
->  create mode 100755 tests/qemu-iotests/310
->  create mode 100644 tests/qemu-iotests/310.out
-> 
-> --=20
-> 2.26.2
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> No, it's not set by CentOS-7.5.
+> Does it mean that we just cannot run the ELF in such a case? I've tried
+> many times, the assert always fails. Maybe, we can blame CentOS-7.5.
 
+The trouble is without MAP_FIXED_NOREPLACE we are at the mercy of the
+host kernel to allow the address request to be honoured. A plain
+MAP_FIXED won't do as it can clober existing mappings. In theory a
+suitable hole has been identified but sometimes the kernel makes a
+decision to offset the suggested mapping for it's own reasons.=20
+
+> BTW: with the option "-p 65536", the case runs successfully.
+
+Hmm interesting. I wonder if we are seeing a fail due to mmap_min_addr?
+What does:
+
+  /proc/sys/vm/mmap_min_addr
+
+give you on the system?
+
+You can manually set the reserved_va and the base address using -R and
+-B although that is more of a developer work around. I think moving the
+assert to the condition above would be an improvement just because it
+tells us what the requested base address was and what the kernel decided
+to give us.
+
+>
+> On Fri, Sep 11, 2020 at 5:50 PM Alex Benn=C3=A9e <1895080@bugs.launchpad.=
+net>
+> wrote:
+>
+>> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+>>
+>> > Laurent Vivier <laurent@vivier.eu> writes:
+>> >
+>> <snip>
+>> >>> Then trying qemu-riscv32 with a simple ELF, I get:
+>> >>> linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D t=
+est'
+>> failed.
+>> >>>
+>> >>> strace shows that:
+>> >>> mmap(0x1000, 4294963200, PROT_NONE,
+>> MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE, -1, 0) =3D 0x10000
+>> >>> write(2, "qemu-riscv32: ../qemu.git/linux-"..., 103qemu-riscv32:
+>> ../qemu.git/linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =
+=3D=3D
+>> test' failed.
+>> >>> ) =3D 103
+>> >>>
+>> >>> The source code is in the function pgb_reserved_va (linux-
+>> >>> user/elfload.c). I think mmap cannot guarantee that the returned
+>> pointer
+>> >>> (test) equals to the parameter of addr. So is this a bug to assert
+>> (addr
+>> >>> =3D=3D test)?
+>> >>
+>> > I'm assuming CentOS 7.5 actually has a definition for
+>> > MAP_FIXED_NOREPLACE which should ensure we get what we asked for -
+>> > otherwise we are in the position of hoping the kernel honours what we
+>> > asked for.
+>>
+>> Doh re-reading I see it's not set in the strace output. Maybe we should
+>> promote the assert case to the failure leg so we have:
+>>
+>>     if (addr =3D=3D MAP_FAILED || addr !=3D test) {
+>>         error_report(...)
+>>     }
+>>
+>> so we at least fail with a user friendly error rather than an abort?
+>>
+>> --
+>> Alex Benn=C3=A9e
+>>
+>> --
+>> You received this bug notification because you are subscribed to the bug
+>> report.
+>> https://bugs.launchpad.net/bugs/1895080
+>>
+>> Title:
+>>   pgb_reserved_va: Assertion `addr =3D=3D test' failed
+>>
+>> Status in QEMU:
+>>   New
+>>
+>> Bug description:
+>>   This problem occurs on CentOS-7.5 (64-bit) with qemu-5.1.0, qemu head
+>>   (commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a) for riscv32-linux-
+>>   user.
+>>
+>>   Firstly, compile fails:
+>>   Compiling C object libqemu-riscv32-linux-user.fa.p/linux-user_strace.c=
+.o
+>>   ../qemu.git/linux-user/strace.c:1210:18: error: =E2=80=98FALLOC_FL_KEE=
+P_SIZE=E2=80=99
+>> undeclared here (not in a function)
+>>        FLAG_GENERIC(FALLOC_FL_KEEP_SIZE),
+>>
+>>   I have to add below include to linux-user/strace.c
+>>   diff --git a/linux-user/strace.c b/linux-user/strace.c
+>>   index 11fea14fba..22e51d4a8a 100644
+>>   --- a/linux-user/strace.c
+>>   +++ b/linux-user/strace.c
+>>   @@ -7,6 +7,7 @@
+>>    #include <sys/mount.h>
+>>    #include <arpa/inet.h>
+>>    #include <netinet/tcp.h>
+>>   +#include <linux/falloc.h>
+>>    #include <linux/if_packet.h>
+>>    #include <linux/netlink.h>
+>>    #include <sched.h>
+>>
+>>   Then trying qemu-riscv32 with a simple ELF, I get:
+>>   linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D tes=
+t'
+>> failed.
+>>
+>>   strace shows that:
+>>   mmap(0x1000, 4294963200, PROT_NONE,
+>> MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE, -1, 0) =3D 0x10000
+>>   write(2, "qemu-riscv32: ../qemu.git/linux-"..., 103qemu-riscv32:
+>> ../qemu.git/linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =
+=3D=3D
+>> test' failed.
+>>   ) =3D 103
+>>
+>>   The source code is in the function pgb_reserved_va (linux-
+>>   user/elfload.c). I think mmap cannot guarantee that the returned
+>>   pointer (test) equals to the parameter of addr. So is this a bug to
+>>   assert (addr =3D=3D test)?
+>>
+>>   Attached configure script and test ELF file.
+>>
+>>   Thanks.
+>>
+>> To manage notifications about this bug go to:
+>> https://bugs.launchpad.net/qemu/+bug/1895080/+subscriptions
+>>
+
+
+--=20
+Alex Benn=C3=A9e
 
