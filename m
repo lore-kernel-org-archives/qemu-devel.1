@@ -2,77 +2,74 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C16BC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:23:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65B85C43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:25:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62C3D208FE
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:23:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 032FA206DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:25:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I0v2youB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62C3D208FE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZjyL9JCh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 032FA206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGlpy-0007KR-Jv
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 12:23:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58494)
+	id 1kGls0-0008Mt-O0
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 12:25:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58906)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kGlpJ-0006C7-2s
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 12:23:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47572)
+ id 1kGlrF-0007r6-6g
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 12:25:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22293)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kGlpG-0007wt-Tc
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 12:23:04 -0400
+ id 1kGlrD-0008CM-65
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 12:25:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599841381;
+ s=mimecast20190719; t=1599841502;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=ogCUpFA1nyPzdCXfnAqTQ3wyky+zL3F2m25FbzkpviQ=;
- b=I0v2youBeJLHsWZ0yJpTCZf4WVRQ5lc8DHfzSQxpcUStEf/SELCdafcmGuyUTRYYSLXN6C
- OzMad1hWVoj7gwkbT9ysSk9Nhi5557TWWLNVmW2PfFE5k35WYWBSUvfssLeo6ajQEsPJVN
- vU3bDsgZdPnZt3xwpuMyhYTElA7eIc0=
+ bh=FTG13XRpQRmIOiuUxd9JdS/JgSvMLjnwnl5liS2NV9c=;
+ b=ZjyL9JChPIRUhUenFbLhL6ycIvzrjDHtD/gQn1gyU4VVPmb8Vvp5zQr6hQJUptn31ThXg8
+ QQxGHww8jhepG2wwZ+KKH8aWvmCRbMtSKMlCWEqH2DDh9bJxTYcB5I7h3How5KIMxTYRCH
+ AwjbN6q2OcDSvpZoThGcX4Pp5TccUyI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-116-QuSvtX_oM9Kn8JRmXHT8EQ-1; Fri, 11 Sep 2020 12:23:00 -0400
-X-MC-Unique: QuSvtX_oM9Kn8JRmXHT8EQ-1
+ us-mta-546-Tcj739AkOo2MXvK-hXhgPg-1; Fri, 11 Sep 2020 12:25:00 -0400
+X-MC-Unique: Tcj739AkOo2MXvK-hXhgPg-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09FCE18B9ECA;
- Fri, 11 Sep 2020 16:22:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7FE480EDA1;
+ Fri, 11 Sep 2020 16:24:58 +0000 (UTC)
 Received: from work-vm (ovpn-113-52.ams2.redhat.com [10.36.113.52])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5DC5B60C15;
- Fri, 11 Sep 2020 16:22:54 +0000 (UTC)
-Date: Fri, 11 Sep 2020 17:22:51 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 85C4C60C07;
+ Fri, 11 Sep 2020 16:24:44 +0000 (UTC)
+Date: Fri, 11 Sep 2020 17:24:41 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: PATCH: Increase System Firmware Max Size
-Message-ID: <20200911162251.GA3311@work-vm>
-References: <CS1PR8401MB0327EF9D532330BA44257AFCF3240@CS1PR8401MB0327.NAMPRD84.PROD.OUTLOOK.COM>
- <20c5210f-8199-a9e7-9297-0bea06c4d9ae@redhat.com>
- <20200911083408.GA3310@work-vm>
- <ae2d820e-78c6-da92-2fa6-73c1a7d10333@redhat.com>
- <20200911150602.GH3310@work-vm>
- <8e2d0bf7-a206-124c-15b0-0f0071ef5a11@redhat.com>
+To: Steve Sistare <steven.sistare@oracle.com>
+Subject: Re: [PATCH V1 01/32] savevm: add vmstate handler iterators
+Message-ID: <20200911162441.GJ3310@work-vm>
+References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
+ <1596122076-341293-2-git-send-email-steven.sistare@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <8e2d0bf7-a206-124c-15b0-0f0071ef5a11@redhat.com>
+In-Reply-To: <1596122076-341293-2-git-send-email-steven.sistare@oracle.com>
 User-Agent: Mutt/1.14.6 (2020-07-11)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.004
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -99,163 +96,255 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "mst@redhat.com" <mst@redhat.com>,
- "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
  Markus Armbruster <armbru@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "McMillan,
- Erich" <erich.mcmillan@hp.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
  Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Laszlo Ersek (lersek@redhat.com) wrote:
-> On 09/11/20 17:06, Dr. David Alan Gilbert wrote:
-> > * Laszlo Ersek (lersek@redhat.com) wrote:
-> >> On 09/11/20 10:34, Dr. David Alan Gilbert wrote:
-> 
-> >>> I'm missing what this constant exists for - why is the
-> >>> check there at all  Is there something else that lives below this
-> >>> address that we have to protect?
-> >>
-> >> Yes, some MMIOs that I'm at least aware of are IO_APIC_DEFAULT_ADDRESS
-> >> (0xfec00000), TPM_PPI_ADDR_BASE (0xFED45000), APIC_DEFAULT_ADDRESS
-> >> (0xfee00000).
-> >>
-> >> They are not directly adjacent with pflash; nor should they be.
-> > 
-> > Hmm those need explicitly checks adding somewhere against
-> > FLASH_SIZE_LIMIT!
-> 
-> Yes, that would be nice. I don't know how it works. Maybe when adding
-> the next MemoryRegion there's an error or an assert(). No clue.
-> 
-> >> If you increase the size limit (without tieing it to a machine type),
-> >> then, with an upgraded QEMU and the same (old) machine type, you can
-> >> start a guest with a larger-than-earlier (cumulative) flash size. Then,
-> >> when you try to migrate this to an old QEMU (but same machine type),
-> >> it's a bad surprise. I understand that backwards migration is not
-> >> universally supported (or expected), but I don't want this problem to
-> >> land on my desk *ever*.
-> > 
-> > I support backwards migration; but that migration wouldn't work anyway -
-> > wouldn't that fail nicely with a mismatched RAMBlock size?
-> 
-> My point wasn't that the guest would be lost or corrupted, only that it
-> couldn't be migrated. We'd say "for this, you have to upgrade QEMU on
-> the destination host as well, or use a smaller firmware", and they'd say
-> "we don't want either of those things".
+Apologies for taking a while to get around to this, 
 
-My point is that already breaks if you used a smaller firmware on the
-source and the current size on the destination.
+* Steve Sistare (steven.sistare@oracle.com) wrote:
+> Provide the SAVEVM_FOREACH and SAVEVM_FORALL macros to loop over all save
+> VM state handlers.  The former will filter handlers based on the operation
+> in the later patch "savevm: VM handlers mode mask".  The latter loops over
+> all handlers.
+> 
+> No functional change.
+> 
+> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+> ---
+>  migration/savevm.c | 57 ++++++++++++++++++++++++++++++++++++------------------
+>  1 file changed, 38 insertions(+), 19 deletions(-)
+> 
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 45c9dd9..a07fcad 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -266,6 +266,25 @@ static SaveState savevm_state = {
+>      .global_section_id = 0,
+>  };
+>  
+> +/*
+> + * The FOREACH macros will filter handlers based on the current operation when
+> + * additional conditions are added in a subsequent patch.
+> + */
+> +
+> +#define SAVEVM_FOREACH(se, entry)                                    \
+> +    QTAILQ_FOREACH(se, &savevm_state.handlers, entry)                \
+> +
+> +#define SAVEVM_FOREACH_SAFE(se, entry, new_se)                       \
+> +    QTAILQ_FOREACH_SAFE(se, &savevm_state.handlers, entry, new_se)   \
+> +
+> +/* The FORALL macros unconditionally loop over all handlers. */
+> +
+> +#define SAVEVM_FORALL(se, entry)                                     \
+> +    QTAILQ_FOREACH(se, &savevm_state.handlers, entry)
+> +
+> +#define SAVEVM_FORALL_SAFE(se, entry, new_se)                        \
+> +    QTAILQ_FOREACH_SAFE(se, &savevm_state.handlers, entry, new_se)
+> +
 
-> >>> Our UEFI firmware is pretty sparse;
-> >>
-> >> Yes, in part because I strive to keep it that way.
-> > 
-> > But that's your choice, on our firmware implementation; that's not a
-> > requirement of QEMU or q35.
-> 
-> Right; if we can keep regressions out (not just functional regressions,
-> but workflow / use case regressions too), then it's OK to support more
-> use cases.
-> 
-> By workflow / use case regressions I mean that it should not become more
-> difficult to maintain OVMF as a result of the patch. (It should not
-> imply that now people can stuff even more cruft into OVMF, because "hey
-> there's more room now".)
-> 
-> >> The reason (should I say: excuse) for the firmware to exist is to (a)
-> >> boot operating systems, (b) abstract away some ugly platform-specific
-> >> hardware for OS runtime (by providing ACPI and SMBIOS descriptions, and
-> >> a *small* set of runtime services). We can maybe add (c) "root of trust".
-> >>
-> >> In practice, physical firmware is becoming the hw vendor's OS before
-> >> (and under) your OS, one you cannot replace, and one whose updates can
-> >> brick your hardware. Permitting the same feature creep on virtual
-> >> platforms is wrong.
-> > 
-> > On the firmware you develop that choice is fine; but there's no reason
-> > to force that restriction onto others.
-> 
-> Technically, I agree. It's fine to run larger UEFI firmware as long as
-> the default size restriction for the default (or traditional) UEFI
-> firmware remains the same.
-> 
-> Turn the size limit into a property, keep the same default value,
-> implement the migration aspects; specify *very clearly* in the commit
-> message what particular firmware this knob is being introduced for.
+OK, can I ask you to merge this with the next patch but to spin it the
+other way, so that we have:
 
-I don't think there is a migration aspect here; and this knob is a
-general knob - it's just Erich here is the poor unfortunate person
-who wanted to tune that knob for the first time.
+  SAVEVM_FOR(se, entry, mask)
 
-> ... And I'd still be grumpy, because it increases maintenance burden for
-> QEMU (and possibly OVMF too -- "hey we got more room now!"; see above),
-> without open source users benefiting from the change. It's not like
-> we'll ever be able to run, or read the source code of, that 8MB+
-> firmware image, is it?
+and the places you use SAVEVM_FORALL_SAFE would become
 
-Sorry, not QEMU's problem; we don't restrict RAM to 640k just because
-it should be enough for anyone.
+  SAVEVM_FOR(se, entry, VMS_MODE_ALL)
 
-> >>> or have to survive configuring lots of hardware; also
-> >>> I'm aware of other companies who are looking at putting big blobs
-> >>> of stuff in firmware for open uses;
-> >>
-> >> Key term being "open uses". Let us see them.
-> > 
-> > Well yes, I think we know who we're speaking about here and we're
-> > working on it.
-> 
-> Sorry, I wasn't clear enough.
-> 
-> I *know* we're going to see *those* "open uses" that you meant.
-> 
-> Precisely because they are "open uses", they have a chance at justifying
-> the churn.
-> 
-> My intent was to apply your (valid) argument to *this* proposal -- let
-> us see the "open uses" for *this* particular proposal.
-> 
-> Notice, in the thread starter:
-> 
-> "We have a need for increased firmware size", "our Uefi Firmware",
-> "change can be made to open source" --> it's obviously for the sake of a
-> proprietary platform firmware. Do you feel comfortable about taking on
-> more risks, reviews and maintenance for that?
-
-I'm not seeing any more risks, reviews or maintenance in QEMU due to it.
-Indeed replacing an undocumented, unchecked constant comparison with
-a proper property seems better.
-
-> (Note that I'm not singling out this particular proprietary guest
-> payload. I feel the exact same way when QEMU is being contorted for
-> Windows of OSX guests, but at least those guest payloads are universally
-> available to users, if the users are willing to comply with the
-> corresponding terms and conditions.)
-> 
-> > Being able to use QEMU to let vendors debug their platform firmware is a
-> > perfectly reasonable use of QEMU; maybe not of your OVMF build - we
-> > need to keep the restrictions on the two separate.
-> 
-> You as a QEMU maintainer / reviewer, and I as an OVMF maintainer /
-> reviewer, are going to pay with our time and effort for a proprietary
-> guest oriented change that normal QEMU users won't even be able to run,
-> let alone read, modify, distribute.
-
-We have lots of complex hideous changes that I'm never going to use but
-seem reasonable;  this is a tiny change that seems perfectly reasonable
-both for open and closed firmware.
-I realise herding OVMF developers is tricky, but that's not a reason
-to nack a reasonable almost trivial change in QEMU.
+I'm thinking at some point in the future we could merge a bunch of the
+other flag checks in there.
 
 Dave
 
-> But yes, technically speaking, we can replace the size limit constant
-> with a property, I think.
+
+>  static bool should_validate_capability(int capability)
+>  {
+>      assert(capability >= 0 && capability < MIGRATION_CAPABILITY__MAX);
+> @@ -673,7 +692,7 @@ static uint32_t calculate_new_instance_id(const char *idstr)
+>      SaveStateEntry *se;
+>      uint32_t instance_id = 0;
+>  
+> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +    SAVEVM_FORALL(se, entry) {
+>          if (strcmp(idstr, se->idstr) == 0
+>              && instance_id <= se->instance_id) {
+>              instance_id = se->instance_id + 1;
+> @@ -689,7 +708,7 @@ static int calculate_compat_instance_id(const char *idstr)
+>      SaveStateEntry *se;
+>      int instance_id = 0;
+>  
+> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +    SAVEVM_FORALL(se, entry) {
+>          if (!se->compat) {
+>              continue;
+>          }
+> @@ -803,7 +822,7 @@ void unregister_savevm(VMStateIf *obj, const char *idstr, void *opaque)
+>      }
+>      pstrcat(id, sizeof(id), idstr);
+>  
+> -    QTAILQ_FOREACH_SAFE(se, &savevm_state.handlers, entry, new_se) {
+> +    SAVEVM_FORALL_SAFE(se, entry, new_se) {
+>          if (strcmp(se->idstr, id) == 0 && se->opaque == opaque) {
+>              savevm_state_handler_remove(se);
+>              g_free(se->compat);
+> @@ -867,7 +886,7 @@ void vmstate_unregister(VMStateIf *obj, const VMStateDescription *vmsd,
+>  {
+>      SaveStateEntry *se, *new_se;
+>  
+> -    QTAILQ_FOREACH_SAFE(se, &savevm_state.handlers, entry, new_se) {
+> +    SAVEVM_FORALL_SAFE(se, entry, new_se) {
+>          if (se->vmsd == vmsd && se->opaque == opaque) {
+>              savevm_state_handler_remove(se);
+>              g_free(se->compat);
+> @@ -1119,7 +1138,7 @@ bool qemu_savevm_state_blocked(Error **errp)
+>  {
+>      SaveStateEntry *se;
+>  
+> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +    SAVEVM_FORALL(se, entry) {
+>          if (se->vmsd && se->vmsd->unmigratable) {
+>              error_setg(errp, "State blocked by non-migratable device '%s'",
+>                         se->idstr);
+> @@ -1145,7 +1164,7 @@ bool qemu_savevm_state_guest_unplug_pending(void)
+>  {
+>      SaveStateEntry *se;
+>  
+> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +    SAVEVM_FOREACH(se, entry) {
+>          if (se->vmsd && se->vmsd->dev_unplug_pending &&
+>              se->vmsd->dev_unplug_pending(se->opaque)) {
+>              return true;
+> @@ -1162,7 +1181,7 @@ void qemu_savevm_state_setup(QEMUFile *f)
+>      int ret;
+>  
+>      trace_savevm_state_setup();
+> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +    SAVEVM_FOREACH(se, entry) {
+>          if (!se->ops || !se->ops->save_setup) {
+>              continue;
+>          }
+> @@ -1193,7 +1212,7 @@ int qemu_savevm_state_resume_prepare(MigrationState *s)
+>  
+>      trace_savevm_state_resume_prepare();
+>  
+> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +    SAVEVM_FOREACH(se, entry) {
+>          if (!se->ops || !se->ops->resume_prepare) {
+>              continue;
+>          }
+> @@ -1223,7 +1242,7 @@ int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy)
+>      int ret = 1;
+>  
+>      trace_savevm_state_iterate();
+> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +    SAVEVM_FOREACH(se, entry) {
+>          if (!se->ops || !se->ops->save_live_iterate) {
+>              continue;
+>          }
+> @@ -1291,7 +1310,7 @@ void qemu_savevm_state_complete_postcopy(QEMUFile *f)
+>      SaveStateEntry *se;
+>      int ret;
+>  
+> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +    SAVEVM_FOREACH(se, entry) {
+>          if (!se->ops || !se->ops->save_live_complete_postcopy) {
+>              continue;
+>          }
+> @@ -1324,7 +1343,7 @@ int qemu_savevm_state_complete_precopy_iterable(QEMUFile *f, bool in_postcopy)
+>      SaveStateEntry *se;
+>      int ret;
+>  
+> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +    SAVEVM_FOREACH(se, entry) {
+>          if (!se->ops ||
+>              (in_postcopy && se->ops->has_postcopy &&
+>               se->ops->has_postcopy(se->opaque)) ||
+> @@ -1366,7 +1385,7 @@ int qemu_savevm_state_complete_precopy_non_iterable(QEMUFile *f,
+>      vmdesc = qjson_new();
+>      json_prop_int(vmdesc, "page_size", qemu_target_page_size());
+>      json_start_array(vmdesc, "devices");
+> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +    SAVEVM_FOREACH(se, entry) {
+>  
+>          if ((!se->ops || !se->ops->save_state) && !se->vmsd) {
+>              continue;
+> @@ -1476,7 +1495,7 @@ void qemu_savevm_state_pending(QEMUFile *f, uint64_t threshold_size,
+>      *res_postcopy_only = 0;
+>  
+>  
+> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +    SAVEVM_FOREACH(se, entry) {
+>          if (!se->ops || !se->ops->save_live_pending) {
+>              continue;
+>          }
+> @@ -1501,7 +1520,7 @@ void qemu_savevm_state_cleanup(void)
+>      }
+>  
+>      trace_savevm_state_cleanup();
+> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +    SAVEVM_FOREACH(se, entry) {
+>          if (se->ops && se->ops->save_cleanup) {
+>              se->ops->save_cleanup(se->opaque);
+>          }
+> @@ -1580,7 +1599,7 @@ int qemu_save_device_state(QEMUFile *f)
+>      }
+>      cpu_synchronize_all_states();
+>  
+> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +    SAVEVM_FOREACH(se, entry) {
+>          int ret;
+>  
+>          if (se->is_ram) {
+> @@ -1612,7 +1631,7 @@ static SaveStateEntry *find_se(const char *idstr, uint32_t instance_id)
+>  {
+>      SaveStateEntry *se;
+>  
+> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +    SAVEVM_FORALL(se, entry) {
+>          if (!strcmp(se->idstr, idstr) &&
+>              (instance_id == se->instance_id ||
+>               instance_id == se->alias_id))
+> @@ -2334,7 +2353,7 @@ qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
+>      }
+>  
+>      trace_qemu_loadvm_state_section_partend(section_id);
+> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +    SAVEVM_FOREACH(se, entry) {
+>          if (se->load_section_id == section_id) {
+>              break;
+>          }
+> @@ -2400,7 +2419,7 @@ static int qemu_loadvm_state_setup(QEMUFile *f)
+>      int ret;
+>  
+>      trace_loadvm_state_setup();
+> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +    SAVEVM_FOREACH(se, entry) {
+>          if (!se->ops || !se->ops->load_setup) {
+>              continue;
+>          }
+> @@ -2425,7 +2444,7 @@ void qemu_loadvm_state_cleanup(void)
+>      SaveStateEntry *se;
+>  
+>      trace_loadvm_state_cleanup();
+> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +    SAVEVM_FOREACH(se, entry) {
+>          if (se->ops && se->ops->load_cleanup) {
+>              se->ops->load_cleanup(se->opaque);
+>          }
+> -- 
+> 1.8.3.1
 > 
-> Laszlo
 -- 
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
