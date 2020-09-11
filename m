@@ -2,161 +2,129 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93047C43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 10:19:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B63C43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 10:19:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACBD220663
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 10:19:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C607320663
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 10:19:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="kEEcT3Od"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACBD220663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="rD6Tn0n1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C607320663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGg91-000872-Oc
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 06:19:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57214)
+	id 1kGg9g-0000IF-OI
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 06:19:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kevin.tian@intel.com>)
- id 1kGg8H-0007WU-I9
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 06:18:17 -0400
-Received: from mga01.intel.com ([192.55.52.88]:19155)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kGg8f-0007oW-Iw; Fri, 11 Sep 2020 06:18:41 -0400
+Received: from mail-eopbgr10117.outbound.protection.outlook.com
+ ([40.107.1.117]:64643 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kevin.tian@intel.com>)
- id 1kGg8E-00071h-3F
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 06:18:16 -0400
-IronPort-SDR: 3GiND2Jrr4qU83d1KjFVKyFm/m5THs19T4j7b6bwZAp+iPHkzDx1K+7YvCJIIBhmEoVvdBze+b
- gh2NwXjNQCnA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9740"; a="176795578"
-X-IronPort-AV: E=Sophos;i="5.76,414,1592895600"; d="scan'208";a="176795578"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 11 Sep 2020 03:18:09 -0700
-IronPort-SDR: SL+FQj1eUuYaneCHhJeXAZZ3Xhe6bddELOPKQJqQsXdTtmU4HahDulATh8TqqFTBTjm8c0cuUC
- 4PvUlP70j1+g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,414,1592895600"; d="scan'208";a="329719963"
-Received: from orsmsx606.amr.corp.intel.com ([10.22.229.19])
- by fmsmga004.fm.intel.com with ESMTP; 11 Sep 2020 03:18:09 -0700
-Received: from orsmsx607.amr.corp.intel.com (10.22.229.20) by
- ORSMSX606.amr.corp.intel.com (10.22.229.19) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Fri, 11 Sep 2020 03:18:08 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX607.amr.corp.intel.com (10.22.229.20) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Fri, 11 Sep 2020 03:18:08 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
- via Frontend Transport; Fri, 11 Sep 2020 03:18:08 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.1713.5; Fri, 11 Sep 2020 03:18:06 -0700
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kGg8c-00074J-Dt; Fri, 11 Sep 2020 06:18:40 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gWLw1aEZyMywsSh/Hyp02eWQGOnlEVPoqReKjvIz84mSsJ5pfIGl2BB8fSROqJ+49kKBqHeOXyoStNbsWU0/VZGi1ohw3GOzKAl/T+cH5oCdyHByQ2VVFd3hdsEJUkLr3S9/iWXHrjAkfv+ARGolpbyEsIlvX+anYjvbSyziC33zUxLjnd6WRw3QZoNIhG92+VbiWXjn1u7+9HMzTagf9gcUs3wnUlQcJrMT/X9f8u1qM20kf822EWGeP42D85mCm0TstyYv6yzZ4nVZ2otYhqTQBLCcLryfThRhC6moQklULXTvUPjT6DdBGoHeJvvVOAz8Pt6T7SoHqPn4ql3dkw==
+ b=dF4ZY75dwwUDgsssU4W0RsLJ4Z9+vTX2SSLMB1pFumjO59+kziMtAx7O3otbIImc2zivyaKKzkgt9aW2LfoAAMkxVIFfFcO9Zw2ijQSQJjuVN4Yf03dF7nR7EAXGIqDaVtTdeD+1+hNuG2v7p45IhYPtopOtFIVAt0gDUWvU1CnbXdPcehFcbDSC+HEfePpHhuEq/DS7meoNsSjrnOYFZyRpv7lXKanq9oljUfuda/71QqjB5aEVinjbdD+fS22M/IyC6Ywd74cJX/NBpRA40J7zI49wfQo78CXbPM0iUThS1vE3+z6LdB1lrvWX1sn5O1MVjstzj3l7p+sUo28n6A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=c8UpJZYd/92B9Erz9/K/AjD1nRQ5k/wUezoqowyMMgo=;
- b=hB6F4teZF2FRO5LxmNebPUIhunwtz9x81Fp+3wFhUuafU3HUdep/v1mY5xRxbZj/H5WwyNRz4Ejyv0X785z+BHmRlPhnnGM3FD9GDkLTKttGsbxsliz7Fkpsl58RoFUJLprKxsVK172YLKjC25uKmXR6P8BJgITSkXX9N/BQ2r/DjjNGRdkPaiKfy69BHcn7AB62O+4MF8nlKTxp3u6D2ic6++RDD0z0k1QZhXey3xFTksNZCHIouvuQbpnx06oOGtyKTowE7Mb4dhA8IzaqsVoebfa09A2Qh5ktWMehTgIjGD/wOiFJ8llmgyjy4ZQVjIxWgNol+ejEpBrWa6SEdA==
+ bh=EtvD1PK7g0TRxYql1DOCK6MVly9x0QkQkGr8iT7KR98=;
+ b=jDLCCVNiA76rNCntA/gDr0V0yMA5VUudplSb3c8ZMfOlzF/7N7hdoj3WWDczTC1UgXKrxmSa/GbZ8IZ5vJrQZZVfRCKW/rUcr5yCtJleseRCVXEjBxPRP5pbi349TzL/Np38QO12kg8gJh5gaYmyg6pt2o4qoIeI5LdDjJi9Knj7i+zzYB75QXA6uykaz5Oe9+3/VhreaGM3k0XaZ5ETVOTRoqYSniKjVWRoIHKz7pNovjj42845DwrdN9zgfvT2E3J8i8puy2BPuWT3a9TyOKmbvpbXmaQzgNTvk/5C0ZHIqCWMgzsydamSzhAdos8qP15vUH9OEecauW3Ia61RAA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com; 
- s=selector2-intel-onmicrosoft-com;
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=c8UpJZYd/92B9Erz9/K/AjD1nRQ5k/wUezoqowyMMgo=;
- b=kEEcT3OdwJ7dKgRco4AF5K5a6d8ySo1bKVSZP/o8xL+J4X9cW858LgPadvAtmpw0HI5iebQ8+835Wx+4wpRZzlfEVxgzErDnmn8UhheKtFVYfVeut6CatFCf+/+J3UDK6xkhbVLh9o1PHtCvOx70GEGqQfUWLXfreZAxSidvJos=
-Received: from MWHPR11MB1645.namprd11.prod.outlook.com (2603:10b6:301:b::12)
- by MWHPR1101MB2158.namprd11.prod.outlook.com (2603:10b6:301:59::17) with
- Microsoft SMTP Server (version=TLS1_2,
+ bh=EtvD1PK7g0TRxYql1DOCK6MVly9x0QkQkGr8iT7KR98=;
+ b=rD6Tn0n1+bBfEzpdISQjgKIVloQtoAzYhoEUbgLfpsJWQy1M4fN7y2oagJR8M+1iOXTqXnbQ9n4NjcIGRHEdfE9ZpkcaxLpZXNV2hcIKGt9STFTukEYG5xh3pxeB1j9rEeCsFmExaz+L2ll1Z66zjgVHEwWTW5h3R+6xWRYbJdU=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB2982.eurprd08.prod.outlook.com (2603:10a6:209:43::10)
+ with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Fri, 11 Sep
- 2020 10:18:01 +0000
-Received: from MWHPR11MB1645.namprd11.prod.outlook.com
- ([fe80::6dfe:feb8:25f1:ac9c]) by MWHPR11MB1645.namprd11.prod.outlook.com
- ([fe80::6dfe:feb8:25f1:ac9c%7]) with mapi id 15.20.3370.017; Fri, 11 Sep 2020
- 10:18:01 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Cornelia Huck <cohuck@redhat.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>
-Subject: RE: device compatibility interface for live migration with assigned
- devices
-Thread-Topic: device compatibility interface for live migration with assigned
- devices
-Thread-Index: AQHWWW8QECb/pyJxCUW88yuEbnXnGKkJnOAAgABHiwCAAhL8AIAFR8uAgAnb6gCAAPsXgIACNNuAgAn8e4CAAKQQgP///oIAgAAG/ACAAFf6gIAAAa4AgAAZYQCAABZEgIAHp3eAgAR+pQCAAaChgIAGKisAgABceICAAAHKgIAABBUAgAAFswCAAo59AIAALZkA///+Q4CACJqBgIABDL6AgAObzICAAASeAIAEGmYAgA05qwCAAME+gIACQQQAgAADTYCAAFdUAIAAc3cAgACaQQCAAAD+0A==
-Date: Fri, 11 Sep 2020 10:18:01 +0000
-Message-ID: <MWHPR11MB164559CBC9819565289BAAE98C240@MWHPR11MB1645.namprd11.prod.outlook.com>
-References: <20200825163925.1c19b0f0.cohuck@redhat.com>
- <20200826064117.GA22243@joy-OptiPlex-7040>
- <20200828154741.30cfc1a3.cohuck@redhat.com>
- <8f5345be73ebf4f8f7f51d6cdc9c2a0d8e0aa45e.camel@redhat.com>
- <20200831044344.GB13784@joy-OptiPlex-7040>
- <20200908164130.2fe0d106.cohuck@redhat.com>
- <20200909021308.GA1277@joy-OptiPlex-7040>
- <20200910143822.2071eca4.cohuck@redhat.com>
- <7cebcb6c8d1a1452b43e8358ee6ee18a150a0238.camel@redhat.com>
- <20200910120244.71e7b630@w520.home>	<20200911005559.GA3932@joy-OptiPlex-7040>
- <20200911120806.5cfe203c.cohuck@redhat.com>
-In-Reply-To: <20200911120806.5cfe203c.cohuck@redhat.com>
-Accept-Language: en-US
+ 2020 10:18:34 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692%7]) with mapi id 15.20.3348.019; Fri, 11 Sep 2020
+ 10:18:34 +0000
+Subject: Re: [PATCH 11/14] block/qcow2-bitmap: return startus from
+ qcow2_store_persistent_dirty_bitmaps
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com,
+ berto@igalia.com, eblake@redhat.com, jsnow@redhat.com, stefanha@redhat.com,
+ pbonzini@redhat.com, pavel.dovgaluk@ispras.ru, ari@tuxera.com,
+ mreitz@redhat.com, kwolf@redhat.com
+References: <20200909185930.26524-1-vsementsov@virtuozzo.com>
+ <20200909185930.26524-12-vsementsov@virtuozzo.com>
+ <20200911113838.482b062e@bahia.lan>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <2d8099d0-c04c-8b91-fd1e-f988cbba14ce@virtuozzo.com>
+Date: Fri, 11 Sep 2020 13:18:32 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
+In-Reply-To: <20200911113838.482b062e@bahia.lan>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-version: 11.5.1.3
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [192.198.147.193]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 0e1828f4-6a97-4d06-af6a-08d8563bf6d6
-x-ms-traffictypediagnostic: MWHPR1101MB2158:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR1101MB2158D7C186CC99652C0920598C240@MWHPR1101MB2158.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: CH3TJtjBPHa0br7UjH0G2a49pVHouWvtCaOhl3ASUn4QQ8ljeY/Cdk0KvrBjVlQGU+YPCUppYpiT52ZzF/8mieKCKIbNEwvwcCb+bjkcMCgpGPqry5eOdDgPQal6flnhZ0SMVSEwgsSLBkah5bulUdHN6xfV2qNyGuMC8txXi+3olzDfP/fLfvyxsgKyVPFzeFpYezBB7m+xNdYd75d6ChOjxg2gRj6VI9kb/QnUjBFSkE3oBwCuHlU1+pVIzx3R3rObDucc68og6cSRqspO/KLW4EddGQzFCj2d9ihT0UIxQ3jaN8ve+fhnDZuR6H3oOqt2SwhLu2uq23KjZ1ZxlOu5x9yjriBeRvp0+FTDEtKiArAki0GdPvdZdK/sT1Mp
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:MWHPR11MB1645.namprd11.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(396003)(376002)(346002)(39860400002)(136003)(26005)(64756008)(66446008)(66556008)(71200400001)(52536014)(66946007)(478600001)(76116006)(7696005)(66476007)(5660300002)(8676002)(33656002)(186003)(4326008)(7416002)(86362001)(6636002)(9686003)(54906003)(6506007)(8936002)(2906002)(110136005)(55016002)(316002)(83380400001)(21314003);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: f0XF7GwfXwjn+XHxrXA7gayCa20CPuo5uC6u/+3fTM2DojJE7NRT22U0NcwXPPfOWOPSAeptJa1Nmnph7wnd4x+H34QnB0Go1YUBK+gUlgjd9CqW4hxJgCU+oHAOrgpKrBdXTNTDp/ZpPRVorsC8oY1Eu075kKblvzdd74CerxaE8ZdhrzoDVCF1YpgDgt4lEjTe+fVMLgTydo0V9ILaKYNdbqDpvmE8AbTSSmLniYvgIWAWm5Cv8bIkwdkhnrTYhP936uMvxUZzObvKbW1sadIzj3z9ddKCJpyRC2mDJNrF52Q0J+w2XmE9QVQ30DcyA/UuMKl4LYv9CkR0weKQhLLKExQ8vESQSzSRP1akTlt17WbbYkrYER7j9td+Il84BoJOzpBLHesg1YKMN2NGaRGm0ZhiyeCxGkWuF4rbRpMGjv9kltZOVFF9finMoUf0zxM4CLOC4MBFoAa+8EGybYjtwm3dHupXu/s5/Y9ptVxjUqBKQJS48GaR6lDKg6TfIkLc3vw1lG3HI9YLfVW2nrFBGLleVxVztEnODhrGLYxnNAz8HD9DL31bewhNllPXb3OgOi3YKKUCwV75zkFadgD22yG2OQtkVqFd/dQ6PDP+yfGGmAS//QrPAtpjhjmo+xEfMq9RvUP949z+avn3oQ==
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM4PR0902CA0014.eurprd09.prod.outlook.com
+ (2603:10a6:200:9b::24) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.150) by
+ AM4PR0902CA0014.eurprd09.prod.outlook.com (2603:10a6:200:9b::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16 via Frontend
+ Transport; Fri, 11 Sep 2020 10:18:33 +0000
+X-Originating-IP: [185.215.60.150]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: cb625127-7808-45a4-21c2-08d8563c0a23
+X-MS-TrafficTypeDiagnostic: AM6PR08MB2982:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB29821DAC70609B342CE89966C1240@AM6PR08MB2982.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:233;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /Ls6DS2UrEysl7fPbSV94r+7lyLEsd0f92EX9Mh8T5haLM9r1VbhwkfZrsha2EJPCE9qG337f8HS3bRPcrpVVRFySz2F8WYxXbzuUlBsGplnToSnze+xKPYTdn5lHS0Z55KmANMZTmFlmmdLsgrkQnORZ6HhKLApvJYVQ5E4H8/wPqx7QmEykMs/P1UEHb9v7e6aeF66dihe+NfBu+sDbMr/z6O1HKedxutojUTqVv5nLab9kapz6u/eBhPalzLWOIoU/Ey7DTUGS4lnQLT/ahJQibpY+2X+c1Oh3zA390Pu3vf7Dwtmlb0TslwDfW5HGUYVR04xIDbE2C8RSqooIMxew8i1KGmPf3iI6Rp+uVwWQXh8xOu6D+7icN2CuA7jTZP7c+5rxRBnb/jxVTNPpA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(39840400004)(396003)(136003)(376002)(346002)(366004)(31696002)(316002)(66574015)(5660300002)(8936002)(19627235002)(66946007)(6916009)(66556008)(4326008)(31686004)(66476007)(956004)(86362001)(478600001)(2616005)(2906002)(36756003)(16576012)(6486002)(7416002)(16526019)(26005)(83380400001)(52116002)(186003)(8676002)(14143004)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: 4KPvCCn/51MSbbNof8hmxez2YuQ/dffXAIsTpUljkzpWCuy+k0aLhs6UgwMzTVAecb+OeqynD4d0QDCARENGR13GJCt+3gQrAYB/iQngf32yCNswSVYHjmu4l7nuVBdHe2IOeFahStOxXJOSyaS5LsCoG6YQNka6+a23WWDA9TV7HpUqcB4/KltJ5y6O1nMXXkMDEv1f7efooQ7ClcH7zht4itJN/TNef2jxl/Z2o3uaHcL/Hpig5eSgyd/xGvHTRyJ9xLGSX93GbVxyZNhEBxL18qLSyHhgAAyD/QWSUQpm2STQuMFpFsiQMvEJQnnjAGdRe2rI2+jyC5C0YMGc+5X43NlUjptsNFPqrEj6uvWHk4U/eXaKMkZHGheHiYj0qgkES2+5L9OLF8mhdJB7P0zCQCPCT+tczhY3a9sR07oBCNxhhEs+O8uboNf2J3T211qfeFc6cyRf1QPXGT0s0gA6AvZT5J21riLGSs8J9xmLnsCUpsNoQaMGC5BbCVowY7qJ4XI0LrDIAVweKPSbnKwELqIoXjAx5jrara8YJOhXM2WG74npIhnd1ipGpPY7W41rduxNZjxZWnCb9Aj5LXH5VpXZ7/Tspwl4uiGthlYmT8N/QBh2T7/wtr/wuBR37dAtOwp6hf/5qhFhUpxpGg==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cb625127-7808-45a4-21c2-08d8563c0a23
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1645.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0e1828f4-6a97-4d06-af6a-08d8563bf6d6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Sep 2020 10:18:01.6209 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Q3d8/PbPaPW56Mf3399GEverXCvU669KPL8slRIbXruATNYcsIdemA84RP/PHXqY3Oz2OUyGiPFYrsxYp65KCg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1101MB2158
-X-OriginatorOrg: intel.com
-Received-SPF: pass client-ip=192.55.52.88; envelope-from=kevin.tian@intel.com;
- helo=mga01.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 06:18:09
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2020 10:18:34.2529 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: RE5qFRfZ7KcKno3p7RREQmwmOl9e5J1KVXqOrM8EDKvg+ieGbVHMRuOQyT2r1n4cGdDFriGW820RkpOWJP7YKj1ddMxTF7qlRy6o6UxojUQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB2982
+Received-SPF: pass client-ip=40.107.1.117;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR02-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 06:18:35
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -56
+X-Spam_score: -5.7
+X-Spam_bar: -----
+X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-3.576, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -170,174 +138,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
- "eauger@redhat.com" <eauger@redhat.com>, "Wang,
- Xin-ran" <xin-ran.wang@intel.com>, "corbet@lwn.net" <corbet@lwn.net>,
- "openstack-discuss@lists.openstack.org"
- <openstack-discuss@lists.openstack.org>, "Feng,
- Shaohe" <shaohe.feng@intel.com>, Parav Pandit <parav@mellanox.com>, "Ding,
- Jian-feng" <jian-feng.ding@intel.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "Xu,
- Hejie" <hejie.xu@intel.com>, "bao.yumeng@zte.com.cn" <bao.yumeng@zte.com.cn>,
- Alex Williamson <alex.williamson@redhat.com>, Sean Mooney <smooney@redhat.com>,
- "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
- =?iso-8859-1?Q?Daniel_P=2EBerrang=E9?= <berrange@redhat.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>, Jiri Pirko <jiri@mellanox.com>,
- "dinechin@redhat.com" <dinechin@redhat.com>,
- "devel@ovirt.org" <devel@ovirt.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Cornelia Huck <cohuck@redhat.com>
-> Sent: Friday, September 11, 2020 6:08 PM
->=20
-> On Fri, 11 Sep 2020 08:56:00 +0800
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
->=20
-> > On Thu, Sep 10, 2020 at 12:02:44PM -0600, Alex Williamson wrote:
-> > > On Thu, 10 Sep 2020 13:50:11 +0100
-> > > Sean Mooney <smooney@redhat.com> wrote:
-> > >
-> > > > On Thu, 2020-09-10 at 14:38 +0200, Cornelia Huck wrote:
-> > > > > On Wed, 9 Sep 2020 10:13:09 +0800
-> > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > >
-> > > > > > > > still, I'd like to put it more explicitly to make ensure it=
-'s not
-> missed:
-> > > > > > > > the reason we want to specify compatible_type as a trait an=
-d
-> check
-> > > > > > > > whether target compatible_type is the superset of source
-> > > > > > > > compatible_type is for the consideration of backward
-> compatibility.
-> > > > > > > > e.g.
-> > > > > > > > an old generation device may have a mdev type xxx-v4-yyy,
-> while a newer
-> > > > > > > > generation  device may be of mdev type xxx-v5-yyy.
-> > > > > > > > with the compatible_type traits, the old generation device =
-is still
-> > > > > > > > able to be regarded as compatible to newer generation devic=
-e
-> even their
-> > > > > > > > mdev types are not equal.
-> > > > > > >
-> > > > > > > If you want to support migration from v4 to v5, can't the
-> (presumably
-> > > > > > > newer) driver that supports v5 simply register the v4 type as=
- well,
-> so
-> > > > > > > that the mdev can be created as v4? (Just like QEMU versioned
-> machine
-> > > > > > > types work.)
-> > > > > >
-> > > > > > yes, it should work in some conditions.
-> > > > > > but it may not be that good in some cases when v5 and v4 in the
-> name string
-> > > > > > of mdev type identify hardware generation (e.g. v4 for gen8, an=
-d v5
-> for
-> > > > > > gen9)
-> > > > > >
-> > > > > > e.g.
-> > > > > > (1). when src mdev type is v4 and target mdev type is v5 as
-> > > > > > software does not support it initially, and v4 and v5 identify
-> hardware
-> > > > > > differences.
-> > > > >
-> > > > > My first hunch here is: Don't introduce types that may be compati=
-ble
-> > > > > later. Either make them compatible, or make them distinct by desi=
-gn,
-> > > > > and possibly add a different, compatible type later.
-> > > > >
-> > > > > > then after software upgrade, v5 is now compatible to v4, should=
- the
-> > > > > > software now downgrade mdev type from v5 to v4?
-> > > > > > not sure if moving hardware generation info into a separate
-> attribute
-> > > > > > from mdev type name is better. e.g. remove v4, v5 in mdev type,
-> while use
-> > > > > > compatible_pci_ids to identify compatibility.
-> > > > >
-> > > > > If the generations are compatible, don't mention it in the mdev t=
-ype.
-> > > > > If they aren't, use distinct types, so that management software
-> doesn't
-> > > > > have to guess. At least that would be my naive approach here.
->=20
-> [*]
->=20
-> > > > yep that is what i would prefer to see too.
-> > > > >
-> > > > > >
-> > > > > > (2) name string of mdev type is composed by "driver_name +
-> type_name".
-> > > > > > in some devices, e.g. qat, different generations of devices are
-> binding to
-> > > > > > drivers of different names, e.g. "qat-v4", "qat-v5".
-> > > > > > then though type_name is equal, mdev type is not equal. e.g.
-> > > > > > "qat-v4-type1", "qat-v5-type1".
-> > > > >
-> > > > > I guess that shows a shortcoming of that "driver_name + type_name=
-"
-> > > > > approach? Or maybe I'm just confused.
-> > > > yes i really dont like haveing the version in the mdev-type name
-> > > > i would stongly perfger just qat-type-1 wehere qat is just there as=
- a way
-> of namespacing.
-> > > > although symmetric-cryto, asymmetric-cryto and compression woudl be
-> a better name then type-1, type-2, type-3 if
-> > > > that is what they would end up mapping too. e.g. qat-compression or
-> qat-aes is a much better name then type-1
-> > > > higher layers of software are unlikely to parse the mdev names but =
-as a
-> human looking at them its much eaiser to
-> > > > understand if the names are meaningful. the qat prefix i think is
-> important however to make sure that your mdev-types
-> > > > dont colide with other vendeors mdev types. so i woudl encurage all
-> vendors to prefix there mdev types with etiher the
-> > > > device name or the vendor.
-> > >
-> > > +1 to all this, the mdev type is meant to indicate a software
-> > > compatible interface, if different hardware versions can be software
-> > > compatible, then don't make the job of finding a compatible device
-> > > harder.  The full type is a combination of the vendor driver name plu=
-s
-> > > the vendor provided type name specifically in order to provide a type
-> > > namespace per vendor driver.  That's done at the mdev core level.
-> > > Thanks,
-> >
-> > hi Alex,
-> > got it. so do you suggest that vendors use consistent driver name over
-> > generations of devices?
-> > for qat, they create different modules for each generation. This
-> > practice is not good if they want to support migration between devices
-> > of different generations, right?
->=20
-> Even if they create different modules, I'd assume that they have some
-> kind of core with common functionality. I'd assume that as long they do
-> any type registrations satisfying [*] in the core, they should be good.
->=20
-> > and can I understand that we don't want support of migration between
-> > different mdev types even in future ?
->=20
-> From my point of view, I don't see anything that migration between
-> different mdev types would buy that is worth the complexity in finding
-> out which mdev types are actually compatible.
+11.09.2020 12:38, Greg Kurz wrote:
+> s/startus/status
+> 
+> On Wed,  9 Sep 2020 21:59:27 +0300
+> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
+> 
+>> It's better to return status together with setting errp. It makes
+>> possible to avoid error propagation.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block/qcow2.h        |  2 +-
+>>   block/qcow2-bitmap.c | 13 ++++++-------
+>>   2 files changed, 7 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/block/qcow2.h b/block/qcow2.h
+>> index e7e662533b..49824be5c6 100644
+>> --- a/block/qcow2.h
+>> +++ b/block/qcow2.h
+>> @@ -972,7 +972,7 @@ bool qcow2_get_bitmap_info_list(BlockDriverState *bs,
+>>                                   Qcow2BitmapInfoList **info_list, Error **errp);
+>>   int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
+>>   int qcow2_truncate_bitmaps_check(BlockDriverState *bs, Error **errp);
+>> -void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs,
+>> +bool qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs,
+>>                                             bool release_stored, Error **errp);
+>>   int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
+>>   bool qcow2_co_can_store_new_dirty_bitmap(BlockDriverState *bs,
+>> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+>> index f58923fce3..5eeff1cb1c 100644
+>> --- a/block/qcow2-bitmap.c
+>> +++ b/block/qcow2-bitmap.c
+>> @@ -1524,9 +1524,10 @@ out:
+>>    * readonly to begin with, and whether we opened directly or reopened to that
+>>    * state shouldn't matter for the state we get afterward.
+>>    */
+>> -void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs,
+>> +bool qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs,
+>>                                             bool release_stored, Error **errp)
+>>   {
+>> +    ERRP_GUARD();
+> 
+> Maybe worth mentioning in the changelog that this ERRP_GUARD() fixes
+> an error_prepend(errp, ...) not visible in the patch context.
 
-Agree. Different type means different device API. as long as the device
-API doesn't change, different modules should expose it as the same type.
-If qat really wants to attach module name to the type, it essentially impli=
-es
-that qat has no generational compatibility.
+Ah yes. Actually this is occasional thing I didn't want to include into this patch
+(and int this part I). So we can just drop it and leave for part II or part III,
+or add a note into commit message
 
-Thanks
-Kevin
+> 
+> Anyway,
+> 
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+
+Thanks a lot for reviewing :)
+
+Hmm.. With this series I understand the following:
+
+1. It's no sense in simple applying scripts/coccinelle/errp-guard.cocci to the whole code-base, because:
+
+   - it produces a lot of "if (*errp)" in places where it is really simple to avoid error propagation at all, like in this series
+   - reviewing is the hardest part of the process
+
+So, if we have to review these changes anyway, it's better to invest a bit more time into patch creation, and make code correspond to our modern error API recommendations.
+
+2. So, the process turns into following steps:
+
+   - apply scripts/coccinelle/errp-guard.cocci
+   - look through patches and do obvious refactorings (like this series)
+   - keep ERRP_GUARD where necessary (appending info to error, or where refactoring of function return status is too invasive and not simple)
+
+3. Obviously, that's too much for me :) Of course, I will invest some time into making the series like this one, and reviewing them, but I can't do it for weeks and months. (My original сunning plan to simply push ~100 generated commits with my s-o-b and become the greatest contributor failed:)
+
+The good thing is that now, with ERRP_GUARD finally merged, we can produce parallel series like this, and they will be processed in parallel by different maintainers (and Markus will have to merge series for subsystems with unavailable maintainers).
+
+So, everybody is welcome to the process [2]. Probably we want to make a separate announcement in a list with short recommendations and instructions? But who read announcements..
+
+> 
+>>       BdrvDirtyBitmap *bitmap;
+>>       BDRVQcow2State *s = bs->opaque;
+>>       uint32_t new_nb_bitmaps = s->nb_bitmaps;
+>> @@ -1546,7 +1547,7 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs,
+>>           bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
+>>                                      s->bitmap_directory_size, errp);
+>>           if (bm_list == NULL) {
+>> -            return;
+>> +            return false;
+>>           }
+>>       }
+>>   
+>> @@ -1661,7 +1662,7 @@ success:
+>>       }
+>>   
+>>       bitmap_list_free(bm_list);
+>> -    return;
+>> +    return true;
+>>   
+>>   fail:
+>>       QSIMPLEQ_FOREACH(bm, bm_list, entry) {
+>> @@ -1679,16 +1680,14 @@ fail:
+>>       }
+>>   
+>>       bitmap_list_free(bm_list);
+>> +    return false;
+>>   }
+>>   
+>>   int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp)
+>>   {
+>>       BdrvDirtyBitmap *bitmap;
+>> -    Error *local_err = NULL;
+>>   
+>> -    qcow2_store_persistent_dirty_bitmaps(bs, false, &local_err);
+>> -    if (local_err != NULL) {
+>> -        error_propagate(errp, local_err);
+>> +    if (!qcow2_store_persistent_dirty_bitmaps(bs, false, errp)) {
+>>           return -EINVAL;
+>>       }
+>>   
+> 
+
+
+-- 
+Best regards,
+Vladimir
 
