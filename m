@@ -2,74 +2,86 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC15EC43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 20:03:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CA4FC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 20:07:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBAE021D79
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 20:03:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B12C221E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 20:07:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="EFdCCxQv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBAE021D79
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z5FIJhL/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B12C221E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGpGM-0006nK-F3
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 16:03:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50240)
+	id 1kGpKU-00011A-OH
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 16:07:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc.michel@greensocs.com>)
- id 1kGp9b-0004l4-M1; Fri, 11 Sep 2020 15:56:15 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:32992)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc.michel@greensocs.com>)
- id 1kGp9Y-0003lk-NA; Fri, 11 Sep 2020 15:56:15 -0400
-Received: from [172.17.10.18] (unknown [172.17.10.18])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 0516921C1F;
- Fri, 11 Sep 2020 19:56:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1599854170;
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kGpJy-0000Wi-Ps
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 16:06:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50206)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kGpJv-0005Hq-V4
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 16:06:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599854814;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=j3Jp32DOmEUKD+UFTzD+kq3uK4vmAci16OFio8uGAN0=;
- b=EFdCCxQvy3oXZTU8J0FIGvNRpmvl6DOjgbz27CdJoafXmobvVOmaqpHmynSCBBt5OJ2Fad
- t8XGWPCyP6xeZ3yGzRmsSzu6Pm9xW5I/at0Ec8zDnpmvAWy+oUukeEmFPZBcrBKKUJVe5Y
- uU3GqpEHk7NxJeO7aAgvxISzLHml3/0=
-Subject: Re: [PATCH v5 4/7] hw/arm/aspeed: Add the 3 front LEDs drived by the
- PCA9552 #1
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200910205429.727766-1-f4bug@amsat.org>
- <20200910205429.727766-5-f4bug@amsat.org>
-From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <2b47f80b-0c4a-5715-af55-19c93c31e30a@greensocs.com>
-Date: Fri, 11 Sep 2020 21:57:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ bh=vVPXKstH9MIaS1lzJPLGLoK5JRr9NgfSAOjZQiqFu3U=;
+ b=Z5FIJhL/eckvh3XIaf62TLm3tnC6dDDdCud66PpYY/dGTDlTQ4JmLNl5ob4AK21H4Oe9zm
+ fA7zbLtUe4y1518n7jtX8GCtE+YM0DIllLSJD61XL8uAUhpPEfmEAByKUP568WKVzjLpY9
+ FNi7mGlEzkfIlHCXoUcLnFM0k4Nk2yY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-339-kM7A-QzXOEiW8E6qkSyPXg-1; Fri, 11 Sep 2020 16:06:51 -0400
+X-MC-Unique: kM7A-QzXOEiW8E6qkSyPXg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36B771882FC6;
+ Fri, 11 Sep 2020 20:06:50 +0000 (UTC)
+Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F31F860C07;
+ Fri, 11 Sep 2020 20:06:49 +0000 (UTC)
+Date: Fri, 11 Sep 2020 16:06:49 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Moving to C11? (was Re: Redefinition of typedefs (C11 feature))
+Message-ID: <20200911200649.GW1618070@habkost.net>
+References: <20200911184919.GV1618070@habkost.net>
+ <CAFEAcA-dnKVyUQ3_ZifdDvrpCbKB1zciuu224BbB1WRV0npxzw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200910205429.727766-5-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=5.135.226.135;
- envelope-from=luc.michel@greensocs.com; helo=beetle.greensocs.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 15:41:15
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -45
-X-Spam_score: -4.6
-X-Spam_bar: ----
-X-Spam_report: (-4.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.469,
+In-Reply-To: <CAFEAcA-dnKVyUQ3_ZifdDvrpCbKB1zciuu224BbB1WRV0npxzw@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 23:26:59
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,107 +95,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Joel Stanley <joel@jms.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/10/20 10:54 PM, Philippe Mathieu-Daudé wrote:
-> The Witherspoon has 3 LEDs connected to a PCA9552. Add them.
-> The names and reset values are taken from:
-> https://github.com/open-power/witherspoon-xml/blob/master/witherspoon.xml
+On Fri, Sep 11, 2020 at 08:06:10PM +0100, Peter Maydell wrote:
+> On Fri, 11 Sep 2020 at 19:49, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >
+> > I'm wondering: do our supported build host platforms all include
+> > compilers that are new enough to let us redefine typedefs?
+> >
+> > The ability to redefine typedefs is a C11 feature which would be
+> > very useful for simplifying our QOM boilerplate code.  The
+> > feature is supported by GCC since 2011 (v4.6.0)[1], and by clang
+> > since 2012 (v3.1)[2].
 > 
-> Example booting obmc-phosphor-image:
-> 
->    $ qemu-system-arm -M witherspoon-bmc -trace led_change_intensity
->    1592693373.997015:led_change_intensity LED desc:'front-fault-4' color:green intensity 0% -> 100%
->    1592693373.997632:led_change_intensity LED desc:'front-power-3' color:green intensity 0% -> 100%
->    1592693373.998239:led_change_intensity LED desc:'front-id-5' color:green intensity 0% -> 100%
->    1592693500.291805:led_change_intensity LED desc:'front-power-3' color:green intensity 100% -> 0%
->    1592693500.312041:led_change_intensity LED desc:'front-power-3' color:green intensity 0% -> 100%
->    1592693500.821254:led_change_intensity LED desc:'front-power-3' color:green intensity 100% -> 0%
->    1592693501.331517:led_change_intensity LED desc:'front-power-3' color:green intensity 0% -> 100%
->    1592693501.841367:led_change_intensity LED desc:'front-power-3' color:green intensity 100% -> 0%
->    1592693502.350839:led_change_intensity LED desc:'front-power-3' color:green intensity 0% -> 100%
->    1592693502.861134:led_change_intensity LED desc:'front-power-3' color:green intensity 100% -> 0%
->    1592693503.371090:led_change_intensity LED desc:'front-power-3' color:green intensity 0% -> 100%
-> 
-> We notice the front-power LED starts to blink at a ~2Hz rate.
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> In configure we mandate either GCC v4.8 or better, or
+> clang v3.4 or better, or XCode Clang v5.1 or better
+> (Apple uses a different version numbering setup to upstream).
+> So you should probably double-check that that xcode clang has
+> what you want, but it looks like we're good to go otherwise.
 
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
+Can anybody confirm if the following is accurate?
 
-> ---
->   hw/arm/aspeed.c | 20 ++++++++++++++++++++
->   hw/arm/Kconfig  |  1 +
->   2 files changed, 21 insertions(+)
-> 
-> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-> index 8bfb1c79ddc..83e322ea983 100644
-> --- a/hw/arm/aspeed.c
-> +++ b/hw/arm/aspeed.c
-> @@ -20,6 +20,7 @@
->   #include "hw/i2c/smbus_eeprom.h"
->   #include "hw/misc/pca9552.h"
->   #include "hw/misc/tmp105.h"
-> +#include "hw/misc/led.h"
->   #include "hw/qdev-properties.h"
->   #include "qemu/log.h"
->   #include "sysemu/block-backend.h"
-> @@ -521,9 +522,20 @@ static void sonorapass_bmc_i2c_init(AspeedMachineState *bmc)
->   
->   static void witherspoon_bmc_i2c_init(AspeedMachineState *bmc)
->   {
-> +    static const struct {
-> +        unsigned gpio_id;
-> +        LEDColor color;
-> +        const char *description;
-> +        bool gpio_polarity;
-> +    } pca1_leds[] = {
-> +        {13, LED_COLOR_GREEN, "front-fault-4",  GPIO_POLARITY_ACTIVE_LOW},
-> +        {14, LED_COLOR_GREEN, "front-power-3",  GPIO_POLARITY_ACTIVE_LOW},
-> +        {15, LED_COLOR_GREEN, "front-id-5",     GPIO_POLARITY_ACTIVE_LOW},
-> +    };
->       AspeedSoCState *soc = &bmc->soc;
->       uint8_t *eeprom_buf = g_malloc0(8 * 1024);
->       DeviceState *dev;
-> +    LEDState *led;
->   
->       /* Bus 3: TODO bmp280@77 */
->       /* Bus 3: TODO max31785@52 */
-> @@ -534,6 +546,14 @@ static void witherspoon_bmc_i2c_init(AspeedMachineState *bmc)
->                                   aspeed_i2c_get_bus(&soc->i2c, 3),
->                                   &error_fatal);
->   
-> +    for (size_t i = 0; i < ARRAY_SIZE(pca1_leds); i++) {
-> +        led = led_create_simple(OBJECT(bmc),
-> +                                pca1_leds[i].gpio_polarity,
-> +                                pca1_leds[i].color,
-> +                                pca1_leds[i].description);
-> +        qdev_connect_gpio_out(dev, pca1_leds[i].gpio_id,
-> +                              qdev_get_gpio_in(DEVICE(led), 0));
-> +    }
->       i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 4), "tmp423", 0x4c);
->       i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 5), "tmp423", 0x4c);
->   
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index bc3a423940b..06ba1c355b1 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -394,6 +394,7 @@ config ASPEED_SOC
->       select TMP105
->       select TMP421
->       select UNIMP
-> +    select LED
->   
->   config MPS2
->       bool
-> 
+https://gist.github.com/yamaya/2924292#file-xcode-clang-vers-L67
+# Xcode 5.1 (5B130a)
+Apple LLVM version 5.1 (clang-503.0.38) (based on LLVM 3.4svn)
+Target: x86_64-apple-darwin13.1.0
+Thread model: posix
+
+If we know we have GCC 4.8+ or clang 3.4+, can we move to C11 and
+start using -std=gnu11?
+
+-- 
+Eduardo
+
 
