@@ -2,93 +2,135 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9182EC43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:04:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D76FC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:04:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 842B6221E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:04:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33A43221E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:04:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tbyvm+gX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 842B6221E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="lbGUI9ji"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33A43221E3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGe2O-0005As-FC
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 04:04:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55342)
+	id 1kGe34-0005tu-50
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 04:04:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55396)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kGe1f-0004de-LW
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 04:03:19 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22966
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kGe1d-0006Er-Oo
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 04:03:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599811396;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=g21yXQNJ9cn6MBZtCYFif6eb6vlGFnXpHGrZMA2DTKo=;
- b=Tbyvm+gXj6z2/sGd1G8HdtgN2soytUws+bwxPIB5YpMR6WIOQZcdwtlHifOUWrDfX0UP+O
- X9H9cqocUUsoUzvisekezh2YxENGNXP1TOPlORZX3TUkxNvirimBJ+U/2v8vh+c96mx7PP
- HDAhNaNj2/pziq0bTdGaNa6oyOhjxEA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-112-_ktEZgFMNLGHKXx5Bm0YZA-1; Fri, 11 Sep 2020 04:03:14 -0400
-X-MC-Unique: _ktEZgFMNLGHKXx5Bm0YZA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CFE9C191E2A1;
- Fri, 11 Sep 2020 08:03:11 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
- [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EECC275127;
- Fri, 11 Sep 2020 08:03:10 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 283C7113865F; Fri, 11 Sep 2020 10:03:09 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Ari Sundholm <ari@tuxera.com>
-Subject: Re: [PATCH 07/14] block/blklogwrites: drop error propagation
-References: <20200909185930.26524-1-vsementsov@virtuozzo.com>
- <20200909185930.26524-8-vsementsov@virtuozzo.com>
- <8856cf15-4092-55b7-6537-a6beb4ce8a18@tuxera.com>
-Date: Fri, 11 Sep 2020 10:03:09 +0200
-In-Reply-To: <8856cf15-4092-55b7-6537-a6beb4ce8a18@tuxera.com> (Ari Sundholm's
- message of "Fri, 11 Sep 2020 00:01:21 +0300")
-Message-ID: <87k0x0g2pu.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <edgar@xilinx.com>) id 1kGe1z-00051X-Gg
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 04:03:39 -0400
+Received: from mail-eopbgr750073.outbound.protection.outlook.com
+ ([40.107.75.73]:49902 helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <edgar@xilinx.com>) id 1kGe1x-0006GC-0t
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 04:03:38 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ih8Sf4AllGfiLC8f4ud4EJcu2IlPqdq/Ivt0XK3vqLfGK6MWBrlaOrLuzhfBOkHfptBQgF30kSD3PZejGhA+rrwoC1wu/lyoJ/suixTL8miei5cK5gkVPG19WE5eT3HbB8AeBVmytNywY1puUJlA6ZkG39v2XtQY5zlvppOhcQ3ZXomJA3mi+31wlyH4QNH0FxlelZhBGx6PVNAYV+PpI6m3ssUhvDulsyQrAyVVtCtWXDI/egV8xBjC+yJTVW0xoWk3nnFb0G5+SywBjrzZ+/BkZ/PfnktkniPqh36+1KrKaqlU2rGCVzV7YxblW4bNkMhDYibuK4FmclYLlgFNHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fb00ELtRFpQJt2mmJoEJIewRl7B8cD6Br2nrSulXfaE=;
+ b=YUJ7yImpuQT51Dl3+/Km1M7nonS1lGUOLYdnx1AUCuP9h+lCLFshI2V1rZwbVYyOHtlvcqDUTaFZctXg07FcNFQNMq+h6+wesf7tkTkHlnMpEB1QO2bj9aBPrjQ74y/r2nMm4JlxFebcW5FzoSBiDS/Xy7Dbjtog1wLOaOxdvv1KU/LFDrLDeWgxicLO/n3T8bzpwlkw+s9sBQlN1ahm1g9W781kipAyJXMuxBAg2p52Ud3Zv9b8Bkx6dWsiUy5/crMwnHAlkOtFTJOgeA52WeAf7cRtjfTnpwxjyRxRSAN7cMhjMY3WnmcIK8eKpIwfsgbo5LUqAav/G3bOLpFuMQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 149.199.60.83) smtp.rcpttodomain=linaro.org smtp.mailfrom=xilinx.com;
+ dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fb00ELtRFpQJt2mmJoEJIewRl7B8cD6Br2nrSulXfaE=;
+ b=lbGUI9jiufAzZsEZvwKiGxzLMfI8gx4Dmb2to6sxysF9kF7Ag4dLgI9tOslKsdfIstL2q1KhwTfmLGfDmxr+FT0DHQ7BHUv7pG66ZAte8s8YWpTy9xbBGfFZqcz/gMYC9hagVpK68L+urYn2IZOILtO7vN8KzLnYGr8AehtFL3U=
+Received: from SN1PR12CA0048.namprd12.prod.outlook.com (2603:10b6:802:20::19)
+ by BN6PR02MB3380.namprd02.prod.outlook.com (2603:10b6:405:62::14)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.16; Fri, 11 Sep
+ 2020 08:03:34 +0000
+Received: from SN1NAM02FT013.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:802:20:cafe::11) by SN1PR12CA0048.outlook.office365.com
+ (2603:10b6:802:20::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.19 via Frontend
+ Transport; Fri, 11 Sep 2020 08:03:34 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
+ smtp.mailfrom=xilinx.com; linaro.org; dkim=none (message not signed)
+ header.d=none;linaro.org; dmarc=bestguesspass action=none
+ header.from=xilinx.com;
+Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
+ 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
+ client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
+Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
+ SN1NAM02FT013.mail.protection.outlook.com (10.152.72.98) with Microsoft SMTP
+ Server id 15.20.3370.16 via Frontend Transport; Fri, 11 Sep 2020 08:03:34
+ +0000
+Received: from [149.199.38.66] (port=35781 helo=smtp.xilinx.com)
+ by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kGe1t-0008Eo-HI; Fri, 11 Sep 2020 01:03:33 -0700
+Received: from [127.0.0.1] (helo=localhost)
+ by smtp.xilinx.com with smtp (Exim 4.63)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kGe1t-0004tH-T3; Fri, 11 Sep 2020 01:03:33 -0700
+Received: from [10.71.116.235] (helo=localhost)
+ by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kGe1k-0004rz-Am; Fri, 11 Sep 2020 01:03:24 -0700
+Date: Fri, 11 Sep 2020 10:03:18 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Subject: Re: [PATCH v5 7/7] Versal: Connect DWC3 controller with virt-versal
+Message-ID: <20200911080318.GQ14249@toto>
+References: <1599719469-24062-1-git-send-email-sai.pavan.boddu@xilinx.com>
+ <1599719469-24062-8-git-send-email-sai.pavan.boddu@xilinx.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 03:28:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1599719469-24062-8-git-send-email-sai.pavan.boddu@xilinx.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
+X-TM-AS-User-Approved-Sender: Yes;Yes
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e203f721-2d39-460d-48ee-08d856292e42
+X-MS-TrafficTypeDiagnostic: BN6PR02MB3380:
+X-Microsoft-Antispam-PRVS: <BN6PR02MB338048C9F9E24A05D7D30ED8C2240@BN6PR02MB3380.namprd02.prod.outlook.com>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-Oob-TLC-OOBClassifiers: OLM:224;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 5Tcg5N9CFIstNZATm0/9NMIOvHHwqY+XZIJy1FCtHuIrRgX91x89nbGmFxb0utJk7hX2bFA8VdoW3qx3rbQj/lkV9psARuK6EANcq3pxfmR4H5i5qJpLn3+z4s6ROa+e09vwEykPjHxlPWaZeabnqXdiZQLvPOlt8JuO5LqGmFG0lWCTvmrhEJWL/Dr4Rtn6kVGvizNHyHrOCKW4gblICtbouZq8Xoi12vyntzLSsb0jSZs52wErKvfPNfRqZqkWODE9aUP/rROVBgbcBUzseYQnydyFDurlg96McLOdvkxW0jw1k9B8S0eot/y9zQHtP7RGFRxB6vhJ+AtNdcaX8FYUwfkPL8Adc2l+P4ukja5uyFgjRXVzwe5r40SIY0FQoD69qUczLBtQ23vwKtrbww==
+X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
+ SFS:(7916004)(39860400002)(136003)(376002)(346002)(396003)(46966005)(82740400003)(33656002)(47076004)(81166007)(5660300002)(356005)(9686003)(70586007)(70206006)(33716001)(82310400003)(6862004)(4326008)(1076003)(2906002)(83380400001)(9786002)(6666004)(26005)(8936002)(54906003)(7416002)(186003)(8676002)(336012)(426003)(478600001)(316002)(6636002);
+ DIR:OUT; SFP:1101; 
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2020 08:03:34.2529 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e203f721-2d39-460d-48ee-08d856292e42
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
+ Helo=[xsj-pvapsmtpgw01]
+X-MS-Exchange-CrossTenant-AuthSource: SN1NAM02FT013.eop-nam02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR02MB3380
+Received-SPF: pass client-ip=40.107.75.73; envelope-from=edgar@xilinx.com;
+ helo=NAM02-BL2-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 04:03:35
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,248 +143,261 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- berto@igalia.com, stefanha@redhat.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, groug@kaod.org, pavel.dovgaluk@ispras.ru,
- pbonzini@redhat.com, mreitz@redhat.com, jsnow@redhat.com
+Cc: Francisco Eduardo Iglesias <figlesia@xilinx.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Vikram Garhwal <fnuv@xilinx.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Edgar Iglesias <edgari@xilinx.com>,
+ Alistair Francis <alistair.francis@wdc.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ =?iso-8859-1?Q?'Marc-Andr=E9?= Lureau' <marcandre.lureau@redhat.com>,
+ Ying Fang <fangying1@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Paul Zimmerman <pauldzim@gmail.com>,
+ 'Philippe =?iso-8859-1?Q?Mathieu-Daud=E9'?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ari Sundholm <ari@tuxera.com> writes:
+On Thu, Sep 10, 2020 at 12:01:09PM +0530, Sai Pavan Boddu wrote:
+> From: Vikram Garhwal <fnu.vikram@xilinx.com>
+> 
+> Connect dwc3 controller and usb2-reg module to virt-versal.
+> Configure it as dual port host controller.
+> 
+> Signed-off-by: Vikram Garhwal <fnu.vikram@xilinx.com>
+> Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+> ---
+>  hw/arm/xlnx-versal-virt.c    | 59 ++++++++++++++++++++++++++++++++++++++++++++
+>  hw/arm/xlnx-versal.c         | 38 ++++++++++++++++++++++++++++
+>  include/hw/arm/xlnx-versal.h | 14 +++++++++++
+>  3 files changed, 111 insertions(+)
+> 
+> diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
+> index 4b3152e..398693d 100644
+> --- a/hw/arm/xlnx-versal-virt.c
+> +++ b/hw/arm/xlnx-versal-virt.c
+> @@ -39,6 +39,8 @@ typedef struct VersalVirt {
+>          uint32_t ethernet_phy[2];
+>          uint32_t clk_125Mhz;
+>          uint32_t clk_25Mhz;
+> +        uint32_t usb;
+> +        uint32_t dwc;
+>      } phandle;
+>      struct arm_boot_info binfo;
+>  
+> @@ -66,6 +68,8 @@ static void fdt_create(VersalVirt *s)
+>      s->phandle.clk_25Mhz = qemu_fdt_alloc_phandle(s->fdt);
+>      s->phandle.clk_125Mhz = qemu_fdt_alloc_phandle(s->fdt);
+>  
+> +    s->phandle.usb = qemu_fdt_alloc_phandle(s->fdt);
+> +    s->phandle.dwc = qemu_fdt_alloc_phandle(s->fdt);
+>      /* Create /chosen node for load_dtb.  */
+>      qemu_fdt_add_subnode(s->fdt, "/chosen");
+>  
+> @@ -148,6 +152,60 @@ static void fdt_add_timer_nodes(VersalVirt *s)
+>                       compat, sizeof(compat));
+>  }
+>  
+> +static void fdt_add_usb_xhci_nodes(VersalVirt *s)
+> +{
+> +    const char clocknames[] = "bus_clk\0ref_clk";
+> +    char *usb2name = g_strdup_printf("/usb@ff9d0000");
 
-> Hi Vladimir!
->
-> Thank you for working on this. My comments below.
->
-> On 9/9/20 9:59 PM, Vladimir Sementsov-Ogievskiy wrote:
->> It's simple to avoid error propagation in blk_log_writes_open(), we
->> just need to refactor blk_log_writes_find_cur_log_sector() a bit.
->> Signed-off-by: Vladimir Sementsov-Ogievskiy
->> <vsementsov@virtuozzo.com>
->> ---
->>   block/blklogwrites.c | 23 +++++++++++------------
->>   1 file changed, 11 insertions(+), 12 deletions(-)
->> diff --git a/block/blklogwrites.c b/block/blklogwrites.c
->> index 7ef046cee9..c7da507b2d 100644
->> --- a/block/blklogwrites.c
->> +++ b/block/blklogwrites.c
->> @@ -96,10 +96,10 @@ static inline bool blk_log_writes_sector_size_valid(=
-uint32_t sector_size)
->>           sector_size < (1ull << 24);
->>   }
->>   -static uint64_t blk_log_writes_find_cur_log_sector(BdrvChild
->> *log,
->> -                                                   uint32_t sector_size=
-,
->> -                                                   uint64_t nr_entries,
->> -                                                   Error **errp)
->> +static int64_t blk_log_writes_find_cur_log_sector(BdrvChild *log,
->
-> I'd rather not change the return type for reasons detailed below.
->
->> +                                                  uint32_t sector_size,
->> +                                                  uint64_t nr_entries,
->> +                                                  Error **errp)
->>   {
->>       uint64_t cur_sector =3D 1;
->>       uint64_t cur_idx =3D 0;
->> @@ -112,13 +112,13 @@ static uint64_t blk_log_writes_find_cur_log_sector=
-(BdrvChild *log,
->>           if (read_ret < 0) {
->>               error_setg_errno(errp, -read_ret,
->>                                "Failed to read log entry %"PRIu64, cur_i=
-dx);
->> -            return (uint64_t)-1ull;
->> +            return read_ret;
->
-> This is OK, provided the change in return type signedness is necessary
-> in the first place.
->
->>           }
->>             if (cur_entry.flags & ~cpu_to_le64(LOG_FLAG_MASK)) {
->>               error_setg(errp, "Invalid flags 0x%"PRIx64" in log entry %=
-"PRIu64,
->>                          le64_to_cpu(cur_entry.flags), cur_idx);
->> -            return (uint64_t)-1ull;
->> +            return -EINVAL;
->
-> This is OK, provided the return type signedness change is necessary,
-> although we already do have errp to indicate any errors.
->
->>           }
->>             /* Account for the sector of the entry itself */
->> @@ -143,7 +143,6 @@ static int blk_log_writes_open(BlockDriverState *bs,=
- QDict *options, int flags,
->>   {
->>       BDRVBlkLogWritesState *s =3D bs->opaque;
->>       QemuOpts *opts;
->> -    Error *local_err =3D NULL;
->>       int ret;
->>       uint64_t log_sector_size;
->>       bool log_append;
->> @@ -215,15 +214,15 @@ static int blk_log_writes_open(BlockDriverState *b=
-s, QDict *options, int flags,
->>           s->nr_entries =3D 0;
->>             if (blk_log_writes_sector_size_valid(log_sector_size)) {
->> -            s->cur_log_sector =3D
->> +            int64_t cur_log_sector =3D
->>                   blk_log_writes_find_cur_log_sector(s->log_file, log_se=
-ctor_size,
->> -                                    le64_to_cpu(log_sb.nr_entries), &lo=
-cal_err);
->> -            if (local_err) {
->> -                ret =3D -EINVAL;
->> -                error_propagate(errp, local_err);
->> +                                    le64_to_cpu(log_sb.nr_entries), err=
-p);
->> +            if (cur_log_sector < 0) {
->> +                ret =3D cur_log_sector;
->
-> This changes the semantics slightly. Changing the return type to int64
-> may theoretically cause valid return values to be interpreted as
-> errors. Since we already do have a dedicated out pointer for the error
-> value (errp), why not use it?
+This string should be generated using the MM_USB2_REGS macro.
 
-Error.h's big comment:
+> +    const char dwcCompat[] = "xlnx,versal-dwc3";
 
- * Error reporting system loosely patterned after Glib's GError.
- *
- * =3D Rules =3D
- [...]
- * - Whenever practical, also return a value that indicates success /
- *   failure.  This can make the error checking more concise, and can
- *   avoid useless error object creation and destruction.  Note that
- *   we still have many functions returning void.  We recommend
- *   =E2=80=A2 bool-valued functions return true on success / false on fail=
-ure,
- *   =E2=80=A2 pointer-valued functions return non-null / null pointer, and
- *   =E2=80=A2 integer-valued functions return non-negative / negative.
+You can use compat[] as we do in other places here.
 
-blk_log_writes_find_cur_log_sector() does return such an error value
-before the patch: (uint64_t)-1.
 
-The caller does not use it to check for errors.  It uses @err instead.
-Awkward, has to error_propagate().
+> +    qemu_fdt_add_subnode(s->fdt, usb2name);
+> +    qemu_fdt_setprop(s->fdt, usb2name, "compatible",
+> +                         dwcCompat, sizeof(dwcCompat));
+> +    qemu_fdt_setprop_sized_cells(s->fdt, usb2name, "reg",
+> +                                     2, MM_USB2_REGS, 2, 0x100);
 
-Avoiding error_propagate() reduces the error handling boileplate.  It
-also improves behavior when @errp is &error_abort: we get the abort
-right where the error happens instead of where we propagate it.
+0x100 as size looks small, you've added a macro for it, why not use it?
 
-Furthermore, caller has to make an error code (-EINVAL), because
-returning (uint64_t)-1 throws it away.  Yes, a detailed error is stored
-into @err, but you can't cleanly extract the error code.
 
-Using a signed integer for returning "non-negative offset or negative
-errno code" is pervasive, starting with read() and write().  It hasn't
-been a problem there, and it hasn't been a problem in the block layer.
-8 exbi-blocks should do for a while.  Should it become troublesome, we
-won't solve the problem by going unsigned and adding one bit, we'll
-double the width and add 64.
+> +    qemu_fdt_setprop(s->fdt, usb2name, "clock-names",
+> +                         clocknames, sizeof(clocknames));
+> +    qemu_fdt_setprop_cells(s->fdt, usb2name, "clocks",
+> +                               s->phandle.clk_25Mhz, s->phandle.clk_125Mhz);
+> +    qemu_fdt_setprop(s->fdt, usb2name, "ranges", NULL, 0);
+> +    qemu_fdt_setprop_cell(s->fdt, usb2name, "#address-cells", 2);
+> +    qemu_fdt_setprop_cell(s->fdt, usb2name, "#size-cells", 2);
+> +    qemu_fdt_setprop_cell(s->fdt, usb2name, "phandle", s->phandle.usb);
+> +    g_free(usb2name);
+> +
+> +    {
+> +        uint64_t addr = MM_USB_XHCI_0;
+> +        unsigned int irq = VERSAL_USB0_IRQ_0;
 
-Additional rationale for returning recognizable error values:
+You're only using irq once? why not just use VERSAL_USB0_IRQ_0 directly?
 
-commit e3fe3988d7851cac30abffae06d2f555ff7bee62
-Author: Markus Armbruster <armbru@redhat.com>
-Date:   Tue Jul 7 18:05:31 2020 +0200
+> +        const char compat[] = "snps,dwc3";
+> +        const char intName[] = "dwc_usb3";
 
-    error: Document Error API usage rules
-   =20
-    This merely codifies existing practice, with one exception: the rule
-    advising against returning void, where existing practice is mixed.
-   =20
-    When the Error API was created, we adopted the (unwritten) rule to
-    return void when the function returns no useful value on success,
-    unlike GError, which recommends to return true on success and false on
-    error then.
-   =20
-    When a function returns a distinct error value, say false, a checked
-    call that passes the error up looks like
-   =20
-        if (!frobnicate(..., errp)) {
-            handle the error...
-        }
-   =20
-    When it returns void, we need
-   =20
-        Error *err =3D NULL;
-   =20
-        frobnicate(..., &err);
-        if (err) {
-            handle the error...
-            error_propagate(errp, err);
-        }
-   =20
-    Not only is this more verbose, it also creates an Error object even
-    when @errp is null, &error_abort or &error_fatal.
-   =20
-    People got tired of the additional boilerplate, and started to ignore
-    the unwritten rule.  The result is confusion among developers about
-    the preferred usage.
-   =20
-    Make the rule advising against returning void official by putting it
-    in writing.  This will hopefully reduce confusion.
-    [...]
+I'd prefer interrupt_names[] or irq_names[].
 
-Additional rationale for avoiding error_propagate():
 
-commit ae7c80a7bd73685437bf6ba9d7c26098351f4166
-Author: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date:   Tue Jul 7 18:50:30 2020 +0200
+> +        uint32_t frameLen = 0x20;
 
-    error: New macro ERRP_GUARD()
-   =20
-    Introduce a new ERRP_GUARD() macro, to be used at start of functions
-    with an errp OUT parameter.
-   =20
-    It has three goals:
-   =20
-    1. Fix issue with error_fatal and error_prepend/error_append_hint: the
-    user can't see this additional information, because exit() happens in
-    error_setg earlier than information is added. [Reported by Greg Kurz]
-   =20
-    2. Fix issue with error_abort and error_propagate: when we wrap
-    error_abort by local_err+error_propagate, the resulting coredump will
-    refer to error_propagate and not to the place where error happened.
-    (the macro itself doesn't fix the issue, but it allows us to [3.] drop
-    the local_err+error_propagate pattern, which will definitely fix the
-    issue) [Reported by Kevin Wolf]
-   =20
-    3. Drop local_err+error_propagate pattern, which is used to workaround
-    void functions with errp parameter, when caller wants to know resulting
-    status. (Note: actually these functions could be merely updated to
-    return int error code).
-    [...]
+Can't you just directly use 0x20 when setting the prop?
 
-> Assigning cur_log_sector to ret looks a bit odd to me. Why not use the
-> original -EINVAL - or maybe some more appropriate errno value than
-> -EINVAL?
+> +
+> +        char *name = g_strdup_printf("/usb@ff9d0000/dwc3@%" PRIx64, addr);
 
-We assign the error code returned by
-blk_log_writes_find_cur_log_sector(), which seems proper to me.
+We shouldn't hard-code ff9d0000 here.
+It also looks weird/wrong to have dwc3 as a subnode of usb like that.
 
-Care to suggest a better variable name?
 
-> I think the desired effect of this change could be achieved with less
-> churn. How about just making just the following change in addition to=20
-> adding ERRP_GUARD() to the beginning of the function and getting rid
-> of local_err:
->
-> -                                    le64_to_cpu(log_sb.nr_entries),
->                                      &local_err);
-> +                                    le64_to_cpu(log_sb.nr_entries), errp=
-);
-> -            if (local_err) {
-> +            if (*errp) {
->                  ret =3D -EINVAL;
-> -                error_propagate(errp, local_err);
->>                   goto fail_log;
->>               }
->>   +            s->cur_log_sector =3D cur_log_sector;
->>               s->nr_entries =3D le64_to_cpu(log_sb.nr_entries);
->>           }
->>       } else {
+> +        qemu_fdt_add_subnode(s->fdt, name);
+> +        qemu_fdt_setprop(s->fdt, name, "compatible",
+> +                         compat, sizeof(compat));
+> +        qemu_fdt_setprop_sized_cells(s->fdt, name, "reg",
+> +                                     2, addr, 2, MM_USB_XHCI_SIZE_0);
+> +        qemu_fdt_setprop(s->fdt, name, "interrupt-names",
+> +                         intName, sizeof(intName));
+> +        qemu_fdt_setprop_cells(s->fdt, name, "interrupts",
+> +                                   GIC_FDT_IRQ_TYPE_SPI, irq,
+> +                                   GIC_FDT_IRQ_FLAGS_LEVEL_HI);
+> +        qemu_fdt_setprop_cell(s->fdt, name,
+> +                              "snps,quirk-frame-length-adjustment",
+> +                               frameLen);
+> +        qemu_fdt_setprop_cells(s->fdt, name, "#stream-id-cells", 1);
+> +        qemu_fdt_setprop_string(s->fdt, name, "dr_mode", "host");
+> +        qemu_fdt_setprop_string(s->fdt, name, "phy-names", "usb3-phy");
+> +        qemu_fdt_setprop(s->fdt, name, "snps,dis_u2_susphy_quirk", NULL, 0);
+> +        qemu_fdt_setprop(s->fdt, name, "snps,dis_u3_susphy_quirk", NULL, 0);
+> +        qemu_fdt_setprop(s->fdt, name, "snps,refclk_fladj", NULL, 0);
+> +        qemu_fdt_setprop(s->fdt, name, "snps,mask_phy_reset", NULL, 0);
+> +        qemu_fdt_setprop(s->fdt, name, "snps,usb3_lpm_capable", NULL, 0);
+> +        qemu_fdt_setprop_cell(s->fdt, name, "phandle", s->phandle.dwc);
+> +        qemu_fdt_setprop_string(s->fdt, name, "maximum-speed", "high-speed");
+> +        g_free(name);
+> +    }
+> +}
+>  static void fdt_add_uart_nodes(VersalVirt *s)
+>  {
+>      uint64_t addrs[] = { MM_UART1, MM_UART0 };
+> @@ -515,6 +573,7 @@ static void versal_virt_init(MachineState *machine)
+>      fdt_add_gic_nodes(s);
+>      fdt_add_timer_nodes(s);
+>      fdt_add_zdma_nodes(s);
+> +    fdt_add_usb_xhci_nodes(s);
+>      fdt_add_sd_nodes(s);
+>      fdt_add_rtc_node(s);
+>      fdt_add_cpu_nodes(s, psci_conduit);
+> diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
+> index e3aa4bd..9b241de 100644
+> --- a/hw/arm/xlnx-versal.c
+> +++ b/hw/arm/xlnx-versal.c
+> @@ -145,6 +145,43 @@ static void versal_create_uarts(Versal *s, qemu_irq *pic)
+>      }
+>  }
+>  
+> +static void versal_create_usbs(Versal *s, qemu_irq *pic)
+> +{
+> +    char *name = g_strdup_printf("dwc3-0");
 
-I prefer this patch.  But it's up to the block maintainers.
+There's no need to allocate and format a constant string...
 
+
+> +    DeviceState *dev, *xhci_dev;
+> +    MemoryRegion *mr;
+> +
+> +    object_initialize_child(OBJECT(s), name, &s->fpd.iou.dwc3,
+> +                            TYPE_USB_DWC3);
+> +    dev = DEVICE(&s->fpd.iou.dwc3);
+> +    xhci_dev = DEVICE(&s->fpd.iou.dwc3.sysbus_xhci);
+> +
+> +    object_property_set_link(OBJECT(xhci_dev), "dma", OBJECT(&s->mr_ps),
+> +                             &error_abort);
+> +    qdev_prop_set_uint32(xhci_dev, "intrs", 1);
+> +    qdev_prop_set_uint32(xhci_dev, "slots", 2);
+> +
+> +    sysbus_realize(SYS_BUS_DEVICE(dev), &error_fatal);
+> +
+> +    mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
+> +    memory_region_add_subregion(&s->mr_ps, MM_USB_XHCI_0 + 0xC100 , mr);
+> +    mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(xhci_dev), 0);
+> +    memory_region_add_subregion(&s->mr_ps, MM_USB_XHCI_0, mr);
+> +
+> +    sysbus_connect_irq(SYS_BUS_DEVICE(xhci_dev), 0, pic[VERSAL_USB0_IRQ_0]);
+> +    g_free(name);
+> +
+> +    name = g_strdup_printf("usb2reg-0");
+
+This one too.
+
+> +    object_initialize_child(OBJECT(s), name, &s->fpd.iou.Usb2Regs,
+> +                           "xlnx.usb2_regs");
+> +    dev = DEVICE(&s->fpd.iou.Usb2Regs);
+> +    sysbus_realize(SYS_BUS_DEVICE(dev), &error_fatal);
+> +
+> +    mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
+> +    memory_region_add_subregion(&s->mr_ps, MM_USB2_REGS, mr);
+> +    g_free(name);
+> +}
+> +
+>  static void versal_create_gems(Versal *s, qemu_irq *pic)
+>  {
+>      int i;
+> @@ -332,6 +369,7 @@ static void versal_realize(DeviceState *dev, Error **errp)
+>      versal_create_apu_cpus(s);
+>      versal_create_apu_gic(s, pic);
+>      versal_create_uarts(s, pic);
+> +    versal_create_usbs(s, pic);
+>      versal_create_gems(s, pic);
+>      versal_create_admas(s, pic);
+>      versal_create_sds(s, pic);
+> diff --git a/include/hw/arm/xlnx-versal.h b/include/hw/arm/xlnx-versal.h
+> index 9c9f47b..e19cfd5 100644
+> --- a/include/hw/arm/xlnx-versal.h
+> +++ b/include/hw/arm/xlnx-versal.h
+> @@ -20,6 +20,8 @@
+>  #include "hw/dma/xlnx-zdma.h"
+>  #include "hw/net/cadence_gem.h"
+>  #include "hw/rtc/xlnx-zynqmp-rtc.h"
+> +#include "hw/usb/hcd-dwc3.h"
+> +#include "hw/misc/xlnx-versal-usb2-regs.h"
+>  
+>  #define TYPE_XLNX_VERSAL "xlnx-versal"
+>  #define XLNX_VERSAL(obj) OBJECT_CHECK(Versal, (obj), TYPE_XLNX_VERSAL)
+> @@ -42,6 +44,11 @@ typedef struct Versal {
+>              ARMCPU cpu[XLNX_VERSAL_NR_ACPUS];
+>              GICv3State gic;
+>          } apu;
+> +
+> +        struct {
+> +            USBDWC3 dwc3;
+> +            XlnxUsb2Regs Usb2Regs;
+> +        } iou;
+>      } fpd;
+>  
+>      MemoryRegion mr_ps;
+> @@ -87,6 +94,7 @@ typedef struct Versal {
+>  
+>  #define VERSAL_UART0_IRQ_0         18
+>  #define VERSAL_UART1_IRQ_0         19
+> +#define VERSAL_USB0_IRQ_0          22
+>  #define VERSAL_GEM0_IRQ_0          56
+>  #define VERSAL_GEM0_WAKE_IRQ_0     57
+>  #define VERSAL_GEM1_IRQ_0          58
+> @@ -124,6 +132,12 @@ typedef struct Versal {
+>  #define MM_OCM                      0xfffc0000U
+>  #define MM_OCM_SIZE                 0x40000
+>  
+> +#define MM_USB2_REGS                0xFF9D0000
+> +#define MM_USB2_SIZE                0x10000
+> +
+> +#define MM_USB_XHCI_0               0xFE200000
+> +#define MM_USB_XHCI_SIZE_0          0x10000
+> +
+>  #define MM_TOP_DDR                  0x0
+>  #define MM_TOP_DDR_SIZE             0x80000000U
+>  #define MM_TOP_DDR_2                0x800000000ULL
+> -- 
+> 2.7.4
+> 
 
