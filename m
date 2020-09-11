@@ -2,93 +2,86 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 626C3C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:45:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 692CEC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:46:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8A16221E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:45:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A43F820665
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:45:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LXbOtnwh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8A16221E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="c5gpYJ1t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A43F820665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGegc-00078M-QE
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 04:45:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35016)
+	id 1kGegw-00080F-Ng
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 04:45:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34106)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kGefc-0005H5-Pd
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 04:44:36 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57403
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kGefb-0002is-4F
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 04:44:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599813874;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9TTA9MZ8aUIl276MUEBXq81ro2HhgcO3JcrlnA45PJU=;
- b=LXbOtnwhqKE7BFo4kGh6J4kn/Uicq3Jgz9b6xNOx936iHXu5aT9xNd+/NetDzfpfq0rPK9
- uZbply95fTFsfrIZ4T255r4UpsZwAUe2mfb4G1qFmpTDVfytCbrNIFsczbhj4TR7fhzXU3
- 5CfdSOZphoPaWGK2CINhVl2T/M64tUc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-412-Esj6XvldP1evPYuENna4Dw-1; Fri, 11 Sep 2020 04:44:30 -0400
-X-MC-Unique: Esj6XvldP1evPYuENna4Dw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13A6210BBEDA;
- Fri, 11 Sep 2020 08:44:29 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6FEB581C44;
- Fri, 11 Sep 2020 08:44:27 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1kGebe-0006GF-0k; Fri, 11 Sep 2020 04:40:30 -0400
+Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:39190)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1kGebc-0002Im-0L; Fri, 11 Sep 2020 04:40:29 -0400
+Received: from sas1-ec30c78b6c5b.qloud-c.yandex.net
+ (sas1-ec30c78b6c5b.qloud-c.yandex.net
+ [IPv6:2a02:6b8:c14:2704:0:640:ec30:c78b])
+ by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 297402E14F1;
+ Fri, 11 Sep 2020 11:40:26 +0300 (MSK)
+Received: from sas2-32987e004045.qloud-c.yandex.net
+ (sas2-32987e004045.qloud-c.yandex.net [2a02:6b8:c08:b889:0:640:3298:7e00])
+ by sas1-ec30c78b6c5b.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ OIF454btik-ePvu5g28; Fri, 11 Sep 2020 11:40:26 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1599813626; bh=q/BEie8WWdulCQ+K3Z9sfH9Ao00pTgDfrRPfxe/FziU=;
+ h=In-Reply-To:In-Reply-To:Message-Id:References:References:Date:
+ Subject:To:From:Cc;
+ b=c5gpYJ1tzBK9sH3o1iqxLpqIr0HiLAluUIlc/GaczcVwRkIy98Q46eVwt/0F7xBCv
+ Rbah60VUvukeVaM9J/uFFUc5rOHR2dkCk4g+VC0FkYpHO6VQEhD7mkvuManzf51pA4
+ p7B+anTsDVWTnKsnc0iMwZ2cy+XrrJsXXcTQ4l1c=
+Authentication-Results: sas1-ec30c78b6c5b.qloud-c.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
+ [2a02:6b8:b080:7216::1:a])
+ by sas2-32987e004045.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ v35icu4tRa-ePlWrTQg; Fri, 11 Sep 2020 11:40:25 +0300
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+ (Client certificate not present)
+From: Dima Stepanov <dimastep@yandex-team.ru>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 3/3] numa: remove fixup numa_state->num_nodes to MAX_NODES
-Date: Fri, 11 Sep 2020 04:44:10 -0400
-Message-Id: <20200911084410.788171-4-imammedo@redhat.com>
-In-Reply-To: <20200911084410.788171-1-imammedo@redhat.com>
-References: <20200911084410.788171-1-imammedo@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 03:40:15
+Subject: [PATCH v5 7/7] tests/qtest/vhost-user-test: enable the reconnect tests
+Date: Fri, 11 Sep 2020 11:39:49 +0300
+Message-Id: <9fee5b17c7940f9126ba7cc014b09106c98118db.1599813294.git.dimastep@yandex-team.ru>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <cover.1599813294.git.dimastep@yandex-team.ru>
+References: <cover.1599813294.git.dimastep@yandex-team.ru>
+In-Reply-To: <cover.1599813294.git.dimastep@yandex-team.ru>
+References: <cover.1599813294.git.dimastep@yandex-team.ru>
+Received-SPF: pass client-ip=77.88.29.217;
+ envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1p.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 04:40:12
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -97,43 +90,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, libvir-list@redhat.com,
- qemu-ppc@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au,
- rth@twiddle.net
+Cc: kwolf@redhat.com, lvivier@redhat.com, thuth@redhat.com,
+ qemu-block@nongnu.org, mst@redhat.com, stefanha@gmail.com, jasowang@redhat.com,
+ dgilbert@redhat.com, mreitz@redhat.com, fengli@smartx.com,
+ yc-core@yandex-team.ru, pbonzini@redhat.com, raphael.norwitz@nutanix.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-current code permits only nodeids in [0..MAX_NODES) range
-due to nodeid check in
+For now a QTEST_VHOST_USER_FIXME environment variable is used to
+separate reconnect tests for the vhost-user-net device. Looks like the
+reconnect functionality is pretty stable, so this separation is
+deprecated.
+Remove it and enable these tests for the default run.
 
-  parse_numa_node()
-      if (nodenr >= MAX_NODES) {
-          error_setg(errp, "Max number of NUMA nodes reached: %"
-
-so subj fixup is not reachable, drop it.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
 ---
- hw/core/numa.c | 4 ----
- 1 file changed, 4 deletions(-)
+ tests/qtest/vhost-user-test.c | 25 +++++++++++--------------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
 
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index 706c1e84c6..7d5d413001 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -677,10 +677,6 @@ void numa_complete_configuration(MachineState *ms)
-     if (ms->numa_state->num_nodes > 0) {
-         uint64_t numa_total;
+diff --git a/tests/qtest/vhost-user-test.c b/tests/qtest/vhost-user-test.c
+index 4b715d3..4b96312 100644
+--- a/tests/qtest/vhost-user-test.c
++++ b/tests/qtest/vhost-user-test.c
+@@ -1140,20 +1140,17 @@ static void register_vhost_user_test(void)
+                  "virtio-net",
+                  test_migrate, &opts);
  
--        if (ms->numa_state->num_nodes > MAX_NODES) {
--            ms->numa_state->num_nodes = MAX_NODES;
--        }
+-    /* keeps failing on build-system since Aug 15 2017 */
+-    if (getenv("QTEST_VHOST_USER_FIXME")) {
+-        opts.before = vhost_user_test_setup_reconnect;
+-        qos_add_test("vhost-user/reconnect", "virtio-net",
+-                     test_reconnect, &opts);
 -
-         numa_total = 0;
-         for (i = 0; i < ms->numa_state->num_nodes; i++) {
-             numa_total += numa_info[i].node_mem;
+-        opts.before = vhost_user_test_setup_connect_fail;
+-        qos_add_test("vhost-user/connect-fail", "virtio-net",
+-                     test_vhost_user_started, &opts);
+-
+-        opts.before = vhost_user_test_setup_flags_mismatch;
+-        qos_add_test("vhost-user/flags-mismatch", "virtio-net",
+-                     test_vhost_user_started, &opts);
+-    }
++    opts.before = vhost_user_test_setup_reconnect;
++    qos_add_test("vhost-user/reconnect", "virtio-net",
++                 test_reconnect, &opts);
++
++    opts.before = vhost_user_test_setup_connect_fail;
++    qos_add_test("vhost-user/connect-fail", "virtio-net",
++                 test_vhost_user_started, &opts);
++
++    opts.before = vhost_user_test_setup_flags_mismatch;
++    qos_add_test("vhost-user/flags-mismatch", "virtio-net",
++                 test_vhost_user_started, &opts);
+ 
+     opts.before = vhost_user_test_setup_multiqueue;
+     opts.edge.extra_device_opts = "mq=on";
 -- 
-2.27.0
+2.7.4
 
 
