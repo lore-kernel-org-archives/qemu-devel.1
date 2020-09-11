@@ -2,98 +2,91 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D1B7C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 05:26:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1281CC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 05:27:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97A302087C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 05:26:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 836C32087C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 05:27:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="lgtlDW3p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97A302087C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eNudNka6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 836C32087C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGbZw-0007nJ-G4
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 01:26:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52268)
+	id 1kGbab-0000WW-Fg
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 01:27:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from
- <3UAlbXwsKCs82D5388z79z819916z.x97Bz7F-yzGz689818F.9C1@flex--hskinnemoen.bounces.google.com>)
- id 1kGbUy-0006PQ-VU
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 01:21:24 -0400
-Received: from mail-pf1-x449.google.com ([2607:f8b0:4864:20::449]:46166)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from
- <3UAlbXwsKCs82D5388z79z819916z.x97Bz7F-yzGz689818F.9C1@flex--hskinnemoen.bounces.google.com>)
- id 1kGbUw-0002NG-Iy
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 01:21:24 -0400
-Received: by mail-pf1-x449.google.com with SMTP id t201so6167803pfc.13
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 22:21:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc:content-transfer-encoding;
- bh=YOrl7QRjHT0JAJTy57fDIpmabWtCrZiSBV/eTlMUOFc=;
- b=lgtlDW3pu1ZDvp4lDZeaWKPRDU1lrbQaV1D+7FBb90jbCZvE4PUcr0MmCJPJzZipJB
- 1PatkN0IGApC4XiXDLWzCwgejMKflEUvMvBISbzHCZFQvYWAoioeOcqEbdQwVjiZ/gHR
- Tg5P4L5hED75P+sORpeM2UPJabDV2UjQCsI09fuIe4idWXXxqWAeNI1+ozASOqjGWyLp
- Cx82s6YFwWF52kMMis2x8jyL+6b8f7qFqpDxs2jz04OsnN0UCEJgEDJeMMewJaRWD7Qt
- IHaQwg/CF5UResKH6tC7MiYC8ldP10GnkSZekYI8NKspMzl6VVFrG2scDXMgedz9c0IO
- 3vhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc:content-transfer-encoding;
- bh=YOrl7QRjHT0JAJTy57fDIpmabWtCrZiSBV/eTlMUOFc=;
- b=IuZ/EH8MAEmvmaaKBp3lWU71E1jffAMSMFkhKOluM65B0qL95bTUWm2GY4/MsIZJ7l
- Xmo00KzMjjbOMXudTGF9VjKUyX4CBAWUeNXK9IqzMoFQLYFnjBKA5wnfQ1kaO99ebwIH
- DAFKMydLPmu4WPf3qo3BcqDiidZDrx0i6cEczp9MMwAF3ZopuVDDGkxD2AqjMwg3TrLv
- AqIXXVsqdYu85N7+gCvOy587v9z70RoUBz5DxzSjNTih7mMzZ8gP16UY9+5HVl2lHWQH
- zUdWgQAdWs9a+tOR51x5tPEKb87TQJ0jDtpk03V+fWAkXVGg1r5VPHQrv+Mvw7Saq7BZ
- HDrg==
-X-Gm-Message-State: AOAM533HFdjIK7oVCpAIKeq2YsrMxczsrEfjOoN8AxBB8QurM0aLmo9W
- I5tqtJQ8efMQIhihAhzStPHVkJaKPIG4OYlqbA==
-X-Google-Smtp-Source: ABdhPJwKgbUEj5rJk7h7VGMA5235ZU7d/y958PF4BjGw7l2aTNBaFGvz70TldlRtIodLchHvF8wB87Qtf9ZcavcQNg==
-X-Received: from skybert.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:3107])
- (user=hskinnemoen job=sendgmr) by
- 2002:a05:6a00:792:b029:13c:1611:652d with
- SMTP id g18-20020a056a000792b029013c1611652dmr634778pfu.13.1599801680246;
- Thu, 10 Sep 2020 22:21:20 -0700 (PDT)
-Date: Thu, 10 Sep 2020 22:20:52 -0700
-In-Reply-To: <20200911052101.2602693-1-hskinnemoen@google.com>
-Message-Id: <20200911052101.2602693-6-hskinnemoen@google.com>
-Mime-Version: 1.0
-References: <20200911052101.2602693-1-hskinnemoen@google.com>
-X-Mailer: git-send-email 2.28.0.526.ge36021eeef-goog
-Subject: [PATCH v9 05/14] hw/arm: Add two NPCM7xx-based machines
-To: peter.maydell@linaro.org, f4bug@amsat.org
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Avi.Fishman@nuvoton.com, 
- kfting@nuvoton.com, Havard Skinnemoen <hskinnemoen@google.com>,
- Joel Stanley <joel@jms.id.au>, 
- "=?UTF-8?q?C=C3=A9dric=20Le=20Goater?=" <clg@kaod.org>,
- Alexander Bulekov <alxndr@bu.edu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::449;
- envelope-from=3UAlbXwsKCs82D5388z79z819916z.x97Bz7F-yzGz689818F.9C1@flex--hskinnemoen.bounces.google.com;
- helo=mail-pf1-x449.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -95
-X-Spam_score: -9.6
-X-Spam_bar: ---------
-X-Spam_report: (-9.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-0.001,
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kGbWx-0001KU-KX
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 01:23:27 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21959
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kGbWu-0002Yi-3b
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 01:23:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599801802;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=9RWA3lJTwxAbxRxOXDAvm9J7zahY3ZbT8YxlmKSUGN8=;
+ b=eNudNka67YEk/SXQDrT+v72w4Jy9hEjKIMatZ6kQAtKdDetoCo/tulrm0Vg4D17z8P+Bn2
+ 5STVcaSR5JwoKQBMc81Z2GsMugXwk4z0doF9LvKg9TmGHujfeB0RmkY1Sahndy2rmg9fGR
+ cPuIfHmjt0hl+kLbMWGnD1QlQQtC59o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-592-hUaTwk1EMO2JRGpUVuBFrg-1; Fri, 11 Sep 2020 01:23:18 -0400
+X-MC-Unique: hUaTwk1EMO2JRGpUVuBFrg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0815B34914;
+ Fri, 11 Sep 2020 05:23:17 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
+ [10.36.114.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 834D019C59;
+ Fri, 11 Sep 2020 05:23:12 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id D16B6113865F; Fri, 11 Sep 2020 07:23:10 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH 07/14] block/blklogwrites: drop error propagation
+References: <20200909185930.26524-1-vsementsov@virtuozzo.com>
+ <20200909185930.26524-8-vsementsov@virtuozzo.com>
+ <20200910192440.695b8e81@bahia.lan>
+Date: Fri, 11 Sep 2020 07:23:10 +0200
+In-Reply-To: <20200910192440.695b8e81@bahia.lan> (Greg Kurz's message of "Thu, 
+ 10 Sep 2020 19:24:40 +0200")
+Message-ID: <878sdghoox.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 01:23:22
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- USER_IN_DEF_DKIM_WL=-7.5 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,256 +99,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ berto@igalia.com, stefanha@redhat.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, mreitz@redhat.com, pavel.dovgaluk@ispras.ru,
+ pbonzini@redhat.com, jsnow@redhat.com, ari@tuxera.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: Havard Skinnemoen <hskinnemoen@google.com>
-From: Havard Skinnemoen via <qemu-devel@nongnu.org>
 
-This adds two new machines, both supported by OpenBMC:
+Greg Kurz <groug@kaod.org> writes:
 
-  - npcm750-evb: Nuvoton NPCM750 Evaluation Board.
-  - quanta-gsj: A board with a NPCM730 chip.
+> On Wed,  9 Sep 2020 21:59:23 +0300
+> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
+>
+>> It's simple to avoid error propagation in blk_log_writes_open(), we
+>> just need to refactor blk_log_writes_find_cur_log_sector() a bit.
+>> 
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>  block/blklogwrites.c | 23 +++++++++++------------
+>>  1 file changed, 11 insertions(+), 12 deletions(-)
+>> 
+>> diff --git a/block/blklogwrites.c b/block/blklogwrites.c
+>> index 7ef046cee9..c7da507b2d 100644
+>> --- a/block/blklogwrites.c
+>> +++ b/block/blklogwrites.c
+>> @@ -96,10 +96,10 @@ static inline bool blk_log_writes_sector_size_valid(uint32_t sector_size)
+>>          sector_size < (1ull << 24);
+>>  }
+>>  
+>> -static uint64_t blk_log_writes_find_cur_log_sector(BdrvChild *log,
+>> -                                                   uint32_t sector_size,
+>> -                                                   uint64_t nr_entries,
+>> -                                                   Error **errp)
+>> +static int64_t blk_log_writes_find_cur_log_sector(BdrvChild *log,
+>> +                                                  uint32_t sector_size,
+>> +                                                  uint64_t nr_entries,
+>> +                                                  Error **errp)
+>>  {
+>>      uint64_t cur_sector = 1;
+>>      uint64_t cur_idx = 0;
+>> @@ -112,13 +112,13 @@ static uint64_t blk_log_writes_find_cur_log_sector(BdrvChild *log,
+>>          if (read_ret < 0) {
+>>              error_setg_errno(errp, -read_ret,
+>>                               "Failed to read log entry %"PRIu64, cur_idx);
+>> -            return (uint64_t)-1ull;
+>> +            return read_ret;
+>
+> This changes the error status of blk_log_writes_open() from -EINVAL to
+> whatever is returned by bdrv_pread(). I guess this is an improvement
+> worth to be mentioned in the changelog.
+>
+>>          }
+>>  
+>>          if (cur_entry.flags & ~cpu_to_le64(LOG_FLAG_MASK)) {
+>>              error_setg(errp, "Invalid flags 0x%"PRIx64" in log entry %"PRIu64,
+>>                         le64_to_cpu(cur_entry.flags), cur_idx);
+>> -            return (uint64_t)-1ull;
+>> +            return -EINVAL;
+>>          }
+>>  
+>>          /* Account for the sector of the entry itself */
+>> @@ -143,7 +143,6 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
+>>  {
+>>      BDRVBlkLogWritesState *s = bs->opaque;
+>>      QemuOpts *opts;
+>> -    Error *local_err = NULL;
+>>      int ret;
+>>      uint64_t log_sector_size;
+>>      bool log_append;
+>> @@ -215,15 +214,15 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
+>>          s->nr_entries = 0;
+>>  
+>>          if (blk_log_writes_sector_size_valid(log_sector_size)) {
+>> -            s->cur_log_sector =
+>> +            int64_t cur_log_sector =
+>>                  blk_log_writes_find_cur_log_sector(s->log_file, log_sector_size,
+>> -                                    le64_to_cpu(log_sb.nr_entries), &local_err);
+>> -            if (local_err) {
+>> -                ret = -EINVAL;
+>> -                error_propagate(errp, local_err);
+>> +                                    le64_to_cpu(log_sb.nr_entries), errp);
+>> +            if (cur_log_sector < 0) {
+>> +                ret = cur_log_sector;
+>
+> This is converting int64_t to int, which is usually not recommended.
+> In practice this is probably okay because cur_log_sector is supposed
+> to be a negative errno (ie. an int) in this case.
 
-They rely on the NPCM7xx SoC device to do the heavy lifting. They are
-almost completely identical at the moment, apart from the SoC type,
-which currently only changes the reset contents of one register
-(GCR.MDLR), but they might grow apart a bit more as more functionality
-is added.
+It isn't: blk_log_writes_find_cur_log_sector() returns (uint64_t)-1ull
+on error.
 
-Both machines can boot the Linux kernel into /bin/sh.
+Aside: returning uint64_t is awkward.  We commonly use a signed integer
+for non-negative offset or negative error.
 
-Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Tested-by: Alexander Bulekov <alxndr@bu.edu>
-Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
----
- default-configs/arm-softmmu.mak |   1 +
- include/hw/arm/npcm7xx.h        |  19 +++++
- hw/arm/npcm7xx_boards.c         | 145 ++++++++++++++++++++++++++++++++
- hw/arm/meson.build              |   2 +-
- 4 files changed, 166 insertions(+), 1 deletion(-)
- create mode 100644 hw/arm/npcm7xx_boards.c
+> Maybe make this clear with a an assert(cur_log_sector >= INT_MIN) ?
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.=
-mak
-index 8fc09a4a51..9a94ebd0be 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -27,6 +27,7 @@ CONFIG_GUMSTIX=3Dy
- CONFIG_SPITZ=3Dy
- CONFIG_TOSA=3Dy
- CONFIG_Z2=3Dy
-+CONFIG_NPCM7XX=3Dy
- CONFIG_COLLIE=3Dy
- CONFIG_ASPEED_SOC=3Dy
- CONFIG_NETDUINO2=3Dy
-diff --git a/include/hw/arm/npcm7xx.h b/include/hw/arm/npcm7xx.h
-index e68d9c79e6..ba7495869d 100644
---- a/include/hw/arm/npcm7xx.h
-+++ b/include/hw/arm/npcm7xx.h
-@@ -35,6 +35,25 @@
- #define NPCM7XX_SMP_BOOTREG_ADDR        (0xf080013c)  /* GCR.SCRPAD */
- #define NPCM7XX_GIC_CPU_IF_ADDR         (0xf03fe100)  /* GIC within A9 */
-=20
-+typedef struct NPCM7xxMachine {
-+    MachineState        parent;
-+} NPCM7xxMachine;
-+
-+#define TYPE_NPCM7XX_MACHINE MACHINE_TYPE_NAME("npcm7xx")
-+#define NPCM7XX_MACHINE(obj)                                            \
-+    OBJECT_CHECK(NPCM7xxMachine, (obj), TYPE_NPCM7XX_MACHINE)
-+
-+typedef struct NPCM7xxMachineClass {
-+    MachineClass        parent;
-+
-+    const char          *soc_type;
-+} NPCM7xxMachineClass;
-+
-+#define NPCM7XX_MACHINE_CLASS(klass)                                    \
-+    OBJECT_CLASS_CHECK(NPCM7xxMachineClass, (klass), TYPE_NPCM7XX_MACHINE)
-+#define NPCM7XX_MACHINE_GET_CLASS(obj)                                  \
-+    OBJECT_GET_CLASS(NPCM7xxMachineClass, (obj), TYPE_NPCM7XX_MACHINE)
-+
- typedef struct NPCM7xxState {
-     DeviceState         parent;
-=20
-diff --git a/hw/arm/npcm7xx_boards.c b/hw/arm/npcm7xx_boards.c
-new file mode 100644
-index 0000000000..939391c3a3
---- /dev/null
-+++ b/hw/arm/npcm7xx_boards.c
-@@ -0,0 +1,145 @@
-+/*
-+ * Machine definitions for boards featuring an NPCM7xx SoC.
-+ *
-+ * Copyright 2020 Google LLC
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WIT=
-HOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ * for more details.
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include "exec/address-spaces.h"
-+#include "hw/arm/npcm7xx.h"
-+#include "hw/core/cpu.h"
-+#include "qapi/error.h"
-+#include "qemu/units.h"
-+
-+#define NPCM750_EVB_POWER_ON_STRAPS 0x00001ff7
-+#define QUANTA_GSJ_POWER_ON_STRAPS 0x00001fff
-+
-+static void npcm7xx_connect_dram(NPCM7xxState *soc, MemoryRegion *dram)
-+{
-+    memory_region_add_subregion(get_system_memory(), NPCM7XX_DRAM_BA, dram=
-);
-+
-+    object_property_set_link(OBJECT(soc), "dram-mr", OBJECT(dram),
-+                             &error_abort);
-+}
-+
-+static NPCM7xxState *npcm7xx_create_soc(MachineState *machine,
-+                                        uint32_t hw_straps)
-+{
-+    NPCM7xxMachineClass *nmc =3D NPCM7XX_MACHINE_GET_CLASS(machine);
-+    MachineClass *mc =3D &nmc->parent;
-+    Object *obj;
-+
-+    if (strcmp(machine->cpu_type, mc->default_cpu_type) !=3D 0) {
-+        error_report("This board can only be used with %s",
-+                     mc->default_cpu_type);
-+        exit(1);
-+    }
-+
-+    obj =3D object_new_with_props(nmc->soc_type, OBJECT(machine), "soc",
-+                                &error_abort, NULL);
-+    object_property_set_uint(obj, "power-on-straps", hw_straps, &error_abo=
-rt);
-+
-+    return NPCM7XX(obj);
-+}
-+
-+static void npcm750_evb_init(MachineState *machine)
-+{
-+    NPCM7xxState *soc;
-+
-+    soc =3D npcm7xx_create_soc(machine, NPCM750_EVB_POWER_ON_STRAPS);
-+    npcm7xx_connect_dram(soc, machine->ram);
-+    qdev_realize(DEVICE(soc), NULL, &error_fatal);
-+
-+    npcm7xx_load_kernel(machine, soc);
-+}
-+
-+static void quanta_gsj_init(MachineState *machine)
-+{
-+    NPCM7xxState *soc;
-+
-+    soc =3D npcm7xx_create_soc(machine, QUANTA_GSJ_POWER_ON_STRAPS);
-+    npcm7xx_connect_dram(soc, machine->ram);
-+    qdev_realize(DEVICE(soc), NULL, &error_fatal);
-+
-+    npcm7xx_load_kernel(machine, soc);
-+}
-+
-+static void npcm7xx_set_soc_type(NPCM7xxMachineClass *nmc, const char *typ=
-e)
-+{
-+    NPCM7xxClass *sc =3D NPCM7XX_CLASS(object_class_by_name(type));
-+    MachineClass *mc =3D MACHINE_CLASS(nmc);
-+
-+    nmc->soc_type =3D type;
-+    mc->default_cpus =3D mc->min_cpus =3D mc->max_cpus =3D sc->num_cpus;
-+}
-+
-+static void npcm7xx_machine_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc =3D MACHINE_CLASS(oc);
-+
-+    mc->no_floppy =3D 1;
-+    mc->no_cdrom =3D 1;
-+    mc->no_parallel =3D 1;
-+    mc->default_ram_id =3D "ram";
-+    mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a9");
-+}
-+
-+/*
-+ * Schematics:
-+ * https://github.com/Nuvoton-Israel/nuvoton-info/blob/master/npcm7xx-pole=
-g/evaluation-board/board_deliverables/NPCM750x_EB_ver.A1.1_COMPLETE.pdf
-+ */
-+static void npcm750_evb_machine_class_init(ObjectClass *oc, void *data)
-+{
-+    NPCM7xxMachineClass *nmc =3D NPCM7XX_MACHINE_CLASS(oc);
-+    MachineClass *mc =3D MACHINE_CLASS(oc);
-+
-+    npcm7xx_set_soc_type(nmc, TYPE_NPCM750);
-+
-+    mc->desc =3D "Nuvoton NPCM750 Evaluation Board (Cortex A9)";
-+    mc->init =3D npcm750_evb_init;
-+    mc->default_ram_size =3D 512 * MiB;
-+};
-+
-+static void gsj_machine_class_init(ObjectClass *oc, void *data)
-+{
-+    NPCM7xxMachineClass *nmc =3D NPCM7XX_MACHINE_CLASS(oc);
-+    MachineClass *mc =3D MACHINE_CLASS(oc);
-+
-+    npcm7xx_set_soc_type(nmc, TYPE_NPCM730);
-+
-+    mc->desc =3D "Quanta GSJ (Cortex A9)";
-+    mc->init =3D quanta_gsj_init;
-+    mc->default_ram_size =3D 512 * MiB;
-+};
-+
-+static const TypeInfo npcm7xx_machine_types[] =3D {
-+    {
-+        .name           =3D TYPE_NPCM7XX_MACHINE,
-+        .parent         =3D TYPE_MACHINE,
-+        .instance_size  =3D sizeof(NPCM7xxMachine),
-+        .class_size     =3D sizeof(NPCM7xxMachineClass),
-+        .class_init     =3D npcm7xx_machine_class_init,
-+        .abstract       =3D true,
-+    }, {
-+        .name           =3D MACHINE_TYPE_NAME("npcm750-evb"),
-+        .parent         =3D TYPE_NPCM7XX_MACHINE,
-+        .class_init     =3D npcm750_evb_machine_class_init,
-+    }, {
-+        .name           =3D MACHINE_TYPE_NAME("quanta-gsj"),
-+        .parent         =3D TYPE_NPCM7XX_MACHINE,
-+        .class_init     =3D gsj_machine_class_init,
-+    },
-+};
-+
-+DEFINE_TYPES(npcm7xx_machine_types)
-diff --git a/hw/arm/meson.build b/hw/arm/meson.build
-index b0967c44c9..be39117b9b 100644
---- a/hw/arm/meson.build
-+++ b/hw/arm/meson.build
-@@ -13,7 +13,7 @@ arm_ss.add(when: 'CONFIG_MICROBIT', if_true: files('micro=
-bit.c'))
- arm_ss.add(when: 'CONFIG_MUSICPAL', if_true: files('musicpal.c'))
- arm_ss.add(when: 'CONFIG_NETDUINO2', if_true: files('netduino2.c'))
- arm_ss.add(when: 'CONFIG_NETDUINOPLUS2', if_true: files('netduinoplus2.c')=
-)
--arm_ss.add(when: 'CONFIG_NPCM7XX', if_true: files('npcm7xx.c'))
-+arm_ss.add(when: 'CONFIG_NPCM7XX', if_true: files('npcm7xx.c', 'npcm7xx_bo=
-ards.c'))
- arm_ss.add(when: 'CONFIG_NSERIES', if_true: files('nseries.c'))
- arm_ss.add(when: 'CONFIG_SX1', if_true: files('omap_sx1.c'))
- arm_ss.add(when: 'CONFIG_CHEETAH', if_true: files('palm.c'))
---=20
-2.28.0.526.ge36021eeef-goog
+Unless we change blk_log_writes_find_cur_log_sector() to return a
+negative errno code, we need to ret = -EINVAL here.  Let's keep this
+series simple.
+
+>>                  goto fail_log;
+>>              }
+>>  
+>> +            s->cur_log_sector = cur_log_sector;
+>>              s->nr_entries = le64_to_cpu(log_sb.nr_entries);
+>>          }
+>>      } else {
 
 
