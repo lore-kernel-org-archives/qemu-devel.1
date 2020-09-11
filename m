@@ -2,95 +2,82 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1742C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 05:31:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D94C43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 06:06:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78FB82087C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 05:31:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BfPET+RT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78FB82087C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2E24921D7E
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 06:06:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E24921D7E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGbf2-0006Mt-If
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 01:31:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53716)
+	id 1kGcCa-0006mp-51
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 02:06:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59318)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kGbe7-0005bK-Ex
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 01:30:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59966)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kGbe5-0003bQ-S9
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 01:30:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599802248;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=RzgFXvI9eaZCZJGYIKhWIRqz8mzckzKJNCqkTTcBtEM=;
- b=BfPET+RTVjGl7n6vLzU+Q/KhD0Jqhf7JHJlcyYl9YhS+UMr0k1A/+nGo3+TRFe8zLxrbfD
- bbMqz638A92uWHRrn0SWT69oUirF3EqS8OacbXSekpI+uqF0YQXymoycjyRN6q8DUj3CPn
- InjXvCUwCgGc58cSFjjiZ6RlYm4RLTA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-377-ic42sxApOcWnLrv1NRCxdg-1; Fri, 11 Sep 2020 01:30:45 -0400
-X-MC-Unique: ic42sxApOcWnLrv1NRCxdg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D426B873155;
- Fri, 11 Sep 2020 05:30:42 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
- [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7584860BF4;
- Fri, 11 Sep 2020 05:30:39 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id B03FE113865F; Fri, 11 Sep 2020 07:30:37 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH 07/14] block/blklogwrites: drop error propagation
-References: <20200909185930.26524-1-vsementsov@virtuozzo.com>
- <20200909185930.26524-8-vsementsov@virtuozzo.com>
- <20200910192440.695b8e81@bahia.lan>
- <878sdghoox.fsf@dusky.pond.sub.org>
-Date: Fri, 11 Sep 2020 07:30:37 +0200
-In-Reply-To: <878sdghoox.fsf@dusky.pond.sub.org> (Markus Armbruster's message
- of "Fri, 11 Sep 2020 07:23:10 +0200")
-Message-ID: <87r1r8g9s2.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kGcBr-0006LG-Kq
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 02:05:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42248)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kGcBp-0007vS-7K
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 02:05:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kGcBn-0005VY-Dc
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 06:05:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 65A102E80E9
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 06:05:39 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 23:26:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 11 Sep 2020 05:57:55 -0000
+From: Hansni Bu <1895080@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: hansni laurent-vivier
+X-Launchpad-Bug-Reporter: Hansni Bu (hansni)
+X-Launchpad-Bug-Modifier: Hansni Bu (hansni)
+References: <159970958159.31371.12301700684467003959.malonedeb@wampee.canonical.com>
+ <92de5ee0-629a-640a-d547-8c2d650742f2@vivier.eu>
+Message-Id: <CAGTPX+CB4JqdFGiWAuRH-uF_ponMZbQ871SOwJWO-MitSE3xLw@mail.gmail.com>
+Subject: Re: [Bug 1895080] [NEW] pgb_reserved_va: Assertion `addr == test'
+ failed
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: 7fc5892b3ba12e63ab7c2f045a8dc1ec600b4977
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 02:05:39
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -99,125 +86,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- berto@igalia.com, stefanha@redhat.com, qemu-block@nongnu.org,
- Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, pavel.dovgaluk@ispras.ru,
- pbonzini@redhat.com, mreitz@redhat.com, jsnow@redhat.com, ari@tuxera.com
+Reply-To: Bug 1895080 <1895080@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Markus Armbruster <armbru@redhat.com> writes:
-
-> Greg Kurz <groug@kaod.org> writes:
+> This problem occurs on CentOS-7.5 (64-bit) with qemu-5.1.0, qemu head
+> > (commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a) for riscv32-linux-
+> > user.
 >
->> On Wed,  9 Sep 2020 21:59:23 +0300
->> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
->>
->>> It's simple to avoid error propagation in blk_log_writes_open(), we
->>> just need to refactor blk_log_writes_find_cur_log_sector() a bit.
->>> 
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> ---
->>>  block/blklogwrites.c | 23 +++++++++++------------
->>>  1 file changed, 11 insertions(+), 12 deletions(-)
->>> 
->>> diff --git a/block/blklogwrites.c b/block/blklogwrites.c
->>> index 7ef046cee9..c7da507b2d 100644
->>> --- a/block/blklogwrites.c
->>> +++ b/block/blklogwrites.c
->>> @@ -96,10 +96,10 @@ static inline bool blk_log_writes_sector_size_valid(uint32_t sector_size)
->>>          sector_size < (1ull << 24);
->>>  }
->>>  
->>> -static uint64_t blk_log_writes_find_cur_log_sector(BdrvChild *log,
->>> -                                                   uint32_t sector_size,
->>> -                                                   uint64_t nr_entries,
->>> -                                                   Error **errp)
->>> +static int64_t blk_log_writes_find_cur_log_sector(BdrvChild *log,
->>> +                                                  uint32_t sector_size,
->>> +                                                  uint64_t nr_entries,
->>> +                                                  Error **errp)
->>>  {
->>>      uint64_t cur_sector = 1;
->>>      uint64_t cur_idx = 0;
->>> @@ -112,13 +112,13 @@ static uint64_t blk_log_writes_find_cur_log_sector(BdrvChild *log,
->>>          if (read_ret < 0) {
->>>              error_setg_errno(errp, -read_ret,
->>>                               "Failed to read log entry %"PRIu64, cur_idx);
->>> -            return (uint64_t)-1ull;
->>> +            return read_ret;
->>
->> This changes the error status of blk_log_writes_open() from -EINVAL to
->> whatever is returned by bdrv_pread(). I guess this is an improvement
->> worth to be mentioned in the changelog.
->>
->>>          }
->>>  
->>>          if (cur_entry.flags & ~cpu_to_le64(LOG_FLAG_MASK)) {
->>>              error_setg(errp, "Invalid flags 0x%"PRIx64" in log entry %"PRIu64,
->>>                         le64_to_cpu(cur_entry.flags), cur_idx);
->>> -            return (uint64_t)-1ull;
->>> +            return -EINVAL;
->>>          }
->>>  
->>>          /* Account for the sector of the entry itself */
->>> @@ -143,7 +143,6 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
->>>  {
->>>      BDRVBlkLogWritesState *s = bs->opaque;
->>>      QemuOpts *opts;
->>> -    Error *local_err = NULL;
->>>      int ret;
->>>      uint64_t log_sector_size;
->>>      bool log_append;
->>> @@ -215,15 +214,15 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
->>>          s->nr_entries = 0;
->>>  
->>>          if (blk_log_writes_sector_size_valid(log_sector_size)) {
->>> -            s->cur_log_sector =
->>> +            int64_t cur_log_sector =
->>>                  blk_log_writes_find_cur_log_sector(s->log_file, log_sector_size,
->>> -                                    le64_to_cpu(log_sb.nr_entries), &local_err);
->>> -            if (local_err) {
->>> -                ret = -EINVAL;
->>> -                error_propagate(errp, local_err);
->>> +                                    le64_to_cpu(log_sb.nr_entries), errp);
->>> +            if (cur_log_sector < 0) {
->>> +                ret = cur_log_sector;
->>
->> This is converting int64_t to int, which is usually not recommended.
->> In practice this is probably okay because cur_log_sector is supposed
->> to be a negative errno (ie. an int) in this case.
+> I tried to build qemu-5.1 on CentOS-7.5.1 but as python 3.5 is not
+> available, I gave up.
 >
-> It isn't: blk_log_writes_find_cur_log_sector() returns (uint64_t)-1ull
-> on error.
+
+Thank you for your effort. I installed python3 with yum:
+python3.x86_64                           3.6.8-10.el7              @centos
+Then maybe you can specify python3 in configure with
+"--python=3D/bin/python3" in case configure cannot find it.
+
+
 >
-> Aside: returning uint64_t is awkward.  We commonly use a signed integer
-> for non-negative offset or negative error.
+> > Firstly, compile fails:
+> > Compiling C object libqemu-riscv32-linux-user.fa.p/linux-user_strace.c.o
+> > ../qemu.git/linux-user/strace.c:1210:18: error: =E2=80=98FALLOC_FL_KEEP=
+_SIZE=E2=80=99
+> undeclared here (not in a function)
+> >      FLAG_GENERIC(FALLOC_FL_KEEP_SIZE),
+> >
+> > I have to add below include to linux-user/strace.c
+> > diff --git a/linux-user/strace.c b/linux-user/strace.c
+> > index 11fea14fba..22e51d4a8a 100644
+> > --- a/linux-user/strace.c
+> > +++ b/linux-user/strace.c
+> > @@ -7,6 +7,7 @@
+> >  #include <sys/mount.h>
+> >  #include <arpa/inet.h>
+> >  #include <netinet/tcp.h>
+> > +#include <linux/falloc.h>
+> >  #include <linux/if_packet.h>
+> >  #include <linux/netlink.h>
+> >  #include <sched.h>
 >
->> Maybe make this clear with a an assert(cur_log_sector >= INT_MIN) ?
+> In fact, fallocate(2) says fcntl.h must be included.
+> And qemu/osdep.h includes it.
+> So you should not have this problem.
 >
-> Unless we change blk_log_writes_find_cur_log_sector() to return a
-> negative errno code,
 
-Which the patch does.  I shouldn't review patches before breakfast.
+I tried to save the file after pre-processing, namely strace.i. Though
+_GNU_SOURCE is defined and fcntl.h is included, falloc.h is not included,
+in which FALLOC_FL_KEEP_SIZE is defined. I'm not sure if it's some
+environmental problem.
 
-> negative errno code, we need to ret = -EINVAL here.  Let's keep this
-> series simple.
+Thanks.
 
-No, the patch is okay as is.
+>
+> > Then trying qemu-riscv32 with a simple ELF, I get:
+> > linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test'
+> failed.
+> >
+> > strace shows that:
+> > mmap(0x1000, 4294963200, PROT_NONE,
+> MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE, -1, 0) =3D 0x10000
+> > write(2, "qemu-riscv32: ../qemu.git/linux-"..., 103qemu-riscv32:
+> ../qemu.git/linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =
+=3D=3D
+> test' failed.
+> > ) =3D 103
+> >
+> > The source code is in the function pgb_reserved_va (linux-
+> > user/elfload.c). I think mmap cannot guarantee that the returned pointer
+> > (test) equals to the parameter of addr. So is this a bug to assert (addr
+> > =3D=3D test)?
+>
+> I think Alex Benn=C3=A9e knows better this code than I do, so cc'ing him.
+>
+> Thnaks
+> Laurent
+>
+> --
+> You received this bug notification because you are subscribed to the bug
+> report.
+> https://bugs.launchpad.net/bugs/1895080
+>
+> Title:
+>   pgb_reserved_va: Assertion `addr =3D=3D test' failed
+>
+> Status in QEMU:
+>   New
+>
+> Bug description:
+>   This problem occurs on CentOS-7.5 (64-bit) with qemu-5.1.0, qemu head
+>   (commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a) for riscv32-linux-
+>   user.
+>
+>   Firstly, compile fails:
+>   Compiling C object libqemu-riscv32-linux-user.fa.p/linux-user_strace.c.o
+>   ../qemu.git/linux-user/strace.c:1210:18: error: =E2=80=98FALLOC_FL_KEEP=
+_SIZE=E2=80=99
+> undeclared here (not in a function)
+>        FLAG_GENERIC(FALLOC_FL_KEEP_SIZE),
+>
+>   I have to add below include to linux-user/strace.c
+>   diff --git a/linux-user/strace.c b/linux-user/strace.c
+>   index 11fea14fba..22e51d4a8a 100644
+>   --- a/linux-user/strace.c
+>   +++ b/linux-user/strace.c
+>   @@ -7,6 +7,7 @@
+>    #include <sys/mount.h>
+>    #include <arpa/inet.h>
+>    #include <netinet/tcp.h>
+>   +#include <linux/falloc.h>
+>    #include <linux/if_packet.h>
+>    #include <linux/netlink.h>
+>    #include <sched.h>
+>
+>   Then trying qemu-riscv32 with a simple ELF, I get:
+>   linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test'
+> failed.
+>
+>   strace shows that:
+>   mmap(0x1000, 4294963200, PROT_NONE,
+> MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE, -1, 0) =3D 0x10000
+>   write(2, "qemu-riscv32: ../qemu.git/linux-"..., 103qemu-riscv32:
+> ../qemu.git/linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =
+=3D=3D
+> test' failed.
+>   ) =3D 103
+>
+>   The source code is in the function pgb_reserved_va (linux-
+>   user/elfload.c). I think mmap cannot guarantee that the returned
+>   pointer (test) equals to the parameter of addr. So is this a bug to
+>   assert (addr =3D=3D test)?
+>
+>   Attached configure script and test ELF file.
+>
+>   Thanks.
+>
+> To manage notifications about this bug go to:
+> https://bugs.launchpad.net/qemu/+bug/1895080/+subscriptions
+>
 
-Dumbing it down to keep it simple would also be okay.
+-- =
 
-Regarding the proposed assertion: do we protect similar conversions from
-over-wide negative errno int elsewhere?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1895080
 
->>>                  goto fail_log;
->>>              }
->>>  
->>> +            s->cur_log_sector = cur_log_sector;
->>>              s->nr_entries = le64_to_cpu(log_sb.nr_entries);
->>>          }
->>>      } else {
+Title:
+  pgb_reserved_va: Assertion `addr =3D=3D test' failed
 
+Status in QEMU:
+  New
+
+Bug description:
+  This problem occurs on CentOS-7.5 (64-bit) with qemu-5.1.0, qemu head
+  (commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a) for riscv32-linux-
+  user.
+
+  Firstly, compile fails:
+  Compiling C object libqemu-riscv32-linux-user.fa.p/linux-user_strace.c.o
+  ../qemu.git/linux-user/strace.c:1210:18: error: =E2=80=98FALLOC_FL_KEEP_S=
+IZE=E2=80=99 undeclared here (not in a function)
+       FLAG_GENERIC(FALLOC_FL_KEEP_SIZE),
+
+  I have to add below include to linux-user/strace.c
+  diff --git a/linux-user/strace.c b/linux-user/strace.c
+  index 11fea14fba..22e51d4a8a 100644
+  --- a/linux-user/strace.c
+  +++ b/linux-user/strace.c
+  @@ -7,6 +7,7 @@
+   #include <sys/mount.h>
+   #include <arpa/inet.h>
+   #include <netinet/tcp.h>
+  +#include <linux/falloc.h>
+   #include <linux/if_packet.h>
+   #include <linux/netlink.h>
+   #include <sched.h>
+
+  Then trying qemu-riscv32 with a simple ELF, I get:
+  linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test' =
+failed.
+
+  strace shows that:
+  mmap(0x1000, 4294963200, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESER=
+VE, -1, 0) =3D 0x10000
+  write(2, "qemu-riscv32: ../qemu.git/linux-"..., 103qemu-riscv32: ../qemu.=
+git/linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test=
+' failed.
+  ) =3D 103
+
+  The source code is in the function pgb_reserved_va (linux-
+  user/elfload.c). I think mmap cannot guarantee that the returned
+  pointer (test) equals to the parameter of addr. So is this a bug to
+  assert (addr =3D=3D test)?
+
+  Attached configure script and test ELF file.
+
+  Thanks.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1895080/+subscriptions
 
