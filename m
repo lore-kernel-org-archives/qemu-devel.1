@@ -2,74 +2,88 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51965C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 20:17:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F1FDC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 20:45:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF88821D81
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 20:17:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 84A9F221EB
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 20:45:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="Bz8oLOU0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF88821D81
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ODhbeB9C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84A9F221EB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGpUJ-0006Db-Hj
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 16:17:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54470)
+	id 1kGpvU-0006Xp-Cp
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 16:45:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33328)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc.michel@greensocs.com>)
- id 1kGpRY-0005B9-H3; Fri, 11 Sep 2020 16:14:48 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:33794)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc.michel@greensocs.com>)
- id 1kGpRW-00067u-FF; Fri, 11 Sep 2020 16:14:48 -0400
-Received: from [172.17.10.18] (unknown [172.17.10.18])
- by beetle.greensocs.com (Postfix) with ESMTPSA id D5BE321C1F;
- Fri, 11 Sep 2020 20:14:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1599855284;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=i88TfxeGEFU+vElX5ESO4RbOvSDOvcZGyygm/y17c4k=;
- b=Bz8oLOU0j7dQVPEt9hMostWx1smZmYbOl1XJIp86G3hLZBZLTig0CDAcSPu1mwJ/owTTcR
- hLTSvXc2GwYjmnacLXQbesQJGXDXHgee+L7CIvdldZi2JUHFMUQ6ditG+sVSPJwbCgrDjW
- H5T3SeRmNlzdhLBFVexfCEmImLtemoI=
-Subject: Re: [PATCH v5 6/7] hw/misc/mps2-scc: Use the LED device
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200910205429.727766-1-f4bug@amsat.org>
- <20200910205429.727766-7-f4bug@amsat.org>
-From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <6d07fc49-b86b-4ec6-66de-470515b12487@greensocs.com>
-Date: Fri, 11 Sep 2020 22:15:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kGpuL-0005gR-PB; Fri, 11 Sep 2020 16:44:35 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:34430)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kGpuI-0002TJ-P9; Fri, 11 Sep 2020 16:44:33 -0400
+Received: by mail-il1-x141.google.com with SMTP id a8so10242319ilk.1;
+ Fri, 11 Sep 2020 13:44:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=dhjFaTfPFQdEGA1ATP1V1t0XWhagAtXsiHjtfnejfLc=;
+ b=ODhbeB9CEqrEUmIbo9g0dTI1jc9Qq1SVF4TCRfXl3eUInqo9kN4d5oNuMeEZXs6mjh
+ Bb4wRpZArKDC1zQCn4JvMQOCjPT3qH1pTyvROpyaXWCXs2NCbpEU2X7YDox3uZhCNgDp
+ 0/4Ouw56uTCB2Ea/2npCc7g/GUjyZ58g7nkIek675eblt9KG54Vlw0JaZPXmPp7/JqeK
+ pmng7+GuqXcQIfwhzzP6CK+swY095jA+w1FGObadUwHn9K7B1Cng5BTK5Z/phI8vPv9O
+ mXMgMcW6gmFcEqaLSnzCu1vEA2yQfUczp8ZuRIYKJZ17rW9yT/Gq/3Nun8pObTgclHCP
+ vJ7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=dhjFaTfPFQdEGA1ATP1V1t0XWhagAtXsiHjtfnejfLc=;
+ b=nlk2+Lt/ul2YcMEUR2lTNzt97VJt+T8tUM7iXTzpWOk4rPa1l94TaLhaksHRzjzl/2
+ iMiYswmwIVXMBHns5rAn2rQbT7hnqYb6vfMIsrMiwk3kPvG7E6lbcSkV8MMLiI8eKkaA
+ XyFULbtjzlVvkdv9Wv7yTjF4SzQxsi5pbi/jqa8u/Gw1KOS0Xajo+GMzW/3zzLWDFrys
+ gduN70PWmuBhPI6gQuvMFGQBvrIyfdGALvbwSMeEznaP+Jb8ZEAb5Y3sjm7uDA9aiS62
+ VLGyusngVzc/GwDOOo2y5TI3ahqPLQBh3Vc8Do3KcFClg0RqPdTNlHqSfSPP9qihmOJb
+ dyWg==
+X-Gm-Message-State: AOAM533UQVHQ2knXyPgV3JthPBP7eumEgtrlyuOt6pvV+1QPKibfXUhJ
+ wjXrWPmJbn+vu1f1KsdjPREnHQLS81JLxdSZ7mk=
+X-Google-Smtp-Source: ABdhPJyZzjLf6RjgdYNe7aIlL1tbUe7GlrhjA+VL66WoBnelsaCmZ1L1qhxTORsEa8ssiXzrI+p5BsjMM8DNBAe1gg8=
+X-Received: by 2002:a92:589a:: with SMTP id z26mr3393227ilf.267.1599857067995; 
+ Fri, 11 Sep 2020 13:44:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200910205429.727766-7-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=5.135.226.135;
- envelope-from=luc.michel@greensocs.com; helo=beetle.greensocs.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 15:41:15
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -45
-X-Spam_score: -4.6
-X-Spam_bar: ----
-X-Spam_report: (-4.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.469,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200911173447.165713-1-ehabkost@redhat.com>
+ <20200911173447.165713-3-ehabkost@redhat.com>
+In-Reply-To: <20200911173447.165713-3-ehabkost@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 11 Sep 2020 13:33:24 -0700
+Message-ID: <CAKmqyKOLK0xss-66Qs7t+CWUfo4Opei__R9jS0VAwFGsifwA7w@mail.gmail.com>
+Subject: Re: [PATCH v4 2/2] sifive_u: Rename memmap enum constants
+To: Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,159 +96,564 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
- qemu-arm@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Joel Stanley <joel@jms.id.au>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/10/20 10:54 PM, Philippe Mathieu-Daudé wrote:
-> Per the 'ARM MPS2 and MPS2+ FPGA Prototyping Boards Technical
-> Reference Manual' (100112_0200_07_en):
-> 
->    2.1  Overview of the MPS2 and MPS2+ hardware
-> 
->         The MPS2 and MPS2+ FPGA Prototyping Boards contain the
->         following components and interfaces:
-> 
->         * User switches and user LEDs:
-> 
->           - Two green LEDs and two push buttons that connect to
->             the FPGA.
->           - Eight green LEDs and one 8-way dip switch that connect
->             to the MCC.
-> 
-> Add the 8 LEDs connected to the MCC.
-> 
-> This remplaces the 'mps2_scc_leds' trace events by the generic
-replaces
-> 'led_set_intensity' event.
+On Fri, Sep 11, 2020 at 10:35 AM Eduardo Habkost <ehabkost@redhat.com> wrot=
+e:
+>
+> Some of the enum constant names conflict with the QOM type check
+> macros (SIFIVE_U_OTP, SIFIVE_U_PRCI).  This needs to be addressed
+> to allow us to transform the QOM type check macros into functions
+> generated by OBJECT_DECLARE_TYPE().
+>
+> Rename all the constants to SIFIVE_U_DEV_*, to avoid conflicts.
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-Same as patch 5, I think you need to reset your LEDs in mps2_scc_reset.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Also, see below for a superfluous new line.
+Alistair
 
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
-> https://youtu.be/l9kD70uPchk?t=288
+> Changes v3 -> v4:
+> * Patch recreated, rebased to tags/pull-riscv-to-apply-20200910
+>
+> Link to v3:
+> https://lore.kernel.org/qemu-devel/20200825192110.3528606-10-ehabkost@red=
+hat.com/
+>
+> Changes v2 -> v3:
+> * Solved conflicts on rebase to latest qemu.git
+> * As this is a new patch, Reviewed-by lines from Alistair Francis
+>   and Daniel P. Berrang=C3=A9 were dropped
+>
+> Changes v1 -> v2:
+> * Added more details to commit message
 > ---
->   include/hw/misc/mps2-scc.h |  2 ++
->   hw/misc/mps2-scc.c         | 25 ++++++++++++++-----------
->   hw/misc/Kconfig            |  1 +
->   hw/misc/trace-events       |  1 -
->   4 files changed, 17 insertions(+), 12 deletions(-)
-> 
-> diff --git a/include/hw/misc/mps2-scc.h b/include/hw/misc/mps2-scc.h
-> index 7045473788b..8542f384227 100644
-> --- a/include/hw/misc/mps2-scc.h
-> +++ b/include/hw/misc/mps2-scc.h
-> @@ -13,6 +13,7 @@
->   #define MPS2_SCC_H
->   
->   #include "hw/sysbus.h"
-> +#include "hw/misc/led.h"
->   
->   #define TYPE_MPS2_SCC "mps2-scc"
->   #define MPS2_SCC(obj) OBJECT_CHECK(MPS2SCC, (obj), TYPE_MPS2_SCC)
-> @@ -25,6 +26,7 @@ typedef struct {
->   
->       /*< public >*/
->       MemoryRegion iomem;
-> +    LEDState *led[8];
->   
->       uint32_t cfg0;
->       uint32_t cfg1;
-> diff --git a/hw/misc/mps2-scc.c b/hw/misc/mps2-scc.c
-> index 9d0909e7b35..745505b849d 100644
-> --- a/hw/misc/mps2-scc.c
-> +++ b/hw/misc/mps2-scc.c
-> @@ -20,11 +20,13 @@
->   #include "qemu/osdep.h"
->   #include "qemu/log.h"
->   #include "qemu/module.h"
-> +#include "qemu/bitops.h"
->   #include "trace.h"
->   #include "hw/sysbus.h"
->   #include "migration/vmstate.h"
->   #include "hw/registerfields.h"
->   #include "hw/misc/mps2-scc.h"
-> +#include "hw/misc/led.h"
->   #include "hw/qdev-properties.h"
->   
->   REG32(CFG0, 0)
-> @@ -152,18 +154,10 @@ static void mps2_scc_write(void *opaque, hwaddr offset, uint64_t value,
->           s->cfg0 = value;
->           break;
->       case A_CFG1:
-> -        /* CFG1 bits [7:0] control the board LEDs. We don't currently have
-> -         * a mechanism for displaying this graphically, so use a trace event.
-> -         */
-> -        trace_mps2_scc_leds(value & 0x80 ? '*' : '.',
-> -                            value & 0x40 ? '*' : '.',
-> -                            value & 0x20 ? '*' : '.',
-> -                            value & 0x10 ? '*' : '.',
-> -                            value & 0x08 ? '*' : '.',
-> -                            value & 0x04 ? '*' : '.',
-> -                            value & 0x02 ? '*' : '.',
-> -                            value & 0x01 ? '*' : '.');
->           s->cfg1 = value;
-> +        for (size_t i = 0; i < ARRAY_SIZE(s->led); i++) {
-> +            led_set_state(s->led[i], extract32(value, i, 1));
-> +        }
->           break;
->       case A_CFGDATA_OUT:
->           s->cfgdata_out = value;
-> @@ -245,10 +239,19 @@ static void mps2_scc_init(Object *obj)
->   
->       memory_region_init_io(&s->iomem, obj, &mps2_scc_ops, s, "mps2-scc", 0x1000);
->       sysbus_init_mmio(sbd, &s->iomem);
-> +
-Superfluous new line.
-
--- 
-Luc
->   }
->   
->   static void mps2_scc_realize(DeviceState *dev, Error **errp)
->   {
-> +    MPS2SCC *s = MPS2_SCC(dev);
-> +
-> +    for (size_t i = 0; i < ARRAY_SIZE(s->led); i++) {
-> +        char *name = g_strdup_printf("SCC LED%zu", i);
-> +        s->led[i] = led_create_simple(OBJECT(dev), GPIO_POLARITY_ACTIVE_HIGH,
-> +                                      LED_COLOR_GREEN, name);
-> +        g_free(name);
-> +    }
->   }
->   
->   static const VMStateDescription mps2_scc_vmstate = {
-> diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-> index 0cecad45aad..7557a3e7b46 100644
-> --- a/hw/misc/Kconfig
-> +++ b/hw/misc/Kconfig
-> @@ -97,6 +97,7 @@ config MPS2_FPGAIO
->   
->   config MPS2_SCC
->       bool
-> +    select LED
->   
->   config TZ_MPC
->       bool
-> diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-> index 43b9e0cf250..a620a358feb 100644
-> --- a/hw/misc/trace-events
-> +++ b/hw/misc/trace-events
-> @@ -85,7 +85,6 @@ aspeed_scu_write(uint64_t offset, unsigned size, uint32_t data) "To 0x%" PRIx64
->   mps2_scc_read(uint64_t offset, uint64_t data, unsigned size) "MPS2 SCC read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
->   mps2_scc_write(uint64_t offset, uint64_t data, unsigned size) "MPS2 SCC write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
->   mps2_scc_reset(void) "MPS2 SCC: reset"
-> -mps2_scc_leds(char led7, char led6, char led5, char led4, char led3, char led2, char led1, char led0) "MPS2 SCC LEDs: %c%c%c%c%c%c%c%c"
->   mps2_scc_cfg_write(unsigned function, unsigned device, uint32_t value) "MPS2 SCC config write: function %d device %d data 0x%" PRIx32
->   mps2_scc_cfg_read(unsigned function, unsigned device, uint32_t value) "MPS2 SCC config read: function %d device %d data 0x%" PRIx32
->   
-> 
+> Cc: Palmer Dabbelt <palmer@dabbelt.com>
+> Cc: Alistair Francis <Alistair.Francis@wdc.com>
+> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Cc: qemu-riscv@nongnu.org
+> Cc: qemu-devel@nongnu.org
+> ---
+>  include/hw/riscv/sifive_u.h |  34 ++++----
+>  hw/riscv/sifive_u.c         | 156 ++++++++++++++++++------------------
+>  2 files changed, 95 insertions(+), 95 deletions(-)
+>
+> diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+> index fe5c580845..22e7e6efa1 100644
+> --- a/include/hw/riscv/sifive_u.h
+> +++ b/include/hw/riscv/sifive_u.h
+> @@ -70,23 +70,23 @@ typedef struct SiFiveUState {
+>  } SiFiveUState;
+>
+>  enum {
+> -    SIFIVE_U_DEBUG,
+> -    SIFIVE_U_MROM,
+> -    SIFIVE_U_CLINT,
+> -    SIFIVE_U_L2CC,
+> -    SIFIVE_U_PDMA,
+> -    SIFIVE_U_L2LIM,
+> -    SIFIVE_U_PLIC,
+> -    SIFIVE_U_PRCI,
+> -    SIFIVE_U_UART0,
+> -    SIFIVE_U_UART1,
+> -    SIFIVE_U_GPIO,
+> -    SIFIVE_U_OTP,
+> -    SIFIVE_U_DMC,
+> -    SIFIVE_U_FLASH0,
+> -    SIFIVE_U_DRAM,
+> -    SIFIVE_U_GEM,
+> -    SIFIVE_U_GEM_MGMT
+> +    SIFIVE_U_DEV_DEBUG,
+> +    SIFIVE_U_DEV_MROM,
+> +    SIFIVE_U_DEV_CLINT,
+> +    SIFIVE_U_DEV_L2CC,
+> +    SIFIVE_U_DEV_PDMA,
+> +    SIFIVE_U_DEV_L2LIM,
+> +    SIFIVE_U_DEV_PLIC,
+> +    SIFIVE_U_DEV_PRCI,
+> +    SIFIVE_U_DEV_UART0,
+> +    SIFIVE_U_DEV_UART1,
+> +    SIFIVE_U_DEV_GPIO,
+> +    SIFIVE_U_DEV_OTP,
+> +    SIFIVE_U_DEV_DMC,
+> +    SIFIVE_U_DEV_FLASH0,
+> +    SIFIVE_U_DEV_DRAM,
+> +    SIFIVE_U_DEV_GEM,
+> +    SIFIVE_U_DEV_GEM_MGMT
+>  };
+>
+>  enum {
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index 4f12a93188..a97637fb33 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -70,23 +70,23 @@ static const struct MemmapEntry {
+>      hwaddr base;
+>      hwaddr size;
+>  } sifive_u_memmap[] =3D {
+> -    [SIFIVE_U_DEBUG] =3D    {        0x0,      0x100 },
+> -    [SIFIVE_U_MROM] =3D     {     0x1000,     0xf000 },
+> -    [SIFIVE_U_CLINT] =3D    {  0x2000000,    0x10000 },
+> -    [SIFIVE_U_L2CC] =3D     {  0x2010000,     0x1000 },
+> -    [SIFIVE_U_PDMA] =3D     {  0x3000000,   0x100000 },
+> -    [SIFIVE_U_L2LIM] =3D    {  0x8000000,  0x2000000 },
+> -    [SIFIVE_U_PLIC] =3D     {  0xc000000,  0x4000000 },
+> -    [SIFIVE_U_PRCI] =3D     { 0x10000000,     0x1000 },
+> -    [SIFIVE_U_UART0] =3D    { 0x10010000,     0x1000 },
+> -    [SIFIVE_U_UART1] =3D    { 0x10011000,     0x1000 },
+> -    [SIFIVE_U_GPIO] =3D     { 0x10060000,     0x1000 },
+> -    [SIFIVE_U_OTP] =3D      { 0x10070000,     0x1000 },
+> -    [SIFIVE_U_GEM] =3D      { 0x10090000,     0x2000 },
+> -    [SIFIVE_U_GEM_MGMT] =3D { 0x100a0000,     0x1000 },
+> -    [SIFIVE_U_DMC] =3D      { 0x100b0000,    0x10000 },
+> -    [SIFIVE_U_FLASH0] =3D   { 0x20000000, 0x10000000 },
+> -    [SIFIVE_U_DRAM] =3D     { 0x80000000,        0x0 },
+> +    [SIFIVE_U_DEV_DEBUG] =3D    {        0x0,      0x100 },
+> +    [SIFIVE_U_DEV_MROM] =3D     {     0x1000,     0xf000 },
+> +    [SIFIVE_U_DEV_CLINT] =3D    {  0x2000000,    0x10000 },
+> +    [SIFIVE_U_DEV_L2CC] =3D     {  0x2010000,     0x1000 },
+> +    [SIFIVE_U_DEV_PDMA] =3D     {  0x3000000,   0x100000 },
+> +    [SIFIVE_U_DEV_L2LIM] =3D    {  0x8000000,  0x2000000 },
+> +    [SIFIVE_U_DEV_PLIC] =3D     {  0xc000000,  0x4000000 },
+> +    [SIFIVE_U_DEV_PRCI] =3D     { 0x10000000,     0x1000 },
+> +    [SIFIVE_U_DEV_UART0] =3D    { 0x10010000,     0x1000 },
+> +    [SIFIVE_U_DEV_UART1] =3D    { 0x10011000,     0x1000 },
+> +    [SIFIVE_U_DEV_GPIO] =3D     { 0x10060000,     0x1000 },
+> +    [SIFIVE_U_DEV_OTP] =3D      { 0x10070000,     0x1000 },
+> +    [SIFIVE_U_DEV_GEM] =3D      { 0x10090000,     0x2000 },
+> +    [SIFIVE_U_DEV_GEM_MGMT] =3D { 0x100a0000,     0x1000 },
+> +    [SIFIVE_U_DEV_DMC] =3D      { 0x100b0000,    0x10000 },
+> +    [SIFIVE_U_DEV_FLASH0] =3D   { 0x20000000, 0x10000000 },
+> +    [SIFIVE_U_DEV_DRAM] =3D     { 0x80000000,        0x0 },
+>  };
+>
+>  #define OTP_SERIAL          1
+> @@ -145,10 +145,10 @@ static void create_fdt(SiFiveUState *s, const struc=
+t MemmapEntry *memmap,
+>      g_free(nodename);
+>
+>      nodename =3D g_strdup_printf("/memory@%lx",
+> -        (long)memmap[SIFIVE_U_DRAM].base);
+> +        (long)memmap[SIFIVE_U_DEV_DRAM].base);
+>      qemu_fdt_add_subnode(fdt, nodename);
+>      qemu_fdt_setprop_cells(fdt, nodename, "reg",
+> -        memmap[SIFIVE_U_DRAM].base >> 32, memmap[SIFIVE_U_DRAM].base,
+> +        memmap[SIFIVE_U_DEV_DRAM].base >> 32, memmap[SIFIVE_U_DEV_DRAM].=
+base,
+>          mem_size >> 32, mem_size);
+>      qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+>      g_free(nodename);
+> @@ -203,39 +203,39 @@ static void create_fdt(SiFiveUState *s, const struc=
+t MemmapEntry *memmap,
+>          g_free(nodename);
+>      }
+>      nodename =3D g_strdup_printf("/soc/clint@%lx",
+> -        (long)memmap[SIFIVE_U_CLINT].base);
+> +        (long)memmap[SIFIVE_U_DEV_CLINT].base);
+>      qemu_fdt_add_subnode(fdt, nodename);
+>      qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,clint0")=
+;
+>      qemu_fdt_setprop_cells(fdt, nodename, "reg",
+> -        0x0, memmap[SIFIVE_U_CLINT].base,
+> -        0x0, memmap[SIFIVE_U_CLINT].size);
+> +        0x0, memmap[SIFIVE_U_DEV_CLINT].base,
+> +        0x0, memmap[SIFIVE_U_DEV_CLINT].size);
+>      qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
+>          cells, ms->smp.cpus * sizeof(uint32_t) * 4);
+>      g_free(cells);
+>      g_free(nodename);
+>
+>      nodename =3D g_strdup_printf("/soc/otp@%lx",
+> -        (long)memmap[SIFIVE_U_OTP].base);
+> +        (long)memmap[SIFIVE_U_DEV_OTP].base);
+>      qemu_fdt_add_subnode(fdt, nodename);
+>      qemu_fdt_setprop_cell(fdt, nodename, "fuse-count", SIFIVE_U_OTP_REG_=
+SIZE);
+>      qemu_fdt_setprop_cells(fdt, nodename, "reg",
+> -        0x0, memmap[SIFIVE_U_OTP].base,
+> -        0x0, memmap[SIFIVE_U_OTP].size);
+> +        0x0, memmap[SIFIVE_U_DEV_OTP].base,
+> +        0x0, memmap[SIFIVE_U_DEV_OTP].size);
+>      qemu_fdt_setprop_string(fdt, nodename, "compatible",
+>          "sifive,fu540-c000-otp");
+>      g_free(nodename);
+>
+>      prci_phandle =3D phandle++;
+>      nodename =3D g_strdup_printf("/soc/clock-controller@%lx",
+> -        (long)memmap[SIFIVE_U_PRCI].base);
+> +        (long)memmap[SIFIVE_U_DEV_PRCI].base);
+>      qemu_fdt_add_subnode(fdt, nodename);
+>      qemu_fdt_setprop_cell(fdt, nodename, "phandle", prci_phandle);
+>      qemu_fdt_setprop_cell(fdt, nodename, "#clock-cells", 0x1);
+>      qemu_fdt_setprop_cells(fdt, nodename, "clocks",
+>          hfclk_phandle, rtcclk_phandle);
+>      qemu_fdt_setprop_cells(fdt, nodename, "reg",
+> -        0x0, memmap[SIFIVE_U_PRCI].base,
+> -        0x0, memmap[SIFIVE_U_PRCI].size);
+> +        0x0, memmap[SIFIVE_U_DEV_PRCI].base,
+> +        0x0, memmap[SIFIVE_U_DEV_PRCI].size);
+>      qemu_fdt_setprop_string(fdt, nodename, "compatible",
+>          "sifive,fu540-c000-prci");
+>      g_free(nodename);
+> @@ -259,7 +259,7 @@ static void create_fdt(SiFiveUState *s, const struct =
+MemmapEntry *memmap,
+>          g_free(nodename);
+>      }
+>      nodename =3D g_strdup_printf("/soc/interrupt-controller@%lx",
+> -        (long)memmap[SIFIVE_U_PLIC].base);
+> +        (long)memmap[SIFIVE_U_DEV_PLIC].base);
+>      qemu_fdt_add_subnode(fdt, nodename);
+>      qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells", 1);
+>      qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,plic0");
+> @@ -267,8 +267,8 @@ static void create_fdt(SiFiveUState *s, const struct =
+MemmapEntry *memmap,
+>      qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
+>          cells, (ms->smp.cpus * 4 - 2) * sizeof(uint32_t));
+>      qemu_fdt_setprop_cells(fdt, nodename, "reg",
+> -        0x0, memmap[SIFIVE_U_PLIC].base,
+> -        0x0, memmap[SIFIVE_U_PLIC].size);
+> +        0x0, memmap[SIFIVE_U_DEV_PLIC].base,
+> +        0x0, memmap[SIFIVE_U_DEV_PLIC].size);
+>      qemu_fdt_setprop_cell(fdt, nodename, "riscv,ndev", 0x35);
+>      qemu_fdt_setprop_cell(fdt, nodename, "phandle", plic_phandle);
+>      plic_phandle =3D qemu_fdt_get_phandle(fdt, nodename);
+> @@ -277,7 +277,7 @@ static void create_fdt(SiFiveUState *s, const struct =
+MemmapEntry *memmap,
+>
+>      gpio_phandle =3D phandle++;
+>      nodename =3D g_strdup_printf("/soc/gpio@%lx",
+> -        (long)memmap[SIFIVE_U_GPIO].base);
+> +        (long)memmap[SIFIVE_U_DEV_GPIO].base);
+>      qemu_fdt_add_subnode(fdt, nodename);
+>      qemu_fdt_setprop_cell(fdt, nodename, "phandle", gpio_phandle);
+>      qemu_fdt_setprop_cells(fdt, nodename, "clocks",
+> @@ -287,8 +287,8 @@ static void create_fdt(SiFiveUState *s, const struct =
+MemmapEntry *memmap,
+>      qemu_fdt_setprop_cell(fdt, nodename, "#gpio-cells", 2);
+>      qemu_fdt_setprop(fdt, nodename, "gpio-controller", NULL, 0);
+>      qemu_fdt_setprop_cells(fdt, nodename, "reg",
+> -        0x0, memmap[SIFIVE_U_GPIO].base,
+> -        0x0, memmap[SIFIVE_U_GPIO].size);
+> +        0x0, memmap[SIFIVE_U_DEV_GPIO].base,
+> +        0x0, memmap[SIFIVE_U_DEV_GPIO].size);
+>      qemu_fdt_setprop_cells(fdt, nodename, "interrupts", SIFIVE_U_GPIO_IR=
+Q0,
+>          SIFIVE_U_GPIO_IRQ1, SIFIVE_U_GPIO_IRQ2, SIFIVE_U_GPIO_IRQ3,
+>          SIFIVE_U_GPIO_IRQ4, SIFIVE_U_GPIO_IRQ5, SIFIVE_U_GPIO_IRQ6,
+> @@ -306,7 +306,7 @@ static void create_fdt(SiFiveUState *s, const struct =
+MemmapEntry *memmap,
+>      g_free(nodename);
+>
+>      nodename =3D g_strdup_printf("/soc/dma@%lx",
+> -        (long)memmap[SIFIVE_U_PDMA].base);
+> +        (long)memmap[SIFIVE_U_DEV_PDMA].base);
+>      qemu_fdt_add_subnode(fdt, nodename);
+>      qemu_fdt_setprop_cell(fdt, nodename, "#dma-cells", 1);
+>      qemu_fdt_setprop_cells(fdt, nodename, "interrupts",
+> @@ -315,18 +315,18 @@ static void create_fdt(SiFiveUState *s, const struc=
+t MemmapEntry *memmap,
+>          SIFIVE_U_PDMA_IRQ6, SIFIVE_U_PDMA_IRQ7);
+>      qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandl=
+e);
+>      qemu_fdt_setprop_cells(fdt, nodename, "reg",
+> -        0x0, memmap[SIFIVE_U_PDMA].base,
+> -        0x0, memmap[SIFIVE_U_PDMA].size);
+> +        0x0, memmap[SIFIVE_U_DEV_PDMA].base,
+> +        0x0, memmap[SIFIVE_U_DEV_PDMA].size);
+>      qemu_fdt_setprop_string(fdt, nodename, "compatible",
+>                              "sifive,fu540-c000-pdma");
+>      g_free(nodename);
+>
+>      nodename =3D g_strdup_printf("/soc/cache-controller@%lx",
+> -        (long)memmap[SIFIVE_U_L2CC].base);
+> +        (long)memmap[SIFIVE_U_DEV_L2CC].base);
+>      qemu_fdt_add_subnode(fdt, nodename);
+>      qemu_fdt_setprop_cells(fdt, nodename, "reg",
+> -        0x0, memmap[SIFIVE_U_L2CC].base,
+> -        0x0, memmap[SIFIVE_U_L2CC].size);
+> +        0x0, memmap[SIFIVE_U_DEV_L2CC].base,
+> +        0x0, memmap[SIFIVE_U_DEV_L2CC].size);
+>      qemu_fdt_setprop_cells(fdt, nodename, "interrupts",
+>          SIFIVE_U_L2CC_IRQ0, SIFIVE_U_L2CC_IRQ1, SIFIVE_U_L2CC_IRQ2);
+>      qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandl=
+e);
+> @@ -341,15 +341,15 @@ static void create_fdt(SiFiveUState *s, const struc=
+t MemmapEntry *memmap,
+>
+>      phy_phandle =3D phandle++;
+>      nodename =3D g_strdup_printf("/soc/ethernet@%lx",
+> -        (long)memmap[SIFIVE_U_GEM].base);
+> +        (long)memmap[SIFIVE_U_DEV_GEM].base);
+>      qemu_fdt_add_subnode(fdt, nodename);
+>      qemu_fdt_setprop_string(fdt, nodename, "compatible",
+>          "sifive,fu540-c000-gem");
+>      qemu_fdt_setprop_cells(fdt, nodename, "reg",
+> -        0x0, memmap[SIFIVE_U_GEM].base,
+> -        0x0, memmap[SIFIVE_U_GEM].size,
+> -        0x0, memmap[SIFIVE_U_GEM_MGMT].base,
+> -        0x0, memmap[SIFIVE_U_GEM_MGMT].size);
+> +        0x0, memmap[SIFIVE_U_DEV_GEM].base,
+> +        0x0, memmap[SIFIVE_U_DEV_GEM].size,
+> +        0x0, memmap[SIFIVE_U_DEV_GEM_MGMT].base,
+> +        0x0, memmap[SIFIVE_U_DEV_GEM_MGMT].size);
+>      qemu_fdt_setprop_string(fdt, nodename, "reg-names", "control");
+>      qemu_fdt_setprop_string(fdt, nodename, "phy-mode", "gmii");
+>      qemu_fdt_setprop_cell(fdt, nodename, "phy-handle", phy_phandle);
+> @@ -370,19 +370,19 @@ static void create_fdt(SiFiveUState *s, const struc=
+t MemmapEntry *memmap,
+>      g_free(nodename);
+>
+>      nodename =3D g_strdup_printf("/soc/ethernet@%lx/ethernet-phy@0",
+> -        (long)memmap[SIFIVE_U_GEM].base);
+> +        (long)memmap[SIFIVE_U_DEV_GEM].base);
+>      qemu_fdt_add_subnode(fdt, nodename);
+>      qemu_fdt_setprop_cell(fdt, nodename, "phandle", phy_phandle);
+>      qemu_fdt_setprop_cell(fdt, nodename, "reg", 0x0);
+>      g_free(nodename);
+>
+>      nodename =3D g_strdup_printf("/soc/serial@%lx",
+> -        (long)memmap[SIFIVE_U_UART0].base);
+> +        (long)memmap[SIFIVE_U_DEV_UART0].base);
+>      qemu_fdt_add_subnode(fdt, nodename);
+>      qemu_fdt_setprop_string(fdt, nodename, "compatible", "sifive,uart0")=
+;
+>      qemu_fdt_setprop_cells(fdt, nodename, "reg",
+> -        0x0, memmap[SIFIVE_U_UART0].base,
+> -        0x0, memmap[SIFIVE_U_UART0].size);
+> +        0x0, memmap[SIFIVE_U_DEV_UART0].base,
+> +        0x0, memmap[SIFIVE_U_DEV_UART0].size);
+>      qemu_fdt_setprop_cells(fdt, nodename, "clocks",
+>          prci_phandle, PRCI_CLK_TLCLK);
+>      qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandl=
+e);
+> @@ -414,7 +414,7 @@ static void sifive_u_machine_init(MachineState *machi=
+ne)
+>      MemoryRegion *system_memory =3D get_system_memory();
+>      MemoryRegion *main_mem =3D g_new(MemoryRegion, 1);
+>      MemoryRegion *flash0 =3D g_new(MemoryRegion, 1);
+> -    target_ulong start_addr =3D memmap[SIFIVE_U_DRAM].base;
+> +    target_ulong start_addr =3D memmap[SIFIVE_U_DEV_DRAM].base;
+>      uint32_t start_addr_hi32 =3D 0x00000000;
+>      int i;
+>      uint32_t fdt_load_addr;
+> @@ -429,13 +429,13 @@ static void sifive_u_machine_init(MachineState *mac=
+hine)
+>      /* register RAM */
+>      memory_region_init_ram(main_mem, NULL, "riscv.sifive.u.ram",
+>                             machine->ram_size, &error_fatal);
+> -    memory_region_add_subregion(system_memory, memmap[SIFIVE_U_DRAM].bas=
+e,
+> +    memory_region_add_subregion(system_memory, memmap[SIFIVE_U_DEV_DRAM]=
+.base,
+>                                  main_mem);
+>
+>      /* register QSPI0 Flash */
+>      memory_region_init_ram(flash0, NULL, "riscv.sifive.u.flash0",
+> -                           memmap[SIFIVE_U_FLASH0].size, &error_fatal);
+> -    memory_region_add_subregion(system_memory, memmap[SIFIVE_U_FLASH0].b=
+ase,
+> +                           memmap[SIFIVE_U_DEV_FLASH0].size, &error_fata=
+l);
+> +    memory_region_add_subregion(system_memory, memmap[SIFIVE_U_DEV_FLASH=
+0].base,
+>                                  flash0);
+>
+>      /* register gpio-restart */
+> @@ -461,14 +461,14 @@ static void sifive_u_machine_init(MachineState *mac=
+hine)
+>
+>      switch (s->msel) {
+>      case MSEL_MEMMAP_QSPI0_FLASH:
+> -        start_addr =3D memmap[SIFIVE_U_FLASH0].base;
+> +        start_addr =3D memmap[SIFIVE_U_DEV_FLASH0].base;
+>          break;
+>      case MSEL_L2LIM_QSPI0_FLASH:
+>      case MSEL_L2LIM_QSPI2_SD:
+> -        start_addr =3D memmap[SIFIVE_U_L2LIM].base;
+> +        start_addr =3D memmap[SIFIVE_U_DEV_L2LIM].base;
+>          break;
+>      default:
+> -        start_addr =3D memmap[SIFIVE_U_DRAM].base;
+> +        start_addr =3D memmap[SIFIVE_U_DEV_DRAM].base;
+>          break;
+>      }
+>
+> @@ -496,7 +496,7 @@ static void sifive_u_machine_init(MachineState *machi=
+ne)
+>      }
+>
+>      /* Compute the fdt load address in dram */
+> -    fdt_load_addr =3D riscv_load_fdt(memmap[SIFIVE_U_DRAM].base,
+> +    fdt_load_addr =3D riscv_load_fdt(memmap[SIFIVE_U_DEV_DRAM].base,
+>                                     machine->ram_size, s->fdt);
+>      #if defined(TARGET_RISCV64)
+>      start_addr_hi32 =3D start_addr >> 32;
+> @@ -528,10 +528,10 @@ static void sifive_u_machine_init(MachineState *mac=
+hine)
+>          reset_vec[i] =3D cpu_to_le32(reset_vec[i]);
+>      }
+>      rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
+> -                          memmap[SIFIVE_U_MROM].base, &address_space_mem=
+ory);
+> +                          memmap[SIFIVE_U_DEV_MROM].base, &address_space=
+_memory);
+>
+> -    riscv_rom_copy_firmware_info(memmap[SIFIVE_U_MROM].base,
+> -                                 memmap[SIFIVE_U_MROM].size,
+> +    riscv_rom_copy_firmware_info(memmap[SIFIVE_U_DEV_MROM].base,
+> +                                 memmap[SIFIVE_U_DEV_MROM].size,
+>                                   sizeof(reset_vec), kernel_entry);
+>  }
+>
+> @@ -674,8 +674,8 @@ static void sifive_u_soc_realize(DeviceState *dev, Er=
+ror **errp)
+>
+>      /* boot rom */
+>      memory_region_init_rom(mask_rom, OBJECT(dev), "riscv.sifive.u.mrom",
+> -                           memmap[SIFIVE_U_MROM].size, &error_fatal);
+> -    memory_region_add_subregion(system_memory, memmap[SIFIVE_U_MROM].bas=
+e,
+> +                           memmap[SIFIVE_U_DEV_MROM].size, &error_fatal)=
+;
+> +    memory_region_add_subregion(system_memory, memmap[SIFIVE_U_DEV_MROM]=
+.base,
+>                                  mask_rom);
+>
+>      /*
+> @@ -688,8 +688,8 @@ static void sifive_u_soc_realize(DeviceState *dev, Er=
+ror **errp)
+>       * too generous to misbehaving guests.
+>       */
+>      memory_region_init_ram(l2lim_mem, NULL, "riscv.sifive.u.l2lim",
+> -                           memmap[SIFIVE_U_L2LIM].size, &error_fatal);
+> -    memory_region_add_subregion(system_memory, memmap[SIFIVE_U_L2LIM].ba=
+se,
+> +                           memmap[SIFIVE_U_DEV_L2LIM].size, &error_fatal=
+);
+> +    memory_region_add_subregion(system_memory, memmap[SIFIVE_U_DEV_L2LIM=
+].base,
+>                                  l2lim_mem);
+>
+>      /* create PLIC hart topology configuration string */
+> @@ -707,7 +707,7 @@ static void sifive_u_soc_realize(DeviceState *dev, Er=
+ror **errp)
+>      }
+>
+>      /* MMIO */
+> -    s->plic =3D sifive_plic_create(memmap[SIFIVE_U_PLIC].base,
+> +    s->plic =3D sifive_plic_create(memmap[SIFIVE_U_DEV_PLIC].base,
+>          plic_hart_config, 0,
+>          SIFIVE_U_PLIC_NUM_SOURCES,
+>          SIFIVE_U_PLIC_NUM_PRIORITIES,
+> @@ -717,27 +717,27 @@ static void sifive_u_soc_realize(DeviceState *dev, =
+Error **errp)
+>          SIFIVE_U_PLIC_ENABLE_STRIDE,
+>          SIFIVE_U_PLIC_CONTEXT_BASE,
+>          SIFIVE_U_PLIC_CONTEXT_STRIDE,
+> -        memmap[SIFIVE_U_PLIC].size);
+> +        memmap[SIFIVE_U_DEV_PLIC].size);
+>      g_free(plic_hart_config);
+> -    sifive_uart_create(system_memory, memmap[SIFIVE_U_UART0].base,
+> +    sifive_uart_create(system_memory, memmap[SIFIVE_U_DEV_UART0].base,
+>          serial_hd(0), qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_U_UART0_I=
+RQ));
+> -    sifive_uart_create(system_memory, memmap[SIFIVE_U_UART1].base,
+> +    sifive_uart_create(system_memory, memmap[SIFIVE_U_DEV_UART1].base,
+>          serial_hd(1), qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_U_UART1_I=
+RQ));
+> -    sifive_clint_create(memmap[SIFIVE_U_CLINT].base,
+> -        memmap[SIFIVE_U_CLINT].size, 0, ms->smp.cpus,
+> +    sifive_clint_create(memmap[SIFIVE_U_DEV_CLINT].base,
+> +        memmap[SIFIVE_U_DEV_CLINT].size, 0, ms->smp.cpus,
+>          SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE,
+>          SIFIVE_CLINT_TIMEBASE_FREQ, false);
+>
+>      if (!sysbus_realize(SYS_BUS_DEVICE(&s->prci), errp)) {
+>          return;
+>      }
+> -    sysbus_mmio_map(SYS_BUS_DEVICE(&s->prci), 0, memmap[SIFIVE_U_PRCI].b=
+ase);
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->prci), 0, memmap[SIFIVE_U_DEV_PRC=
+I].base);
+>
+>      qdev_prop_set_uint32(DEVICE(&s->gpio), "ngpio", 16);
+>      if (!sysbus_realize(SYS_BUS_DEVICE(&s->gpio), errp)) {
+>          return;
+>      }
+> -    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpio), 0, memmap[SIFIVE_U_GPIO].b=
+ase);
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpio), 0, memmap[SIFIVE_U_DEV_GPI=
+O].base);
+>
+>      /* Pass all GPIOs to the SOC layer so they are available to the boar=
+d */
+>      qdev_pass_gpios(DEVICE(&s->gpio), dev, NULL);
+> @@ -751,7 +751,7 @@ static void sifive_u_soc_realize(DeviceState *dev, Er=
+ror **errp)
+>
+>      /* PDMA */
+>      sysbus_realize(SYS_BUS_DEVICE(&s->dma), errp);
+> -    sysbus_mmio_map(SYS_BUS_DEVICE(&s->dma), 0, memmap[SIFIVE_U_PDMA].ba=
+se);
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->dma), 0, memmap[SIFIVE_U_DEV_PDMA=
+].base);
+>
+>      /* Connect PDMA interrupts to the PLIC */
+>      for (i =3D 0; i < SIFIVE_PDMA_IRQS; i++) {
+> @@ -764,7 +764,7 @@ static void sifive_u_soc_realize(DeviceState *dev, Er=
+ror **errp)
+>      if (!sysbus_realize(SYS_BUS_DEVICE(&s->otp), errp)) {
+>          return;
+>      }
+> -    sysbus_mmio_map(SYS_BUS_DEVICE(&s->otp), 0, memmap[SIFIVE_U_OTP].bas=
+e);
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->otp), 0, memmap[SIFIVE_U_DEV_OTP]=
+.base);
+>
+>      /* FIXME use qdev NIC properties instead of nd_table[] */
+>      if (nd->used) {
+> @@ -776,18 +776,18 @@ static void sifive_u_soc_realize(DeviceState *dev, =
+Error **errp)
+>      if (!sysbus_realize(SYS_BUS_DEVICE(&s->gem), errp)) {
+>          return;
+>      }
+> -    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gem), 0, memmap[SIFIVE_U_GEM].bas=
+e);
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gem), 0, memmap[SIFIVE_U_DEV_GEM]=
+.base);
+>      sysbus_connect_irq(SYS_BUS_DEVICE(&s->gem), 0,
+>                         qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_U_GEM_IR=
+Q));
+>
+>      create_unimplemented_device("riscv.sifive.u.gem-mgmt",
+> -        memmap[SIFIVE_U_GEM_MGMT].base, memmap[SIFIVE_U_GEM_MGMT].size);
+> +        memmap[SIFIVE_U_DEV_GEM_MGMT].base, memmap[SIFIVE_U_DEV_GEM_MGMT=
+].size);
+>
+>      create_unimplemented_device("riscv.sifive.u.dmc",
+> -        memmap[SIFIVE_U_DMC].base, memmap[SIFIVE_U_DMC].size);
+> +        memmap[SIFIVE_U_DEV_DMC].base, memmap[SIFIVE_U_DEV_DMC].size);
+>
+>      create_unimplemented_device("riscv.sifive.u.l2cc",
+> -        memmap[SIFIVE_U_L2CC].base, memmap[SIFIVE_U_L2CC].size);
+> +        memmap[SIFIVE_U_DEV_L2CC].base, memmap[SIFIVE_U_DEV_L2CC].size);
+>  }
+>
+>  static Property sifive_u_soc_props[] =3D {
+> --
+> 2.26.2
+>
+>
 
