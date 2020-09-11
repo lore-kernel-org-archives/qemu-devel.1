@@ -2,88 +2,87 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E87B7C43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 14:01:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E68E9C43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 14:02:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6037221D47
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 14:01:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3591F21D47
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 14:02:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="innK/kvB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6037221D47
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lgLujWO/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3591F21D47
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGjcQ-0003Ww-Hi
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 10:01:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40366)
+	id 1kGjd2-00043Y-5j
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 10:02:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40612)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kGjbI-0002rP-EU
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 10:00:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33544
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kGjbC-0007NL-68
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 10:00:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599832821;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=9s0f42anxsvIJ2eW6BTQnBc2WpY1ExdXDdH/Ih8pNlM=;
- b=innK/kvB6rkyFSZgQSkm61+4YrLsqeVf8yojpgiGud0+l4l7QGD6zZNMRMv9gREbQ0FqBc
- Kp/JhFXU9miQ1jsIW5yfdHqB1mE3hR5cXWgN+z3DNxposrBWRxADMFMDNL9AREGMck6duz
- /QZf7KJyiMUy40ShA8YkTfpt5D+koWI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-jTojQ3bbM7C52tn5S5YJvw-1; Fri, 11 Sep 2020 10:00:17 -0400
-X-MC-Unique: jTojQ3bbM7C52tn5S5YJvw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AEDD51009463;
- Fri, 11 Sep 2020 14:00:15 +0000 (UTC)
-Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 16EF37E8F4;
- Fri, 11 Sep 2020 14:00:14 +0000 (UTC)
-Date: Fri, 11 Sep 2020 10:00:13 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Robert Hoo <robert.hu@linux.intel.com>
-Subject: Re: [PATCH v2 1/2] Introduce (x86) CPU model deprecation API
-Message-ID: <20200911140013.GS1618070@habkost.net>
-References: <1591843676-102054-1-git-send-email-robert.hu@linux.intel.com>
- <20200909181506.GM1618070@habkost.net>
- <e3a289f5db0064dd363cb3481d152e20df14b35d.camel@linux.intel.com>
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kGjbo-000399-1j
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 10:01:00 -0400
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:37628)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kGjbm-0007X4-3c
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 10:00:59 -0400
+Received: by mail-ej1-x644.google.com with SMTP id nw23so13966643ejb.4
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 07:00:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=4gmbIN9MUFb5Y4MPI3v2FyDiHafDV5zj1YzK/YIF25A=;
+ b=lgLujWO/vzgIQrslH2D6TFevhu2ZsK3R6vINHzwbg/AG3DAYKVx516lVwT7MeUJHvz
+ FDHVN0nRp/VBVBn8cqOQBLFO0nNj/Gy2Nc9FQtdfzL60W2B+S6y2g1ucCbKQSZ2s7R/w
+ Q7BQlq3cE3RalB1bJcK9pOEw1CDnd3JVrymlO8ppXRpKGJqTaviNMmXOnbgB64dHjAtP
+ ARwfXfdHsTR7nA3hUcEj21l9VDARhwCvf9htY7MoJV+NLCIiP/Od+LYh8IW2WHcIE5LY
+ CQ2D+n/TTc/CLUJwFvFQdJqN6ND8NATBrnFXa9yq8cu3YMDLBUlrQ0zR2G6V1GPkb6yr
+ Mrtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=4gmbIN9MUFb5Y4MPI3v2FyDiHafDV5zj1YzK/YIF25A=;
+ b=bfiArDRHOJWsmUdf1sICMY7zzgh6SUHnDSAy2gCq569Au0qiT2JN3yIo1M8wcuHG5c
+ VoflBe/Re8o2iLImPIex9fUaZR2BVpFEsVo0BDQj/br/59OUc9KEp1zmIAl8/hT5MiLD
+ e1S3IZfy7jkEO8XwW8w3eeCaQu357GMMqpZNgVTzNxb72ew+lKAX6OcfS+E7xXGK+rHP
+ 0zeWwTn1g2naLXm5ayyB8GYnB4jsD6FXBMU8IcTTAFtWnAmPmBuWzFeekQ/ozuXPzzGQ
+ m+5wErmzyrH4Hfb+/x+IfZOWM9yGAwxuFXjat0ePun3Vqr5RqBkCs/DLg/X3uBhAicRw
+ XzRg==
+X-Gm-Message-State: AOAM531k+M6scJ2OWmOvh5KBeLfadRySJYYYFI96jksaRX0bX47dNY0/
+ nKKEjs96OL9bBUFidohP/UXcX9iKaEx5OeYNMwo=
+X-Google-Smtp-Source: ABdhPJxVgMv3A8wnpmKS/l0dk73v8+p0kK30Nnh3aS67uQTzjKn9HmUILJ5l0cwUPNMApBLM2FZvRHI2NisufkcKk7Q=
+X-Received: by 2002:a17:906:faec:: with SMTP id
+ lu44mr2113759ejb.527.1599832856577; 
+ Fri, 11 Sep 2020 07:00:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <e3a289f5db0064dd363cb3481d152e20df14b35d.camel@linux.intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 03:28:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200910174850.716104-1-marcandre.lureau@redhat.com>
+ <eeead7ec-ebde-637d-de06-31c9b343b3b8@redhat.com>
+ <399aad6c-5d86-8988-a44a-e91d650e7273@redhat.com>
+In-Reply-To: <399aad6c-5d86-8988-a44a-e91d650e7273@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 11 Sep 2020 18:00:44 +0400
+Message-ID: <CAJ+F1CKPyBfjPoaRc5j24swo8Bfy0D7m+txNk5cyAi47rOz2bw@mail.gmail.com>
+Subject: Re: [PATCH] PoC: Rust binding for QAPI (qemu-ga only, for now)
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000001dcb5805af0a1d9b"
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=marcandre.lureau@gmail.com; helo=mail-ej1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,330 +96,251 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: xiaoyao.li@intel.com, qemu-devel@nongnu.org, armbru@redhat.com,
- robert.hu@intel.com, chenyi.qiang@intel.com, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: "P. Berrange, Daniel" <berrange@redhat.com>,
+ Sergio Lopez Pascual <slp@redhat.com>, "Hajnoczi, Stefan" <stefanha@gmail.com>,
+ qemu-devel <qemu-devel@nongnu.org>, "Armbruster, Markus" <armbru@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 11, 2020 at 02:22:51PM +0800, Robert Hoo wrote:
-> On Wed, 2020-09-09 at 14:15 -0400, Eduardo Habkost wrote:
-> > Hi,
-> > 
-> > Thanks for the patch, and sorry for taking so long to review
-> > this.  I'm finally getting to the patches that were postponed to
-> > 5.2.
-> > 
-> > Comments and questions below:
-> > 
-> > On Thu, Jun 11, 2020 at 10:47:55AM +0800, Robert Hoo wrote:
-> > > Complement versioned CPU model framework with the ability of
-> > > marking some
-> > > versions deprecated. When that CPU model is chosen, get some
-> > > warning. The
-> > > warning message is customized, e.g. telling in which future QEMU
-> > > version will
-> > > it be obsoleted.
-> > > The deprecation message will also appear by x86_cpu_list_entry(),
-> > > e.g. '-cpu
-> > > help'.
-> > > QMP 'query-cpu-definitions' will also return a bool value
-> > > indicating the
-> > > deprecation status.
-> > > 
-> > > Changes in v2:
-> > > Move deprecation check from parse_cpu_option() to
-> > > machine_run_board_init(), so
-> > > that it can cover implicit cpu_type assignment cases.
-> > > Add qapi new member documentation. Thanks Eric for comment and
-> > > guidance on qapi.
-> > > 
-> > > Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-> > > ---
-> > >  hw/core/machine.c        | 11 +++++++++--
-> > >  include/hw/core/cpu.h    |  1 +
-> > >  qapi/machine-target.json |  7 ++++++-
-> > >  target/i386/cpu.c        | 45
-> > > +++++++++++++++++++++++++++++++++++++++++++--
-> > >  4 files changed, 59 insertions(+), 5 deletions(-)
-> > > 
-> > > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > > index bb3a7b1..9318964 100644
-> > > --- a/hw/core/machine.c
-> > > +++ b/hw/core/machine.c
-> > > @@ -1083,6 +1083,8 @@ MemoryRegion
-> > > *machine_consume_memdev(MachineState *machine,
-> > >  void machine_run_board_init(MachineState *machine)
-> > >  {
-> > >      MachineClass *machine_class = MACHINE_GET_CLASS(machine);
-> > > +    ObjectClass *oc = object_class_by_name(machine->cpu_type);
-> > > +    CPUClass *cc;
-> > >  
-> > >      if (machine->ram_memdev_id) {
-> > >          Object *o;
-> > > @@ -1102,11 +1104,10 @@ void machine_run_board_init(MachineState
-> > > *machine)
-> > >       * specified a CPU with -cpu check here that the user CPU is
-> > > supported.
-> > >       */
-> > >      if (machine_class->valid_cpu_types && machine->cpu_type) {
-> > > -        ObjectClass *class = object_class_by_name(machine-
-> > > >cpu_type);
-> > >          int i;
-> > >  
-> > >          for (i = 0; machine_class->valid_cpu_types[i]; i++) {
-> > > -            if (object_class_dynamic_cast(class,
-> > > +            if (object_class_dynamic_cast(oc,
-> > >                                            machine_class-
-> > > >valid_cpu_types[i])) {
-> > >                  /* The user specificed CPU is in the valid field,
-> > > we are
-> > >                   * good to go.
-> > > @@ -1129,6 +1130,12 @@ void machine_run_board_init(MachineState
-> > > *machine)
-> > >          }
-> > >      }
-> > >  
-> > > +    /* Check if CPU type is deprecated and warn if so */
-> > > +    cc = CPU_CLASS(oc);
-> > > +    if (cc->deprecation_check) {
-> > > +        cc->deprecation_check(oc);
-> > > +    }
-> > 
-> > Why do we need target-specific code here?  A CPUClass::deprecated
-> > field would be much simpler.
-> > 
-> Because the Warning message composing is target-specific, using
-> X86CPUVersionDefinition.note.
-> Other targets can have their own warning message composing approaches.
+--0000000000001dcb5805af0a1d9b
+Content-Type: text/plain; charset="UTF-8"
 
-I think I understand what you were trying to do, but having each
-target with a different warning message would be a bad thing, not
-a desirable feature.  The warning message can be generic.
+Hi
 
-> 
-> > > +
-> > >      machine_class->init(machine);
-> > >  }
-> > >  
-> > > diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-> > > index 497600c..1ca47dc 100644
-> > > --- a/include/hw/core/cpu.h
-> > > +++ b/include/hw/core/cpu.h
-> > > @@ -218,6 +218,7 @@ typedef struct CPUClass {
-> > >      void (*disas_set_info)(CPUState *cpu, disassemble_info *info);
-> > >      vaddr (*adjust_watchpoint_address)(CPUState *cpu, vaddr addr,
-> > > int len);
-> > >      void (*tcg_initialize)(void);
-> > > +    void (*deprecation_check)(ObjectClass *oc);
-> > >  
-> > >      /* Keep non-pointer data at the end to minimize holes.  */
-> > >      int gdb_num_core_regs;
-> > > diff --git a/qapi/machine-target.json b/qapi/machine-target.json
-> > > index f2c8294..c24f506 100644
-> > > --- a/qapi/machine-target.json
-> > > +++ b/qapi/machine-target.json
-> > > @@ -285,6 +285,10 @@
-> > >  #            in the VM configuration, because aliases may stop
-> > > being
-> > >  #            migration-safe in the future (since 4.1)
-> > >  #
-> > > +# @deprecated: If true, this CPU model is deprecated and may be
-> > > removed in
-> > > +#              in some future version of QEMU according to the
-> > > QEMU deprecation
-> > > +#              policy. (since 5.1)
-> > 
-> > Next version needs to say "since 5.2".
-> 
-> Sure.
-> > 
-> > > +#
-> > >  # @unavailable-features is a list of QOM property names that
-> > >  # represent CPU model attributes that prevent the CPU from
-> > > running.
-> > >  # If the QOM property is read-only, that means there's no known
-> > > @@ -309,7 +313,8 @@
-> > >              'static': 'bool',
-> > >              '*unavailable-features': [ 'str' ],
-> > >              'typename': 'str',
-> > > -            '*alias-of' : 'str' },
-> > > +            '*alias-of' : 'str',
-> > > +            'deprecated' : 'bool' },
-> > >    'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) ||
-> > > defined(TARGET_I386) || defined(TARGET_S390X) ||
-> > > defined(TARGET_MIPS)' }
-> > >  
-> > >  ##
-> > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > > index ba05da3..0d8638a 100644
-> > > --- a/target/i386/cpu.c
-> > > +++ b/target/i386/cpu.c
-> > > @@ -1599,6 +1599,7 @@ typedef struct X86CPUVersionDefinition {
-> > >      const char *alias;
-> > >      const char *note;
-> > >      PropValue *props;
-> > > +    bool       deprecated;
-> > >  } X86CPUVersionDefinition;
-> > >  
-> > >  /* Base definition for a CPU model */
-> > > @@ -1638,6 +1639,11 @@ struct X86CPUModel {
-> > >       * This matters only for "-cpu help" and query-cpu-definitions
-> > >       */
-> > >      bool is_alias;
-> > > +    /*
-> > > +     * If true, this model is deprecated, and may be removed in
-> > > the future.
-> > > +     * Trying to use it now will cause a warning.
-> > > +     */
-> > > +    bool deprecated;
-> > >  };
-> > >  
-> > >  /* Get full model name for CPU version */
-> > > @@ -4128,8 +4134,7 @@ static X86CPUVersion
-> > > x86_cpu_model_resolve_version(const X86CPUModel *model)
-> > >      X86CPUVersion v = model->version;
-> > >      if (v == CPU_VERSION_AUTO) {
-> > >          v = default_cpu_version;
-> > > -    }
-> > > -    if (v == CPU_VERSION_LATEST) {
-> > > +    } else if (v == CPU_VERSION_LATEST) {
-> > 
-> > Why is this change necessary?
-> 
-> Just kind of compulsion of avoiding unnecessary if() :-). 'v' can only
-> be one of CPU_VERSION_AUTO and CPU_VERSION_LATEST, unnecessary to judge
-> twice.
+On Fri, Sep 11, 2020 at 5:08 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-I think this breaks the case where default_cpu_version is set to
-CPU_VERSION_LATEST
+> On 11/09/20 12:24, Paolo Bonzini wrote:
+> >>
+> >> - from_qemu_none(ptr: *const sys::P) -> T
+> >>   Return a Rust type T for a const ffi pointer P.
+> >>
+> >> - from_qemu_full(ptr: *mut sys::P) -> T
+> >>   Return a Rust type T for a ffi pointer P, taking ownership.
+> >>
+> >> - T::to_qemu_none() -> Stash<P>
+> >>   Returns a borrowed ffi pointer P (using a Stash to destroy "glue"
+> >>   storage data, if any).
+> >>
+> >> - T::to_qemu_full() -> P
+> >>   Returns a ffi pointer P. (P resources are leaked/passed to C/ffi)
+> >
+> > I know these come from glib-rs, but still the names are awful. :)
+>
+> After studying a bit I managed to give a rational explanation of the
+> above gut feeling.  Conversions in Rust usually follow this naming
+> convention:
+>
+>         Name              Type                  Price
+>         --------          --------------------  -----------
+>         as_*, borrow      Borrowed -> Borrowed  Cheap
+>         to_*, constructor Borrowed -> Owned     Expensive
+>         from, into_*      Owned -> Owned        Any
+>
+> and we have
+>
+>         from_qemu_none    Borrowed -> Owned
+>         to_qemu_none      Borrowed -> Borrowed
+>         from_qemu_full    Owned -> Owned
+>         to_qemu_full      Owned -> Owned
+>
+> So
+>
+> - from_qemu_none should be a "to_*" or "constructor" conversion (I used
+> new_from_foreign)
+>
 
-> > 
-> > >          return x86_cpu_model_last_version(model);
-> > >      }
-> > >      return v;
-> > > @@ -4975,6 +4980,7 @@ static void x86_cpu_definition_entry(gpointer
-> > > data, gpointer user_data)
-> > >      info->migration_safe = cc->migration_safe;
-> > >      info->has_migration_safe = true;
-> > >      info->q_static = cc->static_model;
-> > > +    info->deprecated = cc->model ? cc->model->deprecated : false;
-> > >      /*
-> > >       * Old machine types won't report aliases, so that alias
-> > > translation
-> > >       * doesn't break compatibility with previous QEMU versions.
-> > > @@ -5411,6 +5417,7 @@ static void
-> > > x86_register_cpudef_types(X86CPUDefinition *def)
-> > >          m->cpudef = def;
-> > >          m->version = vdef->version;
-> > >          m->note = vdef->note;
-> > > +        m->deprecated = vdef->deprecated;
-> > >          x86_register_cpu_model_type(name, m);
-> > >  
-> > >          if (vdef->alias) {
-> > > @@ -5418,6 +5425,8 @@ static void
-> > > x86_register_cpudef_types(X86CPUDefinition *def)
-> > >              am->cpudef = def;
-> > >              am->version = vdef->version;
-> > >              am->is_alias = true;
-> > > +            am->note = vdef->note;
-> > 
-> > Is this extra line related to the deprecation feature?
-> > 
-> > It doesn't seem related, and it doesn't seem necessary as the
-> > `note` field is already ignored for alias CPU models.
-> 
-> Because it is unused by other features, I use it to store model
-> specific deprecation message.
-> > 
-> > > +            am->deprecated = vdef->deprecated;
-> > >              x86_register_cpu_model_type(vdef->alias, am);
-> > >          }
-> > >      }
-> > > @@ -7233,6 +7242,37 @@ static Property x86_cpu_properties[] = {
-> > >      DEFINE_PROP_END_OF_LIST()
-> > >  };
-> > >  
-> > > +static void x86_cpu_deprecation_check(ObjectClass *oc)
-> > > +{
-> > > +    X86CPUClass *xcc = X86_CPU_CLASS(oc);
-> > > +    X86CPUVersion effective_version;
-> > > +    const X86CPUVersionDefinition *vdef;
-> > > +
-> > > +    if (xcc->model == NULL) {
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    if (xcc->model->version == CPU_VERSION_LEGACY) {
-> > > +        /* Treat legacy version as v1 */
-> > > +        effective_version = 1;
-> > > +    } else {
-> > > +        effective_version = x86_cpu_model_resolve_version(xcc-
-> > > >model);
-> > > +    }
-> > > +
-> > > +    vdef = xcc->model->cpudef->versions;
-> > > +
-> > > +    if (vdef == NULL) {
-> > > +        return;
-> > > +    } else {
-> > > +        if (vdef[effective_version - 1].deprecated) {
-> > > +            warn_report("Effective CPU model '%s' -- %s",
-> > > +                    x86_cpu_versioned_model_name(xcc->model-
-> > > >cpudef,\
-> > > +                                                effective_version)
-> > > ,
-> > > +                    vdef[effective_version - 1].note);
-> > > +        }
-> > > +    }
-> > 
-> > Why do we need this extra logic?  Isn't it simpler to just add a
-> > bool CPUClass::deprecated field, and set:
-> > 
-> >    cpu->deprecated = model->deprecated;
-> > 
-> > inside x86_cpu_cpudef_class_init()?
-> > 
-> All these are to fulfill the target you expected earlier:
-> 
-> "We need a proper CPU model deprecation API.  Deprecation info
-> should appear on query-cpu-definitions and should trigger a
-> warning when using the CPU model."
-> 
-> So I think each deprecated model shall have its own deprecation
-> message, e.g. by which version it's going to be deprecation, etc.
+new_ prefix is not very rusty.
 
-There's nothing x86-specific about having deprecated CPU models,
-so I don't understand the reason for the x86-specific hook.
+from_raw() is common, and takes ownership.
+from_ptr() (as in CStr) could be a candidate (although it wouldn't have the
+same lifetime requirements)
 
-If the .note field is the reason you added the arch-specific
-hook, you can just add a CPUClass::deprecation_note field and
-make the feature generic.
 
-> 
-> > > +}
-> > > +
-> > >  static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
-> > >  {
-> > >      X86CPUClass *xcc = X86_CPU_CLASS(oc);
-> > > @@ -7291,6 +7331,7 @@ static void
-> > > x86_cpu_common_class_init(ObjectClass *oc, void *data)
-> > >      cc->tlb_fill = x86_cpu_tlb_fill;
-> > >  #endif
-> > >      cc->disas_set_info = x86_disas_set_info;
-> > > +    cc->deprecation_check = x86_cpu_deprecation_check;
-> > >  
-> > >      dc->user_creatable = true;
-> > >  }
-> > > -- 
-> > > 1.8.3.1
-> > > 
-> > 
-> > 
-> 
+> - to_qemu_none, even though in some cases it can be expensive, should be
+> an "as_*" conversion (as_foreign).
+>
 
--- 
-Eduardo
+as_ptr(), but since it's more complicated than just a pointer due to
+temporary storage, it's not the best fit either...
 
+
+> - from_qemu_full and to_qemu_full should be "from" or "into_*"
+>
+
+ok
+
+
+>
+> to_qemu_full() could also be split into a more expensive but flexible
+> "to" variant and the cheaper "into" variant.  Just for the sake of
+> example, I updated my demo by replacing the IntoRaw trait with these two:
+>
+>     trait ToForeign<T> {
+>         fn to_foreign(&self) -> *mut T;
+>     }
+>
+>     trait IntoForeign<T> {
+>         fn into_foreign(self) -> *mut T;
+>     }
+>
+> where the example implementations show the different cost quite clearly:
+>
+>     impl ToForeign<c_char> for String {
+>         fn to_foreign(&self) -> *mut c_char {
+>             unsafe { libc::strndup(self.as_ptr() as *const c_char,
+>                                    self.len() as size_t) }
+>         }
+>     }
+>
+>     impl IntoForeign<c_char> for String {
+>         fn into_foreign(self) -> *mut c_char {
+>             let ptr = self.as_ptr();
+>             forget(self);
+>             ptr as *mut _
+>         }
+>     }
+>
+>
+You corrected the \0-ending in the git tree. However, the memory allocator
+(or the stack) may not be compatible with the one used in C.
+
+ As for the general comparison with glib-rs traits, it's hard for me to say
+upfront the pros and cons, I would need to modify this PoC for example. But
+I must say I feel quite comfortable with the glib approach. It would be
+nice to have some feedback from glib-rs maintainers about your proposal.
+
+(my gut feeling is that we would be better sticking with something close to
+glib, as it is likely we will end up using glib-rs at some point, and
+having similar patterns should help each other)
+
+--0000000000001dcb5805af0a1d9b
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
+"><div dir=3D"ltr" class=3D"gmail_attr">On Fri, Sep 11, 2020 at 5:08 PM Pao=
+lo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com">pbonzini@redhat.com</=
+a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0p=
+x 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On=
+ 11/09/20 12:24, Paolo Bonzini wrote:<br>
+&gt;&gt;<br>
+&gt;&gt; - from_qemu_none(ptr: *const sys::P) -&gt; T<br>
+&gt;&gt;=C2=A0 =C2=A0Return a Rust type T for a const ffi pointer P.<br>
+&gt;&gt;<br>
+&gt;&gt; - from_qemu_full(ptr: *mut sys::P) -&gt; T<br>
+&gt;&gt;=C2=A0 =C2=A0Return a Rust type T for a ffi pointer P, taking owner=
+ship.<br>
+&gt;&gt;<br>
+&gt;&gt; - T::to_qemu_none() -&gt; Stash&lt;P&gt;<br>
+&gt;&gt;=C2=A0 =C2=A0Returns a borrowed ffi pointer P (using a Stash to des=
+troy &quot;glue&quot;<br>
+&gt;&gt;=C2=A0 =C2=A0storage data, if any).<br>
+&gt;&gt;<br>
+&gt;&gt; - T::to_qemu_full() -&gt; P<br>
+&gt;&gt;=C2=A0 =C2=A0Returns a ffi pointer P. (P resources are leaked/passe=
+d to C/ffi)<br>
+&gt;<br>
+&gt; I know these come from glib-rs, but still the names are awful. :)<br>
+<br>
+After studying a bit I managed to give a rational explanation of the<br>
+above gut feeling.=C2=A0 Conversions in Rust usually follow this naming<br>
+convention:<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 Name=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 Type=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 P=
+rice<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 --------=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ----=
+----------------=C2=A0 -----------<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 as_*, borrow=C2=A0 =C2=A0 =C2=A0 Borrowed -&gt;=
+ Borrowed=C2=A0 Cheap<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 to_*, constructor Borrowed -&gt; Owned=C2=A0 =
+=C2=A0 =C2=A0Expensive<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 from, into_*=C2=A0 =C2=A0 =C2=A0 Owned -&gt; Ow=
+ned=C2=A0 =C2=A0 =C2=A0 =C2=A0 Any<br>
+<br>
+and we have<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 from_qemu_none=C2=A0 =C2=A0 Borrowed -&gt; Owne=
+d<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 to_qemu_none=C2=A0 =C2=A0 =C2=A0 Borrowed -&gt;=
+ Borrowed<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 from_qemu_full=C2=A0 =C2=A0 Owned -&gt; Owned<b=
+r>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 to_qemu_full=C2=A0 =C2=A0 =C2=A0 Owned -&gt; Ow=
+ned<br>
+<br>
+So<br>
+<br>
+- from_qemu_none should be a &quot;to_*&quot; or &quot;constructor&quot; co=
+nversion (I used<br>
+new_from_foreign)<br></blockquote><div><br></div><div>new_ prefix is not ve=
+ry rusty.</div><div><br></div><div>from_raw() is common, and takes ownershi=
+p.<br></div><div>from_ptr() (as in CStr) could be a candidate (although it =
+wouldn&#39;t have the same lifetime requirements)<br></div><div><br></div><=
+blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-l=
+eft:1px solid rgb(204,204,204);padding-left:1ex">
+<br>
+- to_qemu_none, even though in some cases it can be expensive, should be<br=
+>
+an &quot;as_*&quot; conversion (as_foreign).<br></blockquote><div><br></div=
+><div>as_ptr(), but since it&#39;s more complicated than just a pointer due=
+ to temporary storage, it&#39;s not the best fit either...</div><div> <br><=
+/div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bo=
+rder-left:1px solid rgb(204,204,204);padding-left:1ex">
+<br>
+- from_qemu_full and to_qemu_full should be &quot;from&quot; or &quot;into_=
+*&quot;<br></blockquote><div><br></div><div>ok<br></div><div>=C2=A0</div><b=
+lockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-le=
+ft:1px solid rgb(204,204,204);padding-left:1ex">
+<br>
+to_qemu_full() could also be split into a more expensive but flexible<br>
+&quot;to&quot; variant and the cheaper &quot;into&quot; variant.=C2=A0 Just=
+ for the sake of<br>
+example, I updated my demo by replacing the IntoRaw trait with these two:<b=
+r>
+<br>
+=C2=A0 =C2=A0 trait ToForeign&lt;T&gt; {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 fn to_foreign(&amp;self) -&gt; *mut T;<br>
+=C2=A0 =C2=A0 }<br>
+<br>
+=C2=A0 =C2=A0 trait IntoForeign&lt;T&gt; {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 fn into_foreign(self) -&gt; *mut T;<br>
+=C2=A0 =C2=A0 }<br>
+<br>
+where the example implementations show the different cost quite clearly:<br=
+>
+<br>
+=C2=A0 =C2=A0 impl ToForeign&lt;c_char&gt; for String {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 fn to_foreign(&amp;self) -&gt; *mut c_char {<br=
+>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 unsafe { libc::strndup(self.as_pt=
+r() as *const c_char,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0self.len() as size_t) }=
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+=C2=A0 =C2=A0 }<br>
+<br>
+=C2=A0 =C2=A0 impl IntoForeign&lt;c_char&gt; for String {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 fn into_foreign(self) -&gt; *mut c_char {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 let ptr =3D self.as_ptr();<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 forget(self);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ptr as *mut _<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+=C2=A0 =C2=A0 }<br>
+<br></blockquote><div><br></div><div>You corrected the \0-ending in the git=
+ tree. However, the memory allocator (or the stack) may not be compatible w=
+ith the one used in C.<br></div><div><br></div><div>=C2=A0As for the genera=
+l comparison with glib-rs traits, it&#39;s hard for me to say upfront the p=
+ros and cons, I would need to modify this PoC for example. But I must say I=
+ feel quite comfortable with the glib approach. It would be nice to have so=
+me feedback from glib-rs maintainers about your proposal.<br></div><div><br=
+></div><div>(my gut feeling is that we would be better sticking with someth=
+ing close to glib, as it is likely we will end up using glib-rs at some poi=
+nt, and having similar patterns should help each other)<br></div></div></di=
+v>
+
+--0000000000001dcb5805af0a1d9b--
 
