@@ -7,63 +7,64 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBC89C43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5ECCC43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:41:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7718521D6C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:41:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7718521D6C
+	by mail.kernel.org (Postfix) with ESMTPS id 2B1E121D6C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:41:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B1E121D6C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGov9-0007L8-C3
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 15:41:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44974)
+	id 1kGovh-0008Aj-1S
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 15:41:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44984)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kGoo6-0003BT-67; Fri, 11 Sep 2020 15:34:02 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:37457)
+ id 1kGoo7-0003DU-1k; Fri, 11 Sep 2020 15:34:03 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:47377)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kGoo4-0000rI-Is; Fri, 11 Sep 2020 15:34:01 -0400
+ id 1kGoo5-0000rV-7x; Fri, 11 Sep 2020 15:34:02 -0400
 Received: from localhost.localdomain ([82.252.129.222]) by
  mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MJnnV-1jwgST02wr-00K7QZ; Fri, 11 Sep 2020 21:33:56 +0200
+ id 1MsrV2-1kW1Ku3qw4-00tBCE; Fri, 11 Sep 2020 21:33:49 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 18/18] target/i386/kvm: Add missing fallthrough comment
-Date: Fri, 11 Sep 2020 21:33:30 +0200
-Message-Id: <20200911193330.1148942-19-laurent@vivier.eu>
+Subject: [PULL 13/18] test-vmstate: remove unnecessary code in
+ match_interval_mapping_node
+Date: Fri, 11 Sep 2020 21:33:25 +0200
+Message-Id: <20200911193330.1148942-14-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200911193330.1148942-1-laurent@vivier.eu>
 References: <20200911193330.1148942-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:8eSCGAMo/5u/kTK+WDIR9jqTjryidJYbIvMIkdsfMbq/F3g0UGc
- FZmmzLd7xa5mMG0LC6Vz/IOJWOta9MTeMy6Fv9YBBnVVu0VlFfPtH/YvXbog9cVn0/mMS7o
- 9x8wiSFOFK75QV37p4PzKzKLrQn2MDWFJ++Mlj4w5SkDFXG5DfgjKRdXXhONkmOEJHR5cHf
- xc2F3v8gL/5rDYMMhTwHg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:BFyx7pkX1ws=:DrsyTQEothKm/cGvb43DTC
- JMSQyjCQ+ACR28sXJrMjaf72G5aCM5KbH/StTZHDyIrFF9tzK4wd9oibiSNDh6eisfcLgOrnR
- RlqoirwiJakCUjLHvq4uqo9KwZWjNZ2+lz5yzg9TyMuheoaeFwbFMVrZKaFamHnHXJLJd7iPA
- TbzhQQyajWKY4rOh2rJ1GMX0O7P7kH6+7tbVqSAM7j6ORHDKXuHdxNhj+JIKhWGuOI9OlTE2D
- 0W0HrmvVnt6E/fWcVheE0EYnw8krXMYWuJZtirh+v8fMctFKDsBHvuceI/fA+H38bRdn+hxx+
- NsWZSxbTjLl/PT7QnKQXcwZVoZUAC0N50j+aeOFRcOX+hgnHU6WDqszKaAVPmx3a8AKFi+H9B
- gqUovXvL+HhjQEz6JXGksS1GLiK4O+3cekMbUthvwd18f1F0750YsFFSdaFvx/nitrtjCnHm5
- kqeDFIOzYUK0y59Y3ivpVRhE15T4PapGt0fN2NNlY/WbDoIIzWhrYzkf0Yj84UMfsCUxr2lo2
- JuoTXfNYMhRQqMS2TN5ZEaj2NL2DqAnQhV9AqT6FwUWsDJjY6rmbL1X4RnNZ42r0AuMOztMWL
- mLak7DXOL8vX2kVjPungn6H/9TYcBLBg88sr/cUib3Dkk5YwQerRHPIYFGF/m8HpIq4UIrBtc
- FljG1Dy/zlRjVE38JtEOJDnEYcUd+k/E2mWkA/dGy1vUQARSA2eSVlhtWv31SE4ITakDDduRz
- iBS8hl0RGS28lvNibl8jKadFBhFpZ5q1Zv1TK8Linxwi3rOa1jM3zGnCy6tczPCRA0qfVUfux
- wiKvXDKekg5AoZGcb/uRh3WFytYU2rZCsfzj8UVSVW8AMmTAP8LYXz/VX7MQGH3lyJ1Z9YN
-Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:zUMa+ifWKXfiliAtzAp9S1WzSxOX2l29IOjWwDZNHPGOvNxcfCZ
+ 8Jl5Fk8z/3yV29GER/jQXVhnnjeW9Sb3kvGraeO2BPB8D9ccWIb11vYlfVITITAZUNMgzc0
+ nQzSEC+Hge922iJdo6YLhFtA4MReHB3LsdnDTbyeaGp+DiCczT1RW0ikUZ/+8/9kfouzKmO
+ qJAWebWzTd8ik6jQvWNkw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:SsnXC+ZFTxo=:d7qKma8lvLuGRwj2S5pPwc
+ 7ZjtJnJTxb8kuDmPR3iejYhxcVBlbgauN6PkcXyFcROd8m8L711AxahwFeARogGYTxFnDemnI
+ ZwKLSmaTildwg8up22ofW3jIeDjfljl1zKQ/9Eiw/L2T0+Ab/1qvoM62R9Nj3JXMxtCn8uAXC
+ P04TLo3QnGgu/Vz0Cy+E0a94IfX3TOReg3iJik0Jr1Z32vosARJrK9Niyu5QYWvNKzpI6YtCb
+ B5GxK5vx57a5a3uTG+WUOcJ+xXHAvvDlfWG+rFNcRimnIyl+dr0Nem35MsOF5mX92az+XszWi
+ JpoTYbhCnwR1A3K8CD87OWi9Ptc3MLw9Creq4C0lMp2i7YwknSU0slya4B/H50VjBf2LpUrio
+ faFBfww3NMMH/mjj/s/tV7OOPaXmPORyQxfKepmFMCJv8CtM+Kw6SkkkjqxVOQfrwvtsWGn3n
+ s2MK/S0iSyO89pgyF/ne91l/WhS+vKZiC4pE/jo0QBUECfvImQeTCsdBtK90hDlfrg10Ngt82
+ L/H7ejZv5XBvgI3T0YYcdkK1Fkkabfw6cL4cC+j9PM5cWuQSaRFVim1iXM/4HirCqGB3JQlX1
+ tGj7kZ1XvQ/ChZFVMUQp69BMbJavLzEHtDLPo6+lm03qyTrh6atTBz+/CHMpVicqR/LxuvZX9
+ e1I4mXV7DN8AMEzEou7SS6Ftq6JYDN2gTj5mJtiEfEOCViOxyWGnYQQNJBvofdejoBDdH99Cj
+ 0L9zCT13YqBiMptDnmuAbsQv7qTKMp0zF907Wuwt61FuUuA11KFl0u7DY2VkcJby1Q+ozQkaT
+ QYBE5GhJUHcYdTRx1OJmGDE6D19+mMdjrs9xjCiXYPEc9JFXoYq99oIylFwgxo+wTshsFqs
+Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 15:33:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 15:33:39
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
@@ -82,38 +83,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-trivial@nongnu.org, Li Qiang <liq3ea@gmail.com>,
+ Thomas Huth <thuth@redhat.com>, Pan Nengyuan <pannengyuan@huawei.com>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Pan Nengyuan <pannengyuan@huawei.com>
 
-Let's make this file compilable with -Werror=implicit-fallthrough :
-Looking at the code, it seems like the fallthrough is intended here,
-so we should add the corresponding "/* fallthrough */" comment here.
+'str' is not used in match_interval_mapping_node(), remove it.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20200911125301.413081-1-thuth@redhat.com>
+Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20200910023818.11880-1-pannengyuan@huawei.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/i386/kvm.c | 1 +
- 1 file changed, 1 insertion(+)
+ tests/test-vmstate.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 3d640a8decf6..d87af57a23ce 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1568,6 +1568,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-             if (env->nr_dies < 2) {
-                 break;
-             }
-+            /* fallthrough */
-         case 4:
-         case 0xb:
-         case 0xd:
+diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+index f8de709a0b2b..1c763015d03c 100644
+--- a/tests/test-vmstate.c
++++ b/tests/test-vmstate.c
+@@ -1055,9 +1055,6 @@ static gboolean match_interval_mapping_node(gpointer key,
+     TestGTreeMapping *map_a, *map_b;
+     TestGTreeInterval *a, *b;
+     struct match_node_data *d = (struct match_node_data *)data;
+-    char *str = g_strdup_printf("dest");
+-
+-    g_free(str);
+     a = (TestGTreeInterval *)key;
+     b = (TestGTreeInterval *)d->key;
+ 
 -- 
 2.26.2
 
