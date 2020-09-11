@@ -2,86 +2,114 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B98E0C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 11:04:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94EC0C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 11:06:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E300221D92
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 11:04:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D6ACC21D92
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 11:06:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OACcdCNE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E300221D92
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y1brM0sn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6ACC21D92
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGgqx-0002pY-OP
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 07:04:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40670)
+	id 1kGgsn-0004EE-MZ
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 07:06:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41050)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kGgqE-0002PA-5m
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 07:03:42 -0400
-Received: from mail-ej1-x629.google.com ([2a00:1450:4864:20::629]:34279)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kGgqB-0005ld-QU
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 07:03:41 -0400
-Received: by mail-ej1-x629.google.com with SMTP id gr14so13274313ejb.1
- for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 04:03:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=sQEMvPK5qpauEIGdA0iadnvQNNPhqlsJWjU3f8TcgEg=;
- b=OACcdCNEbhQuTvVWGDvgJPcw8Xxlk/oCK6mhd7yd9Blceis2Uwm2B43efsOrkMQyH6
- qsVxb3/146inT412KUgLDlOksLFzmPJ+Gt0JpiPmVREHOOQrbKmF773CzdYlcARJjfhl
- osjy4cEXdix6l+KmTRmhCujwKzdYgGBXaMvKNbf/8XbZoW93fYp+Qb1ODFZWd7WmtT0F
- gORVhCCFJWokL9pxpNsneAbr57P3JV6kh43ZtI5rkWY+rs4l+UPI8qUzwwpvEcXDQFjX
- XgNv6V6ypdIbfi48e/wfZHupOOkkG3T54IvwRV2jJTjkksylHF0kS6kregt5EJeFJWlz
- gX5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=sQEMvPK5qpauEIGdA0iadnvQNNPhqlsJWjU3f8TcgEg=;
- b=VVncJh3cBVXShTPJzasWk6QUPWmko2atdLgyvkd4eB8+gaK3fyfZn4aFAwzAq5VWdV
- FeVTipOUe9VXzBCXRCau3PdjSxSPRCNFaZL0jyL7KUAcdRdyVRFAAK0llb1NOB2IjgTC
- XHddvlsZe/t6eu7xI1a/sNh8qjLTV9d1vix/VU5JRAfIXOIegQKCLJBcqnzUht7XQfaa
- nr3NjQW9zl0FDg7SC73+9kD4Ni60bWjO9qUJRbphi5c/Fca1XZdnliLJDfKBn9kGTPC1
- EXTIhdrArX1Ek3DRd+EgSuB1FkKu4RDDZ+4W538euUYfAo9FiNNujDJNynKivhZclNd5
- NxRw==
-X-Gm-Message-State: AOAM532GbWw/cOyal9i3mh4jzyXkpE+4MhONPbIWLuL4vARh6rrim/YL
- NhNoskR1opSrvkMAqZSerFy1X3MJ19ko0zkN0b8=
-X-Google-Smtp-Source: ABdhPJxuAg30pbO3i8b4MRBc7dhe7806AoGQGGA4TQstLb9Owqtq+S1vOaxOcN7BUGc7roJiGn5h8qjny52GxXhxKh8=
-X-Received: by 2002:a17:906:e0c7:: with SMTP id
- gl7mr1462863ejb.109.1599822218301; 
- Fri, 11 Sep 2020 04:03:38 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGgrt-0003Ji-I6
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 07:05:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49684)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGgrq-0005sn-U5
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 07:05:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599822321;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=vnOlO/h2/fazOmBVEofDqXl3TA3TuvaY2p2Xu3AOCVE=;
+ b=Y1brM0snFKz42Y6vOiWnJAjuYiwtXWTfVGsaVGNDLRT6qhjO5J25dM6OjCRUYazyph+ILP
+ qexmQxjQW6PhuIrwWxuQ5aDaRdzgmZIGjQP/o7Y5L5z1MMRFAwek8I8gh6jSd7Fp7gtnGK
+ cO6DIceNphwQhKkudND4dU/whmUIfe4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-585-wurcEu-mNHC_YPT-4H6zhw-1; Fri, 11 Sep 2020 07:05:18 -0400
+X-MC-Unique: wurcEu-mNHC_YPT-4H6zhw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 229861009465
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 11:05:17 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-148.ams2.redhat.com
+ [10.36.113.148])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C60881C40;
+ Fri, 11 Sep 2020 11:05:16 +0000 (UTC)
+Subject: Re: [PULL v2 01/46] qemu-iotests: move check-block back to Makefiles
+From: Max Reitz <mreitz@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20200906175344.5042-1-pbonzini@redhat.com>
+ <20200906175344.5042-2-pbonzini@redhat.com>
+ <98f7869a-cb45-08b5-670a-ebc47254b0c2@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <42d1edc2-228b-220c-8db8-251cb83c964b@redhat.com>
+Date: Fri, 11 Sep 2020 13:05:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200910174850.716104-1-marcandre.lureau@redhat.com>
- <20200911104642.GE1203593@redhat.com>
-In-Reply-To: <20200911104642.GE1203593@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 11 Sep 2020 15:03:26 +0400
-Message-ID: <CAJ+F1CLqE5frh7_0d3epi8OGefLiG6pJZMeGsC0JVL5YR8bMpw@mail.gmail.com>
-Subject: Re: [PATCH] PoC: Rust binding for QAPI (qemu-ga only, for now)
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000006957805af07a3f2"
-Received-SPF: pass client-ip=2a00:1450:4864:20::629;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-ej1-x629.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <98f7869a-cb45-08b5-670a-ebc47254b0c2@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="X7ksedWiecOcjNEunabjtPDZ0YwBkTizZ"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 23:26:59
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -45
+X-Spam_score: -4.6
+X-Spam_bar: ----
+X-Spam_report: (-4.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.469, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,246 +123,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sergio Lopez <slp@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000006957805af07a3f2
-Content-Type: text/plain; charset="UTF-8"
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--X7ksedWiecOcjNEunabjtPDZ0YwBkTizZ
+Content-Type: multipart/mixed; boundary="i11xx23iev6TIInV9sC9RNSlRf2Z6gDLj"
+
+--i11xx23iev6TIInV9sC9RNSlRf2Z6gDLj
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-Hi
+On 11.09.20 12:58, Max Reitz wrote:
+> On 06.09.20 19:53, Paolo Bonzini wrote:
+>> check-block has its own test harness, unlike every other test.  If
+>> we capture its output, as is in general nicer to do without V=3D1,
+>> there will be no sign of progress.  So for lack of a better option
+>> just move the invocation of the test back to Makefile rules.
+>>
+>> As a side effect, this will also fix "make check" in --disable-tools
+>> builds, as they were trying to run qemu-iotests without having
+>> made qemu-img before.
+>>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>  meson.build                    |  1 -
+>>  tests/Makefile.include         | 15 ++++++++++++---
+>>  tests/qemu-iotests/meson.build |  4 ----
+>>  3 files changed, 12 insertions(+), 8 deletions(-)
+>=20
+> I=E2=80=99m not entirely sure why (or I would=E2=80=99ve sent a patch mys=
+elf)
 
-On Fri, Sep 11, 2020 at 2:47 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
-m>
-wrote:
+On closer inspection it seems like it=E2=80=99s because of the
+=E2=80=9Cbuild_by_default: false=E2=80=9D, which seems like a rather consci=
+ous decision.
+ Was I only lucky that the socket_scm_helper was built by default so
+far?  Should I have explicitly built it all this time?
 
-> On Thu, Sep 10, 2020 at 09:48:50PM +0400, marcandre.lureau@redhat.com
-> wrote:
-> > From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >
-> > Hi,
-> >
-> > Among the QEMU developers, there is a desire to use Rust. (see previous
-> > thread from Stefan "Why QEMU should move from C to Rust", the rust-vmm
-> > related projects and other experiments).
-> >
-> > Thanks to our QAPI type system and the associate code generator, it is
-> > relatively straightforward to create Rust bindings for the generated C
-> > types (also called sys/ffi binding) and functions. (rust-bindgen could
-> > probably do a similar job, but it would probably bring other issues).
-> > This provides an important internal API already.
-> >
-> > Slightly more complicated is to expose a Rust API for those, and provid=
-e
-> > convenient conversions C<->Rust. Taking inspiration from glib-rs
-> > binding, I implemented a simplified version of the FromGlib/ToGlib
-> > traits, with simpler ownership model, sufficient for QAPI needs.
-> >
-> > The usage is relatively simple:
-> >
-> > - from_qemu_none(ptr: *const sys::P) -> T
-> >   Return a Rust type T for a const ffi pointer P.
-> >
-> > - from_qemu_full(ptr: *mut sys::P) -> T
-> >   Return a Rust type T for a ffi pointer P, taking ownership.
-> >
-> > - T::to_qemu_none() -> Stash<P>
-> >   Returns a borrowed ffi pointer P (using a Stash to destroy "glue"
-> >   storage data, if any).
-> >
-> > - T::to_qemu_full() -> P
-> >   Returns a ffi pointer P. (P resources are leaked/passed to C/ffi)
-> >
-> > With those traits, it's relatively easy to implement the QMP callbacks.
-> > With enough interest, we could eventually start rewriting QGA in
-> > Rust, as it is a simple service. See qga/qmp.rs for some examples.
-> > We could also try to tackle qemu itself.
-> >
-> > Finally, given that the QAPI types are easy to serialize, it was simple
-> > to use "serde" on them, and provide a D-Bus interface for QMP with zbus=
-.
-> > (a similar approach could probably be taken for other protocols, that
-> > could be dynamically loaded... anyone like protobuf better?)
-> >
-> > This PoC modifies qemu-ga to provide the interface on the session bus:
-> > $ qga/qemu-ga -m unix-listen -p /tmp/qga.sock -t /tmp -v
-> > $ busctl --user introspect org.qemu.qga /org/qemu/qga org.qemu.QgaQapi
-> > ...
-> > $ busctl --user call org.qemu.qga /org/qemu/qga org.qemu.QgaQapi
-> > GuestSetVcpus aa\{sv\} 1 2 logical-id x 0 online b 1
-> > ...
-> >
-> > Note: the generated code doesn't work with the qemu schema, there is a
-> > couple of fixme/todo left.
-> >
-> > Shameful pain point: meson & cargo don't play nicely together.
->
-> Do we actually need/want it to be in the same monolithic repo
-> as qemu, as opposed to a qemu-qapi-rust repo ?
->
-> Trying to weld together different build systems is never that
-> attractive. The language specific build systems generally are
-> much simpler if they're self contained. From a distro POV it
-> can be better if the language bindings are self contained, as
-> you don't neccessarily want to build the language binding in
-> the same environment as the main app. For example with modules
-> in Fedora or RHEL, there can be multiple parallel versions of
-> a language runtime, and thus language bindings would be built
-> separately from QEMU.
->
+Max
 
-> IIUC, you're generating stuff from the QEMU schemas. One way
-> we can deal with this is to actually install the QEMU schemas
-> into /usr/share. Distros would have an "qemu-devel" package
-> that provided the schemas and the QAPI base tools which
-> can then be used by separate bindings.
->
->
-- the schema is configured at build time. The C QAPI types depend on build
-conditions. (although I don't take that into account yet, but that
-shouldn't be too hard to add)
-- one of the goals is to start rewriting some part of QEMU in Rust. Here, I
-started with qemu-ga because it's an "easy" target.
 
-Generating binding for QMP schema (the protocol) is slightly easier, since
-the JSON messages are loosely typed. Yet, we would probably recommend you
-do it from qmp introspect output, at runtime. How close that is from the
-original QAPI schema, I can't tell, I never really looked or used it (it's
-not human friendly to start with, iirc)
+--i11xx23iev6TIInV9sC9RNSlRf2Z6gDLj--
 
-Now, I am confident various people are trying to improve the situation wrt
-meson+cargo integration, I'll do some more research.
+--X7ksedWiecOcjNEunabjtPDZ0YwBkTizZ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-thanks
+-----BEGIN PGP SIGNATURE-----
 
---00000000000006957805af07a3f2
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9bWeoACgkQ9AfbAGHV
+z0AN2Qf/V34wHKj7WX2FTkbrpENCFfY9kLslRmVIwUcSrDKXfJAuX1L5Ku3mv7DS
+xkRkGt5YQxv88iXHkTLU1De0qEvPpgQOJ4mhMxHd3Frl8bjrkILvIj0/IFARO3Pp
+fWMvKlwaZU5dEv1zxBIOPMpJQVdRiYWG+tR5mGL66orvo4jDCf35oo25eyLE+35k
+o9cWKL5n7ZgRGZ9Um9KC4SFXMCegIiMjcla5/9SxCTF+imm3CjeFkd11SPOvgW33
+S/plDyLaFy/jNjdLCKVkv+Itqqg1WUxJq2EqwX+IiaAzfBXuG9koOq93dh6UXqgX
+gExS+e+danKkedHYWBcrjsUvXTAkLg==
+=kUZ4
+-----END PGP SIGNATURE-----
 
-<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
-"><div dir=3D"ltr" class=3D"gmail_attr">On Fri, Sep 11, 2020 at 2:47 PM Dan=
-iel P. Berrang=C3=A9 &lt;<a href=3D"mailto:berrange@redhat.com">berrange@re=
-dhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D=
-"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-le=
-ft:1ex">On Thu, Sep 10, 2020 at 09:48:50PM +0400, <a href=3D"mailto:marcand=
-re.lureau@redhat.com" target=3D"_blank">marcandre.lureau@redhat.com</a> wro=
-te:<br>
-&gt; From: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@re=
-dhat.com" target=3D"_blank">marcandre.lureau@redhat.com</a>&gt;<br>
-&gt; <br>
-&gt; Hi,<br>
-&gt; <br>
-&gt; Among the QEMU developers, there is a desire to use Rust. (see previou=
-s<br>
-&gt; thread from Stefan &quot;Why QEMU should move from C to Rust&quot;, th=
-e rust-vmm<br>
-&gt; related projects and other experiments).<br>
-&gt; <br>
-&gt; Thanks to our QAPI type system and the associate code generator, it is=
-<br>
-&gt; relatively straightforward to create Rust bindings for the generated C=
-<br>
-&gt; types (also called sys/ffi binding) and functions. (rust-bindgen could=
-<br>
-&gt; probably do a similar job, but it would probably bring other issues).<=
-br>
-&gt; This provides an important internal API already.<br>
-&gt; <br>
-&gt; Slightly more complicated is to expose a Rust API for those, and provi=
-de<br>
-&gt; convenient conversions C&lt;-&gt;Rust. Taking inspiration from glib-rs=
-<br>
-&gt; binding, I implemented a simplified version of the FromGlib/ToGlib<br>
-&gt; traits, with simpler ownership model, sufficient for QAPI needs.<br>
-&gt; <br>
-&gt; The usage is relatively simple:<br>
-&gt; <br>
-&gt; - from_qemu_none(ptr: *const sys::P) -&gt; T<br>
-&gt;=C2=A0 =C2=A0Return a Rust type T for a const ffi pointer P.<br>
-&gt; <br>
-&gt; - from_qemu_full(ptr: *mut sys::P) -&gt; T<br>
-&gt;=C2=A0 =C2=A0Return a Rust type T for a ffi pointer P, taking ownership=
-.<br>
-&gt; <br>
-&gt; - T::to_qemu_none() -&gt; Stash&lt;P&gt;<br>
-&gt;=C2=A0 =C2=A0Returns a borrowed ffi pointer P (using a Stash to destroy=
- &quot;glue&quot;<br>
-&gt;=C2=A0 =C2=A0storage data, if any).<br>
-&gt; <br>
-&gt; - T::to_qemu_full() -&gt; P<br>
-&gt;=C2=A0 =C2=A0Returns a ffi pointer P. (P resources are leaked/passed to=
- C/ffi)<br>
-&gt; <br>
-&gt; With those traits, it&#39;s relatively easy to implement the QMP callb=
-acks.<br>
-&gt; With enough interest, we could eventually start rewriting QGA in<br>
-&gt; Rust, as it is a simple service. See qga/<a href=3D"http://qmp.rs" rel=
-=3D"noreferrer" target=3D"_blank">qmp.rs</a> for some examples.<br>
-&gt; We could also try to tackle qemu itself.<br>
-&gt; <br>
-&gt; Finally, given that the QAPI types are easy to serialize, it was simpl=
-e<br>
-&gt; to use &quot;serde&quot; on them, and provide a D-Bus interface for QM=
-P with zbus.<br>
-&gt; (a similar approach could probably be taken for other protocols, that<=
-br>
-&gt; could be dynamically loaded... anyone like protobuf better?)<br>
-&gt; <br>
-&gt; This PoC modifies qemu-ga to provide the interface on the session bus:=
-<br>
-&gt; $ qga/qemu-ga -m unix-listen -p /tmp/qga.sock -t /tmp -v<br>
-&gt; $ busctl --user introspect org.qemu.qga /org/qemu/qga org.qemu.QgaQapi=
-<br>
-&gt; ...<br>
-&gt; $ busctl --user call org.qemu.qga /org/qemu/qga org.qemu.QgaQapi<br>
-&gt; GuestSetVcpus aa\{sv\} 1 2 logical-id x 0 online b 1<br>
-&gt; ...<br>
-&gt; <br>
-&gt; Note: the generated code doesn&#39;t work with the qemu schema, there =
-is a<br>
-&gt; couple of fixme/todo left.<br>
-&gt; <br>
-&gt; Shameful pain point: meson &amp; cargo don&#39;t play nicely together.=
-<br>
-<br>
-Do we actually need/want it to be in the same monolithic repo<br>
-as qemu, as opposed to a qemu-qapi-rust repo ?<br>
-<br>
-Trying to weld together different build systems is never that<br>
-attractive. The language specific build systems generally are<br>
-much simpler if they&#39;re self contained. From a distro POV it<br>
-can be better if the language bindings are self contained, as<br>
-you don&#39;t neccessarily want to build the language binding in<br>
-the same environment as the main app. For example with modules<br>
-in Fedora or RHEL, there can be multiple parallel versions of<br>
-a language runtime, and thus language bindings would be built<br>
-separately from QEMU. <br></blockquote><blockquote class=3D"gmail_quote" st=
-yle=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padd=
-ing-left:1ex">
-<br>
-IIUC, you&#39;re generating stuff from the QEMU schemas. One way<br>
-we can deal with this is to actually install the QEMU schemas<br>
-into /usr/share. Distros would have an &quot;qemu-devel&quot; package<br>
-that provided the schemas and the QAPI base tools which<br>
-can then be used by separate bindings.<br>
-<br></blockquote><div><br></div>- the schema is configured at build time. T=
-he C QAPI types depend on build conditions. (although I don&#39;t take that=
- into account yet, but that shouldn&#39;t be too hard to add)<br><div>- one=
- of the goals is to start rewriting some part of QEMU in Rust. Here, I star=
-ted with qemu-ga because it&#39;s an &quot;easy&quot; target.<br></div><div=
-><br></div>Generating binding for QMP schema (the protocol) is slightly eas=
-ier, since the JSON messages are loosely typed. Yet, we would probably reco=
-mmend you do it from qmp introspect output, at runtime. How close that is f=
-rom the original QAPI schema, I can&#39;t tell, I never really looked or us=
-ed it (it&#39;s not human friendly to start with, iirc)</div><div class=3D"=
-gmail_quote"><br></div><div class=3D"gmail_quote">Now, I am confident vario=
-us people are trying to improve the situation wrt meson+cargo integration, =
-I&#39;ll do some more research.</div><div class=3D"gmail_quote"><br></div><=
-div class=3D"gmail_quote">thanks<br></div></div>
+--X7ksedWiecOcjNEunabjtPDZ0YwBkTizZ--
 
---00000000000006957805af07a3f2--
 
