@@ -2,86 +2,88 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E8A8C43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 12:44:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68C64C43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 12:44:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8523F206DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 12:44:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 022F5206DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 12:44:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f+Wq0KXH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8523F206DB
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IN4fEbgH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 022F5206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGiPN-0003Hr-MO
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 08:44:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36716)
+	id 1kGiPh-0003l2-13
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 08:44:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36762)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kGiOP-00021u-CI
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 08:43:05 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53650
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1kGiOY-0002Jl-U4
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 08:43:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40247)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kGiOM-0002SD-Pi
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 08:43:04 -0400
+ id 1kGiOW-0002UM-L9
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 08:43:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599828181;
+ s=mimecast20190719; t=1599828191;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=cWySAjAn6KJcl83sK/6Mo5N7nJbeZ+huppP+8RitpuM=;
- b=f+Wq0KXHwAr73ovQCEcuidWe6lypGwLBlYOdMvTx7Ti1+gdCbvP1iPyArc1Uy7jD/TgZo0
- FTC0xi04WvhIICf+Qwf8C7tPWnPe7HnF9BV8rVuWIgLCs6VW3gL9yd6wUEsywk7xNvjM1c
- kP3fArbTO7wPxt9BkmGXmzsbdVlpyI0=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Hgennwq69+rU4CDGqOaXlWXS/toaaxReg24jxMkzrYQ=;
+ b=IN4fEbgHOdtjZsj49KIkjs1dfaT7OgU9BaOKtT2Pbuu0m32XGij2FtCU6dEmhhx4ZA2+7D
+ 6v842VgO02ZdzAtle2tOU4/nw+caGAnVPXrc9o1xC4Xqt72Vj35uhMpHMfUPzSQbRrEeMH
+ 7q6WHp5/sgn/KeoVKKJlmCTJxXRJhXQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-QbNWQpOvNmaShz_S0KquTw-1; Fri, 11 Sep 2020 08:42:56 -0400
-X-MC-Unique: QbNWQpOvNmaShz_S0KquTw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-77--vAUP7_7OriDDOj12jIe1g-1; Fri, 11 Sep 2020 08:43:06 -0400
+X-MC-Unique: -vAUP7_7OriDDOj12jIe1g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1D13873157
- for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 12:42:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D54D5802B6D
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 12:43:04 +0000 (UTC)
 Received: from localhost (unknown [10.36.110.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 294265D9E8;
- Fri, 11 Sep 2020 12:42:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5F9971045E82;
+ Fri, 11 Sep 2020 12:43:00 +0000 (UTC)
 From: marcandre.lureau@redhat.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/2] meson: fix MSI rule
-Date: Fri, 11 Sep 2020 16:42:47 +0400
-Message-Id: <20200911124248.1088614-1-marcandre.lureau@redhat.com>
+Subject: [PATCH 2/2] meson: error out if qemu_suffix starts with /
+Date: Fri, 11 Sep 2020 16:42:48 +0400
+Message-Id: <20200911124248.1088614-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20200911124248.1088614-1-marcandre.lureau@redhat.com>
+References: <20200911124248.1088614-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81;
+Received-SPF: pass client-ip=216.205.24.124;
  envelope-from=marcandre.lureau@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 00:33:53
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 23:26:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,27 +104,30 @@ Sender: "Qemu-devel"
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-The environment variables can't be passed through an env: argument
-yet (meson#2723), use 'env' as suggested in:
-https://github.com/mesonbuild/meson/issues/2723#issuecomment-348630957
+Since the variable is used for path concatenation, the result would
+ignore the prefix directory altogether.
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- qga/meson.build | 1 +
- 1 file changed, 1 insertion(+)
+ meson.build | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/qga/meson.build b/qga/meson.build
-index e5c5778a3e..c10a0526b2 100644
---- a/qga/meson.build
-+++ b/qga/meson.build
-@@ -70,6 +70,7 @@ if targetos == 'windows'
-                             output: 'qemu-ga-@0@.msi'.format(config_host['ARCH']),
-                             depends: deps,
-                             command: [
-+                              find_program('env'),
-                               'QEMU_GA_VERSION=' + config_host['QEMU_GA_VERSION'],
-                               'QEMU_GA_MANUFACTURER=' + config_host['QEMU_GA_MANUFACTURER'],
-                               'QEMU_GA_DISTRO=' + config_host['QEMU_GA_DISTRO'],
+diff --git a/meson.build b/meson.build
+index 5421eca66a..cbe1cb51b3 100644
+--- a/meson.build
++++ b/meson.build
+@@ -17,6 +17,11 @@ config_host = keyval.load(meson.current_build_dir() / 'config-host.mak')
+ enable_modules = 'CONFIG_MODULES' in config_host
+ enable_static = 'CONFIG_STATIC' in config_host
+ build_docs = 'BUILD_DOCS' in config_host
++
++if get_option('qemu_suffix').startswith('/')
++  error('qemu_suffix cannot start with a /')
++endif
++
+ qemu_datadir = get_option('datadir') / get_option('qemu_suffix')
+ qemu_docdir = get_option('docdir') / get_option('qemu_suffix')
+ config_host_data = configuration_data()
 -- 
 2.26.2
 
