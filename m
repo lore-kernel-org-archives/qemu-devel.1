@@ -2,88 +2,122 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 034EDC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 18:16:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 669D1C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 18:17:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3674821D40
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 18:16:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A7419208E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 18:17:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="b/GFoVvO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3674821D40
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MnZh28Sy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7419208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGnb7-0004Fx-84
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 14:16:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54036)
+	id 1kGnbv-0005GN-Gc
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 14:17:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55818)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kGnTh-0003TU-Do
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 14:08:53 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:50531)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kGnTf-0005yv-Oo
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 14:08:53 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id fa1so2095091pjb.0
- for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 11:08:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=2bDn5lP82DTof33HcPkKGbpUXGX2/dBL7v5dVOpxZK0=;
- b=b/GFoVvOlaY4Oy7QM61ZqHQqHdQkZlnCKibwTYv0i+Fouk6lhrVPZFVkWNnC861hy6
- vY7DckkrsfCkP1+duurcDlOr/sYkoEdjd61Kd7d4YwZFftuAiaPaxuBmAp+5GPmKyDiI
- gBb+KPU1RTjpgt0Z9JO3xDE50fdniIfcq1K+NPB/vY7qC+dKD3w2g6CdziEtqpl1isFU
- jTHdjdGKfUNRzLKCe4hKUBCOE9IOQxxwN2ZQhSz7lOhasfjENgbzesQ7Hj+RjonhPLsQ
- Kd1irTbLRjdLE2ee9kVtriovxtshIjJn5C9h7IvlZoZrr2Q7CTWdvck9VpAZVR5fH9lE
- wAsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=2bDn5lP82DTof33HcPkKGbpUXGX2/dBL7v5dVOpxZK0=;
- b=Ai1jqQCgEVuE13JKi1pQlXshkFnO4xlzlilwypnpn+CcAaKJFx5STHuHPxfwN87wEY
- coLZfcP8o/wprMEFfSnOfK/c24xEkF+NIDUvXaTHULlCo9ZOXSCjsEzmTXo3VcHjFhjz
- BDIUeadNBmRjpbTWcIk7km8Wf2YZQr5fqUTmn+iMTM3kB1rL6SQIEI+4KvMkNRCEGO12
- Wh+hmAT9TaG3zZhYYqacWOYeVcMStPU+ffcMdufi8yh2XYGRx8KDIFiKCVjDEFNlq3nF
- frHkuxiTbCtKe6g7dvjx5ChHchCkeV4bMDt9iEhQZREckq33eYJ/f7vWF43SltFkII9r
- xblQ==
-X-Gm-Message-State: AOAM5302e+jtXZ0PLyWNjb4sZRbgHFTIhEdj03ug0LUcPoDx2OVYhTuX
- VLC+VEQieQzH9a9D84qPK1ZOxwI3DleDdBho
-X-Google-Smtp-Source: ABdhPJwKUulMOxjoSEaVpBxZ+IGq7azvXY1K9ctlV2klYo1URWjWqnF7wIEeYNbyiOQ7IQ5aXo9keQ==
-X-Received: by 2002:a17:90b:ecc:: with SMTP id
- gz12mr3242695pjb.123.1599847729972; 
- Fri, 11 Sep 2020 11:08:49 -0700 (PDT)
-Received: from localhost.localdomain ([115.96.135.201])
- by smtp.googlemail.com with ESMTPSA id n9sm2929135pfu.163.2020.09.11.11.08.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 11 Sep 2020 11:08:49 -0700 (PDT)
-From: Ani Sinha <ani@anisinha.ca>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 9/9] piix4: don't reserve hw resources when hotplug is off
- globally
-Date: Fri, 11 Sep 2020 23:37:55 +0530
-Message-Id: <20200911180755.28409-9-ani@anisinha.ca>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200911180755.28409-1-ani@anisinha.ca>
-References: <20200911180755.28409-1-ani@anisinha.ca>
-Received-SPF: none client-ip=2607:f8b0:4864:20::1041;
- envelope-from=ani@anisinha.ca; helo=mail-pj1-x1041.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
+ id 1kGnb8-0004PL-5Y; Fri, 11 Sep 2020 14:16:34 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30928)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
+ id 1kGnb6-0007Gn-3U; Fri, 11 Sep 2020 14:16:33 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 08BI2NG6143185; Fri, 11 Sep 2020 14:16:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=subject : from : to : cc
+ : references : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=LwvA878EJyMxvECZnj5gGhCCLzZI2w2UpLcVKBb5uQY=;
+ b=MnZh28Syve+152MnnaGqJNF1BCNXM29dcWizN9LPhKUJfJv4IBr/JghBot072v1Jp5ha
+ UBDeErPiyfyh5AcZ957fcArzXVBo4FnbMlgDNYrIYEI6L+P8Ao5l3tBDdGJwmzhZGP+L
+ YJeC1uUCsKs/hVa0w5iZiivgPwvSns5d4zgDf+7wH1RDiXZLzno7lRUOCsAxB6/TWlkK
+ 3R0M7cseJfDRZWW2qjczQpovE3a1JiIqQqs6+Dp9MSDgUsIgtqpv0MC9X2wm4HiNBfun
+ tWwT4F58kfvAh8klXK0DUregSGkSzSvE2YBt2BAY5EWBapr3CM+BM63gHjbn0YkNKMgT RQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33ge380g9d-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 11 Sep 2020 14:16:30 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08BI2eEf143847;
+ Fri, 11 Sep 2020 14:16:30 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33ge380g94-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 11 Sep 2020 14:16:29 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08BIBxJI023790;
+ Fri, 11 Sep 2020 18:16:29 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
+ [9.57.198.26]) by ppma01dal.us.ibm.com with ESMTP id 33d46ngx63-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 11 Sep 2020 18:16:29 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
+ [9.57.199.106])
+ by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 08BIGSrB15008316
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 11 Sep 2020 18:16:28 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4AD7B2805A;
+ Fri, 11 Sep 2020 18:16:28 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E9AC62805C;
+ Fri, 11 Sep 2020 18:16:27 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.172.6])
+ by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTPS;
+ Fri, 11 Sep 2020 18:16:27 +0000 (GMT)
+Subject: Re: [PATCH v5 3/8] s390/sclp: read sccb from mem based on provided
+ length
+From: Collin Walling <walling@linux.ibm.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org
+References: <20200910093655.255774-1-walling@linux.ibm.com>
+ <20200910093655.255774-4-walling@linux.ibm.com>
+ <02dabe89-8df2-90d4-c7f1-5ef951942639@redhat.com>
+ <811e906a-689e-a53c-706e-5d6217ef3cb2@linux.ibm.com>
+Message-ID: <2b7a8807-279f-1256-e89b-0f53ae6d5623@linux.ibm.com>
+Date: Fri, 11 Sep 2020 14:16:27 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <811e906a-689e-a53c-706e-5d6217ef3cb2@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-11_08:2020-09-10,
+ 2020-09-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 impostorscore=0
+ mlxscore=0 mlxlogscore=999 priorityscore=1501 malwarescore=0 phishscore=0
+ spamscore=0 suspectscore=2 clxscore=1015 bulkscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009110142
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=walling@linux.ibm.com;
+ helo=mx0b-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 09:50:13
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -51
+X-Spam_score: -5.2
+X-Spam_bar: -----
+X-Spam_report: (-5.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.469,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,88 +130,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, jusual@redhat.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
- Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Richard Henderson <rth@twiddle.net>
+Cc: frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, mst@redhat.com,
+ pbonzini@redhat.com, sumanthk@linux.ibm.com, mihajlov@linux.ibm.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When acpi hotplug is turned off for both root pci bus as well as for pci
-bridges, we should not generate the related amls for DSDT table or initialize
-related hw ports or reserve hw resources. This change makes sure all those
-operations are turned off in the case acpi pci hotplug is off globally.
+On 9/10/20 1:56 PM, Collin Walling wrote:
+> On 9/10/20 1:50 PM, Thomas Huth wrote:
+>> On 10/09/2020 11.36, Collin Walling wrote:
+>>> The header contained within the SCCB passed to the SCLP service call
+>>> contains the actual length of the SCCB. Instead of allocating a static
+>>> 4K size for the work sccb, let's allow for a variable size determined
+>>> by the value in the header. The proper checks are already in place to
+>>> ensure the SCCB length is sufficent to store a full response and that
+>>> the length does not cross any explicitly-set boundaries.
+>>>
+>>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+>>> ---
+>>>  hw/s390x/event-facility.c |  2 +-
+>>>  hw/s390x/sclp.c           | 58 ++++++++++++++++++++++-----------------
+>>>  include/hw/s390x/sclp.h   |  2 +-
+>>>  3 files changed, 35 insertions(+), 27 deletions(-)
+>>>
+>>> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+>>> index 645b4080c5..ed92ce510d 100644
+>>> --- a/hw/s390x/event-facility.c
+>>> +++ b/hw/s390x/event-facility.c
+>>> @@ -213,7 +213,7 @@ static uint16_t handle_sccb_read_events(SCLPEventFacility *ef, SCCB *sccb,
+>>>  
+>>>      event_buf = &red->ebh;
+>>>      event_buf->length = 0;
+>>> -    slen = sizeof(sccb->data);
+>>> +    slen = sccb_data_len(sccb);
+>>>  
+>>>      rc = SCLP_RC_NO_EVENT_BUFFERS_STORED;
+>>>  
+>>> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+>>> index 69a8724dc7..cb8e2e8ec3 100644
+>>> --- a/hw/s390x/sclp.c
+>>> +++ b/hw/s390x/sclp.c
+>>> @@ -231,25 +231,30 @@ int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
+>>>  {
+>>>      SCLPDevice *sclp = get_sclp_device();
+>>>      SCLPDeviceClass *sclp_c = SCLP_GET_CLASS(sclp);
+>>> -    SCCB work_sccb;
+>>> -    hwaddr sccb_len = sizeof(SCCB);
+>>> +    SCCBHeader header;
+>>> +    SCCB *work_sccb;
+>>
+>> I'd maybe use "g_autofree SCCB *work_sccb = NULL" so you don't have to
+>> worry about doing the g_free() later.
+> 
+> Can do.
+> 
+>>
+>>> -    s390_cpu_pv_mem_read(env_archcpu(env), 0, &work_sccb, sccb_len);
+>>> +    s390_cpu_pv_mem_read(env_archcpu(env), 0, &header, sizeof(SCCBHeader));
+>>> +
+>>> +    work_sccb = g_malloc0(header.length);
+>>
+>> Please use be16_to_cpu(header.length) here as well.
+> 
+> Good catch, thanks!
+> 
 
-Signed-off-by: Ani Sinha <ani@anisinha.ca>
----
- hw/acpi/piix4.c      |  6 ++++--
- hw/i386/acpi-build.c | 10 ++++++++--
- 2 files changed, 12 insertions(+), 4 deletions(-)
+Shouldn't the mallocs use cpu_to_be16 instead since the header length
+was read in from a cpu?
 
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index e6163bb6ce..b70b1f98af 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -596,8 +596,10 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
-                           "acpi-gpe0", GPE_LEN);
-     memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
- 
--    acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
--                    s->use_acpi_hotplug_bridge);
-+    if (s->use_acpi_hotplug_bridge || s->use_acpi_root_pci_hotplug) {
-+        acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
-+                        s->use_acpi_hotplug_bridge);
-+    }
- 
-     s->cpu_hotplug_legacy = true;
-     object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index e079b686f5..7e3cf3b57b 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -95,6 +95,7 @@ typedef struct AcpiPmInfo {
-     bool s3_disabled;
-     bool s4_disabled;
-     bool pcihp_bridge_en;
-+    bool pcihp_root_en;
-     uint8_t s4_val;
-     AcpiFadtData fadt;
-     uint16_t cpu_hp_io_base;
-@@ -245,6 +246,9 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
-     pm->pcihp_bridge_en =
-         object_property_get_bool(obj, "acpi-pci-hotplug-with-bridge-support",
-                                  NULL);
-+    pm->pcihp_root_en =
-+        object_property_get_bool(obj, "acpi-root-pci-hotplug",
-+                                 NULL);
- }
- 
- static void acpi_get_misc_info(AcpiMiscInfo *info)
-@@ -1504,7 +1508,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         build_hpet_aml(dsdt);
-         build_piix4_isa_bridge(dsdt);
-         build_isa_devices_aml(dsdt);
--        build_piix4_pci_hotplug(dsdt);
-+        if (pm->pcihp_bridge_en || pm->pcihp_root_en) {
-+            build_piix4_pci_hotplug(dsdt);
-+        }
-         build_piix4_pci0_int(dsdt);
-     } else {
-         sb_scope = aml_scope("_SB");
-@@ -1698,7 +1704,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-     crs_range_set_free(&crs_range_set);
- 
-     /* reserve PCIHP resources */
--    if (pm->pcihp_io_len) {
-+    if (pm->pcihp_io_len && (pm->pcihp_bridge_en || pm->pcihp_root_en)) {
-         dev = aml_device("PHPR");
-         aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A06")));
-         aml_append(dev,
+[...]
+
 -- 
-2.17.1
+Regards,
+Collin
 
+Stay safe and stay healthy
 
