@@ -2,81 +2,93 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CD32C43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 07:56:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43091C43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 07:56:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77D5F21D6C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 07:56:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77D5F21D6C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 8957921D6C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 07:56:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ORW0tHdF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8957921D6C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGdvB-0002xh-FI
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 03:56:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53712)
+	id 1kGdvP-0003Mw-Bv
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 03:56:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53750)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kGdua-0002De-R2
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 03:56:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56396)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kGduY-0005Ux-QQ
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 03:56:00 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kGduW-0007t8-1D
- for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 07:55:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B191E2E80EA
- for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 07:55:55 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kGdug-0002Ip-2X
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 03:56:06 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26077
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kGduc-0005Wz-6l
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 03:56:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599810960;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hr81u7eMe+eZt/wS/Plq0RTW8wzeKJ2XtJkP6jGfroA=;
+ b=ORW0tHdFh0hv+Sa62hEUwh7ke0YsxYNEIhvc4O2W11PwJcxbw8coqYrVy8uGqDlgUKsxjM
+ 4IbR1H0wEX4JwC7qgtnvTyVMtkiCNhaI89dDC4CznoZQpd4Dg6VWaD5XB0LdJFk6lyHivE
+ VujkCav8BgPeOcym3PGCEN7LptlUTEE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-578-sDWJ6NXVOnOy-J-JE9HLdw-1; Fri, 11 Sep 2020 03:55:58 -0400
+X-MC-Unique: sDWJ6NXVOnOy-J-JE9HLdw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F3541020AD3;
+ Fri, 11 Sep 2020 07:55:19 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-113-52.ams2.redhat.com
+ [10.36.113.52])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7E9AA7BCC1;
+ Fri, 11 Sep 2020 07:55:17 +0000 (UTC)
+Subject: Re: PATCH: Increase System Firmware Max Size
+To: "McMillan, Erich" <erich.mcmillan@hp.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <CS1PR8401MB0327EF9D532330BA44257AFCF3240@CS1PR8401MB0327.NAMPRD84.PROD.OUTLOOK.COM>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <20c5210f-8199-a9e7-9297-0bea06c4d9ae@redhat.com>
+Date: Fri, 11 Sep 2020 09:55:16 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 11 Sep 2020 07:50:27 -0000
-From: Petunia <1895053@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: laurent-vivier petunia2000
-X-Launchpad-Bug-Reporter: Petunia (petunia2000)
-X-Launchpad-Bug-Modifier: Petunia (petunia2000)
-References: <159968542073.11462.1191604929312152807.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159981062772.14656.1719900949561099077.malone@gac.canonical.com>
-Subject: [Bug 1895053] Re: Cannot nspawn raspbian 10 [FAILED] Failed to start
- Journal Service.
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: 0acd242ee27bfd650ee16bd0f8e7cacc0ab4e939
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 02:05:39
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CS1PR8401MB0327EF9D532330BA44257AFCF3240@CS1PR8401MB0327.NAMPRD84.PROD.OUTLOOK.COM>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
+X-Mimecast-Spam-Score: 0.004
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=lersek@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 03:40:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,68 +97,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1895053 <1895053@bugs.launchpad.net>
+Cc: "mst@redhat.com" <mst@redhat.com>,
+ "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-mhm thats somehow unfortunate since I dont know in what direction I
-would have to go to solve the issue :/
++Markus, Dave, Phil
 
-I tried 245.7 but without success.
+On 09/11/20 03:45, McMillan, Erich wrote:
+> Hi all,
+> 
+> (this is my first Qemu patch submission, please let me know if my formatting/content needs to be fixed).
+> We have a need for increased firmware size, currently we are building Qemu with the following change to test our Uefi Firmware and it works well for us. Hope that this change can be made to open source. Thank you.
+> -------
+> Increase allowed system firmware size to 16M per comment suggesting up to 18M is permissible.
+> 
+>  Signed-off-by: Erich McMillan <erich.mcmillan@hp.com>
+> 
+> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+> index b8d8ef59eb17c6ace8194fc69c3d27809becfbc0..f6f7cd744d0690cee0355fbd19ffdcdb71ea75ca 100644
+> --- a/hw/i386/pc_sysfw.c
+> +++ b/hw/i386/pc_sysfw.c
+> @@ -46,7 +46,7 @@
+>   * only 18MB-4KB below 4G. For now, restrict the cumulative mapping to 8MB in
+>   * size.
+>   */
+> -#define FLASH_SIZE_LIMIT (8 * MiB)
+> +#define FLASH_SIZE_LIMIT (16 * MiB)
+> 
+>  #define FLASH_SECTOR_SIZE 4096
+> -------
+> 
+> 
 
-Do you maybe have an idea on how to investigate further?
-Is this some kind of distribution problem? What is the actual problem anywa=
-y?
+(1) This is not a trivial change, so qemu-trivial: please ignore.
 
--- =
+(2) The comment has not been updated.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1895053
+(3) I'm almost certain that *if* we want to change this, it needs to be
+turned into a machine type (or some device model) property, for
+migration compatibility.
 
-Title:
-  Cannot nspawn raspbian 10 [FAILED] Failed to start Journal Service.
+(4) I feel we need much more justification for this change than just
+"our firmware is larger than upstream OVMF".
 
-Status in QEMU:
-  New
+In the upstream 4MB unified OVMF build, there's *plenty* of free room.
+Of course that's not to say that we're willing to *squander* that space
+-- whenever we include anything new in the upstream OVMF platform(s),
+there must be a very good reason for it --, just that, given the
+upstream OVMF status, the proposed pflash increase in QEMU is staggering.
 
-Bug description:
-  Hi, I'm using nspawn and asked the question @systemd-devel. They redirect=
-ed me to you, guessing that nspawn calls a syscall or ioctl qemu isnt aware=
- of and can't implement properly?
-  They were like: "Sorry, that's not my department." ^^
+Considering upstream OVMF and QEMU, it should take *years* to even get
+close to filling the 4MB unified flash image of OVMF (hint: link-time
+optimization, LZMA compression), let alone to exhaust the twice as large
+(8MB) QEMU allowance.
 
-  Maybe you can reproduce the issue or help me investigating whats wrong
-  or put the ball right back into their court? :D
+Unless you are committed to open source your guest firmware too (maybe
+as part of upstream edk2, maybe elsewhere), I seriously doubt we should
+accommodate this use case in *upstream* QEMU. It complicates things
+(minimally with regard to migration), and currently I don't see the
+benefit to the upstream community.
 
-  Testscript:
-  wget https://downloads.raspberrypi.org/raspios_lite_armhf_latest -o r.zip
-  unzip r.zip
-  LOOP=3D$(losetup --show -Pf *raspios-buster-armhf-lite.img)
-  mount ${LOOP}p2 /mnt
-  mount ${LOOP}p1 /mnt/boot
-  systemd-nspawn --bind /usr/bin/qemu-arm-static --boot --directory=3D/mnt =
--- systemd.log_level=3Ddebug
+Clearly, for building your firmware image, you must have minimally
+modified the DSC and FDF files in OVMF too, or created an entirely
+separate firmware platform -- DSC and FDF both.
 
-  Output:
-  see attachment
+If you are using your downstream OVMF build as a testbed for your
+proprietary physical platform firmware, that's generally a use case that
+we're mildly interested in not breaking in upstream OvmfPkg. But in
+order to make me care for real (as an OvmfPkg co-maintainer), you'd need
+to upstream your OVMF platform to edk2 (we already have Xen and --
+recently added -- bhyve firmware platforms under OvmfPkg, not just
+QEMU). You'd also have to offer long-term reviewership and testing for
+that platform in edk2 (like the Xen and bhyve stake-holders do). Then we
+could consider additional complexity in QEMU for booting that firmware
+platform.
 
-  System:
-  uname -a
-  Linux MArch 5.8.7-arch1-1 #1 SMP PREEMPT Sat, 05 Sep 2020 12:31:32 +0000
-  x86_64 GNU/Linux
+Thanks,
+Laszlo
 
-  qemu-arm-static --version
-  qemu-arm version 5.1.0
-
-  systemd-nspawn --version
-  systemd 246 (246.4-1-arch)
-  +PAM +AUDIT -SELINUX -IMA -APPARMOR +SMACK -SYSVINIT +UTMP +LIBCRYPTSETUP
-  +GCRYPT +GNUTLS +ACL +XZ +LZ4 +ZSTD +SECCOMP +BLKID +ELFUTILS +KMOD +IDN2=
- -IDN
-  +PCRE2 default-hierarchy=3Dhybrid
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1895053/+subscriptions
 
