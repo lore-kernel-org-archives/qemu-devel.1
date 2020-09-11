@@ -2,67 +2,69 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B307C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:35:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD48BC43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:35:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12B4522208
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:35:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12B4522208
+	by mail.kernel.org (Postfix) with ESMTPS id 82A292220D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 19:35:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82A292220D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGop4-0004KQ-04
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 15:35:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44680)
+	id 1kGop7-0004U4-LV
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 15:35:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44742)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kGonj-0002Xw-11; Fri, 11 Sep 2020 15:33:39 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:37843)
+ id 1kGono-0002bg-5J; Fri, 11 Sep 2020 15:33:44 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:58637)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kGong-0000nO-NJ; Fri, 11 Sep 2020 15:33:38 -0400
+ id 1kGonl-0000nl-2p; Fri, 11 Sep 2020 15:33:43 -0400
 Received: from localhost.localdomain ([82.252.129.222]) by
  mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MtPzy-1kWZpT2vnS-00upci; Fri, 11 Sep 2020 21:33:34 +0200
+ id 1Mtxxk-1kX7nh13eO-00uHew; Fri, 11 Sep 2020 21:33:37 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/18] Trivial branch for 5.2 patches
-Date: Fri, 11 Sep 2020 21:33:12 +0200
-Message-Id: <20200911193330.1148942-1-laurent@vivier.eu>
+Subject: [PULL 03/18] hw/acpi/tco: Remove unused definitions
+Date: Fri, 11 Sep 2020 21:33:15 +0200
+Message-Id: <20200911193330.1148942-4-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200911193330.1148942-1-laurent@vivier.eu>
+References: <20200911193330.1148942-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:Uf1ImHGN3hTCyItTuo1NSRy+QQeqZKpPch5ylqEbMnYLi5mncEh
- /phlRp2Peq37BptkEMxOeOX4Q0UB+xGrm0Xqrki/ekT9Zyql9WxNbpvG3Ht4b0hURQzc/MN
- KkLvSdWQvBSnlydZxZ4kzdLmJOuwbHuCsizZmpy6xDnJ0Y+wo3xOC5nDAJMuEAPL9dQbE8f
- B1IzdaYrozXGwzqM/8aug==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:p3sUHaW7zsE=:7+ynzq724ge7URL9KWOMuF
- 1kGRGrwe/9WHiE7nzReq1eDB7iJdiuKtdkrHGrZeMNiqEK/HRMZYzPyQn+Uh8Ozl+N0PpqC2J
- i3jtNAGKyi+NNaRQn20A+97ZwKQHBEFr4HiJ6yeMDwnvEngeeW6xZT6MAT3vW4bIv2dLicA1e
- qcoDQxBhtiIP4lf7RemVigJko4mXXpTTUnvnSH5juxirtXdx9shiHD0ZnzRW4aWyFBYDCJ4FX
- 2YFN9S/Et/dvbaMx15kBFrgDB2ixTIWnqU4qoYf7wyHWRr3oDT/geH0pZZ215KBir/4TiKiVu
- IBzS7zlA6aHOrImDOpNKfgDymekkJiJgJHCIqRwz68Aeih59H1jwYL3DsTgx6UVmeB80ihGVO
- kyb6yZmIoOg16tW8j2ouX417OFi6M/NdnJ25aHMQwMycrTHMUdYTHleTyDbkcX8A1CahzwzHE
- 9sMo44+9wjW0Ru7hEUmxBHNATVKLHyLiJTUgGamCsBuEG03SdeyGuXjdDS5JrAbIX7jV6eqhQ
- cG5Diz6y/fdtIn88UlVlxEo6HNRR99RePoQBmfqeuNLR+KgZRbeSX/7jNdF7bh+IKbMz5yW3o
- g/Z4rnl0B5Qo4nTPJg+thLNFLy1OCgk5cYxPO93V+WuReol3iRWmthCip9nXIBd0a1Kxf7L7G
- KEENJTmIH5MEIteABiXO8v8s6io6xkGo3kSX4i6jjcAZfP8jHjv73yJLv1/5jKHbKc8lcYEyO
- Jl5hh3PblczWzdoKu9ZVNeLP7747mZXuEiRcBnD7ZXyqgiHHs/i+/Af2ekXyBCigN3drhivuT
- 4GpGnq1mJAYiUaaVDNeDgi4kxHAMbyNIhSGrWVBWqgejpQ+IIqL+8b1dBHNIn68L6yq8AZx
-Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:lytElenqQ/jkApA2KD0dlZ7WvY0XwOzKahOEJvBCS+/K7IWbE9Y
+ RFxC4CfKUOPWsG8jnExJi6ggrOq+4/2IjrmLwU3Il3jhGma+rQn7zT3ssFEbFN39eu6wigJ
+ ktQk778rI+lC7sN0Ams0T8eMajWia/cKJ7smUe5VlGmcGWq4YQ5stbNd+wJksSIYMZiS529
+ 5qSW5mA8I1fS5sSDz+DKA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:KE7inTOMhi0=:ZndHDxmf0MC5OOHoHLZb3e
+ GHNqOWqiu/FGC1CJ+3RKUUfUtFv7BoAQNptDDe6g8deSWvQGY+bSDOcmf9j2YbH4X7VaCZANl
+ HTQMQK1Weaaa28mQCaiFzLckB6L96cujMwy/yjt1R0gEx6elsml3MFr5/w4NVES0P5L1wFkwt
+ fpyj9H6DrJUFTYCySIBB7yU3gcsqfhsiF+ZQUtFOnaMnyIm/D9TItJ3obx4rr9ldeGMzXoC5H
+ T7TLvFhvhXncHx4UIbSiIliQyiIPiba8XYKTUTtq1fuCkeAQoGu3Dxhub0duB1O9jT6pY9598
+ ghyv0gL4Gfui6ZDib0j8nhU2M8kfYEOlxRNRKobfJoblbLFpGkd80QOyXGaOBS/9S/wGR0Zxz
+ 5D4yA3gmjobqc9/EN6eadWcyOEYLNZg49Han/b+3vO0/9NUCeRIqU+o7YVJ6lWdgW8YOhHa/F
+ tE/51+DwxGRx+Q0505odW2xpRcx2g5xGUyQghEgjzOmq52nv3bhHStVa382+s0u6XuNJwkDwJ
+ ZTcSIyAW9x0Lxb5qPnZXvmNmWLyCwhrkP6assldyNqnn5yp52PL6mZ5bKY/9Jpiu+p2cRDv+j
+ y/GHKFLh/0cJYVBq9cuXCckHinjBOzvrit/UAACD0rt/EXYvAkd4EK8qMjPCJ8+0JITXYWH9E
+ 8+Ie58mHC4CNC74x9wQtCgtIhp1ixrNGbhsdPf5I1fbyzx1MKvMMwA28XWogpSzVfJ5euk5wf
+ ZueY4XUBfhPzMMfbmrvVcsPwrR/SP89xNd1dvZZIszYnlEp497g6ge/V7PrjsrdHOG/CC65ch
+ F1YkjUlJy0akbQDqXz9c53gmPrMaGaiFR5k6oyOp8mwhUrH8s9fwbcipGCVs+6CTV0nzpWi
+Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 15:33:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 15:33:39
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
@@ -81,91 +83,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-trivial@nongnu.org, Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a=
-:=0D
-=0D
-  Merge remote-tracking branch 'remotes/kraxel/tags/sirius/ipxe-20200908-pu=
-ll=3D=0D
--request' into staging (2020-09-08 21:21:13 +0100)=0D
-=0D
-are available in the Git repository at:=0D
-=0D
-  git://github.com/vivier/qemu.git tags/trivial-branch-for-5.2-pull-request=
-=0D
-=0D
-for you to fetch changes up to 8821e21414468b1810f0ccf38bcbfa5c0bd1d56b:=0D
-=0D
-  target/i386/kvm: Add missing fallthrough comment (2020-09-11 21:25:59 +02=
-00)=0D
-=0D
-----------------------------------------------------------------=0D
-trivial patches pull request 20200911=0D
-=0D
-----------------------------------------------------------------=0D
-=0D
-Greg Kurz (2):=0D
-  Makefile: Drop extra phony cscope=0D
-  Makefile: Skip the meson subdir in cscope/TAGS/ctags=0D
-=0D
-Jon Doron (1):=0D
-  hw: hyperv: vmbus: Fix 32bit compilation=0D
-=0D
-Pan Nengyuan (1):=0D
-  test-vmstate: remove unnecessary code in match_interval_mapping_node=0D
-=0D
-Paolo Bonzini (1):=0D
-  kconfig: fix comment referring to old Makefiles=0D
-=0D
-Philippe Mathieu-Daud=3DC3=3DA9 (10):=0D
-  hw/mips/fuloong2e: Convert pointless error message to an assert()=0D
-  hw/isa/isa-bus: Replace hw_error() by assert()=0D
-  hw/acpi/tco: Remove unused definitions=0D
-  hw/gpio/omap_gpio: Replace fprintf() by qemu_log_mask(GUEST_ERROR)=0D
-  hw/gpio/max7310: Replace disabled printf() by qemu_log_mask(UNIMP)=0D
-  hw/net/e1000e: Remove overwritten read handler for STATUS register=0D
-  hw/net/e1000e: Remove duplicated write handler for FLSWDATA register=0D
-  target/i386/kvm: Rename host_tsx_blacklisted() as host_tsx_broken()=0D
-  util/hexdump: Convert to take a void pointer argument=0D
-  util/hexdump: Reorder qemu_hexdump() arguments=0D
-=0D
-Sergei Trofimovich (1):=0D
-  meson.build: tweak sdl-image error message=0D
-=0D
-Thomas Huth (2):=0D
-  hw/arm/pxa2xx: Add missing fallthrough comment=0D
-  target/i386/kvm: Add missing fallthrough comment=0D
-=0D
- Kconfig.host             |  4 ++--=0D
- Makefile                 | 10 ++++++----=0D
- hw/acpi/tco.c            | 11 -----------=0D
- hw/arm/pxa2xx.c          |  2 +-=0D
- hw/dma/xlnx_dpdma.c      |  2 +-=0D
- hw/gpio/max7310.c        | 11 +++++------=0D
- hw/gpio/omap_gpio.c      |  6 ++++--=0D
- hw/hyperv/vmbus.c        |  3 ++-=0D
- hw/isa/isa-bus.c         |  9 ++-------=0D
- hw/mips/fuloong2e.c      |  5 +----=0D
- hw/net/e1000e_core.c     |  2 --=0D
- hw/net/fsl_etsec/etsec.c |  2 +-=0D
- hw/net/fsl_etsec/rings.c |  2 +-=0D
- hw/sd/sd.c               |  2 +-=0D
- hw/usb/redirect.c        |  2 +-=0D
- include/qemu-common.h    |  3 ++-=0D
- meson.build              |  4 ++--=0D
- net/colo-compare.c       | 24 ++++++++++++------------=0D
- net/net.c                |  2 +-=0D
- target/i386/kvm.c        |  5 +++--=0D
- tests/test-vmstate.c     |  3 ---=0D
- util/hexdump.c           |  4 +++-=0D
- util/iov.c               |  2 +-=0D
- 23 files changed, 52 insertions(+), 68 deletions(-)=0D
-=0D
---=3D20=0D
-2.26.2=0D
-=0D
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+TCO_DEBUG() and DEBUG definitions are not used, remove them.
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20200901101951.85892-1-f4bug@amsat.org>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ hw/acpi/tco.c | 11 -----------
+ 1 file changed, 11 deletions(-)
+
+diff --git a/hw/acpi/tco.c b/hw/acpi/tco.c
+index fb9052dbca2a..cf1e68a5393b 100644
+--- a/hw/acpi/tco.c
++++ b/hw/acpi/tco.c
+@@ -15,17 +15,6 @@
+ #include "hw/acpi/tco.h"
+ #include "trace.h"
+ 
+-//#define DEBUG
+-
+-#ifdef DEBUG
+-#define TCO_DEBUG(fmt, ...)                                     \
+-    do {                                                        \
+-        fprintf(stderr, "%s "fmt, __func__, ## __VA_ARGS__);    \
+-    } while (0)
+-#else
+-#define TCO_DEBUG(fmt, ...) do { } while (0)
+-#endif
+-
+ enum {
+     TCO_RLD_DEFAULT         = 0x0000,
+     TCO_DAT_IN_DEFAULT      = 0x00,
+-- 
+2.26.2
+
 
