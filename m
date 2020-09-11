@@ -2,87 +2,84 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 017A5C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 15:48:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68147C43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 15:53:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30A0D20758
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 15:48:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C952521D7E
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 15:53:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="coIZ7H+M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30A0D20758
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AUy3LNkB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C952521D7E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGlHn-0008Lo-T6
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 11:48:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50136)
+	id 1kGlMV-0003Wc-Cd
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 11:53:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51018)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kGlH8-0007sD-Ho
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 11:47:46 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41409
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kGlH5-0001zg-MR
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 11:47:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599839261;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=Qldg5I0egSU6mHzNQ6ouudBvy85FNvWxGdUFSTIPBxA=;
- b=coIZ7H+MbQv8LW7Gksf33s/bkBQWZKfq6G2g1v8b+PC6KKnlqbmnxyARgPsVcHqgjJgL1z
- Z2HRwY7nM3b+XpcXclKNbwKubewkbCNpiS7TMRS/gMfktFcvB6ys6ihrOz7UXKFp81/KkD
- Xc1iTI/dzyBkv3TWdG7Nn7XAXGZqgno=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17-nSyneRtqPyClEXGyeeEcIQ-1; Fri, 11 Sep 2020 11:47:35 -0400
-X-MC-Unique: nSyneRtqPyClEXGyeeEcIQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 81556801F97
- for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 15:47:34 +0000 (UTC)
-Received: from redhat.com (ovpn-113-229.ams2.redhat.com [10.36.113.229])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C45612C31E;
- Fri, 11 Sep 2020 15:47:33 +0000 (UTC)
-Date: Fri, 11 Sep 2020 16:47:30 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: P J P <ppandit@redhat.com>
-Subject: Re: About 'qemu-security' mailing list
-Message-ID: <20200911154730.GK1203593@redhat.com>
-References: <nycvar.YSQ.7.78.906.2009111910280.36374@xnncv>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kGlLK-0002BQ-5c
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 11:52:06 -0400
+Received: from mail-ej1-x62f.google.com ([2a00:1450:4864:20::62f]:46047)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kGlLG-0002jU-D2
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 11:52:05 -0400
+Received: by mail-ej1-x62f.google.com with SMTP id i26so14405718ejb.12
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 08:52:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=905/LmpI1rmTbzQvyJT7mh2m5Eyt7bbtxYznlZ3RBaI=;
+ b=AUy3LNkB0kAB7CVPN04aeBzUTbFmI5PqLxNTCCh0GuokYYSPWeucQppDJGFoGw2gCc
+ UC1C8x7CiT24CAkZR5dT5Rp8qAQ6R/fA12t9MeRWExQu+SR9O7rpCVoSKz4Y0DoPhLZR
+ fW8RqujRjbN8sSCcgaLoqi282uSGPIWoK0DqirUHrfRyuMNaB3shSKz5oe5xYQYlNjwG
+ 0dVC0LXnwxHNrh9Ygc/tPXWoAgcM4Dl38/A/sqjXqTyA1cuB+8itTgh8Y66hRu1IIiYw
+ 49KTCi2/plEgdguEVX11q1JMtXWDpBM5qR6ujUdKNRUhb9tLQCl+1HGFX1/2zkzog595
+ d95Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=905/LmpI1rmTbzQvyJT7mh2m5Eyt7bbtxYznlZ3RBaI=;
+ b=T/zagjeoBfdVPyxGyeRhlHHRDOSlR3nqo+q1Zlpu+0ofIuUOTquWWeLsQv00nN4NdM
+ bOn63CfoSZKqEb3aBrWnc1sIFAFcj2eWv0fKiTy6x0Ji/rThB9UmOlAWX/tGgXbOzQ51
+ kiN4rJdPZnCiVCrVixpZMfrXrxH4XZlkl2GSDHd9uSpesUEdeRdhGXTGncFTpNuZOjMv
+ SuG+msiadfiUQgqgZJNAuRQU8O3rfNSQywDadzrXbWiupHCyS24Q1OHJk1aV4RNnMsK9
+ HMFvxhKDRDbDeu9hpcw2Fm0ltZAtO1Ac6RComPhBXG8IlgtWlBf/GWNlwLedoQLdrrn2
+ ZQ9w==
+X-Gm-Message-State: AOAM531kjMRHpluZGcAxVGgVQ5ZV5aVSyysKYby8DWueJtSZ4VYVa/AR
+ Wb/A3yxCudllbPezW3NkeUegGAAOVKd5aytqdeY5vw==
+X-Google-Smtp-Source: ABdhPJwgdtmTN6N0YRdTELR66ro07JQFQtcZRXHnQQC/WHpkAVqRP0fLF7S6P4qEXylRaGBP6/gdjKYffE5akddH6FQ=
+X-Received: by 2002:a17:906:71c9:: with SMTP id
+ i9mr2638308ejk.250.1599839520807; 
+ Fri, 11 Sep 2020 08:52:00 -0700 (PDT)
 MIME-Version: 1.0
+References: <nycvar.YSQ.7.78.906.2009111910280.36374@xnncv>
 In-Reply-To: <nycvar.YSQ.7.78.906.2009111910280.36374@xnncv>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 00:33:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 11 Sep 2020 16:51:49 +0100
+Message-ID: <CAFEAcA_9BVbqFCHJqS8jj6L3OqVNc60NCjAjRs516VyLH2EFfw@mail.gmail.com>
+Subject: Re: About 'qemu-security' mailing list
+To: P J P <ppandit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::62f;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x62f.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,84 +93,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 11, 2020 at 07:50:24PM +0530, P J P wrote:
->   Hello all,
-> 
-> Recently while conversing with DanPB this point came up
-> 
->    -> https://www.qemu.org/contribute/security-process/
-> 
-> * Currently QEMU security team is a handful of individual contacts which
->   restricts community participation in dealing with these issues.
-> 
-> * The Onus also lies with the individuals to inform the community about QEMU
->   security issues, as they come in.
-> 
-> 
+On Fri, 11 Sep 2020 at 15:22, P J P <ppandit@redhat.com> wrote:
 > Proposal: (to address above limitations)
 > =========
-> 
+>
 > * We set up a new 'qemu-security' mailing list.
-> 
+>
 > * QEMU security issues are reported to this new list only.
-> 
+>
 > * Representatives from various communities subscribe to this list. (List maybe
->   moderated in the beginning.)
-
-For libvirt we have the list membership targetted as being nominated
-security representatives of any downstream distributor of libvirt.
-ie essentially the security people from various OS vendors. Other
-members can be considered on a case by case basis if they want to
-make their case.
-
-FWIW, we have the libvirt-security list moderated at all times, and
-manually approve mails from non-members in order to prevent it being
-a spam trap. Manual moderation is not too much of a burden assuming
-the rate of CVEs isn't huge !
-
+>    moderated in the beginning.)
+>
 > * As QEMU issues come in, participants on the 'qemu-security' list shall
->   discuss and decide about how to triage them further.
+>    discuss and decide about how to triage them further.
 
-For libvirt-security, members are required to respect the project's
-declared embargo policy. This sets as a 2 week maximum by default,
-anything beyond 2 weeks has to be explicitly requested as appropriate
-and not have objection from members of the list.  QEMU doesn't set any
-explicit default embargo period right now just saying it is via mutual
-agreement:
+Way way back, the idea of a qemu-security list was proposed, and
+it was decided against because there wasn't a clear way that
+people could send encrypted mail to the security team if it
+was just a mailing list. So that's why we have the "handful
+of individual contacts" approach. Is that still something people
+care about ?
 
-  https://www.qemu.org/contribute/security-process/
+My question is, who decides who's on the qemu-security list?
+Is this just "it's the same handful of contacts, but they
+have a mailing list for convenience" ? It sounds like you
+want it to be a larger grouping than that and maybe also
+want to use it as a mechanism for informing downstream distros
+etc about QEMU security issues, which is to say you're
+proposing an overhaul and change to our security process,
+not merely "we'd like to create a mailing list" ?
 
-this might want to be clarified to set a default expectation, because
-with a list of members you won't want to wait for everyone to explicitly
-approve a date. You want people to know what to expect as a default
-upfront, and only have the discussions in cases which need more time.
-
-I'm not saying QEMU has to be 2 weeks - perhaps just look at a sample
-of the past year's CVEs in QEMU and use them as a guide for a reasonable
-default period to handle or publish the issues.
-
-> Please kindly let us know your views about it. I'd appreciate if you have
-> any suggestions/inputs/comments about the same.
-
-I'm in favour of this, since this is what we have done for libvirt
-upstream security response handling, and it has been a clear improvement
-on our previous process involving CC'ing individual developers.
-
-It makes the security response process more of a level playing field for
-all downstreams QEMU distributors.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+thanks
+-- PMM
 
