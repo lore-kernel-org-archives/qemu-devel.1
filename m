@@ -4,92 +4,90 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EA8AC43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:52:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23516C43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:54:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34B82207FB
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:52:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 98D39207FB
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:54:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JbyQZ6nF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34B82207FB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d8mmrL7g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98D39207FB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGmI8-0004gG-Dw
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 12:52:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36894)
+	id 1kGmJO-0005my-Nb
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 12:54:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37266)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kGmHW-0004AY-F1
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 12:52:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51738
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kGmIU-00056A-3I
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 12:53:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32652)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kGmHU-0003lp-Kn
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 12:52:14 -0400
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kGmIS-0003xx-DO
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 12:53:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599843131;
+ s=mimecast20190719; t=1599843191;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KdqJbrxL/AwxVkgJA8HBG/XJzgdBc1MfdvhlV2cP3Dw=;
- b=JbyQZ6nFL3tB+ZYirLcB8/NIrYALP0Fx4N7stEtA4gGUVkUzOWXkvhFizL8Ub0D3Y8KrLt
- wjI/Nv25cqZaDOLiBdg6NEWehLpXxgBsRRbUuYeLdBggts8n4QEh7n5MXz/avD3P4vfGrS
- MRNakwudCVwul0lNcrmwO3c8XuZQKJg=
+ bh=cojfHuAN6eq83UXIvxRiKWfl98snYvoCazGL6PGzvAU=;
+ b=d8mmrL7gq8w7yfxLE4ndiv+A5APHyPWhni0DQWmW2Xz5oViyFc5z5gXLu0wzwlIxzlljW0
+ drq6GYNKodM37ffyWxOaY+TUWX5k4Jz3Yq6WwasHxM/2x9XhO5jPPa8+HXF4WrdPgyebqB
+ BnqbNk5WxtoxK8Hvn3RzXdtUpMiGVRA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-394-lwu8TFuRNAqRRRXD3Uldyg-1; Fri, 11 Sep 2020 12:52:09 -0400
-X-MC-Unique: lwu8TFuRNAqRRRXD3Uldyg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-453-JWwDSXdrOJ6Ld-8ljFACAQ-1; Fri, 11 Sep 2020 12:53:08 -0400
+X-MC-Unique: JWwDSXdrOJ6Ld-8ljFACAQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7B881074643;
- Fri, 11 Sep 2020 16:52:06 +0000 (UTC)
-Received: from w520.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1151F1A8AC;
- Fri, 11 Sep 2020 16:51:57 +0000 (UTC)
-Date: Fri, 11 Sep 2020 10:51:55 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200911105155.184e32a0@w520.home>
-In-Reply-To: <20200911005559.GA3932@joy-OptiPlex-7040>
-References: <20200825163925.1c19b0f0.cohuck@redhat.com>
- <20200826064117.GA22243@joy-OptiPlex-7040>
- <20200828154741.30cfc1a3.cohuck@redhat.com>
- <8f5345be73ebf4f8f7f51d6cdc9c2a0d8e0aa45e.camel@redhat.com>
- <20200831044344.GB13784@joy-OptiPlex-7040>
- <20200908164130.2fe0d106.cohuck@redhat.com>
- <20200909021308.GA1277@joy-OptiPlex-7040>
- <20200910143822.2071eca4.cohuck@redhat.com>
- <7cebcb6c8d1a1452b43e8358ee6ee18a150a0238.camel@redhat.com>
- <20200910120244.71e7b630@w520.home>
- <20200911005559.GA3932@joy-OptiPlex-7040>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AEF318030DD;
+ Fri, 11 Sep 2020 16:53:07 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-113-62.ams2.redhat.com
+ [10.36.113.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0C1457B7A3;
+ Fri, 11 Sep 2020 16:53:02 +0000 (UTC)
+Subject: Re: PATCH: Increase System Firmware Max Size
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <CS1PR8401MB0327EF9D532330BA44257AFCF3240@CS1PR8401MB0327.NAMPRD84.PROD.OUTLOOK.COM>
+ <20c5210f-8199-a9e7-9297-0bea06c4d9ae@redhat.com>
+ <20200911083408.GA3310@work-vm>
+ <ae2d820e-78c6-da92-2fa6-73c1a7d10333@redhat.com>
+ <20200911150602.GH3310@work-vm>
+ <8e2d0bf7-a206-124c-15b0-0f0071ef5a11@redhat.com>
+ <20200911162251.GA3311@work-vm>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <171b8941-abb6-bb21-4080-c5c3eb0e59ae@redhat.com>
+Date: Fri, 11 Sep 2020 18:53:02 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200911162251.GA3311@work-vm>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Received-SPF: pass client-ip=205.139.110.120;
- envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 03:28:41
+Content-Language: en-US
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=lersek@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 23:26:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,132 +100,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
- eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
- openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
- kevin.tian@intel.com, Parav Pandit <parav@mellanox.com>,
- jian-feng.ding@intel.com, dgilbert@redhat.com, zhenyuw@linux.intel.com,
- hejie.xu@intel.com, bao.yumeng@zte.com.cn, Jiri Pirko <jiri@mellanox.com>,
- eskultet@redhat.com, Sean Mooney <smooney@redhat.com>,
- intel-gvt-dev@lists.freedesktop.org,
- Daniel =?UTF-8?B?UC5CZXJyYW5nw6k=?= <berrange@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, dinechin@redhat.com, devel@ovirt.org
+Cc: "mst@redhat.com" <mst@redhat.com>,
+ "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "McMillan,
+ Erich" <erich.mcmillan@hp.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 11 Sep 2020 08:56:00 +0800
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+On 09/11/20 18:22, Dr. David Alan Gilbert wrote:
 
-> On Thu, Sep 10, 2020 at 12:02:44PM -0600, Alex Williamson wrote:
-> > On Thu, 10 Sep 2020 13:50:11 +0100
-> > Sean Mooney <smooney@redhat.com> wrote:
-> >   
-> > > On Thu, 2020-09-10 at 14:38 +0200, Cornelia Huck wrote:  
-> > > > On Wed, 9 Sep 2020 10:13:09 +0800
-> > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > >     
-> > > > > > > still, I'd like to put it more explicitly to make ensure it's not missed:
-> > > > > > > the reason we want to specify compatible_type as a trait and check
-> > > > > > > whether target compatible_type is the superset of source
-> > > > > > > compatible_type is for the consideration of backward compatibility.
-> > > > > > > e.g.
-> > > > > > > an old generation device may have a mdev type xxx-v4-yyy, while a newer
-> > > > > > > generation  device may be of mdev type xxx-v5-yyy.
-> > > > > > > with the compatible_type traits, the old generation device is still
-> > > > > > > able to be regarded as compatible to newer generation device even their
-> > > > > > > mdev types are not equal.      
-> > > > > > 
-> > > > > > If you want to support migration from v4 to v5, can't the (presumably
-> > > > > > newer) driver that supports v5 simply register the v4 type as well, so
-> > > > > > that the mdev can be created as v4? (Just like QEMU versioned machine
-> > > > > > types work.)      
-> > > > > 
-> > > > > yes, it should work in some conditions.
-> > > > > but it may not be that good in some cases when v5 and v4 in the name string
-> > > > > of mdev type identify hardware generation (e.g. v4 for gen8, and v5 for
-> > > > > gen9)
-> > > > > 
-> > > > > e.g.
-> > > > > (1). when src mdev type is v4 and target mdev type is v5 as
-> > > > > software does not support it initially, and v4 and v5 identify hardware
-> > > > > differences.    
-> > > > 
-> > > > My first hunch here is: Don't introduce types that may be compatible
-> > > > later. Either make them compatible, or make them distinct by design,
-> > > > and possibly add a different, compatible type later.
-> > > >     
-> > > > > then after software upgrade, v5 is now compatible to v4, should the
-> > > > > software now downgrade mdev type from v5 to v4?
-> > > > > not sure if moving hardware generation info into a separate attribute
-> > > > > from mdev type name is better. e.g. remove v4, v5 in mdev type, while use
-> > > > > compatible_pci_ids to identify compatibility.    
-> > > > 
-> > > > If the generations are compatible, don't mention it in the mdev type.
-> > > > If they aren't, use distinct types, so that management software doesn't
-> > > > have to guess. At least that would be my naive approach here.    
-> > > yep that is what i would prefer to see too.  
-> > > >     
-> > > > > 
-> > > > > (2) name string of mdev type is composed by "driver_name + type_name".
-> > > > > in some devices, e.g. qat, different generations of devices are binding to
-> > > > > drivers of different names, e.g. "qat-v4", "qat-v5".
-> > > > > then though type_name is equal, mdev type is not equal. e.g.
-> > > > > "qat-v4-type1", "qat-v5-type1".    
-> > > > 
-> > > > I guess that shows a shortcoming of that "driver_name + type_name"
-> > > > approach? Or maybe I'm just confused.    
-> > > yes i really dont like haveing the version in the mdev-type name 
-> > > i would stongly perfger just qat-type-1 wehere qat is just there as a way of namespacing.
-> > > although symmetric-cryto, asymmetric-cryto and compression woudl be a better name then type-1, type-2, type-3 if
-> > > that is what they would end up mapping too. e.g. qat-compression or qat-aes is a much better name then type-1
-> > > higher layers of software are unlikely to parse the mdev names but as a human looking at them its much eaiser to
-> > > understand if the names are meaningful. the qat prefix i think is important however to make sure that your mdev-types
-> > > dont colide with other vendeors mdev types. so i woudl encurage all vendors to prefix there mdev types with etiher the
-> > > device name or the vendor.  
-> > 
-> > +1 to all this, the mdev type is meant to indicate a software
-> > compatible interface, if different hardware versions can be software
-> > compatible, then don't make the job of finding a compatible device
-> > harder.  The full type is a combination of the vendor driver name plus
-> > the vendor provided type name specifically in order to provide a type
-> > namespace per vendor driver.  That's done at the mdev core level.
-> > Thanks,  
-> 
-> hi Alex,
-> got it. so do you suggest that vendors use consistent driver name over
-> generations of devices?
-> for qat, they create different modules for each generation. This
-> practice is not good if they want to support migration between devices
-> of different generations, right?
-> 
-> and can I understand that we don't want support of migration between
-> different mdev types even in future ?
+> We have lots of complex hideous changes that I'm never going to use but
+> seem reasonable;  this is a tiny change that seems perfectly reasonable
+> both for open and closed firmware.
+> I realise herding OVMF developers is tricky, but that's not a reason
+> to nack a reasonable almost trivial change in QEMU.
 
-You need to balance your requirements here.  If you're creating
-different drivers per generation, that suggests different device APIs,
-which is a legitimate use case for different mdev types.  However if
-you're expecting migration compatibility, that must be seamless to the
-guest, therefore the device API must be identical.  That suggests that
-migration between different types doesn't make much sense.  If a new
-generation device wants to expose a new mdev type with new features or
-device API, yet also support migration with an older mdev type, why
-wouldn't it simply expose both the old and the new type?  It seems much
-more supportable to simply instantiate an instance of the older type
-than to create an instance of the new type, which by the contents of
-the migration stream is configured to behave as the older type.  The
-latter sounds very difficult to test.
+OK.
 
-A challenge when we think about migration between different types,
-particularly across different vendor drivers, is that the migration
-stream is opaque, it's device and vendor specific.  Therefore it's not
-only difficult for userspace to understand the compatibility matrix, but
-also to actually support it in software, maintaining version and bug
-compatibility across different drivers.  It's clearly much, much easier
-when the same code base (and thus the same mdev type) is producing and
-consuming the migration data.  Thanks,
-
-Alex
+Laszlo
 
 
