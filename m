@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 403C4C43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 22:48:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CAE3C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 22:49:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDF9F221EB
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 22:48:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DEF97221EB
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 22:49:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Yq6VJMGo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDF9F221EB
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VBVfMgCe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEF97221EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGrqF-0004oa-Rh
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 18:48:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53636)
+	id 1kGrr4-0005l8-2b
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 18:49:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53782)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kGrpE-00040i-Vb
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 18:47:24 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:43345)
+ id 1kGrq2-0004hb-AX
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 18:48:15 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:37886)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kGrpD-00011X-23
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 18:47:24 -0400
-Received: by mail-pg1-x543.google.com with SMTP id t14so7547785pgl.10
- for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 15:47:22 -0700 (PDT)
+ id 1kGrq0-00016Y-Rb
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 18:48:14 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id kk9so2358602pjb.2
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 15:48:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=V6WaJlTZUc6e/j6lXXyh92+LR+6Qs2Lu7woOTUQ8szE=;
- b=Yq6VJMGobB30S2Nf6/+1Ege5Fd1MnhYxC2l6yxjhA+wv/qH1o6lPV4mfxirsnbGbNN
- WYDvU9+NxmoByLZvlm5+vUAZdgDErlVlWGIC6bwG8ZGb7oRhD/G+7AEmvR5XXPFHCQol
- WgaJ/OS7GynvTBvgwXowyyo4fcAixtjzgztLjkZiOziW2Pgex63tg272puy59/WmInxi
- QPGX4a5EjxX5IkAFFib0lXDGyi7otOw6ZSJ80ijWqSa0cFQUdhV1WPf8b8dXwNcEFx6T
- 1DXHYKEaYcJ2NT34KLjdVOV74D0w6z4vCbJIvfniOGOcF/F3dYva9f+pmoe/vWA7wbM7
- ux7w==
+ bh=QIa1gYMd2982R0r1MVBdCj1U9OhtTqhpoj4DQnzfJrM=;
+ b=VBVfMgCeFHxPo3vPFCGpABujuY16lam+Hl1MDZpbhjh1mhaEyb+3fejaEbBu8oX9mB
+ y/uZEp9V7PNVeAJxC6tJbzCY7Nfs9gwjMt+84vrlC/INlI24VOPk9TI6T8hF4PEAPpQB
+ reWQ44xNXObgjF4Rbhmi2gnJXMctRHwsJXLTp0gLuRHcnQilDZAVCCgv2ot+eywf22dh
+ WkA9bCEV/hTUb0aauvp4xQyzpaUNZJzMegfmuIZNc4JJx6sruy3MDOwPDjlliDvQHRMd
+ kGQ49UErx3JG/aMovWuj4nKDRDdCTlBggKiuAMOXX61oroFO+zCv7G08kB5nKkx351kg
+ N1fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=V6WaJlTZUc6e/j6lXXyh92+LR+6Qs2Lu7woOTUQ8szE=;
- b=lztnYuuW7NW1UDkkexyxKfVzYeyX2ztcGf5X4zvEsk9quplzv6fXOvFJZNYq8owhV4
- 4okZfHLxZ862w+ITadL9C1cLoe7r1UWrfZCdNnxs4cHGlCxsxEqy6l6rDmNzy0J4zziV
- L47rBty07RK1amcVxi8MlZE3yQEUeVzU8/HNLUx5hkK9HYgBSSTZQ90E50FzGBgMoG9Q
- ya4rIK1Nw18cqwB619aPKMgND1AIVQzUXmqR6qyD/ZfMJOneg6fNdKCWPD/w6QzTOJyA
- Vf0ArABYJ6jObNz8O7JMbPE2ez9znbWdzv+1VF4ulGfITkARSOHEmWnKXZAc7s/dcxAR
- CLUA==
-X-Gm-Message-State: AOAM5301uz7qjvpj2M8R7nswf20Y00gKKMyrNW7kpIxa6fKhfJTj7tXa
- 7Ww1lZpmfKXmrYg8l0TBnZEddQ==
-X-Google-Smtp-Source: ABdhPJzvHF9+wN/7LjDbKP01RAdISH72JpDqO7NoI8beY/d5j7HznXoiHkSqizPqtIkL5np198wPdQ==
-X-Received: by 2002:a62:52ce:0:b029:13e:50c8:499b with SMTP id
- g197-20020a6252ce0000b029013e50c8499bmr4106208pfb.14.1599864441322; 
- Fri, 11 Sep 2020 15:47:21 -0700 (PDT)
+ bh=QIa1gYMd2982R0r1MVBdCj1U9OhtTqhpoj4DQnzfJrM=;
+ b=SYGGqmoRvimc8er5ntx1T/jYMy0BfOuimd47KbZkndaRzLPRF+HCS6VaAxfCnv1xug
+ qdvm5PXlyb2AwTxkSDw33LmP2lh5qZuJXjbWcvVXg538e/0wGsyzkQSi8QfJCEsDhIoM
+ 9Vtky//npljyce16SQEGC3yrkVT0hthXuf5pogeQaijn6il+W9phwbIaVtK4WAbaGsSW
+ SuGa5yHt+xilseReElqwGnWjHi3hXoLTkftDMem9D88UTGHJoHI9vnkFQzPa6AU5zaJ2
+ O/HJdnTLIXBHzt5IgJn5mLQsdL8UQpkSGVv+lyHZUGzyMguSdYl3paIxn1jz0k72SECX
+ bmxA==
+X-Gm-Message-State: AOAM532fwY+He/HfhjgmRxNFJpjqXA4Cd3Ph1z5z03k/q9qQ6Rvezw/G
+ h+azO+w+T848fad4hoSenVrAZQ==
+X-Google-Smtp-Source: ABdhPJzQb9yWetJN1+iFga6bt2YLBdC1LuXVJx6oN7I6aRhjHqO8NYq0w4wJ/VdoAv7UOZuqwRK0VA==
+X-Received: by 2002:a17:90a:cc0e:: with SMTP id
+ b14mr3976206pju.166.1599864491471; 
+ Fri, 11 Sep 2020 15:48:11 -0700 (PDT)
 Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id v5sm3183153pfv.199.2020.09.11.15.47.20
+ by smtp.gmail.com with ESMTPSA id kt18sm2776896pjb.56.2020.09.11.15.48.10
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 11 Sep 2020 15:47:20 -0700 (PDT)
-Subject: Re: [PATCH v5 6/7] hw/misc/mps2-scc: Use the LED device
+ Fri, 11 Sep 2020 15:48:10 -0700 (PDT)
+Subject: Re: [PATCH v5 7/7] hw/arm/tosa: Replace fprintf() calls by LED devices
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
 References: <20200910205429.727766-1-f4bug@amsat.org>
- <20200910205429.727766-7-f4bug@amsat.org>
+ <20200910205429.727766-8-f4bug@amsat.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d337ce10-a7f3-671a-46c6-5201b004ad6d@linaro.org>
-Date: Fri, 11 Sep 2020 15:47:18 -0700
+Message-ID: <4adecaec-b777-4b53-9890-5b88c5122f63@linaro.org>
+Date: Fri, 11 Sep 2020 15:48:08 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200910205429.727766-7-f4bug@amsat.org>
+In-Reply-To: <20200910205429.727766-8-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -45
@@ -117,28 +117,16 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/10/20 1:54 PM, Philippe Mathieu-Daudé wrote:
-> Per the 'ARM MPS2 and MPS2+ FPGA Prototyping Boards Technical
-> Reference Manual' (100112_0200_07_en):
-> 
->   2.1  Overview of the MPS2 and MPS2+ hardware
-> 
->        The MPS2 and MPS2+ FPGA Prototyping Boards contain the
->        following components and interfaces:
-> 
->        * User switches and user LEDs:
-> 
->          - Two green LEDs and two push buttons that connect to
->            the FPGA.
->          - Eight green LEDs and one 8-way dip switch that connect
->            to the MCC.
-> 
-> Add the 8 LEDs connected to the MCC.
-> 
-> This remplaces the 'mps2_scc_leds' trace events by the generic
-> 'led_set_intensity' event.
+> The recently added LED device reports LED status changes with
+> the 'led_set_intensity' trace event. It is less invasive than
+> the fprintf() calls. We need however to have a binary built
+> with tracing support.
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
+>  hw/arm/tosa.c  | 40 +++++++++++++++-------------------------
+>  hw/arm/Kconfig |  1 +
+>  2 files changed, 16 insertions(+), 25 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
