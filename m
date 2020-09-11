@@ -2,89 +2,110 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 690AFC43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:46:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B44EC43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:50:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C935C206A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:46:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71168221E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 16:50:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OFV8qVPV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C935C206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aGRX8v+d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71168221E7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGmC9-0007dr-Q7
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 12:46:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35558)
+	id 1kGmFV-0001RK-4d
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 12:50:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36338)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kGmBK-0006lf-An
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 12:45:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56273)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kGmBI-000306-HU
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 12:45:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599842747;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=ig1K0ic/2m1hGLRDOGGMf21JlggGM01DRuvqu1oFOJg=;
- b=OFV8qVPVs6YZXB188D0wTN+Mrzb5PU5goGfm9/CeK6tWhOn7GCpP9D6d+gdBMQg0kT4u0U
- H38p+1vvbQlfXoniHXkR6Zwo87EPxK47jP9JS3+2W2vLcekwl0FKOdo6nOvD/DwvgPdv2U
- d+mJKQwdEkuE4bLMhrXrZmObJ8aoW60=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-6-HNFwN7LtPVaVQZnBywfhNQ-1; Fri, 11 Sep 2020 12:45:42 -0400
-X-MC-Unique: HNFwN7LtPVaVQZnBywfhNQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1A9318C5203;
- Fri, 11 Sep 2020 16:45:40 +0000 (UTC)
-Received: from redhat.com (ovpn-113-229.ams2.redhat.com [10.36.113.229])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2EECF60C04;
- Fri, 11 Sep 2020 16:45:34 +0000 (UTC)
-Date: Fri, 11 Sep 2020 17:45:32 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v3 0/7] migration: bring improved savevm/loadvm/delvm to
- QMP
-Message-ID: <20200911164532.GN1203593@redhat.com>
-References: <20200827111606.1408275-1-berrange@redhat.com>
- <20200911115204.GF3310@work-vm>
-MIME-Version: 1.0
-In-Reply-To: <20200911115204.GF3310@work-vm>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 08:18:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kGmEi-0000Gg-BH; Fri, 11 Sep 2020 12:49:20 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:26202
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kGmEe-0003Ow-LD; Fri, 11 Sep 2020 12:49:20 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 08BGVQms115448; Fri, 11 Sep 2020 12:49:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject : date : message-id; s=pp1;
+ bh=p7IeXUiFLkbs016O9ou/uNq2HX6PVYnf3cfqX6Yhmsc=;
+ b=aGRX8v+dQybybhlDYkpOl/JfUPIgRKT9CLuFUvzbb7VW0pKWIfZDi23dqCH6Ny/a/LR1
+ ar/reSCeqow1CDU38aEEP6ZFYZeW2b39FCOeR8Uqh7ZHqUagG5U+NhSOPzYxqL+LBhGZ
+ z/wBktUJ/yy3ohyXYV8NhZA6AM4joyYCPe4z5EIaLi3weRB12bbYbCElnSeQXntXA2gY
+ vv9jzFwkaaqyFHyjn5a4mexjKcMtuxc3Te89+5TpU7NCVi9M+GuESSt0jHCTmw6a0vK4
+ zCXQENZcWSduramtFLt1jeJN9a5GCfA0Ud/tepT/s224jUZFXumRkp4GeBObxI3pyAnk 3A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33gabr5phy-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 11 Sep 2020 12:49:14 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08BGVe58116590;
+ Fri, 11 Sep 2020 12:49:14 -0400
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
+ [169.63.121.186])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33gabr5phc-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 11 Sep 2020 12:49:13 -0400
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+ by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08BGlFZf022924;
+ Fri, 11 Sep 2020 16:49:13 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com
+ (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+ by ppma03wdc.us.ibm.com with ESMTP id 33cebvdj78-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 11 Sep 2020 16:49:13 +0000
+Received: from b03ledav003.gho.boulder.ibm.com
+ (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+ by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 08BGn6bn61669742
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 11 Sep 2020 16:49:06 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id EB48B6A04D;
+ Fri, 11 Sep 2020 16:49:11 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id CB51B6A047;
+ Fri, 11 Sep 2020 16:49:10 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.211.91.207])
+ by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Fri, 11 Sep 2020 16:49:10 +0000 (GMT)
+From: Matthew Rosato <mjrosato@linux.ibm.com>
+To: alex.williamson@redhat.com, cohuck@redhat.com
+Subject: [PATCH 0/3] s390x/pci: Accomodate vfio DMA limiting
+Date: Fri, 11 Sep 2020 12:49:04 -0400
+Message-Id: <1599842947-4051-1-git-send-email-mjrosato@linux.ibm.com>
+X-Mailer: git-send-email 1.8.3.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-11_08:2020-09-10,
+ 2020-09-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 phishscore=0 impostorscore=0 bulkscore=0
+ priorityscore=1501 adultscore=0 mlxlogscore=999 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009110131
+Received-SPF: pass client-ip=148.163.158.5;
+ envelope-from=mjrosato@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 09:50:13
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,34 +118,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com,
+ schnelle@linux.ibm.com, qemu-devel@nongnu.org, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 11, 2020 at 12:52:04PM +0100, Dr. David Alan Gilbert wrote:
-> Kevin:
->   While we're still arguing about details of the last commit; can we get
-> the first few commits in - they seem to be generally nice cleanups/error
-> handling.
+Kernel commit 492855939bdb added a limit to the number of outstanding DMA
+requests for a type1 vfio container.  However, lazy unmapping in s390 can in
+quite a large number of outstanding DMA requests to build up prior to being
+purged, potentially the entire guest DMA space.  This results in unexpected
+'VFIO_MAP_DMA failed: No space left on device' conditions seen in QEMU.
 
-I'm going to try to send a update next week which just cuts out
-the features that are causing disagreements. Someone else can
-worry about them later...
+This patchset adds support to qemu to retrieve the DMA limit information
+added to VFIO_IOMMU_GET_INFO.  The patches are separated into vfio hits
+which add support for reading in VFIO_IOMU_GET_INFO capability chains and
+getting the per-container dma_limit, and s390 hits to track DMA usage on
+a per-container basis.
 
+Associated kernel patch:
+https://marc.info/?l=kvm&m=159984267812181&w=2
 
-Regards,
-Daniel
+Matthew Rosato (3):
+  vfio: Get DMA limit information
+  s390x/pci: Honor DMA limits set by vfio
+  vfio: Create shared routine for scanning info capabilities
+
+ hw/s390x/s390-pci-bus.c       | 56 ++++++++++++++++++++++++---
+ hw/s390x/s390-pci-bus.h       |  9 +++++
+ hw/s390x/s390-pci-inst.c      | 29 +++++++++++---
+ hw/s390x/s390-pci-inst.h      |  3 ++
+ hw/vfio/common.c              | 89 ++++++++++++++++++++++++++++++++++---------
+ include/hw/vfio/vfio-common.h |  1 +
+ 6 files changed, 159 insertions(+), 28 deletions(-)
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+1.8.3.1
 
 
