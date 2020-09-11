@@ -2,77 +2,79 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86E2EC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:36:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17D7DC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:41:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB6812075A
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:36:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB6812075A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 2764B2078B
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:41:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="I84DR4y8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2764B2078B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGeXu-0004xw-VM
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 04:36:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32958)
+	id 1kGecE-0007Ey-0T
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 04:41:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33956)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kGeWx-0003sy-IM
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 04:35:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35044)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kGeWv-0001bu-Ak
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 04:35:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kGeWt-0004QJ-BT
- for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 08:35:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 558D52E80AB
- for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 08:35:35 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 11 Sep 2020 08:30:15 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <1895080@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee hansni laurent-vivier
-X-Launchpad-Bug-Reporter: Hansni Bu (hansni)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <159970958159.31371.12301700684467003959.malonedeb@wampee.canonical.com>
-Message-Id: <159981301514.17958.6383374661853049832.malone@soybean.canonical.com>
-Subject: [Bug 1895080] Re: pgb_reserved_va: Assertion `addr == test' failed
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1kGebQ-0005mB-Sm; Fri, 11 Sep 2020 04:40:16 -0400
+Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:45868)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1kGebM-00029m-6d; Fri, 11 Sep 2020 04:40:14 -0400
+Received: from sas1-ec30c78b6c5b.qloud-c.yandex.net
+ (sas1-ec30c78b6c5b.qloud-c.yandex.net
+ [IPv6:2a02:6b8:c14:2704:0:640:ec30:c78b])
+ by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 62B1D2E14DD;
+ Fri, 11 Sep 2020 11:40:07 +0300 (MSK)
+Received: from sas2-32987e004045.qloud-c.yandex.net
+ (sas2-32987e004045.qloud-c.yandex.net [2a02:6b8:c08:b889:0:640:3298:7e00])
+ by sas1-ec30c78b6c5b.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ tbd42YlPJN-e2vi9dMb; Fri, 11 Sep 2020 11:40:07 +0300
 Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: 8d967eaec65f65cd9735f108c59561101cc67803
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 02:05:39
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1599813607; bh=/1IkPW8SgKZi0C7XPMMhMNC+CPgYH6AncZedQ2SzGzg=;
+ h=Message-Id:Date:Subject:To:From:Cc;
+ b=I84DR4y8b8dBsz7kDEIUAi/rDuUN4KDm3VMS8tdvcMymEeZRRwR5vJ2cJO1T/8Y7Y
+ m6pwbglNWJ2IgK9dseZGq9hEot9FZUyYmU2gAAXpHSoK8feh8JXKVydmjPxt3mCrVe
+ Iha7dX589FYINrcEkXXk9Pnv4LEEQNyCtB6hc7lI=
+Authentication-Results: sas1-ec30c78b6c5b.qloud-c.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
+ [2a02:6b8:b080:7216::1:a])
+ by sas2-32987e004045.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ v35icu4tRa-e2lWlHXo; Fri, 11 Sep 2020 11:40:02 +0300
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+ (Client certificate not present)
+From: Dima Stepanov <dimastep@yandex-team.ru>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5 0/7] vhost-user-blk: fix the migration issue and enhance
+ qtests
+Date: Fri, 11 Sep 2020 11:39:42 +0300
+Message-Id: <cover.1599813294.git.dimastep@yandex-team.ru>
+X-Mailer: git-send-email 2.7.4
+Received-SPF: pass client-ip=5.45.199.163;
+ envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1j.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 04:40:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -84,72 +86,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1895080 <1895080@bugs.launchpad.net>
+Cc: kwolf@redhat.com, lvivier@redhat.com, thuth@redhat.com,
+ qemu-block@nongnu.org, mst@redhat.com, stefanha@gmail.com, jasowang@redhat.com,
+ dgilbert@redhat.com, mreitz@redhat.com, fengli@smartx.com,
+ yc-core@yandex-team.ru, pbonzini@redhat.com, raphael.norwitz@nutanix.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Have you got a static version of the test binary (or a mini rootfs with
-the libraries it needs)?
+v4 -> v5:
+  - vhost: check queue state in the vhost_dev_set_log routine
+    tests/qtest/vhost-user-test: prepare the tests for adding new
+    dev class
+    tests/qtest/vhost-user-test: add support for the
+    vhost-user-blk device
+    tests/qtest/vhost-user-test: add migrate_reconnect test
+    Reviewed-by: Raphael Norwitz
+  - Update qtest, by merging vhost-user-blk "if" case with the
+    virtio-blk case.
 
--- =
+v3 -> v4:
+  - vhost: recheck dev state in the vhost_migration_log routine
+    Reviewed-by: Raphael Norwitz
+  - vhost: check queue state in the vhost_dev_set_log routine
+    Use "continue" instead of "break" to handle non-initialized
+    virtqueue case.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1895080
+v2 -> v3:
+  - update commit message for the 
+    "vhost: recheck dev state in the vhost_migration_log routine" commit
+  - rename "started" field of the VhostUserBlk structure to
+    "started_vu", so there will be no confustion with the VHOST started
+    field
+  - update vhost-user-test.c to always initialize nq local variable
+    (spotted by patchew)
 
-Title:
-  pgb_reserved_va: Assertion `addr =3D=3D test' failed
+v1 -> v2:
+  - add comments to connected/started fields in the header file
+  - move the "s->started" logic from the vhost_user_blk_disconnect
+    routine to the vhost_user_blk_stop routine
 
-Status in QEMU:
-  New
+Reference e-mail threads:
+  - https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg01509.html
+  - https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg05241.html
 
-Bug description:
-  This problem occurs on CentOS-7.5 (64-bit) with qemu-5.1.0, qemu head
-  (commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a) for riscv32-linux-
-  user.
+If vhost-user daemon is used as a backend for the vhost device, then we
+should consider a possibility of disconnect at any moment. There was a general
+question here: should we consider it as an error or okay state for the vhost-user
+devices during migration process?
+I think the disconnect event for the vhost-user devices should not break the
+migration process, because:
+  - the device will be in the stopped state, so it will not be changed
+    during migration
+  - if reconnect will be made the migration log will be reinitialized as
+    part of reconnect/init process:
+    #0  vhost_log_global_start (listener=0x563989cf7be0)
+    at hw/virtio/vhost.c:920
+    #1  0x000056398603d8bc in listener_add_address_space (listener=0x563989cf7be0,
+        as=0x563986ea4340 <address_space_memory>)
+    at softmmu/memory.c:2664
+    #2  0x000056398603dd30 in memory_listener_register (listener=0x563989cf7be0,
+        as=0x563986ea4340 <address_space_memory>)
+    at softmmu/memory.c:2740
+    #3  0x0000563985fd6956 in vhost_dev_init (hdev=0x563989cf7bd8,
+        opaque=0x563989cf7e30, backend_type=VHOST_BACKEND_TYPE_USER,
+        busyloop_timeout=0)
+    at hw/virtio/vhost.c:1385
+    #4  0x0000563985f7d0b8 in vhost_user_blk_connect (dev=0x563989cf7990)
+    at hw/block/vhost-user-blk.c:315
+    #5  0x0000563985f7d3f6 in vhost_user_blk_event (opaque=0x563989cf7990,
+        event=CHR_EVENT_OPENED)
+    at hw/block/vhost-user-blk.c:379
+The first patch in the patchset fixes this issue by setting vhost device to the
+stopped state in the disconnect handler and check it the vhost_migration_log()
+routine before returning from the function.
+qtest framework was updated to test vhost-user-blk functionality. The
+vhost-user-blk/vhost-user-blk-tests/migrate_reconnect test was added to reproduce
+the original issue found.
 
-  Firstly, compile fails:
-  Compiling C object libqemu-riscv32-linux-user.fa.p/linux-user_strace.c.o
-  ../qemu.git/linux-user/strace.c:1210:18: error: =E2=80=98FALLOC_FL_KEEP_S=
-IZE=E2=80=99 undeclared here (not in a function)
-       FLAG_GENERIC(FALLOC_FL_KEEP_SIZE),
+Dima Stepanov (7):
+  vhost: recheck dev state in the vhost_migration_log routine
+  vhost: check queue state in the vhost_dev_set_log routine
+  tests/qtest/vhost-user-test: prepare the tests for adding new dev
+    class
+  tests/qtest/libqos/virtio-blk: add support for vhost-user-blk
+  tests/qtest/vhost-user-test: add support for the vhost-user-blk device
+  tests/qtest/vhost-user-test: add migrate_reconnect test
+  tests/qtest/vhost-user-test: enable the reconnect tests
 
-  I have to add below include to linux-user/strace.c
-  diff --git a/linux-user/strace.c b/linux-user/strace.c
-  index 11fea14fba..22e51d4a8a 100644
-  --- a/linux-user/strace.c
-  +++ b/linux-user/strace.c
-  @@ -7,6 +7,7 @@
-   #include <sys/mount.h>
-   #include <arpa/inet.h>
-   #include <netinet/tcp.h>
-  +#include <linux/falloc.h>
-   #include <linux/if_packet.h>
-   #include <linux/netlink.h>
-   #include <sched.h>
+ hw/block/vhost-user-blk.c          |  19 ++-
+ hw/virtio/vhost.c                  |  39 ++++-
+ include/hw/virtio/vhost-user-blk.h |  10 ++
+ tests/qtest/libqos/virtio-blk.c    |  14 +-
+ tests/qtest/vhost-user-test.c      | 290 +++++++++++++++++++++++++++++++------
+ 5 files changed, 322 insertions(+), 50 deletions(-)
 
-  Then trying qemu-riscv32 with a simple ELF, I get:
-  linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test' =
-failed.
+-- 
+2.7.4
 
-  strace shows that:
-  mmap(0x1000, 4294963200, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESER=
-VE, -1, 0) =3D 0x10000
-  write(2, "qemu-riscv32: ../qemu.git/linux-"..., 103qemu-riscv32: ../qemu.=
-git/linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test=
-' failed.
-  ) =3D 103
-
-  The source code is in the function pgb_reserved_va (linux-
-  user/elfload.c). I think mmap cannot guarantee that the returned
-  pointer (test) equals to the parameter of addr. So is this a bug to
-  assert (addr =3D=3D test)?
-
-  Attached configure script and test ELF file.
-
-  Thanks.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1895080/+subscriptions
 
