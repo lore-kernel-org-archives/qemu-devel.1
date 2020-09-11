@@ -2,78 +2,81 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64FA4C43461
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 09:41:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F18C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 09:41:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBEE721D40
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 09:41:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBEE721D40
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id EAF0321D40
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 09:41:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAF0321D40
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGfYs-0001Vh-VA
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 05:41:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47774)
+	id 1kGfZ8-0001qT-3k
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 05:41:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47884)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kGfXw-0000Xi-SJ; Fri, 11 Sep 2020 05:40:44 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:45231)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kGfXu-0001jw-Vy; Fri, 11 Sep 2020 05:40:44 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.109.138.121])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 0933D59F2CD2;
- Fri, 11 Sep 2020 11:40:12 +0200 (CEST)
-Received: from kaod.org (37.59.142.97) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Fri, 11 Sep
- 2020 11:40:12 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-97G002a9726582-7c06-446a-80e4-d396b60e5c3d,
- 864FBEA0465FE1F0C66A9C6AC37977A76827B8ED) smtp.auth=groug@kaod.org
-Date: Fri, 11 Sep 2020 11:40:11 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH 12/14] block/qcow2: read_cache_sizes: return status value
-Message-ID: <20200911114011.0a9eba59@bahia.lan>
-In-Reply-To: <20200909185930.26524-13-vsementsov@virtuozzo.com>
-References: <20200909185930.26524-1-vsementsov@virtuozzo.com>
- <20200909185930.26524-13-vsementsov@virtuozzo.com>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kGfYG-0000nB-6A
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 05:41:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54264)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kGfYD-0001r0-TG
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 05:41:03 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kGfYC-0007pv-3W
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 09:41:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 199F92E802E
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 09:41:00 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.97]
-X-ClientProxiedBy: DAG9EX2.mxp5.local (172.16.2.82) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: 90f77ad8-a500-4f0a-9247-1dd1001daf9a
-X-Ovh-Tracer-Id: 5042905683400890811
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudehledgvddtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefuddtieejjeevheekieeltefgleetkeetheettdeifeffvefhffelffdtfeeljeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehkfiholhhfsehrvgguhhgrthdrtghomh
-Received-SPF: pass client-ip=178.32.125.2; envelope-from=groug@kaod.org;
- helo=smtpout1.mo529.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 02:19:56
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 11 Sep 2020 09:31:38 -0000
+From: Hansni Bu <1895080@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee hansni laurent-vivier
+X-Launchpad-Bug-Reporter: Hansni Bu (hansni)
+X-Launchpad-Bug-Modifier: Hansni Bu (hansni)
+References: <159970958159.31371.12301700684467003959.malonedeb@wampee.canonical.com>
+ <159981301514.17958.6383374661853049832.malone@soybean.canonical.com>
+Message-Id: <CAGTPX+D9vpQi0wCUU9gvymqpo_SOdCtUOZquo_Tjrh2s85GgMQ@mail.gmail.com>
+Subject: Re: [Bug 1895080] Re: pgb_reserved_va: Assertion `addr == test' failed
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: a5986bb66c4bbdadbbc52c66f2399b4ab649291a
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 02:05:39
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,93 +85,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berto@igalia.com, pavel.dovgaluk@ispras.ru,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com,
- stefanha@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, jsnow@redhat.com,
- ari@tuxera.com
+Reply-To: Bug 1895080 <1895080@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed,  9 Sep 2020 21:59:28 +0300
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
+Have you got a static version of the test binary (or a mini rootfs with
+> the libraries it needs)?
+>
 
-> It's better to return status together with setting errp. It allows to
-> reduce error propagation.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
+If the problem occurs, it does not reach the stage of the dependent
+libraries  of the test ELF. Anyway, I've attached the static test binary as
+hello.static.elf.
+Thanks
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
 
->  block/qcow2.c | 19 +++++++++----------
->  1 file changed, 9 insertions(+), 10 deletions(-)
-> 
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index c2cd9434cc..31dd28d19e 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -869,7 +869,7 @@ static void qcow2_attach_aio_context(BlockDriverState *bs,
->      cache_clean_timer_init(bs, new_context);
->  }
->  
-> -static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
-> +static bool read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
->                               uint64_t *l2_cache_size,
->                               uint64_t *l2_cache_entry_size,
->                               uint64_t *refcount_cache_size, Error **errp)
-> @@ -907,16 +907,16 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
->              error_setg(errp, QCOW2_OPT_CACHE_SIZE ", " QCOW2_OPT_L2_CACHE_SIZE
->                         " and " QCOW2_OPT_REFCOUNT_CACHE_SIZE " may not be set "
->                         "at the same time");
-> -            return;
-> +            return false;
->          } else if (l2_cache_size_set &&
->                     (l2_cache_max_setting > combined_cache_size)) {
->              error_setg(errp, QCOW2_OPT_L2_CACHE_SIZE " may not exceed "
->                         QCOW2_OPT_CACHE_SIZE);
-> -            return;
-> +            return false;
->          } else if (*refcount_cache_size > combined_cache_size) {
->              error_setg(errp, QCOW2_OPT_REFCOUNT_CACHE_SIZE " may not exceed "
->                         QCOW2_OPT_CACHE_SIZE);
-> -            return;
-> +            return false;
->          }
->  
->          if (l2_cache_size_set) {
-> @@ -955,8 +955,10 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
->          error_setg(errp, "L2 cache entry size must be a power of two "
->                     "between %d and the cluster size (%d)",
->                     1 << MIN_CLUSTER_BITS, s->cluster_size);
-> -        return;
-> +        return false;
->      }
-> +
-> +    return true;
->  }
->  
->  typedef struct Qcow2ReopenState {
-> @@ -983,7 +985,6 @@ static int qcow2_update_options_prepare(BlockDriverState *bs,
->      int i;
->      const char *encryptfmt;
->      QDict *encryptopts = NULL;
-> -    Error *local_err = NULL;
->      int ret;
->  
->      qdict_extract_subqdict(options, &encryptopts, "encrypt.");
-> @@ -996,10 +997,8 @@ static int qcow2_update_options_prepare(BlockDriverState *bs,
->      }
->  
->      /* get L2 table/refcount block cache size from command line options */
-> -    read_cache_sizes(bs, opts, &l2_cache_size, &l2_cache_entry_size,
-> -                     &refcount_cache_size, &local_err);
-> -    if (local_err) {
-> -        error_propagate(errp, local_err);
-> +    if (!read_cache_sizes(bs, opts, &l2_cache_size, &l2_cache_entry_size,
-> +                          &refcount_cache_size, errp)) {
->          ret = -EINVAL;
->          goto fail;
->      }
+> --
+> You received this bug notification because you are subscribed to the bug
+> report.
+> https://bugs.launchpad.net/bugs/1895080
+>
+> Title:
+>   pgb_reserved_va: Assertion `addr =3D=3D test' failed
+>
+> Status in QEMU:
+>   New
+>
+> Bug description:
+>   This problem occurs on CentOS-7.5 (64-bit) with qemu-5.1.0, qemu head
+>   (commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a) for riscv32-linux-
+>   user.
+>
+>   Firstly, compile fails:
+>   Compiling C object libqemu-riscv32-linux-user.fa.p/linux-user_strace.c.o
+>   ../qemu.git/linux-user/strace.c:1210:18: error: =E2=80=98FALLOC_FL_KEEP=
+_SIZE=E2=80=99
+> undeclared here (not in a function)
+>        FLAG_GENERIC(FALLOC_FL_KEEP_SIZE),
+>
+>   I have to add below include to linux-user/strace.c
+>   diff --git a/linux-user/strace.c b/linux-user/strace.c
+>   index 11fea14fba..22e51d4a8a 100644
+>   --- a/linux-user/strace.c
+>   +++ b/linux-user/strace.c
+>   @@ -7,6 +7,7 @@
+>    #include <sys/mount.h>
+>    #include <arpa/inet.h>
+>    #include <netinet/tcp.h>
+>   +#include <linux/falloc.h>
+>    #include <linux/if_packet.h>
+>    #include <linux/netlink.h>
+>    #include <sched.h>
+>
+>   Then trying qemu-riscv32 with a simple ELF, I get:
+>   linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test'
+> failed.
+>
+>   strace shows that:
+>   mmap(0x1000, 4294963200, PROT_NONE,
+> MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE, -1, 0) =3D 0x10000
+>   write(2, "qemu-riscv32: ../qemu.git/linux-"..., 103qemu-riscv32:
+> ../qemu.git/linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =
+=3D=3D
+> test' failed.
+>   ) =3D 103
+>
+>   The source code is in the function pgb_reserved_va (linux-
+>   user/elfload.c). I think mmap cannot guarantee that the returned
+>   pointer (test) equals to the parameter of addr. So is this a bug to
+>   assert (addr =3D=3D test)?
+>
+>   Attached configure script and test ELF file.
+>
+>   Thanks.
+>
+> To manage notifications about this bug go to:
+> https://bugs.launchpad.net/qemu/+bug/1895080/+subscriptions
+>
 
+
+** Attachment added: "hello.static.elf"
+   https://bugs.launchpad.net/bugs/1895080/+attachment/5409715/+files/hello=
+.static.elf
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1895080
+
+Title:
+  pgb_reserved_va: Assertion `addr =3D=3D test' failed
+
+Status in QEMU:
+  New
+
+Bug description:
+  This problem occurs on CentOS-7.5 (64-bit) with qemu-5.1.0, qemu head
+  (commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a) for riscv32-linux-
+  user.
+
+  Firstly, compile fails:
+  Compiling C object libqemu-riscv32-linux-user.fa.p/linux-user_strace.c.o
+  ../qemu.git/linux-user/strace.c:1210:18: error: =E2=80=98FALLOC_FL_KEEP_S=
+IZE=E2=80=99 undeclared here (not in a function)
+       FLAG_GENERIC(FALLOC_FL_KEEP_SIZE),
+
+  I have to add below include to linux-user/strace.c
+  diff --git a/linux-user/strace.c b/linux-user/strace.c
+  index 11fea14fba..22e51d4a8a 100644
+  --- a/linux-user/strace.c
+  +++ b/linux-user/strace.c
+  @@ -7,6 +7,7 @@
+   #include <sys/mount.h>
+   #include <arpa/inet.h>
+   #include <netinet/tcp.h>
+  +#include <linux/falloc.h>
+   #include <linux/if_packet.h>
+   #include <linux/netlink.h>
+   #include <sched.h>
+
+  Then trying qemu-riscv32 with a simple ELF, I get:
+  linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test' =
+failed.
+
+  strace shows that:
+  mmap(0x1000, 4294963200, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESER=
+VE, -1, 0) =3D 0x10000
+  write(2, "qemu-riscv32: ../qemu.git/linux-"..., 103qemu-riscv32: ../qemu.=
+git/linux-user/elfload.c:2341: pgb_reserved_va: Assertion `addr =3D=3D test=
+' failed.
+  ) =3D 103
+
+  The source code is in the function pgb_reserved_va (linux-
+  user/elfload.c). I think mmap cannot guarantee that the returned
+  pointer (test) equals to the parameter of addr. So is this a bug to
+  assert (addr =3D=3D test)?
+
+  Attached configure script and test ELF file.
+
+  Thanks.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1895080/+subscriptions
 
