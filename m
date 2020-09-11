@@ -2,97 +2,85 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 813DBC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:05:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6676C43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:08:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0100620575
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:05:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 90DD4208FE
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 08:08:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rd45LHl6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0100620575
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dZZMSVXv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90DD4208FE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGe4C-0006yT-06
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 04:05:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55528)
+	id 1kGe6d-0007xc-Kd
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 04:08:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55860)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kGe3S-0006Qm-EW
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 04:05:10 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37187)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kGe5v-0007WT-0M
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 04:07:43 -0400
+Received: from mail-ej1-x632.google.com ([2a00:1450:4864:20::632]:42668)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kGe3P-0006LF-D1
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 04:05:10 -0400
-Received: by mail-wr1-x442.google.com with SMTP id z4so10546368wrr.4
- for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 01:05:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=Ti0ccMiZBH6WSmU0p9CQpx5A4tGyH+hVnSwHNJ4BVSY=;
- b=rd45LHl6wrc11OlVQMuJtN2CTaR6F9Cw/cI5+U2NnkOP/Kq5jzdmTDShVEv+pnNV6S
- CxRq+rlu0Ibyxe/2oLoLKBbEucEelV+AE4+EomIlIHaY3G03LzpT3clcEhYcvfJoCj/Q
- 9Mb1z5W3Ab/NPAI9PQiCASvvpXqPQcW4NIl766hvgm02taBHprv6xuQpLungYfUgi4vb
- rIOcjnpNf8yHmfZENB9Nbis/DBVLc4uh8t5Reeci0CzcByf8nBHhwJ044k78o9fHR9CC
- 7Citp5z8AC2N5+T5/gZ0YjTkzy9jKhGpRu+ZZAWxHemOR9VgcpWgQyxmW4sRfk29adn4
- krZw==
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kGe5t-0006f3-1Z
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 04:07:42 -0400
+Received: by mail-ej1-x632.google.com with SMTP id q13so12551792ejo.9
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 01:07:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=8y48C6fQMG08qrarN2X9n+BZlUUoCLwucFT8V32XPIg=;
+ b=dZZMSVXvw09GN02BW4YB/KtYKRv7VSgwlXFhYWGdCJzTTNf4Zwmv8kWWefFuadnrwe
+ 0fo+abxv0xtb4a7kUxHAiTFBK7xhYCRYvnKV1y6MfIzREoKYTSs8C3XRTj//rVyf+/bw
+ r9o/JJXtuq6t2wCCUsYeP6LCHSAzjWE4OOHmVwTFg8R8ZYYgTTGXZCTqth2FzKtzs87i
+ 7jsj5dfHYtnHM4W41ZYWHhhyyhEsrbEaOBCihbECBC9MNysi+ckODqz9Fo9xsJjCTXOM
+ 5O7oER7xeGhdKm6Mmjk+y+yeI3tczR1KCb9KlcJ9BTrIXDuNHWOqzW3qWYbHnVW4AdAL
+ W+Rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=Ti0ccMiZBH6WSmU0p9CQpx5A4tGyH+hVnSwHNJ4BVSY=;
- b=dY9hIaZUwr3V+FWQpmf9fLJ4MhgoOQ4dp0F9//KKBUNcmsu2ThPHh2r68i7EuKL/5W
- kUGNv9crMjaTB1xCNZXQ0kfAojTidLEjGmsbYNEnDZBYVwBxvYwouEjEkITcdaC6UQnW
- hJmaOnciOCl82JZFlNarizepvIJERuW2ewxsOoOavSW/YKdkFlByzJOMf+0upP1qH8Wd
- hSAlW9cKKh9snr07SvVH5ulT0oWo4MswdHDBC74nYuqOwW+YsfPhs2NV/sp4OkOKUnu/
- lBAzB8H7oTOquZYvntLSr1NRV2cMr/0y0pL9rylzXBCy6OtvCGmIOUnXZe5y+TZwdsrm
- iuXg==
-X-Gm-Message-State: AOAM531ue/YNSMZGgz3XN5OfHm9p2XDu2/D1vN87R96GgMHM9koQj8gw
- 1hc+rknH8wv9Hfx9FWF9/VV2YA==
-X-Google-Smtp-Source: ABdhPJxlDbjjOGoSknu2bIxA+1VP0gg8dk/dUfiL7b1y/t94hHxJsIMTjZg3YoI4h39+12gViRKeQw==
-X-Received: by 2002:a5d:518b:: with SMTP id k11mr741468wrv.369.1599811505386; 
- Fri, 11 Sep 2020 01:05:05 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id x2sm2963014wrl.13.2020.09.11.01.05.04
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 11 Sep 2020 01:05:04 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 8A3FC1FF7E;
- Fri, 11 Sep 2020 09:05:03 +0100 (BST)
-References: <20200910131504.11341-1-alex.bennee@linaro.org>
- <20200910131504.11341-7-alex.bennee@linaro.org>
- <CAFEAcA9E6sGNGn6aYy8DxCVZDYeot9EjRvKLEQ2CzAxUkGyBzg@mail.gmail.com>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PULL 06/10] configure: don't enable ppc64abi32-linux-user by
- default
-In-reply-to: <CAFEAcA9E6sGNGn6aYy8DxCVZDYeot9EjRvKLEQ2CzAxUkGyBzg@mail.gmail.com>
-Date: Fri, 11 Sep 2020 09:05:03 +0100
-Message-ID: <87wo10oi1c.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=8y48C6fQMG08qrarN2X9n+BZlUUoCLwucFT8V32XPIg=;
+ b=gytudtattwXpfjfoRHrciDI3BQX6iSQUyzRjZ+bNC7hg8BrVptw04B3gOrF6Sj9wUY
+ U1za7rCES4o6XjTb4bJRkmVR+B0GVrQXp30j6fwUbVqIYMlsm17SJSfsZLUjRQquroIg
+ VapqB43smDY8pTmQ95c2PYtKJkU7VBtP+gv3Fb7VHGjVm8UtLTXZIXry3++MhWtlk2MY
+ saP6sZb2ADRr9iStjLEAM7o1lFshJPiCuH1SpcMSp7L7tOY+odngjM2ilY73pUcNbJSh
+ iNNIuC5LfMLAPNZzj0ESsuV126v7+nVKlokVRyaHNrTeGAYBSDUOuKfvcnuOlfCA6CVT
+ YpuQ==
+X-Gm-Message-State: AOAM5319OPG6XZGHHLb3BxbQUM+EYjhW6TUExnMgdKIpHFVb0zaqONQ3
+ nekWese7sP1EetWqynE7voE1MGyhwNts+zQnjPI=
+X-Google-Smtp-Source: ABdhPJzPjJtUPZ6Ux6S4Juy4tnw465GGJbMzxO6JNpSmFRXtJ2r1uAN3MtZzPZzJ5KaTzzvT+VhAoCHxgR4ZCDyoydw=
+X-Received: by 2002:a17:906:4a51:: with SMTP id
+ a17mr853078ejv.381.1599811659186; 
+ Fri, 11 Sep 2020 01:07:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+References: <20200910194903.4104696-1-ehabkost@redhat.com>
+In-Reply-To: <20200910194903.4104696-1-ehabkost@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 11 Sep 2020 12:07:27 +0400
+Message-ID: <CAJ+F1CLLKesMvZo4DJcC=f387d_fN8g--qX8YEQGu8Thf1qotA@mail.gmail.com>
+Subject: Re: [PATCH 00/18] chardev: QOM cleanups
+To: Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000a7458705af052db3"
+Received-SPF: pass client-ip=2a00:1450:4864:20::632;
+ envelope-from=marcandre.lureau@gmail.com; helo=mail-ej1-x632.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,138 +94,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Philippe =?utf-8?Q?Mathieu-Da?= =?utf-8?Q?ud=C3=A9?= <f4bug@amsat.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--000000000000a7458705af052db3
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Hi
 
-> On Thu, 10 Sep 2020 at 14:15, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->>
->> The user can still enable this explicitly but they will get a warning
->> at the end of configure for their troubles. This also drops any builds
->> of ppc64abi32 from our CI tests.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> Message-Id: <20200909112742.25730-7-alex.bennee@linaro.org>
->
-> I know this is in a pullreq at this point, but I just got round
-> to looking at it, and it has some odd logic in it so I figured
-> I'd give my review comments anyway.
->
->> +if test -z "$target_list_exclude" -a -z "$target_list"; then
->> +    # if the user doesn't specify anything lets skip deprecating stuff
->> +    target_list_exclude=3Dppc64abi32-linux-user
->
-> Doesn't this have the slightly curious logic
-> that if we have more than one deprecated target then
-> configure with --target-list-exclude=3Dsomething-else
-> will actually build more targets than configure without that
-> exclude option (because it will exclude the something-else
-> but stop excluding the deprecated targets)? I would have
-> expected the deprecated targets to be not compiled unless
-> the user explicitly enabled them. I think that would be
-> something more like
->
->    deprecated_targets_list=3Dppc64abi32-linux-user
->    if test -z "$target_list"; then
->        target_list_exclude=3D"$target_list_exclude,$deprecated_targets_li=
-st"
->    fi
->
-> I suppose we would ideally like an "enable all including
-> the deprecated stuff", and that gets messy because there's
-> no way to do it except listing everything explicitly I think...
+On Thu, Sep 10, 2020 at 11:50 PM Eduardo Habkost <ehabkost@redhat.com>
+wrote:
 
-Yeah - we could make it smoother although I think the only real users of
---target-list-exclude are the CI systems and they all explicitly exclude
-ppc64abi32 when they do it.
+> Some chardev QOM cleanup patches had to be dropped from my queue
+> due to build erros introduced by code movements across ifdef
+> boundaries at char-parallel.c.  This series redo the changes from
+> those patches, but the macro renames are now a little different:
+>
+> In this version I have decided to rename the type checking macros
+> from *_CHARDEV to CHARDEV_* instead of renaming tye
+> TYPE_CHARDEV_* constants to TYPE_*_CHARDEV, to make the
+> identifiers actually match the QOM type name strings
+> ("chardev-*").
+>
 
-Do you want me to re-spin with those changes?
+Sounds reasonable to me, but it loses the matching with the
+structure/object type name though.
 
->
->> +fi
->> +
->> +exclude_list=3D$(echo "$target_list_exclude" | sed -e 's/,/ /g')
->> +for config in $mak_wilds; do
->> +    target=3D"$(basename "$config" .mak)"
->> +    exclude=3D"no"
->> +    for excl in $exclude_list; do
->> +        if test "$excl" =3D "$target"; then
->> +            exclude=3D"yes"
->> +            break;
->>          fi
->>      done
->> -fi
->> +    if test "$exclude" =3D "no"; then
->> +        default_target_list=3D"${default_target_list} $target"
->> +    fi
->> +done
->>
->>  # Enumerate public trace backends for --help output
->>  trace_backend_list=3D$(echo $(grep -le '^PUBLIC =3D True$' "$source_pat=
-h"/scripts/tracetool/backend/*.py | sed -e 's/^.*\/\(.*\)\.py$/\1/'))
->> @@ -7557,7 +7558,7 @@ TARGET_SYSTBL=3D""
->>  case "$target_name" in
->>    i386)
->>      mttcg=3D"yes"
->> -       gdb_xml_files=3D"i386-32bit.xml"
->> +    gdb_xml_files=3D"i386-32bit.xml"
->>      TARGET_SYSTBL_ABI=3Di386
->>      TARGET_SYSTBL=3Dsyscall_32.tbl
->>    ;;
->
-> (unrelated change ;-))
->
->> @@ -7667,6 +7668,7 @@ case "$target_name" in
->>      TARGET_SYSTBL_ABI=3Dcommon,nospu,32
->>      echo "TARGET_ABI32=3Dy" >> $config_target_mak
->>      gdb_xml_files=3D"power64-core.xml power-fpu.xml power-altivec.xml p=
-ower-spe.xml power-vsx.xml"
->> +    deprecated_features=3D"ppc64abi32 ${deprecated_features}"
->
-> Maybe prefer
->     add_to deprecated_features ppc64abi32
->
-> ?
->
->>    ;;
->>    riscv32)
->>      TARGET_BASE_ARCH=3Driscv
->
-> If we just made the deprecation warning be printed by
-> generic logic whenever a deprecated target ended up in
-> the enabled list then it would be easier to add other deprecated
-> targets to the list, as you wouldn't thae also have to find some
-> other part of configure like this to set a deprecated_features variable.
->
-> (I'll send a patch to add lm32-softmmu,tilegx-linux-user,unicore32-softmmu
-> to the deprecated-target list later once we have the mechanism in place.)
->
->> @@ -8011,6 +8013,12 @@ fi
->>  touch ninjatool.stamp
->>  fi
->>
->> +if test -n "${deprecated_features}"; then
->> +    echo "Warning, deprecated features enabled."
->> +    echo "Please see docs/system/deprecated.rst"
->> +    echo "  features: ${deprecated_features}"
->> +fi
->> +
->>  # Save the configure command line for later reuse.
->>  cat <<EOD >config.status
->>  #!/bin/sh
->> --
->
-> thanks
-> -- PMM
+- MuxChardev *d =3D MUX_CHARDEV(s);
++ MuxChardev *d =3D CHARDEV_MUX(s);
 
+I have a preference for the first. Unless we rename all the chardev types
+too...
+
+Imho, the QOM type name is mostly an internal detail, the C type name is
+dominant in the code.
+
+
+
+> Eduardo Habkost (18):
+>   chardev: Move PARALLEL_CHARDEV macro to common code
+>   chardev: Move ParallelChardev typedef to common code
+>   chardev: Use DECLARE_INSTANCE_CHECKER macro for PARALLEL_CHARDEV
+>   chardev: Rename MOUSE_CHARDEV to CHARDEV_MSMOUSE
+>   chardev: Rename BAUM_CHARDEV to CHARDEV_BRAILLE
+>   chardev: Rename FD_CHARDEV to CHARDEV_FD
+>   chardev: Rename MUX_CHARDEV to CHARDEV_MUX
+>   chardev: Rename PARALLEL_CHARDEV to CHARDEV_PARALLEL
+>   chardev: Rename PTY_CHARDEV to CHARDEV_PTY
+>   chardev: Rename RINGBUF_CHARDEV to CHARDEV_RINGBUF
+>   chardev: Rename SOCKET_CHARDEV to CHARDEV_SOCKET
+>   chardev: Rename SPICE_CHARDEV to CHARDEV_SPICE
+>   chardev: Rename TESTDEV_CHARDEV to CHARDEV_TESTDEV
+>   chardev: Rename UDP_CHARDEV to CHARDEV_UDP
+>   chardev: Rename VC_CHARDEV to CHARDEV_VC
+>   chardev: Rename WCTABLET_CHARDEV to CHARDEV_WCTABLET
+>   chardev: Rename WIN_CHARDEV to CHARDEV_WIN
+>   chardev: Rename WIN_STDIO_CHARDEV to CHARDEV_WIN_STDIO
+>
+>  chardev/chardev-internal.h |  2 +-
+>  include/chardev/char-fd.h  |  2 +-
+>  include/chardev/char-win.h |  2 +-
+>  include/chardev/spice.h    |  2 +-
+>  chardev/baum.c             | 14 ++++----
+>  chardev/char-fd.c          | 14 ++++----
+>  chardev/char-fe.c          |  4 +--
+>  chardev/char-mux.c         | 22 ++++++------
+>  chardev/char-parallel.c    | 28 ++++++++--------
+>  chardev/char-pipe.c        |  2 +-
+>  chardev/char-pty.c         | 22 ++++++------
+>  chardev/char-ringbuf.c     | 12 +++----
+>  chardev/char-serial.c      |  2 +-
+>  chardev/char-socket.c      | 68 +++++++++++++++++++-------------------
+>  chardev/char-udp.c         | 14 ++++----
+>  chardev/char-win-stdio.c   | 14 ++++----
+>  chardev/char-win.c         | 14 ++++----
+>  chardev/char.c             |  2 +-
+>  chardev/msmouse.c          | 12 +++----
+>  chardev/spice.c            | 16 ++++-----
+>  chardev/testdev.c          |  4 +--
+>  chardev/wctablet.c         | 12 +++----
+>  ui/console.c               | 10 +++---
+>  ui/gtk.c                   |  8 ++---
+>  ui/spice-app.c             |  2 +-
+>  25 files changed, 151 insertions(+), 153 deletions(-)
+>
+> --
+> 2.26.2
+>
+>
+>
+>
 
 --=20
-Alex Benn=C3=A9e
+Marc-Andr=C3=A9 Lureau
+
+--000000000000a7458705af052db3
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
+"><div dir=3D"ltr" class=3D"gmail_attr">On Thu, Sep 10, 2020 at 11:50 PM Ed=
+uardo Habkost &lt;<a href=3D"mailto:ehabkost@redhat.com">ehabkost@redhat.co=
+m</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin=
+:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"=
+>Some chardev QOM cleanup patches had to be dropped from my queue<br>
+due to build erros introduced by code movements across ifdef<br>
+boundaries at char-parallel.c.=C2=A0 This series redo the changes from<br>
+those patches, but the macro renames are now a little different:<br>
+<br>
+In this version I have decided to rename the type checking macros<br>
+from *_CHARDEV to CHARDEV_* instead of renaming tye<br>
+TYPE_CHARDEV_* constants to TYPE_*_CHARDEV, to make the<br>
+identifiers actually match the QOM type name strings<br>
+(&quot;chardev-*&quot;).<br></blockquote><div><br></div><div>Sounds reasona=
+ble to me, but it loses the matching with the structure/object type name th=
+ough.</div><br>- MuxChardev *d =3D MUX_CHARDEV(s);<br>+ MuxChardev *d =3D C=
+HARDEV_MUX(s);</div><div class=3D"gmail_quote"><br></div><div class=3D"gmai=
+l_quote">I have a preference for the first. Unless we rename all the charde=
+v types too...</div><div class=3D"gmail_quote"><br></div><div class=3D"gmai=
+l_quote">Imho, the QOM type name is mostly an internal detail, the C type n=
+ame is dominant in the code.<br></div><div class=3D"gmail_quote"><br></div>=
+<div class=3D"gmail_quote"><br><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
+:1ex">
+<br>
+Eduardo Habkost (18):<br>
+=C2=A0 chardev: Move PARALLEL_CHARDEV macro to common code<br>
+=C2=A0 chardev: Move ParallelChardev typedef to common code<br>
+=C2=A0 chardev: Use DECLARE_INSTANCE_CHECKER macro for PARALLEL_CHARDEV<br>
+=C2=A0 chardev: Rename MOUSE_CHARDEV to CHARDEV_MSMOUSE<br>
+=C2=A0 chardev: Rename BAUM_CHARDEV to CHARDEV_BRAILLE<br>
+=C2=A0 chardev: Rename FD_CHARDEV to CHARDEV_FD<br>
+=C2=A0 chardev: Rename MUX_CHARDEV to CHARDEV_MUX<br>
+=C2=A0 chardev: Rename PARALLEL_CHARDEV to CHARDEV_PARALLEL<br>
+=C2=A0 chardev: Rename PTY_CHARDEV to CHARDEV_PTY<br>
+=C2=A0 chardev: Rename RINGBUF_CHARDEV to CHARDEV_RINGBUF<br>
+=C2=A0 chardev: Rename SOCKET_CHARDEV to CHARDEV_SOCKET<br>
+=C2=A0 chardev: Rename SPICE_CHARDEV to CHARDEV_SPICE<br>
+=C2=A0 chardev: Rename TESTDEV_CHARDEV to CHARDEV_TESTDEV<br>
+=C2=A0 chardev: Rename UDP_CHARDEV to CHARDEV_UDP<br>
+=C2=A0 chardev: Rename VC_CHARDEV to CHARDEV_VC<br>
+=C2=A0 chardev: Rename WCTABLET_CHARDEV to CHARDEV_WCTABLET<br>
+=C2=A0 chardev: Rename WIN_CHARDEV to CHARDEV_WIN<br>
+=C2=A0 chardev: Rename WIN_STDIO_CHARDEV to CHARDEV_WIN_STDIO<br>
+<br>
+=C2=A0chardev/chardev-internal.h |=C2=A0 2 +-<br>
+=C2=A0include/chardev/char-fd.h=C2=A0 |=C2=A0 2 +-<br>
+=C2=A0include/chardev/char-win.h |=C2=A0 2 +-<br>
+=C2=A0include/chardev/spice.h=C2=A0 =C2=A0 |=C2=A0 2 +-<br>
+=C2=A0chardev/baum.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 14 ++=
+++----<br>
+=C2=A0chardev/char-fd.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 14 ++++----<br>
+=C2=A0chardev/char-fe.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 4 +--<br>
+=C2=A0chardev/char-mux.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 22 ++++++------=
+<br>
+=C2=A0chardev/char-parallel.c=C2=A0 =C2=A0 | 28 ++++++++--------<br>
+=C2=A0chardev/char-pipe.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 2 +-<br>
+=C2=A0chardev/char-pty.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 22 ++++++------=
+<br>
+=C2=A0chardev/char-ringbuf.c=C2=A0 =C2=A0 =C2=A0| 12 +++----<br>
+=C2=A0chardev/char-serial.c=C2=A0 =C2=A0 =C2=A0 |=C2=A0 2 +-<br>
+=C2=A0chardev/char-socket.c=C2=A0 =C2=A0 =C2=A0 | 68 +++++++++++++++++++---=
+----------------<br>
+=C2=A0chardev/char-udp.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 14 ++++----<br>
+=C2=A0chardev/char-win-stdio.c=C2=A0 =C2=A0| 14 ++++----<br>
+=C2=A0chardev/char-win.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 14 ++++----<br>
+=C2=A0chardev/char.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0=
+ 2 +-<br>
+=C2=A0chardev/msmouse.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 12 +++----<br>
+=C2=A0chardev/spice.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 16 ++++---=
+--<br>
+=C2=A0chardev/testdev.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 4 +--<br>
+=C2=A0chardev/wctablet.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 12 +++----<br>
+=C2=A0ui/console.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| =
+10 +++---<br>
+=C2=A0ui/gtk.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0|=C2=A0 8 ++---<br>
+=C2=A0ui/spice-app.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0=
+ 2 +-<br>
+=C2=A025 files changed, 151 insertions(+), 153 deletions(-)<br>
+<br>
+-- <br>
+2.26.2<br>
+<br>
+<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
+
+--000000000000a7458705af052db3--
 
