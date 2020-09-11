@@ -2,92 +2,90 @@ Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0264DC2BC11
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 17:19:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F08FC43461
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 17:19:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 530F8221ED
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 17:19:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D42EB221E5
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 17:19:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WQfHsRxJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 530F8221ED
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XjNUB0HO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D42EB221E5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGmhf-0007St-7K
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 13:19:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43034)
+	id 1kGmiB-0008Fi-0p
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 13:19:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43162)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kGmgx-0006zn-7d
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 13:18:31 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53681
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kGmhO-0007Mx-QK
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 13:18:58 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34755
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kGmgv-0007gg-J5
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 13:18:30 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kGmhN-0007jA-CC
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 13:18:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599844708;
+ s=mimecast20190719; t=1599844736;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wG/b8c0TirnKfH7WY60P5yOErYcFLhvSzQJAdHnIYYQ=;
- b=WQfHsRxJps9n1QVS1av4uEeYisUW7FC/jN9JGHBCWgrZbSyH0Vmu//hjBZ3JrAhNPIgpqU
- dxZuZvyR2Fwt3iOyYfu8X4mHGLRoK4Xh25z+L+LSkJ51FBoKzpBG9W8v/anymbKvB6k/6x
- 1zRT0I65K6+l5E+9xdhhSiDeCJHxH/Q=
+ bh=b4O5CflzLLcI8EvXiZc6t9EtHziufNXQIOhS4NBZBAc=;
+ b=XjNUB0HOPSu89+5cbt09AiJpiEEBhNCBNxgy1w21D/r7xP016EBlZirKlZDahyAL8RPDR5
+ KTWjSlvap9cX1zsVrF2omuiXW3OV3wC6ROsULpWFyyIMASMpQ1JKewlR081x+g0WEtP14L
+ bYn1XVTxhlAVRVO7vbVYp2ddTRMJSAU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-246-E99DHro1NXKxmdaHQfzheA-1; Fri, 11 Sep 2020 13:18:26 -0400
-X-MC-Unique: E99DHro1NXKxmdaHQfzheA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-565-62k4bFwKMROJrHOfAfk8-A-1; Fri, 11 Sep 2020 13:18:52 -0400
+X-MC-Unique: 62k4bFwKMROJrHOfAfk8-A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 384461091063;
- Fri, 11 Sep 2020 17:18:25 +0000 (UTC)
-Received: from work-vm (ovpn-113-52.ams2.redhat.com [10.36.113.52])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9718575125;
- Fri, 11 Sep 2020 17:18:11 +0000 (UTC)
-Date: Fri, 11 Sep 2020 18:18:09 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Steven Sistare <steven.sistare@oracle.com>
-Subject: Re: [PATCH V1 05/32] savevm: QMP command for cprload
-Message-ID: <20200911171809.GM3310@work-vm>
-References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
- <1596122076-341293-6-git-send-email-steven.sistare@oracle.com>
- <654553cb-e071-0498-fe66-78ddda3942e9@redhat.com>
- <c135f2e5-10d5-81f5-7251-cead777428aa@oracle.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D83EB18A224B;
+ Fri, 11 Sep 2020 17:18:50 +0000 (UTC)
+Received: from [10.3.113.1] (ovpn-113-1.phx2.redhat.com [10.3.113.1])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 62D2C1992D;
+ Fri, 11 Sep 2020 17:18:50 +0000 (UTC)
+Subject: Re: [PATCH v2] configure: Do not intent to build WHPX on 32-bit host
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200910054516.405777-1-f4bug@amsat.org>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <a4c3ac58-ee56-2ebe-fe2b-43c59640d56e@redhat.com>
+Date: Fri, 11 Sep 2020 12:18:49 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <c135f2e5-10d5-81f5-7251-cead777428aa@oracle.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200910054516.405777-1-f4bug@amsat.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0.003
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 03:40:15
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 09:43:46
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -45
+X-Spam_score: -4.6
+X-Spam_bar: ----
+X-Spam_report: (-4.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ NICE_REPLY_A=-2.469, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,80 +99,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>, Stefan Weil <sw@weilnetz.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Steven Sistare (steven.sistare@oracle.com) wrote:
-> On 7/30/2020 12:14 PM, Eric Blake wrote:
-> > On 7/30/20 10:14 AM, Steve Sistare wrote:
-> >> Provide the cprload QMP command.  The VM is created from the file produced
-> >> by the cprsave command.  Guest RAM is restored in-place from the shared
-> >> memory backend file, and guest block devices are used as is.  The contents
-> >> of such devices must not be modified between the cprsave and cprload
-> >> operations.  If the VM was running at cprsave time, then VM execution
-> >> resumes.
-> > 
-> > Is it always wise to unconditionally resume, or might this command need an additional optional knob that says what state (paused or running) to move into?
-> 
-> This can already be done.  Issue a stop command before cprsave, then cprload will finish in a
-> paused state.
-> 
-> Also, cprsave re-execs and leaves the guest in a paused state.  One can
-> 
-> send device add commands, then send cprload which continues
-> .
+On 9/10/20 12:45 AM, Philippe Mathieu-Daudé wrote:
 
-You're suffering here because you're reinventing stuff rather than
-reusing existing migration paths.
-With the existing migration code we require the qemu
-to be started with -incoming ... so we know it's in a clean
-state ready for being loaded, and we've already got the -S
-mechanism that dictates whether or not the VM autostarts
-(regardless of the saved state in the image).  The management
-layers find this pretty useful if they need to wire some networking
-or storage up at the point they know they've got a VM image that's
-loaded OK.
+In the subject, s/intent/attempt/
 
-Dave
-
+> Hyper-V is available on 64-bit versions of Windows,
+> do not try to build its support on 32-bit versions.
 > 
-> >> Syntax:
-> >>    {'command':'cprload', 'data':{'file':'str'}}
-> >>
-> >> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
-> >> Signed-off-by: Maran Wilson <maran.wilson@oracle.com>
-> >> ---
-> > 
-> >> +++ b/qapi/migration.json
-> >> @@ -1635,3 +1635,14 @@
-> >>   ##
-> >>   { 'command': 'cprsave', 'data': { 'file': 'str', 'mode': 'str' } }
-> >>   +##
-> >> +# @cprload:
-> >> +#
-> >> +# Start virtual machine from checkpoint file that was created earlier using
-> >> +# the cprsave command.
-> >> +#
-> >> +# @file: name of checkpoint file
-> >> +#
-> >> +# Since 5.0
-> > 
-> > another 5.2 instance. I'll quit pointing it out for the rest of the series.
-> 
-> Will find and fix all, thanks.
-> 
-> - Steve
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+> Since v1: Handle MinGW automatic detection (Thomas, Stefan)
+> ---
+>   configure | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> -- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
