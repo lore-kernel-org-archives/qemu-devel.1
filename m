@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36EA5C43461
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 10:28:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0298C433E2
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 10:28:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCE742158C
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 10:28:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCE742158C
+	by mail.kernel.org (Postfix) with ESMTPS id 9800221548
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 10:28:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9800221548
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kH2lu-0001t3-Sq
-	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 06:28:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40404)
+	id 1kH2lt-0001oU-Oh
+	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 06:28:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40420)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kH2jK-0005H5-Jt
- for qemu-devel@nongnu.org; Sat, 12 Sep 2020 06:26:02 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4739 helo=huawei.com)
+ id 1kH2jL-0005Hq-3x
+ for qemu-devel@nongnu.org; Sat, 12 Sep 2020 06:26:03 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:4742 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kH2jG-00087z-Hc
+ id 1kH2jG-000885-Hr
  for qemu-devel@nongnu.org; Sat, 12 Sep 2020 06:26:02 -0400
 Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 8A2BCBAE13B8A5F13C80;
+ by Forcepoint Email with ESMTP id 993CDF2BAEEE4E7F31E7;
  Sat, 12 Sep 2020 18:25:51 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS403-HUB.china.huawei.com
  (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Sat, 12 Sep 2020
- 18:25:41 +0800
+ 18:25:42 +0800
 From: Chuan Zheng <zhengchuan@huawei.com>
 To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>,
  <berrange@redhat.com>
-Subject: [PATCH v2 3/6] migration/tls: add MigrationState and tls_hostname
- into MultiFDSendParams
-Date: Sat, 12 Sep 2020 18:36:16 +0800
-Message-ID: <1599906979-17240-4-git-send-email-zhengchuan@huawei.com>
+Subject: [PATCH v2 4/6] migration/tls: extract cleanup function for common-use
+Date: Sat, 12 Sep 2020 18:36:17 +0800
+Message-ID: <1599906979-17240-5-git-send-email-zhengchuan@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1599906979-17240-1-git-send-email-zhengchuan@huawei.com>
 References: <1599906979-17240-1-git-send-email-zhengchuan@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-Originating-IP: [10.175.101.6]
 X-CFilter-Loop: Reflected
 Received-SPF: pass client-ip=45.249.212.191;
@@ -81,65 +81,75 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MigrationState is need for tls session build and tls hostname is need
-for tls handshake, add both MigrationState and tls_hostname
-into MultiFDSendParams.
+multifd channel cleanup is need if multifd handshake failed,
+let's extract it.
 
 Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
 Signed-off-by: Yan Jin <jinyan12@huawei.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- migration/multifd.c | 5 +++++
- migration/multifd.h | 4 ++++
- 2 files changed, 9 insertions(+)
+ migration/multifd.c | 34 ++++++++++++++++++++++------------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
 
 diff --git a/migration/multifd.c b/migration/multifd.c
-index d044120..3e41d9e 100644
+index 3e41d9e..fe08911 100644
 --- a/migration/multifd.c
 +++ b/migration/multifd.c
-@@ -543,11 +543,14 @@ void multifd_save_cleanup(void)
+@@ -720,6 +720,23 @@ out:
+     return NULL;
+ }
  
-         socket_send_channel_destroy(p->c);
-         p->c = NULL;
-+        p->s = NULL;
-         qemu_mutex_destroy(&p->mutex);
-         qemu_sem_destroy(&p->sem);
-         qemu_sem_destroy(&p->sem_sync);
-         g_free(p->name);
-         p->name = NULL;
-+        g_free(p->tls_hostname);
-+        p->tls_hostname = NULL;
-         multifd_pages_clear(p->pages);
-         p->pages = NULL;
-         p->packet_len = 0;
-@@ -779,6 +782,8 @@ int multifd_save_setup(Error **errp)
-         p->packet->magic = cpu_to_be32(MULTIFD_MAGIC);
-         p->packet->version = cpu_to_be32(MULTIFD_VERSION);
-         p->name = g_strdup_printf("multifdsend_%d", i);
-+        p->s = migrate_get_current();
-+        p->tls_hostname = g_strdup(p->s->hostname);
-         socket_send_channel_create(multifd_new_send_channel_async, p);
++static void multifd_new_send_channel_cleanup(MultiFDSendParams *p,
++                                             QIOChannel *ioc, Error *err)
++{
++     migrate_set_error(migrate_get_current(), err);
++     /* Error happen, we need to tell who pay attention to me */
++     qemu_sem_post(&multifd_send_state->channels_ready);
++     qemu_sem_post(&p->sem_sync);
++     /*
++      * Although multifd_send_thread is not created, but main migration
++      * thread neet to judge whether it is running, so we need to mark
++      * its status.
++      */
++     p->quit = true;
++     object_unref(OBJECT(ioc));
++     error_free(err);
++}
++
+ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
+ {
+     MultiFDSendParams *p = opaque;
+@@ -728,25 +745,18 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
+ 
+     trace_multifd_new_send_channel_async(p->id);
+     if (qio_task_propagate_error(task, &local_err)) {
+-        migrate_set_error(migrate_get_current(), local_err);
+-        /* Error happen, we need to tell who pay attention to me */
+-        qemu_sem_post(&multifd_send_state->channels_ready);
+-        qemu_sem_post(&p->sem_sync);
+-        /*
+-         * Although multifd_send_thread is not created, but main migration
+-         * thread neet to judge whether it is running, so we need to mark
+-         * its status.
+-         */
+-        p->quit = true;
+-        object_unref(OBJECT(sioc));
+-        error_free(local_err);
++        goto cleanup;
+     } else {
+         p->c = QIO_CHANNEL(sioc);
+         qio_channel_set_delay(p->c, false);
+         p->running = true;
+         qemu_thread_create(&p->thread, p->name, multifd_send_thread, p,
+                            QEMU_THREAD_JOINABLE);
++        return;
      }
++
++cleanup:
++    multifd_new_send_channel_cleanup(p, sioc, local_err);
+ }
  
-diff --git a/migration/multifd.h b/migration/multifd.h
-index 448a03d..2b400e7 100644
---- a/migration/multifd.h
-+++ b/migration/multifd.h
-@@ -66,11 +66,15 @@ typedef struct {
- } MultiFDPages_t;
- 
- typedef struct {
-+    /* Migration State */
-+    MigrationState *s;
-     /* this fields are not changed once the thread is created */
-     /* channel number */
-     uint8_t id;
-     /* channel thread name */
-     char *name;
-+    /* tls hostname */
-+    char *tls_hostname;
-     /* channel thread id */
-     QemuThread thread;
-     /* communication channel */
+ int multifd_save_setup(Error **errp)
 -- 
 1.8.3.1
 
