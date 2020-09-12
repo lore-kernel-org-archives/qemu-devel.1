@@ -8,76 +8,77 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F91C43461
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 22:58:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB3EBC43461
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 22:58:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B871A20731
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 22:57:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 215A020731
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 22:58:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fY/tK3Cp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B871A20731
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FF0L9bap"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 215A020731
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHET0-0001HM-MK
-	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 18:57:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47552)
+	id 1kHETT-0002SN-9C
+	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 18:58:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47636)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHEHk-0004P0-9D; Sat, 12 Sep 2020 18:46:20 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:37755)
+ id 1kHEHy-0004d6-0l; Sat, 12 Sep 2020 18:46:37 -0400
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:56107)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHEHi-0004WF-Mo; Sat, 12 Sep 2020 18:46:19 -0400
-Received: by mail-pg1-x544.google.com with SMTP id z17so1006413pgc.4;
- Sat, 12 Sep 2020 15:46:17 -0700 (PDT)
+ id 1kHEHw-0004YE-1U; Sat, 12 Sep 2020 18:46:33 -0400
+Received: by mail-pj1-x1042.google.com with SMTP id q4so3481210pjh.5;
+ Sat, 12 Sep 2020 15:46:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=raGFyZs6MR9nEefX4kmRsgZPLq8a4zwcDe8/ve9JX8Y=;
- b=fY/tK3Cpuvo/QA9ZWpgEo4m50ZEfcpRy42u8NOhm3BjXw0wUnkPJbZpdiliGNLBKog
- bXelf+DfBB2u0E4vSC9WV4Ayp3fOclws5ZPa6b7G/G/0LsGHo9SISjtWGZ5Vw8wzmMgs
- k+U2hhVxVSTI2nSIPAL4Rwx5ajWS6jgAGTc/zvc7PaxBpV0E1x3X28L8v7ue5eBESEU2
- 9jI6gzwaNEFZ27hAokXv7Hc+z5uLPtiOi/G8yvHlcO9wM++ouvLqKBcS6FPEbfvckRj9
- S+T0t+rVVqwAHu+Qkrfm0OTiK70w6W7MVeh/NhCgiDDEKaqk0aCFII1h1uZQLU/Dfr3k
- WLiQ==
+ bh=K7y5ZJD/cG5cMFm0+/8rHEDw15+8VS3xMSK8qF/3N8U=;
+ b=FF0L9bapInKkX4o8YTYuvP0aqfzZut36gvlKDuOd7Gds/KPmEwHI3fNI7sSK9QaJry
+ Gw7ok6NMesWxJYBtoNgjBbq9CJZRMfqpw04PH97psVY8AzwG+qhG3lu4hyPU0EDLFznG
+ bfYXJaJ89Q2WMPrvbvkgbCrHFhdY5905zYUSi4pkfWTvGGIAn4uEigcex/RaUGw2hJA1
+ Zdv4ZtsZvSVW4zwhX13HhWCbh9fNVd4UjwrFdXFbdBL0r2+RAQ2pWRUbBj5+SvcMeXPz
+ jIlas4S1HqRUx+Jh/X6IBCoJ0Z8fEyMSrE1KiEcQKvYAKSnvmYuv3HXhKt2x9BLIkhUK
+ 2VgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=raGFyZs6MR9nEefX4kmRsgZPLq8a4zwcDe8/ve9JX8Y=;
- b=Jg9wPbRXvVerdAexWqyp3ztiUKxJqZTOW35TnAuzLW7arFtBT5eYUErXzUiPhIOGS/
- HjnUel10VI1ODQGJyjNXVa8PHFZkPp8KIsh4tCAbd16m4mtZ/Z5T1CXU6vnF90d55Bgf
- cn5LFYIRyXW94xW+CYUCLJvVDRSewLHQTGfDPM2AUhSSG83oHh4X2cxHorXMQs0c/cNY
- O9zKslF6x4xT/n8Z4Coak56lJM0YkNGK5eIZokSEdUGOSF8WaIHzcXlz+P+jIjl5Rwn4
- VKybDJRsOgp/EAAU5WRYa3DbOnBDCBUsX9/b1Fz6AwJYU0o9c2TLfxvCFuKsZFw52sDk
- /ywA==
-X-Gm-Message-State: AOAM532TwBJR2El2m/+v8Hm21jmZFlth6ru1kUC3Bw04m+x42p6CIoNK
- vMEtgeZAs+wACdQQRCLrXfLvIryqeiavgXELgKU=
-X-Google-Smtp-Source: ABdhPJx0kmt7ptJBB42CKsfSXjm94zRnMmI4KxxLwR1wNMJbdHsNkAy+gChBfnKya299a95Y3nPSOw==
-X-Received: by 2002:a63:d257:: with SMTP id t23mr6231472pgi.212.1599950776522; 
- Sat, 12 Sep 2020 15:46:16 -0700 (PDT)
+ bh=K7y5ZJD/cG5cMFm0+/8rHEDw15+8VS3xMSK8qF/3N8U=;
+ b=MUpHdhfxPXXQUbZZZCGVqIRhx9sYsO1dljnwvuSrUvVZMV+7U13n57JOSF0u6/8uQ1
+ +0EPuVhAwHAJFrnntatU6/EbitBe6O3O6+mc3WgVKoR3PxngNAuXYIZ3KXYlD2GM+TMo
+ UCe9m/bkWZGmo0GkNK6UFh5li2OK8p6mTD3EKbY/VMpFMfHYmszE/G8YI+XCXt+nJWGJ
+ eKZ0lwnhBiqyNs0ke1mzi6Hrsw82JbkTqiAFXQ9+dhauZPcc1RJx8woqUvrgtN2KFk5A
+ nd4f8z2qMJ9N1n4arKDkZD8iPPu+jtqFZmiyda83r5f/vrNdxkH1pULSJ5W3fuySfc12
+ ogLA==
+X-Gm-Message-State: AOAM532xe2Hktt7oMkQu6FfyxHwx0d59y001lacy2+gOO3jZ4CddM86z
+ yj3warVPK95f3bxrr4Q3aXn00Wnw0mn6lpKj6pM=
+X-Google-Smtp-Source: ABdhPJxJKU4nziBn1PsXg6/2s04hzj7NC5VTCmM1LWJHX/0eqDW8eYZH/v8Q7WEvEiAupznHU/1/gA==
+X-Received: by 2002:a17:902:6941:b029:d0:cbe1:e76b with SMTP id
+ k1-20020a1709026941b02900d0cbe1e76bmr8250199plt.18.1599950789255; 
+ Sat, 12 Sep 2020 15:46:29 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id t10sm4639266pgp.15.2020.09.12.15.46.12
+ by smtp.googlemail.com with ESMTPSA id t10sm4639266pgp.15.2020.09.12.15.46.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 12 Sep 2020 15:46:15 -0700 (PDT)
+ Sat, 12 Sep 2020 15:46:28 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 20/27] tests: Fixes test-io-channel-file by mask only owner
- file state mask bits
-Date: Sun, 13 Sep 2020 06:44:24 +0800
-Message-Id: <20200912224431.1428-21-luoyonggang@gmail.com>
+Subject: [PATCH v8 23/27] rcu: fixes test-logging.c by call drain_call_rcu
+ before rmdir_full
+Date: Sun, 13 Sep 2020 06:44:27 +0800
+Message-Id: <20200912224431.1428-24-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200912224431.1428-1-luoyonggang@gmail.com>
 References: <20200912224431.1428-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x544.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1042.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -112,45 +113,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is the error on msys2/mingw
-Running test test-io-channel-file
-**
-ERROR:../tests/test-io-channel-file.c:59:test_io_channel_file_helper: assertion failed (TEST_MASK & ~mask == st.st_mode & 0777): (384 == 438)
-ERROR test-io-channel-file - Bail out! ERROR:../tests/test-io-channel-file.c:59:test_io_channel_file_helper: assertion failed (TEST_MASK & ~mask == st.st_mode & 0777): (384 == 438)
+drain_call_rcu is necessary on win32, because under win32, if you
+don't close the file before remove it, the remove would be fail.
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- tests/test-io-channel-file.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ tests/test-logging.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tests/test-io-channel-file.c b/tests/test-io-channel-file.c
-index bac2b07562..1b0e8d7c1b 100644
---- a/tests/test-io-channel-file.c
-+++ b/tests/test-io-channel-file.c
-@@ -28,6 +28,12 @@
- #define TEST_FILE "tests/test-io-channel-file.txt"
- #define TEST_MASK 0600
+diff --git a/tests/test-logging.c b/tests/test-logging.c
+index 783fe09a27..8b1522cfed 100644
+--- a/tests/test-logging.c
++++ b/tests/test-logging.c
+@@ -210,6 +210,8 @@ int main(int argc, char **argv)
+                          tmp_path, test_logfile_lock);
  
-+#ifdef _WIN32
-+#define TEST_MASK_EXPECT 0700
-+#else
-+#define TEST_MASK_EXPECT 0777
-+#endif
-+
- static void test_io_channel_file_helper(int flags)
- {
-     QIOChannel *src, *dst;
-@@ -56,7 +62,9 @@ static void test_io_channel_file_helper(int flags)
-     umask(mask);
-     ret = stat(TEST_FILE, &st);
-     g_assert_cmpint(ret, >, -1);
--    g_assert_cmpuint(TEST_MASK & ~mask, ==, st.st_mode & 0777);
-+    /* On Windows the stat() function in the C library checks only
-+     the FAT-style READONLY attribute and does not look at the ACL at all. */
-+    g_assert_cmpuint(TEST_MASK & ~mask, ==, st.st_mode & TEST_MASK_EXPECT);
+     rc = g_test_run();
++    qemu_log_close();
++    drain_call_rcu();
  
-     unlink(TEST_FILE);
-     object_unref(OBJECT(src));
+     rmdir_full(tmp_path);
+     return rc;
 -- 
 2.28.0.windows.1
 
