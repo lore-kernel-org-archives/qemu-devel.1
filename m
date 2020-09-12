@@ -6,72 +6,76 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 118BFC43461
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 23:13:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADD2BC433E2
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 23:56:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 753A6207BB
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 23:13:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 753A6207BB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7215F2083E
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 23:56:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7215F2083E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHEi5-0005d0-IH
-	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 19:13:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52242)
+	id 1kHFNX-0002Dg-4g
+	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 19:56:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57394)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kHEhU-00057x-RT; Sat, 12 Sep 2020 19:12:56 -0400
-Resent-Date: Sat, 12 Sep 2020 19:12:56 -0400
-Resent-Message-Id: <E1kHEhU-00057x-RT@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21706)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kHEhS-0007iv-Ko; Sat, 12 Sep 2020 19:12:56 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1599952361; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=YZbGKfgi0zFWWTlhfIigXsqX0dwJJ+FcavJITKpDjyKE6eh2SAhNgPDYuUq1pXCJMS8fu5I2p63vwrhsjgSyRVMgLYMtGxp3l6Y/qUArI7/VtksdoB5NBlYE8U8SqxHw5WztbLpbNIDIp5RlgseiKa7bEVuDNi1UImjN8Bjb7kY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1599952361;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=EIKtIxgjLI2eeqkd+AHkApGSi7N8xNZFH7piX/Zw+RY=; 
- b=Z5oqkxzzmpCqC4Rgbi2PCT7jpgpSCHsF4e2ho55QQlIFnQATMsLKDoJ+/MUVB/E3DiLBIf/pvmTeLJkxC1ED4eGSfR9B3UtsiSTlo+EXlpOv4JiHH8Ep4Cwm0NhCAKT9Wh4SHdCcGTogZSieR4PcQRsuE2Y3bxAXIjbnMMQLfgE=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1599952359378993.6626980469503;
- Sat, 12 Sep 2020 16:12:39 -0700 (PDT)
-Subject: Re: [PATCH v2 00/15] hw/block/nvme: Support Namespace Types and Zoned
- Namespace Command Set
-Message-ID: <159995235761.32613.15025608201008649356@66eaa9a8a123>
-In-Reply-To: <20200912225430.1772-1-dmitry.fomichev@wdc.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kHFMo-0001oZ-Dd
+ for qemu-devel@nongnu.org; Sat, 12 Sep 2020 19:55:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42086)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kHFMm-0003pq-AE
+ for qemu-devel@nongnu.org; Sat, 12 Sep 2020 19:55:38 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kHFMk-0002Rl-7J
+ for <qemu-devel@nongnu.org>; Sat, 12 Sep 2020 23:55:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 1BA102E80E9
+ for <qemu-devel@nongnu.org>; Sat, 12 Sep 2020 23:55:34 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: dmitry.fomichev@wdc.com
-Date: Sat, 12 Sep 2020 16:12:39 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/12 19:07:14
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 12 Sep 2020 23:48:39 -0000
+From: Michael Slade <1895363@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: mslade
+X-Launchpad-Bug-Reporter: Michael Slade (mslade)
+X-Launchpad-Bug-Modifier: Michael Slade (mslade)
+References: <159987499082.17652.11658819873688678558.malonedeb@soybean.canonical.com>
+Message-Id: <159995451944.17362.6173499216625986162.malone@soybean.canonical.com>
+Subject: [Bug 1895363] Re: borland IDEs double up cursor key presses (need
+ timing on PS2 port input)
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: 5033b3785a55ccdfe4dfa19c7f3a27794e4e3a26
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/12 19:55:34
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,23 +84,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, kwolf@redhat.com, damien.lemoal@wdc.com,
- qemu-block@nongnu.org, niklas.cassel@wdc.com, dmitry.fomichev@wdc.com,
- k.jensen@samsung.com, qemu-devel@nongnu.org, alistair.francis@wdc.com,
- kbusch@kernel.org, philmd@redhat.com, mlevitsky@redhat.com,
- matias.bjorling@wdc.com
+Reply-To: Bug 1895363 <1895363@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkxMjIyNTQzMC4xNzcy
-LTEtZG1pdHJ5LmZvbWljaGV2QHdkYy5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
-aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
-ZSBpbmZvcm1hdGlvbjoKCk4vQS4gSW50ZXJuYWwgZXJyb3Igd2hpbGUgcmVhZGluZyBsb2cgZmls
-ZQoKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dz
-LzIwMjAwOTEyMjI1NDMwLjE3NzItMS1kbWl0cnkuZm9taWNoZXZAd2RjLmNvbS90ZXN0aW5nLmNo
-ZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
-YmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+This virtualbox bug talks about the same thing, and also mentions qemu:
+
+https://www.virtualbox.org/ticket/58
+
+One of the people in the conversation created a patch for qemu which
+wasn't accepted:
+
+http://qemu.11.n7.nabble.com/PATCH-Fix-for-DOS-keyboard-problems-
+td114076.html
+
+
+** Bug watch added: Virtualbox Trac #58
+   http://www.virtualbox.org/ticket/58
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1895363
+
+Title:
+  borland IDEs double up cursor key presses (need timing on PS2 port
+  input)
+
+Status in QEMU:
+  New
+
+Bug description:
+  Most DOS-era IDEs from Borland (I have tried Borland C++ 2.0, Borland
+  C++ 3.1 and Turbo Pascal 7.1) exhibit strange responses to the
+  keyboard.  Cursor keys are registered twice, so each press of a cursor
+  key causes the cursor to move twice. Also the other keys occasionally
+  are missed or duplicated.
+
+  From an internet search, the problem appears to be this.  These
+  programs read the PS2 input register multiple times per incoming byte,
+  on the assumption that the byte will remain there for at least a few
+  hundred microseconds, before the next byte (if any) appears there.
+  qemu treats a read of the register by the guest as an acknowledgement
+  of the incoming byte and puts the next byte into the register
+  immediately, thus breaking the programs that expect each successive
+  byte to stay in place for a while.
+
+  The obvious solution is to use a timer to advance through the queued
+  bytes.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1895363/+subscriptions
 
