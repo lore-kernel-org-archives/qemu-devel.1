@@ -1,98 +1,64 @@
-Return-Path: <SRS0=/zFi=CU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=E5X6=CV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40E26C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 23:36:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EF22C433E2
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 01:50:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BAB721D91
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Sep 2020 23:36:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Nobw/yhL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BAB721D91
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id B7239208E4
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 01:50:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7239208E4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38751 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGsaS-00027o-FZ
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 19:36:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60078)
+	id 1kGufy-0001Qu-Pc
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 21:50:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kGsZn-0001Oq-Fm
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 19:35:31 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:46814)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kGsZk-00065W-Sd
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 19:35:31 -0400
-Received: by mail-pl1-x641.google.com with SMTP id d16so1594151pll.13
- for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 16:35:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=gy9ew762Kz8uAcIp89Zw7N6msNMi6asxKV4Mu1sd6/4=;
- b=Nobw/yhLj2jWrtf+pxiOb5rRm/xgka26iOmvDiSC3KT5QRYuPXqZu7yqEAPq3gbw00
- 0sRD9sYmKOOohpNu5/wlZeDkWfanHzRyHhVKmYt0xkili02zcukPx4qd6ZSPRwC58DLz
- lWdmUbdOFOwMpSpNxSncpozdbv8IY3SWW7XLLeJXQthwvXSsOQCA8dtYAuzRhIpDqKMG
- OkMRCiL+csjgBw/Nvd59ywjqKY+agDeVnprtpuDUSFAW/0W1Mhwx8P1SuwH3qiUN6poS
- GYbYV6TXcLsKeBtc5c4h5QTC493aJfrm/oBIjr/l6rvbGFlwAYShDHMvUwxaDV1OOX+C
- Upzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=gy9ew762Kz8uAcIp89Zw7N6msNMi6asxKV4Mu1sd6/4=;
- b=kTJf0RMXRK2o+8CsckgJBxUc+RvUN4ZufZ5VVN29FRscP250zWSMWki+daeqq5vMsz
- nDiO2e4FH5Ky2Ky8C0eMKkwHv7c2Sb75FSVjcD1A/QnrBXu0Gk/Gmad7nW8grOpIDT+j
- aRetndxIwV/Y/A1RlNO/uUEaKMg9InUCLwNCK4tEjQtRI/nKj2erRetsXaZocQwW7OQQ
- pN3Ep2mFIjbJLq7cAuG5BtmZNi9WuiTAXu0MspXQbVEMsMp9jEgmyR9njJRQfcQmz33h
- FgP8jqKVh/SXz/glElsjyJTCqOxzDYiw1QNSqur52uWCoUv8UhQpVnYLr40Hw8Fc97e0
- HONA==
-X-Gm-Message-State: AOAM533GW886/xxww2vBGtmeZ17MKsIpFxsk/3wAz9WdJRasDPsrZqL6
- J2YNxukxoDaT5OvU/6bfVeFmxw==
-X-Google-Smtp-Source: ABdhPJw0E+YM8CiAuUzIr6bZ8d6WRqm7v8kuzmMaXnsqh8Or8HfKM/NcP+9SXRzX0SuiUDV0mWhX6A==
-X-Received: by 2002:a17:902:a40e:: with SMTP id
- p14mr4158367plq.4.1599867327150; 
- Fri, 11 Sep 2020 16:35:27 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id 63sm3298449pfw.42.2020.09.11.16.35.25
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 11 Sep 2020 16:35:26 -0700 (PDT)
-Subject: Re: [PATCH v2 0/2] hw: Replace some impossible checks by assertions
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200910072325.439344-1-f4bug@amsat.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <7996e747-9163-649c-9477-3d437bfecf60@linaro.org>
-Date: Fri, 11 Sep 2020 16:35:24 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kGufH-0000W3-1P
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 21:49:20 -0400
+Received: from relay68.bu.edu ([128.197.228.73]:47306)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kGufF-0003Fc-09
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 21:49:18 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 08C1mPGl029499
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Fri, 11 Sep 2020 21:48:32 -0400
+Date: Fri, 11 Sep 2020 21:48:25 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: Li Qiang <liq3ea@gmail.com>
+Subject: Re: [PATCH] hw: usb: hcd-ohci: check len and frame_number variables
+Message-ID: <20200912014825.eg73ixfjkknzd46n@mozz.bu.edu>
+References: <20200911122703.126696-1-ppandit@redhat.com>
+ <CAKXe6SLFG1XMCw7yNM3bres29jiqJ5oLpJUgzXGjj8ay=NkwHQ@mail.gmail.com>
+ <20200911192045.3amzn6zlaynpxbfy@mozz.bu.edu>
 MIME-Version: 1.0
-In-Reply-To: <20200910072325.439344-1-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -45
-X-Spam_score: -4.6
-X-Spam_bar: ----
-X-Spam_report: (-4.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.469,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <20200911192045.3amzn6zlaynpxbfy@mozz.bu.edu>
+Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
+ helo=relay68.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 21:49:15
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -31
+X-Spam_score: -3.2
+X-Spam_bar: ---
+X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=0.999, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,33 +71,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Prasad J Pandit <pjp@fedoraproject.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, P J P <ppandit@redhat.com>,
+ Yi Ren <yunye.ry@alibaba-inc.com>, Yongkang Jia <j_kangel@163.com>,
+ Gaoning Pan <pgn@zju.edu.cn>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/10/20 12:23 AM, Philippe Mathieu-Daudé wrote:
-> Trivial patches removing unreachable code.
-> 
-> Since v1:
-> - dropped patches queued
-> - replace dead code by assert (Peter)
-> - use PCI_NUM_PINS definition (Cédric)
-> 
-> Philippe Mathieu-Daudé (2):
->   hw/gpio/max7310: Remove impossible check
->   hw/ppc/ppc4xx_pci: Replace magic value by the PCI_NUM_PINS definition
-> 
->  hw/gpio/max7310.c   | 5 +----
->  hw/ppc/ppc4xx_pci.c | 2 +-
->  2 files changed, 2 insertions(+), 5 deletions(-)
-> 
+On 200911 1520, Alexander Bulekov wrote:
+> On 200911 2257, Li Qiang wrote:
+> > P J P <ppandit@redhat.com> 于2020年9月11日周五 下午8:30写道：
+> > >
+> > > From: Prasad J Pandit <pjp@fedoraproject.org>
+> > >
+> > > While servicing the OHCI transfer descriptors(TD), OHCI host
+> > > controller derives variables 'start_addr', 'end_addr', 'len'
+> > > etc. from values supplied by the host controller driver.
+> > > Host controller driver may supply values such that using
+> > > above variables leads to out-of-bounds access or loop issues.
+> > > Add checks to avoid them.
+> > >
+> > > AddressSanitizer: stack-buffer-overflow on address 0x7ffd53af76a0
+> > >   READ of size 2 at 0x7ffd53af76a0 thread T0
+> > >   #0 ohci_service_iso_td ../hw/usb/hcd-ohci.c:734
+> > >   #1 ohci_service_ed_list ../hw/usb/hcd-ohci.c:1180
+> > >   #2 ohci_process_lists ../hw/usb/hcd-ohci.c:1214
+> > >   #3 ohci_frame_boundary ../hw/usb/hcd-ohci.c:1257
+> > >   #4 timerlist_run_timers ../util/qemu-timer.c:572
+> > >   #5 qemu_clock_run_timers ../util/qemu-timer.c:586
+> > >   #6 qemu_clock_run_all_timers ../util/qemu-timer.c:672
+> > >   #7 main_loop_wait ../util/main-loop.c:527
+> > >   #8 qemu_main_loop ../softmmu/vl.c:1676
+> > >   #9 main ../softmmu/main.c:50
+> > >
+> > 
+> > Hello Prasad,
+> > Could you also provide the reproducer?
+> > 
+> > > Reported-by: Gaoning Pan <pgn@zju.edu.cn>
+> > > Reported-by: Yongkang Jia <j_kangel@163.com>
+> > > Reported-by: Yi Ren <yunye.ry@alibaba-inc.com>
+> > > Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> > > ---
+> > >  hw/usb/hcd-ohci.c | 29 +++++++++++++++++++++++++++--
+> > >  1 file changed, 27 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
+> > > index 1e6e85e86a..76fb9282e3 100644
+> > > --- a/hw/usb/hcd-ohci.c
+> > > +++ b/hw/usb/hcd-ohci.c
+> > > @@ -691,6 +691,11 @@ static int ohci_service_iso_td(OHCIState *ohci, struct ohci_ed *ed,
+> > >             the next ISO TD of the same ED */
+> > >          trace_usb_ohci_iso_td_relative_frame_number_big(relative_frame_number,
+> > >                                                          frame_count);
+> > > +        if (OHCI_CC_DATAOVERRUN == OHCI_BM(iso_td.flags, TD_CC)) {
+> > > +            /* avoid infinite loop */
+> > > +            return 1;
+> > > +        }
+> > 
+> > I think it is better to split this patch to 2 or three as the infinite
+> > loop as the buffer overflow are independent.
+> > 
+> > 1. here the infinite loop
+> > 
+> > > +
+> > >          OHCI_SET_BM(iso_td.flags, TD_CC, OHCI_CC_DATAOVERRUN);
+> > >          ed->head &= ~OHCI_DPTR_MASK;
+> > >          ed->head |= (iso_td.next & OHCI_DPTR_MASK);
+> > > @@ -731,7 +736,11 @@ static int ohci_service_iso_td(OHCIState *ohci, struct ohci_ed *ed,
+> > >      }
+> > >
+> > >      start_offset = iso_td.offset[relative_frame_number];
+> > > -    next_offset = iso_td.offset[relative_frame_number + 1];
+> > > +    if (relative_frame_number < frame_count) {
+> > > +        next_offset = iso_td.offset[relative_frame_number + 1];
+> > > +    } else {
+> > > +        next_offset = iso_td.be;
+> > > +    }
+> > 
+> > 2. here the stack buffer overflow
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+... and for the stack overflow:
 
+cat << EOF | ./qemu-system-i386 -device pci-ohci,id=usb \
+-nodefaults -qtest stdio -nographic
+outl 0xcf8 0x80001013
+outl 0xcfc 0xfdff5955
+outl 0xcf8 0x80001002
+outl 0xcfc 0xd3073d2f
+writeq 0x55000000 0x5a55b984d3fd0200
+clock_step
+clock_step
+clock_step
+clock_step
+clock_step
+clock_step
+write 0x18 0x1 0x7a
+write 0x19 0x1 0xab
+write 0xab7b 0x1 0xab
+write 0xab7f 0x1 0xff
+write 0xab82 0x1 0x7a
+write 0xab83 0x1 0xab
+write 0xab70 0x1 0xff
+write 0xab71 0x1 0xff
+write 0xab73 0x1 0xff
+write 0xab75 0x1 0xab
+clock_step
+EOF
 
-r~
-
+> > >
+> > >      if (!(OHCI_BM(start_offset, TD_PSW_CC) & 0xe) ||
+> > >          ((relative_frame_number < frame_count) &&
+> > > @@ -764,7 +773,12 @@ static int ohci_service_iso_td(OHCIState *ohci, struct ohci_ed *ed,
+> > >          }
+> > >      } else {
+> > >          /* Last packet in the ISO TD */
+> > > -        end_addr = iso_td.be;
+> > > +        end_addr = next_offset;
+> > > +    }
+> > > +
+> > > +    if (start_addr > end_addr) {
+> > > +        trace_usb_ohci_iso_td_bad_cc_overrun(start_addr, end_addr);
+> > > +        return 1;
+> > >      }
+> > >
+> > >      if ((start_addr & OHCI_PAGE_MASK) != (end_addr & OHCI_PAGE_MASK)) {
+> > > @@ -773,6 +787,9 @@ static int ohci_service_iso_td(OHCIState *ohci, struct ohci_ed *ed,
+> > >      } else {
+> > >          len = end_addr - start_addr + 1;
+> > >      }
+> > > +    if (len > sizeof(ohci->usb_buf)) {
+> > > +        len = sizeof(ohci->usb_buf);
+> > > +    }
+> > >
+> > >      if (len && dir != OHCI_TD_DIR_IN) {
+> > >          if (ohci_copy_iso_td(ohci, start_addr, end_addr, ohci->usb_buf, len,
+> > > @@ -975,8 +992,16 @@ static int ohci_service_td(OHCIState *ohci, struct ohci_ed *ed)
+> > >          if ((td.cbp & 0xfffff000) != (td.be & 0xfffff000)) {
+> > >              len = (td.be & 0xfff) + 0x1001 - (td.cbp & 0xfff);
+> > >          } else {
+> > > +            if (td.cbp > td.be) {
+> > > +                trace_usb_ohci_iso_td_bad_cc_overrun(td.cbp, td.be);
+> > > +                ohci_die(ohci);
+> > > +                return 1;
+> > > +            }
+> > >              len = (td.be - td.cbp) + 1;
+> > >          }
+> > > +        if (len > sizeof(ohci->usb_buf)) {
+> > > +            len = sizeof(ohci->usb_buf);
+> > > +        }
+> > >
+> > 
+> > 3. Then here is the heap overflow.
+> > 
+> 
+> Maybe this is the heap-overflow?
+> 
+> cat << EOF | ./qemu-system-i386 -device pci-ohci,id=usbb \
+> -device usb-tablet,bus=usbb.0,port=1,usb_version=1 \
+> -nodefaults -qtest stdio -nographic
+> outl 0xcf8 0x80001013
+> outl 0xcfc 0x1fd555a
+> outl 0xcf8 0x80001002
+> outl 0xcfc 0x7fe072f
+> write 0x5a000004 0x1 0xa5
+> write 0x0 0x1 0x26
+> write 0x1 0x1 0xfc
+> write 0xfc27 0x1 0xaa
+> write 0xfc30 0x1 0x04
+> write 0x40006 0x1 0x27
+> write 0x4000e 0x1 0x27
+> write 0x40011 0x1 0xff
+> EOF
+> 
+> ==3325498==ERROR: AddressSanitizer: heap-buffer-overflow 
+> WRITE of size 131661824 at 0x6270000031a0 thread T0
+> #0 0x5564784a5a9f in __asan_memcpy (u-system-i386+0x2db6a9f)
+> #1 0x55647abc4cee in flatview_read_continue exec.c:3246:13
+> #2 0x55647abc7513 in flatview_read exec.c:3279:12
+> #3 0x55647abc7068 in address_space_read_full exec.c:3292:18
+> #4 0x55647abc8208 in address_space_rw exec.c:3320:16
+> #5 0x5564798a9467 in dma_memory_rw_relaxed include/sysemu/dma.h:87:18
+> #6 0x5564798a8e85 in dma_memory_rw include/sysemu/dma.h:110:12
+> #7 0x5564798b1d16 in ohci_copy_iso_td hw/usb/hcd-ohci.c:624:9
+> #8 0x5564798a2d66 in ohci_service_iso_td hw/usb/hcd-ohci.c:778:13
+> #9 0x556479897e1b in ohci_service_ed_list hw/usb/hcd-ohci.c:1180:21
+> #10 0x556479889dc6 in ohci_frame_boundary hw/usb/hcd-ohci.c:1245:9
+> #11 0x55647c40c527 in timerlist_run_timers util/qemu-timer.c:572:9
+> 
+> -Alex
+> 
+> > 
+> > So I think it can be more easier to review to split this to 3 patches.
+> > 
+> > Thanks,
+> > Li Qiang
+> > 
+> > >          pktlen = len;
+> > >          if (len && dir != OHCI_TD_DIR_IN) {
+> > > --
+> > > 2.26.2
+> > >
+> > >
+> > 
 
