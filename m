@@ -8,77 +8,78 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D284DC433E2
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 22:48:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78F3FC43461
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 22:48:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67F07214F1
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 22:48:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1625E214F1
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 22:48:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bJuubO2x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67F07214F1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IhtVF26J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1625E214F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHEJj-0007wO-Hj
-	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 18:48:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47280)
+	id 1kHEJq-0008DH-8K
+	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 18:48:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47382)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHEGl-0003Ko-2E; Sat, 12 Sep 2020 18:45:19 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:43773)
+ id 1kHEGz-0003TA-AN; Sat, 12 Sep 2020 18:45:38 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:45790)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHEGj-0004Gv-Ct; Sat, 12 Sep 2020 18:45:18 -0400
-Received: by mail-pl1-x641.google.com with SMTP id e4so2650278pln.10;
- Sat, 12 Sep 2020 15:45:16 -0700 (PDT)
+ id 1kHEGx-0004NC-AA; Sat, 12 Sep 2020 18:45:32 -0400
+Received: by mail-pl1-x642.google.com with SMTP id bh1so2654589plb.12;
+ Sat, 12 Sep 2020 15:45:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=fONA64XSdMINk4Pb3HJvl02BkTmqUfaoSQk6W/tx2aE=;
- b=bJuubO2xrm/C9siIXHjDP3vRF+5d0cv8+AvzsMzEDyybJAaGbATG/XYjf7vGqVzJ57
- DOkvNF2KhXtGDsPP5A2U5pHlXkRoe542EF54tq14mt71wK6CW2j6GG8Y352kQzlkFwFk
- SUN7BYbg3+JD/OLXF8OPB4Ac1jX+s1hKlJwB/X3q/NO6ha4LK+coaZXtI+PTZixZU4Jl
- NE+mLM8OeZYYWb6yHRrvX8QvlO0Xc4OW8gfIw/oe3aF011E2b3omxsnhuGE+YGpCcZYv
- +h3BLvDqNqxYwEYUehXzHHwyvlf9ztnlc9utiR9Ujhc7J4rfO1jcUdBraYC0DffqvpSf
- rI/g==
+ bh=18mOftWXQC3Rn89AKTi/Z7fcDnMtQzhw+fXUDjoqjy0=;
+ b=IhtVF26JU/+ntR2yhL9XU2h3Lqll1gxgh94s0149a8hRbB6rLroxWc7QeGa6/aZN8p
+ z0LQC+MXzBeUXQJ1z2tFfn9oQiW5zJHbnqVxF+p3LCPk3QwXcvYhlhA++oubyQltLz+d
+ gKO+QLV03Yt+Iascu4VJDAk5mTgkCpR94PxcBNULLmeabQVyd0XUZc8FYfFkli4Sw6Uh
+ 81VyfsHaCyYXlOysY+ttJxSMP+SwoCxjBvjcQnxjC6xNomvwPTyNpeIll9TDb9NHIPW0
+ dRbnhNxsFj73LhCF0EiN6/cDZ5r9R1kc3h9rGILL2B3eh/8DVT+LHZQp99XLx27yrHiN
+ ru4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=fONA64XSdMINk4Pb3HJvl02BkTmqUfaoSQk6W/tx2aE=;
- b=BOwbB2ctfp0O8FrtMy0RlLTwn6TQkrW5pFEyLmgxQGsqzfLUt/0xcgSdHKET0jlGlD
- 9RpFq4LJPktlFynntB2VRZjew7LfiIhJxbWMTvLOPQG37kfY9Yj6IFqJ06LL7Si8y9uW
- RI14c8IckjWVQ8Zyk2JVYZ/W7OPvY2yAf/x2HeJowRVfyosC+LdjDNj1FaLugi7F1iGM
- 9bWeeZGrzStIVZkH/xoksbrVrFl5/m5iHLc2mzmVd0Lha5WdQsYYW+EJ3329rLQrVAb6
- gN5AS/KiRX76DfmOmp34kESq3JNM9D+fak0nLLS41FtR8EuBRc66iLv7h7kWluIuGTd6
- D7mg==
-X-Gm-Message-State: AOAM531vVUKON+rNXaXLMXAqhUskBiIgPiBNLaU6ip4utySl1FQgDGw/
- UBKFItixSIdgEpNhC9olsHm/q8uGCWZIFqZNVtE=
-X-Google-Smtp-Source: ABdhPJwHn7qTof05O3b8ed9rQni1lfpk4hOB+CnTs6FEpjXqOwL7v3C5u39Q5OnYvuaYCROHGg5TYA==
-X-Received: by 2002:a17:902:564:: with SMTP id
- 91mr7684596plf.141.1599950715478; 
- Sat, 12 Sep 2020 15:45:15 -0700 (PDT)
+ bh=18mOftWXQC3Rn89AKTi/Z7fcDnMtQzhw+fXUDjoqjy0=;
+ b=RTod0ncfE3TsU5NmZyJcfxU9SzWjPRgScDxNmOJqHKmZ1ovfMHsEDE1E9CAYfUefNk
+ ThWbI43ZRTUUigCoXzZoPm1TB3z05Xcm8JLit+rRZrakzIGsEmWFFagkUmUQPOXqxijS
+ 7/TNNw9LfroXDRhhXPozgzcrCPj7J8fhGZr08bFHrh962MZqyuhTnCympa4L0aPPzDHl
+ FJ+KNsZmEIC8SBnkJgwvLhwSzI0TBya1Q/q1GDRAodhgoI76T5bU1F9qFzl/fl15MHpx
+ hM9A06mkHjoax4eEtwOlXa5ce2jC04ZGvzWZ8790i66Csqf+gVJBDjnt8gNMgzrfB5bn
+ YkYQ==
+X-Gm-Message-State: AOAM5333NsTv2vQJCNGALWevU8TiRkw6QR3kLbp0aCWczPt1anlRRcfx
+ Kjszk13hrJGurc5+wwuwSXIEsE0V9T+8ktUFniU=
+X-Google-Smtp-Source: ABdhPJxPGaZ0Hujfj+vr7jHo33gpnbVCQsXQx3sjQgzKnbXjoofaYzmu0HCpnhB+KKuCVZKOKPprcA==
+X-Received: by 2002:a17:90b:816:: with SMTP id
+ bk22mr7929358pjb.66.1599950728580; 
+ Sat, 12 Sep 2020 15:45:28 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id t10sm4639266pgp.15.2020.09.12.15.45.11
+ by smtp.googlemail.com with ESMTPSA id t10sm4639266pgp.15.2020.09.12.15.45.24
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 12 Sep 2020 15:45:14 -0700 (PDT)
+ Sat, 12 Sep 2020 15:45:27 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 06/27] curses: Fixes curses compiling errors.
-Date: Sun, 13 Sep 2020 06:44:10 +0800
-Message-Id: <20200912224431.1428-7-luoyonggang@gmail.com>
+Subject: [PATCH v8 09/27] tests: test-replication disable
+ /replication/secondary/* on msys2/mingw.
+Date: Sun, 13 Sep 2020 06:44:13 +0800
+Message-Id: <20200912224431.1428-10-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200912224431.1428-1-luoyonggang@gmail.com>
 References: <20200912224431.1428-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x641.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -114,53 +115,71 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is the compiling error:
-../ui/curses.c: In function 'curses_refresh':
-../ui/curses.c:256:5: error: 'next_maybe_keycode' may be used uninitialized in this function [-Werror=maybe-uninitialized]
-  256 |     curses2foo(_curses2keycode, _curseskey2keycode, chr, maybe_keycode)
-      |     ^~~~~~~~~~
-../ui/curses.c:302:32: note: 'next_maybe_keycode' was declared here
-  302 |             enum maybe_keycode next_maybe_keycode;
-      |                                ^~~~~~~~~~~~~~~~~~
-../ui/curses.c:256:5: error: 'maybe_keycode' may be used uninitialized in this function [-Werror=maybe-uninitialized]
-  256 |     curses2foo(_curses2keycode, _curseskey2keycode, chr, maybe_keycode)
-      |     ^~~~~~~~~~
-../ui/curses.c:265:24: note: 'maybe_keycode' was declared here
-  265 |     enum maybe_keycode maybe_keycode;
-      |                        ^~~~~~~~~~~~~
-cc1.exe: all warnings being treated as errors
+They caused failure on msys2/mingw, that's because file-win32.c not implement
+.bdrv_reopen_prepare/commit/abort yet.
 
-gcc version 10.2.0 (Rev1, Built by MSYS2 project)
+This is the error message:
+> $ ./tests/test-replication.exe
+> # random seed: R02S3f4d1c01af2b0a046990e0235c481faf
+> 1..13
+> # Start of replication tests
+> # Start of primary tests
+> ok 1 /replication/primary/read
+> ok 2 /replication/primary/write
+> ok 3 /replication/primary/start
+> ok 4 /replication/primary/stop
+> ok 5 /replication/primary/do_checkpoint
+> ok 6 /replication/primary/get_error_all
+> # End of primary tests
+> # Start of secondary tests
+> ok 7 /replication/secondary/read
+> ok 8 /replication/secondary/write
+> Unexpected error in bdrv_reopen_prepare() at ../block.c:4191:
+> Block format 'file' used by node '#block4287' does not support reopening
+> files
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- ui/curses.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/test-replication.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/ui/curses.c b/ui/curses.c
-index 12bc682cf9..e4f9588c3e 100644
---- a/ui/curses.c
-+++ b/ui/curses.c
-@@ -262,7 +262,7 @@ static int curses2foo(const int _curses2foo[], const int _curseskey2foo[],
- static void curses_refresh(DisplayChangeListener *dcl)
+diff --git a/tests/test-replication.c b/tests/test-replication.c
+index e7cbd6b144..b067240add 100644
+--- a/tests/test-replication.c
++++ b/tests/test-replication.c
+@@ -392,6 +392,7 @@ static void test_secondary_write(void)
+     teardown_secondary();
+ }
+ 
++#ifndef _WIN32
+ static void test_secondary_start(void)
  {
-     int chr, keysym, keycode, keycode_alt;
--    enum maybe_keycode maybe_keycode;
-+    enum maybe_keycode maybe_keycode = CURSES_KEYCODE;
+     BlockBackend *top_blk, *local_blk;
+@@ -546,6 +547,7 @@ static void test_secondary_get_error_all(void)
  
-     curses_winch_check();
+     teardown_secondary();
+ }
++#endif
  
-@@ -299,7 +299,7 @@ static void curses_refresh(DisplayChangeListener *dcl)
+ static void sigabrt_handler(int signo)
+ {
+@@ -597,6 +599,7 @@ int main(int argc, char **argv)
+     /* Secondary */
+     g_test_add_func("/replication/secondary/read",  test_secondary_read);
+     g_test_add_func("/replication/secondary/write", test_secondary_write);
++#ifndef _WIN32
+     g_test_add_func("/replication/secondary/start", test_secondary_start);
+     g_test_add_func("/replication/secondary/stop",  test_secondary_stop);
+     g_test_add_func("/replication/secondary/continuous_replication",
+@@ -605,6 +608,7 @@ int main(int argc, char **argv)
+                     test_secondary_do_checkpoint);
+     g_test_add_func("/replication/secondary/get_error_all",
+                     test_secondary_get_error_all);
++#endif
  
-         /* alt or esc key */
-         if (keycode == 1) {
--            enum maybe_keycode next_maybe_keycode;
-+            enum maybe_keycode next_maybe_keycode = CURSES_KEYCODE;
-             int nextchr = console_getch(&next_maybe_keycode);
+     ret = g_test_run();
  
-             if (nextchr != -1) {
 -- 
 2.28.0.windows.1
 
