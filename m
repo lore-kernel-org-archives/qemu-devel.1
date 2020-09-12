@@ -2,79 +2,117 @@ Return-Path: <SRS0=E5X6=CV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0581FC43461
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 01:51:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C78B9C433E2
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 06:02:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2012B208E4
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 01:51:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2012B208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 2C09920855
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 06:02:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RrY+cVFI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C09920855
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGuhK-0002PU-6Q
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 21:51:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48876)
+	id 1kGycO-00020a-33
+	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 02:02:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kGuga-0001z4-Cm
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 21:50:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49806)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kGugY-0003Sw-8t
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 21:50:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kGugV-0006YN-AQ
- for <qemu-devel@nongnu.org>; Sat, 12 Sep 2020 01:50:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 468642E8053
- for <qemu-devel@nongnu.org>; Sat, 12 Sep 2020 01:50:35 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kGybV-0001Mu-Hh
+ for qemu-devel@nongnu.org; Sat, 12 Sep 2020 02:01:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30969)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kGybT-0001Wq-4R
+ for qemu-devel@nongnu.org; Sat, 12 Sep 2020 02:01:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599890497;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gl2AtlMXNqKvTmPK+6Z4nh0TVjCyOpaXQ00n1fpFNqc=;
+ b=RrY+cVFIycz9JgF1LOD3fXvk7rQMvD76KomXurEQcA3JJKbXID1Rg9wcB5fFy0+3uX5sOy
+ cug+bSE1V7gMZy8Kils9CuUIwhHgHbemD6bO/Z5BiAOzUro4CkT8ScGnwzxel1cQje7chG
+ hAToegmQs3FMOE4C5xHxUjKLofiP3Ok=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-51-UAa2Re4AMQalTkX3OvoDZA-1; Sat, 12 Sep 2020 02:01:35 -0400
+X-MC-Unique: UAa2Re4AMQalTkX3OvoDZA-1
+Received: by mail-wm1-f71.google.com with SMTP id a7so1673382wmc.2
+ for <qemu-devel@nongnu.org>; Fri, 11 Sep 2020 23:01:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=gl2AtlMXNqKvTmPK+6Z4nh0TVjCyOpaXQ00n1fpFNqc=;
+ b=LRQ/9W9j7P/E3iOTFxBthptNzSU5/ZYIBP//k0icWc8b+6r8qeBBlUNoQ+9IDXK0Zj
+ CLsNXA8gW4FIiirSU13xVf5Dx1dDSzQ8dwk6nLib0IjivsJkw9EnCNVBv0xIW8T7mMH8
+ Iag/E+/KJJjl85r5lqX6Yi8K1Xl9bD//O98EFLGewCu1FuSNqx0N5JhMFpKeX/yVetFA
+ B5D9tCFDxqBcfq6GXkaEtmoySJCPFkd0bCcY7yGCFggutTo4B2RsNIMVou28O1QSAVoE
+ cEeulbp2s8vXH3kbuNG4yKvOrkyOMv90wA77XiMrrz5zZPi5PSVNpdBA4PXRtwlgW36/
+ TCIA==
+X-Gm-Message-State: AOAM533Jc3B3Dc9Eicsperrn+7AytUgFS8pwQhIbS6QBgS7/nBTRBDsU
+ QotU1b9aly8RM9yKFwSdzUkXImKQRBxrlhQbWMV/CTstzRb2uLJhnDZrozTAtNTtKyF1NngdgLe
+ LkdLXK+LYMWjpYOo=
+X-Received: by 2002:a1c:7714:: with SMTP id t20mr5734235wmi.55.1599890494249; 
+ Fri, 11 Sep 2020 23:01:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwAz3LYjm0ULsjJ7PFs3pE9KI5HeANjEihDIHjNBSdqeZwduh4mU/81Grk535fRy3WpkjP1Bw==
+X-Received: by 2002:a1c:7714:: with SMTP id t20mr5734216wmi.55.1599890493915; 
+ Fri, 11 Sep 2020 23:01:33 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.170.5])
+ by smtp.gmail.com with ESMTPSA id m13sm8278190wrr.74.2020.09.11.23.01.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 11 Sep 2020 23:01:33 -0700 (PDT)
+Subject: Re: [PATCH v2] scripts/git.orderfile: Display meson files along with
+ buildsys ones
+To: Laszlo Ersek <lersek@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200907161222.41915-1-philmd@redhat.com>
+ <bd658d44-d9bd-81d1-f3c7-89c0d61f6dd2@redhat.com>
+ <79de1ef4-6e08-6f1c-030e-f40e7410e06c@redhat.com>
+ <2d435bb0-eb8d-7a12-b962-2bce246c30fb@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3b529fd7-aae4-645e-c956-aa6f9fc2aea5@redhat.com>
+Date: Sat, 12 Sep 2020 08:01:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 12 Sep 2020 01:43:10 -0000
-From: Michael Slade <1895363@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: mslade
-X-Launchpad-Bug-Reporter: Michael Slade (mslade)
-X-Launchpad-Bug-Modifier: Michael Slade (mslade)
-Message-Id: <159987499082.17652.11658819873688678558.malonedeb@soybean.canonical.com>
-Subject: [Bug 1895363] [NEW] borland IDEs double up cursor key presses (need
- timing on PS2 port input)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: afe60064d62f7237c9cb1cb78a587f4520e07b95
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 21:50:35
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <2d435bb0-eb8d-7a12-b962-2bce246c30fb@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/12 02:01:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -45
+X-Spam_score: -4.6
+X-Spam_bar: ----
+X-Spam_report: (-4.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.469, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,67 +121,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1895363 <1895363@bugs.launchpad.net>
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 08/09/20 14:30, Laszlo Ersek wrote:
+> 
+> The current working directory is the source tree.
+> 
+> The working directory is pristine, as in:
+> $ git reset --hard
+> $ git clean -ffdx
+> $ git submodule deinit --force --all
+> 
+> Then:
+> 
+> $ git submodule update --init --force
+> $ make clean
+> $ git status
 
-Most DOS-era IDEs from Borland (I have tried Borland C++ 2.0, Borland
-C++ 3.1 and Turbo Pascal 7.1) exhibit strange responses to the keyboard.
-Cursor keys are registered twice, so each press of a cursor key causes
-the cursor to move twice. Also the other keys occasionally are missed or
-duplicated.
+I see.  We should probably rename the Makefile in the source tree, since
+it is only meant to be used from the build tree.
 
->From an internet search, the problem appears to be this.  These programs
-read the PS2 input register multiple times per incoming byte, on the
-assumption that the byte will remain there for at least a few hundred
-microseconds, before the next byte (if any) appears there.  qemu treats
-a read of the register by the guest as an acknowledgement of the
-incoming byte and puts the next byte into the register immediately, thus
-breaking the programs that expect each successive byte to stay in place
-for a while.
+Paolo
 
-The obvious solution is to use a timer to advance through the queued
-bytes.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1895363
-
-Title:
-  borland IDEs double up cursor key presses (need timing on PS2 port
-  input)
-
-Status in QEMU:
-  New
-
-Bug description:
-  Most DOS-era IDEs from Borland (I have tried Borland C++ 2.0, Borland
-  C++ 3.1 and Turbo Pascal 7.1) exhibit strange responses to the
-  keyboard.  Cursor keys are registered twice, so each press of a cursor
-  key causes the cursor to move twice. Also the other keys occasionally
-  are missed or duplicated.
-
-  From an internet search, the problem appears to be this.  These
-  programs read the PS2 input register multiple times per incoming byte,
-  on the assumption that the byte will remain there for at least a few
-  hundred microseconds, before the next byte (if any) appears there.
-  qemu treats a read of the register by the guest as an acknowledgement
-  of the incoming byte and puts the next byte into the register
-  immediately, thus breaking the programs that expect each successive
-  byte to stay in place for a while.
-
-  The obvious solution is to use a timer to advance through the queued
-  bytes.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1895363/+subscriptions
 
