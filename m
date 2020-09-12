@@ -2,81 +2,79 @@ Return-Path: <SRS0=E5X6=CV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DE67C433E2
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 23:03:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A165BC433E2
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 23:04:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EE9C20770
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 23:03:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3434220770
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 23:04:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="nE/jjvSS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EE9C20770
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ovrcRmDc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3434220770
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHEYl-0005Bd-Mp
-	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 19:03:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49078)
+	id 1kHEZ4-0005Zj-9p
+	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 19:04:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48782)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=517336518=dmitry.fomichev@wdc.com>)
- id 1kHEQc-0004vi-Op; Sat, 12 Sep 2020 18:55:30 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:26912)
+ id 1kHEPt-0003gO-9G; Sat, 12 Sep 2020 18:54:45 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:26875)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=517336518=dmitry.fomichev@wdc.com>)
- id 1kHEQa-0005f4-2F; Sat, 12 Sep 2020 18:55:30 -0400
+ id 1kHEPp-0005QG-LE; Sat, 12 Sep 2020 18:54:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1599951327; x=1631487327;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=Fe7FRRGcF+PM1kLw/MifPE71wdqaWcMDdZBdLsZIvO8=;
- b=nE/jjvSS4FOY4Yei+0n63+qpqRoqWDnkeFnmTHMfDd277LlIrlB8z6MI
- 9gO/0vM1kY76TJXDyfKOVedfY+vHxzDpS6jRtoPyYhJ+x2aTxV6MppdyM
- 0LNAQyGz7sKbj6rePBrJSn2anBJPgTQSx5XNIc3tVYBMAEac05BKrgw2O
- cuUaBur3rrc82AB3fMYOKtv/rV9EKdp6RFAEPGSu+7qtMjcRZNmV0QnvW
- DTAZB1/NiTHFbfjk8Vv/F34dhlbzpffZmv/5L2NLctGbAQCVTPWcCAWjI
- ZXxpJK9ZZy8cU9MhtrkVqjlAPxoFxtL4pY/YFSpUP+ZdGMAcxmBglKfNG Q==;
-IronPort-SDR: rTXXkeh80pabVRHjnD1UrdfaQ91w7SnpsTRgpNjX/bySrXbkYCZBFP+Gxuzd58pt/indNTRVLd
- dwIdx6KKl/w4k0k/VC3Fe+iqO0XFPENqXse9S020ErHEanU+7xQNAOd0ijKFPpL1DDjzgBjByj
- zF45CYBQ9Kfg6Khg4tWoBh8TT3YyLdzuxKo76o18vB6t1s/mRAfPK6NqQQ1J3JNYQXm2VPc/gy
- H0JnLY+fLqxc4iIrVTxuPxM56yg/0YnyyNgb2Pn2YtUH0F9q0KQ3G2fQfIdmo4zusvMW5pHpP+
- X8I=
-X-IronPort-AV: E=Sophos;i="5.76,420,1592841600"; d="scan'208";a="256834867"
+ t=1599951281; x=1631487281;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=jx/vudLjmjyYXywAG7c1mhEB9IPSBqdmizf4+4VT7z0=;
+ b=ovrcRmDcL8PcQ2urtOFRFnJP8wNFK/OuPU2VkkKihTjcyRzyRiNOfZTw
+ Eaof4n25M4aE7DYNyUHwQk4xDwU6lQD3AzqDNtF4NsJDbcdUU/4rSzbMf
+ JulNO8jr7TBWYXHuPwk9XOImG++bOPO6cOEw3nWAzH0NRkdbWOzzcaBOy
+ Ocu2BBeiY1vkTppNBtDlDMcM+H7UZfwzVnv5aDmupj4I2s4ZPYQkh7drD
+ dhqID4Dq8jyshx2uCImLVFRBnsC406f6vUZ5a1hsLHcttrVtPv2al05YT
+ Qwncugefg9PDX8wPEQPhE1QKFA1yXf+EKrbtYzaHBmUWhlfDI2LzYsOPF w==;
+IronPort-SDR: +mT99MD+RNSz9r3T0DTkR4GAVrAJmE22uUxl/6JyAHzpnLTdEUd4ZbhpbaKjFLd2kC7tKouHOO
+ bgXRy29S5iqG8pHNjl+zFUPOLPPGbvbzpUZKNvjbZeF/bYewT1J4+zd9rrIa8UByYk9Ez+M2sa
+ Z/DQfmKTWhkr0LxkK8QoE7+PrChtpYnebuZ2sK96s6GZvDKG4GaDVDp7a9kd4BBY6NVbk/di0e
+ c7XjuimPjhmtywJGvVt4ng3nYST4B/bhY9EQ2eb96SjDhYdX615at45Nnr63REzpRiOGzk0K3a
+ +ek=
+X-IronPort-AV: E=Sophos;i="5.76,420,1592841600"; d="scan'208";a="256834833"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 13 Sep 2020 06:55:05 +0800
-IronPort-SDR: APIhFRTGdaEbsiiJhWEmzkDR4z57dsCVFg8Am78Po5FvO3lc0/VQooUwWjgl8/3+0ky/asNGwV
- n/gOfP6S/OTg==
+ by ob1.hgst.iphmx.com with ESMTP; 13 Sep 2020 06:54:37 +0800
+IronPort-SDR: ZsC8O/Zf88NoyVIlxvoTQQgAW42RxgQjTHzK+UGGUUBHGhcZvq5IQUAyQFkUvD4SoYC/8X5owD
+ bgiWzekDFIwA==
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 12 Sep 2020 15:41:26 -0700
-IronPort-SDR: Wur8w/eGWIuuW6RHucMXkh8Fyue5XoqJvOmWCWoyKK4XGOHG7nmHVqsTfdkVs16Lmx5Wdxvgr0
- dM34yty1Pj8Q==
+ 12 Sep 2020 15:40:57 -0700
+IronPort-SDR: Nen6EWJPnqlXbShTrc9HVMyZrf2h9hITg2qW6wQSSTdMea71NIipzSk7G1/H1vuYnDp9TelQWl
+ dykzvSs+oBNA==
 WDCIronportException: Internal
 Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
- by uls-op-cesaip02.wdc.com with ESMTP; 12 Sep 2020 15:55:05 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 12 Sep 2020 15:54:36 -0700
 From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 To: Keith Busch <kbusch@kernel.org>, Klaus Jensen <k.jensen@samsung.com>,
  Kevin Wolf <kwolf@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Maxim Levitsky <mlevitsky@redhat.com>, Fam Zheng <fam@euphon.net>
-Subject: [PATCH v2 13/15] hw/block/nvme: Add injection of Offline/Read-Only
- zones
-Date: Sun, 13 Sep 2020 07:54:28 +0900
-Message-Id: <20200912225430.1772-14-dmitry.fomichev@wdc.com>
+Subject: [PATCH v2 00/15] hw/block/nvme: Support Namespace Types and Zoned
+ Namespace Command Set
+Date: Sun, 13 Sep 2020 07:54:15 +0900
+Message-Id: <20200912225430.1772-1-dmitry.fomichev@wdc.com>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200912225430.1772-1-dmitry.fomichev@wdc.com>
-References: <20200912225430.1772-1-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=68.232.141.245;
@@ -111,117 +109,92 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ZNS specification defines two zone conditions for the zones that no
-longer can function properly, possibly because of flash wear or other
-internal fault. It is useful to be able to "inject" a small number of
-such zones for testing purposes.
+v1 -> v2:
 
-This commit defines two optional device properties, "offline_zones"
-and "rdonly_zones". Users can assign non-zero values to these variables
-to specify the number of zones to be initialized as Offline or
-Read-Only. The actual number of injected zones may be smaller than the
-requested amount - Read-Only and Offline counts are expected to be much
-smaller than the total number of zones on a drive.
+ - Rebased on top of qemu-nvme/next branch.
+ - Incorporated feedback from Klaus and Alistair.
+ - Dropped "Simulate Zone Active excursions" patch.
+   Excursion behavior may depend on the internal controller
+   architecture and therefore be vendor-specific.
+ - Dropped support for Zone Attributes and zoned AENs for now.
+   These features can be added in a future series.
+ - NS Types support is extended to handle active/inactive namespaces.
+ - Update the write pointer after backing storage I/O completion, not
+   before. This makes the emulation to run correctly in case of
+   backing device failures.
+ - Avoid division in the I/O path if the device zone size is
+   a power of two (the most common case). Zone index then can be
+   calculated by using bit shift.
+ - A few reported bugs have been fixed.
+ - Indentation in function definitions has been changed to make it
+   the same as the rest of the code.
 
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
----
- hw/block/nvme.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- hw/block/nvme.h |  2 ++
- 2 files changed, 48 insertions(+)
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index ec7fade674..f0a03bea75 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -3361,8 +3361,11 @@ static int nvme_init_zone_meta(NvmeCtrl *n, NvmeNamespace *ns,
-                                uint64_t capacity)
- {
-     NvmeZone *zone;
-+    Error *err;
-     uint64_t start = 0, zone_size = n->zone_size;
-+    uint32_t rnd;
-     int i;
-+    uint16_t zs;
- 
-     ns->zone_array = g_malloc0(n->zone_array_size);
-     ns->exp_open_zones = g_malloc0(sizeof(NvmeZoneList));
-@@ -3392,6 +3395,37 @@ static int nvme_init_zone_meta(NvmeCtrl *n, NvmeNamespace *ns,
-         start += zone_size;
-     }
- 
-+    /* If required, make some zones Offline or Read Only */
-+
-+    for (i = 0; i < n->params.nr_offline_zones; i++) {
-+        do {
-+            qcrypto_random_bytes(&rnd, sizeof(rnd), &err);
-+            rnd %= n->num_zones;
-+        } while (rnd < n->params.max_open_zones);
-+        zone = &ns->zone_array[rnd];
-+        zs = nvme_get_zone_state(zone);
-+        if (zs != NVME_ZONE_STATE_OFFLINE) {
-+            nvme_set_zone_state(zone, NVME_ZONE_STATE_OFFLINE);
-+        } else {
-+            i--;
-+        }
-+    }
-+
-+    for (i = 0; i < n->params.nr_rdonly_zones; i++) {
-+        do {
-+            qcrypto_random_bytes(&rnd, sizeof(rnd), &err);
-+            rnd %= n->num_zones;
-+        } while (rnd < n->params.max_open_zones);
-+        zone = &ns->zone_array[rnd];
-+        zs = nvme_get_zone_state(zone);
-+        if (zs != NVME_ZONE_STATE_OFFLINE &&
-+            zs != NVME_ZONE_STATE_READ_ONLY) {
-+            nvme_set_zone_state(zone, NVME_ZONE_STATE_READ_ONLY);
-+        } else {
-+            i--;
-+        }
-+    }
-+
-     return 0;
- }
- 
-@@ -3440,6 +3474,16 @@ static void nvme_zoned_init_ctrl(NvmeCtrl *n, Error **errp)
-                     " adjusting", n->params.max_active_zones, nz);
-         n->params.max_active_zones = nz;
-     }
-+    if (n->params.max_open_zones < nz) {
-+        if (n->params.nr_offline_zones > nz - n->params.max_open_zones) {
-+            n->params.nr_offline_zones = nz - n->params.max_open_zones;
-+        }
-+        if (n->params.nr_rdonly_zones >
-+            nz - n->params.max_open_zones - n->params.nr_offline_zones) {
-+            n->params.nr_rdonly_zones =
-+                nz - n->params.max_open_zones - n->params.nr_offline_zones;
-+        }
-+    }
-     if (n->params.zd_extension_size) {
-         if (n->params.zd_extension_size & 0x3f) {
-             error_setg(errp,
-@@ -3872,6 +3916,8 @@ static Property nvme_props[] = {
-                        params.zd_extension_size, 0),
-     DEFINE_PROP_UINT32("max_active", NvmeCtrl, params.max_active_zones, 0),
-     DEFINE_PROP_UINT32("max_open", NvmeCtrl, params.max_open_zones, 0),
-+    DEFINE_PROP_UINT32("offline_zones", NvmeCtrl, params.nr_offline_zones, 0),
-+    DEFINE_PROP_UINT32("rdonly_zones", NvmeCtrl, params.nr_rdonly_zones, 0),
-     DEFINE_PROP_BOOL("cross_zone_read", NvmeCtrl, params.cross_zone_read, true),
-     DEFINE_PROP_UINT8("fill_pattern", NvmeCtrl, params.fill_pattern, 0),
-     DEFINE_PROP_END_OF_LIST(),
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index e53388ba66..9a5f4787b7 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -25,6 +25,8 @@ typedef struct NvmeParams {
-     uint32_t    max_active_zones;
-     uint32_t    max_open_zones;
-     uint32_t    zd_extension_size;
-+    uint32_t    nr_offline_zones;
-+    uint32_t    nr_rdonly_zones;
- } NvmeParams;
- 
- typedef struct NvmeAsyncEvent {
+Zoned Namespace (ZNS) Command Set is a newly introduced command set
+published by the NVM Express, Inc. organization as TP 4053. The main
+design goals of ZNS are to provide hardware designers the means to
+reduce NVMe controller complexity and to allow achieving a better I/O
+latency and throughput. SSDs that implement this interface are
+commonly known as ZNS SSDs.
+
+This command set is implementing a zoned storage model, similarly to
+ZAC/ZBC. As such, there is already support in Linux, allowing one to
+perform the majority of tasks needed for managing ZNS SSDs.
+
+The Zoned Namespace Command Set relies on another TP, known as
+Namespace Types (NVMe TP 4056), which introduces support for having
+multiple command sets per namespace.
+
+Both ZNS and Namespace Types specifications can be downloaded by
+visiting the following link -
+
+https://nvmexpress.org/wp-content/uploads/NVM-Express-1.4-Ratified-TPs.zip
+
+This patch series adds Namespace Types support and zoned namespace
+emulation capability to the existing NVMe PCI device.
+
+The patchset is organized as follows -
+
+The first several patches are preparatory and are added to allow for
+an easier review of the subsequent commits. The group of patches that
+follows adds NS Types support with only NVM Command Set being
+available. Finally, the last group of commits makes definitions and
+adds new code to support Zoned Namespace Command Set.
+
+Based-on: https://www.mail-archive.com/qemu-devel@nongnu.org/msg736817.html
+
+
+*** BLURB HERE ***
+
+Ajay Joshi (1):
+  hw/block/nvme: Define 64 bit cqe.result
+
+Dmitry Fomichev (11):
+  hw/block/nvme: Report actual LBA data shift in LBAF
+  hw/block/nvme: Add Commands Supported and Effects log
+  hw/block/nvme: Define trace events related to NS Types
+  hw/block/nvme: Make Zoned NS Command Set definitions
+  hw/block/nvme: Define Zoned NS Command Set trace events
+  hw/block/nvme: Support Zoned Namespace Command Set
+  hw/block/nvme: Introduce max active and open zone limits
+  hw/block/nvme: Support Zone Descriptor Extensions
+  hw/block/nvme: Add injection of Offline/Read-Only zones
+  hw/block/nvme: Use zone metadata file for persistence
+  hw/block/nvme: Document zoned parameters in usage text
+
+Niklas Cassel (3):
+  hw/block/nvme: Introduce the Namespace Types definitions
+  hw/block/nvme: Add support for Namespace Types
+  hw/block/nvme: Add support for active/inactive namespaces
+
+ block/nvme.c          |    2 +-
+ block/trace-events    |    2 +-
+ hw/block/nvme.c       | 1932 ++++++++++++++++++++++++++++++++++++++++-
+ hw/block/nvme.h       |  190 ++++
+ hw/block/trace-events |   38 +
+ include/block/nvme.h  |  210 ++++-
+ 6 files changed, 2308 insertions(+), 66 deletions(-)
+
 -- 
 2.21.0
 
