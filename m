@@ -2,78 +2,82 @@ Return-Path: <SRS0=E5X6=CV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55A8AC43461
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 08:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D575C43461
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 08:32:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1794214F1
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 08:31:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DAEFE214F1
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 08:32:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MeKKaH7C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1794214F1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DGw7Ujhj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAEFE214F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kH0wY-0003OK-IM
-	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 04:31:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44544)
+	id 1kH0xR-0004W6-31
+	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 04:32:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kH0us-00022z-I4
- for qemu-devel@nongnu.org; Sat, 12 Sep 2020 04:29:50 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39254)
+ id 1kH0uu-00025U-Ku
+ for qemu-devel@nongnu.org; Sat, 12 Sep 2020 04:29:52 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37134)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kH0uq-00022Z-NK
- for qemu-devel@nongnu.org; Sat, 12 Sep 2020 04:29:50 -0400
-Received: by mail-wr1-x444.google.com with SMTP id a17so13612357wrn.6
- for <qemu-devel@nongnu.org>; Sat, 12 Sep 2020 01:29:48 -0700 (PDT)
+ id 1kH0ut-00023E-5b
+ for qemu-devel@nongnu.org; Sat, 12 Sep 2020 04:29:52 -0400
+Received: by mail-wr1-x444.google.com with SMTP id z4so13633084wrr.4
+ for <qemu-devel@nongnu.org>; Sat, 12 Sep 2020 01:29:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=5pysvA1syRNHSzPZgeEEJUg4BktCjm4zQbvoXzGgB2w=;
- b=MeKKaH7CKjNaFs7w0tEmfVxr0mySHNXsn+Qs0t3g1AVcfAzOimViHBswJJGTh28cCq
- nyQLKkGwtXEmpZ4GCqRBbI0dVF9/QiuhNcUPX1mtxuvVXwdpqsbYX3CkAHcRVDdcceOz
- MOPazqGhLa6I2yN+unBzHR1x/MQ8w5GPMtxNJrH+b2RvJ7ODy4xJAa7oBC1JIlVkSVP9
- UL4xSrh/YbiVyBMhI/b/SJzUhpjni0lYG4igdtDsUqDe4T8xaI8TTlZQjyxiO2SNFNms
- 3eOvjLiR6xM0d//qRcQ2Kjux2Et811SSsAmMS0J46OEqWQLxAwjBC338xHHiKtMy8f7F
- 16sw==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=gAoMYvbh6PKb/CST4Gg+2AFyuso3E0ZdXk61WQRCbQo=;
+ b=DGw7UjhjP2vauXfLjAsCfKYqeWU5h53umqgNAQdDyHZL7+UZa8lNDgcWEK1bz82g3A
+ 12NLLuAjCsqqqtlBdthVAPy3bk5apZMlzdI5Nsd1bgBUDDlVFkGi7g+1AuNH1+2WE0GU
+ oJgA/cSl9u9dJi19lgQrwz/sjQQVc3tOkvZJmZHxn7xjorf1v801BlgMIq95LfbCU/sq
+ N2B2YSGn86guSZwCojkcs58N8MY62r4a6dquVSqPRB23FV2H9r5inKKPxWmRwebuk/oV
+ ndZER8eRrPoifjHW8YkUYfZ95HNiETaTVTnOOmrlUrQ04V8lJyTwYtzxVWP982VJXBer
+ HV8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=5pysvA1syRNHSzPZgeEEJUg4BktCjm4zQbvoXzGgB2w=;
- b=GQaYuR6KwRKc2WSEbboqC+ysDEMzPdQQYOl3p+JAZ/Yfxsd8SlI7HUk2yYsJ+kgerR
- c8rIH2umF6e0UB4Vpf33HasaXzy2C2cLfhFbO+GSATjM4sVHBDodwAuMp5CEriuVFwjx
- ukxPI516n9xXDiHbtVwfvCyLNC9dXi1wujVE1ETZ5tXesWpag8LU+yCDc62s6cluaRDv
- DlEXF3eTl/yTUsZ1W1nGuB71DDGHFrEwEHUiqmZpCMDESdnfT10Dp4iRxMdnA02ey/sD
- 1Z1OcF1wvlHL4KYb8N+PkpL+sIvMuaEN/4TBVg0l8WfHnpV6mnhzz9ffi3XOEh48dW2F
- hvLA==
-X-Gm-Message-State: AOAM531e20ArYhwrzXnhFP+1HVefxMOXGKV3bZtoTItbKUCk7HV6T0ki
- ZEWHktn6qmtIp+SwuRl43fBZb7RVnM4=
-X-Google-Smtp-Source: ABdhPJxgCHjR5VE3U0GYYPFOlRcyhllXXtTzQjIQ5gMSAXJ8Yieh4lLEu2wpHoqk9wlWH8KqjOk1BQ==
-X-Received: by 2002:a5d:608a:: with SMTP id w10mr5659159wrt.48.1599899386813; 
- Sat, 12 Sep 2020 01:29:46 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=gAoMYvbh6PKb/CST4Gg+2AFyuso3E0ZdXk61WQRCbQo=;
+ b=qI4oQ5mCXclFjiSmnDE6pLF2jFmK2MQ+APi36MaYVlKe/Rhq3f961EN/mnpxUGUerG
+ 6UzOYjfVB3XfiYu69sKZJVRx7U4GHno49Xr9TyyJc8SAN+tSZs79F3i0aH94xnxOumei
+ D4GNbDFXzZWBa/XWOnDou0snAtNAsrhKz0h9toSENbYOPI1brOz6xIngvEfAczbu+g8k
+ tXorj/mtL3WCeVh7URkSevN+gfAFhUfc4YfTirlAK6gCEp+twJy5/+0qqXZ76Dpzw1pk
+ O7N/RaOWLstRdqzu6oHdjaFmKnhpqrEu8K9DwmfJ9tN4I5Fb6bUzzLmVUklFfac/J+36
+ wUOA==
+X-Gm-Message-State: AOAM531hTMreS5smSm5U5vI2STNC+ftL75hzAry84CntqycWetIUWBW5
+ kvGP6oXttY2RR0C7mLlixqREM6vEtA8=
+X-Google-Smtp-Source: ABdhPJwkWo6+i0YDX58FSEg9FV+YKqke0U8ziBczkQ/pFuFvZ8wCS/NwF+p+PYlSYZXdcydWX+bp5Q==
+X-Received: by 2002:adf:eacf:: with SMTP id o15mr6241963wrn.12.1599899389810; 
+ Sat, 12 Sep 2020 01:29:49 -0700 (PDT)
 Received: from localhost.localdomain (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id t188sm9598698wmf.41.2020.09.12.01.29.45
+ by smtp.gmail.com with ESMTPSA id t188sm9598698wmf.41.2020.09.12.01.29.48
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 12 Sep 2020 01:29:45 -0700 (PDT)
+ Sat, 12 Sep 2020 01:29:49 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 0/2] hw/char: Remove TYPE_SERIAL_IO
-Date: Sat, 12 Sep 2020 10:29:42 +0200
-Message-Id: <20200912082944.890972-1-f4bug@amsat.org>
+Subject: [PATCH v3 2/2] hw/char/serial: Remove TYPE_SERIAL_IO (superset of
+ TYPE_SERIAL_MM)
+Date: Sat, 12 Sep 2020 10:29:44 +0200
+Message-Id: <20200912082944.890972-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200912082944.890972-1-f4bug@amsat.org>
+References: <20200912082944.890972-1-f4bug@amsat.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=2a00:1450:4864:20::444;
@@ -103,35 +107,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Peter Maydell <peter.maydell@linaro.org>,
  Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
  "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
  Jiaxun Yang <jiaxun.yang@flygoat.com>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Remove the TYPE_SERIAL_IO which is simply a superset of
-TYPE_SERIAL_MM, as suggested by Paolo and Peter here:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg721806.html
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-All patches reviewed (patch #1 already queued in Paolo's misc tree).
+TYPE_SERIAL_IO is a superset of TYPE_SERIAL_MM, and it is
+not used anymore. Remove it.
 
-Since v2:
-- Rebased on "QOM boilerplate cleanup"
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ hw/char/serial.c | 41 -----------------------------------------
+ 1 file changed, 41 deletions(-)
 
-Since v1:
-- Reword migration comment (Marc-André)
-
-Philippe Mathieu-Daudé (2):
-  hw/mips/mipssim: Use MMIO serial device on fake ISA I/O
-  hw/char/serial: Remove TYPE_SERIAL_IO (superset of TYPE_SERIAL_MM)
-
- hw/char/serial.c  | 41 -----------------------------------------
- hw/mips/mipssim.c |  5 +++--
- 2 files changed, 3 insertions(+), 43 deletions(-)
-
+diff --git a/hw/char/serial.c b/hw/char/serial.c
+index 23864794929..fd80ae55929 100644
+--- a/hw/char/serial.c
++++ b/hw/char/serial.c
+@@ -985,46 +985,6 @@ const MemoryRegionOps serial_io_ops = {
+     .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+-static void serial_io_realize(DeviceState *dev, Error **errp)
+-{
+-    SerialIO *sio = SERIAL_IO(dev);
+-    SerialState *s = &sio->serial;
+-
+-    if (!qdev_realize(DEVICE(s), NULL, errp)) {
+-        return;
+-    }
+-
+-    memory_region_init_io(&s->io, OBJECT(dev), &serial_io_ops, s, "serial", 8);
+-    sysbus_init_mmio(SYS_BUS_DEVICE(sio), &s->io);
+-    sysbus_init_irq(SYS_BUS_DEVICE(sio), &s->irq);
+-}
+-
+-static void serial_io_class_init(ObjectClass *klass, void* data)
+-{
+-    DeviceClass *dc = DEVICE_CLASS(klass);
+-
+-    dc->realize = serial_io_realize;
+-    /* No dc->vmsd: class has no migratable state */
+-}
+-
+-static void serial_io_instance_init(Object *o)
+-{
+-    SerialIO *sio = SERIAL_IO(o);
+-
+-    object_initialize_child(o, "serial", &sio->serial, TYPE_SERIAL);
+-
+-    qdev_alias_all_properties(DEVICE(&sio->serial), o);
+-}
+-
+-
+-static const TypeInfo serial_io_info = {
+-    .name = TYPE_SERIAL_IO,
+-    .parent = TYPE_SYS_BUS_DEVICE,
+-    .instance_size = sizeof(SerialIO),
+-    .instance_init = serial_io_instance_init,
+-    .class_init = serial_io_class_init,
+-};
+-
+ static Property serial_properties[] = {
+     DEFINE_PROP_CHR("chardev", SerialState, chr),
+     DEFINE_PROP_UINT32("baudbase", SerialState, baudbase, 115200),
+@@ -1178,7 +1138,6 @@ static const TypeInfo serial_mm_info = {
+ static void serial_register_types(void)
+ {
+     type_register_static(&serial_info);
+-    type_register_static(&serial_io_info);
+     type_register_static(&serial_mm_info);
+ }
+ 
 -- 
 2.26.2
 
