@@ -2,90 +2,93 @@ Return-Path: <SRS0=E5X6=CV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80E13C43461
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 23:03:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20E5AC433E2
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 23:03:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D8E820770
+	by mail.kernel.org (Postfix) with ESMTPS id B250F20770
 	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 23:03:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YBL0UeQ2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D8E820770
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Rm8kh8e0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B250F20770
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHEXr-00034P-9Z
+	id 1kHEXr-00036i-Tm
 	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 19:02:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47734)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48858)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHEIH-00057z-SS; Sat, 12 Sep 2020 18:46:53 -0400
-Received: from mail-pj1-x102f.google.com ([2607:f8b0:4864:20::102f]:52406)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHEIG-0004aF-3l; Sat, 12 Sep 2020 18:46:53 -0400
-Received: by mail-pj1-x102f.google.com with SMTP id o16so3488521pjr.2;
- Sat, 12 Sep 2020 15:46:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=xja2GOan26JGtbnJysiTAdF/PP8SFiEz9x6o8ysBpug=;
- b=YBL0UeQ2J5GeltLrATBdk4OIYSsJFeZwaZ46eAznrZibWr+QEbklXOLaM6HM8ynaBw
- Qmi9X89Pe0o6KUYbvWjJj/o83HFWmZU/a48+OVCWBgH8mChY9USsMvRgakhKpd1fCbqo
- t7/ygBHX32oZ6fjA5u7eUDy4fr4drEDMk7wIJCL+J38AWOhsC8ALzUME7av4AoidApC2
- DA0i7Wpq0+nH/BbSB37C4+vzuShH27Y/rC/F9PJAYWTIlEoUqCu92uApoAnaw/L4EEPP
- /UFEKzCsXMzp3XZGnCOHZsqeWNMAPR4MCBQ531yAFs2z2H0tMnQu6tE6HWPr3GCHEryI
- qHRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=xja2GOan26JGtbnJysiTAdF/PP8SFiEz9x6o8ysBpug=;
- b=WDb1jdThbI4NOqegKYDv2g7HUOv0W8sC1Vpw8Z/SIjKUx3xpJRSw/ZwCXR2sqwnk3q
- CrZMO5vk3J0Vglnj8s4w9s4Do8iVg1pX6pY+oIne+PwXFbnRJAxvRxwjdqywqRtYavA1
- UWFPhU9lJ7eOeQS1AjKRqKwCY0xd6FYfBmEw3ZSmPCVOaPSLwPKLUw44vWIpncbuwAr3
- 8tMHHNpaJwO62fKXe3s411WZqbDDcYI70F5VeGvuuGqPpFdDWdOtS63MXOd0PPvUuOFE
- ADqSLpdCzX5fcItreSJ5VORqhwJpMtJr1DEYKxRQXyRVlOjaW4oMsOEg848xdaz+ZmYS
- a6vQ==
-X-Gm-Message-State: AOAM532dDz9Kov9B5EA5D4ICQiOVPCxHwxt8xZjnTYQ98pcz5sLpLjXw
- kSgdUCc0CCn1sKJijwYqXfSyw7zfYyTBKPMLBws=
-X-Google-Smtp-Source: ABdhPJyaSAVs8HBXiUomIy060JGqTzzAGhYvWSrLrFvZgqYKCgjFEDlVNRfg+CTEuWYrn7ac3QWsrQ==
-X-Received: by 2002:a17:902:7594:: with SMTP id
- j20mr4528185pll.43.1599950806025; 
- Sat, 12 Sep 2020 15:46:46 -0700 (PDT)
-Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id t10sm4639266pgp.15.2020.09.12.15.46.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 12 Sep 2020 15:46:45 -0700 (PDT)
-From: Yonggang Luo <luoyonggang@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v8 27/27] Revert "configure: add --ninja option"
-Date: Sun, 13 Sep 2020 06:44:31 +0800
-Message-Id: <20200912224431.1428-28-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.28.0.windows.1
-In-Reply-To: <20200912224431.1428-1-luoyonggang@gmail.com>
-References: <20200912224431.1428-1-luoyonggang@gmail.com>
+ (Exim 4.90_1)
+ (envelope-from <prvs=517336518=dmitry.fomichev@wdc.com>)
+ id 1kHEPz-0003vq-Ti; Sat, 12 Sep 2020 18:54:51 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:26879)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=517336518=dmitry.fomichev@wdc.com>)
+ id 1kHEPx-0005R7-Pe; Sat, 12 Sep 2020 18:54:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1599951289; x=1631487289;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=zxe81MuX4urUutIHEtJFE6J8nCgNhHUrmEj1y7p0mBw=;
+ b=Rm8kh8e0OLV0mWx6lzhlB7NDHgq1SEdT1DONXzqXJcRaPD1pFkUAR24F
+ r9DvIcNvyq3P3K0l5VYwItjHRs3lGlmVp06th18zJQNus4Dx3++egU5Vy
+ E7jan7HhCByU3UV4biDV9UFMTcyi+bBOew1EjeyFZddUhKhBsSYUsZ4ie
+ lE5kqkvRG2qgZcF8OeSX954eTtkaP+gDUlwGRwBm9ukJGIQ4I+sBAU1lo
+ 7Ip6cCiEbaRMkx8kFS80NHRm8Qc4ecgWShrpysZIRBBepENHyic+6LFvt
+ X0mzfy9DAL8ZP35GJYw5f3NCQ6X/61BizIA/wDCgtxw/HaRfrW77cWTCd g==;
+IronPort-SDR: Omeotocw6yOjQheq3wNJnm8eW+PBrBrdDW57eJqQzuOxlULmrofN2yoGo9j7LjjXxcBQedqlZG
+ ixdUPtavgxvWuKbmzL2tnSgdxSh/uH04/tE7Q43YMsWi+C9I/sdQWj3VWbRbjQB9VW4gpc0tci
+ QENTm1A54pCUjFRFjbBF4dfhposku7pfUsm8CN4uomadCEV7QHsdIm0Cjnog+7bM8ImH0Ol6B+
+ 3DiTzlizQ8L4iAuou7gIMK2fsyjXBaQ4q2o9EsthLUC8yw3Vyxhbi5dZXVjnvcBSGWC3KqW1d3
+ FrY=
+X-IronPort-AV: E=Sophos;i="5.76,420,1592841600"; d="scan'208";a="256834844"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 13 Sep 2020 06:54:48 +0800
+IronPort-SDR: fvEiqaCauq2J8sp7Bt4pqv7GzrJB5dWnH4hiaX4m+wKKYFd58d4wL/RaxGc/2QfgVRarEoB5l2
+ hfCvWJO+/Hig==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 12 Sep 2020 15:41:08 -0700
+IronPort-SDR: SV0QDCDHVHLv04t4jcrRsErooydDBp2z/OQC5iGkgo7QaM0u8iYckrFJqXHv8IsqcNA8ImNWQZ
+ dQLtCtwgTfAw==
+WDCIronportException: Internal
+Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
+ by uls-op-cesaip02.wdc.com with ESMTP; 12 Sep 2020 15:54:47 -0700
+From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+To: Keith Busch <kbusch@kernel.org>, Klaus Jensen <k.jensen@samsung.com>,
+ Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Maxim Levitsky <mlevitsky@redhat.com>, Fam Zheng <fam@euphon.net>
+Subject: [PATCH v2 05/15] hw/block/nvme: Define trace events related to NS
+ Types
+Date: Sun, 13 Sep 2020 07:54:20 +0900
+Message-Id: <20200912225430.1772-6-dmitry.fomichev@wdc.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200912225430.1772-1-dmitry.fomichev@wdc.com>
+References: <20200912225430.1772-1-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::102f;
- envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x102f.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Received-SPF: pass client-ip=68.232.141.245;
+ envelope-from=prvs=517336518=dmitry.fomichev@wdc.com; helo=esa1.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/12 18:54:38
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,85 +102,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
- Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>,
- Peter Lieven <pl@kamp.de>, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: Niklas Cassel <niklas.cassel@wdc.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
+ Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This reverts commit 48328880fddf0145bdccc499160fb24dfabfbd41.
+A few trace events are defined that are relevant to implementing
+Namespace Types (NVMe TP 4056).
 
-The --ninja option doesn't need anymore because of upgrade meson to 0.55.2
-At that version we can use ninjatool
-
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
 ---
- configure | 16 +---------------
- 1 file changed, 1 insertion(+), 15 deletions(-)
+ hw/block/trace-events | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/configure b/configure
-index af86ba1db3..dc7cc0f411 100755
---- a/configure
-+++ b/configure
-@@ -535,7 +535,6 @@ rng_none="no"
- secret_keyring=""
- libdaxctl=""
- meson=""
--ninja=""
- skip_meson=no
- gettext=""
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 79c9da652d..2414dcbc79 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -46,8 +46,12 @@ pci_nvme_create_cq(uint64_t addr, uint16_t cqid, uint16_t vector, uint16_t size,
+ pci_nvme_del_sq(uint16_t qid) "deleting submission queue sqid=%"PRIu16""
+ pci_nvme_del_cq(uint16_t cqid) "deleted completion queue, cqid=%"PRIu16""
+ pci_nvme_identify_ctrl(void) "identify controller"
++pci_nvme_identify_ctrl_csi(uint8_t csi) "identify controller, csi=0x%"PRIx8""
+ pci_nvme_identify_ns(uint32_t ns) "nsid %"PRIu32""
++pci_nvme_identify_ns_csi(uint32_t ns, uint8_t csi) "nsid=%"PRIu32", csi=0x%"PRIx8""
+ pci_nvme_identify_nslist(uint32_t ns) "nsid %"PRIu32""
++pci_nvme_identify_nslist_csi(uint16_t ns, uint8_t csi) "nsid=%"PRIu16", csi=0x%"PRIx8""
++pci_nvme_identify_cmd_set(void) "identify i/o command set"
+ pci_nvme_identify_ns_descr_list(uint32_t ns) "nsid %"PRIu32""
+ pci_nvme_get_log(uint16_t cid, uint8_t lid, uint8_t lsp, uint8_t rae, uint32_t len, uint64_t off) "cid %"PRIu16" lid 0x%"PRIx8" lsp 0x%"PRIx8" rae 0x%"PRIx8" len %"PRIu32" off %"PRIu64""
+ pci_nvme_getfeat(uint16_t cid, uint8_t fid, uint8_t sel, uint32_t cdw11) "cid %"PRIu16" fid 0x%"PRIx8" sel 0x%"PRIx8" cdw11 0x%"PRIx32""
+@@ -84,6 +88,8 @@ pci_nvme_mmio_stopped(void) "cleared controller enable bit"
+ pci_nvme_mmio_shutdown_set(void) "shutdown bit set"
+ pci_nvme_mmio_shutdown_cleared(void) "shutdown bit cleared"
+ pci_nvme_cmd_supp_and_effects_log_read(void) "commands supported and effects log read"
++pci_nvme_css_nvm_cset_selected_by_host(uint32_t cc) "NVM command set selected by host, bar.cc=0x%"PRIx32""
++pci_nvme_css_all_csets_sel_by_host(uint32_t cc) "all supported command sets selected by host, bar.cc=0x%"PRIx32""
  
-@@ -1003,8 +1002,6 @@ for opt do
-   ;;
-   --meson=*) meson="$optarg"
-   ;;
--  --ninja=*) ninja="$optarg"
--  ;;
-   --smbd=*) smbd="$optarg"
-   ;;
-   --extra-cflags=*)
-@@ -1777,7 +1774,6 @@ Advanced options (experts only):
-   --python=PYTHON          use specified python [$python]
-   --sphinx-build=SPHINX    use specified sphinx-build [$sphinx_build]
-   --meson=MESON            use specified meson [$meson]
--  --ninja=NINJA            use specified ninja [$ninja]
-   --smbd=SMBD              use specified smbd [$smbd]
-   --with-git=GIT           use specified git [$git]
-   --static                 enable static build [$static]
-@@ -2014,16 +2010,6 @@ case "$meson" in
-     *) meson=$(command -v meson) ;;
- esac
+ # nvme traces for error conditions
+ pci_nvme_err_mdts(uint16_t cid, size_t len) "cid %"PRIu16" len %zu"
+@@ -97,6 +103,9 @@ pci_nvme_err_invalid_opc(uint8_t opc) "invalid opcode 0x%"PRIx8""
+ pci_nvme_err_invalid_admin_opc(uint8_t opc) "invalid admin opcode 0x%"PRIx8""
+ pci_nvme_err_invalid_lba_range(uint64_t start, uint64_t len, uint64_t limit) "Invalid LBA start=%"PRIu64" len=%"PRIu64" limit=%"PRIu64""
+ pci_nvme_err_invalid_effects_log_offset(uint64_t ofs) "commands supported and effects log offset must be 0, got %"PRIu64""
++pci_nvme_err_change_css_when_enabled(void) "changing CC.CSS while controller is enabled"
++pci_nvme_err_only_nvm_cmd_set_avail(void) "setting 110b CC.CSS, but only NVM command set is enabled"
++pci_nvme_err_invalid_iocsci(uint32_t idx) "unsupported command set combination index %"PRIu32""
+ pci_nvme_err_invalid_del_sq(uint16_t qid) "invalid submission queue deletion, sid=%"PRIu16""
+ pci_nvme_err_invalid_create_sq_cqid(uint16_t cqid) "failed creating submission queue, invalid cqid=%"PRIu16""
+ pci_nvme_err_invalid_create_sq_sqid(uint16_t sqid) "failed creating submission queue, invalid sqid=%"PRIu16""
+@@ -152,6 +161,7 @@ pci_nvme_ub_db_wr_invalid_cq(uint32_t qid) "completion queue doorbell write for
+ pci_nvme_ub_db_wr_invalid_cqhead(uint32_t qid, uint16_t new_head) "completion queue doorbell write value beyond queue size, cqid=%"PRIu32", new_head=%"PRIu16", ignoring"
+ pci_nvme_ub_db_wr_invalid_sq(uint32_t qid) "submission queue doorbell write for nonexistent queue, sqid=%"PRIu32", ignoring"
+ pci_nvme_ub_db_wr_invalid_sqtail(uint32_t qid, uint16_t new_tail) "submission queue doorbell write value beyond queue size, sqid=%"PRIu32", new_head=%"PRIu16", ignoring"
++pci_nvme_ub_unknown_css_value(void) "unknown value in cc.css field"
  
--# Probe for ninja (used for compdb)
--
--if test -z "$ninja"; then
--    for c in ninja ninja-build samu; do
--        if has $c; then
--            ninja=$(command -v "$c")
--            break
--        fi
--    done
--fi
- 
- # Check that the C compiler works. Doing this here before testing
- # the host CPU ensures that we had a valid CC to autodetect the
-@@ -7952,7 +7938,7 @@ fi
- mv $cross config-meson.cross
- 
- rm -rf meson-private meson-info meson-logs
--NINJA=${ninja:-$PWD/ninjatool} $meson setup \
-+NINJA=$PWD/ninjatool $meson setup \
-         --prefix "${pre_prefix}$prefix" \
-         --libdir "${pre_prefix}$libdir" \
-         --libexecdir "${pre_prefix}$libexecdir" \
+ # xen-block.c
+ xen_block_realize(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
 -- 
-2.28.0.windows.1
+2.21.0
 
 
