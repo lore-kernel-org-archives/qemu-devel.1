@@ -2,67 +2,79 @@ Return-Path: <SRS0=E5X6=CV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EF22C433E2
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 01:50:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0581FC43461
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 01:51:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7239208E4
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 01:50:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7239208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 2012B208E4
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 01:51:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2012B208E4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38751 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGufy-0001Qu-Pc
-	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 21:50:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48758)
+	id 1kGuhK-0002PU-6Q
+	for qemu-devel@archiver.kernel.org; Fri, 11 Sep 2020 21:51:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48876)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kGufH-0000W3-1P
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 21:49:20 -0400
-Received: from relay68.bu.edu ([128.197.228.73]:47306)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kGufF-0003Fc-09
- for qemu-devel@nongnu.org; Fri, 11 Sep 2020 21:49:18 -0400
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 08C1mPGl029499
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Fri, 11 Sep 2020 21:48:32 -0400
-Date: Fri, 11 Sep 2020 21:48:25 -0400
-From: Alexander Bulekov <alxndr@bu.edu>
-To: Li Qiang <liq3ea@gmail.com>
-Subject: Re: [PATCH] hw: usb: hcd-ohci: check len and frame_number variables
-Message-ID: <20200912014825.eg73ixfjkknzd46n@mozz.bu.edu>
-References: <20200911122703.126696-1-ppandit@redhat.com>
- <CAKXe6SLFG1XMCw7yNM3bres29jiqJ5oLpJUgzXGjj8ay=NkwHQ@mail.gmail.com>
- <20200911192045.3amzn6zlaynpxbfy@mozz.bu.edu>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kGuga-0001z4-Cm
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 21:50:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49806)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kGugY-0003Sw-8t
+ for qemu-devel@nongnu.org; Fri, 11 Sep 2020 21:50:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kGugV-0006YN-AQ
+ for <qemu-devel@nongnu.org>; Sat, 12 Sep 2020 01:50:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 468642E8053
+ for <qemu-devel@nongnu.org>; Sat, 12 Sep 2020 01:50:35 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200911192045.3amzn6zlaynpxbfy@mozz.bu.edu>
-Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
- helo=relay68.bu.edu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 21:49:15
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Spam_score_int: -31
-X-Spam_score: -3.2
-X-Spam_bar: ---
-X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- HK_RANDOM_FROM=0.999, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 12 Sep 2020 01:43:10 -0000
+From: Michael Slade <1895363@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: mslade
+X-Launchpad-Bug-Reporter: Michael Slade (mslade)
+X-Launchpad-Bug-Modifier: Michael Slade (mslade)
+Message-Id: <159987499082.17652.11658819873688678558.malonedeb@soybean.canonical.com>
+Subject: [Bug 1895363] [NEW] borland IDEs double up cursor key presses (need
+ timing on PS2 port input)
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: afe60064d62f7237c9cb1cb78a587f4520e07b95
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/11 21:50:35
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -71,208 +83,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Prasad J Pandit <pjp@fedoraproject.org>,
- QEMU Developers <qemu-devel@nongnu.org>, P J P <ppandit@redhat.com>,
- Yi Ren <yunye.ry@alibaba-inc.com>, Yongkang Jia <j_kangel@163.com>,
- Gaoning Pan <pgn@zju.edu.cn>, Gerd Hoffmann <kraxel@redhat.com>
+Reply-To: Bug 1895363 <1895363@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 200911 1520, Alexander Bulekov wrote:
-> On 200911 2257, Li Qiang wrote:
-> > P J P <ppandit@redhat.com> 于2020年9月11日周五 下午8:30写道：
-> > >
-> > > From: Prasad J Pandit <pjp@fedoraproject.org>
-> > >
-> > > While servicing the OHCI transfer descriptors(TD), OHCI host
-> > > controller derives variables 'start_addr', 'end_addr', 'len'
-> > > etc. from values supplied by the host controller driver.
-> > > Host controller driver may supply values such that using
-> > > above variables leads to out-of-bounds access or loop issues.
-> > > Add checks to avoid them.
-> > >
-> > > AddressSanitizer: stack-buffer-overflow on address 0x7ffd53af76a0
-> > >   READ of size 2 at 0x7ffd53af76a0 thread T0
-> > >   #0 ohci_service_iso_td ../hw/usb/hcd-ohci.c:734
-> > >   #1 ohci_service_ed_list ../hw/usb/hcd-ohci.c:1180
-> > >   #2 ohci_process_lists ../hw/usb/hcd-ohci.c:1214
-> > >   #3 ohci_frame_boundary ../hw/usb/hcd-ohci.c:1257
-> > >   #4 timerlist_run_timers ../util/qemu-timer.c:572
-> > >   #5 qemu_clock_run_timers ../util/qemu-timer.c:586
-> > >   #6 qemu_clock_run_all_timers ../util/qemu-timer.c:672
-> > >   #7 main_loop_wait ../util/main-loop.c:527
-> > >   #8 qemu_main_loop ../softmmu/vl.c:1676
-> > >   #9 main ../softmmu/main.c:50
-> > >
-> > 
-> > Hello Prasad,
-> > Could you also provide the reproducer?
-> > 
-> > > Reported-by: Gaoning Pan <pgn@zju.edu.cn>
-> > > Reported-by: Yongkang Jia <j_kangel@163.com>
-> > > Reported-by: Yi Ren <yunye.ry@alibaba-inc.com>
-> > > Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> > > ---
-> > >  hw/usb/hcd-ohci.c | 29 +++++++++++++++++++++++++++--
-> > >  1 file changed, 27 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
-> > > index 1e6e85e86a..76fb9282e3 100644
-> > > --- a/hw/usb/hcd-ohci.c
-> > > +++ b/hw/usb/hcd-ohci.c
-> > > @@ -691,6 +691,11 @@ static int ohci_service_iso_td(OHCIState *ohci, struct ohci_ed *ed,
-> > >             the next ISO TD of the same ED */
-> > >          trace_usb_ohci_iso_td_relative_frame_number_big(relative_frame_number,
-> > >                                                          frame_count);
-> > > +        if (OHCI_CC_DATAOVERRUN == OHCI_BM(iso_td.flags, TD_CC)) {
-> > > +            /* avoid infinite loop */
-> > > +            return 1;
-> > > +        }
-> > 
-> > I think it is better to split this patch to 2 or three as the infinite
-> > loop as the buffer overflow are independent.
-> > 
-> > 1. here the infinite loop
-> > 
-> > > +
-> > >          OHCI_SET_BM(iso_td.flags, TD_CC, OHCI_CC_DATAOVERRUN);
-> > >          ed->head &= ~OHCI_DPTR_MASK;
-> > >          ed->head |= (iso_td.next & OHCI_DPTR_MASK);
-> > > @@ -731,7 +736,11 @@ static int ohci_service_iso_td(OHCIState *ohci, struct ohci_ed *ed,
-> > >      }
-> > >
-> > >      start_offset = iso_td.offset[relative_frame_number];
-> > > -    next_offset = iso_td.offset[relative_frame_number + 1];
-> > > +    if (relative_frame_number < frame_count) {
-> > > +        next_offset = iso_td.offset[relative_frame_number + 1];
-> > > +    } else {
-> > > +        next_offset = iso_td.be;
-> > > +    }
-> > 
-> > 2. here the stack buffer overflow
+Public bug reported:
 
-... and for the stack overflow:
+Most DOS-era IDEs from Borland (I have tried Borland C++ 2.0, Borland
+C++ 3.1 and Turbo Pascal 7.1) exhibit strange responses to the keyboard.
+Cursor keys are registered twice, so each press of a cursor key causes
+the cursor to move twice. Also the other keys occasionally are missed or
+duplicated.
 
-cat << EOF | ./qemu-system-i386 -device pci-ohci,id=usb \
--nodefaults -qtest stdio -nographic
-outl 0xcf8 0x80001013
-outl 0xcfc 0xfdff5955
-outl 0xcf8 0x80001002
-outl 0xcfc 0xd3073d2f
-writeq 0x55000000 0x5a55b984d3fd0200
-clock_step
-clock_step
-clock_step
-clock_step
-clock_step
-clock_step
-write 0x18 0x1 0x7a
-write 0x19 0x1 0xab
-write 0xab7b 0x1 0xab
-write 0xab7f 0x1 0xff
-write 0xab82 0x1 0x7a
-write 0xab83 0x1 0xab
-write 0xab70 0x1 0xff
-write 0xab71 0x1 0xff
-write 0xab73 0x1 0xff
-write 0xab75 0x1 0xab
-clock_step
-EOF
+>From an internet search, the problem appears to be this.  These programs
+read the PS2 input register multiple times per incoming byte, on the
+assumption that the byte will remain there for at least a few hundred
+microseconds, before the next byte (if any) appears there.  qemu treats
+a read of the register by the guest as an acknowledgement of the
+incoming byte and puts the next byte into the register immediately, thus
+breaking the programs that expect each successive byte to stay in place
+for a while.
 
-> > >
-> > >      if (!(OHCI_BM(start_offset, TD_PSW_CC) & 0xe) ||
-> > >          ((relative_frame_number < frame_count) &&
-> > > @@ -764,7 +773,12 @@ static int ohci_service_iso_td(OHCIState *ohci, struct ohci_ed *ed,
-> > >          }
-> > >      } else {
-> > >          /* Last packet in the ISO TD */
-> > > -        end_addr = iso_td.be;
-> > > +        end_addr = next_offset;
-> > > +    }
-> > > +
-> > > +    if (start_addr > end_addr) {
-> > > +        trace_usb_ohci_iso_td_bad_cc_overrun(start_addr, end_addr);
-> > > +        return 1;
-> > >      }
-> > >
-> > >      if ((start_addr & OHCI_PAGE_MASK) != (end_addr & OHCI_PAGE_MASK)) {
-> > > @@ -773,6 +787,9 @@ static int ohci_service_iso_td(OHCIState *ohci, struct ohci_ed *ed,
-> > >      } else {
-> > >          len = end_addr - start_addr + 1;
-> > >      }
-> > > +    if (len > sizeof(ohci->usb_buf)) {
-> > > +        len = sizeof(ohci->usb_buf);
-> > > +    }
-> > >
-> > >      if (len && dir != OHCI_TD_DIR_IN) {
-> > >          if (ohci_copy_iso_td(ohci, start_addr, end_addr, ohci->usb_buf, len,
-> > > @@ -975,8 +992,16 @@ static int ohci_service_td(OHCIState *ohci, struct ohci_ed *ed)
-> > >          if ((td.cbp & 0xfffff000) != (td.be & 0xfffff000)) {
-> > >              len = (td.be & 0xfff) + 0x1001 - (td.cbp & 0xfff);
-> > >          } else {
-> > > +            if (td.cbp > td.be) {
-> > > +                trace_usb_ohci_iso_td_bad_cc_overrun(td.cbp, td.be);
-> > > +                ohci_die(ohci);
-> > > +                return 1;
-> > > +            }
-> > >              len = (td.be - td.cbp) + 1;
-> > >          }
-> > > +        if (len > sizeof(ohci->usb_buf)) {
-> > > +            len = sizeof(ohci->usb_buf);
-> > > +        }
-> > >
-> > 
-> > 3. Then here is the heap overflow.
-> > 
-> 
-> Maybe this is the heap-overflow?
-> 
-> cat << EOF | ./qemu-system-i386 -device pci-ohci,id=usbb \
-> -device usb-tablet,bus=usbb.0,port=1,usb_version=1 \
-> -nodefaults -qtest stdio -nographic
-> outl 0xcf8 0x80001013
-> outl 0xcfc 0x1fd555a
-> outl 0xcf8 0x80001002
-> outl 0xcfc 0x7fe072f
-> write 0x5a000004 0x1 0xa5
-> write 0x0 0x1 0x26
-> write 0x1 0x1 0xfc
-> write 0xfc27 0x1 0xaa
-> write 0xfc30 0x1 0x04
-> write 0x40006 0x1 0x27
-> write 0x4000e 0x1 0x27
-> write 0x40011 0x1 0xff
-> EOF
-> 
-> ==3325498==ERROR: AddressSanitizer: heap-buffer-overflow 
-> WRITE of size 131661824 at 0x6270000031a0 thread T0
-> #0 0x5564784a5a9f in __asan_memcpy (u-system-i386+0x2db6a9f)
-> #1 0x55647abc4cee in flatview_read_continue exec.c:3246:13
-> #2 0x55647abc7513 in flatview_read exec.c:3279:12
-> #3 0x55647abc7068 in address_space_read_full exec.c:3292:18
-> #4 0x55647abc8208 in address_space_rw exec.c:3320:16
-> #5 0x5564798a9467 in dma_memory_rw_relaxed include/sysemu/dma.h:87:18
-> #6 0x5564798a8e85 in dma_memory_rw include/sysemu/dma.h:110:12
-> #7 0x5564798b1d16 in ohci_copy_iso_td hw/usb/hcd-ohci.c:624:9
-> #8 0x5564798a2d66 in ohci_service_iso_td hw/usb/hcd-ohci.c:778:13
-> #9 0x556479897e1b in ohci_service_ed_list hw/usb/hcd-ohci.c:1180:21
-> #10 0x556479889dc6 in ohci_frame_boundary hw/usb/hcd-ohci.c:1245:9
-> #11 0x55647c40c527 in timerlist_run_timers util/qemu-timer.c:572:9
-> 
-> -Alex
-> 
-> > 
-> > So I think it can be more easier to review to split this to 3 patches.
-> > 
-> > Thanks,
-> > Li Qiang
-> > 
-> > >          pktlen = len;
-> > >          if (len && dir != OHCI_TD_DIR_IN) {
-> > > --
-> > > 2.26.2
-> > >
-> > >
-> > 
+The obvious solution is to use a timer to advance through the queued
+bytes.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1895363
+
+Title:
+  borland IDEs double up cursor key presses (need timing on PS2 port
+  input)
+
+Status in QEMU:
+  New
+
+Bug description:
+  Most DOS-era IDEs from Borland (I have tried Borland C++ 2.0, Borland
+  C++ 3.1 and Turbo Pascal 7.1) exhibit strange responses to the
+  keyboard.  Cursor keys are registered twice, so each press of a cursor
+  key causes the cursor to move twice. Also the other keys occasionally
+  are missed or duplicated.
+
+  From an internet search, the problem appears to be this.  These
+  programs read the PS2 input register multiple times per incoming byte,
+  on the assumption that the byte will remain there for at least a few
+  hundred microseconds, before the next byte (if any) appears there.
+  qemu treats a read of the register by the guest as an acknowledgement
+  of the incoming byte and puts the next byte into the register
+  immediately, thus breaking the programs that expect each successive
+  byte to stay in place for a while.
+
+  The obvious solution is to use a timer to advance through the queued
+  bytes.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1895363/+subscriptions
 
