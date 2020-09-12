@@ -2,91 +2,93 @@ Return-Path: <SRS0=E5X6=CV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71660C433E2
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 22:59:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D013C43461
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 23:01:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0BB520731
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 22:59:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9165520770
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 23:01:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p38H6Dg9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0BB520731
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="mnkPSHnV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9165520770
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHEUi-000571-0u
-	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 18:59:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47658)
+	id 1kHEW8-0007Up-H1
+	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 19:01:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49086)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHEI2-0004eb-Gb; Sat, 12 Sep 2020 18:46:38 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:35742)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHEHz-0004Yq-QM; Sat, 12 Sep 2020 18:46:38 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id jw11so3425549pjb.0;
- Sat, 12 Sep 2020 15:46:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=/hY+yQHTuO6c65IcDhojIGm+XDaALdXHmil6ThkS0qk=;
- b=p38H6Dg9fU+nGFni31cwjKe6ksMoAPiwadCV6AXBXjMEhwbhs+bEMA2NN17NzATHsh
- mWUszOD0Dmp31N7J6s8bP7/QFptBBWjQraL3AIoeVATIOVAEsTikHLDvbEvYyi3ZIAIH
- Jd5rBM+cFjOKCf6OD9cdSqWTfv+52MEXDNbIHuqUqMuUFMjNAJlh+BbcklK22dgVxD1B
- CgeUXNlZSh3dFXnKXRfZVCnb3FTBSE+kEvFV3HKGbuHLVP3P1PUlzz7YtBdWBHR+Wt7O
- Lu6MqoS0DjSPjUnzbD6z7k+RqrYxQ1GwsaGY7gIRDkO6EyxOcTLlkfjFEpbbZ9EsSUSE
- TXeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=/hY+yQHTuO6c65IcDhojIGm+XDaALdXHmil6ThkS0qk=;
- b=t3Qa7tv+UGgwI0zLte5ouMlusOao/Wyrfv8+p9T3AytfkWFTJ1jtwCxjxzzLA/CQah
- QaS1baUOdFcSYmUA9zPt9inA7pV2gOHzP1U/Y2Og394yhBGHMvP8q7nNPQiC6h9+bV/g
- YMjBHvhuJdJz4dqj5SMOnUazSFcHMrDN64Y/2qUkaUdVF+sk8lxTQr88iKAYYry0FtKp
- X0y1XbNPaGTwAkarTtyhizj0VI7Ov9P/5m2zvgVif4syMgR2gqZKmJhPh82s7+78cggT
- 4RbtBtccJy89fXD8/ny58O/DveDzfDq1Oy+SZaccVzos8h4ISSXHCEFU3xStNE/LTV3N
- sIGQ==
-X-Gm-Message-State: AOAM531msskSRvIcntZm5giRBXolT/Mk6P120NZAfu286B1XmplGoHcw
- tfpGgVWm/pJv1o5bNV63AZEhxXCyCuBPHUQOQKQ=
-X-Google-Smtp-Source: ABdhPJzNdORoLjVvIE7MJEkHhw4KlwW0PrSUYXJyGjqkqQfq6H8rAA0bUikDnC6cUb1jPfae1BTkJw==
-X-Received: by 2002:a17:902:9303:: with SMTP id
- bc3mr8104411plb.170.1599950793576; 
- Sat, 12 Sep 2020 15:46:33 -0700 (PDT)
-Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id t10sm4639266pgp.15.2020.09.12.15.46.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 12 Sep 2020 15:46:32 -0700 (PDT)
-From: Yonggang Luo <luoyonggang@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v8 24/27] ci: Enable msys2 ci in cirrus
-Date: Sun, 13 Sep 2020 06:44:28 +0800
-Message-Id: <20200912224431.1428-25-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.28.0.windows.1
-In-Reply-To: <20200912224431.1428-1-luoyonggang@gmail.com>
-References: <20200912224431.1428-1-luoyonggang@gmail.com>
+ (Exim 4.90_1)
+ (envelope-from <prvs=517336518=dmitry.fomichev@wdc.com>)
+ id 1kHEQe-0004z1-0k; Sat, 12 Sep 2020 18:55:32 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:26909)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=517336518=dmitry.fomichev@wdc.com>)
+ id 1kHEQb-0005ef-TG; Sat, 12 Sep 2020 18:55:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1599951329; x=1631487329;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=e++3QhnRNffa0GIl2+VYyMaBj8dBPJeZ5MT33Nj7yxg=;
+ b=mnkPSHnVVW1280DGufkc31jKUqAT+I3M3uR584cb0nfwB+6SOKwpyUZm
+ OdqPd8Nyaw8vACdtpXbXAofRIMPBcdKpfT1YLnXN5sbymbLRHTtZoxaHm
+ WiN11loFnWJHlYxXpOCq5ezLFmv+icb93vevsBBnFxy3IzTyuD0eOYw0j
+ 5FHx40S8uuII3PM6csKGbJDTYhFYd1olxNTAGbS9UQDIfReSpNbTHvf2S
+ z/Wly94yn7jaXEb+Vrb5UWVjP0iiPS8lrLL65/xRLfRpsmdTTHPY7gmUA
+ psV/YxghqgvRr8WCjFWa6EjC4JQnxQhwdRxfI+/H80Vgj7x4iNWsCxLNj g==;
+IronPort-SDR: cwAhIacimDfCBJH1RMJcpyJxBewmkJeLjC2G94M/NP3+wgXvZzGeTVZ1maw+6G+xwJM3kaxDCi
+ Jg0nPbAVlM2VF37M2HykNNJjptEMqal9Q2Qw+wgKPrwTBfrZOs0CfCow0p9pm53/jz8l09JTbo
+ /TYf5Y6GKG3DHwBxs7AjXMHjEBnaRSuTf4YRJLRHzsU3fcpRGNoZ3U7HG8HkKKm7bibJwF3ZsZ
+ QK5LUzwycXWELsf/qH5aueycOmd/ecKXWH9x2f+HH+wN3aErn55nAl0/w2pjJABP2SklJFw1FI
+ A5E=
+X-IronPort-AV: E=Sophos;i="5.76,420,1592841600"; d="scan'208";a="256834874"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 13 Sep 2020 06:55:10 +0800
+IronPort-SDR: sbwVKPkqKFPXLH4jqwF+0+wIj69Gbxle9GFt0H+ErYGjq/ux1WD3PG1wfiOdCkEGPHxZuLnjvf
+ 7X2vQrbRa5zw==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 12 Sep 2020 15:41:30 -0700
+IronPort-SDR: 5bPfhaD4gxFT93nNw2ychB66JM48o8fzAT0KxrGRMAcIsRmO6MncNYC2NtiZUPMaHQPYiUjtKw
+ 1RRCddvonNiA==
+WDCIronportException: Internal
+Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
+ by uls-op-cesaip02.wdc.com with ESMTP; 12 Sep 2020 15:55:09 -0700
+From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+To: Keith Busch <kbusch@kernel.org>, Klaus Jensen <k.jensen@samsung.com>,
+ Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Maxim Levitsky <mlevitsky@redhat.com>, Fam Zheng <fam@euphon.net>
+Subject: [PATCH v2 15/15] hw/block/nvme: Document zoned parameters in usage
+ text
+Date: Sun, 13 Sep 2020 07:54:30 +0900
+Message-Id: <20200912225430.1772-16-dmitry.fomichev@wdc.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200912225430.1772-1-dmitry.fomichev@wdc.com>
+References: <20200912225430.1772-1-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1043.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Received-SPF: pass client-ip=68.232.141.245;
+ envelope-from=prvs=517336518=dmitry.fomichev@wdc.com; helo=esa1.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/12 18:54:38
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,105 +102,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Ed Maste <emaste@freebsd.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>,
- Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Yonggang Luo <luoyonggang@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Wen Congyang <wencongyang2@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: Niklas Cassel <niklas.cassel@wdc.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
+ Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Install msys2 in a proper way refer to https://github.com/cirruslabs/cirrus-ci-docs/issues/699
-The https://wiki.qemu.org/Hosts/W32#Native_builds_with_MSYS2 need to be updated.
-There is no need of --cross-prefix, open mingw64.exe instead of msys2.exe then we don't
-need the --cross-prefix, besides we using environment variable settings:
-    MSYS: winsymlinks:nativestrict
-    MSYSTEM: MINGW64
-    CHERE_INVOKING: 1
-to opening mingw64 native shell.
-We now running tests with make -i check to skip tests errors.
+Added brief descriptions of the new device properties that are
+now available to users to configure features of Zoned Namespace
+Command Set in the emulator.
 
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+This patch is for documentation only, no functionality change.
+
+Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 ---
- .cirrus.yml | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+ hw/block/nvme.c | 43 +++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 41 insertions(+), 2 deletions(-)
 
-diff --git a/.cirrus.yml b/.cirrus.yml
-index 690c6882e8..1ff9f0a72f 100644
---- a/.cirrus.yml
-+++ b/.cirrus.yml
-@@ -44,3 +44,63 @@ macos_xcode_task:
-                    --enable-werror --cc=clang || { cat config.log; exit 1; }
-     - gmake -j$(sysctl -n hw.ncpu)
-     - gmake check
-+
-+windows_msys2_task:
-+  windows_container:
-+    image: cirrusci/windowsservercore:cmake
-+    os_version: 2019
-+    cpu: 8
-+    memory: 8G
-+  env:
-+    MSYS: winsymlinks:nativestrict
-+    MSYSTEM: MINGW64
-+    CHERE_INVOKING: 1
-+  printenv_script:
-+    - C:\tools\msys64\usr\bin\bash.exe -lc 'printenv'
-+  install_script:
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools && curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools && curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools && pacman -U --noconfirm msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman -Sy --noconfirm"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --needed --noconfirm -S bash pacman pacman-mirrors msys2-runtime"
-+    - taskkill /F /IM gpg-agent.exe
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Su"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S --needed
-+        base-devel
-+        git
-+        mingw-w64-x86_64-python
-+        mingw-w64-x86_64-python-setuptools
-+        mingw-w64-x86_64-toolchain
-+        mingw-w64-x86_64-SDL2
-+        mingw-w64-x86_64-SDL2_image
-+        mingw-w64-x86_64-gtk3
-+        mingw-w64-x86_64-glib2
-+        mingw-w64-x86_64-ninja
-+        mingw-w64-x86_64-make
-+        mingw-w64-x86_64-jemalloc
-+        mingw-w64-x86_64-lzo2
-+        mingw-w64-x86_64-zstd
-+        mingw-w64-x86_64-libjpeg-turbo
-+        mingw-w64-x86_64-pixman
-+        mingw-w64-x86_64-libgcrypt
-+        mingw-w64-x86_64-capstone
-+        mingw-w64-x86_64-libpng
-+        mingw-w64-x86_64-libssh
-+        mingw-w64-x86_64-libxml2
-+        mingw-w64-x86_64-snappy
-+        mingw-w64-x86_64-libusb
-+        mingw-w64-x86_64-usbredir
-+        mingw-w64-x86_64-libtasn1
-+        mingw-w64-x86_64-libnfs
-+        mingw-w64-x86_64-nettle
-+        mingw-w64-x86_64-cyrus-sasl
-+        mingw-w64-x86_64-curl
-+        mingw-w64-x86_64-gnutls
-+        mingw-w64-x86_64-zstd"
-+  script:
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "mkdir build"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && ../configure --python=python3 --ninja=ninja"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make -j$NUMBER_OF_PROCESSORS"
-+  test_script:
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make V=1 check"
-+
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 3e8e6e1472..9b1d80a204 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -9,7 +9,7 @@
+  */
+ 
+ /**
+- * Reference Specs: http://www.nvmexpress.org, 1.2, 1.1, 1.0e
++ * Reference Specs: http://www.nvmexpress.org, 1.4, 1.3, 1.2, 1.1, 1.0e
+  *
+  *  https://nvmexpress.org/developers/nvme-specification/
+  */
+@@ -22,7 +22,7 @@
+  *              [pmrdev=<mem_backend_file_id>,] \
+  *              max_ioqpairs=<N[optional]>, \
+  *              aerl=<N[optional]>, aer_max_queued=<N[optional]>, \
+- *              mdts=<N[optional]>
++ *              mdts=<N[optional]>, zoned=<true|false[optional]>
+  *
+  * Note cmb_size_mb denotes size of CMB in MB. CMB is assumed to be at
+  * offset 0 in BAR2 and supports only WDS, RDS and SQS for now.
+@@ -48,6 +48,45 @@
+  *   completion when there are no oustanding AERs. When the maximum number of
+  *   enqueued events are reached, subsequent events will be dropped.
+  *
++ * Setting `zoned` to true makes the device to support zoned namespaces.
++ * In this case, of the following options are available to configure zoned
++ * operation:
++ *     zone_size=<zone size in MiB, default: 128MiB>
++ *
++ *     zone_capacity=<zone capacity in MiB, default: zone_size>
++ *         The value 0 (default) forces zone capacity to be the same as zone
++ *         size. The value of this property may not exceed zone size.
++ *
++ *     zone_file=<zone metadata file name, default: none>
++ *         Zone metadata file, if specified, allows zone information
++ *         to be persistent across shutdowns and restarts.
++ *
++ *     zone_descr_ext_size=<zone descriptor extension size, default 0>
++ *         This value needs to be specified in 64B units. If it is zero,
++ *         namespace(s) will not support zone descriptor extensions.
++ *
++ *     max_active=<Maximum Active Resources (zones), default: 0 - no limit>
++ *
++ *     max_open=<Maximum Open Resources (zones), default: 0 - no limit>
++ *
++ *     zone_append_size_limit=<zone append size limit, in KiB, default: MDTS>
++ *         The maximum I/O size that can be supported by Zone Append
++ *         command. Since internally this this value is maintained as
++ *         ZASL = log2(<maximum append size> / <page size>), some
++ *         values assigned to this property may be rounded down and
++ *         result in a lower maximum ZA data size being in effect.
++ *         If MDTS property is not assigned, the default value of 128KiB is
++ *         used as ZASL.
++ *
++ *     offline_zones=<the number of offline zones to inject, default: 0>
++ *
++ *     rdonly_zones=<the number of read-only zones to inject, default: 0>
++ *
++ *     cross_zone_read=<enables Read Across Zone Boundaries, default: true>
++ *
++ *     fill_pattern=<data fill pattern, default: 0x00>
++ *         The byte pattern to return for any portions of unwritten data
++ *         during read.
+  */
+ 
+ #include "qemu/osdep.h"
 -- 
-2.28.0.windows.1
+2.21.0
 
 
