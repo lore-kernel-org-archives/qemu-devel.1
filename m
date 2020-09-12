@@ -8,78 +8,77 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06F2EC43461
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 22:56:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6133C433E2
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 22:57:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 829D621531
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 22:56:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7663120731
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 22:57:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ge4TkZtA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 829D621531
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q14fd5jN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7663120731
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHERi-0006xF-M1
-	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 18:56:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47528)
+	id 1kHESI-0008AL-E9
+	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 18:57:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHEHc-00044U-3A; Sat, 12 Sep 2020 18:46:12 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:42943)
+ id 1kHEHx-0004cB-6u; Sat, 12 Sep 2020 18:46:33 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:42974)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHEHa-0004Ud-6m; Sat, 12 Sep 2020 18:46:11 -0400
-Received: by mail-pf1-x442.google.com with SMTP id d6so9678985pfn.9;
- Sat, 12 Sep 2020 15:46:09 -0700 (PDT)
+ id 1kHEHu-0004X4-CE; Sat, 12 Sep 2020 18:46:32 -0400
+Received: by mail-pl1-x642.google.com with SMTP id y6so2657021plt.9;
+ Sat, 12 Sep 2020 15:46:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ks2bOk3jYOHrXnI/Shz64S+t7ePZagOpQ3Ju/TypT6Y=;
- b=ge4TkZtAR+zIBsnkngBC+8ZPnxcHkgF3tpb21HevxpcyElI8T0+bcXfNHFBD790vdN
- vn5bBi/SwqmzvTuMn6aoee+eUyJ/wAiPYj68dNWDy4C+ol6cUQ5Sns+0hbgxm7vuis+H
- wzwS487vrvT9WB1A+0xU9xk65FeppXvFgjPlPwX3eQmo4xXs6U9hEH0MQA+AXlP0bhvQ
- Ciu7j1inLi+iNJu41KhFW9ZtBwkcsJZ53MnKta5NlqHmYI8UEwdF6K7Lk5c5dM7dPdKt
- ezRdZyZSQoxH176tR6xe2BDSFYPYE31kojjsq8IvPANvb/RhTqWtVMYSqLMfXss+5PSV
- YESg==
+ bh=ajxFadu+yHNyg0D+X68nZFkcXE3tK/jib0sFS+8nB4w=;
+ b=q14fd5jNpTmbP1HexEFKnr9FQdMak13lglhkDvGEx9Y28nxXZTBjabbSYNetL+WhFy
+ m6z0yatCmuZj1ENBIVXdig2KwcnkIi/ksv8iV49hVGOnEOcd4VE/y/OgPuICP6FD5W11
+ SSp8H99wpjbhKLfb7RPfYtJJX8P64Q1u8M3kY3VHNQ/TRj3VYGkqUwdQeCco9oNVXeLF
+ iPsGy9laUl6/EvSbimvyvokbnLEFWnwlNnLiEqUr2aJ5N2aH0bTTyPYN5TD7yVbC67E0
+ LFBMyRzixyi5hWwQ/+rzEdAeTWFIpkRJR7/ZsQ/ahvLYRUi7L66bpmTpSHzclxhkvVCr
+ zssA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ks2bOk3jYOHrXnI/Shz64S+t7ePZagOpQ3Ju/TypT6Y=;
- b=P85Pwk156NvUpJ9XYCinLd5FtCPU8941kX2rVDxUcx16gEaz5WYQsXZJf0Zd5CmJkk
- 15oxddJxkkkSUQFn+00MHzX7NZPXjDHDtSJ6q1UoQvaRAX/4+oxgeAw8ukVKMTIMkUy4
- /y6EeWK8uraYwYi3UrxSzwQ9wIXJaqAuQpfqo7SKG/fU4/3+4JkR+Q/bRpBdfL4xaMjN
- /7Zg8iIbcMotyaleNFziGCmsjtlqTScrgfZTa/A+dXOrUU2sr2fFZdF7G6UqbpIrzo3Q
- s54vah6xqMH7v5lv1ESBZVtvqE0TK9olMAJN4xcCnej1vG5SvlcC2H9r/vc3ztKxafTa
- Q2kQ==
-X-Gm-Message-State: AOAM533ZWg5N+PpRX5cQTBjfTxPTCC+xugOOrrasQm29q9ka4664KzYe
- ml/z8R4YmiYs1emqTP3sBo796SLSnwYFGQO5tjo=
-X-Google-Smtp-Source: ABdhPJxdeCUDjO6Slik77TTdsHiyBxXngb3Tt6JHgNCO83BjGZIHL277mJbn5yaWbbxAw3yEP368nw==
-X-Received: by 2002:aa7:9730:0:b029:13e:d13d:a091 with SMTP id
- k16-20020aa797300000b029013ed13da091mr7796971pfg.40.1599950768210; 
- Sat, 12 Sep 2020 15:46:08 -0700 (PDT)
+ bh=ajxFadu+yHNyg0D+X68nZFkcXE3tK/jib0sFS+8nB4w=;
+ b=CqEHUqdueNDb+qL0xaBlYBnBLfaHxYoHakwnKSlVwOYA7pIN2hxYRYynA0GZvlDkHl
+ DJ2hz6fh4AnI8QKcV8E7Y68AR0LNjUWLUUsnjPd9CVh3q1Yv8TD/NEn2kJ9PY+DIPgb/
+ ucS4R1dbwkpMXkGwzSB1g5Bkxyhfh52ABL59tCD15x6dWUE9IzQ6PTeMdYOJQzfrkFzC
+ SdFlca9CjypclHR7DnmNQA2cpygCJLNzhzq8eJzw59maao9GIqxW1lLShgeqajR/3M6Q
+ obxYe8s3dXdxIpiBH6lPAn/q+z2PCfaHEXCi5oRuNHqY2ERC/jR4H5tfHfQ0dn++Af3e
+ toXA==
+X-Gm-Message-State: AOAM531qGh/xpQFL+9gKVoOPRgEfbAoO6u2grEY+9oRldEL8KnXXwP1A
+ v2bUnbY9Le1xnCqG6vPFQL9jw5zKHzuwimi/bDc=
+X-Google-Smtp-Source: ABdhPJzhoPjhFQvxWRbVrVyd5W1BWweLvsAzUq9gEgTDyjdt5Tqz0jB5RXl2DuIzbd5lVFQSgeB1XA==
+X-Received: by 2002:a17:90b:796:: with SMTP id
+ l22mr7888685pjz.199.1599950785128; 
+ Sat, 12 Sep 2020 15:46:25 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id t10sm4639266pgp.15.2020.09.12.15.46.04
+ by smtp.googlemail.com with ESMTPSA id t10sm4639266pgp.15.2020.09.12.15.46.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 12 Sep 2020 15:46:07 -0700 (PDT)
+ Sat, 12 Sep 2020 15:46:24 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 18/27] tests: Fixes test-io-channel-socket.c tests under
- msys2/mingw
-Date: Sun, 13 Sep 2020 06:44:22 +0800
-Message-Id: <20200912224431.1428-19-luoyonggang@gmail.com>
+Subject: [PATCH v8 22/27] tests: Fixes test-qdev-global-props.c
+Date: Sun, 13 Sep 2020 06:44:26 +0800
+Message-Id: <20200912224431.1428-23-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200912224431.1428-1-luoyonggang@gmail.com>
 References: <20200912224431.1428-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
- envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x442.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -115,48 +114,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently test-io-channel-socket doesn't init with
-qemu_init_main_loop
-and that's cause the qemu_aio_context not inited,
-and the following is the stack when null pointer accessed:
-
-qemu_fd_register (c:\work\xemu\qemu\util\main-loop.c:336)
-qemu_try_set_nonblock (c:\work\xemu\qemu\util\oslib-win32.c:224)
-qemu_set_nonblock (c:\work\xemu\qemu\util\oslib-win32.c:230)
-socket_can_bind_connect (c:\work\xemu\qemu\tests\socket-helpers.c:93)
-socket_check_protocol_support (c:\work\xemu\qemu\tests\socket-helpers.c:141)
-main (c:\work\xemu\qemu\tests\test-io-channel-socket.c:568)
-__tmainCRTStartup (@__tmainCRTStartup:142)
-mainCRTStartup (@1400014f6..140001539:3)
-BaseThreadInitThunk (@BaseThreadInitThunk:9)
-RtlUserThreadStart (@RtlUserThreadStart:12)
+On win32 the line ending are \r\n, so we skip the \n in function test_dynamic_globalprop
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- tests/test-io-channel-socket.c | 2 ++
- 1 file changed, 2 insertions(+)
+ tests/test-qdev-global-props.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/tests/test-io-channel-socket.c b/tests/test-io-channel-socket.c
-index d43083a766..743577d744 100644
---- a/tests/test-io-channel-socket.c
-+++ b/tests/test-io-channel-socket.c
-@@ -25,6 +25,7 @@
- #include "socket-helpers.h"
- #include "qapi/error.h"
- #include "qemu/module.h"
-+#include "qemu/main-loop.h"
+diff --git a/tests/test-qdev-global-props.c b/tests/test-qdev-global-props.c
+index 8a3c14d92c..be6bcfc46b 100644
+--- a/tests/test-qdev-global-props.c
++++ b/tests/test-qdev-global-props.c
+@@ -251,10 +251,10 @@ static void test_dynamic_globalprop(void)
+     g_test_trap_assert_passed();
+     g_test_trap_assert_stderr_unmatched("*prop1*");
+     g_test_trap_assert_stderr_unmatched("*prop2*");
+-    g_test_trap_assert_stderr("*warning: global dynamic-prop-type-bad.prop3 has invalid class name\n*");
++    g_test_trap_assert_stderr("*warning: global dynamic-prop-type-bad.prop3 has invalid class name*");
+     g_test_trap_assert_stderr_unmatched("*prop4*");
+-    g_test_trap_assert_stderr("*warning: global nohotplug-type.prop5=105 not used\n*");
+-    g_test_trap_assert_stderr("*warning: global nondevice-type.prop6 has invalid class name\n*");
++    g_test_trap_assert_stderr("*warning: global nohotplug-type.prop5=105 not used*");
++    g_test_trap_assert_stderr("*warning: global nondevice-type.prop6 has invalid class name*");
+     g_test_trap_assert_stdout("");
+ }
  
- 
- static void test_io_channel_set_socket_bufs(QIOChannel *src,
-@@ -556,6 +557,7 @@ int main(int argc, char **argv)
-     bool has_ipv4, has_ipv6;
- 
-     module_call_init(MODULE_INIT_QOM);
-+    qemu_init_main_loop(&error_abort);
-     socket_init();
- 
-     g_test_init(&argc, &argv, NULL);
 -- 
 2.28.0.windows.1
 
