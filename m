@@ -2,97 +2,110 @@ Return-Path: <SRS0=E5X6=CV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 540E1C433E2
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 09:03:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E683C43461
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 09:15:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DD73214F1
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 09:03:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2AA1206C3
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 09:15:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FwZ8Hss/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DD73214F1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wivvvsf/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2AA1206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kH1Rc-0005Ek-4X
-	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 05:03:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49944)
+	id 1kH1dQ-000097-MP
+	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 05:15:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52486)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kH1Qx-0004h2-PE; Sat, 12 Sep 2020 05:02:59 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43522)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kH1Qv-0005cX-86; Sat, 12 Sep 2020 05:02:59 -0400
-Received: by mail-wr1-x442.google.com with SMTP id k15so13640118wrn.10;
- Sat, 12 Sep 2020 02:02:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=uKpkVzGVPW2RQTS/oWAHFDS5W7BkaGN+p/hf1Z89I+c=;
- b=FwZ8Hss/RL0gMmkvXPXBN6jiu3MII2phq/i+wOQRTBEFkWG85cpHcSo/fAZp7fqcXg
- mpP1a4BIYacOcXirRWuEIawpK72/yAn8xPYZqObMAAPY7/lrUh566yvXnnJ7WEk4UgBq
- 6LR5f6akTRLUcEXqHS4D7DroKFYf4pPgx7mwsFBbbyUzrN574MwM2Vr0zyo37/15i0wv
- zLRie8WcX6KIPZ3lVypIyMP1BLW8jPPLj1AYSUGReNInl4f419p3Cx8vZY7LWIyPRI5C
- YSsFXc5xH0dQ9B2xe5Hqi0CQS9dHg6bTxb5vF+1hbxzn9jWnhhUzLrV7vPp2GBwQ0btM
- TA3w==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kH1cF-0007dQ-Bs
+ for qemu-devel@nongnu.org; Sat, 12 Sep 2020 05:14:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44460)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kH1cC-0006z0-Sm
+ for qemu-devel@nongnu.org; Sat, 12 Sep 2020 05:14:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599902075;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=YI7QEt+hoSZ6ChF6py/IttEMpfIYlFGmr9zeFrnMaW8=;
+ b=Wivvvsf/sv8L1P16jyNy9iNy9Eru6AEpUsPVOBPkFbaGNnQ21R1JHNUbrySwFCQ8HHrgnW
+ WUidRRxDozYkeGb15XYbSlYEqD59jbBXXaIqyqsoarl0Wk6M6eGy23GcVE8wgQq1wba0vw
+ gxP1OCMNPjyOmjAzrQme3H1tM6KrdgA=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-251-UJpXdsO_NiG8GHkhLNl_aA-1; Sat, 12 Sep 2020 05:14:33 -0400
+X-MC-Unique: UJpXdsO_NiG8GHkhLNl_aA-1
+Received: by mail-ed1-f72.google.com with SMTP id x14so6413965edv.8
+ for <qemu-devel@nongnu.org>; Sat, 12 Sep 2020 02:14:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=uKpkVzGVPW2RQTS/oWAHFDS5W7BkaGN+p/hf1Z89I+c=;
- b=G6TUbnH+jzW271Me3lH/Hm1/CmRZ5+v/l0ULtyt3qvO5MYiD4YTPh5vXYRac5G6rGD
- J0knkZgq7zPVm3brXNahRaYu2vDsUDjuQPKUY2tihdd0DGgQUEi/g4Hr8X5V9QmikR9I
- 0sOyB9t7Oc1cvpQYIirFTt2vtEDkHwtKK1OoEm90VqFuzjU3QfEANTyoaFcwkWGPFp7D
- 5qlJyMUWSFmZo71E0N19kOu14M6jrujog0Bbq/TSzIdsYnxqlERWyxYAr5r1F086QGlK
- wEExFOAk1xxH5gpr2eEDohq6vuAOq+IvZDPvlCO9pwwrJxHxmLTOC2ekPdLKcXqrc8Qr
- HJ+A==
-X-Gm-Message-State: AOAM531i5QBnvcf6OKfty2DA4/BEsbXPgPWhfjnQL+co9HpPCpzB/XzC
- 7/dw6mP5xZKIbR+Gsn1kElY=
-X-Google-Smtp-Source: ABdhPJz6QldbCF6Dh5kGSmwsigCaP9gmNj3ghu6l0YzzRBcKtK0BuXV2DZ7t//aFv3zmvtozTMiVvQ==
-X-Received: by 2002:adf:ec45:: with SMTP id w5mr6277133wrn.357.1599901375466; 
- Sat, 12 Sep 2020 02:02:55 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id k4sm9207611wrx.51.2020.09.12.02.02.54
+ bh=YI7QEt+hoSZ6ChF6py/IttEMpfIYlFGmr9zeFrnMaW8=;
+ b=kJhaL/0vUp2SsBjVWJPYLBOnPAXSuxACP578RSam/uPUHbMTo67Bw5AzflL8Zda8bR
+ 8lxm1/nOr9eJeeYlKYjzHIrn+MxC/4vL85EOLD0zVD6YYTiO3qH3jTV5VeGfk9SZew6r
+ y649AQRq5rCRSEha4VRSMf6kzOOD1R31kggPX51X+GwlcXeAQLJLmunfsyikNa4fdr6z
+ SrxHaybeAktfd6DhKIcTRtTD8TAFFmdB+JuM7sWuGdweLWTyanVMMs5Ew4i/jq37cPQJ
+ 9VFbgaqtI4U2+zd5joOTLTtmXElwUhu/AprTj0qYOS+BOj21tQsPTW5xfQB6JophNl/b
+ lFjA==
+X-Gm-Message-State: AOAM533OsheE8m95+Ak07MEf3aOv84vKVUDDIQKB3z8+HfLbT7Cy1s3v
+ PbJLqGQtSoZ214xiGAfG6DBq1VtGALk1tlnI+avcq138+MZ8v7Qktz/gKo/qHq3bP3cT9PRNfxb
+ CmrKOl+1n0oaPMis=
+X-Received: by 2002:aa7:d747:: with SMTP id a7mr6997143eds.304.1599902072728; 
+ Sat, 12 Sep 2020 02:14:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwpspjWytzLB7quIHwx0dvUnUvQlO4ivUMTRgDSOCw5H8QCpnS87/0YJI/yE/YCamlGg/VUJA==
+X-Received: by 2002:aa7:d747:: with SMTP id a7mr6997118eds.304.1599902072451; 
+ Sat, 12 Sep 2020 02:14:32 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:8825:3b3:6c1e:a82d?
+ ([2001:b07:6468:f312:8825:3b3:6c1e:a82d])
+ by smtp.gmail.com with ESMTPSA id g25sm4079472edu.53.2020.09.12.02.14.31
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 12 Sep 2020 02:02:54 -0700 (PDT)
-Subject: Re: [PATCH v5 2/7] hw/misc/led: Allow connecting from GPIO output
-To: Luc Michel <luc.michel@greensocs.com>, qemu-devel@nongnu.org
-References: <20200910205429.727766-1-f4bug@amsat.org>
- <20200910205429.727766-3-f4bug@amsat.org>
- <448947fa-805a-69d6-258f-6e337c4c5076@greensocs.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <03c25384-6913-8cd6-f17c-0baff8fffed3@amsat.org>
-Date: Sat, 12 Sep 2020 11:02:53 +0200
+ Sat, 12 Sep 2020 02:14:31 -0700 (PDT)
+Subject: Re: [PATCH 7/7] hw/char/serial: Let SerialState have an 'id' field
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200907015535.827885-1-f4bug@amsat.org>
+ <20200907015535.827885-8-f4bug@amsat.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b6dceab9-d20d-290e-93c5-170a99499da2@redhat.com>
+Date: Sat, 12 Sep 2020 11:14:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <448947fa-805a-69d6-258f-6e337c4c5076@greensocs.com>
+In-Reply-To: <20200907015535.827885-8-f4bug@amsat.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -39
-X-Spam_score: -4.0
+Content-Language: en-US
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/12 02:01:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -45
+X-Spam_score: -4.6
 X-Spam_bar: ----
-X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-2.469,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.469, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,175 +118,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
- qemu-arm@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Joel Stanley <joel@jms.id.au>
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/11/20 9:42 PM, Luc Michel wrote:
-> Hi Phil,
+On 07/09/20 03:55, Philippe Mathieu-Daudé wrote:
+> When a SoC has multiple UARTs (some configured differently),
+> it is hard to associate events to their UART.
 > 
-> On 9/10/20 10:54 PM, Philippe Mathieu-Daudé wrote:
->> Some devices expose GPIO lines.
->>
->> Add a GPIO qdev input to our LED device, so we can
->> connect a GPIO output using qdev_connect_gpio_out().
->>
->> When used with GPIOs, the intensity can only be either
->> minium or maximum. This depends of the polarity of the
->> GPIO (which can be inverted).
->> Declare the GpioPolarity type to model the polarity.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>   include/hw/misc/led.h  |  8 ++++++++
->>   include/hw/qdev-core.h |  8 ++++++++
->>   hw/misc/led.c          | 17 ++++++++++++++++-
->>   3 files changed, 32 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/hw/misc/led.h b/include/hw/misc/led.h
->> index f5afaa34bfb..71c9b8c59bf 100644
->> --- a/include/hw/misc/led.h
->> +++ b/include/hw/misc/led.h
->> @@ -38,10 +38,16 @@ typedef struct LEDState {
->>       /* Public */
->>         uint8_t intensity_percent;
->> +    qemu_irq irq;
->>         /* Properties */
->>       char *description;
->>       char *color;
->> +    /*
->> +     * When used with GPIO, the intensity at reset is related
->> +     * to the GPIO polarity.
->> +     */
->> +    bool inverted_polarity;
->>   } LEDState;
->>     /**
->> @@ -71,6 +77,7 @@ void led_set_state(LEDState *s, bool is_emitting);
->>   /**
->>    * led_create_simple: Create and realize a LED device
->>    * @parentobj: the parent object
->> + * @gpio_polarity: GPIO polarity
->>    * @color: color of the LED
->>    * @description: description of the LED (optional)
->>    *
->> @@ -78,6 +85,7 @@ void led_set_state(LEDState *s, bool is_emitting);
->>    * drop the reference to it (the device is realized).
->>    */
->>   LEDState *led_create_simple(Object *parentobj,
->> +                            GpioPolarity gpio_polarity,
->>                               LEDColor color,
->>                               const char *description);
->>   diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
->> index ea3f73a282d..846354736a5 100644
->> --- a/include/hw/qdev-core.h
->> +++ b/include/hw/qdev-core.h
->> @@ -424,6 +424,14 @@ void qdev_simple_device_unplug_cb(HotplugHandler
->> *hotplug_dev,
->>   void qdev_machine_creation_done(void);
->>   bool qdev_machine_modified(void);
->>   +/**
->> + * GpioPolarity: Polarity of a GPIO line
->> + */
->> +typedef enum {
->> +    GPIO_POLARITY_ACTIVE_LOW,
->> +    GPIO_POLARITY_ACTIVE_HIGH
->> +} GpioPolarity;
->> +
->>   /**
->>    * qdev_get_gpio_in: Get one of a device's anonymous input GPIO lines
->>    * @dev: Device whose GPIO we want
->> diff --git a/hw/misc/led.c b/hw/misc/led.c
->> index 89acd9acbb7..3ef4f5e0469 100644
->> --- a/hw/misc/led.c
->> +++ b/hw/misc/led.c
->> @@ -10,6 +10,7 @@
->>   #include "migration/vmstate.h"
->>   #include "hw/qdev-properties.h"
->>   #include "hw/misc/led.h"
->> +#include "hw/irq.h"
->>   #include "trace.h"
->>     #define LED_INTENSITY_PERCENT_MAX   100
->> @@ -53,11 +54,19 @@ void led_set_state(LEDState *s, bool is_emitting)
->>       led_set_intensity(s, is_emitting ? LED_INTENSITY_PERCENT_MAX : 0);
->>   }
->>   +static void led_set_state_gpio_handler(void *opaque, int line, int
->> new_state)
->> +{
->> +    LEDState *s = LED(opaque);
->> +
->> +    assert(line == 0);
->> +    led_set_state(s, !!new_state != s->inverted_polarity);
->> +}
->> +
->>   static void led_reset(DeviceState *dev)
->>   {
->>       LEDState *s = LED(dev);
->>   -    led_set_state(s, false);
->> +    led_set_state(s, s->inverted_polarity);
->>   }
->>     static const VMStateDescription vmstate_led = {
->> @@ -84,11 +93,14 @@ static void led_realize(DeviceState *dev, Error
->> **errp)
->>       if (s->description == NULL) {
->>           s->description = g_strdup("n/a");
->>       }
->> +
->> +    qdev_init_gpio_in(DEVICE(s), led_set_state_gpio_handler, 1);
->>   }
->>     static Property led_properties[] = {
->>       DEFINE_PROP_STRING("color", LEDState, color),
->>       DEFINE_PROP_STRING("description", LEDState, description),
->> +    DEFINE_PROP_BOOL("polarity-inverted", LEDState,
->> inverted_polarity, false),
-> I was wondering, since the GpioPolarity type you introduce is not used
-> in the GPIO API, and since you use a boolean property here.
-
-"GpioPolarity not used in GPIO API": For now, but I expect it to be
-used there too. Maybe not soon, but some places could use it and
-become clearer.
-
-> Wouldn't it
-> be clearer is you name this property "active-low"? Because
-> "polarity-inverted" doesn't tell what the polarity is in the first
-> place. Moreover since this property only affects the LED GPIO, and not
-> the LED API (led_set_state), I think you can even name it
-> "gpio-active-low" to make this clear.
-
-Very good point, thanks for your suggestion!
-
+> To be able to distinct trace events between various instances,
+> add an 'id' field. Update the trace format accordingly.
 > 
->>       DEFINE_PROP_END_OF_LIST(),
->>   };
->>   @@ -119,6 +131,7 @@ static void led_register_types(void)
->>   type_init(led_register_types)
->>     LEDState *led_create_simple(Object *parentobj,
->> +                            GpioPolarity gpio_polarity,
-> You could go with a boolean here also and name the parameter
-> gpio_active_low, but I don't have a strong opinion on this.
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  include/hw/char/serial.h | 1 +
+>  hw/char/serial.c         | 7 ++++---
+>  hw/char/trace-events     | 6 +++---
+>  3 files changed, 8 insertions(+), 6 deletions(-)
+> 
+> diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
+> index 3d2a5b27e87..3ee2d096a85 100644
+> --- a/include/hw/char/serial.h
+> +++ b/include/hw/char/serial.h
+> @@ -75,6 +75,7 @@ typedef struct SerialState {
+>      uint64_t char_transmit_time;    /* time to transmit a char in ticks */
+>      int poll_msl;
+>  
+> +    uint8_t id;
+>      QEMUTimer *modem_status_poll;
+>      MemoryRegion io;
+>  } SerialState;
+> diff --git a/hw/char/serial.c b/hw/char/serial.c
+> index ade89fadb44..e5a6b939f13 100644
+> --- a/hw/char/serial.c
+> +++ b/hw/char/serial.c
+> @@ -177,7 +177,7 @@ static void serial_update_parameters(SerialState *s)
+>      ssp.stop_bits = stop_bits;
+>      s->char_transmit_time =  (NANOSECONDS_PER_SECOND / speed) * frame_size;
+>      qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_SET_PARAMS, &ssp);
+> -    trace_serial_update_parameters(speed, parity, data_bits, stop_bits);
+> +    trace_serial_update_parameters(s->id, speed, parity, data_bits, stop_bits);
+>  }
+>  
+>  static void serial_update_msl(SerialState *s)
+> @@ -333,7 +333,7 @@ static void serial_ioport_write(void *opaque, hwaddr addr, uint64_t val,
+>      SerialState *s = opaque;
+>  
+>      assert(size == 1 && addr < 8);
+> -    trace_serial_write(addr, val);
+> +    trace_serial_write(s->id, addr, val);
+>      switch(addr) {
+>      default:
+>      case 0:
+> @@ -550,7 +550,7 @@ static uint64_t serial_ioport_read(void *opaque, hwaddr addr, unsigned size)
+>          ret = s->scr;
+>          break;
+>      }
+> -    trace_serial_read(addr, ret);
+> +    trace_serial_read(s->id, addr, ret);
+>      return ret;
+>  }
+>  
+> @@ -1013,6 +1013,7 @@ static const TypeInfo serial_io_info = {
+>  };
+>  
+>  static Property serial_properties[] = {
+> +    DEFINE_PROP_UINT8("id", SerialState, id, 0),
+>      DEFINE_PROP_CHR("chardev", SerialState, chr),
+>      DEFINE_PROP_UINT32("baudbase", SerialState, baudbase, 115200),
+>      DEFINE_PROP_BOOL("wakeup", SerialState, wakeup, false),
+> diff --git a/hw/char/trace-events b/hw/char/trace-events
+> index cd36b63f39d..40800c9334c 100644
+> --- a/hw/char/trace-events
+> +++ b/hw/char/trace-events
+> @@ -5,9 +5,9 @@ parallel_ioport_read(const char *desc, uint16_t addr, uint8_t value) "read [%s]
+>  parallel_ioport_write(const char *desc, uint16_t addr, uint8_t value) "write [%s] addr 0x%02x val 0x%02x"
+>  
+>  # serial.c
+> -serial_read(uint16_t addr, uint8_t value) "read addr 0x%02x val 0x%02x"
+> -serial_write(uint16_t addr, uint8_t value) "write addr 0x%02x val 0x%02x"
+> -serial_update_parameters(uint64_t baudrate, char parity, int data_bits, int stop_bits) "baudrate=%"PRIu64" parity='%c' data=%d stop=%d"
+> +serial_read(uint8_t id, uint8_t addr, uint8_t value) "id#%u read addr 0x%x val 0x%02x"
+> +serial_write(uint8_t id, uint8_t addr, uint8_t value) "id#%u write addr 0x%x val 0x%02x"
+> +serial_update_parameters(uint8_t id, uint64_t baudrate, char parity, int data_bits, int stop_bits) "id#%u baudrate=%"PRIu64" parity=%c data=%d stop=%d"
+>  
+>  # virtio-serial-bus.c
+>  virtio_serial_send_control_event(unsigned int port, uint16_t event, uint16_t value) "port %u, event %u, value %u"
+> 
 
-I'll try, as this might postpone the need for the GpioPolarity enum
-(including its migration and the qapi enum visitors...).
+I'm not sure about making this one a one-off for serial.c.  You could
+add the SerialState* too, for example.  I have queued the other six though.
 
-> 
-> So with or without those modifications:
-> Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-> 
->>                               LEDColor color,
->>                               const char *description)
->>   {
->> @@ -126,6 +139,8 @@ LEDState *led_create_simple(Object *parentobj,
->>       DeviceState *dev;
->>         dev = qdev_new(TYPE_LED);
->> +    qdev_prop_set_bit(dev, "polarity-inverted",
->> +                      gpio_polarity == GPIO_POLARITY_ACTIVE_LOW);
->>       qdev_prop_set_string(dev, "color", led_color_name[color]);
->>       if (!description) {
->>           static unsigned undescribed_led_id;
->>
-> 
+Paolo
+
 
