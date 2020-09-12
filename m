@@ -2,90 +2,92 @@ Return-Path: <SRS0=E5X6=CV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49089C433E2
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 23:01:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1BA2C2D0E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 23:01:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFA5F20770
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 23:01:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 51D9521775
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Sep 2020 23:01:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jZgF2apC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFA5F20770
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="UbcYHeG9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51D9521775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHEWi-0000TL-S5
-	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 19:01:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47710)
+	id 1kHEWk-0000YY-EH
+	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 19:01:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHEI9-0004wr-JH; Sat, 12 Sep 2020 18:46:45 -0400
-Received: from mail-pj1-x102c.google.com ([2607:f8b0:4864:20::102c]:56085)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHEI7-0004Zy-Tl; Sat, 12 Sep 2020 18:46:45 -0400
-Received: by mail-pj1-x102c.google.com with SMTP id q4so3481328pjh.5;
- Sat, 12 Sep 2020 15:46:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Kzrzivny+4aurKQYh64spFpy22dgRRF/NzeUryxCkkI=;
- b=jZgF2apCgO2xLk6HU/6pB9mRE25hR9rBRh4bweqL5LpGc7ntZW9t+MWGSd3gtcDihs
- 1e+hf+PeutI4P3CBIhWu3H8gnHkSBRDfUkVocXHfJgJEuJ5bmti4UICZGzeioGz5Oiv6
- nukxj9eXloCHY3hgkRW+TUHFhE1SB6lRH5OEfkgobo3HQvNJIE3sm+ORyvlpL5Ekad/c
- nj74vFN82T9FQ2AJy7NSHEYnVeNs9edDtrwFATOAh8kzlRBu2bC8l/j+v95a1KqgYoCa
- EhMbdlbB5U+nNTp2L7hLQFp8WSxsuust7gBEmgzfU2NfsciYDlvgehFn7FaqKeM5/SIP
- vn2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Kzrzivny+4aurKQYh64spFpy22dgRRF/NzeUryxCkkI=;
- b=KLFM/D7dGDQsM0DhQYF3aU1OCOlOJ3X7nzSsmIIGPRTXFuMimUNGJZYt7KgMJcCU/l
- J2CNzQlnLVA9KsH6H9Tlf6cK8irI3AAgIXr5imm+cGu4VeISH4j/JLRrA6xBgPnMufQW
- kPuaEXSWyznEwKP1tfV9vFllEGwPKUYZsgOWrzbvT+qeSv4o8txe8UA/1ynoXumIaMGb
- iDeIWQxzz6UThAGQd3ZZ52aPUCjIYfnBrwz6ByaJvPy+Glwmn2K5drTFyTbh+ONW7Xha
- OXJYr/RrK6OiEEkkBv9n+LmdYciBTIHrVgrf3OpVrhJn8grBkw1uJwFuffjEAoZI+e+J
- SBUw==
-X-Gm-Message-State: AOAM5330R8s3iVKHxJaOXxLGJdZToN4I+/nymtA537qLdpRLNYcnbLcN
- CXP4k29yWlQZa32Q9Ok6eppw0cxNinljyemnjNw=
-X-Google-Smtp-Source: ABdhPJzSwaI1kyf8HYd8KjxbuD5d/nWHS6X13diPEgW/Zq/sZWPWD83nxOgPQRbt6BNdYdnaA5zNGQ==
-X-Received: by 2002:a17:902:8c89:: with SMTP id
- t9mr7869466plo.66.1599950801871; 
- Sat, 12 Sep 2020 15:46:41 -0700 (PDT)
-Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id t10sm4639266pgp.15.2020.09.12.15.46.38
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 12 Sep 2020 15:46:41 -0700 (PDT)
-From: Yonggang Luo <luoyonggang@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v8 26/27] meson: remove --ninja option in configure.
-Date: Sun, 13 Sep 2020 06:44:30 +0800
-Message-Id: <20200912224431.1428-27-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.28.0.windows.1
-In-Reply-To: <20200912224431.1428-1-luoyonggang@gmail.com>
-References: <20200912224431.1428-1-luoyonggang@gmail.com>
+ (Exim 4.90_1)
+ (envelope-from <prvs=517336518=dmitry.fomichev@wdc.com>)
+ id 1kHEPt-0003hS-QN; Sat, 12 Sep 2020 18:54:45 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:26882)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=517336518=dmitry.fomichev@wdc.com>)
+ id 1kHEPr-0005Sh-Me; Sat, 12 Sep 2020 18:54:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1599951283; x=1631487283;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=U0YF82MA56tPKneosTj7Mr55BcKBrlkeEjxyv7jPa74=;
+ b=UbcYHeG9GIopPeB48IYyin4Dg4U9qSuQ9byWzUD2oHKzJanhaJAGs216
+ cwhxsabQV/1OOXEyuAXyFqoWFQqDiWv0XiDFPUYJfXMBxRzarJtinHss9
+ 7yagTPm1txt3DgEbq5SohJSAGsD5JGXDDoF0/JlAPde4IwrDny/nsQiX6
+ 83OInJaqVhyflw6//tDck/I5+xpinCEu/Cef+jZ2nL/I/dW74XaUd3LWP
+ nrV7cIjuNj6DB+ijRPtJK5UduM6HfunWZEr8PD99rPZMpo+E3H/CT2Iw5
+ ySNCz+UZf5ThpPWF85wxeAzSPNOJdOYASQxgJdl4gA+bXti8+JH8TW/RI A==;
+IronPort-SDR: UlB+LkEosqHyiJSn1YL/y4eZIQWY+5aChmmpIhQeQnLiJshPXlYuAESOR1wq+ROXw7Q9uWmJAV
+ X0VyXWSbYE/ItgFeAdIECSSmWoBGwIi0H3DYrBYRgBA5ky/xwfYnPigsdNvlZI3fN87kv2Y0C+
+ xX0pp+cu5dcq0CfLcRD50pyMqmEGaasY5k165yEyk/B9MspbB1IKnlE30RM2oMubIJ5SDAkdHd
+ SJnuly5V1LLjbwD59bxA/RZKaBFMIaXsN060FodvJPlTxHKYylmBKFkA+7ScAAc2PFDH8GCRfL
+ ZSw=
+X-IronPort-AV: E=Sophos;i="5.76,420,1592841600"; d="scan'208";a="256834838"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 13 Sep 2020 06:54:41 +0800
+IronPort-SDR: BRkhCc4uhSC4lRjQ/sp4U1LUdBeF25O8AhKi21TanVq2DSnUubR8sXnrzUA3iGtVlJdWuX/m5u
+ SnXSbc8k5bwg==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 12 Sep 2020 15:41:02 -0700
+IronPort-SDR: sBG+Yiupy9I5Z3doTF7P2gdeusPQe+JYMFaJGXO0n9dVWnNSiIeBCZz9Wzt9W15JJ5HOAJMoWk
+ gJvMipM81yjA==
+WDCIronportException: Internal
+Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
+ by uls-op-cesaip02.wdc.com with ESMTP; 12 Sep 2020 15:54:40 -0700
+From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+To: Keith Busch <kbusch@kernel.org>, Klaus Jensen <k.jensen@samsung.com>,
+ Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Maxim Levitsky <mlevitsky@redhat.com>, Fam Zheng <fam@euphon.net>
+Subject: [PATCH v2 02/15] hw/block/nvme: Report actual LBA data shift in LBAF
+Date: Sun, 13 Sep 2020 07:54:17 +0900
+Message-Id: <20200912225430.1772-3-dmitry.fomichev@wdc.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200912225430.1772-1-dmitry.fomichev@wdc.com>
+References: <20200912225430.1772-1-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::102c;
- envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x102c.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Received-SPF: pass client-ip=68.232.141.245;
+ envelope-from=prvs=517336518=dmitry.fomichev@wdc.com; helo=esa1.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/12 18:54:38
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,38 +101,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
- Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>,
- Peter Lieven <pl@kamp.de>, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: Niklas Cassel <niklas.cassel@wdc.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
+ Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
----
- .cirrus.yml | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Calculate the data shift value to report based on the set value of
+logical_block_size device property.
 
-diff --git a/.cirrus.yml b/.cirrus.yml
-index 1ff9f0a72f..87bd110d28 100644
---- a/.cirrus.yml
-+++ b/.cirrus.yml
-@@ -99,7 +99,7 @@ windows_msys2_task:
-         mingw-w64-x86_64-zstd"
-   script:
-     - C:\tools\msys64\usr\bin\bash.exe -lc "mkdir build"
--    - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && ../configure --python=python3 --ninja=ninja"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && ../configure --python=python3"
-     - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make -j$NUMBER_OF_PROCESSORS"
-   test_script:
-     - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make V=1 check"
+In the process, use a local variable to calculate the LBA format
+index instead of the hardcoded value 0. This makes the code more
+readable and it will make it easier to add support for multiple LBA
+formats in the future.
+
+Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+---
+ hw/block/nvme.c |  4 +++-
+ hw/block/nvme.h | 11 +++++++++++
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 3a90d80694..1cfc136042 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -2203,6 +2203,7 @@ static void nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
+ {
+     int64_t bs_size;
+     NvmeIdNs *id_ns = &ns->id_ns;
++    int lba_index;
+ 
+     bs_size = blk_getlength(n->conf.blk);
+     if (bs_size < 0) {
+@@ -2212,7 +2213,8 @@ static void nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
+ 
+     n->ns_size = bs_size;
+ 
+-    id_ns->lbaf[0].ds = BDRV_SECTOR_BITS;
++    lba_index = NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas);
++    id_ns->lbaf[lba_index].ds = nvme_ilog2(n->conf.logical_block_size);
+     id_ns->nsze = cpu_to_le64(nvme_ns_nlbas(n, ns));
+ 
+     /* no thin provisioning */
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index 52ba794f2e..190c974b6c 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -137,4 +137,15 @@ static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
+     return n->ns_size >> nvme_ns_lbads(ns);
+ }
+ 
++static inline int nvme_ilog2(uint64_t i)
++{
++    int log = -1;
++
++    while (i) {
++        i >>= 1;
++        log++;
++    }
++    return log;
++}
++
+ #endif /* HW_NVME_H */
 -- 
-2.28.0.windows.1
+2.21.0
 
 
