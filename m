@@ -2,78 +2,78 @@ Return-Path: <SRS0=H3r+=CW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A11DC43461
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 22:21:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24158C433E2
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 22:22:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 566E221548
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 22:21:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7932621548
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 22:22:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Pmq82VJs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 566E221548
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="jFo9xaPh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7932621548
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHaNT-0002YW-9D
-	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 18:21:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58648)
+	id 1kHaNp-0003Ig-JR
+	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 18:22:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59054)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=518fa018e=dmitry.fomichev@wdc.com>)
- id 1kHaGv-0008D5-SN; Sun, 13 Sep 2020 18:14:57 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:42014)
+ id 1kHaHZ-0000xT-OM; Sun, 13 Sep 2020 18:15:38 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:42054)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=518fa018e=dmitry.fomichev@wdc.com>)
- id 1kHaGt-00019x-Rh; Sun, 13 Sep 2020 18:14:57 -0400
+ id 1kHaHX-0001Hh-1X; Sun, 13 Sep 2020 18:15:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1600035295; x=1631571295;
+ t=1600035334; x=1631571334;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=zxe81MuX4urUutIHEtJFE6J8nCgNhHUrmEj1y7p0mBw=;
- b=Pmq82VJsyIV9MMJG+eRBQTWyxwv7nCV2XSB3eo66qz4H5zHCEtwk2pCp
- LT/fPFlXmUQp9QoJh4tXf0zkmIAFMC4YHcuvsvxXwHQTVgEadebDSRSgo
- Xg1NOVKWMrqHhOaGUqovEOUTP3fO7C16l+zLK7v6RpdTYRmrYAIWo8lmZ
- NIkhWbjfqQP4ipvVejJc9BOfxm3xEx1cM0sn3ZFp3Dzf7BaZwCEikW5bW
- IsDEh7Gm1OOKHjA0cMKVHvsKZZIfb+YtjLhww7hTByg5VwVNVzMCN9EaT
- iWelC+DJiCgmELF3CnhvMTTJ041AGUEnl2ObQT2SGlsPa3g9kyUiokQbw w==;
-IronPort-SDR: +svW6mFIRNdEwkARtkLjNaZ5f6+t6kCDoie2nyfJ8Qzqkdh+i54v9+PZMnMyDqtPriW1AFn6pF
- FhH+d59ku9uDEVajiWMMBgPpDP7zvftCzLpVglOVIRavNdxsel8aCEyYJFL6nXlHXWkN46ATtM
- GWDxNgS4n7FJh5bKZH3jcoCaWZOciBieuXz3M9x1964P/Rjo0BJNdB2h/hXUn5iYMqSJWgmu5u
- F7ppUChzYdsaI6jHLBgnzvilWN7KmieKEwKgsyFis9fy6R1GpM1WUvq6kO1AFzlxhJZSbQQ9To
- /TY=
-X-IronPort-AV: E=Sophos;i="5.76,423,1592841600"; d="scan'208";a="147179052"
+ bh=4lmXrVv8vWfsQpV3JfcR+Z7HzkK2EhDx634mziV0q6w=;
+ b=jFo9xaPhVlEgTahUeuVUXz7BAJKgGYCNSY2GoCKjgT0nd7fY/imuROlw
+ LP0X/ZgQKCzMVVM2r8b1wmi/D2dxJ1jdF5uC5BiSUCaTnlxItmzGkQwDm
+ x+Sgt1hv2lfvR5xYOTedmSGN/n9mHI7F9d5F3LWRrcITHRt2OlFBu61V6
+ mgBbGsRn+TI0mCNKrRciVL1UFe+y90OUMnT0AmI2kI1KWezQdeREqv8By
+ LAY37LZcJ9/MMoqlBug64m//7yDxLjGFBb9plfOew0UPgo9sX8U0oM4QB
+ tWOS7zSgZ6Xx23X4LUh9H8HpkTy6R+RYQqAK+XQ1mNzAywnSL4OisF2UH Q==;
+IronPort-SDR: mosYTyKC4m213p3djkBhTOmduJdD2i1WLLdh1vk4bBbS9rkIYz6gs2DHIl/87sOnTtibMTJtLb
+ 2rJ300GnDcQOJV0K51o/aVt0z5aJZ1hz6tTG+bYIqs4PWjYY5PBBvdZgM2CH+9Oj02j9MjIrNB
+ PfAJ9yWkTb4DiO2gAINUq0hKAUUZULbhthlxiHxREav/B4QayryLgqjzAyLqmJuaY6rkbJVBSi
+ 2uZs27qvhGdDeyLlZt1bqvehkPYOu8fUA5aCmEPxc7zM5dPJbDQ3TMmxxB2FTN001hJoL4XAn7
+ xqI=
+X-IronPort-AV: E=Sophos;i="5.76,423,1592841600"; d="scan'208";a="147179075"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 14 Sep 2020 06:14:54 +0800
-IronPort-SDR: AKg6SH5MCa/F34qHtrO8nrTV7OjarLyEFVObUjTceYoYkuU+VRm+MGhOu1HTr/4A+BFOFSOx1A
- pDcBG+VmX0kQ==
+ by ob1.hgst.iphmx.com with ESMTP; 14 Sep 2020 06:15:16 +0800
+IronPort-SDR: in056m9MESwZV+xb/CFiaA6dixclYuByFAxUX9/YwVZCVzZEghNwshaUkhmLgZCwxIyttN7jj9
+ IKC7t9GowSaQ==
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 13 Sep 2020 15:02:07 -0700
-IronPort-SDR: 1M5Ey0bpfgXJoYdUHJ4gNBvAZQTI3sV2Nq9Wjk9m77GbFey9jR9QbcCPrIvhpjncx27/b4n6W8
- 6fp/n7U09WMw==
+ 13 Sep 2020 15:02:29 -0700
+IronPort-SDR: ljl7OXn+eZkvSrytXPmTTxbT5vKLbHhFQxXY+8vz8HLoFoLySyme5lI5+OmMpsWX8Are2mxJ+S
+ 6hoEakhdUO+Q==
 WDCIronportException: Internal
 Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
- by uls-op-cesaip02.wdc.com with ESMTP; 13 Sep 2020 15:14:53 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 13 Sep 2020 15:15:15 -0700
 From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 To: Keith Busch <kbusch@kernel.org>, Klaus Jensen <k.jensen@samsung.com>,
  Kevin Wolf <kwolf@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Maxim Levitsky <mlevitsk@redhat.com>, Fam Zheng <fam@euphon.net>
-Subject: [PATCH v3 05/15] hw/block/nvme: Define trace events related to NS
- Types
-Date: Mon, 14 Sep 2020 07:14:26 +0900
-Message-Id: <20200913221436.22844-6-dmitry.fomichev@wdc.com>
+Subject: [PATCH v3 15/15] hw/block/nvme: Document zoned parameters in usage
+ text
+Date: Mon, 14 Sep 2020 07:14:36 +0900
+Message-Id: <20200913221436.22844-16-dmitry.fomichev@wdc.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200913221436.22844-1-dmitry.fomichev@wdc.com>
 References: <20200913221436.22844-1-dmitry.fomichev@wdc.com>
@@ -111,59 +111,85 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A few trace events are defined that are relevant to implementing
-Namespace Types (NVMe TP 4056).
+Added brief descriptions of the new device properties that are
+now available to users to configure features of Zoned Namespace
+Command Set in the emulator.
+
+This patch is for documentation only, no functionality change.
 
 Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
 ---
- hw/block/trace-events | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ hw/block/nvme.c | 43 +++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 41 insertions(+), 2 deletions(-)
 
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index 79c9da652d..2414dcbc79 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -46,8 +46,12 @@ pci_nvme_create_cq(uint64_t addr, uint16_t cqid, uint16_t vector, uint16_t size,
- pci_nvme_del_sq(uint16_t qid) "deleting submission queue sqid=%"PRIu16""
- pci_nvme_del_cq(uint16_t cqid) "deleted completion queue, cqid=%"PRIu16""
- pci_nvme_identify_ctrl(void) "identify controller"
-+pci_nvme_identify_ctrl_csi(uint8_t csi) "identify controller, csi=0x%"PRIx8""
- pci_nvme_identify_ns(uint32_t ns) "nsid %"PRIu32""
-+pci_nvme_identify_ns_csi(uint32_t ns, uint8_t csi) "nsid=%"PRIu32", csi=0x%"PRIx8""
- pci_nvme_identify_nslist(uint32_t ns) "nsid %"PRIu32""
-+pci_nvme_identify_nslist_csi(uint16_t ns, uint8_t csi) "nsid=%"PRIu16", csi=0x%"PRIx8""
-+pci_nvme_identify_cmd_set(void) "identify i/o command set"
- pci_nvme_identify_ns_descr_list(uint32_t ns) "nsid %"PRIu32""
- pci_nvme_get_log(uint16_t cid, uint8_t lid, uint8_t lsp, uint8_t rae, uint32_t len, uint64_t off) "cid %"PRIu16" lid 0x%"PRIx8" lsp 0x%"PRIx8" rae 0x%"PRIx8" len %"PRIu32" off %"PRIu64""
- pci_nvme_getfeat(uint16_t cid, uint8_t fid, uint8_t sel, uint32_t cdw11) "cid %"PRIu16" fid 0x%"PRIx8" sel 0x%"PRIx8" cdw11 0x%"PRIx32""
-@@ -84,6 +88,8 @@ pci_nvme_mmio_stopped(void) "cleared controller enable bit"
- pci_nvme_mmio_shutdown_set(void) "shutdown bit set"
- pci_nvme_mmio_shutdown_cleared(void) "shutdown bit cleared"
- pci_nvme_cmd_supp_and_effects_log_read(void) "commands supported and effects log read"
-+pci_nvme_css_nvm_cset_selected_by_host(uint32_t cc) "NVM command set selected by host, bar.cc=0x%"PRIx32""
-+pci_nvme_css_all_csets_sel_by_host(uint32_t cc) "all supported command sets selected by host, bar.cc=0x%"PRIx32""
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 41f4c0dacd..d0900c2871 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -9,7 +9,7 @@
+  */
  
- # nvme traces for error conditions
- pci_nvme_err_mdts(uint16_t cid, size_t len) "cid %"PRIu16" len %zu"
-@@ -97,6 +103,9 @@ pci_nvme_err_invalid_opc(uint8_t opc) "invalid opcode 0x%"PRIx8""
- pci_nvme_err_invalid_admin_opc(uint8_t opc) "invalid admin opcode 0x%"PRIx8""
- pci_nvme_err_invalid_lba_range(uint64_t start, uint64_t len, uint64_t limit) "Invalid LBA start=%"PRIu64" len=%"PRIu64" limit=%"PRIu64""
- pci_nvme_err_invalid_effects_log_offset(uint64_t ofs) "commands supported and effects log offset must be 0, got %"PRIu64""
-+pci_nvme_err_change_css_when_enabled(void) "changing CC.CSS while controller is enabled"
-+pci_nvme_err_only_nvm_cmd_set_avail(void) "setting 110b CC.CSS, but only NVM command set is enabled"
-+pci_nvme_err_invalid_iocsci(uint32_t idx) "unsupported command set combination index %"PRIu32""
- pci_nvme_err_invalid_del_sq(uint16_t qid) "invalid submission queue deletion, sid=%"PRIu16""
- pci_nvme_err_invalid_create_sq_cqid(uint16_t cqid) "failed creating submission queue, invalid cqid=%"PRIu16""
- pci_nvme_err_invalid_create_sq_sqid(uint16_t sqid) "failed creating submission queue, invalid sqid=%"PRIu16""
-@@ -152,6 +161,7 @@ pci_nvme_ub_db_wr_invalid_cq(uint32_t qid) "completion queue doorbell write for
- pci_nvme_ub_db_wr_invalid_cqhead(uint32_t qid, uint16_t new_head) "completion queue doorbell write value beyond queue size, cqid=%"PRIu32", new_head=%"PRIu16", ignoring"
- pci_nvme_ub_db_wr_invalid_sq(uint32_t qid) "submission queue doorbell write for nonexistent queue, sqid=%"PRIu32", ignoring"
- pci_nvme_ub_db_wr_invalid_sqtail(uint32_t qid, uint16_t new_tail) "submission queue doorbell write value beyond queue size, sqid=%"PRIu32", new_head=%"PRIu16", ignoring"
-+pci_nvme_ub_unknown_css_value(void) "unknown value in cc.css field"
+ /**
+- * Reference Specs: http://www.nvmexpress.org, 1.2, 1.1, 1.0e
++ * Reference Specs: http://www.nvmexpress.org, 1.4, 1.3, 1.2, 1.1, 1.0e
+  *
+  *  https://nvmexpress.org/developers/nvme-specification/
+  */
+@@ -22,7 +22,7 @@
+  *              [pmrdev=<mem_backend_file_id>,] \
+  *              max_ioqpairs=<N[optional]>, \
+  *              aerl=<N[optional]>, aer_max_queued=<N[optional]>, \
+- *              mdts=<N[optional]>
++ *              mdts=<N[optional]>, zoned=<true|false[optional]>
+  *
+  * Note cmb_size_mb denotes size of CMB in MB. CMB is assumed to be at
+  * offset 0 in BAR2 and supports only WDS, RDS and SQS for now.
+@@ -48,6 +48,45 @@
+  *   completion when there are no oustanding AERs. When the maximum number of
+  *   enqueued events are reached, subsequent events will be dropped.
+  *
++ * Setting `zoned` to true makes the device to support zoned namespaces.
++ * In this case, of the following options are available to configure zoned
++ * operation:
++ *     zone_size=<zone size in MiB, default: 128MiB>
++ *
++ *     zone_capacity=<zone capacity in MiB, default: zone_size>
++ *         The value 0 (default) forces zone capacity to be the same as zone
++ *         size. The value of this property may not exceed zone size.
++ *
++ *     zone_file=<zone metadata file name, default: none>
++ *         Zone metadata file, if specified, allows zone information
++ *         to be persistent across shutdowns and restarts.
++ *
++ *     zone_descr_ext_size=<zone descriptor extension size, default 0>
++ *         This value needs to be specified in 64B units. If it is zero,
++ *         namespace(s) will not support zone descriptor extensions.
++ *
++ *     max_active=<Maximum Active Resources (zones), default: 0 - no limit>
++ *
++ *     max_open=<Maximum Open Resources (zones), default: 0 - no limit>
++ *
++ *     zone_append_size_limit=<zone append size limit, in KiB, default: MDTS>
++ *         The maximum I/O size that can be supported by Zone Append
++ *         command. Since internally this this value is maintained as
++ *         ZASL = log2(<maximum append size> / <page size>), some
++ *         values assigned to this property may be rounded down and
++ *         result in a lower maximum ZA data size being in effect.
++ *         If MDTS property is not assigned, the default value of 128KiB is
++ *         used as ZASL.
++ *
++ *     offline_zones=<the number of offline zones to inject, default: 0>
++ *
++ *     rdonly_zones=<the number of read-only zones to inject, default: 0>
++ *
++ *     cross_zone_read=<enables Read Across Zone Boundaries, default: true>
++ *
++ *     fill_pattern=<data fill pattern, default: 0x00>
++ *         The byte pattern to return for any portions of unwritten data
++ *         during read.
+  */
  
- # xen-block.c
- xen_block_realize(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
+ #include "qemu/osdep.h"
 -- 
 2.21.0
 
