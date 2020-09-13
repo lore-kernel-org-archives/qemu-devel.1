@@ -2,78 +2,92 @@ Return-Path: <SRS0=H3r+=CW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82811C43461
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 19:06:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D16E4C43461
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 19:28:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C010221655
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 19:06:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C010221655
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 59043208C7
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 19:28:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YjDsFwgR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59043208C7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHXKJ-0006t6-PL
-	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 15:06:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57144)
+	id 1kHXg7-0006Q8-4K
+	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 15:28:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60660)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kHXJj-0006Pu-Gg
- for qemu-devel@nongnu.org; Sun, 13 Sep 2020 15:05:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58688)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kHXfN-0005lg-Eq
+ for qemu-devel@nongnu.org; Sun, 13 Sep 2020 15:28:01 -0400
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:34555)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kHXJh-0005bg-2r
- for qemu-devel@nongnu.org; Sun, 13 Sep 2020 15:05:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kHXJf-0000Em-Bo
- for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 19:05:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 536862E8058
- for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 19:05:35 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kHXfL-0007rd-Og
+ for qemu-devel@nongnu.org; Sun, 13 Sep 2020 15:28:01 -0400
+Received: by mail-ej1-x644.google.com with SMTP id gr14so20244877ejb.1
+ for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 12:27:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=fVD8/ijvd9x3TokaTFp7vxAe7gqKyc693wlFeTxVaGw=;
+ b=YjDsFwgRp0NNXtBEpKWtHVyjBeyw2Of9bVafvrSxIPtSwUv/Y+aa9v7INi1zGpyLBW
+ XBUvgluyVc4wnETU/GupTwEi1OmIsnuaE+B33dCC/wjbjeDC90HHNx2QpbwkgyDagpzR
+ RwxRST878hzVNmdVcxbmMRp87cSwI+BZd2IY/0cnq/aPV+QrvBJqKYsE+a5Pu7T/+68G
+ Wf7lgMpecrbqsUOVNG/xOq2k6PN5/VIUDrNEfeBN5iTWk2RwmzubBCrDsSi9Jerm1n/c
+ +K4PkL2xdlEuXGQYzom/OzzUljuLnOsMpz3f1wdgKO7TaJwNLG//UW3H8LVCAl1+KJlB
+ S3lQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=fVD8/ijvd9x3TokaTFp7vxAe7gqKyc693wlFeTxVaGw=;
+ b=lFHMlUvEiJ7CRK90SrC5alz2snnmLTHx7kUxNqX/0XuplEQr2JM4kC+WRchxImIE9y
+ S6vEtpLQRxkAvdNWKMJSOmafHuM/4wju6ytN7fbhlAQ5dpg9iSRw2u1A17LZcP6eKAOi
+ Hv4wNDmn5tW1BhFMx0tpXReoj/JUP2VTO0X1w5A98L824wQED4bSoE7/+LBImQLnajWn
+ +XTglCYGX9EwGF1z5GCMtW8kHj3fMUhuqO5KTMmgW+s6T5khKYAd1TriOnAgYJHkUOV7
+ hPf2Sl0+0fDGShjeoqedc4pFX0TlfXmtNzkF9COy8ONHSszaehuoUtQw4+SDRHb48xK2
+ Xquw==
+X-Gm-Message-State: AOAM530aWoExwJoDnD+dUuxymWy9CfPAFcb0My4GKLhklz7wHT4SGBRU
+ 6CuCYm2agZyxnbunblCxk1aBxCgWZr2Wh1cYuL4/vw==
+X-Google-Smtp-Source: ABdhPJxwXU9Gx0pXaR49/pAYWWnQGHSq5HP3sL9D+CycajzfJgtA83a6vIrEGRhyEjlBrw+YKVWALOD0OeK6PVNtL5c=
+X-Received: by 2002:a17:906:4a53:: with SMTP id
+ a19mr11922261ejv.56.1600025277392; 
+ Sun, 13 Sep 2020 12:27:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20200910131504.11341-1-alex.bennee@linaro.org>
+In-Reply-To: <20200910131504.11341-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 13 Sep 2020 20:27:46 +0100
+Message-ID: <CAFEAcA9s5j9DrDkrwBPmfK40FzeXsS6qLKD1Y3cTKgBFJbk_QQ@mail.gmail.com>
+Subject: Re: [PULL 00/10] testing and other mix fixes
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 13 Sep 2020 18:56:12 -0000
-From: Amey Narkhede <1895471@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ameynarkhede
-X-Launchpad-Bug-Reporter: Amey Narkhede (ameynarkhede)
-X-Launchpad-Bug-Modifier: Amey Narkhede (ameynarkhede)
-Message-Id: <160002337216.747.16078826830052525094.malonedeb@chaenomeles.canonical.com>
-Subject: [Bug 1895471] [NEW] compilation error with clang in util/async.c
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: 93f6aed491349cf2abedf1cf1da8a7eb8c4e9932
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/13 15:05:35
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -66
-X-Spam_score: -6.7
-X-Spam_bar: ------
-X-Spam_report: (-6.7 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,126 +96,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1895471 <1895471@bugs.launchpad.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On Thu, 10 Sep 2020 at 14:15, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+> The following changes since commit 9435a8b3dd35f1f926f1b9127e8a906217a551=
+8a:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/sirius/ipxe-20200908-=
+pull-request' into staging (2020-09-08 21:21:13 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/stsquad/qemu.git tags/pull-testing-fixes-100920-1
+>
+> for you to fetch changes up to c17a386b6afe608086aa4d260e29662865680b7f:
+>
+>   plugins: move the more involved plugins to contrib (2020-09-10 10:47:03=
+ +0100)
+>
+> ----------------------------------------------------------------
+> Various misc and testing fixes:
+>
+>   - Expand CODING_STYLE.rst a little more
+>   - usb-host build fix
+>   - allow check-softfloat unit tests without TCG
+>   - simplify mips imm_branch so compiler isn't confused
+>   - mark ppc64abi32 for deprecation
+>   - more compiler soothing in pch_rev_id
+>   - allow acceptance to skip missing binaries
+>   - more a bunch of plugins to contrib
 
-configured with ` CC=3Dclang CXX=3Dclang++ ../configure --target-
-list=3Dx86_64-softmmu --enable-kvm --enable-curl --enable-debug --enable-
-jemalloc --enable-fuzzing --enable-sdl` and after make I get the
-following error related to c11 atomics. I'm using clang because I'm
-experimenting with fuzzer
+Applied, thanks (we can tweak the config-deprecation code as
+a followon patch).
 
-[glitz@archlinux /code/qemu/build]$ ninja -j5
-[479/2290] Compiling C object libqemuutil.a.p/util_async.c.o
-FAILED: libqemuutil.a.p/util_async.c.o
-clang -Ilibqemuutil.a.p -I. -I.. -Iqapi -Itrace -Iui -Iui/shader -I/usr/inc=
-lude/p11-kit-1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/i=
-nclude/libmount -I/usr/include/blkid -I/usr/include/gio-unix-2.0 -Ilinux-he=
-aders -Xclang -fcolor-diagnostics -pipe -Wall -Winvalid-pch -Werror -std=3D=
-gnu99 -g -m64 -mcx16 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SO=
-URCE -Wstrict-prototypes -Wredundant-decls -Wundef -Wwrite-strings -Wmissin=
-g-prototypes -fno-strict-aliasing -fno-common -fwrapv -Wold-style-definitio=
-n -Wtype-limits -Wformat-security -Wformat-y2k -Winit-self -Wignored-qualif=
-iers -Wempty-body -Wnested-externs -Wendif-labels -Wexpansion-to-defined -W=
-no-initializer-overrides -Wno-missing-include-dirs -Wno-shift-negative-valu=
-e -Wno-string-plus-int -Wno-typedef-redefinition -Wno-tautological-type-lim=
-it-compare -fstack-protector-strong -fsanitize=3Dfuzzer-no-link -iquote /co=
-de/qemu/tcg/i386 -isystem /code/qemu/linux-headers -iquote . -iquote /code/=
-qemu -iquote /code/qemu/accel/tcg -iquote /code/qemu/include -iquote /code/=
-qemu/disas/libvixl -pthread -fPIC -MD -MQ libqemuutil.a.p/util_async.c.o -M=
-F libqemuutil.a.p/util_async.c.o.d -o libqemuutil.a.p/util_async.c.o -c ../=
-util/async.c
-../util/async.c:79:17: error: address argument to atomic operation must be =
-a pointer to _Atomic type ('unsigned int *' invalid)
-    old_flags =3D atomic_fetch_or(&bh->flags, BH_PENDING | new_flags);
-                ^               ~~~~~~~~~~
-/usr/lib/clang/10.0.1/include/stdatomic.h:138:42: note: expanded from macro=
- 'atomic_fetch_or'
-#define atomic_fetch_or(object, operand) __c11_atomic_fetch_or(object, oper=
-and, __ATOMIC_SEQ_CST)
-                                         ^                     ~~~~~~
-../util/async.c:105:14: error: address argument to atomic operation must be=
- a pointer to _Atomic type ('unsigned int *' invalid)
-    *flags =3D atomic_fetch_and(&bh->flags,
-             ^                ~~~~~~~~~~
-/usr/lib/clang/10.0.1/include/stdatomic.h:144:43: note: expanded from macro=
- 'atomic_fetch_and'
-#define atomic_fetch_and(object, operand) __c11_atomic_fetch_and(object, op=
-erand, __ATOMIC_SEQ_CST)
-                                          ^                      ~~~~~~
-2 errors generated.
-[483/2290] Compiling C object libqemuutil.a.p/util_qemu-error.c.o
-ninja: build stopped: subcommand failed.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1895471
-
-Title:
-  compilation error with clang in util/async.c
-
-Status in QEMU:
-  New
-
-Bug description:
-  configured with ` CC=3Dclang CXX=3Dclang++ ../configure --target-
-  list=3Dx86_64-softmmu --enable-kvm --enable-curl --enable-debug
-  --enable-jemalloc --enable-fuzzing --enable-sdl` and after make I get
-  the following error related to c11 atomics. I'm using clang because
-  I'm experimenting with fuzzer
-
-  [glitz@archlinux /code/qemu/build]$ ninja -j5
-  [479/2290] Compiling C object libqemuutil.a.p/util_async.c.o
-  FAILED: libqemuutil.a.p/util_async.c.o
-  clang -Ilibqemuutil.a.p -I. -I.. -Iqapi -Itrace -Iui -Iui/shader -I/usr/i=
-nclude/p11-kit-1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr=
-/include/libmount -I/usr/include/blkid -I/usr/include/gio-unix-2.0 -Ilinux-=
-headers -Xclang -fcolor-diagnostics -pipe -Wall -Winvalid-pch -Werror -std=
-=3Dgnu99 -g -m64 -mcx16 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE=
-_SOURCE -Wstrict-prototypes -Wredundant-decls -Wundef -Wwrite-strings -Wmis=
-sing-prototypes -fno-strict-aliasing -fno-common -fwrapv -Wold-style-defini=
-tion -Wtype-limits -Wformat-security -Wformat-y2k -Winit-self -Wignored-qua=
-lifiers -Wempty-body -Wnested-externs -Wendif-labels -Wexpansion-to-defined=
- -Wno-initializer-overrides -Wno-missing-include-dirs -Wno-shift-negative-v=
-alue -Wno-string-plus-int -Wno-typedef-redefinition -Wno-tautological-type-=
-limit-compare -fstack-protector-strong -fsanitize=3Dfuzzer-no-link -iquote =
-/code/qemu/tcg/i386 -isystem /code/qemu/linux-headers -iquote . -iquote /co=
-de/qemu -iquote /code/qemu/accel/tcg -iquote /code/qemu/include -iquote /co=
-de/qemu/disas/libvixl -pthread -fPIC -MD -MQ libqemuutil.a.p/util_async.c.o=
- -MF libqemuutil.a.p/util_async.c.o.d -o libqemuutil.a.p/util_async.c.o -c =
-../util/async.c
-  ../util/async.c:79:17: error: address argument to atomic operation must b=
-e a pointer to _Atomic type ('unsigned int *' invalid)
-      old_flags =3D atomic_fetch_or(&bh->flags, BH_PENDING | new_flags);
-                  ^               ~~~~~~~~~~
-  /usr/lib/clang/10.0.1/include/stdatomic.h:138:42: note: expanded from mac=
-ro 'atomic_fetch_or'
-  #define atomic_fetch_or(object, operand) __c11_atomic_fetch_or(object, op=
-erand, __ATOMIC_SEQ_CST)
-                                           ^                     ~~~~~~
-  ../util/async.c:105:14: error: address argument to atomic operation must =
-be a pointer to _Atomic type ('unsigned int *' invalid)
-      *flags =3D atomic_fetch_and(&bh->flags,
-               ^                ~~~~~~~~~~
-  /usr/lib/clang/10.0.1/include/stdatomic.h:144:43: note: expanded from mac=
-ro 'atomic_fetch_and'
-  #define atomic_fetch_and(object, operand) __c11_atomic_fetch_and(object, =
-operand, __ATOMIC_SEQ_CST)
-                                            ^                      ~~~~~~
-  2 errors generated.
-  [483/2290] Compiling C object libqemuutil.a.p/util_qemu-error.c.o
-  ninja: build stopped: subcommand failed.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1895471/+subscriptions
+-- PMM
 
