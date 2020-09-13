@@ -2,86 +2,130 @@ Return-Path: <SRS0=H3r+=CW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A813DC433E2
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 10:16:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90E44C433E2
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 11:32:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D01620663
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 10:16:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BEA562151B
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 11:32:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cs6ZgcoV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D01620663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fw4+4kW+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEA562151B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHP3x-0006Gw-CZ
-	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 06:16:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58528)
+	id 1kHQFT-0006f1-Qy
+	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 07:32:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39998)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHP3H-0005PL-QW
- for qemu-devel@nongnu.org; Sun, 13 Sep 2020 06:16:07 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:40846)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHP3F-0003SL-Mw
- for qemu-devel@nongnu.org; Sun, 13 Sep 2020 06:16:07 -0400
-Received: by mail-lj1-x241.google.com with SMTP id s205so16077078lja.7
- for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 03:16:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=mNmrvo8yAMqubBqg/kOxlQh0QcxzZEnVg5pgR5+988w=;
- b=Cs6ZgcoVOiqakSBQ6lC8qp0tltVGZ+TurNhtWOSYizfnWlO9CZvTQAFLC80N75Ct3L
- 1nzD/tV5tH34A7WGV8pcYQNA7IeI9Dqsu13YAyUbTY9pa7j0F7ZzKCAcTyKAUJG5Rvk+
- qhBIevYGy66HhqwaKWvOzUUFcq+PT/oa+MQHdhFi3V8dz+oL/t2ejO5ti1MKWWYyJRPJ
- NL2MG7SzExNrUdHupiOEWq22317BK7UfEUGVf8Kgxmt1UJo4ckR4FZ/m4h9FKcl4S05W
- nAHdVQp3yve/D55FuO2ZuodGAZ1rq9deQZ6t2t9GF7kAQ0hDHg/g3jfamUZVFjlxujkS
- JnyQ==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHQEb-00064X-Sz
+ for qemu-devel@nongnu.org; Sun, 13 Sep 2020 07:31:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27452
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHQEY-0002qs-73
+ for qemu-devel@nongnu.org; Sun, 13 Sep 2020 07:31:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599996708;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=GIAySS27Eot4EqlPC5aKlcLDvkJo1dEo9RZF9UXhruo=;
+ b=Fw4+4kW+YQkpkroIUJUDk5LBStqzDkLZ+v7Zfo+uWvjGqZTRFPR+11sPhXQ8NKENQ2JlZD
+ mKsuhtqVag77iA6VTXiAVvleO4hGn9I0I0lQY/g1viC0AOL12GbReu7orIfT1pylIvomJV
+ ZcI3yU2v3DinRXnCXIRJYuo04/hNFqU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-403-ikdAoo0tOW2YOmJUeF_s6w-1; Sun, 13 Sep 2020 07:31:44 -0400
+X-MC-Unique: ikdAoo0tOW2YOmJUeF_s6w-1
+Received: by mail-wr1-f71.google.com with SMTP id i10so5450611wrq.5
+ for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 04:31:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=mNmrvo8yAMqubBqg/kOxlQh0QcxzZEnVg5pgR5+988w=;
- b=fN/6wknxdwLm+/IN55ey4qqM0BtOhZsLH/J68XaYghBbi9gv7H2V+MC1iMgSLwAWkW
- IY6M9Mb2zdlvIJ4mbPjvnq8YgRo7L+cjHmTZ0aeUDU46HjcY02HmF+OmE9e966oHGXEb
- B0hMO7wqgXKSPhyt9LrHxWGj4+y00bWUBqac5uDMQtMYsPenjZfaoNgxqseW6XbvdesL
- FNaU/ejYRjDZU6NoE9WACxORvyp8Nw5ScAZjyv5cNAyQS5S8v7kiMwJ63YrmdxgCTHLm
- J01jeFj421UbvqQiJDCYOZoyh6MlHPM+rj7z8xPrMcAhjsTc2CrrrSGSU22YhYfTSe5o
- iqcg==
-X-Gm-Message-State: AOAM5307Gx8bSWunJUTrL1akq3SPYP3fi60AI6/MoPwuew4ow1+XjLhL
- d2KpU1DWpswYvtCdCl8OC25iByuleLdrbv+5khc=
-X-Google-Smtp-Source: ABdhPJwRi8V/3iqsjfoIi6PEx43Is1+FclCQksc8rD4IpbITd48/UBXySBKto5Rzck/Ajc4QDa1BLmAiSgnP/XlYeQA=
-X-Received: by 2002:a2e:9dc7:: with SMTP id x7mr3721864ljj.447.1599992163905; 
- Sun, 13 Sep 2020 03:16:03 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=GIAySS27Eot4EqlPC5aKlcLDvkJo1dEo9RZF9UXhruo=;
+ b=ZBT/gxwpBErUWOZhM4aUAXImbzjA/X+3bvRRH7Q+plK4OI2KS5QcpTYozxixPmNU6w
+ YKPbmXFoEJBUFuymkc4pwm6wijxfVMgn+sNOW9tRjU+IXdAz87K1kaurV2WWC2ASAsXl
+ 6vkLVVFWHXVNNvvS5R+vgkgF1zc+H6aMyMO+w8VJ6SF34gPMZ9FQplwirQrsZpKICdHT
+ Z05BSGHa0q3oS7RJjgduQBMgloG4WdGmqL8mpyfcTZc6XoIm0k7a/bTZJeje+s8el4MR
+ +ABC5IkIdT5n/H8ne+PbASKJmCY9DYmkHNZdtrx4mnfD1j2i9rwrvgq6ek6c2R4VWcbX
+ i0kg==
+X-Gm-Message-State: AOAM531t3uXOAoAyVCM3LBNtNU/jIti+FxD5iudz74Fu56BMyqe+SZ65
+ xukS23xIZqExGf5whO58YjtdjS0S5DZ+AgfDKQIlt/wSXSF9izNvxfxndfQkaNJszz2kaGoICwO
+ KGCg1e4StyX9B9Kc=
+X-Received: by 2002:adf:f44d:: with SMTP id f13mr10707114wrp.224.1599996703602; 
+ Sun, 13 Sep 2020 04:31:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxn625O9ZbhinOdfKpGc03+gkIdIsafgEQCcjV4kGlXYvbf7KsRWsvbC0Yx3d8ShVsjyFRSvQ==
+X-Received: by 2002:adf:f44d:: with SMTP id f13mr10707078wrp.224.1599996703292; 
+ Sun, 13 Sep 2020 04:31:43 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id v9sm17385273wrv.35.2020.09.13.04.31.40
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 13 Sep 2020 04:31:42 -0700 (PDT)
+Subject: Re: [PATCH v4 0/9] user-mode: Prune build dependencies (part 2)
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
+References: <20200910152225.524322-1-philmd@redhat.com>
+ <f8c9c94c-9b27-6c16-bde1-1a0a91287563@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <fb687ccc-919c-6c61-4dbc-9e76625c3743@redhat.com>
+Date: Sun, 13 Sep 2020 13:31:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200913100534.22084-1-pbonzini@redhat.com>
-In-Reply-To: <20200913100534.22084-1-pbonzini@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Sun, 13 Sep 2020 18:15:52 +0800
-Message-ID: <CAE2XoE8sgGfeoxn7+g4vEnYF52Axx3DOA=37hCO05sCkf+cEdw@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/3] Automatically convert configure options to meson
- build options
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000092b2a405af2f347f"
-Received-SPF: pass client-ip=2a00:1450:4864:20::241;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <f8c9c94c-9b27-6c16-bde1-1a0a91287563@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/13 07:31:48
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.695,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,176 +139,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-level <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>,
+ David Hildenbrand <david@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Igor Mammedov <imammedo@redhat.com>, qemu-block@nongnu.org,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000092b2a405af2f347f
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 9/12/20 11:16 AM, Paolo Bonzini wrote:
+> On 10/09/20 17:22, Philippe Mathieu-Daudé wrote:
+>> This is the second part of a series reducing user-mode
+>> dependencies. By stripping out unused code, the build
+>> and testing time is reduced (as is space used by objects).
+>>
+>> Part 2:
+>> - Extract code not related to user-mode from qapi/misc.json
+>>
+>> Since v3:
+>> - Rebased (Meson)
+>> - Addressed Markus comments:
+>>   - Use g_assert_not_reached() in stub
+>>   - Add commit descriptions
+>>   - Extract ACPI / PCI
+>>   - MEMORY not extracted as no feedback from Igor/MST
+>>
+>> Since v2:
+>> - Addressed Igor review comments (move query-uuid to machine)
+>> - Addressed David review comments (fix balloon documentation)
+>>
+>> Since v1:
+>> - Do not extract the 'add_client' command (elmarco)
+>>
+>> CI:
+>> https://gitlab.com/philmd/qemu/-/pipelines/188367944
+>>
+>> Philippe Mathieu-Daudé (9):
+>>   target/i386: Restrict X86CPUFeatureWord to X86 targets
+>>   qapi: Restrict LostTickPolicy enum to machine code
+>>   qapi: Correct balloon documentation
+>>   qapi: Restrict balloon-related commands to machine code
+>>   qapi: Restrict query-vm-generation-id command to machine code
+>>   qapi: Restrict query-uuid command to machine code
+>>   qapi: Restrict device memory commands to machine code
+>>   qapi: Extract ACPI commands to 'acpi.json'
+>>   qapi: Extract PCI commands to 'pci.json'
+>>
+>>  qapi/acpi.json                       | 141 +++++
+>>  qapi/machine-target.json             |  45 ++
+>>  qapi/machine.json                    | 430 ++++++++++++--
+>>  qapi/misc.json                       | 820 ---------------------------
+>>  qapi/pci.json                        | 316 +++++++++++
+>>  qapi/qapi-schema.json                |   2 +
+>>  include/hw/acpi/acpi_dev_interface.h |   2 +-
+>>  include/hw/mem/memory-device.h       |   2 +-
+>>  include/hw/rtc/mc146818rtc.h         |   2 +-
+>>  include/hw/virtio/virtio-pmem.h      |   2 +-
+>>  include/sysemu/balloon.h             |   2 +-
+>>  block/iscsi.c                        |   2 +-
+>>  hw/acpi/core.c                       |   2 +-
+>>  hw/acpi/cpu.c                        |   2 +-
+>>  hw/acpi/memory_hotplug.c             |   3 +-
+>>  hw/acpi/vmgenid.c                    |   2 +-
+>>  hw/core/qdev-properties.c            |   1 +
+>>  hw/i386/kvm/i8254.c                  |   2 +-
+>>  hw/pci/pci-stub.c                    |   2 +-
+>>  hw/pci/pci.c                         |   2 +-
+>>  hw/virtio/virtio-balloon.c           |   2 +-
+>>  hw/virtio/virtio-mem-pci.c           |   1 +
+>>  monitor/hmp-cmds.c                   |   2 +
+>>  monitor/qmp-cmds.c                   |   1 +
+>>  softmmu/balloon.c                    |   2 +-
+>>  stubs/uuid.c                         |   2 +-
+>>  stubs/vmgenid.c                      |   2 +-
+>>  target/i386/cpu.c                    |   2 +-
+>>  target/i386/machine-stub.c           |  23 +
+>>  MAINTAINERS                          |   2 +
+>>  qapi/meson.build                     |   2 +
+>>  target/i386/meson.build              |   1 +
+>>  32 files changed, 944 insertions(+), 880 deletions(-)
+>>  create mode 100644 qapi/acpi.json
+>>  create mode 100644 qapi/pci.json
+>>  create mode 100644 target/i386/machine-stub.c
+>>
+> 
+> I'm not sure about the first.  It's a bit ugly to have a property whose
+> getter aborts.
 
-On Sun, Sep 13, 2020 at 6:07 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+This is (IIUC) the change Markus requested in v3 (see [*]).
 
-> Right now meson_options.txt lists less than a dozen options, but about
-> 40 more could come as configure tests are converted and moved to
-> meson.build.  Each option needs code in configure to parse it and pass
-> the option down to Meson as a -D command-line argument; in addition the
-> default must be duplicated between configure and meson_options.txt.
->
-> This series tries to remove the code duplication by passing unknown
-> --enable and --disable options to a Python program, and using
-> Meson's introspection support to match those to meson_options.txt
->
-> The disadvantages are:
->
-> - because we parse command-line options before meson is available,
-> the introspection output is stored in the source tree.  The output
-> is slightly modified using the "jq" tool in order to ensure that it's
-> stable and that modifications to meson_buildoptions.txt do not cause
-> horrible conflicts.  This is the main reason for the unattractive
-> diffstat (the number of JSON lines added is higher than the number
-> of configure lines removed, though of course the latter are code
-> that must be maintained manually and the former is not).
->
-> - we now need Python to generate the full help, so if Python is
-> missing we can only print a partial message and direct the user
-> to specify the interpreter with --python.  It would be possible to fix
-> this by rewriting the script in Perl (at least on Fedora, JSON::PP is
-> always installed if Perl is, because it's a dependency for CPAN; I'd
-> have to check Ubuntu and the BSDs), or if we want to write it as a
-> Bourne shell script, to further massage the introspection output into
-> for example TAB-separated values.
->
-I am confusing about this? we were converting configure to meson, and
-python is a
-force dependencies, why we need rewrite the script in Perl? If we wanna
-build qemu, the first thing
-we need to install is python+meson, so there is no need convert to Perl or
-bash script.
-And perl/bash will incur msys2/mingw user, the ideal way is we only depends
-on python+meson to building qemu
+Commit description: "add a stub to satisfy the linker."
 
->
-> Opinions are welcome on whether this is worthwhile and how to solve
-> the above doubts.
->
+This stub should be never used on user-mode => abort.
+
+[*] https://www.mail-archive.com/qemu-block@nongnu.org/msg67560.html
+
+> 
+> For patches 2-9 though:
+> 
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Thanks!
+
+> 
 > Paolo
->
-> Paolo Bonzini (3):
->   configure: quote command line arguments in config.status
->   configure: early test for Python
->   configure: automatically parse command line for meson -D options
->
->  Makefile                                |   6 ++
->  configure                               | 107 ++++++++-----------
->  docs/devel/build-system.rst             |  35 +------
->  meson-buildoptions.json                 | 130 ++++++++++++++++++++++++
->  scripts/configure-parse-buildoptions.py |  94 +++++++++++++++++
->  5 files changed, 280 insertions(+), 92 deletions(-)
->  create mode 100644 meson-buildoptions.json
->  create mode 100644 scripts/configure-parse-buildoptions.py
->
-> --
-> 2.26.2
->
->
->
+> 
 
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---00000000000092b2a405af2f347f
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Sun, Sep 13, 2020 at 6:07 PM Paolo=
- Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com">pbonzini@redhat.com</a>=
-&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px =
-0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Righ=
-t now meson_options.txt lists less than a dozen options, but about<br>
-40 more could come as configure tests are converted and moved to<br>
-meson.build.=C2=A0 Each option needs code in configure to parse it and pass=
-<br>
-the option down to Meson as a -D command-line argument; in addition the<br>
-default must be duplicated between configure and meson_options.txt.<br>
-<br>
-This series tries to remove the code duplication by passing unknown<br>
---enable and --disable options to a Python program, and using<br>
-Meson&#39;s introspection support to match those to meson_options.txt<br>
-<br>
-The disadvantages are:<br>
-<br>
-- because we parse command-line options before meson is available,<br>
-the introspection output is stored in the source tree.=C2=A0 The output<br>
-is slightly modified using the &quot;jq&quot; tool in order to ensure that =
-it&#39;s<br>
-stable and that modifications to meson_buildoptions.txt do not cause<br>
-horrible conflicts.=C2=A0 This is the main reason for the unattractive<br>
-diffstat (the number of JSON lines added is higher than the number<br>
-of configure lines removed, though of course the latter are code<br>
-that must be maintained manually and the former is not).<br>
-<br>
-- we now need Python to generate the full help, so if Python is<br>
-missing we can only print a partial message and direct the user<br>
-to specify the interpreter with --python.=C2=A0 It would be possible to fix=
-<br>
-this by rewriting the script in Perl (at least on Fedora, JSON::PP is<br>
-always installed if Perl is, because it&#39;s a dependency for CPAN; I&#39;=
-d<br>
-have to check Ubuntu and the BSDs), or if we want to write it as a<br>
-Bourne shell script, to further massage the introspection output into<br>
-for example TAB-separated values.<br></blockquote><div>I am confusing about=
- this? we were converting configure to meson, and python is a=C2=A0</div><d=
-iv>force dependencies, why we need rewrite the script in Perl? If we wanna =
-build qemu, the first thing</div><div>we need to install is python+meson, s=
-o there is no need convert to Perl or bash script.</div><div>And perl/bash =
-will incur msys2/mingw user, the ideal way is we only depends on python+mes=
-on to building qemu</div><blockquote class=3D"gmail_quote" style=3D"margin:=
-0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-Opinions are welcome on whether this is worthwhile and how to solve<br>
-the above doubts.<br>
-<br>
-Paolo<br>
-<br>
-Paolo Bonzini (3):<br>
-=C2=A0 configure: quote command line arguments in config.status<br>
-=C2=A0 configure: early test for Python<br>
-=C2=A0 configure: automatically parse command line for meson -D options<br>
-<br>
-=C2=A0Makefile=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A06 ++<br>
-=C2=A0configure=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 107 ++++++++---------=
---<br>
-=C2=A0docs/devel/build-system.rst=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0|=C2=A0 35 +------<br>
-=C2=A0meson-buildoptions.json=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0| 130 ++++++++++++++++++++++++<br>
-=C2=A0scripts/configure-parse-buildoptions.py |=C2=A0 94 +++++++++++++++++<=
-br>
-=C2=A05 files changed, 280 insertions(+), 92 deletions(-)<br>
-=C2=A0create mode 100644 meson-buildoptions.json<br>
-=C2=A0create mode 100644 scripts/configure-parse-buildoptions.py<br>
-<br>
--- <br>
-2.26.2<br>
-<br>
-<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
-=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
-=A0 sincerely,<br>Yonggang Luo<br></div></div>
-
---00000000000092b2a405af2f347f--
 
