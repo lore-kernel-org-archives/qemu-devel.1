@@ -2,93 +2,91 @@ Return-Path: <SRS0=H3r+=CW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EC7DC43461
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 22:26:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2C3AC433E2
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 23:47:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B90ED21D80
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 22:26:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 46A7521D1A
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 23:47:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="EnTzJAjA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B90ED21D80
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fwVgi/RE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46A7521D1A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHaRn-00005x-Md
-	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 18:26:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59024)
+	id 1kHbiI-0007W0-Fj
+	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 19:47:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41022)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=518fa018e=dmitry.fomichev@wdc.com>)
- id 1kHaHY-0000v2-6G; Sun, 13 Sep 2020 18:15:36 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:42057)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=518fa018e=dmitry.fomichev@wdc.com>)
- id 1kHaHW-0001IS-3G; Sun, 13 Sep 2020 18:15:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1600035333; x=1631571333;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=Rza44LwKBuiPgf9tC8NgwfcOAh+uwvRuidSXjufbULc=;
- b=EnTzJAjAJ54UZ3nYrTZwn+8iOilxsx4x9r4ZN+xRJ3x4hxKoHftcl9Kr
- EXRDiU6l8glmmsZNFdZgLcwLN562wAlMZdWRX5KgFgvS8OTJ++/nGtLSF
- DzGB5U39Pm4NKjnIR+dXr6HQkI5Huupy1V0VJ/eZYlH5vlzyYTeqyx6wX
- /F8Q+iN8yzBC8BA9udkFHm1887Ro7zOyUxvnIiBczwWcfh31zOzVA+vZa
- QNMQxQz0UeOhmHUA/x0ruZBNxK/Hxn4x1OybiTnsngHhuNywRWycwgB9e
- YibHQOSV9bIUjDizCp0fsSV5cVQqfXks/3+mKsly4aCJH/dnAwqksFxkS w==;
-IronPort-SDR: oflwiGlOew7gAHgC4QG40m7/62zXgSMhQqr7QJ+p+2wh1wdKMNmYTNOIs0Wuv3Fp7Ej463yx2o
- ixdVYrMG715YtJZ3uyWcNkJzt5exz8aX8BYhbYd3PtPf4XFUKidCdPLPxPXi/K7hPDmUti+xo1
- nW4gGxiebtK3lLSjys3/ZwarvZ2MSFelv1pK5vOpXraB8eX7hvje+g5KYBrcuar8ljzTd6GCdV
- +N/h/zPSjptpo9L2bl7KtKWK9sb3kD929jHJxuZB+yUoQp1eDYf9/OFV7X4bR2ftR72exi4Ak7
- /zw=
-X-IronPort-AV: E=Sophos;i="5.76,423,1592841600"; d="scan'208";a="147179073"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 14 Sep 2020 06:15:12 +0800
-IronPort-SDR: 25UW4kDuugjmZO+kMvTtTDaRAzy3nrh3YVPoJ3n/W/I7K3cQ8HPxUDigAMr2lsgzTcryXabj2x
- dX8/3KIw6qYA==
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 13 Sep 2020 15:02:24 -0700
-IronPort-SDR: rcfnjkkhK0oknNw0S0nhCRftuakxMQvLiybj8KMHK8aT3tga1/0TG97/okB2aKOc9ySBJtvdG1
- 5IX2z23C1fdg==
-WDCIronportException: Internal
-Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
- by uls-op-cesaip02.wdc.com with ESMTP; 13 Sep 2020 15:15:11 -0700
-From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-To: Keith Busch <kbusch@kernel.org>, Klaus Jensen <k.jensen@samsung.com>,
- Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Fam Zheng <fam@euphon.net>
-Subject: [PATCH v3 13/15] hw/block/nvme: Add injection of Offline/Read-Only
- zones
-Date: Mon, 14 Sep 2020 07:14:34 +0900
-Message-Id: <20200913221436.22844-14-dmitry.fomichev@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200913221436.22844-1-dmitry.fomichev@wdc.com>
-References: <20200913221436.22844-1-dmitry.fomichev@wdc.com>
+ (Exim 4.90_1) (envelope-from <ameynarkhede03@gmail.com>)
+ id 1kHbgM-0006AB-Ry
+ for qemu-devel@nongnu.org; Sun, 13 Sep 2020 19:45:18 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:33153)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ameynarkhede03@gmail.com>)
+ id 1kHbgK-00027c-Pz
+ for qemu-devel@nongnu.org; Sun, 13 Sep 2020 19:45:18 -0400
+Received: by mail-pf1-x441.google.com with SMTP id c196so11169253pfc.0
+ for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 16:45:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=6C86PRe3PD1jHOlF067N6BH04+k7qnO7PTI/UUZDrl8=;
+ b=fwVgi/RECgT/8vq1m9jYLNewQZTIXDYl+umVwrTcSAFPe5srlcSv+NU5C4oG1Cnvjy
+ RjWHYYzVydhmGR7EHfBLwTMpYiLrTRhKsdpwGtiYO3LWfOepKc7e59cktkPdM10OXtfu
+ TGwmDK9O88xaS7W9D7GqjiMbYKgPNvOBwvbeYRESxZsNLUtX17Zp6fGD/udiMRsV3Lmi
+ WXFw4zjhUo0fqV7cgJJwU/lAjBaWlHdRxh9M1/fNkAiVn3338qbivDgQE2gFHvcXd4PV
+ mtyG1S5OR6aNdUixDklGqy4d8RRwSXssL0uSpf0Ps6oZW3YXMdFtKJqHU4u9iVDVvOuU
+ PJ7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=6C86PRe3PD1jHOlF067N6BH04+k7qnO7PTI/UUZDrl8=;
+ b=AblSiVmVyxRhQJr6Wr2pQkfHJsTrNfW6vaNgsWSgl1pl7/FZnNZFRR+cCbz1IKeoyX
+ 0/DBo+WLxKl7FgLqy7wilp8WZIZBtV/5+od0veGDiEWTBR2lXhGMOAB7j5sV9Ue2ohlx
+ Fv5VBCz5yn25nXalZs9O7GLhinZGdr2j12VD0DjoCwCJh/2TXh/qkfQcwn2eY9YExjLX
+ I5aDss6jOIFnzSeruxIwOER2A4ffjKDH1MUjjm+nNffcXusENd9GMp3fqeKWr4P3R0TK
+ IsZWCc8k/3YrKSfSR8gE76m+aTim5S5A/XBXEoqcx0u7s1O41Lsyb7TRyxjXTPvU6cpP
+ m1Yw==
+X-Gm-Message-State: AOAM530RgsJlpYoyWtRCfwVjXvhYpSbzd+qbp9LNqm/DHbzBAqfSKbHQ
+ xnimdUrNYPDRLFYGrq6L5y0zLdaGSLGfOHnt
+X-Google-Smtp-Source: ABdhPJwK7aQ4/OhIh8mHcBQHdQoIFXqPgluaTDLStUow9zeez1C4eZbfJHSGiX7Xt1kYRBk2LjaRYQ==
+X-Received: by 2002:a63:4451:: with SMTP id t17mr8654811pgk.92.1600040714887; 
+ Sun, 13 Sep 2020 16:45:14 -0700 (PDT)
+Received: from localhost.localdomain ([49.32.9.241])
+ by smtp.googlemail.com with ESMTPSA id l1sm6768830pgo.11.2020.09.13.16.45.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 13 Sep 2020 16:45:14 -0700 (PDT)
+From: Amey Narkhede <ameynarkhede03@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hw/scsi/vmw_pvscsi.c: Fix wrong usage of gboolean types in
+ PVSCSIState
+Date: Mon, 14 Sep 2020 05:14:51 +0530
+Message-Id: <20200913234451.170022-1-ameynarkhede03@gmail.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.154.42;
- envelope-from=prvs=518fa018e=dmitry.fomichev@wdc.com; helo=esa4.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/13 18:14:44
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
+ envelope-from=ameynarkhede03@gmail.com; helo=mail-pf1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,127 +100,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Niklas Cassel <niklas.cassel@wdc.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
- Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
- Alistair Francis <alistair.francis@wdc.com>,
- Matias Bjorling <matias.bjorling@wdc.com>
+Cc: fam@euphon.net, pbonzini@redhat.com,
+ Amey Narkhede <ameynarkhede03@gmail.com>, dmitry.fleytman@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ZNS specification defines two zone conditions for the zones that no
-longer can function properly, possibly because of flash wear or other
-internal fault. It is useful to be able to "inject" a small number of
-such zones for testing purposes.
+rings_info_valid, msg_ring_info_valid and use_msg fields of struct
+PVSCSIState are using gboolean TRUE/FALSE values with the type uint8_t.
+Change their type to bool along with the usage of initialization macro
+VMSTATE_BOOL during initialization of vmstate_pvscsi and
+pvscsi_properties.
 
-This commit defines two optional device properties, "offline_zones"
-and "rdonly_zones". Users can assign non-zero values to these variables
-to specify the number of zones to be initialized as Offline or
-Read-Only. The actual number of injected zones may be smaller than the
-requested amount - Read-Only and Offline counts are expected to be much
-smaller than the total number of zones on a drive.
-
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Signed-off-by: Amey Narkhede <ameynarkhede03@gmail.com>
 ---
- hw/block/nvme.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- hw/block/nvme.h |  2 ++
- 2 files changed, 48 insertions(+)
+ hw/scsi/vmw_pvscsi.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index f15f1d65dd..b49ae83dd5 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -3361,8 +3361,11 @@ static int nvme_init_zone_meta(NvmeCtrl *n, NvmeNamespace *ns,
-                                uint64_t capacity)
- {
-     NvmeZone *zone;
-+    Error *err;
-     uint64_t start = 0, zone_size = n->zone_size;
-+    uint32_t rnd;
-     int i;
-+    uint16_t zs;
- 
-     ns->zone_array = g_malloc0(n->zone_array_size);
-     ns->exp_open_zones = g_malloc0(sizeof(NvmeZoneList));
-@@ -3392,6 +3395,37 @@ static int nvme_init_zone_meta(NvmeCtrl *n, NvmeNamespace *ns,
-         start += zone_size;
-     }
- 
-+    /* If required, make some zones Offline or Read Only */
-+
-+    for (i = 0; i < n->params.nr_offline_zones; i++) {
-+        do {
-+            qcrypto_random_bytes(&rnd, sizeof(rnd), &err);
-+            rnd %= n->num_zones;
-+        } while (rnd < n->params.max_open_zones);
-+        zone = &ns->zone_array[rnd];
-+        zs = nvme_get_zone_state(zone);
-+        if (zs != NVME_ZONE_STATE_OFFLINE) {
-+            nvme_set_zone_state(zone, NVME_ZONE_STATE_OFFLINE);
-+        } else {
-+            i--;
-+        }
-+    }
-+
-+    for (i = 0; i < n->params.nr_rdonly_zones; i++) {
-+        do {
-+            qcrypto_random_bytes(&rnd, sizeof(rnd), &err);
-+            rnd %= n->num_zones;
-+        } while (rnd < n->params.max_open_zones);
-+        zone = &ns->zone_array[rnd];
-+        zs = nvme_get_zone_state(zone);
-+        if (zs != NVME_ZONE_STATE_OFFLINE &&
-+            zs != NVME_ZONE_STATE_READ_ONLY) {
-+            nvme_set_zone_state(zone, NVME_ZONE_STATE_READ_ONLY);
-+        } else {
-+            i--;
-+        }
-+    }
-+
-     return 0;
+diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
+index c071e0c7aa..86f00e3d7e 100644
+--- a/hw/scsi/vmw_pvscsi.c
++++ b/hw/scsi/vmw_pvscsi.c
+@@ -123,9 +123,9 @@ typedef struct {
+     /* Collector for current command data */
+     uint32_t curr_cmd_data[PVSCSI_MAX_CMD_DATA_WORDS];
+
+-    uint8_t rings_info_valid;            /* Whether data rings initialized   */
+-    uint8_t msg_ring_info_valid;         /* Whether message ring initialized */
+-    uint8_t use_msg;                     /* Whether to use message ring      */
++    bool rings_info_valid;            /* Whether data rings initialized   */
++    bool msg_ring_info_valid;         /* Whether message ring initialized */
++    bool use_msg;                     /* Whether to use message ring      */
+
+     uint8_t msi_used;                    /* For migration compatibility      */
+     PVSCSIRingInfo rings;                /* Data transfer rings manager      */
+@@ -349,8 +349,8 @@ pvscsi_reset_state(PVSCSIState *s)
+     s->reg_command_status = PVSCSI_COMMAND_PROCESSING_SUCCEEDED;
+     s->reg_interrupt_status = 0;
+     pvscsi_ring_cleanup(&s->rings);
+-    s->rings_info_valid = FALSE;
+-    s->msg_ring_info_valid = FALSE;
++    s->rings_info_valid = false;
++    s->msg_ring_info_valid = false;
+     QTAILQ_INIT(&s->pending_queue);
+     QTAILQ_INIT(&s->completion_queue);
  }
- 
-@@ -3440,6 +3474,16 @@ static void nvme_zoned_init_ctrl(NvmeCtrl *n, Error **errp)
-                     " adjusting", n->params.max_active_zones, nz);
-         n->params.max_active_zones = nz;
-     }
-+    if (n->params.max_open_zones < nz) {
-+        if (n->params.nr_offline_zones > nz - n->params.max_open_zones) {
-+            n->params.nr_offline_zones = nz - n->params.max_open_zones;
-+        }
-+        if (n->params.nr_rdonly_zones >
-+            nz - n->params.max_open_zones - n->params.nr_offline_zones) {
-+            n->params.nr_rdonly_zones =
-+                nz - n->params.max_open_zones - n->params.nr_offline_zones;
-+        }
-+    }
-     if (n->params.zd_extension_size) {
-         if (n->params.zd_extension_size & 0x3f) {
-             error_setg(errp,
-@@ -3872,6 +3916,8 @@ static Property nvme_props[] = {
-                        params.zd_extension_size, 0),
-     DEFINE_PROP_UINT32("max_active", NvmeCtrl, params.max_active_zones, 0),
-     DEFINE_PROP_UINT32("max_open", NvmeCtrl, params.max_open_zones, 0),
-+    DEFINE_PROP_UINT32("offline_zones", NvmeCtrl, params.nr_offline_zones, 0),
-+    DEFINE_PROP_UINT32("rdonly_zones", NvmeCtrl, params.nr_rdonly_zones, 0),
-     DEFINE_PROP_BOOL("cross_zone_read", NvmeCtrl, params.cross_zone_read, true),
-     DEFINE_PROP_UINT8("fill_pattern", NvmeCtrl, params.fill_pattern, 0),
-     DEFINE_PROP_END_OF_LIST(),
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index e53388ba66..9a5f4787b7 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -25,6 +25,8 @@ typedef struct NvmeParams {
-     uint32_t    max_active_zones;
-     uint32_t    max_open_zones;
-     uint32_t    zd_extension_size;
-+    uint32_t    nr_offline_zones;
-+    uint32_t    nr_rdonly_zones;
- } NvmeParams;
- 
- typedef struct NvmeAsyncEvent {
--- 
-2.21.0
+@@ -792,7 +792,7 @@ pvscsi_on_cmd_setup_rings(PVSCSIState *s)
+     pvscsi_dbg_dump_tx_rings_config(rc);
+     pvscsi_ring_init_data(&s->rings, rc);
 
+-    s->rings_info_valid = TRUE;
++    s->rings_info_valid = true;
+     return PVSCSI_COMMAND_PROCESSING_SUCCEEDED;
+ }
+
+@@ -874,7 +874,7 @@ pvscsi_on_cmd_setup_msg_ring(PVSCSIState *s)
+         if (pvscsi_ring_init_msg(&s->rings, rc) < 0) {
+             return PVSCSI_COMMAND_PROCESSING_FAILED;
+         }
+-        s->msg_ring_info_valid = TRUE;
++        s->msg_ring_info_valid = true;
+     }
+     return sizeof(PVSCSICmdDescSetupMsgRing) / sizeof(uint32_t);
+ }
+@@ -1232,9 +1232,9 @@ static const VMStateDescription vmstate_pvscsi = {
+         VMSTATE_UINT32(curr_cmd_data_cntr, PVSCSIState),
+         VMSTATE_UINT32_ARRAY(curr_cmd_data, PVSCSIState,
+                              ARRAY_SIZE(((PVSCSIState *)NULL)->curr_cmd_data)),
+-        VMSTATE_UINT8(rings_info_valid, PVSCSIState),
+-        VMSTATE_UINT8(msg_ring_info_valid, PVSCSIState),
+-        VMSTATE_UINT8(use_msg, PVSCSIState),
++        VMSTATE_BOOL(rings_info_valid, PVSCSIState),
++        VMSTATE_BOOL(msg_ring_info_valid, PVSCSIState),
++        VMSTATE_BOOL(use_msg, PVSCSIState),
+
+         VMSTATE_UINT64(rings.rs_pa, PVSCSIState),
+         VMSTATE_UINT32(rings.txr_len_mask, PVSCSIState),
+@@ -1255,7 +1255,7 @@ static const VMStateDescription vmstate_pvscsi = {
+ };
+
+ static Property pvscsi_properties[] = {
+-    DEFINE_PROP_UINT8("use_msg", PVSCSIState, use_msg, 1),
++    DEFINE_PROP_BOOL("use_msg", PVSCSIState, use_msg, true),
+     DEFINE_PROP_BIT("x-old-pci-configuration", PVSCSIState, compat_flags,
+                     PVSCSI_COMPAT_OLD_PCI_CONFIGURATION_BIT, false),
+     DEFINE_PROP_BIT("x-disable-pcie", PVSCSIState, compat_flags,
+--
+2.28.0
+
+This is my first qemu patch. Let know if there are any mistakes
 
