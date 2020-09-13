@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3DB3C433E2
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 02:38:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB73BC43461
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 02:38:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63AC520770
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 02:38:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63AC520770
+	by mail.kernel.org (Postfix) with ESMTPS id 87D0C20770
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 02:38:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87D0C20770
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHHue-0000hc-IU
-	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 22:38:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47932)
+	id 1kHHuf-0000jK-Ml
+	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 22:38:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47870)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kHHsq-0004ya-37
- for qemu-devel@nongnu.org; Sat, 12 Sep 2020 22:36:52 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:43806 helo=huawei.com)
+ id 1kHHsm-0004w3-El
+ for qemu-devel@nongnu.org; Sat, 12 Sep 2020 22:36:48 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4687 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kHHsm-0003W3-Ui
- for qemu-devel@nongnu.org; Sat, 12 Sep 2020 22:36:51 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 5BF4D1059D727A614219;
- Sun, 13 Sep 2020 10:36:43 +0800 (CST)
+ id 1kHHsk-0003VV-2o
+ for qemu-devel@nongnu.org; Sat, 12 Sep 2020 22:36:48 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 48310EAA34D88BAAF7AE;
+ Sun, 13 Sep 2020 10:36:38 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS408-HUB.china.huawei.com
  (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Sun, 13 Sep 2020
- 10:36:35 +0800
+ 10:36:32 +0800
 From: Chuan Zheng <zhengchuan@huawei.com>
 To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>,
  <berrange@redhat.com>
-Subject: [PATCH v3 6/6] migration/tls: add trace points for multifd-tls
-Date: Sun, 13 Sep 2020 10:47:36 +0800
-Message-ID: <1599965256-72150-7-git-send-email-zhengchuan@huawei.com>
+Subject: [PATCH v3 1/6] migration/tls: save hostname into MigrationState
+Date: Sun, 13 Sep 2020 10:47:31 +0800
+Message-ID: <1599965256-72150-2-git-send-email-zhengchuan@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1599965256-72150-1-git-send-email-zhengchuan@huawei.com>
 References: <1599965256-72150-1-git-send-email-zhengchuan@huawei.com>
@@ -51,9 +51,9 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.175.101.6]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35; envelope-from=zhengchuan@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/12 22:36:44
+Received-SPF: pass client-ip=45.249.212.190;
+ envelope-from=zhengchuan@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/12 22:36:39
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -80,65 +80,67 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-add trace points for multifd-tls for debug.
+hostname is need in multifd-tls, save hostname into MigrationState.
 
 Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
 Signed-off-by: Yan Jin <jinyan12@huawei.com>
 ---
- migration/multifd.c    | 10 +++++++++-
- migration/trace-events |  4 ++++
- 2 files changed, 13 insertions(+), 1 deletion(-)
+ migration/channel.c   | 6 ++++++
+ migration/migration.c | 1 +
+ migration/migration.h | 5 +++++
+ 3 files changed, 12 insertions(+)
 
-diff --git a/migration/multifd.c b/migration/multifd.c
-index 8aea4e0..0760502 100644
---- a/migration/multifd.c
-+++ b/migration/multifd.c
-@@ -732,7 +732,11 @@ static void multifd_tls_outgoing_handshake(QIOTask *task,
-     QIOChannel *ioc = QIO_CHANNEL(qio_task_get_source(task));
-     Error *err = NULL;
+diff --git a/migration/channel.c b/migration/channel.c
+index 20e4c8e..0e4104a 100644
+--- a/migration/channel.c
++++ b/migration/channel.c
+@@ -66,6 +66,11 @@ void migration_channel_connect(MigrationState *s,
+     trace_migration_set_outgoing_channel(
+         ioc, object_get_typename(OBJECT(ioc)), hostname, error);
  
--    qio_task_propagate_error(task, &err);
-+    if (qio_task_propagate_error(task, &err)) {
-+        trace_multifd_tls_outgoing_handshake_error(ioc, error_get_pretty(err));
-+    } else {
-+        trace_multifd_tls_outgoing_handshake_complete(ioc);
++    /* Save hostname into MigrationState for handshake */
++    if (hostname) {
++        s->hostname = g_strdup(hostname);
 +    }
-     multifd_channel_connect(p, ioc, err);
- }
- 
-@@ -749,6 +753,7 @@ static void multifd_tls_channel_connect(MultiFDSendParams *p,
-         return;
-     }
- 
-+    trace_multifd_tls_outgoing_handshake_start(ioc, tioc, hostname);
-     qio_channel_set_name(QIO_CHANNEL(tioc), "multifd-tls-outgoing");
-     qio_channel_tls_handshake(tioc,
-                               multifd_tls_outgoing_handshake,
-@@ -764,6 +769,9 @@ static bool multifd_channel_connect(MultiFDSendParams *p,
- {
-     MigrationState *s = p->s;
- 
-+    trace_multifd_set_outgoing_channel(
-+        ioc, object_get_typename(OBJECT(ioc)), s->hostname, error);
 +
      if (!error) {
          if (s->parameters.tls_creds &&
              *s->parameters.tls_creds &&
-diff --git a/migration/trace-events b/migration/trace-events
-index 7ba2fa6..faf52a8 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -129,6 +129,10 @@ multifd_send_sync_main_wait(uint8_t id) "channel %d"
- multifd_send_terminate_threads(bool error) "error %d"
- multifd_send_thread_end(uint8_t id, uint64_t packets, uint64_t pages) "channel %d packets %" PRIu64 " pages %"  PRIu64
- multifd_send_thread_start(uint8_t id) "%d"
-+multifd_tls_outgoing_handshake_start(void *ioc, void *tioc, const char *hostname) "ioc=%p tioc=%p hostname=%s"
-+multifd_tls_outgoing_handshake_error(void *ioc, const char *err) "ioc=%p err=%s"
-+multifd_tls_outgoing_handshake_complete(void *ioc, void) "ioc=%p"
-+multifd_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname, void *err)  "ioc=%p ioctype=%s hostname=%s err=%p"
+@@ -90,5 +95,6 @@ void migration_channel_connect(MigrationState *s,
+         }
+     }
+     migrate_fd_connect(s, error);
++    g_free(s->hostname);
+     error_free(error);
+ }
+diff --git a/migration/migration.c b/migration/migration.c
+index 58a5452..e20b778 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1883,6 +1883,7 @@ void migrate_init(MigrationState *s)
+     s->migration_thread_running = false;
+     error_free(s->error);
+     s->error = NULL;
++    s->hostname = NULL;
  
- # migration.c
- await_return_path_close_on_source_close(void) ""
+     migrate_set_state(&s->state, MIGRATION_STATUS_NONE, MIGRATION_STATUS_SETUP);
+ 
+diff --git a/migration/migration.h b/migration/migration.h
+index bdc7450..bc96322 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -259,6 +259,11 @@ struct MigrationState
+      * (which is in 4M chunk).
+      */
+     uint8_t clear_bitmap_shift;
++
++    /*
++     * This save hostname when out-going migration starts
++     */
++    char *hostname;
+ };
+ 
+ void migrate_set_state(int *state, int old_state, int new_state);
 -- 
 1.8.3.1
 
