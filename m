@@ -2,56 +2,59 @@ Return-Path: <SRS0=H3r+=CW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 656E2C2D0E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63B8FC43461
 	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 02:37:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2C0120770
+	by mail.kernel.org (Postfix) with ESMTPS id E76DA2087C
 	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 02:37:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2C0120770
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E76DA2087C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHHtX-0006Vy-Ll
-	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 22:37:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47878)
+	id 1kHHtX-0006Y8-VX
+	for qemu-devel@archiver.kernel.org; Sat, 12 Sep 2020 22:37:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47930)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kHHsm-0004wB-Od
- for qemu-devel@nongnu.org; Sat, 12 Sep 2020 22:36:48 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4688 helo=huawei.com)
+ id 1kHHso-0004wp-TI
+ for qemu-devel@nongnu.org; Sat, 12 Sep 2020 22:36:50 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:43812 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kHHsk-0003VW-2k
- for qemu-devel@nongnu.org; Sat, 12 Sep 2020 22:36:48 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 7533667A06A439A332DC;
- Sun, 13 Sep 2020 10:36:38 +0800 (CST)
+ id 1kHHsl-0003W5-8h
+ for qemu-devel@nongnu.org; Sat, 12 Sep 2020 22:36:50 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 56B86DB37B92CDC846AC;
+ Sun, 13 Sep 2020 10:36:43 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS408-HUB.china.huawei.com
  (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Sun, 13 Sep 2020
- 10:36:31 +0800
+ 10:36:34 +0800
 From: Chuan Zheng <zhengchuan@huawei.com>
 To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>,
  <berrange@redhat.com>
-Subject: [PATCH v3 0/6] *** Add Multifd support for TLS migration ***
-Date: Sun, 13 Sep 2020 10:47:30 +0800
-Message-ID: <1599965256-72150-1-git-send-email-zhengchuan@huawei.com>
+Subject: [PATCH v3 5/6] migration/tls: add support for multifd tls-handshake
+Date: Sun, 13 Sep 2020 10:47:35 +0800
+Message-ID: <1599965256-72150-6-git-send-email-zhengchuan@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1599965256-72150-1-git-send-email-zhengchuan@huawei.com>
+References: <1599965256-72150-1-git-send-email-zhengchuan@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 X-Originating-IP: [10.175.101.6]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190;
- envelope-from=zhengchuan@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/12 22:36:39
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=zhengchuan@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/12 22:36:44
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -78,60 +81,118 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v2 -> v3:
-    rebase patches on master
+Similar like migration main thread, we need to do handshake
+for each multifd thread.
 
-v1 -> v2:
-    fix memoryleak of MigrationState hostname
-    add tls_hostname into MultiFDSendParams for handshake use
-    fix function alignment
-    squash Patch005 and Patch006
-    add ioc into trace-events
+Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+Signed-off-by: Yan Jin <jinyan12@huawei.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ migration/multifd.c | 77 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 75 insertions(+), 2 deletions(-)
 
-TLS migration could easily reach bottleneck of cpu because of encryption
-and decryption in migration thread.
-In our test, the tls migration could only reach 300MB/s under bandwidth
-of 500MB/s.
-
-Inspired by multifd, we add multifd support for tls migration to make fully
-use of given net bandwidth at the cost of multi-cpus and could reduce
-at most of 100% migration time with 4U16G test vm.
-
-Evaluate migration time of migration vm.
-The VM specifications for migration are as follows:
-- VM use 4-K page;
-- the number of VCPU is 4;
-- the total memory is 16Gigabit;
-- use 'mempress' tool to pressurize VM(mempress 4096 100);
-- migration flag is 73755 (8219 + 65536 (TLS)) vs 204827 (8219 + 65536 (TLS) + 131072(Multifd))
-
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-|                      |         TLS           |      MultiFD + TLS (2 channel)    |
---------------------------------------------------------t---------------------------
-| mempress 1024 120    |       25.035s         |           15.067s                 |
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-| mempress 1024 200    |       48.798s         |           25.334s                 |
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-Chuan Zheng (6):
-  migration/tls: save hostname into MigrationState
-  migration/tls: extract migration_tls_client_create for common-use
-  migration/tls: add MigrationState and tls_hostname into
-    MultiFDSendParams
-  migration/tls: extract cleanup function for common-use
-  migration/tls: add support for multifd tls-handshake
-  migration/tls: add trace points for multifd-tls
-
- migration/channel.c    |   6 +++
- migration/migration.c  |   1 +
- migration/migration.h  |   5 ++
- migration/multifd.c    | 124 +++++++++++++++++++++++++++++++++++++++++++------
- migration/multifd.h    |   4 ++
- migration/tls.c        |  26 +++++++----
- migration/tls.h        |   6 +++
- migration/trace-events |   4 ++
- 8 files changed, 154 insertions(+), 22 deletions(-)
-
+diff --git a/migration/multifd.c b/migration/multifd.c
+index fe08911..8aea4e0 100644
+--- a/migration/multifd.c
++++ b/migration/multifd.c
+@@ -20,6 +20,7 @@
+ #include "ram.h"
+ #include "migration.h"
+ #include "socket.h"
++#include "tls.h"
+ #include "qemu-file.h"
+ #include "trace.h"
+ #include "multifd.h"
+@@ -720,6 +721,77 @@ out:
+     return NULL;
+ }
+ 
++static bool multifd_channel_connect(MultiFDSendParams *p,
++                                    QIOChannel *ioc,
++                                    Error *error);
++
++static void multifd_tls_outgoing_handshake(QIOTask *task,
++                                           gpointer opaque)
++{
++    MultiFDSendParams *p = opaque;
++    QIOChannel *ioc = QIO_CHANNEL(qio_task_get_source(task));
++    Error *err = NULL;
++
++    qio_task_propagate_error(task, &err);
++    multifd_channel_connect(p, ioc, err);
++}
++
++static void multifd_tls_channel_connect(MultiFDSendParams *p,
++                                    QIOChannel *ioc,
++                                    Error **errp)
++{
++    MigrationState *s = p->s;
++    const char *hostname = p->tls_hostname;
++    QIOChannelTLS *tioc;
++
++    tioc = migration_tls_client_create(s, ioc, hostname, errp);
++    if (!tioc) {
++        return;
++    }
++
++    qio_channel_set_name(QIO_CHANNEL(tioc), "multifd-tls-outgoing");
++    qio_channel_tls_handshake(tioc,
++                              multifd_tls_outgoing_handshake,
++                              p,
++                              NULL,
++                              NULL);
++
++}
++
++static bool multifd_channel_connect(MultiFDSendParams *p,
++                                    QIOChannel *ioc,
++                                    Error *error)
++{
++    MigrationState *s = p->s;
++
++    if (!error) {
++        if (s->parameters.tls_creds &&
++            *s->parameters.tls_creds &&
++            !object_dynamic_cast(OBJECT(ioc),
++                                 TYPE_QIO_CHANNEL_TLS)) {
++            multifd_tls_channel_connect(p, ioc, &error);
++            if (!error) {
++                /*
++                 * tls_channel_connect will call back to this
++                 * function after the TLS handshake,
++                 * so we mustn't call multifd_send_thread until then
++                 */
++                return false;
++            } else {
++                return true;
++            }
++        } else {
++            /* update for tls qio channel */
++            p->c = ioc;
++            qemu_thread_create(&p->thread, p->name, multifd_send_thread, p,
++                                   QEMU_THREAD_JOINABLE);
++       }
++       return false;
++    }
++
++    return true;
++}
++
+ static void multifd_new_send_channel_cleanup(MultiFDSendParams *p,
+                                              QIOChannel *ioc, Error *err)
+ {
+@@ -750,8 +822,9 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
+         p->c = QIO_CHANNEL(sioc);
+         qio_channel_set_delay(p->c, false);
+         p->running = true;
+-        qemu_thread_create(&p->thread, p->name, multifd_send_thread, p,
+-                           QEMU_THREAD_JOINABLE);
++        if (multifd_channel_connect(p, sioc, local_err)) {
++            goto cleanup;
++        }
+         return;
+     }
+ 
 -- 
 1.8.3.1
 
