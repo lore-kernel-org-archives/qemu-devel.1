@@ -2,120 +2,131 @@ Return-Path: <SRS0=H3r+=CW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9073C43461
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 11:39:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5106BC433E2
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 11:44:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D708217BA
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 11:39:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A7637217BA
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 11:44:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NyvQnlqV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D708217BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xh0P/doY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7637217BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHQML-0000L1-SQ
-	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 07:39:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40656)
+	id 1kHQQf-0003hW-Kc
+	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 07:44:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40904)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kHQKo-0007qz-RL; Sun, 13 Sep 2020 07:38:20 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55534)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kHQKn-0003LU-8u; Sun, 13 Sep 2020 07:38:18 -0400
-Received: by mail-wm1-x343.google.com with SMTP id d4so2730513wmd.5;
- Sun, 13 Sep 2020 04:38:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:from:to:cc:references:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=8bL7Tyb3MV/UEGkXFiK/mDEGsL868LauQleEyGp/R4g=;
- b=NyvQnlqVU6RB4l1RGrhqE+Cn4SraiXqEoxlJ9J5NJxiMgjycD39o5UgvTrhkuP8Ch6
- zVbYOOHrZYs22M5FV4SDgGmbGcXfknmOrbvFDZBxvqHS950lm9tPE+0u04karTj1uHIX
- ktCkgipF8+Fbsk4yjWiSivsT7ndQ5qjIZsV8RtZpX0czsYLS0FMepiv7V7P8q+kUvj/B
- TVcc8B5CK3nEPH6T3PVfiOWNUUJTDlRifT/t+/WdWCGytL/eHKsISK7s2Lwx7xGjgped
- sUz0HqcfohZ8xXsjukNv4VAqJhxrbX0SYuQm6eM7KiofWe0R0fSCAwCfaIcgxqorsomE
- mVsg==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHQMd-0000zo-Bn
+ for qemu-devel@nongnu.org; Sun, 13 Sep 2020 07:40:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57352
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHQMb-0003Sg-GY
+ for qemu-devel@nongnu.org; Sun, 13 Sep 2020 07:40:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599997207;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=XFpVjO3AiIDze94+9+s5OyYW44SA+zoE/6Tc7U2v+lQ=;
+ b=Xh0P/doYB77Nu7s1vjVJbp2FcM4rXrYLR/vOO8m467we7Rp6tweaQMye89dbubUsVeFqNR
+ vE917GiwAGsZUHjz/38UGYW1ftifkwTEq9o+itGLGykhq/VZOIHXjNvP2nuGp+HqBH2mQW
+ bPwEM6V8x097TTg3+m4gd19ds4DPOuc=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-558-VQ8Zq3XUNDSI7xrlIyGSIQ-1; Sun, 13 Sep 2020 07:40:06 -0400
+X-MC-Unique: VQ8Zq3XUNDSI7xrlIyGSIQ-1
+Received: by mail-wr1-f69.google.com with SMTP id r16so5454453wrm.18
+ for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 04:40:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:from:to:cc:references:autocrypt
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=8bL7Tyb3MV/UEGkXFiK/mDEGsL868LauQleEyGp/R4g=;
- b=ucBubYQdEuA8+g3DizoikHMXK9lnJVf3fvT7zZZs7utfyjwtA4w20h1EiIrhN2XC1X
- +AYx0reG+IBhbTrpvvt7nd5UZkYbK+/FRFoU+HCwYQmoS/VsR+qHSKSGVeHMRJdLl3r0
- mnrsUzTd6BVonFzxl6+IOGs2YYlUjZnYFIcAIEiyzlvBiOFQsdZDwaiz8jtWSljL/AVP
- HD++2p9wCCDq3qLDi4TWevoyp7AXqItP7bgQshJSayFzrf/E/1PrxfNVN01CsT1WcQ6c
- xxUT9EitoHjt62Q3F88NnLTGA3ZS3vMo5XrK0BHFsKBoM+grqe4ajXlQs8vxYuoroDAr
- /lOg==
-X-Gm-Message-State: AOAM531QCtKnrvu9+YTwtN2dJHbpCKzJ29JJXXKmmoi92SWDq2g1NnT8
- GFDwNkksztTU/21mHt5PnFE=
-X-Google-Smtp-Source: ABdhPJyV81ET+xl/q1I11BzF9sSNqafwE5CwOrHF4bqJkyTfSULEIOiKgSs1R+c+wLaaVXMyX7HZ+w==
-X-Received: by 2002:a7b:c938:: with SMTP id h24mr10751468wml.142.1599997094481; 
- Sun, 13 Sep 2020 04:38:14 -0700 (PDT)
+ bh=XFpVjO3AiIDze94+9+s5OyYW44SA+zoE/6Tc7U2v+lQ=;
+ b=t4MCiyqCHtIGDLNYtQkt5lkRsD/v+AHxKu6UkPyuLau4mam/rNwZxhFO13IZXMMqvn
+ FW+6IM2k2srZZrpQ75OF1gzZLJ3rv1BB9abM5EgkAOMJm2uZY/gTVcFt+/6OOh6+fYhb
+ M1RD0x3ui02zpk5MjzzZWzlQmTQZ/lBY7f8SbTE6aVWXHIq0xAcei0KmpTmNYGRfIoa2
+ cMClsLskqUDReq9PxcnIFmNOzBBoWFKBGhe/V9lg0Vbh392VDHguRISppLG9xndbhEYc
+ yR61nQ8bw57KzAuan83O5Ro18FH11VrEb9JHPD4a8konAYUMfcLWBcuS0ux5ajk80Rbo
+ xoSQ==
+X-Gm-Message-State: AOAM531/DCLHmnlLALbV7q2wY+mLSRuszr0jf7SCYKJUilGxcVNUIZtB
+ t+tasBS6oJ7QtqFfmYp+OUYP1opBTbNJzDrj8VAfNvdqeNThmR3RmeuXSagjXrroN7b2CwvQMk6
+ r27EcUndsNH0/gB0=
+X-Received: by 2002:adf:de8b:: with SMTP id w11mr10707034wrl.401.1599997204765; 
+ Sun, 13 Sep 2020 04:40:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxz1MsC/Hbj92MoCQ2s7sVH+9Uqay1x506J31bjSs8mX0me8cyGITSrAZxD74WHq1ZKX/KSJQ==
+X-Received: by 2002:adf:de8b:: with SMTP id w11mr10707013wrl.401.1599997204582; 
+ Sun, 13 Sep 2020 04:40:04 -0700 (PDT)
 Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id b8sm14374571wmh.48.2020.09.13.04.38.13
+ by smtp.gmail.com with ESMTPSA id s124sm14493641wme.29.2020.09.13.04.40.03
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 13 Sep 2020 04:38:13 -0700 (PDT)
-Subject: Re: [PATCH] hw/block/nand: Decommission the NAND museum
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-References: <20200814132118.12450-1-f4bug@amsat.org>
- <75f7421f-3ea4-ff6c-2c92-0ea9b5b8fdc1@amsat.org>
-Autocrypt: addr=f4bug@amsat.org; keydata=
- mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
- u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
- HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
- YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
- ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
- dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
- ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
- Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
- HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
- Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
- klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
- jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
- 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
- loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
- sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
- JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
- 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
- K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
- n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
- CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <d455e7b3-7346-2058-b13f-5455b138577b@amsat.org>
-Date: Sun, 13 Sep 2020 13:38:12 +0200
+ Sun, 13 Sep 2020 04:40:04 -0700 (PDT)
+Subject: Re: [PATCH v2 2/2] hw/timer/hpet: Fix DPRINTF format string
+To: Dov Murik <dovmurik@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+References: <20200910135852.516809-1-philmd@redhat.com>
+ <20200910135852.516809-3-philmd@redhat.com>
+ <9db297fa-02c0-aadb-e0c7-555d3578b7b3@linux.vnet.ibm.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <3dbac311-dc90-0eda-10c2-13ab28407a6a@redhat.com>
+Date: Sun, 13 Sep 2020 13:40:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <75f7421f-3ea4-ff6c-2c92-0ea9b5b8fdc1@amsat.org>
+In-Reply-To: <9db297fa-02c0-aadb-e0c7-555d3578b7b3@linux.vnet.ibm.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.248,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Language: en-US
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/13 07:31:48
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.695,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -128,93 +139,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
+ Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/14/20 3:23 PM, Philippe Mathieu-Daudé wrote:
-> I forgot to Cc qemu-arm@, doing it now since most of the users
-> of this are ARM machines.
-
-The machine using this device are:
-
-- axis-dev88
-- tosa (via tc6393xb_init)
-- spitz based (akita, borzoi, terrier)
-
-$ git grep nand_init
-hw/arm/spitz.c:223:    s->nand = nand_init(nand ?
-blk_by_legacy_dinfo(nand) : NULL,
-hw/block/nand.c:641:DeviceState *nand_init(BlockBackend *blk, int
-manf_id, int chip_id)
-hw/cris/axis_dev88.c:278:    nand_state.nand = nand_init(nand ?
-blk_by_legacy_dinfo(nand) : NULL,
-hw/display/tc6393xb.c:569:    s->flash = nand_init(nand ?
-blk_by_legacy_dinfo(nand) : NULL,
-
+On 9/12/20 7:40 PM, Dov Murik wrote:
+> Hi Phil,
 > 
-> On 8/14/20 3:21 PM, Philippe Mathieu-Daudé wrote:
->> This is the QEMU equivalent of this Linux commit (but 7 years later):
->> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=f7025a43a9da2
+> On 10/09/2020 16:58, Philippe Mathieu-Daudé wrote:
+>> Fix building with HPET_DEBUG enabled:
 >>
->>     The MTD subsystem has its own small museum of ancient NANDs
->>     in a form of the CONFIG_MTD_NAND_MUSEUM_IDS configuration option.
->>     The museum contains stone age NANDs with 256 bytes pages, as well
->>     as iron age NANDs with 512 bytes per page and up to 8MiB page size.
+>>    hw/timer/hpet.c:512:73: error: format specifies type 'unsigned int'
+>> but the argument has type 'uint64_t' (aka 'unsigned long')
+>> [-Werror,-Wformat]
+>>        DPRINTF("qemu: Enter hpet_ram_writel at %" PRIx64 " = %#x\n",
+>> addr, value);
+>>                                                             
+>> ~~~           ^~~~~
+>>                                                              %#lx
+>>    hw/timer/hpet.c:655:21: error: format specifies type 'unsigned int'
+>> but the argument has type 'uint64_t' (aka 'unsigned long')
+>> [-Werror,-Wformat]
+>>                        value, s->hpet_counter);
+>>                        ^~~~~
 >>
->>     It is with great sorrow that I inform you that the museum is being
->>     decommissioned. The MTD subsystem is out of budget for Kconfig
->>     options and already has too many of them, and there is a general
->>     kernel trend to simplify the configuration menu.
->>
->>     We remove the stone age exhibits along with closing the museum,
->>     but some of the iron age ones are transferred to the regular NAND
->>     depot. Namely, only those which have unique device IDs are
->>     transferred, and the ones which have conflicting device IDs are
->>     removed.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>> Signed-off-by: Dov Murik <dovmurik@linux.vnet.ibm.com>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 >> ---
->>  hw/block/nand.c | 13 ++++++-------
->>  1 file changed, 6 insertions(+), 7 deletions(-)
+>>   hw/timer/hpet.c | 9 ++++++---
+>>   1 file changed, 6 insertions(+), 3 deletions(-)
 >>
->> diff --git a/hw/block/nand.c b/hw/block/nand.c
->> index 654e0cb5d1..7d7ccc9aa4 100644
->> --- a/hw/block/nand.c
->> +++ b/hw/block/nand.c
->> @@ -137,7 +137,7 @@ static void mem_and(uint8_t *dest, const uint8_t *src, size_t n)
->>  # define ADDR_SHIFT		16
->>  # include "nand.c"
->>  
->> -/* Information based on Linux drivers/mtd/nand/nand_ids.c */
->> +/* Information based on Linux drivers/mtd/nand/raw/nand_ids.c */
->>  static const struct {
->>      int size;
->>      int width;
->> @@ -153,15 +153,14 @@ static const struct {
->>      [0xe8] = { 1,	8,	8, 4, 0 },
->>      [0xec] = { 1,	8,	8, 4, 0 },
->>      [0xea] = { 2,	8,	8, 4, 0 },
->> -    [0xd5] = { 4,	8,	9, 4, 0 },
->>      [0xe3] = { 4,	8,	9, 4, 0 },
->>      [0xe5] = { 4,	8,	9, 4, 0 },
->> -    [0xd6] = { 8,	8,	9, 4, 0 },
->>  
->> -    [0x39] = { 8,	8,	9, 4, 0 },
->> -    [0xe6] = { 8,	8,	9, 4, 0 },
->> -    [0x49] = { 8,	16,	9, 4, NAND_BUSWIDTH_16 },
->> -    [0x59] = { 8,	16,	9, 4, NAND_BUSWIDTH_16 },
->> +    [0x6b] = { 4,        8,        9, 4, 0 },
->> +    [0xe3] = { 4,        8,        9, 4, 0 },
->> +    [0xe5] = { 4,        8,        9, 4, 0 },
->> +    [0xd6] = { 8,        8,        9, 4, 0 },
->> +    [0xe6] = { 8,        8,        9, 4, 0 },
->>  
->>      [0x33] = { 16,	8,	9, 5, 0 },
->>      [0x73] = { 16,	8,	9, 5, 0 },
+>> diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
+>> index b683f64f1d3..20bd0388740 100644
+>> --- a/hw/timer/hpet.c
+>> +++ b/hw/timer/hpet.c
+>> @@ -495,7 +495,8 @@ static void hpet_ram_write(void *opaque, hwaddr addr,
+>>       HPETState *s = opaque;
+>>       uint64_t old_val, new_val, val, index;
+>>
+>> -    DPRINTF("qemu: Enter hpet_ram_writel at %" PRIx64 " = %#x\n",
+>> addr, value);
+>> +    DPRINTF("qemu: Enter hpet_ram_writel at %#" HWADDR_PRIx " =
+>> %#"PRIx64"\n",
+>> +            addr, value);
+> 
+> You still use "#" in the format string; but qemu's CODING_STYLE.rst says:
+> 
+> //////////////
+> 
+> '#' printf flag
+> ---------------
+> 
+> Do not use printf flag '#', like '%#x'.
+> 
+> Rationale: there are two ways to add a '0x' prefix to printed number:
+> '0x%...'
+> and '%#...'. For consistency the only one way should be used. Arguments for
+> '0x%' are:
+> 
+> * it is more popular
+> * '%#' omits the 0x for the value 0 which makes output inconsistent
+
+Yes you are right, I missed that.
+
+Do you mind adding that check to ./checkpatch?
+
+> 
+> //////////////
+> 
+> 
+> 
+> According to that, I think the better solution would be:
+> 
+> DPRINTF("qemu: Enter hpet_ram_writel at 0x%" HWADDR_PRIx
+>         " = 0x%" PRIx64 "\n", addr, value);
+> 
+> 
+> 
+> 
+>>       index = addr;
+>>       old_val = hpet_ram_read(opaque, addr, 4);
+>>       new_val = value;
+>> @@ -637,7 +638,8 @@ static void hpet_ram_write(void *opaque, hwaddr addr,
+>>               }
+>>               s->hpet_counter =
+>>                   (s->hpet_counter & 0xffffffff00000000ULL) | value;
+>> -            DPRINTF("qemu: HPET counter written. ctr = %#x -> %"
+>> PRIx64 "\n",
+>> +            DPRINTF("qemu: HPET counter written. ctr = %#"
+>> +                    PRIx64 " -> %#" PRIx64 "\n",
+> 
+> ditto.
+> 
+>>                       value, s->hpet_counter);
+>>               break;
+>>           case HPET_COUNTER + 4:
+>> @@ -646,7 +648,8 @@ static void hpet_ram_write(void *opaque, hwaddr addr,
+>>               }
+>>               s->hpet_counter =
+>>                   (s->hpet_counter & 0xffffffffULL) |
+>> (((uint64_t)value) << 32);
+>> -            DPRINTF("qemu: HPET counter + 4 written. ctr = %#x -> %"
+>> PRIx64 "\n",
+>> +            DPRINTF("qemu: HPET counter + 4 written. ctr = %#"
+>> +                    PRIx64 " -> %#" PRIx64 "\n",
+> 
+> ditto.
+> 
+>>                       value, s->hpet_counter);
+>>               break;
+>>           default:
 >>
 > 
+> -Dov
+> 
+
 
