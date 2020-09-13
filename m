@@ -2,82 +2,85 @@ Return-Path: <SRS0=H3r+=CW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69076C43461
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 15:33:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E19C433E2
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 15:36:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA1C42078D
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 15:33:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5FEAC2078D
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 15:36:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N7xYhhMt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA1C42078D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OYHEDE+s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FEAC2078D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHTzx-0002fi-SL
-	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 11:33:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49592)
+	id 1kHU39-00042g-99
+	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 11:36:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49998)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHTys-0001kb-LD
- for qemu-devel@nongnu.org; Sun, 13 Sep 2020 11:31:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34665)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHU27-0003QR-0q
+ for qemu-devel@nongnu.org; Sun, 13 Sep 2020 11:35:15 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53205
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHTyq-000670-MO
- for qemu-devel@nongnu.org; Sun, 13 Sep 2020 11:31:54 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHU25-0006T1-5I
+ for qemu-devel@nongnu.org; Sun, 13 Sep 2020 11:35:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600011111;
+ s=mimecast20190719; t=1600011310;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=VZQPT/4v+63TRRddlsE3lwAOypPyg10G/q0ewL1l2Fw=;
- b=N7xYhhMtHqP/bvoo3E/daK1FA0eysbprnVHKcj/4ZgeWVhSic5Dxgf21alC5fTUHadtXQu
- GnWEFe/n53CO0lnNDMID/wTROJq0f1yjq1Op0lb5448+9vaTwWlQ7+irRemurK49pSNF4p
- mj8NlyJI5r+ypRYFIuMgZw9O3ef6SIo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-571-zN0qpTBvNYG41kd6sOqAaQ-1; Sun, 13 Sep 2020 11:31:50 -0400
-X-MC-Unique: zN0qpTBvNYG41kd6sOqAaQ-1
-Received: by mail-wr1-f71.google.com with SMTP id g6so5701475wrv.3
- for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 08:31:49 -0700 (PDT)
+ bh=yM7jVwC1ENpyKho6fnOSaM5sgV6RYyNF6jPuyGz5RrI=;
+ b=OYHEDE+sl51skK6EXQFWYp6ITrdP8gOBev5o2JbbHBuP66CPIFaU9g6/dujTT/UjdDwF1u
+ YCxJ2EEUwESWZuaJjbvHJ4T5KA2KRk0vyMMJmwV1ITDeb+nX3is3AqGBvtPJcqdmbdyyS/
+ L73hjb5N4d7VbdpWGMyopCb9b9r1hXI=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-480-sgpkNsaIMJCjLib1pX2idw-1; Sun, 13 Sep 2020 11:35:07 -0400
+X-MC-Unique: sgpkNsaIMJCjLib1pX2idw-1
+Received: by mail-wr1-f69.google.com with SMTP id r15so5665813wrt.8
+ for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 08:35:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=VZQPT/4v+63TRRddlsE3lwAOypPyg10G/q0ewL1l2Fw=;
- b=FJuYYxWPqXeAQZiRZeMv+nHTvJlTlOxDilgS0tDd0OZ+OHK64xtq5rbusAx5d995dl
- jiPpGQ2VscTKoJGxLZubVGetH4VcF6vSDtkdY+mbIPgSlI2fSpPVv+YBLmFZskbZilSx
- +oyLP81tavdu5Z4gSuGomS6NCJ3MLCYPhjh9uUk3fpgnew66+/e2P7YFnocZX6I9+ujP
- i3L+aqlokK1C2hzx04Z+RzMCvwQcPGE4yU3ihw+Bb2CujoxbYKw01ZfVVw+0v84hZOmf
- S4noM/2oZTSItZ+8pyFNhUBLr3IfJ11OVMG1zNoyavmmaS/I8DeRxvDKKDmVzWqeeLda
- 0Z4A==
-X-Gm-Message-State: AOAM530L2jmyAOi7cQZf/kUBRSHg4uSpL2UL3C9QocqWRxmC/VsQa9vi
- MyMdP9pU0xbVsmM0J0G/u9sYyprUzyo+8d/xMKEwQIc5FwnqXia8yxi0iWAC4fdZW7UZ47fkzGP
- y/V+ygJaYtAyYEbA=
-X-Received: by 2002:a1c:6487:: with SMTP id y129mr11635863wmb.90.1600011108794; 
- Sun, 13 Sep 2020 08:31:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwxA8uD43kvJMezBNTWyU6bDgAbzQu7B7RCJXFeempPbrS6VDRCnRFHPYTtBJo6PXqhgptWJg==
-X-Received: by 2002:a1c:6487:: with SMTP id y129mr11635831wmb.90.1600011108491; 
- Sun, 13 Sep 2020 08:31:48 -0700 (PDT)
+ bh=yM7jVwC1ENpyKho6fnOSaM5sgV6RYyNF6jPuyGz5RrI=;
+ b=fHmyh3ibgBwI3sOrE/4fAKCQbph/k/LZIyHpl1OBgqCZ1wlKTcdo3q5fzVLX3+1/Rt
+ lhihNkbcfWycbd9x4oB4T3GFJC2YDeVs2hPY7A74xlqR0EixWCB85SdYzBXsUJu6T9nS
+ GKtNgd9OF51mlchx1MioRE54aLtz85nyRXi3P5U16uT+8+bK9V6M+JSxcNRBOqv6Fm0h
+ 1/L4EYf+QBCgIRC6/R7AtmvFuiFeRmPJDFYdQCinlEVQyV2+ckVrIpU8Bh9zYRmoX6mL
+ J2fPmoJjr6HbLp6833B8LHFgq7Y2qZQ2Be2NzJGrnOo5rHd8rwGPQsQlSGPkTXTa+zAb
+ wa4Q==
+X-Gm-Message-State: AOAM530k4VlH3AfU9ANl7iU5pIWMXUAU42OWBZOmwspeWqFaJtLk8ST7
+ mOVQabuoWTyyf3NiLQZRSbR8Q+BnRZXOo/zXVe3UmsTLLr6GFuUSfVERbABKhmq5F2jKM+PLMo0
+ pEECiM2+7+375xl0=
+X-Received: by 2002:a05:600c:230c:: with SMTP id
+ 12mr10918685wmo.23.1600011306196; 
+ Sun, 13 Sep 2020 08:35:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzIx0gvjawSPX4L+ewyWgQF1Zof8Z47odsKxgzm3F5Zc0HKJbnE4B91ctgw0gFBqAyG9CQx8Q==
+X-Received: by 2002:a05:600c:230c:: with SMTP id
+ 12mr10918668wmo.23.1600011306036; 
+ Sun, 13 Sep 2020 08:35:06 -0700 (PDT)
 Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id i6sm17395981wra.1.2020.09.13.08.31.46
+ by smtp.gmail.com with ESMTPSA id n14sm14839648wmi.33.2020.09.13.08.35.04
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 13 Sep 2020 08:31:47 -0700 (PDT)
-Subject: Re: [PATCH v8 12/27] gcrypt: test_tls_psk_init should write binary
- file instead text file.
+ Sun, 13 Sep 2020 08:35:05 -0700 (PDT)
+Subject: Re: [PATCH v8 11/27] meson: Use -b to ignore CR vs. CR-LF issues on
+ Windows
 To: Yonggang Luo <luoyonggang@gmail.com>, qemu-devel@nongnu.org
 References: <20200912224431.1428-1-luoyonggang@gmail.com>
- <20200912224431.1428-13-luoyonggang@gmail.com>
+ <20200912224431.1428-12-luoyonggang@gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -102,31 +105,30 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <600fe2fb-3c24-d0ee-419e-0ba973a0e120@redhat.com>
-Date: Sun, 13 Sep 2020 17:31:46 +0200
+Message-ID: <c6ed5abf-2c71-bded-7efc-33baa0b415af@redhat.com>
+Date: Sun, 13 Sep 2020 17:35:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200912224431.1428-13-luoyonggang@gmail.com>
+In-Reply-To: <20200912224431.1428-12-luoyonggang@gmail.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/13 11:31:51
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/13 11:28:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -47
-X-Spam_score: -4.8
-X-Spam_bar: ----
-X-Spam_report: (-4.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.695,
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.695,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -145,63 +147,41 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
  Michael Roth <mdroth@linux.vnet.ibm.com>,
  Markus Armbruster <armbru@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Li-Wen Hsu <lwhsu@freebsd.org>
+ Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Wen Congyang <wencongyang2@huawei.com>,
+ =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/13/20 12:44 AM, Yonggang Luo wrote:
-> On windows, if open file with "w", it's will automatically convert
-> "\n" to "\r\n" when writing to file.
+> On windows, a difference in line endings causes testsuite failures
+> complaining that every single line in files such as
+> 'tests/qapi-schemadoc-good.texi' is wrong.  Fix it by adding -b to diff.
 
-This is one change.
-
-> 
-> Convert unlink to use g_remove.
-
-This is another (unrelated) change.
-
-We expect patches to be atomic (only one change at
-a time). Can you split this patch in 2?
+Isn't '--strip-trailing-cr' more adapted?
 
 > 
 > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 > ---
->  tests/crypto-tls-psk-helpers.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+>  tests/qapi-schema/meson.build | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/tests/crypto-tls-psk-helpers.c b/tests/crypto-tls-psk-helpers.c
-> index a8395477c3..58888d5537 100644
-> --- a/tests/crypto-tls-psk-helpers.c
-> +++ b/tests/crypto-tls-psk-helpers.c
-> @@ -26,13 +26,15 @@
->  #include "crypto-tls-psk-helpers.h"
->  #include "qemu/sockets.h"
+> diff --git a/tests/qapi-schema/meson.build b/tests/qapi-schema/meson.build
+> index c87d141417..f1449298b0 100644
+> --- a/tests/qapi-schema/meson.build
+> +++ b/tests/qapi-schema/meson.build
+> @@ -220,6 +220,6 @@ qapi_doc = custom_target('QAPI doc',
 >  
-> +#include <glib/gstdio.h>
-> +
->  #ifdef QCRYPTO_HAVE_TLS_TEST_SUPPORT
->  
->  void test_tls_psk_init(const char *pskfile)
->  {
->      FILE *fp;
->  
-> -    fp = fopen(pskfile, "w");
-> +    fp = fopen(pskfile, "wb");
->      if (fp == NULL) {
->          g_critical("Failed to create pskfile %s", pskfile);
->          abort();
-> @@ -44,7 +46,7 @@ void test_tls_psk_init(const char *pskfile)
->  
->  void test_tls_psk_cleanup(const char *pskfile)
->  {
-> -    unlink(pskfile);
-> +    g_remove(pskfile);
->  }
->  
->  #endif /* QCRYPTO_HAVE_TLS_TEST_SUPPORT */
+>  # "full_path()" needed here to work around
+>  # https://github.com/mesonbuild/meson/issues/7585
+> -test('QAPI doc', diff, args: ['-u', files('doc-good.texi'), qapi_doc[0].full_path()],
+> +test('QAPI doc', diff, args: ['-b', '-u', files('doc-good.texi'), qapi_doc[0].full_path()],
+>       depends: qapi_doc,
+>       suite: ['qapi-schema', 'qapi-doc'])
 > 
 
 
