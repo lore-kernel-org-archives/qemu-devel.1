@@ -2,88 +2,87 @@ Return-Path: <SRS0=H3r+=CW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53B1CC43461
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 16:06:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41343C43461
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 16:06:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2038221EB
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 16:06:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC7DC21D80
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 16:06:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PY2t4gQe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2038221EB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LgbqTtv4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC7DC21D80
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHUVr-0007PN-Tm
-	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 12:05:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54330)
+	id 1kHUW7-0007q7-0B
+	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 12:06:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53966)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1kHUTc-0002zg-Ay
- for qemu-devel@nongnu.org; Sun, 13 Sep 2020 12:03:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52389
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1kHUTa-0001QL-4l
- for qemu-devel@nongnu.org; Sun, 13 Sep 2020 12:03:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600013017;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=eooT6LB7ovzjpzN2hgMIQmZV2bZrfVq6sunOr1zhhOM=;
- b=PY2t4gQe8DtDY2gEl744gZKALdgrPNazXY0CPBnrjUG+Wje6h3/OgodJLjyb10ctTzZgFv
- WKYLLGxSiZtwGB068fNQrHigqYJam+aS66jj47EpW6kpsyt/GJWHcx2J0N00czQIsozuV7
- /Na6vuNegdFBsodejF4cVzHSOaLsZlA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-516-tBkGD3mOPuelxnq7RQI50A-1; Sun, 13 Sep 2020 12:03:33 -0400
-X-MC-Unique: tBkGD3mOPuelxnq7RQI50A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB458107AD64;
- Sun, 13 Sep 2020 16:03:32 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.35.206.72])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B7FC619C4F;
- Sun, 13 Sep 2020 16:03:27 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v5 6/9] scsi/scsi-bus: scsi_device_find: don't return
- unrealized devices
-Date: Sun, 13 Sep 2020 19:02:56 +0300
-Message-Id: <20200913160259.32145-7-mlevitsk@redhat.com>
-In-Reply-To: <20200913160259.32145-1-mlevitsk@redhat.com>
-References: <20200913160259.32145-1-mlevitsk@redhat.com>
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kHUS6-0000iR-Bm; Sun, 13 Sep 2020 12:02:06 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:37833)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kHUS3-0001El-Hl; Sun, 13 Sep 2020 12:02:06 -0400
+Received: by mail-lj1-x244.google.com with SMTP id n25so16502701ljj.4;
+ Sun, 13 Sep 2020 09:01:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=VBjD5YigITfEftkqmBaZgUPBAxCG0cniJBZFUE7nokw=;
+ b=LgbqTtv4otg2tkonNQFfteKGEkiXf9gSB4o+DUG/8J/Bw/hV4FTDiKyHZoplJN/v6q
+ Fkj3ZCvz/olo+wkJ1/90dpE+cUnTM1Last1ZHWbbfkN3g4pacWeZ9UnJhUExMyKDyr5s
+ +urTF+4OZfRXtkC0+4KgQZXTZ03X4WQhDWm/Tuv8zAl1dZHz17lpRRi0ga0BzxsrAbqM
+ CDv64PTeQUNpezd/L+agghaR/i1YXwI7U2/1hwP3M0mrqPGyYFoMUV31xzM5UWq5ximf
+ WuZUyKOLYGJ8OVxcfkML2wAjgcDm0dtI26/49oq5JRoEsKasoIyCkBOIS4tHmC2Q+Pvj
+ EAHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=VBjD5YigITfEftkqmBaZgUPBAxCG0cniJBZFUE7nokw=;
+ b=Mi89/DYKcCe8+PIOYjrqhqzyDHVIpXM24YbC8QWfKrJ4OnVBwVXL0eHb9CG7G7nDgp
+ iCoZDV/V9XRXs1UrLHU/lav0l0rwOQrYp3Eb/p6VI2xR6aohOZ5B6uCRuhTqe4A3UHow
+ UJtYX2Nq6w6nehTL263VBVnXVSDGYRWD+9lnFgs3okJxME+z2tavwN6X5MZFmwH9zXdo
+ J866u1fCYSLkiC8k5uZ37MgC8pg1iqik8jmKJMUZxLf2ByyQgOxsheGt9Zh1/pYLIuuE
+ 9IqqdoEC6Txy/N+sh4gmk9rf1Yqv2N22fviSSjBl1/vGDF3GuA6U8QQTKTBK50dZufrl
+ jdnA==
+X-Gm-Message-State: AOAM530A+LmV5n53njsFckJoBccMYuDwidH0bloC/oYW3nh31X1DKPSW
+ dqJz+tuAuqluSIzopjnyEVpfDwVosww1LLmFj9A=
+X-Google-Smtp-Source: ABdhPJwYL22gKF9yyaBMrIXL9r8W4uhGTs5giNgP1Y6ODCCTtE0ppSzumOK79+BwBLTFHFhQr6Lx7LI5oUK7RY2pOvE=
+X-Received: by 2002:a2e:86d3:: with SMTP id n19mr4070220ljj.368.1600012916506; 
+ Sun, 13 Sep 2020 09:01:56 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mlevitsk@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/13 07:31:48
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.695,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+References: <20200912224431.1428-1-luoyonggang@gmail.com>
+ <20200912224431.1428-12-luoyonggang@gmail.com>
+ <c6ed5abf-2c71-bded-7efc-33baa0b415af@redhat.com>
+In-Reply-To: <c6ed5abf-2c71-bded-7efc-33baa0b415af@redhat.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Mon, 14 Sep 2020 00:01:45 +0800
+Message-ID: <CAE2XoE-mFPm=chadNahHgCsa3tSjxRXMH3te29ODV=emWdLjYA@mail.gmail.com>
+Subject: Re: [PATCH v8 11/27] meson: Use -b to ignore CR vs. CR-LF issues on
+ Windows
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000008643ff05af3409c0"
+Received-SPF: pass client-ip=2a00:1450:4864:20::244;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x244.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,157 +96,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: luoyonggang@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
+ Qemu-block <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>,
+ Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
+ qemu-level <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Wen Congyang <wencongyang2@huawei.com>,
+ =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The device core first places a device on the bus and then realizes it.
-Make scsi_device_find avoid returing such devices to avoid
-races in drivers that use an iothread (currently virtio-scsi)
+--0000000000008643ff05af3409c0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1812399
+On Sun, Sep 13, 2020 at 11:35 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat=
+.com>
+wrote:
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- hw/scsi/scsi-bus.c | 89 ++++++++++++++++++++++++++++------------------
- 1 file changed, 54 insertions(+), 35 deletions(-)
+> On 9/13/20 12:44 AM, Yonggang Luo wrote:
+> > On windows, a difference in line endings causes testsuite failures
+> > complaining that every single line in files such as
+> > 'tests/qapi-schemadoc-good.texi' is wrong.  Fix it by adding -b to diff=
+.
+>
+> Isn't '--strip-trailing-cr' more adapted?
+>
+> er, I did that before.....
 
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index 92d412b65c..1fbb3ee584 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -51,6 +51,57 @@ static const TypeInfo scsi_bus_info = {
- };
- static int next_scsi_bus;
- 
-+static SCSIDevice *do_scsi_device_find(SCSIBus *bus,
-+                                       int channel, int id, int lun,
-+                                       bool include_unrealized)
-+{
-+    BusChild *kid;
-+    SCSIDevice *retval = NULL;
-+
-+    rcu_read_lock();
-+
-+    QTAILQ_FOREACH_RCU(kid, &bus->qbus.children, sibling) {
-+        DeviceState *qdev = kid->child;
-+        SCSIDevice *dev = SCSI_DEVICE(qdev);
-+
-+        if (dev->channel == channel && dev->id == id) {
-+            if (dev->lun == lun) {
-+                retval = dev;
-+                goto out;
-+            }
-+
-+            /*
-+             * If we don't find exact match (channel/bus/lun),
-+             * we will return the first device which matches channel/bus
-+             */
-+
-+            if (!retval) {
-+                retval = dev;
-+            }
-+        }
-+    }
-+out:
-+    /*
-+     * This function might run on the IO thread and we might race against
-+     * main thread hot-plugging the device.
-+     * We assume that as soon as .realized is set to true we can let
-+     * the user access the device.
-+     */
-+
-+    if (retval && !include_unrealized &&
-+        !atomic_load_acquire(&retval->qdev.realized)) {
-+        retval = NULL;
-+    }
-+
-+    rcu_read_unlock();
-+    return retval;
-+}
-+
-+SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
-+{
-+    return do_scsi_device_find(bus, channel, id, lun, false);
-+}
-+
- static void scsi_device_realize(SCSIDevice *s, Error **errp)
- {
-     SCSIDeviceClass *sc = SCSI_DEVICE_GET_CLASS(s);
-@@ -186,7 +237,7 @@ static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
-             dev->lun = 0;
-         }
-         do {
--            d = scsi_device_find(bus, dev->channel, ++id, dev->lun);
-+            d = do_scsi_device_find(bus, dev->channel, ++id, dev->lun, true);
-         } while (d && d->lun == dev->lun && id < bus->info->max_target);
-         if (d && d->lun == dev->lun) {
-             error_setg(errp, "no free target");
-@@ -196,7 +247,7 @@ static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
-     } else if (dev->lun == -1) {
-         int lun = -1;
-         do {
--            d = scsi_device_find(bus, dev->channel, dev->id, ++lun);
-+            d = do_scsi_device_find(bus, dev->channel, dev->id, ++lun, true);
-         } while (d && d->lun == lun && lun < bus->info->max_lun);
-         if (d && d->lun == lun) {
-             error_setg(errp, "no free lun");
-@@ -204,7 +255,7 @@ static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
-         }
-         dev->lun = lun;
-     } else {
--        d = scsi_device_find(bus, dev->channel, dev->id, dev->lun);
-+        d = do_scsi_device_find(bus, dev->channel, dev->id, dev->lun, true);
-         assert(d);
-         if (d->lun == dev->lun && dev != d) {
-             error_setg(errp, "lun already used by '%s'", d->qdev.id);
-@@ -1573,38 +1624,6 @@ static char *scsibus_get_fw_dev_path(DeviceState *dev)
-                            qdev_fw_name(dev), d->id, d->lun);
- }
- 
--SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
--{
--    BusChild *kid;
--    SCSIDevice *target_dev = NULL;
--
--    rcu_read_lock();
--
--    QTAILQ_FOREACH_RCU(kid, &bus->qbus.children, sibling) {
--        DeviceState *qdev = kid->child;
--        SCSIDevice *dev = SCSI_DEVICE(qdev);
--
--        if (dev->channel == channel && dev->id == id) {
--            if (dev->lun == lun) {
--                rcu_read_unlock();
--                return dev;
--            }
--
--            /*
--             * If we don't find exact match (channel/bus/lun),
--             * we will return the first device which matches channel/bus
--             */
--
--            if (!target_dev) {
--                target_dev = dev;
--            }
--        }
--    }
--
--    rcu_read_unlock();
--    return target_dev;
--}
--
- /* SCSI request list.  For simplicity, pv points to the whole device */
- 
- static int put_scsi_requests(QEMUFile *f, void *pv, size_t size,
--- 
-2.26.2
+> >
+> > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+> > Reviewed-by: Eric Blake <eblake@redhat.com>
+> > Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > ---
+> >  tests/qapi-schema/meson.build | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/tests/qapi-schema/meson.build
+> b/tests/qapi-schema/meson.build
+> > index c87d141417..f1449298b0 100644
+> > --- a/tests/qapi-schema/meson.build
+> > +++ b/tests/qapi-schema/meson.build
+> > @@ -220,6 +220,6 @@ qapi_doc =3D custom_target('QAPI doc',
+> >
+> >  # "full_path()" needed here to work around
+> >  # https://github.com/mesonbuild/meson/issues/7585
+> > -test('QAPI doc', diff, args: ['-u', files('doc-good.texi'),
+> qapi_doc[0].full_path()],
+> > +test('QAPI doc', diff, args: ['-b', '-u', files('doc-good.texi'),
+> qapi_doc[0].full_path()],
+> >       depends: qapi_doc,
+> >       suite: ['qapi-schema', 'qapi-doc'])
+> >
+>
+>
 
+--=20
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
+
+--0000000000008643ff05af3409c0
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Sun, Sep 13, 2020 at 11:35 PM Phil=
+ippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com">philmd@red=
+hat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"=
+margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-lef=
+t:1ex">On 9/13/20 12:44 AM, Yonggang Luo wrote:<br>
+&gt; On windows, a difference in line endings causes testsuite failures<br>
+&gt; complaining that every single line in files such as<br>
+&gt; &#39;tests/qapi-schemadoc-good.texi&#39; is wrong.=C2=A0 Fix it by add=
+ing -b to diff.<br>
+<br>
+Isn&#39;t &#39;--strip-trailing-cr&#39; more adapted?<br>
+<br></blockquote><div>er, I did that before.....=C2=A0</div><blockquote cla=
+ss=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid =
+rgb(204,204,204);padding-left:1ex">
+&gt; <br>
+&gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.co=
+m" target=3D"_blank">luoyonggang@gmail.com</a>&gt;<br>
+&gt; Reviewed-by: Eric Blake &lt;<a href=3D"mailto:eblake@redhat.com" targe=
+t=3D"_blank">eblake@redhat.com</a>&gt;<br>
+&gt; Reviewed-by: Daniel P. Berrang=C3=A9 &lt;<a href=3D"mailto:berrange@re=
+dhat.com" target=3D"_blank">berrange@redhat.com</a>&gt;<br>
+&gt; ---<br>
+&gt;=C2=A0 tests/qapi-schema/meson.build | 2 +-<br>
+&gt;=C2=A0 1 file changed, 1 insertion(+), 1 deletion(-)<br>
+&gt; <br>
+&gt; diff --git a/tests/qapi-schema/meson.build b/tests/qapi-schema/meson.b=
+uild<br>
+&gt; index c87d141417..f1449298b0 100644<br>
+&gt; --- a/tests/qapi-schema/meson.build<br>
+&gt; +++ b/tests/qapi-schema/meson.build<br>
+&gt; @@ -220,6 +220,6 @@ qapi_doc =3D custom_target(&#39;QAPI doc&#39;,<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 # &quot;full_path()&quot; needed here to work around<br>
+&gt;=C2=A0 # <a href=3D"https://github.com/mesonbuild/meson/issues/7585" re=
+l=3D"noreferrer" target=3D"_blank">https://github.com/mesonbuild/meson/issu=
+es/7585</a><br>
+&gt; -test(&#39;QAPI doc&#39;, diff, args: [&#39;-u&#39;, files(&#39;doc-go=
+od.texi&#39;), qapi_doc[0].full_path()],<br>
+&gt; +test(&#39;QAPI doc&#39;, diff, args: [&#39;-b&#39;, &#39;-u&#39;, fil=
+es(&#39;doc-good.texi&#39;), qapi_doc[0].full_path()],<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0depends: qapi_doc,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0suite: [&#39;qapi-schema&#39;, &#39;qapi-doc=
+&#39;])<br>
+&gt; <br>
+<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
+=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
+=A0 sincerely,<br>Yonggang Luo<br></div></div>
+
+--0000000000008643ff05af3409c0--
 
