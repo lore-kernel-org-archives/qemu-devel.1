@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 427D9C433E2
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 15:29:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69076C43461
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 15:33:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C67D206A2
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 15:29:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA1C42078D
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 15:33:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R8BjuKwv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C67D206A2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N7xYhhMt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA1C42078D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51648 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHTwV-00088E-B0
-	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 11:29:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48860)
+	id 1kHTzx-0002fi-SL
+	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 11:33:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49592)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHTvJ-0006t2-Sy
- for qemu-devel@nongnu.org; Sun, 13 Sep 2020 11:28:13 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28545
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHTys-0001kb-LD
+ for qemu-devel@nongnu.org; Sun, 13 Sep 2020 11:31:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34665)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHTvH-0005CG-Fd
- for qemu-devel@nongnu.org; Sun, 13 Sep 2020 11:28:13 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHTyq-000670-MO
+ for qemu-devel@nongnu.org; Sun, 13 Sep 2020 11:31:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600010889;
+ s=mimecast20190719; t=1600011111;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=xrDGkPV+rP0jsmA1MSmlA68wTTp3qTtM0Hluk3XlBRA=;
- b=R8BjuKwv/W37ohFc/8rHcb0ZksjJsYLUwXoGdQvdTjj4m5QSQqFYBKqcPNqT0snFGyIlRx
- e2jygsNU2scmrU+tP+iODG4vFvpXDQuCd5mpFvwotJtrxlm7EPXW/b1//I50QDV/qZf25y
- 0bTramauiu3nB/zQrZyTPDodmnlURa0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-538-6gDyNlhuO8WxMbBF7KlZ1Q-1; Sun, 13 Sep 2020 11:28:08 -0400
-X-MC-Unique: 6gDyNlhuO8WxMbBF7KlZ1Q-1
-Received: by mail-wr1-f72.google.com with SMTP id x15so5636327wrm.7
- for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 08:28:07 -0700 (PDT)
+ bh=VZQPT/4v+63TRRddlsE3lwAOypPyg10G/q0ewL1l2Fw=;
+ b=N7xYhhMtHqP/bvoo3E/daK1FA0eysbprnVHKcj/4ZgeWVhSic5Dxgf21alC5fTUHadtXQu
+ GnWEFe/n53CO0lnNDMID/wTROJq0f1yjq1Op0lb5448+9vaTwWlQ7+irRemurK49pSNF4p
+ mj8NlyJI5r+ypRYFIuMgZw9O3ef6SIo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-571-zN0qpTBvNYG41kd6sOqAaQ-1; Sun, 13 Sep 2020 11:31:50 -0400
+X-MC-Unique: zN0qpTBvNYG41kd6sOqAaQ-1
+Received: by mail-wr1-f71.google.com with SMTP id g6so5701475wrv.3
+ for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 08:31:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=xrDGkPV+rP0jsmA1MSmlA68wTTp3qTtM0Hluk3XlBRA=;
- b=J3JYQPJv8cAanTvHEm1u10abGPVR8UJjd/LRS+5ONVyAqhvsYaw632dai5675xilHJ
- TE4FFNGOkDEZZPFb42VW4G/pW7ITgqFpbvB1l2WTaHL6K+kf6zptft541KB3XnVVMixs
- mc3R+QxG53ab212eTWxkzVMlw+I5eDIhpnpAnUtCFEMidIYciIJMrr6X7r8/dN8S7e2U
- 8vdf0hvImM4V+Vzhxcjc7ZNeFRuySQfKQaJZgYIra6bNhsscd64Vh0r9aqpsbNELM3fI
- eOdgSNMcht/wnxwW7PnFkYwLuyXgupKMnPZVAkE8Q0fo7ryThqX8k0nfwOwRQSErLXSh
- k/kg==
-X-Gm-Message-State: AOAM531VqGxOVxf9ZGFxaq0GJllNbhVGSPj6vMtaNE89xGuvEr4wCEI7
- CI+uu91i2/D1nzSYhgZKqOx1XJcuBtMthHegsLIyNU9I4CV4X7ImxhkJkGIYPfKJzgomd5q3H9O
- Un2pZPMvwLFD2UCU=
-X-Received: by 2002:adf:81c6:: with SMTP id 64mr11125172wra.176.1600010886734; 
- Sun, 13 Sep 2020 08:28:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwh0hyzhlX4bg0E528sq1o1IhgOOWpoDdz+TujwDIVdXRV7G/ApEb+8udnyge/azJujjKPZhA==
-X-Received: by 2002:adf:81c6:: with SMTP id 64mr11125144wra.176.1600010886402; 
- Sun, 13 Sep 2020 08:28:06 -0700 (PDT)
+ bh=VZQPT/4v+63TRRddlsE3lwAOypPyg10G/q0ewL1l2Fw=;
+ b=FJuYYxWPqXeAQZiRZeMv+nHTvJlTlOxDilgS0tDd0OZ+OHK64xtq5rbusAx5d995dl
+ jiPpGQ2VscTKoJGxLZubVGetH4VcF6vSDtkdY+mbIPgSlI2fSpPVv+YBLmFZskbZilSx
+ +oyLP81tavdu5Z4gSuGomS6NCJ3MLCYPhjh9uUk3fpgnew66+/e2P7YFnocZX6I9+ujP
+ i3L+aqlokK1C2hzx04Z+RzMCvwQcPGE4yU3ihw+Bb2CujoxbYKw01ZfVVw+0v84hZOmf
+ S4noM/2oZTSItZ+8pyFNhUBLr3IfJ11OVMG1zNoyavmmaS/I8DeRxvDKKDmVzWqeeLda
+ 0Z4A==
+X-Gm-Message-State: AOAM530L2jmyAOi7cQZf/kUBRSHg4uSpL2UL3C9QocqWRxmC/VsQa9vi
+ MyMdP9pU0xbVsmM0J0G/u9sYyprUzyo+8d/xMKEwQIc5FwnqXia8yxi0iWAC4fdZW7UZ47fkzGP
+ y/V+ygJaYtAyYEbA=
+X-Received: by 2002:a1c:6487:: with SMTP id y129mr11635863wmb.90.1600011108794; 
+ Sun, 13 Sep 2020 08:31:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwxA8uD43kvJMezBNTWyU6bDgAbzQu7B7RCJXFeempPbrS6VDRCnRFHPYTtBJo6PXqhgptWJg==
+X-Received: by 2002:a1c:6487:: with SMTP id y129mr11635831wmb.90.1600011108491; 
+ Sun, 13 Sep 2020 08:31:48 -0700 (PDT)
 Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id a11sm14321158wmm.18.2020.09.13.08.28.03
+ by smtp.gmail.com with ESMTPSA id i6sm17395981wra.1.2020.09.13.08.31.46
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 13 Sep 2020 08:28:05 -0700 (PDT)
-Subject: Re: [PATCH v8 20/27] tests: Fixes test-io-channel-file by mask only
- owner file state mask bits
+ Sun, 13 Sep 2020 08:31:47 -0700 (PDT)
+Subject: Re: [PATCH v8 12/27] gcrypt: test_tls_psk_init should write binary
+ file instead text file.
 To: Yonggang Luo <luoyonggang@gmail.com>, qemu-devel@nongnu.org
 References: <20200912224431.1428-1-luoyonggang@gmail.com>
- <20200912224431.1428-21-luoyonggang@gmail.com>
+ <20200912224431.1428-13-luoyonggang@gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -103,30 +102,31 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <740b3f23-bb05-4db1-c000-731506b46565@redhat.com>
-Date: Sun, 13 Sep 2020 17:28:03 +0200
+Message-ID: <600fe2fb-3c24-d0ee-419e-0ba973a0e120@redhat.com>
+Date: Sun, 13 Sep 2020 17:31:46 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200912224431.1428-21-luoyonggang@gmail.com>
+In-Reply-To: <20200912224431.1428-13-luoyonggang@gmail.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/13 11:28:09
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/13 11:31:51
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.695,
+X-Spam_score_int: -47
+X-Spam_score: -4.8
+X-Spam_bar: ----
+X-Spam_report: (-4.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.695,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1,
+ RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -153,51 +153,55 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/13/20 12:44 AM, Yonggang Luo wrote:
-> This is the error on msys2/mingw
-> Running test test-io-channel-file
-> **
-> ERROR:../tests/test-io-channel-file.c:59:test_io_channel_file_helper: assertion failed (TEST_MASK & ~mask == st.st_mode & 0777): (384 == 438)
-> ERROR test-io-channel-file - Bail out! ERROR:../tests/test-io-channel-file.c:59:test_io_channel_file_helper: assertion failed (TEST_MASK & ~mask == st.st_mode & 0777): (384 == 438)
+> On windows, if open file with "w", it's will automatically convert
+> "\n" to "\r\n" when writing to file.
+
+This is one change.
+
+> 
+> Convert unlink to use g_remove.
+
+This is another (unrelated) change.
+
+We expect patches to be atomic (only one change at
+a time). Can you split this patch in 2?
+
 > 
 > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 > ---
->  tests/test-io-channel-file.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
+>  tests/crypto-tls-psk-helpers.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> diff --git a/tests/test-io-channel-file.c b/tests/test-io-channel-file.c
-> index bac2b07562..1b0e8d7c1b 100644
-> --- a/tests/test-io-channel-file.c
-> +++ b/tests/test-io-channel-file.c
-> @@ -28,6 +28,12 @@
->  #define TEST_FILE "tests/test-io-channel-file.txt"
->  #define TEST_MASK 0600
+> diff --git a/tests/crypto-tls-psk-helpers.c b/tests/crypto-tls-psk-helpers.c
+> index a8395477c3..58888d5537 100644
+> --- a/tests/crypto-tls-psk-helpers.c
+> +++ b/tests/crypto-tls-psk-helpers.c
+> @@ -26,13 +26,15 @@
+>  #include "crypto-tls-psk-helpers.h"
+>  #include "qemu/sockets.h"
 >  
-
-[*]
-
-> +#ifdef _WIN32
-> +#define TEST_MASK_EXPECT 0700
-> +#else
-> +#define TEST_MASK_EXPECT 0777
-> +#endif
+> +#include <glib/gstdio.h>
 > +
->  static void test_io_channel_file_helper(int flags)
->  {
->      QIOChannel *src, *dst;
-> @@ -56,7 +62,9 @@ static void test_io_channel_file_helper(int flags)
->      umask(mask);
->      ret = stat(TEST_FILE, &st);
->      g_assert_cmpint(ret, >, -1);
-> -    g_assert_cmpuint(TEST_MASK & ~mask, ==, st.st_mode & 0777);
-> +    /* On Windows the stat() function in the C library checks only
-> +     the FAT-style READONLY attribute and does not look at the ACL at all. */
-
-This comment would be better located in [*].
-
-> +    g_assert_cmpuint(TEST_MASK & ~mask, ==, st.st_mode & TEST_MASK_EXPECT);
+>  #ifdef QCRYPTO_HAVE_TLS_TEST_SUPPORT
 >  
->      unlink(TEST_FILE);
->      object_unref(OBJECT(src));
+>  void test_tls_psk_init(const char *pskfile)
+>  {
+>      FILE *fp;
+>  
+> -    fp = fopen(pskfile, "w");
+> +    fp = fopen(pskfile, "wb");
+>      if (fp == NULL) {
+>          g_critical("Failed to create pskfile %s", pskfile);
+>          abort();
+> @@ -44,7 +46,7 @@ void test_tls_psk_init(const char *pskfile)
+>  
+>  void test_tls_psk_cleanup(const char *pskfile)
+>  {
+> -    unlink(pskfile);
+> +    g_remove(pskfile);
+>  }
+>  
+>  #endif /* QCRYPTO_HAVE_TLS_TEST_SUPPORT */
 > 
 
 
