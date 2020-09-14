@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3109FC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:07:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6ADBC2BC11
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:07:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88EE22074B
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:07:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 172EC2074B
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:07:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kDaIheu4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88EE22074B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dtpOork2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 172EC2074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHp8s-0003dy-Ia
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 10:07:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45690)
+	id 1kHp8u-0003jf-6O
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 10:07:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45742)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHp84-0001zc-1T
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:06:48 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:36007)
+ id 1kHp86-00020t-9Y
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:06:50 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:47055)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHp82-0007W6-90
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:06:47 -0400
-Received: by mail-wm1-x333.google.com with SMTP id z9so203443wmk.1
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 07:06:45 -0700 (PDT)
+ id 1kHp84-0007Wn-JJ
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:06:50 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id o5so18847866wrn.13
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 07:06:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=4Wx6PXj8KizxtYio9NXwuWyl3mh6LdgyhmTm+qqDWJY=;
- b=kDaIheu4LRUn52/HnkZnU4n3j2Z/Kt6RoC1D2NuqX7k26d+l94WgUuvZ1FzolA4j4Z
- Qvhva/G6gOpALj3XuHAHwa6OMgSCs9H3ddCN6XGQXhtm6bt7l+WcEGKjfyuK9B0IgQ1n
- eXAj9AaTq2lHTfA6vRAC0l/Lbi00ek+y2eSCgaZ/h40H0qmV4v06bC9ggPHeWapJJUID
- j4XgU3oHT2keMRkHjTrbm70g63EKNigOlVndYKKXiQ9aqNiYH6MXnqQaRxO9VOHEuiPU
- PQCQlZCgcYr8pBKQR8CgLFSswdgDTFRkCrg52xh9QtKvPLckxVHqg8ST1ja84uSC8aQ+
- KE6Q==
+ bh=aRJ9Ctg8nu6Xf2XlWQqq0q3Iaknb86w8CHVdR6KxCHE=;
+ b=dtpOork2t3bZhN3xMU+Qhef5vABHCpss+O8g6ALeGbd0AIkJBYL/V/G9RuSD+45y+K
+ Sz6y6fQCjYns6+uHgcdpnrpMdRRGg5H4gdDpHVzoYEuvn34E3ir2nnCtMTKRoNQ+qwP7
+ X+s51QCAln2irHfb0+yNUP/2zLOQrgQULHIaiGeZJUgIgTvTTa6cNIXH5K8YvPKem1b2
+ Q3ORHZ1ee9R6fx61H4n4/TV4sZtNXtg8l2nzJW61SRt7zR5mowx51azDkzg0OXSr0WV3
+ cks+fhjXLSUh8RlfYlYXksLmYvEbEmf8xwlQ16B2+KmLOt/9edM4+fmyH+/v1q5MRgVL
+ CGmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=4Wx6PXj8KizxtYio9NXwuWyl3mh6LdgyhmTm+qqDWJY=;
- b=QTVidSGaRlIMjYUcg+EFW1Gbf32mhKsU+avqd6kS7yHcANbf/N0YaITmDG18H8MmTn
- 376I42YBkg4eQGxZgtX8BCIYmgtvu3fjKQOVR2q0smvZY4PugdziNFjgtJP9LdHDLoZ7
- seuKCcvC7yVh9nlB9TI2eqbLfR709v34w3pkgT/onDMvFwuXeMT+D8VTE5D1EfTlDXER
- Gr3PC9YNnMJ3QaWwMJ0QMsoIqrCaVOoaCkaFL9L+w0A3lHo4jxiLIh8OyEgFUiyjieHI
- yJbaho3vvJ/YbNYgP7XHjZfZzkQuKbW9Le2RYaVEqrKvRU8jwA8Wnsf898X7VQu25+c5
- 8j8w==
-X-Gm-Message-State: AOAM531vtPsYjz5lE7Ja3l9itGxhf2AuDnNIg+PA/EvaWyPgHT8fHzH+
- C0PaSMsh5Zpm5WzX7DTbjqWZSELXjt8aWJ3T
-X-Google-Smtp-Source: ABdhPJyehNcBLPGgCyYpMR4GoGavZQak00JCr9ZyHGo23s1Uor61Lx0iDYVf7mvCCo65MVHhe/i4mQ==
-X-Received: by 2002:a1c:81c9:: with SMTP id c192mr10308402wmd.2.1600092404606; 
- Mon, 14 Sep 2020 07:06:44 -0700 (PDT)
+ bh=aRJ9Ctg8nu6Xf2XlWQqq0q3Iaknb86w8CHVdR6KxCHE=;
+ b=OsqbJpZ+clUIyp9FaDcWBNeZmi04j1JSp+sZkafTS38dgmu6xe3827xHOwWMCOkOLI
+ DqOgBu/qag1gsfM5jMZLuj6P8HfUQGeKwfN6dbKvzaPHPT04bWJD6v8iHekxbJu7heHg
+ rvm05cmBwcm+N+05ZfUfxIPO/VONjU90dtqz5pVrpTHezvLgODtOuaGYGfvWFpuZ97Vv
+ 2WorIl3609cIjg1A6ivkSVoeJLMPDmOH9Y6WWOoffH505R8lXpcubJkxGgQuphKUbgmJ
+ lBt64iZ1id0QrlD8sS4fMEc7bGiMTcBXULQ/uJWfElT0qrJDvhInlmnSiTPbMtQo3ecE
+ laug==
+X-Gm-Message-State: AOAM530L+QRHPipbj/E0weolEEzeT7qmWBN2P3MbjtoWXDY+zg7MoSwV
+ w8008NbkSt2RmH3V4pJgY1Omlp2MbJBmi+XX
+X-Google-Smtp-Source: ABdhPJwBfJV5h4ZcT0Vkly8BmgoKCItdP+ABDoRn35Tfi6+GGSwMjbZN5LjXW6oPCbWcAoGxYDlOJA==
+X-Received: by 2002:adf:ec4d:: with SMTP id w13mr16680493wrn.334.1600092406819; 
+ Mon, 14 Sep 2020 07:06:46 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id x16sm20834041wrq.62.2020.09.14.07.06.43
+ by smtp.gmail.com with ESMTPSA id x16sm20834041wrq.62.2020.09.14.07.06.45
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Sep 2020 07:06:44 -0700 (PDT)
+ Mon, 14 Sep 2020 07:06:46 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 01/36] hw/misc/a9scu: Do not allow invalid CPU count
-Date: Mon, 14 Sep 2020 15:06:06 +0100
-Message-Id: <20200914140641.21369-2-peter.maydell@linaro.org>
+Subject: [PULL 03/36] hw/misc/a9scu: Simplify setting MemoryRegionOps::impl
+ fields
+Date: Mon, 14 Sep 2020 15:06:08 +0100
+Message-Id: <20200914140641.21369-4-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200914140641.21369-1-peter.maydell@linaro.org>
 References: <20200914140641.21369-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::333;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x333.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42b;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,76 +108,67 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Per the datasheet (DDI0407 r2p0):
-
-  "The SCU connects one to four Cortex-A9 processors to
-   the memory system through the AXI interfaces."
-
-Change the instance_init() handler to a device_realize()
-one so we can verify the property is in range, and return
-an error to the caller if not.
+This model implementation is designed for 32-bit accesses.
+We can simplify setting the MemoryRegionOps::impl min/max
+fields to 32-bit (memory::access_with_adjusted_size() will
+take care of the 8/16-bit accesses).
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200901144100.116742-2-f4bug@amsat.org
+Message-id: 20200901144100.116742-4-f4bug@amsat.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/misc/a9scu.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+ hw/misc/a9scu.c | 16 +++++-----------
+ 1 file changed, 5 insertions(+), 11 deletions(-)
 
 diff --git a/hw/misc/a9scu.c b/hw/misc/a9scu.c
-index 324371a1c00..915f127761e 100644
+index 3f3dcc414fe..47f948341f7 100644
 --- a/hw/misc/a9scu.c
 +++ b/hw/misc/a9scu.c
-@@ -12,8 +12,11 @@
- #include "hw/misc/a9scu.h"
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
-+#include "qapi/error.h"
- #include "qemu/module.h"
- 
-+#define A9_SCU_CPU_MAX  4
-+
- static uint64_t a9_scu_read(void *opaque, hwaddr offset,
-                             unsigned size)
+@@ -28,12 +28,6 @@ static uint64_t a9_scu_read(void *opaque, hwaddr offset,
+         return (((1 << s->num_cpu) - 1) << 4) | (s->num_cpu - 1);
+     case 0x08: /* CPU Power Status */
+         return s->status;
+-    case 0x09: /* CPU status.  */
+-        return s->status >> 8;
+-    case 0x0a: /* CPU status.  */
+-        return s->status >> 16;
+-    case 0x0b: /* CPU status.  */
+-        return s->status >> 24;
+     case 0x0c: /* Invalidate All Registers In Secure State */
+         return 0;
+     case 0x40: /* Filtering Start Address Register */
+@@ -52,8 +46,6 @@ static void a9_scu_write(void *opaque, hwaddr offset,
+                          uint64_t value, unsigned size)
  {
-@@ -105,12 +108,17 @@ static void a9_scu_reset(DeviceState *dev)
-     s->control = 0;
- }
+     A9SCUState *s = (A9SCUState *)opaque;
+-    uint32_t mask = MAKE_64BIT_MASK(0, size * 8);
+-    uint32_t shift;
  
--static void a9_scu_init(Object *obj)
-+static void a9_scu_realize(DeviceState *dev, Error **errp)
- {
--    A9SCUState *s = A9_SCU(obj);
--    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    A9SCUState *s = A9_SCU(dev);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
- 
--    memory_region_init_io(&s->iomem, obj, &a9_scu_ops, s,
-+    if (!s->num_cpu || s->num_cpu > A9_SCU_CPU_MAX) {
-+        error_setg(errp, "Illegal CPU count: %u", s->num_cpu);
-+        return;
-+    }
-+
-+    memory_region_init_io(&s->iomem, OBJECT(s), &a9_scu_ops, s,
-                           "a9-scu", 0x100);
-     sysbus_init_mmio(sbd, &s->iomem);
- }
-@@ -138,13 +146,13 @@ static void a9_scu_class_init(ObjectClass *klass, void *data)
-     device_class_set_props(dc, a9_scu_properties);
-     dc->vmsd = &vmstate_a9_scu;
-     dc->reset = a9_scu_reset;
-+    dc->realize = a9_scu_realize;
- }
- 
- static const TypeInfo a9_scu_info = {
-     .name          = TYPE_A9_SCU,
-     .parent        = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(A9SCUState),
--    .instance_init = a9_scu_init,
-     .class_init    = a9_scu_class_init,
- };
- 
+     switch (offset) {
+     case 0x00: /* Control */
+@@ -62,9 +54,7 @@ static void a9_scu_write(void *opaque, hwaddr offset,
+     case 0x4: /* Configuration: RO */
+         break;
+     case 0x08: case 0x09: case 0x0A: case 0x0B: /* Power Control */
+-        shift = (offset - 0x8) * 8;
+-        s->status &= ~(mask << shift);
+-        s->status |= ((value & mask) << shift);
++        s->status = value;
+         break;
+     case 0x0c: /* Invalidate All Registers In Secure State */
+         /* no-op as we do not implement caches */
+@@ -84,6 +74,10 @@ static void a9_scu_write(void *opaque, hwaddr offset,
+ static const MemoryRegionOps a9_scu_ops = {
+     .read = a9_scu_read,
+     .write = a9_scu_write,
++    .impl = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++    },
+     .valid = {
+         .min_access_size = 1,
+         .max_access_size = 4,
 -- 
 2.20.1
 
