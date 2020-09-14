@@ -2,87 +2,94 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBAE4C43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 16:06:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 581E4C43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 16:07:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C72020715
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 16:06:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DD41320715
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 16:07:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AYq/ZnmN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C72020715
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NzEcOMW+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD41320715
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHqzp-0001Df-8T
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 12:06:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50648)
+	id 1kHr0y-0002Vl-NJ
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 12:07:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53108)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kHpJD-0001pl-9P
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:18:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35624)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kHqvY-0005J3-OO
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 12:02:00 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40281
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kHpJB-0000ku-E8
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:18:18 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kHqvU-0001Ad-CI
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 12:01:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600093096;
+ s=mimecast20190719; t=1600099315;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pHOIGQPbtopccAorHZ23av7PCHO0J7zXSXdiXtLkwFo=;
- b=AYq/ZnmN4GAmSVkxBDmLh4blJbRfh/UHsNTwcRBTcuLQn3yNIHmHwZ8EpPtwiWBPF2y1BK
- uJnMOzPW07F6a7DmhL8hvW/+nsFwSteg4APfAFLUc4gQpEZ1EG9p0Vew/rdW+Mq03UHRF8
- gI9RLeQ/A8gYkgCJobSrbqt8xJAwhgk=
+ bh=UnZd1C1Dzx808yTzg3H4cr0hvOF+Jf8RtGEPQ5T5fus=;
+ b=NzEcOMW+mbCNolTMYOclBuXE5iL2WHj3+ePOiW2q/mGL7T7OBZwqF4qElFfP9kZmQD/ttV
+ oQCflZtstTCdDif8iLa80zCrI7Nn3tEDvbEybjKcQaAVQLdYNa/xDKUmnbXP6C6iUGE6Yr
+ ivYtTSajWUuFukxFW3+ovdO+ZBNjdtI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-150-PGcTUXE5PNmy8y5wSE7_fA-1; Mon, 14 Sep 2020 10:18:12 -0400
-X-MC-Unique: PGcTUXE5PNmy8y5wSE7_fA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-580-dXPCaz50MSaxraCzuq92KQ-1; Mon, 14 Sep 2020 12:01:50 -0400
+X-MC-Unique: dXPCaz50MSaxraCzuq92KQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89E611084C86;
- Mon, 14 Sep 2020 14:18:11 +0000 (UTC)
-Received: from localhost (ovpn-114-32.ams2.redhat.com [10.36.114.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 56CDB7B7B5;
- Mon, 14 Sep 2020 14:18:08 +0000 (UTC)
-Date: Mon, 14 Sep 2020 14:46:35 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH] docs/system: clarify deprecation scheduled
-Message-ID: <20200914134635.GO579094@stefanha-x1.localdomain>
-References: <20200811104736.17140-1-stefanha@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1B8B800C60;
+ Mon, 14 Sep 2020 16:01:49 +0000 (UTC)
+Received: from [10.3.113.68] (ovpn-113-68.phx2.redhat.com [10.3.113.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F8435C1BB;
+ Mon, 14 Sep 2020 16:01:49 +0000 (UTC)
+Subject: Re: [PATCH] tests/check-block: Do not run the iotests with old
+ versions of bash
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+References: <20200912121412.10999-1-thuth@redhat.com>
+ <80c1a6a5-df83-8f48-309a-4dc8d3982a43@redhat.com>
+ <ea934211-75d3-456d-1456-3aba3689db68@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <25b36a43-cf0d-c4d8-4289-8b7add39e607@redhat.com>
+Date: Mon, 14 Sep 2020 11:01:48 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200811104736.17140-1-stefanha@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <ea934211-75d3-456d-1456-3aba3689db68@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="7gLe/sNPhR777EPF"
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:55:39
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:33:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -38
 X-Spam_score: -3.9
 X-Spam_bar: ---
 X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,75 +102,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, philmd@redhat.com,
- Daniel Berrange <berrange@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---7gLe/sNPhR777EPF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 9/14/20 10:33 AM, Thomas Huth wrote:
+> On 14/09/2020 17.03, Eric Blake wrote:
+>> On 9/12/20 7:14 AM, Thomas Huth wrote:
+>>> macOS is shipped with a very old version of the bash (3.2), which
+>>> is currently not suitable for running the iotests anymore. Add
+>>> a check to skip the iotests in this case - if someone still wants
+>>> to run the iotests on macOS, they can install a newer version from
+>>> homebrew, for example.
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>    tests/check-block.sh | 5 +++++
+>>>    1 file changed, 5 insertions(+)
+>>>
+>>> diff --git a/tests/check-block.sh b/tests/check-block.sh
+>>> index 8e29c868e5..bfe1630c1e 100755
+>>> --- a/tests/check-block.sh
+>>> +++ b/tests/check-block.sh
+>>> @@ -46,6 +46,11 @@ if ! command -v bash >/dev/null 2>&1 ; then
+>>>        exit 0
+>>>    fi
+>>>    +if bash --version | grep 'GNU bash, version [123]' > /dev/null 2>&1
+>>> ; then
+>>
+>> We're already running bash - why do we need to spawn another bash and a
+>> grep, when we can just check $BASH_VERSION?
+> 
+> tests/check-block.sh uses "#!/bin/sh", so it could be running with a
+> different kind of shell, I think.
 
-On Tue, Aug 11, 2020 at 11:47:36AM +0100, Stefan Hajnoczi wrote:
-> The sentence explaining the deprecation schedule is ambiguous. Make it
-> clear that a feature deprecated in the Nth release is guaranteed to
-> remain available in the N+1th release. Removal can occur in the N+2nd
-> release or later.
->=20
-> As an example of this in action, see commit
-> 25956af3fe5dd0385ad8017bc768a6afe41e2a74 ("block: Finish deprecation of
-> 'qemu-img convert -n -o'"). The feature was deprecated in QEMU 4.2.0. It
-> was present in the 5.0.0 release and removed in the 5.1.0 release.
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  docs/system/deprecated.rst | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+Ah, right; I'm so used to most of our testsuite demanding bash that I 
+forgot to check that this script sticks to the smaller subset of /bin/sh 
+portability.
 
-Ping?
-
->=20
-> diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-> index 851dbdeb8a..fecfb2f1c1 100644
-> --- a/docs/system/deprecated.rst
-> +++ b/docs/system/deprecated.rst
-> @@ -4,9 +4,9 @@ Deprecated features
->  In general features are intended to be supported indefinitely once
->  introduced into QEMU. In the event that a feature needs to be removed,
->  it will be listed in this section. The feature will remain functional
-> -for 2 releases prior to actual removal. Deprecated features may also
-> -generate warnings on the console when QEMU starts up, or if activated
-> -via a monitor command, however, this is not a mandatory requirement.
-> +for 1 more release after deprecation. Deprecated features may also gener=
-ate
-> +warnings on the console when QEMU starts up, or if activated via a monit=
-or
-> +command, however, this is not a mandatory requirement.
-> =20
->  Prior to the 2.10.0 release there was no official policy on how
->  long features would be deprecated prior to their removal, nor
-> --=20
-> 2.26.2
->=20
-
---7gLe/sNPhR777EPF
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9fdDsACgkQnKSrs4Gr
-c8gc3ggAkMegKwFe9fk/PYRAg6OM+TPAxsDkvGk1E+TWpFH5i7+tRZZm5U+WzsE3
-pqnnbWpzIBXwxW9jChxph6RFvV2xwKDv4m9kis8Ve06mC+zvbgpKrtgk+qYpDDdM
-Er4sLI4vZh0E3J3mAB05Ur+LddSgjIyNcRjuWcCT14+Tbv/twsQyrRFg5ZifIO/b
-HhtEtWZ4ZuHk8My+fQzyUYx4Vg6nz01t00GV+OLKizI7U9y7XMOr+ItsWCo+zX9r
-6/D1cVT0KRxJgGb3MLtTiHL5vm4aVCxY0jdVjmf5O9b7xxNujV1OZh0LpqjfXSm1
-gAkXpiQN0KXTAuebbdPUVdhXhx35vw==
-=xOnc
------END PGP SIGNATURE-----
-
---7gLe/sNPhR777EPF--
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
