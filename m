@@ -2,91 +2,88 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F29C43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 15:42:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EF4AC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 15:44:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 755D820E65
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 15:42:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 952AD2074B
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 15:44:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ODfQcLEI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 755D820E65
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fjO5QZK9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 952AD2074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHqcq-0004zV-Eg
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 11:42:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46040)
+	id 1kHqf3-0006Sh-Mt
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 11:44:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47688)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHp8L-0002e4-Ud
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:07:06 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:33630)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHp8K-0007an-3d
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:07:05 -0400
-Received: by mail-wr1-x430.google.com with SMTP id m6so18931469wrn.0
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 07:07:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=ZD6keKSXkMPE+jVkaNX44x7EafwuotxjEIF6brG60A4=;
- b=ODfQcLEIwCGzcPoy/GJuSoaVGoCOepNX7usHCaNqkM1QqJIObdI0cntvuB5M8IqUY6
- tZZpUaeAjeRehCJfwQU6NeFMzcrUHf8LCtGfqhIyQBnHZI76MNH0kJBVS5LWIWxzKujK
- 2YP68k4RYJ9J5lCJkWXqHYeFex6rGgszUYh9qrXIUxetF2mi2o7HuwdfYPMgJ6MOUy1z
- BwTnwSPQcO/g9pK+p6LNSwWeCMizqRalG+0inH+1rIxhKHCZyBBqH8dM6Hb4Qw0Z4pqQ
- oX1kgXOM/runwrwFrMnHlUNMbxSK/YB85QUHpktWZS4dvSxrEtI8g5a9XfmVsSNCRL5h
- MjzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=ZD6keKSXkMPE+jVkaNX44x7EafwuotxjEIF6brG60A4=;
- b=cYEv6ngm2FmHg+mm53I53aqcQU13Qd4Uba/niwObm+qF30sGximhybyCI88nvv3mVK
- h1EIerZrOfZNL7D5d/1BOiLnMGspH+RXY/MU+q78/RwuzdgBAaauDSnHikXFyoOPPmoR
- Put3m5uvK6SLqowU9eF9c6c8+OWeKAtAUS2KO2RoLdgx1PGvLYY32jVifSSATnH9rP19
- tjp2rqqhF7DniAdpzNHUACvb7vwE5YpPGQULqtKiP1e1zvV+EEVoXK6tHNXXLsbR451v
- TQvi8NKUAfs+kHkruIBvgh8IRB33HleUma/FHJ0PjnAQi7Zh68Jcay2V3uOmiw3/xJ33
- nW1w==
-X-Gm-Message-State: AOAM531CmrBbyIl3AEHwd+A+aTKrimBjtKdqluaMX2xPuh1NLVwe0zQK
- SQ8hKo7OZqhRkygzyZOGoNkiz8nlRzS3Y1De
-X-Google-Smtp-Source: ABdhPJyjagOEF5lmMOTMiKxg7GiIiCFwVtFQzXZhSvI5OoQuxBKKxWtTt43jYrJea5HFgMHaUJG4ZQ==
-X-Received: by 2002:adf:ec4d:: with SMTP id w13mr16681854wrn.334.1600092422602; 
- Mon, 14 Sep 2020 07:07:02 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id x16sm20834041wrq.62.2020.09.14.07.07.01
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Sep 2020 07:07:01 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 17/36] target/arm: Count PMU events when MDCR.SPME is set
-Date: Mon, 14 Sep 2020 15:06:22 +0100
-Message-Id: <20200914140641.21369-18-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200914140641.21369-1-peter.maydell@linaro.org>
-References: <20200914140641.21369-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kHqdM-0005Rq-FD
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 11:43:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20185)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kHqdI-00062b-V8
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 11:43:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600098187;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=pJ/5ssdtLSBUnTb9YzrkxcGP83YO4HWb0uV6GCVeX8Y=;
+ b=fjO5QZK9N1VFexPuvQSHbkk/HZlIcidGQIPIbFEmcByFosaw10/p9cH/1u+zKyNwYf8i/8
+ 9WqjPd9cLw0JLMR5V5GKS2raoyisVOZRdiP//2WQK9G+QHD5eA+4WbrGTROb3Hji3U6HwQ
+ XSFV3QKd7jdSr3WkUp2YMzLNJMKfB4Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-243-TLc8ZGX7MueRNyaY4e2EyQ-1; Mon, 14 Sep 2020 11:43:06 -0400
+X-MC-Unique: TLc8ZGX7MueRNyaY4e2EyQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5C4118BE161;
+ Mon, 14 Sep 2020 15:43:03 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-134.ams2.redhat.com [10.36.112.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2BE7050B44;
+ Mon, 14 Sep 2020 15:43:01 +0000 (UTC)
+Subject: Re: [PATCH v3] iotests: Drop readlink -f
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200914145606.94620-1-mreitz@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <424302b6-c326-f0f8-9bec-8d5805e04f6e@redhat.com>
+Date: Mon, 14 Sep 2020 17:43:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <20200914145606.94620-1-mreitz@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::430;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x430.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Language: en-US
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:10:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -38
+X-Spam_score: -3.9
+X-Spam_bar: ---
+X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,39 +97,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Claudio Fontana <cfontana@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aaron Lindsay <aaron@os.amperecomputing.com>
+On 14/09/2020 16.56, Max Reitz wrote:
+> On macOS, (out of the box) readlink does not have -f.  We do not really
+> need readlink here, though, it was just a replacement for realpath
+> (which is not available on our BSD test systems), which we needed to
+> make the $(dirname) into an absolute path.
+> 
+> Instead of using either, just use "cd; pwd" like is done for
+> $source_iotests.
+> 
+> Fixes: b1cbc33a3971b6bb005d5ac3569feae35a71de0f
+>        ("iotests: Allow running from different directory")
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Reported-by: Claudio Fontana <cfontana@suse.de>
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/check | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+> index e14a1f354d..678b6e4910 100755
+> --- a/tests/qemu-iotests/check
+> +++ b/tests/qemu-iotests/check
+> @@ -44,7 +44,7 @@ then
+>          _init_error "failed to obtain source tree name from check symlink"
+>      fi
+>      source_iotests=$(cd "$source_iotests"; pwd) || _init_error "failed to enter source tree"
+> -    build_iotests=$(readlink -f $(dirname "$0"))
+> +    build_iotests=$(cd "$(dirname "$0")"; pwd)
 
-This check was backwards when introduced in commit
-033614c47de78409ad3fb39bb7bd1483b71c6789:
+I assume the nested quotes are ok here? ... shell scripts always confuse
+me in that regard...
 
-    target/arm: Filter cycle counter based on PMCCFILTR_EL0
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Aaron Lindsay <aaron@os.amperecomputing.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 44d666627a8..88bd9dd35da 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -1452,7 +1452,7 @@ static bool pmu_counter_enabled(CPUARMState *env, uint8_t counter)
-         }
-     } else {
-         prohibited = arm_feature(env, ARM_FEATURE_EL3) &&
--           (env->cp15.mdcr_el3 & MDCR_SPME);
-+           !(env->cp15.mdcr_el3 & MDCR_SPME);
-     }
- 
-     if (prohibited && counter == 31) {
--- 
-2.20.1
+ Thomas
 
 
