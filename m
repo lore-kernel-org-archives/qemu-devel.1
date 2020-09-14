@@ -2,88 +2,100 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE6F0C43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 07:16:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CB29C43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 07:18:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05A8D21548
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 07:16:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BDE9721548
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 07:18:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="udKNGn37"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05A8D21548
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LkkUH0t0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDE9721548
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHijH-00072W-Uy
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 03:16:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48928)
+	id 1kHil1-0000eA-Py
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 03:18:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49304)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHiig-0006W4-1E; Mon, 14 Sep 2020 03:16:10 -0400
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:41154)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHiie-0001sz-56; Mon, 14 Sep 2020 03:16:09 -0400
-Received: by mail-lf1-x144.google.com with SMTP id y17so12238162lfa.8;
- Mon, 14 Sep 2020 00:16:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=GMYz2WpBG5wDGzP/oQ7zm/3jvlWdBEAmyG2w/ei9Trs=;
- b=udKNGn37wMs2owm3AjiJDREf0z5oUo5EYgKuNLzSnfauI3upb4uqYRg40PcoysyNeB
- JcWA+nJX68+DfXrF+y+oNinj+nF2uAJ8O7imCTgfVOr5xuOB4JMRSGnNtz6V5coXJPy7
- TgWb282i7UF/GvWfe/5/h5VA9Zz27ClC3t7K5x9dPA93HckMhrduHw0IXHWe7tyqYEFb
- KjY/vl9mnc0BFrYDamLsVCFllo20euuY0kY89IVp3eO3ZH1g3uip2LO38umlCQOBZ/Ke
- dwHAi9Wwk9rKjLr5YuC5YbnSxkq85+Dmqu+mOFXKPDpZXJBsD9Kt4+p+3HB22OQjVRIU
- ZhzA==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHik1-0007Xw-Be
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 03:17:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50282)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHijy-000217-HV
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 03:17:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600067849;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=JZdohivG8OwPaekS7kZwOMGmQnOEdRQq9UPoCkczNfM=;
+ b=LkkUH0t0o1pQv3MO05ZnpCdhtZkSXX2+D7sw66HRLfFhEXfWGN+bGUUxSvasK/TPS5oZHH
+ 0nAgSykcLiHqfz3uZsp6WAeVWE/lgkl7qXS46Yzgz6qVL4VUO7xbNgMMnPOLRHAFrD0PHc
+ kYlE9IOdyH7WRVuJSdIhdzL6Mxfkmhk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-15-BC9tfZD4P-GU1oZ8ZbgjHw-1; Mon, 14 Sep 2020 03:17:24 -0400
+X-MC-Unique: BC9tfZD4P-GU1oZ8ZbgjHw-1
+Received: by mail-wm1-f71.google.com with SMTP id b14so2898997wmj.3
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 00:17:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=GMYz2WpBG5wDGzP/oQ7zm/3jvlWdBEAmyG2w/ei9Trs=;
- b=X/b6AA3oAMnzuEZ3N0kFsJKt2Aso/am6YQnANLi4gXMDdA0+qI0DV+imGrqUvH+ZkK
- 0ce/lZD4UEZfLZSB2vLVEGE77IEZiR1dJ8tloytFaQLDTJ3ImbOM4UmR1gP9Z31WCxea
- nwwIdguWqFeYv9rqDy5Nh24t09VWU3m8EzOOyPwENG+S//EHr6dCtqgPgT/p5fZs5SXY
- /JFAY/EioAtLwiCT4NiOXngr094FlX42rBa3vXnOFOPn3UCXffDH+fZ4R1goOZ+0Bota
- k1IGu1T68bEpWz08gVLSN8RR1C4JQH780muYSq3ozNmZv+mEOrPJ3f98OUpEsVmdl1S2
- /6fg==
-X-Gm-Message-State: AOAM533xLriK8i9Ukq591b0lq2CqHko6ET0ymwt+Zxcb1IVnolgz4aaU
- SEV48tav7VqImQGlOUoZGJj68sQ0JpCsLXR17bk=
-X-Google-Smtp-Source: ABdhPJzawAv+L7e4uSacApYMjfXF16l97dYAkl7vLO7mWl5wCRkM90RSfKTxD9fxR7Cfw5fkRLYjne7Tg6y/e9tFFGg=
-X-Received: by 2002:a19:383:: with SMTP id 125mr4166417lfd.356.1600067765739; 
- Mon, 14 Sep 2020 00:16:05 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=JZdohivG8OwPaekS7kZwOMGmQnOEdRQq9UPoCkczNfM=;
+ b=T8fiNSZLgsmAL+yZ9wmX6DjPuqXVtrROaCM3SFhIDAxgJPuWyo+qurgUlgecDvl/+B
+ kYq07P7WU9VA0vFQX14W2KnIRugDWUKOZrYjzEpKGWMl6AXqn0xiiIcbhA4MsT1O2C8a
+ 8fxkilJNr7JZtq/r1XwoZbVn767mZFGRwsiGKIGXXM/9tEWh1DATwhxaNP+4s/nm0HG9
+ EhUp49NuZQ7/WZuoDk5tZv2bp5m4R4OfVsTNd8o6/LE++acYUZipmSk/1DTBz+01cI86
+ 175fk9aml4aq+SEwoZF3Y0k6tUFp6+rKJkfeaE5PHMdvm8rPQA4KI0Gi+ZmzTCSt/UNv
+ VFuA==
+X-Gm-Message-State: AOAM533ZmzILwEZ1dQJ0pTRu3Lm5xfe5rCEnc0XBjs6ZFjYlERov3qLf
+ c3czLkVTkqP8pFvo/qRPGriEbHyRbESueclwtCCs+EW3xMWJkh74lJzDRqHWMMPFiFgpbLB83fn
+ nxoy7t0e5dDhx0qU=
+X-Received: by 2002:adf:ef45:: with SMTP id c5mr13887811wrp.37.1600067842616; 
+ Mon, 14 Sep 2020 00:17:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzFpQuiVCqi9PXUzY1WA59wm7FBhBivers5jKIDr5YCRZ9muz3ZP60tS7fHI64vFOL/8PA1yg==
+X-Received: by 2002:adf:ef45:: with SMTP id c5mr13887785wrp.37.1600067842376; 
+ Mon, 14 Sep 2020 00:17:22 -0700 (PDT)
+Received: from localhost.localdomain (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id v9sm22640343wrv.35.2020.09.14.00.17.21
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 14 Sep 2020 00:17:21 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 00/10] EDK2 firmware: Adopt the edk2-stable202008 release
+Date: Mon, 14 Sep 2020 09:17:10 +0200
+Message-Id: <20200914071720.1099898-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <20200912224431.1428-1-luoyonggang@gmail.com>
- <20200912224431.1428-4-luoyonggang@gmail.com>
- <4601317a-d110-e5f3-faf5-8b9b0278ffb9@redhat.com>
-In-Reply-To: <4601317a-d110-e5f3-faf5-8b9b0278ffb9@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Mon, 14 Sep 2020 15:15:56 +0800
-Message-ID: <CAE2XoE98mgOmh7N4Z07xOU9a0yhMDQkzq+RhJ6r9v9Q-ap4ZtQ@mail.gmail.com>
-Subject: Re: [PATCH v8 03/27] ci: fixes msys2 build by upgrading capstone to
- 4.0.2
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000cb247e05af40cebc"
-Received-SPF: pass client-ip=2a00:1450:4864:20::144;
- envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x144.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:10:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -47
+X-Spam_score: -4.8
+X-Spam_bar: ----
+X-Spam_report: (-4.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.695,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,162 +108,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
- Qemu-block <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>,
- Xie Changlong <xiechanglong.d@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- qemu-level <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Li-Wen Hsu <lwhsu@freebsd.org>, Markus Armbruster <armbru@redhat.com>,
- Peter Lieven <pl@kamp.de>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000cb247e05af40cebc
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+The following changes since commit 3d9f371b01067d9cec4d592920013012119397c8:
 
-On Mon, Sep 14, 2020 at 3:10 PM Thomas Huth <thuth@redhat.com> wrote:
->
-> On 13/09/2020 00.44, Yonggang Luo wrote:
-> > The currently random version capstone have the following compiling
-issue:
-> >   CC      /c/work/xemu/qemu/build/slirp/src/arp_table.o
-> > make[1]: *** No rule to make target
-=E2=80=9C/c/work/xemu/qemu/build/capstone/capstone.lib=E2=80=9D=E3=80=82 St=
-op.
-> >
-> > Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1 are the
-tagged version 4.0.2
-> > when upgrading to this version, the folder structure of include are
-changed to
-> > qemu\capstone\include
-> > =E2=94=82  platform.h
-> > =E2=94=82
-> > =E2=94=9C=E2=94=80capstone
-> > =E2=94=82      arm.h
-> > =E2=94=82      arm64.h
-> > =E2=94=82      capstone.h
-> > =E2=94=82      evm.h
-> > =E2=94=82      m680x.h
-> > =E2=94=82      m68k.h
-> > =E2=94=82      mips.h
-> > =E2=94=82      platform.h
-> > =E2=94=82      ppc.h
-> > =E2=94=82      sparc.h
-> > =E2=94=82      systemz.h
-> > =E2=94=82      tms320c64x.h
-> > =E2=94=82      x86.h
-> > =E2=94=82      xcore.h
-> > =E2=94=82
-> > =E2=94=94=E2=94=80windowsce
-> >         intrin.h
-> >         stdint.h
-> >
-> > in capstone. so we need add extra include path
--I${source_path}/capstone/include/capstone
-> > for directly #include <capstone.h>, and the exist include path should
-preserve, because
-> > in capstone code there something like #include "capstone/capstone.h"
-> >
-> > If only using
-> >     capstone_cflags=3D"-I${source_path}/capstone/include/capstone"
-> > Then will cause the following compiling error:
-> >
-> >   CC      cs.o
-> > cs.c:17:10: fatal error: 'capstone/capstone.h' file not found
-> > #include <capstone/capstone.h>
-> >          ^~~~~~~~~~~~~~~~~~~~~
-> > 1 error generated.
-> >
-> > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> > ---
-> >  capstone  | 2 +-
-> >  configure | 2 +-
-> >  2 files changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/capstone b/capstone
-> > index 22ead3e0bf..1d23053284 160000
-> > --- a/capstone
-> > +++ b/capstone
-> > @@ -1 +1 @@
-> > -Subproject commit 22ead3e0bfdb87516656453336160e0a37b066bf
-> > +Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1
->
-> Richard has a patch series on the list now to update and improve the
-> capstone submodule (see "capstone + disassembler patches") ... I think
-> this patch here will then not be required anymore.
-I've seen that, of cause, this patch need to be dropped.
->
->  Thomas
->
+  Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-fixes-100920-1' into staging (2020-09-12 22:54:32 +0100)
 
+are available in the Git repository at:
 
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
+  https://gitlab.com/philmd/qemu.git tags/edk2-next-20200914
 
---000000000000cb247e05af40cebc
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+for you to fetch changes up to 8fa3b7029f3c9f901cd6bb01004114c003432d9b:
 
-<div dir=3D"ltr"><br><br>On Mon, Sep 14, 2020 at 3:10 PM Thomas Huth &lt;<a=
- href=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt; wrote:<br>&gt;<b=
-r>&gt; On 13/09/2020 00.44, Yonggang Luo wrote:<br>&gt; &gt; The currently =
-random version capstone have the following compiling issue:<br>&gt; &gt; =
-=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/c/work/xemu/qemu/build/slirp/src/arp_table.o=
-<br>&gt; &gt; make[1]: *** No rule to make target =E2=80=9C/c/work/xemu/qem=
-u/build/capstone/capstone.lib=E2=80=9D=E3=80=82 Stop.<br>&gt; &gt;<br>&gt; =
-&gt; Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1 are the tag=
-ged version 4.0.2<br>&gt; &gt; when upgrading to this version, the folder s=
-tructure of include are changed to<br>&gt; &gt; qemu\capstone\include<br>&g=
-t; &gt; =E2=94=82 =C2=A0platform.h<br>&gt; &gt; =E2=94=82<br>&gt; &gt; =E2=
-=94=9C=E2=94=80capstone<br>&gt; &gt; =E2=94=82 =C2=A0 =C2=A0 =C2=A0arm.h<br=
->&gt; &gt; =E2=94=82 =C2=A0 =C2=A0 =C2=A0arm64.h<br>&gt; &gt; =E2=94=82 =C2=
-=A0 =C2=A0 =C2=A0capstone.h<br>&gt; &gt; =E2=94=82 =C2=A0 =C2=A0 =C2=A0evm.=
-h<br>&gt; &gt; =E2=94=82 =C2=A0 =C2=A0 =C2=A0m680x.h<br>&gt; &gt; =E2=94=82=
- =C2=A0 =C2=A0 =C2=A0m68k.h<br>&gt; &gt; =E2=94=82 =C2=A0 =C2=A0 =C2=A0mips=
-.h<br>&gt; &gt; =E2=94=82 =C2=A0 =C2=A0 =C2=A0platform.h<br>&gt; &gt; =E2=
-=94=82 =C2=A0 =C2=A0 =C2=A0ppc.h<br>&gt; &gt; =E2=94=82 =C2=A0 =C2=A0 =C2=
-=A0sparc.h<br>&gt; &gt; =E2=94=82 =C2=A0 =C2=A0 =C2=A0systemz.h<br>&gt; &gt=
-; =E2=94=82 =C2=A0 =C2=A0 =C2=A0tms320c64x.h<br>&gt; &gt; =E2=94=82 =C2=A0 =
-=C2=A0 =C2=A0x86.h<br>&gt; &gt; =E2=94=82 =C2=A0 =C2=A0 =C2=A0xcore.h<br>&g=
-t; &gt; =E2=94=82<br>&gt; &gt; =E2=94=94=E2=94=80windowsce<br>&gt; &gt; =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 intrin.h<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-stdint.h<br>&gt; &gt;<br>&gt; &gt; in capstone. so we need add extra includ=
-e path -I${source_path}/capstone/include/capstone<br>&gt; &gt; for directly=
- #include &lt;capstone.h&gt;, and the exist include path should preserve, b=
-ecause<br>&gt; &gt; in capstone code there something like #include &quot;ca=
-pstone/capstone.h&quot;<br>&gt; &gt;<br>&gt; &gt; If only using<br>&gt; &gt=
-; =C2=A0 =C2=A0 capstone_cflags=3D&quot;-I${source_path}/capstone/include/c=
-apstone&quot;<br>&gt; &gt; Then will cause the following compiling error:<b=
-r>&gt; &gt;<br>&gt; &gt; =C2=A0 CC =C2=A0 =C2=A0 =C2=A0cs.o<br>&gt; &gt; cs=
-.c:17:10: fatal error: &#39;capstone/capstone.h&#39; file not found<br>&gt;=
- &gt; #include &lt;capstone/capstone.h&gt;<br>&gt; &gt; =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0^~~~~~~~~~~~~~~~~~~~~<br>&gt; &gt; 1 error generated.<br>&=
-gt; &gt;<br>&gt; &gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luo=
-yonggang@gmail.com">luoyonggang@gmail.com</a>&gt;<br>&gt; &gt; ---<br>&gt; =
-&gt; =C2=A0capstone =C2=A0| 2 +-<br>&gt; &gt; =C2=A0configure | 2 +-<br>&gt=
-; &gt; =C2=A02 files changed, 2 insertions(+), 2 deletions(-)<br>&gt; &gt;<=
-br>&gt; &gt; diff --git a/capstone b/capstone<br>&gt; &gt; index 22ead3e0bf=
-..1d23053284 160000<br>&gt; &gt; --- a/capstone<br>&gt; &gt; +++ b/capstone=
-<br>&gt; &gt; @@ -1 +1 @@<br>&gt; &gt; -Subproject commit 22ead3e0bfdb87516=
-656453336160e0a37b066bf<br>&gt; &gt; +Subproject commit 1d230532840a37ac032=
-c6ab80128238fc930c6c1<br>&gt;<br>&gt; Richard has a patch series on the lis=
-t now to update and improve the<br>&gt; capstone submodule (see &quot;capst=
-one + disassembler patches&quot;) ... I think<br>&gt; this patch here will =
-then not be required anymore.<div>I&#39;ve seen that, of cause, this patch =
-need to be dropped.<br>&gt;<br>&gt; =C2=A0Thomas<br>&gt;<br><br><br>--<br>=
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=
-=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo<=
-/div></div>
+  tests: acpi: update "virt/SSDT.memhp" for edk2-stable202008 (2020-09-13 23:03:15 +0200)
 
---000000000000cb247e05af40cebc--
+----------------------------------------------------------------
+EDK2 firmware: Adopt the edk2-stable202008 release
+
+Note from Laszlo Ersek [1] while addressing LP#1852196 [2]:
+
+Consume the following upstream edk2 releases:
+
+  https://github.com/tianocore/edk2/releases/tag/edk2-stable201908
+  https://github.com/tianocore/edk2/releases/tag/edk2-stable201911
+  https://github.com/tianocore/edk2/releases/tag/edk2-stable202002
+  https://github.com/tianocore/edk2/releases/tag/edk2-stable202005
+  https://github.com/tianocore/edk2/releases/tag/edk2-stable202008
+
+Worth mentioning (in random order):
+
+- various CVE fixes (see [2] and shortlog)
+- OpenSSL-1.1.1g
+- UEFI HTTPS Boot for ARM/AARCH64
+- TPM2 for ARM/AARCH64
+- VCPU hotplug with SMI
+- support for Linux v5.7+ initrd and mixed mode loading
+- Fusion-MPT SCSI driver in OVMF
+- VMware PVSCSI driver in OVMF
+- PXEv4 / PXEv6 boot possible to disable on the QEMU command line
+- SEV-ES support
+
+The IA32 and X64 binaries are now smaller -- the reason is that Laszlo
+built them with DevToolSet 9 (gcc-9) on RHEL7, and so this is the first
+time they've undergone LTO (with the GCC5 edk2 toolchain settings).
+
+CI jobs results:
+  https://gitlab.com/philmd/qemu/-/pipelines/189394120
+  https://travis-ci.org/github/philmd/qemu/builds/726842542
+  https://app.shippable.com/github/philmd/qemu/runs/866/summary/console
+
+[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg738173.html
+[2] https://bugs.launchpad.net/qemu/+bug/1852196
+
+----------------------------------------------------------------
+
+Laszlo Ersek (10):
+  Makefile: remove obsolete edk2 exception from "clean" rule
+  roms/efirom, tests/uefi-test-tools: update edk2's own submodules first
+  roms/Makefile.edk2: prepare for replacing TPM2*_ENABLE macros
+  tests: acpi: tolerate "virt/SSDT.memhp" mismatch temporarily
+  roms/edk2: update submodule from edk2-stable201905 to
+    edk2-stable202008
+  roms/Makefile.edk2: complete replacing TPM2*_ENABLE macros
+  roms/Makefile.edk2: enable new ARM/AARCH64 flags up to
+    edk2-stable202008
+  pc-bios: refresh edk2 build artifacts for edk2-stable202008
+  pc-bios: update the README file with edk2-stable202008 information
+  tests: acpi: update "virt/SSDT.memhp" for edk2-stable202008
+
+ Makefile                               |   1 -
+ pc-bios/README                         |   4 ++--
+ pc-bios/edk2-aarch64-code.fd.bz2       | Bin 1178070 -> 1507722 bytes
+ pc-bios/edk2-arm-code.fd.bz2           | Bin 1172752 -> 1503187 bytes
+ pc-bios/edk2-i386-code.fd.bz2          | Bin 1736199 -> 1646741 bytes
+ pc-bios/edk2-i386-secure-code.fd.bz2   | Bin 1943949 -> 1860546 bytes
+ pc-bios/edk2-x86_64-code.fd.bz2        | Bin 1717094 -> 1680164 bytes
+ pc-bios/edk2-x86_64-secure-code.fd.bz2 | Bin 1958037 -> 1912112 bytes
+ roms/Makefile                          |   1 +
+ roms/Makefile.edk2                     |  26 +++++++++++++++----------
+ roms/edk2                              |   2 +-
+ tests/data/acpi/virt/SSDT.memhp        | Bin 736 -> 736 bytes
+ tests/uefi-test-tools/Makefile         |   1 +
+ 13 files changed, 21 insertions(+), 14 deletions(-)
+
+-- 
+2.26.2
+
 
