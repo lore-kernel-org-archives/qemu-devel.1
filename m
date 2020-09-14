@@ -4,71 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 629F0C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:41:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55BF0C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:42:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 116B720771
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:41:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 116B720771
+	by mail.kernel.org (Postfix) with ESMTPS id EB1C720771
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:42:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB1C720771
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHnne-0000bT-2u
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 08:41:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37898)
+	id 1kHnoW-0002NK-P0
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 08:42:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37726)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kHni5-00078o-UT
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:35:55 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54949
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kHnhv-0006pL-TQ
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:35:43 -0400
+Received: from us-smtp-delivery-44.mimecast.com ([207.211.30.44]:52226)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kHni2-0000pT-G0
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:35:52 -0400
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kHnhu-0000l9-7d
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:35:43 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-RztJe6czPCCMT3mXO8w4Xw-1; Mon, 14 Sep 2020 08:35:36 -0400
-X-MC-Unique: RztJe6czPCCMT3mXO8w4Xw-1
+ us-mta-471-791W7vbJM1OJDub1wcFMPQ-1; Mon, 14 Sep 2020 08:35:37 -0400
+X-MC-Unique: 791W7vbJM1OJDub1wcFMPQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BBE7E1021D22;
- Mon, 14 Sep 2020 12:35:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 642C2801F9A;
+ Mon, 14 Sep 2020 12:35:36 +0000 (UTC)
 Received: from bahia.redhat.com (ovpn-112-218.ams2.redhat.com [10.36.112.218])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6AF8B1002393;
- Mon, 14 Sep 2020 12:35:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 140B41002393;
+ Mon, 14 Sep 2020 12:35:34 +0000 (UTC)
 From: Greg Kurz <groug@kaod.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 11/15] spapr: Simplify error handling in
- spapr_cpu_core_realize()
-Date: Mon, 14 Sep 2020 14:35:01 +0200
-Message-Id: <20200914123505.612812-12-groug@kaod.org>
+Subject: [PATCH 12/15] spapr: Add a return value to spapr_nvdimm_validate()
+Date: Mon, 14 Sep 2020 14:35:02 +0200
+Message-Id: <20200914123505.612812-13-groug@kaod.org>
 In-Reply-To: <20200914123505.612812-1-groug@kaod.org>
 References: <20200914123505.612812-1-groug@kaod.org>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: kaod.org
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=205.139.110.61; envelope-from=groug@kaod.org;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:33:07
+Received-SPF: softfail client-ip=207.211.30.44; envelope-from=groug@kaod.org;
+ helo=us-smtp-delivery-44.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 08:35:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -11
 X-Spam_score: -1.2
 X-Spam_bar: -
 X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,92 +87,116 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As recommended in "qapi/error.h", add a bool return value to
-spapr_realize_vcpu() and use it in spapr_cpu_core_realize()
-in order to get rid of the error propagation overhead.
+As recommended in "qapi/error.h", return true on success and false on
+failure. This allows to reduce error propagation overhead in the callers.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr_cpu_core.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ include/hw/ppc/spapr_nvdimm.h |  2 +-
+ hw/ppc/spapr.c                |  4 +---
+ hw/ppc/spapr_nvdimm.c         | 14 ++++++++------
+ 3 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 0c879d4da262..b03620823adb 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -227,14 +227,14 @@ static void spapr_cpu_core_unrealize(DeviceState *dev=
-)
-     g_free(sc->threads);
- }
+diff --git a/include/hw/ppc/spapr_nvdimm.h b/include/hw/ppc/spapr_nvdimm.h
+index 3eb344e8e976..b834d82f5545 100644
+--- a/include/hw/ppc/spapr_nvdimm.h
++++ b/include/hw/ppc/spapr_nvdimm.h
+@@ -28,7 +28,7 @@ QEMU_BUILD_BUG_ON(SPAPR_MINIMUM_SCM_BLOCK_SIZE % SPAPR_ME=
+MORY_BLOCK_SIZE);
+ int spapr_pmem_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
+                            void *fdt, int *fdt_start_offset, Error **errp)=
+;
+ void spapr_dt_persistent_memory(SpaprMachineState *spapr, void *fdt);
+-void spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdi=
+mm,
++bool spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdi=
+mm,
+                            uint64_t size, Error **errp);
+ void spapr_add_nvdimm(DeviceState *dev, uint64_t slot, Error **errp);
+ void spapr_create_nvdimm_dr_connectors(SpaprMachineState *spapr);
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index e11472a53ab4..bfa2a00da77e 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3481,9 +3481,7 @@ static void spapr_memory_pre_plug(HotplugHandler *hot=
+plug_dev, DeviceState *dev,
+     }
 =20
--static void spapr_realize_vcpu(PowerPCCPU *cpu, SpaprMachineState *spapr,
-+static bool spapr_realize_vcpu(PowerPCCPU *cpu, SpaprMachineState *spapr,
-                                SpaprCpuCore *sc, Error **errp)
+     if (is_nvdimm) {
+-        spapr_nvdimm_validate(hotplug_dev, NVDIMM(dev), size, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        if (!spapr_nvdimm_validate(hotplug_dev, NVDIMM(dev), size, errp)) =
+{
+             return;
+         }
+     } else if (size % SPAPR_MEMORY_BLOCK_SIZE) {
+diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
+index c06f903e5bff..b3a489e9fe18 100644
+--- a/hw/ppc/spapr_nvdimm.c
++++ b/hw/ppc/spapr_nvdimm.c
+@@ -33,7 +33,7 @@
+ #include "sysemu/sysemu.h"
+ #include "hw/ppc/spapr_numa.h"
+=20
+-void spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdi=
+mm,
++bool spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdi=
+mm,
+                            uint64_t size, Error **errp)
  {
-     CPUPPCState *env =3D &cpu->env;
-     CPUState *cs =3D CPU(cpu);
+     const MachineClass *mc =3D MACHINE_GET_CLASS(hotplug_dev);
+@@ -45,7 +45,7 @@ void spapr_nvdimm_validate(HotplugHandler *hotplug_dev, N=
+VDIMMDevice *nvdimm,
 =20
-     if (!qdev_realize(DEVICE(cpu), NULL, errp)) {
+     if (!mc->nvdimm_supported) {
+         error_setg(errp, "NVDIMM hotplug not supported for this machine");
 -        return;
 +        return false;
      }
 =20
-     /* Set time-base frequency to 512 MHz */
-@@ -245,13 +245,14 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, Spapr=
-MachineState *spapr,
-=20
-     if (spapr_irq_cpu_intc_create(spapr, cpu, errp) < 0) {
-         cpu_remove_sync(CPU(cpu));
+     /*
+@@ -59,20 +59,20 @@ void spapr_nvdimm_validate(HotplugHandler *hotplug_dev,=
+ NVDIMMDevice *nvdimm,
+      */
+     if (!ms->nvdimms_state->is_enabled && nvdimm_opt) {
+         error_setg(errp, "nvdimm device found but 'nvdimm=3Doff' was set")=
+;
 -        return;
 +        return false;
      }
 =20
-     if (!sc->pre_3_0_migration) {
-         vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
-                          cpu->machine_data);
+     if (object_property_get_int(OBJECT(nvdimm), NVDIMM_LABEL_SIZE_PROP,
+                                 &error_abort) =3D=3D 0) {
+         error_setg(errp, "PAPR requires NVDIMM devices to have label-size =
+set");
+-        return;
++        return false;
      }
+=20
+     if (size % SPAPR_MINIMUM_SCM_BLOCK_SIZE) {
+         error_setg(errp, "PAPR requires NVDIMM memory size (excluding labe=
+l)"
+                    " to be a multiple of %" PRIu64 "MB",
+                    SPAPR_MINIMUM_SCM_BLOCK_SIZE / MiB);
+-        return;
++        return false;
+     }
+=20
+     uuidstr =3D object_property_get_str(OBJECT(nvdimm), NVDIMM_UUID_PROP,
+@@ -82,8 +82,10 @@ void spapr_nvdimm_validate(HotplugHandler *hotplug_dev, =
+NVDIMMDevice *nvdimm,
+=20
+     if (qemu_uuid_is_null(&uuid)) {
+         error_setg(errp, "NVDIMM device requires the uuid to be set");
+-        return;
++        return false;
+     }
++
 +    return true;
  }
 =20
- static PowerPCCPU *spapr_create_vcpu(SpaprCpuCore *sc, int i, Error **errp=
-)
-@@ -312,7 +313,6 @@ static void spapr_cpu_core_realize(DeviceState *dev, Er=
-ror **errp)
-                                                   TYPE_SPAPR_MACHINE);
-     SpaprCpuCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
-     CPUCore *cc =3D CPU_CORE(OBJECT(dev));
--    Error *local_err =3D NULL;
-     int i, j;
 =20
-     if (!spapr) {
-@@ -322,15 +322,14 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
-Error **errp)
-=20
-     sc->threads =3D g_new(PowerPCCPU *, cc->nr_threads);
-     for (i =3D 0; i < cc->nr_threads; i++) {
--        sc->threads[i] =3D spapr_create_vcpu(sc, i, &local_err);
--        if (local_err) {
-+        sc->threads[i] =3D spapr_create_vcpu(sc, i, errp);
-+        if (!sc->threads[i]) {
-             goto err;
-         }
-     }
-=20
-     for (j =3D 0; j < cc->nr_threads; j++) {
--        spapr_realize_vcpu(sc->threads[j], spapr, sc, &local_err);
--        if (local_err) {
-+        if (!spapr_realize_vcpu(sc->threads[j], spapr, sc, errp)) {
-             goto err_unrealize;
-         }
-     }
-@@ -347,7 +346,6 @@ err:
-         spapr_delete_vcpu(sc->threads[i], sc);
-     }
-     g_free(sc->threads);
--    error_propagate(errp, local_err);
- }
-=20
- static Property spapr_cpu_core_properties[] =3D {
 --=20
 2.26.2
 
