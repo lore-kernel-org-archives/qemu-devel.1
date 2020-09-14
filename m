@@ -7,72 +7,71 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B0AFC2BC11
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:18:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00BDEC43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:20:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 901CE2074B
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:18:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 739B92074B
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:20:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DEMALVo/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 901CE2074B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UOizjK9j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 739B92074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHpJp-0002DI-MR
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 10:18:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46236)
+	id 1kHpL6-0003av-Ap
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 10:20:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46350)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHp8X-0003BF-Ox
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:07:17 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:40118)
+ id 1kHp8c-0003Pj-Hh
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:07:22 -0400
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:34838)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHp8V-0007cp-Et
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:07:17 -0400
-Received: by mail-wm1-x333.google.com with SMTP id k18so176998wmj.5
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 07:07:15 -0700 (PDT)
+ id 1kHp8Z-0007ew-MK
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:07:22 -0400
+Received: by mail-wm1-x333.google.com with SMTP id y15so213181wmi.0
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 07:07:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=7qdIVpv+Fj2dOjiIb2MIanH8g8e50FxyjJB1Ytaz/Is=;
- b=DEMALVo/jN1Rgoi/msJCVwbo3aNGIcQRHB2ogFO8g6vqtSJ/i1J9RudWGpT+Gptmhv
- mRe7TPtzkXp+JFuWGDLj/Pf222QZh6ybg8q3DHCsNqsV31ddNFwHoCugIVIz+girnH+Z
- Xy0ME0+FWnWcN8MQk58si2/yxUwaZTYefgCR7CZvDx8dR1OXPGWgOFu372Fpnj5dwYbQ
- Aw+hms1la1SrnHaLfGbu7fO28PWkh1lXHxQRBRhBpHw825vjwTl6bP8UbGH4tHM6zJoW
- +0WvS2kr16nBXWR2ppSSn+UpL6g13EE0lLMbkWMgbGG8KMPbKaG5GPNX580mNpub/lDY
- 28zw==
+ bh=+mtOlMEuw3HvpJKrB1GOD8D12U8B4KYT+5FYplXqpYI=;
+ b=UOizjK9jo4r/EQlVET3j2zQtbhOcsa2GOwEUM5n8SQh6uj5dQzOtAsgZn8WD8A0Iyp
+ 5gHxFn9CYF77BuvT5CTUeJIYGKWkQpJAyg9PW1sqxZNWeKUNfHhDtAB0fZzpT8/Zujwn
+ e2BEhlanVExNjfbxmXnNjaK/JJVu9eTYgNkUdAp//Wi25JzZcb4omjzBJt4r52XJBEEA
+ WczueyUON33+Oji9HrTwlwk2J+OCoxtNTNhC+/x654PoI6uqtBhD3cqnKHeDlxvINuuk
+ Pyjc1bXx5mJxKv9tb8aELfsQlzHgHNBpYQB1I8mBctfz5jQlI6u0dokGaVVvN1OEh39I
+ eBEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=7qdIVpv+Fj2dOjiIb2MIanH8g8e50FxyjJB1Ytaz/Is=;
- b=gFLEZVQvbAT7o4HCXM/p60p4ozGl2Xjmr+RWdaYi5tjy0vt5a9PtKD5C081dSnnWnB
- GPw2VEGLMupOGIsrw3GQ15txqoPwfp6Qrs7K6j8W++TOmBAQ3pcgqiCqrclZaqP/D0zX
- XGGawPhVplKaA3S24i05ZnOe9K/5folNoxh895LRHsEYjujoe8TAddc60oM/AKwl5/B0
- DlpELxUJd/FcGLXp+CeJ2Ocl1+ODnbWGiwE+waDNvLDcR8ru7tuvSjwE5fpnt/h9X8BH
- pV3BrglKOQIeGUFOO9JPVJEbTAv2Ncy1/7190aUXjOkrlr3ItNJbH8pY77uQgjlkURbf
- arPg==
-X-Gm-Message-State: AOAM531MehtYfDsLZGTG/3NMMvg0wHoiu9phE/ctKAfmFM9UxTb2si8a
- akyNhsFIoe/gPqaexNLgkNKyVvEk7J+vOdNl
-X-Google-Smtp-Source: ABdhPJxcauaXFlWkFqpgO7TGq5qbBoEaVLu6T8JKKmmz2olBbKJ5GohABOOnYckF3Tj6/2LTpcmvUA==
-X-Received: by 2002:a05:600c:21c4:: with SMTP id
- x4mr15659299wmj.107.1600092433779; 
- Mon, 14 Sep 2020 07:07:13 -0700 (PDT)
+ bh=+mtOlMEuw3HvpJKrB1GOD8D12U8B4KYT+5FYplXqpYI=;
+ b=g78OWR8gtsXGY9y1Xwr7ACmXqt1/mN+yepR5d3t+AiDtEJ5xyU0k5dNCaf1gAhX3G3
+ DXZ/kU9/rQORTJJH/ORQmW72u86qmX2ZgpBTumnWofbODp/dWZL/il5oCH1GhGtEFUA3
+ l0+y45hkzc1Eoy+6ypIpNLasb13Hn8iOoV/yIX/WZDc6WCqqL2PK1B4YazBF5yq3IB1z
+ ofQXTD77NuzSGT0AIfHzbbxqTfOlrCTi2mDeecc/rs5vPeBfqqa5QHjTx6SNKMr41GII
+ W8W+8OkoxuheTD31Goa42EjDsURErlQS06nBgPOYkiujmqB8RehYBQu6FA6kbo+bdhC5
+ AdpA==
+X-Gm-Message-State: AOAM530Qi/M11NFh6TvsQ10CUmggZaD2YLB6LfdYWCXgT9/EpXc3Hj40
+ VgVKgb5jgCinPrPdtODIixfhTfGT3zqUwxtE
+X-Google-Smtp-Source: ABdhPJxZphnf1BVfXyp743VVu93vrZfeW8b8hwuKu6Ts9WqklRxhag6f6SDCUX3ZSAJMIwPl9iSAYQ==
+X-Received: by 2002:a1c:b388:: with SMTP id c130mr7017953wmf.175.1600092438037; 
+ Mon, 14 Sep 2020 07:07:18 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id x16sm20834041wrq.62.2020.09.14.07.07.13
+ by smtp.gmail.com with ESMTPSA id x16sm20834041wrq.62.2020.09.14.07.07.17
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Sep 2020 07:07:13 -0700 (PDT)
+ Mon, 14 Sep 2020 07:07:17 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 27/36] hw/mem: Stubbed out NPCM7xx Memory Controller model
-Date: Mon, 14 Sep 2020 15:06:32 +0100
-Message-Id: <20200914140641.21369-28-peter.maydell@linaro.org>
+Subject: [PULL 31/36] docs/system: Add Nuvoton machine documentation
+Date: Mon, 14 Sep 2020 15:06:36 +0100
+Message-Id: <20200914140641.21369-32-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200914140641.21369-1-peter.maydell@linaro.org>
 References: <20200914140641.21369-1-peter.maydell@linaro.org>
@@ -88,8 +87,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ T_PDS_OTHER_BAD_TLD=0.01 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,222 +107,127 @@ Sender: "Qemu-devel"
 
 From: Havard Skinnemoen <hskinnemoen@google.com>
 
-This just implements the bare minimum to cause the boot block to skip
-memory initialization.
-
-Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
 Reviewed-by: Cédric Le Goater <clg@kaod.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Alexander Bulekov <alxndr@bu.edu>
 Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
-Message-id: 20200911052101.2602693-10-hskinnemoen@google.com
+Message-id: 20200911052101.2602693-14-hskinnemoen@google.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/npcm7xx.h    |  2 +
- include/hw/mem/npcm7xx_mc.h | 36 ++++++++++++++++
- hw/arm/npcm7xx.c            |  6 +++
- hw/mem/npcm7xx_mc.c         | 84 +++++++++++++++++++++++++++++++++++++
- hw/mem/meson.build          |  1 +
- 5 files changed, 129 insertions(+)
- create mode 100644 include/hw/mem/npcm7xx_mc.h
- create mode 100644 hw/mem/npcm7xx_mc.c
+ docs/system/arm/nuvoton.rst | 92 +++++++++++++++++++++++++++++++++++++
+ docs/system/target-arm.rst  |  1 +
+ 2 files changed, 93 insertions(+)
+ create mode 100644 docs/system/arm/nuvoton.rst
 
-diff --git a/include/hw/arm/npcm7xx.h b/include/hw/arm/npcm7xx.h
-index 5816a07a72e..9fa84a0702f 100644
---- a/include/hw/arm/npcm7xx.h
-+++ b/include/hw/arm/npcm7xx.h
-@@ -18,6 +18,7 @@
- 
- #include "hw/boards.h"
- #include "hw/cpu/a9mpcore.h"
-+#include "hw/mem/npcm7xx_mc.h"
- #include "hw/misc/npcm7xx_clk.h"
- #include "hw/misc/npcm7xx_gcr.h"
- #include "hw/nvram/npcm7xx_otp.h"
-@@ -71,6 +72,7 @@ typedef struct NPCM7xxState {
-     NPCM7xxTimerCtrlState tim[3];
-     NPCM7xxOTPState     key_storage;
-     NPCM7xxOTPState     fuse_array;
-+    NPCM7xxMCState      mc;
- } NPCM7xxState;
- 
- #define TYPE_NPCM7XX    "npcm7xx"
-diff --git a/include/hw/mem/npcm7xx_mc.h b/include/hw/mem/npcm7xx_mc.h
+diff --git a/docs/system/arm/nuvoton.rst b/docs/system/arm/nuvoton.rst
 new file mode 100644
-index 00000000000..7ed38be2431
+index 00000000000..e3e1a3a3a73
 --- /dev/null
-+++ b/include/hw/mem/npcm7xx_mc.h
-@@ -0,0 +1,36 @@
-+/*
-+ * Nuvoton NPCM7xx Memory Controller stub
-+ *
-+ * Copyright 2020 Google LLC
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ * for more details.
-+ */
-+#ifndef NPCM7XX_MC_H
-+#define NPCM7XX_MC_H
++++ b/docs/system/arm/nuvoton.rst
+@@ -0,0 +1,92 @@
++Nuvoton iBMC boards (``npcm750-evb``, ``quanta-gsj``)
++=====================================================
 +
-+#include "exec/memory.h"
-+#include "hw/sysbus.h"
++The `Nuvoton iBMC`_ chips (NPCM7xx) are a family of ARM-based SoCs that are
++designed to be used as Baseboard Management Controllers (BMCs) in various
++servers. They all feature one or two ARM Cortex A9 CPU cores, as well as an
++assortment of peripherals targeted for either Enterprise or Data Center /
++Hyperscale applications. The former is a superset of the latter, so NPCM750 has
++all the peripherals of NPCM730 and more.
 +
-+/**
-+ * struct NPCM7xxMCState - Device state for the memory controller.
-+ * @parent: System bus device.
-+ * @mmio: Memory region through which registers are accessed.
-+ */
-+typedef struct NPCM7xxMCState {
-+    SysBusDevice parent;
++.. _Nuvoton iBMC: https://www.nuvoton.com/products/cloud-computing/ibmc/
 +
-+    MemoryRegion mmio;
-+} NPCM7xxMCState;
++The NPCM750 SoC has two Cortex A9 cores and is targeted for the Enterprise
++segment. The following machines are based on this chip :
 +
-+#define TYPE_NPCM7XX_MC "npcm7xx-mc"
-+#define NPCM7XX_MC(obj) OBJECT_CHECK(NPCM7xxMCState, (obj), TYPE_NPCM7XX_MC)
++- ``npcm750-evb``       Nuvoton NPCM750 Evaluation board
 +
-+#endif /* NPCM7XX_MC_H */
-diff --git a/hw/arm/npcm7xx.c b/hw/arm/npcm7xx.c
-index 91660025984..6bb1693833e 100644
---- a/hw/arm/npcm7xx.c
-+++ b/hw/arm/npcm7xx.c
-@@ -43,6 +43,7 @@
- #define NPCM7XX_CPUP_BA         (0xf03fe000)
- #define NPCM7XX_GCR_BA          (0xf0800000)
- #define NPCM7XX_CLK_BA          (0xf0801000)
-+#define NPCM7XX_MC_BA           (0xf0824000)
- 
- /* Internal AHB SRAM */
- #define NPCM7XX_RAM3_BA         (0xc0008000)
-@@ -186,6 +187,7 @@ static void npcm7xx_init(Object *obj)
-                             TYPE_NPCM7XX_KEY_STORAGE);
-     object_initialize_child(obj, "otp2", &s->fuse_array,
-                             TYPE_NPCM7XX_FUSE_ARRAY);
-+    object_initialize_child(obj, "mc", &s->mc, TYPE_NPCM7XX_MC);
- 
-     for (i = 0; i < ARRAY_SIZE(s->tim); i++) {
-         object_initialize_child(obj, "tim[*]", &s->tim[i], TYPE_NPCM7XX_TIMER);
-@@ -261,6 +263,10 @@ static void npcm7xx_realize(DeviceState *dev, Error **errp)
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->fuse_array), 0, NPCM7XX_OTP2_BA);
-     npcm7xx_init_fuses(s);
- 
-+    /* Fake Memory Controller (MC). Cannot fail. */
-+    sysbus_realize(SYS_BUS_DEVICE(&s->mc), &error_abort);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->mc), 0, NPCM7XX_MC_BA);
++The NPCM730 SoC has two Cortex A9 cores and is targeted for Data Center and
++Hyperscale applications. The following machines are based on this chip :
 +
-     /* Timer Modules (TIM). Cannot fail. */
-     QEMU_BUILD_BUG_ON(ARRAY_SIZE(npcm7xx_tim_addr) != ARRAY_SIZE(s->tim));
-     for (i = 0; i < ARRAY_SIZE(s->tim); i++) {
-diff --git a/hw/mem/npcm7xx_mc.c b/hw/mem/npcm7xx_mc.c
-new file mode 100644
-index 00000000000..0435d06ab44
---- /dev/null
-+++ b/hw/mem/npcm7xx_mc.c
-@@ -0,0 +1,84 @@
-+/*
-+ * Nuvoton NPCM7xx Memory Controller stub
-+ *
-+ * Copyright 2020 Google LLC
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ * for more details.
-+ */
++- ``quanta-gsj``        Quanta GSJ server BMC
 +
-+#include "qemu/osdep.h"
++There are also two more SoCs, NPCM710 and NPCM705, which are single-core
++variants of NPCM750 and NPCM730, respectively. These are currently not
++supported by QEMU.
 +
-+#include "hw/mem/npcm7xx_mc.h"
-+#include "qapi/error.h"
-+#include "qemu/log.h"
-+#include "qemu/module.h"
-+#include "qemu/units.h"
++Supported devices
++-----------------
 +
-+#define NPCM7XX_MC_REGS_SIZE (4 * KiB)
++ * SMP (Dual Core Cortex-A9)
++ * Cortex-A9MPCore built-in peripherals: SCU, GIC, Global Timer, Private Timer
++   and Watchdog.
++ * SRAM, ROM and DRAM mappings
++ * System Global Control Registers (GCR)
++ * Clock and reset controller (CLK)
++ * Timer controller (TIM)
++ * Serial ports (16550-based)
++ * DDR4 memory controller (dummy interface indicating memory training is done)
++ * OTP controllers (no protection features)
++ * Flash Interface Unit (FIU; no protection features)
 +
-+static uint64_t npcm7xx_mc_read(void *opaque, hwaddr addr, unsigned int size)
-+{
-+    /*
-+     * If bits 8..11 @ offset 0 are not zero, the boot block thinks the memory
-+     * controller has already been initialized and will skip DDR training.
-+     */
-+    if (addr == 0) {
-+        return 0x100;
-+    }
++Missing devices
++---------------
 +
-+    qemu_log_mask(LOG_UNIMP, "%s: mostly unimplemented\n", __func__);
++ * GPIO controller
++ * LPC/eSPI host-to-BMC interface, including
 +
-+    return 0;
-+}
++   * Keyboard and mouse controller interface (KBCI)
++   * Keyboard Controller Style (KCS) channels
++   * BIOS POST code FIFO
++   * System Wake-up Control (SWC)
++   * Shared memory (SHM)
++   * eSPI slave interface
 +
-+static void npcm7xx_mc_write(void *opaque, hwaddr addr, uint64_t v,
-+                             unsigned int size)
-+{
-+    qemu_log_mask(LOG_UNIMP, "%s: mostly unimplemented\n", __func__);
-+}
++ * Ethernet controllers (GMAC and EMC)
++ * USB host (USBH)
++ * USB device (USBD)
++ * SMBus controller (SMBF)
++ * Peripheral SPI controller (PSPI)
++ * Analog to Digital Converter (ADC)
++ * SD/MMC host
++ * Random Number Generator (RNG)
++ * PECI interface
++ * Pulse Width Modulation (PWM)
++ * Tachometer
++ * PCI and PCIe root complex and bridges
++ * VDM and MCTP support
++ * Serial I/O expansion
++ * LPC/eSPI host
++ * Coprocessor
++ * Graphics
++ * Video capture
++ * Encoding compression engine
++ * Security features
 +
-+static const MemoryRegionOps npcm7xx_mc_ops = {
-+    .read = npcm7xx_mc_read,
-+    .write = npcm7xx_mc_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+        .unaligned = false,
-+    },
-+};
++Boot options
++------------
 +
-+static void npcm7xx_mc_realize(DeviceState *dev, Error **errp)
-+{
-+    NPCM7xxMCState *s = NPCM7XX_MC(dev);
++The Nuvoton machines can boot from an OpenBMC firmware image, or directly into
++a kernel using the ``-kernel`` option. OpenBMC images for `quanta-gsj` and
++possibly others can be downloaded from the OpenPOWER jenkins :
 +
-+    memory_region_init_io(&s->mmio, OBJECT(s), &npcm7xx_mc_ops, s, "regs",
-+                          NPCM7XX_MC_REGS_SIZE);
-+    sysbus_init_mmio(&s->parent, &s->mmio);
-+}
++   https://openpower.xyz/
 +
-+static void npcm7xx_mc_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
++The firmware image should be attached as an MTD drive. Example :
 +
-+    dc->desc = "NPCM7xx Memory Controller stub";
-+    dc->realize = npcm7xx_mc_realize;
-+}
++.. code-block:: bash
 +
-+static const TypeInfo npcm7xx_mc_types[] = {
-+    {
-+        .name = TYPE_NPCM7XX_MC,
-+        .parent = TYPE_SYS_BUS_DEVICE,
-+        .instance_size = sizeof(NPCM7xxMCState),
-+        .class_init = npcm7xx_mc_class_init,
-+    },
-+};
-+DEFINE_TYPES(npcm7xx_mc_types);
-diff --git a/hw/mem/meson.build b/hw/mem/meson.build
-index ba424622bbb..0d22f2b5727 100644
---- a/hw/mem/meson.build
-+++ b/hw/mem/meson.build
-@@ -1,6 +1,7 @@
- mem_ss = ss.source_set()
- mem_ss.add(files('memory-device.c'))
- mem_ss.add(when: 'CONFIG_DIMM', if_true: files('pc-dimm.c'))
-+mem_ss.add(when: 'CONFIG_NPCM7XX', if_true: files('npcm7xx_mc.c'))
- mem_ss.add(when: 'CONFIG_NVDIMM', if_true: files('nvdimm.c'))
- 
- softmmu_ss.add_all(when: 'CONFIG_MEM_DEVICE', if_true: mem_ss)
++  $ qemu-system-arm -machine quanta-gsj -nographic \
++      -drive file=image-bmc,if=mtd,bus=0,unit=0,format=raw
++
++The default root password for test images is usually ``0penBmc``.
+diff --git a/docs/system/target-arm.rst b/docs/system/target-arm.rst
+index afdb37e7384..fdcf25c2375 100644
+--- a/docs/system/target-arm.rst
++++ b/docs/system/target-arm.rst
+@@ -86,6 +86,7 @@ undocumented; you can get a complete list by running
+    arm/musicpal
+    arm/gumstix
+    arm/nseries
++   arm/nuvoton
+    arm/orangepi
+    arm/palm
+    arm/xscale
 -- 
 2.20.1
 
