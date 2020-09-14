@@ -2,85 +2,89 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CB29C43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 07:18:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BED05C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 07:18:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDE9721548
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 07:18:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 583CC21548
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 07:18:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LkkUH0t0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDE9721548
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HR4guqP6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 583CC21548
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHil1-0000eA-Py
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 03:18:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49304)
+	id 1kHil4-0000j6-94
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 03:18:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49306)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHik1-0007Xw-Be
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHik1-0007Xx-D2
  for qemu-devel@nongnu.org; Mon, 14 Sep 2020 03:17:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50282)
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43890)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHijy-000217-HV
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 03:17:32 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHijz-00021W-LN
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 03:17:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600067849;
+ s=mimecast20190719; t=1600067851;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=JZdohivG8OwPaekS7kZwOMGmQnOEdRQq9UPoCkczNfM=;
- b=LkkUH0t0o1pQv3MO05ZnpCdhtZkSXX2+D7sw66HRLfFhEXfWGN+bGUUxSvasK/TPS5oZHH
- 0nAgSykcLiHqfz3uZsp6WAeVWE/lgkl7qXS46Yzgz6qVL4VUO7xbNgMMnPOLRHAFrD0PHc
- kYlE9IOdyH7WRVuJSdIhdzL6Mxfkmhk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-BC9tfZD4P-GU1oZ8ZbgjHw-1; Mon, 14 Sep 2020 03:17:24 -0400
-X-MC-Unique: BC9tfZD4P-GU1oZ8ZbgjHw-1
-Received: by mail-wm1-f71.google.com with SMTP id b14so2898997wmj.3
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 00:17:23 -0700 (PDT)
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=EgwrzFklfMso8GiwV7PkcDWToLClRIWXp85qXWnix6Q=;
+ b=HR4guqP6Xov4MXT9UjwcQnMyBFPWMDoT5sjsJg0AUsLZpe3Zce18F5OzJccDCpqRHoG4H2
+ ukrIAzpXINs9lvPrEIEjzbVm6q7aUm+rag+159NAurtvHfc54OZCdeJsMOJzrJFvSZChkG
+ iuU+BdNMNhl0eyCfKoq8qWtnk77JqDU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-153-IgS1POIUN8CYxFwqZE3zcQ-1; Mon, 14 Sep 2020 03:17:29 -0400
+X-MC-Unique: IgS1POIUN8CYxFwqZE3zcQ-1
+Received: by mail-wm1-f69.google.com with SMTP id a7so2142567wmc.2
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 00:17:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=JZdohivG8OwPaekS7kZwOMGmQnOEdRQq9UPoCkczNfM=;
- b=T8fiNSZLgsmAL+yZ9wmX6DjPuqXVtrROaCM3SFhIDAxgJPuWyo+qurgUlgecDvl/+B
- kYq07P7WU9VA0vFQX14W2KnIRugDWUKOZrYjzEpKGWMl6AXqn0xiiIcbhA4MsT1O2C8a
- 8fxkilJNr7JZtq/r1XwoZbVn767mZFGRwsiGKIGXXM/9tEWh1DATwhxaNP+4s/nm0HG9
- EhUp49NuZQ7/WZuoDk5tZv2bp5m4R4OfVsTNd8o6/LE++acYUZipmSk/1DTBz+01cI86
- 175fk9aml4aq+SEwoZF3Y0k6tUFp6+rKJkfeaE5PHMdvm8rPQA4KI0Gi+ZmzTCSt/UNv
- VFuA==
-X-Gm-Message-State: AOAM533ZmzILwEZ1dQJ0pTRu3Lm5xfe5rCEnc0XBjs6ZFjYlERov3qLf
- c3czLkVTkqP8pFvo/qRPGriEbHyRbESueclwtCCs+EW3xMWJkh74lJzDRqHWMMPFiFgpbLB83fn
- nxoy7t0e5dDhx0qU=
-X-Received: by 2002:adf:ef45:: with SMTP id c5mr13887811wrp.37.1600067842616; 
- Mon, 14 Sep 2020 00:17:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzFpQuiVCqi9PXUzY1WA59wm7FBhBivers5jKIDr5YCRZ9muz3ZP60tS7fHI64vFOL/8PA1yg==
-X-Received: by 2002:adf:ef45:: with SMTP id c5mr13887785wrp.37.1600067842376; 
- Mon, 14 Sep 2020 00:17:22 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=EgwrzFklfMso8GiwV7PkcDWToLClRIWXp85qXWnix6Q=;
+ b=gct42v8QH2SOR4+W8axqSRs0/+VBlA9LpDj0KoNf6jomUcCwpVXn+tpOFuxL9Z736G
+ qUMTLqmHDpR3hcLFQNZ7v8HzQJklKbK7AHIeMcRROezFkc2RR187LkD4XOJMsGzWXLJK
+ ybvdVoXCYjhf2Z/UjiLjdnxValetFZh/9AIkm0BRBQ4i/0Kdd1iut455z98ZC3PP99HU
+ /UJzywnjX3XuVPsVEAhMcpMxUsJJKXtiAUz6F+xXaxuD5RoZcFeoyA8aTKHMGcXRuVGX
+ 8N0tFfHeheyGTrByVZrFSyZqbscs0QKMUg0eN52vSDik0UGprpAsVXaztbwp4K78z8c3
+ 2XUw==
+X-Gm-Message-State: AOAM533aAe4Kd3Efrkp5QwLj1KxRN6JjXf9I26h32pp6z2zIm7647Ipm
+ rELXEUNU49Pom/9Ay1eOqeYDF3W4PEvkwQCmYz8uyeZz9FSJnNQ0Hpw/AHcWofGc1FoKc9sLJEk
+ FsLC3XSJPsEK+u/M=
+X-Received: by 2002:a1c:7716:: with SMTP id t22mr12890359wmi.64.1600067847630; 
+ Mon, 14 Sep 2020 00:17:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzd6Lb8nddHp5N/1In+XgC7uxByr70NyaCE5mGEkkvns9gAZUdOhmQyPrOZy4XWxqAvH1ZZ+w==
+X-Received: by 2002:a1c:7716:: with SMTP id t22mr12890335wmi.64.1600067847370; 
+ Mon, 14 Sep 2020 00:17:27 -0700 (PDT)
 Received: from localhost.localdomain (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id v9sm22640343wrv.35.2020.09.14.00.17.21
+ by smtp.gmail.com with ESMTPSA id q192sm19652914wme.13.2020.09.14.00.17.26
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Sep 2020 00:17:21 -0700 (PDT)
+ Mon, 14 Sep 2020 00:17:26 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/10] EDK2 firmware: Adopt the edk2-stable202008 release
-Date: Mon, 14 Sep 2020 09:17:10 +0200
-Message-Id: <20200914071720.1099898-1-philmd@redhat.com>
+Subject: [PULL 01/10] Makefile: remove obsolete edk2 exception from "clean"
+ rule
+Date: Mon, 14 Sep 2020 09:17:11 +0200
+Message-Id: <20200914071720.1099898-2-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200914071720.1099898-1-philmd@redhat.com>
+References: <20200914071720.1099898-1-philmd@redhat.com>
 MIME-Version: 1.0
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
@@ -114,87 +118,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 3d9f371b01067d9cec4d592920013012119397c8:
+From: Laszlo Ersek <lersek@redhat.com>
 
-  Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-fixes-100920-1' into staging (2020-09-12 22:54:32 +0100)
+The file "BaseTools/Source/Python/UPT/Dll/sqlite3.dll" was removed in edk2
+commit 26e2b295ec7a ("BaseTools:Remove unused
+BaseTools\Source\Python\UPT\Dll", 2019-05-08), part of edk2-stable201905,
+so skipping it in the outermost in-tree "clean" rule is unnecessary.
 
-are available in the Git repository at:
+Remove the obsolete pathname reference.
 
-  https://gitlab.com/philmd/qemu.git tags/edk2-next-20200914
+Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
+Ref: https://bugs.launchpad.net/qemu/+bug/1852196
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200908072939.30178-2-lersek@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ Makefile | 1 -
+ 1 file changed, 1 deletion(-)
 
-for you to fetch changes up to 8fa3b7029f3c9f901cd6bb01004114c003432d9b:
-
-  tests: acpi: update "virt/SSDT.memhp" for edk2-stable202008 (2020-09-13 23:03:15 +0200)
-
-----------------------------------------------------------------
-EDK2 firmware: Adopt the edk2-stable202008 release
-
-Note from Laszlo Ersek [1] while addressing LP#1852196 [2]:
-
-Consume the following upstream edk2 releases:
-
-  https://github.com/tianocore/edk2/releases/tag/edk2-stable201908
-  https://github.com/tianocore/edk2/releases/tag/edk2-stable201911
-  https://github.com/tianocore/edk2/releases/tag/edk2-stable202002
-  https://github.com/tianocore/edk2/releases/tag/edk2-stable202005
-  https://github.com/tianocore/edk2/releases/tag/edk2-stable202008
-
-Worth mentioning (in random order):
-
-- various CVE fixes (see [2] and shortlog)
-- OpenSSL-1.1.1g
-- UEFI HTTPS Boot for ARM/AARCH64
-- TPM2 for ARM/AARCH64
-- VCPU hotplug with SMI
-- support for Linux v5.7+ initrd and mixed mode loading
-- Fusion-MPT SCSI driver in OVMF
-- VMware PVSCSI driver in OVMF
-- PXEv4 / PXEv6 boot possible to disable on the QEMU command line
-- SEV-ES support
-
-The IA32 and X64 binaries are now smaller -- the reason is that Laszlo
-built them with DevToolSet 9 (gcc-9) on RHEL7, and so this is the first
-time they've undergone LTO (with the GCC5 edk2 toolchain settings).
-
-CI jobs results:
-  https://gitlab.com/philmd/qemu/-/pipelines/189394120
-  https://travis-ci.org/github/philmd/qemu/builds/726842542
-  https://app.shippable.com/github/philmd/qemu/runs/866/summary/console
-
-[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg738173.html
-[2] https://bugs.launchpad.net/qemu/+bug/1852196
-
-----------------------------------------------------------------
-
-Laszlo Ersek (10):
-  Makefile: remove obsolete edk2 exception from "clean" rule
-  roms/efirom, tests/uefi-test-tools: update edk2's own submodules first
-  roms/Makefile.edk2: prepare for replacing TPM2*_ENABLE macros
-  tests: acpi: tolerate "virt/SSDT.memhp" mismatch temporarily
-  roms/edk2: update submodule from edk2-stable201905 to
-    edk2-stable202008
-  roms/Makefile.edk2: complete replacing TPM2*_ENABLE macros
-  roms/Makefile.edk2: enable new ARM/AARCH64 flags up to
-    edk2-stable202008
-  pc-bios: refresh edk2 build artifacts for edk2-stable202008
-  pc-bios: update the README file with edk2-stable202008 information
-  tests: acpi: update "virt/SSDT.memhp" for edk2-stable202008
-
- Makefile                               |   1 -
- pc-bios/README                         |   4 ++--
- pc-bios/edk2-aarch64-code.fd.bz2       | Bin 1178070 -> 1507722 bytes
- pc-bios/edk2-arm-code.fd.bz2           | Bin 1172752 -> 1503187 bytes
- pc-bios/edk2-i386-code.fd.bz2          | Bin 1736199 -> 1646741 bytes
- pc-bios/edk2-i386-secure-code.fd.bz2   | Bin 1943949 -> 1860546 bytes
- pc-bios/edk2-x86_64-code.fd.bz2        | Bin 1717094 -> 1680164 bytes
- pc-bios/edk2-x86_64-secure-code.fd.bz2 | Bin 1958037 -> 1912112 bytes
- roms/Makefile                          |   1 +
- roms/Makefile.edk2                     |  26 +++++++++++++++----------
- roms/edk2                              |   2 +-
- tests/data/acpi/virt/SSDT.memhp        | Bin 736 -> 736 bytes
- tests/uefi-test-tools/Makefile         |   1 +
- 13 files changed, 21 insertions(+), 14 deletions(-)
-
+diff --git a/Makefile b/Makefile
+index 57f72f56c6c..7c60b9dcb83 100644
+--- a/Makefile
++++ b/Makefile
+@@ -200,7 +200,6 @@ clean: recurse-clean ninja-clean clean-ctlist
+ 	find . \( -name '*.so' -o -name '*.dll' -o -name '*.[oda]' \) -type f \
+ 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-aarch64.a \
+ 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-arm.a \
+-		! -path ./roms/edk2/BaseTools/Source/Python/UPT/Dll/sqlite3.dll \
+ 		-exec rm {} +
+ 	rm -f TAGS cscope.* *.pod *~ */*~
+ 	rm -f fsdev/*.pod scsi/*.pod
 -- 
 2.26.2
 
