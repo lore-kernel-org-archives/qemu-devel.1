@@ -2,92 +2,89 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AAAAC43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:47:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA1C2C43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:51:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A77CD208E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:47:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3918C206BE
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:51:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cqHT7uHa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A77CD208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="ivF/VB8r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3918C206BE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHpl6-0001Vu-QS
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 10:47:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54348)
+	id 1kHppL-0003xL-1W
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 10:51:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60046)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kHpWu-0000fI-Ul
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:32:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42964
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kHpWs-0002sr-4g
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:32:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600093944;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MbjXg/tr5NJidRCp1NxTRuMBj5nSWST9axGLSKjhneg=;
- b=cqHT7uHaTXirb/tVAuYUsYW7Ncr6V5h9jhhhSa7yCKAGhPp11t89Z7/sUHC9UQB7Z0jNWN
- jSEn5KFdN4MXD3VPxdRWcMuveRg1FM8wVoD2CiJcu6LO3hiFXevRxABATQxbMNJQtGWI3h
- uJIwGqYfhe9b09ARY9x+C41s7xyDSd8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-428-mwe4vugHNwuoIN8qe6vP6Q-1; Mon, 14 Sep 2020 10:32:19 -0400
-X-MC-Unique: mwe4vugHNwuoIN8qe6vP6Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 570D11005E5D;
- Mon, 14 Sep 2020 14:32:18 +0000 (UTC)
-Received: from [10.3.113.68] (ovpn-113-68.phx2.redhat.com [10.3.113.68])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F53276E16;
- Mon, 14 Sep 2020 14:32:11 +0000 (UTC)
-Subject: Re: [PATCH] docs/system: clarify deprecation scheduled
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
-References: <20200811104736.17140-1-stefanha@redhat.com>
- <20200914142146.GN1252186@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <5ccbee6a-cbf7-d790-457f-b15c3eef5c1e@redhat.com>
-Date: Mon, 14 Sep 2020 09:32:11 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kHpoS-0003KS-DG
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:50:36 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37922)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kHpoQ-0005LW-1m
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:50:36 -0400
+Received: by mail-wm1-x343.google.com with SMTP id l9so346131wme.3
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 07:50:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=BFJVlSwkU9Jhg1YeFJp2YmxLghPWtLUVqgXJN5m/8ss=;
+ b=ivF/VB8r/s6Wxx3Ln33v9ZmvLvM/rurRL/GoKC28em0ax46KP5MmdZ8JAisWcvJD1D
+ Dlapy9/m18DwFTounMdi7ZyZ9774iUiehWCF+PGtObCuCtt6n5uJPRc4EllkYEH+sgmx
+ PTPNDHWJ9DHyqLcHR6L4/Qn5P4UzF2BBHzV9EMIj6hYACC15UyVaEWi4tF8GsUSNJpZ9
+ CBbaiFxJ9RGsChlAUQy0DhluGbHD5pR49qxxb+hOQMHGswfxJmVWNSdvxvdnZIBnR9A3
+ 2Cv2CMJG6GXLib8bkxs2kHu05Zy57dHQLMg+7+jnE5POBSP6D8uAEFrb6qttqS48S+5b
+ iAig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=BFJVlSwkU9Jhg1YeFJp2YmxLghPWtLUVqgXJN5m/8ss=;
+ b=OAAwNK/qvNQbnKH4YfitaUCIZMMlp6EdEdYbVeobecJPY7JE8y/2TjtkGZatkApkAI
+ ckhwlKscG/HsJ1KP4j7OYrnHKg4PLldF0d5SgjBT9fw5ZjahzJjMSeW8DOPZ0gZMxFOK
+ ocLiYEtAr0dVAqzN6TBFESl3/iO+s9r6+Ew26nD9yM5eTnrZWR6nM9iv7E243+EBGu26
+ F3DPVg6BqXPV4GNwJu5AbRQYPtCQdSUJ2myKna/XQGfpQCdazlYgbXNhA1OFkTM4nlxH
+ g7Yfdg9H/WNiKD6PfBofVQ6Mi/Vfv8gVL/sfmotNdA5+4tn/tR6YOR2ng6zPl7CHtVvE
+ I+HA==
+X-Gm-Message-State: AOAM5319Ul5yXJO0vZyVfhjvPQNp0i4HBpicXCA9PJ8FZqWyGIAIGRFD
+ bDEbv3MOJon2PTGpn4V7BogE8jWcGGCxGNZSS+PCPQ==
+X-Google-Smtp-Source: ABdhPJx3mjycABIvyGDe05ZZTi3Aa56calRYJn9j2lPun9VesqkH+qIp1dZvdnExyrTE0Iku3M5y0s0ldIPuleJRzcA=
+X-Received: by 2002:a1c:7405:: with SMTP id p5mr15456569wmc.35.1600095032377; 
+ Mon, 14 Sep 2020 07:50:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200914142146.GN1252186@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 01:39:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -38
-X-Spam_score: -3.9
-X-Spam_bar: ---
-X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200911180755.28409-1-ani@anisinha.ca>
+ <20200911180755.28409-9-ani@anisinha.ca>
+ <20200914150550.23a91fa2@redhat.com>
+ <CAARzgwyrSW4jjrPCc1SJkDZUV9C-e_96RNGytZ8VjpPzzrWfXg@mail.gmail.com>
+ <CAARzgwx4T0MXtFTMe-b8DbAQCi7xq231kjOv8wRcRxwE5HPCyw@mail.gmail.com>
+ <20200914160910.66785da8@redhat.com>
+In-Reply-To: <20200914160910.66785da8@redhat.com>
+From: Ani Sinha <ani@anisinha.ca>
+Date: Mon, 14 Sep 2020 20:20:21 +0530
+Message-ID: <CAARzgwzSg7zCk_jaQ7iriC4_L+9oTykv0RhPdkTroP9pNtiMCg@mail.gmail.com>
+Subject: Re: [PATCH 9/9] piix4: don't reserve hw resources when hotplug is off
+ globally
+To: Igor Mammedov <imammedo@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: none client-ip=2a00:1450:4864:20::343;
+ envelope-from=ani@anisinha.ca; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,40 +97,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, Peter Maydell <peter.maydell@linaro.org>,
- philmd@redhat.com, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Julia Suvorova <jusual@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/14/20 9:21 AM, Daniel P. Berrangé wrote:
-> On Tue, Aug 11, 2020 at 11:47:36AM +0100, Stefan Hajnoczi wrote:
->> The sentence explaining the deprecation schedule is ambiguous. Make it
->> clear that a feature deprecated in the Nth release is guaranteed to
->> remain available in the N+1th release. Removal can occur in the N+2nd
->> release or later.
->>
+On Mon, Sep 14, 2020 at 7:39 PM Igor Mammedov <imammedo@redhat.com> wrote:
+>
+> On Mon, 14 Sep 2020 18:58:19 +0530
+> Ani Sinha <ani@anisinha.ca> wrote:
+>
+> > On Mon, Sep 14, 2020 at 6:40 PM Ani Sinha <ani@anisinha.ca> wrote:
+> > >
+> > > On Mon, Sep 14, 2020 at 6:36 PM Igor Mammedov <imammedo@redhat.com> wrote:
+> > > >
+> > > > On Fri, 11 Sep 2020 23:37:55 +0530
+> > > > Ani Sinha <ani@anisinha.ca> wrote:
+> > > >
+> > > > > When acpi hotplug is turned off for both root pci bus as well as for pci
+> > > > > bridges, we should not generate the related amls for DSDT table or initialize
+> > > > > related hw ports or reserve hw resources. This change makes sure all those
+> > > > > operations are turned off in the case acpi pci hotplug is off globally.
+> > > >
+> > > > it still leaves around pure PCI hotplug ACPI code:
+> > > >
+> > > >             Method (PCNT, 0, NotSerialized)
+> > > >             {
+> > > >             }
+> > >
+> > > How do you suggest we fix this?
+> >
+> > One way to fix this would be to do this:
+> >
+> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > index 7e3cf3b57b..2bd0c37143 100644
+> > --- a/hw/i386/acpi-build.c
+> > +++ b/hw/i386/acpi-build.c
+> > @@ -483,7 +483,8 @@ static void build_append_pci_bus_devices(Aml
+> > *parent_scope, PCIBus *bus,
+> >              aml_append(method, aml_name("^S%.02X.PCNT", devfn));
+> >          }
+> >      }
+> > -    aml_append(parent_scope, method);
+> > +    if (bsel)
+> > +        aml_append(parent_scope, method);
+> >      qobject_unref(bsel);
+> >  }
+> >
+> > This means that if the hotplug on the root bus is disabled, we also
+> > disable PCNT. This will also need the unit test update as the unit
+> Does bridge hot-plug still work if we disable it only on root bus?
 
-> So we're changing
-> 
->    The feature will remain functional for 2 releases prior to actual removal.
-> 
-> to
-> 
->    The feature will remain functional for 1 more release after deprecation.
-> 
-> How about
-> 
->    The feature will remain functional for the release in which it was
->    deprecated and one further release. After these two releases, the
->    feature is liable to be removed.
+Just did a quick test. Windows seems to eject devices on the bridge
+even when the root bus hot plug is off.
 
-Longer, but definitely conveys more information in an 
-easier-to-understand format.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+>
+> > test
+> > will fail with :
+> >
+> > @@ -3113,24 +3113,20 @@
+> >                  Name (_ADR, 0x00010000)  // _ADR: Address
+> >                  Method (_S1D, 0, NotSerialized)  // _S1D: S1 Device State
+> >                  {
+> >                      Return (Zero)
+> >                  }
+> >
+> >                  Method (_S2D, 0, NotSerialized)  // _S2D: S2 Device State
+> >                  {
+> >                      Return (Zero)
+> >                  }
+> >
+> >                  Method (_S3D, 0, NotSerialized)  // _S3D: S3 Device State
+> >                  {
+> >                      Return (Zero)
+> >                  }
+> >              }
+> > -
+> > -            Method (PCNT, 0, NotSerialized)
+> > -            {
+> > -            }
+> >          }
+> >      }
+> >  }
+> >
+> > Let's fix this as a separate patch.
+>
+> I'd rather fix up this patch, so it would do what it claims.
+>
+> > >
+> > > > >
+> > > > > Signed-off-by: Ani Sinha <ani@anisinha.ca>
+> > > > > ---
+> > > > >  hw/acpi/piix4.c      |  6 ++++--
+> > > > >  hw/i386/acpi-build.c | 10 ++++++++--
+> > > > >  2 files changed, 12 insertions(+), 4 deletions(-)
+> > > > >
+> > > > > diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> > > > > index e6163bb6ce..b70b1f98af 100644
+> > > > > --- a/hw/acpi/piix4.c
+> > > > > +++ b/hw/acpi/piix4.c
+> > > > > @@ -596,8 +596,10 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
+> > > > >                            "acpi-gpe0", GPE_LEN);
+> > > > >      memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
+> > > > >
+> > > > > -    acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
+> > > > > -                    s->use_acpi_hotplug_bridge);
+> > > > > +    if (s->use_acpi_hotplug_bridge || s->use_acpi_root_pci_hotplug) {
+> > > > > +        acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
+> > > > > +                        s->use_acpi_hotplug_bridge);
+> > > > > +    }
+> > > > >
+> > > > >      s->cpu_hotplug_legacy = true;
+> > > > >      object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
+> > > > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > > > > index e079b686f5..7e3cf3b57b 100644
+> > > > > --- a/hw/i386/acpi-build.c
+> > > > > +++ b/hw/i386/acpi-build.c
+> > > > > @@ -95,6 +95,7 @@ typedef struct AcpiPmInfo {
+> > > > >      bool s3_disabled;
+> > > > >      bool s4_disabled;
+> > > > >      bool pcihp_bridge_en;
+> > > > > +    bool pcihp_root_en;
+> > > > >      uint8_t s4_val;
+> > > > >      AcpiFadtData fadt;
+> > > > >      uint16_t cpu_hp_io_base;
+> > > > > @@ -245,6 +246,9 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
+> > > > >      pm->pcihp_bridge_en =
+> > > > >          object_property_get_bool(obj, "acpi-pci-hotplug-with-bridge-support",
+> > > > >                                   NULL);
+> > > > > +    pm->pcihp_root_en =
+> > > > > +        object_property_get_bool(obj, "acpi-root-pci-hotplug",
+> > > > > +                                 NULL);
+> > > > >  }
+> > > > >
+> > > > >  static void acpi_get_misc_info(AcpiMiscInfo *info)
+> > > > > @@ -1504,7 +1508,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> > > > >          build_hpet_aml(dsdt);
+> > > > >          build_piix4_isa_bridge(dsdt);
+> > > > >          build_isa_devices_aml(dsdt);
+> > > > > -        build_piix4_pci_hotplug(dsdt);
+> > > > > +        if (pm->pcihp_bridge_en || pm->pcihp_root_en) {
+> > > > > +            build_piix4_pci_hotplug(dsdt);
+> > > > > +        }
+> > > > >          build_piix4_pci0_int(dsdt);
+> > > > >      } else {
+> > > > >          sb_scope = aml_scope("_SB");
+> > > > > @@ -1698,7 +1704,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> > > > >      crs_range_set_free(&crs_range_set);
+> > > > >
+> > > > >      /* reserve PCIHP resources */
+> > > > > -    if (pm->pcihp_io_len) {
+> > > > > +    if (pm->pcihp_io_len && (pm->pcihp_bridge_en || pm->pcihp_root_en)) {
+> > > > >          dev = aml_device("PHPR");
+> > > > >          aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A06")));
+> > > > >          aml_append(dev,
+> > > >
+> >
+>
 
