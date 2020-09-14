@@ -2,90 +2,93 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6BAFC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 13:51:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31ECCC43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 13:51:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73C5B208E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 13:51:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C01CF208E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 13:51:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="iO2NTlUw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73C5B208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bytedance.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BCsuzFX3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C01CF208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHosx-00072J-HB
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 09:51:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34678)
+	id 1kHot9-0007S2-PU
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 09:51:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37980)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pizhenwei@bytedance.com>)
- id 1kHolf-0004aC-QO
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:43:39 -0400
-Received: from mail-pf1-x432.google.com ([2607:f8b0:4864:20::432]:34507)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <pizhenwei@bytedance.com>)
- id 1kHole-0003Dt-2O
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:43:39 -0400
-Received: by mail-pf1-x432.google.com with SMTP id v196so12803331pfc.1
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 06:43:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bytedance-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=JROvm5rr8+1Wo6J5ML/BSylPouNvBTyMPETS3dPRS0U=;
- b=iO2NTlUwRzUBjKxIrIcrFbtpVDp0XQ0a1GoBBi8ezebXOEJYVnCFA5YE3yDHFpdqN0
- UpWaBYutZ4W4KeHjlRUo8YXQlFpdCWW8EvFRG62gxkpBQmf5/514DLIH3AYrmBwTKN2t
- Yz7jfi/B0b3JGjFqS/Y3jbHISVXncB3CmGQ1E5LcDjurXf13L116h9PLNMYAX0SWIQg3
- huxoZAHVkCFMhas2w877YQjNDg5iqiQJXguTI0mAC1dlCGQzsYmeRo6kR8PXrhcOHc4q
- OrcOAPKjL+uy+FdtvWCXzfGL9Dn/iYq+NmYnnQYKaUeBW1itpVT8EgRpKhrFZSNJb8u2
- 3LXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=JROvm5rr8+1Wo6J5ML/BSylPouNvBTyMPETS3dPRS0U=;
- b=NFZff72ez7sXpfKCl/T3CO/wUgzGYwRWQY1nH3z3cB45bnWruNZ1SVZHUYJoWmSrBl
- UE3vt0HOdpyrcuCXyoSBayfHcGucPmVYg6iL6TZuObHKuAP/0w32IUsfSN9VDY55gc7O
- G5h/2A8xE5xtKUxPjLbJEQSiQh5UjP6bA0iDJnaLKlaa01F8/LB91A1qAGk2WLWi48q+
- 6euJbLqrJMumwyDocDLBeQj7uADXgyZ+XQcaDmD7Ooxrmee9PaH5jU7zyKUXXNhilgrz
- eMRPojwaOuVevvyydcFKnlklV/IIN6K1+jBpevw4nU7yDjM/F9TQBb02WOVpeCHYQWVX
- REVw==
-X-Gm-Message-State: AOAM533QaBTxmeHJAVCMHd71IAkHVfAHcP3betH+1iddMiqM7ZJPVzsT
- D3zhT79VjU/O5pfeApqyo0v3Yg==
-X-Google-Smtp-Source: ABdhPJz3IDFU3LaNb/2kVDj8Xj91ZvFmbnrqBDRygh4Rh/LOCuRErfRq2Y/yjx+HnrSSKzRvQT3idQ==
-X-Received: by 2002:a62:4e49:: with SMTP id c70mr13275778pfb.100.1600091016777; 
- Mon, 14 Sep 2020 06:43:36 -0700 (PDT)
-Received: from libai.bytedance.net ([61.120.150.71])
- by smtp.gmail.com with ESMTPSA id c4sm7626378pjq.7.2020.09.14.06.43.34
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 14 Sep 2020 06:43:36 -0700 (PDT)
-From: zhenwei pi <pizhenwei@bytedance.com>
-To: armbru@redhat.com,
-	pbonzini@redhat.com,
-	mtosatti@redhat.com
-Subject: [PATCH 3/3] target-i386: post memory failure event to uplayer
-Date: Mon, 14 Sep 2020 21:43:21 +0800
-Message-Id: <20200914134321.958079-4-pizhenwei@bytedance.com>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20200914134321.958079-1-pizhenwei@bytedance.com>
-References: <20200914134321.958079-1-pizhenwei@bytedance.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::432;
- envelope-from=pizhenwei@bytedance.com; helo=mail-pf1-x432.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kHosJ-000670-03
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:50:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47940)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kHosG-0004cx-C7
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:50:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600091427;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=YEJbQkzrhuUP1Sq5Y3kI4aEfq75TO/6TswEr0tZeyXs=;
+ b=BCsuzFX3g5Z3wD5MQjpzCYKsztVMkLwiJd/jqpHsrjQ9WEW72r1bs9UfBw9VZjZnMWK5pE
+ CZIB82UUvYDxmEOsOC/Q5MDW4S/nFasMs/PYTYAd//Vex7tkiozqgrj02XLE47fhTwnBnX
+ /uIy9rz9Amdq4H0En75Oq6rBfxXVA+U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-525-R5Eqe6nLPYKNb_9MxqtjMg-1; Mon, 14 Sep 2020 09:50:18 -0400
+X-MC-Unique: R5Eqe6nLPYKNb_9MxqtjMg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0D591017DCB;
+ Mon, 14 Sep 2020 13:50:17 +0000 (UTC)
+Received: from redhat.com (ovpn-114-99.ams2.redhat.com [10.36.114.99])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 18BE05E1DF;
+ Mon, 14 Sep 2020 13:50:15 +0000 (UTC)
+Date: Mon, 14 Sep 2020 14:50:13 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: Moving to C11? (was Re: Redefinition of typedefs (C11 feature))
+Message-ID: <20200914135013.GM1252186@redhat.com>
+References: <20200911184919.GV1618070@habkost.net>
+ <CAFEAcA-dnKVyUQ3_ZifdDvrpCbKB1zciuu224BbB1WRV0npxzw@mail.gmail.com>
+ <20200911200649.GW1618070@habkost.net>
+ <e2e2a955-693d-1372-f2e2-c58b7f88d0d7@redhat.com>
+ <20200913025151.GX1618070@habkost.net>
+ <329a1ae1-7b74-4045-3305-0577fcbb447a@redhat.com>
+ <20200914134636.GZ1618070@habkost.net>
+MIME-Version: 1.0
+In-Reply-To: <20200914134636.GZ1618070@habkost.net>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:10:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -38
+X-Spam_score: -3.9
+X-Spam_bar: ---
+X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,83 +101,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, pizhenwei@bytedance.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Post memory failure event to uplayer to handle hardware memory
-corrupted event. Rather than simple QEMU log, QEMU could report more
-effective message to uplayer. For example, guest crashes by MCE,
-selecting another host server is a better choice.
+On Mon, Sep 14, 2020 at 09:46:36AM -0400, Eduardo Habkost wrote:
+> On Mon, Sep 14, 2020 at 07:39:09AM +0200, Thomas Huth wrote:
+> > On 13/09/2020 04.51, Eduardo Habkost wrote:
+> > > On Sat, Sep 12, 2020 at 08:45:19AM +0200, Thomas Huth wrote:
+> > >> On 11/09/2020 22.06, Eduardo Habkost wrote:
+> > >>> On Fri, Sep 11, 2020 at 08:06:10PM +0100, Peter Maydell wrote:
+> > >>>> On Fri, 11 Sep 2020 at 19:49, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > >>>>>
+> > >>>>> I'm wondering: do our supported build host platforms all include
+> > >>>>> compilers that are new enough to let us redefine typedefs?
+> > >>>>>
+> > >>>>> The ability to redefine typedefs is a C11 feature which would be
+> > >>>>> very useful for simplifying our QOM boilerplate code.  The
+> > >>>>> feature is supported by GCC since 2011 (v4.6.0)[1], and by clang
+> > >>>>> since 2012 (v3.1)[2].
+> > >>>>
+> > >>>> In configure we mandate either GCC v4.8 or better, or
+> > >>>> clang v3.4 or better, or XCode Clang v5.1 or better
+> > >>>> (Apple uses a different version numbering setup to upstream).
+> > >>>> So you should probably double-check that that xcode clang has
+> > >>>> what you want, but it looks like we're good to go otherwise.
+> > >>>
+> > >>> Can anybody confirm if the following is accurate?
+> > >>>
+> > >>> https://gist.github.com/yamaya/2924292#file-xcode-clang-vers-L67
+> > >>> # Xcode 5.1 (5B130a)
+> > >>> Apple LLVM version 5.1 (clang-503.0.38) (based on LLVM 3.4svn)
+> > >>> Target: x86_64-apple-darwin13.1.0
+> > >>> Thread model: posix
+> > >>>
+> > >>> If we know we have GCC 4.8+ or clang 3.4+, can we move to C11 and
+> > >>> start using -std=gnu11?
+> > >>
+> > >> You don't have to switch to gnu11, redefintions of typedefs are already
+> > >> fine in gnu99, they are a gnu extension there to the c99 standard.
+> > >>
+> > >> See also:
+> > >> https://git.qemu.org/?p=qemu.git;a=commitdiff;h=7be41675f7cb16b
+> > >>
+> > >> https://www.mail-archive.com/qemu-devel@nongnu.org/msg585581.html
+> > > 
+> > > They still trigger a warning with gnu99 on clang:
+> > > 
+> > > $ clang --version
+> > > clang version 10.0.0 (Fedora 10.0.0-2.fc32)
+> > > Target: x86_64-unknown-linux-gnu
+> > > Thread model: posix
+> > > InstalledDir: /usr/bin
+> > > $ cat test.c
+> > > typedef struct A A;
+> > > typedef struct A A;
+> > > $ clang -std=gnu11 -c test.c
+> > > $ clang -std=gnu99 -c test.c
+> > > test.c:2:18: warning: redefinition of typedef 'A' is a C11 feature [-Wtypedef-redefinition]
+> > > typedef struct A A;
+> > 
+> > Ah, right, I forgot about that ... so for clang, we silence that warning
+> > via CFLAGS in the configure script. See commit e6e90feedb706b1.
+> 
+> Nice, I hadn't seen that.  This means we don't need C11 for
+> supporting redefinition of typedefs.
+> 
+> Now, do we have other reasons for not moving to C11?  It would be
+> nice to make QEMU_GENERIC unnecessary and just use _Generic, for
+> example.
 
-Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
----
- target/i386/helper.c | 5 +++++
- target/i386/kvm.c    | 5 ++++-
- 2 files changed, 9 insertions(+), 1 deletion(-)
+When we set std=gnu99 in:
 
-diff --git a/target/i386/helper.c b/target/i386/helper.c
-index 0c7fd32491..f7b2dbeec8 100644
---- a/target/i386/helper.c
-+++ b/target/i386/helper.c
-@@ -18,6 +18,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qapi/qapi-events-run-state.h"
- #include "cpu.h"
- #include "exec/exec-all.h"
- #include "qemu/qemu-print.h"
-@@ -897,6 +898,8 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
-         }
- 
-         if (cenv->mcg_status & MCG_STATUS_MCIP) {
-+            qapi_event_send_memory_failure(
-+                 MEMORY_FAILURE_ACTION_GUEST_TRIPLE_FAULT);
-             need_reset = true;
-             snprintf(msg, sizeof(msg), "CPU %d: Previous MCE still in progress,"
-                      " raising triple fault", cs->cpu_index);
-@@ -934,6 +937,8 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
-     } else {
-         banks[1] |= MCI_STATUS_OVER;
-     }
-+
-+    qapi_event_send_memory_failure(MEMORY_FAILURE_ACTION_GUEST_MCE);
- }
- 
- void cpu_x86_inject_mce(Monitor *mon, X86CPU *cpu, int bank,
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 205b68bc0c..63a585cc64 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -14,6 +14,7 @@
- 
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-+#include "qapi/qapi-events-run-state.h"
- #include <sys/ioctl.h>
- #include <sys/utsname.h>
- 
-@@ -577,6 +578,7 @@ static void kvm_mce_inject(X86CPU *cpu, hwaddr paddr, int code)
- 
- static void hardware_memory_error(void *host_addr)
- {
-+    qapi_event_send_memory_failure(MEMORY_FAILURE_ACTION_HYPERVISOR_STOP);
-     error_report("QEMU got Hardware memory error at addr %p", host_addr);
-     exit(1);
- }
-@@ -631,7 +633,8 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
-         hardware_memory_error(addr);
-     }
- 
--    /* Hope we are lucky for AO MCE */
-+    /* Hope we are lucky for AO MCE, just notify a event */
-+    qapi_event_send_memory_failure(MEMORY_FAILURE_ACTION_HYPERVISOR_IGNORE);
- }
- 
- static void kvm_reset_exception(CPUX86State *env)
+
+  commit 7be41675f7cb16be7c8d2554add7a63fa43781a8
+  Author: Thomas Huth <thuth@redhat.com>
+  Date:   Mon Jan 7 11:25:22 2019 +0100
+
+    configure: Force the C standard to gnu99
+
+we chose to not use gnu11, because this standard level is marked as
+experimental in GCC 4.8 and thus we felt it wasn't a good idea to
+rely on.
+
+
+Regards,
+Daniel
 -- 
-2.11.0
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
