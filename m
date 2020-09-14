@@ -2,85 +2,130 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B2EC43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:27:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3967EC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:33:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F8BF207C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:27:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8DFCC2078D
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:33:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TtVg944o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F8BF207C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UMp684M4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DFCC2078D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHhy0-00008Q-Lu
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 02:27:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40820)
+	id 1kHi3g-00039p-EF
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 02:33:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHhxR-00085B-Fr; Mon, 14 Sep 2020 02:27:21 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:45515)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHhxP-0004dW-Gl; Mon, 14 Sep 2020 02:27:21 -0400
-Received: by mail-lj1-x242.google.com with SMTP id c2so17562146ljj.12;
- Sun, 13 Sep 2020 23:27:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=M7dFwmsRh+FNZP7P1iJ6lahhJX9ebnRyFa52mZuB15A=;
- b=TtVg944oKwyjhi5iT9N/nhE605at7B8RtAC3TsFsOJR2E5ye9t2JAUqK+wJvohe+jb
- fMPiDfC7poG1udHslzWrlemg7fAkDaniXj8sLP30+jFKekNVmbs7g0jMRRX6riRVbfyc
- ahfTQ5KkUCGHNwwoIdZOnzposb045dzS3uzqx6UIF7rMrb0iZKclo8hRolcQoerIMx59
- v+jMlKqXonERzPg2z9DkQqR8gryPWXJfRJjSXDJTgSNieR0o4Qs4WXHGtBmNBImAtATq
- 07qnrPm+c01+AaoCFCZK+QUV+pVK8yVSUCfsf1z/FXbd8Fx060hiD63oCzdmrLAOjQ/X
- 7LrA==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHi35-0002gt-0I
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 02:33:12 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60882
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHi32-0005NY-Ec
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 02:33:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600065187;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=nil+6YG+W1mjfKCfY42i6jndXWuYJu5ocfcJaGt+jVY=;
+ b=UMp684M4KQNORcD2xwex3Phv9SSPFvlvMLKTsWNMDqQBYmy5P7krBbFNRXpVartfNotERV
+ u0ScA0ZqL93uJQLtzGx7MiNU2gAHw+al95jV3QfryODxs8Kvd9DA6tEhRlTzPOmVsO4NqD
+ /BRe9LXZtQU+vrVaKFgE3wYMY8y1Pj4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-302-ZyMu7kCPOa6Jg2Hr9_EECw-1; Mon, 14 Sep 2020 02:33:00 -0400
+X-MC-Unique: ZyMu7kCPOa6Jg2Hr9_EECw-1
+Received: by mail-wr1-f71.google.com with SMTP id j7so6506577wro.14
+ for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 23:33:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=M7dFwmsRh+FNZP7P1iJ6lahhJX9ebnRyFa52mZuB15A=;
- b=LGmeLMmrKnNvR8bQmTym+tW6uIUFEferCXQ24f1TmBME3swIpeDlaP20ll1DYv6gtW
- V+xX3aKrmw7jHUhR94RMzkVoOfeeb0aFxOb3Aw2tLip40VIjXCrA9ToNbxgXYkwg37ZD
- xPe7LxVeix4zXMRwkRMabqat7pCSNL7SrkQBom7JOxTRQE72jXErLDbCfVKPKgzBkeeF
- N04FrboHzOHcZ76MAmau0MWSRrCxxFU4WgyYXTivO1AGOHeTnv6v0SiUIXqMmhVKTNTG
- rBKCHRxM4xz9vGDQenIlcsfOJ+ZZqnpnlPL8huDHAfIOyLLf8dSFw5sR5/Ta1b2744PX
- Qa0A==
-X-Gm-Message-State: AOAM531Mh6EDH49gwTiLE1vBkEUdpL5B9bPyNrflc/l2yVKNK3iB/a26
- b62Vv7/VtrSlHrUiCcmy6cLFfGUfywdUWBJJ4lc=
-X-Google-Smtp-Source: ABdhPJxmi3xDwXP6/+0Gbl35i4V4QodzOWmUwGZrgypUTmQ8b7YPRRyM2/ak/UYai1lLFFKlIBXMdcsUXRoziQ1rnfs=
-X-Received: by 2002:a2e:9dc7:: with SMTP id x7mr4930578ljj.447.1600064836986; 
- Sun, 13 Sep 2020 23:27:16 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=nil+6YG+W1mjfKCfY42i6jndXWuYJu5ocfcJaGt+jVY=;
+ b=oTJBVkNWEvsqdJjXkP5kYmWwhRcezrp8c7ZGjANPKRc1GiN8vpqS1UA4lVb60cxw1f
+ rH7of5pL7cpgecHMpJ/6s7YcFb9WY02tMnN724YCnJqAMSXMO/9BtscBu3aKMTpXeK6Y
+ 94xxcVaiBb3G3oRvwQvonGxWqJ8f6ah+n4QtA/pnxJfjsPVK2x6zW/wb0swhTGacBEDK
+ jdhQqBDHz7YaaTJ3flBZ+k+6O6cfnmb/+qLfHHG/m9+oz2+oaf+IyGDKCxlYSi/ZYqxx
+ 8rwz0KVBZ/eeEl9xXk2Sus9XPPVf10cQYxfAUSTOcq5MmtPPr2Et7Iu+R9BfdwGc8t6/
+ JGEA==
+X-Gm-Message-State: AOAM5311eT1wJbUe/R2lC9u4aWzdoY8zcf6NIIOBxBPBSuWeymtfvaLU
+ 3cAZxr/yP1CBUFPa/oyHf4voL2ueZEyJCfYEAZlJDG9vxKpNyrG0eExLMsbpJFrMdVzsYev3iG3
+ CFS9UOayHGHv/Y/Y=
+X-Received: by 2002:adf:dccd:: with SMTP id x13mr15189686wrm.403.1600065179384; 
+ Sun, 13 Sep 2020 23:32:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyRDJulQFpmlAVeHBaq0PDhL2U/4j0f6E9fw0sH+IS2JR7DzW/EYV7Spm7lgc12D+eU/32RLw==
+X-Received: by 2002:adf:dccd:: with SMTP id x13mr15189656wrm.403.1600065179133; 
+ Sun, 13 Sep 2020 23:32:59 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id l10sm17920990wmh.27.2020.09.13.23.32.57
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 13 Sep 2020 23:32:58 -0700 (PDT)
+Subject: Re: [PATCH] hw/scsi/vmw_pvscsi.c: Fix wrong usage of gboolean types
+ in PVSCSIState
+To: Amey Narkhede <ameynarkhede03@gmail.com>, qemu-devel@nongnu.org
+References: <20200913234451.170022-1-ameynarkhede03@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <bee146be-e867-6c6f-4007-b61751be1e6c@redhat.com>
+Date: Mon, 14 Sep 2020 08:32:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200912224431.1428-1-luoyonggang@gmail.com>
- <276a137d-d863-2465-1fe2-599e5772a1a8@redhat.com>
-In-Reply-To: <276a137d-d863-2465-1fe2-599e5772a1a8@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Mon, 14 Sep 2020 14:27:07 +0800
-Message-ID: <CAE2XoE8WrE1_e1VR1VSG7vWWX9nsbp2iRwZvOur1ouGrbC+Rqw@mail.gmail.com>
-Subject: Re: [PATCH v8 00/27] W32, W64 msys2/mingw patches
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000039ee8e05af402030"
-Received-SPF: pass client-ip=2a00:1450:4864:20::242;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x242.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200913234451.170022-1-ameynarkhede03@gmail.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:33:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.695,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,103 +138,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
- Qemu-block <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>,
- Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
- qemu-level <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Li-Wen Hsu <lwhsu@freebsd.org>, Markus Armbruster <armbru@redhat.com>
+Cc: fam@euphon.net, pbonzini@redhat.com, dmitry.fleytman@gmail.com,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000039ee8e05af402030
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hi Amey,
 
-On Mon, Sep 14, 2020 at 2:10 PM Thomas Huth <thuth@redhat.com> wrote:
+On 9/14/20 1:44 AM, Amey Narkhede wrote:
+> rings_info_valid, msg_ring_info_valid and use_msg fields of struct
+> PVSCSIState are using gboolean TRUE/FALSE values with the type uint8_t.
+> Change their type to bool along with the usage of initialization macro
+> VMSTATE_BOOL during initialization of vmstate_pvscsi and
+> pvscsi_properties.
+> 
+> Signed-off-by: Amey Narkhede <ameynarkhede03@gmail.com>
+> ---
+>  hw/scsi/vmw_pvscsi.c | 22 +++++++++++-----------
+>  1 file changed, 11 insertions(+), 11 deletions(-)
+> 
+> diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
+> index c071e0c7aa..86f00e3d7e 100644
+> --- a/hw/scsi/vmw_pvscsi.c
+> +++ b/hw/scsi/vmw_pvscsi.c
+> @@ -123,9 +123,9 @@ typedef struct {
+>      /* Collector for current command data */
+>      uint32_t curr_cmd_data[PVSCSI_MAX_CMD_DATA_WORDS];
+> 
+> -    uint8_t rings_info_valid;            /* Whether data rings initialized   */
+> -    uint8_t msg_ring_info_valid;         /* Whether message ring initialized */
+> -    uint8_t use_msg;                     /* Whether to use message ring      */
+> +    bool rings_info_valid;            /* Whether data rings initialized   */
+> +    bool msg_ring_info_valid;         /* Whether message ring initialized */
+> +    bool use_msg;                     /* Whether to use message ring      */
+> 
+>      uint8_t msi_used;                    /* For migration compatibility      */
+>      PVSCSIRingInfo rings;                /* Data transfer rings manager      */
+> @@ -349,8 +349,8 @@ pvscsi_reset_state(PVSCSIState *s)
+>      s->reg_command_status = PVSCSI_COMMAND_PROCESSING_SUCCEEDED;
+>      s->reg_interrupt_status = 0;
+>      pvscsi_ring_cleanup(&s->rings);
+> -    s->rings_info_valid = FALSE;
+> -    s->msg_ring_info_valid = FALSE;
+> +    s->rings_info_valid = false;
+> +    s->msg_ring_info_valid = false;
+>      QTAILQ_INIT(&s->pending_queue);
+>      QTAILQ_INIT(&s->completion_queue);
+>  }
+> @@ -792,7 +792,7 @@ pvscsi_on_cmd_setup_rings(PVSCSIState *s)
+>      pvscsi_dbg_dump_tx_rings_config(rc);
+>      pvscsi_ring_init_data(&s->rings, rc);
+> 
+> -    s->rings_info_valid = TRUE;
+> +    s->rings_info_valid = true;
+>      return PVSCSI_COMMAND_PROCESSING_SUCCEEDED;
+>  }
+> 
+> @@ -874,7 +874,7 @@ pvscsi_on_cmd_setup_msg_ring(PVSCSIState *s)
+>          if (pvscsi_ring_init_msg(&s->rings, rc) < 0) {
+>              return PVSCSI_COMMAND_PROCESSING_FAILED;
+>          }
+> -        s->msg_ring_info_valid = TRUE;
+> +        s->msg_ring_info_valid = true;
+>      }
+>      return sizeof(PVSCSICmdDescSetupMsgRing) / sizeof(uint32_t);
+>  }
+> @@ -1232,9 +1232,9 @@ static const VMStateDescription vmstate_pvscsi = {
+>          VMSTATE_UINT32(curr_cmd_data_cntr, PVSCSIState),
+>          VMSTATE_UINT32_ARRAY(curr_cmd_data, PVSCSIState,
+>                               ARRAY_SIZE(((PVSCSIState *)NULL)->curr_cmd_data)),
+> -        VMSTATE_UINT8(rings_info_valid, PVSCSIState),
+> -        VMSTATE_UINT8(msg_ring_info_valid, PVSCSIState),
+> -        VMSTATE_UINT8(use_msg, PVSCSIState),
+> +        VMSTATE_BOOL(rings_info_valid, PVSCSIState),
+> +        VMSTATE_BOOL(msg_ring_info_valid, PVSCSIState),
+> +        VMSTATE_BOOL(use_msg, PVSCSIState),
 
-> On 13/09/2020 00.44, Yonggang Luo wrote:
-> > It first introduce msys2 CI on cirrus by fixes nfs, capstone, curses an=
-d
-> > disable partial test-char tests.
-> > And then fixes all unit tests failure on msys2/mingw
-> > This fixes the reviews suggested in the mailling list
-> > All cirrus CI are passed
->
->  Hi,
->
-> since you're very often sending new versions of your patch series, could
-> you please add a history to the cover letter to say what you changed in
-> each version? Otherwise, your work is very hard to follow.
-> I'd also suggest to really slow down the sending a little bit. Let your
-> patches mature in your tests first, then send out a new series only if
-> you feel that they are really ready. Nobody has the bandwith to review a
-> patch series with 27 patches each day...
->
-> Thanks, I am learning how to submit patches properly, in old days,  when =
-I
-am using pull request on github have no such problems. easy to follow up
+I believe this change the migration data structure. This
+area is described in "Changing migration data structures"
+in docs/devel/migration.rst.
 
->  Thanks,
->   Thomas
->
->
->
+If this structure were not affected, your change would be
+a good cleanup. However changing migration can become a
+nightmare, so ... cleaning this is hard.
 
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
+Cc'ing Dave (a migration maintainer) as I'm not sure there
+already is a document describing easily this problem.
 
---00000000000039ee8e05af402030
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> 
+>          VMSTATE_UINT64(rings.rs_pa, PVSCSIState),
+>          VMSTATE_UINT32(rings.txr_len_mask, PVSCSIState),
+> @@ -1255,7 +1255,7 @@ static const VMStateDescription vmstate_pvscsi = {
+>  };
+> 
+>  static Property pvscsi_properties[] = {
+> -    DEFINE_PROP_UINT8("use_msg", PVSCSIState, use_msg, 1),
+> +    DEFINE_PROP_BOOL("use_msg", PVSCSIState, use_msg, true),
+>      DEFINE_PROP_BIT("x-old-pci-configuration", PVSCSIState, compat_flags,
+>                      PVSCSI_COMPAT_OLD_PCI_CONFIGURATION_BIT, false),
+>      DEFINE_PROP_BIT("x-disable-pcie", PVSCSIState, compat_flags,
+> --
+> 2.28.0
+> 
+> This is my first qemu patch. Let know if there are any mistakes
+> 
 
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Mon, Sep 14, 2020 at 2:10 PM Thoma=
-s Huth &lt;<a href=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt; wro=
-te:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px =
-0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On 13/09/202=
-0 00.44, Yonggang Luo wrote:<br>
-&gt; It first introduce msys2 CI on cirrus by fixes nfs, capstone, curses a=
-nd<br>
-&gt; disable partial test-char tests.<br>
-&gt; And then fixes all unit tests failure on msys2/mingw<br>
-&gt; This fixes the reviews suggested in the mailling list<br>
-&gt; All cirrus CI are passed<br>
-<br>
-=C2=A0Hi,<br>
-<br>
-since you&#39;re very often sending new versions of your patch series, coul=
-d<br>
-you please add a history to the cover letter to say what you changed in<br>
-each version? Otherwise, your work is very hard to follow.<br>
-I&#39;d also suggest to really slow down the sending a little bit. Let your=
-<br>
-patches mature in your tests first, then send out a new series only if<br>
-you feel that they are really ready. Nobody has the bandwith to review a<br=
->
-patch series with 27 patches each day...<br>
-<br></blockquote><div>Thanks, I am learning how to submit patches properly,=
- in old days,=C2=A0 when I am using pull request on github have no such pro=
-blems. easy to follow up=C2=A0</div><blockquote class=3D"gmail_quote" style=
-=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
--left:1ex">
-=C2=A0Thanks,<br>
-=C2=A0 Thomas<br>
-<br>
-<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
-=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
-=A0 sincerely,<br>Yonggang Luo<br></div></div>
-
---00000000000039ee8e05af402030--
 
