@@ -2,87 +2,132 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8FD1C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 10:53:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EA3AC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 10:54:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74AC220829
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 10:53:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CB77920829
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 10:53:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H+Q+mDl7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74AC220829
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b+J4K+3u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB77920829
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHm6Z-0005VU-LF
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 06:53:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39830)
+	id 1kHm7S-0006n0-Tm
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 06:53:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40406)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
- id 1kHm4Q-0002Y3-Dm
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 06:50:50 -0400
-Received: from mail-lj1-x234.google.com ([2a00:1450:4864:20::234]:42904)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
- id 1kHm4N-0003cX-OR
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 06:50:50 -0400
-Received: by mail-lj1-x234.google.com with SMTP id k25so18156694ljg.9
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 03:50:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=FI5Sz2MXJvpKasOtCWzBM3wi8uYnUx4jdHymkn5UcTU=;
- b=H+Q+mDl7333NDx5QLRcQuz8KWVo+pbWChCtMbQInkO3xab2nJSr4NwCnrBzA56G4R0
- 4gxzIcenl2kViPlL5iWX8nqvUwljO+9AjxlCL1aMT5iM5AIWJciWLv7KdOP1sPlUZM5A
- TqSBq7PcbamWAhesigL8cZSpbjvrS90538wNfUFLl4bg2XIfSqF8JgcIiMu8mfITR21Q
- 1oUefO/BQmKDmL4sUijnUNKwr1pAk9WqxTxfe0dNM0ijFTBEj4JKFWWzyPtU2URpnuyX
- AaRbQ0T+g/vxKGbxBuiw8oJJzr0k8lKuq0qKoxVOs14HsHFsy+35foXsjO+Sqb/QRRm+
- uB+w==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHm6d-0005lV-Ry
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 06:53:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39240)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHm6b-00043R-VW
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 06:53:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600080785;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=2CZNSI3F+NLY37OZHZ6G0S1NMPMavrd2JAop5LfGlxg=;
+ b=b+J4K+3uUetS+10OhA8cS/E0cdkjjekLjHLFEAn9aJlhOr0Vy8xhz3TP34e5KuUqR8SWq4
+ o9PrN6h+gq+6voG6VfUbZlqwn35xx+Jta3D4OsG24/fTwb8NkBrTeLe0nngEbVPEKAUFH0
+ aUJa7Bn6ewt+bc2o40/rr9s6pRt+1rQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-574-KvRgYejiMzWnrf6AjqnXkQ-1; Mon, 14 Sep 2020 06:53:03 -0400
+X-MC-Unique: KvRgYejiMzWnrf6AjqnXkQ-1
+Received: by mail-wm1-f72.google.com with SMTP id a7so2337793wmc.2
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 03:53:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=FI5Sz2MXJvpKasOtCWzBM3wi8uYnUx4jdHymkn5UcTU=;
- b=LJ7ULAkiw44jteko5wpjsjiUWm3okHonXY0LLW7HM2YB5vFofKRn1gn/50e6keXW4O
- n5meL0ioeL5PMTCH2fPM/1WvLCJdcmZlTOsOYQipj9J4GKrk5oTbq9rsktFRP2N8Qace
- HrtsEd0AiLGmMYKnM8/SBW/bGpptqPmc8fcFYjN7biKAXdImYF/50kwGNFTbtZMRq1ph
- 6NoHyU9GyaeRCbeFaF7cMIT/Fyystodgu9tbiNiicXbZQe2gt0QafpZRs42lc62rnhIe
- 1xRjFGvZbxKmxgDjfoAuCsfrUOmBpvB1CtX5SYWT2WEEAqTKQRIWXT+jHcN2RAy3hleT
- SloA==
-X-Gm-Message-State: AOAM5334BbFcxyckX9gL2au7yM1qB2F7kCuRxjsHzp1dm2evDjyxMI8H
- n7xWKwdEBVvBougjAlaYbpe83n8uUJWuR/JEEXQ=
-X-Google-Smtp-Source: ABdhPJyT3gsWx+FTBdrPMvxClKioTuMYGDMtpcvhw5XuE6CFZ9AFlsTFGRrngLES27BiHNNoJCFCVwJ7dCFwCBykmB8=
-X-Received: by 2002:a2e:9042:: with SMTP id n2mr4577348ljg.112.1600080645176; 
- Mon, 14 Sep 2020 03:50:45 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=2CZNSI3F+NLY37OZHZ6G0S1NMPMavrd2JAop5LfGlxg=;
+ b=MYMGZ0JcH1DFnBWIAGlQVqpJ6d55N91T1xdFbJR+aOBl7xBzkyG9D3Lj4QqkrWA9mp
+ KgM6PhjzBI3+luiMMShlzlsWFJkfVgXfzOCWkvJdpkDwtagejsmHGsUJAfkTtIIHe3pT
+ qk4hPQG8AwxDLxXS6Eco/KrGEAPzoB8DWtQk1eTvW4F+TFhkMytj1Wp4jaZusKvpTb9f
+ EIfqbGfwpSjPTTEBVnajbutkKeVsIDhumExKVSh9DcqbBKa2sSAcAMyIXnxghMizl5Vh
+ byI6Dutdxz9O8ukd7jPi9WKMq8cgri0xgCgaTKBz0D3lt3fgfiqUX7ClSykeCMe/P0DS
+ 2dlg==
+X-Gm-Message-State: AOAM531zXp2ExQ9ahnLxlWUySs7h+ewnhl1ccExadxZdRMVG8/2Aoo7X
+ X7D4E/7ZXqx/CK6ZMjpY5VLNHU09+jdDt83wGmDN+9Hd/KGKx/YJzg9nsCxM0vpauF3JqYXT8Vo
+ C2DV2fz7ICIaunDc=
+X-Received: by 2002:a7b:ce96:: with SMTP id q22mr13650361wmj.132.1600080782368; 
+ Mon, 14 Sep 2020 03:53:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx/iqkQsLnAtuS11dd8nnRSKZdvssXO0oNe0EOjPf0L7Xw9z+mG4TPSZC2jHu2aBAWpuxRoLw==
+X-Received: by 2002:a7b:ce96:: with SMTP id q22mr13650338wmj.132.1600080782110; 
+ Mon, 14 Sep 2020 03:53:02 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id 97sm20439342wrm.15.2020.09.14.03.53.00
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 14 Sep 2020 03:53:01 -0700 (PDT)
+Subject: Re: [PATCH 08/10] pc-bios: refresh edk2 build artifacts for
+ edk2-stable202008
+To: Gerd Hoffmann <kraxel@redhat.com>
+References: <20200908072939.30178-1-lersek@redhat.com>
+ <20200908072939.30178-9-lersek@redhat.com>
+ <b2037644-bf48-e86f-23e3-f2c68e7ddc1f@redhat.com>
+ <20200914095438.wkc2fou3ijrctmfl@sirius.home.kraxel.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <a1ec5724-bebd-3fe7-a1a2-db8065266feb@redhat.com>
+Date: Mon, 14 Sep 2020 12:53:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <5f5e9831.1c69fb81.bdbec.98b8@mx.google.com>
- <ea64c109-6bd9-c0f1-964c-46be5c6ba020@amsat.org>
-In-Reply-To: <ea64c109-6bd9-c0f1-964c-46be5c6ba020@amsat.org>
-From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-Date: Mon, 14 Sep 2020 12:50:08 +0200
-Message-ID: <CALTWKrW-U261HNc8mSxmu1uYKqrZxZM4+661ZK_m-W_Ky8eiFQ@mail.gmail.com>
-Subject: Re: [REPORT] Nightly Performance Tests - Sunday, September 13, 2020
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::234;
- envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-lj1-x234.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200914095438.wkc2fou3ijrctmfl@sirius.home.kraxel.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:55:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -38
+X-Spam_score: -3.9
+X-Spam_bar: ---
+X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,120 +141,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Cc: Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+ qemu devel list <qemu-devel@nongnu.org>, Bruce Rogers <brogers@suse.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 14, 2020 at 8:46 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
->
-> Hi Ahmed,
->
-> On 9/14/20 12:07 AM, Ahmed Karaman wrote:
-> > Host CPU         : Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz
-> > Host Memory      : 15.49 GB
-> >
-> > Start Time (UTC) : 2020-09-13 21:35:01
-> > End Time (UTC)   : 2020-09-13 22:07:44
-> > Execution Time   : 0:32:42.230467
-> >
-> > Status           : SUCCESS
-> >
-> > Note:
-> > Changes denoted by '-----' are less than 0.01%.
-> >
-> > --------------------------------------------------------
-> >             SUMMARY REPORT - COMMIT f00f57f3
-> > --------------------------------------------------------
->
-> (Maybe this was already commented earlier but I missed it).
->
-> What change had a so significant impact on the m68k target?
-> At a glance I only see mostly changes in softfloat:
->
-> $ git log --oneline v5.1.0..f00f57f3 tcg target/m68k fpu
-> fe4b0b5bfa9 tcg: Implement 256-bit dup for tcg_gen_gvec_dup_mem
-> 6a17646176e tcg: Eliminate one store for in-place 128-bit dup_mem
-> e7e8f33fb60 tcg: Fix tcg gen for vectorized absolute value
-> 5ebf5f4be66 softfloat: Define misc operations for bfloat16
-> 34f0c0a98a5 softfloat: Define convert operations for bfloat16
-> 8282310d853 softfloat: Define operations for bfloat16
-> 0d93d8ec632 softfloat: Add fp16 and uint8/int8 conversion functions
-> fbcc38e4cb1 softfloat: add xtensa specialization for pickNaNMulAdd
-> 913602e3ffe softfloat: pass float_status pointer to pickNaN
-> cc43c692511 softfloat: make NO_SIGNALING_NANS runtime property
-> 73ebe95e8e5 target/ppc: add vmulld to INDEX_op_mul_vec case
->
-> > --------------------------------------------------------
-> > --------------------------------------------------------
-> > Test Program: matmult_double
-> > --------------------------------------------------------
-> > Target              Instructions      Latest      v5.1.0
-> > ----------  --------------------  ----------  ----------
-> > aarch64            1 412 412 599       -----     +0.311%
-> > alpha              3 233 957 639       -----     +7.472%
-> > arm                8 545 302 995       -----      +1.09%
-> > hppa               3 483 527 330       -----     +4.466%
-> > m68k               3 919 110 506       -----    +18.433%
-> > mips               2 344 641 840       -----     +4.085%
-> > mipsel             3 329 912 425       -----     +5.177%
-> > mips64             2 359 024 910       -----     +4.075%
-> > mips64el           3 343 650 686       -----     +5.166%
-> > ppc                3 209 505 701       -----     +3.248%
-> > ppc64              3 287 495 266       -----     +3.173%
-> > ppc64le            3 287 135 580       -----     +3.171%
-> > riscv64            1 221 617 903       -----     +0.278%
-> > s390x              2 874 160 417       -----     +5.826%
-> > sh4                3 544 094 841       -----      +6.42%
-> > sparc64            3 426 094 848       -----     +7.138%
-> > x86_64             1 249 076 697       -----     +0.335%
-> > --------------------------------------------------------
-> ...
-> > --------------------------------------------------------
-> > Test Program: qsort_double
-> > --------------------------------------------------------
-> > Target              Instructions      Latest      v5.1.0
-> > ----------  --------------------  ----------  ----------
-> > aarch64            2 709 839 947       -----     +2.423%
-> > alpha              1 969 432 086       -----     +3.679%
-> > arm                8 323 168 267       -----     +2.589%
-> > hppa               3 188 316 726       -----       +2.9%
-> > m68k               4 953 947 225       -----    +15.153%
-> > mips               2 123 789 120       -----     +3.049%
-> > mipsel             2 124 235 492       -----     +3.049%
-> > mips64             1 999 025 951       -----     +3.404%
-> > mips64el           1 996 433 190       -----     +3.409%
-> > ppc                2 819 299 843       -----     +5.436%
-> > ppc64              2 768 177 037       -----     +5.512%
-> > ppc64le            2 724 766 044       -----     +5.602%
-> > riscv64            1 638 324 190       -----     +4.021%
-> > s390x              2 519 117 806       -----     +3.364%
-> > sh4                2 595 696 102       -----       +3.0%
-> > sparc64            3 988 892 763       -----     +2.744%
-> > x86_64             2 033 624 062       -----     +3.242%
-> > --------------------------------------------------------
++Michael & Bruce
 
-Hi Mr. Philippe,
-The performance degradation from v5.1.0 of all targets, and especially
-m68k, was introduced between the two nightly tests below:
+On 9/14/20 11:54 AM, Gerd Hoffmann wrote:
+>   Hi,
+> 
+>> The CI idea is to have reproducible builds if possible.
+>> When the submodule is updated (or the QEMU scripts containing the
+>> -D defines), it triggers the 'build-edk2' job which produce these
+>> same binaries.
+>> My original idea was to push the tag on GitLab that triggers the
+>> job, then download the produced binaries, test them, then commit
+>> them.
+> 
+> Now with CI in place we maybe should step back and have a look at the
+> big picture.
+> 
+> Should we simply stop committing firmware binaries into git and provide
+> them as CI artifacts instead?
 
-[REPORT] Nightly Performance Tests - Thursday, August 20, 2020:
-https://lists.nongnu.org/archive/html/qemu-devel/2020-08/msg04923.html
+What I'm not sure about is how to keep the built artifacts forever.
+Usually git-forge based projects keep release builds forever.
+In our case we are interested in updating them during the development
+window, to be well tested on release.
 
-[REPORT] Nightly Performance Tests - Saturday, August 22, 2020
-https://lists.nongnu.org/archive/html/qemu-devel/2020-08/msg05537.html
+Also we need to modify the source tarball generator script to fetch
+the artifacts and include them, isn't it?
 
-It looks like the new build system is the culprit.
+>  Can we build all our firmware in CI,
+> using the shared gitlab x86 runners and cross compilers?
 
-The "bisect.py" script introduced during the "TCG Continuous
-Benchmarking" GSoC project can be very handy in these cases. I wrote
-about the tool and how to use it in the report below:
-https://ahmedkrmn.github.io/TCG-Continuous-Benchmarking/Finding-Commits-Aff=
-ecting-QEMU-Performance/
+I'm pretty sure. In case something is missing, adding it shouldn't
+be a problem anyway.
 
-Best regards,
-Ahmed Karaman
+Regards,
+
+Phil.
+
 
