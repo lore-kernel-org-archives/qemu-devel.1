@@ -2,74 +2,86 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCFBEC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 08:24:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AF09C43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 08:26:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FE5A20EDD
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 08:24:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FE5A20EDD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cmp.felk.cvut.cz
+	by mail.kernel.org (Postfix) with ESMTPS id CA22C2192A
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 08:26:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DNhGfl6c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA22C2192A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHjmm-0003OV-BS
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 04:24:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33586)
+	id 1kHjoQ-0005YD-Ty
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 04:26:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34180)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pisa@cmp.felk.cvut.cz>)
- id 1kHjeX-0003lE-Lp
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 04:15:57 -0400
-Received: from relay.felk.cvut.cz ([2001:718:2:1611:0:1:0:70]:46964)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pisa@cmp.felk.cvut.cz>) id 1kHjeU-0000vv-QU
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 04:15:57 -0400
-Received: from cmp.felk.cvut.cz (haar.felk.cvut.cz [147.32.84.19])
- by relay.felk.cvut.cz (8.15.2/8.15.2) with ESMTP id 08E8EDtC043035;
- Mon, 14 Sep 2020 10:14:13 +0200 (CEST)
- (envelope-from pisa@cmp.felk.cvut.cz)
-Received: from haar.felk.cvut.cz (localhost [127.0.0.1])
- by cmp.felk.cvut.cz (8.14.0/8.12.3/SuSE Linux 0.6) with ESMTP id
- 08E8EDLq005943; Mon, 14 Sep 2020 10:14:13 +0200
-Received: (from pisa@localhost)
- by haar.felk.cvut.cz (8.14.0/8.13.7/Submit) id 08E8EClk005941;
- Mon, 14 Sep 2020 10:14:12 +0200
-From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Jason Wang <jasowang@redhat.com>
-Subject: [PATCH v3 6/7] hw/net/can: Documentation for CTU CAN FD IP open
- hardware core emulation.
-Date: Mon, 14 Sep 2020 10:13:41 +0200
-Message-Id: <6d1b8db69efc4e5cfad702d2150e1960e8f63572.1600069689.git.pisa@cmp.felk.cvut.cz>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <cover.1600069689.git.pisa@cmp.felk.cvut.cz>
-References: <cover.1600069689.git.pisa@cmp.felk.cvut.cz>
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kHjhv-0006oG-3C; Mon, 14 Sep 2020 04:19:27 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:37503)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kHjhs-0001EY-Gs; Mon, 14 Sep 2020 04:19:26 -0400
+Received: by mail-lj1-x242.google.com with SMTP id n25so17845878ljj.4;
+ Mon, 14 Sep 2020 01:19:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=2idPZSzmbFPEhVtb5XvxCEwyWC8kLOm9nmIVZu8BppU=;
+ b=DNhGfl6c9mZQ3IRJh0LA4d4A3zEbQ33bBF5ga/KQpZJs9JwfQsNBRHr4/ts80Oajsz
+ F7OwANMi7BEjyYmlM4KNCSxTnnNjQmjEv6EApuTrOqrCHO5pfUJIMnDpqeupxc5KQ3np
+ lFEmMXz4GKBAMtkftUGiIc1jXwOUl5nTjwBcdRJCRq8/si30lNMqK5689aaCupaPq8Yw
+ 4B669IoamO9qFGo0bFtyOY+pJJx8bfUYnr07CKqL6y64oO4jS3pr8cUjwNpp4hR14byL
+ t7FwG0LTNqx40rpi2oCINfbrT5dDMjW94gehHDwvp/lL7TQTwIAWG/8jzp9SNTN1Flhx
+ 9o4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=2idPZSzmbFPEhVtb5XvxCEwyWC8kLOm9nmIVZu8BppU=;
+ b=sOu5rWnX8KhlMwwkZu7T08AACVY3PqY3IWVIfulsZRWdfPMujmA4R0BLvj8t5CTAqs
+ pDUUiObZm+f2RXUxLa/Nxgh5w3VkVZEzV3aIcH/ghWvobECYDa2gnue+vxK43TMz+KiO
+ xjXWfOEBcT1Kv4rJ9DVQIe3zAlZu7bLsYtdGktGfOm+KtCI2lIv7V8Otg4gq+YFfj1E5
+ TkXIGeMRCBC3EDN4r7ke9W1o6tW/z+FpinD1mswOm1Su93zvBjouzxHFksrdz7F6SjXa
+ TCQaetTlUVha3iTmJutn3EguupcE61SeaZVpnuTtxjzSrcPduatL17iMSqGy5XJs6Uxj
+ 2IqQ==
+X-Gm-Message-State: AOAM530SDqH+hqL+xLa5irLgkb4fRWlSSDj5jzIJ/7/KQ6NQ7Jw1fUYH
+ JH5G958OUCK42eJFxfuaYNtC1d0anvhxz/HbYlQ=
+X-Google-Smtp-Source: ABdhPJwYJQkfywFGYRWebw10gYCyBW2qricwmTnJ4mdrtAD2Sr+t2uEgrk8xFRVrw07rmGrM0hYLFkvInWkbNjmGsp8=
+X-Received: by 2002:a2e:86d3:: with SMTP id n19mr5057501ljj.368.1600071562182; 
+ Mon, 14 Sep 2020 01:19:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-FELK-MailScanner-Information: 
-X-MailScanner-ID: 08E8EDtC043035
-X-FELK-MailScanner: Found to be clean
-X-FELK-MailScanner-SpamCheck: not spam, SpamAssassin (not cached, score=-0.1, 
- required 6, BAYES_00 -0.50, KHOP_HELO_FCRDNS 0.40,
- SPF_HELO_NONE 0.00, SPF_NONE 0.00)
-X-FELK-MailScanner-From: pisa@cmp.felk.cvut.cz
-X-FELK-MailScanner-Watermark: 1600676068.77104@tmJ9KpDds2oLtaKslLDE6Q
-Received-SPF: none client-ip=2001:718:2:1611:0:1:0:70;
- envelope-from=pisa@cmp.felk.cvut.cz; helo=relay.felk.cvut.cz
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 04:11:16
-X-ACL-Warn: Detected OS   = ???
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+References: <20200912224431.1428-1-luoyonggang@gmail.com>
+ <20200912224431.1428-14-luoyonggang@gmail.com>
+ <119be52f-fc8b-dd37-e3d6-04a13109c845@redhat.com>
+In-Reply-To: <119be52f-fc8b-dd37-e3d6-04a13109c845@redhat.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Mon, 14 Sep 2020 16:19:12 +0800
+Message-ID: <CAE2XoE-Qi1aZhq09QEswq-NFYRYWV+ZM4YZz=pGCynMd5Ova8Q@mail.gmail.com>
+Subject: Re: [PATCH v8 13/27] tests: Enable crypto tests under msys2/mingw
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000001445cb05af41b180"
+Received-SPF: pass client-ip=2a00:1450:4864:20::242;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,195 +94,381 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marek Vasut <marex@denx.de>, Vikram Garhwal <fnu.vikram@xilinx.com>,
- Jiri Novak <jnovak@fel.cvut.cz>, Stefan Hajnoczi <stefanha@gmail.com>,
- Deniz Eren <deniz.eren@icloud.com>, Markus Armbruster <armbru@redhat.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- Konrad Frederic <frederic.konrad@adacore.com>,
- Jan Kiszka <jan.kiszka@siemens.com>, Jan Charvat <charvj10@fel.cvut.cz>,
- Oliver Hartkopp <socketcan@hartkopp.net>, Ondrej Ille <ondrej.ille@gmail.com>,
- Pavel Pisa <pisa@cmp.felk.cvut.cz>
+Reply-To: luoyonggang@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Qemu-block <qemu-block@nongnu.org>,
+ Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>,
+ Peter Lieven <pl@kamp.de>, "Daniel P. Berrange" <berrange@redhat.com>,
+ qemu-level <qemu-devel@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Li-Wen Hsu <lwhsu@freebsd.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Updated MAINTAINERS for CAN bus related emulation as well.
+--0000000000001445cb05af41b180
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
----
- MAINTAINERS  |   9 ++++
- docs/can.txt | 113 ++++++++++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 111 insertions(+), 11 deletions(-)
+On Mon, Sep 14, 2020 at 3:23 PM Thomas Huth <thuth@redhat.com> wrote:
+>
+> On 13/09/2020 00.44, Yonggang Luo wrote:
+> > Fixes following tests on msys2/mingw
+> >       'test-crypto-tlscredsx509': ['crypto-tls-x509-helpers.c',
+'pkix_asn1_tab.c',
+> >                                    tasn1, crypto],
+> >       'test-crypto-tlssession': ['crypto-tls-x509-helpers.c',
+'pkix_asn1_tab.c', 'crypto-tls-psk-helpers.c',
+> >                                  tasn1, crypto],
+> >       'test-io-channel-tls': ['io-channel-helpers.c',
+'crypto-tls-x509-helpers.c', 'pkix_asn1_tab.c',
+> >                               tasn1, io, crypto]}
+> > These tests are failure with:
+> > ERROR test-crypto-tlscredsx509 - missing test plan
+> > ERROR test-crypto-tlssession - missing test plan
+> > ERROR test-io-channel-tls - missing test plan
+> >
+> > Because on win32 those test case are all disabled in the header
+> >
+> > Add qemu_socket_pair for cross platform support, convert file system
+> > handling functions to glib
+> > Add qemu_link function instead posix only link function.
+> > Use send ad recv from qemu that convert Windows Socks error
+> > to errno properly.
+> >
+> > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+> > ---
+> [...]
+> > +static int __stream_socketpair(struct addrinfo* addr_info, int
+sock[2]){
+> > +    SOCKET listener, client, server;
+> > +    int opt =3D 1;
+> > +
+> > +    listener =3D server =3D client =3D INVALID_SOCKET;
+> > +    listener =3D socket(addr_info->ai_family, addr_info->ai_socktype,
+addr_info->ai_protocol);
+> > +    if (INVALID_SOCKET =3D=3D listener)
+> > +        goto fail;
+> > +
+> > +    setsockopt(listener, SOL_SOCKET, SO_REUSEADDR,(const char*)&opt,
+sizeof(opt));
+> > +
+> > +    if(SOCKET_ERROR =3D=3D bind(listener, addr_info->ai_addr,
+addr_info->ai_addrlen))
+> > +        goto fail;
+> > +
+> > +    if (SOCKET_ERROR =3D=3D getsockname(listener, addr_info->ai_addr,
+(int*)&addr_info->ai_addrlen))
+> > +        goto fail;
+> > +
+> > +    if(SOCKET_ERROR =3D=3D listen(listener, 5))
+> > +        goto fail;
+> > +
+> > +    client =3D socket(addr_info->ai_family, addr_info->ai_socktype,
+addr_info->ai_protocol);
+> > +
+> > +    if (INVALID_SOCKET =3D=3D client)
+> > +        goto fail;
+> > +
+> > +    if (SOCKET_ERROR =3D=3D
+connect(client,addr_info->ai_addr,addr_info->ai_addrlen))
+> > +        goto fail;
+> > +
+> > +    server =3D accept(listener, 0, 0);
+> > +
+> > +    if (INVALID_SOCKET =3D=3D server)
+> > +        goto fail;
+> > +
+> > +    closesocket(listener);
+> > +
+> > +    sock[0] =3D client;
+> > +    sock[1] =3D server;
+> > +
+> > +    return 0;
+> > +fail:
+> > +    if(INVALID_SOCKET!=3Dlistener)
+> > +        closesocket(listener);
+> > +    if (INVALID_SOCKET!=3Dclient)
+> > +        closesocket(client);
+> > +    return -1;
+> > +}
+> > +
+> > +static int __dgram_socketpair(struct addrinfo* addr_info, int sock[2])
+> > +{
+> > +    SOCKET client, server;
+> > +    struct addrinfo addr, *result =3D NULL;
+> > +    const char* address;
+> > +    int opt =3D 1;
+> > +
+> > +    server =3D client =3D INVALID_SOCKET;
+> > +
+> > +    server =3D socket(addr_info->ai_family, addr_info->ai_socktype,
+addr_info->ai_protocol);
+> > +    if (INVALID_SOCKET =3D=3D server)
+> > +        goto fail;
+> > +
+> > +    setsockopt(server, SOL_SOCKET,SO_REUSEADDR, (const char*)&opt,
+sizeof(opt));
+> > +
+> > +    if(SOCKET_ERROR =3D=3D bind(server, addr_info->ai_addr,
+addr_info->ai_addrlen))
+> > +        goto fail;
+> > +
+> > +    if (SOCKET_ERROR =3D=3D getsockname(server, addr_info->ai_addr,
+(int*)&addr_info->ai_addrlen))
+> > +        goto fail;
+> > +
+> > +    client =3D socket(addr_info->ai_family, addr_info->ai_socktype,
+addr_info->ai_protocol);
+> > +    if (INVALID_SOCKET =3D=3D client)
+> > +        goto fail;
+> > +
+> > +    memset(&addr,0,sizeof(addr));
+> > +    addr.ai_family =3D addr_info->ai_family;
+> > +    addr.ai_socktype =3D addr_info->ai_socktype;
+> > +    addr.ai_protocol =3D addr_info->ai_protocol;
+> > +
+> > +    if (AF_INET6=3D=3Daddr.ai_family)
+> > +        address =3D "0:0:0:0:0:0:0:1";
+> > +    else
+> > +        address =3D "127.0.0.1";
+> > +
+> > +    if (getaddrinfo(address, "0", &addr, &result))
+> > +        goto fail;
+> > +
+> > +    setsockopt(client,SOL_SOCKET,SO_REUSEADDR,(const char*)&opt,
+sizeof(opt));
+> > +    if(SOCKET_ERROR =3D=3D bind(client, result->ai_addr,
+result->ai_addrlen))
+> > +        goto fail;
+> > +
+> > +    if (SOCKET_ERROR =3D=3D getsockname(client, result->ai_addr,
+(int*)&result->ai_addrlen))
+> > +        goto fail;
+> > +
+> > +    if (SOCKET_ERROR =3D=3D connect(server, result->ai_addr,
+result->ai_addrlen))
+> > +        goto fail;
+> > +
+> > +    if (SOCKET_ERROR =3D=3D connect(client, addr_info->ai_addr,
+addr_info->ai_addrlen))
+> > +        goto fail;
+> > +
+> > +    freeaddrinfo(result);
+> > +    sock[0] =3D client;
+> > +    sock[1] =3D server;
+> > +    return 0;
+> > +
+> > +fail:
+> > +    if (INVALID_SOCKET!=3Dclient)
+> > +        closesocket(client);
+> > +    if (INVALID_SOCKET!=3Dserver)
+> > +        closesocket(server);
+> > +    if (result)
+> > +        freeaddrinfo(result);
+> > +    return -1;
+> > +}
+> > +
+> > +int qemu_socketpair(int family, int type, int protocol,int recv[2]){
+> > +    const char* address;
+> > +    struct addrinfo addr_info,*p_addrinfo;
+> > +    int result =3D -1;
+> > +
+> > +    if (family =3D=3D AF_UNIX)
+> > +    {
+> > +        family =3D AF_INET;
+> > +    }
+> > +
+> > +    memset(&addr_info, 0, sizeof(addr_info));
+> > +    addr_info.ai_family =3D family;
+> > +    addr_info.ai_socktype =3D type;
+> > +    addr_info.ai_protocol =3D protocol;
+> > +    if (AF_INET6=3D=3Dfamily)
+> > +        address =3D "0:0:0:0:0:0:0:1";
+> > +    else
+> > +        address =3D "127.0.0.1";
+> > +
+> > +    if (0 =3D=3D getaddrinfo(address, "0", &addr_info, &p_addrinfo)){
+> > +        if (SOCK_STREAM =3D=3D type)
+> > +            result =3D __stream_socketpair(p_addrinfo, recv);
+> > +        else if(SOCK_DGRAM =3D=3D type)
+> > +            result =3D __dgram_socketpair(p_addrinfo, recv);
+> > +        freeaddrinfo(p_addrinfo);
+> > +    }
+> > +    return result;
+> > +}
+>
+> Where do you've got this code from? It seems like this has been taken
+> from a 3rd party source? E.g.:
+>
+>  https://blog.csdn.net/wufuhuai/article/details/79761889
+>
+> What's the license of this new code? ... please clarify such details in
+The original code have no license information, neither copyleft nor
+copyright, what's your suggestion
+or rewrite it?
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index cf96fa8379..c0be9bbcfe 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2069,6 +2069,15 @@ F: hw/rx/
- F: include/hw/intc/rx_icu.h
- F: include/hw/rx/
- 
-+CAN bus subsystem and hardware
-+M: Pavel Pisa <pisa@cmp.felk.cvut.cz>
-+M: Vikram Garhwal <fnu.vikram@xilinx.com>
-+S: Maintained
-+W: https://canbus.pages.fel.cvut.cz/
-+F: net/can/*
-+F: hw/net/can/*
-+F: include/net/can_*.h
-+
- Subsystems
- ----------
- Audio
-diff --git a/docs/can.txt b/docs/can.txt
-index 11ed8f2d68..5838f6620c 100644
---- a/docs/can.txt
-+++ b/docs/can.txt
-@@ -8,13 +8,22 @@ can be connected to host system CAN API (at this time only Linux
- SocketCAN is supported).
- 
- The concept of busses is generic and different CAN controllers
--can be implemented for it but at this time only SJA1000 chip
--controller is implemented.
-+can be implemented.
-+
-+The initial submission implemented SJA1000 controller which
-+is common and well supported by by drivers for the most operating
-+systems.
- 
- The PCI addon card hardware has been selected as the first CAN
- interface to implement because such device can be easily connected
- to systems with different CPU architectures (x86, PowerPC, Arm, etc.).
- 
-+In 2020, CTU CAN FD controller model has been added as part
-+of the bachelor theses of Jan Charvat. This controller is complete
-+open-source/design/hardware solution. The core designer
-+of the project is Ondrej Ille, the financial support has been
-+provided by CTU, and more companies including Volkswagen subsidiaries.
-+
- The project has been initially started in frame of RTEMS GSoC 2013
- slot by Jin Yang under our mentoring  The initial idea was to provide generic
- CAN subsystem for RTEMS. But lack of common environment for code and RTEMS
-@@ -22,8 +31,8 @@ testing lead to goal change to provide environment which provides complete
- emulated environment for testing and RTEMS GSoC slot has been donated
- to work on CAN hardware emulation on QEMU.
- 
--Examples how to use CAN emulation
--=================================
-+Examples how to use CAN emulation for SJA1000 based borads
-+==========================================================
- 
- When QEMU with CAN PCI support is compiled then one of the next
- CAN boards can be selected
-@@ -90,18 +99,100 @@ traffic with "candump" command which is included in "can-utils".
- 
-   candump can0
- 
-+CTU CAN FD support examples
-+===========================
-+
-+This open-source core provides CAN FD support. CAN FD drames are
-+delivered even to the host systems when SocketCAN interface is found
-+CAN FD capable.
-+
-+The PCIe borad emulation is provided for now (the device identifier is
-+ctucan_pci). The defauld build defines two CTU CAN FD cores
-+on the board.
-+
-+Example how to connect the canbus0-bus (virtual wire) to the host
-+Linux system (SocketCAN used) and to both CTU CAN FD cores emulated
-+on the corresponding PCI card expects that host system CAN bus
-+is setup according to the previous SJA1000 section.
-+
-+  qemu-system-x86_64 -enable-kvm -kernel /boot/vmlinuz-4.19.52+ \
-+      -initrd ramdisk.cpio \
-+      -virtfs local,path=shareddir,security_model=none,mount_tag=shareddir \
-+      -vga cirrus \
-+      -append "console=ttyS0" \
-+      -object can-bus,id=canbus0-bus \
-+      -object can-host-socketcan,if=can0,canbus=canbus0-bus,id=canbus0-socketcan \
-+      -device ctucan_pci,canbus0=canbus0-bus,canbus1=canbus0-bus \
-+      -nographic
-+
-+Setup of CTU CAN FD controller in a guest Linux system
-+
-+  insmod ctucanfd.ko || modprobe ctucanfd
-+  insmod ctucanfd_pci.ko || modprobe ctucanfd_pci
-+
-+  for ifc in /sys/class/net/can* ; do
-+    if [ -e  $ifc/device/vendor ] ; then
-+      if ! grep -q 0x1760 $ifc/device/vendor ; then
-+        continue;
-+      fi
-+    else
-+      continue;
-+    fi
-+    if [ -e  $ifc/device/device ] ; then
-+       if ! grep -q 0xff00 $ifc/device/device ; then
-+         continue;
-+       fi
-+    else
-+      continue;
-+    fi
-+    ifc=$(basename $ifc)
-+    /bin/ip link set $ifc type can bitrate 1000000 dbitrate 10000000 fd on
-+    /bin/ip link set $ifc up
-+  done
-+
-+The test can run for example
-+
-+  candump can1
-+
-+in the guest system and next commands in the host system for basic CAN
-+
-+  cangen can0
-+
-+for CAN FD without bitrate switch
-+
-+  cangen can0 -f
-+
-+and with bitrate switch
-+
-+  cangen can0 -b
-+
-+The test can be run viceversa, generate messages in the guest system and capture them
-+in the host one and much more combinations.
-+
- Links to other resources
- ========================
- 
-- (1) Repository with development branch can-pci at Czech Technical University
--     https://gitlab.fel.cvut.cz/canbus/qemu-canbus
-- (2) GitHub repository with can-pci and our other changes included
-+ (1) CAN related projects at Czech Technical University, Faculty of Electrical Engineering
-+     http://canbus.pages.fel.cvut.cz/
-+ (2) Repository with development can-pci branch at Czech Technical University
-      https://gitlab.fel.cvut.cz/canbus/qemu-canbus
-  (3) RTEMS page describing project
-      https://devel.rtems.org/wiki/Developer/Simulators/QEMU/CANEmulation
-  (4) RTLWS 2015 article about the project and its use with CANopen emulation
--     http://rtime.felk.cvut.cz/publications/public/rtlws2015-qemu-can.pdf
--     Slides
--     http://rtime.felk.cvut.cz/publications/public/rtlws2015-qemu-can-slides.pdf
-- (5) Linux SocketCAN utilities
-+     http://cmp.felk.cvut.cz/~pisa/can/doc/rtlws-17-pisa-qemu-can.pdf
-+ (5) GNU/Linux, CAN and CANopen in Real-time Control Applications
-+     Slides from LinuxDays 2017 (include updated RTLWS 2015 content)
-+     https://www.linuxdays.cz/2017/video/Pavel_Pisa-CAN_canopen.pdf
-+ (6) Linux SocketCAN utilities
-      https://github.com/linux-can/can-utils/
-+ (7) CTU CAN FD project including core VHDL design, Linux driver,
-+     test utilities etc.
-+     https://gitlab.fel.cvut.cz/canbus/ctucanfd_ip_core
-+ (8) CTU CAN FD Core Datasheet Documentation
-+     http://canbus.pages.fel.cvut.cz/ctucanfd_ip_core/Progdokum.pdf
-+ (9) CTU CAN FD Core System Architecture Documentation
-+     http://canbus.pages.fel.cvut.cz/ctucanfd_ip_core/ctu_can_fd_architecture.pdf
-+ (10) CTU CAN FD Driver Documentation
-+     http://canbus.pages.fel.cvut.cz/ctucanfd_ip_core/driver_doc/ctucanfd-driver.html
-+ (11) Integration with PCIe interfacing for Intel/Altera Cyclone IV based board
-+     https://gitlab.fel.cvut.cz/canbus/pcie-ctu_can_fd
--- 
-2.20.1
+>
+> the commit description.
+>
+>  Thanks,
+>   Thomas
+>
 
+
+--
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
+
+--0000000000001445cb05af41b180
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><br><br>On Mon, Sep 14, 2020 at 3:23 PM Thomas Huth &lt;<a=
+ href=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt; wrote:<br>&gt;<b=
+r>&gt; On 13/09/2020 00.44, Yonggang Luo wrote:<br>&gt; &gt; Fixes followin=
+g tests on msys2/mingw<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 &#39;test-crypto-t=
+lscredsx509&#39;: [&#39;crypto-tls-x509-helpers.c&#39;, &#39;pkix_asn1_tab.=
+c&#39;,<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ta=
+sn1, crypto],<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 &#39;test-crypto-tlssession=
+&#39;: [&#39;crypto-tls-x509-helpers.c&#39;, &#39;pkix_asn1_tab.c&#39;, &#3=
+9;crypto-tls-psk-helpers.c&#39;,<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0tasn1, crypto],<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 &#39;tes=
+t-io-channel-tls&#39;: [&#39;io-channel-helpers.c&#39;, &#39;crypto-tls-x50=
+9-helpers.c&#39;, &#39;pkix_asn1_tab.c&#39;,<br>&gt; &gt; =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 tasn1, io, crypto]}<br>&gt; &gt; These tests are failure with=
+:<br>&gt; &gt; ERROR test-crypto-tlscredsx509 - missing test plan<br>&gt; &=
+gt; ERROR test-crypto-tlssession - missing test plan<br>&gt; &gt; ERROR tes=
+t-io-channel-tls - missing test plan<br>&gt; &gt;<br>&gt; &gt; Because on w=
+in32 those test case are all disabled in the header<br>&gt; &gt;<br>&gt; &g=
+t; Add qemu_socket_pair for cross platform support, convert file system<br>=
+&gt; &gt; handling functions to glib<br>&gt; &gt; Add qemu_link function in=
+stead posix only link function.<br>&gt; &gt; Use send ad recv from qemu tha=
+t convert Windows Socks error<br>&gt; &gt; to errno properly.<br>&gt; &gt;<=
+br>&gt; &gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@=
+gmail.com">luoyonggang@gmail.com</a>&gt;<br>&gt; &gt; ---<br>&gt; [...]<br>=
+&gt; &gt; +static int __stream_socketpair(struct addrinfo* addr_info, int s=
+ock[2]){<br>&gt; &gt; + =C2=A0 =C2=A0SOCKET listener, client, server;<br>&g=
+t; &gt; + =C2=A0 =C2=A0int opt =3D 1;<br>&gt; &gt; +<br>&gt; &gt; + =C2=A0 =
+=C2=A0listener =3D server =3D client =3D INVALID_SOCKET;<br>&gt; &gt; + =C2=
+=A0 =C2=A0listener =3D socket(addr_info-&gt;ai_family, addr_info-&gt;ai_soc=
+ktype, addr_info-&gt;ai_protocol);<br>&gt; &gt; + =C2=A0 =C2=A0if (INVALID_=
+SOCKET =3D=3D listener)<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0goto fail=
+;<br>&gt; &gt; +<br>&gt; &gt; + =C2=A0 =C2=A0setsockopt(listener, SOL_SOCKE=
+T, SO_REUSEADDR,(const char*)&amp;opt, sizeof(opt));<br>&gt; &gt; +<br>&gt;=
+ &gt; + =C2=A0 =C2=A0if(SOCKET_ERROR =3D=3D bind(listener, addr_info-&gt;ai=
+_addr, addr_info-&gt;ai_addrlen))<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0goto fail;<br>&gt; &gt; +<br>&gt; &gt; + =C2=A0 =C2=A0if (SOCKET_ERROR =
+=3D=3D getsockname(listener, addr_info-&gt;ai_addr, (int*)&amp;addr_info-&g=
+t;ai_addrlen))<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0goto fail;<br>&gt;=
+ &gt; +<br>&gt; &gt; + =C2=A0 =C2=A0if(SOCKET_ERROR =3D=3D listen(listener,=
+ 5))<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0goto fail;<br>&gt; &gt; +<br=
+>&gt; &gt; + =C2=A0 =C2=A0client =3D socket(addr_info-&gt;ai_family, addr_i=
+nfo-&gt;ai_socktype, addr_info-&gt;ai_protocol);<br>&gt; &gt; +<br>&gt; &gt=
+; + =C2=A0 =C2=A0if (INVALID_SOCKET =3D=3D client)<br>&gt; &gt; + =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0goto fail;<br>&gt; &gt; +<br>&gt; &gt; + =C2=A0 =C2=A0i=
+f (SOCKET_ERROR =3D=3D connect(client,addr_info-&gt;ai_addr,addr_info-&gt;a=
+i_addrlen))<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0goto fail;<br>&gt; &g=
+t; +<br>&gt; &gt; + =C2=A0 =C2=A0server =3D accept(listener, 0, 0);<br>&gt;=
+ &gt; +<br>&gt; &gt; + =C2=A0 =C2=A0if (INVALID_SOCKET =3D=3D server)<br>&g=
+t; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0goto fail;<br>&gt; &gt; +<br>&gt; &gt;=
+ + =C2=A0 =C2=A0closesocket(listener);<br>&gt; &gt; +<br>&gt; &gt; + =C2=A0=
+ =C2=A0sock[0] =3D client;<br>&gt; &gt; + =C2=A0 =C2=A0sock[1] =3D server;<=
+br>&gt; &gt; +<br>&gt; &gt; + =C2=A0 =C2=A0return 0;<br>&gt; &gt; +fail:<br=
+>&gt; &gt; + =C2=A0 =C2=A0if(INVALID_SOCKET!=3Dlistener)<br>&gt; &gt; + =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0closesocket(listener);<br>&gt; &gt; + =C2=A0 =C2=A0=
+if (INVALID_SOCKET!=3Dclient)<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0clo=
+sesocket(client);<br>&gt; &gt; + =C2=A0 =C2=A0return -1;<br>&gt; &gt; +}<br=
+>&gt; &gt; +<br>&gt; &gt; +static int __dgram_socketpair(struct addrinfo* a=
+ddr_info, int sock[2])<br>&gt; &gt; +{<br>&gt; &gt; + =C2=A0 =C2=A0SOCKET c=
+lient, server;<br>&gt; &gt; + =C2=A0 =C2=A0struct addrinfo addr, *result =
+=3D NULL;<br>&gt; &gt; + =C2=A0 =C2=A0const char* address;<br>&gt; &gt; + =
+=C2=A0 =C2=A0int opt =3D 1;<br>&gt; &gt; +<br>&gt; &gt; + =C2=A0 =C2=A0serv=
+er =3D client =3D INVALID_SOCKET;<br>&gt; &gt; +<br>&gt; &gt; + =C2=A0 =C2=
+=A0server =3D socket(addr_info-&gt;ai_family, addr_info-&gt;ai_socktype, ad=
+dr_info-&gt;ai_protocol); <br>&gt; &gt; + =C2=A0 =C2=A0if (INVALID_SOCKET =
+=3D=3D server)<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0goto fail;<br>&gt;=
+ &gt; +<br>&gt; &gt; + =C2=A0 =C2=A0setsockopt(server, SOL_SOCKET,SO_REUSEA=
+DDR, (const char*)&amp;opt, sizeof(opt));<br>&gt; &gt; +<br>&gt; &gt; + =C2=
+=A0 =C2=A0if(SOCKET_ERROR =3D=3D bind(server, addr_info-&gt;ai_addr, addr_i=
+nfo-&gt;ai_addrlen))<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0goto fail;<b=
+r>&gt; &gt; +<br>&gt; &gt; + =C2=A0 =C2=A0if (SOCKET_ERROR =3D=3D getsockna=
+me(server, addr_info-&gt;ai_addr, (int*)&amp;addr_info-&gt;ai_addrlen))<br>=
+&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0goto fail;<br>&gt; &gt; +<br>&gt; &g=
+t; + =C2=A0 =C2=A0client =3D socket(addr_info-&gt;ai_family, addr_info-&gt;=
+ai_socktype, addr_info-&gt;ai_protocol);<br>&gt; &gt; + =C2=A0 =C2=A0if (IN=
+VALID_SOCKET =3D=3D client)<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0goto =
+fail;<br>&gt; &gt; +<br>&gt; &gt; + =C2=A0 =C2=A0memset(&amp;addr,0,sizeof(=
+addr));<br>&gt; &gt; + =C2=A0 =C2=A0addr.ai_family =3D addr_info-&gt;ai_fam=
+ily;<br>&gt; &gt; + =C2=A0 =C2=A0addr.ai_socktype =3D addr_info-&gt;ai_sock=
+type;<br>&gt; &gt; + =C2=A0 =C2=A0addr.ai_protocol =3D addr_info-&gt;ai_pro=
+tocol;<br>&gt; &gt; +<br>&gt; &gt; + =C2=A0 =C2=A0if (AF_INET6=3D=3Daddr.ai=
+_family)<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0address =3D &quot;0:0:0:=
+0:0:0:0:1&quot;;<br>&gt; &gt; + =C2=A0 =C2=A0else<br>&gt; &gt; + =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0address =3D &quot;127.0.0.1&quot;;<br>&gt; &gt; +<br>&gt; =
+&gt; + =C2=A0 =C2=A0if (getaddrinfo(address, &quot;0&quot;, &amp;addr, &amp=
+;result))<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0goto fail;<br>&gt; &gt;=
+ +<br>&gt; &gt; + =C2=A0 =C2=A0setsockopt(client,SOL_SOCKET,SO_REUSEADDR,(c=
+onst char*)&amp;opt, sizeof(opt));<br>&gt; &gt; + =C2=A0 =C2=A0if(SOCKET_ER=
+ROR =3D=3D bind(client, result-&gt;ai_addr, result-&gt;ai_addrlen))<br>&gt;=
+ &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0goto fail;<br>&gt; &gt; +<br>&gt; &gt; +=
+ =C2=A0 =C2=A0if (SOCKET_ERROR =3D=3D getsockname(client, result-&gt;ai_add=
+r, (int*)&amp;result-&gt;ai_addrlen))<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0goto fail;<br>&gt; &gt; +<br>&gt; &gt; + =C2=A0 =C2=A0if (SOCKET_ERRO=
+R =3D=3D connect(server, result-&gt;ai_addr, result-&gt;ai_addrlen))<br>&gt=
+; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0goto fail;<br>&gt; &gt; +<br>&gt; &gt; =
++ =C2=A0 =C2=A0if (SOCKET_ERROR =3D=3D connect(client, addr_info-&gt;ai_add=
+r, addr_info-&gt;ai_addrlen))<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0got=
+o fail;<br>&gt; &gt; +<br>&gt; &gt; + =C2=A0 =C2=A0freeaddrinfo(result);<br=
+>&gt; &gt; + =C2=A0 =C2=A0sock[0] =3D client;<br>&gt; &gt; + =C2=A0 =C2=A0s=
+ock[1] =3D server;<br>&gt; &gt; + =C2=A0 =C2=A0return 0;<br>&gt; &gt; +<br>=
+&gt; &gt; +fail:<br>&gt; &gt; + =C2=A0 =C2=A0if (INVALID_SOCKET!=3Dclient)<=
+br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0closesocket(client);<br>&gt; &gt;=
+ + =C2=A0 =C2=A0if (INVALID_SOCKET!=3Dserver)<br>&gt; &gt; + =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0closesocket(server);<br>&gt; &gt; + =C2=A0 =C2=A0if (result)<b=
+r>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0freeaddrinfo(result);<br>&gt; &gt;=
+ + =C2=A0 =C2=A0return -1;<br>&gt; &gt; +}<br>&gt; &gt; +<br>&gt; &gt; +int=
+ qemu_socketpair(int family, int type, int protocol,int recv[2]){<br>&gt; &=
+gt; + =C2=A0 =C2=A0const char* address;<br>&gt; &gt; + =C2=A0 =C2=A0struct =
+addrinfo addr_info,*p_addrinfo;<br>&gt; &gt; + =C2=A0 =C2=A0int result =3D =
+-1;<br>&gt; &gt; +<br>&gt; &gt; + =C2=A0 =C2=A0if (family =3D=3D AF_UNIX)<b=
+r>&gt; &gt; + =C2=A0 =C2=A0{<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0fami=
+ly =3D AF_INET;<br>&gt; &gt; + =C2=A0 =C2=A0}<br>&gt; &gt; +<br>&gt; &gt; +=
+ =C2=A0 =C2=A0memset(&amp;addr_info, 0, sizeof(addr_info));<br>&gt; &gt; + =
+=C2=A0 =C2=A0addr_info.ai_family =3D family;<br>&gt; &gt; + =C2=A0 =C2=A0ad=
+dr_info.ai_socktype =3D type;<br>&gt; &gt; + =C2=A0 =C2=A0addr_info.ai_prot=
+ocol =3D protocol;<br>&gt; &gt; + =C2=A0 =C2=A0if (AF_INET6=3D=3Dfamily)<br=
+>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0address =3D &quot;0:0:0:0:0:0:0:1&q=
+uot;;<br>&gt; &gt; + =C2=A0 =C2=A0else<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0address =3D &quot;127.0.0.1&quot;;<br>&gt; &gt; +<br>&gt; &gt; + =C2=
+=A0 =C2=A0if (0 =3D=3D getaddrinfo(address, &quot;0&quot;, &amp;addr_info, =
+&amp;p_addrinfo)){<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0if (SOCK_STREA=
+M =3D=3D type)<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0resu=
+lt =3D __stream_socketpair(p_addrinfo, recv);<br>&gt; &gt; + =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0else if(SOCK_DGRAM =3D=3D type)<br>&gt; &gt; + =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0result =3D __dgram_socketpair(p_addrinfo, recv);=
+<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0freeaddrinfo(p_addrinfo);<br>&gt=
+; &gt; + =C2=A0 =C2=A0}<br>&gt; &gt; + =C2=A0 =C2=A0return result;<br>&gt; =
+&gt; +}<br>&gt;<br>&gt; Where do you&#39;ve got this code from? It seems li=
+ke this has been taken<br>&gt; from a 3rd party source? E.g.:<br>&gt;<br>&g=
+t; =C2=A0<a href=3D"https://blog.csdn.net/wufuhuai/article/details/79761889=
+">https://blog.csdn.net/wufuhuai/article/details/79761889</a><br>&gt;<br>&g=
+t; What&#39;s the license of this new code? ... please clarify such details=
+ in<br>The original code have no license information, neither copyleft nor =
+copyright, what&#39;s your suggestion<div>or rewrite it?<br>=C2=A0<br>&gt;<=
+br>&gt; the commit description.<br>&gt;<br>&gt; =C2=A0Thanks,<br>&gt; =C2=
+=A0 Thomas<br>&gt;<br><br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=
+=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=
+=A0 =C2=A0 sincerely,<br>Yonggang Luo</div></div>
+
+--0000000000001445cb05af41b180--
 
