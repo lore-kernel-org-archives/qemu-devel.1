@@ -2,117 +2,57 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACE4CC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:01:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 787B8C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:07:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAD62206C9
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:01:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aa3NXd+W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAD62206C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id CB200206F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:07:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB200206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHhYr-0001FB-R4
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 02:01:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35756)
+	id 1kHhdy-00032K-Qd
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 02:07:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36736)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dovmurik@linux.vnet.ibm.com>)
- id 1kHhYE-0000oz-LT
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 02:01:18 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45558)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dovmurik@linux.vnet.ibm.com>)
- id 1kHhYC-0001hF-I6
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 02:01:18 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 08E5VrA8016541
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 02:01:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=nP3Eugv5dluo/FXEPi0IxHvQJaTGM74RNS4Iyd5n0q4=;
- b=aa3NXd+WdEnetyPfs0bZu7K48cvIn6bCRZGuqWlOQKXkFuvhflu4wlklGBIOQnTXUwpU
- UbfvnV/1mDB8PBIxWUjg0HDvseoyZrHuH1UIk4VAhp2O/h3Y3wO6pwNvnWcIjTiWJM+F
- mDMUtpoBK+U9uhinsuYW7hDj//XipoQqtqUcdeuEWgh6i4MzEv3OVhvOgKAUGUejkevL
- nABGHiw5IzuJLpXV/fkQGG3zcNQLg1GSgRKcaNT2hLCaTeK4kfwlK7aPdaW/No/OQDYU
- qbzK8wETHivsukNp5vRZXReNOh0tBw/ZIGG0p1KUxZYlavweu5ZIkhK2v9b7dlqiOTjd kQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33j2830tks-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 02:01:12 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08E5rCTX128205
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 02:01:12 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33j2830tkb-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 14 Sep 2020 02:01:12 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08E5wCC7030225;
- Mon, 14 Sep 2020 06:01:11 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com
- (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
- by ppma01dal.us.ibm.com with ESMTP id 33gny8rx49-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 14 Sep 2020 06:01:11 +0000
-Received: from b03ledav002.gho.boulder.ibm.com
- (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
- by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 08E61AfQ65143054
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 14 Sep 2020 06:01:10 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E3C7F136055;
- Mon, 14 Sep 2020 06:01:09 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id AC74B13605D;
- Mon, 14 Sep 2020 06:01:09 +0000 (GMT)
-Received: from amdrome1.watson.ibm.com (unknown [9.2.130.16])
- by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
- Mon, 14 Sep 2020 06:01:09 +0000 (GMT)
-From: Dov Murik <dovmurik@linux.vnet.ibm.com>
-To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-Subject: [PATCH] checkpatch: Detect '%#' or '%0#' in printf-style format
- strings
-Date: Mon, 14 Sep 2020 06:01:09 +0000
-Message-Id: <20200914060109.69583-1-dovmurik@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.20.1
+ (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
+ id 1kHhdK-0002J8-Qd
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 02:06:34 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:44816)
+ by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
+ id 1kHhdI-0002Gj-6d
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 02:06:34 -0400
+Received: from [127.0.1.1] (unknown [62.118.151.149])
+ by mail.ispras.ru (Postfix) with ESMTPSA id 5BBA940D3BFF;
+ Mon, 14 Sep 2020 06:06:26 +0000 (UTC)
+Subject: [PATCH v4 00/15] Reverse debugging
+From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
+To: qemu-devel@nongnu.org
+Date: Mon, 14 Sep 2020 09:06:26 +0300
+Message-ID: <160006358590.31457.16757371597343007847.stgit@pasha-ThinkPad-X280>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-09-13_09:2020-09-10,
- 2020-09-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 adultscore=0
- suspectscore=0 phishscore=0 lowpriorityscore=0 malwarescore=0
- impostorscore=0 clxscore=1015 mlxlogscore=999 bulkscore=0 spamscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009140045
-Received-SPF: none client-ip=148.163.156.1;
- envelope-from=dovmurik@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:01:13
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
-X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=83.149.199.84;
+ envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:06:27
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -125,59 +65,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Dov Murik <dovmurik@linux.vnet.ibm.com>
+Cc: kwolf@redhat.com, wrampazz@redhat.com, pavel.dovgalyuk@ispras.ru,
+ ehabkost@redhat.com, alex.bennee@linaro.org, mtosatti@redhat.com,
+ armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, crosa@redhat.com,
+ pbonzini@redhat.com, philmd@redhat.com, zhiwei_liu@c-sky.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-According to the coding style document, we should use literal '0x' prefix
-instead of printf's '#' flag (which appears as '%#' or '%0#' in the format
-string).  Add a checkpatch rule to enforce that.
+GDB remote protocol supports reverse debugging of the targets.
+It includes 'reverse step' and 'reverse continue' operations.
+The first one finds the previous step of the execution,
+and the second one is intended to stop at the last breakpoint that
+would happen when the program is executed normally.
 
-Note that checkpatch already had a similar rule for trace-events files.
+Reverse debugging is possible in the replay mode, when at least
+one snapshot was created at the record or replay phase.
+QEMU can use these snapshots for travelling back in time with GDB.
 
-Example usage:
+Running the execution in replay mode allows using GDB reverse debugging
+commands:
+ - reverse-stepi (or rsi): Steps one instruction to the past.
+   QEMU loads on of the prior snapshots and proceeds to the desired
+   instruction forward. When that step is reaches, execution stops.
+ - reverse-continue (or rc): Runs execution "backwards".
+   QEMU tries to find breakpoint or watchpoint by loaded prior snapshot
+   and replaying the execution. Then QEMU loads snapshots again and
+   replays to the latest breakpoint. When there are no breakpoints in
+   the examined section of the execution, QEMU finds one more snapshot
+   and tries again. After the first snapshot is processed, execution
+   stops at this snapshot.
 
-  $ scripts/checkpatch.pl --file chardev/baum.c
-  ...
-  ERROR: Don't use '#' flag of printf format ('%#') in format strings, use '0x' prefix instead
-  #366: FILE: chardev/baum.c:366:
-  +            DPRINTF("Broken packet %#2x, tossing\n", req); \
-  ...
-  ERROR: Don't use '#' flag of printf format ('%#') in format strings, use '0x' prefix instead
-  #472: FILE: chardev/baum.c:472:
-  +        DPRINTF("unrecognized request %0#2x\n", req);
-  ...
+The set of patches include the following modifications:
+ - gdbstub update for reverse debugging support
+ - functions that automatically perform reverse step and reverse
+   continue operations
+ - hmp/qmp commands for manipulating the replay process
+ - improvement of the snapshotting for saving the execution step
+   in the snapshot parameters
+ - avocado-based acceptance tests for reverse debugging
 
-Signed-off-by: Dov Murik <dovmurik@linux.vnet.ibm.com>
+The patches are available in the repository:
+https://github.com/ispras/qemu/tree/rr-200901
+
+v4 changes:
+ - added VM snapshot creation on gdb connect (suggested by Alex Bennée)
+ - removed useless calls to error_free
+ - updated poll interrupt processing
+ - minor changes
+v3 changes:
+ - rebased to support the new build system
+ - bumped avocado framework version for using fixed remote gdb client
+v2 changes:
+ - rebased to the latest upstream version
+ - fixed replaying of the POLL interrupts after the latest debug changes
+
 ---
- scripts/checkpatch.pl | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index bd3faa154c..6ec2a9f6a1 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -2891,6 +2891,18 @@ sub process {
- 			}
- 		}
- 
-+# check for %# or %0# in printf-style format strings
-+		while ($line =~ /(?:^|")([X\t]*)(?:"|$)/g) {
-+			my $string = substr($rawline, $-[1], $+[1] - $-[1]);
-+			$string =~ s/%%/__/g;
-+			if ($string =~ /(?<!%)%0?#/) {
-+				ERROR("Don't use '#' flag of printf format " .
-+				      "('%#') in format strings, use '0x' " .
-+				      "prefix instead\n" . $herecurr);
-+				last;
-+			}
-+		}
-+
- # QEMU specific tests
- 		if ($rawline =~ /\b(?:Qemu|QEmu)\b/) {
- 			ERROR("use QEMU instead of Qemu or QEmu\n" . $herecurr);
--- 
-2.20.1
+Pavel Dovgaluk (11):
+      replay: provide an accessor for rr filename
+      qcow2: introduce icount field for snapshots
+      qapi: introduce replay.json for record/replay-related stuff
+      replay: introduce info hmp/qmp command
+      replay: introduce breakpoint at the specified step
+      replay: implement replay-seek command
+      replay: flush rr queue before loading the vmstate
+      gdbstub: add reverse step support in replay mode
+      gdbstub: add reverse continue support in replay mode
+      replay: describe reverse debugging in docs/replay.txt
+      tests/acceptance: add reverse debugging test
 
+Pavel Dovgalyuk (4):
+      replay: don't record interrupt poll
+      migration: introduce icount field for snapshots
+      docs: convert replay.txt to rst
+      replay: create temporary snapshot at debugger connection
+
+
+ MAINTAINERS                           |    2 
+ accel/tcg/cpu-exec.c                  |   21 +-
+ accel/tcg/translator.c                |    1 
+ block/qapi.c                          |   18 +
+ block/qcow2-snapshot.c                |    9 +
+ block/qcow2.h                         |    3 
+ blockdev.c                            |   10 +
+ docs/interop/qcow2.txt                |    5 
+ docs/replay.txt                       |  364 -----------------------------
+ docs/system/index.rst                 |    1 
+ docs/system/replay.rst                |  410 +++++++++++++++++++++++++++++++++
+ exec.c                                |    8 +
+ gdbstub.c                             |   64 +++++
+ hmp-commands-info.hx                  |   11 +
+ hmp-commands.hx                       |   50 ++++
+ include/block/snapshot.h              |    1 
+ include/monitor/hmp.h                 |    4 
+ include/sysemu/replay.h               |   26 ++
+ migration/savevm.c                    |   17 +
+ qapi/block-core.json                  |   11 +
+ qapi/meson.build                      |    1 
+ qapi/misc.json                        |   18 -
+ qapi/qapi-schema.json                 |    1 
+ qapi/replay.json                      |  121 ++++++++++
+ replay/meson.build                    |    1 
+ replay/replay-debugging.c             |  334 +++++++++++++++++++++++++++
+ replay/replay-events.c                |    4 
+ replay/replay-internal.h              |    6 
+ replay/replay.c                       |   22 ++
+ softmmu/cpus.c                        |   19 +-
+ stubs/replay.c                        |   15 +
+ tests/acceptance/reverse_debugging.py |  203 ++++++++++++++++
+ tests/qemu-iotests/267.out            |   48 ++--
+ 33 files changed, 1401 insertions(+), 428 deletions(-)
+ delete mode 100644 docs/replay.txt
+ create mode 100644 docs/system/replay.rst
+ create mode 100644 qapi/replay.json
+ create mode 100644 replay/replay-debugging.c
+ create mode 100644 tests/acceptance/reverse_debugging.py
+
+--
+Pavel Dovgalyuk
 
