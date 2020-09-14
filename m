@@ -8,68 +8,68 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 225C6C2BC11
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 19:18:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E1B1C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 19:21:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C888A217BA
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 19:18:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C0865208E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 19:21:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ihb5G6bh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C888A217BA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SxToguuK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0865208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHtzX-00088Y-T6
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 15:18:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45116)
+	id 1kHu2c-0001FI-03
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 15:21:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45644)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kHtyd-0006vJ-3B
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 15:17:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53093)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kHu1m-0000js-7E
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 15:20:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59106)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kHtyb-0004Zy-80
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 15:17:22 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kHu1g-0004sf-Ek
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 15:20:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600111040;
+ s=mimecast20190719; t=1600111230;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Q0xYGmOZ8NQh/Lz8+ujlazBqg3OHt4dx5AP/gBYC12w=;
- b=ihb5G6bhmzQ+8YmlQpRQ6WLwWB+EPlHckMJ8YKJbUX0gVnDR+B8qrg5cR9BVcvuTTPq5fO
- JBeUW+C3mWODz6CD6x9NZz0hAgsZEMV80amWgE2Gjq+rcC3yVgjZu9TxknfUpKobIG2Px/
- gjOY8INt3Kr8JGsSm/cr8XIbPS1wBC0=
+ bh=8ppPxP+PwS1YG3Xlw4vV7QbAFY9TdDZZ6KdQVQY860I=;
+ b=SxToguuKFWbV0Yw+H+sxctXlpyX6H5RoWrhbqdrAgyTLqhPZrUp7/FQPjPx3fUycOZBiww
+ DszK2E1FZOAEiaU04INbb0o4Z2XhVrOqrXRiJh19al9YTYxFmlnhqdj/XCD2M0jM2ZvEHK
+ 0Nc0y87BWusi59GC50KNN7R7rnA2c7w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-191-BGMS26tfMbCecsR7Y12Kug-1; Mon, 14 Sep 2020 15:17:15 -0400
-X-MC-Unique: BGMS26tfMbCecsR7Y12Kug-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-576-HHoVJq72Psmj9QVUo4PMQA-1; Mon, 14 Sep 2020 15:20:25 -0400
+X-MC-Unique: HHoVJq72Psmj9QVUo4PMQA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDFE31006700;
- Mon, 14 Sep 2020 19:17:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0F5818BA282;
+ Mon, 14 Sep 2020 19:20:24 +0000 (UTC)
 Received: from [10.3.113.68] (ovpn-113-68.phx2.redhat.com [10.3.113.68])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 480F027BC5;
- Mon, 14 Sep 2020 19:17:11 +0000 (UTC)
-Subject: Re: [PATCH 1/3] configure: quote command line arguments in
- config.status
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 51D267839F;
+ Mon, 14 Sep 2020 19:20:21 +0000 (UTC)
+Subject: Re: [PATCH 3/3] configure: automatically parse command line for meson
+ -D options
 To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 References: <20200913100534.22084-1-pbonzini@redhat.com>
- <20200913100534.22084-2-pbonzini@redhat.com>
+ <20200913100534.22084-4-pbonzini@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <2be1eaef-a823-5b0e-47a6-783c7e1aacb0@redhat.com>
-Date: Mon, 14 Sep 2020 14:17:10 -0500
+Message-ID: <a4a800dc-1f7f-da5d-e7e5-ccbacc1f9bf3@redhat.com>
+Date: Mon, 14 Sep 2020 14:20:20 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200913100534.22084-2-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200913100534.22084-4-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
 X-Mimecast-Spam-Score: 0.001
@@ -77,9 +77,9 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 15:10:18
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 15:06:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -38
 X-Spam_score: -3.9
@@ -109,42 +109,46 @@ Sender: "Qemu-devel"
 On 9/13/20 5:05 AM, Paolo Bonzini wrote:
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->   configure | 6 +++++-
->   1 file changed, 5 insertions(+), 1 deletion(-)
+>   Makefile                                |   6 ++
+>   configure                               |  71 +++++--------
+>   docs/devel/build-system.rst             |  35 +------
+>   meson-buildoptions.json                 | 130 ++++++++++++++++++++++++
+>   scripts/configure-parse-buildoptions.py |  94 +++++++++++++++++
+>   5 files changed, 258 insertions(+), 78 deletions(-)
+>   create mode 100644 meson-buildoptions.json
+>   create mode 100644 scripts/configure-parse-buildoptions.py
 > 
-> diff --git a/configure b/configure
-> index 53723ace57..beae010e39 100755
-> --- a/configure
-> +++ b/configure
-> @@ -89,6 +89,10 @@ printf " '%s'" "$0" "$@" >> config.log
->   echo >> config.log
->   echo "#" >> config.log
->   
-> +quote_sh() {
-> +    printf "'%s'" "$(echo "$1" | sed "s,','\\',")"
-
-This is unsafe if $1 starts with - or contains \.  Better is using 
-printf.  It also eats any trailing newlines in $1, although that may be 
-less of a concern.
-
-> +}
+> diff --git a/Makefile b/Makefile
+> index d6c5c9fdef..b22e5b272e 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -80,6 +80,12 @@ ifneq ($(MESON),)
+>   Makefile.mtest: build.ninja scripts/mtest2make.py
+>   	$(MESON) introspect --tests --benchmarks | $(PYTHON) scripts/mtest2make.py > $@
+>   -include Makefile.mtest
 > +
->   print_error() {
->       (echo
->       echo "ERROR: $1"
-> @@ -8061,7 +8065,7 @@ preserve_env WINDRES
+> +# jq is used to keep the result stable
+> +meson-buildoptions.json: meson_options.txt
+> +	$(MESON) introspect --buildoptions . | \
+> +	    jq 'map(select(.section == "user")) | sort_by(.name)' \
+> +	    > $(SRC_PATH)/meson-buildoptions.json
+
+Are we guaranteed to have jq on the system?  This appears to be the 
+first use of it in qemu.git.
+
+> @@ -108,6 +78,11 @@ In meson.build::
+>     # Summary
+>     summary_info += {'SDL image support': sdl_image.found()}
 >   
->   printf "exec" >>config.status
->   for i in "$0" "$@"; do
-> -  test "$i" = --skip-meson || printf " '%s'" "$i" >>config.status
-> +  test "$i" = --skip-meson || printf " %s" "$(quote_sh $i)" >>config.status
+> +The configure script automatically converts command line options to
+> +Meson options as long as the `meson-buildoptions.json` file in the
+> +root source directory is up-to-date.  You can simply type
+> +`make meson-buildoptions.json` to update it; the `jq` program
+> +is needed.
 
-And this unquoted use of $i is wrong.
-
->   done
->   echo ' "$@"' >>config.status
->   chmod +x config.status
-> 
+Oh, you're using it for an optional step, that most people don't have to 
+run, but where a developer needing to regenerate things can be likely to 
+understand how to get it.
 
 -- 
 Eric Blake, Principal Software Engineer
