@@ -2,72 +2,86 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43CCEC43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 09:37:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9026CC43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 09:38:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CD4C21D1A
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 09:37:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CD4C21D1A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0649E21D1A
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 09:38:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BzrmQRsE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0649E21D1A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHkvo-0003wZ-EM
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 05:37:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52202)
+	id 1kHkw3-0004MV-5y
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 05:38:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52256)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kHkuw-00039k-Vs
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 05:36:58 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4693 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kHkuu-0002tq-H3
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 05:36:58 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id BFCAA3DAEEAF744F5D5B;
- Mon, 14 Sep 2020 17:36:51 +0800 (CST)
-Received: from [10.174.186.4] (10.174.186.4) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0;
- Mon, 14 Sep 2020 17:36:39 +0800
-Subject: Re: [PATCH v3 3/6] migration/tls: add MigrationState and tls_hostname
- into MultiFDSendParams
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <1599965256-72150-1-git-send-email-zhengchuan@huawei.com>
- <1599965256-72150-4-git-send-email-zhengchuan@huawei.com>
- <20200914090209.GD1252186@redhat.com>
- <c3db0348-8d59-74b3-6931-d3dc8787810b@huawei.com>
- <20200914092659.GF1252186@redhat.com>
-From: Zheng Chuan <zhengchuan@huawei.com>
-Message-ID: <2abf6fb4-d4f9-88af-b540-d18db22e46ca@huawei.com>
-Date: Mon, 14 Sep 2020 17:36:40 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kHkv8-0003LJ-OF; Mon, 14 Sep 2020 05:37:10 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:36769)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kHkv7-0002uq-4x; Mon, 14 Sep 2020 05:37:10 -0400
+Received: by mail-lf1-x141.google.com with SMTP id x69so12685895lff.3;
+ Mon, 14 Sep 2020 02:37:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=IND7o5/NYMnf56KGOS8IpAtjkZVelZOlJ/IDjk8aMUw=;
+ b=BzrmQRsENSV3reN27GFWl9lq1PHKPQN695vxS9PzrDVwo0Y1hEcznen/4yvvabpVHz
+ Ncd7+oqK/T5MaG0KDIEH115/XwTuSuePmIoepKRSqk5bD1BR/Bc7NJ/r2URO8kVWD4uz
+ dNu5HSS28VqoN39Z4is0qNMhmxcNdxbEj1bHoj3VNV8J8Z8ejrFbh7UhZYi4+r0cNFKk
+ uD3YGmIfT/90Vc1AA5HwOWaxLPI+FT9GfAbI8mUq3l7X2FOEPrhpgmFXACYke+nxgNnq
+ 1YjEn9jIi3FXFoz4aspnkTdcRD3Rw35lZoYHID+el9XFCnJVg3WHmLHsl6ieQmFDYshW
+ HSHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=IND7o5/NYMnf56KGOS8IpAtjkZVelZOlJ/IDjk8aMUw=;
+ b=FYKsLa+NxWjKIvUQNoiWe5OiW6YNVf4DMeiYw+Z0JPnpvZqQd5CCaSPc7NdvU6W8Rw
+ 0TCP18sQNysrCvGyCg9EQC6BLUuKTdv5ZJBETe1Ti7ZpKb5/94j1zINetcKR+gVLtsKZ
+ a+ri75BqtcJnBLxUqC+iamC9UoWLqAe5J83RmU67X2dYbV2OCPgoDcaETbDFDq190k//
+ FtBZDsLNjmsnYJVidclkmnYKTKNrh8GIM8YIgFpLTdkauByZwjTGfMMc/tEb1zyBiBRY
+ JskKA6RL5a6GmyqsAdOmyAE7nO7uhnSkUNeuBdpu1xH8Gvfes0fZ+ZiLGIisyH4UdJX+
+ jeWg==
+X-Gm-Message-State: AOAM532IVFnr3mmlRQkoFYdK1pfEMkY2z2tEsRC06O1/30p2S2C3Ea85
+ lMAqtO+ZjiqRWFBhVDctYi1txdwRslQ1H2zyY40=
+X-Google-Smtp-Source: ABdhPJw3xGA2LEgoChuCaqTV4Q1xI21XoWb/1hC270j/oB4KqAnwqcZvlbQtnMTobXc6YhvIUSUy2AgY7zjEQcvPf4I=
+X-Received: by 2002:a19:a407:: with SMTP id q7mr3742435lfc.377.1600076227018; 
+ Mon, 14 Sep 2020 02:37:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200914092659.GF1252186@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.186.4]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190;
- envelope-from=zhengchuan@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 04:52:27
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200912121412.10999-1-thuth@redhat.com>
+In-Reply-To: <20200912121412.10999-1-thuth@redhat.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Mon, 14 Sep 2020 17:36:57 +0800
+Message-ID: <CAE2XoE-RxwJ1ddAb_RzWHVYQFtkdy=d-1W0eFicMyJMyeP1LLA@mail.gmail.com>
+Subject: Re: [PATCH] tests/check-block: Do not run the iotests with old
+ versions of bash
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000002005a405af42c7fe"
+Received-SPF: pass client-ip=2a00:1450:4864:20::141;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x141.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,113 +94,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, yuxiating@huawei.com,
- qemu-devel@nongnu.org, xiexiangyou@huawei.com, dgilbert@redhat.com,
- alex.chen@huawei.com, jinyan12@huawei.com
+Reply-To: luoyonggang@gmail.com
+Cc: =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-level <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--0000000000002005a405af42c7fe
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Sat, Sep 12, 2020 at 8:16 PM Thomas Huth <thuth@redhat.com> wrote:
+>
+> macOS is shipped with a very old version of the bash (3.2), which
+> is currently not suitable for running the iotests anymore. Add
+> a check to skip the iotests in this case - if someone still wants
+> to run the iotests on macOS, they can install a newer version from
+> homebrew, for example.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tests/check-block.sh | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/tests/check-block.sh b/tests/check-block.sh
+> index 8e29c868e5..bfe1630c1e 100755
+> --- a/tests/check-block.sh
+> +++ b/tests/check-block.sh
+> @@ -46,6 +46,11 @@ if ! command -v bash >/dev/null 2>&1 ; then
+>      exit 0
+>  fi
+>
+> +if bash --version | grep 'GNU bash, version [123]' > /dev/null 2>&1 ;
+then
+> +    echo "bash version too old =3D=3D> Not running the qemu-iotests."
+> +    exit 0
+> +fi
+> +
+>  if ! (sed --version | grep 'GNU sed') > /dev/null 2>&1 ; then
+>      if ! command -v gsed >/dev/null 2>&1; then
+>          echo "GNU sed not available =3D=3D> Not running the qemu-iotests=
+."
+> --
+> 2.18.2
+>
+>
+Is that worth to convert the check-block.sh script to python script? so it
+can even running under msys2/mingw=EF=BC=9F
 
-On 2020/9/14 17:26, Daniel P. Berrangé wrote:
-> On Mon, Sep 14, 2020 at 05:20:14PM +0800, Zheng Chuan wrote:
->>
->>
->> On 2020/9/14 17:02, Daniel P. Berrangé wrote:
->>> On Sun, Sep 13, 2020 at 10:47:33AM +0800, Chuan Zheng wrote:
->>>> MigrationState is need for tls session build and tls hostname is need
->>>> for tls handshake, add both MigrationState and tls_hostname
->>>> into MultiFDSendParams.
->>>>
->>>> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
->>>> Signed-off-by: Yan Jin <jinyan12@huawei.com>
->>>> ---
->>>>  migration/multifd.c | 5 +++++
->>>>  migration/multifd.h | 4 ++++
->>>>  2 files changed, 9 insertions(+)
->>>>
->>>> diff --git a/migration/multifd.c b/migration/multifd.c
->>>> index d044120..3e41d9e 100644
->>>> --- a/migration/multifd.c
->>>> +++ b/migration/multifd.c
->>>> @@ -543,11 +543,14 @@ void multifd_save_cleanup(void)
->>>>  
->>>>          socket_send_channel_destroy(p->c);
->>>>          p->c = NULL;
->>>> +        p->s = NULL;
->>>>          qemu_mutex_destroy(&p->mutex);
->>>>          qemu_sem_destroy(&p->sem);
->>>>          qemu_sem_destroy(&p->sem_sync);
->>>>          g_free(p->name);
->>>>          p->name = NULL;
->>>> +        g_free(p->tls_hostname);
->>>> +        p->tls_hostname = NULL;
->>>>          multifd_pages_clear(p->pages);
->>>>          p->pages = NULL;
->>>>          p->packet_len = 0;
->>>> @@ -779,6 +782,8 @@ int multifd_save_setup(Error **errp)
->>>>          p->packet->magic = cpu_to_be32(MULTIFD_MAGIC);
->>>>          p->packet->version = cpu_to_be32(MULTIFD_VERSION);
->>>>          p->name = g_strdup_printf("multifdsend_%d", i);
->>>> +        p->s = migrate_get_current();
->>>> +        p->tls_hostname = g_strdup(p->s->hostname);
->>>>          socket_send_channel_create(multifd_new_send_channel_async, p);
->>>>      }
->>>>  
->>>> diff --git a/migration/multifd.h b/migration/multifd.h
->>>> index 448a03d..2b400e7 100644
->>>> --- a/migration/multifd.h
->>>> +++ b/migration/multifd.h
->>>> @@ -66,11 +66,15 @@ typedef struct {
->>>>  } MultiFDPages_t;
->>>>  
->>>>  typedef struct {
->>>> +    /* Migration State */
->>>> +    MigrationState *s;
->>>>      /* this fields are not changed once the thread is created */
->>>>      /* channel number */
->>>>      uint8_t id;
->>>>      /* channel thread name */
->>>>      char *name;
->>>> +    /* tls hostname */
->>>> +    char *tls_hostname;
->>>
->>> Why do we need this, when it is already accessible from the
->>> MigrationState field you're adding
->>>
->>>
->>> Regards,
->>> Daniel
->>>
->> Hi，Daniel. Thank you for your review.
->>
->> This is because i have free hostname in MigrationState field after migrate_fd_connect(s, error).
->> Since multifd thread creation is async by socket_send_channel_create(), we must record it in MultiFDSendParams
->> in case of concurrency issues.
->>
->> migration_channel_connect
->>        migrate_fd_connect
->>            multifd_save_setup
->>               socket_send_channel_create(multifd_new_send_channel_async, p); / async, do not wait for multifd creation
->>                 g_free(s->hostname);
->>                                                           multifd_new_send_channel_async
->>                                                                   multifd_channel_connect
->>                                                                          multifd_tls_channel_connect
->>                                                                                 migration_tls_client_create  /* UAF happen */
->>
->> As you mentioned in Patch001, i am not sure if it will cause the same concurrency issues if i put hostname in MigrationState field
->> freed in migrate_fd_cancel.
-> 
-> If MigrationState isn't safe to access from the multifd threads, then
-> don't addd it to the struct, as I think that will mislead people into
-> thinking it is ok to use. Only add the hostname.
-> 
-> 
-> Regards,
-> Daniel
-> 
-Sure, I'll fix that in V4.
+--
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
 
-In addition, is that OK I pass hostname to MultiFDSendParams through MigrationState field as Patch001 do?
+--0000000000002005a405af42c7fe
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><br><br>On Sat, Sep 12, 2020 at 8:16 PM Thomas Huth &lt;<a=
+ href=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt; wrote:<br>&gt;<b=
+r>&gt; macOS is shipped with a very old version of the bash (3.2), which<br=
+>&gt; is currently not suitable for running the iotests anymore. Add<br>&gt=
+; a check to skip the iotests in this case - if someone still wants<br>&gt;=
+ to run the iotests on macOS, they can install a newer version from<br>&gt;=
+ homebrew, for example.<br>&gt;<br>&gt; Signed-off-by: Thomas Huth &lt;<a h=
+ref=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt;<br>&gt; ---<br>&gt=
+; =C2=A0tests/check-block.sh | 5 +++++<br>&gt; =C2=A01 file changed, 5 inse=
+rtions(+)<br>&gt;<br>&gt; diff --git a/tests/check-block.sh b/tests/check-b=
+lock.sh<br>&gt; index 8e29c868e5..bfe1630c1e 100755<br>&gt; --- a/tests/che=
+ck-block.sh<br>&gt; +++ b/tests/check-block.sh<br>&gt; @@ -46,6 +46,11 @@ i=
+f ! command -v bash &gt;/dev/null 2&gt;&amp;1 ; then<br>&gt; =C2=A0 =C2=A0 =
+=C2=A0exit 0<br>&gt; =C2=A0fi<br>&gt;<br>&gt; +if bash --version | grep &#3=
+9;GNU bash, version [123]&#39; &gt; /dev/null 2&gt;&amp;1 ; then<br>&gt; + =
+=C2=A0 =C2=A0echo &quot;bash version too old =3D=3D&gt; Not running the qem=
+u-iotests.&quot;<br>&gt; + =C2=A0 =C2=A0exit 0<br>&gt; +fi<br>&gt; +<br>&gt=
+; =C2=A0if ! (sed --version | grep &#39;GNU sed&#39;) &gt; /dev/null 2&gt;&=
+amp;1 ; then<br>&gt; =C2=A0 =C2=A0 =C2=A0if ! command -v gsed &gt;/dev/null=
+ 2&gt;&amp;1; then<br>&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0echo &quot;GNU=
+ sed not available =3D=3D&gt; Not running the qemu-iotests.&quot;<br>&gt; -=
+-<br>&gt; 2.18.2<br>&gt;<br>&gt;<br>Is that worth to convert the check-bloc=
+k.sh script to python script? so it can even running under msys2/mingw=EF=
+=BC=9F<br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br=
+>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincere=
+ly,<br>Yonggang Luo</div>
+
+--0000000000002005a405af42c7fe--
 
