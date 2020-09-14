@@ -2,91 +2,96 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DFB4C2BC11
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 15:26:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C363C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 15:26:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEFD620665
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 15:26:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB9D620665
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 15:26:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cbjvG+S/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEFD620665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OjyaHq3h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB9D620665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHqNA-0000QH-RE
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 11:26:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38812)
+	id 1kHqNN-0000mf-3w
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 11:26:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37888)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kHq7I-0003Dn-1y
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 11:10:04 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25576
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kHq7G-0000dn-9U
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 11:10:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600096201;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xmkNFXn5romqt0qO36K56LVLvbuVIhRg7OzLMl+V5Xo=;
- b=cbjvG+S/hU/BEKovveYeRIkTqu8IqYwCuAxH6EcmpxkrG+PakhfKa3/2Qx8TyY8Yb8JZ9r
- ujv3LwNLOUd4J5CADmZbRGyONFvAWGaRdbNEOGYbvWSYFOirXWpDCLDm8IP5sseLdWR5zQ
- BY8dxXYSuaDsVwElxMj20RUegBRlXXk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-avqXsM3wPJWe1e-DI1jx5A-1; Mon, 14 Sep 2020 11:09:57 -0400
-X-MC-Unique: avqXsM3wPJWe1e-DI1jx5A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26076913121;
- Mon, 14 Sep 2020 15:09:56 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
- [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 74BDC1002D46;
- Mon, 14 Sep 2020 15:09:51 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id E834E113864A; Mon, 14 Sep 2020 17:09:49 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH v7 00/13] monitor: Optionally run handlers in coroutines
-References: <20200909151149.490589-1-kwolf@redhat.com>
- <20200910132439.GE45048@stefanha-x1.localdomain>
-Date: Mon, 14 Sep 2020 17:09:49 +0200
-In-Reply-To: <20200910132439.GE45048@stefanha-x1.localdomain> (Stefan
- Hajnoczi's message of "Thu, 10 Sep 2020 14:24:39 +0100")
-Message-ID: <878sdco0n6.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kHq4r-0000i1-Qq
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 11:07:34 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52445)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kHq4k-0000Da-AR
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 11:07:30 -0400
+Received: by mail-wm1-x341.google.com with SMTP id q9so372194wmj.2
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 08:07:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=+qj72lK8wx2iNL797q3LY8hGwabeZRPUrw3VVMi4u3Y=;
+ b=OjyaHq3hQx/JIUjAgrGwsYCLPtYXQ0C+AxMg+d7Eg90Om/c8OqcECCRhAsxPK/FSLQ
+ ZVmHE5sPlxtgmPkdeAOaKC9WjM8QG6jXVQbdS1QMpnZLsUihD7fMAXrgpV//ajYOc7dP
+ Om3hKL0QYldc/ZKonnKmzhTokgeQ5ZlDVs6q1KTDIW58Ez2mjg4e3479hmPaXD9umDMl
+ 2yo/j1uyRfioeiUPmlfefwc0A8mdSIZUE3pjqtBZnHlNst5CzYPIMC6xM3FooEiE4BpV
+ Tk1VSRLBdliOm2TzMvQH7NcDf6p5hoaN3pVKRypJYH490z8QWEVXZJaTfvGU/05CRv/c
+ CTnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=+qj72lK8wx2iNL797q3LY8hGwabeZRPUrw3VVMi4u3Y=;
+ b=F1VPv7gO/uegdJRpnKeItq0t16PXgGpoyudfuRPbiineIZrp/Uzwig8kIdroZgS/M1
+ fI/O5/7526V6B1kW/SWf6kn9b3hrwTk3GH6XWl4fW1XGtzvLYJgufLPIQWRMd3OYS8Ib
+ 0DYxpGeP8nAjMqOwpmafgSDb3mrhwIizwKwdHSUbFyrZSodjOyNASOfyKUtJV6NdIuU5
+ QC4VKptcnEvXeDPDD56upPGWG0xP/wfFWV7eUOapT2f+Ql3iJBaIKQddrp0xqvG3EF3V
+ 8oFcb/Fl2ZkW3NSFZjMAz4wNCIf/T1z+qLzRb4ELMTR/X4iIpzV5xBt7yQe4aUWBlXAb
+ YEjA==
+X-Gm-Message-State: AOAM531DGzuthEgDix+obsgFrDFBXmnqMYcyl1tSaIkO33f44hOUKVgu
+ x7ULKfOx3wCcbAGC2egobM625qL+YHjZsA==
+X-Google-Smtp-Source: ABdhPJxGlkopwD3BuA6SaRfPrVQUBDwE8ICBSH11D+7S6jENuhPMkJfn7GVefzx8P9KRwgUhnBdbfw==
+X-Received: by 2002:a1c:2e17:: with SMTP id u23mr16310203wmu.73.1600096042834; 
+ Mon, 14 Sep 2020 08:07:22 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id m13sm20395126wrr.74.2020.09.14.08.07.17
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 14 Sep 2020 08:07:18 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 291D11FF8F;
+ Mon, 14 Sep 2020 16:07:17 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1 3/6] configure: also skip deprecated targets with
+ target-list-exclude
+Date: Mon, 14 Sep 2020 16:07:13 +0100
+Message-Id: <20200914150716.10501-4-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200914150716.10501-1-alex.bennee@linaro.org>
+References: <20200914150716.10501-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 00:11:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -38
-X-Spam_score: -3.9
-X-Spam_bar: ---
-X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,36 +104,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, marcandre.lureau@gmail.com,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, dgilbert@redhat.com
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Stefan Hajnoczi <stefanha@redhat.com> writes:
+Now the user has to make an even more deliberate decision to
+enable a deprecated target rather than getting it as a side effect of
+using --target-exclude-list.
 
-> On Wed, Sep 09, 2020 at 05:11:36PM +0200, Kevin Wolf wrote:
->> Some QMP command handlers can block the main loop for a relatively long
->> time, for example because they perform some I/O. This is quite nasty.
->> Allowing such handlers to run in a coroutine where they can yield (and
->> therefore release the BQL) while waiting for an event such as I/O
->> completion solves the problem.
->>=20
->> This series adds the infrastructure to allow this and switches
->> block_resize to run in a coroutine as a first example.
->>=20
->> This is an alternative solution to Marc-Andr=C3=A9's "monitor: add
->> asynchronous command type" series.
->
-> Please clarify the following in the QAPI documentation:
->  * Is the QMP monitor suspended while the command is pending?
->  * Are QMP events reported while the command is pending?
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ configure | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-Good points.  Kevin, I'd be willing to take this as a follow-up patch,
-if that's more convenient for you.
-
-> Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
-
-Stefan, I could use your proper review of PATCH 11-13.  Pretty-please?
+diff --git a/configure b/configure
+index e365a90cc133..50052378e417 100755
+--- a/configure
++++ b/configure
+@@ -1722,9 +1722,15 @@ if [ "$bsd_user" = "yes" ]; then
+     mak_wilds="${mak_wilds} $source_path/default-configs/*-bsd-user.mak"
+ fi
+ 
+-if test -z "$target_list_exclude" -a -z "$target_list"; then
+-    # if the user doesn't specify anything lets skip deprecating stuff
+-    target_list_exclude=ppc64abi32-linux-user
++# If the user doesn't explicitly specify a deprecated target we will
++# skip it.
++if test -z "$target_list"; then
++    deprecated_targets_list=ppc64abi32-linux-user
++    if test -z "$target_list_exclude"; then
++        target_list_exclude="$deprecated_targets_list"
++    else
++        target_list_exclude="$target_list_exclude,$deprecated_targets_list"
++    fi
+ fi
+ 
+ exclude_list=$(echo "$target_list_exclude" | sed -e 's/,/ /g')
+-- 
+2.20.1
 
 
