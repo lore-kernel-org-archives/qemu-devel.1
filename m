@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6ADBC2BC11
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:07:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8EBEC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:07:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 172EC2074B
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:07:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 033A4214F1
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:07:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dtpOork2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 172EC2074B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sV/2Js5u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 033A4214F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHp8u-0003jf-6O
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 10:07:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45742)
+	id 1kHp91-00041Z-KG
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 10:07:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45854)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHp86-00020t-9Y
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:06:50 -0400
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:47055)
+ id 1kHp8B-0002C4-E6
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:06:55 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:47063)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHp84-0007Wn-JJ
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:06:50 -0400
-Received: by mail-wr1-x42b.google.com with SMTP id o5so18847866wrn.13
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 07:06:48 -0700 (PDT)
+ id 1kHp89-0007YW-Qk
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:06:55 -0400
+Received: by mail-wr1-x433.google.com with SMTP id o5so18848231wrn.13
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 07:06:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=aRJ9Ctg8nu6Xf2XlWQqq0q3Iaknb86w8CHVdR6KxCHE=;
- b=dtpOork2t3bZhN3xMU+Qhef5vABHCpss+O8g6ALeGbd0AIkJBYL/V/G9RuSD+45y+K
- Sz6y6fQCjYns6+uHgcdpnrpMdRRGg5H4gdDpHVzoYEuvn34E3ir2nnCtMTKRoNQ+qwP7
- X+s51QCAln2irHfb0+yNUP/2zLOQrgQULHIaiGeZJUgIgTvTTa6cNIXH5K8YvPKem1b2
- Q3ORHZ1ee9R6fx61H4n4/TV4sZtNXtg8l2nzJW61SRt7zR5mowx51azDkzg0OXSr0WV3
- cks+fhjXLSUh8RlfYlYXksLmYvEbEmf8xwlQ16B2+KmLOt/9edM4+fmyH+/v1q5MRgVL
- CGmw==
+ bh=uhXKnXYG439EfLyUd9/2dMX94MN5ygNhQBpZxGoK2Ss=;
+ b=sV/2Js5uZr0HXm33KdjcvvPKzAwvfs4R8thsNWpOamxlY+fdw0BCKdlEx8yzdsW5q7
+ oq3vpZVFahDmJKKrZZ6b8NyBO4TcNgouobga1iRHUt4E6ZqpvqfPMCHaGTa8a56HkjU3
+ FuVxKnImfTRdwpbEuTs0a6q98MR30hgtJgEjCodNUfK27hyc5ppeKBnLGQJbJN3K9UKb
+ F2QmLjUKl4HKXFs0peZpupoHvx/VBnfrWdVC0tzEsGpnDDzm+4DcAxwE3XZwhkkTBihw
+ H+Uv0UhMBxnzACQW6/TAn5+s/RdXBaFUssWbitNB/KmnVE2HJhwrExTBi9BPkziB57Oh
+ M+DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=aRJ9Ctg8nu6Xf2XlWQqq0q3Iaknb86w8CHVdR6KxCHE=;
- b=OsqbJpZ+clUIyp9FaDcWBNeZmi04j1JSp+sZkafTS38dgmu6xe3827xHOwWMCOkOLI
- DqOgBu/qag1gsfM5jMZLuj6P8HfUQGeKwfN6dbKvzaPHPT04bWJD6v8iHekxbJu7heHg
- rvm05cmBwcm+N+05ZfUfxIPO/VONjU90dtqz5pVrpTHezvLgODtOuaGYGfvWFpuZ97Vv
- 2WorIl3609cIjg1A6ivkSVoeJLMPDmOH9Y6WWOoffH505R8lXpcubJkxGgQuphKUbgmJ
- lBt64iZ1id0QrlD8sS4fMEc7bGiMTcBXULQ/uJWfElT0qrJDvhInlmnSiTPbMtQo3ecE
- laug==
-X-Gm-Message-State: AOAM530L+QRHPipbj/E0weolEEzeT7qmWBN2P3MbjtoWXDY+zg7MoSwV
- w8008NbkSt2RmH3V4pJgY1Omlp2MbJBmi+XX
-X-Google-Smtp-Source: ABdhPJwBfJV5h4ZcT0Vkly8BmgoKCItdP+ABDoRn35Tfi6+GGSwMjbZN5LjXW6oPCbWcAoGxYDlOJA==
-X-Received: by 2002:adf:ec4d:: with SMTP id w13mr16680493wrn.334.1600092406819; 
- Mon, 14 Sep 2020 07:06:46 -0700 (PDT)
+ bh=uhXKnXYG439EfLyUd9/2dMX94MN5ygNhQBpZxGoK2Ss=;
+ b=cXOb6NP+O8rbZh9NmmN6m0i26VlDqDF+ruCSH0//5a+wBsHakndfVMCgSpHVSxVkK9
+ tQh7SRsVahnj1Jzjt9SxK6FU4DfUybcuPwApi7PeQoXckSv1AYmB3PThX656w87kxcNL
+ fly5tj1RSjMz01sMUjLEXbBLccmZ+5PXWoQwGfrD1xMy4tLmYiGjZxJD1vSKD7RuqUH9
+ 2oORASwpkmCNrVqSzJSDRaPoU1QYyimpBgyvI7pd6MgK42FkWtB6dryT5HjxiDG2J1j3
+ N0vJLvZUVHJznXhbepEeth+pTG2h6ThQQgEWWZudvZUpTe2UMa4sgGCGaIdCjFLeXYxc
+ iefw==
+X-Gm-Message-State: AOAM533X+SqHUizgBtGIrk3icb1tIh3ny9WeP1fHf2YmK2kC0q14HO2x
+ ndcMXfk+5WvH0DuI82J5PC9hN0XrjML2uGTL
+X-Google-Smtp-Source: ABdhPJyEBGf//49GRYIxBecapcOFuKwu9UtyLQxGqtJ2PNv1GcQ1NhalSrlrYDPWBvreos6cFdg5gw==
+X-Received: by 2002:adf:f011:: with SMTP id j17mr15514769wro.335.1600092412215; 
+ Mon, 14 Sep 2020 07:06:52 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id x16sm20834041wrq.62.2020.09.14.07.06.45
+ by smtp.gmail.com with ESMTPSA id x16sm20834041wrq.62.2020.09.14.07.06.51
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Sep 2020 07:06:46 -0700 (PDT)
+ Mon, 14 Sep 2020 07:06:51 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/36] hw/misc/a9scu: Simplify setting MemoryRegionOps::impl
- fields
-Date: Mon, 14 Sep 2020 15:06:08 +0100
-Message-Id: <20200914140641.21369-4-peter.maydell@linaro.org>
+Subject: [PULL 08/36] target/arm: Convert Neon VCVT fp size field to MO_* in
+ decode
+Date: Mon, 14 Sep 2020 15:06:13 +0100
+Message-Id: <20200914140641.21369-9-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200914140641.21369-1-peter.maydell@linaro.org>
 References: <20200914140641.21369-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42b;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42b.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::433;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x433.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,69 +105,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Convert the insns using the 2reg_vcvt and 2reg_vcvt_f16 formats
+to pass the size through to the trans function as a MO_* value
+rather than the '0==f32, 1==f16' used in the fp 3-same encodings.
 
-This model implementation is designed for 32-bit accesses.
-We can simplify setting the MemoryRegionOps::impl min/max
-fields to 32-bit (memory::access_with_adjusted_size() will
-take care of the 8/16-bit accesses).
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200901144100.116742-4-f4bug@amsat.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200903133209.5141-3-peter.maydell@linaro.org
 ---
- hw/misc/a9scu.c | 16 +++++-----------
- 1 file changed, 5 insertions(+), 11 deletions(-)
+ target/arm/neon-dp.decode       | 3 +--
+ target/arm/translate-neon.c.inc | 4 ++--
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/hw/misc/a9scu.c b/hw/misc/a9scu.c
-index 3f3dcc414fe..47f948341f7 100644
---- a/hw/misc/a9scu.c
-+++ b/hw/misc/a9scu.c
-@@ -28,12 +28,6 @@ static uint64_t a9_scu_read(void *opaque, hwaddr offset,
-         return (((1 << s->num_cpu) - 1) << 4) | (s->num_cpu - 1);
-     case 0x08: /* CPU Power Status */
-         return s->status;
--    case 0x09: /* CPU status.  */
--        return s->status >> 8;
--    case 0x0a: /* CPU status.  */
--        return s->status >> 16;
--    case 0x0b: /* CPU status.  */
--        return s->status >> 24;
-     case 0x0c: /* Invalidate All Registers In Secure State */
-         return 0;
-     case 0x40: /* Filtering Start Address Register */
-@@ -52,8 +46,6 @@ static void a9_scu_write(void *opaque, hwaddr offset,
-                          uint64_t value, unsigned size)
- {
-     A9SCUState *s = (A9SCUState *)opaque;
--    uint32_t mask = MAKE_64BIT_MASK(0, size * 8);
--    uint32_t shift;
+diff --git a/target/arm/neon-dp.decode b/target/arm/neon-dp.decode
+index ea2f0dfcf16..51aa0f08194 100644
+--- a/target/arm/neon-dp.decode
++++ b/target/arm/neon-dp.decode
+@@ -256,9 +256,8 @@ VMINNM_fp_3s     1111 001 1 0 . 1 . .... .... 1111 ... 1 .... @3same_fp
+ @2reg_shll_b     .... ... . . . 001 shift:3  .... .... 0 . . . .... \
+                  &2reg_shift vm=%vm_dp vd=%vd_dp size=0 q=0
  
-     switch (offset) {
-     case 0x00: /* Control */
-@@ -62,9 +54,7 @@ static void a9_scu_write(void *opaque, hwaddr offset,
-     case 0x4: /* Configuration: RO */
-         break;
-     case 0x08: case 0x09: case 0x0A: case 0x0B: /* Power Control */
--        shift = (offset - 0x8) * 8;
--        s->status &= ~(mask << shift);
--        s->status |= ((value & mask) << shift);
-+        s->status = value;
-         break;
-     case 0x0c: /* Invalidate All Registers In Secure State */
-         /* no-op as we do not implement caches */
-@@ -84,6 +74,10 @@ static void a9_scu_write(void *opaque, hwaddr offset,
- static const MemoryRegionOps a9_scu_ops = {
-     .read = a9_scu_read,
-     .write = a9_scu_write,
-+    .impl = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-     .valid = {
-         .min_access_size = 1,
-         .max_access_size = 4,
+-# We use size=0 for fp32 and size=1 for fp16 to match the 3-same encodings.
+ @2reg_vcvt       .... ... . . . 1 ..... .... .... . q:1 . . .... \
+-                 &2reg_shift vm=%vm_dp vd=%vd_dp size=0 shift=%neon_rshift_i5
++                 &2reg_shift vm=%vm_dp vd=%vd_dp size=2 shift=%neon_rshift_i5
+ @2reg_vcvt_f16   .... ... . . . 11 .... .... .... . q:1 . . .... \
+                  &2reg_shift vm=%vm_dp vd=%vd_dp size=1 shift=%neon_rshift_i4
+ 
+diff --git a/target/arm/translate-neon.c.inc b/target/arm/translate-neon.c.inc
+index 255c1cf8a2a..213c1c2174a 100644
+--- a/target/arm/translate-neon.c.inc
++++ b/target/arm/translate-neon.c.inc
+@@ -1626,7 +1626,7 @@ static bool do_fp_2sh(DisasContext *s, arg_2reg_shift *a,
+         return false;
+     }
+ 
+-    if (a->size != 0) {
++    if (a->size == MO_16) {
+         if (!dc_isar_feature(aa32_fp16_arith, s)) {
+             return false;
+         }
+@@ -1646,7 +1646,7 @@ static bool do_fp_2sh(DisasContext *s, arg_2reg_shift *a,
+         return true;
+     }
+ 
+-    fpst = fpstatus_ptr(a->size ? FPST_STD_F16 : FPST_STD);
++    fpst = fpstatus_ptr(a->size == MO_16 ? FPST_STD_F16 : FPST_STD);
+     tcg_gen_gvec_2_ptr(rd_ofs, rm_ofs, fpst, vec_size, vec_size, a->shift, fn);
+     tcg_temp_free_ptr(fpst);
+     return true;
 -- 
 2.20.1
 
