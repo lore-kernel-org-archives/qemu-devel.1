@@ -2,80 +2,83 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DDEBC43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 00:02:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55E0DC43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 00:02:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CE8E20796
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 00:02:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C0DDD20796
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 00:02:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RZUqFLex"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CE8E20796
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vrw+7R58"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0DDD20796
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHbxI-0003wZ-4u
-	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 20:02:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43496)
+	id 1kHbxM-00046t-TS
+	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 20:02:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43556)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kHbwV-0002UT-BJ
- for qemu-devel@nongnu.org; Sun, 13 Sep 2020 20:01:59 -0400
-Received: from mail-pf1-x434.google.com ([2607:f8b0:4864:20::434]:35225)
+ id 1kHbwb-0002bg-6D
+ for qemu-devel@nongnu.org; Sun, 13 Sep 2020 20:02:05 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:33971)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kHbwT-0004BR-Gb
- for qemu-devel@nongnu.org; Sun, 13 Sep 2020 20:01:59 -0400
-Received: by mail-pf1-x434.google.com with SMTP id o68so11179403pfg.2
- for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 17:01:56 -0700 (PDT)
+ id 1kHbwZ-0004C4-Av
+ for qemu-devel@nongnu.org; Sun, 13 Sep 2020 20:02:04 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id s14so418837pju.1
+ for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 17:02:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=INOIZZ1UU6wjUvExIBY5xZEUID/bFlB32HgebiDeLvo=;
- b=RZUqFLexb/mvoAA1++MJGs1AUjxM/wRxFM/AbTSd3aRw3UitS7Wz1BYn3AnkCZVEnj
- FDuum2D71e0SKqKqBlb8NTZmAnrkeiheu9UO7SPdqZQb37ucVgOE6siCuwhhpYIYeC60
- xIgRRa2XnosMabb04VA4FGuNTIg5OiHaBjNoDhD/B56KnEf5jqX6Bh+Eo4Gyt7WRBp8e
- eE8VmSAALc2pNsLCifm2UxLTQnCDhjRZmxkGGWITXxRhy3a46yRU3qeUE35hiCqHasvI
- L9avhW4dAVETwPDdpt600M93VQnRrYXoLzcOc8DblQ7oouXhwAooGAjUON20Qsen+mP/
- B5oQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=9uEhRDQbPBvpSG5xc2pJjbxBlGNp1Es5E3WFmyWYEgg=;
+ b=vrw+7R58kQ5LK4jlxQL0MS/fmlg++1IqtaK293e8p3GYKqLWMTXNbUpZSkQjn4pFTi
+ WtLnwHeufF/paKi7S2P2s7mE5uwds/VdVXj7A5gEpkFPvv09ogeiiDo4k02rGWUB+JYc
+ 2wDrcMkOh4f7MmE79HVCi1O/sTkhWphooGyMS4MCpXvEtXpgHo6/KYB6K279l/1cCSSp
+ oifxrv2hAuiGwwVKl1GjJVAsGrHE4KIUkq2Cao27+iRN6zou+vTbjCsE08E9Om0J6kQf
+ 5i5BEOnGY5XI5NE2Fub1ahGaLVRRctvJ3uZkx4QwqkI2drI2WiGebrkEDMR1UKNj8Qqv
+ sklw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=INOIZZ1UU6wjUvExIBY5xZEUID/bFlB32HgebiDeLvo=;
- b=p1gymoVhfCixWy6H75hSQnAwCl5iVbLrSdZ9JInHCmbToGLb8P/FourOBFPAsZt/WF
- abSRL6WcJNUN1p5YtGexrDCCmbIyORQRM7Pn1vM6wI8GQ9zS06jgu2Hftc+wkG8Nfm7b
- 1HmNH+BQRUmXgrBnaBMDgs/2QchXUXCzJSCJ5NVfwhNssjTVU8U6s1g+53MoGDPj4PNU
- nOCdWaPPty8uZc+4tXw/z8W+tkxAJJw2PVai4nE7e+6jYyekfjHrYCBojkObPA59xQ+M
- YnWkTBBSD1rApRZ45FQpsWtXJuaGFHzxnLlZj8ogIbLTDHs8o81dSPZpVEO8megBc9it
- MroQ==
-X-Gm-Message-State: AOAM53116Xz24VTxDOx0xNVjzpauIOjn/h64arAZcCQWKglIbBo2AANj
- fw4frw5gdl87ATgkTKK02lI0sBF0xlKaEA==
-X-Google-Smtp-Source: ABdhPJxzp8Jq255Gh7TCBleCy3l7F8De1+0V73rp7fZfIHZbHVQLSoW1WR28gUBI9NmpTT443hUZiQ==
-X-Received: by 2002:a17:902:b586:b029:d1:bb0f:2644 with SMTP id
- a6-20020a170902b586b02900d1bb0f2644mr8292015pls.34.1600041715069; 
- Sun, 13 Sep 2020 17:01:55 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=9uEhRDQbPBvpSG5xc2pJjbxBlGNp1Es5E3WFmyWYEgg=;
+ b=oE3XHveCkctfF0CmctVZn1kFOHHbDYjo9JHSznl4YDwCQ2snI5QrZyVM2N7Ja1k+d8
+ WezHJX+NxH2YmxLbfjxmH8bY8b0QUrrMvoVryHyfu0zU3PxLStoIgu1T2i1LWUsRFAj+
+ LkQGtdOudihyPxKYZGbBeTwwgHyjaBzIPC6wKYxU8euqMRP9qwN205At+NkxsLZd2JLl
+ p4wwhWuZE1w0qi/BTjO8PZMCpPAVFnbcYkPc95tndl7NW7fngoK3rVbZjMN47YkZOrrs
+ 9EtXejZK7a66cwa/ha7zhRfXi1cMF2WVa1BNXmxWIDNnaNNDGwo/mP5W3z87aPEMYv+m
+ xpIQ==
+X-Gm-Message-State: AOAM530lf+pSbtqIsPiyC+sb3U4TPiq6FjTPxz5G+Hf75P1crQTglQLB
+ TM9UYNB/PHyjKAIbROpj8/vAJvzfIz78SQ==
+X-Google-Smtp-Source: ABdhPJxwVr1oppoIGobuV9LmqBXCta2XXV+YRKXVMah1ORF4zVuA7eMOzgfMyNcKW9vRRHNX7uzLXQ==
+X-Received: by 2002:a17:90a:6a4e:: with SMTP id
+ d14mr11001888pjm.63.1600041721573; 
+ Sun, 13 Sep 2020 17:02:01 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id 31sm6538252pgs.59.2020.09.13.17.01.53
+ by smtp.gmail.com with ESMTPSA id 31sm6538252pgs.59.2020.09.13.17.02.00
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 13 Sep 2020 17:01:54 -0700 (PDT)
+ Sun, 13 Sep 2020 17:02:00 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 00/11] capstone + disassembler patches
-Date: Sun, 13 Sep 2020 17:01:42 -0700
-Message-Id: <20200914000153.1725632-1-richard.henderson@linaro.org>
+Subject: [PATCH 05/11] disas: Use qemu/bswap.h for bfd endian loads
+Date: Sun, 13 Sep 2020 17:01:47 -0700
+Message-Id: <20200914000153.1725632-6-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200914000153.1725632-1-richard.henderson@linaro.org>
+References: <20200914000153.1725632-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::434;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x434.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -102,61 +105,123 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The primary change here is the update for capstone to meson.
-This bypasses capstone's build system entirely.  There's more
-commentary on that subject with the first patch.
+Use the routines we have already instead of open-coding.
 
-Plus a collection of other fixes and cleanups in the area.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ include/disas/dis-asm.h | 32 ++++++++++++++++++++----
+ disas.c                 | 55 -----------------------------------------
+ 2 files changed, 27 insertions(+), 60 deletions(-)
 
-There are a couple of other targets that could use capstone:
-
-The current capstone branch has a fatal bug affecting RISC-V.
-I have submitted a fix upstream for that, and have the minimal
-patches required to enable it here.
-
-There is capstone support for m68k, but it doesn't look like
-there's coldfire support.  So capstone is a subset of what we
-have in disas/m68k.c.  There's probably no point changing here.
-
-There is capstone support for mips, which might be good enough
-to replace disas/mips.c.  It wouldn't replace disas/nanomips.c,
-and there's no support at all for the micromips isa.
-
-
-r~
-
-
-Richard Henderson (11):
-  capstone: Convert Makefile bits to meson bits
-  capstone: Update to upstream "next" branch
-  disas: Move host asm annotations to tb_gen_code
-  disas: Clean up CPUDebug initialization
-  disas: Use qemu/bswap.h for bfd endian loads
-  disas: Cleanup plugin_disas
-  disas: Configure capstone for aarch64 host without libvixl
-  disas: Split out capstone code to disas/capstone.c
-  disas: Enable capstone disassembly for s390x
-  disas/capstone: Add skipdata hook for s390x
-  disas: Enable capstone disassembly for sparc
-
- configure                 |  24 +-
- Makefile                  |  16 -
- include/disas/dis-asm.h   | 102 +++---
- include/disas/disas.h     |   2 +-
- include/exec/log.h        |   4 +-
- accel/tcg/translate-all.c |  24 +-
- disas.c                   | 702 +++++++++-----------------------------
- disas/capstone.c          | 326 ++++++++++++++++++
- target/s390x/cpu.c        |   4 +
- target/sparc/cpu.c        |   4 +
- tcg/tcg.c                 |   4 +-
- capstone                  |   2 +-
- disas/meson.build         |   1 +
- meson.build               | 112 +++++-
- meson_options.txt         |   3 +
- 15 files changed, 672 insertions(+), 658 deletions(-)
- create mode 100644 disas/capstone.c
-
+diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
+index d2418c977e..8a216ac495 100644
+--- a/include/disas/dis-asm.h
++++ b/include/disas/dis-asm.h
+@@ -468,11 +468,33 @@ int print_insn_rx(bfd_vma, disassemble_info *);
+ 
+ /* from libbfd */
+ 
+-bfd_vma bfd_getl64 (const bfd_byte *addr);
+-bfd_vma bfd_getl32 (const bfd_byte *addr);
+-bfd_vma bfd_getb32 (const bfd_byte *addr);
+-bfd_vma bfd_getl16 (const bfd_byte *addr);
+-bfd_vma bfd_getb16 (const bfd_byte *addr);
++#include "qemu/bswap.h"
++
++static inline bfd_vma bfd_getl64(const bfd_byte *addr)
++{
++    return ldq_le_p(addr);
++}
++
++static inline bfd_vma bfd_getl32(const bfd_byte *addr)
++{
++    return (uint32_t)ldl_le_p(addr);
++}
++
++static inline bfd_vma bfd_getl16(const bfd_byte *addr)
++{
++    return lduw_le_p(addr);
++}
++
++static inline bfd_vma bfd_getb32(const bfd_byte *addr)
++{
++    return (uint32_t)ldl_be_p(addr);
++}
++
++static inline bfd_vma bfd_getb16(const bfd_byte *addr)
++{
++    return lduw_be_p(addr);
++}
++
+ typedef bool bfd_boolean;
+ 
+ #endif /* DISAS_DIS_ASM_H */
+diff --git a/disas.c b/disas.c
+index 50b5677930..20fad6aabb 100644
+--- a/disas.c
++++ b/disas.c
+@@ -85,61 +85,6 @@ generic_symbol_at_address (bfd_vma addr, struct disassemble_info *info)
+   return 1;
+ }
+ 
+-bfd_vma bfd_getl64 (const bfd_byte *addr)
+-{
+-  unsigned long long v;
+-
+-  v = (unsigned long long) addr[0];
+-  v |= (unsigned long long) addr[1] << 8;
+-  v |= (unsigned long long) addr[2] << 16;
+-  v |= (unsigned long long) addr[3] << 24;
+-  v |= (unsigned long long) addr[4] << 32;
+-  v |= (unsigned long long) addr[5] << 40;
+-  v |= (unsigned long long) addr[6] << 48;
+-  v |= (unsigned long long) addr[7] << 56;
+-  return (bfd_vma) v;
+-}
+-
+-bfd_vma bfd_getl32 (const bfd_byte *addr)
+-{
+-  unsigned long v;
+-
+-  v = (unsigned long) addr[0];
+-  v |= (unsigned long) addr[1] << 8;
+-  v |= (unsigned long) addr[2] << 16;
+-  v |= (unsigned long) addr[3] << 24;
+-  return (bfd_vma) v;
+-}
+-
+-bfd_vma bfd_getb32 (const bfd_byte *addr)
+-{
+-  unsigned long v;
+-
+-  v = (unsigned long) addr[0] << 24;
+-  v |= (unsigned long) addr[1] << 16;
+-  v |= (unsigned long) addr[2] << 8;
+-  v |= (unsigned long) addr[3];
+-  return (bfd_vma) v;
+-}
+-
+-bfd_vma bfd_getl16 (const bfd_byte *addr)
+-{
+-  unsigned long v;
+-
+-  v = (unsigned long) addr[0];
+-  v |= (unsigned long) addr[1] << 8;
+-  return (bfd_vma) v;
+-}
+-
+-bfd_vma bfd_getb16 (const bfd_byte *addr)
+-{
+-  unsigned long v;
+-
+-  v = (unsigned long) addr[0] << 24;
+-  v |= (unsigned long) addr[1] << 16;
+-  return (bfd_vma) v;
+-}
+-
+ static int print_insn_objdump(bfd_vma pc, disassemble_info *info,
+                               const char *prefix)
+ {
 -- 
 2.25.1
 
