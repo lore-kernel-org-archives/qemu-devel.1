@@ -2,100 +2,111 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF979C43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 11:18:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C63BC43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 11:21:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C13FC21D24
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 11:18:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 44CA721D24
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 11:21:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OPWUNPtG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C13FC21D24
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C5Mg9Anz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44CA721D24
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHmVI-0003De-VP
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 07:18:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46940)
+	id 1kHmXw-0005vI-D3
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 07:21:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47486)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kHmUX-0002Ei-DD
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 07:17:49 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37525)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kHmUV-0007R3-9e
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 07:17:49 -0400
-Received: by mail-wm1-x343.google.com with SMTP id a9so10851925wmm.2
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 04:17:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=sf2O2C+k1uIzmcOjOoPjnnks+53ZM/QXsyWchmkvUSs=;
- b=OPWUNPtGa7KNDtohOdmi/KaN0KEMCyL0Q/jfamXZajShDQabiU2jjU1jbT4fVJ9/Zm
- kpbxR7j5RasxZp58JKSCUe3ALYgTqf+pb7g1MsISdtioDKKb4dxR49Y234u3clCuEqIp
- MVW3X31f8Tdf52cEWZkqFQ0tQtndiFCTllQ6GoLSy5eQbz7RXKsgbsw0SSSJ98bEMhZ5
- 0SQQVMwVXShgPMuuGT+gyZJF3g7ZMLfJU6PU3mN6Qavp09VAwn6mvMNYVrrqhaqTbcVc
- 8VRDPHJMUm7b012kYeyAoB7Iui2EksXgqAlNC88TSmARfH1reKbpRZV1F4HsNUnpnNRV
- lSIQ==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kHmWG-0003yJ-UF
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 07:19:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23030
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kHmWC-0007bF-Pz
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 07:19:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600082366;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zv9Eyag0g2ZUVW7ywsVcCbHRN8LW+0Zx/h9DYWBw424=;
+ b=C5Mg9Anz2KXi1rjqGLLb/NS6eqyBehTOuB7XqbyO2DECWXnTkiw6IaR79JxVekC7DMeHPx
+ ML0XQn5JNX0GO5ShCJKXE8ihBxRS/18+jQrVkWPAt6uZIWTmjdlQjSmWwX9aNuG8pU6ECH
+ N5EayA6kGOO3TzqrWnHiq3r6hbhFc5I=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-583-uZLRqCtnO8GqZLdT8ZDA-A-1; Mon, 14 Sep 2020 07:19:25 -0400
+X-MC-Unique: uZLRqCtnO8GqZLdT8ZDA-A-1
+Received: by mail-ed1-f71.google.com with SMTP id y1so9105963edw.16
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 04:19:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=sf2O2C+k1uIzmcOjOoPjnnks+53ZM/QXsyWchmkvUSs=;
- b=P+cmE6dZQ7q/syzvNtLmUvuzB58yQRrujjBs7RL2AtwJXLsqJJ2FTAPQOvdX56uUGU
- HiGVQHv+g5ytjMbNbe/fZicC5yYZGWJKrTl8yrFcJDOdMlrndrNdoX76o9hqK78G3tqL
- UlYxCurzjsc9QQRUQClSPCSM6ktuUcalti1J2JFwlDNIYCGJEC6hQY8RO+CQmFqF/JU8
- UvLPBB87PSsoa76MyWZe6wbOZzhqc12DBpSqk1Ly3445Y+rRDNXLHgrRMhn4lEFz6uzy
- QeOFOI3C/s/MrimHNcbMw9d21bIH4HEkkhqH1SsKXqV63tQJzMOi33+8RPQwL8/fKlzx
- Zwjw==
-X-Gm-Message-State: AOAM531N2Jcw4tAprhh9B8qYNmTR1xYVUQvvkc/A/LQUlfzYBXUvVA6E
- /HY4VKUrL+4jU2MPBm2tHfk=
-X-Google-Smtp-Source: ABdhPJw3JxKlDPxK+BEBWKkVD24PSNfuk3zDjFrz5MOjLZw1J9Dh7y0fzrLAzJTO4DM9fDGGk2Oy+A==
-X-Received: by 2002:a05:600c:4142:: with SMTP id
- h2mr14389848wmm.128.1600082265602; 
- Mon, 14 Sep 2020 04:17:45 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id r14sm20141313wrn.56.2020.09.14.04.17.44
+ bh=zv9Eyag0g2ZUVW7ywsVcCbHRN8LW+0Zx/h9DYWBw424=;
+ b=muQRQYpJ/z+QFj7ux3YLzFAYDl3aHh6RjGcONPnduAON/LqO6MbZDE5jpKz3g1sThU
+ ZqEePPt21gpU5QqT2rZOVP5UW+C1JjGgspvYaACSaeEMU/TMnXdjyREJT7Olt1SggEKz
+ BZS4rtCiLpb3dE3Bnhtrq4bHuQBc8/d8b4ifXVUoEBvnCNm2Kv/KLWprugse0Ls+8xxI
+ IwDOiv/B/sdXldHM7rgrD8pHU1lPlWAkhCGSjv03m02n9Xqrd1+C9bOzM//T9Do1F6fL
+ nT29jetYS8gIOYZBa5pYxYu06xbeE7Xohr5CDKX0KpuOd02TJSeg1KhKm8mxlyxYBVip
+ stRw==
+X-Gm-Message-State: AOAM532UWBHL65QnLFyvFtQo4rLWCuJoK8bG/PtWqAPcGDAGT8ZK2Lka
+ i2ePPVwT9i/g01yJQH87QR9RSIie6BmQMO1Md8PsDzG1RK9yO3bJ/bDinWO+C8SVOa1+IL1NPRF
+ danl7OPK6PpvZHf4=
+X-Received: by 2002:a05:6402:6d6:: with SMTP id
+ n22mr16406974edy.79.1600082363496; 
+ Mon, 14 Sep 2020 04:19:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyKzk0FeH5GZIykLzpxGxnI7obLhZa1p2HQArknsEzKYnMz9slvSiVFmSsECEdjOJRkM4Jovw==
+X-Received: by 2002:a05:6402:6d6:: with SMTP id
+ n22mr16406950edy.79.1600082363225; 
+ Mon, 14 Sep 2020 04:19:23 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d386:a377:dd9c:9b59?
+ ([2001:b07:6468:f312:d386:a377:dd9c:9b59])
+ by smtp.gmail.com with ESMTPSA id l21sm7610911ejg.124.2020.09.14.04.19.22
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 14 Sep 2020 04:17:45 -0700 (PDT)
-Subject: Re: [REPORT] Nightly Performance Tests - Sunday, September 13, 2020
-To: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-References: <5f5e9831.1c69fb81.bdbec.98b8@mx.google.com>
- <ea64c109-6bd9-c0f1-964c-46be5c6ba020@amsat.org>
- <CALTWKrW-U261HNc8mSxmu1uYKqrZxZM4+661ZK_m-W_Ky8eiFQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <eb155563-9274-8ddd-54b8-1de421b117ee@amsat.org>
-Date: Mon, 14 Sep 2020 13:17:44 +0200
+ Mon, 14 Sep 2020 04:19:22 -0700 (PDT)
+Subject: Re: [PATCH] scripts: display how long each test takes to execute
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200914110948.1425082-1-berrange@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fdbb969d-6569-87bc-901a-f51d7bf2cd21@redhat.com>
+Date: Mon, 14 Sep 2020 13:19:20 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <CALTWKrW-U261HNc8mSxmu1uYKqrZxZM4+661ZK_m-W_Ky8eiFQ@mail.gmail.com>
+In-Reply-To: <20200914110948.1425082-1-berrange@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.248,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 01:36:47
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -38
+X-Spam_score: -3.9
+X-Spam_bar: ---
+X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,127 +119,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <huth@tuxfamily.org>, Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/14/20 12:50 PM, Ahmed Karaman wrote:
-> On Mon, Sep 14, 2020 at 8:46 AM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>
->> Hi Ahmed,
->>
->> On 9/14/20 12:07 AM, Ahmed Karaman wrote:
->>> Host CPU         : Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz
->>> Host Memory      : 15.49 GB
->>>
->>> Start Time (UTC) : 2020-09-13 21:35:01
->>> End Time (UTC)   : 2020-09-13 22:07:44
->>> Execution Time   : 0:32:42.230467
->>>
->>> Status           : SUCCESS
->>>
->>> Note:
->>> Changes denoted by '-----' are less than 0.01%.
->>>
->>> --------------------------------------------------------
->>>             SUMMARY REPORT - COMMIT f00f57f3
->>> --------------------------------------------------------
->>
->> (Maybe this was already commented earlier but I missed it).
->>
->> What change had a so significant impact on the m68k target?
->> At a glance I only see mostly changes in softfloat:
->>
->> $ git log --oneline v5.1.0..f00f57f3 tcg target/m68k fpu
->> fe4b0b5bfa9 tcg: Implement 256-bit dup for tcg_gen_gvec_dup_mem
->> 6a17646176e tcg: Eliminate one store for in-place 128-bit dup_mem
->> e7e8f33fb60 tcg: Fix tcg gen for vectorized absolute value
->> 5ebf5f4be66 softfloat: Define misc operations for bfloat16
->> 34f0c0a98a5 softfloat: Define convert operations for bfloat16
->> 8282310d853 softfloat: Define operations for bfloat16
->> 0d93d8ec632 softfloat: Add fp16 and uint8/int8 conversion functions
->> fbcc38e4cb1 softfloat: add xtensa specialization for pickNaNMulAdd
->> 913602e3ffe softfloat: pass float_status pointer to pickNaN
->> cc43c692511 softfloat: make NO_SIGNALING_NANS runtime property
->> 73ebe95e8e5 target/ppc: add vmulld to INDEX_op_mul_vec case
->>
->>> --------------------------------------------------------
->>> --------------------------------------------------------
->>> Test Program: matmult_double
->>> --------------------------------------------------------
->>> Target              Instructions      Latest      v5.1.0
->>> ----------  --------------------  ----------  ----------
->>> aarch64            1 412 412 599       -----     +0.311%
->>> alpha              3 233 957 639       -----     +7.472%
->>> arm                8 545 302 995       -----      +1.09%
->>> hppa               3 483 527 330       -----     +4.466%
->>> m68k               3 919 110 506       -----    +18.433%
->>> mips               2 344 641 840       -----     +4.085%
->>> mipsel             3 329 912 425       -----     +5.177%
->>> mips64             2 359 024 910       -----     +4.075%
->>> mips64el           3 343 650 686       -----     +5.166%
->>> ppc                3 209 505 701       -----     +3.248%
->>> ppc64              3 287 495 266       -----     +3.173%
->>> ppc64le            3 287 135 580       -----     +3.171%
->>> riscv64            1 221 617 903       -----     +0.278%
->>> s390x              2 874 160 417       -----     +5.826%
->>> sh4                3 544 094 841       -----      +6.42%
->>> sparc64            3 426 094 848       -----     +7.138%
->>> x86_64             1 249 076 697       -----     +0.335%
->>> --------------------------------------------------------
->> ...
->>> --------------------------------------------------------
->>> Test Program: qsort_double
->>> --------------------------------------------------------
->>> Target              Instructions      Latest      v5.1.0
->>> ----------  --------------------  ----------  ----------
->>> aarch64            2 709 839 947       -----     +2.423%
->>> alpha              1 969 432 086       -----     +3.679%
->>> arm                8 323 168 267       -----     +2.589%
->>> hppa               3 188 316 726       -----       +2.9%
->>> m68k               4 953 947 225       -----    +15.153%
->>> mips               2 123 789 120       -----     +3.049%
->>> mipsel             2 124 235 492       -----     +3.049%
->>> mips64             1 999 025 951       -----     +3.404%
->>> mips64el           1 996 433 190       -----     +3.409%
->>> ppc                2 819 299 843       -----     +5.436%
->>> ppc64              2 768 177 037       -----     +5.512%
->>> ppc64le            2 724 766 044       -----     +5.602%
->>> riscv64            1 638 324 190       -----     +4.021%
->>> s390x              2 519 117 806       -----     +3.364%
->>> sh4                2 595 696 102       -----       +3.0%
->>> sparc64            3 988 892 763       -----     +2.744%
->>> x86_64             2 033 624 062       -----     +3.242%
->>> --------------------------------------------------------
-> 
-> Hi Mr. Philippe,
-> The performance degradation from v5.1.0 of all targets, and especially
-> m68k, was introduced between the two nightly tests below:
-> 
-> [REPORT] Nightly Performance Tests - Thursday, August 20, 2020:
-> https://lists.nongnu.org/archive/html/qemu-devel/2020-08/msg04923.html
-> 
-> [REPORT] Nightly Performance Tests - Saturday, August 22, 2020
-> https://lists.nongnu.org/archive/html/qemu-devel/2020-08/msg05537.html
-> 
-> It looks like the new build system is the culprit.
+On 14/09/20 13:09, Daniel P. Berrangé wrote:
+> I'm unclear if meson's native test runner can print timings. If not,
+> we might want to submit an RFE there too.
 
-Maybe we lost a build flag in that 1d806cef..66e01f1c range?
-(or added a new one unconditionally).
+I agree that any holes should be filled in there.  In this case it does,
+so I think we should start using it in CI so that RFEs can be sent there.
 
-> 
-> The "bisect.py" script introduced during the "TCG Continuous
-> Benchmarking" GSoC project can be very handy in these cases. I wrote
-> about the tool and how to use it in the report below:
-> https://ahmedkrmn.github.io/TCG-Continuous-Benchmarking/Finding-Commits-Affecting-QEMU-Performance/
+mtest2make-style output has been in use (and good enough) for years so
+I'd rather avoid piling up more hacks on top.  "meson test" is not
+perfect but I'd rather improve it instead.
 
-Yeah, looks like the ideal tool for that.
+Paolo
 
+>  scripts/mtest2make.py | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Best regards,
-> Ahmed Karaman
-> 
+> diff --git a/scripts/mtest2make.py b/scripts/mtest2make.py
+> index 9cbb2e374d..9103ae65b9 100644
+> --- a/scripts/mtest2make.py
+> +++ b/scripts/mtest2make.py
+> @@ -20,7 +20,7 @@ print('''
+>  SPEED = quick
+>  
+>  # $1 = environment, $2 = test command, $3 = test name, $4 = dir
+> -.test-human-tap = $1 $(if $4,(cd $4 && $2),$2) < /dev/null | ./scripts/tap-driver.pl --test-name="$3" $(if $(V),,--show-failures-only)
+> +.test-human-tap = export then=`date +%s` ; $1 $(if $4,(cd $4 && $2),$2) < /dev/null | ./scripts/tap-driver.pl --test-name="$3" $(if $(V),,--show-failures-only) ; export now=`date +%s` ; delta=`expr $$now - $$then` ; $(if $(V),echo "TIME $$delta seconds",true)
+>  .test-human-exitcode = $1 $(PYTHON) scripts/test-driver.py $(if $4,-C$4) $(if $(V),--verbose) -- $2 < /dev/null
+>  .test-tap-tap = $1 $(if $4,(cd $4 && $2),$2) < /dev/null | sed "s/^[a-z][a-z]* [0-9]*/& $3/" || true
+>  .test-tap-exitcode = printf "%s\\n" 1..1 "`$1 $(if $4,(cd $4 && $2),$2) < /dev/null > /dev/null || echo "not "`ok 1 $3"
+> -- 2.26.2
+
+
+Paolo
+
 
