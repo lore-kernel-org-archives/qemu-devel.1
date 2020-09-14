@@ -2,95 +2,96 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD491C2D0F6
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 02:00:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 619B6C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 02:01:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64D8C2168B
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 02:00:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00E2D21655
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 02:01:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OoHgpdM2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64D8C2168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lm4+1GLU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00E2D21655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHdmp-0003ei-8g
-	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 22:00:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59278)
+	id 1kHdoN-0006Hs-5C
+	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 22:01:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59412)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kHdm2-00023G-GL
- for qemu-devel@nongnu.org; Sun, 13 Sep 2020 21:59:18 -0400
-Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:40954)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kHdmw-0004T8-3D
+ for qemu-devel@nongnu.org; Sun, 13 Sep 2020 22:00:14 -0400
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:37762)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kHdm0-0008G9-TH
- for qemu-devel@nongnu.org; Sun, 13 Sep 2020 21:59:18 -0400
-Received: by mail-oi1-x236.google.com with SMTP id t76so16176652oif.7
- for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 18:59:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=qPIPNTwPz2JPOtlyZclHBQ77xy7GpRmo9vH1WLt6diQ=;
- b=OoHgpdM2wGam0s5v6n1OQjNP1xmXCRHaj+Yj2PJkBNDFWaJUiOO5OkQlVX8/8HX8qK
- rXXLAaMmUMtWb95nweoPKcn85zDh/lcjoqckwke5s1Czjnsy5jot4B1tOZDyptf+/VoZ
- aOgWwbJq5bh2RLzjjc6xnm7hmgYtE3DJvpNU5UZ4ZFB/KAAb20Q9MXAcws31JOusSiAx
- rbe/wy3v6z1V41rgJT9zqUXsd/g7y9pUKETCwzxIeDpS+CPg+Inc7vwSsKzcofC+XoJu
- V5LyF2qcX4nGkj9wdT40hBhcTwa7VT9+JKWYbnHvuwYBAhyLH6/RT1maLHblQR4kBgzT
- uXsg==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kHdmu-00007W-8x
+ for qemu-devel@nongnu.org; Sun, 13 Sep 2020 22:00:13 -0400
+Received: by mail-pj1-x1042.google.com with SMTP id kk9so4528000pjb.2
+ for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 19:00:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=uluZ9e4xTwH5WsMOku+/uLhXVuDT1HwGYMAaCi9BPdI=;
+ b=lm4+1GLUiTw1CTyGwC2dxSq9XtbeK+iNNAEbAqNyEFLqxArSVwPcovJsE1NbIAblMc
+ 1uGD+z+yQBKaFtgAaSXMf5yNVZJ79l74g8YNwtfe181xbYdI8qLWcGRJEZkYMFZ4S0h9
+ jUsASaLB6uk6mWxU6uFgzc3HEnWZhiMq2jkfY80xiWOvp9pf1oF6xn6BaiTRm2gLHgAo
+ H9J78vAAkIbmaadvpIOTbZAqIjZv7XfTdJ5/bxNB+t9/gId2EURbyaQi3+IegvKA0LWC
+ pGWGOJlLDqdoSCErV8TLSSruky5dGVORz41iCm4jHCBGUccllTocqNtjzcz/RwZEHYkk
+ b+tQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=qPIPNTwPz2JPOtlyZclHBQ77xy7GpRmo9vH1WLt6diQ=;
- b=EckHNnxS17XYb/O9qf5uprfpEOIWQr09tQWwF9cWeokqIItfEp5nuF+VFl8L8ypMYj
- MVpogSW2WIYD6MaqaOeCtbfVJlhVX/N3lHujx5cN0gavQxuDhLPLUgxmmUQdpJCaaJo4
- lHU++Cl8050FjStVdtcaGRFPWE3ECGwperwooAyPYl34HYRQb65CnDyliEw4dQtPV8aM
- qX92bwAdGWV8XQJUUDShad+1nYfqQeumETFr0p5zXVrwFkJ5M+qB0rj7AMw4X2hv81BO
- XdKcsN4MBPBxymlcg5YMdQr3f0IacrG32wc14N5ks3kZuioCGDxHY+iVRItUtYk9uUID
- qwZQ==
-X-Gm-Message-State: AOAM532xuX9Tjc/RHY8Sldz5b+OL+drTpxHHHk9xz6YgOhHVzwLtSuOI
- xbbBVUnSyDkhcG7gC3y2TAjJP76kfjQ=
-X-Google-Smtp-Source: ABdhPJxspV9JUIYTXbdx5sMCbRnTzOlhVsF1cudcSubC0NSdsidui3FXAXRO6HB7LAczkG7LAU13nA==
-X-Received: by 2002:aca:1312:: with SMTP id e18mr7467435oii.19.1600048755235; 
- Sun, 13 Sep 2020 18:59:15 -0700 (PDT)
-Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
- [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id i7sm2390668oto.62.2020.09.13.18.59.14
- (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Sun, 13 Sep 2020 18:59:14 -0700 (PDT)
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 2/4] qga/commands-posix: Move the udev code from the pci to the
- generic function
-Date: Sun, 13 Sep 2020 20:59:00 -0500
-Message-Id: <20200914015902.25769-3-mdroth@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200914015902.25769-1-mdroth@linux.vnet.ibm.com>
-References: <20200914015902.25769-1-mdroth@linux.vnet.ibm.com>
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=uluZ9e4xTwH5WsMOku+/uLhXVuDT1HwGYMAaCi9BPdI=;
+ b=TNieLcfXxTHONbbNAg1iSCgf3da9iYeEQqpwRGV3ks9hvz/7Nh22sHmOKWTAEQqKlN
+ Z0Hg6ZNQeJNDgGCKuW0V57gugWMjn9QRRrBkK2KhDUbDRWWhNVuVwobSpKslcc9GV6cn
+ 6FQiPE9h4i0tp26jdVUEX/L97KN7N8q3z2bBjn62HP6+6rGMzus/dkcmTHWhJppi3gTC
+ /D4biMWTbvlcwuzmcOsDcGewwYHxYGguL9rkLyGwpOJUUcZVYbBV1hdzR49LURKWFtQg
+ +TgqN8B4RCj5RSnmh97rbPhw+hb1YsTRT1LTVnFW3DaB74zPRQvrwUZaxP0T8UUNI0FS
+ XIbA==
+X-Gm-Message-State: AOAM533KOq6c0gSJyoj2qeLIUQg5LORapXazWI8R8iU6bCmMOT6My9VH
+ GmJQSK60WVYyg7v5+SEc3LhuqJGQ0Ek1rg==
+X-Google-Smtp-Source: ABdhPJxTEEg9wW+SsBeyAB0fNzliRLO6l73KIzniS3Y1J/CbqVTJ+EiJpSrMKBZLsK2iUNw07i2/MQ==
+X-Received: by 2002:a17:90a:f407:: with SMTP id
+ ch7mr11722047pjb.142.1600048810329; 
+ Sun, 13 Sep 2020 19:00:10 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id t25sm6683925pgn.13.2020.09.13.19.00.09
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 13 Sep 2020 19:00:09 -0700 (PDT)
+Subject: Re: [PATCH] lockable.h: always define unknown_lock_type
+To: mingli.yu@windriver.com, qemu-devel@nongnu.org
+References: <20200914014236.2355289-1-mingli.yu@windriver.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <4b20315c-e75d-904c-99d5-3a844ed3bb66@linaro.org>
+Date: Sun, 13 Sep 2020 19:00:07 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::236;
- envelope-from=flukshun@gmail.com; helo=mail-oi1-x236.google.com
+In-Reply-To: <20200914014236.2355289-1-mingli.yu@windriver.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.248,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,131 +104,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+On 9/13/20 6:42 PM, mingli.yu@windriver.com wrote:
+> From: Mingli Yu <mingli.yu@windriver.com>
+> 
+> There comes below build failure when use gcc 10.1.0 and
+> "-Og" passed to compiler.
+>  | /usr/lib/gcc/x86_64-wrs-linux/10.1.0/../../../../x86_64-wrs-linux/bin/ld.bfd: /mnt/build/tmp/work/x86_64-linux/qemu-system-native/5.1.0-r0/qemu-5.1.0/fsdev/qemu-fsdev-throttle.c:25: undefined reference to `unknown_lock_type'
+>  | /usr/lib/gcc/x86_64-wrs-linux/10.1.0/../../../../x86_64-wrs-linux/bin/ld.bfd: ../fsdev/qemu-fsdev-throttle.o: in function `fsdev_co_throttle_request':
+>  | /mnt/build/tmp/work/x86_64-linux/qemu-system-native/5.1.0-r0/qemu-5.1.0/fsdev/qemu-fsdev-throttle.c:103: undefined reference to `unknown_lock_type'
+>  | /usr/lib/gcc/x86_64-wrs-linux/10.1.0/../../../../x86_64-wrs-linux/bin/ld.bfd: ../fsdev/qemu-fsdev-throttle.o:/mnt/build/tmp/work/x86_64-linux/qemu-system-native/5.1.0-r0/qemu-5.1.0/fsdev/qemu-fsdev-throttle.c:103: more undefined references to `unknown_lock_type' follow
+>  | collect2: error: ld returned 1 exit status
+> 
+> So always define unknown_lock_type to fix the above error.
 
-The libudev-related code is independent from the other pci-related code
-and can be re-used for non-pci devices (like ccw devices on s390x). Thus
-move this part to the generic function.
+There's a lot that won't work with -Og, including stuff that uses
+qemu_build_not_reached (which this itself should have been using).
 
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1755075
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
- qga/commands-posix.c | 62 +++++++++++++++++++++++---------------------
- 1 file changed, 33 insertions(+), 29 deletions(-)
 
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 1a42ec8171..e8467ac567 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -874,10 +874,6 @@ static bool build_guest_fsinfo_for_pci_dev(char const *syspath,
-     GuestPCIAddress *pciaddr = disk->pci_controller;
-     bool has_ata = false, has_host = false, has_tgt = false;
-     char *p, *q, *driver = NULL;
--#ifdef CONFIG_LIBUDEV
--    struct udev *udev = NULL;
--    struct udev_device *udevice = NULL;
--#endif
-     bool ret = false;
- 
-     p = strstr(syspath, "/devices/pci");
-@@ -936,26 +932,6 @@ static bool build_guest_fsinfo_for_pci_dev(char const *syspath,
-     pciaddr->slot = pci[2];
-     pciaddr->function = pci[3];
- 
--#ifdef CONFIG_LIBUDEV
--    udev = udev_new();
--    udevice = udev_device_new_from_syspath(udev, syspath);
--    if (udev == NULL || udevice == NULL) {
--        g_debug("failed to query udev");
--    } else {
--        const char *devnode, *serial;
--        devnode = udev_device_get_devnode(udevice);
--        if (devnode != NULL) {
--            disk->dev = g_strdup(devnode);
--            disk->has_dev = true;
--        }
--        serial = udev_device_get_property_value(udevice, "ID_SERIAL");
--        if (serial != NULL && *serial != 0) {
--            disk->serial = g_strdup(serial);
--            disk->has_serial = true;
--        }
--    }
--#endif
--
-     if (strcmp(driver, "ata_piix") == 0) {
-         /* a host per ide bus, target*:0:<unit>:0 */
-         if (!has_host || !has_tgt) {
-@@ -1017,10 +993,6 @@ static bool build_guest_fsinfo_for_pci_dev(char const *syspath,
- 
- cleanup:
-     g_free(driver);
--#ifdef CONFIG_LIBUDEV
--    udev_unref(udev);
--    udev_device_unref(udevice);
--#endif
-     return ret;
- }
- 
-@@ -1033,18 +1005,50 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
-     GuestPCIAddress *pciaddr;
-     GuestDiskAddressList *list = NULL;
-     bool has_hwinf;
-+#ifdef CONFIG_LIBUDEV
-+    struct udev *udev = NULL;
-+    struct udev_device *udevice = NULL;
-+#endif
- 
-     pciaddr = g_new0(GuestPCIAddress, 1);
-+    pciaddr->domain = -1;                       /* -1 means field is invalid */
-+    pciaddr->bus = -1;
-+    pciaddr->slot = -1;
-+    pciaddr->function = -1;
- 
-     disk = g_new0(GuestDiskAddress, 1);
-     disk->pci_controller = pciaddr;
-+    disk->bus_type = GUEST_DISK_BUS_TYPE_UNKNOWN;
- 
-     list = g_new0(GuestDiskAddressList, 1);
-     list->value = disk;
- 
-+#ifdef CONFIG_LIBUDEV
-+    udev = udev_new();
-+    udevice = udev_device_new_from_syspath(udev, syspath);
-+    if (udev == NULL || udevice == NULL) {
-+        g_debug("failed to query udev");
-+    } else {
-+        const char *devnode, *serial;
-+        devnode = udev_device_get_devnode(udevice);
-+        if (devnode != NULL) {
-+            disk->dev = g_strdup(devnode);
-+            disk->has_dev = true;
-+        }
-+        serial = udev_device_get_property_value(udevice, "ID_SERIAL");
-+        if (serial != NULL && *serial != 0) {
-+            disk->serial = g_strdup(serial);
-+            disk->has_serial = true;
-+        }
-+    }
-+
-+    udev_unref(udev);
-+    udev_device_unref(udevice);
-+#endif
-+
-     has_hwinf = build_guest_fsinfo_for_pci_dev(syspath, disk, errp);
- 
--    if (has_hwinf) {
-+    if (has_hwinf || disk->has_dev || disk->has_serial) {
-         list->next = fs->disk;
-         fs->disk = list;
-     } else {
--- 
-2.17.1
-
+r~
 
