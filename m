@@ -2,81 +2,93 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1665CC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 15:52:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6E61C43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 15:52:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58952208DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 15:52:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58952208DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 09A70208DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 15:52:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y+OqfV+w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09A70208DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHqmA-0004YG-5W
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 11:52:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49564)
+	id 1kHqmP-0004uq-Qk
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 11:52:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39538)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kHqke-0002xg-LH
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 11:50:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48960)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kHqka-0007Gf-VO
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 11:50:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kHqkX-00026K-Rf
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 15:50:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C0D7A2E80EE
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 15:50:37 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kHq9k-0005xT-Cx
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 11:12:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23172)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kHq9i-0001Cr-60
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 11:12:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600096349;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=dd3GXnEjgoAnUmz/ncsCBQVJXy51bVIMrRUnXganD7A=;
+ b=Y+OqfV+wTtw4CylWSwWQQf/fEWEXHnmuXUsbs5XltcbgQEZColvjL3607ZaGr/FRFJ49Sd
+ IyLfxWKqDbFhrD86UXwaqCUs64W50Pv5on83P7O3jrle5qvy5MiSNcPgFUymEW5cOz3Be/
+ gm0PILn3kSyli5Vyitp2pSs008RurtA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-330--jChKDb7MV-B_UA6cdsx5Q-1; Mon, 14 Sep 2020 11:11:54 -0400
+X-MC-Unique: -jChKDb7MV-B_UA6cdsx5Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6730A873115;
+ Mon, 14 Sep 2020 15:11:53 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
+ [10.36.114.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D7F260DA0;
+ Mon, 14 Sep 2020 15:11:50 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id A62D4113864A; Mon, 14 Sep 2020 17:11:48 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH v7 07/13] monitor: Make current monitor a per-coroutine
+ property
+References: <20200909151149.490589-1-kwolf@redhat.com>
+ <20200909151149.490589-8-kwolf@redhat.com>
+Date: Mon, 14 Sep 2020 17:11:48 +0200
+In-Reply-To: <20200909151149.490589-8-kwolf@redhat.com> (Kevin Wolf's message
+ of "Wed, 9 Sep 2020 17:11:43 +0200")
+Message-ID: <874ko0o0jv.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Sep 2020 15:44:34 -0000
-From: Daniel Berrange <1893691@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange dgilbert-h piotrjurkiewicz
-X-Launchpad-Bug-Reporter: Piotr Jurkiewicz (piotrjurkiewicz)
-X-Launchpad-Bug-Modifier: Daniel Berrange (berrange)
-References: <159890390988.14589.1084059668441088626.malonedeb@gac.canonical.com>
-Message-Id: <160009827412.539.2162169911416376883.malone@chaenomeles.canonical.com>
-Subject: [Bug 1893691] Re: Chardev logfile is not written (regression between
- 5.0 and 5.1)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: 2a476ea10162e7411740399bc266d7a617742c30
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 05:55:43
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:55:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -38
+X-Spam_score: -3.9
+X-Spam_bar: ---
+X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,106 +97,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1893691 <1893691@bugs.launchpad.net>
+Cc: stefanha@redhat.com, marcandre.lureau@gmail.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg04809.html
+Kevin Wolf <kwolf@redhat.com> writes:
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
+> This way, a monitor command handler will still be able to access the
+> current monitor, but when it yields, all other code code will correctly
+> get NULL from monitor_cur().
+>
+> This uses a hash table to map the coroutine pointer to the current
+> monitor of that coroutine.  Outside of coroutine context, we associate
+> the current monitor with the leader coroutine of the current thread.
 
--- =
+In qemu-system-FOO, the hash table can have only these entries:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1893691
+* (OOB) One mapping @mon_iothread's thread leader to a QMP monitor, while
+  executing a QMP command out-of-band.
 
-Title:
-  Chardev logfile is not written (regression between 5.0 and 5.1)
+* (QMP-CO) One mapping @qmp_dispatcher_co (a coroutine in the main
+  thread) to a QMP monitor, while executing a QMP command in-band and in
+  coroutine context.
 
-Status in QEMU:
-  Confirmed
+* (QMP) One mapping the main thread's leader to a QMP monitor, while
+  executing a QMP command in-band and out of coroutine context, in a
+  bottom half.
 
-Bug description:
-  After update from version 5.0 to 5.1, logfile stopped being populated
-  with console output. The file is being created, but remains empty.
+* (HMP) One mapping the main thread's leader to an HMP monitor, while
+  executing an HMP command out of coroutine context.
 
-  Relevant command line options:
+* (HMP-CO) One mapping a transient coroutine in the main thread to an
+  HMP monitor, while executing an HMP command in coroutine context.
 
-  -mon chardev=3Dchar0
-  -serial chardev:char0
-  -chardev socket,host=3D127.0.0.10,port=3D2323,server,nowait,telnet,mux=3D=
-on,id=3Dchar0,logfile=3D/home/jurkiew/.machiner/runs/2020-08-31T21:46:55-0/=
-internal/log
+In-band execution is one command after the other.
 
-  =
+Therefore, at most one monitor command can be executing in-band at any
+time.
 
-  Full command line:
+Therefore, the hash table has at most *two* entries: one (OOB), and one
+of the other four.
 
-  qemu-system-x86_64
-  -nodefaults
-  -no-user-config
-  -snapshot
-  -enable-kvm
-  -cpu
-  host
-  -nographic
-  -echr
-  17
-  -mon
-  chardev=3Dchar0
-  -serial
-  chardev:char0
-  -rtc
-  clock=3Dvm
-  -object
-  rng-random,filename=3D/dev/urandom,id=3Drng0
-  -device
-  virtio-rng-pci,rng=3Drng0,max-bytes=3D512,period=3D1000
-  -name
-  2020-08-31T21:46:55-0,debug-threads=3Don
-  -smp
-  sockets=3D1,cores=3D9,threads=3D2
-  -m
-  251G
-  -overcommit
-  cpu-pm=3Don
-  -pidfile
-  /home/jurkiew/.machiner/runs/2020-08-31T21:46:55-0/internal/pid
-  -net
-  nic,model=3Dvirtio
-  -net
-  user,hostfwd=3Dtcp:127.0.0.10:2222-:22,hostfwd=3Dtcp:127.0.0.10:8000-:800=
-0,hostfwd=3Dtcp:127.0.0.10:9000-:9000
-  -fsdev
-  local,id=3Dmachiner_internal_dir,security_model=3Dnone,path=3D/home/jurki=
-ew/.machiner/runs/2020-08-31T21:46:55-0/internal
-  -device
-  virtio-9p-pci,fsdev=3Dmachiner_internal_dir,mount_tag=3Dmachiner_internal=
-_dir
-  -fsdev
-  local,id=3Dmachiner_lower_dir,security_model=3Dnone,readonly,path=3D.
-  -device
-  virtio-9p-pci,fsdev=3Dmachiner_lower_dir,mount_tag=3Dmachiner_lower_dir
-  -fsdev
-  local,id=3Dmachiner_upper_dir,security_model=3Dmapped-xattr,fmode=3D0777,=
-dmode=3D0777,path=3D/home/jurkiew/.machiner/runs/2020-08-31T21:46:55-0
-  -device
-  virtio-9p-pci,fsdev=3Dmachiner_upper_dir,mount_tag=3Dmachiner_upper_dir
-  -device
-  virtio-scsi
-  -drive
-  if=3Dnone,file=3D/home/jurkiew/.machiner/images/famtar/image.qcow2,discar=
-d=3Don,id=3Dfamtar
-  -device
-  scsi-hd,drive=3Dfamtar
-  -chardev
-  socket,host=3D127.0.0.10,port=3D2323,server,nowait,telnet,mux=3Don,id=3Dc=
-har0,logfile=3D/home/jurkiew/.machiner/runs/2020-08-31T21:46:55-0/internal/=
-log
+Can you shoot any holes into my argument?
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1893691/+subscriptions
+I suspect there's a simpler solution struggling to get out.  But this
+solution works, so in it goes.  Should the simpler one succeed at
+getting out, it can go in on top.  If not, I'll probably add even more
+comments to remind myself of these facts.
+
+> Approaches to implement some form of coroutine local storage directly in
+> the coroutine core code have been considered and discarded because they
+> didn't end up being much more generic than the hash table and their
+> performance impact on coroutines not using coroutine local storage was
+> unclear. As the block layer uses a coroutine per I/O request, this is a
+> fast path and we have to be careful. It's safest to just stay out of
+> this path with code only used by the monitor.
+>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
 
