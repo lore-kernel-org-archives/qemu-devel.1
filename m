@@ -2,87 +2,89 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A4A8C43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 08:50:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78597C43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 08:51:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D429320756
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 08:50:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B28320756
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 08:50:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uYWc3mF5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D429320756
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dcoF7wRW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B28320756
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHkCL-0002rh-Vs
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 04:50:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41542)
+	id 1kHkCR-00034b-1h
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 04:50:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41370)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHkAK-0007dR-8F; Mon, 14 Sep 2020 04:48:48 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:33703)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHkAI-0005He-FW; Mon, 14 Sep 2020 04:48:47 -0400
-Received: by mail-lf1-x141.google.com with SMTP id x77so12547416lfa.0;
- Mon, 14 Sep 2020 01:48:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=9dk1cB9J9OAz5tHPdR37OGX9IkumYg5PLfAmqD+4Lhs=;
- b=uYWc3mF5BMeM2pHRQ31JE8odMmFLLG8q48dj/3F/FaXOxb3V+G8t3MrMmL4gkt0Fqm
- GcU+CQOBOpI7SZsQOLgrtr/p41BJFe6tC3a0m73StpSepONuCxnoTKJpGaXdn798d3Xi
- 9nW6cU6gu57SzgwGeSOqJa+PY2X+SqiUPlrnL3g0usXOv8JPAWVuFmsktnm3SU+bK17W
- u3RjTUuTTwOBjLZMECDJ7Nyh+brtqW9SBkCa7xtIhS/uRXb063csc/d1ijsgr8YwjYxk
- vYKzf/mJnbLO6EqPmQ7Eenugwuk1BCr8nkfwqDekdb03s7/C6D894HcJEOSMBneQ/BPd
- POQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=9dk1cB9J9OAz5tHPdR37OGX9IkumYg5PLfAmqD+4Lhs=;
- b=AFVhbsb+EZZvFzIALEL7ZiMj+HBlncgkkGMc8IGvGMQtmZ8+9SSoX2RsENOiGO1oip
- vGiRoLJYCYFGuaUu9CRVTA+IebvOgSY97hJM53BevKExit9wrIJapfjqZMx6TKsO+myC
- vfUpl/h09BvXfU8EEkqXROd5mACvNgMuiTvNEsZ4C8JiXZ/UscgIjjCHAjxXAqBMBt20
- VCJVQVAZSitORAMjCeUkzJ/4APOvnZsH6/FHtVwfQr+S3IfqirYPrWFcFGhBAEkrFfHy
- iEcdBToQ5cqqURiZp/Mh2sXseVSuJSTy39ssjAw2BHgDJ1EaVKHdChGXigmjYCnRUNsY
- YlzQ==
-X-Gm-Message-State: AOAM533B1Fp4tQ71BD+e4Sd1ZUl6nwAYcIZXHTbdrXkgtECkS29v3f9H
- pjy/QHnVXGkrlbwZ71pcCGsPGIluKeQE+lUO2zk=
-X-Google-Smtp-Source: ABdhPJxS0yMm97Uq+SAzZYPt/tJ27JK7ILueafww3iyz2g7sQI9RSOtov1hNRomw0giq1fa90YhxOEJdnKbaa0xDjSo=
-X-Received: by 2002:a19:383:: with SMTP id 125mr4289969lfd.356.1600073324170; 
- Mon, 14 Sep 2020 01:48:44 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kHk9k-0006bN-SW
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 04:48:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41078
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kHk9i-0005DP-8c
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 04:48:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600073289;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZVYGpXY6+gkZvGfPrHmNExooqUnhdkkdmUY/MaXIzPA=;
+ b=dcoF7wRWFFCh7m9v09hL/EbxHFBcwyiUcHDizXrZ7K2A/10Ko8wKxt7wihZM/CnfKK+Gef
+ XBUbXhRN3nhRky3F4hOfxzxlfpT0nQDOKh5KbiuBrZoMz33WgBi9zATSnWjGR8DEzmKYv+
+ CRBZul4cXnWewa4+uFV2817xvxufko0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-23-56nd3RA0MYORTc6MJUxxDQ-1; Mon, 14 Sep 2020 04:48:07 -0400
+X-MC-Unique: 56nd3RA0MYORTc6MJUxxDQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E57E801AE3;
+ Mon, 14 Sep 2020 08:48:06 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
+ [10.36.114.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F3AB75DE93;
+ Mon, 14 Sep 2020 08:48:03 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 75F7F1138461; Mon, 14 Sep 2020 10:48:02 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5 1/8] qemu-options: New -compat to set policy for deprecated
+ interfaces
+Date: Mon, 14 Sep 2020 10:47:55 +0200
+Message-Id: <20200914084802.4185028-2-armbru@redhat.com>
+In-Reply-To: <20200914084802.4185028-1-armbru@redhat.com>
+References: <20200914084802.4185028-1-armbru@redhat.com>
 MIME-Version: 1.0
-References: <20200912224431.1428-1-luoyonggang@gmail.com>
- <20200912224431.1428-28-luoyonggang@gmail.com>
- <34306ec4-bafb-20dc-f90f-ff320fa4b575@redhat.com>
- <CAE2XoE8Ly=bhkLPbnUm1eg91Re0rf-UkAy25f8LgPLJUaYyHNw@mail.gmail.com>
- <d7b83b76-ff7a-85cb-0676-559d5680f070@redhat.com>
-In-Reply-To: <d7b83b76-ff7a-85cb-0676-559d5680f070@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Mon, 14 Sep 2020 16:48:34 +0800
-Message-ID: <CAE2XoE9GdOZzp+kZB52RObK4tSUuF3tTKRx7b5iRyovUYj3mag@mail.gmail.com>
-Subject: Re: [PATCH v8 27/27] Revert "configure: add --ninja option"
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000001a118c05af421abf"
-Received-SPF: pass client-ip=2a00:1450:4864:20::141;
- envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x141.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 01:36:47
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.695,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,71 +98,243 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Qemu-block <qemu-block@nongnu.org>,
- Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>,
- Peter Lieven <pl@kamp.de>, qemu-level <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Wen Congyang <wencongyang2@huawei.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Li-Wen Hsu <lwhsu@freebsd.org>, Markus Armbruster <armbru@redhat.com>
+Cc: marcandre.lureau@gmail.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000001a118c05af421abf
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Policy is separate for input and output.
 
-On Mon, Sep 14, 2020 at 4:45 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 13/09/20 18:14, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
-> > I am hurry to revert --ninja option because when the meson are changed,
-the
-> > make -j10 can not automatically re configure, that would raise ninja ca=
-n
-> > not found error
->
-> My understanding is that with 0.55.2 you don't need --ninja at all (the
-> default search works), and also the previously configured build tree
-> should work.
->
-> What's the issue there?
->
-Oh, I mis-understood the --ninja option, so the ninja option doesn't have
-to be revert, but upgrade meson to 0.55.2 are necessary
->
-> Paolo
->
+Input policy can be "accept" (accept silently), or "reject" (reject
+the request with an error).
 
+Output policy can be "accept" (pass on unchanged), or "hide" (filter
+out the deprecated parts).
 
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
+Default is "accept".  Policies other than "accept" are implemented
+later in this series.
 
---0000000000001a118c05af421abf
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+For now, -compat covers only syntactic aspects of QMP, i.e. stuff
+tagged with feature 'deprecated'.  We may want to extend it to cover
+semantic aspects, CLI, and experimental features.
 
-<div dir=3D"ltr"><br><br>On Mon, Sep 14, 2020 at 4:45 PM Paolo Bonzini &lt;=
-<a href=3D"mailto:pbonzini@redhat.com">pbonzini@redhat.com</a>&gt; wrote:<b=
-r>&gt;<br>&gt; On 13/09/20 18:14, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo)=
- wrote:<br>&gt; &gt; I am hurry to revert --ninja option because when the m=
-eson are changed, the<br>&gt; &gt; make -j10 can not automatically re confi=
-gure, that would raise ninja can<br>&gt; &gt; not found error <br>&gt;<br>&=
-gt; My understanding is that with 0.55.2 you don&#39;t need --ninja at all =
-(the<br>&gt; default search works), and also the previously configured buil=
-d tree<br>&gt; should work.<br>&gt;<br>&gt; What&#39;s the issue there?<br>=
-&gt;<br>Oh, I mis-understood the --ninja option, so the ninja option doesn&=
-#39;t have to be revert, but upgrade meson to 0.55.2 are necessary<br>&gt;<=
-br>&gt; Paolo<br>&gt;<br><br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
-=E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=
-=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo</div>
+The option is experimental.
 
---0000000000001a118c05af421abf--
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ qapi/compat.json             | 51 ++++++++++++++++++++++++++++++++++++
+ qapi/qapi-schema.json        |  1 +
+ include/qapi/compat-policy.h | 20 ++++++++++++++
+ qapi/qmp-dispatch.c          |  3 +++
+ softmmu/vl.c                 | 17 ++++++++++++
+ qapi/meson.build             |  1 +
+ qemu-options.hx              | 20 ++++++++++++++
+ 7 files changed, 113 insertions(+)
+ create mode 100644 qapi/compat.json
+ create mode 100644 include/qapi/compat-policy.h
+
+diff --git a/qapi/compat.json b/qapi/compat.json
+new file mode 100644
+index 0000000000..d2c02a21aa
+--- /dev/null
++++ b/qapi/compat.json
+@@ -0,0 +1,51 @@
++# -*- Mode: Python -*-
++
++##
++# = Compatibility policy
++##
++
++##
++# @CompatPolicyInput:
++#
++# Policy for handling "funny" input.
++#
++# @accept: Accept silently
++# @reject: Reject with an error
++#
++# Since: 5.2
++##
++{ 'enum': 'CompatPolicyInput',
++  'data': [ 'accept', 'reject' ] }
++
++##
++# @CompatPolicyOutput:
++#
++# Policy for handling "funny" output.
++#
++# @accept: Pass on unchanged
++# @hide: Filter out
++#
++# Since: 5.2
++##
++{ 'enum': 'CompatPolicyOutput',
++  'data': [ 'accept', 'hide' ] }
++
++##
++# @CompatPolicy:
++#
++# Policy for handling deprecated management interfaces.
++#
++# This is intended for testing users of the management interfaces.
++#
++# Limitation: covers only syntactic aspects of QMP, i.e. stuff tagged
++# with feature 'deprecated'.  We may want to extend it to cover
++# semantic aspects, CLI, and experimental features.
++#
++# @deprecated-input: how to handle deprecated input (default 'accept')
++# @deprecated-output: how to handle deprecated output (default 'accept')
++#
++# Since: 5.2
++##
++{ 'struct': 'CompatPolicy',
++  'data': { '*deprecated-input': 'CompatPolicyInput',
++            '*deprecated-output': 'CompatPolicyOutput' } }
+diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
+index f03ff91ceb..2550b16028 100644
+--- a/qapi/qapi-schema.json
++++ b/qapi/qapi-schema.json
+@@ -76,6 +76,7 @@
+ { 'include': 'migration.json' }
+ { 'include': 'transaction.json' }
+ { 'include': 'trace.json' }
++{ 'include': 'compat.json' }
+ { 'include': 'control.json' }
+ { 'include': 'introspect.json' }
+ { 'include': 'qom.json' }
+diff --git a/include/qapi/compat-policy.h b/include/qapi/compat-policy.h
+new file mode 100644
+index 0000000000..b8c6638156
+--- /dev/null
++++ b/include/qapi/compat-policy.h
+@@ -0,0 +1,20 @@
++/*
++ * Policy for handling "funny" management interfaces
++ *
++ * Copyright (C) 2020 Red Hat, Inc.
++ *
++ * Authors:
++ *  Markus Armbruster <armbru@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * later.  See the COPYING file in the top-level directory.
++ */
++
++#ifndef QAPI_COMPAT_POLICY_H
++#define QAPI_COMPAT_POLICY_H
++
++#include "qapi/qapi-types-compat.h"
++
++extern CompatPolicy compat_policy;
++
++#endif
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index 79347e0864..f65b8cf000 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -12,6 +12,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qapi/compat-policy.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/dispatch.h"
+ #include "qapi/qmp/qdict.h"
+@@ -19,6 +20,8 @@
+ #include "sysemu/runstate.h"
+ #include "qapi/qmp/qbool.h"
+ 
++CompatPolicy compat_policy;
++
+ static QDict *qmp_dispatch_check_obj(QDict *dict, bool allow_oob,
+                                      Error **errp)
+ {
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index 0cc86b0766..dbe9dc06f0 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -27,6 +27,7 @@
+ #include "qemu/units.h"
+ #include "hw/boards.h"
+ #include "hw/qdev-properties.h"
++#include "qapi/compat-policy.h"
+ #include "qapi/error.h"
+ #include "qemu-version.h"
+ #include "qemu/cutils.h"
+@@ -106,6 +107,7 @@
+ #include "sysemu/replay.h"
+ #include "qapi/qapi-events-run-state.h"
+ #include "qapi/qapi-visit-block-core.h"
++#include "qapi/qapi-visit-compat.h"
+ #include "qapi/qapi-visit-ui.h"
+ #include "qapi/qapi-commands-block-core.h"
+ #include "qapi/qapi-commands-run-state.h"
+@@ -3771,6 +3773,21 @@ void qemu_init(int argc, char **argv, char **envp)
+                     qemu_opt_get_bool(opts, "mem-lock", false);
+                 enable_cpu_pm = qemu_opt_get_bool(opts, "cpu-pm", false);
+                 break;
++            case QEMU_OPTION_compat:
++                {
++                    CompatPolicy *opts;
++                    Visitor *v;
++
++                    v = qobject_input_visitor_new_str(optarg, NULL,
++                                                      &error_fatal);
++
++                    visit_type_CompatPolicy(v, NULL, &opts, &error_fatal);
++                    QAPI_CLONE_MEMBERS(CompatPolicy, &compat_policy, opts);
++
++                    qapi_free_CompatPolicy(opts);
++                    visit_free(v);
++                    break;
++                }
+             case QEMU_OPTION_msg:
+                 opts = qemu_opts_parse_noisily(qemu_find_opts("msg"), optarg,
+                                                false);
+diff --git a/qapi/meson.build b/qapi/meson.build
+index 2b2872a41d..c72fcd9616 100644
+--- a/qapi/meson.build
++++ b/qapi/meson.build
+@@ -20,6 +20,7 @@ qapi_all_modules = [
+   'block',
+   'char',
+   'common',
++  'compat',
+   'control',
+   'crypto',
+   'dump',
+diff --git a/qemu-options.hx b/qemu-options.hx
+index b0f020594e..bb0c6bb70e 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3391,6 +3391,26 @@ DEFHEADING()
+ 
+ DEFHEADING(Debug/Expert options:)
+ 
++DEF("compat", HAS_ARG, QEMU_OPTION_compat,
++    "-compat [deprecated-input=accept|reject][,deprecated-output=accept|hide]\n"
++    "                Policy for handling deprecated management interfaces\n",
++    QEMU_ARCH_ALL)
++SRST
++``-compat [deprecated-input=@var{input-policy}][,deprecated-output=@var{output-policy}]``
++    Set policy for handling deprecated management interfaces (experimental):
++
++    ``deprecated-input=accept`` (default)
++        Accept deprecated commands and arguments
++    ``deprecated-input=reject``
++        Reject deprecated commands and arguments
++    ``deprecated-output=accept`` (default)
++        Emit deprecated command results and events
++    ``deprecated-output=hide``
++        Suppress deprecated command results and events
++
++    Limitation: covers only syntactic aspects of QMP.
++ERST
++
+ DEF("fw_cfg", HAS_ARG, QEMU_OPTION_fwcfg,
+     "-fw_cfg [name=]<name>,file=<file>\n"
+     "                add named fw_cfg entry with contents from file\n"
+-- 
+2.26.2
+
 
