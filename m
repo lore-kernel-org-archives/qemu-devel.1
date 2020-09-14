@@ -2,99 +2,59 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5FB8C43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:11:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1614C43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:11:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F5C8206F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:11:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bTWAmtst"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F5C8206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9938D206F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:11:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9938D206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHhhn-0002ew-B6
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 02:11:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37132)
+	id 1kHhi8-0003bt-MS
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 02:11:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kHheQ-0004Ue-Um
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 02:07:42 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:34951)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kHheP-0002RR-EB
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 02:07:42 -0400
-Received: by mail-wm1-x344.google.com with SMTP id y15so9958266wmi.0
- for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 23:07:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Zpru2l6H5AvsbRbvD7bzBszMIc64fIb4bNTz3Zo/HDQ=;
- b=bTWAmtstPTUiPf8mkCPCChWiT88eB2n+STMsHq1RBOXlFP9h7hXD0hztyeIktNyr62
- VlWHusQf2Ii2MErUU8m0WSOCmlxT/VWqry2kX9AOo5jEEMJMzwCGejAD7ASS9YhsU8YV
- RZZ3Wpi/CKMLpMzWSa9dux0cXsRpv/Q0rbe//YcoGQKOgvXLQ00GB2/tUBntjJSYJBUe
- KOttgCohd6+oPubr56+31rCIW1Zk2HyY3kWBSfDeTnBAtwnD0OEvI0Xe5OxerDuetT4x
- Axv9qKqGZNLRpjn/42wPfi5U1S+Rnkvrg5/QIn8rJZsHAlP/n1xQ+f5yAcyrXZQLCzwz
- rGPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Zpru2l6H5AvsbRbvD7bzBszMIc64fIb4bNTz3Zo/HDQ=;
- b=hE2bvtCcsp/JPt4Io1IxU5i3Wsaoad4/KM2w8Zd+QPSQURunD/nEwD2j7pjOHxKI7M
- oyvFu08eLdtdtNA0xtWSgQEUISe/ePYRsTUK2Zo0nPGw5kB48RLVop0CK9aK0kM97g8K
- enmFSBgr51rC8HcyV4CISxbSFyHhGSFiYrTwSKPR4bEU0uhRUKwVk+4ZcAm6B9lzhZMy
- zlPREzXpG/FyaPCCslLkFFj2RRjRCCVfBuKiNfz8W8Vr2FkXXj3jo8Vth7XBcDCINmq8
- zhO70thazA5iSX/64Bk4MR6pXMaSBgYXfpqHJ2BELoqFRq+zPUSl7CLJO5L448eqr+fF
- 0c6Q==
-X-Gm-Message-State: AOAM533P93JYrmmLZpGKouMg9+VIQiHzk0xFuERTY+VffhMjiTIMniLY
- PdvbfITIOgCJClXITw6seq0=
-X-Google-Smtp-Source: ABdhPJytRWrjQjLDbMQbs+D2sUUU1ShnWpjmcyqsmAYvJXWf2+A5LpHdmHTOMiy5qDnWGRtojsJOOQ==
-X-Received: by 2002:a1c:6145:: with SMTP id v66mr13871949wmb.171.1600063659902; 
- Sun, 13 Sep 2020 23:07:39 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id g143sm16944420wme.0.2020.09.13.23.07.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 13 Sep 2020 23:07:39 -0700 (PDT)
-Subject: Re: [PATCH 02/11] capstone: Update to upstream "next" branch
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
-References: <20200914000153.1725632-1-richard.henderson@linaro.org>
- <20200914000153.1725632-3-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7adb30d0-bf05-5809-24f3-c9478d2d9917@amsat.org>
-Date: Mon, 14 Sep 2020 08:07:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
+ id 1kHheg-0005AS-1p
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 02:07:58 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:45044)
+ by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
+ id 1kHhed-0002TF-BT
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 02:07:57 -0400
+Received: from [127.0.1.1] (unknown [62.118.151.149])
+ by mail.ispras.ru (Postfix) with ESMTPSA id 66E0440A2055;
+ Mon, 14 Sep 2020 06:07:53 +0000 (UTC)
+Subject: [PATCH v4 15/15] tests/acceptance: add reverse debugging test
+From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
+To: qemu-devel@nongnu.org
+Date: Mon, 14 Sep 2020 09:07:53 +0300
+Message-ID: <160006367307.31457.8896551368353881221.stgit@pasha-ThinkPad-X280>
+In-Reply-To: <160006358590.31457.16757371597343007847.stgit@pasha-ThinkPad-X280>
+References: <160006358590.31457.16757371597343007847.stgit@pasha-ThinkPad-X280>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-In-Reply-To: <20200914000153.1725632-3-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=83.149.199.84;
+ envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:06:27
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.248,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,69 +67,253 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: luoyonggang@gmail.com, alex.bennee@linaro.org, thuth@redhat.com
+Cc: kwolf@redhat.com, wrampazz@redhat.com, pavel.dovgalyuk@ispras.ru,
+ ehabkost@redhat.com, alex.bennee@linaro.org, mtosatti@redhat.com,
+ armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, crosa@redhat.com,
+ pbonzini@redhat.com, philmd@redhat.com, zhiwei_liu@c-sky.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/14/20 2:01 AM, Richard Henderson wrote:
-> This branch contains a number of improvements over master,
-> including making all of the disassembler data constant.
-> 
-> We are skipping past the 4.0 branchpoint, which changed
-> the location of the includes within the source directory.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  capstone    | 2 +-
->  meson.build | 3 ++-
->  2 files changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/capstone b/capstone
-> index 22ead3e0bf..f8b1b83301 160000
-> --- a/capstone
-> +++ b/capstone
-> @@ -1 +1 @@
-> -Subproject commit 22ead3e0bfdb87516656453336160e0a37b066bf
-> +Subproject commit f8b1b833015a4ae47110ed068e0deb7106ced66d
-> diff --git a/meson.build b/meson.build
-> index 4417de1e14..00e2b8cc29 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -668,6 +668,7 @@ else
->        'capstone/arch/X86/X86DisassemblerDecoder.c',
->        'capstone/arch/X86/X86ATTInstPrinter.c',
->        'capstone/arch/X86/X86IntelInstPrinter.c',
-> +      'capstone/arch/X86/X86InstPrinterCommon.c',
->        'capstone/arch/X86/X86Mapping.c',
->        'capstone/arch/X86/X86Module.c'
->      )
-> @@ -692,7 +693,7 @@ else
->                                 c_args: capstone_cargs,
->                                 include_directories: 'capstone/include')
->    capstone = declare_dependency(link_with: libcapstone,
-> -                                include_directories: 'capstone/include')
-> +                                include_directories: 'capstone/include/capstone')
->  endif
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
 
-Not sure what is missing (here or in the previous?), I'm
-getting:
+This is a test for GDB reverse debugging commands: reverse step and reverse continue.
+Every test in this suite consists of two phases: record and replay.
+Recording saves the execution of some instructions and makes an initial
+VM snapshot to allow reverse execution.
+Replay saves the order of the first instructions and then checks that they
+are executed backwards in the correct order.
+After that the execution is replayed to the end, and reverse continue
+command is checked by setting several breakpoints, and asserting
+that the execution is stopped at the last of them.
 
-In file included from disas/capstone.c:9:
-include/disas/capstone.h:6:10: fatal error: capstone.h: No such file or
-directory
-    6 | #include <capstone.h>
-      |          ^~~~~~~~~~~~
+Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
+---
+ MAINTAINERS                           |    1 
+ tests/acceptance/reverse_debugging.py |  203 +++++++++++++++++++++++++++++++++
+ 2 files changed, 204 insertions(+)
+ create mode 100644 tests/acceptance/reverse_debugging.py
 
-Ah, my build directory was already configured, so it uses --skip-meson.
-Re-configuring without that, the build succeeds.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 7724fd3f8a..227d15a3ad 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2661,6 +2661,7 @@ F: include/sysemu/replay.h
+ F: docs/replay.txt
+ F: stubs/replay.c
+ F: tests/acceptance/replay_kernel.py
++F: tests/acceptance/reverse_debugging.py
+ F: qapi/replay.json
+ 
+ IOVA Tree
+diff --git a/tests/acceptance/reverse_debugging.py b/tests/acceptance/reverse_debugging.py
+new file mode 100644
+index 0000000000..dda42e1c1a
+--- /dev/null
++++ b/tests/acceptance/reverse_debugging.py
+@@ -0,0 +1,203 @@
++# Reverse debugging test
++#
++# Copyright (c) 2020 ISP RAS
++#
++# Author:
++#  Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
++#
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later.  See the COPYING file in the top-level directory.
++import os
++import logging
++
++from avocado_qemu import BUILD_DIR
++from avocado.utils import gdb
++from avocado.utils import process
++from avocado.utils.path import find_command
++from boot_linux_console import LinuxKernelTest
++
++class ReverseDebugging(LinuxKernelTest):
++    """
++    Test GDB reverse debugging commands: reverse step and reverse continue.
++    Recording saves the execution of some instructions and makes an initial
++    VM snapshot to allow reverse execution.
++    Replay saves the order of the first instructions and then checks that they
++    are executed backwards in the correct order.
++    After that the execution is replayed to the end, and reverse continue
++    command is checked by setting several breakpoints, and asserting
++    that the execution is stopped at the last of them.
++    """
++
++    timeout = 10
++    STEPS = 10
++    endian_is_le = True
++
++    def run_vm(self, record, shift, args, replay_path, image_path):
++        logger = logging.getLogger('replay')
++        vm = self.get_vm()
++        vm.set_console()
++        if record:
++            logger.info('recording the execution...')
++            mode = 'record'
++        else:
++            logger.info('replaying the execution...')
++            mode = 'replay'
++            vm.add_args('-s', '-S')
++        vm.add_args('-icount', 'shift=%s,rr=%s,rrfile=%s,rrsnapshot=init' %
++                    (shift, mode, replay_path),
++                    '-net', 'none')
++        vm.add_args('-drive', 'file=%s,if=none' % image_path)
++        if args:
++            vm.add_args(*args)
++        vm.launch()
++        return vm
++
++    @staticmethod
++    def get_reg_le(g, reg):
++        res = g.cmd(b'p%x' % reg)
++        num = 0
++        for i in range(len(res))[-2::-2]:
++            num = 0x100 * num + int(res[i:i + 2], 16)
++        return num
++
++    @staticmethod
++    def get_reg_be(g, reg):
++        res = g.cmd(b'p%x' % reg)
++        return int(res, 16)
++
++    def get_reg(self, g, reg):
++        # value may be encoded in BE or LE order
++        if self.endian_is_le:
++            return self.get_reg_le(g, reg)
++        else:
++            return self.get_reg_be(g, reg)
++
++    def get_pc(self, g):
++        return self.get_reg(g, self.REG_PC)
++
++    def check_pc(self, g, addr):
++        pc = self.get_pc(g)
++        if pc != addr:
++            self.fail('Invalid PC (read %x instead of %x)' % (pc, addr))
++
++    @staticmethod
++    def gdb_step(g):
++        g.cmd(b's', b'T05thread:01;')
++
++    @staticmethod
++    def gdb_bstep(g):
++        g.cmd(b'bs', b'T05thread:01;')
++
++    @staticmethod
++    def vm_get_icount(vm):
++        return vm.qmp('query-replay')['return']['icount']
++
++    def reverse_debugging(self, shift=7, args=None):
++        logger = logging.getLogger('replay')
++
++        # create qcow2 for snapshots
++        logger.info('creating qcow2 image for VM snapshots')
++        image_path = os.path.join(self.workdir, 'disk.qcow2')
++        qemu_img = os.path.join(BUILD_DIR, 'qemu-img')
++        if not os.path.exists(qemu_img):
++            qemu_img = find_command('qemu-img', False)
++        if qemu_img is False:
++            self.cancel('Could not find "qemu-img", which is required to '
++                        'create the temporary qcow2 image')
++        cmd = '%s create -f qcow2 %s 128M' % (qemu_img, image_path)
++        process.run(cmd)
++
++        replay_path = os.path.join(self.workdir, 'replay.bin')
++
++        # record the log
++        vm = self.run_vm(True, shift, args, replay_path, image_path)
++        while self.vm_get_icount(vm) <= self.STEPS:
++            pass
++        last_icount = self.vm_get_icount(vm)
++        vm.shutdown()
++
++        logger.info("recorded log with %s+ steps" % last_icount)
++
++        # replay and run debug commands
++        vm = self.run_vm(False, shift, args, replay_path, image_path)
++        logger.info('connecting to gdbstub')
++        g = gdb.GDBRemote('127.0.0.1', 1234, False, False)
++        g.connect()
++        r = g.cmd(b'qSupported')
++        if b'qXfer:features:read+' in r:
++            g.cmd(b'qXfer:features:read:target.xml:0,ffb')
++        if b'ReverseStep+' not in r:
++            self.fail('Reverse step is not supported by QEMU')
++        if b'ReverseContinue+' not in r:
++            self.fail('Reverse continue is not supported by QEMU')
++
++        logger.info('stepping forward')
++        steps = []
++        # record first instruction addresses
++        for _ in range(self.STEPS):
++            pc = self.get_pc(g)
++            logger.info('saving position %x' % pc)
++            steps.append(pc)
++            self.gdb_step(g)
++
++        # visit the recorded instruction in reverse order
++        logger.info('stepping backward')
++        for addr in steps[::-1]:
++            self.gdb_bstep(g)
++            self.check_pc(g, addr)
++            logger.info('found position %x' % addr)
++
++        logger.info('seeking to the end (icount %s)' % (last_icount - 1))
++        vm.qmp('replay-break', icount=last_icount - 1)
++        # continue - will return after pausing
++        g.cmd(b'c', b'T02thread:01;')
++
++        logger.info('setting breakpoints')
++        for addr in steps:
++            # hardware breakpoint at addr with len=1
++            g.cmd(b'Z1,%x,1' % addr, b'OK')
++
++        logger.info('running reverse continue to reach %x' % steps[-1])
++        # reverse continue - will return after stopping at the breakpoint
++        g.cmd(b'bc', b'T05thread:01;')
++
++        # assume that none of the first instructions is executed again
++        # breaking the order of the breakpoints
++        self.check_pc(g, steps[-1])
++        logger.info('successfully reached %x' % steps[-1])
++
++        logger.info('exitting gdb and qemu')
++        vm.shutdown()
++
++class ReverseDebugging_X86_64(ReverseDebugging):
++    REG_PC = 0x10
++    REG_CS = 0x12
++    def get_pc(self, g):
++        return self.get_reg_le(g, self.REG_PC) \
++            + self.get_reg_le(g, self.REG_CS) * 0x10
++
++    def test_x86_64_pc(self):
++        """
++        :avocado: tags=arch:x86_64
++        :avocado: tags=machine:pc
++        """
++        # start with BIOS only
++        self.reverse_debugging()
++
++class ReverseDebugging_AArch64(ReverseDebugging):
++    REG_PC = 32
++
++    def test_aarch64_virt(self):
++        """
++        :avocado: tags=arch:aarch64
++        :avocado: tags=machine:virt
++        :avocado: tags=cpu:cortex-a53
++        """
++        kernel_url = ('https://archives.fedoraproject.org/pub/archive/fedora'
++                      '/linux/releases/29/Everything/aarch64/os/images/pxeboot'
++                      '/vmlinuz')
++        kernel_hash = '8c73e469fc6ea06a58dc83a628fc695b693b8493'
++        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
++
++        self.reverse_debugging(
++            args=('-kernel', kernel_path, '-cpu', 'cortex-a53'))
 
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-Paolo, maybe git submodule updates should invalidate the '--skip-meson'
-option?
-
-Regards,
-
-Phil.
 
