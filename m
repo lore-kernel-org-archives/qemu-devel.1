@@ -2,84 +2,93 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F21DC43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:27:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48952C43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:28:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C43120709
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:27:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C43120709
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id C00C520709
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:28:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VWZiVMYW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C00C520709
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHnZi-0008JI-I3
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 08:27:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35258)
+	id 1kHnam-0001SF-Qn
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 08:28:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35568)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kHnYM-000775-6O
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:25:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37550)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kHnYK-0007gO-5b
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:25:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kHnYI-0000mw-91
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 12:25:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 40FE92E8071
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 12:25:46 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kHnZW-000071-BC
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:27:02 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48639
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kHnZT-0007m5-4S
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:27:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600086418;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=iucBFllIdbVQAaXJm9ty7DHJerNaXWF863wTtPe1a9Q=;
+ b=VWZiVMYWe9jOpWRz+EEMuNcxEljlx8ejNKY9IHVzT1xAbdK6xBjl07lGy3pl9xVNMMLrQ0
+ ikNoxjJeeKidkUYeE8lpVlPg+YmhI6cNk+/PN371BFbHjXgRw5pmzqXHjthGYUQghjgGEC
+ ewZ3H6Lq3+y/8CJq345+yUpB2aGTPw8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-263-YJtmjeZPNRmq55hHQoa7kQ-1; Mon, 14 Sep 2020 08:26:55 -0400
+X-MC-Unique: YJtmjeZPNRmq55hHQoa7kQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 76D3DE9020;
+ Mon, 14 Sep 2020 12:26:49 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-134.ams2.redhat.com [10.36.112.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 684477E404;
+ Mon, 14 Sep 2020 12:26:48 +0000 (UTC)
+Subject: Re: [PATCH] iotests: Work around failing readlink -f
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200914113809.63640-1-mreitz@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <abaa48c8-c947-4a50-6342-a094b7d0f532@redhat.com>
+Date: Mon, 14 Sep 2020 14:26:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Sep 2020 12:16:26 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1852196@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=lersek@redhat.com; 
-X-Launchpad-Bug-Tags: feature-request
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: lersek philmd
-X-Launchpad-Bug-Reporter: Laszlo Ersek (Red Hat) (lersek)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <157355353271.7205.5763587027166419396.malonedeb@gac.canonical.com>
-Message-Id: <160008578614.17165.13721016950964155459.malone@soybean.canonical.com>
-Subject: [Bug 1852196] Re: update edk2 submodule & binaries to
- edk2-stable202008
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: 94d29bdcba23b0989ba61c7a48f8dd45d404e6d9
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 05:55:43
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200914113809.63640-1-mreitz@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 00:11:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -38
+X-Spam_score: -3.9
+X-Spam_bar: ---
+X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,61 +97,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1852196 <1852196@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commit a68694cd1f3.
+On 14/09/2020 13.38, Max Reitz wrote:
+> On macOS, (out of the box) readlink does not have -f.  If the recent
+> "readlink -f" call introduced by b1cbc33a397 fails, just fall back to
+> the old behavior (which means you can run the iotests only from the
+> build tree, but that worked fine for six years, so it should be fine
+> still).
+> 
+> Keep any potential error message on stderr.  If users want to run the
+> iotests from outside the build tree, this may point them to what's wrong
+> (with their system).
+> 
+> Fixes: b1cbc33a3971b6bb005d5ac3569feae35a71de0f
+>        ("iotests: Allow running from different directory")
+> Reported-by: Claudio Fontana <cfontana@suse.de>
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+> Hi Thomas,
+> 
+> I thought this would be quicker than writing a witty response on whether
+> you or me should write this patch. O:)
+> ---
+>  tests/qemu-iotests/check | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+> index e14a1f354d..75675e1a18 100755
+> --- a/tests/qemu-iotests/check
+> +++ b/tests/qemu-iotests/check
+> @@ -45,6 +45,10 @@ then
+>      fi
+>      source_iotests=$(cd "$source_iotests"; pwd) || _init_error "failed to enter source tree"
+>      build_iotests=$(readlink -f $(dirname "$0"))
+> +    if [ "$?" -ne 0 ]; then
+> +        # Perhaps -f is unsupported, revert to pre-b1cbc33a397 behavior
+> +        build_iotests=$PWD
+> +    fi
+>  else
+>      # called from the source tree
+>      source_iotests=$PWD
 
-** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
+Thanks, the macOS build seems to work again:
 
--- =
+ https://cirrus-ci.com/task/5431828267925504?command=main#L7033
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1852196
+Tested-by: Thomas Huth <thuth@redhat.com>
 
-Title:
-  update edk2 submodule & binaries to edk2-stable202008
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  Consume the following upstream edk2 releases:
-
-  https://github.com/tianocore/edk2/releases/tag/edk2-stable201908
-  https://github.com/tianocore/edk2/releases/tag/edk2-stable201911
-  https://github.com/tianocore/edk2/releases/tag/edk2-stable202002
-  https://github.com/tianocore/edk2/releases/tag/edk2-stable202005
-  https://github.com/tianocore/edk2/releases/tag/edk2-stable202008
-
-  Worth mentioning (in random order):
-
-  - various CVE fixes [*]
-  - OpenSSL-1.1.1g
-  - UEFI HTTPS Boot for ARM/AARCH64
-  - TPM2 for ARM/AARCH64
-  - VCPU hotplug with SMI
-  - support for Linux v5.7+ initrd and mixed mode loading
-  - Fusion-MPT SCSI driver in OVMF
-  - VMware PVSCSI driver in OVMF
-  - PXEv4 / PXEv6 boot possible to disable on the QEMU command line
-  - SEV-ES support
-
-  [*] the below list has been collected simply from the subject lines in
-  commit range edk2-stable201905..edk2-stable202008:
-
-    CVE-2019-11098 CVE-2019-14553 CVE-2019-14558 CVE-2019-14559
-    CVE-2019-14562 CVE-2019-14563 CVE-2019-14575 CVE-2019-14586
-    CVE-2019-14587
-
-  (Note that any given CVE from the above list may or may not affect the
-  firmware binaries packaged with upstream QEMU; consult the upstream
-  TianoCore bug tracker at <https://bugzilla.tianocore.org/> for details.)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1852196/+subscriptions
 
