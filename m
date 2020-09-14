@@ -2,98 +2,117 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B265C43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 05:55:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACE4CC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:01:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A6D620639
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 05:55:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DAD62206C9
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:01:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HpfjOI8k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A6D620639
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aa3NXd+W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAD62206C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHhSo-00088c-OI
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 01:55:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35106)
+	id 1kHhYr-0001FB-R4
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 02:01:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35756)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kHhS6-0007fZ-Gm
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 01:54:58 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41143)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kHhS5-0000zK-38
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 01:54:58 -0400
-Received: by mail-wr1-x443.google.com with SMTP id w5so17217388wrp.8
- for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 22:54:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=MdFDoppZup9jP/UUo3evqxbdOj26wOhAMDiv3SGY0gw=;
- b=HpfjOI8kH1ymuXp6oENBIZpdfJfRkyUL5td9zhbWl4gozhBiEzaHWrhjWThDlf5BBr
- oIdOeYem//cfoalaFA0BKRfDb0cOu0bipuN8NWtbwJjwHe8mGd/+m/hUwyMPj0qUF0HW
- LJHVxAFXR9UcYK3edHm2szoNB9J4YXn9tSOTu7k+q9MW+bd078QHprkcNp9aSNcP40uf
- Hvn0BSsL/fSPhA8q6MguxdeTYkkoI5xxSt6Z+s7ak2xp+YP/XrkK5JktkY9DXtWFWC54
- 2ASkkomklhA8GgEJBF6yxzF0oDtWBswWne1cwRSHDAnDQv67c6hpFgyzAG/wPto+xJrw
- NSnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=MdFDoppZup9jP/UUo3evqxbdOj26wOhAMDiv3SGY0gw=;
- b=dyc8J2Il6kTCsVQclzlt8saSLszYpAaUW8irfRYokiU852g4GzJmbrNTiJueB1pC6a
- kMTiQAYoEHmNmf1ugN9XcOhDatQXcpMrdWUaT1WVH5HeBczgzUWXB3HVEt0OpfTtlLlR
- RzDbY00nqC/lET2uGo+aiXgZZsSGTXSwewhLyxhYadROfae31sN+FcI0gHXtamazmK+z
- 24XqqBH/IGvsnWReZESFOgRvbgKFuP3X1uoxabWeQSQOa4dJzCrcwlHpD63Vnqg44Vb7
- Q1dnLviYIeTZXz+pQOrqhtoLijoARddUNGrw/55/Qx8Y6+1L9l6OYkXa5FiH7YQn7n1w
- 8izA==
-X-Gm-Message-State: AOAM531bmKrHoUR20DRv6oTYRbxJlcouGGq9kCb9U7OX9JuIb3h9RdvE
- 8c8j+quzGlAjOOxMRiPk1HQ=
-X-Google-Smtp-Source: ABdhPJxm00WJCDnhJAIe6BPdf7Yn6Seh+x/y2NtX8TiMGk5dp3DRBFEm4eTMiC0/qFjpQEW2zi1jaw==
-X-Received: by 2002:adf:a4cc:: with SMTP id h12mr8852629wrb.123.1600062895130; 
- Sun, 13 Sep 2020 22:54:55 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id b194sm18345910wmd.42.2020.09.13.22.54.54
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 13 Sep 2020 22:54:54 -0700 (PDT)
-Subject: Re: [PATCH 10/11] disas/capstone: Add skipdata hook for s390x
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200914000153.1725632-1-richard.henderson@linaro.org>
- <20200914000153.1725632-11-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <45155b58-dcca-74e8-1467-a8b793357db1@amsat.org>
-Date: Mon, 14 Sep 2020 07:54:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <dovmurik@linux.vnet.ibm.com>)
+ id 1kHhYE-0000oz-LT
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 02:01:18 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45558)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dovmurik@linux.vnet.ibm.com>)
+ id 1kHhYC-0001hF-I6
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 02:01:18 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 08E5VrA8016541
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 02:01:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=nP3Eugv5dluo/FXEPi0IxHvQJaTGM74RNS4Iyd5n0q4=;
+ b=aa3NXd+WdEnetyPfs0bZu7K48cvIn6bCRZGuqWlOQKXkFuvhflu4wlklGBIOQnTXUwpU
+ UbfvnV/1mDB8PBIxWUjg0HDvseoyZrHuH1UIk4VAhp2O/h3Y3wO6pwNvnWcIjTiWJM+F
+ mDMUtpoBK+U9uhinsuYW7hDj//XipoQqtqUcdeuEWgh6i4MzEv3OVhvOgKAUGUejkevL
+ nABGHiw5IzuJLpXV/fkQGG3zcNQLg1GSgRKcaNT2hLCaTeK4kfwlK7aPdaW/No/OQDYU
+ qbzK8wETHivsukNp5vRZXReNOh0tBw/ZIGG0p1KUxZYlavweu5ZIkhK2v9b7dlqiOTjd kQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33j2830tks-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 02:01:12 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08E5rCTX128205
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 02:01:12 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33j2830tkb-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 14 Sep 2020 02:01:12 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08E5wCC7030225;
+ Mon, 14 Sep 2020 06:01:11 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com
+ (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+ by ppma01dal.us.ibm.com with ESMTP id 33gny8rx49-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 14 Sep 2020 06:01:11 +0000
+Received: from b03ledav002.gho.boulder.ibm.com
+ (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+ by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 08E61AfQ65143054
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 14 Sep 2020 06:01:10 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E3C7F136055;
+ Mon, 14 Sep 2020 06:01:09 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id AC74B13605D;
+ Mon, 14 Sep 2020 06:01:09 +0000 (GMT)
+Received: from amdrome1.watson.ibm.com (unknown [9.2.130.16])
+ by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Mon, 14 Sep 2020 06:01:09 +0000 (GMT)
+From: Dov Murik <dovmurik@linux.vnet.ibm.com>
+To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+Subject: [PATCH] checkpatch: Detect '%#' or '%0#' in printf-style format
+ strings
+Date: Mon, 14 Sep 2020 06:01:09 +0000
+Message-Id: <20200914060109.69583-1-dovmurik@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200914000153.1725632-11-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.248,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-13_09:2020-09-10,
+ 2020-09-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 adultscore=0
+ suspectscore=0 phishscore=0 lowpriorityscore=0 malwarescore=0
+ impostorscore=0 clxscore=1015 mlxlogscore=999 bulkscore=0 spamscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009140045
+Received-SPF: none client-ip=148.163.156.1;
+ envelope-from=dovmurik@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:01:13
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
+X-Spam_bar: --
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,90 +125,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: luoyonggang@gmail.com, alex.bennee@linaro.org, thuth@redhat.com
+Cc: Dov Murik <dovmurik@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/14/20 2:01 AM, Richard Henderson wrote:
-> It is always possible to tell the length of an insn, even if the
-> actual insn is unknown.  Skip the correct number of bytes, so that
-> we stay in sync with the instruction stream.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+According to the coding style document, we should use literal '0x' prefix
+instead of printf's '#' flag (which appears as '%#' or '%0#' in the format
+string).  Add a checkpatch rule to enforce that.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Note that checkpatch already had a similar rule for trace-events files.
 
-> ---
->  disas/capstone.c | 42 +++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 41 insertions(+), 1 deletion(-)
-> 
-> diff --git a/disas/capstone.c b/disas/capstone.c
-> index b48f83958d..0a9ef9c892 100644
-> --- a/disas/capstone.c
-> +++ b/disas/capstone.c
-> @@ -16,6 +16,39 @@
->   */
->  static __thread cs_insn *cap_insn;
->  
-> +/*
-> + * The capstone library always skips 2 bytes for S390X.
-> + * This is less than ideal, since we can tell from the first two bits
-> + * the size of the insn and thus stay in sync with the insn stream.
-> + */
-> +static size_t CAPSTONE_API
-> +cap_skipdata_s390x_cb(const uint8_t *code, size_t code_size,
-> +                      size_t offset, void *user_data)
-> +{
-> +    size_t ilen;
-> +
-> +    /* See get_ilen() in target/s390x/internal.h.  */
-> +    switch (code[offset] >> 6) {
-> +    case 0:
-> +        ilen = 2;
-> +        break;
-> +    case 1:
-> +    case 2:
-> +        ilen = 4;
-> +        break;
-> +    default:
-> +        ilen = 6;
-> +        break;
-> +    }
-> +
-> +    return ilen;
-> +}
-> +
-> +static const cs_opt_skipdata cap_skipdata_s390x = {
-> +    .mnemonic = ".byte",
-> +    .callback = cap_skipdata_s390x_cb
-> +};
-> +
->  /*
->   * Initialize the Capstone library.
->   *
-> @@ -42,13 +75,20 @@ static cs_err cap_disas_start(disassemble_info *info, csh *handle)
->      /* "Disassemble" unknown insns as ".byte W,X,Y,Z".  */
->      cs_option(*handle, CS_OPT_SKIPDATA, CS_OPT_ON);
->  
-> -    if (info->cap_arch == CS_ARCH_X86) {
-> +    switch (info->cap_arch) {
-> +    case CS_ARCH_SYSZ:
-> +        cs_option(*handle, CS_OPT_SKIPDATA_SETUP,
-> +                  (uintptr_t)&cap_skipdata_s390x);
-> +        break;
-> +
-> +    case CS_ARCH_X86:
->          /*
->           * We don't care about errors (if for some reason the library
->           * is compiled without AT&T syntax); the user will just have
->           * to deal with the Intel syntax.
->           */
->          cs_option(*handle, CS_OPT_SYNTAX, CS_OPT_SYNTAX_ATT);
-> +        break;
->      }
->  
->      /* Allocate temp space for cs_disasm_iter.  */
-> 
+Example usage:
+
+  $ scripts/checkpatch.pl --file chardev/baum.c
+  ...
+  ERROR: Don't use '#' flag of printf format ('%#') in format strings, use '0x' prefix instead
+  #366: FILE: chardev/baum.c:366:
+  +            DPRINTF("Broken packet %#2x, tossing\n", req); \
+  ...
+  ERROR: Don't use '#' flag of printf format ('%#') in format strings, use '0x' prefix instead
+  #472: FILE: chardev/baum.c:472:
+  +        DPRINTF("unrecognized request %0#2x\n", req);
+  ...
+
+Signed-off-by: Dov Murik <dovmurik@linux.vnet.ibm.com>
+---
+ scripts/checkpatch.pl | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index bd3faa154c..6ec2a9f6a1 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -2891,6 +2891,18 @@ sub process {
+ 			}
+ 		}
+ 
++# check for %# or %0# in printf-style format strings
++		while ($line =~ /(?:^|")([X\t]*)(?:"|$)/g) {
++			my $string = substr($rawline, $-[1], $+[1] - $-[1]);
++			$string =~ s/%%/__/g;
++			if ($string =~ /(?<!%)%0?#/) {
++				ERROR("Don't use '#' flag of printf format " .
++				      "('%#') in format strings, use '0x' " .
++				      "prefix instead\n" . $herecurr);
++				last;
++			}
++		}
++
+ # QEMU specific tests
+ 		if ($rawline =~ /\b(?:Qemu|QEmu)\b/) {
+ 			ERROR("use QEMU instead of Qemu or QEmu\n" . $herecurr);
+-- 
+2.20.1
 
 
