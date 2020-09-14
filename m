@@ -2,88 +2,96 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14AB0C43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 09:13:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 075C4C43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 09:14:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44A5320EDD
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 09:13:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A063C20EDD
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 09:13:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ekk1oEQh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44A5320EDD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dtwqkzGh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A063C20EDD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHkYP-0001ww-3w
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 05:13:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47046)
+	id 1kHkYg-0002Rj-QN
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 05:13:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47162)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kHkXk-0001El-RU
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 05:13:00 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31520
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kHkXi-0008HD-G4
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 05:13:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600074777;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=nN5r5rV5o7uf2HwOh5Z1rX7MrM9DelDhDi6fXi9fewQ=;
- b=ekk1oEQhRmM+rm8l90ZU5UX9vIxsJK89LRWVllMHrzZugRUDCRq9KrWMOsv44l4rQbsCxk
- iD9Yz9lUQGA13vyJW9jFfc9MTxzFCOqfknjtGvgLjlQsz1fDP/9+E0E0q/Bs/4P9L8bMra
- tAwGXxHJCcDEHOWXcxSjsSUHAzmcltU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-93-BNbx1EI1Mr6Ur7619RJzwg-1; Mon, 14 Sep 2020 05:12:53 -0400
-X-MC-Unique: BNbx1EI1Mr6Ur7619RJzwg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 125D51005E63;
- Mon, 14 Sep 2020 09:12:52 +0000 (UTC)
-Received: from redhat.com (ovpn-114-99.ams2.redhat.com [10.36.114.99])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A158E5DA60;
- Mon, 14 Sep 2020 09:12:47 +0000 (UTC)
-Date: Mon, 14 Sep 2020 10:12:44 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC PATCH 0/3] Automatically convert configure options to meson
- build options
-Message-ID: <20200914091244.GE1252186@redhat.com>
-References: <20200913100534.22084-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <ameynarkhede03@gmail.com>)
+ id 1kHkY0-0001a5-Sm
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 05:13:16 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:36314)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ameynarkhede03@gmail.com>)
+ id 1kHkXz-0008J8-4r
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 05:13:16 -0400
+Received: by mail-pg1-x541.google.com with SMTP id f2so9010118pgd.3
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 02:13:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=xj1d+Sx5/JOifWq4WQ0hc3mcoPyEEX5rtqoKh8IV/bM=;
+ b=dtwqkzGhhPS024lVb1RMwfyz855O9tQYt/kiLM33fke68FsWqpnl5JfMtJ7iUTbIdg
+ O54KeEYj2m0X7ZDg0LmACsFm5S88Og57MwpOWIxBYFypkr/viNBOBp1rTqLPt08l62Uc
+ RfDmNYZxMddOYmFIBTEBWYuwzjyiCYLpn9us3zXqvFTm5AQlCEQULD4/YHNVG9EPVxG6
+ bQ+Z6wA3JsENkszmpM67ClIJ89vjR/if0kS/9/lVPnVoAgy7fHHN53tRHrugMO5R53SB
+ /RVoXEt7hQjgPwPhj9ar+LrX0onitqY7rxNYFZrbbDejJz9cb3Jc73izurFaYpFcc4nU
+ L1Dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=xj1d+Sx5/JOifWq4WQ0hc3mcoPyEEX5rtqoKh8IV/bM=;
+ b=msTOFnCgQDmp4IwVF6QeDjshIx2GTq9dLsWqYWKbSOpk+HiRG9NWzrMwffglzAXi8g
+ Gg/mqFFNpMVnb2JSOH6Qg0B20+fA6sfu2vxVpXkKSUr2hBB6K2dfS/s5p6eznfQdCOQw
+ xiML2Zdz5GSNFWs9KagAdRd2zQIAD/oqwOwp6WAQx7XPsqrg6H8Ybn0gnl96Lp8Egcek
+ U/upN3LukmT3pyh5HLFHvNmeyUwEU+bvnXXHBbGqPDACWtEwG0XfrhiQF++vH+c1wc0Q
+ IvWoYNNkaE7zAqiETRARUkwK7Co6xhx6ghTiRg4+N4tLPk2xtplJt0BxDDJ3RT3B2qy2
+ 4ERw==
+X-Gm-Message-State: AOAM5334uc0SFVG8AIadJrtIqj2Y1F3PEKvTQdjdDA1QhQW1nxHQgnsW
+ LTGqgupezdkWPfFkG+DEwBs=
+X-Google-Smtp-Source: ABdhPJzFT3qaS52jrV01wP40GU8hTV9Brd2Gmo/gqEdiFwbgZK5i47ISAiWYeAFYMogfPMwQvXGQUQ==
+X-Received: by 2002:a05:6a00:808:b029:13e:d13d:a05d with SMTP id
+ m8-20020a056a000808b029013ed13da05dmr12137017pfk.35.1600074793613; 
+ Mon, 14 Sep 2020 02:13:13 -0700 (PDT)
+Received: from localhost ([103.248.31.177])
+ by smtp.gmail.com with ESMTPSA id j11sm7820924pgh.8.2020.09.14.02.13.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 14 Sep 2020 02:13:13 -0700 (PDT)
+Date: Mon, 14 Sep 2020 14:43:09 +0530
+From: Amey Narkhede <ameynarkhede03@gmail.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+Subject: Re: [PATCH] hw/scsi/vmw_pvscsi.c: Fix wrong usage of gboolean types
+ in PVSCSIState
+Message-ID: <20200914091309.n6pvk4r5vsx6gzar@archlinux>
+References: <20200913234451.170022-1-ameynarkhede03@gmail.com>
+ <bee146be-e867-6c6f-4007-b61751be1e6c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200913100534.22084-1-pbonzini@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="hh4u5ljmqibfnas7"
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 00:11:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.695,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+In-Reply-To: <bee146be-e867-6c6f-4007-b61751be1e6c@redhat.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
+ envelope-from=ameynarkhede03@gmail.com; helo=mail-pg1-x541.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,78 +105,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
- peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Sep 13, 2020 at 12:05:31PM +0200, Paolo Bonzini wrote:
-> Right now meson_options.txt lists less than a dozen options, but about
-> 40 more could come as configure tests are converted and moved to
-> meson.build.  Each option needs code in configure to parse it and pass
-> the option down to Meson as a -D command-line argument; in addition the
-> default must be duplicated between configure and meson_options.txt.
-> 
-> This series tries to remove the code duplication by passing unknown
-> --enable and --disable options to a Python program, and using
-> Meson's introspection support to match those to meson_options.txt
-> 
-> The disadvantages are:
-> 
-> - because we parse command-line options before meson is available,
-> the introspection output is stored in the source tree.  The output
-> is slightly modified using the "jq" tool in order to ensure that it's
-> stable and that modifications to meson_buildoptions.txt do not cause
-> horrible conflicts.  This is the main reason for the unattractive
-> diffstat (the number of JSON lines added is higher than the number
-> of configure lines removed, though of course the latter are code
-> that must be maintained manually and the former is not).
-> 
-> - we now need Python to generate the full help, so if Python is
-> missing we can only print a partial message and direct the user
-> to specify the interpreter with --python.  It would be possible to fix
-> this by rewriting the script in Perl (at least on Fedora, JSON::PP is
-> always installed if Perl is, because it's a dependency for CPAN; I'd
-> have to check Ubuntu and the BSDs), or if we want to write it as a
-> Bourne shell script, to further massage the introspection output into
-> for example TAB-separated values.
 
-IMHO we should stay as far away from Perl as possible, and I say this as
-someone who enjoys writing Perl scripts !  Perl is a significant barrier
-to entry for potential contributors, because it just doesn't have the
-wide knowledge base that it did in the past. You can expect most people
-to have some familiarity with Python, or be able to pick it up fairly
-easily in a way that just isn't possible in Perl.
+--hh4u5ljmqibfnas7
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-As for shell, we have a never ending stream of bugs due to the wide
-range of different shell impls which make portable coding very hard.
+On 20/09/14 08:32AM, Philippe Mathieu-Daud=E9 wrote:
+> Hi Amey,
+>
+> On 9/14/20 1:44 AM, Amey Narkhede wrote:
+> > rings_info_valid, msg_ring_info_valid and use_msg fields of struct
+> > PVSCSIState are using gboolean TRUE/FALSE values with the type uint8_t.
+> > Change their type to bool along with the usage of initialization macro
+> > VMSTATE_BOOL during initialization of vmstate_pvscsi and
+> > pvscsi_properties.
+> >
+> > Signed-off-by: Amey Narkhede <ameynarkhede03@gmail.com>
+> > ---
+> >  hw/scsi/vmw_pvscsi.c | 22 +++++++++++-----------
+> >  1 file changed, 11 insertions(+), 11 deletions(-)
+> >
+> > diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
+> > index c071e0c7aa..86f00e3d7e 100644
+> > --- a/hw/scsi/vmw_pvscsi.c
+> > +++ b/hw/scsi/vmw_pvscsi.c
+> > @@ -123,9 +123,9 @@ typedef struct {
+> >      /* Collector for current command data */
+> >      uint32_t curr_cmd_data[PVSCSI_MAX_CMD_DATA_WORDS];
+> >
+> > -    uint8_t rings_info_valid;            /* Whether data rings initial=
+ized   */
+> > -    uint8_t msg_ring_info_valid;         /* Whether message ring initi=
+alized */
+> > -    uint8_t use_msg;                     /* Whether to use message rin=
+g      */
+> > +    bool rings_info_valid;            /* Whether data rings initialize=
+d   */
+> > +    bool msg_ring_info_valid;         /* Whether message ring initiali=
+zed */
+> > +    bool use_msg;                     /* Whether to use message ring  =
+    */
+> >
+> >      uint8_t msi_used;                    /* For migration compatibilit=
+y      */
+> >      PVSCSIRingInfo rings;                /* Data transfer rings manage=
+r      */
+> > @@ -349,8 +349,8 @@ pvscsi_reset_state(PVSCSIState *s)
+> >      s->reg_command_status =3D PVSCSI_COMMAND_PROCESSING_SUCCEEDED;
+> >      s->reg_interrupt_status =3D 0;
+> >      pvscsi_ring_cleanup(&s->rings);
+> > -    s->rings_info_valid =3D FALSE;
+> > -    s->msg_ring_info_valid =3D FALSE;
+> > +    s->rings_info_valid =3D false;
+> > +    s->msg_ring_info_valid =3D false;
+> >      QTAILQ_INIT(&s->pending_queue);
+> >      QTAILQ_INIT(&s->completion_queue);
+> >  }
+> > @@ -792,7 +792,7 @@ pvscsi_on_cmd_setup_rings(PVSCSIState *s)
+> >      pvscsi_dbg_dump_tx_rings_config(rc);
+> >      pvscsi_ring_init_data(&s->rings, rc);
+> >
+> > -    s->rings_info_valid =3D TRUE;
+> > +    s->rings_info_valid =3D true;
+> >      return PVSCSI_COMMAND_PROCESSING_SUCCEEDED;
+> >  }
+> >
+> > @@ -874,7 +874,7 @@ pvscsi_on_cmd_setup_msg_ring(PVSCSIState *s)
+> >          if (pvscsi_ring_init_msg(&s->rings, rc) < 0) {
+> >              return PVSCSI_COMMAND_PROCESSING_FAILED;
+> >          }
+> > -        s->msg_ring_info_valid =3D TRUE;
+> > +        s->msg_ring_info_valid =3D true;
+> >      }
+> >      return sizeof(PVSCSICmdDescSetupMsgRing) / sizeof(uint32_t);
+> >  }
+> > @@ -1232,9 +1232,9 @@ static const VMStateDescription vmstate_pvscsi =
+=3D {
+> >          VMSTATE_UINT32(curr_cmd_data_cntr, PVSCSIState),
+> >          VMSTATE_UINT32_ARRAY(curr_cmd_data, PVSCSIState,
+> >                               ARRAY_SIZE(((PVSCSIState *)NULL)->curr_cm=
+d_data)),
+> > -        VMSTATE_UINT8(rings_info_valid, PVSCSIState),
+> > -        VMSTATE_UINT8(msg_ring_info_valid, PVSCSIState),
+> > -        VMSTATE_UINT8(use_msg, PVSCSIState),
+> > +        VMSTATE_BOOL(rings_info_valid, PVSCSIState),
+> > +        VMSTATE_BOOL(msg_ring_info_valid, PVSCSIState),
+> > +        VMSTATE_BOOL(use_msg, PVSCSIState),
+>
+> I believe this change the migration data structure. This
+> area is described in "Changing migration data structures"
+> in docs/devel/migration.rst.
+>
+> If this structure were not affected, your change would be
+> a good cleanup. However changing migration can become a
+> nightmare, so ... cleaning this is hard.
+>
+> Cc'ing Dave (a migration maintainer) as I'm not sure there
+> already is a document describing easily this problem.
+>
+So should I drop those migration related changes?
+> >
+> >          VMSTATE_UINT64(rings.rs_pa, PVSCSIState),
+> >          VMSTATE_UINT32(rings.txr_len_mask, PVSCSIState),
+> > @@ -1255,7 +1255,7 @@ static const VMStateDescription vmstate_pvscsi =
+=3D {
+> >  };
+> >
+> >  static Property pvscsi_properties[] =3D {
+> > -    DEFINE_PROP_UINT8("use_msg", PVSCSIState, use_msg, 1),
+> > +    DEFINE_PROP_BOOL("use_msg", PVSCSIState, use_msg, true),
+> >      DEFINE_PROP_BIT("x-old-pci-configuration", PVSCSIState, compat_fla=
+gs,
+> >                      PVSCSI_COMPAT_OLD_PCI_CONFIGURATION_BIT, false),
+> >      DEFINE_PROP_BIT("x-disable-pcie", PVSCSIState, compat_flags,
+> > --
+> > 2.28.0
+> >
+> > This is my first qemu patch. Let know if there are any mistakes
+> >
+>
 
-In general I think our overall goal should be to focus on getting down to
-use of a single scripting language in QEMU, and that language clearly has
-to be python3. We shouldn't introduce any new usage of Perl or Shell
-in QEMU IMHO. Even if we think the usage will only be short term temporary
-workaround, short term hacks in QEMU have a habit of living for years longer
-than we expect.
+--hh4u5ljmqibfnas7
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> Opinions are welcome on whether this is worthwhile and how to solve
-> the above doubts.
+-----BEGIN PGP SIGNATURE-----
 
-IIUC, the motivation of this series is just to remove some duplication
-of defaults / args, nothing more than that ?
+iQEzBAABCAAdFiEEb5tNK+B4oWmn+0Z9BBTsy/Z3yzYFAl9fNCUACgkQBBTsy/Z3
+yzbHSAf/Z7BRjPoG7+JmWwmCwcvnD3cMNEbosUZmDcROaCdNAbO5AzWqwKLGWqmK
+qg4iRU/HjxTMI0FRzSkj80s5Z3WyP7vDFx9ShO+cYIPocXPo3tnS0+6iAYOj7fqR
+1egRTntquyA73jsJi1n3wifj/z3q50+XlTrgagfDFHbFDvh+r8mARybVlIKgFV+i
+XE8nStVMRFTODoBaRNlHil/+0cyZEFDkq3lCJsLv2EEjLKfyWIEVL+mhfr2M8wME
+W2Z7gFd4E4QcjAtGAR1GMTowErJYODd2pQExt/DmZVMneX5vPfurI145yPrx+GRp
+lTTYSdRaQtjMe7gwTCCd/XBcQa4nCQ==
+=0b/J
+-----END PGP SIGNATURE-----
 
-If correct, then I'd say it probably isn't worth the hassle. I'd say we
-should focus effort on just converting more of configure to meson, as
-quickly as practical, and not try to add much more magic that's only
-relevant for the transition time.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+--hh4u5ljmqibfnas7--
 
