@@ -7,47 +7,48 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55BF0C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:42:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBF7BC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:42:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB1C720771
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:42:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB1C720771
+	by mail.kernel.org (Postfix) with ESMTPS id 7CBCB20771
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:42:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CBCB20771
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHnoW-0002NK-P0
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 08:42:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37726)
+	id 1kHnop-000392-Gr
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 08:42:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37754)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kHnhv-0006pL-TQ
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:35:43 -0400
-Received: from us-smtp-delivery-44.mimecast.com ([207.211.30.44]:52226)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kHnhx-0006st-H6
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:35:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57800
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kHnhu-0000l9-7d
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:35:43 -0400
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kHnhv-0000lP-Nt
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:35:45 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-471-791W7vbJM1OJDub1wcFMPQ-1; Mon, 14 Sep 2020 08:35:37 -0400
-X-MC-Unique: 791W7vbJM1OJDub1wcFMPQ-1
+ us-mta-120-cqBDgbwINseq0AClHZNAHw-1; Mon, 14 Sep 2020 08:35:39 -0400
+X-MC-Unique: cqBDgbwINseq0AClHZNAHw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 642C2801F9A;
- Mon, 14 Sep 2020 12:35:36 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BFD68030A2;
+ Mon, 14 Sep 2020 12:35:38 +0000 (UTC)
 Received: from bahia.redhat.com (ovpn-112-218.ams2.redhat.com [10.36.112.218])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 140B41002393;
- Mon, 14 Sep 2020 12:35:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B03441002393;
+ Mon, 14 Sep 2020 12:35:36 +0000 (UTC)
 From: Greg Kurz <groug@kaod.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 12/15] spapr: Add a return value to spapr_nvdimm_validate()
-Date: Mon, 14 Sep 2020 14:35:02 +0200
-Message-Id: <20200914123505.612812-13-groug@kaod.org>
+Subject: [PATCH 13/15] spapr: Add a return value to spapr_check_pagesize()
+Date: Mon, 14 Sep 2020 14:35:03 +0200
+Message-Id: <20200914123505.612812-14-groug@kaod.org>
 In-Reply-To: <20200914123505.612812-1-groug@kaod.org>
 References: <20200914123505.612812-1-groug@kaod.org>
 MIME-Version: 1.0
@@ -58,15 +59,16 @@ X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: kaod.org
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=207.211.30.44; envelope-from=groug@kaod.org;
- helo=us-smtp-delivery-44.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 08:35:33
+Received-SPF: softfail client-ip=205.139.110.120; envelope-from=groug@kaod.org;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 01:39:17
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -11
 X-Spam_score: -1.2
 X-Spam_bar: -
 X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,111 +94,76 @@ failure. This allows to reduce error propagation overhead in the callers.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- include/hw/ppc/spapr_nvdimm.h |  2 +-
- hw/ppc/spapr.c                |  4 +---
- hw/ppc/spapr_nvdimm.c         | 14 ++++++++------
- 3 files changed, 10 insertions(+), 10 deletions(-)
+ include/hw/ppc/spapr.h | 2 +-
+ hw/ppc/spapr.c         | 4 +---
+ hw/ppc/spapr_caps.c    | 7 +++++--
+ 3 files changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/include/hw/ppc/spapr_nvdimm.h b/include/hw/ppc/spapr_nvdimm.h
-index 3eb344e8e976..b834d82f5545 100644
---- a/include/hw/ppc/spapr_nvdimm.h
-+++ b/include/hw/ppc/spapr_nvdimm.h
-@@ -28,7 +28,7 @@ QEMU_BUILD_BUG_ON(SPAPR_MINIMUM_SCM_BLOCK_SIZE % SPAPR_ME=
-MORY_BLOCK_SIZE);
- int spapr_pmem_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
-                            void *fdt, int *fdt_start_offset, Error **errp)=
-;
- void spapr_dt_persistent_memory(SpaprMachineState *spapr, void *fdt);
--void spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdi=
-mm,
-+bool spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdi=
-mm,
-                            uint64_t size, Error **errp);
- void spapr_add_nvdimm(DeviceState *dev, uint64_t slot, Error **errp);
- void spapr_create_nvdimm_dr_connectors(SpaprMachineState *spapr);
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 11682f00e8cc..114e81996988 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -941,7 +941,7 @@ void spapr_caps_cpu_apply(SpaprMachineState *spapr, Pow=
+erPCCPU *cpu);
+ void spapr_caps_add_properties(SpaprMachineClass *smc);
+ int spapr_caps_post_migration(SpaprMachineState *spapr);
+=20
+-void spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
++bool spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
+                           Error **errp);
+ /*
+  * XIVE definitions
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index e11472a53ab4..bfa2a00da77e 100644
+index bfa2a00da77e..e813c7cfb949 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -3481,9 +3481,7 @@ static void spapr_memory_pre_plug(HotplugHandler *hot=
+@@ -3493,9 +3493,7 @@ static void spapr_memory_pre_plug(HotplugHandler *hot=
 plug_dev, DeviceState *dev,
+     memdev =3D object_property_get_link(OBJECT(dimm), PC_DIMM_MEMDEV_PROP,
+                                       &error_abort);
+     pagesize =3D host_memory_backend_pagesize(MEMORY_BACKEND(memdev));
+-    spapr_check_pagesize(spapr, pagesize, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (!spapr_check_pagesize(spapr, pagesize, errp)) {
+         return;
      }
 =20
-     if (is_nvdimm) {
--        spapr_nvdimm_validate(hotplug_dev, NVDIMM(dev), size, &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
-+        if (!spapr_nvdimm_validate(hotplug_dev, NVDIMM(dev), size, errp)) =
-{
-             return;
-         }
-     } else if (size % SPAPR_MEMORY_BLOCK_SIZE) {
-diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
-index c06f903e5bff..b3a489e9fe18 100644
---- a/hw/ppc/spapr_nvdimm.c
-+++ b/hw/ppc/spapr_nvdimm.c
-@@ -33,7 +33,7 @@
- #include "sysemu/sysemu.h"
- #include "hw/ppc/spapr_numa.h"
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 10a80a8159f4..9341e9782a3f 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -310,13 +310,13 @@ static void cap_safe_indirect_branch_apply(SpaprMachi=
+neState *spapr,
 =20
--void spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdi=
-mm,
-+bool spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdi=
-mm,
-                            uint64_t size, Error **errp)
+ #define VALUE_DESC_TRISTATE     " (broken, workaround, fixed)"
+=20
+-void spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
++bool spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
+                           Error **errp)
  {
-     const MachineClass *mc =3D MACHINE_GET_CLASS(hotplug_dev);
-@@ -45,7 +45,7 @@ void spapr_nvdimm_validate(HotplugHandler *hotplug_dev, N=
-VDIMMDevice *nvdimm,
+     hwaddr maxpagesize =3D (1ULL << spapr->eff.caps[SPAPR_CAP_HPT_MAXPAGES=
+IZE]);
 =20
-     if (!mc->nvdimm_supported) {
-         error_setg(errp, "NVDIMM hotplug not supported for this machine");
+     if (!kvmppc_hpt_needs_host_contiguous_pages()) {
 -        return;
-+        return false;
++        return true;
      }
 =20
-     /*
-@@ -59,20 +59,20 @@ void spapr_nvdimm_validate(HotplugHandler *hotplug_dev,=
- NVDIMMDevice *nvdimm,
-      */
-     if (!ms->nvdimms_state->is_enabled && nvdimm_opt) {
-         error_setg(errp, "nvdimm device found but 'nvdimm=3Doff' was set")=
-;
--        return;
-+        return false;
-     }
-=20
-     if (object_property_get_int(OBJECT(nvdimm), NVDIMM_LABEL_SIZE_PROP,
-                                 &error_abort) =3D=3D 0) {
-         error_setg(errp, "PAPR requires NVDIMM devices to have label-size =
-set");
--        return;
-+        return false;
-     }
-=20
-     if (size % SPAPR_MINIMUM_SCM_BLOCK_SIZE) {
-         error_setg(errp, "PAPR requires NVDIMM memory size (excluding labe=
-l)"
-                    " to be a multiple of %" PRIu64 "MB",
-                    SPAPR_MINIMUM_SCM_BLOCK_SIZE / MiB);
--        return;
-+        return false;
-     }
-=20
-     uuidstr =3D object_property_get_str(OBJECT(nvdimm), NVDIMM_UUID_PROP,
-@@ -82,8 +82,10 @@ void spapr_nvdimm_validate(HotplugHandler *hotplug_dev, =
-NVDIMMDevice *nvdimm,
-=20
-     if (qemu_uuid_is_null(&uuid)) {
-         error_setg(errp, "NVDIMM device requires the uuid to be set");
--        return;
+     if (maxpagesize > pagesize) {
+@@ -324,7 +324,10 @@ void spapr_check_pagesize(SpaprMachineState *spapr, hw=
+addr pagesize,
+                    "Can't support %"HWADDR_PRIu" kiB guest pages with %"
+                    HWADDR_PRIu" kiB host pages with this KVM implementatio=
+n",
+                    maxpagesize >> 10, pagesize >> 10);
 +        return false;
      }
 +
 +    return true;
  }
 =20
-=20
+ static void cap_hpt_maxpagesize_apply(SpaprMachineState *spapr,
 --=20
 2.26.2
 
