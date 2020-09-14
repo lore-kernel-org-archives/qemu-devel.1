@@ -3,64 +3,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8D7BC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 19:59:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9003BC43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 20:11:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59A91207EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 19:59:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59A91207EA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=m3y3r.de
+	by mail.kernel.org (Postfix) with ESMTPS id 807F9208DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 20:11:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 807F9208DB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHudB-0005EO-7C
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 15:59:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52708)
+	id 1kHup1-0007ab-9v
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 16:11:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55256)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thomas@m3y3r.de>) id 1kHucS-0004o7-PP
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 15:58:32 -0400
-Received: from www17.your-server.de ([213.133.104.17]:36828)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thomas@m3y3r.de>) id 1kHucQ-000118-TE
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 15:58:32 -0400
-Received: from sslproxy02.your-server.de ([78.47.166.47])
- by www17.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
- (Exim 4.92.3) (envelope-from <thomas@m3y3r.de>) id 1kHucJ-000460-Ud
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 21:58:23 +0200
-Received: from [2a02:908:4c22:ec00:8ad5:993:4cda:a89f]
- (helo=localhost.localdomain)
- by sslproxy02.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
- (Exim 4.92) (envelope-from <thomas@m3y3r.de>) id 1kHucJ-000Jx3-Qj
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 21:58:23 +0200
-Date: Mon, 14 Sep 2020 21:58:21 +0200
-From: Thomas Meyer <thomas@m3y3r.de>
-To: qemu-devel@nongnu.org
-Subject: question regarding vexpress and aarch64 secure boot
-Message-ID: <20200914195821.GA571133@localhost.localdomain>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kHuoK-00079W-MJ
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 16:10:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34960)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kHuoI-0002Lx-OM
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 16:10:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kHuoG-0005MV-Pm
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 20:10:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id B36662E80DC
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 20:10:44 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Authenticated-Sender: thomas@m3y3r.de
-X-Virus-Scanned: Clear (ClamAV 0.102.4/25929/Sun Sep 13 15:53:46 2020)
-Received-SPF: none client-ip=213.133.104.17; envelope-from=thomas@m3y3r.de;
- helo=www17.your-server.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 15:58:24
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 14 Sep 2020 20:05:14 -0000
+From: Nick Bauer <1894869@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=debian; sourcepackage=None; component=None;
+ status=Unknown; importance=Unknown; assignee=None; 
+X-Launchpad-Bug-Tags: chelsio t4
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: 1butteryadmin
+X-Launchpad-Bug-Reporter: Nick Bauer (1butteryadmin)
+X-Launchpad-Bug-Modifier: Nick Bauer (1butteryadmin)
+References: <159958042175.17914.10047848067927369523.malonedeb@soybean.canonical.com>
+Message-Id: <160011391480.21912.14442151580363170369.launchpad@wampee.canonical.com>
+Subject: [Bug 1894869] Re: Chelsio T4 has old MSIX PBA offset bug
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: 2b21789eb98c33d0ffdda15d485655d45324d906
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 16:10:45
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -69,78 +86,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1894869 <1894869@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+** Bug watch added: bugzilla.proxmox.com/ #2969
+   https://bugzilla.proxmox.com/show_bug.cgi?id=3D2969
 
-When trying to boot an linux kernel with
+** Also affects: debian via
+   https://bugzilla.proxmox.com/show_bug.cgi?id=3D2969
+   Importance: Unknown
+       Status: Unknown
 
-qemu-system-aarch64 -s -S -kernel /path/to/kernel -append
-"console=ttyAMA0 loglevel=9 nokaslr" -dtb /path/to/dtb -M vexpress-a15 -cpu cortex-a53 -nographic
+-- =
 
-I do hit the assertion:
-qemu-system-aarch64: /builddir/build/BUILD/qemu-4.2.1/hw/arm/boot.c:742: do_cpu_reset: Assertion `!info->secure_boot' failed.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1894869
 
-which seems to come from this commit:
-43118f4351c hw/arm/boot.c (Peter Maydell          2018-03-13  745)                     /* AArch64 kernels never boot in secure mode */
-43118f4351c hw/arm/boot.c (Peter Maydell          2018-03-13  746)                     assert(!info->secure_boot);
-43118f4351c hw/arm/boot.c (Peter Maydell          2018-03-13  747)                     /* This hook is only supported for AArch32 currently:
-43118f4351c hw/arm/boot.c (Peter Maydell          2018-03-13  748)                      * bootloader_aarch64[] will not call the hook, and
-43118f4351c hw/arm/boot.c (Peter Maydell          2018-03-13  749)                      * the code above has already dropped us into EL2 or EL1.
-43118f4351c hw/arm/boot.c (Peter Maydell          2018-03-13  750)                      */
-43118f4351c hw/arm/boot.c (Peter Maydell          2018-03-13  751)                     assert(!info->secure_board_setup);
+Title:
+  Chelsio T4 has old MSIX PBA offset bug
 
-So I did try to boot with "-machine secure=off" which makes the kernel
-boot (at least a bit...), but it also seems to drop EL3 support in vexpress.c:
+Status in QEMU:
+  New
+Status in Debian:
+  Unknown
 
-        if (!secure) {
-            object_property_set_bool(cpuobj, "has_el3", false, NULL);
-        }
+Bug description:
+  There exists a bug with Chelsio NICs T4 that causes the following
+  error:
 
-which triggers arm/cpu.c:
+  kvm: -device vfio-
+  pci,host=3D0000:83:00.7,id=3Dhostpci1.7,bus=3Dpci.0,addr=3D0x11.7: vfio
+  0000:83:00.7: hardware reports invalid configuration, MSIX PBA outside
+  of specified BAR
 
-    if (!cpu->has_el3) {
-        /* If the has_el3 CPU property is disabled then we need to disable the
-         * feature.
-         */
-        unset_feature(env, ARM_FEATURE_EL3);
+  I discovered this bug on a Proxmox system, and I was working with a
+  downstream Proxmox developer to try to fix this issue. They provided
+  me with the following change to make from line 1484 of hw/vfio/pci.c:
 
-my kernel then tries to determine the secure state by issuing a SCM
-instruction, which leads to an undefined exception because no EL3 is
-available, see arm/target/op_helper.c:
+  static void vfio_msix_early_setup(VFIOPCIDevice *vdev, Error **errp)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* is 0x1000, =
+so we hard code that here.
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*/
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (vdev->vendor_id=
+ =3D=3D PCI_VENDOR_ID_CHELSIO &&
+  -            (vdev->device_id & 0xff00) =3D=3D 0x5800) {
+  +            ((vdev->device_id & 0xff00) =3D=3D 0x5800 ||
+  +             (vdev->device_id & 0xff00) =3D=3D 0x1425)) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0msix->pba_offset =3D 0x1000;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else if (vdev->ms=
+ix_relo =3D=3D OFF_AUTOPCIBAR_OFF) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0error_setg(errp, "hardware reports invalid configuration, "
 
-    if (!arm_feature(env, ARM_FEATURE_EL3) &&
-        cpu->psci_conduit != QEMU_PSCI_CONDUIT_SMC) {
-        /* If we have no EL3 then SMC always UNDEFs and can't be
-         * trapped to EL2. PSCI-via-SMC is a sort of ersatz EL3
-         * firmware within QEMU, and we want an EL2 guest to be able
-         * to forbid its EL1 from making PSCI calls into QEMU's
-         * "firmware" via HCR.TSC, so for these purposes treat
-         * PSCI-via-SMC as implying an EL3.
-         * This handles the very last line of the previous table.
-         */
-        raise_exception(env, EXCP_UDEF, syn_uncategorized(),
-                        exception_target_el(env));
-    }
+  However, I found that this did not fix the issue, so the bug appears
+  to work differently than the one that was present on the T5 NICs which
+  has already been patched. I have attached the output of my lspci
+  -nnkvv
 
-which leads the kernel to call die()
-
-So may question is:
-is above assert wrong? Is this a bug?
-
-I think the assert in above commit tries to prevent the boot in secure
-state (vs non-secure state/NS), but I think there is a mix-up between secure state and EL3
-support?
-
-what do you think?
-
-bug or feature?
-
-please be gentle as I'm fairly new to qemu and aarch64 :-)
-
-with kind regards
-thomas
-
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1894869/+subscriptions
 
