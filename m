@@ -2,88 +2,58 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98251C43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 11:46:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16B33C43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 11:47:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 143CC21BE5
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 11:46:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JKzDXz0G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 143CC21BE5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5B66621741
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 11:47:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B66621741
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHmwC-0004o2-7j
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 07:46:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54344)
+	id 1kHmxH-0005n6-Hg
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 07:47:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54708)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kHmvK-0004D6-NN
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 07:45:30 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35549
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kHmvI-0002a2-5k
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 07:45:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600083926;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=r0SuWcHzAXLmful9rAoQB8tLz8DtChdsNi3HEQ01Hq0=;
- b=JKzDXz0Gm5larEDAStsXyVwQeb7yFoEdLNTjLo9VuD26j7MPF1iZCPDUVR9qG15DV4ZVjh
- 2ft196f16TkAn4hqkRTW0X2agDbdp2VHbwo89MZYDpigO3AdkmvqSHG/ToJfcVAWsJ/3zc
- O2u/AH9tl1iqx2ZSvJWLPZe1GuS/Xtw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-Ea7PcGSYNXSszlVyEr302A-1; Mon, 14 Sep 2020 07:45:23 -0400
-X-MC-Unique: Ea7PcGSYNXSszlVyEr302A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 858AA873081;
- Mon, 14 Sep 2020 11:45:22 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DBFF37B7B8;
- Mon, 14 Sep 2020 11:45:06 +0000 (UTC)
-Date: Mon, 14 Sep 2020 13:45:05 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Ani Sinha <ani@anisinha.ca>
-Subject: Re: [PATCH 1/9] tests/acpi: document addition of table DSDT.roothp
- for unit testing root pci hotplug on/off
-Message-ID: <20200914134505.7e6acac4@redhat.com>
-In-Reply-To: <20200911180755.28409-1-ani@anisinha.ca>
-References: <20200911180755.28409-1-ani@anisinha.ca>
+ (Exim 4.90_1) (envelope-from <s.reiter@proxmox.com>)
+ id 1kHmwV-0005B7-4d; Mon, 14 Sep 2020 07:46:43 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:37739)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <s.reiter@proxmox.com>)
+ id 1kHmwS-0002tk-Ng; Mon, 14 Sep 2020 07:46:42 -0400
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 7106744BBD;
+ Mon, 14 Sep 2020 13:46:28 +0200 (CEST)
+Subject: Re: [PATCH 0/3] Add support for sequential backups
+From: Stefan Reiter <s.reiter@proxmox.com>
+To: qemu-block@nongnu.org
+References: <20200826121359.15450-1-s.reiter@proxmox.com>
+Message-ID: <3b016643-dc96-bb0a-2b7a-592cb439fc94@proxmox.com>
+Date: Mon, 14 Sep 2020 13:46:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200826121359.15450-1-s.reiter@proxmox.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 00:11:19
+Received-SPF: pass client-ip=212.186.127.180;
+ envelope-from=s.reiter@proxmox.com; helo=proxmox-new.maurer-it.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 07:46:28
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -38
-X-Spam_score: -3.9
-X-Spam_bar: ---
-X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,39 +67,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jusual@redhat.com, qemu-devel@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: kwolf@redhat.com, w.bumiller@proxmox.com, t.lamprecht@proxmox.com,
+ qemu-devel@nongnu.org, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com,
+ dietmar@proxmox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 11 Sep 2020 23:37:47 +0530
-Ani Sinha <ani@anisinha.ca> wrote:
+Friendly ping :)
 
-> A new binary acpi table tests/data/acpi/pc/DSDT.roothp is added in order to unit test
-> the feature flag that can disable/enable root pci bus hotplug on i440fx. This feature was
-> added with the commit:
-> 3d7e78aa7777f0 ("Introduce a new flag for i440fx to disable PCI hotplug on the root bus")
+On 8/26/20 2:13 PM, Stefan Reiter wrote:
+> Backups can already be done for multiple drives in a transaction. However, these
+> jobs will start all at once, potentially hogging a lot of disk IO all at once.
+> This problem is made worse, since IO throttling is only available on a per-job
+> basis.
 > 
-> This change documents the fact that this new file addition was made as a part of the
-> unit test change.
+> Add a flag to QMP to support sequential transactions for backups. This way,
+> every job will be executed one after the other, while still providing the
+> benefit of transactions (i.e. once one fails, all remaining ones will be
+> cancelled).
 > 
-> Signed-off-by: Ani Sinha <ani@anisinha.ca>
-since it's new test case. I'd squash it into 2/9
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-
-> ---
->  tests/qtest/bios-tables-test-allowed-diff.h | 1 +
->  1 file changed, 1 insertion(+)
+> We've internally (in Proxmox VE) been doing sequential backups for a long time
+> with great success, albeit in a different fashion. This series is the result of
+> aligning our internal changes closer to upstream, and might be useful for other
+> people as well.
 > 
-> diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
-> index dfb8523c8b..ac864fc982 100644
-> --- a/tests/qtest/bios-tables-test-allowed-diff.h
-> +++ b/tests/qtest/bios-tables-test-allowed-diff.h
-> @@ -1 +1,2 @@
->  /* List of comma-separated changed AML files to ignore */
-> +"tests/data/acpi/pc/DSDT.roothp",
+> 
+> Stefan Reiter (3):
+>    job: add sequential transaction support
+>    blockdev: add sequential mode to *-backup transactions
+>    backup: initialize bcs bitmap on job create, not start
+> 
+>   block/backup.c        |  4 ++--
+>   blockdev.c            | 25 ++++++++++++++++++++++---
+>   include/qemu/job.h    | 12 ++++++++++++
+>   job.c                 | 24 ++++++++++++++++++++++++
+>   qapi/transaction.json |  6 +++++-
+>   5 files changed, 65 insertions(+), 6 deletions(-)
+> 
 
 
