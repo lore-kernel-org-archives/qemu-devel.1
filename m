@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1CF9C43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:09:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53A11C43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:09:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7BFAE206F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:09:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BFAE206F4
+	by mail.kernel.org (Postfix) with ESMTPS id 114B520756
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:09:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 114B520756
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHhfx-0007YV-Fp
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 02:09:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37052)
+	id 1kHhgQ-0000Av-4R
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 02:09:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37120)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kHheD-0003yT-1a
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 02:07:29 -0400
-Received: from mail.ispras.ru ([83.149.199.84]:44978)
+ id 1kHheO-0004MY-0W
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 02:07:40 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:44998)
  by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kHheA-0002QV-Bn
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 02:07:28 -0400
+ id 1kHheL-0002RE-Uh
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 02:07:39 -0400
 Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 562E840D3BFF;
- Mon, 14 Sep 2020 06:07:24 +0000 (UTC)
-Subject: [PATCH v4 10/15] gdbstub: add reverse step support in replay mode
+ by mail.ispras.ru (Postfix) with ESMTPSA id EFB4940D3BFF;
+ Mon, 14 Sep 2020 06:07:35 +0000 (UTC)
+Subject: [PATCH v4 12/15] replay: describe reverse debugging in docs/replay.txt
 From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
 To: qemu-devel@nongnu.org
-Date: Mon, 14 Sep 2020 09:07:24 +0300
-Message-ID: <160006364393.31457.10487097692089464911.stgit@pasha-ThinkPad-X280>
+Date: Mon, 14 Sep 2020 09:07:35 +0300
+Message-ID: <160006365557.31457.13435872247215044498.stgit@pasha-ThinkPad-X280>
 In-Reply-To: <160006358590.31457.16757371597343007847.stgit@pasha-ThinkPad-X280>
 References: <160006358590.31457.16757371597343007847.stgit@pasha-ThinkPad-X280>
 User-Agent: StGit/0.17.1-dirty
@@ -77,16 +77,8 @@ Sender: "Qemu-devel"
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-GDB remote protocol supports two reverse debugging commands:
-reverse step and reverse continue.
-This patch adds support of the first one to the gdbstub.
-Reverse step is intended to step one instruction in the backwards
-direction. This is not possible in regular execution.
-But replayed execution is deterministic, therefore we can load one of
-the prior snapshots and proceed to the desired step. It is equivalent
-to stepping one instruction back.
-There should be at least one snapshot preceding the debugged part of
-the replay log.
+This patch updates the documentation and describes usage of the reverse
+debugging in QEMU+GDB.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
@@ -94,258 +86,75 @@ Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 --
 
 v4 changes:
- - inverted condition in cpu_handle_guest_debug (suggested by Alex Bennée)
+ - added an example of the command line for reverse debugging of
+   the diskless machine
 ---
- accel/tcg/translator.c    |    1 +
- exec.c                    |    7 ++++++
- gdbstub.c                 |   55 +++++++++++++++++++++++++++++++++++++++++++--
- include/sysemu/replay.h   |   11 +++++++++
- replay/replay-debugging.c |   33 +++++++++++++++++++++++++++
- softmmu/cpus.c            |   14 +++++++++--
- stubs/replay.c            |    5 ++++
- 7 files changed, 121 insertions(+), 5 deletions(-)
+ docs/replay.txt |   46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
 
-diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
-index 603d17ff83..fb1e19c585 100644
---- a/accel/tcg/translator.c
-+++ b/accel/tcg/translator.c
-@@ -17,6 +17,7 @@
- #include "exec/log.h"
- #include "exec/translator.h"
- #include "exec/plugin-gen.h"
-+#include "sysemu/replay.h"
+diff --git a/docs/replay.txt b/docs/replay.txt
+index 70c27edb36..39fe5e9740 100644
+--- a/docs/replay.txt
++++ b/docs/replay.txt
+@@ -265,6 +265,16 @@ of the original disk image, use overlay files linked to the original images.
+ Therefore all new snapshots (including the starting one) will be saved in
+ overlays and the original image remains unchanged.
  
- /* Pairs with tcg_clear_temp_count.
-    To be called by #TranslatorOps.{translate_insn,tb_stop} if
-diff --git a/exec.c b/exec.c
-index e34b602bdf..65983738f2 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2751,6 +2751,13 @@ void cpu_check_watchpoint(CPUState *cpu, vaddr addr, vaddr len,
-     QTAILQ_FOREACH(wp, &cpu->watchpoints, entry) {
-         if (watchpoint_address_matches(wp, addr, len)
-             && (wp->flags & flags)) {
-+            if (replay_running_debug()) {
-+                /*
-+                 * Don't process the watchpoints when we are
-+                 * in a reverse debugging operation.
-+                 */
-+                return;
-+            }
-             if (flags == BP_MEM_READ) {
-                 wp->flags |= BP_WATCHPOINT_HIT_READ;
-             } else {
-diff --git a/gdbstub.c b/gdbstub.c
-index 9dfb6e4142..79e8ccc050 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -51,6 +51,7 @@
- #include "sysemu/runstate.h"
- #include "hw/semihosting/semihost.h"
- #include "exec/exec-all.h"
-+#include "sysemu/replay.h"
++When you need to use snapshots with diskless virtual machine,
++it must be started with 'orphan' qcow2 image. This image will be used
++for storing VM snapshots. Here is the example of the command line for this:
++
++  qemu-system-i386 -icount shift=3,rr=replay,rrfile=record.bin,rrsnapshot=init \
++    -net none -drive file=empty.qcow2,if=none,id=rr
++
++empty.qcow2 drive does not connected to any virtual block device and used
++for VM snapshots only.
++
+ Network devices
+ ---------------
  
- #ifdef CONFIG_USER_ONLY
- #define GDB_ATTACHED "0"
-@@ -375,6 +376,20 @@ typedef struct GDBState {
-  */
- static int sstep_flags = SSTEP_ENABLE|SSTEP_NOIRQ|SSTEP_NOTIMER;
+@@ -294,6 +304,42 @@ for recording and replaying must contain identical number of ports in record
+ and replay modes, but their backends may differ.
+ E.g., '-serial stdio' in record mode, and '-serial null' in replay mode.
  
-+/* Retrieves flags for single step mode. */
-+static int get_sstep_flags(void)
-+{
-+    /*
-+     * In replay mode all events written into the log should be replayed.
-+     * That is why NOIRQ flag is removed in this mode.
-+     */
-+    if (replay_mode != REPLAY_MODE_NONE) {
-+        return SSTEP_ENABLE;
-+    } else {
-+        return sstep_flags;
-+    }
-+}
++Reverse debugging
++-----------------
 +
- static GDBState gdbserver_state;
++Reverse debugging allows "executing" the program in reverse direction.
++GDB remote protocol supports "reverse step" and "reverse continue"
++commands. The first one steps single instruction backwards in time,
++and the second one finds the last breakpoint in the past.
++
++Recorded executions may be used to enable reverse debugging. QEMU can't
++execute the code in backwards direction, but can load a snapshot and
++replay forward to find the desired position or breakpoint.
++
++The following GDB commands are supported:
++ - reverse-stepi (or rsi) - step one instruction backwards
++ - reverse-continue (or rc) - find last breakpoint in the past
++
++Reverse step loads the nearest snapshot and replays the execution until
++the required instruction is met.
++
++Reverse continue may include several passes of examining the execution
++between the snapshots. Each of the passes include the following steps:
++ 1. loading the snapshot
++ 2. replaying to examine the breakpoints
++ 3. if breakpoint or watchpoint was met
++    - loading the snaphot again
++    - replaying to the required breakpoint
++ 4. else
++    - proceeding to the p.1 with the earlier snapshot
++
++Therefore usage of the reverse debugging requires at least one snapshot
++created in advance. This can be done by omitting 'snapshot' option
++for the block drives and adding 'rrsnapshot' for both record and replay
++command lines.
++See the "Snapshotting" section to learn more about running record/replay
++and creating the snapshot in these modes.
++
+ Replay log format
+ -----------------
  
- static void init_gdbserver_state(void)
-@@ -501,7 +516,7 @@ static int gdb_continue_partial(char *newstates)
-                 break; /* nothing to do here */
-             case 's':
-                 trace_gdbstub_op_stepping(cpu->cpu_index);
--                cpu_single_step(cpu, sstep_flags);
-+                cpu_single_step(cpu, get_sstep_flags());
-                 cpu_resume(cpu);
-                 flag = 1;
-                 break;
-@@ -1874,10 +1889,31 @@ static void handle_step(GdbCmdContext *gdb_ctx, void *user_ctx)
-         gdb_set_cpu_pc((target_ulong)gdb_ctx->params[0].val_ull);
-     }
- 
--    cpu_single_step(gdbserver_state.c_cpu, sstep_flags);
-+    cpu_single_step(gdbserver_state.c_cpu, get_sstep_flags());
-     gdb_continue();
- }
- 
-+static void handle_backward(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    if (replay_mode != REPLAY_MODE_PLAY) {
-+        put_packet("E22");
-+    }
-+    if (gdb_ctx->num_params == 1) {
-+        switch (gdb_ctx->params[0].opcode) {
-+        case 's':
-+            if (replay_reverse_step()) {
-+                gdb_continue();
-+            } else {
-+                put_packet("E14");
-+            }
-+            return;
-+        }
-+    }
-+
-+    /* Default invalid command */
-+    put_packet("");
-+}
-+
- static void handle_v_cont_query(GdbCmdContext *gdb_ctx, void *user_ctx)
- {
-     put_packet("vCont;c;C;s;S");
-@@ -2124,6 +2160,10 @@ static void handle_query_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
-         g_string_append(gdbserver_state.str_buf, ";qXfer:features:read+");
-     }
- 
-+    if (replay_mode == REPLAY_MODE_PLAY) {
-+        g_string_append(gdbserver_state.str_buf, ";ReverseStep+");
-+    }
-+
-     if (gdb_ctx->num_params &&
-         strstr(gdb_ctx->params[0].data, "multiprocess+")) {
-         gdbserver_state.multiprocess = true;
-@@ -2460,6 +2500,17 @@ static int gdb_handle_packet(const char *line_buf)
-             cmd_parser = &step_cmd_desc;
-         }
-         break;
-+    case 'b':
-+        {
-+            static const GdbCmdParseEntry backward_cmd_desc = {
-+                .handler = handle_backward,
-+                .cmd = "b",
-+                .cmd_startswith = 1,
-+                .schema = "o0"
-+            };
-+            cmd_parser = &backward_cmd_desc;
-+        }
-+        break;
-     case 'F':
-         {
-             static const GdbCmdParseEntry file_io_cmd_desc = {
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index 239c01e7df..13a8123b09 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -75,6 +75,17 @@ void replay_finish(void);
- void replay_add_blocker(Error *reason);
- /* Returns name of the replay log file */
- const char *replay_get_filename(void);
-+/*
-+ * Start making one step in backward direction.
-+ * Used by gdbstub for backwards debugging.
-+ * Returns true on success.
-+ */
-+bool replay_reverse_step(void);
-+/*
-+ * Returns true if replay module is processing
-+ * reverse_continue or reverse_step request
-+ */
-+bool replay_running_debug(void);
- 
- /* Processing the instructions */
- 
-diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
-index e1fe6b8661..f7594a88cd 100644
---- a/replay/replay-debugging.c
-+++ b/replay/replay-debugging.c
-@@ -22,6 +22,13 @@
- #include "block/snapshot.h"
- #include "migration/snapshot.h"
- 
-+static bool replay_is_debugging;
-+
-+bool replay_running_debug(void)
-+{
-+    return replay_is_debugging;
-+}
-+
- void hmp_info_replay(Monitor *mon, const QDict *qdict)
- {
-     if (replay_mode == REPLAY_MODE_NONE) {
-@@ -212,3 +219,29 @@ void hmp_replay_seek(Monitor *mon, const QDict *qdict)
-         return;
-     }
- }
-+
-+static void replay_stop_vm_debug(void *opaque)
-+{
-+    replay_is_debugging = false;
-+    vm_stop(RUN_STATE_DEBUG);
-+    replay_delete_break();
-+}
-+
-+bool replay_reverse_step(void)
-+{
-+    Error *err = NULL;
-+
-+    assert(replay_mode == REPLAY_MODE_PLAY);
-+
-+    if (replay_get_current_icount() != 0) {
-+        replay_seek(replay_get_current_icount() - 1, replay_stop_vm_debug, &err);
-+        if (err) {
-+            error_free(err);
-+            return false;
-+        }
-+        replay_is_debugging = true;
-+        return true;
-+    }
-+
-+    return false;
-+}
-diff --git a/softmmu/cpus.c b/softmmu/cpus.c
-index e3b98065c9..dc72f93bc0 100644
---- a/softmmu/cpus.c
-+++ b/softmmu/cpus.c
-@@ -1004,9 +1004,17 @@ static bool cpu_can_run(CPUState *cpu)
- 
- static void cpu_handle_guest_debug(CPUState *cpu)
- {
--    gdb_set_stop_cpu(cpu);
--    qemu_system_debug_request();
--    cpu->stopped = true;
-+    if (replay_running_debug()) {
-+        if (!cpu->singlestep_enabled) {
-+            cpu_single_step(cpu, SSTEP_ENABLE);
-+        } else {
-+            cpu_single_step(cpu, 0);
-+        }
-+    } else {
-+        gdb_set_stop_cpu(cpu);
-+        qemu_system_debug_request();
-+        cpu->stopped = true;
-+    }
- }
- 
- #ifdef CONFIG_LINUX
-diff --git a/stubs/replay.c b/stubs/replay.c
-index eacb366aa8..d5b52302e9 100644
---- a/stubs/replay.c
-+++ b/stubs/replay.c
-@@ -93,3 +93,8 @@ uint64_t replay_get_current_icount(void)
- {
-     return 0;
- }
-+
-+bool replay_reverse_step(void)
-+{
-+    return false;
-+}
 
 
