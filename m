@@ -2,136 +2,73 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17FBDC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 13:01:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B59DC2BC11
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 13:04:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B52FB206B2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 13:01:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XJJ8lAQw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B52FB206B2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EFF6722242
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 13:04:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFF6722242
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHo6k-0005qm-O5
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 09:01:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45984)
+	id 1kHoA8-00077z-5H
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 09:04:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47406)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHo5t-0005LG-Lr
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:00:29 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55653
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHo5m-0004ky-U6
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:00:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600088420;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=XzfsYBBR6ql0PejUd9uKdABHbwbkvG9tgQil0vLKZuo=;
- b=XJJ8lAQwLjR6iaTbPiSeOjnXGbjvHK8N9oqrO+rQmeFtG/Imc4zpH+RJTTHA/fIj/PMdu7
- Kciii3yjw80i4+mgA+6BHwdfjr3yqLQs+u/LW56UPPCbJHBqqn49iVdorSvsxhckH3YBIs
- XjXJbfr3TCzR78Xhy3vw2xXr8bDmrU8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-GyyZ0OUkN6CBhGPp-2a-Pg-1; Mon, 14 Sep 2020 09:00:17 -0400
-X-MC-Unique: GyyZ0OUkN6CBhGPp-2a-Pg-1
-Received: by mail-wm1-f70.google.com with SMTP id w3so2429271wmg.4
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 06:00:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=XzfsYBBR6ql0PejUd9uKdABHbwbkvG9tgQil0vLKZuo=;
- b=ZRzE6YwO+gahMTSlqqxyrIL3AAuAEXVLTz6bVVlx/wtKTGJqQUjw24/1uezc/YZqIC
- WM0Y/b59IKEqPwFJ2q1g9rJOjxiotYS+w7G7sfZkg4zQl5Cp0tQDdWP9mAXz+BASSX4b
- X8IeFsXliHV9ksJhEplcVC5Kx1JJcf9YWdZFEQlYaqaL7VBjT30Rc/J6sP/Na5J+KY7v
- BVVjofwRTEBns2Ew5vfAhSzHlJnmoG5TuFcb4nM8pqXbV8siSDWjLpDfQCt+X/MWDM1t
- P7f5XQWCRSZBQE35hxvWTS9nXYW1fFxTLOvAQV2OWNvq0L8dfx/x04LBJLqJI8ortjxN
- L+Ig==
-X-Gm-Message-State: AOAM533XTl/3c9NePldVOcO1mo0itvsYjLHXrWSWZ8kAQAnyKpXmYuue
- UWE9hHi4xy/+9ngZUS6lKigP4PR9syj0hSM6XR7kEbyYtDHPuAUS/pFaOVBnNaNn5OuBa2u61Mh
- eFbZdYgnsLWF72pU=
-X-Received: by 2002:a05:600c:2246:: with SMTP id
- a6mr15611884wmm.38.1600088415803; 
- Mon, 14 Sep 2020 06:00:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw3nLiIPrySz2EpNFx9XzxSHJHGLZX2HghO3Hs68DFjqGu6z9szEMMpfTtkatDbO/SZbxUzhw==
-X-Received: by 2002:a05:600c:2246:: with SMTP id
- a6mr15611852wmm.38.1600088415510; 
- Mon, 14 Sep 2020 06:00:15 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id u66sm27186314wme.1.2020.09.14.06.00.14
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 14 Sep 2020 06:00:14 -0700 (PDT)
-Subject: Re: [PATCH] checkpatch: Detect '%#' or '%0#' in printf-style format
- strings
-To: Dov Murik <dovmurik@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
- Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-References: <20200914060109.69583-1-dovmurik@linux.vnet.ibm.com>
- <cc5a95d7-4efd-a3de-c1a2-0c77cb60c63a@redhat.com>
- <649cd6c5-7825-9373-4da0-7a28c3c97c8b@linux.vnet.ibm.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <83728898-f305-d6df-f4ed-63580ff87eab@redhat.com>
-Date: Mon, 14 Sep 2020 15:00:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kHo9R-0006hz-Mx
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:04:09 -0400
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:45537)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kHo9N-0005S6-My
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:04:09 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.108.1.6])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id AE82C616C1E5;
+ Mon, 14 Sep 2020 15:04:01 +0200 (CEST)
+Received: from kaod.org (37.59.142.95) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Mon, 14 Sep
+ 2020 15:04:00 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-95G0018df47402-f128-48fb-87ec-2aec69e0959c,
+ 33559CD024D4F69900824C14C2AC4808F9346AFD) smtp.auth=groug@kaod.org
+Date: Mon, 14 Sep 2020 15:03:32 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] add a source path Makefile
+Message-ID: <20200914150332.6b89da73@bahia.lan>
+In-Reply-To: <20200912084656.111174-1-pbonzini@redhat.com>
+References: <20200912084656.111174-1-pbonzini@redhat.com>
+X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <649cd6c5-7825-9373-4da0-7a28c3c97c8b@linux.vnet.ibm.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:33:07
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -38
-X-Spam_score: -3.9
-X-Spam_bar: ---
-X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.95]
+X-ClientProxiedBy: DAG9EX2.mxp5.local (172.16.2.82) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: 7147f680-a936-4c0a-922a-2460cb770ab6
+X-Ovh-Tracer-Id: 7656400844409772509
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudeiiedgiedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefuddtieejjeevheekieeltefgleetkeetheettdeifeffvefhffelffdtfeeljeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegsvghrrhgrnhhgvgesrhgvughhrghtrdgtohhm
+Received-SPF: pass client-ip=79.137.123.220; envelope-from=groug@kaod.org;
+ helo=smtpout1.mo804.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 09:04:02
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -144,116 +81,521 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: berrange@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/14/20 1:27 PM, Dov Murik wrote:
-> On 14/09/2020 9:55, Philippe Mathieu-Daudé wrote:
->> +qemu-perl team
->>
->> On 9/14/20 8:01 AM, Dov Murik wrote:
->>> According to the coding style document, we should use literal '0x'
->>> prefix
->>> instead of printf's '#' flag (which appears as '%#' or '%0#' in the
->>> format
->>> string).  Add a checkpatch rule to enforce that.
->>>
->>> Note that checkpatch already had a similar rule for trace-events files.
->>>
->>> Example usage:
->>>
->>>    $ scripts/checkpatch.pl --file chardev/baum.c
->>>    ...
->>>    ERROR: Don't use '#' flag of printf format ('%#') in format
->>> strings, use '0x' prefix instead
->>>    #366: FILE: chardev/baum.c:366:
->>>    +            DPRINTF("Broken packet %#2x, tossing\n", req); \
->>>    ...
->>>    ERROR: Don't use '#' flag of printf format ('%#') in format
->>> strings, use '0x' prefix instead
->>>    #472: FILE: chardev/baum.c:472:
->>>    +        DPRINTF("unrecognized request %0#2x\n", req);
->>>    ...
->>>
->>> Signed-off-by: Dov Murik <dovmurik@linux.vnet.ibm.com>
->>> ---
->>>   scripts/checkpatch.pl | 12 ++++++++++++
->>>   1 file changed, 12 insertions(+)
->>>
->>> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
->>> index bd3faa154c..6ec2a9f6a1 100755
->>> --- a/scripts/checkpatch.pl
->>> +++ b/scripts/checkpatch.pl
->>> @@ -2891,6 +2891,18 @@ sub process {
->>>               }
->>>           }
->>>   +# check for %# or %0# in printf-style format strings
->>> +        while ($line =~ /(?:^|")([X\t]*)(?:"|$)/g) {
->>> +            my $string = substr($rawline, $-[1], $+[1] - $-[1]);
->>> +            $string =~ s/%%/__/g;
->>> +            if ($string =~ /(?<!%)%0?#/) {
->>> +                ERROR("Don't use '#' flag of printf format " .
->>> +                      "('%#') in format strings, use '0x' " .
->>> +                      "prefix instead\n" . $herecurr);
->>> +                last;
->>> +            }
->>> +        }
->>> +
->>>   # QEMU specific tests
->>>           if ($rawline =~ /\b(?:Qemu|QEmu)\b/) {
->>>               ERROR("use QEMU instead of Qemu or QEmu\n" . $herecurr);
->>>
->>
->> Thank you for this patch!
->>
->> What about folding it in the same block?
->>
-> 
-> That makes sense, except that 'last' statement which will escape the
-> loop if one of the bad patterns is found.
-> 
-> Maybe we can just drop 'last' from both if-then blocks?  We'll get
-> multiple alerts if bad patterns are used more than once in the same
-> line, which sounds OK to me.
+On Sat, 12 Sep 2020 10:46:56 +0200
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-No objection.
+> Now that QEMU is always built out-of-tree, the rules to build
+> QEMU need not be in a file called "Makefile".  Move them to
+> "Makefile.build" (which is symlinked to Makefile in the build
+> tree) and only leave the support for fake in-tree build in the
+> source directory Makefile.  This support is enabled conditionally
+> if the marker file is found in the build/ directory, and therefore
+> configure does not have to create a makefile of its own anymore.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
 
+Hi Paolo,
+
+This doesn't apply on master, likely because some changes got
+merged this week-end with the latest PR of the trivial tree.
+
+Also, please use my <groug@kaod.org> address for upstream work.
+
+Cheers,
+
+--
+Greg
+
+>  Makefile                   | 298 +++++--------------------------------
+>  Makefile => Makefile.build |  39 +----
+>  configure                  |  25 +---
+>  3 files changed, 42 insertions(+), 320 deletions(-)
+>  copy Makefile => Makefile.build (90%)
 > 
-> 
->> -- >8 --
->> --- a/scripts/checkpatch.pl
->> +++ b/scripts/checkpatch.pl
->> @@ -2880,15 +2880,22 @@ sub process {
->>                                  $herecurr);
->>                  }
->>
->> -# check for %L{u,d,i} in strings
->> +# format strings checks
->>                  my $string;
->>                  while ($line =~ /(?:^|")([X\t]*)(?:"|$)/g) {
->>                          $string = substr($rawline, $-[1], $+[1] -
->> $-[1]);
->>                          $string =~ s/%%/__/g;
->> +                       # check for %L{u,d,i} in strings
->>                          if ($string =~ /(?<!%)%L[udi]/) {
->>                                  ERROR("\%Ld/%Lu are not-standard C, use
->> %lld/%llu\n" . $herecurr);
->>                                  last;
->>                          }
->> +                       if ($string =~ /(?<!%)%0?#/) {
->> +                               ERROR("Don't use '#' flag of printf
->> format " .
->> +                                     "('%#') in format strings, use
->> '0x' " .
->> +                                     "prefix instead\n" . $herecurr);
->> +                               last;
->> +                       }
->>                  }
->>
->>   # QEMU specific tests
->> ---
->>
-> 
+> diff --git a/Makefile b/Makefile
+> index d6c5c9fdef..643041dc04 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1,288 +1,68 @@
+> -# Makefile for QEMU.
+> +# Makefile for the QEMU source directory.
+>  
+>  ifneq ($(words $(subst :, ,$(CURDIR))), 1)
+>    $(error main directory cannot contain spaces nor colons)
+>  endif
+>  
+> -# Always point to the root of the build tree (needs GNU make).
+> -BUILD_DIR=$(CURDIR)
+> +SRCPATH_GOALS = docker docker-% vm-% ctags TAGS cscope dist clean distclean recurse
+> +.PHONY: all clean distclean ctags TAGS cscope dist help
+> +.NOTPARALLEL: %
+>  
+> -# Before including a proper config-host.mak, assume we are in the source tree
+> -SRC_PATH=.
+> -
+> -# Don't use implicit rules or variables
+> -# we have explicit rules for everything
+> -MAKEFLAGS += -rR
+> -
+> -# Usage: $(call quiet-command,command and args,"NAME","args to print")
+> -# This will run "command and args", and either:
+> -#  if V=1 just print the whole command and args
+> -#  otherwise print the 'quiet' output in the format "  NAME     args to print"
+> -# NAME should be a short name of the command, 7 letters or fewer.
+> -# If called with only a single argument, will print nothing in quiet mode.
+> -quiet-command-run = $(if $(V),,$(if $2,printf "  %-7s %s\n" $2 $3 && ))$1
+> -quiet-@ = $(if $(V),,@)
+> -quiet-command = $(quiet-@)$(call quiet-command-run,$1,$2,$3)
+> -
+> -UNCHECKED_GOALS := %clean TAGS cscope ctags dist \
+> -    help check-help print-% \
+> -    docker docker-% vm-help vm-test vm-build-%
+> -
+> -# All following code might depend on configuration variables
+> -ifneq ($(wildcard config-host.mak),)
+> -# Put the all: rule here so that config-host.mak can contain dependencies.
+>  all:
+> -include config-host.mak
+> -
+> -git-submodule-update:
+> -
+> -.PHONY: git-submodule-update
+> -
+> -git_module_status := $(shell \
+> -  cd '$(SRC_PATH)' && \
+> -  GIT="$(GIT)" ./scripts/git-submodule.sh status $(GIT_SUBMODULES); \
+> -  echo $$?; \
+> -)
+> -
+> -ifeq (1,$(git_module_status))
+> -ifeq (no,$(GIT_UPDATE))
+> -git-submodule-update:
+> -	$(call quiet-command, \
+> -            echo && \
+> -            echo "GIT submodule checkout is out of date. Please run" && \
+> -            echo "  scripts/git-submodule.sh update $(GIT_SUBMODULES)" && \
+> -            echo "from the source directory checkout $(SRC_PATH)" && \
+> -            echo && \
+> -            exit 1)
+> -else
+> -git-submodule-update:
+> -	$(call quiet-command, \
+> -          (cd $(SRC_PATH) && GIT="$(GIT)" ./scripts/git-submodule.sh update $(GIT_SUBMODULES)), \
+> -          "GIT","$(GIT_SUBMODULES)")
+> -endif
+> -endif
+> -
+> -export NINJA=./ninjatool
+> -
+> -# Running meson regenerates both build.ninja and ninjatool, and that is
+> -# enough to prime the rest of the build.
+> -ninjatool: build.ninja
+> -
+> -Makefile.ninja: build.ninja ninjatool
+> -	./ninjatool -t ninja2make --omit clean dist uninstall cscope TAGS ctags < $< > $@
+> --include Makefile.ninja
+> -
+> -${ninja-targets-c_COMPILER} ${ninja-targets-cpp_COMPILER}: .var.command += -MP
+> -
+> -# If MESON is empty, the rule will be re-evaluated after Makefiles are
+> -# reread (and MESON won't be empty anymore).
+> -ifneq ($(MESON),)
+> -Makefile.mtest: build.ninja scripts/mtest2make.py
+> -	$(MESON) introspect --tests --benchmarks | $(PYTHON) scripts/mtest2make.py > $@
+> --include Makefile.mtest
+> -endif
+> -
+> -Makefile: .git-submodule-status
+> -.git-submodule-status: git-submodule-update config-host.mak
+> -
+> -# Check that we're not trying to do an out-of-tree build from
+> -# a tree that's been used for an in-tree build.
+> -ifneq ($(realpath $(SRC_PATH)),$(realpath .))
+> -ifneq ($(wildcard $(SRC_PATH)/config-host.mak),)
+> -$(error This is an out of tree build but your source tree ($(SRC_PATH)) \
+> -seems to have been used for an in-tree build. You can fix this by running \
+> -"$(MAKE) distclean && rm -rf *-linux-user *-softmmu" in your source tree)
+> -endif
+> -endif
+> -
+> -config-host.mak: $(SRC_PATH)/configure $(SRC_PATH)/pc-bios $(SRC_PATH)/VERSION
+> -	@echo $@ is out-of-date, running configure
+> -	@if test -f meson-private/coredata.dat; then \
+> -	  ./config.status --skip-meson; \
+> -	else \
+> -	  ./config.status; \
+> -	fi
+> -
+> -# Force configure to re-run if the API symbols are updated
+> -ifeq ($(CONFIG_PLUGIN),y)
+> -config-host.mak: $(SRC_PATH)/plugins/qemu-plugins.symbols
+> -endif
+> -
+> -else
+> -config-host.mak:
+> -ifneq ($(filter-out $(UNCHECKED_GOALS),$(MAKECMDGOALS)),$(if $(MAKECMDGOALS),,fail))
+> -	@echo "Please call configure before running make!"
+> -	@exit 1
+> -endif
+> -endif
+> -
+> -# Only needed in case Makefile.ninja does not exist.
+> -.PHONY: ninja-clean ninja-distclean clean-ctlist
+> -clean-ctlist:
+> -ninja-clean::
+> -ninja-distclean::
+> -build.ninja: config-host.mak
+> -
+> -# Don't try to regenerate Makefile or configure
+> -# We don't generate any of them
+> -Makefile: ;
+> -configure: ;
+> -
+> -.PHONY: all clean cscope distclean install \
+> -	recurse-all dist msi FORCE
+> -
+> -SUBDIR_MAKEFLAGS=$(if $(V),,--no-print-directory --quiet)
+> +clean:; @:
+> +distclean::; @:
+>  
+> -include $(SRC_PATH)/tests/Makefile.include
+> -
+> -all: recurse-all
+> -Makefile: $(addsuffix /all, $(SUBDIRS))
+> -
+> -# LIBFDT_lib="": avoid breaking existing trees with objects requiring -fPIC
+> -DTC_MAKE_ARGS=-I$(SRC_PATH)/dtc VPATH=$(SRC_PATH)/dtc -C dtc V="$(V)" LIBFDT_lib=""
+> -DTC_CFLAGS=$(CFLAGS) $(QEMU_CFLAGS)
+> -DTC_CPPFLAGS=-I$(SRC_PATH)/dtc/libfdt
+> -
+> -.PHONY: dtc/all
+> -dtc/all: .git-submodule-status dtc/libfdt
+> -	$(call quiet-command,$(MAKE) $(DTC_MAKE_ARGS) CPPFLAGS="$(DTC_CPPFLAGS)" CFLAGS="$(DTC_CFLAGS)" LDFLAGS="$(QEMU_LDFLAGS)" ARFLAGS="$(ARFLAGS)" CC="$(CC)" AR="$(AR)" LD="$(LD)" $(SUBDIR_MAKEFLAGS) libfdt,)
+> -
+> -dtc/%: .git-submodule-status
+> -	@mkdir -p $@
+> -
+> -# Overriding CFLAGS causes us to lose defines added in the sub-makefile.
+> -# Not overriding CFLAGS leads to mis-matches between compilation modes.
+> -# Therefore we replicate some of the logic in the sub-makefile.
+> -# Remove all the extra -Warning flags that QEMU uses that Capstone doesn't;
+> -# no need to annoy QEMU developers with such things.
+> -CAP_CFLAGS = $(patsubst -W%,,$(CFLAGS) $(QEMU_CFLAGS)) $(CAPSTONE_CFLAGS)
+> -CAP_CFLAGS += -DCAPSTONE_USE_SYS_DYN_MEM
+> -CAP_CFLAGS += -DCAPSTONE_HAS_ARM
+> -CAP_CFLAGS += -DCAPSTONE_HAS_ARM64
+> -CAP_CFLAGS += -DCAPSTONE_HAS_POWERPC
+> -CAP_CFLAGS += -DCAPSTONE_HAS_X86
+> -
+> -.PHONY: capstone/all
+> -capstone/all: .git-submodule-status
+> -	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=no BUILDDIR="$(BUILD_DIR)/capstone" CC="$(CC)" AR="$(AR)" LD="$(LD)" RANLIB="$(RANLIB)" CFLAGS="$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(BUILD_DIR)/capstone/$(LIBCAPSTONE))
+> -
+> -.PHONY: slirp/all
+> -slirp/all: .git-submodule-status
+> -	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/slirp		\
+> -		BUILD_DIR="$(BUILD_DIR)/slirp" 			\
+> -		PKG_CONFIG="$(PKG_CONFIG)" 				\
+> -		CC="$(CC)" AR="$(AR)" 	LD="$(LD)" RANLIB="$(RANLIB)"	\
+> -		CFLAGS="$(QEMU_CFLAGS) $(CFLAGS)" LDFLAGS="$(QEMU_LDFLAGS)")
+> -
+> -ROM_DIRS = $(addprefix pc-bios/, $(ROMS))
+> -ROM_DIRS_RULES=$(foreach t, all clean, $(addsuffix /$(t), $(ROM_DIRS)))
+> -# Only keep -O and -g cflags
+> -.PHONY: $(ROM_DIRS_RULES)
+> -$(ROM_DIRS_RULES):
+> -	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $(dir $@) V="$(V)" TARGET_DIR="$(dir $@)" $(notdir $@),)
+> -
+> -.PHONY: recurse-all recurse-clean
+> -recurse-all: $(addsuffix /all, $(ROM_DIRS))
+> -recurse-clean: $(addsuffix /clean, $(ROM_DIRS))
+> -
+> -######################################################################
+> -
+> -clean: recurse-clean ninja-clean clean-ctlist
+> -	if test -f ninjatool; then ./ninjatool $(if $(V),-v,) -t clean; fi
+> -# avoid old build problems by removing potentially incorrect old files
+> -	rm -f config.mak op-i386.h opc-i386.h gen-op-i386.h op-arm.h opc-arm.h gen-op-arm.h
+> -	find . \( -name '*.so' -o -name '*.dll' -o -name '*.[oda]' \) -type f \
+> -		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-aarch64.a \
+> -		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-arm.a \
+> -		! -path ./roms/edk2/BaseTools/Source/Python/UPT/Dll/sqlite3.dll \
+> -		-exec rm {} +
+> -	rm -f TAGS cscope.* *.pod *~ */*~
+> -	rm -f fsdev/*.pod scsi/*.pod
+> -
+> -VERSION = $(shell cat $(SRC_PATH)/VERSION)
+> -
+> -dist: qemu-$(VERSION).tar.bz2
+> -
+> -qemu-%.tar.bz2:
+> -	$(SRC_PATH)/scripts/make-release "$(SRC_PATH)" "$(patsubst qemu-%.tar.bz2,%,$@)"
+> -
+> -distclean: clean ninja-distclean
+> -	-test -f ninjatool && ./ninjatool $(if $(V),-v,) -t clean -g
+> -	rm -f config-host.mak config-host.h*
+> -	rm -f tests/tcg/config-*.mak
+> -	rm -f config-all-disas.mak config.status
+> -	rm -f tests/qemu-iotests/common.env
+> -	rm -f roms/seabios/config.mak roms/vgabios/config.mak
+> -	rm -f qemu-plugins-ld.symbols qemu-plugins-ld64.symbols
+> -	rm -f *-config-target.h *-config-devices.mak *-config-devices.h
+> -	rm -rf meson-private meson-logs meson-info compile_commands.json
+> -	rm -f Makefile.ninja ninjatool ninjatool.stamp Makefile.mtest
+> -	rm -f config.log
+> -	rm -f linux-headers/asm
+> -	rm -Rf .sdk
+> -
+> -.PHONY: ctags
+>  ctags:
+>  	rm -f tags
+> -	find "$(SRC_PATH)" -name '*.[hc]' -exec ctags --append {} +
+> +	find . -name '*.[hc]' -exec ctags --append {} +
+>  
+> -.PHONY: TAGS
+>  TAGS:
+>  	rm -f TAGS
+> -	find "$(SRC_PATH)" -name '*.[hc]' -exec etags --append {} +
+> +	find . -name '*.[hc]' -exec etags --append {} +
+>  
+> -.PHONY: cscope
+>  cscope:
+> -	rm -f "$(SRC_PATH)"/cscope.*
+> -	find "$(SRC_PATH)/" -name "*.[chsS]" -print | sed -e 's,^\./,,' > "$(SRC_PATH)/cscope.files"
+> -	cscope -b -i"$(SRC_PATH)/cscope.files"
+> +	rm -f ./cscope.*
+> +	find . -name "*.[chsS]" -print | sed -e 's,^\./,,' > "./cscope.files"
+> +	cscope -b -i./cscope.files
+> +
+> +VERSION = $(shell cat VERSION)
+> +.PHONY: dist
+> +dist: qemu-$(VERSION).tar.bz2
+> +qemu-%.tar.bz2:
+> +	./scripts/make-release . "$(patsubst qemu-%.tar.bz2,%,$@)"
+>  
+> -# Needed by "meson install"
+> -export DESTDIR
+> +SRC_PATH = .
+> +include tests/docker/Makefile.include
+> +include tests/vm/Makefile.include
+>  
+> -include $(SRC_PATH)/tests/docker/Makefile.include
+> -include $(SRC_PATH)/tests/vm/Makefile.include
+> +print-help = @printf "  %-30s - %s\\n" "$1" "$2"
+>  
+> -print-help-run = printf "  %-30s - %s\\n" "$1" "$2"
+> -print-help = $(quiet-@)$(call print-help-run,$1,$2)
+> +# Fake in-tree build support
+> +
+> +ifeq ($(wildcard build/auto-created-by-configure),)
+> +all: help
+> +	@exit 1
+>  
+> -.PHONY: help
+>  help:
+> +	@echo 'This is not a build directory.'
+> +	@echo 'Please call configure to build QEMU.'
+> +	@echo  ''
+>  	@echo  'Generic targets:'
+> -	$(call print-help,all,Build all)
+> -	$(call print-help,dir/file.o,Build specified target only)
+> -	$(call print-help,install,Install QEMU, documentation and tools)
+>  	$(call print-help,ctags/TAGS,Generate tags file for editors)
+>  	$(call print-help,cscope,Generate cscope index)
+> -	$(call print-help,sparse,Run sparse on the QEMU source)
+> -	@echo  ''
+> -	@echo  'Cleaning targets:'
+> -	$(call print-help,clean,Remove most generated files but keep the config)
+> -	$(call print-help,distclean,Remove all generated files)
+>  	$(call print-help,dist,Build a distributable tarball)
+>  	@echo  ''
+>  	@echo  'Test targets:'
+> -	$(call print-help,check,Run all tests (check-help for details))
+> -	$(call print-help,bench,Run all benchmarks)
+>  	$(call print-help,docker,Help about targets running tests inside containers)
+>  	$(call print-help,vm-help,Help about targets running tests inside VM)
+> -	@echo  ''
+> -	@echo  'Documentation targets:'
+> -	$(call print-help,html info pdf txt man,Build documentation in specified format)
+> -	@echo  ''
+> -ifdef CONFIG_WIN32
+> -	@echo  'Windows targets:'
+> -	$(call print-help,installer,Build NSIS-based installer for QEMU)
+> -ifdef QEMU_GA_MSI_ENABLED
+> -	$(call print-help,msi,Build MSI-based installer for qemu-ga)
+> -endif
+> -	@echo  ''
+> -endif
+> -	$(call print-help,$(MAKE) [targets],(quiet build, default))
+> -	$(call print-help,$(MAKE) V=1 [targets],(verbose build))
+> -
+> -# will delete the target of a rule if commands exit with a nonzero exit status
+> -.DELETE_ON_ERROR:
+>  
+> -print-%:
+> -	@echo '$*=$($*)'
+> +else
+> +$(filter-out $(SRCPATH_GOALS), all $(MAKECMDGOALS)): recurse
+> +.PHONY: $(MAKECMDGOALS)
+> +recurse:
+> +	@echo 'changing dir to build for $(MAKE) "$(MAKECMDGOALS)"...'
+> +	@$(MAKE) -C build -f Makefile $(MAKECMDGOALS)
+> +
+> +distclean::
+> +	rm -rf build
+> +endif
+> diff --git a/Makefile b/Makefile.build
+> similarity index 90%
+> copy from Makefile
+> copy to Makefile.build
+> index d6c5c9fdef..1c75d4e3b5 100644
+> --- a/Makefile
+> +++ b/Makefile.build
+> @@ -24,14 +24,7 @@ quiet-command-run = $(if $(V),,$(if $2,printf "  %-7s %s\n" $2 $3 && ))$1
+>  quiet-@ = $(if $(V),,@)
+>  quiet-command = $(quiet-@)$(call quiet-command-run,$1,$2,$3)
+>  
+> -UNCHECKED_GOALS := %clean TAGS cscope ctags dist \
+> -    help check-help print-% \
+> -    docker docker-% vm-help vm-test vm-build-%
+> -
+>  # All following code might depend on configuration variables
+> -ifneq ($(wildcard config-host.mak),)
+> -# Put the all: rule here so that config-host.mak can contain dependencies.
+> -all:
+>  include config-host.mak
+>  
+>  git-submodule-update:
+> @@ -69,7 +62,7 @@ export NINJA=./ninjatool
+>  ninjatool: build.ninja
+>  
+>  Makefile.ninja: build.ninja ninjatool
+> -	./ninjatool -t ninja2make --omit clean dist uninstall cscope TAGS ctags < $< > $@
+> +	./ninjatool -t ninja2make --omit clean dist uninstall < $< > $@
+>  -include Makefile.ninja
+>  
+>  ${ninja-targets-c_COMPILER} ${ninja-targets-cpp_COMPILER}: .var.command += -MP
+> @@ -108,14 +101,6 @@ ifeq ($(CONFIG_PLUGIN),y)
+>  config-host.mak: $(SRC_PATH)/plugins/qemu-plugins.symbols
+>  endif
+>  
+> -else
+> -config-host.mak:
+> -ifneq ($(filter-out $(UNCHECKED_GOALS),$(MAKECMDGOALS)),$(if $(MAKECMDGOALS),,fail))
+> -	@echo "Please call configure before running make!"
+> -	@exit 1
+> -endif
+> -endif
+> -
+>  # Only needed in case Makefile.ninja does not exist.
+>  .PHONY: ninja-clean ninja-distclean clean-ctlist
+>  clean-ctlist:
+> @@ -128,8 +113,7 @@ build.ninja: config-host.mak
+>  Makefile: ;
+>  configure: ;
+>  
+> -.PHONY: all clean cscope distclean install \
+> -	recurse-all dist msi FORCE
+> +.PHONY: all clean distclean recurse-all dist msi
+>  
+>  SUBDIR_MAKEFLAGS=$(if $(V),,--no-print-directory --quiet)
+>  
+> @@ -176,7 +160,6 @@ slirp/all: .git-submodule-status
+>  
+>  ROM_DIRS = $(addprefix pc-bios/, $(ROMS))
+>  ROM_DIRS_RULES=$(foreach t, all clean, $(addsuffix /$(t), $(ROM_DIRS)))
+> -# Only keep -O and -g cflags
+>  .PHONY: $(ROM_DIRS_RULES)
+>  $(ROM_DIRS_RULES):
+>  	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $(dir $@) V="$(V)" TARGET_DIR="$(dir $@)" $(notdir $@),)
+> @@ -200,9 +183,7 @@ clean: recurse-clean ninja-clean clean-ctlist
+>  	rm -f fsdev/*.pod scsi/*.pod
+>  
+>  VERSION = $(shell cat $(SRC_PATH)/VERSION)
+> -
+>  dist: qemu-$(VERSION).tar.bz2
+> -
+>  qemu-%.tar.bz2:
+>  	$(SRC_PATH)/scripts/make-release "$(SRC_PATH)" "$(patsubst qemu-%.tar.bz2,%,$@)"
+>  
+> @@ -221,22 +202,6 @@ distclean: clean ninja-distclean
+>  	rm -f linux-headers/asm
+>  	rm -Rf .sdk
+>  
+> -.PHONY: ctags
+> -ctags:
+> -	rm -f tags
+> -	find "$(SRC_PATH)" -name '*.[hc]' -exec ctags --append {} +
+> -
+> -.PHONY: TAGS
+> -TAGS:
+> -	rm -f TAGS
+> -	find "$(SRC_PATH)" -name '*.[hc]' -exec etags --append {} +
+> -
+> -.PHONY: cscope
+> -cscope:
+> -	rm -f "$(SRC_PATH)"/cscope.*
+> -	find "$(SRC_PATH)/" -name "*.[chsS]" -print | sed -e 's,^\./,,' > "$(SRC_PATH)/cscope.files"
+> -	cscope -b -i"$(SRC_PATH)/cscope.files"
+> -
+>  # Needed by "meson install"
+>  export DESTDIR
+>  
+> diff --git a/configure b/configure
+> index 91c5d78184..dffbde47a5 100755
+> --- a/configure
+> +++ b/configure
+> @@ -33,29 +33,6 @@ then
+>  
+>      mkdir build
+>      touch $MARKER
+> -
+> -    cat > GNUmakefile <<'EOF'
+> -# This file is auto-generated by configure to support in-source tree
+> -# 'make' command invocation
+> -
+> -ifeq ($(MAKECMDGOALS),)
+> -recurse: all
+> -endif
+> -
+> -.NOTPARALLEL: %
+> -%: force
+> -	@echo 'changing dir to build for $(MAKE) "$(MAKECMDGOALS)"...'
+> -	@$(MAKE) -C build -f Makefile $(MAKECMDGOALS)
+> -	@if test "$(MAKECMDGOALS)" = "distclean" && \
+> -	    test -e build/auto-created-by-configure ; \
+> -	then \
+> -	    rm -rf build GNUmakefile ; \
+> -	fi
+> -force: ;
+> -.PHONY: force
+> -GNUmakefile: ;
+> -
+> -EOF
+>      cd build
+>      exec $source_path/configure "$@"
+>  fi
+> @@ -7856,7 +7833,6 @@ DIRS="$DIRS tests/qtest tests/qemu-iotests tests/vm tests/fp tests/qgraph"
+>  DIRS="$DIRS docs docs/interop fsdev scsi"
+>  DIRS="$DIRS pc-bios/optionrom pc-bios/s390-ccw"
+>  DIRS="$DIRS roms/seabios"
+> -LINKS="Makefile"
+>  LINKS="$LINKS tests/tcg/lm32/Makefile"
+>  LINKS="$LINKS tests/tcg/Makefile.target"
+>  LINKS="$LINKS pc-bios/optionrom/Makefile"
+> @@ -7888,6 +7864,7 @@ for f in $LINKS ; do
+>          symlink "$source_path/$f" "$f"
+>      fi
+>  done
+> +symlink "$source_path/Makefile.build" "Makefile"
+>  for f in $UNLINK ; do
+>      if [ -L "$f" ]; then
+>          rm -f "$f"
 
 
