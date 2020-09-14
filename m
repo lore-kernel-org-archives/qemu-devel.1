@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 071C2C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:15:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFA14C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:16:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63C7120672
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:15:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 40F942074B
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:16:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZQH6L5M4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63C7120672
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qh/FQTPF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40F942074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHpGB-0006ox-F6
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 10:15:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45788)
+	id 1kHpHE-0007xR-7k
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 10:16:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46194)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHp88-00023K-0J
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:06:52 -0400
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:37013)
+ id 1kHp8V-00035D-FY
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:07:15 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:35196)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHp86-0007XZ-DC
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:06:51 -0400
-Received: by mail-wm1-x334.google.com with SMTP id a9so200193wmm.2
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 07:06:50 -0700 (PDT)
+ id 1kHp8T-0007cZ-Hg
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:07:15 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id e16so18928909wrm.2
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 07:07:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=sQjyHYblqUK5pKnBXUKXJ7oRaJ4PY+n7hD6rVfgknOM=;
- b=ZQH6L5M4b3AzFRCsNeYgZMnBBfWwKLAoc2ZO5uwASkOZ10WHvT3+AFlXQkpG8dHz+X
- Tqmviq9JNa3r7RHlzzow4EzAxhEZwDd7YDhjzvGwLxgZwD4jEO0YPNalfa+bkKaRrUt5
- hi+w4zSR3jbwRFlU0ChiJiZalpK4IPsV6siKE2NB7csXZbPC7iu7cYckpSyeXx1K2kTb
- JekLxS05uPzyYzro3/jF69e/0igSKMLAxmrvqUrkC+d61VPSRF0u1I8DrT0OphcNPb3a
- 1znSNIfQBbnxCtcRfrqhzer6VmAnEND7J7KbcmhFOaogg5l//ykfzABU34LIbE7fsSGX
- sQ0Q==
+ bh=t7GgsIy/CKDFP2Rw0R3wmNWViXiOV67C9XbYARPcce0=;
+ b=qh/FQTPFSDZmo6X7AM3S0XLPrL0wo+WRZZ9mIq9cl9x7aigfG4W/+FFNilFe6mOIVd
+ Yhsc0Y61vZxbIoggYinDzAD8YCshDWcc/ks2iQ06Yu6Eb5CBXvGYTvJ5oe1I7DTvWMmP
+ soq1r93aoQDNzORR7h9lGKIQTU3zY+HEMlrPKNLQtcCmElQ6e8ULPFwvq0kzLxG+5mNX
+ rabhiG7T3GG9WR/qe3m+J2H/rJkypBORqsNmkDy6uW0PCpscZnns1m9sIDYCEmEp3cLh
+ eU91pP7G5qrvdXJGFvkBOIemUJ7oB0THGdSQaTmLm65PbIx0/ovhlYtL2pq923EAtxku
+ jYqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=sQjyHYblqUK5pKnBXUKXJ7oRaJ4PY+n7hD6rVfgknOM=;
- b=IlUbqa1yR1zXyf2EuiS3EiteQ5v3btJd6BvnlOHkitGRQGE+BZRIX/WgKJZ6Deeo2/
- BYGXKU/ERfpgMtrDk2ahKmjJ7PWN6+eWexCJNj2NoMyS2QF34o8Lw9ucIAp0WqMEFEyl
- tbmpWfotwIt1WYhXb54QIqKmNWuIug2hFcCApHvXOZn0u1flQVIDnSFBOAuobfjr+d8y
- /AiIja/H0M0H7sDjCoghmSek2jfxpvlNXZTJKXYu/6vR2HLJjgdbTFszLjiJx+5lOg2j
- HRerg5U55KsWTknIr9t85BhzEFAVmAa/edJRJZYAiwHj4wf9501sviFcc/xboAMNCAIM
- +7HA==
-X-Gm-Message-State: AOAM533PHi7mgX0YE+dH8T/TU2li0aI3TQnJAf5TpSA2rF+7U6FWGdSQ
- I5LLClkN9JlwhrxEhzEwyKypEIDr/K+4vRab
-X-Google-Smtp-Source: ABdhPJzhbRfz11fhIKjB0uG2vrN/OXptZEcV1+dFKJFEtXfSUrOMplHOZVgM+1UJ7yuaaCxpQR4vJQ==
-X-Received: by 2002:a7b:cf30:: with SMTP id m16mr15150060wmg.0.1600092408843; 
- Mon, 14 Sep 2020 07:06:48 -0700 (PDT)
+ bh=t7GgsIy/CKDFP2Rw0R3wmNWViXiOV67C9XbYARPcce0=;
+ b=b9Jfb4p9jOsMrjuZLAQNG+rfXcGzQMyiiy49wwJgJ+9N7gzQgdEcJngCx6sCaKpLbP
+ egQhYMi1/Rc8RCU47WMhh1zehXwSVULvXWysRpzwYJng6hRfi4DqV44SIjwNOwe+L0GM
+ xJ4FHrASSzuMJAqcFggKDvD4dDmnzAe4PT6ooNz/Bj9tT63Ms/6wxc4A2PxajIZtGBZo
+ 3EqFQdOt4RlA/jzGCOVNTLtZ/1d19SzLhmh+rkHa40rlW10Xn0aEudPICVpthdlSL7pK
+ KMAZMxbojuhhFxdsLN4f0r3WkqDyNsbGMC0TMFA23YIflLWV2nIdof1cLC6ZlojoFobS
+ x0zg==
+X-Gm-Message-State: AOAM533js+Bw1T6cYrbGCRTYOOw4DitWXWV06IZburO3puDvqwnbaIT9
+ rX5b1wnGyLjxDa+JdTTcXxT0OL1V7+m9WXnO
+X-Google-Smtp-Source: ABdhPJwAurgwM0J/3UbKuFVoKTExKrC3u+6GTLhZWmxWiwlhiVpMpwswfdTWWlYzARVylf6u0wpSGA==
+X-Received: by 2002:adf:b306:: with SMTP id j6mr15443875wrd.279.1600092431823; 
+ Mon, 14 Sep 2020 07:07:11 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id x16sm20834041wrq.62.2020.09.14.07.06.47
+ by smtp.gmail.com with ESMTPSA id x16sm20834041wrq.62.2020.09.14.07.07.10
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Sep 2020 07:06:48 -0700 (PDT)
+ Mon, 14 Sep 2020 07:07:11 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/36] hw/timer/armv7m_systick: assert that board code set
- system_clock_scale
-Date: Mon, 14 Sep 2020 15:06:10 +0100
-Message-Id: <20200914140641.21369-6-peter.maydell@linaro.org>
+Subject: [PULL 25/36] hw/arm: Load -bios image as a boot ROM for npcm7xx
+Date: Mon, 14 Sep 2020 15:06:30 +0100
+Message-Id: <20200914140641.21369-26-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200914140641.21369-1-peter.maydell@linaro.org>
 References: <20200914140641.21369-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::334;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x334.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,41 +105,89 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It is the responsibility of board code for an armv7m system to set
-system_clock_scale appropriately for the CPU speed of the core.
-If it forgets to do this, then QEMU will hang if the guest tries
-to use the systick timer in the "tick at the CPU clock frequency" mode.
+From: Havard Skinnemoen <hskinnemoen@google.com>
 
-We forgot that in a couple of our boards (see commits ce4f70e81ed23c93f,
-e7e5a9595ab1136). Add an assertion in the systick reset method so
-we don't let any new boards in with the same bug.
+If a -bios option is specified on the command line, load the image into
+the internal ROM memory region, which contains the first instructions
+run by the CPU after reset.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+If -bios is not specified, the vbootrom included with qemu is loaded by
+default.
+
+Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20200825160847.18091-1-peter.maydell@linaro.org
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+Message-id: 20200911052101.2602693-8-hskinnemoen@google.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/timer/armv7m_systick.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ hw/arm/npcm7xx_boards.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-diff --git a/hw/timer/armv7m_systick.c b/hw/timer/armv7m_systick.c
-index 74c58bcf245..a8cec7eb56b 100644
---- a/hw/timer/armv7m_systick.c
-+++ b/hw/timer/armv7m_systick.c
-@@ -202,6 +202,14 @@ static void systick_reset(DeviceState *dev)
- {
-     SysTickState *s = SYSTICK(dev);
+diff --git a/hw/arm/npcm7xx_boards.c b/hw/arm/npcm7xx_boards.c
+index 939391c3a3c..b4c772d6b52 100644
+--- a/hw/arm/npcm7xx_boards.c
++++ b/hw/arm/npcm7xx_boards.c
+@@ -19,12 +19,42 @@
+ #include "exec/address-spaces.h"
+ #include "hw/arm/npcm7xx.h"
+ #include "hw/core/cpu.h"
++#include "hw/loader.h"
+ #include "qapi/error.h"
++#include "qemu-common.h"
+ #include "qemu/units.h"
++#include "sysemu/sysemu.h"
  
-+    /*
-+     * Forgetting to set system_clock_scale is always a board code
-+     * bug. We can't check this earlier because for some boards
-+     * (like stellaris) it is not yet configured at the point where
-+     * the systick device is realized.
-+     */
-+    assert(system_clock_scale != 0);
+ #define NPCM750_EVB_POWER_ON_STRAPS 0x00001ff7
+ #define QUANTA_GSJ_POWER_ON_STRAPS 0x00001fff
+ 
++static const char npcm7xx_default_bootrom[] = "npcm7xx_bootrom.bin";
 +
-     s->control = 0;
-     s->reload = 0;
-     s->tick = 0;
++static void npcm7xx_load_bootrom(MachineState *machine, NPCM7xxState *soc)
++{
++    g_autofree char *filename = NULL;
++    int ret;
++
++    if (!bios_name) {
++        bios_name = npcm7xx_default_bootrom;
++    }
++
++    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
++    if (!filename) {
++        error_report("Could not find ROM image '%s'", bios_name);
++        if (!machine->kernel_filename) {
++            /* We can't boot without a bootrom or a kernel image. */
++            exit(1);
++        }
++        return;
++    }
++    ret = load_image_mr(filename, &soc->irom);
++    if (ret < 0) {
++        error_report("Failed to load ROM image '%s'", filename);
++        exit(1);
++    }
++}
++
+ static void npcm7xx_connect_dram(NPCM7xxState *soc, MemoryRegion *dram)
+ {
+     memory_region_add_subregion(get_system_memory(), NPCM7XX_DRAM_BA, dram);
+@@ -61,6 +91,7 @@ static void npcm750_evb_init(MachineState *machine)
+     npcm7xx_connect_dram(soc, machine->ram);
+     qdev_realize(DEVICE(soc), NULL, &error_fatal);
+ 
++    npcm7xx_load_bootrom(machine, soc);
+     npcm7xx_load_kernel(machine, soc);
+ }
+ 
+@@ -72,6 +103,7 @@ static void quanta_gsj_init(MachineState *machine)
+     npcm7xx_connect_dram(soc, machine->ram);
+     qdev_realize(DEVICE(soc), NULL, &error_fatal);
+ 
++    npcm7xx_load_bootrom(machine, soc);
+     npcm7xx_load_kernel(machine, soc);
+ }
+ 
 -- 
 2.20.1
 
