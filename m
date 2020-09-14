@@ -2,84 +2,84 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-17.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06121C43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:24:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA38CC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:27:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 875B120EDD
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:24:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 53E8F20829
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:27:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mfHt+E+r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 875B120EDD
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZwDEg4+h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53E8F20829
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHpPN-0001Rm-M7
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 10:24:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46386)
+	id 1kHpRb-0003Ya-EE
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 10:26:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46178)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHp8f-0003XF-EJ
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:07:25 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:35986)
+ id 1kHp8U-00032k-IF
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:07:14 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:47058)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHp8d-0007fl-C6
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:07:25 -0400
-Received: by mail-wr1-x435.google.com with SMTP id z1so18906651wrt.3
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 07:07:22 -0700 (PDT)
+ id 1kHp8S-0007cN-FK
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:07:14 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id o5so18849394wrn.13
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 07:07:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=daROO0Em6m1DZaN+OXwsmJwfKn2V8wIq3+CRqWTJIwE=;
- b=mfHt+E+r8Bo8VOUd1uRkIQMNI4hi5dhPzqYxU6Emuz1unsifdDE0Trkkur8KbZYGDb
- Egjg6eU3Tjl8WMfRKLBroUGrDlWQpz9dvgLR8dBWWUoAC305/tYd8Y/7I7W7rPE1+KDi
- 5iAWZqgTvL+d33dRTboCZrITB+yqMo+y8Ft3aD6xKb2iXHU8l1VubVmTUv6peHgTcHx9
- 7SZNbGKYY1+Br2HBGRB5TlmVvJsLBMeuRgx4NA0qXDKUaVwmsbzF/Eyp0wr4LQn9YlcY
- CuS2knqKQtopRrydVK3bNnHQNOijBYWS4+AEQMMy4TpGlw7JlMmxPrRugRELP53TR43Q
- PVpw==
+ bh=TR7g/XOXg0ArMBsKi4z4nvRcU8XcdUFb0nODVD4YAB4=;
+ b=ZwDEg4+hNTjAifVjO7eYSDq1yDJLrkoWo1AtrHgD9am9baWQizQXw7awgF49y8ByOk
+ krltMt4lcH7UzGFVcBWORBYCfq0Ru4hfuCQ94VrrKbHMXlevDoRuzbMRuGZcHzCVvyOT
+ CcckQBuwepmN8dEkneJnOwL8JU/k536QpASufLhdU2rrOTomvhL+puC8hYgH9GWtunAi
+ 24VjlQjykn/j7aSagoIw87unPK48IAo/vFL+XLDshzMpx3AVgzmqlC9Lctcka6zZwhBi
+ WWgyN2+e+4d4rYcgqk2nWrfZPlGiduiIDkael0IPmBN6zbUYnpRyLspyqajWAbKc7OOU
+ /B1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=daROO0Em6m1DZaN+OXwsmJwfKn2V8wIq3+CRqWTJIwE=;
- b=fOKUVH4oNZzWxBsyszDsFSyQO0YF41bKdxEdyAurs0lSVe6NXYcMbmE/OtGpVy6DAa
- uzC2H/4OLl8kinOZzmOTtQ0ferjCuboEUDfD8BqQhDy2s0/yNjLTuo4o8x9HhNoi8bqf
- I3wJvkOlGfk4z0VzkV7Dmo7OL/TDvD3CNoUOAsTJJDJGsTHek7jZGn9pdDNbZbiYbpM3
- 4tCjN/STp4eMo12g1i5CBn+9AWR7f58mXMrJTaq0D9/WjWNcE8PqcNOe4vWY78dLsfe8
- J8zyqVSVugJ3RnvDbeQ06gP/aE4+7CdIna2/mEWCWoZyvoYAMRaePrhThXL6NPRR+cJ9
- xAbQ==
-X-Gm-Message-State: AOAM530D1I7n1VVv9mAVtEAgtEYX83cb5nJ4IBXhusnkVYr0heADuIIY
- jU6bmmCrFrU2FFmJnOJaECbiB8AQeGWehtvb
-X-Google-Smtp-Source: ABdhPJw5L43iAfsBQ2Y7Q5izom6hYNiXsFy9WKeAR301TBnBZm3NRQ5kQWZSlu+aB5VuEFWLbdpJ/Q==
-X-Received: by 2002:a5d:6406:: with SMTP id z6mr15536126wru.133.1600092441728; 
- Mon, 14 Sep 2020 07:07:21 -0700 (PDT)
+ bh=TR7g/XOXg0ArMBsKi4z4nvRcU8XcdUFb0nODVD4YAB4=;
+ b=t/jc+PqliF9O/Pk9qZctDqUiQ7kGI2A0KlNOoR55WPAgfktkvWgfr/aCCyY9Ayo6KW
+ kLZ8pd2WUn+rtDuuoahNXJSqw2Sl8HXC2OBV9ynqQLniM70Q3Wf/loneG0VaEasbgyR0
+ 28rV/vPjIGAKSpdZ3K75OYfse4xnrOwjcfeMKI2EDEChleWXdn5IHKUv0JOqdTF9XlVl
+ H6NYUhrImr2lBtX7a5aW4kYSstzihqOsf6EOQ0eCK0qpRi0KjTmi0Rvc64zB4vyH/Nzr
+ iQ1yi0xfO7J2GVcmc74L95qhBE/KV9WAXN8NfjIfqM++ZJ+owULE5p1ZvY5mzT0NGt2q
+ lEkg==
+X-Gm-Message-State: AOAM531lARjId+fP/USe9Wj3CGR+mCQ0ePhPAJ/pAEYNPsYMcB1yROQO
+ 57M8INCrNa1hsnP3EEGCkiSYyRj0MJaeYILG
+X-Google-Smtp-Source: ABdhPJwsufMMBXBAG1oBEg2CV5wghODLlqaearNB6Y4JkDQaiaVT0Hs91fjgTb06t1tRuIJpJ3iogw==
+X-Received: by 2002:adf:efc9:: with SMTP id i9mr16807472wrp.187.1600092430743; 
+ Mon, 14 Sep 2020 07:07:10 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id x16sm20834041wrq.62.2020.09.14.07.07.20
+ by smtp.gmail.com with ESMTPSA id x16sm20834041wrq.62.2020.09.14.07.07.09
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Sep 2020 07:07:21 -0700 (PDT)
+ Mon, 14 Sep 2020 07:07:09 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 34/36] xlnx-zynqmp: Connect Xilinx ZynqMP CAN controllers
-Date: Mon, 14 Sep 2020 15:06:39 +0100
-Message-Id: <20200914140641.21369-35-peter.maydell@linaro.org>
+Subject: [PULL 24/36] roms: Add virtual Boot ROM for NPCM7xx SoCs
+Date: Mon, 14 Sep 2020 15:06:29 +0100
+Message-Id: <20200914140641.21369-25-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200914140641.21369-1-peter.maydell@linaro.org>
 References: <20200914140641.21369-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::435;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x435.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42b;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,186 +105,140 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vikram Garhwal <fnu.vikram@xilinx.com>
+From: Havard Skinnemoen <hskinnemoen@google.com>
 
-Connect CAN0 and CAN1 on the ZynqMP.
+This is a minimalistic boot ROM written specifically for use with QEMU.
+It supports loading the second-stage loader from SPI flash into RAM, SMP
+boot, and not much else.
 
-Reviewed-by: Francisco Iglesias <francisco.iglesias@xilinx.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Signed-off-by: Vikram Garhwal <fnu.vikram@xilinx.com>
-Message-id: 1597278668-339715-3-git-send-email-fnu.vikram@xilinx.com
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+Message-id: 20200911052101.2602693-7-hskinnemoen@google.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/xlnx-zynqmp.h |  8 ++++++++
- hw/arm/xlnx-zcu102.c         | 20 ++++++++++++++++++++
- hw/arm/xlnx-zynqmp.c         | 34 ++++++++++++++++++++++++++++++++++
- 3 files changed, 62 insertions(+)
+ .gitmodules                 |   3 +++
+ MAINTAINERS                 |   2 ++
+ pc-bios/README              |   6 ++++++
+ pc-bios/meson.build         |   1 +
+ pc-bios/npcm7xx_bootrom.bin | Bin 0 -> 768 bytes
+ roms/Makefile               |   7 +++++++
+ roms/vbootrom               |   1 +
+ 7 files changed, 20 insertions(+)
+ create mode 100644 pc-bios/npcm7xx_bootrom.bin
+ create mode 160000 roms/vbootrom
 
-diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-index 4cc97b46109..ae914807be5 100644
---- a/include/hw/arm/xlnx-zynqmp.h
-+++ b/include/hw/arm/xlnx-zynqmp.h
-@@ -22,6 +22,7 @@
- #include "hw/intc/arm_gic.h"
- #include "hw/net/cadence_gem.h"
- #include "hw/char/cadence_uart.h"
-+#include "hw/net/xlnx-zynqmp-can.h"
- #include "hw/ide/ahci.h"
- #include "hw/sd/sdhci.h"
- #include "hw/ssi/xilinx_spips.h"
-@@ -33,6 +34,7 @@
- #include "hw/cpu/cluster.h"
- #include "target/arm/cpu.h"
- #include "qom/object.h"
-+#include "net/can_emu.h"
+diff --git a/.gitmodules b/.gitmodules
+index ce979398a87..9ffb9f3f4f3 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -61,3 +61,6 @@
+ [submodule "meson"]
+ 	path = meson
+ 	url = https://github.com/mesonbuild/meson/
++[submodule "roms/vbootrom"]
++	path = roms/vbootrom
++	url = https://github.com/google/vbootrom.git
+diff --git a/MAINTAINERS b/MAINTAINERS
+index c95a00c12dd..3d17cad19aa 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -757,6 +757,8 @@ L: qemu-arm@nongnu.org
+ S: Supported
+ F: hw/*/npcm7xx*
+ F: include/hw/*/npcm7xx*
++F: pc-bios/npcm7xx_bootrom.bin
++F: roms/vbootrom
  
- #define TYPE_XLNX_ZYNQMP "xlnx,zynqmp"
- typedef struct XlnxZynqMPState XlnxZynqMPState;
-@@ -43,6 +45,8 @@ DECLARE_INSTANCE_CHECKER(XlnxZynqMPState, XLNX_ZYNQMP,
- #define XLNX_ZYNQMP_NUM_RPU_CPUS 2
- #define XLNX_ZYNQMP_NUM_GEMS 4
- #define XLNX_ZYNQMP_NUM_UARTS 2
-+#define XLNX_ZYNQMP_NUM_CAN 2
-+#define XLNX_ZYNQMP_CAN_REF_CLK (24 * 1000 * 1000)
- #define XLNX_ZYNQMP_NUM_SDHCI 2
- #define XLNX_ZYNQMP_NUM_SPIS 2
- #define XLNX_ZYNQMP_NUM_GDMA_CH 8
-@@ -94,6 +98,7 @@ struct XlnxZynqMPState {
- 
-     CadenceGEMState gem[XLNX_ZYNQMP_NUM_GEMS];
-     CadenceUARTState uart[XLNX_ZYNQMP_NUM_UARTS];
-+    XlnxZynqMPCANState can[XLNX_ZYNQMP_NUM_CAN];
-     SysbusAHCIState sata;
-     SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
-     XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
-@@ -114,6 +119,9 @@ struct XlnxZynqMPState {
-     bool virt;
-     /* Has the RPU subsystem?  */
-     bool has_rpu;
+ nSeries
+ M: Andrzej Zaborowski <balrogg@gmail.com>
+diff --git a/pc-bios/README b/pc-bios/README
+index 2e49be607e0..33f9754ad30 100644
+--- a/pc-bios/README
++++ b/pc-bios/README
+@@ -71,3 +71,9 @@
+   ("Simplified BSD License" or "FreeBSD License", SPDX: BSD-2-Clause). OpenSBI
+   source code also contains code reused from other projects desribed here:
+   https://github.com/riscv/opensbi/blob/master/ThirdPartyNotices.md.
 +
-+    /* CAN bus. */
-+    CanBusState *canbus[XLNX_ZYNQMP_NUM_CAN];
- };
++- npcm7xx_bootrom.bin is a simplified, free (Apache 2.0) boot ROM for Nuvoton
++  NPCM7xx BMC devices. It currently implements the bare minimum to load, parse,
++  initialize and run boot images stored in SPI flash, but may grow more
++  features over time as needed. The source code is available at:
++  https://github.com/google/vbootrom
+diff --git a/pc-bios/meson.build b/pc-bios/meson.build
+index 8087e5c0a7a..182d5ebb35d 100644
+--- a/pc-bios/meson.build
++++ b/pc-bios/meson.build
+@@ -81,6 +81,7 @@ blobs = files(
+   'opensbi-riscv64-generic-fw_dynamic.bin',
+   'opensbi-riscv32-generic-fw_dynamic.elf',
+   'opensbi-riscv64-generic-fw_dynamic.elf',
++  'npcm7xx_bootrom.bin',
+ )
  
- #endif
-diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-index 19d5a4d4e0e..cb0fba7975f 100644
---- a/hw/arm/xlnx-zcu102.c
-+++ b/hw/arm/xlnx-zcu102.c
-@@ -25,6 +25,7 @@
- #include "sysemu/qtest.h"
- #include "sysemu/device_tree.h"
- #include "qom/object.h"
-+#include "net/can_emu.h"
+ if install_blobs
+diff --git a/pc-bios/npcm7xx_bootrom.bin b/pc-bios/npcm7xx_bootrom.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..38f89d1b97b0c2e133af2a9fbed0521be132065b
+GIT binary patch
+literal 768
+zcmd5)JxClu6n-<aczPbVhZYusb8wKx;7TklHfmuZdYT9pDRLwd1p_t-DFpWpyA+8(
+zwKtZg3J4a0aCM3_X(ZL&4g;46VVk5e$K;z;L99|b@aE%v^S$rQ8)h(Vm@cB9IYc+2
+z2SHd4^NwTIGE%w>9S05p1#kf90Sj5Z(jG8}+)IZIp~iXK=T&)dL`%d-q*8aR#mq{7
+z9`=6;Dr(H0ACe72R5x?!)^86Qj-X%{+!K9iZNA@*wkBAV&iZ(l^I9?!Gz=S2I_*1d
+zr+tTQDHjvyzKnw(hu00yX`u!Fv<!~XVcX?@kr#<B0(gGU?$W{gSsQa}CF^8Cfzp2X
+z@P}yDV-bci(K9XL$FU!som2C`c)?Uc&294s^}Wzumap{hg1X^jN|V25M5tQZ=<9lN
+z%(zKz#t-qCwHKb;HygOCpvCNL_4@1tXV1YGf^XUE_$zr{g8zWh-6gz-teI(eibtxo
+z?0OZI4%rU0741PgUD`2xq@H|*4=+Rs?%N)Ox5G+q>C;DilBe_YlkeSUVHA-crNk+k
+jtiF_MudA<CB(}8|fqYwCf3re&=&@_s761P#-ID$TwgmBa
+
+literal 0
+HcmV?d00001
+
+diff --git a/roms/Makefile b/roms/Makefile
+index d3a32283591..3726f06fe7e 100644
+--- a/roms/Makefile
++++ b/roms/Makefile
+@@ -34,6 +34,7 @@ find-cross-gcc = $(firstword $(wildcard $(patsubst %ld,%gcc,$(call find-cross-ld
+ # finally strip off path + toolname so we get the prefix
+ find-cross-prefix = $(subst gcc,,$(notdir $(call find-cross-gcc,$(1))))
  
- struct XlnxZCU102 {
-     MachineState parent_obj;
-@@ -34,6 +35,8 @@ struct XlnxZCU102 {
-     bool secure;
-     bool virt;
++arm_cross_prefix := $(call find-cross-prefix,arm)
+ powerpc64_cross_prefix := $(call find-cross-prefix,powerpc64)
+ powerpc_cross_prefix := $(call find-cross-prefix,powerpc)
+ x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
+@@ -63,6 +64,7 @@ default help:
+ 	@echo "  skiboot            -- update skiboot.lid"
+ 	@echo "  u-boot.e500        -- update u-boot.e500"
+ 	@echo "  u-boot.sam460      -- update u-boot.sam460"
++	@echo "  npcm7xx_bootrom    -- update vbootrom for npcm7xx"
+ 	@echo "  efi                -- update UEFI (edk2) platform firmware"
+ 	@echo "  opensbi32-generic  -- update OpenSBI for 32-bit generic machine"
+ 	@echo "  opensbi64-generic  -- update OpenSBI for 64-bit generic machine"
+@@ -185,6 +187,10 @@ bios-microvm:
+ 	$(MAKE) -C qboot
+ 	cp qboot/bios.bin ../pc-bios/bios-microvm.bin
  
-+    CanBusState *canbus[XLNX_ZYNQMP_NUM_CAN];
++npcm7xx_bootrom:
++	$(MAKE) -C vbootrom CROSS_COMPILE=$(arm_cross_prefix)
++	cp vbootrom/npcm7xx_bootrom.bin ../pc-bios/npcm7xx_bootrom.bin
 +
-     struct arm_boot_info binfo;
- };
- typedef struct XlnxZCU102 XlnxZCU102;
-@@ -127,6 +130,14 @@ static void xlnx_zcu102_init(MachineState *machine)
-     object_property_set_bool(OBJECT(&s->soc), "virtualization", s->virt,
-                              &error_fatal);
- 
-+    for (i = 0; i < XLNX_ZYNQMP_NUM_CAN; i++) {
-+        gchar *bus_name = g_strdup_printf("canbus%d", i);
-+
-+        object_property_set_link(OBJECT(&s->soc), bus_name,
-+                                 OBJECT(s->canbus[i]), &error_fatal);
-+        g_free(bus_name);
-+    }
-+
-     qdev_realize(DEVICE(&s->soc), NULL, &error_fatal);
- 
-     /* Create and plug in the SD cards */
-@@ -222,6 +233,15 @@ static void xlnx_zcu102_machine_instance_init(Object *obj)
-                                     "Set on/off to enable/disable emulating a "
-                                     "guest CPU which implements the ARM "
-                                     "Virtualization Extensions");
-+    object_property_add_link(obj, "xlnx-zcu102.canbus0", TYPE_CAN_BUS,
-+                             (Object **)&s->canbus[0],
-+                             object_property_allow_set_link,
-+                             0);
-+
-+    object_property_add_link(obj, "xlnx-zcu102.canbus1", TYPE_CAN_BUS,
-+                             (Object **)&s->canbus[1],
-+                             object_property_allow_set_link,
-+                             0);
- }
- 
- static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index 7885bb17745..881847255b4 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -81,6 +81,14 @@ static const int uart_intr[XLNX_ZYNQMP_NUM_UARTS] = {
-     21, 22,
- };
- 
-+static const uint64_t can_addr[XLNX_ZYNQMP_NUM_CAN] = {
-+    0xFF060000, 0xFF070000,
-+};
-+
-+static const int can_intr[XLNX_ZYNQMP_NUM_CAN] = {
-+    23, 24,
-+};
-+
- static const uint64_t sdhci_addr[XLNX_ZYNQMP_NUM_SDHCI] = {
-     0xFF160000, 0xFF170000,
- };
-@@ -243,6 +251,11 @@ static void xlnx_zynqmp_init(Object *obj)
-                                 TYPE_CADENCE_UART);
-     }
- 
-+    for (i = 0; i < XLNX_ZYNQMP_NUM_CAN; i++) {
-+        object_initialize_child(obj, "can[*]", &s->can[i],
-+                                TYPE_XLNX_ZYNQMP_CAN);
-+    }
-+
-     object_initialize_child(obj, "sata", &s->sata, TYPE_SYSBUS_AHCI);
- 
-     for (i = 0; i < XLNX_ZYNQMP_NUM_SDHCI; i++) {
-@@ -482,6 +495,23 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-                            gic_spi[uart_intr[i]]);
-     }
- 
-+    for (i = 0; i < XLNX_ZYNQMP_NUM_CAN; i++) {
-+        object_property_set_int(OBJECT(&s->can[i]), "ext_clk_freq",
-+                                XLNX_ZYNQMP_CAN_REF_CLK, &error_abort);
-+
-+        object_property_set_link(OBJECT(&s->can[i]), "canbus",
-+                                 OBJECT(s->canbus[i]), &error_fatal);
-+
-+        sysbus_realize(SYS_BUS_DEVICE(&s->can[i]), &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        sysbus_mmio_map(SYS_BUS_DEVICE(&s->can[i]), 0, can_addr[i]);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->can[i]), 0,
-+                           gic_spi[can_intr[i]]);
-+    }
-+
-     object_property_set_int(OBJECT(&s->sata), "num-ports", SATA_NUM_PORTS,
-                             &error_abort);
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->sata), errp)) {
-@@ -619,6 +649,10 @@ static Property xlnx_zynqmp_props[] = {
-     DEFINE_PROP_BOOL("has_rpu", XlnxZynqMPState, has_rpu, false),
-     DEFINE_PROP_LINK("ddr-ram", XlnxZynqMPState, ddr_ram, TYPE_MEMORY_REGION,
-                      MemoryRegion *),
-+    DEFINE_PROP_LINK("canbus0", XlnxZynqMPState, canbus[0], TYPE_CAN_BUS,
-+                     CanBusState *),
-+    DEFINE_PROP_LINK("canbus1", XlnxZynqMPState, canbus[1], TYPE_CAN_BUS,
-+                     CanBusState *),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
+ clean:
+ 	rm -rf seabios/.config seabios/out seabios/builds
+ 	$(MAKE) -C sgabios clean
+@@ -198,3 +204,4 @@ clean:
+ 	$(MAKE) -f Makefile.edk2 clean
+ 	$(MAKE) -C opensbi clean
+ 	$(MAKE) -C qboot clean
++	$(MAKE) -C vbootrom clean
+diff --git a/roms/vbootrom b/roms/vbootrom
+new file mode 160000
+index 00000000000..0c37a43527f
+--- /dev/null
++++ b/roms/vbootrom
+@@ -0,0 +1 @@
++Subproject commit 0c37a43527f0ee2b9584e7fb2fdc805e902635ac
 -- 
 2.20.1
 
