@@ -2,89 +2,89 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0089CC43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 17:06:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E379C43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 17:10:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61F7C217BA
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 17:06:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0802206F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 17:10:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e/B2j5zQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61F7C217BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gPriTDAe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0802206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHrvy-0001l1-54
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 13:06:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41960)
+	id 1kHrzO-0004kE-Qv
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 13:10:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44510)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHqI2-0005EF-BD; Mon, 14 Sep 2020 11:21:10 -0400
-Received: from mail-lj1-x234.google.com ([2a00:1450:4864:20::234]:43465)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHqHy-0002R0-UN; Mon, 14 Sep 2020 11:21:10 -0400
-Received: by mail-lj1-x234.google.com with SMTP id u4so18973890ljd.10;
- Mon, 14 Sep 2020 08:21:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=wiBPlbHq0ocqw4fuwVjBBbjEGqDi4667VPPjPjKXhg4=;
- b=e/B2j5zQ6aPAhIwzTxD1NSYWa8hF1przpbOMS+8b8d09Y1stXYm6JWmx353lJA4F8l
- EuFkxcRI4BP2+t+WJH9uipowKd7c8l+hruQ2VS7sVekuUEM11GRAzlCIFtJAbVtysFO0
- 9Kbj8TbhuUtPQn4t78qgVNDMQzYKEMKqmiZInabhO0LZ6gKaoMtfkRugVbSD8v0e3QlP
- iJE+cuHlQOqriRfO3KrODkCVIgH155PfNSfSb1x9t6oVdov/q9MqMXEKg5IdKEYMkFJj
- fc8gfyU/ebf+tBNfGzLEORWRaNBrnKgQYxT2/Lh2NBB1ypsu8v6M9t4SavJCQ59ix/bS
- 0O0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=wiBPlbHq0ocqw4fuwVjBBbjEGqDi4667VPPjPjKXhg4=;
- b=lAuE4t3avn6mZIOyTVMR9LkzB7UVgd65ZPUdmL2yqO4+PpF+qPbxMt48OIshTvMAbA
- i/kKAxbj3hKQz7uIgce9SWiiHBTWmDfIPjEYD4GSRoQ5o5fv7TOGPvFvkyBn8M4aN2vf
- lIRI3KfmsIUOKK4nIlO9DET31iNQs19Qw4bpY5yiXGM45hortZIKoq6Xu0uv+zQSw7Kf
- 5rvPppLC1Hgq1EBC0eyLAMMVjFhhziR7n4rbD5Hp49zmho6Xy0Xzxf24fjguRqK+DKeO
- cCRr+3p0y0TneT/AnSFpQGfgj5lFqk6AR0XKD35mkvPYRKntRdgStfh//hrrD0/3MdVy
- T09w==
-X-Gm-Message-State: AOAM53221HR1IGb3JzJExadnV0ZYyUItT1NmOw3xRvmrMhHZ+8Pj1ET3
- RUueUOryU6dRCXjJyf1zq5esdtB3cvL5x4LPo/g=
-X-Google-Smtp-Source: ABdhPJwVnaaK/ZOtZDnYp0SvyhzRI9Wda2J6G00UTL5mzVUtz3ODlHZNvy4wfpPdxX0BcpOP0j5yh6MH60BTMAxLzPo=
-X-Received: by 2002:a2e:86d3:: with SMTP id n19mr5654600ljj.368.1600096864173; 
- Mon, 14 Sep 2020 08:21:04 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kHqRo-0004HN-BI
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 11:31:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23168
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kHqRk-00043X-FC
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 11:31:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600097470;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZmMdYiFCnBjr19tsO940l5aeEeesspiUHNNge/SuhsM=;
+ b=gPriTDAeVJMA5mxF19gxWdEFkH6B0g6JEVpd/f10QAyChjk06qe2rRlxVv7LuDPlIw7YxM
+ heKE31z0UJ/c+bWin7qGf6Nm6MWp0smlNyYYTi2Ig03SF4U9QRRYuK7tko3oSsCEkMleJ5
+ kjOkh2pmBqE5Zia78aiJfg00TC7xAlU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-45-ON5GpyUqNMeCiIMl6UfuBA-1; Mon, 14 Sep 2020 11:31:05 -0400
+X-MC-Unique: ON5GpyUqNMeCiIMl6UfuBA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE170191E2B8;
+ Mon, 14 Sep 2020 15:30:45 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
+ [10.36.114.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 154F775139;
+ Mon, 14 Sep 2020 15:30:45 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 91D5D113864A; Mon, 14 Sep 2020 17:30:43 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH v7 09/13] qmp: Move dispatcher to a coroutine
+References: <20200909151149.490589-1-kwolf@redhat.com>
+ <20200909151149.490589-10-kwolf@redhat.com>
+Date: Mon, 14 Sep 2020 17:30:43 +0200
+In-Reply-To: <20200909151149.490589-10-kwolf@redhat.com> (Kevin Wolf's message
+ of "Wed, 9 Sep 2020 17:11:45 +0200")
+Message-ID: <87imcgml3w.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-References: <20200912224431.1428-1-luoyonggang@gmail.com>
- <20200912224431.1428-12-luoyonggang@gmail.com>
- <c6ed5abf-2c71-bded-7efc-33baa0b415af@redhat.com>
- <CAE2XoE-mFPm=chadNahHgCsa3tSjxRXMH3te29ODV=emWdLjYA@mail.gmail.com>
- <d6dd1c31-4bf0-3fd0-4c32-7216c8b3435c@redhat.com>
- <CAFEAcA98VD2f3TQBDrfFv4swwu2Txhs2KXXKiHgFGsN7P_B3AQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA98VD2f3TQBDrfFv4swwu2Txhs2KXXKiHgFGsN7P_B3AQ@mail.gmail.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Mon, 14 Sep 2020 23:20:52 +0800
-Message-ID: <CAE2XoE_mD-0=1-9cLrQAqxsX4J1Ji9mV6pVSg6+JqmEdtzuUfA@mail.gmail.com>
-Subject: Re: [PATCH v8 11/27] meson: Use -b to ignore CR vs. CR-LF issues on
- Windows
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="0000000000003206ff05af4795a2"
-Received-SPF: pass client-ip=2a00:1450:4864:20::234;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x234.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 01:36:47
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -38
+X-Spam_score: -3.9
+X-Spam_bar: ---
+X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,167 +98,456 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Ed Maste <emaste@freebsd.org>, Qemu-block <qemu-block@nongnu.org>,
- Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>,
- Peter Lieven <pl@kamp.de>, qemu-level <qemu-devel@nongnu.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Max Reitz <mreitz@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Wen Congyang <wencongyang2@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Li-Wen Hsu <lwhsu@freebsd.org>, Markus Armbruster <armbru@redhat.com>
+Cc: stefanha@redhat.com, marcandre.lureau@gmail.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000003206ff05af4795a2
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Kevin Wolf <kwolf@redhat.com> writes:
 
-On Mon, Sep 14, 2020 at 10:41 PM Peter Maydell <peter.maydell@linaro.org>
-wrote:
-
-> On Sun, 13 Sep 2020 at 19:51, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com>
-> wrote:
-> >
-> > On 9/13/20 6:01 PM, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
-> > >
-> > >
-> > > On Sun, Sep 13, 2020 at 11:35 PM Philippe Mathieu-Daud=C3=A9
-> > > <philmd@redhat.com <mailto:philmd@redhat.com>> wrote:
-> > >
-> > >     On 9/13/20 12:44 AM, Yonggang Luo wrote:
-> > >     > On windows, a difference in line endings causes testsuite
-> failures
-> > >     > complaining that every single line in files such as
-> > >     > 'tests/qapi-schemadoc-good.texi' is wrong.  Fix it by adding -b
-> to
-> > >     diff.
-> > >
-> > >     Isn't '--strip-trailing-cr' more adapted?
-> > >
-> > > er, I did that before.....
-> >
-> > So, yes/no? We can not follow all patches, so better if you
-> > add a note about your changes, either in the patch description
-> > if you think it's worthwhile keeping that information in the
-> > git history, else below the '---' separator, so that information
-> > is stripped from the patch when applying.
-> >
-> > Looking at the archive I see Thomas said this option is not
-> > POSIX thus not portable.
-> >
-> > What about adding this?
-> >
-> > "Ideally we would use the '--strip-trailing-cr' option, but not
-> > being POSIX is a portability problem (i.e. BSDs and Solaris
-> > based OSes). Instead use the '-b' option which, although doing
-> > slightly more, produce the expected result on Windows."
+> This moves the QMP dispatcher to a coroutine and runs all QMP command
+> handlers that declare 'coroutine': true in coroutine context so they
+> can avoid blocking the main loop while doing I/O or waiting for other
+> events.
 >
-> The other important point to note here is that because
-> texi output is mostly not case-sensitive, we are not
-> losing important test coverage by not checking for exact
-> whitespace matches between the known-good output and
-> the generated output. If we were checking the doc-good.out
-> text file, -b would be bad because there whitespace is
-> important and is part of what we need to be checking.
+> For commands that are not declared safe to run in a coroutine, the
+> dispatcher drops out of coroutine context by calling the QMP command
+> handler from a bottom half.
 >
-> (Also the texi stuff is going to go away soon I hope :-))
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  include/qapi/qmp/dispatch.h |   1 +
+>  monitor/monitor-internal.h  |   6 +-
+>  monitor/monitor.c           |  55 +++++++++++++---
+>  monitor/qmp.c               | 122 +++++++++++++++++++++++++++---------
+>  qapi/qmp-dispatch.c         |  61 ++++++++++++++++--
+>  qapi/qmp-registry.c         |   3 +
+>  util/aio-posix.c            |   8 ++-
+>  7 files changed, 210 insertions(+), 46 deletions(-)
 >
-So continue with -b are accepted? or I just diable it on win32?
+> diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+> index 9fd2b720a7..af8d96c570 100644
+> --- a/include/qapi/qmp/dispatch.h
+> +++ b/include/qapi/qmp/dispatch.h
+> @@ -31,6 +31,7 @@ typedef enum QmpCommandOptions
+>  typedef struct QmpCommand
+>  {
+>      const char *name;
+> +    /* Runs in coroutine context if QCO_COROUTINE is set */
+>      QmpCommandFunc *fn;
+>      QmpCommandOptions options;
+>      QTAILQ_ENTRY(QmpCommand) node;
+> diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
+> index b39e03b744..b55d6df07f 100644
+> --- a/monitor/monitor-internal.h
+> +++ b/monitor/monitor-internal.h
+> @@ -155,7 +155,9 @@ static inline bool monitor_is_qmp(const Monitor *mon)
+>  
+>  typedef QTAILQ_HEAD(MonitorList, Monitor) MonitorList;
+>  extern IOThread *mon_iothread;
+> -extern QEMUBH *qmp_dispatcher_bh;
+> +extern Coroutine *qmp_dispatcher_co;
+> +extern bool qmp_dispatcher_co_shutdown;
+> +extern bool qmp_dispatcher_co_busy;
+>  extern QmpCommandList qmp_commands, qmp_cap_negotiation_commands;
+>  extern QemuMutex monitor_lock;
+>  extern MonitorList mon_list;
+> @@ -173,7 +175,7 @@ void monitor_fdsets_cleanup(void);
+>  
+>  void qmp_send_response(MonitorQMP *mon, const QDict *rsp);
+>  void monitor_data_destroy_qmp(MonitorQMP *mon);
+> -void monitor_qmp_bh_dispatcher(void *data);
+> +void coroutine_fn monitor_qmp_dispatcher_co(void *data);
+>  
+>  int get_monitor_def(int64_t *pval, const char *name);
+>  void help_cmd(Monitor *mon, const char *name);
+> diff --git a/monitor/monitor.c b/monitor/monitor.c
+> index 629aa073ee..ac2722bf91 100644
+> --- a/monitor/monitor.c
+> +++ b/monitor/monitor.c
+> @@ -55,8 +55,32 @@ typedef struct {
+>  /* Shared monitor I/O thread */
+>  IOThread *mon_iothread;
+>  
+> -/* Bottom half to dispatch the requests received from I/O thread */
+> -QEMUBH *qmp_dispatcher_bh;
+> +/* Coroutine to dispatch the requests received from I/O thread */
+> +Coroutine *qmp_dispatcher_co;
+> +
+> +/* Set to true when the dispatcher coroutine should terminate */
+> +bool qmp_dispatcher_co_shutdown;
+> +
+> +/*
+> + * qmp_dispatcher_co_busy is used for synchronisation between the
+> + * monitor thread and the main thread to ensure that the dispatcher
+> + * coroutine never gets scheduled a second time when it's already
+> + * scheduled (scheduling the same coroutine twice is forbidden).
+> + *
+> + * It is true if the coroutine is active and processing requests.
+> + * Additional requests may then be pushed onto mon->qmp_requests,
+> + * and @qmp_dispatcher_co_shutdown may be set without further ado.
+> + * @qmp_dispatcher_co_busy must not be woken up in this case.
+> + *
+> + * If false, you also have to set @qmp_dispatcher_co_busy to true and
+> + * wake up @qmp_dispatcher_co after pushing the new requests.
+> + *
+> + * The coroutine will automatically change this variable back to false
+> + * before it yields.  Nobody else may set the variable to false.
+> + *
+> + * Access must be atomic for thread safety.
+> + */
+> +bool qmp_dispatcher_co_busy;
+>  
+>  /*
+>   * Protects mon_list, monitor_qapi_event_state, coroutine_mon,
+> @@ -623,9 +647,24 @@ void monitor_cleanup(void)
+>      }
+>      qemu_mutex_unlock(&monitor_lock);
+>  
+> -    /* QEMUBHs needs to be deleted before destroying the I/O thread */
+> -    qemu_bh_delete(qmp_dispatcher_bh);
+> -    qmp_dispatcher_bh = NULL;
+> +    /*
+> +     * The dispatcher needs to stop before destroying the I/O thread.
+> +     *
+> +     * We need to poll both qemu_aio_context and iohandler_ctx to make
+> +     * sure that the dispatcher coroutine keeps making progress and
+> +     * eventually terminates.  qemu_aio_context is automatically
+> +     * polled by calling AIO_WAIT_WHILE on it, but we must poll
+> +     * iohandler_ctx manually.
+> +     */
+> +    qmp_dispatcher_co_shutdown = true;
+> +    if (!atomic_xchg(&qmp_dispatcher_co_busy, true)) {
+> +        aio_co_wake(qmp_dispatcher_co);
+> +    }
+> +
+> +    AIO_WAIT_WHILE(qemu_get_aio_context(),
+> +                   (aio_poll(iohandler_get_aio_context(), false),
+> +                    atomic_mb_read(&qmp_dispatcher_co_busy)));
+> +
+>      if (mon_iothread) {
+>          iothread_destroy(mon_iothread);
+>          mon_iothread = NULL;
+> @@ -649,9 +688,9 @@ void monitor_init_globals_core(void)
+>       * have commands assuming that context.  It would be nice to get
+>       * rid of those assumptions.
+>       */
+> -    qmp_dispatcher_bh = aio_bh_new(iohandler_get_aio_context(),
+> -                                   monitor_qmp_bh_dispatcher,
+> -                                   NULL);
+> +    qmp_dispatcher_co = qemu_coroutine_create(monitor_qmp_dispatcher_co, NULL);
+> +    atomic_mb_set(&qmp_dispatcher_co_busy, true);
+> +    aio_co_schedule(iohandler_get_aio_context(), qmp_dispatcher_co);
+>  }
+>  
+>  int monitor_init(MonitorOptions *opts, bool allow_hmp, Error **errp)
+> diff --git a/monitor/qmp.c b/monitor/qmp.c
+> index 922fdb5541..69f6e93f38 100644
+> --- a/monitor/qmp.c
+> +++ b/monitor/qmp.c
+> @@ -133,6 +133,10 @@ static void monitor_qmp_respond(MonitorQMP *mon, QDict *rsp)
+>      }
+>  }
+>  
+> +/*
+> + * Runs outside of coroutine context for OOB commands, but in
+> + * coroutine context for everything else.
+> + */
+>  static void monitor_qmp_dispatch(MonitorQMP *mon, QObject *req)
+>  {
+>      QDict *rsp;
+> @@ -205,43 +209,99 @@ static QMPRequest *monitor_qmp_requests_pop_any_with_lock(void)
+>      return req_obj;
+>  }
+>  
+> -void monitor_qmp_bh_dispatcher(void *data)
+> +void coroutine_fn monitor_qmp_dispatcher_co(void *data)
+>  {
+> -    QMPRequest *req_obj = monitor_qmp_requests_pop_any_with_lock();
+> +    QMPRequest *req_obj = NULL;
+>      QDict *rsp;
+>      bool need_resume;
+>      MonitorQMP *mon;
+>  
+> -    if (!req_obj) {
+> -        return;
+> -    }
+> +    while (true) {
+> +        assert(atomic_mb_read(&qmp_dispatcher_co_busy) == true);
+>  
+> -    mon = req_obj->mon;
+> -    /*  qmp_oob_enabled() might change after "qmp_capabilities" */
+> -    need_resume = !qmp_oob_enabled(mon) ||
+> -        mon->qmp_requests->length == QMP_REQ_QUEUE_LEN_MAX - 1;
+> -    qemu_mutex_unlock(&mon->qmp_queue_lock);
+> -    if (req_obj->req) {
+> -        QDict *qdict = qobject_to(QDict, req_obj->req);
+> -        QObject *id = qdict ? qdict_get(qdict, "id") : NULL;
+> -        trace_monitor_qmp_cmd_in_band(qobject_get_try_str(id) ?: "");
+> -        monitor_qmp_dispatch(mon, req_obj->req);
+> -    } else {
+> -        assert(req_obj->err);
+> -        rsp = qmp_error_response(req_obj->err);
+> -        req_obj->err = NULL;
+> -        monitor_qmp_respond(mon, rsp);
+> -        qobject_unref(rsp);
+> -    }
+> +        /*
+> +         * Mark the dispatcher as not busy already here so that we
+> +         * don't miss any new requests coming in the middle of our
+> +         * processing.
+> +         */
+> +        atomic_mb_set(&qmp_dispatcher_co_busy, false);
+> +
+> +        while (!(req_obj = monitor_qmp_requests_pop_any_with_lock())) {
+> +            /*
+> +             * No more requests to process.  Wait to be reentered from
+> +             * handle_qmp_command() when it pushes more requests, or
+> +             * from monitor_cleanup() when it requests shutdown.
+> +             */
+> +            if (!qmp_dispatcher_co_shutdown) {
+> +                qemu_coroutine_yield();
+> +
+> +                /*
+> +                 * busy must be set to true again by whoever
+> +                 * rescheduled us to avoid double scheduling
+> +                 */
+> +                assert(atomic_xchg(&qmp_dispatcher_co_busy, false) == true);
+> +            }
+> +
+> +            /*
+> +             * qmp_dispatcher_co_shutdown may have changed if we
+> +             * yielded and were reentered from monitor_cleanup()
+> +             */
+> +            if (qmp_dispatcher_co_shutdown) {
+> +                return;
+> +            }
+> +        }
+>  
+> -    if (need_resume) {
+> -        /* Pairs with the monitor_suspend() in handle_qmp_command() */
+> -        monitor_resume(&mon->common);
+> -    }
+> -    qmp_request_free(req_obj);
+> +        if (atomic_xchg(&qmp_dispatcher_co_busy, true) == true) {
+> +            /*
+> +             * Someone rescheduled us (probably because a new requests
+> +             * came in), but we didn't actually yield. Do that now,
+> +             * only to be immediately reentered and removed from the
+> +             * list of scheduled coroutines.
+> +             */
+> +            qemu_coroutine_yield();
+> +        }
+>  
+> -    /* Reschedule instead of looping so the main loop stays responsive */
+> -    qemu_bh_schedule(qmp_dispatcher_bh);
+> +        /*
+> +         * Move the coroutine from iohandler_ctx to qemu_aio_context for
+> +         * executing the command handler so that it can make progress if it
+> +         * involves an AIO_WAIT_WHILE().
+> +         */
+> +        aio_co_schedule(qemu_get_aio_context(), qmp_dispatcher_co);
+> +        qemu_coroutine_yield();
+> +
+> +        mon = req_obj->mon;
+> +        /* qmp_oob_enabled() might change after "qmp_capabilities" */
+> +        need_resume = !qmp_oob_enabled(mon) ||
+> +            mon->qmp_requests->length == QMP_REQ_QUEUE_LEN_MAX - 1;
+> +        qemu_mutex_unlock(&mon->qmp_queue_lock);
+> +        if (req_obj->req) {
+> +            QDict *qdict = qobject_to(QDict, req_obj->req);
+> +            QObject *id = qdict ? qdict_get(qdict, "id") : NULL;
+> +            trace_monitor_qmp_cmd_in_band(qobject_get_try_str(id) ?: "");
+> +            monitor_qmp_dispatch(mon, req_obj->req);
+> +        } else {
+> +            assert(req_obj->err);
+> +            rsp = qmp_error_response(req_obj->err);
+> +            req_obj->err = NULL;
+> +            monitor_qmp_respond(mon, rsp);
+> +            qobject_unref(rsp);
+> +        }
+> +
+> +        if (need_resume) {
+> +            /* Pairs with the monitor_suspend() in handle_qmp_command() */
+> +            monitor_resume(&mon->common);
+> +        }
+> +        qmp_request_free(req_obj);
+> +
+> +        /*
+> +         * Yield and reschedule so the main loop stays responsive.
+> +         *
+> +         * Move back to iohandler_ctx so that nested event loops for
+> +         * qemu_aio_context don't start new monitor commands.
+> +         */
+> +        aio_co_schedule(iohandler_get_aio_context(), qmp_dispatcher_co);
+> +        qemu_coroutine_yield();
+> +    }
+>  }
+>  
+>  static void handle_qmp_command(void *opaque, QObject *req, Error *err)
+> @@ -302,7 +362,9 @@ static void handle_qmp_command(void *opaque, QObject *req, Error *err)
+>      qemu_mutex_unlock(&mon->qmp_queue_lock);
+>  
+>      /* Kick the dispatcher routine */
+> -    qemu_bh_schedule(qmp_dispatcher_bh);
+> +    if (!atomic_xchg(&qmp_dispatcher_co_busy, true)) {
+> +        aio_co_wake(qmp_dispatcher_co);
+> +    }
+>  }
+>  
+>  static void monitor_qmp_read(void *opaque, const uint8_t *buf, int size)
+> diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+> index 5677ba92ca..754f7b854c 100644
+> --- a/qapi/qmp-dispatch.c
+> +++ b/qapi/qmp-dispatch.c
+> @@ -12,12 +12,16 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +
+> +#include "block/aio.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qmp/dispatch.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/qjson.h"
+>  #include "sysemu/runstate.h"
+>  #include "qapi/qmp/qbool.h"
+> +#include "qemu/coroutine.h"
+> +#include "qemu/main-loop.h"
+>  
+>  static QDict *qmp_dispatch_check_obj(QDict *dict, bool allow_oob,
+>                                       Error **errp)
+> @@ -88,6 +92,30 @@ bool qmp_is_oob(const QDict *dict)
+>          && !qdict_haskey(dict, "execute");
+>  }
+>  
+> +typedef struct QmpDispatchBH {
+> +    const QmpCommand *cmd;
+> +    Monitor *cur_mon;
+> +    QDict *args;
+> +    QObject **ret;
+> +    Error **errp;
+> +    Coroutine *co;
+> +} QmpDispatchBH;
+> +
+> +static void do_qmp_dispatch_bh(void *opaque)
+> +{
+> +    QmpDispatchBH *data = opaque;
+> +
+> +    assert(monitor_cur() == NULL);
+> +    monitor_set_cur(qemu_coroutine_self(), data->cur_mon);
+> +    data->cmd->fn(data->args, data->ret, data->errp);
+> +    monitor_set_cur(qemu_coroutine_self(), NULL);
+> +    aio_co_wake(data->co);
+> +}
+> +
+> +/*
+> + * Runs outside of coroutine context for OOB commands, but in coroutine
+> + * context for everything else.
+> + */
+>  QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
+>                      bool allow_oob, Monitor *cur_mon)
+>  {
+> @@ -153,12 +181,35 @@ QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
+>          qobject_ref(args);
+>      }
+>  
+> +    assert(!(oob && qemu_in_coroutine()));
+>      assert(monitor_cur() == NULL);
+> -    monitor_set_cur(qemu_coroutine_self(), cur_mon);
+> -
+> -    cmd->fn(args, &ret, &err);
+> -
+> -    monitor_set_cur(qemu_coroutine_self(), NULL);
+> +    if (!!(cmd->options & QCO_COROUTINE) == qemu_in_coroutine()) {
+> +        monitor_set_cur(qemu_coroutine_self(), cur_mon);
+> +        cmd->fn(args, &ret, &err);
+> +        monitor_set_cur(qemu_coroutine_self(), NULL);
+> +    } else {
+> +        /*
+> +         * Not being in coroutine context implies that we're handling
+> +         * an OOB command, which must not have QCO_COROUTINE.
+> +         *
+> +         * This implies that we are in coroutine context, but the
+> +         * command doesn't have QCO_COROUTINE. We must drop out of
+> +         * coroutine context for this one.
+> +         */
 
->
-> thanks
-> -- PMM
->
+I had to read this several times to get it.  The first sentence leads me
+into coroutine context, and then the next sentence tells me the
+opposite, throwing me into confusion.
 
+Perhaps something like this:
 
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
+           /*
+            * Actual context doesn't match the one the command needs.
+            * Case 1: we are in coroutine context, but command does not
+            * have QCO_COROUTINE.  We need to drop out of coroutine
+            * context for executing it.
+            * Case 2: we are outside coroutine context, but command has
+            * QCO_COROUTINE.  Can't actually happen, because we get here
+            * outside coroutine context only when executing a command
+            * out of band, and OOB commands never have QCO_COROUTINE.
+            */
 
---0000000000003206ff05af4795a2
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> +        assert(!oob && qemu_in_coroutine() && !(cmd->options & QCO_COROUTINE));
+> +
+> +        QmpDispatchBH data = {
+> +            .cur_mon    = cur_mon,
+> +            .cmd        = cmd,
+> +            .args       = args,
+> +            .ret        = &ret,
+> +            .errp       = &err,
+> +            .co         = qemu_coroutine_self(),
+> +        };
+> +        aio_bh_schedule_oneshot(qemu_get_aio_context(), do_qmp_dispatch_bh,
+> +                                &data);
+> +        qemu_coroutine_yield();
+> +    }
+>      qobject_unref(args);
+>      if (err) {
+>          /* or assert(!ret) after reviewing all handlers: */
+> diff --git a/qapi/qmp-registry.c b/qapi/qmp-registry.c
+> index d0f9a1d3e3..58c65b5052 100644
+> --- a/qapi/qmp-registry.c
+> +++ b/qapi/qmp-registry.c
+> @@ -20,6 +20,9 @@ void qmp_register_command(QmpCommandList *cmds, const char *name,
+>  {
+>      QmpCommand *cmd = g_malloc0(sizeof(*cmd));
+>  
+> +    /* QCO_COROUTINE and QCO_ALLOW_OOB are incompatible for now */
+> +    assert(!((options & QCO_COROUTINE) && (options & QCO_ALLOW_OOB)));
+> +
+>      cmd->name = name;
+>      cmd->fn = fn;
+>      cmd->enabled = true;
+> diff --git a/util/aio-posix.c b/util/aio-posix.c
+> index f7f13ebfc2..30bb21d699 100644
+> --- a/util/aio-posix.c
+> +++ b/util/aio-posix.c
+> @@ -15,6 +15,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "block/block.h"
+> +#include "qemu/main-loop.h"
+>  #include "qemu/rcu.h"
+>  #include "qemu/rcu_queue.h"
+>  #include "qemu/sockets.h"
+> @@ -558,8 +559,13 @@ bool aio_poll(AioContext *ctx, bool blocking)
+>       * There cannot be two concurrent aio_poll calls for the same AioContext (or
+>       * an aio_poll concurrent with a GSource prepare/check/dispatch callback).
+>       * We rely on this below to avoid slow locked accesses to ctx->notify_me.
+> +     *
+> +     * aio_poll() may only be called in the AioContext's thread. iohandler_ctx
+> +     * is special in that it runs in the main thread, but that thread's context
+> +     * is qemu_aio_context.
+>       */
+> -    assert(in_aio_context_home_thread(ctx));
+> +    assert(in_aio_context_home_thread(ctx == iohandler_get_aio_context() ?
+> +                                      qemu_get_aio_context() : ctx));
+>  
+>      qemu_lockcnt_inc(&ctx->list_lock);
 
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Mon, Sep 14, 2020 at 10:41 PM Pete=
-r Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org">peter.maydell@lin=
-aro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"=
-margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-lef=
-t:1ex">On Sun, 13 Sep 2020 at 19:51, Philippe Mathieu-Daud=C3=A9 &lt;<a hre=
-f=3D"mailto:philmd@redhat.com" target=3D"_blank">philmd@redhat.com</a>&gt; =
-wrote:<br>
-&gt;<br>
-&gt; On 9/13/20 6:01 PM, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:<b=
-r>
-&gt; &gt;<br>
-&gt; &gt;<br>
-&gt; &gt; On Sun, Sep 13, 2020 at 11:35 PM Philippe Mathieu-Daud=C3=A9<br>
-&gt; &gt; &lt;<a href=3D"mailto:philmd@redhat.com" target=3D"_blank">philmd=
-@redhat.com</a> &lt;mailto:<a href=3D"mailto:philmd@redhat.com" target=3D"_=
-blank">philmd@redhat.com</a>&gt;&gt; wrote:<br>
-&gt; &gt;<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0On 9/13/20 12:44 AM, Yonggang Luo wrote:<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt; On windows, a difference in line endings =
-causes testsuite failures<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt; complaining that every single line in fil=
-es such as<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt; &#39;tests/qapi-schemadoc-good.texi&#39; =
-is wrong.=C2=A0 Fix it by adding -b to<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0diff.<br>
-&gt; &gt;<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0Isn&#39;t &#39;--strip-trailing-cr&#39; more a=
-dapted?<br>
-&gt; &gt;<br>
-&gt; &gt; er, I did that before.....<br>
-&gt;<br>
-&gt; So, yes/no? We can not follow all patches, so better if you<br>
-&gt; add a note about your changes, either in the patch description<br>
-&gt; if you think it&#39;s worthwhile keeping that information in the<br>
-&gt; git history, else below the &#39;---&#39; separator, so that informati=
-on<br>
-&gt; is stripped from the patch when applying.<br>
-&gt;<br>
-&gt; Looking at the archive I see Thomas said this option is not<br>
-&gt; POSIX thus not portable.<br>
-&gt;<br>
-&gt; What about adding this?<br>
-&gt;<br>
-&gt; &quot;Ideally we would use the &#39;--strip-trailing-cr&#39; option, b=
-ut not<br>
-&gt; being POSIX is a portability problem (i.e. BSDs and Solaris<br>
-&gt; based OSes). Instead use the &#39;-b&#39; option which, although doing=
-<br>
-&gt; slightly more, produce the expected result on Windows.&quot;<br>
-<br>
-The other important point to note here is that because<br>
-texi output is mostly not case-sensitive, we are not<br>
-losing important test coverage by not checking for exact<br>
-whitespace matches between the known-good output and<br>
-the generated output. If we were checking the doc-good.out<br>
-text file, -b would be bad because there whitespace is<br>
-important and is part of what we need to be checking.<br>
-<br>
-(Also the texi stuff is going to go away soon I hope :-))<br></blockquote><=
-div>So continue with -b are accepted? or I just diable it on win32?=C2=A0</=
-div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bor=
-der-left:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-thanks<br>
--- PMM<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
-=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
-=A0 sincerely,<br>Yonggang Luo<br></div></div>
-
---0000000000003206ff05af4795a2--
 
