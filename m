@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CB3CC43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 23:03:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE460C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 23:03:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF7E3206E9
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 23:03:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B090206E9
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 23:03:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vqoIS1eK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF7E3206E9
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qTn+S/sj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B090206E9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHxVa-0002Qz-UW
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 19:03:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33650)
+	id 1kHxVc-0002YG-DU
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 19:03:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33666)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kHxUI-0000tO-Qo
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 19:02:18 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:40536)
+ id 1kHxUK-0000vO-ED
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 19:02:20 -0400
+Received: from mail-pl1-x629.google.com ([2607:f8b0:4864:20::629]:37588)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kHxUG-0006Zy-Jy
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 19:02:18 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id gf14so715287pjb.5
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 16:02:16 -0700 (PDT)
+ id 1kHxUI-0006aM-G7
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 19:02:20 -0400
+Received: by mail-pl1-x629.google.com with SMTP id u9so291839plk.4
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 16:02:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ALNSa/DecTe4W9DwCQMu8Ql5AeR22CfvyUrSkBl9Tqk=;
- b=vqoIS1eKFJXtgotvd5r7DVGjlJBlYJMiRum3qi6cx9mGs/mgZrX9fP7NDA+t9gIa81
- VSgUuQ4SRIkb8qNOTxl/+nHXeBT4svi64WQFg1JAsP6Bk/P4v5yRt2ePLg5glfx7UYOJ
- zbBOwUvuh6VUim56o/Dzq5bTSb7xxjHSAN25Coz7+Rnixx5ioFALR0h0mpUT67ENarS0
- Vg+KAUuM1+UZbXbWxn5KqgCIyDIlacYIMR+kBaMflj2h1iemv2F7ABbRjG7RGOTRL0om
- Rx8fAxVQVbNXzl//fJDb+DNuhjSf8xeBp74Pwi++/0hnCzIIxl5V5O4wXxTwnUxT79Bk
- 9m1g==
+ bh=O5tftEr4wcy+EcfeUo13CTd2wMJ9pZ9l7p7m81TmeOA=;
+ b=qTn+S/sjqQ+bcsb9+z9xX43/4W5MQf8c1MFy681kjsJKBX/ZmlhK7gv3eR1XbFgL5x
+ 6KbcCG11Coru2vGjy83Mp151pXdYE1rwINqEnZVJbiM3sTwDlIIV4JqzBnt1svcXImAl
+ ww18dF9bx0MNyiFO8slYHfgnBvMMrJEkjiMoFzjtAgdgp1TuHxzYNkALW7rX+GcAZ7yv
+ LN1wF6fdQo0nzllTVU/mkh3D9MUMmHS59t/OeirPkJbbppXfcEOY+Sk4r7X7NLG0vI9H
+ BK0Q/knDK1RXcJGwVWVXTt/RJxO7xERnh2pnzvfNMs0b0t5Nx4wOqtjL4O9HpHchCCpw
+ 3Jhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ALNSa/DecTe4W9DwCQMu8Ql5AeR22CfvyUrSkBl9Tqk=;
- b=ddIfsT2SqG1ahd+6dJ5p3YYMbxYaJZDzvY4FoWecpe8o2TdWZ/NodMqzQKtA2zZFg5
- ZxKZpnejqLkHhk3L1cX/hEHF9JhWqsvZKeJHxTdALerQoqmODNe59w2Le0Cn+F+Hsnmc
- 8C9UrintCNsARZhJln4C3IwROUDUbL1tEiaBGR9yoFCn9Hnbf1/jsTQVKl5B/ji1+rS9
- bCpeObShP1SgNEactHV11y+ix68bRJavBkw4b0K2vZmR9J+aW8x+yJdw/Qqr42W7NvjV
- YP0z+owayMRvRwd2892MhqxcyJ/GOghGlhNnOWKeH48kJc4uWXrUPxVp4XuyrR2u5k3W
- +hhg==
-X-Gm-Message-State: AOAM5303mUV9LMfWit0N5jEfvbPSzeUr3hwI7Z+cE19JYiWwfWcXry/H
- pHjW1m+mPrreHVWDzFvzQUmyRwkR/ni7Dg==
-X-Google-Smtp-Source: ABdhPJy4QQ7Z4nTZM1HHDp+Uc4KiSEsWUyXiUzoGlXUWSthRp9szo7AZDx08damRl8irUr+KrYenUA==
-X-Received: by 2002:a17:90a:71c7:: with SMTP id
- m7mr1516364pjs.190.1600124534393; 
- Mon, 14 Sep 2020 16:02:14 -0700 (PDT)
+ bh=O5tftEr4wcy+EcfeUo13CTd2wMJ9pZ9l7p7m81TmeOA=;
+ b=KUNN8p5xGCeamHXMIUvnhnHoSAY6nwAz/qHVuoLWZdXKUcKDjOeXvXV15TdXy0n+19
+ Ql2ILkwYhUtId3RdRKrN7sFq7dT+QuhUPzvQCC7gUYXHWIsSiJikXc5SamcYcOj0p31g
+ CKlxutypZB1naoGevp7iVlApoGiT7rY1A4YFhooiV9ACVBnViFOvtmrIgGBoxEeW47HM
+ VHiNWMGmgN0LNE3RfEVhxPkzuV8XDO4Q8fm4IgoKBJw2QJ1mFKeUsCOfIAG37OS2HPYQ
+ /jRQgWRAyOyLOnoL13qwMXZ8nTXtngQRi98zq0KFHraKbRVM2LjqpRaNEUdFudk2idZh
+ LGHQ==
+X-Gm-Message-State: AOAM532Gr8ZvP2AL3US50QxykcmZ7cxk0vdfLcVrdrdcrueMpuEakMMZ
+ oltLI1fmEOe9+sXT2QgDqfr7hZyHmm+DEQ==
+X-Google-Smtp-Source: ABdhPJzrkjSX1h6oiG0Xnlnrqml3KjeMjvm4yWFcU/it+hYB+lGo3PMvzYl1VrDItX8DE9m4sfiqEA==
+X-Received: by 2002:a17:90a:5304:: with SMTP id
+ x4mr1400156pjh.16.1600124536586; 
+ Mon, 14 Sep 2020 16:02:16 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id l23sm9106076pgt.16.2020.09.14.16.02.13
+ by smtp.gmail.com with ESMTPSA id l23sm9106076pgt.16.2020.09.14.16.02.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Sep 2020 16:02:13 -0700 (PDT)
+ Mon, 14 Sep 2020 16:02:15 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 01/10] capstone: Convert Makefile bits to meson bits
-Date: Mon, 14 Sep 2020 16:02:01 -0700
-Message-Id: <20200914230210.2185860-2-richard.henderson@linaro.org>
+Subject: [PATCH v2 03/10] disas: Move host asm annotations to tb_gen_code
+Date: Mon, 14 Sep 2020 16:02:03 -0700
+Message-Id: <20200914230210.2185860-4-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200914230210.2185860-1-richard.henderson@linaro.org>
 References: <20200914230210.2185860-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1044.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::629;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x629.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -100,338 +100,241 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, luoyonggang@gmail.com,
- alex.bennee@linaro.org, thuth@redhat.com
+Cc: luoyonggang@gmail.com, alex.bennee@linaro.org, thuth@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There are better ways to do this, e.g. meson cmake subproject,
-but that requires cmake 3.7 and some of our CI environments
-only provide cmake 3.5.
+Instead of creating GStrings and passing them into log_disas,
+just print the annotations directly in tb_gen_code.
 
-Nor can we add a meson.build file to capstone/, because the git
-submodule would then always report "untracked files".  Fixing that
-would require creating our own branch on the qemu git mirror, at
-which point we could just as easily create a native meson subproject.
-
-Instead, build the library via the main meson.build.
-
-This improves the current state of affairs in that we will re-link
-the qemu executables against a changed libcapstone.a, which we wouldn't
-do before-hand.  In addition, the use of the confuration header file
-instead of command-line -DEFINES means that we will rebuild the
-capstone objects with changes to meson.build.
+Fix the annotations for the slow paths of the TB, after the
+part implementing the final guest instruction.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-v2: Further reduce probing in configure (paolo),
-    Drop state 'internal' and use 'git' even when it isn't git.
-    Move CONFIG_CAPSTONE to config_host_data.
----
- configure         |  61 +++-----------------------
- Makefile          |  16 -------
- meson.build       | 109 +++++++++++++++++++++++++++++++++++++++++++---
- meson_options.txt |   4 ++
- 4 files changed, 113 insertions(+), 77 deletions(-)
+ include/disas/disas.h     |  2 +-
+ include/exec/log.h        |  4 ++--
+ accel/tcg/translate-all.c | 24 +++++++++++++++---------
+ disas.c                   | 29 +++++++++--------------------
+ tcg/tcg.c                 |  4 ++--
+ 5 files changed, 29 insertions(+), 34 deletions(-)
 
-diff --git a/configure b/configure
-index ce27eafb0a..1fd80ed699 100755
---- a/configure
-+++ b/configure
-@@ -469,7 +469,7 @@ opengl=""
- opengl_dmabuf="no"
- cpuid_h="no"
- avx2_opt=""
--capstone=""
-+capstone="auto"
- lzo=""
- snappy=""
- bzip2=""
-@@ -1573,7 +1573,7 @@ for opt do
-   ;;
-   --enable-capstone) capstone="yes"
-   ;;
--  --enable-capstone=git) capstone="git"
-+  --enable-capstone=git) capstone="internal"
-   ;;
-   --enable-capstone=system) capstone="system"
-   ;;
-@@ -5124,51 +5124,11 @@ fi
- # capstone
+diff --git a/include/disas/disas.h b/include/disas/disas.h
+index 1b6e035e32..36c33f6f19 100644
+--- a/include/disas/disas.h
++++ b/include/disas/disas.h
+@@ -7,7 +7,7 @@
+ #include "cpu.h"
  
- case "$capstone" in
--  "" | yes)
--    if $pkg_config capstone; then
--      capstone=system
--    elif test -e "${source_path}/.git" && test $git_update = 'yes' ; then
--      capstone=git
--    elif test -e "${source_path}/capstone/Makefile" ; then
--      capstone=internal
--    elif test -z "$capstone" ; then
--      capstone=no
--    else
--      feature_not_found "capstone" "Install capstone devel or git submodule"
--    fi
--    ;;
--
--  system)
--    if ! $pkg_config capstone; then
--      feature_not_found "capstone" "Install capstone devel"
--    fi
--    ;;
--esac
--
--case "$capstone" in
--  git | internal)
--    if test "$capstone" = git; then
-+  auto | yes | internal)
-+    # Simpler to always update submodule, even if not needed.
-+    if test -e "${source_path}/.git" && test $git_update = 'yes' ; then
-       git_submodules="${git_submodules} capstone"
-     fi
--    mkdir -p capstone
--    if test "$mingw32" = "yes"; then
--      LIBCAPSTONE=capstone.lib
--    else
--      LIBCAPSTONE=libcapstone.a
--    fi
--    capstone_libs="-Lcapstone -lcapstone"
--    capstone_cflags="-I${source_path}/capstone/include"
--    ;;
--
--  system)
--    capstone_libs="$($pkg_config --libs capstone)"
--    capstone_cflags="$($pkg_config --cflags capstone)"
--    ;;
--
--  no)
--    ;;
--  *)
--    error_exit "Unknown state for capstone: $capstone"
-     ;;
- esac
+ /* Disassemble this for me please... (debugging). */
+-void disas(FILE *out, void *code, unsigned long size, const char *note);
++void disas(FILE *out, void *code, unsigned long size);
+ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
+                   target_ulong size);
  
-@@ -7288,11 +7248,6 @@ fi
- if test "$ivshmem" = "yes" ; then
-   echo "CONFIG_IVSHMEM=y" >> $config_host_mak
- fi
--if test "$capstone" != "no" ; then
--  echo "CONFIG_CAPSTONE=y" >> $config_host_mak
--  echo "CAPSTONE_CFLAGS=$capstone_cflags" >> $config_host_mak
--  echo "CAPSTONE_LIBS=$capstone_libs" >> $config_host_mak
--fi
- if test "$debug_mutex" = "yes" ; then
-   echo "CONFIG_DEBUG_MUTEX=y" >> $config_host_mak
- fi
-@@ -7816,9 +7771,6 @@ done # for target in $targets
- if [ "$fdt" = "git" ]; then
-   subdirs="$subdirs dtc"
- fi
--if [ "$capstone" = "git" -o "$capstone" = "internal" ]; then
--  subdirs="$subdirs capstone"
--fi
- echo "SUBDIRS=$subdirs" >> $config_host_mak
- if test -n "$LIBCAPSTONE"; then
-   echo "LIBCAPSTONE=$LIBCAPSTONE" >> $config_host_mak
-@@ -8005,7 +7957,8 @@ NINJA=${ninja:-$PWD/ninjatool} $meson setup \
-         -Db_coverage=$(if test "$gcov" = yes; then echo true; else echo false; fi) \
- 	-Dsdl=$sdl -Dsdl_image=$sdl_image \
- 	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
--	-Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f\
-+	-Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f \
-+	-Dcapstone=$capstone \
-         $cross_arg \
-         "$PWD" "$source_path"
- 
-diff --git a/Makefile b/Makefile
-index 7c60b9dcb8..f3da1760ad 100644
---- a/Makefile
-+++ b/Makefile
-@@ -156,22 +156,6 @@ dtc/all: .git-submodule-status dtc/libfdt
- dtc/%: .git-submodule-status
- 	@mkdir -p $@
- 
--# Overriding CFLAGS causes us to lose defines added in the sub-makefile.
--# Not overriding CFLAGS leads to mis-matches between compilation modes.
--# Therefore we replicate some of the logic in the sub-makefile.
--# Remove all the extra -Warning flags that QEMU uses that Capstone doesn't;
--# no need to annoy QEMU developers with such things.
--CAP_CFLAGS = $(patsubst -W%,,$(CFLAGS) $(QEMU_CFLAGS)) $(CAPSTONE_CFLAGS)
--CAP_CFLAGS += -DCAPSTONE_USE_SYS_DYN_MEM
--CAP_CFLAGS += -DCAPSTONE_HAS_ARM
--CAP_CFLAGS += -DCAPSTONE_HAS_ARM64
--CAP_CFLAGS += -DCAPSTONE_HAS_POWERPC
--CAP_CFLAGS += -DCAPSTONE_HAS_X86
--
--.PHONY: capstone/all
--capstone/all: .git-submodule-status
--	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=no BUILDDIR="$(BUILD_DIR)/capstone" CC="$(CC)" AR="$(AR)" LD="$(LD)" RANLIB="$(RANLIB)" CFLAGS="$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(BUILD_DIR)/capstone/$(LIBCAPSTONE))
--
- .PHONY: slirp/all
- slirp/all: .git-submodule-status
- 	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/slirp		\
-diff --git a/meson.build b/meson.build
-index 690723b470..df7d2eb52f 100644
---- a/meson.build
-+++ b/meson.build
-@@ -10,6 +10,7 @@ else
-   keyval = import('unstable-keyval')
- endif
- ss = import('sourceset')
-+fs = import('fs')
- 
- sh = find_program('sh')
- cc = meson.get_compiler('c')
-@@ -415,11 +416,6 @@ if 'CONFIG_USB_LIBUSB' in config_host
-   libusb = declare_dependency(compile_args: config_host['LIBUSB_CFLAGS'].split(),
-                               link_args: config_host['LIBUSB_LIBS'].split())
- endif
--capstone = not_found
--if 'CONFIG_CAPSTONE' in config_host
--  capstone = declare_dependency(compile_args: config_host['CAPSTONE_CFLAGS'].split(),
--                                link_args: config_host['CAPSTONE_LIBS'].split())
--endif
- libpmem = not_found
- if 'CONFIG_LIBPMEM' in config_host
-   libpmem = declare_dependency(compile_args: config_host['LIBPMEM_CFLAGS'].split(),
-@@ -476,7 +472,6 @@ foreach k, v: config_host
-     config_host_data.set(k, v == 'y' ? 1 : v)
-   endif
- endforeach
--genh += configure_file(output: 'config-host.h', configuration: config_host_data)
- 
- minikconf = find_program('scripts/minikconf.py')
- config_all_devices = {}
-@@ -616,6 +611,106 @@ config_all += {
-   'CONFIG_ALL': true,
+diff --git a/include/exec/log.h b/include/exec/log.h
+index 3ed797c1c8..fcc7b9e00b 100644
+--- a/include/exec/log.h
++++ b/include/exec/log.h
+@@ -56,13 +56,13 @@ static inline void log_target_disas(CPUState *cpu, target_ulong start,
+     rcu_read_unlock();
  }
  
-+capstone = not_found
-+capstone_opt = get_option('capstone')
-+if capstone_opt == 'no'
-+  capstone_opt = false
-+elif capstone_opt in ['yes', 'auto', 'system']
-+  have_internal = fs.exists('capstone/Makefile')
-+  capstone = dependency('capstone', static: enable_static,
-+                        required: capstone_opt == 'system' or
-+                                  capstone_opt == 'yes' and not have_internal)
-+  if capstone.found()
-+    capstone_opt = 'system'
-+  elif have_internal
-+    capstone_opt = 'internal'
-+  else
-+    capstone_opt = false
-+  endif
-+endif
-+if capstone_opt == 'internal'
-+  capstone_data = configuration_data()
-+  capstone_data.set('CAPSTONE_USE_SYS_DYN_MEM', '1')
+-static inline void log_disas(void *code, unsigned long size, const char *note)
++static inline void log_disas(void *code, unsigned long size)
+ {
+     QemuLogFile *logfile;
+     rcu_read_lock();
+     logfile = atomic_rcu_read(&qemu_logfile);
+     if (logfile) {
+-        disas(logfile->fd, code, size, note);
++        disas(logfile->fd, code, size);
+     }
+     rcu_read_unlock();
+ }
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 2d83013633..2874104a6a 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -1815,10 +1815,9 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+         qemu_log_in_addr_range(tb->pc)) {
+         FILE *logfile = qemu_log_lock();
+         int code_size, data_size = 0;
+-        g_autoptr(GString) note = g_string_new("[tb header & initial instruction]");
+-        size_t chunk_start = 0;
++        size_t chunk_start;
+         int insn = 0;
+-        qemu_log("OUT: [size=%d]\n", gen_code_size);
 +
-+  capstone_files = files(
-+    'capstone/cs.c',
-+    'capstone/MCInst.c',
-+    'capstone/MCInstrDesc.c',
-+    'capstone/MCRegisterInfo.c',
-+    'capstone/SStream.c',
-+    'capstone/utils.c'
-+  )
-+
-+  if 'CONFIG_ARM_DIS' in config_all_disas
-+    capstone_data.set('CAPSTONE_HAS_ARM', '1')
-+    capstone_files += files(
-+      'capstone/arch/ARM/ARMDisassembler.c',
-+      'capstone/arch/ARM/ARMInstPrinter.c',
-+      'capstone/arch/ARM/ARMMapping.c',
-+      'capstone/arch/ARM/ARMModule.c'
-+    )
-+  endif
-+
-+  # FIXME: This config entry currently depends on a c++ compiler.
-+  # Which is needed for building libvixl, but not for capstone.
-+  if 'CONFIG_ARM_A64_DIS' in config_all_disas
-+    capstone_data.set('CAPSTONE_HAS_ARM64', '1')
-+    capstone_files += files(
-+      'capstone/arch/AArch64/AArch64BaseInfo.c',
-+      'capstone/arch/AArch64/AArch64Disassembler.c',
-+      'capstone/arch/AArch64/AArch64InstPrinter.c',
-+      'capstone/arch/AArch64/AArch64Mapping.c',
-+      'capstone/arch/AArch64/AArch64Module.c'
-+    )
-+  endif
-+
-+  if 'CONFIG_PPC_DIS' in config_all_disas
-+    capstone_data.set('CAPSTONE_HAS_POWERPC', '1')
-+    capstone_files += files(
-+      'capstone/arch/PowerPC/PPCDisassembler.c',
-+      'capstone/arch/PowerPC/PPCInstPrinter.c',
-+      'capstone/arch/PowerPC/PPCMapping.c',
-+      'capstone/arch/PowerPC/PPCModule.c'
-+    )
-+  endif
-+
-+  if 'CONFIG_I386_DIS' in config_all_disas
-+    capstone_data.set('CAPSTONE_HAS_X86', 1)
-+    capstone_files += files(
-+      'capstone/arch/X86/X86Disassembler.c',
-+      'capstone/arch/X86/X86DisassemblerDecoder.c',
-+      'capstone/arch/X86/X86ATTInstPrinter.c',
-+      'capstone/arch/X86/X86IntelInstPrinter.c',
-+      'capstone/arch/X86/X86Mapping.c',
-+      'capstone/arch/X86/X86Module.c'
-+    )
-+  endif
-+
-+  configure_file(output: 'capstone-defs.h', configuration: capstone_data)
-+
-+  capstone_cargs = [
-+    # FIXME: There does not seem to be a way to completely replace the c_args
-+    # that come from add_project_arguments() -- we can only add to them.
-+    # So: disable all warnings with a big hammer.
-+    '-Wno-error', '-w',
-+
-+    # Include all configuration defines via a header file, which will wind up
-+    # as a dependency on the object file, and thus changes here will result
-+    # in a rebuild.
-+    '-include', 'capstone-defs.h'
-+  ]
-+
-+  libcapstone = static_library('capstone',
-+                               sources: capstone_files,
-+                               c_args: capstone_cargs,
-+                               include_directories: 'capstone/include')
-+  capstone = declare_dependency(link_with: libcapstone,
-+                                include_directories: 'capstone/include')
-+endif
-+config_host_data.set('CONFIG_CAPSTONE', capstone.found())
-+
-+genh += configure_file(output: 'config-host.h', configuration: config_host_data)
-+
- # Generators
+         if (tcg_ctx->data_gen_ptr) {
+             code_size = tcg_ctx->data_gen_ptr - tb->tc.ptr;
+             data_size = gen_code_size - code_size;
+@@ -1827,26 +1826,33 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+         }
  
- hxtool = find_program('scripts/hxtool')
-@@ -1518,7 +1613,7 @@ summary_info += {'vvfat support':     config_host.has_key('CONFIG_VVFAT')}
- summary_info += {'qed support':       config_host.has_key('CONFIG_QED')}
- summary_info += {'parallels support': config_host.has_key('CONFIG_PARALLELS')}
- summary_info += {'sheepdog support':  config_host.has_key('CONFIG_SHEEPDOG')}
--summary_info += {'capstone':          config_host.has_key('CONFIG_CAPSTONE')}
-+summary_info += {'capstone':          capstone_opt}
- summary_info += {'libpmem support':   config_host.has_key('CONFIG_LIBPMEM')}
- summary_info += {'libdaxctl support': config_host.has_key('CONFIG_LIBDAXCTL')}
- summary_info += {'libudev':           config_host.has_key('CONFIG_LIBUDEV')}
-diff --git a/meson_options.txt b/meson_options.txt
-index 543cf70043..f6a1b8ad21 100644
---- a/meson_options.txt
-+++ b/meson_options.txt
-@@ -22,3 +22,7 @@ option('vnc_sasl', type : 'feature', value : 'auto',
-        description: 'SASL authentication for VNC server')
- option('xkbcommon', type : 'feature', value : 'auto',
-        description: 'xkbcommon support')
+         /* Dump header and the first instruction */
++        qemu_log("OUT: [size=%d]\n", gen_code_size);
++        qemu_log("  -- guest addr 0x" TARGET_FMT_lx " + tb prologue\n",
++                 tcg_ctx->gen_insn_data[insn][0]);
+         chunk_start = tcg_ctx->gen_insn_end_off[insn];
+-        log_disas(tb->tc.ptr, chunk_start, note->str);
++        log_disas(tb->tc.ptr, chunk_start);
+ 
+         /*
+          * Dump each instruction chunk, wrapping up empty chunks into
+          * the next instruction. The whole array is offset so the
+          * first entry is the beginning of the 2nd instruction.
+          */
+-        while (insn <= tb->icount && chunk_start < code_size) {
++        while (insn < tb->icount) {
+             size_t chunk_end = tcg_ctx->gen_insn_end_off[insn];
+             if (chunk_end > chunk_start) {
+-                g_string_printf(note, "[guest addr: " TARGET_FMT_lx "]",
+-                                tcg_ctx->gen_insn_data[insn][0]);
+-                log_disas(tb->tc.ptr + chunk_start, chunk_end - chunk_start,
+-                          note->str);
++                qemu_log("  -- guest addr 0x" TARGET_FMT_lx "\n",
++                         tcg_ctx->gen_insn_data[insn][0]);
++                log_disas(tb->tc.ptr + chunk_start, chunk_end - chunk_start);
+                 chunk_start = chunk_end;
+             }
+             insn++;
+         }
+ 
++        if (chunk_start < code_size) {
++            qemu_log("  -- tb slow paths + alignment\n");
++            log_disas(tb->tc.ptr + chunk_start, code_size - chunk_start);
++        }
 +
-+option('capstone', type: 'combo', value: 'no',
-+       choices: ['no', 'yes', 'auto', 'system', 'internal'],
-+       description: 'Whether and how to find the capstone library')
+         /* Finally dump any data we may have after the block */
+         if (data_size) {
+             int i;
+diff --git a/disas.c b/disas.c
+index c1397d3933..a4304e8137 100644
+--- a/disas.c
++++ b/disas.c
+@@ -262,8 +262,7 @@ static void cap_dump_insn_units(disassemble_info *info, cs_insn *insn,
+     }
+ }
+ 
+-static void cap_dump_insn(disassemble_info *info, cs_insn *insn,
+-                          const char *note)
++static void cap_dump_insn(disassemble_info *info, cs_insn *insn)
+ {
+     fprintf_function print = info->fprintf_func;
+     int i, n, split;
+@@ -284,11 +283,7 @@ static void cap_dump_insn(disassemble_info *info, cs_insn *insn,
+     }
+ 
+     /* Print the actual instruction.  */
+-    print(info->stream, "  %-8s %s", insn->mnemonic, insn->op_str);
+-    if (note) {
+-        print(info->stream, "\t\t%s", note);
+-    }
+-    print(info->stream, "\n");
++    print(info->stream, "  %-8s %s\n", insn->mnemonic, insn->op_str);
+ 
+     /* Dump any remaining part of the insn on subsequent lines.  */
+     for (i = split; i < n; i += split) {
+@@ -320,7 +315,7 @@ static bool cap_disas_target(disassemble_info *info, uint64_t pc, size_t size)
+         size -= tsize;
+ 
+         while (cs_disasm_iter(handle, &cbuf, &csize, &pc, insn)) {
+-            cap_dump_insn(info, insn, NULL);
++            cap_dump_insn(info, insn);
+         }
+ 
+         /* If the target memory is not consumed, go back for more... */
+@@ -349,8 +344,7 @@ static bool cap_disas_target(disassemble_info *info, uint64_t pc, size_t size)
+ }
+ 
+ /* Disassemble SIZE bytes at CODE for the host.  */
+-static bool cap_disas_host(disassemble_info *info, void *code, size_t size,
+-                           const char *note)
++static bool cap_disas_host(disassemble_info *info, void *code, size_t size)
+ {
+     csh handle;
+     const uint8_t *cbuf;
+@@ -366,8 +360,7 @@ static bool cap_disas_host(disassemble_info *info, void *code, size_t size,
+     pc = (uintptr_t)code;
+ 
+     while (cs_disasm_iter(handle, &cbuf, &size, &pc, insn)) {
+-        cap_dump_insn(info, insn, note);
+-        note = NULL;
++        cap_dump_insn(info, insn);
+     }
+     if (size != 0) {
+         (*info->fprintf_func)(info->stream,
+@@ -411,7 +404,7 @@ static bool cap_disas_monitor(disassemble_info *info, uint64_t pc, int count)
+         csize += tsize;
+ 
+         if (cs_disasm_iter(handle, &cbuf, &csize, &pc, insn)) {
+-            cap_dump_insn(info, insn, NULL);
++            cap_dump_insn(info, insn);
+             if (--count <= 0) {
+                 break;
+             }
+@@ -425,7 +418,7 @@ static bool cap_disas_monitor(disassemble_info *info, uint64_t pc, int count)
+ #endif /* !CONFIG_USER_ONLY */
+ #else
+ # define cap_disas_target(i, p, s)  false
+-# define cap_disas_host(i, p, s, n)  false
++# define cap_disas_host(i, p, s)  false
+ # define cap_disas_monitor(i, p, c)  false
+ # define cap_disas_plugin(i, p, c) false
+ #endif /* CONFIG_CAPSTONE */
+@@ -595,7 +588,7 @@ char *plugin_disas(CPUState *cpu, uint64_t addr, size_t size)
+ }
+ 
+ /* Disassemble this for me please... (debugging). */
+-void disas(FILE *out, void *code, unsigned long size, const char *note)
++void disas(FILE *out, void *code, unsigned long size)
+ {
+     uintptr_t pc;
+     int count;
+@@ -673,7 +666,7 @@ void disas(FILE *out, void *code, unsigned long size, const char *note)
+     print_insn = print_insn_hppa;
+ #endif
+ 
+-    if (s.info.cap_arch >= 0 && cap_disas_host(&s.info, code, size, note)) {
++    if (s.info.cap_arch >= 0 && cap_disas_host(&s.info, code, size)) {
+         return;
+     }
+ 
+@@ -683,10 +676,6 @@ void disas(FILE *out, void *code, unsigned long size, const char *note)
+     for (pc = (uintptr_t)code; size > 0; pc += count, size -= count) {
+         fprintf(out, "0x%08" PRIxPTR ":  ", pc);
+         count = print_insn(pc, &s.info);
+-        if (note) {
+-            fprintf(out, "\t\t%s", note);
+-            note = NULL;
+-        }
+         fprintf(out, "\n");
+         if (count < 0) {
+             break;
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index 62f299e36e..9a111ce604 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -1101,7 +1101,7 @@ void tcg_prologue_init(TCGContext *s)
+             size_t data_size = prologue_size - code_size;
+             size_t i;
+ 
+-            log_disas(buf0, code_size, NULL);
++            log_disas(buf0, code_size);
+ 
+             for (i = 0; i < data_size; i += sizeof(tcg_target_ulong)) {
+                 if (sizeof(tcg_target_ulong) == 8) {
+@@ -1115,7 +1115,7 @@ void tcg_prologue_init(TCGContext *s)
+                 }
+             }
+         } else {
+-            log_disas(buf0, prologue_size, NULL);
++            log_disas(buf0, prologue_size);
+         }
+         qemu_log("\n");
+         qemu_log_flush();
 -- 
 2.25.1
 
