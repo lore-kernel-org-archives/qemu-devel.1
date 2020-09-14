@@ -2,76 +2,80 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 527B0C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 22:41:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFC6EC43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 23:03:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A85A820732
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 22:41:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 56D2F206E9
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 23:03:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PAjDkflS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A85A820732
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JOB+HAtx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56D2F206E9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHxAV-0002LP-KK
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 18:41:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58280)
+	id 1kHxVW-0002GL-8k
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 19:03:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33616)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHx9U-0001uW-QM
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 18:40:48 -0400
-Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:46151)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kHxUH-0000sx-67
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 19:02:17 -0400
+Received: from mail-pf1-x42f.google.com ([2607:f8b0:4864:20::42f]:40801)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHx9R-00047N-Px
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 18:40:48 -0400
-Received: by mail-ej1-x643.google.com with SMTP id z23so2161739ejr.13
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 15:40:42 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kHxUF-0006Zk-1Q
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 19:02:16 -0400
+Received: by mail-pf1-x42f.google.com with SMTP id x123so788069pfc.7
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 16:02:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=O/2e9hILLquDY/vf6zAoasgy7+Dqn8zRzQpwlQE6unE=;
- b=PAjDkflSMsTxxzzS69KyUDCIzckwEj1AV8LZ+zUY2SbJlEcE8XtZleklC7+3trWd3C
- aGT0ITP9P0IuUNcyOh1541/C+8il/xKNLDaDqNsRP9qG+7uJegALlLiiSIZSS/1rHdGt
- yEKS8RsdvLWwXsI9ku2Hnix6EdyXh8wxmcHwF2w3BgL2N9A2D9cfGuX540PMJlUgz9Io
- 4lKym4sO2GYUt4jC2V2AsvcUxlu+c3Y8TrA/f1vKvR2Sn1ljPzd+Qn6rouXsCdLeFLBs
- FJ4f2cCb0+M7HcE3ycHZ/us/CN3OQqAekBANsiV4CsSoqaxAzmfkIXz92nesNCppcUzY
- +KpA==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=b044IQlDRKwrZCBpWAifgPS5Su17ECHz8Bxv35VbyP0=;
+ b=JOB+HAtx48jE2uZkhJcrkytG8xZJFmSs2jeoo5BRWTrqQLpgbzfasFFroqOY6dqR5N
+ f2kvvB8FFACtvZE+wUYWnmZWC1HvjjrV+cq4GYIlGhHECt+yQdjdCARtb0e28AgmLyBi
+ GjXMEnfXU96oc7t/TEjgoMve6M0jORLASaCLCdYM8JLsReaP2MQOJ9e4qdLZXFRiXFwg
+ Vy1niVhnpqbYweFvfPIPYSQ26gdFyq0sJJhwmcG1Rsau0Vr/yW2zS4uczWubckrsqZYX
+ w92w4xNUyX3vlhCWN3nmraSvvGvtlRHuM/SIBVQW+L3M6xDKQRhcTgPPXPF2ZtSulQXs
+ hXzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=O/2e9hILLquDY/vf6zAoasgy7+Dqn8zRzQpwlQE6unE=;
- b=DHKx9Ip/mb+tq/JoAcpFerDyblgrz0GsgYjJMG7u7cPxmxLsOyA6eX8A+RGtpHGXXS
- ieAqWYgysEXBkSfsyN+FhRKjXoie5c1HBGGiG0fbLh1kPlOLOwHkYP192aEZkNRH4Va9
- 5QOJewPElNjpuXlgCrkZJuYFc1n/SVqvr1Kx+QTDCspVsZkSyIcbHrGBDIvXBYk3EWF1
- jdjFooeMd4To2zhlHQjcJ+/7Uud87MlYWfm27I6QBdyswRtFcvWQ2UmUzAXGVMhF7OUS
- ifhsW18TBQn0Mmd9iyjYQJ1vll/KUWVJprPCdbWjxIe47spEKnnRLWQCIM9X8GiVqzhe
- RZmw==
-X-Gm-Message-State: AOAM530iWExLou17JIWLs8qkfE2xEu0uk6sHEJPLjpbLLLILg/oOL1UM
- IogMhccdGfVSMaWcK546UM8VMhahHVspD8VR9Z1JBQ==
-X-Google-Smtp-Source: ABdhPJzZCuIa2RTy6EupiLTD8Ry/O4qRT1UzyLMVc0PV/UdjgxuQNoDCjb0CiHn9PXDgG4mTkmfyDo5RbBBQ3mwYrfw=
-X-Received: by 2002:a17:906:1f42:: with SMTP id
- d2mr16524183ejk.407.1600123241548; 
- Mon, 14 Sep 2020 15:40:41 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=b044IQlDRKwrZCBpWAifgPS5Su17ECHz8Bxv35VbyP0=;
+ b=nR5Ga7ok1QGI872bowFX858L3jaP4tZT9kxT+vIhWklv8TbtzIHrXnEcb1ghrdddT3
+ 4TVrd8vEfvOThXT0Zv9nt7XN+1i6t9A3ts2pOcXc/fhMjrSHH7UO37nRWNwE7s1P0+wG
+ oZ4wtzLLghaAMuzhmi8S3iTAzmjYmA66eWR5wg6UtX/legfVo974jAm9Vrbikx0ArWxL
+ QkLXh3WsUgIYV2f/QQekg8Y2gZhLDg8h/X5rPWY8PX7kKIit27jydvi+RrzyeIM/qQQN
+ pB6YbEk0CkL+jVdehn7W0WFX25Oc7syIzYhkSY7nGIApM5dOhMRji1h0nAYNcurcUn2W
+ nvlg==
+X-Gm-Message-State: AOAM531UNhFZsyQvMSSjV80Aa+T2fc0WR4plK4hvHO1vjXWauG8jpfKK
+ iOqZb5N1snpRTXXSvM5xefWu6xzyX4C2CQ==
+X-Google-Smtp-Source: ABdhPJyntEmKE4ihJ8n0hDtb7LwnpZ1ZTa9CFbxbszsNx26yi0uu/uo0AELHmTmascmH2wXdEG/10A==
+X-Received: by 2002:a63:a4d:: with SMTP id z13mr5964085pgk.247.1600124533028; 
+ Mon, 14 Sep 2020 16:02:13 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id l23sm9106076pgt.16.2020.09.14.16.02.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 14 Sep 2020 16:02:12 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 00/10] capstone + disassembler patches
+Date: Mon, 14 Sep 2020 16:02:00 -0700
+Message-Id: <20200914230210.2185860-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20200914195821.GA571133@localhost.localdomain>
-In-Reply-To: <20200914195821.GA571133@localhost.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 Sep 2020 23:40:30 +0100
-Message-ID: <CAFEAcA_122rB0NQMnfjRdxBBrMUiFSfgFUZqhbCNzu757aqx7w@mail.gmail.com>
-Subject: Re: question regarding vexpress and aarch64 secure boot
-To: Thomas Meyer <thomas@m3y3r.de>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::643;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x643.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::42f;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x42f.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -93,61 +97,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: luoyonggang@gmail.com, alex.bennee@linaro.org, thuth@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 14 Sep 2020 at 20:59, Thomas Meyer <thomas@m3y3r.de> wrote:
-> When trying to boot an linux kernel with
->
-> qemu-system-aarch64 -s -S -kernel /path/to/kernel -append
-> "console=ttyAMA0 loglevel=9 nokaslr" -dtb /path/to/dtb -M vexpress-a15 -cpu cortex-a53 -nographic
+The primary change here is the update for capstone to meson.
+This bypasses capstone's build system entirely.  There's more
+commentary on that subject with the first patch.
 
-This is trying to boot the vexpress-a15 board, which uses a Cortex-A15,
-with a Cortex-A53, which is a different CPU and not compatible
-with it at all (in particular it is 64 bits).
+Plus a collection of other fixes and cleanups in the area.
 
-Unfortunately a lot of our boards don't really sanity check user
-arguments; it would be more userfriendly in this case to simply
-forbid anything other than '-cpu cortex-a15' (which is the default
-anyway).
+Changes for v2:
+  * Several configury changes in patch 1, along the lines
+    of that suggested by Paolo, but not exactly the same.
+  * Drop sparc capstone enablement (I suddenly have a memory
+    of doing the same thing last year).
 
-The general rule of thumb for arm board models is: don't try
-to specify the CPU for anything except the 'virt' board,
-just use the default. Almost all of them are models of
-specific bits of hardware which did not have pluggable CPUs
-and which won't work if you try to use a different CPU type.
 
-> I do hit the assertion:
-> qemu-system-aarch64: /builddir/build/BUILD/qemu-4.2.1/hw/arm/boot.c:742: do_cpu_reset: Assertion `!info->secure_boot' failed.
+r~
 
-This assert fires because the board says "I always boot kernels
-in secure state" but the bootloader code knows that AArch64
-CPUs don't boot kernels in secure state. The contradiction is
-because you've tried to use a 64-bit CPU on this 32-bit-only board.
 
-> So I did try to boot with "-machine secure=off" which makes the kernel
-> boot (at least a bit...), but it also seems to drop EL3 support in vexpress.c:
->
->         if (!secure) {
->             object_property_set_bool(cpuobj, "has_el3", false, NULL);
->         }
->
-> which triggers arm/cpu.c:
->
->     if (!cpu->has_el3) {
->         /* If the has_el3 CPU property is disabled then we need to disable the
->          * feature.
->          */
->         unset_feature(env, ARM_FEATURE_EL3);
+Richard Henderson (10):
+  capstone: Convert Makefile bits to meson bits
+  capstone: Update to upstream "next" branch
+  disas: Move host asm annotations to tb_gen_code
+  disas: Clean up CPUDebug initialization
+  disas: Use qemu/bswap.h for bfd endian loads
+  disas: Cleanup plugin_disas
+  disas: Configure capstone for aarch64 host without libvixl
+  disas: Split out capstone code to disas/capstone.c
+  disas: Enable capstone disassembly for s390x
+  disas/capstone: Add skipdata hook for s390x
 
-That part is all expected: saying "secure=off" is saying "I don't
-want EL3/TrustZone", so we give your guest code a CPU without it,
-and then your guest falls over because it assumed it was present.
+ configure                 |  61 +---
+ Makefile                  |  16 -
+ include/disas/dis-asm.h   | 102 +++---
+ include/disas/disas.h     |   2 +-
+ include/exec/log.h        |   4 +-
+ accel/tcg/translate-all.c |  24 +-
+ disas.c                   | 703 +++++++++-----------------------------
+ disas/capstone.c          | 326 ++++++++++++++++++
+ target/s390x/cpu.c        |   4 +
+ tcg/tcg.c                 |   4 +-
+ capstone                  |   2 +-
+ disas/meson.build         |   1 +
+ meson.build               | 122 ++++++-
+ meson_options.txt         |   4 +
+ 14 files changed, 676 insertions(+), 699 deletions(-)
+ create mode 100644 disas/capstone.c
 
-If you want a board type for AArch64 work, we recommend "virt".
+-- 
+2.25.1
 
-thanks
--- PMM
 
