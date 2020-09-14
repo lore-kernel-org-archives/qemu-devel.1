@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39083C433E2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3944C43461
 	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 13:43:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C140B208E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 13:43:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 466FA208E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 13:43:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NbXsnLuB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C140B208E4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QF0tP8zY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 466FA208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHoln-0004O1-Q9
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 09:43:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34220)
+	id 1kHolo-0004P3-AX
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 09:43:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34264)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kHoki-0002cX-9b
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:42:40 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31191
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kHokl-0002fa-2X
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:42:43 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23505
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kHokf-00035c-9f
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:42:39 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kHokf-00035g-Ht
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:42:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600090955;
+ s=mimecast20190719; t=1600090956;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RHmnfKTHgb67jiCf5qFHais7ZvKSxP8oR29nwoZS+ao=;
- b=NbXsnLuBhdTf4Vpv4rX7WeF97sWS9k79miPddCA+ohUiycUvw5SqaWEThnb56mKoaHnL+6
- VICNg58HSKETMvQeIreWWGd1o+r8L5sJmeSZAxeQfNgbLcWmtGbCZozjMfye6/X4U2ks2x
- VUOgejWhi5VqZnp6QKUNvsMpNA6Vk60=
+ bh=ozdCNqPxHUIVCYpTw7BPVWd2I2aNiWMludowt4idVAA=;
+ b=QF0tP8zY0HLzYFhcOJgd/hCptCFt+9cVGSJWrDHKtshE6HYXsFJt0XK5v1LyyoHKyl7dCN
+ lR3kQQlEZe1yUy3V5GFScBQbuG4908ypI98SAcXCciHUtAyHUFa2z7+3cWg3fmEm2bCIWq
+ pjVggl/pHDzeZXuMNpWVuhuN9JzyAkU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-EWPUx9PmP5iDvB37IEW26w-1; Mon, 14 Sep 2020 09:42:33 -0400
-X-MC-Unique: EWPUx9PmP5iDvB37IEW26w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-408-8OVHnPqgOUKDYtbupMS6yg-1; Mon, 14 Sep 2020 09:42:34 -0400
+X-MC-Unique: 8OVHnPqgOUKDYtbupMS6yg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D40D1882FBA
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 13:42:32 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5D191882FA1
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 13:42:33 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
  [10.36.112.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1A9EF60BE2;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 242C27B7B8;
  Mon, 14 Sep 2020 13:42:26 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id B038231E67; Mon, 14 Sep 2020 15:42:24 +0200 (CEST)
+ id B946B31E68; Mon, 14 Sep 2020 15:42:24 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 3/6] meson: remove duplicate qxl sources
-Date: Mon, 14 Sep 2020 15:42:21 +0200
-Message-Id: <20200914134224.29769-4-kraxel@redhat.com>
+Subject: [PATCH v2 4/6] object_initialize: try module load
+Date: Mon, 14 Sep 2020 15:42:22 +0200
+Message-Id: <20200914134224.29769-5-kraxel@redhat.com>
 In-Reply-To: <20200914134224.29769-1-kraxel@redhat.com>
 References: <20200914134224.29769-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
@@ -105,26 +105,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We should add sources to the softmmu_ss or module_ss but not both.
+Needed to allow virtio-gpu-pci initialize the
+virtio-gpu-device child device.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/display/meson.build | 2 --
- 1 file changed, 2 deletions(-)
+ qom/object.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/hw/display/meson.build b/hw/display/meson.build
-index 2cc73fc2b927..2f07d427ddc8 100644
---- a/hw/display/meson.build
-+++ b/hw/display/meson.build
-@@ -46,8 +46,6 @@ if config_all_devices.has_key('CONFIG_QXL')
-   hw_display_modules += {'qxl': qxl_ss}
- endif
+diff --git a/qom/object.c b/qom/object.c
+index b1822a2ef4be..387efb25ebe9 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -518,6 +518,12 @@ void object_initialize(void *data, size_t size, const char *typename)
+ {
+     TypeImpl *type = type_get_by_name(typename);
  
--softmmu_ss.add(when: 'CONFIG_QXL', if_true: files('qxl.c', 'qxl-logger.c', 'qxl-render.c'))
--
- softmmu_ss.add(when: 'CONFIG_DPCD', if_true: files('dpcd.c'))
- softmmu_ss.add(when: 'CONFIG_XLNX_ZYNQMP_ARM', if_true: files('xlnx_dp.c'))
- 
++#ifdef CONFIG_MODULES
++    if (!type) {
++        module_load_qom_one(typename);
++        type = type_get_by_name(typename);
++    }
++#endif
+     if (!type) {
+         error_report("missing object type '%s'", typename);
+         abort();
 -- 
 2.27.0
 
