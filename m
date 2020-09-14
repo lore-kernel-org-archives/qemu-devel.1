@@ -2,86 +2,131 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9026CC43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 09:38:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA1F5C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 09:39:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0649E21D1A
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 09:38:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5AFC221D24
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 09:39:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BzrmQRsE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0649E21D1A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jL6KB30I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AFC221D24
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHkw3-0004MV-5y
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 05:38:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52256)
+	id 1kHkwu-0005Qo-Ix
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 05:39:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52284)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHkv8-0003LJ-OF; Mon, 14 Sep 2020 05:37:10 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:36769)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kHkv7-0002uq-4x; Mon, 14 Sep 2020 05:37:10 -0400
-Received: by mail-lf1-x141.google.com with SMTP id x69so12685895lff.3;
- Mon, 14 Sep 2020 02:37:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=IND7o5/NYMnf56KGOS8IpAtjkZVelZOlJ/IDjk8aMUw=;
- b=BzrmQRsENSV3reN27GFWl9lq1PHKPQN695vxS9PzrDVwo0Y1hEcznen/4yvvabpVHz
- Ncd7+oqK/T5MaG0KDIEH115/XwTuSuePmIoepKRSqk5bD1BR/Bc7NJ/r2URO8kVWD4uz
- dNu5HSS28VqoN39Z4is0qNMhmxcNdxbEj1bHoj3VNV8J8Z8ejrFbh7UhZYi4+r0cNFKk
- uD3YGmIfT/90Vc1AA5HwOWaxLPI+FT9GfAbI8mUq3l7X2FOEPrhpgmFXACYke+nxgNnq
- 1YjEn9jIi3FXFoz4aspnkTdcRD3Rw35lZoYHID+el9XFCnJVg3WHmLHsl6ieQmFDYshW
- HSHw==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHkvD-0003Ul-6e
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 05:37:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50569
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kHkvB-0002vC-Et
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 05:37:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600076232;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=e+LceTluk9JR3JdXIQD5mYK3KfB+wrhz6ZU0SgmnCrU=;
+ b=jL6KB30IxIR1YNFgEjUfSatL3xnGp7bzev41lL16PEydBkGDQhcC6kVap2Vug4ob5Zziou
+ x2JmAAVgBtVkK7T/9pqTM7MFu692GjRD0XfW0+df2EtBY4feJcpb2g9yScS+hd0ZU9GljD
+ xLV/Nfhv55tn/S90UCQufwstjXjm5rc=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-251-FiLi-LVVM_WW-15HJHjPRA-1; Mon, 14 Sep 2020 05:37:10 -0400
+X-MC-Unique: FiLi-LVVM_WW-15HJHjPRA-1
+Received: by mail-wr1-f69.google.com with SMTP id f18so6672593wrv.19
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 02:37:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=IND7o5/NYMnf56KGOS8IpAtjkZVelZOlJ/IDjk8aMUw=;
- b=FYKsLa+NxWjKIvUQNoiWe5OiW6YNVf4DMeiYw+Z0JPnpvZqQd5CCaSPc7NdvU6W8Rw
- 0TCP18sQNysrCvGyCg9EQC6BLUuKTdv5ZJBETe1Ti7ZpKb5/94j1zINetcKR+gVLtsKZ
- a+ri75BqtcJnBLxUqC+iamC9UoWLqAe5J83RmU67X2dYbV2OCPgoDcaETbDFDq190k//
- FtBZDsLNjmsnYJVidclkmnYKTKNrh8GIM8YIgFpLTdkauByZwjTGfMMc/tEb1zyBiBRY
- JskKA6RL5a6GmyqsAdOmyAE7nO7uhnSkUNeuBdpu1xH8Gvfes0fZ+ZiLGIisyH4UdJX+
- jeWg==
-X-Gm-Message-State: AOAM532IVFnr3mmlRQkoFYdK1pfEMkY2z2tEsRC06O1/30p2S2C3Ea85
- lMAqtO+ZjiqRWFBhVDctYi1txdwRslQ1H2zyY40=
-X-Google-Smtp-Source: ABdhPJw3xGA2LEgoChuCaqTV4Q1xI21XoWb/1hC270j/oB4KqAnwqcZvlbQtnMTobXc6YhvIUSUy2AgY7zjEQcvPf4I=
-X-Received: by 2002:a19:a407:: with SMTP id q7mr3742435lfc.377.1600076227018; 
- Mon, 14 Sep 2020 02:37:07 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=e+LceTluk9JR3JdXIQD5mYK3KfB+wrhz6ZU0SgmnCrU=;
+ b=JSAq/COAYAUWz6fhN1KV7xRxtFPynWmuqfxRngywvYQgN3eYEzfYSSgehEOk2BLtPC
+ NhFm5JKWIb27JvKDdsrPsVsSvJswA/8lJp2B0XcSpdLueSIoHLT+IvNYdkhjSij3ECVN
+ Tj9pKjqDGHb2goB+EP0UdP3Sd/VUnoWZzNK5G6jNnr8MstQmccbiNzhRxSWTEmoxnUU6
+ ZQtV6LBc4K2rO7nOtFDKuarEC0CeMYF2saWLCcNBCeZC7taDUXFyKSwDMMMy9vT78RVw
+ H38b4QntP6QFGtCmczmcO42BtmtlniB8k22nE5z2+iIeNsSu1+cUADKkneHbWqDVGwVO
+ Pu4w==
+X-Gm-Message-State: AOAM533rU39hFSD8OzGHE9QAlv/zAWsb0QHLMMc7wDtbLEZTid6UUDD/
+ sAic3lBoSNIzD7xpOfSabpVkt659yh3XRDqTz9uknwdBToDo+2KqY0fOKENaeCVDbb1Zu+RgOYd
+ NzQKNG6io0g02KXA=
+X-Received: by 2002:adf:f4c6:: with SMTP id h6mr14801626wrp.310.1600076229780; 
+ Mon, 14 Sep 2020 02:37:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxuICA+v3+pYlJ3G13o969Iihi4eN2ZUzLtMZTHQjC/e7b4qYfsWMA6G/TpCzKaSDEwD+Fgug==
+X-Received: by 2002:adf:f4c6:: with SMTP id h6mr14801606wrp.310.1600076229599; 
+ Mon, 14 Sep 2020 02:37:09 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id m2sm11004723wrq.25.2020.09.14.02.37.08
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 14 Sep 2020 02:37:09 -0700 (PDT)
+Subject: Re: [PATCH v5 1/8] qapi: Restrict LostTickPolicy enum to machine code
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200913195348.1064154-1-philmd@redhat.com>
+ <20200913195348.1064154-2-philmd@redhat.com>
+ <871rj4u3ct.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <d80894ba-9958-48e6-33cc-6356474fc2b7@redhat.com>
+Date: Mon, 14 Sep 2020 11:37:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200912121412.10999-1-thuth@redhat.com>
-In-Reply-To: <20200912121412.10999-1-thuth@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Mon, 14 Sep 2020 17:36:57 +0800
-Message-ID: <CAE2XoE-RxwJ1ddAb_RzWHVYQFtkdy=d-1W0eFicMyJMyeP1LLA@mail.gmail.com>
-Subject: Re: [PATCH] tests/check-block: Do not run the iotests with old
- versions of bash
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000002005a405af42c7fe"
-Received-SPF: pass client-ip=2a00:1450:4864:20::141;
- envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x141.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <871rj4u3ct.fsf@dusky.pond.sub.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 01:36:47
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.695,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,94 +139,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-level <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Qemu-block <qemu-block@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000002005a405af42c7fe
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
++Laurent + qemu-block@
 
-On Sat, Sep 12, 2020 at 8:16 PM Thomas Huth <thuth@redhat.com> wrote:
->
-> macOS is shipped with a very old version of the bash (3.2), which
-> is currently not suitable for running the iotests anymore. Add
-> a check to skip the iotests in this case - if someone still wants
-> to run the iotests on macOS, they can install a newer version from
-> homebrew, for example.
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/check-block.sh | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/tests/check-block.sh b/tests/check-block.sh
-> index 8e29c868e5..bfe1630c1e 100755
-> --- a/tests/check-block.sh
-> +++ b/tests/check-block.sh
-> @@ -46,6 +46,11 @@ if ! command -v bash >/dev/null 2>&1 ; then
->      exit 0
->  fi
->
-> +if bash --version | grep 'GNU bash, version [123]' > /dev/null 2>&1 ;
-then
-> +    echo "bash version too old =3D=3D> Not running the qemu-iotests."
-> +    exit 0
-> +fi
-> +
->  if ! (sed --version | grep 'GNU sed') > /dev/null 2>&1 ; then
->      if ! command -v gsed >/dev/null 2>&1; then
->          echo "GNU sed not available =3D=3D> Not running the qemu-iotests=
-."
-> --
-> 2.18.2
->
->
-Is that worth to convert the check-block.sh script to python script? so it
-can even running under msys2/mingw=EF=BC=9F
+On 9/14/20 11:14 AM, Markus Armbruster wrote:
+> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
+> 
+>> Acked-by: Markus Armbruster <armbru@redhat.com>
+>> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> 
+> Unlike the other patches that move code out of misc.json, this one
+> doesn't say "allows pulling less declarations/definitions to user-mode."
+> Intentional?
 
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
+TBH I don't remember as this is 6months old.
 
---0000000000002005a405af42c7fe
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+IIUC the "tick lost" feature is only meaningful when running
+virtualized with a RTC profile, so this is pointless for
+user-mode binaries and tools.
 
-<div dir=3D"ltr"><br><br>On Sat, Sep 12, 2020 at 8:16 PM Thomas Huth &lt;<a=
- href=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt; wrote:<br>&gt;<b=
-r>&gt; macOS is shipped with a very old version of the bash (3.2), which<br=
->&gt; is currently not suitable for running the iotests anymore. Add<br>&gt=
-; a check to skip the iotests in this case - if someone still wants<br>&gt;=
- to run the iotests on macOS, they can install a newer version from<br>&gt;=
- homebrew, for example.<br>&gt;<br>&gt; Signed-off-by: Thomas Huth &lt;<a h=
-ref=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt;<br>&gt; ---<br>&gt=
-; =C2=A0tests/check-block.sh | 5 +++++<br>&gt; =C2=A01 file changed, 5 inse=
-rtions(+)<br>&gt;<br>&gt; diff --git a/tests/check-block.sh b/tests/check-b=
-lock.sh<br>&gt; index 8e29c868e5..bfe1630c1e 100755<br>&gt; --- a/tests/che=
-ck-block.sh<br>&gt; +++ b/tests/check-block.sh<br>&gt; @@ -46,6 +46,11 @@ i=
-f ! command -v bash &gt;/dev/null 2&gt;&amp;1 ; then<br>&gt; =C2=A0 =C2=A0 =
-=C2=A0exit 0<br>&gt; =C2=A0fi<br>&gt;<br>&gt; +if bash --version | grep &#3=
-9;GNU bash, version [123]&#39; &gt; /dev/null 2&gt;&amp;1 ; then<br>&gt; + =
-=C2=A0 =C2=A0echo &quot;bash version too old =3D=3D&gt; Not running the qem=
-u-iotests.&quot;<br>&gt; + =C2=A0 =C2=A0exit 0<br>&gt; +fi<br>&gt; +<br>&gt=
-; =C2=A0if ! (sed --version | grep &#39;GNU sed&#39;) &gt; /dev/null 2&gt;&=
-amp;1 ; then<br>&gt; =C2=A0 =C2=A0 =C2=A0if ! command -v gsed &gt;/dev/null=
- 2&gt;&amp;1; then<br>&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0echo &quot;GNU=
- sed not available =3D=3D&gt; Not running the qemu-iotests.&quot;<br>&gt; -=
--<br>&gt; 2.18.2<br>&gt;<br>&gt;<br>Is that worth to convert the check-bloc=
-k.sh script to python script? so it can even running under msys2/mingw=EF=
-=BC=9F<br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br=
->=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincere=
-ly,<br>Yonggang Luo</div>
-
---0000000000002005a405af42c7fe--
 
