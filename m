@@ -2,88 +2,90 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97FE1C43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 13:50:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6BAFC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 13:51:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06B0320759
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 13:50:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 73C5B208E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 13:51:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L8pVlIeR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06B0320759
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="iO2NTlUw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73C5B208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bytedance.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHosb-0006EB-2D
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 09:50:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34300)
+	id 1kHosx-00072J-HB
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 09:51:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34678)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kHokp-0002mt-AY
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:42:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42224)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kHokm-00037D-AJ
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:42:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600090962;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=tF8qpzdaZ/T6Te/ZEiZs8KXYQcEQMACXlftO9ZA3/MU=;
- b=L8pVlIeRo/Y6sTxoupCixDmo9GFPjQrE9Z7TPAs0e/60gWOVvqnwCIC+7PpDwShErWbKdu
- RYq8vCgdPGSnX78eSk9CvgqqUDaFDxeWUXsTfVlsXK5poL+BN7DB6tKy2HOqJ0DEkp+kL2
- 0eVx7PgbvmkWfeuEF2/vOLPJ7U/9BIQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-526-CBhB85IvNTGaYlL1jsoW5g-1; Mon, 14 Sep 2020 09:42:41 -0400
-X-MC-Unique: CBhB85IvNTGaYlL1jsoW5g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 24A8A1006701
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 13:42:40 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
- [10.36.112.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C34627BE5B;
- Mon, 14 Sep 2020 13:42:33 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id C5BF131F73; Mon, 14 Sep 2020 15:42:24 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 5/6] virtio-gpu: make virtio_gpu_ops static
-Date: Mon, 14 Sep 2020 15:42:23 +0200
-Message-Id: <20200914134224.29769-6-kraxel@redhat.com>
-In-Reply-To: <20200914134224.29769-1-kraxel@redhat.com>
-References: <20200914134224.29769-1-kraxel@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:55:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -38
-X-Spam_score: -3.9
-X-Spam_bar: ---
-X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <pizhenwei@bytedance.com>)
+ id 1kHolf-0004aC-QO
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:43:39 -0400
+Received: from mail-pf1-x432.google.com ([2607:f8b0:4864:20::432]:34507)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <pizhenwei@bytedance.com>)
+ id 1kHole-0003Dt-2O
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:43:39 -0400
+Received: by mail-pf1-x432.google.com with SMTP id v196so12803331pfc.1
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 06:43:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=JROvm5rr8+1Wo6J5ML/BSylPouNvBTyMPETS3dPRS0U=;
+ b=iO2NTlUwRzUBjKxIrIcrFbtpVDp0XQ0a1GoBBi8ezebXOEJYVnCFA5YE3yDHFpdqN0
+ UpWaBYutZ4W4KeHjlRUo8YXQlFpdCWW8EvFRG62gxkpBQmf5/514DLIH3AYrmBwTKN2t
+ Yz7jfi/B0b3JGjFqS/Y3jbHISVXncB3CmGQ1E5LcDjurXf13L116h9PLNMYAX0SWIQg3
+ huxoZAHVkCFMhas2w877YQjNDg5iqiQJXguTI0mAC1dlCGQzsYmeRo6kR8PXrhcOHc4q
+ OrcOAPKjL+uy+FdtvWCXzfGL9Dn/iYq+NmYnnQYKaUeBW1itpVT8EgRpKhrFZSNJb8u2
+ 3LXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=JROvm5rr8+1Wo6J5ML/BSylPouNvBTyMPETS3dPRS0U=;
+ b=NFZff72ez7sXpfKCl/T3CO/wUgzGYwRWQY1nH3z3cB45bnWruNZ1SVZHUYJoWmSrBl
+ UE3vt0HOdpyrcuCXyoSBayfHcGucPmVYg6iL6TZuObHKuAP/0w32IUsfSN9VDY55gc7O
+ G5h/2A8xE5xtKUxPjLbJEQSiQh5UjP6bA0iDJnaLKlaa01F8/LB91A1qAGk2WLWi48q+
+ 6euJbLqrJMumwyDocDLBeQj7uADXgyZ+XQcaDmD7Ooxrmee9PaH5jU7zyKUXXNhilgrz
+ eMRPojwaOuVevvyydcFKnlklV/IIN6K1+jBpevw4nU7yDjM/F9TQBb02WOVpeCHYQWVX
+ REVw==
+X-Gm-Message-State: AOAM533QaBTxmeHJAVCMHd71IAkHVfAHcP3betH+1iddMiqM7ZJPVzsT
+ D3zhT79VjU/O5pfeApqyo0v3Yg==
+X-Google-Smtp-Source: ABdhPJz3IDFU3LaNb/2kVDj8Xj91ZvFmbnrqBDRygh4Rh/LOCuRErfRq2Y/yjx+HnrSSKzRvQT3idQ==
+X-Received: by 2002:a62:4e49:: with SMTP id c70mr13275778pfb.100.1600091016777; 
+ Mon, 14 Sep 2020 06:43:36 -0700 (PDT)
+Received: from libai.bytedance.net ([61.120.150.71])
+ by smtp.gmail.com with ESMTPSA id c4sm7626378pjq.7.2020.09.14.06.43.34
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 14 Sep 2020 06:43:36 -0700 (PDT)
+From: zhenwei pi <pizhenwei@bytedance.com>
+To: armbru@redhat.com,
+	pbonzini@redhat.com,
+	mtosatti@redhat.com
+Subject: [PATCH 3/3] target-i386: post memory failure event to uplayer
+Date: Mon, 14 Sep 2020 21:43:21 +0800
+Message-Id: <20200914134321.958079-4-pizhenwei@bytedance.com>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20200914134321.958079-1-pizhenwei@bytedance.com>
+References: <20200914134321.958079-1-pizhenwei@bytedance.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::432;
+ envelope-from=pizhenwei@bytedance.com; helo=mail-pf1-x432.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,122 +98,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, pizhenwei@bytedance.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reference it via ops pointer instead, simliar to the vga one.
-Removes hard symbol reference, needed to build virtio-gpu modular.
+Post memory failure event to uplayer to handle hardware memory
+corrupted event. Rather than simple QEMU log, QEMU could report more
+effective message to uplayer. For example, guest crashes by MCE,
+selecting another host server is a better choice.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
 ---
- include/hw/virtio/virtio-gpu.h |  3 +--
- hw/display/virtio-gpu-base.c   |  3 ++-
- hw/display/virtio-vga.c        | 16 ++++++++--------
- 3 files changed, 11 insertions(+), 11 deletions(-)
+ target/i386/helper.c | 5 +++++
+ target/i386/kvm.c    | 5 ++++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gpu.h
-index f334b780858c..6b45b4799a3e 100644
---- a/include/hw/virtio/virtio-gpu.h
-+++ b/include/hw/virtio/virtio-gpu.h
-@@ -106,6 +106,7 @@ struct VirtIOGPUBase {
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index 0c7fd32491..f7b2dbeec8 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -18,6 +18,7 @@
+  */
  
-     struct virtio_gpu_base_conf conf;
-     struct virtio_gpu_config virtio_config;
-+    const GraphicHwOps *hw_ops;
- 
-     bool use_virgl_renderer;
-     int renderer_blocked;
-@@ -171,8 +172,6 @@ struct VhostUserGPU {
-     bool backend_blocked;
- };
- 
--extern const GraphicHwOps virtio_gpu_ops;
--
- #define VIRTIO_GPU_FILL_CMD(out) do {                                   \
-         size_t s;                                                       \
-         s = iov_to_buf(cmd->elem.out_sg, cmd->elem.out_num, 0,          \
-diff --git a/hw/display/virtio-gpu-base.c b/hw/display/virtio-gpu-base.c
-index 796130860657..aeb87235420a 100644
---- a/hw/display/virtio-gpu-base.c
-+++ b/hw/display/virtio-gpu-base.c
-@@ -112,7 +112,7 @@ virtio_gpu_gl_block(void *opaque, bool block)
-     }
- }
- 
--const GraphicHwOps virtio_gpu_ops = {
-+static const GraphicHwOps virtio_gpu_ops = {
-     .invalidate = virtio_gpu_invalidate_display,
-     .gfx_update = virtio_gpu_update_display,
-     .text_update = virtio_gpu_text_update,
-@@ -162,6 +162,7 @@ virtio_gpu_base_device_realize(DeviceState *qdev,
-     g->req_state[0].width = g->conf.xres;
-     g->req_state[0].height = g->conf.yres;
- 
-+    g->hw_ops = &virtio_gpu_ops;
-     for (i = 0; i < g->conf.max_outputs; i++) {
-         g->scanout[i].con =
-             graphic_console_init(DEVICE(g), i, &virtio_gpu_ops, g);
-diff --git a/hw/display/virtio-vga.c b/hw/display/virtio-vga.c
-index 573e7d59282a..f9410a0c2e61 100644
---- a/hw/display/virtio-vga.c
-+++ b/hw/display/virtio-vga.c
-@@ -13,7 +13,7 @@ static void virtio_vga_base_invalidate_display(void *opaque)
-     VirtIOGPUBase *g = vvga->vgpu;
- 
-     if (g->enable) {
--        virtio_gpu_ops.invalidate(g);
-+        g->hw_ops->invalidate(g);
-     } else {
-         vvga->vga.hw_ops->invalidate(&vvga->vga);
-     }
-@@ -25,7 +25,7 @@ static void virtio_vga_base_update_display(void *opaque)
-     VirtIOGPUBase *g = vvga->vgpu;
- 
-     if (g->enable) {
--        virtio_gpu_ops.gfx_update(g);
-+        g->hw_ops->gfx_update(g);
-     } else {
-         vvga->vga.hw_ops->gfx_update(&vvga->vga);
-     }
-@@ -37,8 +37,8 @@ static void virtio_vga_base_text_update(void *opaque, console_ch_t *chardata)
-     VirtIOGPUBase *g = vvga->vgpu;
- 
-     if (g->enable) {
--        if (virtio_gpu_ops.text_update) {
--            virtio_gpu_ops.text_update(g, chardata);
-+        if (g->hw_ops->text_update) {
-+            g->hw_ops->text_update(g, chardata);
+ #include "qemu/osdep.h"
++#include "qapi/qapi-events-run-state.h"
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+ #include "qemu/qemu-print.h"
+@@ -897,6 +898,8 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
          }
+ 
+         if (cenv->mcg_status & MCG_STATUS_MCIP) {
++            qapi_event_send_memory_failure(
++                 MEMORY_FAILURE_ACTION_GUEST_TRIPLE_FAULT);
+             need_reset = true;
+             snprintf(msg, sizeof(msg), "CPU %d: Previous MCE still in progress,"
+                      " raising triple fault", cs->cpu_index);
+@@ -934,6 +937,8 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
      } else {
-         if (vvga->vga.hw_ops->text_update) {
-@@ -52,8 +52,8 @@ static int virtio_vga_base_ui_info(void *opaque, uint32_t idx, QemuUIInfo *info)
-     VirtIOVGABase *vvga = opaque;
-     VirtIOGPUBase *g = vvga->vgpu;
- 
--    if (virtio_gpu_ops.ui_info) {
--        return virtio_gpu_ops.ui_info(g, idx, info);
-+    if (g->hw_ops->ui_info) {
-+        return g->hw_ops->ui_info(g, idx, info);
+         banks[1] |= MCI_STATUS_OVER;
      }
-     return -1;
- }
-@@ -63,8 +63,8 @@ static void virtio_vga_base_gl_block(void *opaque, bool block)
-     VirtIOVGABase *vvga = opaque;
-     VirtIOGPUBase *g = vvga->vgpu;
- 
--    if (virtio_gpu_ops.gl_block) {
--        virtio_gpu_ops.gl_block(g, block);
-+    if (g->hw_ops->gl_block) {
-+        g->hw_ops->gl_block(g, block);
-     }
++
++    qapi_event_send_memory_failure(MEMORY_FAILURE_ACTION_GUEST_MCE);
  }
  
+ void cpu_x86_inject_mce(Monitor *mon, X86CPU *cpu, int bank,
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 205b68bc0c..63a585cc64 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -14,6 +14,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "qapi/qapi-events-run-state.h"
+ #include <sys/ioctl.h>
+ #include <sys/utsname.h>
+ 
+@@ -577,6 +578,7 @@ static void kvm_mce_inject(X86CPU *cpu, hwaddr paddr, int code)
+ 
+ static void hardware_memory_error(void *host_addr)
+ {
++    qapi_event_send_memory_failure(MEMORY_FAILURE_ACTION_HYPERVISOR_STOP);
+     error_report("QEMU got Hardware memory error at addr %p", host_addr);
+     exit(1);
+ }
+@@ -631,7 +633,8 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+         hardware_memory_error(addr);
+     }
+ 
+-    /* Hope we are lucky for AO MCE */
++    /* Hope we are lucky for AO MCE, just notify a event */
++    qapi_event_send_memory_failure(MEMORY_FAILURE_ACTION_HYPERVISOR_IGNORE);
+ }
+ 
+ static void kvm_reset_exception(CPUX86State *env)
 -- 
-2.27.0
+2.11.0
 
 
