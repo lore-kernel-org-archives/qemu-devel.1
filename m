@@ -2,88 +2,90 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13DECC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 13:49:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AB5BC43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 13:49:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5862208E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 13:49:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8780A208E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 13:49:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q2wzXKxe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5862208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="C7a0ltWl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8780A208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bytedance.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHorL-0004H6-JP
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 09:49:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34254)
+	id 1kHorg-0004wg-8k
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 09:49:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34652)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kHokj-0002dr-L3
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:42:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34958
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kHokg-00036B-SS
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:42:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600090957;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=OoOQQ/TcONqnDSGYe6BQp0f/Vy3VYLfnj+Ju0OAuWVc=;
- b=Q2wzXKxeIOCtT0FUIz6FHieMxGfbdu2+B/bDYMmHidHhMns1wqvau+GOtctSsYr3nApOTz
- CTOaAlDX1BKNoHAOOEHdyVwuLtRbiVg+PZMueGlkX6z1tJDaajDn85dhSLLaF6qicBnfws
- UjSt6m9ZYmgDkXLQiLBpMFLMb0Tbd10=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-182-hZDmXGsIMIa2UOE6oXEG8Q-1; Mon, 14 Sep 2020 09:42:35 -0400
-X-MC-Unique: hZDmXGsIMIa2UOE6oXEG8Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DAD2D425CF
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 13:42:34 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
- [10.36.112.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 206501002D41;
- Mon, 14 Sep 2020 13:42:26 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 9E6A6204AE; Mon, 14 Sep 2020 15:42:24 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/6] meson: fix qxl dependencies
-Date: Mon, 14 Sep 2020 15:42:19 +0200
-Message-Id: <20200914134224.29769-2-kraxel@redhat.com>
-In-Reply-To: <20200914134224.29769-1-kraxel@redhat.com>
-References: <20200914134224.29769-1-kraxel@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0.0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 01:39:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -38
-X-Spam_score: -3.9
-X-Spam_bar: ---
-X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <pizhenwei@bytedance.com>)
+ id 1kHola-0004Kr-Ps
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:43:34 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:46547)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <pizhenwei@bytedance.com>)
+ id 1kHolY-0003DP-8R
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 09:43:33 -0400
+Received: by mail-pg1-x543.google.com with SMTP id 34so11565921pgo.13
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 06:43:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=uQrg1REyMjiUFdnwANv+hN+vv/GKYugaQbmL1Bq+zcc=;
+ b=C7a0ltWl6GQDSzT0MRVC+/MVpTf35edDb2/ALFKVEFo6kVoYrnjonGpxCD9AGCuaak
+ rL8yOzP/FaJAQs1BhPf1fNNwG3HJsXpwpVuR5/xQmK8rsorGhZ25otdWZjxAz7md7NvC
+ bWbw9nbHKp5CclIfm4vKaPTcIk3f6z1v4vpg2e6Ud9iT7nB/F2bREbfN8JkpjtiMNF4e
+ WS/mrGxLUSKPOr3XHPUlQlQSkdHkJECMcCsb+k9MweskDKsuRSv1xEBHD1NuIkDB28zj
+ Qn+RQF7VPhkjPKsPFBlcgMUsF+3EmKTBnvYopeOwrOypBRcOi1Or+daf6AkeaMIU972w
+ qnHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=uQrg1REyMjiUFdnwANv+hN+vv/GKYugaQbmL1Bq+zcc=;
+ b=QGpaoujDZuzoIi5xZK5UvCRxX4InWZxNXJHzBRWv1a0tcKuJXcL/LlyToTfOItvsav
+ IXrHntxvhiPmmoBHcl/yhs3QCoK3fYQm/RbyLgKSgYV2U8FR+clKKB9tM8DHdc2/8QC4
+ LssGGfGF0+iwYPV0o8hnaKWWUirt6XtuAcB3Lxtk0Kj9JIOfi7xZm/bBAKTFoWjoi897
+ Hua40/UrQk3gwjNCJBMX+qI7tA7rgsfmqUIM0CyNyLCp/QCrbNgBr2v1IxAAG+srMsln
+ iTQyALCH0xsRc3OwtX/F69hrlyDJlY+Mmfp30xks9KOH0prrg2Z7KfUo5zV+F/CgOgPN
+ zzUg==
+X-Gm-Message-State: AOAM5323yxNw/Yfsg0AmLxkz+BOIywXNz9WTvIjHQQ9J2oTc2EianNvg
+ 9qtEQy4VjsmlKMW2XypPyTd11qMTNf9oKQ==
+X-Google-Smtp-Source: ABdhPJzse4Mfto7/6YHK4720MVQ6yJ+5UCF6h1YuS2hHbe69kNs5Kr+Ek0SEuxdDDBiV1xa63ukggQ==
+X-Received: by 2002:a62:e501:0:b029:13c:1611:6527 with SMTP id
+ n1-20020a62e5010000b029013c16116527mr13273942pff.7.1600091010913; 
+ Mon, 14 Sep 2020 06:43:30 -0700 (PDT)
+Received: from libai.bytedance.net ([61.120.150.71])
+ by smtp.gmail.com with ESMTPSA id c4sm7626378pjq.7.2020.09.14.06.43.28
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 14 Sep 2020 06:43:30 -0700 (PDT)
+From: zhenwei pi <pizhenwei@bytedance.com>
+To: armbru@redhat.com,
+	pbonzini@redhat.com,
+	mtosatti@redhat.com
+Subject: [PATCH 1/3] target-i386: seperate MCIP & MCE_MASK error reason
+Date: Mon, 14 Sep 2020 21:43:19 +0800
+Message-Id: <20200914134321.958079-2-pizhenwei@bytedance.com>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20200914134321.958079-1-pizhenwei@bytedance.com>
+References: <20200914134321.958079-1-pizhenwei@bytedance.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=pizhenwei@bytedance.com; helo=mail-pg1-x543.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,36 +99,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, pizhenwei@bytedance.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add pixman and spice deps to qxl module.
+Previously we can only get a simple string "Triple fault" in qemu
+log. Add detailed message for the two reasons to describe why qemu
+has to reset the guest.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
 ---
- hw/display/meson.build | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ target/i386/helper.c | 25 ++++++++++++++++++-------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
 
-diff --git a/hw/display/meson.build b/hw/display/meson.build
-index 78adaf9db463..2cc73fc2b927 100644
---- a/hw/display/meson.build
-+++ b/hw/display/meson.build
-@@ -41,7 +41,8 @@ specific_ss.add(when: 'CONFIG_VGA', if_true: files('vga.c'))
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index 70be53e2c3..0c7fd32491 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -857,6 +857,8 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
+     X86CPU *cpu = X86_CPU(cs);
+     CPUX86State *cenv = &cpu->env;
+     uint64_t *banks = cenv->mce_banks + 4 * params->bank;
++    char msg[64];
++    bool need_reset = false;
  
- if config_all_devices.has_key('CONFIG_QXL')
-   qxl_ss = ss.source_set()
--  qxl_ss.add(when: 'CONFIG_QXL', if_true: files('qxl.c', 'qxl-logger.c', 'qxl-render.c'))
-+  qxl_ss.add(when: 'CONFIG_QXL', if_true: [files('qxl.c', 'qxl-logger.c', 'qxl-render.c'),
-+                                           pixman, spice])
-   hw_display_modules += {'qxl': qxl_ss}
- endif
+     cpu_synchronize_state(cs);
  
+@@ -894,16 +896,25 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
+             return;
+         }
+ 
+-        if ((cenv->mcg_status & MCG_STATUS_MCIP) ||
+-            !(cenv->cr[4] & CR4_MCE_MASK)) {
+-            monitor_printf(params->mon,
+-                           "CPU %d: Previous MCE still in progress, raising"
+-                           " triple fault\n",
+-                           cs->cpu_index);
+-            qemu_log_mask(CPU_LOG_RESET, "Triple fault\n");
++        if (cenv->mcg_status & MCG_STATUS_MCIP) {
++            need_reset = true;
++            snprintf(msg, sizeof(msg), "CPU %d: Previous MCE still in progress,"
++                     " raising triple fault", cs->cpu_index);
++        }
++
++        if (!(cenv->cr[4] & CR4_MCE_MASK)) {
++            need_reset = true;
++            snprintf(msg, sizeof(msg), "CPU %d: MCE capability is not enabled,"
++                     " raising triple fault", cs->cpu_index);
++        }
++
++        if (need_reset) {
++            monitor_printf(params->mon, "%s", msg);
++            qemu_log_mask(CPU_LOG_RESET, "%s\n", msg);
+             qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+             return;
+         }
++
+         if (banks[1] & MCI_STATUS_VAL) {
+             params->status |= MCI_STATUS_OVER;
+         }
 -- 
-2.27.0
+2.11.0
 
 
