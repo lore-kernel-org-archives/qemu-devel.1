@@ -4,86 +4,86 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67F61C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 05:50:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B265C43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 05:55:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9ED942074B
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 05:50:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A6D620639
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 05:55:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PJdTGGuW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9ED942074B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HpfjOI8k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A6D620639
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHhO3-00070x-HT
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 01:50:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34346)
+	id 1kHhSo-00088c-OI
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 01:55:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35106)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kHhNM-0006Qi-2n
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 01:50:04 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:32925)
+ id 1kHhS6-0007fZ-Gm
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 01:54:58 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41143)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kHhNK-0000VF-DZ
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 01:50:03 -0400
-Received: by mail-wm1-x343.google.com with SMTP id e11so8096764wme.0
- for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 22:50:02 -0700 (PDT)
+ id 1kHhS5-0000zK-38
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 01:54:58 -0400
+Received: by mail-wr1-x443.google.com with SMTP id w5so17217388wrp.8
+ for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 22:54:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=MM4QN20OpQleKay+gY9gyk7Q5qZA5CeWW6wFCQ78now=;
- b=PJdTGGuWtZVacFUzY2a1tpNX39rJfOKCUWiPYisWPq6TyVwjT6qPKGon27m4412IWd
- RvVFdd8SCigvicAUyXgKSo3elprst1jBI3DhH7dHjwuUq1H6xgi4Yw354Dt3HPnOjsCQ
- W7JxAvr012qHLPZOvEn44b8wlN7vGXSEJCuZBV/HgyjHg5OHE1nV+tO9zY00ARL9rvjk
- qINbs6d9ExZcbgRZy965gXCz75hx8O3E0ju72GOl4fmyC9rinPJ7/xDjBoml9VmerC0s
- ioqekCMZcQNBpHN3+oYw0wshbRhB16UJtPhNJiS5vp9Y+eb+19Zol0VUTYzsOEvGfqHz
- GhkQ==
+ bh=MdFDoppZup9jP/UUo3evqxbdOj26wOhAMDiv3SGY0gw=;
+ b=HpfjOI8kH1ymuXp6oENBIZpdfJfRkyUL5td9zhbWl4gozhBiEzaHWrhjWThDlf5BBr
+ oIdOeYem//cfoalaFA0BKRfDb0cOu0bipuN8NWtbwJjwHe8mGd/+m/hUwyMPj0qUF0HW
+ LJHVxAFXR9UcYK3edHm2szoNB9J4YXn9tSOTu7k+q9MW+bd078QHprkcNp9aSNcP40uf
+ Hvn0BSsL/fSPhA8q6MguxdeTYkkoI5xxSt6Z+s7ak2xp+YP/XrkK5JktkY9DXtWFWC54
+ 2ASkkomklhA8GgEJBF6yxzF0oDtWBswWne1cwRSHDAnDQv67c6hpFgyzAG/wPto+xJrw
+ NSnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=MM4QN20OpQleKay+gY9gyk7Q5qZA5CeWW6wFCQ78now=;
- b=AJhkzZb59juD8UxSiVKqO1det7etgl7GVRIqNLC/nxe+7ySPCwwF2TywlmqwkJfQj4
- oZlrOz5I6QZOofGEJRq46K8/AF6a71bkk2I3tx+RxwH0dl2890kdEvb3KPWezySDdByV
- WNQC6PSA7xYWbQ8xGAGDUnGRCD93jZqSbwMnbAZRoFZ0S1KUJIWtQmgVkEQYwpzmC9WO
- kHqKrZBS6vWe1w2x22iSdw0U40c25iELXRwQ6tBj2/+K0Y4krzRNi+yLhnU9cr9gsoNn
- ZQz/MFbwB+KM+QAFtPF2pyBXWU9lbQwj7F2791RKD1saN9xFdxXMObzarLzU7ByDjtl+
- gTVA==
-X-Gm-Message-State: AOAM5301si61cSQP3AWGaMpBq8eHfmuiR35Kk60v6Vs1Q8RpMGXAUJMI
- QhCL8zpZHE6vi6GHw+qaXmY=
-X-Google-Smtp-Source: ABdhPJxfZ/W0J2QXNNlA+cjX/aLEm6O8eEQlRa7QzxLg+P/bE7KDq1dnOgwio33ZB+tkAmtBjM9mBQ==
-X-Received: by 2002:a1c:7907:: with SMTP id l7mr13230388wme.89.1600062600622; 
- Sun, 13 Sep 2020 22:50:00 -0700 (PDT)
+ bh=MdFDoppZup9jP/UUo3evqxbdOj26wOhAMDiv3SGY0gw=;
+ b=dyc8J2Il6kTCsVQclzlt8saSLszYpAaUW8irfRYokiU852g4GzJmbrNTiJueB1pC6a
+ kMTiQAYoEHmNmf1ugN9XcOhDatQXcpMrdWUaT1WVH5HeBczgzUWXB3HVEt0OpfTtlLlR
+ RzDbY00nqC/lET2uGo+aiXgZZsSGTXSwewhLyxhYadROfae31sN+FcI0gHXtamazmK+z
+ 24XqqBH/IGvsnWReZESFOgRvbgKFuP3X1uoxabWeQSQOa4dJzCrcwlHpD63Vnqg44Vb7
+ Q1dnLviYIeTZXz+pQOrqhtoLijoARddUNGrw/55/Qx8Y6+1L9l6OYkXa5FiH7YQn7n1w
+ 8izA==
+X-Gm-Message-State: AOAM531bmKrHoUR20DRv6oTYRbxJlcouGGq9kCb9U7OX9JuIb3h9RdvE
+ 8c8j+quzGlAjOOxMRiPk1HQ=
+X-Google-Smtp-Source: ABdhPJxm00WJCDnhJAIe6BPdf7Yn6Seh+x/y2NtX8TiMGk5dp3DRBFEm4eTMiC0/qFjpQEW2zi1jaw==
+X-Received: by 2002:adf:a4cc:: with SMTP id h12mr8852629wrb.123.1600062895130; 
+ Sun, 13 Sep 2020 22:54:55 -0700 (PDT)
 Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id i3sm18877506wrs.4.2020.09.13.22.49.59
+ by smtp.gmail.com with ESMTPSA id b194sm18345910wmd.42.2020.09.13.22.54.54
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 13 Sep 2020 22:50:00 -0700 (PDT)
-Subject: Re: [PATCH 05/11] disas: Use qemu/bswap.h for bfd endian loads
+ Sun, 13 Sep 2020 22:54:54 -0700 (PDT)
+Subject: Re: [PATCH 10/11] disas/capstone: Add skipdata hook for s390x
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20200914000153.1725632-1-richard.henderson@linaro.org>
- <20200914000153.1725632-6-richard.henderson@linaro.org>
+ <20200914000153.1725632-11-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1d157b8d-0295-799b-40cb-e1f36c505bac@amsat.org>
-Date: Mon, 14 Sep 2020 07:49:59 +0200
+Message-ID: <45155b58-dcca-74e8-1467-a8b793357db1@amsat.org>
+Date: Mon, 14 Sep 2020 07:54:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200914000153.1725632-6-richard.henderson@linaro.org>
+In-Reply-To: <20200914000153.1725632-11-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -112,127 +112,84 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/14/20 2:01 AM, Richard Henderson wrote:
-> Use the routines we have already instead of open-coding.
-
-Yay \o/
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+> It is always possible to tell the length of an insn, even if the
+> actual insn is unknown.  Skip the correct number of bytes, so that
+> we stay in sync with the instruction stream.
 > 
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
->  include/disas/dis-asm.h | 32 ++++++++++++++++++++----
->  disas.c                 | 55 -----------------------------------------
->  2 files changed, 27 insertions(+), 60 deletions(-)
+>  disas/capstone.c | 42 +++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 41 insertions(+), 1 deletion(-)
 > 
-> diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
-> index d2418c977e..8a216ac495 100644
-> --- a/include/disas/dis-asm.h
-> +++ b/include/disas/dis-asm.h
-> @@ -468,11 +468,33 @@ int print_insn_rx(bfd_vma, disassemble_info *);
+> diff --git a/disas/capstone.c b/disas/capstone.c
+> index b48f83958d..0a9ef9c892 100644
+> --- a/disas/capstone.c
+> +++ b/disas/capstone.c
+> @@ -16,6 +16,39 @@
+>   */
+>  static __thread cs_insn *cap_insn;
 >  
->  /* from libbfd */
+> +/*
+> + * The capstone library always skips 2 bytes for S390X.
+> + * This is less than ideal, since we can tell from the first two bits
+> + * the size of the insn and thus stay in sync with the insn stream.
+> + */
+> +static size_t CAPSTONE_API
+> +cap_skipdata_s390x_cb(const uint8_t *code, size_t code_size,
+> +                      size_t offset, void *user_data)
+> +{
+> +    size_t ilen;
+> +
+> +    /* See get_ilen() in target/s390x/internal.h.  */
+> +    switch (code[offset] >> 6) {
+> +    case 0:
+> +        ilen = 2;
+> +        break;
+> +    case 1:
+> +    case 2:
+> +        ilen = 4;
+> +        break;
+> +    default:
+> +        ilen = 6;
+> +        break;
+> +    }
+> +
+> +    return ilen;
+> +}
+> +
+> +static const cs_opt_skipdata cap_skipdata_s390x = {
+> +    .mnemonic = ".byte",
+> +    .callback = cap_skipdata_s390x_cb
+> +};
+> +
+>  /*
+>   * Initialize the Capstone library.
+>   *
+> @@ -42,13 +75,20 @@ static cs_err cap_disas_start(disassemble_info *info, csh *handle)
+>      /* "Disassemble" unknown insns as ".byte W,X,Y,Z".  */
+>      cs_option(*handle, CS_OPT_SKIPDATA, CS_OPT_ON);
 >  
-> -bfd_vma bfd_getl64 (const bfd_byte *addr);
-> -bfd_vma bfd_getl32 (const bfd_byte *addr);
-> -bfd_vma bfd_getb32 (const bfd_byte *addr);
-> -bfd_vma bfd_getl16 (const bfd_byte *addr);
-> -bfd_vma bfd_getb16 (const bfd_byte *addr);
-> +#include "qemu/bswap.h"
+> -    if (info->cap_arch == CS_ARCH_X86) {
+> +    switch (info->cap_arch) {
+> +    case CS_ARCH_SYSZ:
+> +        cs_option(*handle, CS_OPT_SKIPDATA_SETUP,
+> +                  (uintptr_t)&cap_skipdata_s390x);
+> +        break;
 > +
-> +static inline bfd_vma bfd_getl64(const bfd_byte *addr)
-> +{
-> +    return ldq_le_p(addr);
-> +}
-> +
-> +static inline bfd_vma bfd_getl32(const bfd_byte *addr)
-> +{
-> +    return (uint32_t)ldl_le_p(addr);
-> +}
-> +
-> +static inline bfd_vma bfd_getl16(const bfd_byte *addr)
-> +{
-> +    return lduw_le_p(addr);
-> +}
-> +
-> +static inline bfd_vma bfd_getb32(const bfd_byte *addr)
-> +{
-> +    return (uint32_t)ldl_be_p(addr);
-> +}
-> +
-> +static inline bfd_vma bfd_getb16(const bfd_byte *addr)
-> +{
-> +    return lduw_be_p(addr);
-> +}
-> +
->  typedef bool bfd_boolean;
+> +    case CS_ARCH_X86:
+>          /*
+>           * We don't care about errors (if for some reason the library
+>           * is compiled without AT&T syntax); the user will just have
+>           * to deal with the Intel syntax.
+>           */
+>          cs_option(*handle, CS_OPT_SYNTAX, CS_OPT_SYNTAX_ATT);
+> +        break;
+>      }
 >  
->  #endif /* DISAS_DIS_ASM_H */
-> diff --git a/disas.c b/disas.c
-> index 50b5677930..20fad6aabb 100644
-> --- a/disas.c
-> +++ b/disas.c
-> @@ -85,61 +85,6 @@ generic_symbol_at_address (bfd_vma addr, struct disassemble_info *info)
->    return 1;
->  }
->  
-> -bfd_vma bfd_getl64 (const bfd_byte *addr)
-> -{
-> -  unsigned long long v;
-> -
-> -  v = (unsigned long long) addr[0];
-> -  v |= (unsigned long long) addr[1] << 8;
-> -  v |= (unsigned long long) addr[2] << 16;
-> -  v |= (unsigned long long) addr[3] << 24;
-> -  v |= (unsigned long long) addr[4] << 32;
-> -  v |= (unsigned long long) addr[5] << 40;
-> -  v |= (unsigned long long) addr[6] << 48;
-> -  v |= (unsigned long long) addr[7] << 56;
-> -  return (bfd_vma) v;
-> -}
-> -
-> -bfd_vma bfd_getl32 (const bfd_byte *addr)
-> -{
-> -  unsigned long v;
-> -
-> -  v = (unsigned long) addr[0];
-> -  v |= (unsigned long) addr[1] << 8;
-> -  v |= (unsigned long) addr[2] << 16;
-> -  v |= (unsigned long) addr[3] << 24;
-> -  return (bfd_vma) v;
-> -}
-> -
-> -bfd_vma bfd_getb32 (const bfd_byte *addr)
-> -{
-> -  unsigned long v;
-> -
-> -  v = (unsigned long) addr[0] << 24;
-> -  v |= (unsigned long) addr[1] << 16;
-> -  v |= (unsigned long) addr[2] << 8;
-> -  v |= (unsigned long) addr[3];
-> -  return (bfd_vma) v;
-> -}
-> -
-> -bfd_vma bfd_getl16 (const bfd_byte *addr)
-> -{
-> -  unsigned long v;
-> -
-> -  v = (unsigned long) addr[0];
-> -  v |= (unsigned long) addr[1] << 8;
-> -  return (bfd_vma) v;
-> -}
-> -
-> -bfd_vma bfd_getb16 (const bfd_byte *addr)
-> -{
-> -  unsigned long v;
-> -
-> -  v = (unsigned long) addr[0] << 24;
-> -  v |= (unsigned long) addr[1] << 16;
-> -  return (bfd_vma) v;
-> -}
-> -
->  static int print_insn_objdump(bfd_vma pc, disassemble_info *info,
->                                const char *prefix)
->  {
+>      /* Allocate temp space for cs_disasm_iter.  */
 > 
 
 
