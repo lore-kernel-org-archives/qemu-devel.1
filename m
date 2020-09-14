@@ -2,80 +2,80 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79107C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:40:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E83EBC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:44:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 068A0205F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:40:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 36243205F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:44:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ezRiYeMN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 068A0205F4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cYBds0oF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36243205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHpej-0005A2-SH
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 10:40:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50602)
+	id 1kHpi7-0007VP-4y
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 10:44:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51914)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kHpJA-0001kW-Tc
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:18:17 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43525
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kHpN2-0006ZW-Iw
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:22:16 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59067
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kHpJ6-0000kY-GK
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:18:16 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kHpN0-0001Mu-LS
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:22:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600093091;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=oETInUiFWpxHf215yFoCpZHKJLSv7N4yWD2WVpGTVKU=;
- b=ezRiYeMNtXU8BE58hfni8QsV+14RGhIYke7+933n7+NjfFiomKSYu4b1o4y1WosVEvOAub
- CiWx07FvA5Gh8qkiD8LGYsyAujIdi09uNINgwTmQjbX9lmmjfE6/Mb4ua5QWKsAQedGyDM
- aj6PQSCmqEc4SbBqmsdJZ1f/uu8lJ1A=
+ s=mimecast20190719; t=1600093333;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=2ie34C1Nrify66QddFHK2c4Ik5ZXbZ8QQTzGd6yTYY8=;
+ b=cYBds0oFHKOZ770iFzSR2CGZMioIKlXJwUKSB+1vwDZw/TkBiOAxZc7fJ5j8yblW7eDSmn
+ Hl1QsSvO02zRWbfVopZ/HxiwFkOf42eFLLPsj/Lw+qyKrTaV7XIfbgps9U5D2YNjS7volM
+ eOFrhGt7h3KCigTDDQLoYrNuAtrzEtM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-_KYfvAvuOtmWAJ03XzDVvg-1; Mon, 14 Sep 2020 10:18:08 -0400
-X-MC-Unique: _KYfvAvuOtmWAJ03XzDVvg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-173--OttyGeEOLOoNANoaNftQg-1; Mon, 14 Sep 2020 10:21:56 -0400
+X-MC-Unique: -OttyGeEOLOoNANoaNftQg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32C3F801AC2;
- Mon, 14 Sep 2020 14:18:07 +0000 (UTC)
-Received: from localhost (ovpn-114-32.ams2.redhat.com [10.36.114.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A51FD7B7B9;
- Mon, 14 Sep 2020 14:18:03 +0000 (UTC)
-Date: Mon, 14 Sep 2020 14:44:42 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Claudio Fontana <cfontana@suse.de>
-Subject: Re: [RFC v3] checkpatch: detect missing changes to trace-events
-Message-ID: <20200914134442.GN579094@stefanha-x1.localdomain>
-References: <20200811081158.4893-1-cfontana@suse.de>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D70C318B9F01;
+ Mon, 14 Sep 2020 14:21:55 +0000 (UTC)
+Received: from redhat.com (ovpn-114-99.ams2.redhat.com [10.36.114.99])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F0C17A414;
+ Mon, 14 Sep 2020 14:21:48 +0000 (UTC)
+Date: Mon, 14 Sep 2020 15:21:46 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH] docs/system: clarify deprecation scheduled
+Message-ID: <20200914142146.GN1252186@redhat.com>
+References: <20200811104736.17140-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200811081158.4893-1-cfontana@suse.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200811104736.17140-1-stefanha@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0.0
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ztcJpsdPpsnnlAp8"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=stefanha@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:33:07
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 00:11:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -38
 X-Spam_score: -3.9
@@ -96,66 +96,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: libvir-list@redhat.com, Peter Maydell <peter.maydell@linaro.org>,
+ philmd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---ztcJpsdPpsnnlAp8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Aug 11, 2020 at 10:11:58AM +0200, Claudio Fontana wrote:
-> Signed-off-by: Claudio Fontana <cfontana@suse.de>
+On Tue, Aug 11, 2020 at 11:47:36AM +0100, Stefan Hajnoczi wrote:
+> The sentence explaining the deprecation schedule is ambiguous. Make it
+> clear that a feature deprecated in the Nth release is guaranteed to
+> remain available in the N+1th release. Removal can occur in the N+2nd
+> release or later.
+> 
+> As an example of this in action, see commit
+> 25956af3fe5dd0385ad8017bc768a6afe41e2a74 ("block: Finish deprecation of
+> 'qemu-img convert -n -o'"). The feature was deprecated in QEMU 4.2.0. It
+> was present in the 5.0.0 release and removed in the 5.1.0 release.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  scripts/checkpatch.pl | 48 ++++++++++++++++++++++++++++++++++++---------=
----
->  1 file changed, 36 insertions(+), 12 deletions(-)
->=20
-> v2 -> v3 :
->=20
-> * move the check for missing changes to MAINTAINERS and trace-events
->   later on, as otherwise the check for in_commit_log will not be done
->   on an up to date value, causing fromfile and realfile to not be set,
->   and matching unwanted strings inside the commit log.
->=20
-> * Ensure that at least one file name is passed to grep.
->=20
->=20
-> ----
->=20
-> v1 -> v2 :
->=20
-> * track the "from" file in addition to the "to" file,
->   and grep into both (if they exist), looking for trace.h, trace-root.h
->=20
->   If files are reachable and readable, emit a warning if there is no
->   update to trace-events.
+>  docs/system/deprecated.rst | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+> index 851dbdeb8a..fecfb2f1c1 100644
+> --- a/docs/system/deprecated.rst
+> +++ b/docs/system/deprecated.rst
+> @@ -4,9 +4,9 @@ Deprecated features
+>  In general features are intended to be supported indefinitely once
+>  introduced into QEMU. In the event that a feature needs to be removed,
+>  it will be listed in this section. The feature will remain functional
+> -for 2 releases prior to actual removal. Deprecated features may also
+> -generate warnings on the console when QEMU starts up, or if activated
+> -via a monitor command, however, this is not a mandatory requirement.
+> +for 1 more release after deprecation. Deprecated features may also generate
+> +warnings on the console when QEMU starts up, or if activated via a monitor
+> +command, however, this is not a mandatory requirement.
 
-This patch still has an RFC tag. Is it ready to be merged?
+So we're changing
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+  The feature will remain functional for 2 releases prior to actual removal.
 
---ztcJpsdPpsnnlAp8
-Content-Type: application/pgp-signature; name="signature.asc"
+to
 
------BEGIN PGP SIGNATURE-----
+  The feature will remain functional for 1 more release after deprecation.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9fc8oACgkQnKSrs4Gr
-c8jxzAgAxOFwyZPSvrhGQ5+i6Paxn/jSRZkgRRxKduQKOkRQuZ7NbLRqL5YBcmUq
-sB3hqxLXOIy7Q91xM02zSf02qXxVRckGBIrtxrcvCCj3eJXFlj/EIQI0ius62T3p
-3gH7H75LfBScJod1twGplSmMtpp/u+GarrqFKSj2909ETBtpzOjymNH2lA0J8Y3A
-gt2FgSbLf8d2GijeSCcM4ln1Qz3Js0VCFjYf9EcOr3ky7uubzDx/pLHfS3UNZZEs
-8qpJdXW6rLSK6e4DNjRRl6FoUhQmQGTGlhaxckdPvYNJpUKz7OOjfZddUlWuVmgm
-qMbEgRn7uNrbF4VoIocFx923kvBqhQ==
-=awgG
------END PGP SIGNATURE-----
+How about
 
---ztcJpsdPpsnnlAp8--
+  The feature will remain functional for the release in which it was
+  deprecated and one further release. After these two releases, the
+  feature is liable to be removed.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
