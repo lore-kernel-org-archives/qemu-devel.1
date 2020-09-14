@@ -2,96 +2,87 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 847B1C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:54:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDB1FC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:55:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10858207EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:54:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 349F8204FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:55:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dqM47iCx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10858207EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H9f0DmSR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 349F8204FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHiO0-0004KO-TJ
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 02:54:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45174)
+	id 1kHiOv-0005Tx-4s
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 02:55:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45296)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kHiNI-0003nj-Sx
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 02:54:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54908
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kHiNG-0007ay-8w
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 02:54:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600066440;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=phA8Ph1KmuGW2DJpK5jIeK2ENPap7pE3eC12INbNqc8=;
- b=dqM47iCxmiytrh2NkVteKYjxrRqdUA6T9RTEeJTBmuc6W1M0eDd4nHS4WFNNGHRzTK1VBj
- a2g1b12jLh/DqHj1zlTNmtorqsMm2UpizowYm2/xxGCl9KIOFl8BQNIJFAUDQ6wVedXZwn
- bdtRza6NVMtlCZRKB3qiVx8EYjaftus=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-474-q3jV14wBNniLqCog9_ADFw-1; Mon, 14 Sep 2020 02:53:59 -0400
-X-MC-Unique: q3jV14wBNniLqCog9_ADFw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0637B427FB;
- Mon, 14 Sep 2020 06:53:57 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
- [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B004D81C44;
- Mon, 14 Sep 2020 06:53:52 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id F3E16113865F; Mon, 14 Sep 2020 08:53:50 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH 11/14] block/qcow2-bitmap: return startus from
- qcow2_store_persistent_dirty_bitmaps
-References: <20200909185930.26524-1-vsementsov@virtuozzo.com>
- <20200909185930.26524-12-vsementsov@virtuozzo.com>
- <20200911113838.482b062e@bahia.lan>
- <2d8099d0-c04c-8b91-fd1e-f988cbba14ce@virtuozzo.com>
- <20200911132152.01855289@bahia.lan>
- <12a7ab93-6545-a221-e9ff-4328c781fbb3@virtuozzo.com>
- <87r1r8cp8e.fsf@dusky.pond.sub.org>
- <7863ba25-250e-a562-4925-6c5f992e587c@virtuozzo.com>
-Date: Mon, 14 Sep 2020 08:53:50 +0200
-In-Reply-To: <7863ba25-250e-a562-4925-6c5f992e587c@virtuozzo.com> (Vladimir
- Sementsov-Ogievskiy's message of "Fri, 11 Sep 2020 20:20:18 +0300")
-Message-ID: <87v9gg4znl.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kHiO7-0004Zi-Ja; Mon, 14 Sep 2020 02:54:55 -0400
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:45805)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kHiO6-0007eG-0j; Mon, 14 Sep 2020 02:54:55 -0400
+Received: by mail-lf1-x144.google.com with SMTP id z17so12150475lfi.12;
+ Sun, 13 Sep 2020 23:54:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=I9fWzwv/TuxbKhu5rrnZXSIlX0XUO8DlQp+5IcGKFKE=;
+ b=H9f0DmSRUR85BBoo+izVW7W8b67fcQNgjHV/DP/D2yJjJpBwNs5zWX9vbtHlRhF2z+
+ qRDeAs1y1p1wM23v1uz6+WCTLXqhBr0SjFWm9CaWNjXiOZoLyezrM8+z/JeYL1OQLVw4
+ 0cbWJfAnL12FimQDL1HoljoNLwr3nmqnXe0wZWFa07X/SVztSyaU4HciLxPeX88s6tG7
+ gn1lOvNm9uLRMZ2CII7J8imxrPFDAbcXrM7QS6t9PmJKeElGNGWCZBd5ePAFm6oj5HAD
+ p9e5jBxpD4HpxR+w58CVUNdMMNtd05XDXF31jKJoRG+8YB21jcGzazxE2aPi5nDXvG07
+ iKCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=I9fWzwv/TuxbKhu5rrnZXSIlX0XUO8DlQp+5IcGKFKE=;
+ b=YzWcFfbX/ONq3ggUbsqMPNLdVpvSuZJhKnZfthgwAY7rNVUb6maVg7z6/VzBDynxl0
+ dlkPGU6ozGz28HXH94LxR0+End7fmUUbkS+WmzPzxEPGjHOsA4nQ1Hzu3Of8sPdcxATE
+ CxTUu0ZgT1+Pv2L3vOTFtMMd/0w5oFwi4BgFzZcIKK9G4IMjHVNQHsRO4lvhPxpc8T2h
+ F6b/eO1BCCGO+33rbcFMciU83j6b/3Jb0lFDvhevgx+Ez+1na1VTVOXc9G6tG4EMxT/+
+ FOKV9PI4ztTGHimxgHYwQhvdeuWT9POyOwp/0YBI5LB5WTlNAEIKIRSRR+K7KH1VV4zM
+ m1aA==
+X-Gm-Message-State: AOAM531QWavjUZUGSYPVhj8tLqK9uzvIQ29tY21g+eYF8vmtjV0z/Bdb
+ aYbZSojOIdmFnJg0h+pzrIx8CggG08OnBX1EwIs=
+X-Google-Smtp-Source: ABdhPJzUSP59xUsUpIerex4i/IUTybzrORV4bRme51HqOGVzrkpJq+SYAki2vquy6MYHCWVZHS8hIIlj4j4N9ZIYcqQ=
+X-Received: by 2002:a19:560a:: with SMTP id k10mr3537359lfb.599.1600066491492; 
+ Sun, 13 Sep 2020 23:54:51 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 01:39:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.695,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+References: <20200912224431.1428-1-luoyonggang@gmail.com>
+ <276a137d-d863-2465-1fe2-599e5772a1a8@redhat.com>
+ <CAE2XoE8WrE1_e1VR1VSG7vWWX9nsbp2iRwZvOur1ouGrbC+Rqw@mail.gmail.com>
+ <98ea8ecd-afb4-c2de-214e-b94dcdbd6c8b@weilnetz.de>
+In-Reply-To: <98ea8ecd-afb4-c2de-214e-b94dcdbd6c8b@weilnetz.de>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Mon, 14 Sep 2020 14:54:41 +0800
+Message-ID: <CAE2XoE-7=T5NtZjZQ4zAP3nj34uVajr84=18Bn3Yi4OMGScFDw@mail.gmail.com>
+Subject: Re: [PATCH v8 00/27] W32, W64 msys2/mingw patches
+To: Stefan Weil <sw@weilnetz.de>
+Content-Type: multipart/alternative; boundary="000000000000d7b3ed05af408240"
+Received-SPF: pass client-ip=2a00:1450:4864:20::144;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x144.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,45 +95,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berto@igalia.com, pavel.dovgaluk@ispras.ru,
- qemu-block@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org,
- stefanha@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, jsnow@redhat.com,
- ari@tuxera.com
+Reply-To: luoyonggang@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Ed Maste <emaste@freebsd.org>, Qemu-block <qemu-block@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
+ qemu-level <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Li-Wen Hsu <lwhsu@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+--000000000000d7b3ed05af408240
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> 11.09.2020 18:22, Markus Armbruster wrote:
->> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->> 
->>> 11.09.2020 14:21, Greg Kurz wrote:
->>>> On Fri, 11 Sep 2020 13:18:32 +0300
->>>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
-[...]
->>>>> Hmm.. With this series I understand the following:
->>>>>
->>>>> 1. It's no sense in simple applying scripts/coccinelle/errp-guard.cocci to the whole code-base, because:
->>>>>
->>>>>      - it produces a lot of "if (*errp)" in places where it is really simple to avoid error propagation at all, like in this series
->>>>>      - reviewing is the hardest part of the process
->>>>>
->>>>> So, if we have to review these changes anyway, it's better to invest a bit more time into patch creation, and make code correspond to our modern error API recommendations.
->>
->> Yes, going the extra mile is better.
->>
->> I recommend it for code that is actively maintained.  Making the code
->> simpler and thus easier to maintain is an investment that'll pay off.
->>
->> We may have code where it won't pay off.  Do you think a blind
->> application of errp-guard.cocci might be better than nothing there?
+On Mon, Sep 14, 2020 at 2:38 PM Stefan Weil <sw@weilnetz.de> wrote:
 >
-> I think, careful review is needed anyway. And it may be too large effort for dead (or almost dead) code.
-> So, let's start from popular subsystems. And make a decision for the rest later.
+> Am 14.09.20 um 08:27 schrieb =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo):
+>
+>
+> Thanks, I am learning how to submit patches properly, in old days,  when
+I am using pull request on github have no such problems. easy to follow up
+>
+>
+> May I also ask you to send text-only e-mails? Your HTML e-mails are
+really hard to read.
+>
+> Thanks,
+>
+> Stefan Weil
+>
+>
+Sorry, I am using gmail to send, I'll review the email format in latter
+messages
 
-Makes sense.
 
-[...]
+--
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
 
+--000000000000d7b3ed05af408240
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><br><br>On Mon, Sep 14, 2020 at 2:38 PM Stefan Weil &lt;<a=
+ href=3D"mailto:sw@weilnetz.de">sw@weilnetz.de</a>&gt; wrote:<br>&gt;<br>&g=
+t; Am 14.09.20 um 08:27 schrieb =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo):<=
+br>&gt;<br>&gt;<br>&gt; Thanks, I am learning how to submit patches properl=
+y, in old days, =C2=A0when I am using pull request on github have no such p=
+roblems. easy to follow up<br>&gt;<br>&gt;<br>&gt; May I also ask you to se=
+nd text-only e-mails? Your HTML e-mails are really hard to read.<br>&gt;<br=
+>&gt; Thanks,<br>&gt;<br>&gt; Stefan Weil<br>&gt;<br>&gt;<div>Sorry, I am u=
+sing gmail to send, I&#39;ll review the email format in latter messages</di=
+v><div><br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<b=
+r>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincer=
+ely,<br>Yonggang Luo</div></div>
+
+--000000000000d7b3ed05af408240--
 
