@@ -2,84 +2,87 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79257C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:54:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D891C43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:56:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15B65206B2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:54:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 831D5208DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:56:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="WITLPvNC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15B65206B2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YnH2Aaam"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 831D5208DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHo06-0000wH-9Y
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 08:54:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41208)
+	id 1kHo1z-0002yG-JH
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 08:56:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43894)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kHnsY-0000yd-J4
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:46:42 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:44508)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kHo0s-0001iI-NW
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:55:18 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:43880)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kHnsW-0002Wv-Js
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:46:42 -0400
-Received: by mail-pg1-x544.google.com with SMTP id 7so11446816pgm.11
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 05:46:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id;
- bh=yG5xlWr2lQRI+IJ71Zoym72UsKovjcpiQ/ZPFc5P+6U=;
- b=WITLPvNCDiT5D1k+tZFmd/iobNnp79eixFGSN31hcDNyssyhRSmZPZiX/xY8DO6B2E
- Thj9RzDTDsY2ydQYlvEYfbN3K2bTqIaavahnVDaFRaKqROmIu9cRmN6AGfUTC1x0ha+b
- 1EE0UkMvzwKWaPbRNIc9I/1SM5ath5MVd6xx4uHU5JXVtr/TzVqrzBWcqbcZ92Se0oUR
- Gt/gUo0H5BxxgN2pyfs3doabQxUOg7eeOPtVAry8+ASjiKreFvun4YxSZAuTtOor4DgN
- r+RKtfpGos7LcoeTQKGG13Y4URNBiy/GRSbGpV21EObqLP7K51EUgKfZ2tX8AIUz+OGk
- U5fg==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kHo0p-0003qB-KE
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:55:18 -0400
+Received: by mail-ej1-x643.google.com with SMTP id o8so23089512ejb.10
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 05:55:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=DVaCRgx1fQKr14/rUIRwArlH3VkYirm2d8m195lA3Ns=;
+ b=YnH2AaamclDWLtGSojwbFNsdtFCoD6NFtF0Bc0Uo56CUeG9ySEETO5JHXbQao8iFzB
+ TxNsKsVvIsa/e93sa9s4u6bA8R72PstYfBlWApsaO/Jpitet6ERGysU+akae92hBlD8C
+ PGPseXpFXRTMVzk9SNflqGi03UYozGfc7Q2E007Wnn8NsteSA1WQpv4iVnCH085S4NjE
+ b34g2gwXtDr0SeYAVOg2Rqv07sBcF9kqxBYf84jZ1nB2jJL1W3NizZO+23oFcMxDIIzz
+ mSeD8JfAVfqAWLM68ItGULbGyarve+MOQ3lYKkvnYprF5YtQqf7D8G1gxjYVaeUK7/yi
+ Vn3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=yG5xlWr2lQRI+IJ71Zoym72UsKovjcpiQ/ZPFc5P+6U=;
- b=M66svI1ESYuXnwa3ympjnGyFblM7vlLF0JTL3Sl/Iskv0XzvRo34BNeBz2Vh/j2cb0
- n52O15xqSAIKkHUktIA8VlVUYYlEp0ZN+sw8AsWKBP+djE2fvmh8Lk/KbpT9HWNjrV4R
- pvL60bXKD9zjS05FEDnZVQABaHk2KJ+XR/nprmPk9vJdCggVlkfhbV95GLwevOOt27Kd
- YA5UQadMeZuKT8ewKYoAQ1fnzZe5Bi6OGC2MwP7qP9zRxuCaJM4reMeN2Akn29DQ9cS0
- Qv5Ztg5O40pgeRMU/KDWI8TAZtbpCouX/R87lMhM1jMq3rvU05VTfE8sLhMH9lDKbYap
- k3QQ==
-X-Gm-Message-State: AOAM530tgz9QP0s2cQV6T9NRvTNjZD8F6I9tji6KOx69q3BDOjogncJd
- +PpkSN2TAu9kHEs+4pPbFRYUO3AIm1KEHF/r
-X-Google-Smtp-Source: ABdhPJzN89Tp3tRJDCK7xPLpT3dqIOnKCl78+jlLVUIIOTUBY+dmBq+HH5EfTePC3UrqTUAJQlsBIw==
-X-Received: by 2002:a63:4554:: with SMTP id u20mr646286pgk.441.1600087598591; 
- Mon, 14 Sep 2020 05:46:38 -0700 (PDT)
-Received: from localhost.localdomain ([203.212.240.177])
- by smtp.googlemail.com with ESMTPSA id ep4sm9156116pjb.39.2020.09.14.05.46.34
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Sep 2020 05:46:37 -0700 (PDT)
-From: Ani Sinha <ani@anisinha.ca>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 7/9 v2] tests/acpi: unit test for
- 'acpi-pci-hotplug-with-bridge-support' bridge flag
-Date: Mon, 14 Sep 2020 18:16:19 +0530
-Message-Id: <20200914124619.4382-1-ani@anisinha.ca>
-X-Mailer: git-send-email 2.17.1
-Received-SPF: none client-ip=2607:f8b0:4864:20::544;
- envelope-from=ani@anisinha.ca; helo=mail-pg1-x544.google.com
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=DVaCRgx1fQKr14/rUIRwArlH3VkYirm2d8m195lA3Ns=;
+ b=Amz63tcLU++B6P5GsK7m4KEID5yoXkhgrCrxciGbmpWvId+5o9Dh7BWI6Mxx3sHBm3
+ bcDHAtVzPQnFZRJ28e/KBIj69tPjGWdOhlP3g6XYab5+1aVevtyJ0GTTARIMepzPaKKv
+ SniNhLuAmIfwiC+f5utoq9K58dvSxUETmr7aELei8QeIHVrYTEEBgW+DhoBegrqYaU10
+ 8e01Iil1ctCyubIhwoqCps2cMEfaojhlJGZ0DoJ+BsGS+dcvZhpSuHArhaQdaYAjp5n4
+ VGK2uK2hkTsrJ28o0hkq9UXMo2D6bR1vuQsgChFjMk535WsuDMYBVuq3KYukiFqR5UwL
+ k3EA==
+X-Gm-Message-State: AOAM531FgyCE3ZKgvVs89MY+E9CLU82XwGBBESNV8IKPtfQIcwNeNtoS
+ 3RmxLsdPnWESdLEqmIi01DONDIRhxjfHasNVo/FsrQ==
+X-Google-Smtp-Source: ABdhPJxMqTnGDIMByFQBnIsin7Yvmjgv1YBkiAL6USkCGgUriR5LNjabNeJIKkmD7q1MSF1fv2ide2ML5TQPceB7pY0=
+X-Received: by 2002:a17:906:71c9:: with SMTP id
+ i9mr14284636ejk.250.1600088113855; 
+ Mon, 14 Sep 2020 05:55:13 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200911052101.2602693-1-hskinnemoen@google.com>
+In-Reply-To: <20200911052101.2602693-1-hskinnemoen@google.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 14 Sep 2020 13:55:02 +0100
+Message-ID: <CAFEAcA-77U7p3RCQS5z7ZJf-CBNKqXrkwB+Kdz3ZCjPQgEge6Q@mail.gmail.com>
+Subject: Re: [PATCH v9 00/14] Add Nuvoton NPCM730/NPCM750 SoCs and two BMC
+ machines
+To: Havard Skinnemoen <hskinnemoen@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,62 +95,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, jusual@redhat.com,
- Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: CS20 KFTing <kfting@nuvoton.com>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ IS20 Avi Fishman <Avi.Fishman@nuvoton.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This change adds a new unit test for the global flag
-'acpi-pci-hotplug-with-bridge-support' which is available for cold plugged pci
-bridges in i440fx. The flag can be used to turn off acpi based hotplug support
-for all pci bridges.
+On Fri, 11 Sep 2020 at 06:21, Havard Skinnemoen <hskinnemoen@google.com> wrote:
+>
+> This should be fully reviewed now, but the Timer patch may deserve another
+> look, as I fixed a few bugs in it. Huge thanks to everyone who reviewed and/or
+> tested this patchset, it has clearly improved a lot since I started.
+>
+> I also pushed this and the previous patchsets to my qemu fork on github.  The
+> branches are named npcm7xx-v[1-9].
+>
+>   https://github.com/hskinnemoen/qemu
+>
+> This patch series models enough of the Nuvoton NPCM730 and NPCM750 SoCs to boot
+> an OpenBMC image built for quanta-gsj.
 
-Signed-off-by: Ani Sinha <ani@anisinha.ca>
----
- tests/qtest/bios-tables-test.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
 
-changelog:
-v1 : initial patch
-v2: commit log updated.
 
-diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-index d8c7d57557..7632cfe1be 100644
---- a/tests/qtest/bios-tables-test.c
-+++ b/tests/qtest/bios-tables-test.c
-@@ -754,6 +754,20 @@ static void test_acpi_piix4_root_hotplug(void)
-     free_test_data(&data);
- }
- 
-+static void test_acpi_piix4_bridge_hotplug(void)
-+{
-+    test_data data;
-+
-+    memset(&data, 0, sizeof(data));
-+    data.machine = MACHINE_PC;
-+    data.variant = ".hpbridge";
-+    data.required_struct_types = base_required_struct_types;
-+    data.required_struct_types_len = ARRAY_SIZE(base_required_struct_types);
-+    test_acpi_one("-global PIIX4_PM.acpi-pci-hotplug-with-bridge-support=off "
-+                  "-device pci-bridge,chassis_nr=1", &data);
-+    free_test_data(&data);
-+}
-+
- static void test_acpi_q35_tcg(void)
- {
-     test_data data;
-@@ -1159,6 +1173,7 @@ int main(int argc, char *argv[])
-         qtest_add_func("acpi/piix4", test_acpi_piix4_tcg);
-         qtest_add_func("acpi/piix4/bridge", test_acpi_piix4_tcg_bridge);
-         qtest_add_func("acpi/piix4/hotplug", test_acpi_piix4_root_hotplug);
-+        qtest_add_func("acpi/piix4/brhotplug", test_acpi_piix4_bridge_hotplug);
-         qtest_add_func("acpi/q35", test_acpi_q35_tcg);
-         qtest_add_func("acpi/q35/bridge", test_acpi_q35_tcg_bridge);
-         qtest_add_func("acpi/q35/mmio64", test_acpi_q35_tcg_mmio64);
--- 
-2.17.1
+Applied to target-arm.next, thanks.
 
+-- PMM
 
