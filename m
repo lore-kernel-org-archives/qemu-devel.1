@@ -1,91 +1,88 @@
-Return-Path: <SRS0=H3r+=CW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2C3AC433E2
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 23:47:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DDEBC43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 00:02:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46A7521D1A
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Sep 2020 23:47:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1CE8E20796
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 00:02:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fwVgi/RE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46A7521D1A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RZUqFLex"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CE8E20796
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHbiI-0007W0-Fj
-	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 19:47:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41022)
+	id 1kHbxI-0003wZ-4u
+	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 20:02:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ameynarkhede03@gmail.com>)
- id 1kHbgM-0006AB-Ry
- for qemu-devel@nongnu.org; Sun, 13 Sep 2020 19:45:18 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:33153)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kHbwV-0002UT-BJ
+ for qemu-devel@nongnu.org; Sun, 13 Sep 2020 20:01:59 -0400
+Received: from mail-pf1-x434.google.com ([2607:f8b0:4864:20::434]:35225)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ameynarkhede03@gmail.com>)
- id 1kHbgK-00027c-Pz
- for qemu-devel@nongnu.org; Sun, 13 Sep 2020 19:45:18 -0400
-Received: by mail-pf1-x441.google.com with SMTP id c196so11169253pfc.0
- for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 16:45:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kHbwT-0004BR-Gb
+ for qemu-devel@nongnu.org; Sun, 13 Sep 2020 20:01:59 -0400
+Received: by mail-pf1-x434.google.com with SMTP id o68so11179403pfg.2
+ for <qemu-devel@nongnu.org>; Sun, 13 Sep 2020 17:01:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=6C86PRe3PD1jHOlF067N6BH04+k7qnO7PTI/UUZDrl8=;
- b=fwVgi/RECgT/8vq1m9jYLNewQZTIXDYl+umVwrTcSAFPe5srlcSv+NU5C4oG1Cnvjy
- RjWHYYzVydhmGR7EHfBLwTMpYiLrTRhKsdpwGtiYO3LWfOepKc7e59cktkPdM10OXtfu
- TGwmDK9O88xaS7W9D7GqjiMbYKgPNvOBwvbeYRESxZsNLUtX17Zp6fGD/udiMRsV3Lmi
- WXFw4zjhUo0fqV7cgJJwU/lAjBaWlHdRxh9M1/fNkAiVn3338qbivDgQE2gFHvcXd4PV
- mtyG1S5OR6aNdUixDklGqy4d8RRwSXssL0uSpf0Ps6oZW3YXMdFtKJqHU4u9iVDVvOuU
- PJ7g==
+ bh=INOIZZ1UU6wjUvExIBY5xZEUID/bFlB32HgebiDeLvo=;
+ b=RZUqFLexb/mvoAA1++MJGs1AUjxM/wRxFM/AbTSd3aRw3UitS7Wz1BYn3AnkCZVEnj
+ FDuum2D71e0SKqKqBlb8NTZmAnrkeiheu9UO7SPdqZQb37ucVgOE6siCuwhhpYIYeC60
+ xIgRRa2XnosMabb04VA4FGuNTIg5OiHaBjNoDhD/B56KnEf5jqX6Bh+Eo4Gyt7WRBp8e
+ eE8VmSAALc2pNsLCifm2UxLTQnCDhjRZmxkGGWITXxRhy3a46yRU3qeUE35hiCqHasvI
+ L9avhW4dAVETwPDdpt600M93VQnRrYXoLzcOc8DblQ7oouXhwAooGAjUON20Qsen+mP/
+ B5oQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=6C86PRe3PD1jHOlF067N6BH04+k7qnO7PTI/UUZDrl8=;
- b=AblSiVmVyxRhQJr6Wr2pQkfHJsTrNfW6vaNgsWSgl1pl7/FZnNZFRR+cCbz1IKeoyX
- 0/DBo+WLxKl7FgLqy7wilp8WZIZBtV/5+od0veGDiEWTBR2lXhGMOAB7j5sV9Ue2ohlx
- Fv5VBCz5yn25nXalZs9O7GLhinZGdr2j12VD0DjoCwCJh/2TXh/qkfQcwn2eY9YExjLX
- I5aDss6jOIFnzSeruxIwOER2A4ffjKDH1MUjjm+nNffcXusENd9GMp3fqeKWr4P3R0TK
- IsZWCc8k/3YrKSfSR8gE76m+aTim5S5A/XBXEoqcx0u7s1O41Lsyb7TRyxjXTPvU6cpP
- m1Yw==
-X-Gm-Message-State: AOAM530RgsJlpYoyWtRCfwVjXvhYpSbzd+qbp9LNqm/DHbzBAqfSKbHQ
- xnimdUrNYPDRLFYGrq6L5y0zLdaGSLGfOHnt
-X-Google-Smtp-Source: ABdhPJwK7aQ4/OhIh8mHcBQHdQoIFXqPgluaTDLStUow9zeez1C4eZbfJHSGiX7Xt1kYRBk2LjaRYQ==
-X-Received: by 2002:a63:4451:: with SMTP id t17mr8654811pgk.92.1600040714887; 
- Sun, 13 Sep 2020 16:45:14 -0700 (PDT)
-Received: from localhost.localdomain ([49.32.9.241])
- by smtp.googlemail.com with ESMTPSA id l1sm6768830pgo.11.2020.09.13.16.45.12
+ bh=INOIZZ1UU6wjUvExIBY5xZEUID/bFlB32HgebiDeLvo=;
+ b=p1gymoVhfCixWy6H75hSQnAwCl5iVbLrSdZ9JInHCmbToGLb8P/FourOBFPAsZt/WF
+ abSRL6WcJNUN1p5YtGexrDCCmbIyORQRM7Pn1vM6wI8GQ9zS06jgu2Hftc+wkG8Nfm7b
+ 1HmNH+BQRUmXgrBnaBMDgs/2QchXUXCzJSCJ5NVfwhNssjTVU8U6s1g+53MoGDPj4PNU
+ nOCdWaPPty8uZc+4tXw/z8W+tkxAJJw2PVai4nE7e+6jYyekfjHrYCBojkObPA59xQ+M
+ YnWkTBBSD1rApRZ45FQpsWtXJuaGFHzxnLlZj8ogIbLTDHs8o81dSPZpVEO8megBc9it
+ MroQ==
+X-Gm-Message-State: AOAM53116Xz24VTxDOx0xNVjzpauIOjn/h64arAZcCQWKglIbBo2AANj
+ fw4frw5gdl87ATgkTKK02lI0sBF0xlKaEA==
+X-Google-Smtp-Source: ABdhPJxzp8Jq255Gh7TCBleCy3l7F8De1+0V73rp7fZfIHZbHVQLSoW1WR28gUBI9NmpTT443hUZiQ==
+X-Received: by 2002:a17:902:b586:b029:d1:bb0f:2644 with SMTP id
+ a6-20020a170902b586b02900d1bb0f2644mr8292015pls.34.1600041715069; 
+ Sun, 13 Sep 2020 17:01:55 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id 31sm6538252pgs.59.2020.09.13.17.01.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 13 Sep 2020 16:45:14 -0700 (PDT)
-From: Amey Narkhede <ameynarkhede03@gmail.com>
+ Sun, 13 Sep 2020 17:01:54 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] hw/scsi/vmw_pvscsi.c: Fix wrong usage of gboolean types in
- PVSCSIState
-Date: Mon, 14 Sep 2020 05:14:51 +0530
-Message-Id: <20200913234451.170022-1-ameynarkhede03@gmail.com>
-X-Mailer: git-send-email 2.28.0
+Subject: [PATCH 00/11] capstone + disassembler patches
+Date: Sun, 13 Sep 2020 17:01:42 -0700
+Message-Id: <20200914000153.1725632-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
- envelope-from=ameynarkhede03@gmail.com; helo=mail-pf1-x441.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::434;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x434.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -100,93 +97,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, pbonzini@redhat.com,
- Amey Narkhede <ameynarkhede03@gmail.com>, dmitry.fleytman@gmail.com
+Cc: luoyonggang@gmail.com, alex.bennee@linaro.org, thuth@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-rings_info_valid, msg_ring_info_valid and use_msg fields of struct
-PVSCSIState are using gboolean TRUE/FALSE values with the type uint8_t.
-Change their type to bool along with the usage of initialization macro
-VMSTATE_BOOL during initialization of vmstate_pvscsi and
-pvscsi_properties.
+The primary change here is the update for capstone to meson.
+This bypasses capstone's build system entirely.  There's more
+commentary on that subject with the first patch.
 
-Signed-off-by: Amey Narkhede <ameynarkhede03@gmail.com>
----
- hw/scsi/vmw_pvscsi.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+Plus a collection of other fixes and cleanups in the area.
 
-diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
-index c071e0c7aa..86f00e3d7e 100644
---- a/hw/scsi/vmw_pvscsi.c
-+++ b/hw/scsi/vmw_pvscsi.c
-@@ -123,9 +123,9 @@ typedef struct {
-     /* Collector for current command data */
-     uint32_t curr_cmd_data[PVSCSI_MAX_CMD_DATA_WORDS];
+There are a couple of other targets that could use capstone:
 
--    uint8_t rings_info_valid;            /* Whether data rings initialized   */
--    uint8_t msg_ring_info_valid;         /* Whether message ring initialized */
--    uint8_t use_msg;                     /* Whether to use message ring      */
-+    bool rings_info_valid;            /* Whether data rings initialized   */
-+    bool msg_ring_info_valid;         /* Whether message ring initialized */
-+    bool use_msg;                     /* Whether to use message ring      */
+The current capstone branch has a fatal bug affecting RISC-V.
+I have submitted a fix upstream for that, and have the minimal
+patches required to enable it here.
 
-     uint8_t msi_used;                    /* For migration compatibility      */
-     PVSCSIRingInfo rings;                /* Data transfer rings manager      */
-@@ -349,8 +349,8 @@ pvscsi_reset_state(PVSCSIState *s)
-     s->reg_command_status = PVSCSI_COMMAND_PROCESSING_SUCCEEDED;
-     s->reg_interrupt_status = 0;
-     pvscsi_ring_cleanup(&s->rings);
--    s->rings_info_valid = FALSE;
--    s->msg_ring_info_valid = FALSE;
-+    s->rings_info_valid = false;
-+    s->msg_ring_info_valid = false;
-     QTAILQ_INIT(&s->pending_queue);
-     QTAILQ_INIT(&s->completion_queue);
- }
-@@ -792,7 +792,7 @@ pvscsi_on_cmd_setup_rings(PVSCSIState *s)
-     pvscsi_dbg_dump_tx_rings_config(rc);
-     pvscsi_ring_init_data(&s->rings, rc);
+There is capstone support for m68k, but it doesn't look like
+there's coldfire support.  So capstone is a subset of what we
+have in disas/m68k.c.  There's probably no point changing here.
 
--    s->rings_info_valid = TRUE;
-+    s->rings_info_valid = true;
-     return PVSCSI_COMMAND_PROCESSING_SUCCEEDED;
- }
+There is capstone support for mips, which might be good enough
+to replace disas/mips.c.  It wouldn't replace disas/nanomips.c,
+and there's no support at all for the micromips isa.
 
-@@ -874,7 +874,7 @@ pvscsi_on_cmd_setup_msg_ring(PVSCSIState *s)
-         if (pvscsi_ring_init_msg(&s->rings, rc) < 0) {
-             return PVSCSI_COMMAND_PROCESSING_FAILED;
-         }
--        s->msg_ring_info_valid = TRUE;
-+        s->msg_ring_info_valid = true;
-     }
-     return sizeof(PVSCSICmdDescSetupMsgRing) / sizeof(uint32_t);
- }
-@@ -1232,9 +1232,9 @@ static const VMStateDescription vmstate_pvscsi = {
-         VMSTATE_UINT32(curr_cmd_data_cntr, PVSCSIState),
-         VMSTATE_UINT32_ARRAY(curr_cmd_data, PVSCSIState,
-                              ARRAY_SIZE(((PVSCSIState *)NULL)->curr_cmd_data)),
--        VMSTATE_UINT8(rings_info_valid, PVSCSIState),
--        VMSTATE_UINT8(msg_ring_info_valid, PVSCSIState),
--        VMSTATE_UINT8(use_msg, PVSCSIState),
-+        VMSTATE_BOOL(rings_info_valid, PVSCSIState),
-+        VMSTATE_BOOL(msg_ring_info_valid, PVSCSIState),
-+        VMSTATE_BOOL(use_msg, PVSCSIState),
 
-         VMSTATE_UINT64(rings.rs_pa, PVSCSIState),
-         VMSTATE_UINT32(rings.txr_len_mask, PVSCSIState),
-@@ -1255,7 +1255,7 @@ static const VMStateDescription vmstate_pvscsi = {
- };
+r~
 
- static Property pvscsi_properties[] = {
--    DEFINE_PROP_UINT8("use_msg", PVSCSIState, use_msg, 1),
-+    DEFINE_PROP_BOOL("use_msg", PVSCSIState, use_msg, true),
-     DEFINE_PROP_BIT("x-old-pci-configuration", PVSCSIState, compat_flags,
-                     PVSCSI_COMPAT_OLD_PCI_CONFIGURATION_BIT, false),
-     DEFINE_PROP_BIT("x-disable-pcie", PVSCSIState, compat_flags,
---
-2.28.0
 
-This is my first qemu patch. Let know if there are any mistakes
+Richard Henderson (11):
+  capstone: Convert Makefile bits to meson bits
+  capstone: Update to upstream "next" branch
+  disas: Move host asm annotations to tb_gen_code
+  disas: Clean up CPUDebug initialization
+  disas: Use qemu/bswap.h for bfd endian loads
+  disas: Cleanup plugin_disas
+  disas: Configure capstone for aarch64 host without libvixl
+  disas: Split out capstone code to disas/capstone.c
+  disas: Enable capstone disassembly for s390x
+  disas/capstone: Add skipdata hook for s390x
+  disas: Enable capstone disassembly for sparc
+
+ configure                 |  24 +-
+ Makefile                  |  16 -
+ include/disas/dis-asm.h   | 102 +++---
+ include/disas/disas.h     |   2 +-
+ include/exec/log.h        |   4 +-
+ accel/tcg/translate-all.c |  24 +-
+ disas.c                   | 702 +++++++++-----------------------------
+ disas/capstone.c          | 326 ++++++++++++++++++
+ target/s390x/cpu.c        |   4 +
+ target/sparc/cpu.c        |   4 +
+ tcg/tcg.c                 |   4 +-
+ capstone                  |   2 +-
+ disas/meson.build         |   1 +
+ meson.build               | 112 +++++-
+ meson_options.txt         |   3 +
+ 15 files changed, 672 insertions(+), 658 deletions(-)
+ create mode 100644 disas/capstone.c
+
+-- 
+2.25.1
+
 
