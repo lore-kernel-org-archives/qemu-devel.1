@@ -2,92 +2,92 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88A03C43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:46:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AAAAC43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:47:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8DF020829
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:46:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A77CD208E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:47:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pJDbx9lM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8DF020829
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cqHT7uHa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A77CD208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHpkO-0000wY-Uo
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 10:46:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56514)
+	id 1kHpl6-0001Vu-QS
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 10:47:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54348)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHpfg-0005xu-Bj
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:41:32 -0400
-Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:41521)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHpfd-00040V-95
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:41:31 -0400
-Received: by mail-ej1-x641.google.com with SMTP id lo4so294219ejb.8
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 07:41:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=4nwERILA7b9Xpydmv48s8OUFv2ib10tP646OF3d5TYU=;
- b=pJDbx9lMiK2wxN23UFzHqLRLFBAddBP0xsCdoXj/qNw05q2ecK1YYEL63CQeUyEHgJ
- rcZJdlq2uopwpJMAHG+rZ3xCKk9mKqJcvDIpccl9+0REm9reOjA4ua5RCvtpHDU7sDvn
- zC1pu4QcIrpahdEBgwKmvZYRqVaj/GbYQZOizWkP7WKgeE9263klLzDPSPvujsYQihCX
- s/XNSpivrQelxfqH9m+35vyucpKEUn9iyu3r8fg0aPQIbTnHfv4kVhSJk3c44sKjZJgg
- 2J0VanY+PNgB9I5W20/bjCrBqekbvkp4l5bvXMLnyS3DjGEPxtMLligyGshHZf2UaGtF
- h8+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=4nwERILA7b9Xpydmv48s8OUFv2ib10tP646OF3d5TYU=;
- b=fEB3uH2xpJyw2nwIjaQFB8qu7AHbouzOkopI8WD4uYGbZesKBs0FhK7KGSz/eWRs/V
- IpeEznkyxUy936VU8ar+xrKGR2PsPnAXrd7P+jMGT27Hl6uW+wJQclZNiIVjTwwlD907
- iU3OZ28iveA2tJsOsP7bPc9DjPDqMEx/pBVl3ZkBFPRnOVqb/YbIJt2lesAyGDJcwpg6
- yg5c5paE9Kf+BIZFkLlM9tCcpjaNrrdc/qN4RhrCAneWry04jDsKyAKaz8Mqa6daFAUh
- cA4PdutgG1mgWswgLDp4EENbnWePTeCPIPv1Ni3gHsqHQ7mB3iWJ5PQn7ZvMRoNC33KS
- HgGA==
-X-Gm-Message-State: AOAM533yVS5ZTLUbFuxYS4R7IsvQXjAKh2YV9hvKW0vbaTtKkcAYKZiQ
- 3Xg2r6G3eCcLI9ZlHGf8IvLfcs8t86JXcJSTYtqi4w==
-X-Google-Smtp-Source: ABdhPJwd78IedPyB2UtJnaQBtcO72sLbnPj4Gteow/UY6lp/E6MlCCT5JItwsnnkSyQfxzAdcSbEE8JNWNqLuLtJ1tw=
-X-Received: by 2002:a17:906:1f42:: with SMTP id
- d2mr14656899ejk.407.1600094487603; 
- Mon, 14 Sep 2020 07:41:27 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kHpWu-0000fI-Ul
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:32:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42964
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kHpWs-0002sr-4g
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:32:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600093944;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MbjXg/tr5NJidRCp1NxTRuMBj5nSWST9axGLSKjhneg=;
+ b=cqHT7uHaTXirb/tVAuYUsYW7Ncr6V5h9jhhhSa7yCKAGhPp11t89Z7/sUHC9UQB7Z0jNWN
+ jSEn5KFdN4MXD3VPxdRWcMuveRg1FM8wVoD2CiJcu6LO3hiFXevRxABATQxbMNJQtGWI3h
+ uJIwGqYfhe9b09ARY9x+C41s7xyDSd8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-428-mwe4vugHNwuoIN8qe6vP6Q-1; Mon, 14 Sep 2020 10:32:19 -0400
+X-MC-Unique: mwe4vugHNwuoIN8qe6vP6Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 570D11005E5D;
+ Mon, 14 Sep 2020 14:32:18 +0000 (UTC)
+Received: from [10.3.113.68] (ovpn-113-68.phx2.redhat.com [10.3.113.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F53276E16;
+ Mon, 14 Sep 2020 14:32:11 +0000 (UTC)
+Subject: Re: [PATCH] docs/system: clarify deprecation scheduled
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+References: <20200811104736.17140-1-stefanha@redhat.com>
+ <20200914142146.GN1252186@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <5ccbee6a-cbf7-d790-457f-b15c3eef5c1e@redhat.com>
+Date: Mon, 14 Sep 2020 09:32:11 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200912224431.1428-1-luoyonggang@gmail.com>
- <20200912224431.1428-12-luoyonggang@gmail.com>
- <c6ed5abf-2c71-bded-7efc-33baa0b415af@redhat.com>
- <CAE2XoE-mFPm=chadNahHgCsa3tSjxRXMH3te29ODV=emWdLjYA@mail.gmail.com>
- <d6dd1c31-4bf0-3fd0-4c32-7216c8b3435c@redhat.com>
-In-Reply-To: <d6dd1c31-4bf0-3fd0-4c32-7216c8b3435c@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 Sep 2020 15:41:16 +0100
-Message-ID: <CAFEAcA98VD2f3TQBDrfFv4swwu2Txhs2KXXKiHgFGsN7P_B3AQ@mail.gmail.com>
-Subject: Re: [PATCH v8 11/27] meson: Use -b to ignore CR vs. CR-LF issues on
- Windows
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::641;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x641.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200914142146.GN1252186@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 01:39:17
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -38
+X-Spam_score: -3.9
+X-Spam_bar: ---
+X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,67 +100,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Ed Maste <emaste@freebsd.org>, Qemu-block <qemu-block@nongnu.org>,
- Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>,
- Peter Lieven <pl@kamp.de>, qemu-level <qemu-devel@nongnu.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Yonggang Luo <luoyonggang@gmail.com>,
- Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Wen Congyang <wencongyang2@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Li-Wen Hsu <lwhsu@freebsd.org>, Markus Armbruster <armbru@redhat.com>
+Cc: libvir-list@redhat.com, Peter Maydell <peter.maydell@linaro.org>,
+ philmd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 13 Sep 2020 at 19:51, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
->
-> On 9/13/20 6:01 PM, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
-> >
-> >
-> > On Sun, Sep 13, 2020 at 11:35 PM Philippe Mathieu-Daud=C3=A9
-> > <philmd@redhat.com <mailto:philmd@redhat.com>> wrote:
-> >
-> >     On 9/13/20 12:44 AM, Yonggang Luo wrote:
-> >     > On windows, a difference in line endings causes testsuite failure=
-s
-> >     > complaining that every single line in files such as
-> >     > 'tests/qapi-schemadoc-good.texi' is wrong.  Fix it by adding -b t=
-o
-> >     diff.
-> >
-> >     Isn't '--strip-trailing-cr' more adapted?
-> >
-> > er, I did that before.....
->
-> So, yes/no? We can not follow all patches, so better if you
-> add a note about your changes, either in the patch description
-> if you think it's worthwhile keeping that information in the
-> git history, else below the '---' separator, so that information
-> is stripped from the patch when applying.
->
-> Looking at the archive I see Thomas said this option is not
-> POSIX thus not portable.
->
-> What about adding this?
->
-> "Ideally we would use the '--strip-trailing-cr' option, but not
-> being POSIX is a portability problem (i.e. BSDs and Solaris
-> based OSes). Instead use the '-b' option which, although doing
-> slightly more, produce the expected result on Windows."
+On 9/14/20 9:21 AM, Daniel P. Berrangé wrote:
+> On Tue, Aug 11, 2020 at 11:47:36AM +0100, Stefan Hajnoczi wrote:
+>> The sentence explaining the deprecation schedule is ambiguous. Make it
+>> clear that a feature deprecated in the Nth release is guaranteed to
+>> remain available in the N+1th release. Removal can occur in the N+2nd
+>> release or later.
+>>
 
-The other important point to note here is that because
-texi output is mostly not case-sensitive, we are not
-losing important test coverage by not checking for exact
-whitespace matches between the known-good output and
-the generated output. If we were checking the doc-good.out
-text file, -b would be bad because there whitespace is
-important and is part of what we need to be checking.
+> So we're changing
+> 
+>    The feature will remain functional for 2 releases prior to actual removal.
+> 
+> to
+> 
+>    The feature will remain functional for 1 more release after deprecation.
+> 
+> How about
+> 
+>    The feature will remain functional for the release in which it was
+>    deprecated and one further release. After these two releases, the
+>    feature is liable to be removed.
 
-(Also the texi stuff is going to go away soon I hope :-))
+Longer, but definitely conveys more information in an 
+easier-to-understand format.
 
-thanks
--- PMM
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
