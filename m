@@ -2,75 +2,76 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77ED4C43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:28:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A41C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:33:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C86B720709
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:28:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7657B20735
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 12:33:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FSivjIPs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C86B720709
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yHv4LPHZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7657B20735
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHnaq-0001Zu-Lt
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 08:28:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35556)
+	id 1kHnfj-0004nJ-VL
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 08:33:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHnZV-00006W-6y
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:27:01 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:33617)
+ id 1kHndw-00042a-JH
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:31:40 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:35450)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHnZR-0007lv-G5
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:27:00 -0400
-Received: by mail-ed1-x543.google.com with SMTP id g4so17401221edk.0
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 05:26:55 -0700 (PDT)
+ id 1kHndr-0000BD-E1
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 08:31:36 -0400
+Received: by mail-ed1-x544.google.com with SMTP id i1so17418647edv.2
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 05:31:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=4YJvX8r1AGHm4LXtW8381XZByd8RQjFAZBDnyxEbrMw=;
- b=FSivjIPsD4WUtqcCSO4DguzznYxJ9+kIIfV5Cg9bSBwXe+yUXLjoe9No43KJx7HaVB
- TWeblfRTuEbQNBfdCRfozLHdlT5Dyk+37AM0B1ukNMeiVj6yfxIw5KeiRE9ihnShzke/
- uOwndNqUmr4IfH4DhFBQCbonEzFmLbYRpzxm1iUWUcW3pagBPoesgNm8KzpUi/yOTaqv
- uatm0eEa2OSX9NGCOU5tK+CywxNFmGuMwEU88t3PEFJ81fGlIkOJilqo/ax4NoBmz5Al
- 63BlUzWoBOJPc6gB6dZx6GvaDyN8yclTWJGydDbcrRCMv3xexhdATtJAVq8A0hA5oC1A
- 7zXQ==
+ :cc; bh=uTjO00w5lmowq0jE0QoOxZDYI4Y5K99mjBn52injmVE=;
+ b=yHv4LPHZhKWH7hGpZplmgstWtqpGBgSVc5VhCPkaSwTz0myIQZYye6OXsNSYi437vr
+ BPdMTs5tY9CO+lQ1JsKYdyiyba1+no+7asCeOA6ER/AHvC2r3070IuMb0kgmSXDqGsF3
+ o69KjdXEUuaHS0BWTYjLSoxrEsckdpqtRDhDApNCdVlhQF31adDcRo08sfv/uUqCebJZ
+ BdNP0EK3SvgywgTz50F3g566XKkHLFRjsMdhe73Ojziu1csY7gRWgOmyOFCUgF259/Kh
+ 9bjcYz3y/xMw5r6BDzfd5b6qzN4ido9/knhR3R4FBPJmCWPXPzecZxkXsth+Lm+lbtDw
+ 7Lyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=4YJvX8r1AGHm4LXtW8381XZByd8RQjFAZBDnyxEbrMw=;
- b=o0gxipVeTuiLRlnTN7bTqHqiD3SLssd/fxYkWYQ6Wo5Twyc++vPrrxsaQ/4j+OT2ZW
- pznTPfc6pWqlrRXJ4Y0mA9gZ+HEqvJXM/zlVMqMu58CyLXMLHtRsbzt5+srJF9wd/gbi
- SGrNkaZDOzv9FpIHathqhylIVUsKvBbLMJBL56sYHXcIfNdVyqqMlFu1YfjC+cNIu9SA
- dV8IylV2tDTd9a/nC24UYdOu7uC1k+HO8dPPGomHPPjam0j2NITqV7hKpu/LkUTieLCM
- n9DI63s5NzLkk3ltLEEB0rSAtM8gqUKliTpmJq/ynef/xLNx+j3F0J7+9Bxz+XWX1Czl
- xbGg==
-X-Gm-Message-State: AOAM530+quzxlPwEdepLDvNRi5+nJewN7VxL8GFnstGcXxTutXS0mtme
- a+gBqedXu7506SjZp0/xl0SevplcxjkvyihtKg+ScA==
-X-Google-Smtp-Source: ABdhPJxBH4PJUyGn+N/L+W75/b0M7uxmnR/1UZG/riBILETXbjcU90bd5qlbYyLm/lKukYBKdoqRWw3wPT90OHrYS8w=
-X-Received: by 2002:a50:8f45:: with SMTP id 63mr17594526edy.52.1600086414320; 
- Mon, 14 Sep 2020 05:26:54 -0700 (PDT)
+ bh=uTjO00w5lmowq0jE0QoOxZDYI4Y5K99mjBn52injmVE=;
+ b=ZPxVxNxivUbAcKsrKYYwUNPmAebgEnK/bdDk/A3zX9pG+Dwxn3OShaeGYQmNEm0BOe
+ h23CIx7IAYw86Yi9YYFCQnUgXIXrfHndslC0W0ZD5PT5H3sBD452ABNe9sfP9xvP4CTk
+ RfFHvl4QkmRuR5P0aZPj1wCLEU+mS9zXECTwb8tG6bdx/h9kod15QuLM2bkREtCL4NEE
+ sHtl6Co36FiibWatTttfmb6n9viWxnYO+spaKF9Laa0F/+Q5wIZwDrH4H/pVsNlVpY9g
+ KG+loUkotu9ak9X2ugH1dyG0hPK6nQRMxHHQ0o9QM7z+/Ndm8nSiwgAHgGREVpQUMVmi
+ RJjA==
+X-Gm-Message-State: AOAM530Oj9gHaupx9mc0MCZEObxQhLShshjdcOu05R2CSfHpYAo3d0Qp
+ zPPQHhz9nHXvQdVC+Owh2KWo8g+i07Drc5eP4cwYHA==
+X-Google-Smtp-Source: ABdhPJxBioiOEEhz1K3OB94EwRXsux3e7utvoXivr2Z2N/Rob2Jhw5FXocgDJSvQBkPC7jxEvMmPHaRFW6OU9l28UX4=
+X-Received: by 2002:a50:e68a:: with SMTP id z10mr17569402edm.100.1600086689267; 
+ Mon, 14 Sep 2020 05:31:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200909174647.662864-1-edgar.iglesias@gmail.com>
-In-Reply-To: <20200909174647.662864-1-edgar.iglesias@gmail.com>
+References: <20200914113809.63640-1-mreitz@redhat.com>
+In-Reply-To: <20200914113809.63640-1-mreitz@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 Sep 2020 13:26:43 +0100
-Message-ID: <CAFEAcA9BK1z3hJL0nNjJQkX9kH0_64v81fPhOmj78DY85zYTgw@mail.gmail.com>
-Subject: Re: [PATCH v2 0/1] hw/arm: versal-virt: Correct the tx/rx GEM clocks
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Date: Mon, 14 Sep 2020 13:31:18 +0100
+Message-ID: <CAFEAcA-jN39TufevHy6sng-53NAzqfdm=4NEzGe1Yg+oFzfFQg@mail.gmail.com>
+Subject: Re: [PATCH] iotests: Work around failing readlink -f
+To: Max Reitz <mreitz@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::543;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x543.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -79,7 +80,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,43 +93,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, Edgar Iglesias <edgar.iglesias@xilinx.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
- Francisco Iglesias <frasse.iglesias@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- QEMU Developers <qemu-devel@nongnu.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Luc Michel <luc.michel@greensocs.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 9 Sep 2020 at 18:46, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
+On Mon, 14 Sep 2020 at 12:39, Max Reitz <mreitz@redhat.com> wrote:
 >
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> On macOS, (out of the box) readlink does not have -f.  If the recent
+> "readlink -f" call introduced by b1cbc33a397 fails, just fall back to
+> the old behavior (which means you can run the iotests only from the
+> build tree, but that worked fine for six years, so it should be fine
+> still).
 >
-> This corrects the Ethernet tx/rx clocks in the generated DTB.
-> Avoids a Linux kernel warning.
+> Keep any potential error message on stderr.  If users want to run the
+> iotests from outside the build tree, this may point them to what's wrong
+> (with their system).
 >
-> Cheers,
-> Edgar
+> Fixes: b1cbc33a3971b6bb005d5ac3569feae35a71de0f
+>        ("iotests: Allow running from different directory")
+> Reported-by: Claudio Fontana <cfontana@suse.de>
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+> Hi Thomas,
 >
-> ChangeLog:
+> I thought this would be quicker than writing a witty response on whether
+> you or me should write this patch. O:)
+> ---
+>  tests/qemu-iotests/check | 4 ++++
+>  1 file changed, 4 insertions(+)
 >
-> v1 -> v2:
-> * Fix commit message typo, I -> It
->
-> Edgar E. Iglesias (1):
->   hw/arm: versal-virt: Correct the tx/rx GEM clocks
->
->  hw/arm/xlnx-versal-virt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+> index e14a1f354d..75675e1a18 100755
+> --- a/tests/qemu-iotests/check
+> +++ b/tests/qemu-iotests/check
+> @@ -45,6 +45,10 @@ then
+>      fi
+>      source_iotests=$(cd "$source_iotests"; pwd) || _init_error "failed to enter source tree"
+>      build_iotests=$(readlink -f $(dirname "$0"))
+> +    if [ "$?" -ne 0 ]; then
+> +        # Perhaps -f is unsupported, revert to pre-b1cbc33a397 behavior
+> +        build_iotests=$PWD
+> +    fi
+>  else
 
+This still prints
+  readlink: illegal option -- f
+  usage: readlink [-n] [file ...]
 
+(you can see it in the build log that Thomas links to).
 
-Applied to target-arm.next, thanks.
+   build_iotests=$(readlink -f $(dirname "$0") 2>/dev/null)
 
+should avoid that, I think.
+
+thanks
 -- PMM
 
