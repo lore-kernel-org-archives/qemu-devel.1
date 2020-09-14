@@ -2,87 +2,93 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A746EC43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 10:10:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43461C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 10:16:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 083242078D
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 10:10:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 718062076C
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 10:16:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eBLpKEa9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 083242078D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="So8nvsxY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 718062076C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHlRD-0006iZ-2X
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 06:10:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58932)
+	id 1kHlWl-000888-HI
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 06:16:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60246)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kHlQR-0006HD-Ed
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 06:09:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58321)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kHlQK-0006kq-44
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 06:09:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600078162;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=btL/XCcR2ElM9o1Z6wzGb21Rzgql8/q3+WXl1pNqG2o=;
- b=eBLpKEa9tZJqyf74iXkBmLNTqBImjgUGwwqNJPTuvEPwied73In4JXDJxsHBt/e7pJmnS0
- HMpF6wrjaunxvE5NdTCIOVMnxNwmxuwuE8D33pXlHMa1dGU1y9qWKf/49jTqxcZXOTppdo
- Ii7KoXoTBD3UdxjwwJK4HgEkID+RZbw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-96-tHZASE4VOYuRDIdN7DwQSA-1; Mon, 14 Sep 2020 06:09:19 -0400
-X-MC-Unique: tHZASE4VOYuRDIdN7DwQSA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93FA78030BA;
- Mon, 14 Sep 2020 10:09:18 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E10417A1FC;
- Mon, 14 Sep 2020 10:09:07 +0000 (UTC)
-Date: Mon, 14 Sep 2020 12:09:01 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Michal Privoznik <mprivozn@redhat.com>
-Subject: Re: [PATCH v2] cphp: remove deprecated cpu-add command(s)
-Message-ID: <20200914120901.1f8769fb@redhat.com>
-In-Reply-To: <f8406b80-0243-49bf-a384-5c625d9a7974@redhat.com>
-References: <20200914074614.973112-1-imammedo@redhat.com>
- <f8406b80-0243-49bf-a384-5c625d9a7974@redhat.com>
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1kHlW6-0007eD-Qv
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 06:15:22 -0400
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:44094)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1kHlW5-0007Tm-6g
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 06:15:22 -0400
+Received: by mail-wr1-x432.google.com with SMTP id s12so18040621wrw.11
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 03:15:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=1j6iFCN3R8KhmwBqpw1NePKqpf4XYXzO9vRPsnj/qSI=;
+ b=So8nvsxYyyzlqoykxH+LdM6/QBbpPfaSLHuNFzstpAsDRvLn99C8tQiEL1DraqTTFL
+ XEn/C36Ei7tKLD14InvNey1GOLZ25w0FRb2CaGswvHdpzEbkJ0cdEv09bDrRyTdp95nO
+ 1nMsxg+uEPT4ytZotKKOTWp3xCoSykJWPBZryaHGi2IGgeCO9leuyzJI95oH+WiuuoRX
+ kZT76TTWG91/e1aTGMbRFzTRjjJ74wIeUl70hUZY7awXzuYNSlaqqy62ZPM5LYkgNdwi
+ qURqP1Yw27mVllDeqorD/PnXWQs58zrc39u2hLCvpfDevASxivjqK6g0L2fqygw5MiuJ
+ rSjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=1j6iFCN3R8KhmwBqpw1NePKqpf4XYXzO9vRPsnj/qSI=;
+ b=n0n4Yf7rlHLhAFrElhpPxnNfrqFZWV1c6szVqR8wfeCKkcwg2BgTf3cXSv4KbIwbnr
+ d45d0R8hwsMqHMXWPMq6pEgSqerbYP070eT2fgI31LUSqqr1JRmHPxaVe8hJvTMKnT+Z
+ uZGxx0xERugM+acJSwHjBYfc2hHZLkRg6Yd2L6btFgqsBrNy8PK6KFcZSt5m7gU3j6F6
+ mm4lq3I0dHG5f1FE4ubE2w/UoJDyj41Rml2ML1c3/Ylis76rIVw2i2x4iKZwsuHQy+7Y
+ yw0xv4uKm8IwV/D8n0XTkNMkEhnpVAk/cBKk8pSsdc4SJfni3iNbYA9i6BWzjQy6HNM/
+ s7YA==
+X-Gm-Message-State: AOAM5326q/zZLgR7HVc/85JKvdtj5GnlXZbFLqNi535Dr8EjrZc/5gmC
+ pSvWwULj9ox8Uhczmn5xP3U=
+X-Google-Smtp-Source: ABdhPJx57PsXVyigZiZj70FZTG/s+R75WNnJPnFVKDuZNVfjI7udteFdVaxJmW4IjsQ5zl2NBJSG3Q==
+X-Received: by 2002:adf:8b48:: with SMTP id v8mr15161044wra.21.1600078519872; 
+ Mon, 14 Sep 2020 03:15:19 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id d23sm1802472wmb.6.2020.09.14.03.15.18
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 14 Sep 2020 03:15:18 -0700 (PDT)
+Date: Mon, 14 Sep 2020 11:15:17 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: ppandit@redhat.com
+Subject: Re: About 'qemu-security' mailing list
+Message-ID: <20200914101517.GD579094@stefanha-x1.localdomain>
+References: <nycvar.YSQ.7.78.906.2009111910280.36374@xnncv>
+ <CAFEAcA_9BVbqFCHJqS8jj6L3OqVNc60NCjAjRs516VyLH2EFfw@mail.gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:55:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -47
-X-Spam_score: -4.8
-X-Spam_bar: ----
-X-Spam_report: (-4.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.695,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="XvKFcGCOAo53UbWW"
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_9BVbqFCHJqS8jj6L3OqVNc60NCjAjRs516VyLH2EFfw@mail.gmail.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::432;
+ envelope-from=stefanha@gmail.com; helo=mail-wr1-x432.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,60 +101,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com, mst@redhat.com,
- libvir-list@redhat.com, cohuck@redhat.com, david@redhat.com,
- qemu-devel@nongnu.org, dgilbert@redhat.com, pasic@linux.ibm.com,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: peter.maydell@linaro.org,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 14 Sep 2020 10:07:36 +0200
-Michal Privoznik <mprivozn@redhat.com> wrote:
 
-> On 9/14/20 9:46 AM, Igor Mammedov wrote:
-> > theses were deprecated since 4.0, remove both HMP and QMP variants.
-> > 
-> > Users should use device_add command instead. To get list of
-> > possible CPUs and options, use 'info hotpluggable-cpus' HMP
-> > or query-hotpluggable-cpus QMP command.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > Reviewed-by: Thomas Huth <thuth@redhat.com>
-> > Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >   include/hw/boards.h         |   1 -
-> >   include/hw/i386/pc.h        |   1 -
-> >   include/monitor/hmp.h       |   1 -
-> >   docs/system/deprecated.rst  |  25 +++++----
-> >   hmp-commands.hx             |  15 ------
-> >   hw/core/machine-hmp-cmds.c  |  12 -----
-> >   hw/core/machine-qmp-cmds.c  |  12 -----
-> >   hw/i386/pc.c                |  27 ----------
-> >   hw/i386/pc_piix.c           |   1 -
-> >   hw/s390x/s390-virtio-ccw.c  |  12 -----
-> >   qapi/machine.json           |  24 ---------
-> >   tests/qtest/cpu-plug-test.c | 100 ++++--------------------------------
-> >   tests/qtest/test-hmp.c      |   1 -
-> >   13 files changed, 21 insertions(+), 211 deletions(-)  
-> 
-> Thanks to Peter Libvirt uses device_add instead cpu_add whenever 
-> possible. Hence this is okay from Libvirt's POV.
-we shoul make libvirt switch from -numa node,cpus= to -numa cpu=
-to get rid of the 'last' interface that uses cpu-index as input.
+--XvKFcGCOAo53UbWW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-To help libvirt to migrate existing configs from older syntax to
-the newer one, we can introduce field x-cpu-index to
-query-hotplugable-cpus output (with a goal to deprecate it in few years).
-Would it work for you?
+On Fri, Sep 11, 2020 at 04:51:49PM +0100, Peter Maydell wrote:
+> It sounds like you
+> want it to be a larger grouping than that and maybe also
+> want to use it as a mechanism for informing downstream distros
+> etc about QEMU security issues, which is to say you're
+> proposing an overhaul and change to our security process,
+> not merely "we'd like to create a mailing list" ?
 
-> 
-> Reviewed-by: Michal Privoznik <mprivozn@redhat.com>
-Thanks!
+Yes, please discuss the reasons for wanting a mailing list:
 
-> 
-> Michal
-> 
+Is the goal to involve more people in triaging CVEs in a timely manner?
 
+Is the goal to include new people who have recently asked to participate?
+
+Is the goal to use an easier workflow than manually sending encrypted
+email to a handful of people?
+
+etc
+
+Stefan
+
+--XvKFcGCOAo53UbWW
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9fQrUACgkQnKSrs4Gr
+c8j7Qwf+L/qZl5ExVQrNwzxZEZY3W/fDR98kdidczaA/YXjxVEQXrTPiODphYXcC
+2YzF+wjtxB1R1qoRFYnkcRcasRjYcpu/H04JJKHBnWfrxTugrxqzva3SU2/b9ZsH
+j0j/0Masf6FO70Metb3AHxSznRx0IPMN+na3rQwOFE39j2spPmOn0Um8YvlvYAT/
+kbDNHasfHHRM0QjIavA8TN1/f40PBCarEzpMO7tt2DP5LLZPEH/AeI17jUMD5X4e
+vDwFCbj+yIncJaEkDz6tr+TYkq8B5Ub5EGwVPipLixMu1aSL5PEWpz2824DRDlnv
+i/wPaBgOVaYmwGilQz1fU6iCeOq8eQ==
+=X3sB
+-----END PGP SIGNATURE-----
+
+--XvKFcGCOAo53UbWW--
 
