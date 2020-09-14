@@ -2,116 +2,121 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F2B7C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:38:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4531C43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:41:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DE8C21548
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:38:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DE8C21548
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
+	by mail.kernel.org (Postfix) with ESMTPS id 33FDC20829
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 06:41:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GGehs10D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33FDC20829
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHi8O-0006Ht-EM
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 02:38:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42440)
+	id 1kHiAt-0007LO-Aj
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 02:41:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42722)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sw@weilnetz.de>)
- id 1kHi7r-0005li-6R; Mon, 14 Sep 2020 02:38:07 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:52054
- helo=v2201612906741603.powersrv.de)
+ (Exim 4.90_1) (envelope-from <dovmurik@linux.vnet.ibm.com>)
+ id 1kHiAH-0006vM-49; Mon, 14 Sep 2020 02:40:37 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19766)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sw@weilnetz.de>)
- id 1kHi7o-0005tJ-Kf; Mon, 14 Sep 2020 02:38:06 -0400
-Received: from localhost (localhost [127.0.0.1])
- by v2201612906741603.powersrv.de (Postfix) with ESMTP id DDC7EDB1FFE;
- Mon, 14 Sep 2020 08:38:00 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
-Received: from v2201612906741603.powersrv.de ([127.0.0.1])
- by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
- port 10024)
- with ESMTP id ITlV4IumV0nM; Mon, 14 Sep 2020 08:37:59 +0200 (CEST)
-Received: from macbook02.fritz.box (pd9ec31d2.dip0.t-ipconnect.de
- [217.236.49.210])
- (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
- key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
- (No client certificate requested)
- by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 56A63DB0857;
- Mon, 14 Sep 2020 08:37:59 +0200 (CEST)
-Subject: Re: [PATCH v8 00/27] W32, W64 msys2/mingw patches
-To: luoyonggang@gmail.com, Thomas Huth <thuth@redhat.com>
-References: <20200912224431.1428-1-luoyonggang@gmail.com>
- <276a137d-d863-2465-1fe2-599e5772a1a8@redhat.com>
- <CAE2XoE8WrE1_e1VR1VSG7vWWX9nsbp2iRwZvOur1ouGrbC+Rqw@mail.gmail.com>
-From: Stefan Weil <sw@weilnetz.de>
-Autocrypt: addr=sw@weilnetz.de; keydata=
- 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
-Message-ID: <98ea8ecd-afb4-c2de-214e-b94dcdbd6c8b@weilnetz.de>
-Date: Mon, 14 Sep 2020 08:37:58 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <dovmurik@linux.vnet.ibm.com>)
+ id 1kHiAD-00067A-T2; Mon, 14 Sep 2020 02:40:36 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 08E6XVhE062025; Mon, 14 Sep 2020 02:40:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=GIy6mz3+A3PXzu4bhygSvTwWkrqPCtfiQOXJoTn4hxA=;
+ b=GGehs10DDBVJnEGbpPYt2+2kJ76K/+gJ5GZ6yhiqFrgr3meJwL3QDtGt+v4/GHfR6C7K
+ NqCI3YKzxM6q8zRgS/nSpPZP0jEChExG4E/+tNU3hUikMojvoNazr9s171fH0i3L3KjH
+ rbPzkgH78nssMn+ZgiBbPK6ORDqjMcihDtFrylfhgJOS2nLpsfHEbazKq4ujo8cj3L86
+ TKf7+QYbxOCJ/AUVh92Sob1DgKAZ6pXCdXdN7gc4dnNnOHxHi+rRUnV+0lsqTzmBWP/N
+ SP4Wa6uFm9e6wFUWeMMrU9Y+dn8m2a+ocCH3FJfwFgVeAF25kV/tOOKguRLAeQawAxj8 /w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33hyapdg2g-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 14 Sep 2020 02:40:30 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08E6XhVe062853;
+ Mon, 14 Sep 2020 02:40:30 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com
+ [159.122.73.71])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33hyapdg03-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 14 Sep 2020 02:40:30 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+ by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08E6NvFx020744;
+ Mon, 14 Sep 2020 06:40:27 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com
+ (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+ by ppma02fra.de.ibm.com with ESMTP id 33gny8102m-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 14 Sep 2020 06:40:27 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 08E6ePXq15401302
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 14 Sep 2020 06:40:25 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5089E4204F;
+ Mon, 14 Sep 2020 06:40:25 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id D44EB42042;
+ Mon, 14 Sep 2020 06:40:22 +0000 (GMT)
+Received: from [9.65.222.171] (unknown [9.65.222.171])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon, 14 Sep 2020 06:40:22 +0000 (GMT)
+Subject: Re: [PATCH v2 2/2] hw/timer/hpet: Fix DPRINTF format string
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200910135852.516809-1-philmd@redhat.com>
+ <20200910135852.516809-3-philmd@redhat.com>
+ <9db297fa-02c0-aadb-e0c7-555d3578b7b3@linux.vnet.ibm.com>
+ <3dbac311-dc90-0eda-10c2-13ab28407a6a@redhat.com>
+From: Dov Murik <dovmurik@linux.vnet.ibm.com>
+Message-ID: <00747ce4-c714-cfca-464c-6999edfede3a@linux.vnet.ibm.com>
+Date: Mon, 14 Sep 2020 09:40:21 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-In-Reply-To: <CAE2XoE8WrE1_e1VR1VSG7vWWX9nsbp2iRwZvOur1ouGrbC+Rqw@mail.gmail.com>
-Content-Type: multipart/alternative;
- boundary="------------31B17AB3EEDC7C2F6F359D8C"
-Received-SPF: pass client-ip=37.120.169.71; envelope-from=sw@weilnetz.de;
- helo=v2201612906741603.powersrv.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:38:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
- NICE_REPLY_A=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <3dbac311-dc90-0eda-10c2-13ab28407a6a@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-13_09:2020-09-10,
+ 2020-09-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 bulkscore=0
+ clxscore=1011 spamscore=0 impostorscore=0 mlxscore=0 lowpriorityscore=0
+ malwarescore=0 priorityscore=1501 suspectscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009140054
+Received-SPF: none client-ip=148.163.156.1;
+ envelope-from=dovmurik@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:01:13
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
+X-Spam_bar: --
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -124,73 +129,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
- Qemu-block <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
- qemu-level <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
+ Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a multi-part message in MIME format.
---------------31B17AB3EEDC7C2F6F359D8C
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-
-Am 14.09.20 um 08:27 schrieb 罗勇刚(Yonggang Luo):
-
->
-> Thanks, I am learning how to submit patches properly, in old days, 
-> when I am using pull request on github have no such problems. easy to
-> follow up
 
 
-May I also ask you to send text-only e-mails? Your HTML e-mails are
-really hard to read.
+On 13/09/2020 14:40, Philippe Mathieu-Daudé wrote:
+> On 9/12/20 7:40 PM, Dov Murik wrote:
+>> Hi Phil,
+>>
+>> On 10/09/2020 16:58, Philippe Mathieu-Daudé wrote:
+>>> Fix building with HPET_DEBUG enabled:
+>>>
+>>>     hw/timer/hpet.c:512:73: error: format specifies type 'unsigned int'
+>>> but the argument has type 'uint64_t' (aka 'unsigned long')
+>>> [-Werror,-Wformat]
+>>>         DPRINTF("qemu: Enter hpet_ram_writel at %" PRIx64 " = %#x\n",
+>>> addr, value);
+>>>                                                              
+>>> ~~~           ^~~~~
+>>>                                                               %#lx
+>>>     hw/timer/hpet.c:655:21: error: format specifies type 'unsigned int'
+>>> but the argument has type 'uint64_t' (aka 'unsigned long')
+>>> [-Werror,-Wformat]
+>>>                         value, s->hpet_counter);
+>>>                         ^~~~~
+>>>
+>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>> Signed-off-by: Dov Murik <dovmurik@linux.vnet.ibm.com>
+>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>> ---
+>>>    hw/timer/hpet.c | 9 ++++++---
+>>>    1 file changed, 6 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
+>>> index b683f64f1d3..20bd0388740 100644
+>>> --- a/hw/timer/hpet.c
+>>> +++ b/hw/timer/hpet.c
+>>> @@ -495,7 +495,8 @@ static void hpet_ram_write(void *opaque, hwaddr addr,
+>>>        HPETState *s = opaque;
+>>>        uint64_t old_val, new_val, val, index;
+>>>
+>>> -    DPRINTF("qemu: Enter hpet_ram_writel at %" PRIx64 " = %#x\n",
+>>> addr, value);
+>>> +    DPRINTF("qemu: Enter hpet_ram_writel at %#" HWADDR_PRIx " =
+>>> %#"PRIx64"\n",
+>>> +            addr, value);
+>>
+>> You still use "#" in the format string; but qemu's CODING_STYLE.rst says:
+>>
+>> //////////////
+>>
+>> '#' printf flag
+>> ---------------
+>>
+>> Do not use printf flag '#', like '%#x'.
+>>
+>> Rationale: there are two ways to add a '0x' prefix to printed number:
+>> '0x%...'
+>> and '%#...'. For consistency the only one way should be used. Arguments for
+>> '0x%' are:
+>>
+>> * it is more popular
+>> * '%#' omits the 0x for the value 0 which makes output inconsistent
+> 
+> Yes you are right, I missed that.
+> 
+> Do you mind adding that check to ./checkpatch?
 
-Thanks,
+Fix to checkpatch sent in another patch:
 
-Stefan Weil
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg740065.html
 
-
-
---------------31B17AB3EEDC7C2F6F359D8C
-Content-Type: text/html; charset=utf-8
-Content-Transfer-Encoding: 8bit
-
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  </head>
-  <body>
-    <p>Am 14.09.20 um 08:27 schrieb 罗勇刚(Yonggang Luo):<br>
-    </p>
-    <blockquote type="cite"
-cite="mid:CAE2XoE8WrE1_e1VR1VSG7vWWX9nsbp2iRwZvOur1ouGrbC+Rqw@mail.gmail.com">
-      <div dir="ltr">
-        <div dir="ltr"><br>
-        </div>
-        <div class="gmail_quote">
-          <div>Thanks, I am learning how to submit patches properly, in
-            old days,  when I am using pull request on github have no
-            such problems. easy to follow up</div>
-        </div>
-      </div>
-    </blockquote>
-    <p><br>
-    </p>
-    <p>May I also ask you to send text-only e-mails? Your HTML e-mails
-      are really hard to read.</p>
-    <p>Thanks,</p>
-    <p>Stefan Weil</p>
-    <p><br>
-    </p>
-  </body>
-</html>
-
---------------31B17AB3EEDC7C2F6F359D8C--
+-Dov
 
