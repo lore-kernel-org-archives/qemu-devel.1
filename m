@@ -2,66 +2,93 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MIME_HTML_MOSTLY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F41CBC43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 03:57:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B431AC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 05:37:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 679E2206BE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 03:57:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 679E2206BE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id E3B8E214F1
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 05:37:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U0SK6LSw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3B8E214F1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHfck-0006Ic-8i
-	for qemu-devel@archiver.kernel.org; Sun, 13 Sep 2020 23:57:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47914)
+	id 1kHhBF-0003wO-R3
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 01:37:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60222)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kHfc4-0005kf-Sl; Sun, 13 Sep 2020 23:57:08 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2537 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kHfc1-0005FB-Sh; Sun, 13 Sep 2020 23:57:08 -0400
-Received: from dggemi406-hub.china.huawei.com (unknown [172.30.72.53])
- by Forcepoint Email with ESMTP id 74481FE1F74BC1701D5B;
- Mon, 14 Sep 2020 11:56:52 +0800 (CST)
-Received: from DGGEMI522-MBS.china.huawei.com ([169.254.8.78]) by
- dggemi406-hub.china.huawei.com ([10.3.17.144]) with mapi id 14.03.0487.000;
- Mon, 14 Sep 2020 11:56:42 +0800
-From: zhaolichang <zhaolichang@huawei.com>
-To: zhaolichang <zhaolichang@huawei.com>
-Subject: Re: [PATCH V2 00/10] fix some comment spelling errors
-Thread-Topic: Re: [PATCH V2 00/10] fix some comment spelling errors
-Thread-Index: AdaKSwpwVT6rHY/nQ5CCifgPto8GOg==
-Date: Mon, 14 Sep 2020 03:56:41 +0000
-Message-ID: <640CDEE67BE2784FAE298BB2517210E48B38FC@dggemi522-mbs.china.huawei.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.187.87]
-Content-Type: multipart/alternative;
- boundary="_000_640CDEE67BE2784FAE298BB2517210E48B38FCdggemi522mbschina_"
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kHhAa-0003EE-Af
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 01:36:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26266
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kHhAX-0007Ru-CT
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 01:36:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600061807;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hVDco7s3DT5FrUhr7u6KQzF8Go9IADGfWCrpwsrGuvk=;
+ b=U0SK6LSwwzRF73mZvn9DESx+YjfM8SdNbCGCCe8nLZ/S6lqw0IbUJ5szpFwjPoZsYg029V
+ tmYZesXNubQxDZjKK4tWyPXrjWjcp2VRvbMpVUrilu14XVLfeuQ4Lot0tbPdvctF31NyjC
+ 7WPuKbuySd7CkP7xRPIIF6AASZWaFw8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-437-g0TuM7P-N2aeJZMcc3SFQw-1; Mon, 14 Sep 2020 01:36:45 -0400
+X-MC-Unique: g0TuM7P-N2aeJZMcc3SFQw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 795B78015A4;
+ Mon, 14 Sep 2020 05:36:44 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-134.ams2.redhat.com [10.36.112.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6A4A55C699;
+ Mon, 14 Sep 2020 05:36:43 +0000 (UTC)
+Subject: Re: [PULL v2] Block layer patches
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200908115322.325832-1-kwolf@redhat.com>
+ <CAFEAcA-wrgOC9oqdqBuVSTiidaRcwbgQWF08zD=TSetSwn_tjA@mail.gmail.com>
+ <480db253-9aa4-39c3-592f-bc5cfea1997b@redhat.com>
+ <06214b2c-adc7-1e3b-a15f-fe3c16ff0983@redhat.com>
+ <CAFEAcA99YnJ2nC-Cw6JaYJMSMmvy-idC+625KYfOVUx_wb60=A@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <1d97b582-a530-ac54-5afc-5f4c1e6fa547@redhat.com>
+Date: Mon, 14 Sep 2020 07:36:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.188;
- envelope-from=zhaolichang@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/13 23:56:53
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
-X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
- MIME_HTML_MOSTLY=0.1, PYZOR_CHECK=1.392, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAFEAcA99YnJ2nC-Cw6JaYJMSMmvy-idC+625KYfOVUx_wb60=A@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 01:36:47
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.695,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -74,87 +101,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---_000_640CDEE67BE2784FAE298BB2517210E48B38FCdggemi522mbschina_
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+On 12/09/2020 20.38, Peter Maydell wrote:
+> On Sat, 12 Sep 2020 at 13:27, Thomas Huth <thuth@redhat.com> wrote:
+>> Peter, why did this slip through your merge tests, do you still skip the
+>> iotests there?
+> 
+> I forget what the reason for them being skipped is, maybe
+> it's because they demand a gnu sed ?
 
-ping
+The tests/check-block.sh script should tell you when you run "make
+check-block" ... but yes, they need gnu sed - which should be available
+via homebrew.
 
---_000_640CDEE67BE2784FAE298BB2517210E48B38FCdggemi522mbschina_
-Content-Type: text/html; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ Thomas
 
-<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
-osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
-xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" xmlns=3D"http:=
-//www.w3.org/TR/REC-html40">
-<head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
->
-<meta name=3D"Generator" content=3D"Microsoft Word 15 (filtered medium)">
-<style><!--
-/* Font Definitions */
-@font-face
-	{font-family:SimSun;
-	panose-1:2 1 6 0 3 1 1 1 1 1;}
-@font-face
-	{font-family:"Cambria Math";
-	panose-1:2 4 5 3 5 4 6 3 2 4;}
-@font-face
-	{font-family:Calibri;
-	panose-1:2 15 5 2 2 2 4 3 2 4;}
-@font-face
-	{font-family:SimSun;
-	panose-1:2 1 6 0 3 1 1 1 1 1;}
-/* Style Definitions */
-p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin:0cm;
-	margin-bottom:.0001pt;
-	text-align:justify;
-	text-justify:inter-ideograph;
-	font-size:10.5pt;
-	font-family:"Calibri",sans-serif;}
-a:link, span.MsoHyperlink
-	{mso-style-priority:99;
-	color:#0563C1;
-	text-decoration:underline;}
-a:visited, span.MsoHyperlinkFollowed
-	{mso-style-priority:99;
-	color:#954F72;
-	text-decoration:underline;}
-span.EmailStyle17
-	{mso-style-type:personal-compose;
-	font-family:"Calibri",sans-serif;
-	color:windowtext;}
-.MsoChpDefault
-	{mso-style-type:export-only;
-	font-family:"Calibri",sans-serif;}
-/* Page Definitions */
-@page WordSection1
-	{size:612.0pt 792.0pt;
-	margin:72.0pt 90.0pt 72.0pt 90.0pt;}
-div.WordSection1
-	{page:WordSection1;}
---></style><!--[if gte mso 9]><xml>
-<o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
-</xml><![endif]--><!--[if gte mso 9]><xml>
-<o:shapelayout v:ext=3D"edit">
-<o:idmap v:ext=3D"edit" data=3D"1" />
-</o:shapelayout></xml><![endif]-->
-</head>
-<body lang=3D"ZH-CN" link=3D"#0563C1" vlink=3D"#954F72" style=3D"text-justi=
-fy-trim:punctuation">
-<div class=3D"WordSection1">
-<p class=3D"MsoNormal"><span lang=3D"EN-US">ping<o:p></o:p></span></p>
-</div>
-</body>
-</html>
-
---_000_640CDEE67BE2784FAE298BB2517210E48B38FCdggemi522mbschina_--
 
