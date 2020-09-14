@@ -2,81 +2,96 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B13EDC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 15:58:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FB46C43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 16:01:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB27C2074B
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 15:58:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB27C2074B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id D30AB20756
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 16:01:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D3JfD4Ui"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D30AB20756
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHqrg-0002Nh-Fx
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 11:58:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40596)
+	id 1kHqvE-0004Qy-NU
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 12:01:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52016)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kHqCk-0000kg-TL
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 11:15:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42976)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kHqCi-0001ga-Af
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 11:15:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kHqCf-0006Vt-JS
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 15:15:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 924D12E80DB
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 15:15:37 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kHqrW-0002Ut-3h
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 11:57:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22680)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kHqrT-0008Sr-PW
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 11:57:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600099066;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ovTg2ccLhlJpIKCRLYMSAp4zlItYn0rQkX9LXngqg9I=;
+ b=D3JfD4Ui52HaJ/qhlflORENVigMjghpnIGIA9ExCoKHlBrlLLeGLp9Ml8HG6kL4lzlNA++
+ kYRJKxCeVGnZvOEI8oNSy5RZM1qY3HfrnvR+Z5DVo4YIutg/iO8x5qUHE9HpzrFgLPITSZ
+ dW1PNBALaefbBFYm9/CXVQTiZv9GBz0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-457-QKL6EI4YP9CfZMQxCsYYdw-1; Mon, 14 Sep 2020 11:57:44 -0400
+X-MC-Unique: QKL6EI4YP9CfZMQxCsYYdw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F0C5B8B068D;
+ Mon, 14 Sep 2020 15:57:31 +0000 (UTC)
+Received: from [10.3.113.68] (ovpn-113-68.phx2.redhat.com [10.3.113.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E6FC60BE2;
+ Mon, 14 Sep 2020 15:57:31 +0000 (UTC)
+Subject: Re: [PATCH v5 7/8] qapi: Implement deprecated-input=reject for QMP
+ command arguments
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200914084802.4185028-1-armbru@redhat.com>
+ <20200914084802.4185028-8-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <a5014641-6c47-d37f-c7c9-c862bf4e8217@redhat.com>
+Date: Mon, 14 Sep 2020 10:57:31 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Sep 2020 15:09:34 -0000
-From: Alexander Bulekov <1895219@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: keymaps vnc
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr dmbtech
-X-Launchpad-Bug-Reporter: Darren Blaber (dmbtech)
-X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
-References: <159978635021.22139.4037516560250644869.malonedeb@wampee.canonical.com>
- <160009007915.15025.5721686079641285935.launchpad@gac.canonical.com>
-Message-Id: <20200914150934.ratvtegtv2aghr74@mozz.bu.edu>
-Subject: Re: [Bug 1895219] Re: qemu git -vnc fails due to missing en-us keymap
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: ca9d6a35a9144a8f98cb2f8cc17ddfc45771943b
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 05:55:43
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200914084802.4185028-8-armbru@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:10:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -38
+X-Spam_score: -3.9
+X-Spam_bar: ---
+X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,77 +100,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1895219 <1895219@bugs.launchpad.net>
+Cc: marcandre.lureau@gmail.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I can also reproduce this issue. +CC Gerd Hoffmann
+On 9/14/20 3:48 AM, Markus Armbruster wrote:
+> This policy rejects deprecated input, and thus permits "testing the
+> future".  Implement it for QMP command arguments: reject commands with
+> deprecated ones.  Example: when QEMU is run with -compat
+> deprecated-input=reject, then
+> 
+>      {"execute": "eject", "arguments": {"device": "cd"}}
+> 
+> fails like this
+> 
+>      {"error": {"class": "GenericError", "desc": "Deprecated parameter 'device' disabled by policy"}}
+> 
+> When the deprecated parameter is removed, the error will change to
+> 
+>      {"error": {"class": "GenericError", "desc": "Parameter 'device' is unexpected"}}
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
 
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-On 200914 1327, Darren Blaber wrote:
-> ** Branch unlinked: lp:envbot/0.0.1
-> =
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-> -- =
-
-> You received this bug notification because you are a member of qemu-
-> devel-ml, which is subscribed to QEMU.
-> https://bugs.launchpad.net/bugs/1895219
-> =
-
-> Title:
->   qemu git -vnc fails due to missing en-us keymap
-> =
-
-> Status in QEMU:
->   New
-> =
-
-> Bug description:
->   If trying to run qemu with -vnc :0, it will fail with:
->   ./qemu-system-x86_64 -vnc :2
->   qemu-system-x86_64: -vnc :2: could not read keymap file: 'en-us'
-> =
-
->   share/keymaps is missing en-us keymap and only has sl and sv,
->   confirmed previous stable versions had en-us.
-> =
-
->   Tried with multiple targets, on arm64 and amd64
-> =
-
->   Git commit hash: 9435a8b3dd35f1f926f1b9127e8a906217a5518a (head)
-> =
-
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1895219/+subscriptions
->
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1895219
-
-Title:
-  qemu git -vnc fails due to missing en-us keymap
-
-Status in QEMU:
-  New
-
-Bug description:
-  If trying to run qemu with -vnc :0, it will fail with:
-  ./qemu-system-x86_64 -vnc :2
-  qemu-system-x86_64: -vnc :2: could not read keymap file: 'en-us'
-
-  share/keymaps is missing en-us keymap and only has sl and sv,
-  confirmed previous stable versions had en-us.
-
-  Tried with multiple targets, on arm64 and amd64
-
-  Git commit hash: 9435a8b3dd35f1f926f1b9127e8a906217a5518a (head)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1895219/+subscriptions
 
