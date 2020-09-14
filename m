@@ -2,84 +2,82 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-16.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11C4BC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:10:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 400A7C43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:11:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77230214F1
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:10:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC79E216C4
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 14:11:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t+NO/wXW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77230214F1
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yTm2fVFN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC79E216C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36340 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHpBY-0008C0-5T
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 10:10:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45900)
+	id 1kHpCj-0001l1-Mp
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 10:11:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45708)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHp8F-0002MO-Gj
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:06:59 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:34835)
+ id 1kHp84-0001zj-Nk
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:06:48 -0400
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:44226)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kHp8D-0007Zc-Bl
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:06:59 -0400
-Received: by mail-wm1-x333.google.com with SMTP id y15so211689wmi.0
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 07:06:56 -0700 (PDT)
+ id 1kHp82-0007Vy-4b
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 10:06:48 -0400
+Received: by mail-wr1-x42a.google.com with SMTP id s12so18873945wrw.11
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 07:06:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ h=from:to:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=2Pm0HMO2zXGIGpZaPm/owGvMJz02qx44BSYos4Dfokk=;
- b=t+NO/wXWg95yON2MqwdHg0QRP2HibN1G+cwm9+XGZnQbkFJH3Lyms6IUaBAKLpyGyF
- Otx5t7lU8LimIHpaooSVRHpDeQbEI5ePcRqBabXjWfOdT0O7RVXAN//5/txvGIkvWNVR
- nG9i87/MkaldM4FIw9fhkSne5z9784IgsifLbRGzLgFFmJPmomEZMGzzmLIbUazK3BT/
- pQUyAuvlXilswqNUqIlQVz2j1VTpvc2yOi5T4UfN4kWgJvIwOOXMrtGSflT3zqUxygkW
- gWkbdgfab8t6M/hKNXGLTGIYtVRRtiHraADk6p2MLkYvDcdg+iLgUaqaSt+u3EvjIWxZ
- VJQw==
+ bh=EnNTV7+OPS/Qkj7q6BpLWlhxHtmDDvBfdXjalrA7KYs=;
+ b=yTm2fVFNuFlHAxrRPCKrWd1eeWtf8YU17aG3GjN27kSPd4UDx/6msvepuXEqbuErBF
+ pqYQFIKpQbxpmKskHR9yzcQwb3Y+Y9VpNhTBTXYrFjMN14aeNHykVwiJi95ZhD/q04o4
+ 9oPHY/QCs0qZouIldt0bmVn4sdx4w0grAvxlxS9BMYkRaJdVvuNZnN+/NB3WLzyAtAU+
+ bErHQE5nFtjb9XfeWq8v5uDwWeyDzsTJjECOtVdOIpbaNJ3/AybY+Nl2C+q/p7fMtTZh
+ UHagPexKCWx/6TNQ0gZnj5Q4Gncyl/riRDudg/iyllKRJ+h3plympqzUCTcXQ+UElwqi
+ LjLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=2Pm0HMO2zXGIGpZaPm/owGvMJz02qx44BSYos4Dfokk=;
- b=pUWsUJkuB3i0bjICc6Qu+qSOUxT7QZvVsfpJsdsEewgaRqoYjFNRy3WCijcca6fe7X
- crfIJffhGeuAm6WPtwpKYqJQuE8t+HETLH9Wf4rFOqDfnLONxa77HR1nPwim0rRbUQBb
- sBXPGC59tTBHuFtcxlcEY09fZGd9TAzLO9SrKHBZoU5nX613SFGmsrYyWrMX7bV1sJ/T
- UFC1bg+nrilg6mwqMTkIncBdsljhRujY7LlGg7i74jZG81ne9jMXiIDT0ZMWOBk9uL9Q
- edXJ9yUspJSQ4kWg3RHmQR3x3e/V5ljgbH1Z/XWgprnn2RQ6KfpirSErz0K01/pRS4Xx
- 6cWQ==
-X-Gm-Message-State: AOAM531E7w03WElsD6OJxH+Q+RqM/K06XWqwU0Fqb3vw/PwmIs0+2Au+
- BqBNfYs8K5Zcl9AlBYem/TDu+FpMfdTtF+GU
-X-Google-Smtp-Source: ABdhPJwuJx/ruZ1revnFG+IIRHwyn4qSpBXabThyyhbemPMUBL7sXgYNKVLy9hQJhKev0OvQhA3x8w==
-X-Received: by 2002:a7b:c241:: with SMTP id b1mr15154416wmj.98.1600092415593; 
- Mon, 14 Sep 2020 07:06:55 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=EnNTV7+OPS/Qkj7q6BpLWlhxHtmDDvBfdXjalrA7KYs=;
+ b=sP0Sw9d6qzD1k92L5/Iw1LiZxEnzmIEcEgUC05mka3dUn+fm2QtWOlJGmeWW9gc+xn
+ Ih+fGLhs8rhgYvxpvjjefk5F77m2MTL5oJnvKVOGa4dvT2qbd+K1cw0d24IyR5Vz1D7E
+ RxuHpeSij78oxu+fKjD2kaLMKGCN4UQ6JV9PTPjsHA8fvH/hbbTLvoFDZO1JUkyG2uIz
+ 8RAo+AhkIN31Q73VOHxZviDLJgj/5drMzPBnLSWshM9M+fvXG0IEQWkdVzWCX1YhIqtp
+ deGHbLSKlWoKg6Ld8kKp3lBPKp2zSq76mFBsqaQRhSwbNB/GX0LmA2OPMcrp7oo19S1L
+ 4rPA==
+X-Gm-Message-State: AOAM5339lRc2EfEBYUgTug7G9MQ+ozVHTAyGzUmMUH/ZK/oXQZQsgtLE
+ RfhL8lww4+R9uFU/0E227kaD3W0ukKmTcs+A
+X-Google-Smtp-Source: ABdhPJzSSL3C9m7JGFDog2u2HgpgSALD6c/eAvieKu3NB2iCW7DOpCvhHuYJ7QzDJeSpMvm/jORk2A==
+X-Received: by 2002:a5d:4603:: with SMTP id t3mr15608148wrq.424.1600092403828; 
+ Mon, 14 Sep 2020 07:06:43 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id x16sm20834041wrq.62.2020.09.14.07.06.54
+ by smtp.gmail.com with ESMTPSA id x16sm20834041wrq.62.2020.09.14.07.06.43
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Sep 2020 07:06:54 -0700 (PDT)
+ Mon, 14 Sep 2020 07:06:43 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 11/36] target/arm: Remove no-longer-reachable 32-bit KVM code
-Date: Mon, 14 Sep 2020 15:06:16 +0100
-Message-Id: <20200914140641.21369-12-peter.maydell@linaro.org>
+Subject: [PULL 00/36] target-arm queue
+Date: Mon, 14 Sep 2020 15:06:05 +0100
+Message-Id: <20200914140641.21369-1-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200914140641.21369-1-peter.maydell@linaro.org>
-References: <20200914140641.21369-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::333;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x333.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42a;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,240 +103,176 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that 32-bit KVM host support is gone, KVM can never
-be enabled unless CONFIG_AARCH64 is true, and some code
-paths are no longer reachable and can be deleted.
+Nuvoton new board models, and some more minor stuff. I also put
+in the deprecation patches for unicore32 and lm32.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20200904154156.31943-3-peter.maydell@linaro.org
----
- target/arm/kvm-consts.h |   7 ---
- target/arm/kvm_arm.h    |   6 ---
- target/arm/cpu.c        | 101 +++++++++++++++++++---------------------
- target/arm/kvm.c        |   7 ---
- 4 files changed, 47 insertions(+), 74 deletions(-)
+thanks
+-- PMM
 
-diff --git a/target/arm/kvm-consts.h b/target/arm/kvm-consts.h
-index aad28258a36..580f1c1fee0 100644
---- a/target/arm/kvm-consts.h
-+++ b/target/arm/kvm-consts.h
-@@ -136,16 +136,11 @@ MISMATCH_CHECK(QEMU_PSCI_RET_DISABLED, PSCI_RET_DISABLED);
-  */
- #define QEMU_KVM_ARM_TARGET_NONE UINT_MAX
- 
--#ifdef TARGET_AARCH64
- MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_AEM_V8, KVM_ARM_TARGET_AEM_V8);
- MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_FOUNDATION_V8, KVM_ARM_TARGET_FOUNDATION_V8);
- MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A57, KVM_ARM_TARGET_CORTEX_A57);
- MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_XGENE_POTENZA, KVM_ARM_TARGET_XGENE_POTENZA);
- MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A53, KVM_ARM_TARGET_CORTEX_A53);
--#else
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A15, KVM_ARM_TARGET_CORTEX_A15);
--MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A7, KVM_ARM_TARGET_CORTEX_A7);
--#endif
- 
- #define CP_REG_ARM64                   0x6000000000000000ULL
- #define CP_REG_ARM_COPROC_MASK         0x000000000FFF0000
-@@ -165,7 +160,6 @@ MISMATCH_CHECK(QEMU_KVM_ARM_TARGET_CORTEX_A7, KVM_ARM_TARGET_CORTEX_A7);
- /* No kernel define but it's useful to QEMU */
- #define CP_REG_ARM64_SYSREG_CP (CP_REG_ARM64_SYSREG >> CP_REG_ARM_COPROC_SHIFT)
- 
--#ifdef TARGET_AARCH64
- MISMATCH_CHECK(CP_REG_ARM64, KVM_REG_ARM64);
- MISMATCH_CHECK(CP_REG_ARM_COPROC_MASK, KVM_REG_ARM_COPROC_MASK);
- MISMATCH_CHECK(CP_REG_ARM_COPROC_SHIFT, KVM_REG_ARM_COPROC_SHIFT);
-@@ -180,7 +174,6 @@ MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRM_MASK, KVM_REG_ARM64_SYSREG_CRM_MASK);
- MISMATCH_CHECK(CP_REG_ARM64_SYSREG_CRM_SHIFT, KVM_REG_ARM64_SYSREG_CRM_SHIFT);
- MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP2_MASK, KVM_REG_ARM64_SYSREG_OP2_MASK);
- MISMATCH_CHECK(CP_REG_ARM64_SYSREG_OP2_SHIFT, KVM_REG_ARM64_SYSREG_OP2_SHIFT);
--#endif
- 
- #undef MISMATCH_CHECK
- 
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index adb38514bf2..bc178eeb84c 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -406,13 +406,7 @@ static inline const char *gic_class_name(void)
- static inline const char *gicv3_class_name(void)
- {
-     if (kvm_irqchip_in_kernel()) {
--#ifdef TARGET_AARCH64
-         return "kvm-arm-gicv3";
--#else
--        error_report("KVM GICv3 acceleration is not supported on this "
--                     "platform");
--        exit(1);
--#endif
-     } else {
-         if (kvm_enabled()) {
-             error_report("Userspace GICv3 is not supported with KVM");
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 6b4e708c08f..7b5ea65fab9 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -2098,72 +2098,69 @@ static void cortex_a15_initfn(Object *obj)
- }
- 
- #ifndef TARGET_AARCH64
--/* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
-- * otherwise, a CPU with as many features enabled as our emulation supports.
-+/*
-+ * -cpu max: a CPU with as many features enabled as our emulation supports.
-  * The version of '-cpu max' for qemu-system-aarch64 is defined in cpu64.c;
-- * this only needs to handle 32 bits.
-+ * this only needs to handle 32 bits, and need not care about KVM.
-  */
- static void arm_max_initfn(Object *obj)
- {
-     ARMCPU *cpu = ARM_CPU(obj);
- 
--    if (kvm_enabled()) {
--        kvm_arm_set_cpu_features_from_host(cpu);
--    } else {
--        cortex_a15_initfn(obj);
-+    cortex_a15_initfn(obj);
- 
--        /* old-style VFP short-vector support */
--        cpu->isar.mvfr0 = FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPSHVEC, 1);
-+    /* old-style VFP short-vector support */
-+    cpu->isar.mvfr0 = FIELD_DP32(cpu->isar.mvfr0, MVFR0, FPSHVEC, 1);
- 
- #ifdef CONFIG_USER_ONLY
--        /* We don't set these in system emulation mode for the moment,
--         * since we don't correctly set (all of) the ID registers to
--         * advertise them.
--         */
--        set_feature(&cpu->env, ARM_FEATURE_V8);
--        {
--            uint32_t t;
-+    /*
-+     * We don't set these in system emulation mode for the moment,
-+     * since we don't correctly set (all of) the ID registers to
-+     * advertise them.
-+     */
-+    set_feature(&cpu->env, ARM_FEATURE_V8);
-+    {
-+        uint32_t t;
- 
--            t = cpu->isar.id_isar5;
--            t = FIELD_DP32(t, ID_ISAR5, AES, 2);
--            t = FIELD_DP32(t, ID_ISAR5, SHA1, 1);
--            t = FIELD_DP32(t, ID_ISAR5, SHA2, 1);
--            t = FIELD_DP32(t, ID_ISAR5, CRC32, 1);
--            t = FIELD_DP32(t, ID_ISAR5, RDM, 1);
--            t = FIELD_DP32(t, ID_ISAR5, VCMA, 1);
--            cpu->isar.id_isar5 = t;
-+        t = cpu->isar.id_isar5;
-+        t = FIELD_DP32(t, ID_ISAR5, AES, 2);
-+        t = FIELD_DP32(t, ID_ISAR5, SHA1, 1);
-+        t = FIELD_DP32(t, ID_ISAR5, SHA2, 1);
-+        t = FIELD_DP32(t, ID_ISAR5, CRC32, 1);
-+        t = FIELD_DP32(t, ID_ISAR5, RDM, 1);
-+        t = FIELD_DP32(t, ID_ISAR5, VCMA, 1);
-+        cpu->isar.id_isar5 = t;
- 
--            t = cpu->isar.id_isar6;
--            t = FIELD_DP32(t, ID_ISAR6, JSCVT, 1);
--            t = FIELD_DP32(t, ID_ISAR6, DP, 1);
--            t = FIELD_DP32(t, ID_ISAR6, FHM, 1);
--            t = FIELD_DP32(t, ID_ISAR6, SB, 1);
--            t = FIELD_DP32(t, ID_ISAR6, SPECRES, 1);
--            cpu->isar.id_isar6 = t;
-+        t = cpu->isar.id_isar6;
-+        t = FIELD_DP32(t, ID_ISAR6, JSCVT, 1);
-+        t = FIELD_DP32(t, ID_ISAR6, DP, 1);
-+        t = FIELD_DP32(t, ID_ISAR6, FHM, 1);
-+        t = FIELD_DP32(t, ID_ISAR6, SB, 1);
-+        t = FIELD_DP32(t, ID_ISAR6, SPECRES, 1);
-+        cpu->isar.id_isar6 = t;
- 
--            t = cpu->isar.mvfr1;
--            t = FIELD_DP32(t, MVFR1, FPHP, 3);     /* v8.2-FP16 */
--            t = FIELD_DP32(t, MVFR1, SIMDHP, 2);   /* v8.2-FP16 */
--            cpu->isar.mvfr1 = t;
-+        t = cpu->isar.mvfr1;
-+        t = FIELD_DP32(t, MVFR1, FPHP, 3);     /* v8.2-FP16 */
-+        t = FIELD_DP32(t, MVFR1, SIMDHP, 2);   /* v8.2-FP16 */
-+        cpu->isar.mvfr1 = t;
- 
--            t = cpu->isar.mvfr2;
--            t = FIELD_DP32(t, MVFR2, SIMDMISC, 3); /* SIMD MaxNum */
--            t = FIELD_DP32(t, MVFR2, FPMISC, 4);   /* FP MaxNum */
--            cpu->isar.mvfr2 = t;
-+        t = cpu->isar.mvfr2;
-+        t = FIELD_DP32(t, MVFR2, SIMDMISC, 3); /* SIMD MaxNum */
-+        t = FIELD_DP32(t, MVFR2, FPMISC, 4);   /* FP MaxNum */
-+        cpu->isar.mvfr2 = t;
- 
--            t = cpu->isar.id_mmfr3;
--            t = FIELD_DP32(t, ID_MMFR3, PAN, 2); /* ATS1E1 */
--            cpu->isar.id_mmfr3 = t;
-+        t = cpu->isar.id_mmfr3;
-+        t = FIELD_DP32(t, ID_MMFR3, PAN, 2); /* ATS1E1 */
-+        cpu->isar.id_mmfr3 = t;
- 
--            t = cpu->isar.id_mmfr4;
--            t = FIELD_DP32(t, ID_MMFR4, HPDS, 1); /* AA32HPD */
--            t = FIELD_DP32(t, ID_MMFR4, AC2, 1); /* ACTLR2, HACTLR2 */
--            t = FIELD_DP32(t, ID_MMFR4, CNP, 1); /* TTCNP */
--            t = FIELD_DP32(t, ID_MMFR4, XNX, 1); /* TTS2UXN */
--            cpu->isar.id_mmfr4 = t;
--        }
--#endif
-+        t = cpu->isar.id_mmfr4;
-+        t = FIELD_DP32(t, ID_MMFR4, HPDS, 1); /* AA32HPD */
-+        t = FIELD_DP32(t, ID_MMFR4, AC2, 1); /* ACTLR2, HACTLR2 */
-+        t = FIELD_DP32(t, ID_MMFR4, CNP, 1); /* TTCNP */
-+        t = FIELD_DP32(t, ID_MMFR4, XNX, 1); /* TTS2UXN */
-+        cpu->isar.id_mmfr4 = t;
-     }
-+#endif
- }
- #endif
- 
-@@ -2267,11 +2264,7 @@ static void arm_host_initfn(Object *obj)
- 
- static const TypeInfo host_arm_cpu_type_info = {
-     .name = TYPE_ARM_HOST_CPU,
--#ifdef TARGET_AARCH64
-     .parent = TYPE_AARCH64_CPU,
--#else
--    .parent = TYPE_ARM_CPU,
--#endif
-     .instance_init = arm_host_initfn,
- };
- 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 8bb7318378b..2eae73315d6 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -918,22 +918,15 @@ int kvm_arch_process_async_events(CPUState *cs)
-     return 0;
- }
- 
--/* The #ifdef protections are until 32bit headers are imported and can
-- * be removed once both 32 and 64 bit reach feature parity.
-- */
- void kvm_arch_update_guest_debug(CPUState *cs, struct kvm_guest_debug *dbg)
- {
--#ifdef KVM_GUESTDBG_USE_SW_BP
-     if (kvm_sw_breakpoints_active(cs)) {
-         dbg->control |= KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_SW_BP;
-     }
--#endif
--#ifdef KVM_GUESTDBG_USE_HW
-     if (kvm_arm_hw_debug_active(cs)) {
-         dbg->control |= KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_HW;
-         kvm_arm_copy_hw_debug_data(&dbg->arch);
-     }
--#endif
- }
- 
- void kvm_arch_init_irq_routing(KVMState *s)
--- 
-2.20.1
+The following changes since commit a68694cd1f3e5448cca814ff39b871f9ebd71ed5:
 
+  Merge remote-tracking branch 'remotes/philmd-gitlab/tags/edk2-next-20200914' into staging (2020-09-14 12:18:58 +0100)
+
+are available in the Git repository at:
+
+  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200914
+
+for you to fetch changes up to dd44ae00fc5342ed99acb68ec3508f76a71d523a:
+
+  MAINTAINERS: Add maintainer entry for Xilinx ZynqMP CAN controller (2020-09-14 14:27:08 +0100)
+
+----------------------------------------------------------------
+target-arm queue:
+ * hw/misc/a9scu: Do not allow invalid CPU count
+ * hw/misc/a9scu: Minor cleanups
+ * hw/timer/armv7m_systick: assert that board code set system_clock_scale
+ * decodetree: Improve identifier matching
+ * target/arm: Clean up neon fp insn size field decode
+ * target/arm: Remove KVM support for 32-bit Arm hosts
+ * hw/arm/mps2: New board models mps2-an386, mps2-an500
+ * Deprecate Unicore32 port
+ * Deprecate lm32 port
+ * target/arm: Count PMU events when MDCR.SPME is set
+ * hw/arm: versal-virt: Correct the tx/rx GEM clocks
+ * New Nuvoton iBMC board models npcm750-evb, quanta-gsj
+ * xlnx-zynqmp: implement ZynqMP CAN controllers
+
+----------------------------------------------------------------
+Aaron Lindsay (1):
+      target/arm: Count PMU events when MDCR.SPME is set
+
+Edgar E. Iglesias (1):
+      hw/arm: versal-virt: Correct the tx/rx GEM clocks
+
+Havard Skinnemoen (14):
+      hw/misc: Add NPCM7xx System Global Control Registers device model
+      hw/misc: Add NPCM7xx Clock Controller device model
+      hw/timer: Add NPCM7xx Timer device model
+      hw/arm: Add NPCM730 and NPCM750 SoC models
+      hw/arm: Add two NPCM7xx-based machines
+      roms: Add virtual Boot ROM for NPCM7xx SoCs
+      hw/arm: Load -bios image as a boot ROM for npcm7xx
+      hw/nvram: NPCM7xx OTP device model
+      hw/mem: Stubbed out NPCM7xx Memory Controller model
+      hw/ssi: NPCM7xx Flash Interface Unit device model
+      hw/arm: Wire up BMC boot flash for npcm750-evb and quanta-gsj
+      hw/arm/npcm7xx: add board setup stub for CPU and UART clocks
+      docs/system: Add Nuvoton machine documentation
+      tests/acceptance: console boot tests for quanta-gsj
+
+Peter Maydell (11):
+      hw/timer/armv7m_systick: assert that board code set system_clock_scale
+      target/arm: Convert Neon 3-same-fp size field to MO_* in decode
+      target/arm: Convert Neon VCVT fp size field to MO_* in decode
+      target/arm: Convert VCMLA, VCADD size field to MO_* in decode
+      target/arm: Remove KVM support for 32-bit Arm hosts
+      target/arm: Remove no-longer-reachable 32-bit KVM code
+      hw/arm/mps2: New board model mps2-an386
+      hw/arm/mps2: New board model mps2-an500
+      docs/system/arm/mps2.rst: Make board list consistent
+      Deprecate Unicore32 port
+      Deprecate lm32 port
+
+Philippe Mathieu-Daudé (4):
+      hw/misc/a9scu: Do not allow invalid CPU count
+      hw/misc/a9scu: Simplify setting MemoryRegionOps::valid fields
+      hw/misc/a9scu: Simplify setting MemoryRegionOps::impl fields
+      hw/misc/a9scu: Report unimplemented accesses with qemu_log_mask(UNIMP)
+
+Richard Henderson (1):
+      decodetree: Improve identifier matching
+
+Vikram Garhwal (4):
+      hw/net/can: Introduce Xilinx ZynqMP CAN controller
+      xlnx-zynqmp: Connect Xilinx ZynqMP CAN controllers
+      tests/qtest: Introduce tests for Xilinx ZynqMP CAN controller
+      MAINTAINERS: Add maintainer entry for Xilinx ZynqMP CAN controller
+
+ docs/system/arm/mps2.rst               |   20 +-
+ docs/system/arm/nuvoton.rst            |   92 +++
+ docs/system/deprecated.rst             |   32 +-
+ docs/system/target-arm.rst             |    1 +
+ configure                              |    2 +-
+ default-configs/arm-softmmu.mak        |    1 +
+ include/hw/arm/npcm7xx.h               |  112 +++
+ include/hw/arm/xlnx-zynqmp.h           |    8 +
+ include/hw/mem/npcm7xx_mc.h            |   36 +
+ include/hw/misc/npcm7xx_clk.h          |   48 ++
+ include/hw/misc/npcm7xx_gcr.h          |   43 ++
+ include/hw/net/xlnx-zynqmp-can.h       |   78 +++
+ include/hw/nvram/npcm7xx_otp.h         |   79 +++
+ include/hw/ssi/npcm7xx_fiu.h           |   73 ++
+ include/hw/timer/npcm7xx_timer.h       |   78 +++
+ target/arm/kvm-consts.h                |    7 -
+ target/arm/kvm_arm.h                   |    6 -
+ target/arm/neon-dp.decode              |   18 +-
+ target/arm/neon-shared.decode          |   18 +-
+ tests/decode/succ_ident1.decode        |    7 +
+ hw/arm/mps2.c                          |   97 ++-
+ hw/arm/npcm7xx.c                       |  532 +++++++++++++++
+ hw/arm/npcm7xx_boards.c                |  197 ++++++
+ hw/arm/xlnx-versal-virt.c              |    2 +-
+ hw/arm/xlnx-zcu102.c                   |   20 +
+ hw/arm/xlnx-zynqmp.c                   |   34 +
+ hw/mem/npcm7xx_mc.c                    |   84 +++
+ hw/misc/a9scu.c                        |   59 +-
+ hw/misc/npcm7xx_clk.c                  |  266 ++++++++
+ hw/misc/npcm7xx_gcr.c                  |  269 ++++++++
+ hw/net/can/xlnx-zynqmp-can.c           | 1165 ++++++++++++++++++++++++++++++++
+ hw/nvram/npcm7xx_otp.c                 |  440 ++++++++++++
+ hw/ssi/npcm7xx_fiu.c                   |  572 ++++++++++++++++
+ hw/timer/armv7m_systick.c              |    8 +
+ hw/timer/npcm7xx_timer.c               |  543 +++++++++++++++
+ target/arm/cpu.c                       |  101 ++-
+ target/arm/helper.c                    |    2 +-
+ target/arm/kvm.c                       |    7 -
+ target/arm/kvm32.c                     |  595 ----------------
+ tests/qtest/xlnx-can-test.c            |  359 ++++++++++
+ .gitmodules                            |    3 +
+ MAINTAINERS                            |   18 +
+ hw/arm/Kconfig                         |    9 +
+ hw/arm/meson.build                     |    1 +
+ hw/mem/meson.build                     |    1 +
+ hw/misc/meson.build                    |    4 +
+ hw/misc/trace-events                   |    8 +
+ hw/net/can/meson.build                 |    1 +
+ hw/nvram/meson.build                   |    1 +
+ hw/ssi/meson.build                     |    1 +
+ hw/ssi/trace-events                    |   11 +
+ hw/timer/meson.build                   |    1 +
+ hw/timer/trace-events                  |    5 +
+ pc-bios/README                         |    6 +
+ pc-bios/meson.build                    |    1 +
+ pc-bios/npcm7xx_bootrom.bin            |  Bin 0 -> 768 bytes
+ roms/Makefile                          |    7 +
+ roms/vbootrom                          |    1 +
+ scripts/decodetree.py                  |   46 +-
+ target/arm/meson.build                 |    5 +-
+ target/arm/translate-neon.c.inc        |   42 +-
+ tests/acceptance/boot_linux_console.py |   83 +++
+ tests/qtest/meson.build                |    1 +
+ 63 files changed, 5584 insertions(+), 783 deletions(-)
+ create mode 100644 docs/system/arm/nuvoton.rst
+ create mode 100644 include/hw/arm/npcm7xx.h
+ create mode 100644 include/hw/mem/npcm7xx_mc.h
+ create mode 100644 include/hw/misc/npcm7xx_clk.h
+ create mode 100644 include/hw/misc/npcm7xx_gcr.h
+ create mode 100644 include/hw/net/xlnx-zynqmp-can.h
+ create mode 100644 include/hw/nvram/npcm7xx_otp.h
+ create mode 100644 include/hw/ssi/npcm7xx_fiu.h
+ create mode 100644 include/hw/timer/npcm7xx_timer.h
+ create mode 100644 tests/decode/succ_ident1.decode
+ create mode 100644 hw/arm/npcm7xx.c
+ create mode 100644 hw/arm/npcm7xx_boards.c
+ create mode 100644 hw/mem/npcm7xx_mc.c
+ create mode 100644 hw/misc/npcm7xx_clk.c
+ create mode 100644 hw/misc/npcm7xx_gcr.c
+ create mode 100644 hw/net/can/xlnx-zynqmp-can.c
+ create mode 100644 hw/nvram/npcm7xx_otp.c
+ create mode 100644 hw/ssi/npcm7xx_fiu.c
+ create mode 100644 hw/timer/npcm7xx_timer.c
+ delete mode 100644 target/arm/kvm32.c
+ create mode 100644 tests/qtest/xlnx-can-test.c
+ create mode 100644 pc-bios/npcm7xx_bootrom.bin
+ create mode 160000 roms/vbootrom
 
