@@ -2,116 +2,89 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BA6BC43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 08:27:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE2EC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 08:49:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65D16221E8
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 08:27:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65D16221E8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
+	by mail.kernel.org (Postfix) with ESMTPS id 40087206DC
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 08:49:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S3rlhgo6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40087206DC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHjpa-0006v9-FX
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 04:27:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35578)
+	id 1kHkAp-0008Ea-7r
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 04:49:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41314)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sw@weilnetz.de>)
- id 1kHjoG-0005Wr-7G; Mon, 14 Sep 2020 04:26:00 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:54088
- helo=v2201612906741603.powersrv.de)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sw@weilnetz.de>)
- id 1kHjoD-00027q-RD; Mon, 14 Sep 2020 04:25:59 -0400
-Received: from localhost (localhost [127.0.0.1])
- by v2201612906741603.powersrv.de (Postfix) with ESMTP id 58845DB25F3;
- Mon, 14 Sep 2020 10:25:55 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
-Received: from v2201612906741603.powersrv.de ([127.0.0.1])
- by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
- port 10024)
- with ESMTP id 6Wp0Q_7sf3zZ; Mon, 14 Sep 2020 10:25:53 +0200 (CEST)
-Received: from mobile-147-236.wlan.uni-mannheim.de
- (mobile-147-236.wlan.uni-mannheim.de [134.155.147.236])
- (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
- key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kHk9j-0006ad-1d
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 04:48:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21055
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kHk9h-0005DE-6w
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 04:48:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600073288;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=s3Qbp7v97u0gkincEc06YlAQyuldnRs3C7IH3sh7GGw=;
+ b=S3rlhgo68KB4AF5daejrPi76+Zq50Os8eUX2UnomY4UB7w60Zlxluko9iYWmdeGshKLJBK
+ zUphQjJoU1kItGiDyt/PMBpHQBfhgPl7wECjUoIkF2OT2RpqJhy76udE2EOLe3ZnILPEwh
+ qF0R7etkYYuFNTwcdSGmp1TVLqtCzac=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-580-LmkFhWFzN7Se9p8mu8-nhg-1; Mon, 14 Sep 2020 04:48:05 -0400
+X-MC-Unique: LmkFhWFzN7Se9p8mu8-nhg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 2B91FDB25F0;
- Mon, 14 Sep 2020 10:25:52 +0200 (CEST)
-Subject: Re: [PATCH v8 24/27] ci: Enable msys2 ci in cirrus
-To: Thomas Huth <thuth@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>,
- qemu-devel@nongnu.org
-References: <20200912224431.1428-1-luoyonggang@gmail.com>
- <20200912224431.1428-25-luoyonggang@gmail.com>
- <c3529d95-6d0b-a8ca-23cb-21393435ba94@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Autocrypt: addr=sw@weilnetz.de; keydata=
- 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
-Message-ID: <64e7d8f2-93aa-3605-7376-d46383eedda4@weilnetz.de>
-Date: Mon, 14 Sep 2020 10:25:51 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.12.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 492401007C87;
+ Mon, 14 Sep 2020 08:48:04 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
+ [10.36.114.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 174717E8CD;
+ Mon, 14 Sep 2020 08:48:04 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 7D2D311329B3; Mon, 14 Sep 2020 10:48:02 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5 3/8] qapi: Implement deprecated-output=hide for QMP events
+Date: Mon, 14 Sep 2020 10:47:57 +0200
+Message-Id: <20200914084802.4185028-4-armbru@redhat.com>
+In-Reply-To: <20200914084802.4185028-1-armbru@redhat.com>
+References: <20200914084802.4185028-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <c3529d95-6d0b-a8ca-23cb-21393435ba94@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=37.120.169.71; envelope-from=sw@weilnetz.de;
- helo=v2201612906741603.powersrv.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:38:01
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 01:39:17
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.695,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -124,45 +97,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
- qemu-block@nongnu.org, Wen Congyang <wencongyang2@huawei.com>,
- Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Markus Armbruster <armbru@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: marcandre.lureau@gmail.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 14.09.20 um 09:38 schrieb Thomas Huth:
+This policy suppresses deprecated bits in output, and thus permits
+"testing the future".  Implement it for QMP events: suppress
+deprecated ones.
 
-> On 13/09/2020 00.44, Yonggang Luo wrote:
->> Install msys2 in a proper way refer to https://github.com/cirruslabs/c=
-irrus-ci-docs/issues/699
->> The https://wiki.qemu.org/Hosts/W32#Native_builds_with_MSYS2 need to b=
-e updated.
-> I don't think that a request to update the wiki should be part of the
-> commit message here.
-> Stefan, could you please have a look at the wiki to see whether it need=
-s
-> an update?
+No QMP event is deprecated right now.
 
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ tests/test-qmp-event.c | 20 ++++++++++++++++++++
+ scripts/qapi/events.py | 14 ++++++++++++--
+ 2 files changed, 32 insertions(+), 2 deletions(-)
 
-https://wiki.qemu.org/Hosts/W32 needs several updates.
-
-I never use native builds with msys, so cannot say whether they work at a=
-ll.
-
-All I know is that cross builds with Mingw-w64 work, either on Linux (my =
-usual environment is Debian Bullseye) or on Cygwin (very slow). https://g=
-ithub.com/stweil/qemu/tree/master/.github/workflows contains my build scr=
-ipt and other required files.
-
-
-Stefan
-
+diff --git a/tests/test-qmp-event.c b/tests/test-qmp-event.c
+index 7dd0053190..ab059fb5c2 100644
+--- a/tests/test-qmp-event.c
++++ b/tests/test-qmp-event.c
+@@ -14,6 +14,7 @@
+ #include "qemu/osdep.h"
+ 
+ #include "qemu-common.h"
++#include "qapi/compat-policy.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/qbool.h"
+ #include "qapi/qmp/qdict.h"
+@@ -140,6 +141,24 @@ static void test_event_d(TestEventData *data,
+     qobject_unref(data->expect);
+ }
+ 
++static void test_event_deprecated(TestEventData *data, const void *unused)
++{
++    data->expect = qdict_from_jsonf_nofail("{ 'event': 'TEST-EVENT-FEATURES1' }");
++
++    memset(&compat_policy, 0, sizeof(compat_policy));
++
++    qapi_event_send_test_event_features1();
++    g_assert(data->emitted);
++
++    compat_policy.has_deprecated_output = true;
++    compat_policy.deprecated_output = COMPAT_POLICY_OUTPUT_HIDE;
++    data->emitted = false;
++    qapi_event_send_test_event_features1();
++    g_assert(!data->emitted);
++
++    qobject_unref(data->expect);
++}
++
+ int main(int argc, char **argv)
+ {
+     g_test_init(&argc, &argv, NULL);
+@@ -148,6 +167,7 @@ int main(int argc, char **argv)
+     event_test_add("/event/event_b", test_event_b);
+     event_test_add("/event/event_c", test_event_c);
+     event_test_add("/event/event_d", test_event_d);
++    event_test_add("/event/deprecated", test_event_deprecated);
+     g_test_run();
+ 
+     return 0;
+diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
+index b544af5a1c..95ca4b4753 100644
+--- a/scripts/qapi/events.py
++++ b/scripts/qapi/events.py
+@@ -61,7 +61,8 @@ def gen_param_var(typ):
+     return ret
+ 
+ 
+-def gen_event_send(name, arg_type, boxed, event_enum_name, event_emit):
++def gen_event_send(name, arg_type, features, boxed,
++                   event_enum_name, event_emit):
+     # FIXME: Our declaration of local variables (and of 'errp' in the
+     # parameter list) can collide with exploded members of the event's
+     # data type passed in as parameters.  If this collision ever hits in
+@@ -86,6 +87,14 @@ def gen_event_send(name, arg_type, boxed, event_enum_name, event_emit):
+         if not boxed:
+             ret += gen_param_var(arg_type)
+ 
++    if 'deprecated' in [f.name for f in features]:
++        ret += mcgen('''
++
++    if (compat_policy.deprecated_output == COMPAT_POLICY_OUTPUT_HIDE) {
++        return;
++    }
++''')
++
+     ret += mcgen('''
+ 
+     qmp = qmp_event_build_dict("%(name)s");
+@@ -154,6 +163,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCVisitor):
+ #include "%(prefix)sqapi-emit-events.h"
+ #include "%(events)s.h"
+ #include "%(visit)s.h"
++#include "qapi/compat-policy.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qobject-output-visitor.h"
+@@ -192,7 +202,7 @@ void %(event_emit)s(%(event_enum)s event, QDict *qdict);
+     def visit_event(self, name, info, ifcond, features, arg_type, boxed):
+         with ifcontext(ifcond, self._genh, self._genc):
+             self._genh.add(gen_event_send_decl(name, arg_type, boxed))
+-            self._genc.add(gen_event_send(name, arg_type, boxed,
++            self._genc.add(gen_event_send(name, arg_type, features, boxed,
+                                           self._event_enum_name,
+                                           self._event_emit_name))
+         # Note: we generate the enum member regardless of @ifcond, to
+-- 
+2.26.2
 
 
