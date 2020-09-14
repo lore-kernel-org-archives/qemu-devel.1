@@ -2,74 +2,92 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBFDCC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 07:27:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10222C43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 07:27:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10F11217BA
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 07:27:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E2CB206F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 07:27:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="cAg3RQKx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10F11217BA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UZ9cpW6K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E2CB206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHitO-0004Db-0F
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 03:27:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49656)
+	id 1kHitu-000583-NR
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 03:27:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50726)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc.michel@greensocs.com>)
- id 1kHikt-0000oH-AU; Mon, 14 Sep 2020 03:18:27 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:53774)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc.michel@greensocs.com>)
- id 1kHikr-00029f-7Y; Mon, 14 Sep 2020 03:18:26 -0400
-Received: from [172.17.10.10] (unknown [172.17.10.10])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 6378A21CBE;
- Mon, 14 Sep 2020 07:18:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1600067902;
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kHiq9-0002J6-TU
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 03:23:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58755)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kHiq7-0002hy-KG
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 03:23:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600068230;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Tl8+9pox6Y0GrVZQtjT/RRM08CiZQzm/z7WLyiFM7QE=;
- b=cAg3RQKxS+3savFp6Ufp2fUi+7DaHkPCkPfRqZaMGkMoZiKzPx6VlnXKzxhiN5LHardiZm
- vNp+0bP5LmTAol7xkNiP+QaH3ucEZJjL8lLOz+aTrjoBzxsKYfeyKiLT6eWQCZUwuxvMM5
- TLt/j656q6F/5A8t9rpxoQIJZsq+ie8=
-Subject: Re: [PATCH v6 5/7] hw/misc/mps2-fpgaio: Use the LED device
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200912134041.946260-1-f4bug@amsat.org>
- <20200912134041.946260-6-f4bug@amsat.org>
-From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <1cc1dc36-4f6c-7001-8af1-0009ce6c1596@greensocs.com>
-Date: Mon, 14 Sep 2020 09:19:13 +0200
+ bh=b8la2PXAZNU2an3S6A0fBd1Ams0shTqsEkdRIqUEKCc=;
+ b=UZ9cpW6Kq92j2OBTEKUlu2t6/yas3GiIWUZNKzDSAPqNrP9g0+Z3co+Q2M1Zr/Q9vi67Zh
+ +lGMErbOM7/lW+rPCbAVSMfxyvmZAVUGdjpTe5v2RYCIX+nnE+zdcQU4gRpPutZgecJ0pm
+ KU93fX/mFRfz0qDdWPwgrvRl5fVuDQw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-346-754TwMyqPbm3i-PptlZKoA-1; Mon, 14 Sep 2020 03:23:44 -0400
+X-MC-Unique: 754TwMyqPbm3i-PptlZKoA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17039801AC2;
+ Mon, 14 Sep 2020 07:23:43 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-134.ams2.redhat.com [10.36.112.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6FB561A8AC;
+ Mon, 14 Sep 2020 07:23:34 +0000 (UTC)
+Subject: Re: [PATCH v8 13/27] tests: Enable crypto tests under msys2/mingw
+To: Yonggang Luo <luoyonggang@gmail.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange"
+ <berrange@redhat.com>
+References: <20200912224431.1428-1-luoyonggang@gmail.com>
+ <20200912224431.1428-14-luoyonggang@gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <119be52f-fc8b-dd37-e3d6-04a13109c845@redhat.com>
+Date: Mon, 14 Sep 2020 09:23:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200912134041.946260-6-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200912224431.1428-14-luoyonggang@gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=5.135.226.135;
- envelope-from=luc.michel@greensocs.com; helo=beetle.greensocs.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 03:17:59
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 02:55:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -47
+X-Spam_score: -4.8
+X-Spam_bar: ----
+X-Spam_report: (-4.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.695,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1,
+ RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,155 +100,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
+ qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>,
+ Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Max Reitz <mreitz@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/12/20 3:40 PM, Philippe Mathieu-Daudé wrote:
-> Per the 'ARM MPS2 and MPS2+ FPGA Prototyping Boards Technical
-> Reference Manual' (100112_0200_07_en):
+On 13/09/2020 00.44, Yonggang Luo wrote:
+> Fixes following tests on msys2/mingw
+>       'test-crypto-tlscredsx509': ['crypto-tls-x509-helpers.c', 'pkix_asn1_tab.c',
+>                                    tasn1, crypto],
+>       'test-crypto-tlssession': ['crypto-tls-x509-helpers.c', 'pkix_asn1_tab.c', 'crypto-tls-psk-helpers.c',
+>                                  tasn1, crypto],
+>       'test-io-channel-tls': ['io-channel-helpers.c', 'crypto-tls-x509-helpers.c', 'pkix_asn1_tab.c',
+>                               tasn1, io, crypto]}
+> These tests are failure with:
+> ERROR test-crypto-tlscredsx509 - missing test plan
+> ERROR test-crypto-tlssession - missing test plan
+> ERROR test-io-channel-tls - missing test plan
 > 
->    2.1  Overview of the MPS2 and MPS2+ hardware
+> Because on win32 those test case are all disabled in the header
 > 
->         The MPS2 and MPS2+ FPGA Prototyping Boards contain the
->         following components and interfaces:
+> Add qemu_socket_pair for cross platform support, convert file system
+> handling functions to glib
+> Add qemu_link function instead posix only link function.
+> Use send ad recv from qemu that convert Windows Socks error
+> to errno properly.
 > 
->         * User switches and user LEDs:
-> 
->           - Two green LEDs and two push buttons that connect to
->             the FPGA.
->           - Eight green LEDs and one 8-way dip switch that connect
->             to the MCC.
-> 
-> Add the 2 LEDs connected to the FPGA.
-> 
-> This replaces the 'mps2_fpgaio_leds' trace events by the generic
-> 'led_set_intensity' event.
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-
+> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 > ---
->   include/hw/misc/mps2-fpgaio.h |  2 ++
->   hw/misc/mps2-fpgaio.c         | 23 ++++++++++++++++++-----
->   hw/misc/Kconfig               |  1 +
->   hw/misc/trace-events          |  1 -
->   4 files changed, 21 insertions(+), 6 deletions(-)
-> 
-> diff --git a/include/hw/misc/mps2-fpgaio.h b/include/hw/misc/mps2-fpgaio.h
-> index 991f5b731e8..513e3be6f13 100644
-> --- a/include/hw/misc/mps2-fpgaio.h
-> +++ b/include/hw/misc/mps2-fpgaio.h
-> @@ -22,6 +22,7 @@
->   #define MPS2_FPGAIO_H
->   
->   #include "hw/sysbus.h"
-> +#include "hw/misc/led.h"
->   #include "qom/object.h"
->   
->   #define TYPE_MPS2_FPGAIO "mps2-fpgaio"
-> @@ -35,6 +36,7 @@ struct MPS2FPGAIO {
->   
->       /*< public >*/
->       MemoryRegion iomem;
-> +    LEDState *led[2];
->   
->       uint32_t led0;
->       uint32_t prescale;
-> diff --git a/hw/misc/mps2-fpgaio.c b/hw/misc/mps2-fpgaio.c
-> index 2f3fbeef348..6af0e8f837a 100644
-> --- a/hw/misc/mps2-fpgaio.c
-> +++ b/hw/misc/mps2-fpgaio.c
-> @@ -24,6 +24,7 @@
->   #include "migration/vmstate.h"
->   #include "hw/registerfields.h"
->   #include "hw/misc/mps2-fpgaio.h"
-> +#include "hw/misc/led.h"
->   #include "hw/qdev-properties.h"
->   #include "qemu/timer.h"
->   
-> @@ -176,12 +177,9 @@ static void mps2_fpgaio_write(void *opaque, hwaddr offset, uint64_t value,
->   
->       switch (offset) {
->       case A_LED0:
-> -        /* LED bits [1:0] control board LEDs. We don't currently have
-> -         * a mechanism for displaying this graphically, so use a trace event.
-> -         */
-> -        trace_mps2_fpgaio_leds(value & 0x02 ? '*' : '.',
-> -                               value & 0x01 ? '*' : '.');
->           s->led0 = value & 0x3;
-> +        led_set_state(s->led[0], value & 0x01);
-> +        led_set_state(s->led[1], value & 0x02);
->           break;
->       case A_PRESCALE:
->           resync_counter(s);
-> @@ -239,6 +237,10 @@ static void mps2_fpgaio_reset(DeviceState *dev)
->       s->counter = 0;
->       s->pscntr = 0;
->       s->pscntr_sync_ticks = now;
+[...]
+> +static int __stream_socketpair(struct addrinfo* addr_info, int sock[2]){
+> +    SOCKET listener, client, server;
+> +    int opt = 1;
 > +
-> +    for (size_t i = 0; i < ARRAY_SIZE(s->led); i++) {
-> +        device_cold_reset(DEVICE(s->led[i]));
-> +    }
->   }
->   
->   static void mps2_fpgaio_init(Object *obj)
-> @@ -251,6 +253,16 @@ static void mps2_fpgaio_init(Object *obj)
->       sysbus_init_mmio(sbd, &s->iomem);
->   }
->   
-> +static void mps2_fpgaio_realize(DeviceState *dev, Error **errp)
-> +{
-> +    MPS2FPGAIO *s = MPS2_FPGAIO(dev);
+> +    listener = server = client = INVALID_SOCKET;
+> +    listener = socket(addr_info->ai_family, addr_info->ai_socktype, addr_info->ai_protocol);
+> +    if (INVALID_SOCKET == listener)
+> +        goto fail;
 > +
-> +    s->led[0] = led_create_simple(OBJECT(dev), GPIO_POLARITY_ACTIVE_HIGH,
-> +                                  LED_COLOR_GREEN, "USERLED0");
-> +    s->led[1] = led_create_simple(OBJECT(dev), GPIO_POLARITY_ACTIVE_HIGH,
-> +                                  LED_COLOR_GREEN, "USERLED1");
+> +    setsockopt(listener, SOL_SOCKET, SO_REUSEADDR,(const char*)&opt, sizeof(opt));
+> +
+> +    if(SOCKET_ERROR == bind(listener, addr_info->ai_addr, addr_info->ai_addrlen))
+> +        goto fail;
+> +
+> +    if (SOCKET_ERROR == getsockname(listener, addr_info->ai_addr, (int*)&addr_info->ai_addrlen))
+> +        goto fail;
+> +
+> +    if(SOCKET_ERROR == listen(listener, 5))
+> +        goto fail;
+> +
+> +    client = socket(addr_info->ai_family, addr_info->ai_socktype, addr_info->ai_protocol);
+> +
+> +    if (INVALID_SOCKET == client)
+> +        goto fail;
+> +
+> +    if (SOCKET_ERROR == connect(client,addr_info->ai_addr,addr_info->ai_addrlen))
+> +        goto fail;
+> +
+> +    server = accept(listener, 0, 0);
+> +
+> +    if (INVALID_SOCKET == server)
+> +        goto fail;
+> +
+> +    closesocket(listener);
+> +
+> +    sock[0] = client;
+> +    sock[1] = server;
+> +
+> +    return 0;
+> +fail:
+> +    if(INVALID_SOCKET!=listener)
+> +        closesocket(listener);
+> +    if (INVALID_SOCKET!=client)
+> +        closesocket(client);
+> +    return -1;
 > +}
 > +
->   static bool mps2_fpgaio_counters_needed(void *opaque)
->   {
->       /* Currently vmstate.c insists all subsections have a 'needed' function */
-> @@ -299,6 +311,7 @@ static void mps2_fpgaio_class_init(ObjectClass *klass, void *data)
->       DeviceClass *dc = DEVICE_CLASS(klass);
->   
->       dc->vmsd = &mps2_fpgaio_vmstate;
-> +    dc->realize = mps2_fpgaio_realize;
->       dc->reset = mps2_fpgaio_reset;
->       device_class_set_props(dc, mps2_fpgaio_properties);
->   }
-> diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-> index 5c151fa3a83..0cecad45aad 100644
-> --- a/hw/misc/Kconfig
-> +++ b/hw/misc/Kconfig
-> @@ -93,6 +93,7 @@ config MIPS_ITU
->   
->   config MPS2_FPGAIO
->       bool
-> +    select LED
->   
->   config MPS2_SCC
->       bool
-> diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-> index 5f3f6121bc9..908272e8593 100644
-> --- a/hw/misc/trace-events
-> +++ b/hw/misc/trace-events
-> @@ -92,7 +92,6 @@ mps2_scc_cfg_read(unsigned function, unsigned device, uint32_t value) "MPS2 SCC
->   mps2_fpgaio_read(uint64_t offset, uint64_t data, unsigned size) "MPS2 FPGAIO read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
->   mps2_fpgaio_write(uint64_t offset, uint64_t data, unsigned size) "MPS2 FPGAIO write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
->   mps2_fpgaio_reset(void) "MPS2 FPGAIO: reset"
-> -mps2_fpgaio_leds(char led1, char led0) "MPS2 FPGAIO LEDs: %c%c"
->   
->   # msf2-sysreg.c
->   msf2_sysreg_write(uint64_t offset, uint32_t val, uint32_t prev) "msf2-sysreg write: addr 0x%08" PRIx64 " data 0x%" PRIx32 " prev 0x%" PRIx32
-> 
+> +static int __dgram_socketpair(struct addrinfo* addr_info, int sock[2])
+> +{
+> +    SOCKET client, server;
+> +    struct addrinfo addr, *result = NULL;
+> +    const char* address;
+> +    int opt = 1;
+> +
+> +    server = client = INVALID_SOCKET;
+> +
+> +    server = socket(addr_info->ai_family, addr_info->ai_socktype, addr_info->ai_protocol);  
+> +    if (INVALID_SOCKET == server)
+> +        goto fail;
+> +
+> +    setsockopt(server, SOL_SOCKET,SO_REUSEADDR, (const char*)&opt, sizeof(opt));
+> +
+> +    if(SOCKET_ERROR == bind(server, addr_info->ai_addr, addr_info->ai_addrlen))
+> +        goto fail;
+> +
+> +    if (SOCKET_ERROR == getsockname(server, addr_info->ai_addr, (int*)&addr_info->ai_addrlen))
+> +        goto fail;
+> +
+> +    client = socket(addr_info->ai_family, addr_info->ai_socktype, addr_info->ai_protocol); 
+> +    if (INVALID_SOCKET == client)
+> +        goto fail;
+> +
+> +    memset(&addr,0,sizeof(addr));
+> +    addr.ai_family = addr_info->ai_family;
+> +    addr.ai_socktype = addr_info->ai_socktype;
+> +    addr.ai_protocol = addr_info->ai_protocol;
+> +
+> +    if (AF_INET6==addr.ai_family)
+> +        address = "0:0:0:0:0:0:0:1";
+> +    else
+> +        address = "127.0.0.1";
+> +
+> +    if (getaddrinfo(address, "0", &addr, &result))
+> +        goto fail;
+> +
+> +    setsockopt(client,SOL_SOCKET,SO_REUSEADDR,(const char*)&opt, sizeof(opt));
+> +    if(SOCKET_ERROR == bind(client, result->ai_addr, result->ai_addrlen))
+> +        goto fail;
+> +
+> +    if (SOCKET_ERROR == getsockname(client, result->ai_addr, (int*)&result->ai_addrlen))
+> +        goto fail;
+> +
+> +    if (SOCKET_ERROR == connect(server, result->ai_addr, result->ai_addrlen))
+> +        goto fail;
+> +
+> +    if (SOCKET_ERROR == connect(client, addr_info->ai_addr, addr_info->ai_addrlen))
+> +        goto fail;
+> +
+> +    freeaddrinfo(result);
+> +    sock[0] = client;
+> +    sock[1] = server;
+> +    return 0;
+> +
+> +fail:
+> +    if (INVALID_SOCKET!=client)
+> +        closesocket(client);
+> +    if (INVALID_SOCKET!=server)
+> +        closesocket(server);
+> +    if (result)
+> +        freeaddrinfo(result);
+> +    return -1;
+> +}
+> +
+> +int qemu_socketpair(int family, int type, int protocol,int recv[2]){
+> +    const char* address;
+> +    struct addrinfo addr_info,*p_addrinfo;
+> +    int result = -1;
+> +
+> +    if (family == AF_UNIX)
+> +    {
+> +        family = AF_INET;
+> +    }
+> +
+> +    memset(&addr_info, 0, sizeof(addr_info));
+> +    addr_info.ai_family = family;
+> +    addr_info.ai_socktype = type;
+> +    addr_info.ai_protocol = protocol;
+> +    if (AF_INET6==family)
+> +        address = "0:0:0:0:0:0:0:1";
+> +    else
+> +        address = "127.0.0.1";
+> +
+> +    if (0 == getaddrinfo(address, "0", &addr_info, &p_addrinfo)){
+> +        if (SOCK_STREAM == type)
+> +            result = __stream_socketpair(p_addrinfo, recv);
+> +        else if(SOCK_DGRAM == type)
+> +            result = __dgram_socketpair(p_addrinfo, recv);
+> +        freeaddrinfo(p_addrinfo);
+> +    }
+> +    return result;
+> +}
+
+Where do you've got this code from? It seems like this has been taken
+from a 3rd party source? E.g.:
+
+ https://blog.csdn.net/wufuhuai/article/details/79761889
+
+What's the license of this new code? ... please clarify such details in
+the commit description.
+
+ Thanks,
+  Thomas
+
 
