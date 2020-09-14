@@ -2,75 +2,75 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17804C43461
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 09:01:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3947FC43461
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 09:02:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C051207C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 09:01:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 956E4207C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 09:02:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aYRkE595"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C051207C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ged8XCqA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 956E4207C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHkMe-0004yR-DO
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 05:01:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42864)
+	id 1kHkNQ-00065Z-MP
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 05:02:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44052)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kHkGY-0003YW-LA
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 04:55:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35462
+ id 1kHkM5-0004ha-Br
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 05:00:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57792
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kHkGW-0005xi-Kk
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 04:55:14 -0400
+ id 1kHkM2-0006rZ-6c
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 05:00:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600073711;
+ s=mimecast20190719; t=1600074053;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=jRB1h5J2Cri9ZN+hGh81po34aJSpZ0Dk1pqJQnkFBOk=;
- b=aYRkE59517u6xrli5p0fT6+iyeSicyENHicC3S+AUAGva45IktfJH0eIDUBpDLdLqVE3Cm
- wkYvmgnGpbtbemXyWHHsu+YSjobKJ98yIr1/Ypj8+fU7FsgVJHR2vTTyOvhEeB+S8ofgIe
- +SXOid65EPxb+KydDWe9Xb6s3HzwpGY=
+ bh=rpjzEeE5wDw0AhGcrcrQPwmY9Dq+JsRrS9dkQacGeZo=;
+ b=Ged8XCqAT/hlbOU37l8tpMjUHN5DWidSeAOATtCxDwKqAg8u0sBS/je7WAvSmLBWsxNX4v
+ veFeylkeum2Lro7rIHTgVX5dOb0ieH5pKYbh8AyXVunceZHaL3N934AB49293oLpwecc8U
+ xyGYTp2WONzeZIk9uc36Cf344609H2E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-285-1oY67yqBOk6Mo8s3qi3N_w-1; Mon, 14 Sep 2020 04:55:03 -0400
-X-MC-Unique: 1oY67yqBOk6Mo8s3qi3N_w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-295-2PeU-XJKPr2tlwi29Quqkg-1; Mon, 14 Sep 2020 05:00:51 -0400
+X-MC-Unique: 2PeU-XJKPr2tlwi29Quqkg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC29B800470;
- Mon, 14 Sep 2020 08:55:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B805FAF20C;
+ Mon, 14 Sep 2020 09:00:49 +0000 (UTC)
 Received: from redhat.com (ovpn-114-99.ams2.redhat.com [10.36.114.99])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A35405DEC2;
- Mon, 14 Sep 2020 08:55:01 +0000 (UTC)
-Date: Mon, 14 Sep 2020 09:54:58 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EA30660FC2;
+ Mon, 14 Sep 2020 09:00:46 +0000 (UTC)
+Date: Mon, 14 Sep 2020 10:00:43 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: About 'qemu-security' mailing list
-Message-ID: <20200914085458.GA1252186@redhat.com>
-References: <nycvar.YSQ.7.78.906.2009111910280.36374@xnncv>
- <CAFEAcA_9BVbqFCHJqS8jj6L3OqVNc60NCjAjRs516VyLH2EFfw@mail.gmail.com>
+To: Chuan Zheng <zhengchuan@huawei.com>
+Subject: Re: [PATCH v3 1/6] migration/tls: save hostname into MigrationState
+Message-ID: <20200914090043.GC1252186@redhat.com>
+References: <1599965256-72150-1-git-send-email-zhengchuan@huawei.com>
+ <1599965256-72150-2-git-send-email-zhengchuan@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_9BVbqFCHJqS8jj6L3OqVNc60NCjAjRs516VyLH2EFfw@mail.gmail.com>
+In-Reply-To: <1599965256-72150-2-git-send-email-zhengchuan@huawei.com>
 User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.003
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
@@ -98,47 +98,86 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, P J P <ppandit@redhat.com>
+Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, yuxiating@huawei.com,
+ dgilbert@redhat.com, xiexiangyou@huawei.com, qemu-devel@nongnu.org,
+ alex.chen@huawei.com, jinyan12@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 11, 2020 at 04:51:49PM +0100, Peter Maydell wrote:
-> On Fri, 11 Sep 2020 at 15:22, P J P <ppandit@redhat.com> wrote:
-> > Proposal: (to address above limitations)
-> > =========
-> >
-> > * We set up a new 'qemu-security' mailing list.
-> >
-> > * QEMU security issues are reported to this new list only.
-> >
-> > * Representatives from various communities subscribe to this list. (List maybe
-> >    moderated in the beginning.)
-> >
-> > * As QEMU issues come in, participants on the 'qemu-security' list shall
-> >    discuss and decide about how to triage them further.
+On Sun, Sep 13, 2020 at 10:47:31AM +0800, Chuan Zheng wrote:
+> hostname is need in multifd-tls, save hostname into MigrationState.
 > 
-> Way way back, the idea of a qemu-security list was proposed, and
-> it was decided against because there wasn't a clear way that
-> people could send encrypted mail to the security team if it
-> was just a mailing list. So that's why we have the "handful
-> of individual contacts" approach. Is that still something people
-> care about ?
+> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+> Signed-off-by: Yan Jin <jinyan12@huawei.com>
+> ---
+>  migration/channel.c   | 6 ++++++
+>  migration/migration.c | 1 +
+>  migration/migration.h | 5 +++++
+>  3 files changed, 12 insertions(+)
 > 
-> My question is, who decides who's on the qemu-security list?
-> Is this just "it's the same handful of contacts, but they
-> have a mailing list for convenience" ? It sounds like you
-> want it to be a larger grouping than that and maybe also
-> want to use it as a mechanism for informing downstream distros
-> etc about QEMU security issues, which is to say you're
-> proposing an overhaul and change to our security process,
-> not merely "we'd like to create a mailing list" ?
+> diff --git a/migration/channel.c b/migration/channel.c
+> index 20e4c8e..0e4104a 100644
+> --- a/migration/channel.c
+> +++ b/migration/channel.c
+> @@ -66,6 +66,11 @@ void migration_channel_connect(MigrationState *s,
+>      trace_migration_set_outgoing_channel(
+>          ioc, object_get_typename(OBJECT(ioc)), hostname, error);
+>  
+> +    /* Save hostname into MigrationState for handshake */
+> +    if (hostname) {
+> +        s->hostname = g_strdup(hostname);
+> +    }
+> +
+>      if (!error) {
+>          if (s->parameters.tls_creds &&
+>              *s->parameters.tls_creds &&
+> @@ -90,5 +95,6 @@ void migration_channel_connect(MigrationState *s,
+>          }
+>      }
+>      migrate_fd_connect(s, error);
+> +    g_free(s->hostname);
+>      error_free(error);
+>  }
 
-Yes, that is a reasonable description. 
+IIUC, this means hostname is free'd once the initial connection is
+established. Don't we have to wait until all the multifd connections
+exist too ?
 
-Do we think the current QEMU security process is working well for the
-community as a whole in terms of our downstream consumers learning about
-security flaws in an appropriate timeframe and manner ?  
+IOW, should we be doing this somewhere in a cleanup path. Perhaps
+migrate_fd_cancel() is the rigt place ?
+
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 58a5452..e20b778 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1883,6 +1883,7 @@ void migrate_init(MigrationState *s)
+>      s->migration_thread_running = false;
+>      error_free(s->error);
+>      s->error = NULL;
+> +    s->hostname = NULL;
+>  
+>      migrate_set_state(&s->state, MIGRATION_STATUS_NONE, MIGRATION_STATUS_SETUP);
+>  
+> diff --git a/migration/migration.h b/migration/migration.h
+> index bdc7450..bc96322 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -259,6 +259,11 @@ struct MigrationState
+>       * (which is in 4M chunk).
+>       */
+>      uint8_t clear_bitmap_shift;
+> +
+> +    /*
+> +     * This save hostname when out-going migration starts
+> +     */
+> +    char *hostname;
+>  };
+>  
+>  void migrate_set_state(int *state, int old_state, int new_state);
+> -- 
+> 1.8.3.1
+> 
 
 Regards,
 Daniel
