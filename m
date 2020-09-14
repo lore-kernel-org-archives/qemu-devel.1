@@ -2,74 +2,88 @@ Return-Path: <SRS0=afRr=CX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C4D2C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 10:52:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8FD1C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 10:53:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1613B20829
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 10:52:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1613B20829
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 74AC220829
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Sep 2020 10:53:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H+Q+mDl7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74AC220829
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHm5b-00047j-6f
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 06:52:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39740)
+	id 1kHm6Z-0005VU-LF
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 06:53:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39830)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <robert.hu@linux.intel.com>)
- id 1kHm3u-000211-UJ
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 06:50:18 -0400
-Received: from mga03.intel.com ([134.134.136.65]:62124)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <robert.hu@linux.intel.com>)
- id 1kHm3s-0003Ul-Cv
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 06:50:18 -0400
-IronPort-SDR: 01xze5c0/hULXLsdGObYxRbLoVNyy8I8PSgPcBimSU3fXHidiQJWZ5Z0AVaHACWN/HZSW0jvr9
- vux60c79rdiQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9743"; a="159094755"
-X-IronPort-AV: E=Sophos;i="5.76,425,1592895600"; d="scan'208";a="159094755"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 14 Sep 2020 03:50:12 -0700
-IronPort-SDR: D6Ga8BPJT1GlESDyl75B9zIVRecrBcm4pl6S/MAktIAdBsXZSZPuUCJ7qWzxPwTRYvYTn/10kQ
- hHN1TMEo4Rag==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,425,1592895600"; d="scan'208";a="301715473"
-Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org)
- ([10.239.48.212])
- by orsmga003.jf.intel.com with ESMTP; 14 Sep 2020 03:50:10 -0700
-Message-ID: <b3d7de0e900c199e28702584a90a08987862e655.camel@linux.intel.com>
-Subject: Re: [PATCH v2 1/2] Introduce (x86) CPU model deprecation API
-From: Robert Hoo <robert.hu@linux.intel.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 14 Sep 2020 18:50:09 +0800
-In-Reply-To: <20200911140013.GS1618070@habkost.net>
-References: <1591843676-102054-1-git-send-email-robert.hu@linux.intel.com>
- <20200909181506.GM1618070@habkost.net>
- <e3a289f5db0064dd363cb3481d152e20df14b35d.camel@linux.intel.com>
- <20200911140013.GS1618070@habkost.net>
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1kHm4Q-0002Y3-Dm
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 06:50:50 -0400
+Received: from mail-lj1-x234.google.com ([2a00:1450:4864:20::234]:42904)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1kHm4N-0003cX-OR
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 06:50:50 -0400
+Received: by mail-lj1-x234.google.com with SMTP id k25so18156694ljg.9
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 03:50:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=FI5Sz2MXJvpKasOtCWzBM3wi8uYnUx4jdHymkn5UcTU=;
+ b=H+Q+mDl7333NDx5QLRcQuz8KWVo+pbWChCtMbQInkO3xab2nJSr4NwCnrBzA56G4R0
+ 4gxzIcenl2kViPlL5iWX8nqvUwljO+9AjxlCL1aMT5iM5AIWJciWLv7KdOP1sPlUZM5A
+ TqSBq7PcbamWAhesigL8cZSpbjvrS90538wNfUFLl4bg2XIfSqF8JgcIiMu8mfITR21Q
+ 1oUefO/BQmKDmL4sUijnUNKwr1pAk9WqxTxfe0dNM0ijFTBEj4JKFWWzyPtU2URpnuyX
+ AaRbQ0T+g/vxKGbxBuiw8oJJzr0k8lKuq0qKoxVOs14HsHFsy+35foXsjO+Sqb/QRRm+
+ uB+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=FI5Sz2MXJvpKasOtCWzBM3wi8uYnUx4jdHymkn5UcTU=;
+ b=LJ7ULAkiw44jteko5wpjsjiUWm3okHonXY0LLW7HM2YB5vFofKRn1gn/50e6keXW4O
+ n5meL0ioeL5PMTCH2fPM/1WvLCJdcmZlTOsOYQipj9J4GKrk5oTbq9rsktFRP2N8Qace
+ HrtsEd0AiLGmMYKnM8/SBW/bGpptqPmc8fcFYjN7biKAXdImYF/50kwGNFTbtZMRq1ph
+ 6NoHyU9GyaeRCbeFaF7cMIT/Fyystodgu9tbiNiicXbZQe2gt0QafpZRs42lc62rnhIe
+ 1xRjFGvZbxKmxgDjfoAuCsfrUOmBpvB1CtX5SYWT2WEEAqTKQRIWXT+jHcN2RAy3hleT
+ SloA==
+X-Gm-Message-State: AOAM5334BbFcxyckX9gL2au7yM1qB2F7kCuRxjsHzp1dm2evDjyxMI8H
+ n7xWKwdEBVvBougjAlaYbpe83n8uUJWuR/JEEXQ=
+X-Google-Smtp-Source: ABdhPJyT3gsWx+FTBdrPMvxClKioTuMYGDMtpcvhw5XuE6CFZ9AFlsTFGRrngLES27BiHNNoJCFCVwJ7dCFwCBykmB8=
+X-Received: by 2002:a2e:9042:: with SMTP id n2mr4577348ljg.112.1600080645176; 
+ Mon, 14 Sep 2020 03:50:45 -0700 (PDT)
+MIME-Version: 1.0
+References: <5f5e9831.1c69fb81.bdbec.98b8@mx.google.com>
+ <ea64c109-6bd9-c0f1-964c-46be5c6ba020@amsat.org>
+In-Reply-To: <ea64c109-6bd9-c0f1-964c-46be5c6ba020@amsat.org>
+From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+Date: Mon, 14 Sep 2020 12:50:08 +0200
+Message-ID: <CALTWKrW-U261HNc8mSxmu1uYKqrZxZM4+661ZK_m-W_Ky8eiFQ@mail.gmail.com>
+Subject: Re: [REPORT] Nightly Performance Tests - Sunday, September 13, 2020
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-8.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Received-SPF: none client-ip=134.134.136.65;
- envelope-from=robert.hu@linux.intel.com; helo=mga03.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 06:50:13
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::234;
+ envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-lj1-x234.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,255 +96,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: xiaoyao.li@intel.com, qemu-devel@nongnu.org, armbru@redhat.com,
- robert.hu@intel.com, chenyi.qiang@intel.com, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 2020-09-11 at 10:00 -0400, Eduardo Habkost wrote:
-> On Fri, Sep 11, 2020 at 02:22:51PM +0800, Robert Hoo wrote:
-> > On Wed, 2020-09-09 at 14:15 -0400, Eduardo Habkost wrote:
-> > > Hi,
-> > > 
-> > > 
-> > > > @@ -1129,6 +1130,12 @@ void machine_run_board_init(MachineState
-> > > > *machine)
-> > > >          }
-> > > >      }
-> > > >  
-> > > > +    /* Check if CPU type is deprecated and warn if so */
-> > > > +    cc = CPU_CLASS(oc);
-> > > > +    if (cc->deprecation_check) {
-> > > > +        cc->deprecation_check(oc);
-> > > > +    }
-> > > 
-> > > Why do we need target-specific code here?  A CPUClass::deprecated
-> > > field would be much simpler.
-> > > 
-> > 
-> > Because the Warning message composing is target-specific, using
-> > X86CPUVersionDefinition.note.
-> > Other targets can have their own warning message composing
-> > approaches.
-> 
-> I think I understand what you were trying to do, but having each
-> target with a different warning message would be a bad thing, not
-> a desirable feature.  The warning message can be generic.
-> 
-> > 
-> > > > +
-> > > >      machine_class->init(machine);
-> > > >  }
-> > > >  
-> > > > diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-> > > > index 497600c..1ca47dc 100644
-> > > > --- a/include/hw/core/cpu.h
-> > > > +++ b/include/hw/core/cpu.h
-> > > > @@ -218,6 +218,7 @@ typedef struct CPUClass {
-> > > >      void (*disas_set_info)(CPUState *cpu, disassemble_info
-> > > > *info);
-> > > >      vaddr (*adjust_watchpoint_address)(CPUState *cpu, vaddr
-> > > > addr,
-> > > > int len);
-> > > >      void (*tcg_initialize)(void);
-> > > > +    void (*deprecation_check)(ObjectClass *oc);
-> > > >  
-> > > >      /* Keep non-pointer data at the end to minimize holes.  */
-> > > >      int gdb_num_core_regs;
-> > > > diff --git a/qapi/machine-target.json b/qapi/machine-
-> > > > target.json
-> > > > index f2c8294..c24f506 100644
-> > > > --- a/qapi/machine-target.json
-> > > > +++ b/qapi/machine-target.json
-> > > > @@ -285,6 +285,10 @@
-> > > >  #            in the VM configuration, because aliases may stop
-> > > > being
-> > > >  #            migration-safe in the future (since 4.1)
-> > > >  #
-> > > > +# @deprecated: If true, this CPU model is deprecated and may
-> > > > be
-> > > > removed in
-> > > > +#              in some future version of QEMU according to the
-> > > > QEMU deprecation
-> > > > +#              policy. (since 5.1)
-> > > 
-> > > Next version needs to say "since 5.2".
-> > 
-> > Sure.
-> > > 
-> > > > 
-> > > >  
-> > > >  /* Get full model name for CPU version */
-> > > > @@ -4128,8 +4134,7 @@ static X86CPUVersion
-> > > > x86_cpu_model_resolve_version(const X86CPUModel *model)
-> > > >      X86CPUVersion v = model->version;
-> > > >      if (v == CPU_VERSION_AUTO) {
-> > > >          v = default_cpu_version;
-> > > > -    }
-> > > > -    if (v == CPU_VERSION_LATEST) {
-> > > > +    } else if (v == CPU_VERSION_LATEST) {
-> > > 
-> > > Why is this change necessary?
-> > 
-> > Just kind of compulsion of avoiding unnecessary if() :-). 'v' can
-> > only
-> > be one of CPU_VERSION_AUTO and CPU_VERSION_LATEST, unnecessary to
-> > judge
-> > twice.
-> 
-> I think this breaks the case where default_cpu_version is set to
-> CPU_VERSION_LATEST
-> 
-OK, understand.
-> > > 
-> > > >          return x86_cpu_model_last_version(model);
-> > > >      }
-> > > >      return v;
-> > > > @@ -4975,6 +4980,7 @@ static void
-> > > > x86_cpu_definition_entry(gpointer
-> > > > data, gpointer user_data)
-> > > >      info->migration_safe = cc->migration_safe;
-> > > >      info->has_migration_safe = true;
-> > > >      info->q_static = cc->static_model;
-> > > > +    info->deprecated = cc->model ? cc->model->deprecated :
-> > > > false;
-> > > >      /*
-> > > >       * Old machine types won't report aliases, so that alias
-> > > > translation
-> > > >       * doesn't break compatibility with previous QEMU
-> > > > versions.
-> > > > @@ -5411,6 +5417,7 @@ static void
-> > > > x86_register_cpudef_types(X86CPUDefinition *def)
-> > > >          m->cpudef = def;
-> > > >          m->version = vdef->version;
-> > > >          m->note = vdef->note;
-> > > > +        m->deprecated = vdef->deprecated;
-> > > >          x86_register_cpu_model_type(name, m);
-> > > >  
-> > > >          if (vdef->alias) {
-> > > > @@ -5418,6 +5425,8 @@ static void
-> > > > x86_register_cpudef_types(X86CPUDefinition *def)
-> > > >              am->cpudef = def;
-> > > >              am->version = vdef->version;
-> > > >              am->is_alias = true;
-> > > > +            am->note = vdef->note;
-> > > 
-> > > Is this extra line related to the deprecation feature?
-> > > 
-> > > It doesn't seem related, and it doesn't seem necessary as the
-> > > `note` field is already ignored for alias CPU models.
-> > 
-> > Because it is unused by other features, I use it to store model
-> > specific deprecation message.
-> > > 
-> > > > +            am->deprecated = vdef->deprecated;
-> > > >              x86_register_cpu_model_type(vdef->alias, am);
-> > > >          }
-> > > >      }
-> > > > @@ -7233,6 +7242,37 @@ static Property x86_cpu_properties[] = {
-> > > >      DEFINE_PROP_END_OF_LIST()
-> > > >  };
-> > > >  
-> > > > +static void x86_cpu_deprecation_check(ObjectClass *oc)
-> > > > +{
-> > > > +    X86CPUClass *xcc = X86_CPU_CLASS(oc);
-> > > > +    X86CPUVersion effective_version;
-> > > > +    const X86CPUVersionDefinition *vdef;
-> > > > +
-> > > > +    if (xcc->model == NULL) {
-> > > > +        return;
-> > > > +    }
-> > > > +
-> > > > +    if (xcc->model->version == CPU_VERSION_LEGACY) {
-> > > > +        /* Treat legacy version as v1 */
-> > > > +        effective_version = 1;
-> > > > +    } else {
-> > > > +        effective_version = x86_cpu_model_resolve_version(xcc-
-> > > > > model);
-> > > > 
-> > > > +    }
-> > > > +
-> > > > +    vdef = xcc->model->cpudef->versions;
-> > > > +
-> > > > +    if (vdef == NULL) {
-> > > > +        return;
-> > > > +    } else {
-> > > > +        if (vdef[effective_version - 1].deprecated) {
-> > > > +            warn_report("Effective CPU model '%s' -- %s",
-> > > > +                    x86_cpu_versioned_model_name(xcc->model-
-> > > > > cpudef,\
-> > > > 
-> > > > +                                                effective_vers
-> > > > ion)
-> > > > ,
-> > > > +                    vdef[effective_version - 1].note);
-> > > > +        }
-> > > > +    }
-> > > 
-> > > Why do we need this extra logic?  Isn't it simpler to just add a
-> > > bool CPUClass::deprecated field, and set:
-> > > 
-> > >    cpu->deprecated = model->deprecated;
-> > > 
-> > > inside x86_cpu_cpudef_class_init()?
-> > > 
-> > 
-> > All these are to fulfill the target you expected earlier:
-> > 
-> > "We need a proper CPU model deprecation API.  Deprecation info
-> > should appear on query-cpu-definitions and should trigger a
-> > warning when using the CPU model."
-> > 
-> > So I think each deprecated model shall have its own deprecation
-> > message, e.g. by which version it's going to be deprecation, etc.
-> 
-> There's nothing x86-specific about having deprecated CPU models,
-> so I don't understand the reason for the x86-specific hook.
-> 
-> If the .note field is the reason you added the arch-specific
-> hook, you can just add a CPUClass::deprecation_note field and
-> make the feature generic.
-> 
-I tend to agree with you on this generalization requirement.
+On Mon, Sep 14, 2020 at 8:46 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+>
+> Hi Ahmed,
+>
+> On 9/14/20 12:07 AM, Ahmed Karaman wrote:
+> > Host CPU         : Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz
+> > Host Memory      : 15.49 GB
+> >
+> > Start Time (UTC) : 2020-09-13 21:35:01
+> > End Time (UTC)   : 2020-09-13 22:07:44
+> > Execution Time   : 0:32:42.230467
+> >
+> > Status           : SUCCESS
+> >
+> > Note:
+> > Changes denoted by '-----' are less than 0.01%.
+> >
+> > --------------------------------------------------------
+> >             SUMMARY REPORT - COMMIT f00f57f3
+> > --------------------------------------------------------
+>
+> (Maybe this was already commented earlier but I missed it).
+>
+> What change had a so significant impact on the m68k target?
+> At a glance I only see mostly changes in softfloat:
+>
+> $ git log --oneline v5.1.0..f00f57f3 tcg target/m68k fpu
+> fe4b0b5bfa9 tcg: Implement 256-bit dup for tcg_gen_gvec_dup_mem
+> 6a17646176e tcg: Eliminate one store for in-place 128-bit dup_mem
+> e7e8f33fb60 tcg: Fix tcg gen for vectorized absolute value
+> 5ebf5f4be66 softfloat: Define misc operations for bfloat16
+> 34f0c0a98a5 softfloat: Define convert operations for bfloat16
+> 8282310d853 softfloat: Define operations for bfloat16
+> 0d93d8ec632 softfloat: Add fp16 and uint8/int8 conversion functions
+> fbcc38e4cb1 softfloat: add xtensa specialization for pickNaNMulAdd
+> 913602e3ffe softfloat: pass float_status pointer to pickNaN
+> cc43c692511 softfloat: make NO_SIGNALING_NANS runtime property
+> 73ebe95e8e5 target/ppc: add vmulld to INDEX_op_mul_vec case
+>
+> > --------------------------------------------------------
+> > --------------------------------------------------------
+> > Test Program: matmult_double
+> > --------------------------------------------------------
+> > Target              Instructions      Latest      v5.1.0
+> > ----------  --------------------  ----------  ----------
+> > aarch64            1 412 412 599       -----     +0.311%
+> > alpha              3 233 957 639       -----     +7.472%
+> > arm                8 545 302 995       -----      +1.09%
+> > hppa               3 483 527 330       -----     +4.466%
+> > m68k               3 919 110 506       -----    +18.433%
+> > mips               2 344 641 840       -----     +4.085%
+> > mipsel             3 329 912 425       -----     +5.177%
+> > mips64             2 359 024 910       -----     +4.075%
+> > mips64el           3 343 650 686       -----     +5.166%
+> > ppc                3 209 505 701       -----     +3.248%
+> > ppc64              3 287 495 266       -----     +3.173%
+> > ppc64le            3 287 135 580       -----     +3.171%
+> > riscv64            1 221 617 903       -----     +0.278%
+> > s390x              2 874 160 417       -----     +5.826%
+> > sh4                3 544 094 841       -----      +6.42%
+> > sparc64            3 426 094 848       -----     +7.138%
+> > x86_64             1 249 076 697       -----     +0.335%
+> > --------------------------------------------------------
+> ...
+> > --------------------------------------------------------
+> > Test Program: qsort_double
+> > --------------------------------------------------------
+> > Target              Instructions      Latest      v5.1.0
+> > ----------  --------------------  ----------  ----------
+> > aarch64            2 709 839 947       -----     +2.423%
+> > alpha              1 969 432 086       -----     +3.679%
+> > arm                8 323 168 267       -----     +2.589%
+> > hppa               3 188 316 726       -----       +2.9%
+> > m68k               4 953 947 225       -----    +15.153%
+> > mips               2 123 789 120       -----     +3.049%
+> > mipsel             2 124 235 492       -----     +3.049%
+> > mips64             1 999 025 951       -----     +3.404%
+> > mips64el           1 996 433 190       -----     +3.409%
+> > ppc                2 819 299 843       -----     +5.436%
+> > ppc64              2 768 177 037       -----     +5.512%
+> > ppc64le            2 724 766 044       -----     +5.602%
+> > riscv64            1 638 324 190       -----     +4.021%
+> > s390x              2 519 117 806       -----     +3.364%
+> > sh4                2 595 696 102       -----       +3.0%
+> > sparc64            3 988 892 763       -----     +2.744%
+> > x86_64             2 033 624 062       -----     +3.242%
+> > --------------------------------------------------------
 
-But then I find it still has some tricky thing, perhaps that's why I
-defined this x86 target specific hook:
+Hi Mr. Philippe,
+The performance degradation from v5.1.0 of all targets, and especially
+m68k, was introduced between the two nightly tests below:
 
-1) The versioned CPU model is x86 specific (at least at present)
+[REPORT] Nightly Performance Tests - Thursday, August 20, 2020:
+https://lists.nongnu.org/archive/html/qemu-devel/2020-08/msg04923.html
 
-2) Each x86 cpudef CPU model has 1 unversioned cpu_model_type then its
-versioned cpu_model_types. Refer to code in
-x86_register_cpudef_types(). The unversioned model won't be marked
-deprecated as it is unkown when registered. In
-machine_run_board_init(), the cpu_model being checked is the
-unversioned one, if I set -cpu to its general unversioned model.
-In short, the unversioned cpudef CPU model would escape the deprecation
-check.
+[REPORT] Nightly Performance Tests - Saturday, August 22, 2020
+https://lists.nongnu.org/archive/html/qemu-devel/2020-08/msg05537.html
 
-> > 
-> > > > +}
-> > > > +
-> > > >  static void x86_cpu_common_class_init(ObjectClass *oc, void
-> > > > *data)
-> > > >  {
-> > > >      X86CPUClass *xcc = X86_CPU_CLASS(oc);
-> > > > @@ -7291,6 +7331,7 @@ static void
-> > > > x86_cpu_common_class_init(ObjectClass *oc, void *data)
-> > > >      cc->tlb_fill = x86_cpu_tlb_fill;
-> > > >  #endif
-> > > >      cc->disas_set_info = x86_disas_set_info;
-> > > > +    cc->deprecation_check = x86_cpu_deprecation_check;
-> > > >  
-> > > >      dc->user_creatable = true;
-> > > >  }
-> > > > -- 
-> > > > 1.8.3.1
-> > > > 
-> > > 
-> > > 
-> 
-> 
+It looks like the new build system is the culprit.
 
+The "bisect.py" script introduced during the "TCG Continuous
+Benchmarking" GSoC project can be very handy in these cases. I wrote
+about the tool and how to use it in the report below:
+https://ahmedkrmn.github.io/TCG-Continuous-Benchmarking/Finding-Commits-Aff=
+ecting-QEMU-Performance/
+
+Best regards,
+Ahmed Karaman
 
