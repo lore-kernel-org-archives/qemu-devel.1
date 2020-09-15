@@ -2,144 +2,53 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 199C1C2D0E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 18:59:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3826CC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 18:59:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F7E820720
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 18:59:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="bBdqm9LT";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="t87+RE2r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F7E820720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id CE02220720
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 18:59:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE02220720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gentoo.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIGAn-00023X-LO
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 14:59:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40118)
+	id 1kIGAu-0002JG-Ul
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 14:59:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40230)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=520035bb9=Dmitry.Fomichev@wdc.com>)
- id 1kIG9N-00013y-7S; Tue, 15 Sep 2020 14:57:57 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:52118)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=520035bb9=Dmitry.Fomichev@wdc.com>)
- id 1kIG9K-0008Eu-3C; Tue, 15 Sep 2020 14:57:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1600196288; x=1631732288;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-transfer-encoding:mime-version;
- bh=mOuZHmdXyrdCYMjJPZbKf3J3i/8NBCPiXgc4bER6P/w=;
- b=bBdqm9LTseafooUS0riGMlw3I2Wx03F02pVARFnc8Uxmcs76dx8yCbCF
- Gq8XenEqqWZxhWYX70TbPQj2MUfN3jmoQSqKaTDidNpUqU7HZWU2f8oVL
- zG2mDmtxnZWq3OHq5SAs6q1Kqx9aw6fp4XaJbXJAT+xrYUi49l1Y0x2xa
- oRdWjLAa6OvLNKQnWW72KmBbxIEclzKDypGnAxpuMQhHFfOxaEPdJ+NQ1
- Q8KN9MhiYt4rcVlRU6rUvkyN3oNCFNwKvE3qzR2lO+eHEjto0DN4lmSs2
- L5vcKwyr/cyOtj3NkmrTxUTZD9VQ5AJHeJz6wdLJhuT2jyul28pRa2UFO w==;
-IronPort-SDR: gzrkzocw8QwYTqTAAQN5Oo6awCh21PW0DaQ8F18EjeekY4yguF8KJpHnGlbsCWsejdI03gCvm/
- daop1tpTmUoT72/EccYttrZzdr9RqR+gw1mj4cjfkQltL3T40XSbrdwpA3fCiVC3Xob1/bjci9
- kzKN/rHIiKXVVAX7pxGTfpljuGL7w7TvaPMzz9U6nw8sBCP6TLvjrK8GGmr8xju1HfnhXhWmmS
- 3iHY42/1LWJT1uhnh82fJnF1BhZF89yfEszEp/x/zzB0mrw6jb8GgK0aATRxpp6MZABCd+2cMT
- dZM=
-X-IronPort-AV: E=Sophos;i="5.76,430,1592841600"; d="scan'208";a="250781120"
-Received: from mail-co1nam11lp2174.outbound.protection.outlook.com (HELO
- NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.174])
- by ob1.hgst.iphmx.com with ESMTP; 16 Sep 2020 02:58:03 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MWhzopddr9wctA4gf3LhIuJrEmn4mUlYmxxaZwHM5Aen2GwLNPfuxVdQlrjjLtLlJiZRhf/3ePmh9xeL+gaRKOMHNTlI5TiWXzkF5aEN9cbmHSCenutt/nba1SubSO2BTwr5bevRbYRu67EVkxRg5mI9ZkUN1oYHXtSf2ZJdXPwmLmur/Q5tzM1Bn8deWSSyR2+DQvzhaX0j2OqXJKfUz6mtRk8FHfP9uHb7M07XE+NS1ivayEq/eOQpEmLn3aK3whvmbddJfWbfkIGMuBFUg0PzxZrk0AxE/XsHrnXo7XArXC1Jkdv+MwbO+DOnXHzL/U0CazdikKu/OV2abXITOA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mOuZHmdXyrdCYMjJPZbKf3J3i/8NBCPiXgc4bER6P/w=;
- b=MJ+BB7nAxjUTieVcdOaKUvk0cIHmezdonxe4KZCueINDtkujr0rrRbIGKGuacjLTWqEIA/RhDNGMsrIqg+LvbIQqOhPgMqwXUu0HiEFN8dMigUmwT4HtWCS7wF0lGkgoNWxZ7S+YRDb6Gre0khqfERmyoU8io0cY8/bDieNB1hcRnM8JAXDi2FWO3AgFdgiIV+vWvKu9RKtqj5dRPN1tRPwSNVvswrIa1amHtnRW2q2ofrFLbnesYq8dxcBdmNb3JJUbktMXr1Hkpc/E4bGOpaEe2d/zZPtMUX7r7HdsxBAQJDJS2AUyZb1LQUqNPz5TeZjv6xx8L2KrUJ7JKXSsNQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mOuZHmdXyrdCYMjJPZbKf3J3i/8NBCPiXgc4bER6P/w=;
- b=t87+RE2r0I/hmgv19OujGgtvRRJXGqAXsMqQlrEyaOlTFq49wNvmYzLuPj+WNYvXckV784bKexldLP8K18tqnxlbiDb7Cbh6EgOG3X2+cMCKvWF+efl48ZbxsKWD2THZNvnB6XV3QD80oVFOa8XR490JWwkRIfUXvPVaQ9R4CA0=
-Received: from MN2PR04MB5951.namprd04.prod.outlook.com (2603:10b6:208:3f::13)
- by MN2PR04MB6253.namprd04.prod.outlook.com (2603:10b6:208:d9::10)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.11; Tue, 15 Sep
- 2020 18:57:49 +0000
-Received: from MN2PR04MB5951.namprd04.prod.outlook.com
- ([fe80::44d8:522e:db29:bb94]) by MN2PR04MB5951.namprd04.prod.outlook.com
- ([fe80::44d8:522e:db29:bb94%6]) with mapi id 15.20.3370.019; Tue, 15 Sep 2020
- 18:57:49 +0000
-From: Dmitry Fomichev <Dmitry.Fomichev@wdc.com>
-To: Klaus Jensen <its@irrelevant.dk>
-Subject: RE: [PATCH v3 02/15] hw/block/nvme: Report actual LBA data shift in
- LBAF
-Thread-Topic: [PATCH v3 02/15] hw/block/nvme: Report actual LBA data shift in
- LBAF
-Thread-Index: AQHWihtOZT645M4IFUCMbhLpxZlonKlpUQqAgAC2XNA=
-Date: Tue, 15 Sep 2020 18:57:49 +0000
-Message-ID: <MN2PR04MB595149E6ED89CB2EBEBF33B7E1200@MN2PR04MB5951.namprd04.prod.outlook.com>
-References: <20200913221436.22844-1-dmitry.fomichev@wdc.com>
- <20200913221436.22844-3-dmitry.fomichev@wdc.com>
- <20200915073421.GA499689@apples.localdomain>
-In-Reply-To: <20200915073421.GA499689@apples.localdomain>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: irrelevant.dk; dkim=none (message not signed)
- header.d=none;irrelevant.dk; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 08dad005-ec04-4b00-ab1e-08d859a93df2
-x-ms-traffictypediagnostic: MN2PR04MB6253:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR04MB6253471E5B84A51881E48D2DE1200@MN2PR04MB6253.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:5797;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 5MkHW8zoxBS1GHVrafMKc0aWOrztngq5ea0J/n9Oq6+BdS9hUxnuo7d5RnUHWGL6x0Lm1eyFCJlaedf94yZxGJE8RZGY4YBoWE3UGLDwce+nsDivd7qGND719NxcjnU8eYwy8QG0XGXbeZYd0dgeTv7RW7ZeT3MdTxWIRAga6c4Qly+so9YpAD4NlBjIp7l1FPPD6UJl9mC6uvwL+kARU9I/c4b88rgekikVVoCJsfwdd1Br6NFCvxXGQd+midaI9skRKEJo572aJd8qDeW3jMZpTx2Wpkj5zmO4eQx/Vjgq9k6TWFsiO7oOtsJtdVc6lNz45O919FhazC2BP/Vnsg==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:MN2PR04MB5951.namprd04.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(396003)(366004)(39860400002)(346002)(376002)(136003)(54906003)(316002)(86362001)(7696005)(186003)(8676002)(33656002)(8936002)(83380400001)(55016002)(2906002)(52536014)(76116006)(5660300002)(9686003)(66946007)(6506007)(6916009)(66446008)(64756008)(26005)(71200400001)(53546011)(66556008)(4326008)(66476007)(478600001);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: 4aDucPRerUW1o1ZsHFhFyk7gnPEHgPzBqb1vtIharzm+uQPq3f0WIJXSUJrFHr8t0A6g+fhXUwUxVc1TQQEwHfR5x7LHWi7MQXCrFEFrx0v8krk1dfP6JcI+PjZSxtckwHXhnMhDL6R+eT1P+vlaT67K/VKnmYT9z6CCw9BA2zrD2upRje9BfykBhBnw7Ifgr/eNL+JN6hDKuAJViH/JodWRiw54pRKdJ1SxPVtdsNr66nlUz0jhc7Pq5HDfg7Ff6DRKvyIub0brDF/LlHbuYKYMKB+3F6y1LiZAqXRBoe3QieSOMYPwu9kxTklXi4iSbX/tAB0LC1xhZxjrq6cupkyaVEnC7mFOBr6995i3Pj/rZCPwHQNwl9MuWFodM6n/BjrSpdeRtBKaHfoCmyKoV25AkR48mRSpN95xwIEFIidM5UsAr+wesNm/bcgUIArvrVzzG2RAEzLS1YORVzLNhbvg6QWLhdddEs3pVs4+kdh0cVp418msxxWqVBMHDwKyb6eBVek5gi5XkHgxvw+aScgYO5sncw98imq5vecwqGU4gTo98E0OAYhEzgC95S/15cLtInA6w4madeWD+tDyxkUgYmvYM3RYEVLp0EopV2+2sNQd3h4EW+8ry9uKWKk6HhL5yGTF+z7B8eSqOdf2JQ==
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <dilfridge@gentoo.org>)
+ id 1kIG9n-0001Ri-Vi; Tue, 15 Sep 2020 14:58:23 -0400
+Received: from smtp.gentoo.org ([2001:470:ea4a:1:5054:ff:fec7:86e4]:53397)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <dilfridge@gentoo.org>)
+ id 1kIG9i-0008GL-8g; Tue, 15 Sep 2020 14:58:23 -0400
+From: Andreas =?ISO-8859-1?Q?K=2E_H=FCttel?= <dilfridge@gentoo.org>
+To: qemu-devel@nongnu.org, libc-alpha@sourceware.org, qemu-riscv@nongnu.org
+Subject: Re: riscv32 wait() problem, qemu or glibc?
+Date: Tue, 15 Sep 2020 21:57:57 +0300
+Message-ID: <2629181.rzyxZ31qjY@farino>
+Organization: Gentoo Linux
+In-Reply-To: <9435182.tdPhlSkOF2@farino>
+References: <9435182.tdPhlSkOF2@farino>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR04MB5951.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 08dad005-ec04-4b00-ab1e-08d859a93df2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Sep 2020 18:57:49.5634 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 0N4ls4GbMiILD8TjrN9EE5aKCNEedQkQ4U0P52pnqxmEQ1xj557Z0EHoWc2DXY/qsAa8EFW0TSQcCok6r+pkUg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6253
-Received-SPF: pass client-ip=68.232.143.124;
- envelope-from=prvs=520035bb9=Dmitry.Fomichev@wdc.com; helo=esa2.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 14:57:52
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; boundary="nextPart3100299.CJZsxu672h";
+ micalg="pgp-sha512"; protocol="application/pgp-signature"
+Received-SPF: pass client-ip=2001:470:ea4a:1:5054:ff:fec7:86e4;
+ envelope-from=dilfridge@gentoo.org; helo=smtp.gentoo.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 14:58:06
+X-ACL-Warn: Detected OS   = ???
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -152,61 +61,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Damien Le Moal <Damien.LeMoal@wdc.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Niklas Cassel <Niklas.Cassel@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Maxim Levitsky <mlevitsk@redhat.com>,
- Alistair Francis <Alistair.Francis@wdc.com>, Keith Busch <kbusch@kernel.org>,
- =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- Matias Bjorling <Matias.Bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBLbGF1cyBKZW5zZW4gPGl0c0Bp
-cnJlbGV2YW50LmRrPg0KPiBTZW50OiBUdWVzZGF5LCBTZXB0ZW1iZXIgMTUsIDIwMjAgMzozNCBB
-TQ0KPiBUbzogRG1pdHJ5IEZvbWljaGV2IDxEbWl0cnkuRm9taWNoZXZAd2RjLmNvbT4NCj4gQ2M6
-IEtlaXRoIEJ1c2NoIDxrYnVzY2hAa2VybmVsLm9yZz47IEtsYXVzIEplbnNlbg0KPiA8ay5qZW5z
-ZW5Ac2Ftc3VuZy5jb20+OyBLZXZpbiBXb2xmIDxrd29sZkByZWRoYXQuY29tPjsgUGhpbGlwcGUN
-Cj4gTWF0aGlldS1EYXVkw6kgPHBoaWxtZEByZWRoYXQuY29tPjsgTWF4aW0gTGV2aXRza3kNCj4g
-PG1sZXZpdHNrQHJlZGhhdC5jb20+OyBGYW0gWmhlbmcgPGZhbUBldXBob24ubmV0PjsgTmlrbGFz
-IENhc3NlbA0KPiA8TmlrbGFzLkNhc3NlbEB3ZGMuY29tPjsgRGFtaWVuIExlIE1vYWwgPERhbWll
-bi5MZU1vYWxAd2RjLmNvbT47DQo+IHFlbXUtYmxvY2tAbm9uZ251Lm9yZzsgcWVtdS1kZXZlbEBu
-b25nbnUub3JnOyBBbGlzdGFpciBGcmFuY2lzDQo+IDxBbGlzdGFpci5GcmFuY2lzQHdkYy5jb20+
-OyBNYXRpYXMgQmpvcmxpbmcgPE1hdGlhcy5Cam9ybGluZ0B3ZGMuY29tPg0KPiBTdWJqZWN0OiBS
-ZTogW1BBVENIIHYzIDAyLzE1XSBody9ibG9jay9udm1lOiBSZXBvcnQgYWN0dWFsIExCQSBkYXRh
-IHNoaWZ0IGluDQo+IExCQUYNCj4gDQo+IE9uIFNlcCAxNCAwNzoxNCwgRG1pdHJ5IEZvbWljaGV2
-IHdyb3RlOg0KPiA+IENhbGN1bGF0ZSB0aGUgZGF0YSBzaGlmdCB2YWx1ZSB0byByZXBvcnQgYmFz
-ZWQgb24gdGhlIHNldCB2YWx1ZSBvZg0KPiA+IGxvZ2ljYWxfYmxvY2tfc2l6ZSBkZXZpY2UgcHJv
-cGVydHkuDQo+ID4NCj4gPiBJbiB0aGUgcHJvY2VzcywgdXNlIGEgbG9jYWwgdmFyaWFibGUgdG8g
-Y2FsY3VsYXRlIHRoZSBMQkEgZm9ybWF0DQo+ID4gaW5kZXggaW5zdGVhZCBvZiB0aGUgaGFyZGNv
-ZGVkIHZhbHVlIDAuIFRoaXMgbWFrZXMgdGhlIGNvZGUgbW9yZQ0KPiA+IHJlYWRhYmxlIGFuZCBp
-dCB3aWxsIG1ha2UgaXQgZWFzaWVyIHRvIGFkZCBzdXBwb3J0IGZvciBtdWx0aXBsZSBMQkENCj4g
-PiBmb3JtYXRzIGluIHRoZSBmdXR1cmUuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBEbWl0cnkg
-Rm9taWNoZXYgPGRtaXRyeS5mb21pY2hldkB3ZGMuY29tPg0KPiA+IC0tLQ0KPiA+ICBody9ibG9j
-ay9udm1lLmMgfCAgNCArKystDQo+ID4gIGh3L2Jsb2NrL252bWUuaCB8IDExICsrKysrKysrKysr
-DQo+ID4gIDIgZmlsZXMgY2hhbmdlZCwgMTQgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0K
-PiA+DQo+ID4gZGlmZiAtLWdpdCBhL2h3L2Jsb2NrL252bWUuYyBiL2h3L2Jsb2NrL252bWUuYw0K
-PiA+IGluZGV4IDNhOTBkODA2OTQuLjFjZmMxMzYwNDIgMTAwNjQ0DQo+ID4gLS0tIGEvaHcvYmxv
-Y2svbnZtZS5jDQo+ID4gKysrIGIvaHcvYmxvY2svbnZtZS5jDQo+ID4gQEAgLTIyMDMsNiArMjIw
-Myw3IEBAIHN0YXRpYyB2b2lkIG52bWVfaW5pdF9uYW1lc3BhY2UoTnZtZUN0cmwgKm4sDQo+IE52
-bWVOYW1lc3BhY2UgKm5zLCBFcnJvciAqKmVycnApDQo+ID4gIHsNCj4gPiAgICAgIGludDY0X3Qg
-YnNfc2l6ZTsNCj4gPiAgICAgIE52bWVJZE5zICppZF9ucyA9ICZucy0+aWRfbnM7DQo+ID4gKyAg
-ICBpbnQgbGJhX2luZGV4Ow0KPiA+DQo+ID4gICAgICBic19zaXplID0gYmxrX2dldGxlbmd0aChu
-LT5jb25mLmJsayk7DQo+ID4gICAgICBpZiAoYnNfc2l6ZSA8IDApIHsNCj4gPiBAQCAtMjIxMiw3
-ICsyMjEzLDggQEAgc3RhdGljIHZvaWQgbnZtZV9pbml0X25hbWVzcGFjZShOdm1lQ3RybCAqbiwN
-Cj4gTnZtZU5hbWVzcGFjZSAqbnMsIEVycm9yICoqZXJycCkNCj4gPg0KPiA+ICAgICAgbi0+bnNf
-c2l6ZSA9IGJzX3NpemU7DQo+ID4NCj4gPiAtICAgIGlkX25zLT5sYmFmWzBdLmRzID0gQkRSVl9T
-RUNUT1JfQklUUzsNCj4gPiArICAgIGxiYV9pbmRleCA9IE5WTUVfSURfTlNfRkxCQVNfSU5ERVgo
-bnMtPmlkX25zLmZsYmFzKTsNCj4gPiArICAgIGlkX25zLT5sYmFmW2xiYV9pbmRleF0uZHMgPSBu
-dm1lX2lsb2cyKG4tPmNvbmYubG9naWNhbF9ibG9ja19zaXplKTsNCj4gDQo+IEluc3RlYWQgb2Yg
-ZGVmaW5pbmcgYSBuZXcgZnVuY3Rpb24sIHdlIGNhbiBkaXJlY3RseSB1c2UgY2x6MzIoKS4NCj4g
-DQo+ICAgMzEgLSBjbHozMihuLT5jb25mLmxvZ2ljYWxfYmxvY2tfc2l6ZSkNCg0KT2sgbmljZSEg
-SSBsb29rZWQgdXAgd2hhdCBRRU1VIHVzZXMgZm9yIGJpbmFyeSBsb2csIGJ1dCBjb3VsZG4ndCBm
-aW5kIGl0IHF1aWNrbHkNCnNvIEkgZGVjaWRlZCB0byBkZWZpbmUgYSBmdW5jdGlvbiBmb3IgdGhh
-dCA6KSBXaWxsIHN3aXRjaCB0byBjbHpYWCBpbiB0aGUgcGF0Y2ggc2V0IC0NCkkgYmVsaWV2ZSB0
-aGVyZSBhcmUgdGhyZWUgb2NjdXJyZW5jZXMgd2hlcmUgaWxvZzIgaXMgdXNlZCBpbiB0aGUgYWRk
-ZWQgY29kZS4NCg0K
+--nextPart3100299.CJZsxu672h
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
+
+Not sure if this helps in any way, but I tried if the problem is specific t=
+o=20
+the return value 42. Leading to more confusing results... though this looks=
+=20
+more like an emulator problem than a libc problem to me now.
+
+Happy to debug further, but with limited ideas on how to proceed.
+
+(riscv-ilp32 chroot) farino /tmp # ./wait-test=20
+child wants to return 34 (0x22), parent received 32 (0x20), difference -2
+child wants to return 35 (0x23), parent received 33 (0x21), difference -2
+child wants to return 36 (0x24), parent received 34 (0x22), difference -2
+child wants to return 37 (0x25), parent received 35 (0x23), difference -2
+child wants to return 38 (0x26), parent received 36 (0x24), difference -2
+child wants to return 39 (0x27), parent received 37 (0x25), difference -2
+child wants to return 40 (0x28), parent received 38 (0x26), difference -2
+child wants to return 41 (0x29), parent received 39 (0x27), difference -2
+child wants to return 42 (0x2A), parent received 40 (0x28), difference -2
+child wants to return 43 (0x2B), parent received 41 (0x29), difference -2
+child wants to return 44 (0x2C), parent received 42 (0x2A), difference -2
+child wants to return 45 (0x2D), parent received 43 (0x2B), difference -2
+child wants to return 46 (0x2E), parent received 44 (0x2C), difference -2
+child wants to return 47 (0x2F), parent received 45 (0x2D), difference -2
+child wants to return 48 (0x30), parent received 46 (0x2E), difference -2
+child wants to return 49 (0x31), parent received 47 (0x2F), difference -2
+child wants to return 50 (0x32), parent received 48 (0x30), difference -2
+child wants to return 51 (0x33), parent received 49 (0x31), difference -2
+child wants to return 52 (0x34), parent received 50 (0x32), difference -2
+child wants to return 53 (0x35), parent received 51 (0x33), difference -2
+child wants to return 54 (0x36), parent received 52 (0x34), difference -2
+child wants to return 55 (0x37), parent received 53 (0x35), difference -2
+child wants to return 56 (0x38), parent received 54 (0x36), difference -2
+child wants to return 57 (0x39), parent received 55 (0x37), difference -2
+child wants to return 58 (0x3A), parent received 56 (0x38), difference -2
+child wants to return 59 (0x3B), parent received 57 (0x39), difference -2
+child wants to return 60 (0x3C), parent received 58 (0x3A), difference -2
+child wants to return 61 (0x3D), parent received 59 (0x3B), difference -2
+child wants to return 62 (0x3E), parent received 60 (0x3C), difference -2
+child wants to return 63 (0x3F), parent received 61 (0x3D), difference -2
+child wants to return 64 (0x40), parent received 62 (0x3E), difference -2
+child wants to return 162 (0xA2), parent received 160 (0xA0), difference -2
+child wants to return 163 (0xA3), parent received 161 (0xA1), difference -2
+child wants to return 164 (0xA4), parent received 162 (0xA2), difference -2
+child wants to return 165 (0xA5), parent received 163 (0xA3), difference -2
+child wants to return 166 (0xA6), parent received 164 (0xA4), difference -2
+child wants to return 167 (0xA7), parent received 165 (0xA5), difference -2
+child wants to return 168 (0xA8), parent received 166 (0xA6), difference -2
+child wants to return 169 (0xA9), parent received 167 (0xA7), difference -2
+child wants to return 170 (0xAA), parent received 168 (0xA8), difference -2
+child wants to return 171 (0xAB), parent received 169 (0xA9), difference -2
+child wants to return 172 (0xAC), parent received 170 (0xAA), difference -2
+child wants to return 173 (0xAD), parent received 171 (0xAB), difference -2
+child wants to return 174 (0xAE), parent received 172 (0xAC), difference -2
+child wants to return 175 (0xAF), parent received 173 (0xAD), difference -2
+child wants to return 176 (0xB0), parent received 174 (0xAE), difference -2
+child wants to return 177 (0xB1), parent received 175 (0xAF), difference -2
+child wants to return 178 (0xB2), parent received 176 (0xB0), difference -2
+child wants to return 179 (0xB3), parent received 177 (0xB1), difference -2
+child wants to return 180 (0xB4), parent received 178 (0xB2), difference -2
+child wants to return 181 (0xB5), parent received 179 (0xB3), difference -2
+child wants to return 182 (0xB6), parent received 180 (0xB4), difference -2
+child wants to return 183 (0xB7), parent received 181 (0xB5), difference -2
+child wants to return 184 (0xB8), parent received 182 (0xB6), difference -2
+child wants to return 185 (0xB9), parent received 183 (0xB7), difference -2
+child wants to return 186 (0xBA), parent received 184 (0xB8), difference -2
+child wants to return 187 (0xBB), parent received 185 (0xB9), difference -2
+child wants to return 188 (0xBC), parent received 186 (0xBA), difference -2
+child wants to return 189 (0xBD), parent received 187 (0xBB), difference -2
+child wants to return 190 (0xBE), parent received 188 (0xBC), difference -2
+child wants to return 191 (0xBF), parent received 189 (0xBD), difference -2
+child wants to return 192 (0xC0), parent received 190 (0xBE), difference -2
+(riscv-ilp32 chroot) farino /tmp #
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <sys/wait.h>
+
+main(c, v)
+     int c;
+     char **v;
+{
+ for(int z=3D0; z<255; z++){
+  pid_t pid, p;
+  int s, i, n;
+
+  s =3D 0;
+  pid =3D fork();
+  if (pid =3D=3D 0)
+    exit(z);
+
+  /* wait for the process */
+  p =3D wait(&s);
+  if (p !=3D pid)
+    exit (255);
+
+  if (WIFEXITED(s))
+  {
+     int r=3DWEXITSTATUS(s);
+     if (z!=3Dr) {
+      printf("child wants to return %i (0x%X), parent received %i (0x%X),=20
+difference %i\n",z,z,r,r,r-z);
+     }
+  }
+ }
+}
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+
+Am Montag, 14. September 2020, 11:14:16 EEST schrieb Andreas K. H=FCttel:
+> Hi,
+>=20
+> first of all, sorry for crossposting, but I'm dealing with many moving and
+> experimental parts here...
+>=20
+> Situation: riscv32 (ilp32) qemu-user [1] chroot, Linux [2], glibc [3], gcc
+> [4]
+>=20
+> The following small program outputs "child exited with status 40", which =
+is
+> rather unexpected (it should be 42). Any idea what is going on?
+>=20
+> (This is a simplified version of code in a configure test. The test has
+> other potential issues [5], but in any case it cant produce useful results
+> on riscv32 right now.)
+>=20
+> TIA,
+> Andreas
+>=20
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> #include <stdlib.h>
+> #include <unistd.h>
+> #include <stdio.h>
+> #include <sys/wait.h>
+>=20
+> main(c, v)
+>      int c;
+>      char **v;
+> {
+>   pid_t pid, p;
+>   int s, i, n;
+>=20
+>   s =3D 0;
+>   pid =3D fork();
+>   if (pid =3D=3D 0)
+>     exit (42);
+>=20
+>   /* wait for the process */
+>   p =3D wait(&s);
+>   if (p !=3D pid)
+>     exit (255);
+>=20
+>   if (WIFEXITED(s))
+>   {
+>      int r=3DWEXITSTATUS(s);
+>      printf("child exited with status %i\n",r);
+>   }
+> }
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+>=20
+> [1] qemu built from git master, Sep 12, 2020 16:30:37 EEST
+> [2] host kernel is 5.8.8
+> [3] glibc-2.32 with the rv32 patch series backported from master
+> [4] (Gentoo 10.2.0-r1 p2)
+> [5] https://lists.gnu.org/archive/html/bug-bash/2020-09/msg00033.html
+
+
+=2D-=20
+Andreas K. H=FCttel
+dilfridge@gentoo.org
+Gentoo Linux developer=20
+(council, qa, toolchain, base-system, perl, libreoffice)
+--nextPart3100299.CJZsxu672h
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQKTBAABCgB9FiEE50NBr50KpJKM5MK59n+4O2olsAAFAl9hDrVfFIAAAAAALgAo
+aXNzdWVyLWZwckBub3RhdGlvbnMub3BlbnBncC5maWZ0aGhvcnNlbWFuLm5ldEU3
+NDM0MUFGOUQwQUE0OTI4Q0U0QzJCOUY2N0ZCODNCNkEyNUIwMDAACgkQ9n+4O2ol
+sAAA7RAAmwB93YGZ4EW1Y2wl5aOAX7UblNRY2oiO9JX9n8KxKkbW+I2aMflqSX9Z
+PdaaVfWQelH1D6Ey/UUbB4SOsubp7KNjCRiopADCNPmBbwbQPkz4dcoYe5vISeQu
+Ybc55nQcbXqvyp5t+lQFBHSgYNSJQKEu5Cu3zHGQ2gBhh58qGuDLQ++fhdTHAUxp
+y1q/32PQ1SQnoLEVrjRkGL3Bu3QYteIYNHwDdEaye/+mW/FVdbUi7XZiUqT/fb+u
+XEY2aF8wm1IK3unGrzdcFB0qkSS1QcAn7YaCn7SpHO4n56wWIDs5k52VMPxPiaXC
+bRgLmbgSrxEaRQvcUhIvm4Hgt2uMcsUnimFsSKfMAuF9Eq6cLiSI2Il+tGuw6qU+
+wJPYknjB8Ohe6rRf8VnWWd31Cz7pA42fdb4F+sfYm2WOQrUCA4PzB0/uXzKA59yD
+bTBnOyTM33e4ooNog6MA9BzqUtUB9prz5xlLRKNvAQxo+a/2MCJifpGUj52qAqs/
+J6fqiOe7bvlfca3xYgZ1XyeN9vKIc357NuGlU8wLTH0xFa/1f+2/AHNl7osea90d
+QWrFPrXJprzQzj/XviqC+HSGmaRskPg4AZwJG6OSjaWF0oVa3McUS8sCbW88suPm
+uzrt2jx5TeZPQ7xT5d86luaMmOzrC7pHPsrteiBX6fMy2au6fak=
+=qjPY
+-----END PGP SIGNATURE-----
+
+--nextPart3100299.CJZsxu672h--
+
+
+
 
