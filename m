@@ -2,112 +2,92 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B66C43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 16:59:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 873F1C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:16:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64F982193E
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 16:59:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D9FF320829
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:16:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hwGucUdq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64F982193E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ns1DCL3s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9FF320829
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIEIh-00060T-FA
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 12:59:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41042)
+	id 1kIEZ8-00023V-N1
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 13:16:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44268)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kIEHm-0005OT-SJ
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 12:58:30 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27404
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kIEHk-0000zD-Ny
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 12:58:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600189106;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1PsjdetKq0hwwm1fGYkthknhoskaTzOH0B5Xupxyaaw=;
- b=hwGucUdq19LoG4RWrDJ2Ik2xyjz69wU4jch6naR3MlWFyEHk/BeUpEbk2uKSuzc2W0fu3l
- +ecfAxdZC7fmy9MBNgwVDqNc2XxsJpt+ILJr/ISoDR9ZXWjLPrioJMUmvDztG/6Cm6rBQV
- crxL2dW7JPq/CsCU452S3AUBVXKniOE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-452-P6w4V3lSMSuoMgyiwLFPyw-1; Tue, 15 Sep 2020 12:58:22 -0400
-X-MC-Unique: P6w4V3lSMSuoMgyiwLFPyw-1
-Received: by mail-wr1-f69.google.com with SMTP id a12so1453821wrg.13
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 09:58:21 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kIEWp-0008Og-UR; Tue, 15 Sep 2020 13:14:03 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:42068)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kIEWo-0002iA-7P; Tue, 15 Sep 2020 13:14:03 -0400
+Received: by mail-pl1-x642.google.com with SMTP id y6so1682803plt.9;
+ Tue, 15 Sep 2020 10:14:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=Bgt27bCdhURdGhLo2M0oeI2N1IaaI1SbICE67RRbSus=;
+ b=ns1DCL3snoCB4DzRBmVOwdO67SNZVpT+nnZkRwC/2HQs4IxZE7+rhzbTKGZRCz484k
+ wa7zySjj5wifnSvMZXEPmUJ1/u3wLCjhLQI77TPp8jTD+C2JcktepYNDj6ncaeVlvGLO
+ cezLx5rhyiblQLhJxZU/lNavoS4Oez2b1GtjTk5goNd6cjAVbjqsDoNkLAZL79GMnq+I
+ nbjuM6Bt8ZY6hz8R0JDCUxVTcg39lZZa9UWwrNXAxSbKQDzMR35eW7pL4DMuGkR3mRnH
+ IrkYCMu69KHszu+34NRIIBwlAx7Tcy9r/dKFSQfr6U9ZMvDJv8WJP8atEY4Exc1lR+pK
+ 4sHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=1PsjdetKq0hwwm1fGYkthknhoskaTzOH0B5Xupxyaaw=;
- b=M8B7B8JKqLXrLMfOkjcyVzO0lnlZ6XsjLFxxXCz2MdEr5qX53hwbO4BkCkh6Lc/XKh
- PwHK4A62UpslttMA16tT3XF5o6JVcnIX5Sv8yuW2Dodz//OLQaM+AD8WtTTQiQ43OUX/
- BOc8aWsUrryTEz9WrAbffaaBDF9ZhW6luSj7b1vNL3FMHoBRl+u5MuOaRBX+H+gZkCPz
- KqPRXnKa3Ln48TH/OnMm8jqvqGsvi2RsN2gzBOYB36Bk1HSmLhRonOHjeo6ekbFvTp7W
- vRaaa7YoyYeF1sRVZYIbC+mn3lMA5y0nvFRF4GiKb9TnuvrTLPWF8nlJ+RunCh86FeGu
- oygw==
-X-Gm-Message-State: AOAM530JGIn0Wb2cQoz8rKtl4Ba7ALUCBuI6H4LdS87edyH1na8QCEaf
- fYXzit2oz8vapl6M2ZxlZ8hAfg51pf/M+nwP2omdR9fd4WqTmEme0ePmbTM+xuil5haEYpSwPVP
- W5aCVRMfxnIn3Ntk=
-X-Received: by 2002:a5d:4d48:: with SMTP id a8mr22048640wru.318.1600189100522; 
- Tue, 15 Sep 2020 09:58:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwtNBTnOUdVClwZX9G2nxSi3WN+C1rHq+tGTDEmOoEANIteLfINOA1YuXG+iTPdIvxy47ceQQ==
-X-Received: by 2002:a5d:4d48:: with SMTP id a8mr22048625wru.318.1600189100310; 
- Tue, 15 Sep 2020 09:58:20 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:eac8:587f:8ca7:e1e8?
- ([2001:b07:6468:f312:eac8:587f:8ca7:e1e8])
- by smtp.gmail.com with ESMTPSA id q8sm27833915wrx.79.2020.09.15.09.58.19
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 15 Sep 2020 09:58:19 -0700 (PDT)
-Subject: Re: [PATCH v2 01/10] capstone: Convert Makefile bits to meson bits
-To: Richard Henderson <richard.henderson@linaro.org>
-References: <20200914230210.2185860-1-richard.henderson@linaro.org>
- <20200914230210.2185860-2-richard.henderson@linaro.org>
- <eced490f-0250-3516-5d75-c6c3ff6e97be@linaro.org>
- <CABgObfbWzf7DLgx23+yMqYqnMUaiJ=0WKaW4zvzkA4u5T9fQXQ@mail.gmail.com>
- <4813770a-34a4-72ce-17f7-7ea451a7af99@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <74eed6fb-3b83-9338-949a-4f3ce3098315@redhat.com>
-Date: Tue, 15 Sep 2020 18:58:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=Bgt27bCdhURdGhLo2M0oeI2N1IaaI1SbICE67RRbSus=;
+ b=WeR7XNRRzOIIRnIUnxGu7lus4qunEouNreVgOGdtCfGDKGIyzturaNlzGPAHw+z2eJ
+ 2gmuHhLtxYDCbJSMOVIiAvyPBZrcqPcbMbjSCYY54KQovWDvdk6DcwO5rsO4FTsJEJXm
+ daxoDGZBRSo5r0j/iXLMsJLVIgwcXvqz75VN1+wQpWyiHKtNypsc3mzj+v1UkAe25hVj
+ qWLXBX4gekRayQW6DNywey1EE8M2ORtQRdl4toOGWIbOdmk+CIu8PpeoiWV5GgK4fY/O
+ MATR/cXrAgXGSNsms7VqjY3B6Tpwsf/vSqKQdZ8FIPaWrjx4aOF+m7ES3UQgSwYjjri9
+ nrPg==
+X-Gm-Message-State: AOAM532f/LGm1qTdKig4eIF+OES+fR8b7lKuDI/QwVecN0YdvF0I2rdT
+ M39epiAQOEkr+HYnDsvqVeiu2ZdChK6jPaw0MTA=
+X-Google-Smtp-Source: ABdhPJzcTGdoj0cL3HGbdEdXo52AaJS7RKOpcLESEsjmgceVuAWzKxI16Jrg+1FAkb+nXHtp5fFe3Q==
+X-Received: by 2002:a17:90a:d512:: with SMTP id
+ t18mr336923pju.106.1600190040245; 
+ Tue, 15 Sep 2020 10:14:00 -0700 (PDT)
+Received: from localhost.localdomain ([103.94.185.75])
+ by smtp.googlemail.com with ESMTPSA id j14sm124046pjz.21.2020.09.15.10.13.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 15 Sep 2020 10:13:59 -0700 (PDT)
+From: Yonggang Luo <luoyonggang@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v10 15/26] cirrus: Building freebsd in a single short
+Date: Wed, 16 Sep 2020 01:12:23 +0800
+Message-Id: <20200915171234.236-16-luoyonggang@gmail.com>
+X-Mailer: git-send-email 2.28.0.windows.1
+In-Reply-To: <20200915171234.236-1-luoyonggang@gmail.com>
+References: <20200915171234.236-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <4813770a-34a4-72ce-17f7-7ea451a7af99@linaro.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 03:21:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x642.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -120,56 +100,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, luoyonggang@gmail.com,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Ed Maste <emaste@FreeBSD.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Yonggang Luo <luoyonggang@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Wen Congyang <wencongyang2@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Li-Wen Hsu <lwhsu@freebsd.org>, Peter Lieven <pl@kamp.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/09/20 16:27, Richard Henderson wrote:
-> On 9/14/20 11:27 PM, Paolo Bonzini wrote:
->> Looks good. Can you just add a "# Submodules" heading above the test?
->>
->> I would also like to remove the "yes" value (that is, the default fails if the
->> internal copy is not there) but it can be done later for all submodules.
-> 
-> Unless you simply plan to rename {no, yes} to {disabled, enabled}, as for the
-> Feature objects, why?
-> 
-> That seems to be the only sensible value for --enable-foo, without the =system
-> or =git specifiers.  We *should* fail if no system library nor internal copy is
-> present.
+This reverts commit 45f7b7b9f38f5c4d1529a37c93dedfc26a231bba
+("cirrus.yml: Split FreeBSD job into two parts").
 
-Yes, that was a bit concise.  I would like "auto" to take the meaning
-that "yes" currently as.  Right now we have
+freebsd 1 hour limit not hit anymore
 
-no -> Easy :)
-system -> System capstone if found, fail otherwise
-internal/git -> Compile capstone if found, fail otherwise
-auto -> System capstone, then internal, then disable
-yes -> System capstone, then internal, then fail
+I think we going to a wrong direction, I think there is some tests a stall the test runner,
+please look at
+https://cirrus-ci.com/task/5110577531977728
+When its running properly, the consumed time are little, but when tests running too long,
+look at the cpu usage, the cpu usage are nearly zero. doesn't consuming time.
 
-I'm not sure of the usefulness of disabling a dependency because we
-don't have it checked out, since we have the machinery to do the
-checkout automatically.  So that would become:
+And look at
+https://cirrus-ci.com/task/6119341601062912
 
-no -> Easy :)
-system -> System capstone if found, fail otherwise
-internal/git -> Compile capstone if found, fail otherwise
-auto -> System capstone, then internal, then fail
+If the tests running properly, the time consuming are little
+We should not hide the error by split them
 
-The disadvantage is that it would be different from other "auto"
-symbols, which never fail.  But then those other "auto" symbols do not
-have a built-in fallback, so the question is whether the combination of
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Reviewed-by: Ed Maste <emaste@FreeBSD.org>
+---
+ .cirrus.yml | 35 ++++++++---------------------------
+ 1 file changed, 8 insertions(+), 27 deletions(-)
 
-1) building from a fresh git checkout
-2) --disable-git-update
-3) not having a system capstone/libfdt/slirp
-4) not having --disable-{capstone,libfdt,slirp} on the command line
-
-is more likely to be intentional or operator error.
-
-Paolo
+diff --git a/.cirrus.yml b/.cirrus.yml
+index 3dd9fcff7f..25fb4add9b 100644
+--- a/.cirrus.yml
++++ b/.cirrus.yml
+@@ -1,38 +1,19 @@
+ env:
+   CIRRUS_CLONE_DEPTH: 1
+ 
+-freebsd_1st_task:
++freebsd_12_task:
+   freebsd_instance:
+     image_family: freebsd-12-1
+-    cpu: 4
+-    memory: 4G
+-  install_script: ASSUME_ALWAYS_YES=yes pkg bootstrap -f ; pkg install -y
+-    bash curl cyrus-sasl git glib gmake gnutls gsed
+-    nettle perl5 pixman pkgconf png usbredir
++    cpu: 8
++    memory: 8G
++  install_script:
++    - ASSUME_ALWAYS_YES=yes pkg bootstrap -f ;
++    - pkg install -y bash curl cyrus-sasl git glib gmake gnutls gsed
++          nettle perl5 pixman pkgconf png usbredir
+   script:
+     - mkdir build
+     - cd build
+-    - ../configure --disable-user --target-list-exclude='alpha-softmmu
+-        ppc64-softmmu ppc-softmmu riscv32-softmmu riscv64-softmmu s390x-softmmu
+-        sparc64-softmmu sparc-softmmu x86_64-softmmu i386-softmmu'
+-        --enable-werror || { cat config.log; exit 1; }
+-    - gmake -j$(sysctl -n hw.ncpu)
+-    - gmake -j$(sysctl -n hw.ncpu) check
+-
+-freebsd_2nd_task:
+-  freebsd_instance:
+-    image_family: freebsd-12-1
+-    cpu: 4
+-    memory: 4G
+-  install_script: ASSUME_ALWAYS_YES=yes pkg bootstrap -f ; pkg install -y
+-    bash curl cyrus-sasl git glib gmake gnutls gtk3 gsed libepoxy mesa-libs
+-    nettle perl5 pixman pkgconf png SDL2 usbredir
+-  script:
+-    - ./configure --enable-werror --target-list='alpha-softmmu ppc64-softmmu
+-        ppc-softmmu riscv32-softmmu riscv64-softmmu s390x-softmmu
+-        sparc64-softmmu sparc-softmmu x86_64-softmmu i386-softmmu
+-        sparc-bsd-user sparc64-bsd-user x86_64-bsd-user i386-bsd-user'
+-        || { cat config.log; exit 1; }
++    - ../configure --enable-werror || { cat config.log; exit 1; }
+     - gmake -j$(sysctl -n hw.ncpu)
+     - gmake -j$(sysctl -n hw.ncpu) check
+ 
+-- 
+2.28.0.windows.1
 
 
