@@ -7,88 +7,89 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7FD0C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 20:51:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B249C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 20:52:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F03AC20809
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 20:51:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F03AC20809
+	by mail.kernel.org (Postfix) with ESMTPS id DAEA020771
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 20:52:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAEA020771
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIHv6-0002gz-J2
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 16:51:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37596)
+	id 1kIHwV-000404-OJ
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 16:52:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38114)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kIHqU-0007AI-53; Tue, 15 Sep 2020 16:46:35 -0400
-Received: from new1-smtp.messagingengine.com ([66.111.4.221]:52341)
+ id 1kIHsl-0001JI-Va; Tue, 15 Sep 2020 16:48:56 -0400
+Received: from new1-smtp.messagingengine.com ([66.111.4.221]:51021)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kIHqR-0005jf-J6; Tue, 15 Sep 2020 16:46:33 -0400
+ id 1kIHsk-0005wx-6i; Tue, 15 Sep 2020 16:48:55 -0400
 Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
- by mailnew.nyi.internal (Postfix) with ESMTP id 1FFDA5803CF;
- Tue, 15 Sep 2020 16:46:30 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
- by compute7.internal (MEProxy); Tue, 15 Sep 2020 16:46:30 -0400
+ by mailnew.nyi.internal (Postfix) with ESMTP id 604435803CF;
+ Tue, 15 Sep 2020 16:48:53 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+ by compute7.internal (MEProxy); Tue, 15 Sep 2020 16:48:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
  h=date:from:to:cc:subject:message-id:references:mime-version
- :content-type:in-reply-to; s=fm1; bh=vCkhGcQlFAmTI2qMBXMg3d+qaez
- CL/kbOU8m+zS3kFc=; b=VoEjPvPbeuJlU14vbrzwFvwDuYOnA06h3gyFGnt7HQa
- /HRgFyVhjI8ZOib3X49qcCeVewLI0aDBYoB8hv9eYLrL5gKBMubXtkk9Cyas+m1g
- ba66uxXy1aHrTqsLoc6qLDZvRNR5xqAfFj3puiooxcvqtt2m2tJe1EFaPPqHLFv+
- wCfpIfppoFIVb5HVFvnkVAlibQeqU6dCno+XqBS/4zMVpy2G5d7Iy2gkXx4fCT6N
- Mb+WcSM4x4682J10W538sDqf26UMa8NT1XnjIRYYfuii1o2CmjmgM+ZmH9B3ZriO
- JbDq/6VByNShlRzh1jemNWYpYr7qftechNoT0u8CHfA==
+ :content-type:in-reply-to; s=fm1; bh=w3K7ZpDE328VF7rO7sRSvqFXSJu
+ xyQoubQ8Yde+b2ek=; b=qDoHThbQjngcZPm/20MhSYP6qTnDe8dQ22L8TuxNlzZ
+ ugDRQ/mx654v2cnxPKJTcpoQGrhTU+t9F1tGOofqmwfULzg7ELiaNz3zgVsPyJM3
+ k5CjvLvNm4yHlY1rthkGbyGSf4z/HhfSgnJZ4jyuJ4zO8oSbmsuoigTUoKGA9UJK
+ zCYsfowtP+kY0eizBaEIGPuPMKAssovtDORvffuUAOF9XvApriaxvZXtSBeiAhh6
+ bFiRUBV0dsAL1cNmQQDqQBHp74KlVVnGfZZe4gKpZ64Z/eqn0ejS+FxAKRvcqdS4
+ BejQz+owRv/rVMO47FCtWFnBGlbLpr1TYZK31eUSGyQ==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
  messagingengine.com; h=cc:content-type:date:from:in-reply-to
  :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=vCkhGc
- QlFAmTI2qMBXMg3d+qaezCL/kbOU8m+zS3kFc=; b=WsDlEtq/r7ljPTTDpHjj58
- V72AxEi0ZA+esZmVjFyUIBCgXweLqdhfHfXLoY+Om5NZ6ObczoDr+P5s/41pZ/aq
- fqpGWQPcrPY9cZp6TMFPkxc4P/FC6l7dbgba330Xe4NQS2fsXldse/ZUmZ28Pp7B
- iCdVX94xw6XmdnVDzkt12M8sIZyDgU8RfMLnfzwT9kNWnhoKmkKvVCTnu4ypQi9b
- R9ZtCHAZGUgFHEw7HIykEAlka8WJVsabIOB7sc8wHQr/l5NktUaO39RNeiBjIDhi
- O1/DLyrvq2omFkin81pbPbAdgIaYx4Xt3Moq/TT00BJG+TZOovC05GL8g3Y6PoGg
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=w3K7Zp
+ DE328VF7rO7sRSvqFXSJuxyQoubQ8Yde+b2ek=; b=FgnFKQ/Wzrj+wvSVFSWjON
+ 6cfcBvKLEHfADuZzE2jg40riMkfhVff3My6+iEDdOK8vOF3nUOwJDvXDnABt2Qnp
+ oCUNjoZYC2juHu4SfRUaQpx39n1OBX2m3W2BkGIfRWsdq6YwKeiAu5BMBN2mCjxJ
+ 1MG2BpAoQx3cBOtD7DeQLDAZOoCtuTpGsyWq4ADtI+rNSCLGpmxVeQQMlbezY4qo
+ MH0ke4KIwmzLtyZDJzB6F2DBmISYBvzSjHPqYqjC07WHL+vu9alLI/KjW6a/zh7I
+ mYdGPA6CA16AWKakMAlASgEAe55Ruz9uP0SaxZQR9xp2tGAS+I5aHdyVssjNGESw
  ==
-X-ME-Sender: <xms:JChhX0kOKrvvkG_ZZ04uq4GLZ6FWLvxmuNV7iSBr6wpOZbt-mOaGZw>
- <xme:JChhXz3H_zoV9yZ_IBJoZ4NeSRlfVxtlD_v4vjlRJeRc_6xcwdbbqVOUJuGrIzeXG
- FcfXnzyPp21jmaA_WQ>
+X-ME-Sender: <xms:tChhX6cLwcqnuKGlLDHw5-iK5HGHCVtTkJfJp_vUMRglM9HJgXoZQA>
+ <xme:tChhX0MclJw8Das7gMAvZHTUWvzarWFFWVAwOKBE_5hbPX-30Pc8b7nC-M4Jwa2JU
+ SdC9eAJ4fWhQOethyY>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrtddtgdduvdefucetufdoteggodetrfdotf
  fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
  uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
  cujfgurhepfffhvffukfhfgggtuggjsehgtderredttdejnecuhfhrohhmpefmlhgruhhs
  ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
  gvrhhnpeejgeduffeuieetkeeileekvdeuleetveejudeileduffefjeegfffhuddvudff
- keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtne
+ keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedune
  curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
-X-ME-Proxy: <xmx:JChhXyr7hHVtD4YDj2HLOGUpdyj4N9a2qdrmdjZnsYwgdkOS20hhgQ>
- <xmx:JChhXwkZ4r7kaS5j6BKw3h6k8_wvH2O42zmBCxaa_YLkKjQctTd2Ow>
- <xmx:JChhXy2DUoewGlZH0gUGY4Ms8AbexcA_RANPT42uhkFQ8bQ9f6D8lw>
- <xmx:JShhX7s6xOHme9nVExWnK8GsL5a3xkF7xBPQ8jja5vymmnmecAdGVnXT5Uo>
+X-ME-Proxy: <xmx:tChhX7iSmNuIvs1bRq8iRf7T5s4opvUncdQ17St-JAq_tMsDAxM2Cw>
+ <xmx:tChhX380S6oB5OrRseXIAfUZI-x289Bpx4fPRWtaoc-KTib_GMJeAw>
+ <xmx:tChhX2s4h9ZuY6uTbcCwV3jEOWFpqrGQk2Fuqn2F_Q02SkDYthAnew>
+ <xmx:tChhX3m7qMcu9BBUuGYOISVmQeKXAJmaKm9uMiusrZ_AMejP1OE3jTEPeO0>
 Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id 63B753064683;
- Tue, 15 Sep 2020 16:46:26 -0400 (EDT)
-Date: Tue, 15 Sep 2020 22:46:24 +0200
+ by mail.messagingengine.com (Postfix) with ESMTPA id 1A562328005A;
+ Tue, 15 Sep 2020 16:48:51 -0400 (EDT)
+Date: Tue, 15 Sep 2020 22:48:49 +0200
 From: Klaus Jensen <its@irrelevant.dk>
 To: Dmitry Fomichev <Dmitry.Fomichev@wdc.com>
-Subject: Re: [PATCH v3 14/15] hw/block/nvme: Use zone metadata file for
- persistence
-Message-ID: <20200915204624.GB14485@apples.localdomain>
+Subject: Re: [PATCH v3 01/15] hw/block/nvme: Define 64 bit cqe.result
+Message-ID: <20200915204849.GC14485@apples.localdomain>
 References: <20200913221436.22844-1-dmitry.fomichev@wdc.com>
- <20200913221436.22844-15-dmitry.fomichev@wdc.com>
- <20200915190935.GD499689@apples.localdomain>
- <MN2PR04MB5951BE02EAFDCDEF2DEF9AFBE1200@MN2PR04MB5951.namprd04.prod.outlook.com>
+ <20200913221436.22844-2-dmitry.fomichev@wdc.com>
+ <20200915073720.GB499689@apples.localdomain>
+ <MN2PR04MB5951ED0FD5633E8144459A28E1200@MN2PR04MB5951.namprd04.prod.outlook.com>
+ <20200915195546.GA14485@apples.localdomain>
+ <MN2PR04MB5951E0BA1D9E217C37B82ED3E1200@MN2PR04MB5951.namprd04.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="i9LlY+UWpKt15+FH"
+ protocol="application/pgp-signature"; boundary="69pVuxX8awAiJ7fD"
 Content-Disposition: inline
-In-Reply-To: <MN2PR04MB5951BE02EAFDCDEF2DEF9AFBE1200@MN2PR04MB5951.namprd04.prod.outlook.com>
+In-Reply-To: <MN2PR04MB5951E0BA1D9E217C37B82ED3E1200@MN2PR04MB5951.namprd04.prod.outlook.com>
 Received-SPF: pass client-ip=66.111.4.221; envelope-from=its@irrelevant.dk;
  helo=new1-smtp.messagingengine.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 16:46:30
@@ -125,7 +126,7 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---i9LlY+UWpKt15+FH
+--69pVuxX8awAiJ7fD
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
@@ -133,64 +134,87 @@ Content-Transfer-Encoding: quoted-printable
 On Sep 15 20:44, Dmitry Fomichev wrote:
 > > -----Original Message-----
 > > From: Klaus Jensen <its@irrelevant.dk>
-> > Sent: Tuesday, September 15, 2020 3:10 PM
+> > Sent: Tuesday, September 15, 2020 3:56 PM
 > > To: Dmitry Fomichev <Dmitry.Fomichev@wdc.com>
-> > Cc: Keith Busch <kbusch@kernel.org>; Klaus Jensen
-> > <k.jensen@samsung.com>; Kevin Wolf <kwolf@redhat.com>; Philippe
-> > Mathieu-Daud=C3=A9 <philmd@redhat.com>; Maxim Levitsky
-> > <mlevitsk@redhat.com>; Fam Zheng <fam@euphon.net>; Niklas Cassel
-> > <Niklas.Cassel@wdc.com>; Damien Le Moal <Damien.LeMoal@wdc.com>;
-> > qemu-block@nongnu.org; qemu-devel@nongnu.org; Alistair Francis
-> > <Alistair.Francis@wdc.com>; Matias Bjorling <Matias.Bjorling@wdc.com>
-> > Subject: Re: [PATCH v3 14/15] hw/block/nvme: Use zone metadata file for
-> > persistence
+> > Cc: Fam Zheng <fam@euphon.net>; Kevin Wolf <kwolf@redhat.com>;
+> > Damien Le Moal <Damien.LeMoal@wdc.com>; qemu-block@nongnu.org;
+> > Niklas Cassel <Niklas.Cassel@wdc.com>; Klaus Jensen
+> > <k.jensen@samsung.com>; qemu-devel@nongnu.org; Alistair Francis
+> > <Alistair.Francis@wdc.com>; Keith Busch <kbusch@kernel.org>; Philippe
+> > Mathieu-Daud=C3=A9 <philmd@redhat.com>; Matias Bjorling
+> > <Matias.Bjorling@wdc.com>
+> > Subject: Re: [PATCH v3 01/15] hw/block/nvme: Define 64 bit cqe.result
 > >=20
-> > On Sep 14 07:14, Dmitry Fomichev wrote:
-> > > A ZNS drive that is emulated by this module is currently initialized
-> > > with all zones Empty upon startup. However, actual ZNS SSDs save the
-> > > state and condition of all zones in their internal NVRAM in the event
-> > > of power loss. When such a drive is powered up again, it closes or
-> > > finishes all zones that were open at the moment of shutdown. Besides
-> > > that, the write pointer position as well as the state and condition
-> > > of all zones is preserved across power-downs.
+> > On Sep 15 18:56, Dmitry Fomichev wrote:
+> > > > -----Original Message-----
+> > > > From: Klaus Jensen <its@irrelevant.dk>
+> > > > Sent: Tuesday, September 15, 2020 3:37 AM
+> > > > To: Dmitry Fomichev <Dmitry.Fomichev@wdc.com>
+> > > > Cc: Keith Busch <kbusch@kernel.org>; Klaus Jensen
+> > > > <k.jensen@samsung.com>; Kevin Wolf <kwolf@redhat.com>; Philippe
+> > > > Mathieu-Daud=C3=A9 <philmd@redhat.com>; Maxim Levitsky
+> > > > <mlevitsk@redhat.com>; Fam Zheng <fam@euphon.net>; Niklas Cassel
+> > > > <Niklas.Cassel@wdc.com>; Damien Le Moal
+> > <Damien.LeMoal@wdc.com>;
+> > > > qemu-block@nongnu.org; qemu-devel@nongnu.org; Alistair Francis
+> > > > <Alistair.Francis@wdc.com>; Matias Bjorling <Matias.Bjorling@wdc.co=
+m>
+> > > > Subject: Re: [PATCH v3 01/15] hw/block/nvme: Define 64 bit cqe.resu=
+lt
+> > > >
+> > > > On Sep 14 07:14, Dmitry Fomichev wrote:
+> > > > > From: Ajay Joshi <ajay.joshi@wdc.com>
+> > > > >
+> > > > > A new write command, Zone Append, is added as a part of Zoned
+> > > > > Namespace Command Set. Upon successful completion of this
+> > command,
+> > > > > the controller returns the start LBA of the performed write opera=
+tion
+> > > > > in cqe.result field. Therefore, the maximum size of this variable
+> > > > > needs to be changed from 32 to 64 bit, consuming the reserved 32 =
+bit
+> > > > > field that follows the result in CQE struct. Since the existing
+> > > > > commands are expected to return a 32 bit LE value, two separate
+> > > > > variables, result32 and result64, are now kept in a union.
+> > > > >
+> > > > > Signed-off-by: Ajay Joshi <ajay.joshi@wdc.com>
+> > > > > Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+> > > > > Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
+> > > >
+> > > > I know that I R-b'ed this, but can this be moved to the namespace t=
+ypes
+> > > > patch, since that is the TP that changes this.
 > > >
-> > > This commit adds the capability to have a persistent zone metadata
-> > > to the device. The new optional module property, "zone_file",
-> > > is introduced. If added to the command line, this property specifies
-> > > the name of the file that stores the zone metadata. If "zone_file" is
-> > > omitted, the device will be initialized with all zones empty, the same
-> > > as before.
+> > > You probably meant the ZNS patch since result64 is first used there to
+> > return
+> > > ZA starting data LBA. Sure, I can move this stuff to that patch.
 > > >
-> > > If zone metadata is configured to be persistent, then zone descriptor
-> > > extensions also persist across controller shutdowns.
-> > >
-> > > Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 > >=20
-> > This doesn't build on mingw.
+> > No, I actually did mean the NST patch since TP 4056 is the TP that
+> > "unreserves" dw1 in the CQE.
 >=20
-> Thanks for letting me know. I'll try to look into this. Do you cross-comp=
-ile
-> with mingw64?
+> It is not necessary to change it in NST patch since result64 field is not=
+ used
+> in that patch. But if you insist, I can move it to NST patch :)
 
-Yup,
+You are right of course, but since it is a change to the "spec" related
+data structures that go into include/block/nvme.h, I think it belongs in
+"hw/block/nvme: Introduce the Namespace Types definitions".
 
-make docker-test-mingw@fedora
-
-
---i9LlY+UWpKt15+FH
+--69pVuxX8awAiJ7fD
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9hKBkACgkQTeGvMW1P
-DekJYwf/bfPKuyqSbE1Ir71fGH2lFmDbroMwj0TOtvSrn+7UdjUtE45QgLVLGbY7
-7FC4Dnm5aKfF7uPr3TQdolR+wlCOzblTPSt3jiGdYLXhmOuWJdTa4ITXmWhuOlXg
-LLc7TjcOb0Yqi0YWBRD3FgNErhEDGMHeIa5l/p0bof8UuL5+XEOI0AcPPiHmvx/K
-FxJtpqAWKaj4wUHzwVddZ3KgBSTLx5w7/RpWt5pnNZR7alLXQqZKcX7MeVO0L3Ig
-ZsEBfw3nI3kgZaBCW4UsfFPa/izj5E0F/KBODpwBHzHSLJKX/V/hn/CbfQQ129vc
-ynG1/tES4zy42Hyk1u5oDMzmjroDUQ==
-=mGoJ
+iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9hKK0ACgkQTeGvMW1P
+Deljwgf/cvxpE622fjcz41x3Axb+OXcB9ac/azepfYlVKhzrctwCcERGPhsrZYuN
+PWIbyZQUzs7KZJot2oUEBYgu//4undJ5JweupIvlMQa6CbSKEAnY9lKAsKOkGIWL
+xAU3iZqZINi+4n3bs8GuPMPHw1um0fGD/0LirYujWbjxVzT39WdLNRwy4pDUKSRd
+rBxG4CEbqp+RBUJtP3NG0ke0m5ZdkWqKeRn5f/9eHH7gyGgmLDI6PwS9kBjvn+RW
+NKiXJApA1HY6QdoVEn9QMCmFKazmDu4FQV3RE3P+6yjM8oiOWDZ8UGxEQlgTH8Mv
+Beqr+8ApS01WFeUs+YjYvuYIjFzq/Q==
+=LYaG
 -----END PGP SIGNATURE-----
 
---i9LlY+UWpKt15+FH--
+--69pVuxX8awAiJ7fD--
 
