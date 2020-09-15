@@ -2,87 +2,76 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1126BC43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 11:08:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56ACEC43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 11:09:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BFD521D7B
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 11:08:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MFlVlUc1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BFD521D7B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CC86E21D43
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 11:09:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC86E21D43
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kI8pK-0003ak-Nc
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 07:08:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52938)
+	id 1kI8pZ-000410-TS
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 07:09:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55290)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kI8Ug-00019j-DX
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 06:47:26 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40625
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kI8Ue-0004fz-MZ
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 06:47:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600166843;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xZoa4RowV/fB16RrOuni5OhsgOZy07E6WT0/T3ii30M=;
- b=MFlVlUc1gD7+6qQeweQ+jkSaifce0tpxf226ATswznRkUFD+5f0uf9Fg0B42A87pj/zGgX
- Bfh13Kusw0HcHVyAoabgB/pol4tbRAoxqvQ1fFoALjrcgEUUNO5tAOJlwOOEOxfG32oB+K
- 0BzJoNIL+sOw7Y8IRbV4gkYufojyiF4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-2-EfyzLUtGOaOAn2cZSieiUA-1; Tue, 15 Sep 2020 06:47:19 -0400
-X-MC-Unique: EfyzLUtGOaOAn2cZSieiUA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AFF0A1005E64;
- Tue, 15 Sep 2020 10:47:18 +0000 (UTC)
-Received: from localhost (ovpn-113-7.ams2.redhat.com [10.36.113.7])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 514D05FC2A;
- Tue, 15 Sep 2020 10:47:18 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 22/22] block/rbd: add 'namespace' to
- qemu_rbd_strong_runtime_opts[]
-Date: Tue, 15 Sep 2020 12:46:27 +0200
-Message-Id: <20200915104627.699552-23-mreitz@redhat.com>
-In-Reply-To: <20200915104627.699552-1-mreitz@redhat.com>
-References: <20200915104627.699552-1-mreitz@redhat.com>
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>)
+ id 1kI8he-0004Ew-Ll; Tue, 15 Sep 2020 07:00:51 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:35591)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>)
+ id 1kI8hV-0006Mt-Te; Tue, 15 Sep 2020 07:00:50 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.146.173])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id E5BEE5B47973;
+ Tue, 15 Sep 2020 13:00:34 +0200 (CEST)
+Received: from kaod.org (37.59.142.100) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Tue, 15 Sep
+ 2020 13:00:34 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-100R00310b41507-9e73-4985-8e1d-1d30655ef92b,
+ DB33878D1665C97D8818E18A24225F630DB8C599) smtp.auth=groug@kaod.org
+Date: Tue, 15 Sep 2020 13:00:33 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [SPAM] Re: [PATCH 05/15] spapr: Get rid of cas_check_pvr()
+ error reporting
+Message-ID: <20200915130033.0b5f5abd@bahia.lan>
+In-Reply-To: <1255830e-1be0-86d3-f830-a48bb9bd87b2@virtuozzo.com>
+References: <20200914123505.612812-1-groug@kaod.org>
+ <20200914123505.612812-6-groug@kaod.org>
+ <1255830e-1be0-86d3-f830-a48bb9bd87b2@virtuozzo.com>
+X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 03:21:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -38
-X-Spam_score: -3.9
-X-Spam_bar: ---
-X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.100]
+X-ClientProxiedBy: DAG9EX1.mxp5.local (172.16.2.81) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: 30bbdd67-5f6f-4dc8-830f-34820513ea9a
+X-Ovh-Tracer-Id: 11444209603587447203
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrtddtgddtgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepfedutdeijeejveehkeeileetgfelteekteehtedtieefffevhffflefftdefleejnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutddtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegurghvihgusehgihgsshhonhdrughrohhpsggvrghrrdhiugdrrghu
+Received-SPF: pass client-ip=178.32.125.2; envelope-from=groug@kaod.org;
+ helo=smtpout1.mo529.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 05:34:57
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,45 +84,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+On Tue, 15 Sep 2020 13:03:13 +0300
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
 
-Commit 19ae9ae014 ("block/rbd: Add support for ceph namespaces")
-introduced namespace support for RBD, but we forgot to add the
-new 'namespace' options to qemu_rbd_strong_runtime_opts[].
+> 14.09.2020 15:34, Greg Kurz wrote:
+> > The cas_check_pvr() function has two purposes:
+> > - finding the "best" logical PVR, ie. the most recent one supported by
+> >    the guest for this CPU type
+> > - checking if the guest supports the real PVR of this CPU type, which
+> >    is just an optional extra information to workaround the lack of
+> >    support for "compat" mode in PR KVM
+> > 
+> > This logic doesn't need error reporting, really. If we don't find a
+> > suitable logical PVR, we return the special value 0 which is definitely
+> > not a valid PVR. Let the caller decide on whether it should error out
+> > or not.
+> 
+> maybe then rename it s/cas_check_pvr/cas_find_compat_pvr/ or something like this?
+> 
 
-The 'namespace' is used to identify the image, so it is a strong
-option since it can changes the data of a BDS.
+Ah yes, since this function doesn't do an actual check anymore, it may
+be worth changing its name.
 
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1821528
-Fixes: 19ae9ae014 ("block/rbd: Add support for ceph namespaces")
-Cc: Florian Florensa <fflorensa@online.net>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Message-Id: <20200914190553.74871-1-sgarzare@redhat.com>
-Reviewed-by: Jason Dillaman <dillaman@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- block/rbd.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/block/rbd.c b/block/rbd.c
-index 171c67e3a0..9bd2bce716 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -1247,6 +1247,7 @@ static QemuOptsList qemu_rbd_create_opts = {
- 
- static const char *const qemu_rbd_strong_runtime_opts[] = {
-     "pool",
-+    "namespace",
-     "image",
-     "conf",
-     "snapshot",
--- 
-2.26.2
+> > 
+> > This doesn't change the behavior.
+> > 
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> 
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> 
+> 
+> 
 
 
