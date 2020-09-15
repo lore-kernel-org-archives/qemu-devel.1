@@ -2,80 +2,96 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E269C43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 20:16:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEF00C43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 20:19:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E7C520731
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 20:16:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E7C520731
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 3E55A20731
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 20:19:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bk6THXpr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E55A20731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIHNK-0003mK-PG
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 16:16:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59060)
+	id 1kIHQe-00057C-6B
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 16:19:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59566)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIHMa-0003HF-RI
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 16:15:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43530)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIHMY-0001la-JX
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 16:15:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kIHMU-0002Ft-3K
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 20:15:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id EB1152E8076
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 20:15:33 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kIHPx-0004Zf-0R
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 16:19:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55916)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kIHPu-00025i-DX
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 16:19:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600201145;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ytrKaJFGUbf39bPtEOpShZGZpXzbAoR/g9V7Ygb4Krw=;
+ b=Bk6THXpryPVtc4ZZZRajrrJd7JyVVKQUeY/omQmjm1Y+4mRp1JfC6wHxB7IxJQnfv3ws9E
+ /JAHtwYEMxTJAwS2TWivChsD0HCdBIXeYFmSvoFFUzn3IDznZPVZre4dJjwcWNJdXiB8AF
+ zw+4jbXoH4SIUTngIHwc+LsGVSzRnNY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-69-uKnMl-IAPbyadTk7rXnA2g-1; Tue, 15 Sep 2020 16:19:03 -0400
+X-MC-Unique: uKnMl-IAPbyadTk7rXnA2g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 763746409A;
+ Tue, 15 Sep 2020 20:19:02 +0000 (UTC)
+Received: from localhost (ovpn-119-217.rdu2.redhat.com [10.10.119.217])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3C2365DC08;
+ Tue, 15 Sep 2020 20:19:02 +0000 (UTC)
+Date: Tue, 15 Sep 2020 16:19:01 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 1/5] qom: Allow objects to be allocated with increased
+ alignment
+Message-ID: <20200915201901.GD7594@habkost.net>
+References: <20200915174635.2333553-1-richard.henderson@linaro.org>
+ <20200915174635.2333553-2-richard.henderson@linaro.org>
+ <20200915180736.GB7594@habkost.net>
+ <6d6a80bf-a542-6818-1638-0318f4aab336@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 15 Sep 2020 20:10:28 -0000
-From: Paul Zimmerman <1892604@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: brendandg pauldzim petunia2000 pmaydell
-X-Launchpad-Bug-Reporter: Brendan Dolan-Gavitt (brendandg)
-X-Launchpad-Bug-Modifier: Paul Zimmerman (pauldzim)
-References: <159814309088.988.14645850566795174578.malonedeb@wampee.canonical.com>
-Message-Id: <160020062868.17165.2766044332605096422.malone@soybean.canonical.com>
-Subject: [Bug 1892604] Re: qemu-system-arm: ../hw/usb/hcd-dwc2.c:666:
- dwc2_glbreg_read: Assertion `addr <= GINTSTS2' failed.
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: 799f11a0ddc478efbe128c80a45c58d9f5c8245c
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 09:50:55
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <6d6a80bf-a542-6818-1638-0318f4aab336@linaro.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:10:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,76 +100,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1892604 <1892604@bugs.launchpad.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Are you able to modify the -append string to add
-"dwc_otg.fiq_fsm_enable=3D0", and if so does it fix the problem?
+On Tue, Sep 15, 2020 at 12:09:59PM -0700, Richard Henderson wrote:
+> On 9/15/20 11:07 AM, Eduardo Habkost wrote:
+> > On Tue, Sep 15, 2020 at 10:46:31AM -0700, Richard Henderson wrote:
+> >> It turns out that some hosts have a default malloc alignment less
+> >> than that required for vectors.
+> >>
+> >> We assume that, with compiler annotation on CPUArchState, that we
+> >> can properly align the vector portion of the guest state.  Fix the
+> >> alignment of the allocation by using qemu_memalloc when required.
+> >>
+> >> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> >> ---
+> >> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> >> Cc: "Daniel P. Berrangé" <berrange@redhat.com>
+> >> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> >> ---
+> >>  include/qom/object.h |  4 ++++
+> >>  qom/object.c         | 16 +++++++++++++---
+> >>  2 files changed, 17 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/include/qom/object.h b/include/qom/object.h
+> >> index 056f67ab3b..d52d0781a3 100644
+> >> --- a/include/qom/object.h
+> >> +++ b/include/qom/object.h
+> >> @@ -770,6 +770,9 @@ struct Object
+> >>   * @instance_size: The size of the object (derivative of #Object).  If
+> >>   *   @instance_size is 0, then the size of the object will be the size of the
+> >>   *   parent object.
+> >> + * @instance_align: The required alignment of the object.  If @instance_align
+> >> + *   is 0, then normal malloc alignment is sufficient; if non-zero, then we
+> >> + *   must use qemu_memalign for allocation.
+> >>   * @instance_init: This function is called to initialize an object.  The parent
+> >>   *   class will have already been initialized so the type is only responsible
+> >>   *   for initializing its own members.
+> >> @@ -807,6 +810,7 @@ struct TypeInfo
+> >>      const char *parent;
+> >>  
+> >>      size_t instance_size;
+> >> +    size_t instance_align;
+> >>      void (*instance_init)(Object *obj);
+> >>      void (*instance_post_init)(Object *obj);
+> >>      void (*instance_finalize)(Object *obj);
+> >> diff --git a/qom/object.c b/qom/object.c
+> >> index 387efb25eb..2e53cb44a6 100644
+> >> --- a/qom/object.c
+> >> +++ b/qom/object.c
+> >> @@ -50,6 +50,7 @@ struct TypeImpl
+> >>      size_t class_size;
+> >>  
+> >>      size_t instance_size;
+> >> +    size_t instance_align;
+> >>  
+> >>      void (*class_init)(ObjectClass *klass, void *data);
+> >>      void (*class_base_init)(ObjectClass *klass, void *data);
+> >> @@ -114,6 +115,7 @@ static TypeImpl *type_new(const TypeInfo *info)
+> >>  
+> >>      ti->class_size = info->class_size;
+> >>      ti->instance_size = info->instance_size;
+> >> +    ti->instance_align = info->instance_align;
+> >>  
+> >>      ti->class_init = info->class_init;
+> >>      ti->class_base_init = info->class_base_init;
+> >> @@ -691,13 +693,21 @@ static void object_finalize(void *data)
+> >>  static Object *object_new_with_type(Type type)
+> >>  {
+> >>      Object *obj;
+> >> +    size_t size, align;
+> >>  
+> >>      g_assert(type != NULL);
+> >>      type_initialize(type);
+> >>  
+> >> -    obj = g_malloc(type->instance_size);
+> >> -    object_initialize_with_type(obj, type->instance_size, type);
+> >> -    obj->free = g_free;
+> >> +    size = type->instance_size;
+> >> +    align = type->instance_align;
+> >> +    if (align) {
+> > 
+> > If we check for (align > G_MEM_ALIGN) instead, we will be able to
+> > set instance_align automatically at OBJECT_DEFINE_TYPE*.
+> 
+> I agree a value check would be good here, as well as setting this by default.
+> 
+> As for the value check itself...
+> 
+> I see that G_MEM_ALIGN isn't actually defined in an interesting or even correct
+> way.  E.g. it doesn't take the long double type into account.
+> 
+> The usual mechanism is
+> 
+> struct s {
+>   char pad;
+>   union {
+>     long l;
+>     void *p;
+>     double d;
+>     long double ld;
+>   } u;
+> };
+> 
+> offsetof(s, u)
+> 
+> since all of these types are required to be taken into account by the system
+> malloc.
 
--- =
+Due to the existence of G_MEM_ALIGN, I thought GLib alignment
+guarantees could be weaker than malloc().  I've just learned that
+GLib uses system malloc() since 2.46.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1892604
+> 
+> E.g it doesn't take other host guarantees into account, e.g. i386-linux
+> guarantees 16-byte alignment.  This possibly dubious ABI change was made 20+
+> years ago with the introduction of SSE and is now set in stone.
+> 
+> Glibc has a "malloc-alignment.h" internal header that defaults to
+> 
+>   MIN(2 * sizeof(size_t), __alignof__(long double))
+> 
+> and is overridden for i386.  Sadly, it doesn't export MALLOC_ALIGNMENT.
+> 
+> Musl has two different malloc implementations.  One has UNIT = 16; the other
+> has SIZE_ALIGN = 4*sizeof(size_t).  Both have a minimum value of 16, and this
+> is not target-specific.
+> 
+> Any further comments on the subject, or should I put together something that
+> computes the MAX of the above?
 
-Title:
-  qemu-system-arm: ../hw/usb/hcd-dwc2.c:666: dwc2_glbreg_read: Assertion
-  `addr <=3D GINTSTS2' failed.
+Once we move to C11, we can just use max_align_t.
 
-Status in QEMU:
-  New
+While we don't move to C11, why not just use
+  __alignof__(union { long l; void *p; double d; long double ld;})
+?
 
-Bug description:
-  When trying to run the 2016-05-27 Raspbian image on the emulated
-  raspi2 platform, the system boots but shortly after the login prompt
-  QEMU (master; commit ID ca489cd037e4d50dc6c40570a167504ad7e5a521) dies
-  with:
+-- 
+Eduardo
 
-  qemu-system-arm: ../hw/usb/hcd-dwc2.c:666: dwc2_glbreg_read: Assertion
-  `addr <=3D GINTSTS2' failed.
-
-  Steps to reproduce:
-
-  1. Get the image: wget
-  http://downloads.raspberrypi.org/raspbian/images/raspbian-2016-05-31/2016=
--05-27
-  -raspbian-jessie.zip
-
-  2. Extract the kernel image and DTB:
-
-  sudo losetup -f --show -P 2016-05-27-raspbian-jessie.img
-  sudo mkdir /mnt/rpi
-  sudo mount /dev/loop11p1 /mnt/rpi/
-  cp /mnt/rpi/kernel7.img .                                                =
-                                                                           =
-                                                                           =
-                                                                   =
-
-  cp /mnt/rpi/bcm2709-rpi-2-b.dtb .                                        =
-                                                                           =
-                                                                           =
-                                                                   =
-
-  sudo umount /mnt/rpi =
-
-  sudo losetup -d /dev/loop11 =
-
-
-  3. Run QEMU:
-  qemu-system-arm -M raspi2 -m 1G -dtb bcm2709-rpi-2-b.dtb -kernel kernel7.=
-img -append "rw earlyprintk loglevel=3D8 console=3DttyAMA0,115200 dwc_otg.l=
-pm_enable=3D0 root=3D/dev/mmcblk0p2" -sd 2016-05-27-raspbian-jessie.img -sm=
-p 4 -serial stdio -display none
-
-  A few seconds after the login prompt is displayed, QEMU will exit with
-  the assertion failure.
-
-  I also tried changing all of the asserts to if statements that (for
-  MMIO reads) returned 0 and (for writes) just returned, but this
-  resulted in a non-responsive system.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1892604/+subscriptions
 
