@@ -2,79 +2,83 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06027C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:33:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0E01C43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:34:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 944F7208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:33:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 59D0A208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:34:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e7B8uy0d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 944F7208E4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nLrw10xa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59D0A208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIEpI-0008Qs-Or
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 13:33:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44268)
+	id 1kIEqE-00011S-Aw
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 13:34:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44460)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kIEWz-0008Og-2q; Tue, 15 Sep 2020 13:14:13 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:36946)
+ id 1kIEXL-0000V1-LM; Tue, 15 Sep 2020 13:14:35 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:38982)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kIEVj-0002cK-QC; Tue, 15 Sep 2020 13:12:57 -0400
-Received: by mail-pg1-x541.google.com with SMTP id z17so2332586pgc.4;
- Tue, 15 Sep 2020 10:12:55 -0700 (PDT)
+ id 1kIEXG-0002ox-25; Tue, 15 Sep 2020 13:14:35 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id v14so118041pjd.4;
+ Tue, 15 Sep 2020 10:14:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=uq19f9xUw48l5aXNxxsd8+DiZHX2ja2v+vKEiZxAu2E=;
- b=e7B8uy0dw+crxqUF38VkbKKY9MA1ud690/+tOccJTABxcq6dmNOLjiDhod8nAT4IJ+
- JXsRX7ePWaQJFe5qAg00nCdEvFQqTscHhSDDJ4werhFjhAmXTZfbnllXHL2vB/AfsjKr
- Xxr4XZ1zAJx3jMekBumjRZG+OzX5qc+eArJL/wfvtwtuw2J3J2zhZPScidi+2QRwKoBB
- DdGGgvCG1WTHmGdUERWDlFHgCI1+dSlIIlOdIeDLFHxMi3lWKlL7f2LVumJIIILPiVx9
- IHK2v4PGwEwGuVqGrDd0FrFtSEanPmuV3nvUbmYVPVLYieSl0Jd+FRcZTsGlMcICpX/6
- 6HyA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ISfeCpjoQz41XYkDVzSwja5AQEtv40E6VBUlsI12dS8=;
+ b=nLrw10xaWy9aDQN10gIc5soSu5ktnEn4bsfPQ4qCecFA3RpXGhS0TOJOwzMtmf3+HS
+ UOgB7ukxVCSqyXtSLjbK0lSVWcRodequVDq5rVG+nRHMQv+D02sAsMYA1aZNTYgXk2TG
+ KLTs67FpWQo595nktD8xmjqGOM4l4u1YzAqEthWmqopoxF41U5aSTdujIitEoF8sIhbG
+ XH8JgD+z5+i90FDwA2uidoVJbdIsoN8CH3KrOY07wksLMt3nTduLrGUztjuJ7q/q4Joi
+ jFf6GKwqgCHABuT8B9L2pHiyAfmvYM6ZvtUkkd45Sydfo0ZpvbbSkowHMeYYHtgiAeGx
+ Nt+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=uq19f9xUw48l5aXNxxsd8+DiZHX2ja2v+vKEiZxAu2E=;
- b=Xh/2spXJktU/mfGnn6qx0vK8ZI5H3NPDiyQAYUAj8D6pZzE1zGKgTnmXNR1YGD/3wX
- MmVItF+umI+cBCBNf7CDQgPx+xwnOjhE8TEMVX9aL8O+Hhrha5h6f2K78MJsRENB5GL0
- XtQF+lOlup6xv7j+mTzY9Tb+5JVsKNkUhA+c7TMUNZobq/zxEkqdDJ0/yIVqMky0ByxP
- y/nfxzAAMKAA+a8q7Pgjmh6haMbB8o1NMMz5l/4u7NcWT8KSStkL6i4Fu1IzgDn/kiBI
- vt+rjcGyJRJ4NC1qZTPHBlyeOqaO0jy3uBpHwOK7DNCCMEYnuQmS69o6Nvv1G7a3880t
- dyvg==
-X-Gm-Message-State: AOAM532KryW7aopx9uTzt7A/iXQs19ZsCEq1id+l3m/xJevB9wLi5pZu
- fQPRD3qtgSwhMTxi7Xu50h+pQAvuhjM5uVg2p98=
-X-Google-Smtp-Source: ABdhPJx9H5cSUYhwOKMTdt1zNwd08euPKS2Fsvbr9Fm9cPPguJN6XVUgZQckLkfkA4vo7xUWvDKmOQ==
-X-Received: by 2002:a65:6412:: with SMTP id a18mr15737240pgv.215.1600189973055; 
- Tue, 15 Sep 2020 10:12:53 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ISfeCpjoQz41XYkDVzSwja5AQEtv40E6VBUlsI12dS8=;
+ b=Zb1Cn1ddv+10OF8xh8exFL08OUj9p3qor9TuHdBcS3sya0fRKmjGHXK8TrdgKw0XAF
+ P8ko3JVwzbNvUcQ234ZLYRgm5liRoJlDOJFUZmSdWhLAUklqwrvenGbKrnSR16OSQmj6
+ 2FdbXwE2qjl77XTKoZFJgRVSibhFfNmhA2sSghNLbUjEWI1M/I/FzS6j5qLaWSAFH/gg
+ 2Naum2TSEUMP+JEjTe9XRywPS6W4LuyULeLHQzCHecQM/GlDMQj9sQFbW2c70w/gmfhk
+ T6kVIdRVEQ/0meH6RgXrJ4Uh5tdUJp2Z3WlqChGOzlHerjbFrQPWJ+eBNhXEMO6trmZz
+ 9vAw==
+X-Gm-Message-State: AOAM531r66yTXpWbLjjQFbxTqGnGpKMcd/hTJgZTy735mfDV6JuibXcX
+ 67ZgXns99mH/XH6xgXw41s+6iHeRkepP/6GIJ0A=
+X-Google-Smtp-Source: ABdhPJxh9aFKnxyu9itFoD/F+X7J59o+rlYXjZ4OpcSekFovPAnrR9x5REgZRor0TrmHpKWDBp0usA==
+X-Received: by 2002:a17:902:fe84:b029:d1:e598:3ff6 with SMTP id
+ x4-20020a170902fe84b02900d1e5983ff6mr2768151plm.48.1600190067267; 
+ Tue, 15 Sep 2020 10:14:27 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id j14sm124046pjz.21.2020.09.15.10.12.48
+ by smtp.googlemail.com with ESMTPSA id j14sm124046pjz.21.2020.09.15.10.14.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Sep 2020 10:12:52 -0700 (PDT)
+ Tue, 15 Sep 2020 10:14:26 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 00/26] W32, W64 msys2/mingw patches
-Date: Wed, 16 Sep 2020 01:12:08 +0800
-Message-Id: <20200915171234.236-1-luoyonggang@gmail.com>
+Subject: [PATCH v10 21/26] tests: Fixes test-qdev-global-props.c
+Date: Wed, 16 Sep 2020 01:12:29 +0800
+Message-Id: <20200915171234.236-22-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
+In-Reply-To: <20200915171234.236-1-luoyonggang@gmail.com>
+References: <20200915171234.236-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x541.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1043.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -96,9 +100,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
- Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>,
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Ed Maste <emaste@freebsd.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
  Richard Henderson <richard.henderson@linaro.org>,
  Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
  Yonggang Luo <luoyonggang@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
@@ -108,140 +114,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-V9-V10=0D
-* gcrypt: test_tls_psk_init should write binary file instead text file.=0D
-  Split #include <glib/gstdio.h> out, that line not belong this patch=0D
-=0D
-* tests: Enable crypto tests under msys2/mingw=0D
-  move qemu_socketpair into oslib-win32.c and rename to socketpair=0D
-  move qemu_link into osdep.c=0D
-  Fixes code style warning=0D
-=0D
-* tests: Fixes test-io-channel-file by mask only owner file state mask bits=
-=0D
-  Update comment place=0D
-=0D
-* ci: Enable msys2 ci in cirrus=0D
-  Fixes misleading error message=0D
-=0D
-Fixes all checkpatch error messages=0D
-=0D
-V8-V9=0D
-=0D
-* ci: Enable msys2 ci in cirrus=0D
-  do not install libnfs, libcapstone and jemalloc=0D
-  ident lines properly=0D
-  Do not install libnfs when the add the msys2 ci,=0D
-=0D
-* Revert "configure: add --ninja option"=0D
-  Skip this revision=0D
-=0D
-* block: Fixes nfs compiling error on msys2/mingw=0D
-  Use typedef long long blkcnt_t; for libnfs on msys2/mingw=0D
-  for futher implemenation, still disable nfs_get_allocated_file_size=0D
-  on win32 as it not working yet, but preserve the possibility implemenatio=
-n=0D
-  it in futher=0D
-=0D
-* gcrypt: test_tls_psk_init should write binary file instead text file.=0D
-  only fixes the file open mode parameter=0D
-=0D
-* osdep: file locking functions are not available on Win32:=0D
-  Reword with "Do not declare the following locking functions on Win32:"=0D
-=0D
-* meson: Use -b to ignore CR vs. CR-LF issues on Windows=0D
-  Reword of commit message=0D
-=0D
-* tests: Enable crypto tests under msys2/mingw=0D
-  Reimplement qemu_socketpair in a simpler way. without thirdparty code=0D
-=0D
-* block: enable libnfs on msys2/mingw in cirrus.yml=0D
-  New commit=0D
-=0D
-* tests: disable /char/stdio/* tests in test-char.c on win32=0D
-  Needs review=0D
-=0D
-* tests: fixes aio-win32 about aio_remove_fd_handler, get it consistence wi=
-th=3D=0D
- aio-posix.c=0D
-  Needs review=0D
-=0D
-* rcu: fixes test-logging.c by call drain_call_rcu before rmdir_full=0D
-  Needs review=0D
-=0D
-It first introduce msys2 CI on cirrus by fixes nfs, capstone, curses and=0D
-disable partial test-char tests.=0D
-And then fixes all unit tests failure on msys2/mingw=0D
-This fixes the reviews suggested in the mailling list=0D
-All cirrus CI are passed=0D
-=0D
-Maxim Levitsky (1):=0D
-  rcu: Implement drain_call_rcu=0D
-=0D
-Yonggang Luo (25):=0D
-  ci: fixes msys2 build by upgrading capstone to 4.0.2=0D
-  configure: Fixes ncursesw detection under msys2/mingw and enable=0D
-    curses=0D
-  win32: Simplify gmtime_r detection direct base on=0D
-    _POSIX_THREAD_SAFE_FUNCTIONS.=0D
-  curses: Fixes curses compiling errors.=0D
-  tests: disable /char/stdio/* tests in test-char.c on win32=0D
-  tests: Fixes test-replication.c on msys2/mingw.=0D
-  tests: test-replication disable /replication/secondary/* on=0D
-    msys2/mingw.=0D
-  osdep: file locking functions are not available on Win32=0D
-  meson: Use -b to ignore CR vs. CR-LF issues on Windows=0D
-  gcrypt: test_tls_psk_init should write binary file instead text file.=0D
-  tests: Enable crypto tests under msys2/mingw=0D
-  meson: remove empty else and duplicated gio deps=0D
-  vmstate: Fixes test-vmstate.c on msys2/mingw=0D
-  cirrus: Building freebsd in a single short=0D
-  tests: Convert g_free to g_autofree macro in test-logging.c=0D
-  tests: Fixes test-io-channel-socket.c tests under msys2/mingw=0D
-  tests: fixes aio-win32 about aio_remove_fd_handler, get it consistence=0D
-    with aio-posix.c=0D
-  tests: Fixes test-io-channel-file by mask only owner file state mask=0D
-    bits=0D
-  tests: fix test-util-sockets.c=0D
-  tests: Fixes test-qdev-global-props.c=0D
-  rcu: fixes test-logging.c by call drain_call_rcu before rmdir_full=0D
-  meson: upgrade meson for execute custom ninjatool under msys2 properly=0D
-  ci: Enable msys2 ci in cirrus=0D
-  block: Fixes nfs compiling error on msys2/mingw=0D
-  block: enable libnfs on msys2/mingw in cirrus.yml=0D
-=0D
- .cirrus.yml                      | 97 +++++++++++++++++++++++---------=0D
- block/nfs.c                      | 37 +++++++++---=0D
- capstone                         |  2 +-=0D
- configure                        | 61 ++++++--------------=0D
- include/qemu/osdep.h             |  3 +-=0D
- include/qemu/rcu.h               |  1 +=0D
- include/sysemu/os-win32.h        |  9 ++-=0D
- meson                            |  2 +-=0D
- meson.build                      |  6 --=0D
- tests/crypto-tls-psk-helpers.c   |  6 +-=0D
- tests/crypto-tls-x509-helpers.c  |  6 +-=0D
- tests/crypto-tls-x509-helpers.h  |  5 +-=0D
- tests/qapi-schema/meson.build    |  2 +-=0D
- tests/test-char.c                | 27 +++++----=0D
- tests/test-crypto-tlscredsx509.c | 47 ++++++++--------=0D
- tests/test-crypto-tlssession.c   | 64 ++++++++++++---------=0D
- tests/test-io-channel-file.c     | 12 +++-=0D
- tests/test-io-channel-socket.c   |  2 +=0D
- tests/test-io-channel-tls.c      | 49 +++++++++-------=0D
- tests/test-logging.c             |  6 +-=0D
- tests/test-qdev-global-props.c   |  9 ++-=0D
- tests/test-replication.c         | 22 ++++++--=0D
- tests/test-util-sockets.c        |  6 +-=0D
- tests/test-vmstate.c             |  3 +-=0D
- ui/curses.c                      | 14 ++---=0D
- util/aio-win32.c                 | 12 +++-=0D
- util/osdep.c                     | 16 ++++++=0D
- util/oslib-win32.c               | 78 ++++++++++++++++++++++++-=0D
- util/rcu.c                       | 55 ++++++++++++++++++=0D
- 29 files changed, 459 insertions(+), 200 deletions(-)=0D
-=0D
---=3D20=0D
-2.28.0.windows.1=0D
-=0D
+On win32 the line ending are \r\n, so we skip the \n in function test_dynamic_globalprop
+
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ tests/test-qdev-global-props.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/tests/test-qdev-global-props.c b/tests/test-qdev-global-props.c
+index 8a3c14d92c..c8862cac5f 100644
+--- a/tests/test-qdev-global-props.c
++++ b/tests/test-qdev-global-props.c
+@@ -251,10 +251,13 @@ static void test_dynamic_globalprop(void)
+     g_test_trap_assert_passed();
+     g_test_trap_assert_stderr_unmatched("*prop1*");
+     g_test_trap_assert_stderr_unmatched("*prop2*");
+-    g_test_trap_assert_stderr("*warning: global dynamic-prop-type-bad.prop3 has invalid class name\n*");
++    g_test_trap_assert_stderr(
++        "*warning: global dynamic-prop-type-bad.prop3 has invalid class name*");
+     g_test_trap_assert_stderr_unmatched("*prop4*");
+-    g_test_trap_assert_stderr("*warning: global nohotplug-type.prop5=105 not used\n*");
+-    g_test_trap_assert_stderr("*warning: global nondevice-type.prop6 has invalid class name\n*");
++    g_test_trap_assert_stderr(
++        "*warning: global nohotplug-type.prop5=105 not used*");
++    g_test_trap_assert_stderr(
++        "*warning: global nondevice-type.prop6 has invalid class name*");
+     g_test_trap_assert_stdout("");
+ }
+ 
+-- 
+2.28.0.windows.1
+
 
