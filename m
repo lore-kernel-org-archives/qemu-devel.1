@@ -2,72 +2,91 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D5A0C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:05:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E977BC43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:07:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 557EF20639
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:05:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 557EF20639
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 67AB720684
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:07:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LlexGVik"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67AB720684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIAee-0005Ka-VQ
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 09:05:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60604)
+	id 1kIAgA-0007XZ-Ez
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 09:07:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57930)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kIAau-0000wG-2s; Tue, 15 Sep 2020 09:02:03 -0400
-Resent-Date: Tue, 15 Sep 2020 09:02:00 -0400
-Resent-Message-Id: <E1kIAau-0000wG-2s@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21787)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kIAal-0006F9-0q; Tue, 15 Sep 2020 09:01:59 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1600174860; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=AkaWVXdda2UbzfuZ5wYPsbuuhFcqDynSo30/m7GEqdwYqtSajpXC0WUUy+8t6aYrJVhLrKWMe/lMmlKwO/LFioIdVBxp3Ps0t1h53CB1Nink16mjb1LfG2WX3PwaUglb3nPaE4qWuspwI/HUUHDNaKXKHbKkswtGj3wic8Nu7OA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1600174860;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=XNp5BKi0J0hoFytLxodKDxSfs+NhTCSSZK8GFbOcYiU=; 
- b=Xh13hi9K6l+VWsaETsfFTLNAewDOKcO+HupVrPHCVa8Kzd+AYsQ/rMKDSK8EIbtwgdz6BIHiJPAzb5xeREj0L5OHeMPquFYsU1woAo2+oFQnoaOMMNZd+dJqT07LO9RnuzjgNS9LMXsuI+OEPseFapjhf2g1sLsJriZEu9ihTMg=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 160017485686549.48925595732294;
- Tue, 15 Sep 2020 06:00:56 -0700 (PDT)
-Subject: Re: [PATCH v9 00/26] W32, W64 msys2/mingw patches
-Message-ID: <160017485411.8478.7836863018207276822@66eaa9a8a123>
-In-Reply-To: <20200915121318.247-1-luoyonggang@gmail.com>
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kIAUP-0001YP-EH
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:55:17 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54754
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kIAUL-0004yl-JS
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:55:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600174511;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=XenKRFXMCMemmYBxy6DJC7TEKcFssMfYO5ijTrmNJog=;
+ b=LlexGVik8i7OgAMJycjUf88CsQON2R1sRSG9VKRlAfvAgUBq7z1+Y+NuiALt0ehl3xoB51
+ 6sVjWVoK6YoasBHnQWmkiEgEmUW+4+8r23yOMyEsOUHrQavsLm0KaoQRw8PvwI0xTS25G8
+ 0gWN1guy/+uzIpFrH0iC7S03TRkagzk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-424-Lo4ZbOusNe23YtSRZUQmLw-1; Tue, 15 Sep 2020 08:55:07 -0400
+X-MC-Unique: Lo4ZbOusNe23YtSRZUQmLw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A479D425CD;
+ Tue, 15 Sep 2020 12:55:05 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-174.ams2.redhat.com [10.36.112.174])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0C4CD5DC17;
+ Tue, 15 Sep 2020 12:54:56 +0000 (UTC)
+Subject: Re: [PATCH v2 2/3] s390x/pci: Honor DMA limits set by vfio
+To: Matthew Rosato <mjrosato@linux.ibm.com>, alex.williamson@redhat.com,
+ cohuck@redhat.com
+References: <1600122570-12941-1-git-send-email-mjrosato@linux.ibm.com>
+ <1600122570-12941-3-git-send-email-mjrosato@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6d835b47-5935-8eb7-f0f7-d81f0cec4028@redhat.com>
+Date: Tue, 15 Sep 2020 14:54:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: luoyonggang@gmail.com
-Date: Tue, 15 Sep 2020 06:00:56 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 09:01:46
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <1600122570-12941-3-git-send-email-mjrosato@linux.ibm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 03:21:13
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,203 +99,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, emaste@freebsd.org, qemu-block@nongnu.org, sw@weilnetz.de,
- xiechanglong.d@gmail.com, pl@kamp.de, qemu-devel@nongnu.org,
- mdroth@linux.vnet.ibm.com, luoyonggang@gmail.com, richard.henderson@linaro.org,
- kraxel@redhat.com, wencongyang2@huawei.com, pbonzini@redhat.com,
- mreitz@redhat.com, lwhsu@freebsd.org, armbru@redhat.com
+Cc: pmorel@linux.ibm.com, schnelle@linux.ibm.com, david@redhat.com,
+ qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ qemu-s390x@nongnu.org, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkxNTEyMTMxOC4yNDct
-MS1sdW95b25nZ2FuZ0BnbWFpbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
-ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
-bmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMDkxNTEyMTMxOC4yNDct
-MS1sdW95b25nZ2FuZ0BnbWFpbC5jb20KU3ViamVjdDogW1BBVENIIHY5IDAwLzI2XSBXMzIsIFc2
-NCBtc3lzMi9taW5ndyBwYXRjaGVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
-YXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
-IFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3Njcmlw
-dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0
-YWddICAgICAgICAgcGF0Y2hldy8yMDIwMDkxNTEyMTMxOC4yNDctMS1sdW95b25nZ2FuZ0BnbWFp
-bC5jb20gLT4gcGF0Y2hldy8yMDIwMDkxNTEyMTMxOC4yNDctMS1sdW95b25nZ2FuZ0BnbWFpbC5j
-b20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwowYjExM2M2IGJsb2NrOiBlbmFibGUg
-bGlibmZzIG9uIG1zeXMyL21pbmd3IGluIGNpcnJ1cy55bWwKOTQ4Yzc4YyBibG9jazogRml4ZXMg
-bmZzIGNvbXBpbGluZyBlcnJvciBvbiBtc3lzMi9taW5ndwowODNjZTMyIGNpOiBFbmFibGUgbXN5
-czIgY2kgaW4gY2lycnVzCmJjNjkyNzggbWVzb246IHVwZ3JhZGUgbWVzb24gZm9yIGV4ZWN1dGUg
-Y3VzdG9tIG5pbmphdG9vbCB1bmRlciBtc3lzMiBwcm9wZXJseQpmZWY4YTBjIHJjdTogZml4ZXMg
-dGVzdC1sb2dnaW5nLmMgYnkgY2FsbCBkcmFpbl9jYWxsX3JjdSBiZWZvcmUgcm1kaXJfZnVsbAo1
-OGYyZTc4IHRlc3RzOiBGaXhlcyB0ZXN0LXFkZXYtZ2xvYmFsLXByb3BzLmMKNGExN2E1NyB0ZXN0
-czogZml4IHRlc3QtdXRpbC1zb2NrZXRzLmMKNmQyYjkyNiB0ZXN0czogRml4ZXMgdGVzdC1pby1j
-aGFubmVsLWZpbGUgYnkgbWFzayBvbmx5IG93bmVyIGZpbGUgc3RhdGUgbWFzayBiaXRzCmUxNzAz
-MDEgdGVzdHM6IGZpeGVzIGFpby13aW4zMiBhYm91dCBhaW9fcmVtb3ZlX2ZkX2hhbmRsZXIsIGdl
-dCBpdCBjb25zaXN0ZW5jZSB3aXRoIGFpby1wb3NpeC5jCjk1ZDI1NzkgdGVzdHM6IEZpeGVzIHRl
-c3QtaW8tY2hhbm5lbC1zb2NrZXQuYyB0ZXN0cyB1bmRlciBtc3lzMi9taW5ndwo3ZTI3ZjI3IHRl
-c3RzOiBDb252ZXJ0IGdfZnJlZSB0byBnX2F1dG9mcmVlIG1hY3JvIGluIHRlc3QtbG9nZ2luZy5j
-CjA3YmRkZWMgY2lycnVzOiBCdWlsZGluZyBmcmVlYnNkIGluIGEgc2luZ2xlIHNob3J0CmFlNjFl
-YmQgdm1zdGF0ZTogRml4ZXMgdGVzdC12bXN0YXRlLmMgb24gbXN5czIvbWluZ3cKNzg3ZWViNCBt
-ZXNvbjogcmVtb3ZlIGVtcHR5IGVsc2UgYW5kIGR1cGxpY2F0ZWQgZ2lvIGRlcHMKYWQyOWI0MiB0
-ZXN0czogRW5hYmxlIGNyeXB0byB0ZXN0cyB1bmRlciBtc3lzMi9taW5ndwplYjk3MDY0IGdjcnlw
-dDogdGVzdF90bHNfcHNrX2luaXQgc2hvdWxkIHdyaXRlIGJpbmFyeSBmaWxlIGluc3RlYWQgdGV4
-dCBmaWxlLgo3ZWJmYWM2IG1lc29uOiBVc2UgLWIgdG8gaWdub3JlIENSIHZzLiBDUi1MRiBpc3N1
-ZXMgb24gV2luZG93cwo2YzYxNjZjIG9zZGVwOiBmaWxlIGxvY2tpbmcgZnVuY3Rpb25zIGFyZSBu
-b3QgYXZhaWxhYmxlIG9uIFdpbjMyCjVhZTU0OGEgdGVzdHM6IHRlc3QtcmVwbGljYXRpb24gZGlz
-YWJsZSAvcmVwbGljYXRpb24vc2Vjb25kYXJ5Lyogb24gbXN5czIvbWluZ3cuCjc0YTY1ODkgdGVz
-dHM6IEZpeGVzIHRlc3QtcmVwbGljYXRpb24uYyBvbiBtc3lzMi9taW5ndy4KNGEwNmNlNyB0ZXN0
-czogZGlzYWJsZSAvY2hhci9zdGRpby8qIHRlc3RzIGluIHRlc3QtY2hhci5jIG9uIHdpbjMyCjFj
-MWZiNTMgY3Vyc2VzOiBGaXhlcyBjdXJzZXMgY29tcGlsaW5nIGVycm9ycy4KYmJmZTk2NiB3aW4z
-MjogU2ltcGxpZnkgZ210aW1lX3IgZGV0ZWN0aW9uIGRpcmVjdCBiYXNlIG9uIF9QT1NJWF9USFJF
-QURfU0FGRV9GVU5DVElPTlMuCjU4OGMyZjYgY29uZmlndXJlOiBGaXhlcyBuY3Vyc2VzdyBkZXRl
-Y3Rpb24gdW5kZXIgbXN5czIvbWluZ3cgYW5kIGVuYWJsZSBjdXJzZXMKNDRlZDQ4NSBjaTogZml4
-ZXMgbXN5czIgYnVpbGQgYnkgdXBncmFkaW5nIGNhcHN0b25lIHRvIDQuMC4yCjJmMjViYWYgcmN1
-OiBJbXBsZW1lbnQgZHJhaW5fY2FsbF9yY3UKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMjYgQ2hl
-Y2tpbmcgY29tbWl0IDJmMjViYWYzNTQxMyAocmN1OiBJbXBsZW1lbnQgZHJhaW5fY2FsbF9yY3Up
-CjIvMjYgQ2hlY2tpbmcgY29tbWl0IDQ0ZWQ0ODU2ZTFlZiAoY2k6IGZpeGVzIG1zeXMyIGJ1aWxk
-IGJ5IHVwZ3JhZGluZyBjYXBzdG9uZSB0byA0LjAuMikKMy8yNiBDaGVja2luZyBjb21taXQgNTg4
-YzJmNmMxODI3IChjb25maWd1cmU6IEZpeGVzIG5jdXJzZXN3IGRldGVjdGlvbiB1bmRlciBtc3lz
-Mi9taW5ndyBhbmQgZW5hYmxlIGN1cnNlcykKNC8yNiBDaGVja2luZyBjb21taXQgYmJmZTk2NmI0
-NzJmICh3aW4zMjogU2ltcGxpZnkgZ210aW1lX3IgZGV0ZWN0aW9uIGRpcmVjdCBiYXNlIG9uIF9Q
-T1NJWF9USFJFQURfU0FGRV9GVU5DVElPTlMuKQo1LzI2IENoZWNraW5nIGNvbW1pdCAxYzFmYjUz
-NjY3MzMgKGN1cnNlczogRml4ZXMgY3Vyc2VzIGNvbXBpbGluZyBlcnJvcnMuKQo2LzI2IENoZWNr
-aW5nIGNvbW1pdCA0YTA2Y2U3NzJjODIgKHRlc3RzOiBkaXNhYmxlIC9jaGFyL3N0ZGlvLyogdGVz
-dHMgaW4gdGVzdC1jaGFyLmMgb24gd2luMzIpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
-ZXJzCiM2MDogRklMRTogdGVzdHMvdGVzdC1jaGFyLmM6MTQ3NDoKKyAgICAgICAgZ190ZXN0X2Fk
-ZF9mdW5jKCIvY2hhci9jb25zb2xlL3N1YnByb2Nlc3MiLCBjaGFyX2NvbnNvbGVfdGVzdF9zdWJw
-cm9jZXNzKTsKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNTYgbGluZXMgY2hlY2tlZAoK
-UGF0Y2ggNi8yNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo3LzI2IENoZWNraW5nIGNvbW1p
-dCA3NGE2NTg5YTM0ZTAgKHRlc3RzOiBGaXhlcyB0ZXN0LXJlcGxpY2F0aW9uLmMgb24gbXN5czIv
-bWluZ3cuKQo4LzI2IENoZWNraW5nIGNvbW1pdCA1YWU1NDhhYzJmZjkgKHRlc3RzOiB0ZXN0LXJl
-cGxpY2F0aW9uIGRpc2FibGUgL3JlcGxpY2F0aW9uL3NlY29uZGFyeS8qIG9uIG1zeXMyL21pbmd3
-LikKOS8yNiBDaGVja2luZyBjb21taXQgNmM2MTY2YzUwMTM4IChvc2RlcDogZmlsZSBsb2NraW5n
-IGZ1bmN0aW9ucyBhcmUgbm90IGF2YWlsYWJsZSBvbiBXaW4zMikKMTAvMjYgQ2hlY2tpbmcgY29t
-bWl0IDdlYmZhYzY2MTVlMCAobWVzb246IFVzZSAtYiB0byBpZ25vcmUgQ1IgdnMuIENSLUxGIGlz
-c3VlcyBvbiBXaW5kb3dzKQoxMS8yNiBDaGVja2luZyBjb21taXQgZWI5NzA2NGFiYzAwIChnY3J5
-cHQ6IHRlc3RfdGxzX3Bza19pbml0IHNob3VsZCB3cml0ZSBiaW5hcnkgZmlsZSBpbnN0ZWFkIHRl
-eHQgZmlsZS4pCjEyLzI2IENoZWNraW5nIGNvbW1pdCBhZDI5YjQyNTNhYzIgKHRlc3RzOiBFbmFi
-bGUgY3J5cHRvIHRlc3RzIHVuZGVyIG1zeXMyL21pbmd3KQpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
-Y2hhcmFjdGVycwojNzc6IEZJTEU6IHRlc3RzL2NyeXB0by10bHMteDUwOS1oZWxwZXJzLmM6NTE0
-OgorICAgIGdfYXV0b2ZyZWUgZ2NoYXIgKmZ1bGxfcGF0aCA9IGdfYnVpbGRfZmlsZW5hbWUoY3Vy
-cmVudF9kaXIsIGV4aXN0X3BhdGgxLCBOVUxMKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
-YWN0ZXJzCiM3OTogRklMRTogdGVzdHMvY3J5cHRvLXRscy14NTA5LWhlbHBlcnMuYzo1MTY6Cisg
-ICAgICAgIG5ld19wYXRoMiwgZnVsbF9wYXRoLCAwIHwgU1lNQk9MSUNfTElOS19GTEFHX0FMTE9X
-X1VOUFJJVklMRUdFRF9DUkVBVEUpID8gMCA6IC0xOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNo
-YXJhY3RlcnMKIzEwODogRklMRTogdGVzdHMvY3J5cHRvLXRscy14NTA5LWhlbHBlcnMuYzo1NDU6
-CisgICAgc29ja19saXN0ZW5lciA9IHNvY2tldChhZGRyLT5haV9mYW1pbHksIGFkZHItPmFpX3Nv
-Y2t0eXBlLCBhZGRyLT5haV9wcm90b2NvbCk7CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3Rl
-cnMKIzExMzogRklMRTogdGVzdHMvY3J5cHRvLXRscy14NTA5LWhlbHBlcnMuYzo1NTA6CisgICAg
-aWYgKC0xID09IHNldHNvY2tvcHQoc29ja19saXN0ZW5lciwgU09MX1NPQ0tFVCwgU09fUkVVU0VB
-RERSLCAoY29uc3QgY2hhciAqKSZvbmUsIHNpemVvZihvbmUpKSkgewoKV0FSTklORzogbGluZSBv
-dmVyIDgwIGNoYXJhY3RlcnMKIzExOTogRklMRTogdGVzdHMvY3J5cHRvLXRscy14NTA5LWhlbHBl
-cnMuYzo1NTY6CisgICAgaWYgKC0xID09IGdldHNvY2tuYW1lKHNvY2tfbGlzdGVuZXIsIGFkZHIt
-PmFpX2FkZHIsIChpbnQgKikmKGFkZHItPmFpX2FkZHJsZW4pKSkgewoKRVJST1I6IHNwYWNlIHBy
-b2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwoj
-MjIzOiBGSUxFOiB0ZXN0cy90ZXN0LWNyeXB0by10bHNjcmVkc3g1MDkuYzo4NToKKyAgICBnX3Jl
-bW92ZSAoQ0VSVF9ESVIgUUNSWVBUT19UTFNfQ1JFRFNfWDUwOV9DQV9DRVJUKTsKCkVSUk9SOiBz
-cGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNp
-cyAnKCcKIzIyNzogRklMRTogdGVzdHMvdGVzdC1jcnlwdG8tdGxzY3JlZHN4NTA5LmM6ODc6Cisg
-ICAgICAgIGdfcmVtb3ZlIChDRVJUX0RJUiBRQ1JZUFRPX1RMU19DUkVEU19YNTA5X1NFUlZFUl9D
-RVJUKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQg
-b3BlbiBwYXJlbnRoZXNpcyAnKCcKIzIyODogRklMRTogdGVzdHMvdGVzdC1jcnlwdG8tdGxzY3Jl
-ZHN4NTA5LmM6ODg6CisgICAgICAgIGdfcmVtb3ZlIChDRVJUX0RJUiBRQ1JZUFRPX1RMU19DUkVE
-U19YNTA5X1NFUlZFUl9LRVkpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5j
-dGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMjMyOiBGSUxFOiB0ZXN0cy90ZXN0
-LWNyeXB0by10bHNjcmVkc3g1MDkuYzo5MDoKKyAgICAgICAgZ19yZW1vdmUgKENFUlRfRElSIFFD
-UllQVE9fVExTX0NSRURTX1g1MDlfQ0xJRU5UX0NFUlQpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0
-ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMjMzOiBG
-SUxFOiB0ZXN0cy90ZXN0LWNyeXB0by10bHNjcmVkc3g1MDkuYzo5MToKKyAgICAgICAgZ19yZW1v
-dmUgKENFUlRfRElSIFFDUllQVE9fVExTX0NSRURTX1g1MDlfQ0xJRU5UX0tFWSk7Cgp0b3RhbDog
-NiBlcnJvcnMsIDQgd2FybmluZ3MsIDQ4NCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMi8yNiBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTMvMjYgQ2hlY2tpbmcgY29tbWl0IDc4N2VlYjRlMzc5
-YiAobWVzb246IHJlbW92ZSBlbXB0eSBlbHNlIGFuZCBkdXBsaWNhdGVkIGdpbyBkZXBzKQoxNC8y
-NiBDaGVja2luZyBjb21taXQgYWU2MWViZDViMzk0ICh2bXN0YXRlOiBGaXhlcyB0ZXN0LXZtc3Rh
-dGUuYyBvbiBtc3lzMi9taW5ndykKMTUvMjYgQ2hlY2tpbmcgY29tbWl0IDA3YmRkZWM4MTQyMSAo
-Y2lycnVzOiBCdWlsZGluZyBmcmVlYnNkIGluIGEgc2luZ2xlIHNob3J0KQpFUlJPUjogdHJhaWxp
-bmcgd2hpdGVzcGFjZQojNTA6IEZJTEU6IC5jaXJydXMueW1sOjExOgorICAgIC0gcGtnIGluc3Rh
-bGwgLXkgYmFzaCBjdXJsIGN5cnVzLXNhc2wgZ2l0IGdsaWIgZ21ha2UgZ251dGxzIGdzZWQgJAoK
-dG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0NiBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8y
-NiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTYvMjYgQ2hlY2tpbmcgY29tbWl0IDdlMjdm
-Mjc0ZmY3ZCAodGVzdHM6IENvbnZlcnQgZ19mcmVlIHRvIGdfYXV0b2ZyZWUgbWFjcm8gaW4gdGVz
-dC1sb2dnaW5nLmMpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMzogRklMRTog
-dGVzdHMvdGVzdC1sb2dnaW5nLmM6MTk5OgorICAgIGdfYXV0b2ZyZWUgZ2NoYXIgKnRtcF9wYXRo
-ID0gZ19kaXJfbWFrZV90bXAoInFlbXUtdGVzdC1sb2dnaW5nLlhYWFhYWCIsIE5VTEwpOwoKdG90
-YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNi8yNiBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNy8yNiBDaGVja2luZyBjb21taXQgOTVkMjU3OTZm
-ZTk3ICh0ZXN0czogRml4ZXMgdGVzdC1pby1jaGFubmVsLXNvY2tldC5jIHRlc3RzIHVuZGVyIG1z
-eXMyL21pbmd3KQoxOC8yNiBDaGVja2luZyBjb21taXQgZTE3MDMwMWU3MWQwICh0ZXN0czogZml4
-ZXMgYWlvLXdpbjMyIGFib3V0IGFpb19yZW1vdmVfZmRfaGFuZGxlciwgZ2V0IGl0IGNvbnNpc3Rl
-bmNlIHdpdGggYWlvLXBvc2l4LmMpCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRp
-bmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMyNzogRklMRTogdXRpbC9haW8td2luMzIuYzo0MDoK
-KyAgICAvKiBJZiB0aGUgR1NvdXJjZSBpcyBpbiB0aGUgcHJvY2VzcyBvZiBiZWluZyBkZXN0cm95
-ZWQgdGhlbgoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMyBsaW5lcyBjaGVja2VkCgpQ
-YXRjaCAxOC8yNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxOS8yNiBDaGVja2luZyBjb21t
-aXQgNmQyYjkyNmFmNGMxICh0ZXN0czogRml4ZXMgdGVzdC1pby1jaGFubmVsLWZpbGUgYnkgbWFz
-ayBvbmx5IG93bmVyIGZpbGUgc3RhdGUgbWFzayBiaXRzKQpXQVJOSU5HOiBCbG9jayBjb21tZW50
-cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMzg6IEZJTEU6IHRlc3RzL3Rl
-c3QtaW8tY2hhbm5lbC1maWxlLmM6NjU6CisgICAgLyogT24gV2luZG93cyB0aGUgc3RhdCgpIGZ1
-bmN0aW9uIGluIHRoZSBDIGxpYnJhcnkgY2hlY2tzIG9ubHkKCldBUk5JTkc6IEJsb2NrIGNvbW1l
-bnRzIHVzZSAqIG9uIHN1YnNlcXVlbnQgbGluZXMKIzM5OiBGSUxFOiB0ZXN0cy90ZXN0LWlvLWNo
-YW5uZWwtZmlsZS5jOjY2OgorICAgIC8qIE9uIFdpbmRvd3MgdGhlIHN0YXQoKSBmdW5jdGlvbiBp
-biB0aGUgQyBsaWJyYXJ5IGNoZWNrcyBvbmx5CisgICAgIHRoZSBGQVQtc3R5bGUgUkVBRE9OTFkg
-YXR0cmlidXRlIGFuZCBkb2VzIG5vdCBsb29rIGF0IHRoZSBBQ0wgYXQgYWxsLiAqLwoKV0FSTklO
-RzogQmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiMz
-OTogRklMRTogdGVzdHMvdGVzdC1pby1jaGFubmVsLWZpbGUuYzo2NjoKKyAgICAgdGhlIEZBVC1z
-dHlsZSBSRUFET05MWSBhdHRyaWJ1dGUgYW5kIGRvZXMgbm90IGxvb2sgYXQgdGhlIEFDTCBhdCBh
-bGwuICovCgp0b3RhbDogMCBlcnJvcnMsIDMgd2FybmluZ3MsIDIyIGxpbmVzIGNoZWNrZWQKClBh
-dGNoIDE5LzI2IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjIwLzI2IENoZWNraW5nIGNvbW1p
-dCA0YTE3YTU3OTM1ZjAgKHRlc3RzOiBmaXggdGVzdC11dGlsLXNvY2tldHMuYykKMjEvMjYgQ2hl
-Y2tpbmcgY29tbWl0IDU4ZjJlNzgyYTI4ZSAodGVzdHM6IEZpeGVzIHRlc3QtcWRldi1nbG9iYWwt
-cHJvcHMuYykKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMyMjogRklMRTogdGVzdHMv
-dGVzdC1xZGV2LWdsb2JhbC1wcm9wcy5jOjI1NDoKKyAgICBnX3Rlc3RfdHJhcF9hc3NlcnRfc3Rk
-ZXJyKCIqd2FybmluZzogZ2xvYmFsIGR5bmFtaWMtcHJvcC10eXBlLWJhZC5wcm9wMyBoYXMgaW52
-YWxpZCBjbGFzcyBuYW1lKiIpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI2
-OiBGSUxFOiB0ZXN0cy90ZXN0LXFkZXYtZ2xvYmFsLXByb3BzLmM6MjU2OgorICAgIGdfdGVzdF90
-cmFwX2Fzc2VydF9zdGRlcnIoIip3YXJuaW5nOiBnbG9iYWwgbm9ob3RwbHVnLXR5cGUucHJvcDU9
-MTA1IG5vdCB1c2VkKiIpOwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMyNzogRklM
-RTogdGVzdHMvdGVzdC1xZGV2LWdsb2JhbC1wcm9wcy5jOjI1NzoKKyAgICBnX3Rlc3RfdHJhcF9h
-c3NlcnRfc3RkZXJyKCIqd2FybmluZzogZ2xvYmFsIG5vbmRldmljZS10eXBlLnByb3A2IGhhcyBp
-bnZhbGlkIGNsYXNzIG5hbWUqIik7Cgp0b3RhbDogMiBlcnJvcnMsIDEgd2FybmluZ3MsIDEzIGxp
-bmVzIGNoZWNrZWQKClBhdGNoIDIxLzI2IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyMi8y
-NiBDaGVja2luZyBjb21taXQgZmVmOGEwY2EzMWViIChyY3U6IGZpeGVzIHRlc3QtbG9nZ2luZy5j
-IGJ5IGNhbGwgZHJhaW5fY2FsbF9yY3UgYmVmb3JlIHJtZGlyX2Z1bGwpCjIzLzI2IENoZWNraW5n
-IGNvbW1pdCBiYzY5Mjc4NzgzNjMgKG1lc29uOiB1cGdyYWRlIG1lc29uIGZvciBleGVjdXRlIGN1
-c3RvbSBuaW5qYXRvb2wgdW5kZXIgbXN5czIgcHJvcGVybHkpCjI0LzI2IENoZWNraW5nIGNvbW1p
-dCAwODNjZTMyOTQzZjUgKGNpOiBFbmFibGUgbXN5czIgY2kgaW4gY2lycnVzKQoyNS8yNiBDaGVj
-a2luZyBjb21taXQgOTQ4Yzc4YzNmMzM4IChibG9jazogRml4ZXMgbmZzIGNvbXBpbGluZyBlcnJv
-ciBvbiBtc3lzMi9taW5ndykKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlv
-biBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojNTc6IEZJTEU6IGJsb2NrL25mcy5jOjU2
-OgorI2lmIGRlZmluZWQgKF9XSU4zMikKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
-ODM6IEZJTEU6IGJsb2NrL25mcy5jOjQzMDoKKyAgICAvKiBUT0RPOiBOb3QgYmUgcG9zc2libGUg
-aW1wbGVtZW50IG9uIHdpbjMyIHlldCwgcGxhY2UgaGVyZSBmb3IgZnV0aGVyIGltcGxlbWVudGF0
-aW9uICovCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5k
-IG9wZW4gcGFyZW50aGVzaXMgJygnCiMxMTI6IEZJTEU6IGJsb2NrL25mcy5jOjcyODoKKyNpZiAh
-ZGVmaW5lZCAoX1dJTjMyKQoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlv
-biBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMTU4OiBGSUxFOiBibG9jay9uZnMuYzo4
-OTM6CisjaWYgIWRlZmluZWQgKF9XSU4zMikKCnRvdGFsOiA0IGVycm9ycywgMCB3YXJuaW5ncywg
-MTEwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDI1LzI2IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-CgoyNi8yNiBDaGVja2luZyBjb21taXQgMGIxMTNjNjMyZGFiIChibG9jazogZW5hYmxlIGxpYm5m
-cyBvbiBtc3lzMi9taW5ndyBpbiBjaXJydXMueW1sKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3Qg
-Y29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBh
-dApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDkxNTEyMTMxOC4yNDctMS1sdW95b25nZ2Fu
-Z0BnbWFpbC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 15/09/2020 00.29, Matthew Rosato wrote:
+> When an s390 guest is using lazy unmapping, it can result in a very
+> large number of oustanding DMA requests, far beyond the default
+> limit configured for vfio.  Let's track DMA usage similar to vfio
+> in the host, and trigger the guest to flush their DMA mappings
+> before vfio runs out.
+> 
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>  hw/s390x/s390-pci-bus.c  | 99 +++++++++++++++++++++++++++++++++++++++++++++---
+>  hw/s390x/s390-pci-bus.h  |  9 +++++
+>  hw/s390x/s390-pci-inst.c | 29 +++++++++++---
+>  hw/s390x/s390-pci-inst.h |  3 ++
+>  4 files changed, 129 insertions(+), 11 deletions(-)
+> 
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index 92146a2..23474cd 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -11,6 +11,8 @@
+>   * directory.
+>   */
+>  
+> +#include <sys/ioctl.h>
+> +
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+>  #include "qapi/visitor.h"
+> @@ -24,6 +26,9 @@
+>  #include "qemu/error-report.h"
+>  #include "qemu/module.h"
+>  
+> +#include "hw/vfio/pci.h"
+> +#include "hw/vfio/vfio-common.h"
+> +
+>  #ifndef DEBUG_S390PCI_BUS
+>  #define DEBUG_S390PCI_BUS  0
+>  #endif
+> @@ -737,6 +742,82 @@ static void s390_pci_iommu_free(S390pciState *s, PCIBus *bus, int32_t devfn)
+>      object_unref(OBJECT(iommu));
+>  }
+>  
+> +static bool s390_sync_dma_avail(int fd, unsigned int *avail)
+> +{
+> +    struct vfio_iommu_type1_info *info;
+
+You could use g_autofree to get rid of the g_free() at the end.
+
+> +    uint32_t argsz;
+> +    bool rval = false;
+> +    int ret;
+> +
+> +    if (avail == NULL) {
+> +        return false;
+> +    }
+
+Since this is a "static" local function, and calling it with avail ==
+NULL does not make too much sense, I think I'd rather turn this into an
+assert() instead.
+
+> +    argsz = sizeof(struct vfio_iommu_type1_info);
+> +    info = g_malloc0(argsz);
+> +    info->argsz = argsz;
+> +    /*
+> +     * If the specified argsz is not large enough to contain all
+> +     * capabilities it will be updated upon return.  In this case
+> +     * use the updated value to get the entire capability chain.
+> +     */
+> +    ret = ioctl(fd, VFIO_IOMMU_GET_INFO, info);
+> +    if (argsz != info->argsz) {
+> +        argsz = info->argsz;
+> +        info = g_realloc(info, argsz);
+> +        info->argsz = argsz;
+> +        ret = ioctl(fd, VFIO_IOMMU_GET_INFO, info);
+> +    }
+> +
+> +    if (ret) {
+> +        goto out;
+> +    }
+> +
+> +    /* If the capability exists, update with the current value */
+> +    rval = vfio_get_info_dma_avail(info, avail);
+> +
+> +out:
+> +    g_free(info);
+> +    return rval;
+> +}
+> +
+> +static S390PCIDMACount *s390_start_dma_count(S390pciState *s, VFIODevice *vdev)
+> +{
+> +    int id = vdev->group->container->fd;
+> +    S390PCIDMACount *cnt;
+> +    uint32_t avail;
+> +
+> +    if (!s390_sync_dma_avail(id, &avail)) {
+> +        return NULL;
+> +    }
+> +
+> +    QTAILQ_FOREACH(cnt, &s->zpci_dma_limit, link) {
+> +        if (cnt->id  == id) {
+> +            cnt->users++;
+> +            return cnt;
+> +        }
+> +    }
+> +
+> +    cnt = g_new0(S390PCIDMACount, 1);
+> +    cnt->id = id;
+> +    cnt->users = 1;
+> +    cnt->avail = avail;
+> +    QTAILQ_INSERT_TAIL(&s->zpci_dma_limit, cnt, link);
+> +    return cnt;
+> +}
+> +
+> +static void s390_end_dma_count(S390pciState *s, S390PCIDMACount *cnt)
+> +{
+> +    if (cnt == NULL) {
+> +        return;
+> +    }
+
+Either use assert() or drop this completely (since you're checking it at
+the caller site already).
+
+> +    cnt->users--;
+> +    if (cnt->users == 0) {
+> +        QTAILQ_REMOVE(&s->zpci_dma_limit, cnt, link);
+> +    }
+> +}
+> +
+>  static void s390_pcihost_realize(DeviceState *dev, Error **errp)
+>  {
+>      PCIBus *b;
+> @@ -764,6 +845,7 @@ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
+>      s->bus_no = 0;
+>      QTAILQ_INIT(&s->pending_sei);
+>      QTAILQ_INIT(&s->zpci_devs);
+> +    QTAILQ_INIT(&s->zpci_dma_limit);
+>  
+>      css_register_io_adapters(CSS_IO_ADAPTER_PCI, true, false,
+>                               S390_ADAPTER_SUPPRESSIBLE, errp);
+> @@ -902,6 +984,7 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>  {
+>      S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
+>      PCIDevice *pdev = NULL;
+> +    VFIOPCIDevice *vpdev = NULL;
+>      S390PCIBusDevice *pbdev = NULL;
+>  
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
+> @@ -941,17 +1024,20 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>              }
+>          }
+>  
+> +        pbdev->pdev = pdev;
+> +        pbdev->iommu = s390_pci_get_iommu(s, pci_get_bus(pdev), pdev->devfn);
+> +        pbdev->iommu->pbdev = pbdev;
+> +        pbdev->state = ZPCI_FS_DISABLED;
+> +
+>          if (object_dynamic_cast(OBJECT(dev), "vfio-pci")) {
+>              pbdev->fh |= FH_SHM_VFIO;
+> +            vpdev = container_of(pbdev->pdev, VFIOPCIDevice, pdev);
+> +            pbdev->iommu->dma_limit = s390_start_dma_count(s,
+> +                                                           &vpdev->vbasedev);
+>          } else {
+>              pbdev->fh |= FH_SHM_EMUL;
+>          }
+>  
+> -        pbdev->pdev = pdev;
+> -        pbdev->iommu = s390_pci_get_iommu(s, pci_get_bus(pdev), pdev->devfn);
+> -        pbdev->iommu->pbdev = pbdev;
+> -        pbdev->state = ZPCI_FS_DISABLED;
+> -
+>          if (s390_pci_msix_init(pbdev)) {
+>              error_setg(errp, "MSI-X support is mandatory "
+>                         "in the S390 architecture");
+> @@ -1004,6 +1090,9 @@ static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>          pbdev->fid = 0;
+>          QTAILQ_REMOVE(&s->zpci_devs, pbdev, link);
+>          g_hash_table_remove(s->zpci_table, &pbdev->idx);
+> +        if (pbdev->iommu->dma_limit) {
+> +            s390_end_dma_count(s, pbdev->iommu->dma_limit);
+> +        }
+>          qdev_unrealize(dev);
+>      }
+>  }
+
+ Thomas
+
 
