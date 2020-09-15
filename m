@@ -2,120 +2,87 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29F21C43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:41:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82DC7C43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:42:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 706B82074B
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:41:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D355720936
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:42:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QKt6z057"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 706B82074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pM6WwYBa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D355720936
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIBCf-0006Y0-Hr
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 09:41:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44252)
+	id 1kIBEX-0008CZ-TM
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 09:42:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44226)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
- id 1kIBBB-0005e9-Q0; Tue, 15 Sep 2020 09:39:30 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48884)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
- id 1kIBB9-0003br-Os; Tue, 15 Sep 2020 09:39:29 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 08FDV8mc012401; Tue, 15 Sep 2020 09:39:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=5H5fdr6S7enjKHGlcngleBikSOE+EZB5qySSDWJEOm4=;
- b=QKt6z057lt0Nya3sic3igCD+1Ce5MoPitVkcJP3crW+DffXiVfolG7DMgU7VyARs3K63
- 2tpW8fmM1+B8jBVxoZxK7qj7h/pxa6TQ6OokD2Y8ot4IT8thFOBkwAXETY/Q8NT/pYbo
- 6S/4//aPOQTZe4NryFrfKsVM0Tad2UqWM68lVMk45n9RYMpzrbeVbl15j5c6RxZQWDiT
- PxxbETDrb6VYb3N/Tgcdy7hOlM0XEH9tSSugOF23yqsWC/XUUBV/H5CufJWiDLGIhWr8
- 7YBVl5lrKZrs/vOCobCLz7dHWWZVNvBURc+cXsHbMQ1qeuHHY4TOZJHoHFT4L1YFmWp2 QQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33jxjkr7my-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 15 Sep 2020 09:39:25 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08FDVL7Y013505;
- Tue, 15 Sep 2020 09:39:25 -0400
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.27])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33jxjkr7m3-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 15 Sep 2020 09:39:25 -0400
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
- by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08FDVgE7030232;
- Tue, 15 Sep 2020 13:39:23 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com
- (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
- by ppma05wdc.us.ibm.com with ESMTP id 33gny8ypaw-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 15 Sep 2020 13:39:23 +0000
-Received: from b03ledav002.gho.boulder.ibm.com
- (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
- by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 08FDdII216581224
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 15 Sep 2020 13:39:19 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7C636136051;
- Tue, 15 Sep 2020 13:39:22 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 730CD136053;
- Tue, 15 Sep 2020 13:39:21 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.163.85.51])
- by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 15 Sep 2020 13:39:21 +0000 (GMT)
-Subject: Re: [PATCH v2 1/3] vfio: Find DMA available capability
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- alex.williamson@redhat.com, cohuck@redhat.com
-References: <1600122570-12941-1-git-send-email-mjrosato@linux.ibm.com>
- <1600122570-12941-2-git-send-email-mjrosato@linux.ibm.com>
- <fbd1df4e-8d51-87c8-2b07-5b65666342d0@redhat.com>
-From: Matthew Rosato <mjrosato@linux.ibm.com>
-Message-ID: <433aee24-84eb-527b-189e-f312054cb214@linux.ibm.com>
-Date: Tue, 15 Sep 2020 09:39:20 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1kIBB1-0005Vw-6l; Tue, 15 Sep 2020 09:39:23 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:41126)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1kIBAz-0003a5-A3; Tue, 15 Sep 2020 09:39:18 -0400
+Received: by mail-oi1-x241.google.com with SMTP id x69so3856911oia.8;
+ Tue, 15 Sep 2020 06:39:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=ReJBSgR0MBfNmaORKGPRNsYUCnnVMyzb4+glv2ZsKnw=;
+ b=pM6WwYBaf8AkkEvmXYHoq141dWAR4xmz1alixsNvCndm2tt/NMWLrmenv5fUxEUuYz
+ 9XWM2lX+wFBunmPYvJsKaxVe9Ru7tbsMoFBe9K7dG2OEmsmw79eVr9U/bYsIsJzuW+d6
+ OCUF+dnR153EWMYEr7+VWHSB7fTky1thdaJDkSX47e8Ycp9mZDvtAQmtXVA7tzhdGzB3
+ P1ccV/hVdFY80Ct/tTAtqm3BsgSUUbf4mAY6JRXHSInzBXjPkveAXFGTtPEkTu6zSu96
+ mj4RY70UZC3xaSXQaO1Rz21wTJeccpFhBCo8ZGvt7CK8NBjxX/MuPbPlL1UtkZMLFpbf
+ w/wQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=ReJBSgR0MBfNmaORKGPRNsYUCnnVMyzb4+glv2ZsKnw=;
+ b=ZAvg2cms6mju7vChd39f+EVCgXmJtsWH5C/nrtiLvJuBj0fuMOoi7vAfSHGNgQSi4i
+ m/cneWeCpU0jGIaUfgmvv2jpxIbPNkyr4eUb4jO604zwNfMxFAagl/CHxmEFqCfYELO1
+ lmmRSD5DatiaWnT5e97hFCjRcjrU5VwyuWOpvhG/9Qa5D0TQZHb8HrXzN5POof2eis6r
+ gHq7IjyZii0SnS8yOsKDNa8qdak/tvQRI0RMy1INQrtkX82WgDT/G8tf3GoPi9pHLMkw
+ EToMxE9pgEhjxZuAEBaVCrwl5TWftnbu8GJda+Tc1yZATXmfGtDPx7a1eVqI54imTMNK
+ KJUw==
+X-Gm-Message-State: AOAM530/jozl1WngACjPOwA973NWyWS3Gg/yqbROf/X8gMZk8xOS/s9x
+ +I+vRe6bKuop5USZG3MwJaDn19rdCDyGGpKCY4c=
+X-Google-Smtp-Source: ABdhPJxSQsov/qvtrK62WO1tyQ6AHqk0qghi7qHyc02c8TMyUcVS5ZaDOFABFPnlUjQCntdHNzajxT3tIZduPYvNM8w=
+X-Received: by 2002:aca:bf82:: with SMTP id p124mr3147098oif.133.1600177155481; 
+ Tue, 15 Sep 2020 06:39:15 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <fbd1df4e-8d51-87c8-2b07-5b65666342d0@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-09-15_08:2020-09-15,
- 2020-09-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 spamscore=0
- phishscore=0 lowpriorityscore=0 mlxscore=0 adultscore=0 suspectscore=0
- clxscore=1015 impostorscore=0 mlxlogscore=999 priorityscore=1501
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009150109
-Received-SPF: pass client-ip=148.163.156.1;
- envelope-from=mjrosato@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 09:39:26
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
+References: <20200815072052.73228-1-liq3ea@163.com>
+ <CAKXe6SJkqaeDBpDC__N6-RYgOMdTRO8NcJ0jkaFvAheEkfqbbw@mail.gmail.com>
+ <CAKXe6S+Qq+GN6JYJa69+s0UHUd=2EKRAwJAjUKVt3+jPqdWeCQ@mail.gmail.com>
+In-Reply-To: <CAKXe6S+Qq+GN6JYJa69+s0UHUd=2EKRAwJAjUKVt3+jPqdWeCQ@mail.gmail.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue, 15 Sep 2020 21:38:39 +0800
+Message-ID: <CAKXe6SJdkgYsenYLKrsWZSBya531dp-+rz2WRZuFLyC+NxR7Zg@mail.gmail.com>
+Subject: Re: [PATCH] hw: ide: check the pointer before do dma memory unmap
+To: Li Qiang <liq3ea@163.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
+ envelope-from=liq3ea@gmail.com; helo=mail-oi1-x241.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -129,105 +96,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, pmorel@linux.ibm.com, schnelle@linux.ibm.com,
- david@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
+Cc: Alexander Bulekov <alxndr@bu.edu>, John Snow <jsnow@redhat.com>,
+ Qemu Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/15/20 2:14 AM, Philippe Mathieu-Daudé wrote:
-> Hi Matthew,
-> 
-> On 9/15/20 12:29 AM, Matthew Rosato wrote:
->> The underlying host may be limiting the number of outstanding DMA
->> requests for type 1 IOMMU.  Add helper functions to check for the
->> DMA available capability and retrieve the current number of DMA
->> mappings allowed.
->>
->> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->> ---
->>   hw/vfio/common.c              | 37 +++++++++++++++++++++++++++++++++++++
->>   include/hw/vfio/vfio-common.h |  2 ++
->>   2 files changed, 39 insertions(+)
->>
->> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
->> index 3335714..7f4a338 100644
->> --- a/hw/vfio/common.c
->> +++ b/hw/vfio/common.c
->> @@ -844,6 +844,43 @@ vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id)
->>       return NULL;
->>   }
->>   
->> +static struct vfio_info_cap_header *
->> +vfio_get_iommu_type1_info_cap(struct vfio_iommu_type1_info *info, uint16_t id)
->> +{
->> +    struct vfio_info_cap_header *hdr;
->> +    void *ptr = info;
->> +
->> +    if (!(info->flags & VFIO_IOMMU_INFO_CAPS)) {
->> +        return NULL;
->> +    }
->> +
->> +    for (hdr = ptr + info->cap_offset; hdr != ptr; hdr = ptr + hdr->next) {
->> +        if (hdr->id == id) {
->> +            return hdr;
->> +        }
->> +    }
->> +
->> +    return NULL;
->> +}
->> +
->> +bool vfio_get_info_dma_avail(struct vfio_iommu_type1_info *info,
->> +                             unsigned int *avail)
->> +{
->> +    struct vfio_info_cap_header *hdr;
->> +    struct vfio_iommu_type1_info_dma_avail *cap;
->> +
->> +    /* If the capability cannot be found, assume no DMA limiting */
->> +    hdr = vfio_get_iommu_type1_info_cap(info,
->> +                                        VFIO_IOMMU_TYPE1_INFO_DMA_AVAIL);
->> +    if (hdr == NULL || avail == NULL) {
-> 
-> If you expect the caller to use avail=NULL, then why
-> return false when there is available information?
+ping!!
 
-I was not expecting the caller to use avail=NULL as there would be 
-nowhere to stash the dma_avail count.  But you're right, we can at least 
-still know that the capability is enabled/disabled when avail=NULL.
-
-I can change this by returning true/false solely based upon the 
-existence of the capability (whether or not hdr==NULL) while only 
-updating the caller's *avail value when avail!=NULL.
-
-If that's no good, then the alternative would be an assert()
-
-> 
->> +        return false;
->> +    }
->> +
->> +    cap = (void *) hdr;
->> +    *avail = cap->avail;
->> +    return true;
->> +}
->> +
->>   static int vfio_setup_region_sparse_mmaps(VFIORegion *region,
->>                                             struct vfio_region_info *info)
->>   {
->> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
->> index c78f3ff..661a380 100644
->> --- a/include/hw/vfio/vfio-common.h
->> +++ b/include/hw/vfio/vfio-common.h
->> @@ -178,6 +178,8 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp);
->>   void vfio_put_group(VFIOGroup *group);
->>   int vfio_get_device(VFIOGroup *group, const char *name,
->>                       VFIODevice *vbasedev, Error **errp);
->> +bool vfio_get_info_dma_avail(struct vfio_iommu_type1_info *info,
->> +                             unsigned int *avail);
->>   
->>   extern const MemoryRegionOps vfio_region_ops;
->>   typedef QLIST_HEAD(VFIOGroupList, VFIOGroup) VFIOGroupList;
->>
-> 
-
+Li Qiang <liq3ea@gmail.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=887=E6=97=A5=E5=
+=91=A8=E4=B8=80 =E4=B8=8A=E5=8D=889:39=E5=86=99=E9=81=93=EF=BC=9A
+>
+> Ping!
+>
+> Li Qiang <liq3ea@gmail.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=881=E6=97=A5=E5=
+=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=886:34=E5=86=99=E9=81=93=EF=BC=9A
+> >
+> > Ping.
+> >
+> > Li Qiang <liq3ea@163.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8815=E6=97=A5=
+=E5=91=A8=E5=85=AD =E4=B8=8B=E5=8D=883:21=E5=86=99=E9=81=93=EF=BC=9A
+> > >
+> > > In 'map_page' we need to check the return value of
+> > > 'dma_memory_map' to ensure the we actully maped something.
+> > > Otherwise, we will hit an assert in 'address_space_unmap'.
+> > > This is because we can't find the MR with the NULL buffer.
+> > > This is the LP#1884693:
+> > >
+> > > -->https://bugs.launchpad.net/qemu/+bug/1884693
+> > >
+> > > Reported-by: Alexander Bulekov <alxndr@bu.edu>
+> > > Signed-off-by: Li Qiang <liq3ea@163.com>
+> > > ---
+> > >  hw/ide/ahci.c | 5 +++++
+> > >  1 file changed, 5 insertions(+)
+> > >
+> > > diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+> > > index 009120f88b..63e9fccdbe 100644
+> > > --- a/hw/ide/ahci.c
+> > > +++ b/hw/ide/ahci.c
+> > > @@ -250,6 +250,11 @@ static void map_page(AddressSpace *as, uint8_t *=
+*ptr, uint64_t addr,
+> > >      }
+> > >
+> > >      *ptr =3D dma_memory_map(as, addr, &len, DMA_DIRECTION_FROM_DEVIC=
+E);
+> > > +
+> > > +    if (!*ptr) {
+> > > +        return;
+> > > +    }
+> > > +
+> > >      if (len < wanted) {
+> > >          dma_memory_unmap(as, *ptr, len, DMA_DIRECTION_FROM_DEVICE, l=
+en);
+> > >          *ptr =3D NULL;
+> > > --
+> > > 2.17.1
+> > >
 
