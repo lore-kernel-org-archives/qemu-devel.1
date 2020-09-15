@@ -7,84 +7,85 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00F8EC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 19:49:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3875C43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 19:51:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C31D2078E
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 19:49:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3DFF2078D
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 19:51:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fc2ybjWK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C31D2078E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ootolb1p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3DFF2078D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIGx9-0007Ge-Bp
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 15:49:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50404)
+	id 1kIGz0-0000Kw-MU
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 15:51:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50426)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1kIGso-0001IR-5v; Tue, 15 Sep 2020 15:44:54 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32316)
+ id 1kIGsq-0001LP-65; Tue, 15 Sep 2020 15:44:56 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45734
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1kIGsl-0005pK-Pl; Tue, 15 Sep 2020 15:44:53 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 08FJXV2Q145852; Tue, 15 Sep 2020 15:44:50 -0400
+ id 1kIGso-0005pv-9t; Tue, 15 Sep 2020 15:44:55 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 08FJWYDI050033; Tue, 15 Sep 2020 15:44:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
  h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=JEHLjeGNxbN3NXr9SXXQuSbQTuyasf2QlLQQVKy9Z4w=;
- b=fc2ybjWKUfb/oDwOTq5YytT0OEjsAsz+HySzy13OFXq2S4V96LgJV8SPuCI1rIrWBB4h
- 8wVYKSPyb8GCrhBxuvec0NZR+AKFnwcfOUVcL8l5uazEuPSl/8I+vvdtjy71/cnUeA+u
- zTky08HuHA2RYpV0YaBbo7jJjC+RcLY4QaAwhX5NX5iWyphAW2xM8yREdICcC6l+jbZU
- V1koAGlVA/rLgYfaipV2RINw5NHbhy/VZkEJPycKr6QvEWauQGSyzBJ1SfwrUEtUtkK3
- tkUGd1cqaGt83cOujW83VIfuY6bSO0THxnvyMKHMXO/o747IWR2+wVlykso57BgdbDWA gg== 
+ bh=FcGuP/jUD8lNTSAOuOJChyl2Ny2cXN6+D51sFQfrki0=;
+ b=Ootolb1ptXxbfS6Gwj8I3LFYO1Q1J0Ir2/2NmSkUcZ5rXgNoUcF6vs2Kw/B5O/fgbh5B
+ L0uvz4TY1umRh/UKErlg5tUrUQmvUh1uRzWAdm4V6u11sLocZzWvr/0mAnIPIH8tTgQG
+ /KGSn4UOsFkaAmydSeUG9YAi/yG+P2b+r3gLLmTQ6ObHoBbd6v3reYhruQgPSyassOhg
+ HV9sQCcSc9bR2rr4ys0MBCHpmT/jD1PV+JDz/8zZGjZ/Q+jDOFTR0nypTaZGqeGf53AG
+ imn/3b/yCux8+zQ+hiu4BgH172XuzaEfBUUZ6Xeu99DB3+OPsR9cSE+BqJySkaKaAzAB Lw== 
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33k38jh8kx-1
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33k3ta0cc0-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 15 Sep 2020 15:44:50 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08FJXuNR147768;
- Tue, 15 Sep 2020 15:44:49 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33k38jh8km-1
+ Tue, 15 Sep 2020 15:44:53 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08FJZBdE063048;
+ Tue, 15 Sep 2020 15:44:52 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33k3ta0cbu-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 15 Sep 2020 15:44:49 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08FJWHYr004632;
- Tue, 15 Sep 2020 19:44:48 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com
- (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
- by ppma01dal.us.ibm.com with ESMTP id 33gny98bqe-1
+ Tue, 15 Sep 2020 15:44:52 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08FJWXm9008562;
+ Tue, 15 Sep 2020 19:44:52 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com
+ (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+ by ppma03dal.us.ibm.com with ESMTP id 33gny9g9v2-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 15 Sep 2020 19:44:48 +0000
+ Tue, 15 Sep 2020 19:44:52 +0000
 Received: from b03ledav003.gho.boulder.ibm.com
  (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
- by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 08FJilvd49217904
+ by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 08FJijCW20316460
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 15 Sep 2020 19:44:47 GMT
+ Tue, 15 Sep 2020 19:44:45 GMT
 Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 28D156A04F;
- Tue, 15 Sep 2020 19:44:47 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 8287C6A04D;
+ Tue, 15 Sep 2020 19:44:50 +0000 (GMT)
 Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2880E6A047;
- Tue, 15 Sep 2020 19:44:46 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 90E926A047;
+ Tue, 15 Sep 2020 19:44:49 +0000 (GMT)
 Received: from localhost.localdomain.com (unknown [9.85.140.9])
  by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 15 Sep 2020 19:44:46 +0000 (GMT)
+ Tue, 15 Sep 2020 19:44:49 +0000 (GMT)
 From: Collin Walling <walling@linux.ibm.com>
 To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
-Subject: [PATCH v6 4/8] s390/sclp: check sccb len before filling in data
-Date: Tue, 15 Sep 2020 15:44:12 -0400
-Message-Id: <20200915194416.107460-5-walling@linux.ibm.com>
+Subject: [PATCH v6 7/8] s390/kvm: header sync for diag318
+Date: Tue, 15 Sep 2020 15:44:15 -0400
+Message-Id: <20200915194416.107460-8-walling@linux.ibm.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200915194416.107460-1-walling@linux.ibm.com>
 References: <20200915194416.107460-1-walling@linux.ibm.com>
@@ -95,15 +96,15 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
  definitions=2020-09-15_13:2020-09-15,
  2020-09-15 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 phishscore=0
- adultscore=0 malwarescore=0 priorityscore=1501 mlxlogscore=999
- lowpriorityscore=0 impostorscore=0 bulkscore=0 spamscore=0 clxscore=1015
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009150152
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=walling@linux.ibm.com;
+ mlxlogscore=999 spamscore=0
+ malwarescore=0 adultscore=0 impostorscore=0 bulkscore=0 lowpriorityscore=0
+ mlxscore=0 priorityscore=1501 phishscore=0 suspectscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009150149
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=walling@linux.ibm.com;
  helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 15:14:56
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 15:14:53
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
 X-Spam_score_int: -26
 X-Spam_score: -2.7
 X-Spam_bar: --
@@ -131,87 +132,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The SCCB must be checked for a sufficient length before it is filled
-with any data. If the length is insufficient, then the SCLP command
-is suppressed and the proper response code is set in the SCCB header.
-
-While we're at it, let's cleanup the length check by placing the
-calculation inside a macro.
-
-Fixes: 832be0d8a3bb ("s390x: sclp: Report insufficient SCCB length")
 Signed-off-by: Collin Walling <walling@linux.ibm.com>
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/s390x/sclp.c | 26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+ linux-headers/asm-s390/kvm.h | 7 +++++--
+ linux-headers/linux/kvm.h    | 1 +
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index 4ae6fb400b..0d54075309 100644
---- a/hw/s390x/sclp.c
-+++ b/hw/s390x/sclp.c
-@@ -78,6 +78,8 @@ static void prepare_cpu_entries(MachineState *ms, CPUEntry *entry, int *count)
-     }
- }
+diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
+index 0138ccb0d8..f053b8304a 100644
+--- a/linux-headers/asm-s390/kvm.h
++++ b/linux-headers/asm-s390/kvm.h
+@@ -231,11 +231,13 @@ struct kvm_guest_debug_arch {
+ #define KVM_SYNC_GSCB   (1UL << 9)
+ #define KVM_SYNC_BPBC   (1UL << 10)
+ #define KVM_SYNC_ETOKEN (1UL << 11)
++#define KVM_SYNC_DIAG318 (1UL << 12)
  
-+#define SCCB_REQ_LEN(s, max_cpus) (sizeof(s) + max_cpus * sizeof(CPUEntry))
-+
- /* Provide information about the configuration, CPUs and storage */
- static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
- {
-@@ -86,6 +88,12 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
-     int cpu_count;
-     int rnsize, rnmax;
-     IplParameterBlock *ipib = s390_ipl_get_iplb();
-+    int required_len = SCCB_REQ_LEN(ReadInfo, machine->possible_cpus->len);
-+
-+    if (be16_to_cpu(sccb->h.length) < required_len) {
-+        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
-+        return;
-+    }
+ #define KVM_SYNC_S390_VALID_FIELDS \
+ 	(KVM_SYNC_PREFIX | KVM_SYNC_GPRS | KVM_SYNC_ACRS | KVM_SYNC_CRS | \
+ 	 KVM_SYNC_ARCH0 | KVM_SYNC_PFAULT | KVM_SYNC_VRS | KVM_SYNC_RICCB | \
+-	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN)
++	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN | \
++	 KVM_SYNC_DIAG318)
  
-     /* CPU information */
-     prepare_cpu_entries(machine, read_info->entries, &cpu_count);
-@@ -95,12 +103,6 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+ /* length and alignment of the sdnx as a power of two */
+ #define SDNXC 8
+@@ -264,7 +266,8 @@ struct kvm_sync_regs {
+ 	__u8 reserved2 : 7;
+ 	__u8 padding1[51];	/* riccb needs to be 64byte aligned */
+ 	__u8 riccb[64];		/* runtime instrumentation controls block */
+-	__u8 padding2[192];	/* sdnx needs to be 256byte aligned */
++	__u64 diag318;		/* diagnose 0x318 info */
++	__u8 padding2[184];	/* sdnx needs to be 256byte aligned */
+ 	union {
+ 		__u8 sdnx[SDNXL];  /* state description annex */
+ 		struct {
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index a28c366737..a789bfb5a2 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -1031,6 +1031,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_PPC_SECURE_GUEST 181
+ #define KVM_CAP_HALT_POLL 182
+ #define KVM_CAP_ASYNC_PF_INT 183
++#define KVM_CAP_S390_DIAG318 184
  
-     read_info->ibc_val = cpu_to_be32(s390_get_ibc_val());
+ #ifdef KVM_CAP_IRQ_ROUTING
  
--    if (be16_to_cpu(sccb->h.length) <
--            (sizeof(ReadInfo) + cpu_count * sizeof(CPUEntry))) {
--        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
--        return;
--    }
--
-     /* Configuration Characteristic (Extension) */
-     s390_get_feat_block(S390_FEAT_TYPE_SCLP_CONF_CHAR,
-                          read_info->conf_char);
-@@ -146,18 +148,18 @@ static void sclp_read_cpu_info(SCLPDevice *sclp, SCCB *sccb)
-     MachineState *machine = MACHINE(qdev_get_machine());
-     ReadCpuInfo *cpu_info = (ReadCpuInfo *) sccb;
-     int cpu_count;
-+    int required_len = SCCB_REQ_LEN(ReadCpuInfo, machine->possible_cpus->len);
-+
-+    if (be16_to_cpu(sccb->h.length) < required_len) {
-+        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
-+        return;
-+    }
- 
-     prepare_cpu_entries(machine, cpu_info->entries, &cpu_count);
-     cpu_info->nr_configured = cpu_to_be16(cpu_count);
-     cpu_info->offset_configured = cpu_to_be16(offsetof(ReadCpuInfo, entries));
-     cpu_info->nr_standby = cpu_to_be16(0);
- 
--    if (be16_to_cpu(sccb->h.length) <
--            (sizeof(ReadCpuInfo) + cpu_count * sizeof(CPUEntry))) {
--        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
--        return;
--    }
--
-     /* The standby offset is 16-byte for each CPU */
-     cpu_info->offset_standby = cpu_to_be16(cpu_info->offset_configured
-         + cpu_info->nr_configured*sizeof(CPUEntry));
 -- 
 2.26.2
 
