@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0674C43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:24:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F5C2C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:24:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A31C2078E
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:24:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A49FD20B1F
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:24:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fIKLYnL8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A31C2078E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zx6gZFJB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A49FD20B1F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIA0g-00033X-1A
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:24:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46686)
+	id 1kIA13-00041Z-O0
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:24:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46682)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kI9nN-0004tA-Dl
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kI9nN-0004t3-2G
  for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:10:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37989)
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57867)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kI9nI-0007ib-Lh
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kI9nI-0007iQ-Ko
  for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:10:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1600171843;
@@ -38,44 +38,44 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=S7l+P3buoZt7VTrit7Bgi07Dv5+mwhkNmD/cqJKlVcc=;
- b=fIKLYnL8tUdA/xSoq2l9Ue6Bb5/MgkuhovKsyVNPgXwDAoT38pcWKMsPgyD9xWxTKMaKVh
- SdXWOKafdCksjPC4DV22hz7JxpVWijFJXNB/xXcw0vuZg6oKlzbnLXMCevqzOULQz78fLd
- 88gp18T76zeUHJOzScj3BClfYycdOMw=
+ bh=l8Ud8iozTU5Im+G80wvGvhC9Rn5W0PW1auciivrLPfY=;
+ b=Zx6gZFJBLALHJ/f5NZBPPl+bBIywFvRlieduOFvLOCKZlP6KKsGoW4TDh5xXEnsPP1m8kg
+ CZUGHfTeP3rkuSKFUx/97r+0iPC6xDUKlMXQXXPr9HLFvvMgPD1oG/58FV/aC9y+pVYAwO
+ 0O1InTU3Z73W/d6Kj4x2A6tkcsvVy7k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-247-5BU4jkNcMPK9Ob8JkhdGdw-1; Tue, 15 Sep 2020 08:09:33 -0400
-X-MC-Unique: 5BU4jkNcMPK9Ob8JkhdGdw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-152-BvPwM7fgPxW897GTd-PIWQ-1; Tue, 15 Sep 2020 08:09:33 -0400
+X-MC-Unique: BvPwM7fgPxW897GTd-PIWQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9390C64086;
- Tue, 15 Sep 2020 12:09:31 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F4031009459;
+ Tue, 15 Sep 2020 12:09:32 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
  [10.36.112.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BCFBA19D7D;
- Tue, 15 Sep 2020 12:09:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0D4065FC16;
+ Tue, 15 Sep 2020 12:09:24 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id AC6B240820; Tue, 15 Sep 2020 14:09:09 +0200 (CEST)
+ id 123C040845; Tue, 15 Sep 2020 14:09:10 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 05/21] acpi: ged: add x86 device variant.
-Date: Tue, 15 Sep 2020 14:08:53 +0200
-Message-Id: <20200915120909.20838-6-kraxel@redhat.com>
+Subject: [PATCH v8 13/21] x86: constify x86_machine_is_*_enabled
+Date: Tue, 15 Sep 2020 14:09:01 +0200
+Message-Id: <20200915120909.20838-14-kraxel@redhat.com>
 In-Reply-To: <20200915120909.20838-1-kraxel@redhat.com>
 References: <20200915120909.20838-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:23:19
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:10:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
@@ -102,92 +102,58 @@ Cc: Laurent Vivier <lvivier@redhat.com>,
  "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>,
  qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Set AcpiDeviceIfClass->madt_cpu,
-otherwise identical to TYPE_ACPI_GED.
-
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Sergio Lopez <slp@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- include/hw/acpi/generic_event_device.h |  4 +++
- hw/i386/generic_event_device_x86.c     | 36 ++++++++++++++++++++++++++
- hw/i386/meson.build                    |  1 +
- 3 files changed, 41 insertions(+)
- create mode 100644 hw/i386/generic_event_device_x86.c
+ include/hw/i386/x86.h | 4 ++--
+ hw/i386/x86.c         | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
-index 38aec526f944..241151662b45 100644
---- a/include/hw/acpi/generic_event_device.h
-+++ b/include/hw/acpi/generic_event_device.h
-@@ -71,6 +71,10 @@ typedef struct AcpiGedState AcpiGedState;
- DECLARE_INSTANCE_CHECKER(AcpiGedState, ACPI_GED,
-                          TYPE_ACPI_GED)
+diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
+index 1a188a7deabb..25c904638c11 100644
+--- a/include/hw/i386/x86.h
++++ b/include/hw/i386/x86.h
+@@ -100,8 +100,8 @@ void x86_load_linux(X86MachineState *x86ms,
+                     bool pvh_enabled,
+                     bool linuxboot_dma_enabled);
  
-+#define TYPE_ACPI_GED_X86 "acpi-ged-x86"
-+#define ACPI_GED_X86(obj) \
-+    OBJECT_CHECK(AcpiGedX86State, (obj), TYPE_ACPI_GED_X86)
-+
- #define ACPI_GED_EVT_SEL_OFFSET    0x0
- #define ACPI_GED_EVT_SEL_LEN       0x4
+-bool x86_machine_is_smm_enabled(X86MachineState *x86ms);
+-bool x86_machine_is_acpi_enabled(X86MachineState *x86ms);
++bool x86_machine_is_smm_enabled(const X86MachineState *x86ms);
++bool x86_machine_is_acpi_enabled(const X86MachineState *x86ms);
  
-diff --git a/hw/i386/generic_event_device_x86.c b/hw/i386/generic_event_device_x86.c
-new file mode 100644
-index 000000000000..e26fb02a2ef6
---- /dev/null
-+++ b/hw/i386/generic_event_device_x86.c
-@@ -0,0 +1,36 @@
-+/*
-+ * x86 variant of the generic event device for hw reduced acpi
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/acpi/generic_event_device.h"
-+#include "hw/i386/pc.h"
-+
-+static void acpi_ged_x86_class_init(ObjectClass *class, void *data)
-+{
-+    AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_CLASS(class);
-+
-+    adevc->madt_cpu = pc_madt_cpu_entry;
-+}
-+
-+static const TypeInfo acpi_ged_x86_info = {
-+    .name          = TYPE_ACPI_GED_X86,
-+    .parent        = TYPE_ACPI_GED,
-+    .class_init    = acpi_ged_x86_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_HOTPLUG_HANDLER },
-+        { TYPE_ACPI_DEVICE_IF },
-+        { }
-+    }
-+};
-+
-+static void acpi_ged_x86_register_types(void)
-+{
-+    type_register_static(&acpi_ged_x86_info);
-+}
-+
-+type_init(acpi_ged_x86_register_types)
-diff --git a/hw/i386/meson.build b/hw/i386/meson.build
-index 63918fbe22f9..1a7d1a685d77 100644
---- a/hw/i386/meson.build
-+++ b/hw/i386/meson.build
-@@ -18,6 +18,7 @@ i386_ss.add(when: 'CONFIG_VMPORT', if_true: files('vmport.c'))
- i386_ss.add(when: 'CONFIG_VTD', if_true: files('intel_iommu.c'))
+ /* Global System Interrupts */
  
- i386_ss.add(when: 'CONFIG_ACPI', if_true: files('acpi-common.c'))
-+i386_ss.add(when: 'CONFIG_ACPI_HW_REDUCED', if_true: files('generic_event_device_x86.c'))
- i386_ss.add(when: 'CONFIG_PC', if_true: files(
-   'pc.c',
-   'pc_sysfw.c',
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index c1954db152eb..e2a5005f389c 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -821,7 +821,7 @@ void x86_bios_rom_init(MemoryRegion *rom_memory, bool isapc_ram_fw)
+                                 bios);
+ }
+ 
+-bool x86_machine_is_smm_enabled(X86MachineState *x86ms)
++bool x86_machine_is_smm_enabled(const X86MachineState *x86ms)
+ {
+     bool smm_available = false;
+ 
+@@ -863,7 +863,7 @@ static void x86_machine_set_smm(Object *obj, Visitor *v, const char *name,
+     visit_type_OnOffAuto(v, name, &x86ms->smm, errp);
+ }
+ 
+-bool x86_machine_is_acpi_enabled(X86MachineState *x86ms)
++bool x86_machine_is_acpi_enabled(const X86MachineState *x86ms)
+ {
+     if (x86ms->acpi == ON_OFF_AUTO_OFF) {
+         return false;
 -- 
 2.27.0
 
