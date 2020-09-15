@@ -8,76 +8,78 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D164EC43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:16:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BD1AC43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:16:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BB1D20809
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:16:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C327820809
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:16:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I9EE2F0F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BB1D20809
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ts08TTDN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C327820809
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIEZ9-00024n-7Y
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 13:16:27 -0400
+	id 1kIEZS-0002df-Ol
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 13:16:46 -0400
 Received: from eggs.gnu.org ([2001:470:142:3::10]:44268)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kIEWq-0008Og-Jd; Tue, 15 Sep 2020 13:14:04 -0400
-Received: from mail-pf1-x42c.google.com ([2607:f8b0:4864:20::42c]:46099)
+ id 1kIEWw-0008Og-4Q; Tue, 15 Sep 2020 13:14:10 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:38187)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kIEWe-0002he-Vl; Tue, 15 Sep 2020 13:13:57 -0400
-Received: by mail-pf1-x42c.google.com with SMTP id b124so2287957pfg.13;
- Tue, 15 Sep 2020 10:13:52 -0700 (PDT)
+ id 1kIEWN-0002gJ-79; Tue, 15 Sep 2020 13:13:37 -0400
+Received: by mail-pl1-x644.google.com with SMTP id c3so1686125plz.5;
+ Tue, 15 Sep 2020 10:13:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=rY6yNgCy25oDmt+nU7EZEt8FaOeANESnxbsMxWp5WF0=;
- b=I9EE2F0F8I9O7/i3HuRMJx+r20C8zSqL3qiMbhqP6oSav96x4Z89VvUvTR5M2f9eu2
- m1Vjad7WWDkjLFhs+4XF/3ZzrckQnQBYNUBto8zbp6ESMLDGraTWx6f3IiOBbPsbpkWI
- +d/6Zw2gaZ1V/Tb5dIxMzFfp9GyKukEhWLklHKh4twQgO/HHtUdlEd8dhs2xiAhT+BHp
- 2fGXLpGDuTz2vdmXPqdXyxPL/qQ3DrCGhlWiAexvr7DqrXBY29axUD7ujFujcldp/qTj
- AFI6eAf3AdM4pymyi6L1RxjmrlIRmvK3C/W1ocXFy2feSx58kr/NsrVCD9oN5uXWMFgC
- BRtQ==
+ bh=08QvrHPKEN4GbCfMFC4QXPv5o40Q0NOGDJhtin5ahIA=;
+ b=ts08TTDNhUmfwp4B/1inYE2FatlvbkqcvC5DiEuE7T2blowBhwn68GsH2tyjaoEwwI
+ EC9YRDdtvCt7EpI1DUBwIN4okqZhtZm0t4kaR7UDu8Wa6m6x0ePb5AihFrf6DoRBxF4b
+ RuqQ5eJnGtu9wCCC8bFha/YSGBNQ0CDnD+2S8t1SgPIizHGvAFc2l26/lUii96RvDIXS
+ aKu8MnQ8OYJB3RHmd1IItsRhlVe/+9X5Dj/RX6tYUEehe3FmsHdaij/bwSVIh0MJBZZk
+ GYUVxOL36Z2foy7eZgwQRM49ajJg3XKZhv+xUJGKifSU/DzoNxfvhv57zATf5al4Ycxm
+ AS6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=rY6yNgCy25oDmt+nU7EZEt8FaOeANESnxbsMxWp5WF0=;
- b=tUsLc7Oejge8Z4UTOOdmgF83mPVXwd57tmhl5vVJB0BI7tCBPi7bHQFNd6BZj2G4b6
- 5KJShbHbBavTnE+6YNTyicwyk32p3KEl1VQLz2FWEk4KoXsffOGArt89N9P5ay2RIJ/W
- /ZO5Ihk5Eu//NCbTlmbli452Vka+ecpEusxUtDlKAvZaBXM1chD2sAb8U4iidqvsoqzu
- 926nXYXXPPaDYsmT5R0N7cfTn/aE6+3OVP3Mux64rdAKHmXSAG+lqqdL9c26TBeqKkDr
- mZFSPLm/g2s29rkrHxI6mdxttDvaEaYLp+bCNYpUtZhkik+l6ErSPTPstqKz0ZcdffW7
- JwDw==
-X-Gm-Message-State: AOAM5310Y9lZjOCSOZEn19BT3O6hbDqC8ACtUeU0aLZCFcUJKqrKEv/8
- RUsImmiR6MSm0m1PXn+ewt4hZ+H4BMhiv0edYps=
-X-Google-Smtp-Source: ABdhPJzEtNRduQmGwI4ajbu/PGg6XRFf39ze0bYHCtD2ZDXy++mzgxZMu7FZ2fxaGbdSTBKZVGNfQg==
-X-Received: by 2002:a63:500e:: with SMTP id e14mr15326207pgb.36.1600190031007; 
- Tue, 15 Sep 2020 10:13:51 -0700 (PDT)
+ bh=08QvrHPKEN4GbCfMFC4QXPv5o40Q0NOGDJhtin5ahIA=;
+ b=SdBEZMqFubS6HQWI9xjE57wOFfJtWY7vPSUoG4IA7ItTzsg0qJ3NGUezpDZw9SO6Px
+ v7/C/gGjpRDE/KWP0yK61LhtbsPXzc7azk1jE2yQMdRT2p286UgocgsVPYW6ErSRxwBw
+ sSiSPF9AydZRr7V2PWc14Pt1AhD7RsCs/Tt+b6vZAmfTvwClnhiMhlej0AA2GVXLs7dq
+ lzHZVB4bquTCYXzvRYxuKdhRDvjzHwznFJJSo1gms39ox2VtojKPZWzG001tCTah8Lss
+ NgT/B14nFKaDS1hRSEeG0aq3A6JqDeDvrnORepzXnvxZwQKS+EujdFzdADz2MM/Wh7HZ
+ bSiA==
+X-Gm-Message-State: AOAM530IZ5ES24/5fVVJIwkUFPGADykP6fx1QVzcZjXIlk6PI6sCMB4T
+ 3VtK/U8lyASxZQQVFE4tV0Bp4F4d2op3FsVI/7g=
+X-Google-Smtp-Source: ABdhPJyw9OTfF716itTQieo+AEhXCVEQF/0pFd9wT/wExvS9fFCMHYiHFRSEn8QVZMEsfjTK3tSqAQ==
+X-Received: by 2002:a17:90b:3105:: with SMTP id
+ gc5mr312191pjb.225.1600190013205; 
+ Tue, 15 Sep 2020 10:13:33 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id j14sm124046pjz.21.2020.09.15.10.13.46
+ by smtp.googlemail.com with ESMTPSA id j14sm124046pjz.21.2020.09.15.10.13.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Sep 2020 10:13:50 -0700 (PDT)
+ Tue, 15 Sep 2020 10:13:32 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 13/26] meson: remove empty else and duplicated gio deps
-Date: Wed, 16 Sep 2020 01:12:21 +0800
-Message-Id: <20200915171234.236-14-luoyonggang@gmail.com>
+Subject: [PATCH v10 09/26] osdep: file locking functions are not available on
+ Win32
+Date: Wed, 16 Sep 2020 01:12:17 +0800
+Message-Id: <20200915171234.236-10-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200915171234.236-1-luoyonggang@gmail.com>
 References: <20200915171234.236-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::42c;
- envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x42c.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -113,36 +115,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Do not declare the following locking functions on Win32:
+int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive);
+int qemu_unlock_fd(int fd, int64_t start, int64_t len);
+int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive);
+bool qemu_has_ofd_lock(void);
+
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- meson.build | 6 ------
- 1 file changed, 6 deletions(-)
+ include/qemu/osdep.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/meson.build b/meson.build
-index 690723b470..23cb1b8742 100644
---- a/meson.build
-+++ b/meson.build
-@@ -317,7 +317,6 @@ opengl = not_found
- if 'CONFIG_OPENGL' in config_host
-   opengl = declare_dependency(compile_args: config_host['OPENGL_CFLAGS'].split(),
-                               link_args: config_host['OPENGL_LIBS'].split())
--else
- endif
- gtk = not_found
- if 'CONFIG_GTK' in config_host
-@@ -344,11 +343,6 @@ if 'CONFIG_ICONV' in config_host
-   iconv = declare_dependency(compile_args: config_host['ICONV_CFLAGS'].split(),
-                              link_args: config_host['ICONV_LIBS'].split())
- endif
--gio = not_found
--if 'CONFIG_GIO' in config_host
--  gio = declare_dependency(compile_args: config_host['GIO_CFLAGS'].split(),
--                           link_args: config_host['GIO_LIBS'].split())
--endif
- vnc = not_found
- png = not_found
- jpeg = not_found
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 412962d91a..e80fddd1e8 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -502,11 +502,11 @@ int qemu_close(int fd);
+ int qemu_unlink(const char *name);
+ #ifndef _WIN32
+ int qemu_dup(int fd);
+-#endif
+ int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive);
+ int qemu_unlock_fd(int fd, int64_t start, int64_t len);
+ int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive);
+ bool qemu_has_ofd_lock(void);
++#endif
+ 
+ #if defined(__HAIKU__) && defined(__i386__)
+ #define FMT_pid "%ld"
 -- 
 2.28.0.windows.1
 
