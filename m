@@ -2,87 +2,84 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77147C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:05:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E24DC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:06:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02F8F206B2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:05:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D2FE7206DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:06:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eD9YU4ED"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02F8F206B2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pgYvI4lq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2FE7206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kI9iU-0006I0-Lo
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:05:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43918)
+	id 1kI9jX-0007fF-Kr
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:06:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44280)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kI9gd-0004sS-OS
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:03:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44916)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kI9gb-0006jM-Gx
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:03:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600171428;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=U430QtBsTWFREOkRM85ZbGnYJYkSQ7370e7MvFDRAGw=;
- b=eD9YU4EDDAw9M5AFang9aB9cXCpyje9Thz+7UsrRsAct1p6JGaeTnic8M+1tHDtQy9iyGO
- OKOnljbnGWYvvmS+c9rmk7Cv4SbtbSdL4ZpU80ecuDAjSaaUFQiWUMrk9y8csEykmCxMD1
- B0YPr4uH898CryNfjL/I5v6wHMIX12k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-442-tUg1l1_KPJmL4HmVFZco0A-1; Tue, 15 Sep 2020 08:03:45 -0400
-X-MC-Unique: tUg1l1_KPJmL4HmVFZco0A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F8FF1009441;
- Tue, 15 Sep 2020 12:03:44 +0000 (UTC)
-Received: from localhost (ovpn-112-192.ams2.redhat.com [10.36.112.192])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C7AC8614F5;
- Tue, 15 Sep 2020 12:03:43 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/2] tests: add test-fdmon-epoll
-Date: Tue, 15 Sep 2020 13:03:39 +0100
-Message-Id: <20200915120339.702938-3-stefanha@redhat.com>
-In-Reply-To: <20200915120339.702938-1-stefanha@redhat.com>
-References: <20200915120339.702938-1-stefanha@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kI9hv-0005w3-4C
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:05:11 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:35925)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kI9ht-0006pc-C6
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:05:10 -0400
+Received: by mail-ed1-x542.google.com with SMTP id w1so2777136edr.3
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 05:05:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ZHwFZD2iS8lX03gcG5etkJBgj7sK0DAkBxeIMUOryCU=;
+ b=pgYvI4lq6KtyS9uNLXUgZQybuagTfy8p6+6dS9Eu+JBxA38eQjfn/XPrVon1lVXUNj
+ 59QPrbAfQi7dY4tD8856Pa85cW67H0UWlfIr5NpMjwRgS1t/C95Ld/OpNvxg74x8qjqr
+ PNPM3cMr9YVb7BecDrKZrsov+wH8ktq2OtSv14pdimO/+5F7IruGMHOGe8Honsln0Q0C
+ BW853a4GHbKwCUTMNO3B4xqhrvuu0t4VdMoLhNoIyGmhApemUHhhXo/YNmSJCK63csZI
+ JK+6+mlseZ2U7l13+3RG6wjBdtrtTRginwp21GFmjeTfFPP5oDUPiSFWWoGWgOfT6q2/
+ 2dcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ZHwFZD2iS8lX03gcG5etkJBgj7sK0DAkBxeIMUOryCU=;
+ b=WSvFPiiV/Z0auG/uqLw5ln632pHf0tHvHb1EHTpFEs8UMnmYWkpqMGFvDOjguoNGN8
+ AEoUH115dPjctQMvI8zmZ4UIIQcC0DJbyjQOMXJn+NguUIEtUIZ3oJJkButpgQEsVHUD
+ Aezi+LxQFbpMUAAdUQwpqHWkl9sZ6TAbOaIylME/QQvQ0Ns4BXGYz+xaz0L1eNU+GhBs
+ d0BMChYMCCcTTokP5SYAT5g8T1730WOIkXFo4xRJTU8fd7yV3ehbSpL92Pkn2tzxPFJl
+ UmhFNAA+vc3OxYvQtp6NVmfCRZ3PX432fWNJq9W7xYpRV2YKRuRBwOgUb6zis0devcph
+ REkw==
+X-Gm-Message-State: AOAM533rzb06JHg/tLlRJ3UbT6Of77ylOG1yXvNdqgH38TJrWyZ5+SNt
+ Y32N9SMUNE0Zlv0yfX9+eU9NFoE++VRB7VIUhSdBnw==
+X-Google-Smtp-Source: ABdhPJyfaxJJTmjJherotcp9AByVrz3XfkQPVtyLHCmKZkVBpeBspW4QKMPEfXHJm8ShbMUauRkPHBb/5tjnYyt6pKo=
+X-Received: by 2002:aa7:d58e:: with SMTP id r14mr4152052edq.52.1600171507338; 
+ Tue, 15 Sep 2020 05:05:07 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:23:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -33
-X-Spam_score: -3.4
-X-Spam_bar: ---
-X-Spam_report: (-3.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MIME_BASE64_TEXT=1.741, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+References: <20200915104627.699552-1-mreitz@redhat.com>
+In-Reply-To: <20200915104627.699552-1-mreitz@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 15 Sep 2020 13:04:56 +0100
+Message-ID: <CAFEAcA_K=AVuc77c+JQ01Dp=9rp0CChhQ3VN4M8RMZSJW++Qhw@mail.gmail.com>
+Subject: Re: [PULL 00/22] Block patches
+To: Max Reitz <mreitz@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::542;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x542.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,73 +93,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org, qemu-stable@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-VGVzdCBhaW9fZGlzYWJsZV9leHRlcm5hbCgpLCB3aGljaCBzd2l0Y2hlcyBmcm9tIGZkbW9uLWVw
-b2xsIGJhY2sgdG8KZmRtb24tcG9sbC4gVGhpcyByZXN1bHRlZCBpbiBhbiBhc3NlcnRpb24gZmFp
-bHVyZSB0aGF0IHdhcyBmaXhlZCBpbiB0aGUKcHJldmlvdXMgcGF0Y2guCgpTaWduZWQtb2ZmLWJ5
-OiBTdGVmYW4gSGFqbm9jemkgPHN0ZWZhbmhhQHJlZGhhdC5jb20+Ci0tLQogTUFJTlRBSU5FUlMg
-ICAgICAgICAgICAgIHwgIDEgKwogdGVzdHMvdGVzdC1mZG1vbi1lcG9sbC5jIHwgNzMgKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwogdGVzdHMvbWVzb24uYnVpbGQgICAg
-ICAgIHwgIDMgKysKIDMgZmlsZXMgY2hhbmdlZCwgNzcgaW5zZXJ0aW9ucygrKQogY3JlYXRlIG1v
-ZGUgMTAwNjQ0IHRlc3RzL3Rlc3QtZmRtb24tZXBvbGwuYwoKZGlmZiAtLWdpdCBhL01BSU5UQUlO
-RVJTIGIvTUFJTlRBSU5FUlMKaW5kZXggM2QxN2NhZDE5YS4uOTllNDAxMDYyMyAxMDA2NDQKLS0t
-IGEvTUFJTlRBSU5FUlMKKysrIGIvTUFJTlRBSU5FUlMKQEAgLTIxMzIsNiArMjEzMiw3IEBAIEY6
-IG1pZ3JhdGlvbi9ibG9jayoKIEY6IGluY2x1ZGUvYmxvY2svYWlvLmgKIEY6IGluY2x1ZGUvYmxv
-Y2svYWlvLXdhaXQuaAogRjogc2NyaXB0cy9xZW11Z2RiL2Fpby5weQorRjogdGVzdHMvdGVzdC1m
-ZG1vbi1lcG9sbC5jCiBUOiBnaXQgaHR0cHM6Ly9naXRodWIuY29tL3N0ZWZhbmhhL3FlbXUuZ2l0
-IGJsb2NrCiAKIEJsb2NrIFNDU0kgc3Vic3lzdGVtCmRpZmYgLS1naXQgYS90ZXN0cy90ZXN0LWZk
-bW9uLWVwb2xsLmMgYi90ZXN0cy90ZXN0LWZkbW9uLWVwb2xsLmMKbmV3IGZpbGUgbW9kZSAxMDA2
-NDQKaW5kZXggMDAwMDAwMDAwMC4uMTFmZDhhMmZhOQotLS0gL2Rldi9udWxsCisrKyBiL3Rlc3Rz
-L3Rlc3QtZmRtb24tZXBvbGwuYwpAQCAtMCwwICsxLDczIEBACisvKiBTUERYLUxpY2Vuc2UtSWRl
-bnRpZmllcjogR1BMLTIuMC1vci1sYXRlciAqLworLyoKKyAqIGZkbW9uLWVwb2xsIHRlc3RzCisg
-KgorICogQ29weXJpZ2h0IChjKSAyMDIwIFJlZCBIYXQsIEluYy4KKyAqLworCisjaW5jbHVkZSAi
-cWVtdS9vc2RlcC5oIgorI2luY2x1ZGUgImJsb2NrL2Fpby5oIgorI2luY2x1ZGUgInFhcGkvZXJy
-b3IuaCIKKyNpbmNsdWRlICJxZW11L21haW4tbG9vcC5oIgorCitzdGF0aWMgQWlvQ29udGV4dCAq
-Y3R4OworCitzdGF0aWMgdm9pZCBkdW1teV9mZF9oYW5kbGVyKEV2ZW50Tm90aWZpZXIgKm5vdGlm
-aWVyKQoreworICAgIGV2ZW50X25vdGlmaWVyX3Rlc3RfYW5kX2NsZWFyKG5vdGlmaWVyKTsKK30K
-Kworc3RhdGljIHZvaWQgYWRkX2V2ZW50X25vdGlmaWVycyhFdmVudE5vdGlmaWVyICpub3RpZmll
-cnMsIHNpemVfdCBuKQoreworICAgIGZvciAoc2l6ZV90IGkgPSAwOyBpIDwgbjsgaSsrKSB7Cisg
-ICAgICAgIGV2ZW50X25vdGlmaWVyX2luaXQoJm5vdGlmaWVyc1tpXSwgZmFsc2UpOworICAgICAg
-ICBhaW9fc2V0X2V2ZW50X25vdGlmaWVyKGN0eCwgJm5vdGlmaWVyc1tpXSwgZmFsc2UsCisgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgZHVtbXlfZmRfaGFuZGxlciwgTlVMTCk7CisgICAg
-fQorfQorCitzdGF0aWMgdm9pZCByZW1vdmVfZXZlbnRfbm90aWZpZXJzKEV2ZW50Tm90aWZpZXIg
-Km5vdGlmaWVycywgc2l6ZV90IG4pCit7CisgICAgZm9yIChzaXplX3QgaSA9IDA7IGkgPCBuOyBp
-KyspIHsKKyAgICAgICAgYWlvX3NldF9ldmVudF9ub3RpZmllcihjdHgsICZub3RpZmllcnNbaV0s
-IGZhbHNlLCBOVUxMLCBOVUxMKTsKKyAgICAgICAgZXZlbnRfbm90aWZpZXJfY2xlYW51cCgmbm90
-aWZpZXJzW2ldKTsKKyAgICB9Cit9CisKKy8qIENoZWNrIHRoYXQgZmQgaGFuZGxlcnMgd29yayB3
-aGVuIGV4dGVybmFsIGNsaWVudHMgYXJlIGRpc2FibGVkICovCitzdGF0aWMgdm9pZCB0ZXN0X2V4
-dGVybmFsX2Rpc2FibGVkKHZvaWQpCit7CisgICAgRXZlbnROb3RpZmllciBub3RpZmllcnNbMTAw
-XTsKKworICAgIC8qIGZkbW9uLWVwb2xsIGlzIG9ubHkgZW5hYmxlZCB3aGVuIG1hbnkgZmQgaGFu
-ZGxlcnMgYXJlIHJlZ2lzdGVyZWQgKi8KKyAgICBhZGRfZXZlbnRfbm90aWZpZXJzKG5vdGlmaWVy
-cywgR19OX0VMRU1FTlRTKG5vdGlmaWVycykpOworCisgICAgZXZlbnRfbm90aWZpZXJfc2V0KCZu
-b3RpZmllcnNbMF0pOworICAgIGFzc2VydChhaW9fcG9sbChjdHgsIHRydWUpKTsKKworICAgIGFp
-b19kaXNhYmxlX2V4dGVybmFsKGN0eCk7CisgICAgZXZlbnRfbm90aWZpZXJfc2V0KCZub3RpZmll
-cnNbMF0pOworICAgIGFzc2VydChhaW9fcG9sbChjdHgsIHRydWUpKTsKKyAgICBhaW9fZW5hYmxl
-X2V4dGVybmFsKGN0eCk7CisKKyAgICByZW1vdmVfZXZlbnRfbm90aWZpZXJzKG5vdGlmaWVycywg
-R19OX0VMRU1FTlRTKG5vdGlmaWVycykpOworfQorCitpbnQgbWFpbihpbnQgYXJnYywgY2hhciAq
-KmFyZ3YpCit7CisgICAgLyoKKyAgICAgKiBUaGlzIGNvZGUgcmVsaWVzIG9uIHRoZSBmYWN0IHRo
-YXQgZmRtb24taW9fdXJpbmcgZGlzYWJsZXMgaXRzZWxmIHdoZW4KKyAgICAgKiB0aGUgZ2xpYiBt
-YWluIGxvb3AgaXMgaW4gdXNlLiBUaGUgbWFpbiBsb29wIHVzZXMgZmRtb24tcG9sbCBhbmQgdXBn
-cmFkZXMKKyAgICAgKiB0byBmZG1vbi1lcG9sbCB3aGVuIHRoZSBudW1iZXIgb2YgZmRzIGV4Y2Vl
-ZHMgYSB0aHJlc2hvbGQuCisgICAgICovCisgICAgcWVtdV9pbml0X21haW5fbG9vcCgmZXJyb3Jf
-ZmF0YWwpOworICAgIGN0eCA9IHFlbXVfZ2V0X2Fpb19jb250ZXh0KCk7CisKKyAgICB3aGlsZSAo
-Z19tYWluX2NvbnRleHRfaXRlcmF0aW9uKE5VTEwsIGZhbHNlKSkgeworICAgICAgICAvKiBEbyBu
-b3RoaW5nICovCisgICAgfQorCisgICAgZ190ZXN0X2luaXQoJmFyZ2MsICZhcmd2LCBOVUxMKTsK
-KyAgICBnX3Rlc3RfYWRkX2Z1bmMoIi9mZG1vbi1lcG9sbC9leHRlcm5hbC1kaXNhYmxlZCIsIHRl
-c3RfZXh0ZXJuYWxfZGlzYWJsZWQpOworICAgIHJldHVybiBnX3Rlc3RfcnVuKCk7Cit9CmRpZmYg
-LS1naXQgYS90ZXN0cy9tZXNvbi5idWlsZCBiL3Rlc3RzL21lc29uLmJ1aWxkCmluZGV4IGRhZThh
-NzdkZjEuLjYyMjc3ZTY4NTggMTAwNjQ0Ci0tLSBhL3Rlc3RzL21lc29uLmJ1aWxkCisrKyBiL3Rl
-c3RzL21lc29uLmJ1aWxkCkBAIC0xNjksNiArMTY5LDkgQEAgaWYgaGF2ZV9ibG9jawogICBpZiAn
-Q09ORklHX05FVFRMRScgaW4gY29uZmlnX2hvc3Qgb3IgJ0NPTkZJR19HQ1JZUFQnIGluIGNvbmZp
-Z19ob3N0CiAgICAgdGVzdHMgKz0geyd0ZXN0LWNyeXB0by1wYmtkZic6IFtpb119CiAgIGVuZGlm
-CisgIGlmICdDT05GSUdfRVBPTExfQ1JFQVRFMScgaW4gY29uZmlnX2hvc3QKKyAgICB0ZXN0cyAr
-PSB7J3Rlc3QtZmRtb24tZXBvbGwnOiBbdGVzdGJsb2NrXX0KKyAgZW5kaWYKICAgYmVuY2hzICs9
-IHsKICAgICAgJ2JlbmNobWFyay1jcnlwdG8taGFzaCc6IFtjcnlwdG9dLAogICAgICAnYmVuY2ht
-YXJrLWNyeXB0by1obWFjJzogW2NyeXB0b10sCi0tIAoyLjI2LjIKCg==
+On Tue, 15 Sep 2020 at 11:46, Max Reitz <mreitz@redhat.com> wrote:
+>
+> The following changes since commit 2d2c73d0e3d504a61f868e46e6abd5643f38091b:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200914-1' into staging (2020-09-14 16:03:08 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/XanClic/qemu.git tags/pull-block-2020-09-15
+>
+> for you to fetch changes up to 7bae7c805d82675eb3a02c744093703d84ada2d6:
+>
+>   block/rbd: add 'namespace' to qemu_rbd_strong_runtime_opts[] (2020-09-15 11:31:10 +0200)
+>
+> ----------------------------------------------------------------
+> Block patches:
+> - Several qcow2 fixes and refactorings
+> - Let qemu-img convert try to stay at cluster boundaries
+> - Stable child names for quorum (with x-blockdev-change)
+> - Explicitly drop vhdx 4k sector support, as it was never actually
+>   working
+> - rbd: Mark @namespace a strong runtime option
+> - iotests.py improvements
+> - Drop unused runtime_opts objects
+> - Skip a test case in 030 when run through make check-block
+>
+> ----------------------------------------------------------------
 
+
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
+
+-- PMM
 
