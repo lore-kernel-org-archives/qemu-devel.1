@@ -2,96 +2,90 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 995E6C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:35:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E69EEC43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:36:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 078CB208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:34:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5FBA7208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:36:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sTMuBhHv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 078CB208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="trTDeXCR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FBA7208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIEr5-0003MM-0L
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 13:34:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44930)
+	id 1kIEsA-0004kg-DV
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 13:36:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44504)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kIEZ8-0002Yh-IY
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 13:16:26 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:45754)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kIEXO-0000f1-Ml; Tue, 15 Sep 2020 13:14:38 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:37620)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kIEZ4-0003Kl-LV
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 13:16:25 -0400
-Received: by mail-pg1-x544.google.com with SMTP id 67so2294216pgd.12
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 10:16:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=Jlwzo35vvjMnhBg5jjD5gQJxj45DXQ1gaS0XT6337gM=;
- b=sTMuBhHvrAkNcVTHM7KdG6R+l36+10Ax8gUpCKITkLxnmlXlHS+2Od6RbXTKpGsAGb
- nRLlw5ky4VyCYUxHy7VQIDEbaHBA3BYfsuLUosdG6cWKxBUqKIjTX0E7HAcA3K3BYFAE
- 6EotDXWr5MR6v33SCwMQ2isYj61/IfUrqCu0/P1KC9uamV6tpukosdFJkyyC0qUksv9u
- OR3Ny/Ukpd7P0ySC8IM9MIwqIgOWu8CEigjExVzmg6b60UXSt+W4NZ3p5Ik0kdYj7rpO
- zzFQlDRadneip0SNzF61zs8q6Hz9hbJRpPEOxNwI0bC00lkQsn5RQGe60FNV1kl4ajKL
- 5Ilw==
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kIEXL-0002pS-MD; Tue, 15 Sep 2020 13:14:38 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id kk9so124289pjb.2;
+ Tue, 15 Sep 2020 10:14:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=EBhZ0tPMEzEbVc2ih32FHbQeoM4d+XPCBYcJq9Mkgzw=;
+ b=trTDeXCRqAK71fBTmFO/K9BLMGThkKDvB1Z2UZgixDgb27SwnUNzqfD6qpe11kP2+R
+ zF1tUOoLCIqAft0nMRrSZAOdhFEYdl1rBtrTNzTh26n+dcz4ONV2ygqDrfu5dc93/Z47
+ bIZq2HpNgvh+K6iSqS4PYscvrnmjG8w6zbuFO4oMhP1cCHGiflTgMFYw8CmCO3vyPMZf
+ 8WGKnGaGUpPszNrcSUuQTEm4EwwRWQ5oXcDGYHb/UiIgM/U8D9Gcm4RV5ymlCQMZ0E8s
+ 9plJBl0RmHu5sGMOXDMnWkLhh/lwhWwNLIli8kCCFl4P8eeEBNaiFH22quhGSe6GlNGR
+ 8bpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Jlwzo35vvjMnhBg5jjD5gQJxj45DXQ1gaS0XT6337gM=;
- b=dWEVi9GmQYUjq9kWXQTq99Sv4XAqDkpxs10L07RBHS0pqqAGT8wqbPv2enrzn3j2o3
- clPBH5BNBtA8e7vbeEYPmeU1jco55Xip+pPe5DBD0xRAqFIQrkRi3jbwNZD/K1UR3t5K
- 0K/EvnmUzz6xWybQz+psJyydZTWrGgxWvkM3pobgfhvlgIBN7SlZmxcDkadykBnEO+RX
- uaIKE+befPr8OdD9c4anBOPAzoCHdUhg2BQuS3p11eRs3LwpdU5anO8nhlL+mmbWpg8t
- x9ktvN5c+HjI78bZw3oRqIs06ad7EaiN9KEsgtK+nXiyeN0ztbr0OB1yFL7TPKwVFImc
- 3D5Q==
-X-Gm-Message-State: AOAM531kLKsfXSHyvvv0qaklzDM+GEfRpPIWWvc/l2nSvuIHqud3qcBh
- 2Q3SeAZfAgudAJ7RXDq6wAsIPhQGpE05vA==
-X-Google-Smtp-Source: ABdhPJw9VU/Z52pasnTR+oVQYxBDzh9F7bsfIZcZFwA2nS4SGumMqGbphcCI+X6hIG1oAJqpNCaPVw==
-X-Received: by 2002:a63:b20d:: with SMTP id x13mr12968049pge.136.1600190180715; 
- Tue, 15 Sep 2020 10:16:20 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id y202sm14763700pfc.179.2020.09.15.10.16.19
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 15 Sep 2020 10:16:20 -0700 (PDT)
-Subject: Re: [PATCH v2 4/8] configure: also skip deprecated targets with
- target-list-exclude
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200915134317.11110-1-alex.bennee@linaro.org>
- <20200915134317.11110-5-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <6b0148d6-511f-d5f7-6291-abebf1cfb06e@linaro.org>
-Date: Tue, 15 Sep 2020 10:16:18 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=EBhZ0tPMEzEbVc2ih32FHbQeoM4d+XPCBYcJq9Mkgzw=;
+ b=AeHLz4xZEDHFNfQQfWgMVDB6MFTdDq1koE7O6r3K+ZBobObIUwpBa7sVzDypYEzEJQ
+ vVBUNvQYAGsWfyywxnUTSEda+y3J/s1JIhdjzpNazM80qRL/BGeitmR75+ei0vGizdyl
+ +MZwKE2p9goB+xvCvxie7cvZnGm5IYSIk0smRp/ZNTszszxzpHCHNn4ztjDBBaQMXvcU
+ pxWENwZc7By3sQmNfUKWKhw+RLE6FsDUejE0oqzPvU8FHqe8D7sWLmqa9XH+doAsEIt5
+ E6qLxGDVk5Auqo1WmKSi37z7qiqoMFgF0UHEldgnHoOy/AjM0mrQ/5aDWuXcmROQ2tbX
+ +GVQ==
+X-Gm-Message-State: AOAM532w0PDrm+zPM/gemXNoTU4fiZTmDQQXgSDTyqfO5NFlEBNIBnPF
+ bTQN2CJCkXYWNpNKvvZARj9QuFUCMZhk74Fbyec=
+X-Google-Smtp-Source: ABdhPJwBg2Q6Q34oj/JelEKd6Cm+W7qeXLJKXsGTdMxWEtu+fzD71g2mUoeR94RtymDpUhQnrM1GXg==
+X-Received: by 2002:a17:90b:3105:: with SMTP id
+ gc5mr315565pjb.225.1600190071522; 
+ Tue, 15 Sep 2020 10:14:31 -0700 (PDT)
+Received: from localhost.localdomain ([103.94.185.75])
+ by smtp.googlemail.com with ESMTPSA id j14sm124046pjz.21.2020.09.15.10.14.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 15 Sep 2020 10:14:30 -0700 (PDT)
+From: Yonggang Luo <luoyonggang@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v10 22/26] rcu: fixes test-logging.c by call drain_call_rcu
+ before rmdir_full
+Date: Wed, 16 Sep 2020 01:12:30 +0800
+Message-Id: <20200915171234.236-23-luoyonggang@gmail.com>
+X-Mailer: git-send-email 2.28.0.windows.1
+In-Reply-To: <20200915171234.236-1-luoyonggang@gmail.com>
+References: <20200915171234.236-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200915134317.11110-5-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1044.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -106,22 +100,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
+ Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Yonggang Luo <luoyonggang@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Wen Congyang <wencongyang2@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Li-Wen Hsu <lwhsu@freebsd.org>, Peter Lieven <pl@kamp.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/15/20 6:43 AM, Alex Bennée wrote:
-> Now the user has to make an even more deliberate decision to
-> enable a deprecated target rather than getting it as a side effect of
-> using --target-exclude-list.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  configure | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+drain_call_rcu is necessary on win32, because under win32, if you
+don't close the file before remove it, the remove would be fail.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+---
+ tests/test-logging.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-r~
+diff --git a/tests/test-logging.c b/tests/test-logging.c
+index cec18b31b4..a7e36dbfe8 100644
+--- a/tests/test-logging.c
++++ b/tests/test-logging.c
+@@ -211,6 +211,8 @@ int main(int argc, char **argv)
+                          tmp_path, test_logfile_lock);
+ 
+     rc = g_test_run();
++    qemu_log_close();
++    drain_call_rcu();
+ 
+     rmdir_full(tmp_path);
+     return rc;
+-- 
+2.28.0.windows.1
 
 
