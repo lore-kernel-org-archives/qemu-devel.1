@@ -2,103 +2,125 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37099C43461
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4581AC2D0E3
 	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 21:33:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 942DD2078E
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 21:33:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A16A21D7E
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 21:33:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nIREcKbx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 942DD2078E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="Uk6gszkL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A16A21D7E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIIZy-0003XD-FT
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 17:33:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46278)
+	id 1kIIZx-0003VK-Mt
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 17:33:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46306)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kIIXC-0001l1-En
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 17:30:43 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:53785)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kIIX9-0002ix-4y
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 17:30:42 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id t7so457796pjd.3
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 14:30:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=zxy8V1MNkV+mqhUqTlm+FEkBAi1RK8rG5fspzNc+5Hw=;
- b=nIREcKbxawTBr1qw3b8gEyS72A3YWaXu2fbFqReT7PqkMwOftoPzxV6hJpg+XsGVdE
- xgincoC1CoJPho+OnHIJiuhMrUSa4jPoyaf6F1o7JImUrCITiAlWhQUaHepckN0egCnd
- fSFqWWGutj1OsJYgkF9FTu4+LVZNzsnKqC/L/35jrBDvBoI8og3Ve4MRrRdJk1jC7BQf
- M+3aLZm4A9ZA3RpY4u5RacexiiCW4ui50/4lGsW6cbEMM0Sr4JiBkEBZJh4tyIytO6Ku
- Ja+m0L7uMdSd6jB/00TwnNtgsu0iRQ88ii6GOi4WQo3plBqocIRfLbAHaIxKSRUOGvhJ
- oOLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=zxy8V1MNkV+mqhUqTlm+FEkBAi1RK8rG5fspzNc+5Hw=;
- b=JwDn4FFYrMXuWo6S/Wf+fId4VkkB6wRDYIT93AkPlDMUTBh3LvyTRk5Ltyj/SLOGVd
- DtlNSJQJLAY+F6YxZpMVkyOP2XiwaFu2zHXQJWEpcd8iNbigK2qGWWmPukqzOePALIEm
- BHDlJ14xWuPOkRO8Gto4yG4+csPdbxrarjItvxS5naQI0H9q/G+scbmYm88PU5QhXL2H
- drg8rYptd+A+ycsc7Qse3WiEOp/RABY+xu+C9oEaTn6uamlt0/5MbIE5LATsqTUSiIa6
- nzLeRO+VsgxaBf9fekmG2FOZzr8NoCcdJfeE42adZ+OhuReDfcRm+DW04gwHF+tKHv9d
- D2AA==
-X-Gm-Message-State: AOAM531kJnrlklJoqDqw8xk5aIu5HkV2lQVpG2xo0JISSsmLQCCF/9nr
- nW0RuToVW2P29Z6XsXUsBqWHlg==
-X-Google-Smtp-Source: ABdhPJxytltE+/fLGA+hEcdOJLbjWxPv0hx2NAbR0EiWJU3pIRJYgtRfpEl/UNKhHYNt3Md3eGGnkg==
-X-Received: by 2002:a17:902:8f88:b029:d0:cbe1:e719 with SMTP id
- z8-20020a1709028f88b02900d0cbe1e719mr21431895plo.39.1600205437147; 
- Tue, 15 Sep 2020 14:30:37 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id y126sm14724600pfy.138.2020.09.15.14.30.36
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 15 Sep 2020 14:30:36 -0700 (PDT)
-Subject: Re: [PATCH 1/5] qom: Allow objects to be allocated with increased
- alignment
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20200915174635.2333553-1-richard.henderson@linaro.org>
- <20200915174635.2333553-2-richard.henderson@linaro.org>
- <20200915180736.GB7594@habkost.net>
- <6d6a80bf-a542-6818-1638-0318f4aab336@linaro.org>
- <20200915201901.GD7594@habkost.net>
- <74c1e091-63c4-9ea0-c515-ad977ffa1d98@linaro.org>
- <20200915212732.GE7594@habkost.net>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <7c827913-db00-ab68-94fb-8512f716356c@linaro.org>
-Date: Tue, 15 Sep 2020 14:30:34 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20200915212732.GE7594@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+ (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
+ id 1kIIXI-0001nf-9N
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 17:30:48 -0400
+Received: from mail-dm6nam10on2054.outbound.protection.outlook.com
+ ([40.107.93.54]:28256 helo=NAM10-DM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
+ id 1kIIXG-0002jx-QE
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 17:30:48 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=k4wz7gsGCwHH3N6SYOFksxI722vG6OONX8HDR3lWkp14pi6B8MZcWuc9oUWRDH3hoZ9efPawV4F1wIX1KkMG301DIr6lhmPODQGtByLyZvQtZKRmRioex2vK0vJFpIsAUTWb9lGx3ozRIvaEFpTyb2sfcXFnQB6cDzKb/taxlHnnrtXyvQyeqjsqVZNwJ2LkkCcKepgBncSxAiTZ/TfMhRnPjXbnXP3K7vfeODLGuj/k2KUxxgH8oDTYEd665WQz8yqcXC0NAYcoaRRlI2hj1P5FUEmAnkWyg+Uo1AZtERvKkdxRBEWh69TA6Kp75YhO39bHtq+H+BDxGD1Splt8iA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pwUL4IAYHpyXvJJHQEV+j4J5TbqEfkYMfCqoG7chKXE=;
+ b=PTx4WhBNnGM89Z+HJq9pQcMgrXy4mYPnLp9GGRDTVJYQyDI9ec7AWOWG62wGpkDnd3lIgqRVMohXL4yKOtiGfopQFjvV58lkzQSgMjnukPTz464VKSdJbNsFn+4vI2+WYHSEd+0k4UaX3g7+VJkxvCyoc0zhHnCKGIovHRkOpdpP7BMuvaxDxd1Atezs9c0sVgpDpJp6gsY3M1yS6cnxRy6sz6EYTnWq23uE+YytV9xNFoQ6ujXZllnD9Vcm4yS2iSZEAsYQWV0XEwhMGVrQuCyYZWNEJGLlBi7ZEOlT0RBVTigSb/hKtLRw69lzVb8WpIq5C4FyWSJJQ9HkooqyWQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pwUL4IAYHpyXvJJHQEV+j4J5TbqEfkYMfCqoG7chKXE=;
+ b=Uk6gszkL/eDiX8tXdtJD1rlwe2+9yj7h09zBidK0zPQbu2UOvZ4CjOd42TfO1s7llva1IQtaT0Yy62Qdm9MIzZn9cWuf6AaDPMZ8ioEra5AL+Wrsc7CuuKAGfJBo13oBQbP2Q50sXWT2a+9ncrrSSesjMr4oDOnZM39RtSvE/ow=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
+Received: from CY4PR12MB1352.namprd12.prod.outlook.com (2603:10b6:903:3a::13)
+ by CY4PR12MB1607.namprd12.prod.outlook.com (2603:10b6:910:b::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Tue, 15 Sep
+ 2020 21:30:16 +0000
+Received: from CY4PR12MB1352.namprd12.prod.outlook.com
+ ([fe80::989b:b1b2:464c:443]) by CY4PR12MB1352.namprd12.prod.outlook.com
+ ([fe80::989b:b1b2:464c:443%10]) with mapi id 15.20.3370.019; Tue, 15 Sep 2020
+ 21:30:16 +0000
+From: Tom Lendacky <thomas.lendacky@amd.com>
+To: qemu-devel@nongnu.org,
+	kvm@vger.kernel.org
+Subject: [PATCH v3 2/5] sev/i386: Require in-kernel irqchip support for SEV-ES
+ guests
+Date: Tue, 15 Sep 2020 16:29:41 -0500
+Message-Id: <59ca62e1527a854fc8c411fb01bf0f55ee13aeb7.1600205384.git.thomas.lendacky@amd.com>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <cover.1600205384.git.thomas.lendacky@amd.com>
+References: <cover.1600205384.git.thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1044.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-ClientProxiedBy: DM5PR21CA0053.namprd21.prod.outlook.com
+ (2603:10b6:3:129::15) To CY4PR12MB1352.namprd12.prod.outlook.com
+ (2603:10b6:903:3a::13)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from tlendack-t1.amd.com (165.204.77.1) by
+ DM5PR21CA0053.namprd21.prod.outlook.com (2603:10b6:3:129::15) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3412.1 via Frontend Transport; Tue, 15 Sep 2020 21:30:15 +0000
+X-Mailer: git-send-email 2.28.0
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 8434a1a4-dec5-43ea-d2bf-08d859be89be
+X-MS-TrafficTypeDiagnostic: CY4PR12MB1607:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CY4PR12MB16071FCE9B025799E42F3805EC200@CY4PR12MB1607.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:989;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /tgiEkMy1imv5MAlhFkAr+Dsdtwys5kLUDHz8xALlQK4kP3Uq/0zhZfGVWntmiKw2nu3U4vuf6jN8ZwZsifkhAe+ytuFUNPKd8xSAuITC6G9iVg9GNpeUVq/AsE20UX9jGMEOxWC6pa1qR5/YALgQL90VJLdtm/WeT+2S6tRGPGRqf8rHsQ5DiKahtkkCytHJWWTB6rYH60k5l7Q8FFVwXF/P22iqWuNXhcCt42XX/7DB8EIsYcD7Rmhow/s4F5MZYuFyAfot6jcpqG4l8wLdT+dpKp0rdQYkSXeUPO+TQPjeY6UarsvXnDEsvs78txT
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:CY4PR12MB1352.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(396003)(366004)(346002)(136003)(39860400002)(376002)(5660300002)(956004)(478600001)(6666004)(86362001)(52116002)(2616005)(2906002)(7696005)(36756003)(66476007)(8936002)(66556008)(66946007)(4744005)(316002)(54906003)(7416002)(26005)(6486002)(4326008)(8676002)(16526019)(186003);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-AntiSpam-MessageData: FGZPTAE35glA00aZnnUUzL6GK6EP11xfDDzr6f/XFCsj8vDhBm6ghCxIFoaoU2VdvLe1uCBsnT5upU5BNFC1/uZFzE1t1khr/Juw5p0uTIDvr8OUV1C74mOkyjnBUUsfUwuaotKqe0GZHWSRiEMPtRMZBE1jikXepWOBDT1EsgNtTdy+wZQcYPZ4Am3fBgwgJbw4eJ5jfEUSmdXDSeabcyh3wz9ur/zVH902yflj7JXErijo7uU93g2n9ycoU0MImIW7NhlgkWAinIxtUaw3Bx9FRtDUqtIB1YF49OEEVqQVpse0dq9NjQ4o2hB/7yNkajSqrDgCPr6JHz03ge8cKOZYQV2Zscj+0SstldN2xAG9xU/1GsnzDx99LvpePHdqTijgQKcZ6EqxlsMMyi30IjaZMKYbN55ay24Kvde+GbtNVh7Ix+cCPqPsZEevqzIz6i3VAdpCsZqYRiXlGKyTVuUhRaQWY/N9RNGF/z/ylrplPIaD5/+m3L6McsX6xa0THFkolKvsIJqTxMoed79xuTW8WDqToVjktd76NrDF+PxJn4hgr1rZt2wsRB+pvZlfV3STe1w2P0f1de/w5PErJ+vpfptN5bXOcc77r8wct5wjUXfK1MTlx+qFusbtuO6mDDVNw72dgSgVyr2myfWbxA==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8434a1a4-dec5-43ea-d2bf-08d859be89be
+X-MS-Exchange-CrossTenant-AuthSource: CY4PR12MB1352.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2020 21:30:16.4816 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dQsfTw+AAXbg2cFx+5hJ/M8WbNVJyKfTB8MOUXVCb14SfhNE55IdzZ4h5z9IZLnx2wPQljr8DneArV5WV+o19A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1607
+Received-SPF: none client-ip=40.107.93.54;
+ envelope-from=Thomas.Lendacky@amd.com;
+ helo=NAM10-DM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 17:30:43
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -8
+X-Spam_score: -0.9
+X-Spam_bar: /
+X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_NONE=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,37 +133,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Brijesh Singh <brijesh.singh@amd.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Connor Kuehl <ckuehl@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Jiri Slaby <jslaby@suse.cz>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/15/20 2:27 PM, Eduardo Habkost wrote:
-> On Tue, Sep 15, 2020 at 01:51:48PM -0700, Richard Henderson wrote:
->> On 9/15/20 1:19 PM, Eduardo Habkost wrote:
->>> Once we move to C11, we can just use max_align_t.
->>
->> Yes.
->>
->>> While we don't move to C11, why not just use
->>>   __alignof__(union { long l; void *p; double d; long double ld;})
->>> ?
->>
->> For i386, this is 4.
-> 
-> Is i386-linux the only case where there are additional alignment
-> guarantees not covered by C99?
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
-I think so.
+In prep for AP booting, require the use of in-kernel irqchip support. This
+lessens the Qemu support burden required to boot APs.
 
-> I would prefer a i386-linux-specific #ifdef for that case instead
-> of guessing based on undocumented libc internals.
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+---
+ target/i386/sev.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-I was thinking abi, not internals.
-
-
-r~
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 6c9cd0854b..5055b1fe00 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -776,6 +776,12 @@ sev_guest_init(const char *id)
+     sev->api_minor = status.api_minor;
+ 
+     if (sev_es_enabled()) {
++        if (!kvm_kernel_irqchip_allowed()) {
++            error_report("%s: SEV-ES guests require in-kernel irqchip support",
++                         __func__);
++            goto err;
++        }
++
+         if (!(status.flags & SEV_STATUS_FLAGS_CONFIG_ES)) {
+             error_report("%s: guest policy requires SEV-ES, but "
+                          "host SEV-ES support unavailable",
+-- 
+2.28.0
 
 
