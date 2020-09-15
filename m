@@ -2,90 +2,89 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC81DC43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:46:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3940C43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:48:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DAAD208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:46:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 67850208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:48:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U1v73fky"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DAAD208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kBFG5zie"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67850208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIF2g-0001CH-En
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 13:46:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44508)
+	id 1kIF4X-0003yG-HT
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 13:48:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kIEXP-0000i5-Ip; Tue, 15 Sep 2020 13:14:39 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:46401)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kIF2T-0001Zt-J7
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 13:46:46 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:45202)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kIEXN-0002pq-Vs; Tue, 15 Sep 2020 13:14:39 -0400
-Received: by mail-pf1-x444.google.com with SMTP id b124so2289197pfg.13;
- Tue, 15 Sep 2020 10:14:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kIF2Q-0007Ff-5d
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 13:46:45 -0400
+Received: by mail-pg1-x542.google.com with SMTP id 67so2337500pgd.12
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 10:46:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=+2fNL50dgeI28TebAqSoSX6cTtGwDHyqvFUmnw67Jgc=;
- b=U1v73fkydNQnHcMcbp3JTeTZOjhtisqCvxkSJCSyxxK5JRkpBavtwsXuxDS+wViYsI
- KDgDVMTdlPe/CKP82/QurVWtCetpuhs81V3kIptAmioF66RwzWiGuXFRd5/gDR+oCZEs
- jllWPl5quHm42JyxWGUqphLfZ480SnGiGBMfGFCcji4DEmpSsE29LtsIKKFh27btsD2s
- 4/mq/6Lx2fbsDXjhDsDs7EWEdusQh4BaXnQYqsymhLGo7fw6GIxLems/UtpIPeR2bsn4
- Rd3bs0JlFllPBRas8PVXS8STfkzDqV3YOrzEzcMODTLHEBTv6wJPoMUT4iyWB5c9NhKD
- C2CQ==
+ bh=zb/g+Fvikq2LApYjpqfoFSuv71lvaud3AwPVH756moE=;
+ b=kBFG5ziek6umJHHOGvYzci5tJyE9CPxBb6vyI3flzI+ZOz6WbjSG/Wt04UvpyBvaAR
+ fheuhKJCdS3ddA3Iqi7AEyg3ahujPUjSSdolxW5sFeWOjUjDcJPKhAXll19vd8xMs3l+
+ nu/cc4lk1gw9w4LyG9uZh4m2Em9aATGCK5N0ne8ICYdYTgy0T5tVXMMJvziUAt8Sz2aU
+ 5JCm+QrJ6esuUsXdvIkQ2ke5PnbWLTDJljWGmjevW+xzYLcYE1v6OdgjUPL1so8NCca5
+ dAvDWrIPKB9NyNreuRIJ9rEdXfFpX9B5O+eoVWRhM4ifRSMi6RTJFQHMqbRKRtBQXZ/F
+ 3ZEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=+2fNL50dgeI28TebAqSoSX6cTtGwDHyqvFUmnw67Jgc=;
- b=gU6NO1rbHMogy4I3/YjgC8rr5ds7Y2UP5uNTEqqB/VsNqp3oHTN0N55qjIzTDi2UKm
- oDMftNDim5hjlJR81yIBVSTOWKz18cVuu8BBA8SEyUAB0qsd+dnqInRt+71PFoHPvA7t
- x4UuxS65ZeMPZ/a+QiBIKguXbV1ShW2/yXQLSg+TWZ8pc7OBRKBX+SPiy73tLxQmxxHJ
- M56Nc22CsrD5XS3vEHPNVJviqMPzTOpVTBi48cbeXfK/l3UkMt2ToOuoXVFMIp6nwhgu
- sobzn8cfJ4NiUwCJMI/OFWdgzwJjDWxIihZ1a17R9HgXJJAmQR818T3q9539jYeiuGHE
- sjJA==
-X-Gm-Message-State: AOAM530vZ6FfzXXen2uPtEO98SkPFKLh6X6oN7zLuPOeG821JOhSVYJQ
- XfLFe/Zuim4OR/6xCutvRpdPdRIHDH9a7MgXnlk=
-X-Google-Smtp-Source: ABdhPJx6CrxI2ejTyVJxO9kSWHtWoBx8L/1qCVZ306sN5g2xbSmH66vo1s9Bsy/VX1bgejQmLKJnRg==
-X-Received: by 2002:a05:6a00:1703:b029:142:2f13:f1c5 with SMTP id
- h3-20020a056a001703b02901422f13f1c5mr978323pfc.29.1600190075790; 
- Tue, 15 Sep 2020 10:14:35 -0700 (PDT)
-Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id j14sm124046pjz.21.2020.09.15.10.14.31
+ bh=zb/g+Fvikq2LApYjpqfoFSuv71lvaud3AwPVH756moE=;
+ b=Xep6c+rhBlH2sU/1jjL9HP/2zd1XJXHvBuFJe1R+YbFvpldK5urxp/DavwfoTcbYpA
+ gLf/ZKMW1PcDZ/lG11N2bVeMB92FxHMGjFOd8/t2orqDw8wrgX7ZiyPVs5OsvokMvJn3
+ vGnYcBcDosWi1sy9YK4WUM8fLeXe4HRcAr7RQvaDqSzwKhd3B3CPVzRMndIoN7DzGMFG
+ fiELTgFa1o1ebcdErd2akN8Uf7PmhJlkvoWrSI0XX+cREAjHEuyFVRkoqQOuO8scMruB
+ LAWnUL86omvF5nCnlniO/ITAYe0rUJIF9gigvd3jWhNlt/9LEQJFssOMRBFJWlKC96Hc
+ ByTg==
+X-Gm-Message-State: AOAM532MGpDCMA/0nHa1RwqZr2ie/37waUA7PJDMNUdr9srDw4uQpEjG
+ SmZg2lWXRcv2B9NjWJ/VaZCiMClWh8IFTA==
+X-Google-Smtp-Source: ABdhPJw3BWkw4aLiFSYzXDuopVcGZbso73fpig8yQTG4xurwAInnErlR3N8xpKuQ0CpSrXRjVjgRNg==
+X-Received: by 2002:a63:1016:: with SMTP id f22mr15540135pgl.226.1600192000425; 
+ Tue, 15 Sep 2020 10:46:40 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id cf7sm147896pjb.52.2020.09.15.10.46.39
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Sep 2020 10:14:34 -0700 (PDT)
-From: Yonggang Luo <luoyonggang@gmail.com>
+ Tue, 15 Sep 2020 10:46:39 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 23/26] meson: upgrade meson for execute custom ninjatool
- under msys2 properly
-Date: Wed, 16 Sep 2020 01:12:31 +0800
-Message-Id: <20200915171234.236-24-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.28.0.windows.1
-In-Reply-To: <20200915171234.236-1-luoyonggang@gmail.com>
-References: <20200915171234.236-1-luoyonggang@gmail.com>
+Subject: [PATCH 3/5] target/ppc: Set instance_align on PowerPCCPU TypeInfo
+Date: Tue, 15 Sep 2020 10:46:33 -0700
+Message-Id: <20200915174635.2333553-4-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200915174635.2333553-1-richard.henderson@linaro.org>
+References: <20200915174635.2333553-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
- envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x444.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -100,39 +99,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
- Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Yonggang Luo <luoyonggang@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Wen Congyang <wencongyang2@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Li-Wen Hsu <lwhsu@freebsd.org>, Peter Lieven <pl@kamp.de>
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Bump versions to 0.55.2 for release
+Fix alignment of CPUPPCState.vsr.
 
-* Tag Info:
-object 008d13038f95e7c7d8ad553f14e408da5b94c360
-type commit
-tag 0.55.2
-tagger Jussi Pakkanen <jpakkane@gmail.com> 2020/9/11 1:24:47
-
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- meson | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org
+---
+ target/ppc/translate_init.c.inc | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/meson b/meson
-index 68ed748f84..008d13038f 160000
---- a/meson
-+++ b/meson
-@@ -1 +1 @@
--Subproject commit 68ed748f84f14c2d4e62dcbd123816e5898eb04c
-+Subproject commit 008d13038f95e7c7d8ad553f14e408da5b94c360
+diff --git a/target/ppc/translate_init.c.inc b/target/ppc/translate_init.c.inc
+index 230a062d29..accb4f2fae 100644
+--- a/target/ppc/translate_init.c.inc
++++ b/target/ppc/translate_init.c.inc
+@@ -10960,6 +10960,7 @@ static const TypeInfo ppc_cpu_type_info = {
+     .name = TYPE_POWERPC_CPU,
+     .parent = TYPE_CPU,
+     .instance_size = sizeof(PowerPCCPU),
++    .instance_align = __alignof__(PowerPCCPU),
+     .instance_init = ppc_cpu_instance_init,
+     .instance_finalize = ppc_cpu_instance_finalize,
+     .abstract = true,
 -- 
-2.28.0.windows.1
+2.25.1
 
 
