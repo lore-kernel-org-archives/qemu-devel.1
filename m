@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC1DEC43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 02:36:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91466C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 02:36:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BE34207EA
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 02:36:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BE34207EA
+	by mail.kernel.org (Postfix) with ESMTPS id 43225207EA
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 02:36:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43225207EA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kI0q1-0007Sw-It
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 22:36:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39562)
+	id 1kI0q2-0007Th-DU
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 22:36:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39586)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kI0nL-0002Ll-98
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 22:34:11 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:48968 helo=huawei.com)
+ id 1kI0nM-0002Mf-Jy
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 22:34:12 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:48906 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kI0nJ-0005tP-FG
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 22:34:11 -0400
+ id 1kI0nJ-0005sy-Ib
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 22:34:12 -0400
 Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 39F1B6B1A8C28649F8E5;
- Tue, 15 Sep 2020 10:34:07 +0800 (CST)
+ by Forcepoint Email with ESMTP id 2E181DBB89DFA140C1C9;
+ Tue, 15 Sep 2020 10:34:02 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS408-HUB.china.huawei.com
  (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Tue, 15 Sep 2020
- 10:34:00 +0800
+ 10:33:55 +0800
 From: Chuan Zheng <zhengchuan@huawei.com>
 To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>,
  <berrange@redhat.com>
-Subject: [PATCH v9 09/12] migration/dirtyrate: Implement
- set_sample_page_period() and is_sample_period_valid()
-Date: Tue, 15 Sep 2020 10:44:44 +0800
-Message-ID: <1600137887-58739-10-git-send-email-zhengchuan@huawei.com>
+Subject: [PATCH v9 02/12] migration/dirtyrate: add DirtyRateStatus to denote
+ calculation status
+Date: Tue, 15 Sep 2020 10:44:37 +0800
+Message-ID: <1600137887-58739-3-git-send-email-zhengchuan@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1600137887-58739-1-git-send-email-zhengchuan@huawei.com>
 References: <1600137887-58739-1-git-send-email-zhengchuan@huawei.com>
@@ -81,69 +81,86 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implement is_sample_period_valid() to check if the sample period is vaild and
-do set_sample_page_period() to sleep specific time between sample actions.
+add DirtyRateStatus to denote calculating status.
 
 Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: David Edmondson <david.edmondson@oracle.com>
 ---
- migration/dirtyrate.c | 24 ++++++++++++++++++++++++
- migration/dirtyrate.h |  6 ++++++
- 2 files changed, 30 insertions(+)
+ migration/dirtyrate.c | 26 ++++++++++++++++++++++++++
+ qapi/migration.json   | 17 +++++++++++++++++
+ 2 files changed, 43 insertions(+)
 
 diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-index 903f728..bcff10e 100644
+index bf7fd24..7bea8ff 100644
 --- a/migration/dirtyrate.c
 +++ b/migration/dirtyrate.c
-@@ -27,6 +27,30 @@
- static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
- static struct DirtyRateStat DirtyStat;
+@@ -22,6 +22,19 @@
+ #include "migration.h"
+ #include "dirtyrate.h"
  
-+static int64_t set_sample_page_period(int64_t msec, int64_t initial_time)
-+{
-+    int64_t current_time;
++static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
 +
-+    current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-+    if ((current_time - initial_time) >= msec) {
-+        msec = current_time - initial_time;
++static int dirtyrate_set_state(int *state, int old_state, int new_state)
++{
++    assert(new_state < DIRTY_RATE_STATUS__MAX);
++    if (atomic_cmpxchg(state, old_state, new_state) == old_state) {
++        return 0;
 +    } else {
-+        g_usleep((msec + initial_time - current_time) * 1000);
++        return -1;
 +    }
-+
-+    return msec;
 +}
 +
-+static bool is_sample_period_valid(int64_t sec)
-+{
-+    if (sec < MIN_FETCH_DIRTYRATE_TIME_SEC ||
-+        sec > MAX_FETCH_DIRTYRATE_TIME_SEC) {
-+        return false;
-+    }
 +
-+    return true;
-+}
-+
- static int dirtyrate_set_state(int *state, int old_state, int new_state)
+ static void calculate_dirtyrate(struct DirtyRateConfig config)
  {
-     assert(new_state < DIRTY_RATE_STATUS__MAX);
-diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
-index faaf9da..8f9bc80 100644
---- a/migration/dirtyrate.h
-+++ b/migration/dirtyrate.h
-@@ -29,6 +29,12 @@
-  */
- #define MIN_RAMBLOCK_SIZE                         128
- 
-+/*
-+ * Take 1s as minimum time for calculation duration
-+ */
-+#define MIN_FETCH_DIRTYRATE_TIME_SEC              1
-+#define MAX_FETCH_DIRTYRATE_TIME_SEC              60
+     /* todo */
+@@ -31,8 +44,21 @@ static void calculate_dirtyrate(struct DirtyRateConfig config)
+ void *get_dirtyrate_thread(void *arg)
+ {
+     struct DirtyRateConfig config = *(struct DirtyRateConfig *)arg;
++    int ret;
 +
- struct DirtyRateConfig {
-     uint64_t sample_pages_per_gigabytes; /* sample pages per GB */
-     int64_t sample_period_seconds; /* time duration between two sampling */
++    ret = dirtyrate_set_state(&CalculatingState, DIRTY_RATE_STATUS_UNSTARTED,
++                              DIRTY_RATE_STATUS_MEASURING);
++    if (ret == -1) {
++        error_report("change dirtyrate state failed.");
++        return NULL;
++    }
+ 
+     calculate_dirtyrate(config);
+ 
++    ret = dirtyrate_set_state(&CalculatingState, DIRTY_RATE_STATUS_MEASURING,
++                              DIRTY_RATE_STATUS_MEASURED);
++    if (ret == -1) {
++        error_report("change dirtyrate state failed.");
++    }
+     return NULL;
+ }
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 5f6b061..061ff25 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -1720,3 +1720,20 @@
+ ##
+ { 'event': 'UNPLUG_PRIMARY',
+   'data': { 'device-id': 'str' } }
++
++##
++# @DirtyRateStatus:
++#
++# An enumeration of dirtyrate status.
++#
++# @unstarted: the dirtyrate thread has not been started.
++#
++# @measuring: the dirtyrate thread is measuring.
++#
++# @measured: the dirtyrate thread has measured and results are available.
++#
++# Since: 5.2
++#
++##
++{ 'enum': 'DirtyRateStatus',
++  'data': [ 'unstarted', 'measuring', 'measured'] }
 -- 
 1.8.3.1
 
