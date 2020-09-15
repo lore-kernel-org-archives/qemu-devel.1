@@ -8,78 +8,78 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1EC7C43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:38:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F163DC43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:39:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5875D20731
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:38:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 598A520731
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:39:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FJLN2R8R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5875D20731
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VoBtXm1i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 598A520731
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIAEY-0006dI-EG
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:38:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47940)
+	id 1kIAEd-0006ty-Gr
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:38:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48288)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kI9qI-0000XJ-S3; Tue, 15 Sep 2020 08:13:51 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:40210)
+ id 1kI9qx-00011n-Oq; Tue, 15 Sep 2020 08:14:31 -0400
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:37364)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kI9qH-000899-1G; Tue, 15 Sep 2020 08:13:50 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id gf14so1614294pjb.5;
- Tue, 15 Sep 2020 05:13:48 -0700 (PDT)
+ id 1kI9qv-0008Ep-N3; Tue, 15 Sep 2020 08:14:31 -0400
+Received: by mail-pj1-x1042.google.com with SMTP id kk9so1624064pjb.2;
+ Tue, 15 Sep 2020 05:14:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=qBiHjFc2XldMuU70Rv/GASQm/Q1CmoJMQE32Qhbbw0w=;
- b=FJLN2R8RyyiCUgjf4S7wi5csg/znuwBY8H9s2TJQJ2ni/KB0yZaDm+TeNK1KBT5iNg
- 7fLoZimL7CufnMQo1TrFW0xHKCTmxb1K9jQD8GlDZsNWjW7BwlihqkcDWiFE58uXFNv6
- INUy35fQmuNohONEhl84oDPahsjKWSnQoAtFjjP0/C3MG3J+VKrIaUqvqEX5OnaCDBgN
- AlXVetsJFmuAUhGuO37xhsgLXKeJ7cgL5DaMcUAirJp0Rt3QHA1O1mLGOxLdlI7Y+vd/
- WactelzQkIVSQCOJamFB5yNit/LxzUkRwExt8A4PsVdFStiQhH1e7OLWON7/lowyLU1i
- 0ccw==
+ bh=oGHfde2/p7Unz0ZWASemFfUTS9Iu9gtXZvUHoGMG0N8=;
+ b=VoBtXm1iXA2cWPMVJjiuvbaRmJfadoHiieVIKykWquoVeayOo3GLcPawOKzS8A5ani
+ Lf/5b4Rk1sVWPjbHLoAUXrXMmRIk2oCVSjpxXqCcFtxCkHjBPTqLRPDyvOpH0x+l3OOG
+ XEtRECeKQiEH0yqshV9KIhWj0IrRkVjzQw1kLOIpJ+0B0dywuXjGznQnMQjeOANlmaCR
+ WGAoOFbYfjF0/lnYGoYCcwJhmVcxJnjmBEWJjruypMQ2SpkEq1WP+xBsMKn58oWGbw3Y
+ g2KHap6m2rHqcQ991nDNVZDGIXW//aEXDRY1k+8MZ8KjtQitUcg/rrOYYdQHM74dN37s
+ zjyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=qBiHjFc2XldMuU70Rv/GASQm/Q1CmoJMQE32Qhbbw0w=;
- b=p44MfaKw+ajJwN8+chDgX18eBYH5DUuj2nSfi0jwiNUkUvjI8FZmLXH6my6oW0z0E3
- 1tOLteM6RMjEMr/yB6YTbwcuzXF2xFNLMvZjP82gnU1EgRNiEhpZZQk+xGA+US31Ywmo
- w015pyl1CMv15ZYYOc6KiyW+yz9xBwCFOMWInph9Kd6pUcoYE/3cBzH3BMPW8fhoaEZb
- 84FrK7ZrAqu35wk82mj27Z4TyaESITyleKZinCMgKm6/1MHktY10zKOHAoGTLbwfZGB3
- VwTXfjh/cSVM2CSjYEYDYvJsfUIy2vxRh5vEVA8hEfRep5WeId1iWB0kFv1gbyaQV1iB
- aUaQ==
-X-Gm-Message-State: AOAM53338pbZE6fAFSDcMs6mgxayisZLYFJViiqRyUve5ueyvbOYqdPu
- IZdYIYWDG6yQnHgBb7qWCAM2+SqsJmYBKLhfrR8=
-X-Google-Smtp-Source: ABdhPJwUGnNJNo26A0ff1ET+pLtDkOBF7JIHVPUdG6sQi+qP73QgIUQ71caVdf1G9VDGAyPKh3qkHA==
-X-Received: by 2002:a17:902:c202:b029:d1:cbf4:c596 with SMTP id
- 2-20020a170902c202b02900d1cbf4c596mr7840166pll.27.1600172026597; 
- Tue, 15 Sep 2020 05:13:46 -0700 (PDT)
+ bh=oGHfde2/p7Unz0ZWASemFfUTS9Iu9gtXZvUHoGMG0N8=;
+ b=m1wMJ5S//YU3yx/MotzN0btr8RGrXMw+7zYXGPK3B77KElSF4A8MZPHsh/TQn8c2k1
+ WDOQWmpIEvaH6ofacTq/Lyi/aqrrVcRJ7jV0kAYxjK/oakQOlM098iXHx4QwKLZfDQql
+ qOULdjSpo02Ouz7YN/Eiin6s6yfe3UemVlL55bleklAaDpW37CmZho/JDcyvSFkBdIlZ
+ AlEy6czMEG3MsyBb4tTW1e74lG7VrEW/e6im4mjeiZNdjnkpsxqiuB+wHnehugMJ3z+U
+ AQO0H0KHXAXO/yPEOiFvkIi0FqOFJxqcArsXjWH4ijYyBQBTUk8YpCbwZbpuxff23KNx
+ dV0g==
+X-Gm-Message-State: AOAM533JvLSVpwzhWhHNjiQZga1XS5XghpJrda6/5Yi1y9lLYPIAWYiy
+ dGY5uYhaqe/W/zrNhcrh2evvixHzlykEVVEMbj0=
+X-Google-Smtp-Source: ABdhPJxf67dWEUzcJ29bQNXsHeYqVbM44nvPNU97E1rJTq6ySQStXsTGRcdjrXbbqjHKxK2vaHF6cA==
+X-Received: by 2002:a17:902:c1cb:b029:d0:cb2d:f271 with SMTP id
+ c11-20020a170902c1cbb02900d0cb2df271mr19226911plc.10.1600172067565; 
+ Tue, 15 Sep 2020 05:14:27 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
  by smtp.googlemail.com with ESMTPSA id
- k28sm13683061pfh.196.2020.09.15.05.13.42
+ k28sm13683061pfh.196.2020.09.15.05.14.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Sep 2020 05:13:45 -0700 (PDT)
+ Tue, 15 Sep 2020 05:14:26 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 02/26] ci: fixes msys2 build by upgrading capstone to 4.0.2
-Date: Tue, 15 Sep 2020 20:12:54 +0800
-Message-Id: <20200915121318.247-3-luoyonggang@gmail.com>
+Subject: [PATCH v9 11/26] gcrypt: test_tls_psk_init should write binary file
+ instead text file.
+Date: Tue, 15 Sep 2020 20:13:03 +0800
+Message-Id: <20200915121318.247-12-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200915121318.247-1-luoyonggang@gmail.com>
 References: <20200915121318.247-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1044.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1042.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -114,75 +114,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The currently random version capstone have the following compiling issue:
-  CC      /c/work/xemu/qemu/build/slirp/src/arp_table.o
-make[1]: *** No rule to make target “/c/work/xemu/qemu/build/capstone/capstone.lib”。 Stop.
-
-Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1 are the tagged version 4.0.2
-when upgrading to this version, the folder structure of include are changed to
-qemu\capstone\include
-│  platform.h
-│
-├─capstone
-│      arm.h
-│      arm64.h
-│      capstone.h
-│      evm.h
-│      m680x.h
-│      m68k.h
-│      mips.h
-│      platform.h
-│      ppc.h
-│      sparc.h
-│      systemz.h
-│      tms320c64x.h
-│      x86.h
-│      xcore.h
-│
-└─windowsce
-        intrin.h
-        stdint.h
-
-in capstone. so we need add extra include path -I${source_path}/capstone/include/capstone
-for directly #include <capstone.h>, and the exist include path should preserve, because
-in capstone code there something like #include "capstone/capstone.h"
-
-If only using
-    capstone_cflags="-I${source_path}/capstone/include/capstone"
-Then will cause the following compiling error:
-
-  CC      cs.o
-cs.c:17:10: fatal error: 'capstone/capstone.h' file not found
-#include <capstone/capstone.h>
-         ^~~~~~~~~~~~~~~~~~~~~
-1 error generated.
+On windows, if open file with "w", it's will automatically convert
+"\n" to "\r\n" when writing to file.
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- capstone  | 2 +-
- configure | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ tests/crypto-tls-psk-helpers.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/capstone b/capstone
-index 22ead3e0bf..1d23053284 160000
---- a/capstone
-+++ b/capstone
-@@ -1 +1 @@
--Subproject commit 22ead3e0bfdb87516656453336160e0a37b066bf
-+Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1
-diff --git a/configure b/configure
-index ce27eafb0a..f59080703e 100755
---- a/configure
-+++ b/configure
-@@ -5157,7 +5157,7 @@ case "$capstone" in
-       LIBCAPSTONE=libcapstone.a
-     fi
-     capstone_libs="-Lcapstone -lcapstone"
--    capstone_cflags="-I${source_path}/capstone/include"
-+    capstone_cflags="-I${source_path}/capstone/include -I${source_path}/capstone/include/capstone"
-     ;;
+diff --git a/tests/crypto-tls-psk-helpers.c b/tests/crypto-tls-psk-helpers.c
+index a8395477c3..4f3bd446ad 100644
+--- a/tests/crypto-tls-psk-helpers.c
++++ b/tests/crypto-tls-psk-helpers.c
+@@ -26,13 +26,15 @@
+ #include "crypto-tls-psk-helpers.h"
+ #include "qemu/sockets.h"
  
-   system)
++#include <glib/gstdio.h>
++
+ #ifdef QCRYPTO_HAVE_TLS_TEST_SUPPORT
+ 
+ void test_tls_psk_init(const char *pskfile)
+ {
+     FILE *fp;
+ 
+-    fp = fopen(pskfile, "w");
++    fp = fopen(pskfile, "wb");
+     if (fp == NULL) {
+         g_critical("Failed to create pskfile %s", pskfile);
+         abort();
 -- 
 2.28.0.windows.1
 
