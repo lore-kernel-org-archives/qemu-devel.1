@@ -2,102 +2,127 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3443C43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 19:59:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE603C43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 20:03:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65BF82080C
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 19:59:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65BF82080C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 05AE32080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 20:03:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="v1JnJo4o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05AE32080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIH6l-0005Q9-9T
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 15:59:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53646)
+	id 1kIHAc-0008JJ-3f
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 16:03:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55912)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kIH3X-00045g-BX; Tue, 15 Sep 2020 15:55:59 -0400
-Received: from new4-smtp.messagingengine.com ([66.111.4.230]:55299)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kIH9y-0007mO-Af; Tue, 15 Sep 2020 16:02:38 -0400
+Received: from mail-eopbgr60100.outbound.protection.outlook.com
+ ([40.107.6.100]:28318 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kIH3T-0007ZO-Gl; Tue, 15 Sep 2020 15:55:59 -0400
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
- by mailnew.nyi.internal (Postfix) with ESMTP id 3DC94580103;
- Tue, 15 Sep 2020 15:55:53 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
- by compute7.internal (MEProxy); Tue, 15 Sep 2020 15:55:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-type:in-reply-to; s=fm1; bh=qMo4dN99YdwSpV4KoHamz8OIjPf
- QjVHVa6X7s8tvk0I=; b=IKbca5b6T/o7PZjeNee96DJ6odvhRooXl11nMFZE5Zk
- M6VYjEdz/0RoIon2dM4OfClP+NedRaT5LclZwG2mNBNaf4aySemipCkmPnzj7yNW
- f4A0YgKxjYsm8zWLbeCrmxSg6pmzI+aEjxXh7YjyXDFIu7rx17sviKAOXjxsLm0f
- F0GjeSLxRqYUsv2wgpDMhrj9Wemyvz8k0gKINYw1sCsN8MOJ6HGcS8R5krVGah1c
- YgRohsUvFSODAGUECy16OT0QXLgUWqukPEGiWMYbuEfCrkm0Hj5vtLmvNiZILQNN
- BXgSk/7Z0IpG9PEs6odSUNFvAwVOkm1wrh4wU0Qhz+A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=qMo4dN
- 99YdwSpV4KoHamz8OIjPfQjVHVa6X7s8tvk0I=; b=I5ynJeiiPt/v8xCcpxkrYt
- VhZM22SnzcTP9cFXxcznaUGy7YNqdswpl5IihPXPaBR71D3erSlX2NNDblBQzNjC
- DJy6izohyWXAvjmBP5x9xLcxBlK+rVADRwF3hdg5WHOu3ByN8kyqVPLxWjfpjwMy
- xB6IkQm7O2ReB6CG9tomwvY+dHfwR+BLW6wehPon5TeO3wQFxXtomSacuw1Ohgz4
- 3PkUv5w5xUYD3X+ADPXfIQjt1TKri3G7hkCjJBUox7sUVtL5QIjHVyl/wowJ3DpK
- 70o9ZcvstptvthG1hhuvFV0wcwXObkFj1YHAqiWY3asbSzq34n8VsT7QXlcsXyCQ
- ==
-X-ME-Sender: <xms:RxxhX7YeW68-Ysfzta0uQjDNMyVZHLbv7eDLkU2SBAEHn0pTWGwFUA>
- <xme:RxxhX6azIfMblHqNqFIZB7KmxUdS63pd3Lvn6bmGMO1Uy3PEoy4eohyuoYv8DK5nA
- PJh3mrNZk-NMl5drNM>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrtddtgdduuddvucetufdoteggodetrfdotf
- fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
- cujfgurhepfffhvffukfhfgggtuggjsehgtderredttdejnecuhfhrohhmpefmlhgruhhs
- ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
- gvrhhnpeejgeduffeuieetkeeileekvdeuleetveejudeileduffefjeegfffhuddvudff
- keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtne
- curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
-X-ME-Proxy: <xmx:RxxhX9_5KFVu7NEl8-UoWTGOE1wtR7VmraqJgyiT751dJ4jWRAhcQQ>
- <xmx:RxxhXxoqaBP0z7_ynM2qa-WXadD8s05KUFNxqYZc6Gt4Gf0YL8B3xQ>
- <xmx:RxxhX2oNaXGyw2mffn_35qsSAYTQeims2oUAW12wyDwQDBE_bEJfpQ>
- <xmx:SBxhXzjONQK5WILdztvDZM4h9UFBJbRZf1H2btONCVnc2Ox7HFlfEsuVreg>
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id 5F1B93064683;
- Tue, 15 Sep 2020 15:55:49 -0400 (EDT)
-Date: Tue, 15 Sep 2020 21:55:46 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Dmitry Fomichev <Dmitry.Fomichev@wdc.com>
-Subject: Re: [PATCH v3 01/15] hw/block/nvme: Define 64 bit cqe.result
-Message-ID: <20200915195546.GA14485@apples.localdomain>
-References: <20200913221436.22844-1-dmitry.fomichev@wdc.com>
- <20200913221436.22844-2-dmitry.fomichev@wdc.com>
- <20200915073720.GB499689@apples.localdomain>
- <MN2PR04MB5951ED0FD5633E8144459A28E1200@MN2PR04MB5951.namprd04.prod.outlook.com>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kIH9u-00006m-Om; Tue, 15 Sep 2020 16:02:37 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=J18TE0XRskwqfRh3XirEHAZ+gclAXHN1YX/rsnLFoEz1F9dY0piz0cJRw6zKFkyvBUmu5r1iAoL2hgbWsI1ADIghcs2p01xpyoy9c/imngMzMJcBf38z2LU0zJsAcIOcVorq+4k2UY01BScMBFAjazD6AmFbouL2caP5Fe3zikAX1FMImS77UjuJJm5HdEZX7lSGemHTBZKf3vVFdbcvYACzyeIboTakLyf1twZVv+rQ12YxLwDSh2SwbNTQi+PpisptuA9boGS52ScXtQ/Xn+8NRR6yVTCFdAvmhmYhGkS9IbOW3nJQSqeICv5ltFh2qk2j30+Zv+xaNHOvXz0ivg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/1MUIdGgiwPed4iihqyAzoI6xvI7896Ug3e1wU0y718=;
+ b=P04aD1QhtMq653tKLdKlMSGxUPEFcGEy/R7NgZ1TDRyXzyEZE1B86LcNlyRfp9jJePsjNy9md60BlHZfuy8W5OgtVxLBi7HxB7zHVENX2H1/gvkBkfowhHxeJg12L+LPmCdFGKrKusBARTiQSBeLR27HdwkqivE9xktM4gDTTGoNoXv1Ux2ujkdA2RfmVXAtV99EP0JmR4m9hhVp1kRSCId16lX0zH2KnLqxZmCXC/AEBw0A1mDvdCLtDosaGESZN8icKaM8EtFf9KUWqa/yNkWr4sHjMq03CJDgqVEcEIjxCyjLdzv2343v3YAyBS5H9ZeVgQDJjNy3Yr6yW9L4IQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/1MUIdGgiwPed4iihqyAzoI6xvI7896Ug3e1wU0y718=;
+ b=v1JnJo4orKBVMvWMkuBcUSHCXqa+i1CtmJST060cv52ijOr9HwNG6oux0nUsTmlEeFyfoXRB22zzXPIrcsWVjIy6rljuuVoQoBwZRdCJM56xBVhHO43dBiV5KYCJiTtd5AiVjURZ1UzMHFxYlMh3i5hQe0NIZqug4RCgJcDtlmY=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB4341.eurprd08.prod.outlook.com (2603:10a6:20b:b9::22)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Tue, 15 Sep
+ 2020 20:02:30 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692%8]) with mapi id 15.20.3370.019; Tue, 15 Sep 2020
+ 20:02:30 +0000
+Subject: Re: [PATCH v8 4/7] scripts: add block-coroutine-wrapper.py
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, crosa@redhat.com, ehabkost@redhat.com,
+ fam@euphon.net, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com,
+ den@openvz.org, eblake@redhat.com
+References: <20200915164411.20590-1-vsementsov@virtuozzo.com>
+ <20200915164411.20590-5-vsementsov@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <be6408ba-a430-0294-96e8-a38af7f94c1b@virtuozzo.com>
+Date: Tue, 15 Sep 2020 23:02:28 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
+In-Reply-To: <20200915164411.20590-5-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR01CA0120.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:168::25) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="sdtB3X0nJg68CQEu"
-Content-Disposition: inline
-In-Reply-To: <MN2PR04MB5951ED0FD5633E8144459A28E1200@MN2PR04MB5951.namprd04.prod.outlook.com>
-Received-SPF: pass client-ip=66.111.4.230; envelope-from=its@irrelevant.dk;
- helo=new4-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 15:09:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.75) by
+ AM0PR01CA0120.eurprd01.prod.exchangelabs.com (2603:10a6:208:168::25) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.11 via Frontend
+ Transport; Tue, 15 Sep 2020 20:02:29 +0000
+X-Originating-IP: [185.215.60.75]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 362a86fe-6bfd-4722-c290-08d859b246c1
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4341:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB4341B13F62BFDAC990F45A43C1200@AM6PR08MB4341.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:923;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 2wJTgN+og/tRUJgnpmtmY68ypicNo8+ptbBk1crI4Tj4nCdUL+cqcNBtFsyXKmPwyNfICjxcrBl2ncKaGSjmZtrTCrqKKu2jI/mPhOxTWCGGykkSBXYmjgeYVDeA0oijry+s58CkFLCFgUxXxJldV0s9il1lbgsFL7YcXCEkGYvycZNNHDptE8fNkyLSsZJhnF7vZyV/hfDOKjhXziAPQRJTeAo3PuKB9mSt7VXNMUTcm5mkbBUIwjx09f/yINNYaF24XQAp8j2DNMZ6Sk+H7InQ0oa9R7PoiN4aVV3QeZDhZ6J4F4ccFGUfHb0KG7Ax8SdbAr7Stxm1TBbdLmdHJ7Myh7G0ExFQoThbgpAhcYI0tECduEb2D5Urq7JuBKNY
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(39840400004)(136003)(396003)(346002)(366004)(376002)(8676002)(31686004)(478600001)(83380400001)(2906002)(6916009)(316002)(26005)(5660300002)(86362001)(16526019)(16576012)(186003)(31696002)(956004)(4326008)(52116002)(66556008)(66476007)(66946007)(36756003)(6486002)(2616005)(8936002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: hxB+4DGVxkR0zZ8H6BUXxvFKsTmWPnSmbqcPVCK/xY9IpHlTOkTN//xtaYvbej/Hb+XfNEuU1h5HYxEfYjrzc/TGypFaU3ziYIHj4Qv8C/Hv1NLeFtRi96/tBa/gCsyMKZlZ0UpvYpnMlqwOCIczMvkUBUs7LsN9OLd14bW+T+QXAPfbmgSNFdyOeSamvinf1Sa4lY6mqFj79CLapyUwwX9qG+V3UahjoDSoefg2NMftX+CIB8Tk89ZhSw7S2KP1OBpEfzXNo6pwXHmV8Eguefj7xQFSBLFVhl5/SV3yvK7P8kx2Uz2W58u+ELxbQNR2r/2n6iNFfu/kOny46WwJ904ScKLdCFgiARI3OgBun0PLtmS0Sr4WIeVMLHcCV+cqIoiv98giNFJM/zqpUHu4Lu5595X2rw9B861gJlXIUUdl2cfoakDdY9o873oW87CX9e3IqzyUupcjWr8ofGBdgwuk2kxTEp1He+0Yl+jQM+rPqiF2E4CPwTQX7HDg+/qJHaddiABO+834QB5x23bqIMWsehN/8QShjgDNDSKWlUhQrpEqApnkK7EsQwjK8o/IxlK1Nx2zb4sGusy7g8EmJT5/kiyC/yfaGTZUbdFzYv4qqGVjV6/qLVPl3uHHcNh4A8x5fEm0K3DRDEsZ8+qzLA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 362a86fe-6bfd-4722-c290-08d859b246c1
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2020 20:02:30.0931 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZqqI9wx2Bh9NyohXslbunNoujT1drpys6lXt22QTh2x2L6w142JkHDyYIAUfwc8SHrtAqxiZbRb7hrRhAZqucjBSjK9gJt5Bc2fPqGrHro8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4341
+Received-SPF: pass client-ip=40.107.6.100;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-DB3-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 16:02:30
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
 X-Spam_bar: --
 X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -111,79 +136,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Damien Le Moal <Damien.LeMoal@wdc.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Niklas Cassel <Niklas.Cassel@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>, Keith Busch <kbusch@kernel.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Matias Bjorling <Matias.Bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+15.09.2020 19:44, Vladimir Sementsov-Ogievskiy wrote:
+> We have a very frequent pattern of creating coroutine from function
+> with several arguments:
+> 
+>    - create structure to pack parameters
+>    - create _entry function to call original function taking parameters
+>      from struct
+>    - do different magic to handle completion: set ret to NOT_DONE or
+>      EINPROGRESS or use separate bool field
+>    - fill the struct and create coroutine from _entry function and this
+>      struct as a parameter
+>    - do coroutine enter and BDRV_POLL_WHILE loop
+> 
+> Let's reduce code duplication by generating coroutine wrappers.
+> 
+> This patch adds scripts/block-coroutine-wrapper.py together with some
+> friends, which will generate functions with declared prototypes marked
+> by 'generated_co_wrapper' specifier.
+> 
+> The usage of new code generation is as follows:
+> 
+>      1. define somewhere
+> 
+>          int coroutine_fn bdrv_co_NAME(...) {...}
+> 
+>         function
+> 
+>      2. declare in some header file
+> 
+>          int generated_co_wrapper bdrv_NAME(...);
+> 
+>         function with same list of parameters. (you'll need to include
+>         "block/generated-co-wrapper.h" to get the specifier)
+> 
+>      3. both declarations should be available through block/coroutines.h
+>         header.
+> 
+>      4. add header with generated_co_wrapper declaration into
+>         COROUTINE_HEADERS list in Makefile
+> 
+> Still, no function is now marked, this work is for the following
+> commit.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
+> ---
+>   docs/devel/block-coroutine-wrapper.rst |  54 +++++++
+>   block/block-gen.h                      |  49 +++++++
+>   include/block/block.h                  |  10 ++
+>   block/meson.build                      |   8 ++
+>   scripts/block-coroutine-wrapper.py     | 187 +++++++++++++++++++++++++
+>   5 files changed, 308 insertions(+)
+>   create mode 100644 docs/devel/block-coroutine-wrapper.rst
+>   create mode 100644 block/block-gen.h
+>   create mode 100755 scripts/block-coroutine-wrapper.py
 
---sdtB3X0nJg68CQEu
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Sep 15 18:56, Dmitry Fomichev wrote:
-> > -----Original Message-----
-> > From: Klaus Jensen <its@irrelevant.dk>
-> > Sent: Tuesday, September 15, 2020 3:37 AM
-> > To: Dmitry Fomichev <Dmitry.Fomichev@wdc.com>
-> > Cc: Keith Busch <kbusch@kernel.org>; Klaus Jensen
-> > <k.jensen@samsung.com>; Kevin Wolf <kwolf@redhat.com>; Philippe
-> > Mathieu-Daud=C3=A9 <philmd@redhat.com>; Maxim Levitsky
-> > <mlevitsk@redhat.com>; Fam Zheng <fam@euphon.net>; Niklas Cassel
-> > <Niklas.Cassel@wdc.com>; Damien Le Moal <Damien.LeMoal@wdc.com>;
-> > qemu-block@nongnu.org; qemu-devel@nongnu.org; Alistair Francis
-> > <Alistair.Francis@wdc.com>; Matias Bjorling <Matias.Bjorling@wdc.com>
-> > Subject: Re: [PATCH v3 01/15] hw/block/nvme: Define 64 bit cqe.result
-> >=20
-> > On Sep 14 07:14, Dmitry Fomichev wrote:
-> > > From: Ajay Joshi <ajay.joshi@wdc.com>
-> > >
-> > > A new write command, Zone Append, is added as a part of Zoned
-> > > Namespace Command Set. Upon successful completion of this command,
-> > > the controller returns the start LBA of the performed write operation
-> > > in cqe.result field. Therefore, the maximum size of this variable
-> > > needs to be changed from 32 to 64 bit, consuming the reserved 32 bit
-> > > field that follows the result in CQE struct. Since the existing
-> > > commands are expected to return a 32 bit LE value, two separate
-> > > variables, result32 and result64, are now kept in a union.
-> > >
-> > > Signed-off-by: Ajay Joshi <ajay.joshi@wdc.com>
-> > > Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-> > > Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
-> >=20
-> > I know that I R-b'ed this, but can this be moved to the namespace types
-> > patch, since that is the TP that changes this.
->=20
-> You probably meant the ZNS patch since result64 is first used there to re=
-turn
-> ZA starting data LBA. Sure, I can move this stuff to that patch.
->=20
+Also needed:
 
-No, I actually did mean the NST patch since TP 4056 is the TP that
-"unreserves" dw1 in the CQE.
+diff --git a/docs/devel/index.rst b/docs/devel/index.rst
+index 04773ce076..cb0abe1e69 100644
+--- a/docs/devel/index.rst
++++ b/docs/devel/index.rst
+@@ -31,3 +31,4 @@ Contents:
+     reset
+     s390-dasd-ipl
+     clocks
++   block-coroutine-wrapper
 
---sdtB3X0nJg68CQEu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9hHD4ACgkQTeGvMW1P
-Delo0wgArnVFiwUX/sEcjx5OPesVq+wwzBUUq7xiutsnel9NGQRO5m4vb6B+wGU3
-R6czLMJGKo/4c2BoDznv3bXbXF2P6OkWjWDqA4AQRr+6cV0s1V01Eah/D394FWjL
-Q1jY4Q7A8E7s+6qJ/PkENKboMJI1kfFtaKU15Gpsv7iZnbLkABnJAcydzp2xKmLe
-GGhTWit4jeHwh0+/QQAvm90Fl7A8BzQEza56k/rlYUjNCCf32qeFfjQgN4Boir0+
-DHvAc0k8ibO4yy1N3NBZi3L+k4spDCepEX1BCV7I4Pa+Bxd9rlVQmMqF2MJaWJfD
-RKLcdnYKEpksA0LBWvBe2OSRctuYbA==
-=ENfG
------END PGP SIGNATURE-----
-
---sdtB3X0nJg68CQEu--
+-- 
+Best regards,
+Vladimir
 
