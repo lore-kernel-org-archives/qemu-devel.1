@@ -4,84 +4,84 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B860C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 10:59:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82EAEC43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 11:00:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1708218AC
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 10:59:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D98A2206F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 11:00:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NAcJ78Sp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1708218AC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AXsbUDNz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D98A2206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kI8ge-0003FC-2P
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 06:59:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52594)
+	id 1kI8hm-0003vK-14
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 07:00:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52806)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kI8UF-0000XN-K5
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 06:46:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38365)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kI8UX-0000xc-5u
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 06:47:17 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51563
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kI8UE-0004Zy-54
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 06:46:59 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kI8UU-0004e5-JK
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 06:47:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600166817;
+ s=mimecast20190719; t=1600166832;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=v7xfZqXP8N2Iw5FMG+YtAL5uE/6BoA1G9Am5lWixxdU=;
- b=NAcJ78Sp2tYqgNCyvufZKssEyGbJNXpzjUHJGzcHv9gtAFhR8tNJHspkHVTjVu2ll+ioM9
- EUh6/spzWJj/ZIE3CzcyM83ss8jNfTglDhsXMIITmJDdd3TtnjBrYiOEwSy2j61QUQckgR
- Yqv4UYwv3i1UmMRAGyMM216tZp2q5KI=
+ bh=O+wlTowVCJpAvfNu8KtauowcUK2/YnTK25EvbZZlnOk=;
+ b=AXsbUDNzquW/HI9xr2VYhwPquUlWv+hZhDH9t4lDNZu//exxxurLP34rKSW+lnc5zlwjYI
+ 8VG1aSZbWSe3wQixSoOuHWQ87OQY0PPDMwnTmkB2k760Itq7cblM54mGgLVdafdQR2PPoc
+ NEwgoNbbplxWonYMp593DwT4ecj4SNQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-561-JDNvuE19MSmxr-JV4LNxRA-1; Tue, 15 Sep 2020 06:46:53 -0400
-X-MC-Unique: JDNvuE19MSmxr-JV4LNxRA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-192-Ij26yJLrORm4umYw58rhHg-1; Tue, 15 Sep 2020 06:47:10 -0400
+X-MC-Unique: Ij26yJLrORm4umYw58rhHg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3BE0A801ADF;
- Tue, 15 Sep 2020 10:46:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C79FD1005E67;
+ Tue, 15 Sep 2020 10:47:09 +0000 (UTC)
 Received: from localhost (ovpn-113-7.ams2.redhat.com [10.36.113.7])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D032B19C4F;
- Tue, 15 Sep 2020 10:46:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 68F8B7EB7C;
+ Tue, 15 Sep 2020 10:47:09 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 10/22] qcow2: Don't check nb_clusters when removing l2meta from
- the list
-Date: Tue, 15 Sep 2020 12:46:15 +0200
-Message-Id: <20200915104627.699552-11-mreitz@redhat.com>
+Subject: [PULL 18/22] block/rbd: remove runtime_opts
+Date: Tue, 15 Sep 2020 12:46:23 +0200
+Message-Id: <20200915104627.699552-19-mreitz@redhat.com>
 In-Reply-To: <20200915104627.699552-1-mreitz@redhat.com>
 References: <20200915104627.699552-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:10:32
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 03:21:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -38
 X-Spam_score: -3.9
 X-Spam_bar: ---
 X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,38 +100,70 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alberto Garcia <berto@igalia.com>
+From: John Snow <jsnow@redhat.com>
 
-In the past, when a new cluster was allocated the l2meta structure was
-a variable in the stack so it was necessary to have a way to tell
-whether it had been initialized and contained valid data or not. The
-nb_clusters field was used for this purpose. Since commit f50f88b9fe
-this is no longer the case, l2meta (nowadays a pointer to a list) is
-only allocated when needed and nb_clusters is guaranteed to be > 0 so
-this check is unnecessary.
+This saw its last use in 4bfb274165ba.
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Message-Id: <ab0b67c29c7ba26e598db35f12aa5ab5982539c1.1599150873.git.berto@igalia.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
+Message-Id: <20200806211345.2925343-2-jsnow@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ block/rbd.c | 42 ------------------------------------------
+ 1 file changed, 42 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index ef9a45e82f..3e8114dcf8 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2111,9 +2111,7 @@ static coroutine_fn int qcow2_handle_l2meta(BlockDriverState *bs,
-         }
+diff --git a/block/rbd.c b/block/rbd.c
+index 688074c64b..171c67e3a0 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -341,48 +341,6 @@ static void qemu_rbd_memset(RADOSCB *rcb, int64_t offs)
+     }
+ }
  
-         /* Take the request off the list of running requests */
--        if (l2meta->nb_clusters != 0) {
--            QLIST_REMOVE(l2meta, next_in_flight);
--        }
-+        QLIST_REMOVE(l2meta, next_in_flight);
- 
-         qemu_co_queue_restart_all(&l2meta->dependent_requests);
- 
+-static QemuOptsList runtime_opts = {
+-    .name = "rbd",
+-    .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
+-    .desc = {
+-        {
+-            .name = "pool",
+-            .type = QEMU_OPT_STRING,
+-            .help = "Rados pool name",
+-        },
+-        {
+-            .name = "namespace",
+-            .type = QEMU_OPT_STRING,
+-            .help = "Rados namespace name in the pool",
+-        },
+-        {
+-            .name = "image",
+-            .type = QEMU_OPT_STRING,
+-            .help = "Image name in the pool",
+-        },
+-        {
+-            .name = "conf",
+-            .type = QEMU_OPT_STRING,
+-            .help = "Rados config file location",
+-        },
+-        {
+-            .name = "snapshot",
+-            .type = QEMU_OPT_STRING,
+-            .help = "Ceph snapshot name",
+-        },
+-        {
+-            /* maps to 'id' in rados_create() */
+-            .name = "user",
+-            .type = QEMU_OPT_STRING,
+-            .help = "Rados id name",
+-        },
+-        /*
+-         * server.* extracted manually, see qemu_rbd_mon_host()
+-         */
+-        { /* end of list */ }
+-    },
+-};
+-
+ /* FIXME Deprecate and remove keypairs or make it available in QMP. */
+ static int qemu_rbd_do_create(BlockdevCreateOptions *options,
+                               const char *keypairs, const char *password_secret,
 -- 
 2.26.2
 
