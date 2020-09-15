@@ -2,136 +2,82 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A150CC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 06:18:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3EBBC43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 06:22:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3C3720732
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 06:18:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HtZghfhM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3C3720732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0E7352076C
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 06:22:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E7352076C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kI4I0-0006SM-Lx
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 02:18:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52084)
+	id 1kI4M1-0000W2-68
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 02:22:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53044)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kI4H7-000607-Ud
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 02:17:09 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52526
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kI4H3-0004MP-5c
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 02:17:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600150624;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=C0UQmO+27YOKqBXPt++CUZUgQwVTyyou4t1I2CBH484=;
- b=HtZghfhMFCKPxBRYEx+3lCU5QolZIZlkgku8nSCgqkCun6NXJ3iqN4Cr4nnNUIGAkZClJK
- BJNHrcMqmKNMPhB4Rr9eiOK6ikwMiiqI/vj9p0JFGwMyy8ZgwhhsJkFgcr4Zey6u6RBh0s
- eOHcmRrDUqvKQeYl2uEvLfXh9jKwsts=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-TJvbqh4CNB2YGcnZHzwhDQ-1; Tue, 15 Sep 2020 02:17:02 -0400
-X-MC-Unique: TJvbqh4CNB2YGcnZHzwhDQ-1
-Received: by mail-wm1-f70.google.com with SMTP id b20so1732784wmj.1
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 23:17:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=C0UQmO+27YOKqBXPt++CUZUgQwVTyyou4t1I2CBH484=;
- b=beHyG5UssBnE0v6r1Ennk3z88uXcSpclbsM8+CzW86ZLyaKBSyv5fZ1aq00g0G1xOl
- um7aNz97viUEnYkofuw53oFs+2GuOFBCpYweQLVV03FcD03dBo9eFylczjmFCgyeChtk
- LRUngurLZLrTsC5htu3q1ir2UUxDHnjREoy/8N39IOV95rXsnkdfjxVb5KtA8Uq6FAd7
- fvLjBd3+x5sLtVyWqFuPC8dOyIYJA4NWUPAFB/BxYOm/3+urfpnp65w43Ko2Ed5BsN4Y
- ozqlioFcF3CAojQY4a4ENqo987NkkLof1WwRQieKZgLBM2mN0NWylRYpszUEkgxxuW7M
- A09w==
-X-Gm-Message-State: AOAM532PjbT9WH2Ra4ppg5rJ9/PjmBlECYDSAHcl1cLZSNAu7olxa+p9
- OUhQLNEsPX6RDbZOlCLuEgm8fcGr+EwpdA3LcwdKrxEVErcllO/XlmJShJWNM4dUZH2bofO/pwW
- qkJc7k5WSQWyfV08=
-X-Received: by 2002:a1c:4c05:: with SMTP id z5mr2717923wmf.47.1600150621547;
- Mon, 14 Sep 2020 23:17:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzeV9nYUb37iRYHMcbVKeb4xceCKX9ufBLQihnWlvokIVsAvjlgb0V9Qv7eG5B4wnWiCzdh2Q==
-X-Received: by 2002:a1c:4c05:: with SMTP id z5mr2717896wmf.47.1600150621376;
- Mon, 14 Sep 2020 23:17:01 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id s12sm15680272wmd.20.2020.09.14.23.17.00
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 14 Sep 2020 23:17:00 -0700 (PDT)
-Subject: Re: [PATCH v2 3/3] vfio: Create shared routine for scanning info
- capabilities
-To: Matthew Rosato <mjrosato@linux.ibm.com>, alex.williamson@redhat.com,
- cohuck@redhat.com
-References: <1600122570-12941-1-git-send-email-mjrosato@linux.ibm.com>
- <1600122570-12941-4-git-send-email-mjrosato@linux.ibm.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <942e216a-f431-9eb2-c20b-e3733615601e@redhat.com>
-Date: Tue, 15 Sep 2020 08:16:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kI4KY-0007e2-UC
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 02:20:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54760)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kI4KV-0004t4-Qf
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 02:20:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kI4KT-0007aU-Jh
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 06:20:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 932AF2E80DB
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 06:20:37 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1600122570-12941-4-git-send-email-mjrosato@linux.ibm.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:14:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -38
-X-Spam_score: -3.9
-X-Spam_bar: ---
-X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 15 Sep 2020 06:15:06 -0000
+From: Nick Bauer <1894869@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=debian; sourcepackage=None; component=None;
+ status=In Progress; importance=Unknown; assignee=None; 
+X-Launchpad-Bug-Tags: chelsio t4
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: 1butteryadmin alex-l-williamson stefan-proxmox
+X-Launchpad-Bug-Reporter: Nick Bauer (1butteryadmin)
+X-Launchpad-Bug-Modifier: Nick Bauer (1butteryadmin)
+References: <159958042175.17914.10047848067927369523.malonedeb@soybean.canonical.com>
+Message-Id: <160015050691.480.9842898284770994326.malone@chaenomeles.canonical.com>
+Subject: [Bug 1894869] Re: Chelsio T4 has old MSIX PBA offset bug
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: 9c1c370ff020247dbea10cbfdd0959eb721ff326
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:20:37
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -140,86 +86,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, pmorel@linux.ibm.com, schnelle@linux.ibm.com,
- david@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
+Reply-To: Bug 1894869 <1894869@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/15/20 12:29 AM, Matthew Rosato wrote:
-> Rather than duplicating the same loop in multiple locations,
-> create a static function to do the work.
+Yeah, I figured out that the logic behind that patch was failed and
+corrected it to get the same error again already. Just to clarify, it is
+two of the same card giving the same error. I ran dmesg --level=3Derr, but
+got no output. In the full output of dmesg, though, I noticed that there
+are some problems with the nics, but I don't know enough about this to
+know if there's anything I can do about it. I included dmesg output
+here. I don't believe the nics are giving the host any functionality
+since I added the driver for them to the blacklist, so it shouldn't even
+be getting loaded by it. In case it's useful, I'm not sure if SR-IOV is
+enabled on these cards or not, though I'm trying to use PCI passthrough
+for my VMs.
 
-Why not do that first in your series?
+** Attachment added: "Output of dmesg"
+   https://bugs.launchpad.net/qemu/+bug/1894869/+attachment/5410926/+files/=
+dmesg.txt
 
-> 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->  hw/vfio/common.c | 33 +++++++++++++++------------------
->  1 file changed, 15 insertions(+), 18 deletions(-)
-> 
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 7f4a338..bfbbfe4 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -825,17 +825,12 @@ static void vfio_listener_release(VFIOContainer *container)
->      }
->  }
->  
-> -struct vfio_info_cap_header *
-> -vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id)
-> +static struct vfio_info_cap_header *
-> +vfio_get_cap(void *ptr, uint32_t cap_offset, uint16_t id)
->  {
->      struct vfio_info_cap_header *hdr;
-> -    void *ptr = info;
-> -
-> -    if (!(info->flags & VFIO_REGION_INFO_FLAG_CAPS)) {
-> -        return NULL;
-> -    }
->  
-> -    for (hdr = ptr + info->cap_offset; hdr != ptr; hdr = ptr + hdr->next) {
-> +    for (hdr = ptr + cap_offset; hdr != ptr; hdr = ptr + hdr->next) {
->          if (hdr->id == id) {
->              return hdr;
->          }
-> @@ -844,23 +839,25 @@ vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id)
->      return NULL;
->  }
->  
-> +
-> +struct vfio_info_cap_header *
-> +vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id)
-> +{
-> +    if (!(info->flags & VFIO_REGION_INFO_FLAG_CAPS)) {
-> +        return NULL;
-> +    }
-> +
-> +    return vfio_get_cap((void *)info, info->cap_offset, id);
-> +}
-> +
->  static struct vfio_info_cap_header *
->  vfio_get_iommu_type1_info_cap(struct vfio_iommu_type1_info *info, uint16_t id)
->  {
-> -    struct vfio_info_cap_header *hdr;
-> -    void *ptr = info;
-> -
->      if (!(info->flags & VFIO_IOMMU_INFO_CAPS)) {
->          return NULL;
->      }
->  
-> -    for (hdr = ptr + info->cap_offset; hdr != ptr; hdr = ptr + hdr->next) {
-> -        if (hdr->id == id) {
-> -            return hdr;
-> -        }
-> -    }
-> -
-> -    return NULL;
-> +    return vfio_get_cap((void *)info, info->cap_offset, id);
->  }
->  
->  bool vfio_get_info_dma_avail(struct vfio_iommu_type1_info *info,
-> 
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1894869
+
+Title:
+  Chelsio T4 has old MSIX PBA offset bug
+
+Status in QEMU:
+  New
+Status in Debian:
+  In Progress
+
+Bug description:
+  There exists a bug with Chelsio NICs T4 that causes the following
+  error:
+
+  kvm: -device vfio-
+  pci,host=3D0000:83:00.7,id=3Dhostpci1.7,bus=3Dpci.0,addr=3D0x11.7: vfio
+  0000:83:00.7: hardware reports invalid configuration, MSIX PBA outside
+  of specified BAR
+
+  I discovered this bug on a Proxmox system, and I was working with a
+  downstream Proxmox developer to try to fix this issue. They provided
+  me with the following change to make from line 1484 of hw/vfio/pci.c:
+
+  static void vfio_msix_early_setup(VFIOPCIDevice *vdev, Error **errp)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* is 0x1000, =
+so we hard code that here.
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*/
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (vdev->vendor_id=
+ =3D=3D PCI_VENDOR_ID_CHELSIO &&
+  -            (vdev->device_id & 0xff00) =3D=3D 0x5800) {
+  +            ((vdev->device_id & 0xff00) =3D=3D 0x5800 ||
+  +             (vdev->device_id & 0xff00) =3D=3D 0x1425)) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0msix->pba_offset =3D 0x1000;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else if (vdev->ms=
+ix_relo =3D=3D OFF_AUTOPCIBAR_OFF) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0error_setg(errp, "hardware reports invalid configuration, "
+
+  However, I found that this did not fix the issue, so the bug appears
+  to work differently than the one that was present on the T5 NICs which
+  has already been patched. I have attached the output of my lspci
+  -nnkvv
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1894869/+subscriptions
 
