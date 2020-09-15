@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3E2FC43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 11:05:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EDF1C43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 11:07:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FE1A21D1B
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 11:05:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 011EB21D1B
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 11:07:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SS637634"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FE1A21D1B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JV+29TZf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 011EB21D1B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kI8m4-00089X-Cn
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 07:05:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52732)
+	id 1kI8o2-0001wB-21
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 07:07:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52900)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kI8UO-0000tA-O0
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 06:47:08 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23919
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kI8Ud-00013i-At
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 06:47:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54473
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kI8UM-0004dB-VL
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 06:47:08 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kI8Ua-0004ey-Cg
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 06:47:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600166826;
+ s=mimecast20190719; t=1600166839;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rSgvq6swWaOeoMm7noo48t3BlK9H+HlOXThylQ/P9wg=;
- b=SS637634MTSgrxtT/07G2mNuM6vjZTMKmQZEW7aEJXtncdq8vl3YxmeoLzz0cKpm8beViL
- BpVtkDzNkEVkDMnEoc+Tct3pe+gza3Lz7IN6XNIitZ13FRcNEiIOV1PrfqOrK8TBXpbu/C
- 9OBP1NaLI5ZB+TZ8msm6YTSQCxEraBI=
+ bh=vZ/4iXDyh/GClurwSqIb6dMh22LSvdlpa0SHBWTovlY=;
+ b=JV+29TZf2oMuWpXDyyXLTNhQ2e01ZVFlbD/7WVhxoRNc37JJdRK72x31OXKZ3thnHxnFuW
+ o10kSSjrjmTUPisjhXwjZHcMYbCJabjFItt3m4W2GLXH09kxf9PIJJ5Tg1S/aycBRMaUUo
+ 3pZpziF2eiiXWdQ5CnuMRWqQ4uc9Iw8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-512-k3N2VNm1NEyosckPjGS5BA-1; Tue, 15 Sep 2020 06:47:04 -0400
-X-MC-Unique: k3N2VNm1NEyosckPjGS5BA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-100-srlLcSfRNpyb_PyYXah7-A-1; Tue, 15 Sep 2020 06:47:15 -0400
+X-MC-Unique: srlLcSfRNpyb_PyYXah7-A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F0AB801AC2;
- Tue, 15 Sep 2020 10:47:03 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A8601084D69;
+ Tue, 15 Sep 2020 10:47:14 +0000 (UTC)
 Received: from localhost (ovpn-113-7.ams2.redhat.com [10.36.113.7])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ADF0610021AA;
- Tue, 15 Sep 2020 10:47:02 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CC9B35DC1E;
+ Tue, 15 Sep 2020 10:47:13 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 15/22] qcow2: Handle QCowL2Meta on error in preallocate_co()
-Date: Tue, 15 Sep 2020 12:46:20 +0200
-Message-Id: <20200915104627.699552-16-mreitz@redhat.com>
+Subject: [PULL 20/22] qcow2: Make preallocate_co() resize the image to the
+ correct size
+Date: Tue, 15 Sep 2020 12:46:25 +0200
+Message-Id: <20200915104627.699552-21-mreitz@redhat.com>
 In-Reply-To: <20200915104627.699552-1-mreitz@redhat.com>
 References: <20200915104627.699552-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 03:21:13
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:11:06
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -38
 X-Spam_score: -3.9
@@ -81,7 +82,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,111 +103,145 @@ Sender: "Qemu-devel"
 
 From: Alberto Garcia <berto@igalia.com>
 
-If qcow2_alloc_cluster_offset() or qcow2_alloc_cluster_link_l2() fail
-then this function simply returns the error code, potentially leaking
-the QCowL2Meta structure and leaving stale items in s->cluster_allocs.
+This function preallocates metadata structures and then extends the
+image to its new size, but that new size calculation is wrong because
+it doesn't take into account that the host_offset variable is always
+cluster-aligned.
 
-A second problem is that this function calls qcow2_free_any_clusters()
-on failure but passing a host cluster offset instead of an L2 entry.
-Luckily for normal uncompressed clusters a raw offset also works like
-a valid L2 entry so it works just the same, but we should be using
-qcow2_free_clusters() instead.
+This problem can be reproduced with preallocation=metadata when the
+original size is not cluster-aligned but the new size is. In this case
+the final image size will be shorter than expected.
 
-This patch fixes both problems by using qcow2_handle_l2meta().
+   qemu-img create -f qcow2 img.qcow2 31k
+   qemu-img resize --preallocation=metadata img.qcow2 128k
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Message-Id: <cd3a6b9abd43f9c0b60be413d760f0cacc67eb66.1599573989.git.berto@igalia.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Message-Id: <adeb8b059917b141d5f5b3bd2a016262d3052c79.1599833007.git.berto@igalia.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+[mreitz: Mark compat=0.10 unsupported for iotest 125]
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.c | 40 +++++++++++++++++-----------------------
- 1 file changed, 17 insertions(+), 23 deletions(-)
+ block/qcow2.c              |  1 +
+ tests/qemu-iotests/125     | 44 ++++++++++++++++++++++----------------
+ tests/qemu-iotests/125.out | 28 ++++++++++++++++++++++--
+ 3 files changed, 53 insertions(+), 20 deletions(-)
 
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 3e8114dcf8..d241fb734c 100644
+index 77c43ce178..1cb5daf39a 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -2101,7 +2101,6 @@ static coroutine_fn int qcow2_handle_l2meta(BlockDriverState *bs,
-         QCowL2Meta *next;
- 
-         if (link_l2) {
--            assert(!l2meta->prealloc);
-             ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
-             if (ret) {
-                 goto out;
-@@ -3123,7 +3122,7 @@ static int coroutine_fn preallocate_co(BlockDriverState *bs, uint64_t offset,
-     int64_t file_length;
-     unsigned int cur_bytes;
-     int ret;
--    QCowL2Meta *meta;
-+    QCowL2Meta *meta = NULL, *m;
- 
-     assert(offset <= new_length);
-     bytes = new_length - offset;
-@@ -3134,27 +3133,17 @@ static int coroutine_fn preallocate_co(BlockDriverState *bs, uint64_t offset,
-                                          &host_offset, &meta);
-         if (ret < 0) {
+@@ -3135,6 +3135,7 @@ static int coroutine_fn preallocate_co(BlockDriverState *bs, uint64_t offset,
              error_setg_errno(errp, -ret, "Allocating clusters failed");
--            return ret;
-+            goto out;
+             goto out;
          }
++        host_offset += offset_into_cluster(s, offset);
  
--        while (meta) {
--            QCowL2Meta *next = meta->next;
--            meta->prealloc = true;
--
--            ret = qcow2_alloc_cluster_link_l2(bs, meta);
--            if (ret < 0) {
--                error_setg_errno(errp, -ret, "Mapping clusters failed");
--                qcow2_free_any_clusters(bs, meta->alloc_offset,
--                                        meta->nb_clusters, QCOW2_DISCARD_NEVER);
--                return ret;
--            }
--
--            /* There are no dependent requests, but we need to remove our
--             * request from the list of in-flight requests */
--            QLIST_REMOVE(meta, next_in_flight);
-+        for (m = meta; m != NULL; m = m->next) {
-+            m->prealloc = true;
-+        }
+         for (m = meta; m != NULL; m = m->next) {
+             m->prealloc = true;
+diff --git a/tests/qemu-iotests/125 b/tests/qemu-iotests/125
+index 7cb1c19730..5720e86dce 100755
+--- a/tests/qemu-iotests/125
++++ b/tests/qemu-iotests/125
+@@ -43,6 +43,10 @@ get_image_size_on_host()
  
--            g_free(meta);
--            meta = next;
-+        ret = qcow2_handle_l2meta(bs, &meta, true);
-+        if (ret < 0) {
-+            error_setg_errno(errp, -ret, "Mapping clusters failed");
-+            goto out;
-         }
+ _supported_fmt qcow2
+ _supported_proto file
++# Growing a file with a backing file (without preallocation=full or
++# =falloc) requires zeroing the newly added area, which is impossible
++# to do quickly for v2 images, and hence is unsupported.
++_unsupported_imgopts 'compat=0.10'
  
-         /* TODO Preallocate data if requested */
-@@ -3171,7 +3160,8 @@ static int coroutine_fn preallocate_co(BlockDriverState *bs, uint64_t offset,
-     file_length = bdrv_getlength(s->data_file->bs);
-     if (file_length < 0) {
-         error_setg_errno(errp, -file_length, "Could not get file size");
--        return file_length;
-+        ret = file_length;
-+        goto out;
-     }
+ if [ -z "$TEST_IMG_FILE" ]; then
+     TEST_IMG_FILE=$TEST_IMG
+@@ -168,24 +172,28 @@ done
+ $QEMU_IMG create -f raw "$TEST_IMG.base" 128k | _filter_img_create
+ $QEMU_IO -c 'write -q -P 1 0 128k' -f raw "$TEST_IMG.base"
+ for orig_size in 31k 33k; do
+-    echo "--- Resizing image from $orig_size to 96k ---"
+-    _make_test_img -F raw -b "$TEST_IMG.base" -o cluster_size=64k "$orig_size"
+-    $QEMU_IMG resize -f "$IMGFMT" --preallocation=full "$TEST_IMG" 96k
+-    # The first part of the image should contain data from the backing file
+-    $QEMU_IO -c "read -q -P 1 0 ${orig_size}" "$TEST_IMG"
+-    # The resized part of the image should contain zeroes
+-    $QEMU_IO -c "read -q -P 0 ${orig_size} 63k" "$TEST_IMG"
+-    # If the image does not have an external data file we can also verify its
+-    # actual size. The resized image should have 7 clusters:
+-    # header, L1 table, L2 table, refcount table, refcount block, 2 data clusters
+-    if ! _get_data_file "$TEST_IMG" > /dev/null; then
+-        expected_file_length=$((65536 * 7))
+-        file_length=$(stat -c '%s' "$TEST_IMG_FILE")
+-        if [ "$file_length" != "$expected_file_length" ]; then
+-            echo "ERROR: file length $file_length (expected $expected_file_length)"
+-        fi
+-    fi
+-    echo
++    for dst_size in 96k 128k; do
++        for prealloc in metadata full; do
++            echo "--- Resizing image from $orig_size to $dst_size (preallocation=$prealloc) ---"
++            _make_test_img -F raw -b "$TEST_IMG.base" -o cluster_size=64k "$orig_size"
++            $QEMU_IMG resize -f "$IMGFMT" --preallocation="$prealloc" "$TEST_IMG" "$dst_size"
++            # The first part of the image should contain data from the backing file
++            $QEMU_IO -c "read -q -P 1 0 ${orig_size}" "$TEST_IMG"
++            # The resized part of the image should contain zeroes
++            $QEMU_IO -c "read -q -P 0 ${orig_size} 63k" "$TEST_IMG"
++            # If the image does not have an external data file we can also verify its
++            # actual size. The resized image should have 7 clusters:
++            # header, L1 table, L2 table, refcount table, refcount block, 2 data clusters
++            if ! _get_data_file "$TEST_IMG" > /dev/null; then
++                expected_file_length=$((65536 * 7))
++                file_length=$(stat -c '%s' "$TEST_IMG_FILE")
++                if [ "$file_length" != "$expected_file_length" ]; then
++                    echo "ERROR: file length $file_length (expected $expected_file_length)"
++                fi
++            fi
++            echo
++        done
++    done
+ done
  
-     if (host_offset + cur_bytes > file_length) {
-@@ -3181,11 +3171,15 @@ static int coroutine_fn preallocate_co(BlockDriverState *bs, uint64_t offset,
-         ret = bdrv_co_truncate(s->data_file, host_offset + cur_bytes, false,
-                                mode, 0, errp);
-         if (ret < 0) {
--            return ret;
-+            goto out;
-         }
-     }
+ # success, all done
+diff --git a/tests/qemu-iotests/125.out b/tests/qemu-iotests/125.out
+index 7f76f7af20..63a6e9e8a9 100644
+--- a/tests/qemu-iotests/125.out
++++ b/tests/qemu-iotests/125.out
+@@ -768,11 +768,35 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
--    return 0;
-+    ret = 0;
+ Formatting 'TEST_DIR/t.IMGFMT.base', fmt=raw size=131072
+---- Resizing image from 31k to 96k ---
++--- Resizing image from 31k to 96k (preallocation=metadata) ---
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=31744 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw
+ Image resized.
+ 
+---- Resizing image from 33k to 96k ---
++--- Resizing image from 31k to 96k (preallocation=full) ---
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=31744 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw
++Image resized.
 +
-+out:
-+    qcow2_handle_l2meta(bs, &meta, false);
-+    return ret;
- }
++--- Resizing image from 31k to 128k (preallocation=metadata) ---
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=31744 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw
++Image resized.
++
++--- Resizing image from 31k to 128k (preallocation=full) ---
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=31744 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw
++Image resized.
++
++--- Resizing image from 33k to 96k (preallocation=metadata) ---
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33792 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw
++Image resized.
++
++--- Resizing image from 33k to 96k (preallocation=full) ---
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33792 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw
++Image resized.
++
++--- Resizing image from 33k to 128k (preallocation=metadata) ---
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33792 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw
++Image resized.
++
++--- Resizing image from 33k to 128k (preallocation=full) ---
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33792 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw
+ Image resized.
  
- /* qcow2_refcount_metadata_size:
 -- 
 2.26.2
 
