@@ -8,69 +8,70 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84EA6C43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:24:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B3EC43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:24:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 105E121D24
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:24:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80EB021D41
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:24:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lxh+fpbt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 105E121D24
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XeAlc+PN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80EB021D41
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIEhF-0004Fh-4u
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 13:24:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44268)
+	id 1kIEhH-0004NC-Ky
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 13:24:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44362)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kIEWx-0008Og-31; Tue, 15 Sep 2020 13:14:11 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:46015)
+ id 1kIEWz-0000BW-PO; Tue, 15 Sep 2020 13:14:13 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:39801)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kIEWE-0002fv-81; Tue, 15 Sep 2020 13:13:27 -0400
-Received: by mail-pl1-x642.google.com with SMTP id bh1so1681326plb.12;
- Tue, 15 Sep 2020 10:13:25 -0700 (PDT)
+ id 1kIEWx-0002kP-Ud; Tue, 15 Sep 2020 13:14:13 -0400
+Received: by mail-pl1-x642.google.com with SMTP id x18so1684450pll.6;
+ Tue, 15 Sep 2020 10:14:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=7zvfu2AU8jmrgTOs2oC3Qnm1T8TZc9G/7u0+CpqNJic=;
- b=Lxh+fpbtzUw8lEDag8RBDAQu6NVws2MDKUtGtpZUoHfLcBAA4FWBKsts/h49PF2OQX
- eBbG6WNPz9lSEYC+9uTKfd/LM+YBO+ydG+hFyNK50g0UNjIWj2JP9wdE3obtHTBt1bSA
- DrY5t3xeXp+xHyr2CdbT6dLyBU9oOtJmeyUxK8F3LMdLDf1IIJr8u0p0hPDNRs4QU3d2
- AlL70uoTIpF1VteR92LAg4UppG2A1RjzAoFoGuwUG6BElQm4hhY+jtx12xfxkdhPQXLI
- iEQnawpY2A4vMDBnUF2gXkbkLolTAo04DFNoei6rcayYz2uwOyVY0pqZa+Tj1PQ7477e
- ZmjQ==
+ bh=ks2bOk3jYOHrXnI/Shz64S+t7ePZagOpQ3Ju/TypT6Y=;
+ b=XeAlc+PNskaW0TsZ6wLSwzkO++M5no96XeJ+BEymzqQbQyRrQjLye3CKjeThyHurM3
+ jMSjq7/wSn0j04Fs8ltK/W93arJt3LEx4FXG5xGgEHklDp/fy3OrYG8npnZ+uJAsVEBn
+ Bapo8/95FR2Cz2HYlunAVqVwOpGBlOtEWKYr7N/qYenzaRIg8OPzU6KRZLIhyLt7AWZd
+ LCq1G16s3xPT2rKngq7rk/OiToDkTPCMzQrqND9Glx/xwwh18oKVUhobsFl83MAye/h9
+ N/sEsIH8ONflK4/1FPKWa/O9TKJzLov8JoUQdd1pI3jxQG9OPgPomBBA7GiRd2bw3Ibe
+ FEFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=7zvfu2AU8jmrgTOs2oC3Qnm1T8TZc9G/7u0+CpqNJic=;
- b=Sig2H8WpeoVBVPn6bb8xMzjXfCG30Cp3hVoZ01lgUtsfmp2Cub0El3I/yY5gkl8aao
- sGy9ZYvxInPjHQXaO+BpXL2cq4aw06ZLVyYnLJrJiVg3qKFZupiEFKwJq+dScmNK6L6+
- oKu5obX0XqjESexf2ZAduU6vL2N5T8ouIw6St9lFRSib6i8883UluWkvdIlAVRKwhxVP
- /Jf4CtZKwFMxV30vzztO1+PO++OWrTr+AinrvRUuHACdDcJ65vN7RgND62FUWXatqsdE
- nGA+zc6tLU17WYv+xSgXW2ozV/QWsHGPZx1a+475nq7loafp5ZemercAQjQLyFJ+lMHb
- 05OA==
-X-Gm-Message-State: AOAM531QZqieZWBGZ7VInq5/SXpDaxBWQxUBFwgJM8Pi73W+wgJtqiJ/
- kkh+20KAOgDtiNiBE/XBa8vEEDGH1EpNsx7YL4I=
-X-Google-Smtp-Source: ABdhPJxmxx08k/UjHH1KvuuXszEK/OXbFy4Ew5im1vp39jBxnOB2rZokMAX5w5jKghXMCW1zcAPlTg==
+ bh=ks2bOk3jYOHrXnI/Shz64S+t7ePZagOpQ3Ju/TypT6Y=;
+ b=i4E+g+tTEFmYRckQsJxJ+S3CmMbwVgs5sjgXPHUV/WQ0ANjDB+dN6LPV4ZlC1K+gil
+ /scOOIOvQk9YD3/AYXKP3BFCRGlo/43p8Jiiqo80w+lMPzt6QobraCKu6jxJ15CvLsjk
+ SO9LM75rvSGFKsxfpsjI5S6uj0r2HmNZv60TMzyCCH01ZYiyB4HuT61eVWlayN0lb8nA
+ 6Pg9qYtCL1Fv/bZm3qNB/mScUTJtEBngCwQMKCxYu+3FMOF+SjZFsPiG5LZ+f/L//46B
+ mVQ7sZfIPCS7DCN0Hnsw1MXiZRk1V9Ec1B3XZmmzelyQGXqveuVDQrQxVg5q/MOyYcSF
+ dUdw==
+X-Gm-Message-State: AOAM531Pb3MGiVckCLVf4PVK4RowFjtKaCmuOA/VPSqSx+1a8tKZtR4a
+ uL2/XyH+X7BztPsVkPpt7i7elgohoXun9eja+es=
+X-Google-Smtp-Source: ABdhPJyQUTmkgKkJ0fvFp+YpueSlTJkES3GO1mJnS623YpWVGo+0LQjZT389u14+Cyo248jBEGgUsQ==
 X-Received: by 2002:a17:90b:198:: with SMTP id
- t24mr322408pjs.107.1600190004192; 
- Tue, 15 Sep 2020 10:13:24 -0700 (PDT)
+ t24mr324950pjs.107.1600190049739; 
+ Tue, 15 Sep 2020 10:14:09 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id j14sm124046pjz.21.2020.09.15.10.13.20
+ by smtp.googlemail.com with ESMTPSA id j14sm124046pjz.21.2020.09.15.10.14.05
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Sep 2020 10:13:23 -0700 (PDT)
+ Tue, 15 Sep 2020 10:14:08 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 07/26] tests: Fixes test-replication.c on msys2/mingw.
-Date: Wed, 16 Sep 2020 01:12:15 +0800
-Message-Id: <20200915171234.236-8-luoyonggang@gmail.com>
+Subject: [PATCH v10 17/26] tests: Fixes test-io-channel-socket.c tests under
+ msys2/mingw
+Date: Wed, 16 Sep 2020 01:12:25 +0800
+Message-Id: <20200915171234.236-18-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200915171234.236-1-luoyonggang@gmail.com>
 References: <20200915171234.236-1-luoyonggang@gmail.com>
@@ -114,61 +115,48 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Windows there is no path like /tmp/s_local_disk.XXXXXX
-Use g_get_tmp_dir instead of /tmp.
+Currently test-io-channel-socket doesn't init with
+qemu_init_main_loop
+and that's cause the qemu_aio_context not inited,
+and the following is the stack when null pointer accessed:
+
+qemu_fd_register (c:\work\xemu\qemu\util\main-loop.c:336)
+qemu_try_set_nonblock (c:\work\xemu\qemu\util\oslib-win32.c:224)
+qemu_set_nonblock (c:\work\xemu\qemu\util\oslib-win32.c:230)
+socket_can_bind_connect (c:\work\xemu\qemu\tests\socket-helpers.c:93)
+socket_check_protocol_support (c:\work\xemu\qemu\tests\socket-helpers.c:141)
+main (c:\work\xemu\qemu\tests\test-io-channel-socket.c:568)
+__tmainCRTStartup (@__tmainCRTStartup:142)
+mainCRTStartup (@1400014f6..140001539:3)
+BaseThreadInitThunk (@BaseThreadInitThunk:9)
+RtlUserThreadStart (@RtlUserThreadStart:12)
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- tests/test-replication.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ tests/test-io-channel-socket.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tests/test-replication.c b/tests/test-replication.c
-index 9ab3666a90..e7cbd6b144 100644
---- a/tests/test-replication.c
-+++ b/tests/test-replication.c
-@@ -23,14 +23,14 @@
+diff --git a/tests/test-io-channel-socket.c b/tests/test-io-channel-socket.c
+index d43083a766..743577d744 100644
+--- a/tests/test-io-channel-socket.c
++++ b/tests/test-io-channel-socket.c
+@@ -25,6 +25,7 @@
+ #include "socket-helpers.h"
+ #include "qapi/error.h"
+ #include "qemu/module.h"
++#include "qemu/main-loop.h"
  
- /* primary */
- #define P_ID "primary-id"
--static char p_local_disk[] = "/tmp/p_local_disk.XXXXXX";
-+static char *p_local_disk;
  
- /* secondary */
- #define S_ID "secondary-id"
- #define S_LOCAL_DISK_ID "secondary-local-disk-id"
--static char s_local_disk[] = "/tmp/s_local_disk.XXXXXX";
--static char s_active_disk[] = "/tmp/s_active_disk.XXXXXX";
--static char s_hidden_disk[] = "/tmp/s_hidden_disk.XXXXXX";
-+static char *s_local_disk;
-+static char *s_active_disk;
-+static char *s_hidden_disk;
+ static void test_io_channel_set_socket_bufs(QIOChannel *src,
+@@ -556,6 +557,7 @@ int main(int argc, char **argv)
+     bool has_ipv4, has_ipv6;
  
- /* FIXME: steal from blockdev.c */
- QemuOptsList qemu_drive_opts = {
-@@ -571,6 +571,11 @@ static void setup_sigabrt_handler(void)
- int main(int argc, char **argv)
- {
-     int ret;
-+    const char *tmpdir = g_get_tmp_dir();
-+    p_local_disk = g_strdup_printf("%s/p_local_disk.XXXXXX", tmpdir);
-+    s_local_disk = g_strdup_printf("%s/s_local_disk.XXXXXX", tmpdir);
-+    s_active_disk = g_strdup_printf("%s/s_active_disk.XXXXXX", tmpdir);
-+    s_hidden_disk = g_strdup_printf("%s/s_hidden_disk.XXXXXX", tmpdir);
-     qemu_init_main_loop(&error_fatal);
-     bdrv_init();
+     module_call_init(MODULE_INIT_QOM);
++    qemu_init_main_loop(&error_abort);
+     socket_init();
  
-@@ -605,5 +610,10 @@ int main(int argc, char **argv)
- 
-     cleanup_imgs();
- 
-+    g_free(p_local_disk);
-+    g_free(s_local_disk);
-+    g_free(s_active_disk);
-+    g_free(s_hidden_disk);
-+
-     return ret;
- }
+     g_test_init(&argc, &argv, NULL);
 -- 
 2.28.0.windows.1
 
