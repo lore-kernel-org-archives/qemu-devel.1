@@ -2,92 +2,88 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 091BEC433E2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0674C43461
 	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:24:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75DBA2078E
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:24:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A31C2078E
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:24:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GJ1StaBr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75DBA2078E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fIKLYnL8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A31C2078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIA0f-0002zF-FC
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:24:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47906)
+	id 1kIA0g-00033X-1A
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:24:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46686)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kI9qE-0000TF-BT; Tue, 15 Sep 2020 08:13:47 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:42200)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kI9qC-00088x-EN; Tue, 15 Sep 2020 08:13:46 -0400
-Received: by mail-pl1-x644.google.com with SMTP id y6so1238554plt.9;
- Tue, 15 Sep 2020 05:13:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=hrJEqDkxFKpoRhRzMOgEeJejUGbXqPW0+cFjCJrQlA0=;
- b=GJ1StaBr/nZdQchwU/7KeA7/NzcOt0HN5hJLx1Kbbhh6vaoV2oM7Make5Pwx5Wqh0s
- cJXJgAwi6Cv4Y1PArVIl+BxCaLGtVpZFnmEOjdQQY1JPXNrnLqVZKMUhM9n/oMTpIl27
- 0mVvzpzst0iJqZmhGiZiC+naauOy4A04VQkbbmwuyzuRU+fABqkHaGWyj6lipSwJYmVP
- EqAdRLRFY1dFwcKx/3jR9ws18Tj9nzcfI0+BsSeQUrvzpKEZqcK+gXpDZlYfYeAayUmW
- s5cnOGKbKjQ6enQdCIwqOOkvBe7DTxSg91nrZdSNilW1SyUAdnCPKbWFnbjwasocuKvO
- 6BMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=hrJEqDkxFKpoRhRzMOgEeJejUGbXqPW0+cFjCJrQlA0=;
- b=PGfV9PqsHKA7ytDzgAnTMelhNyIcB29ICzj9SkY6n62gM6aSS4oXkx3/MUemc8viUB
- lyXwJFGRbbsfEjKDP/LGR9I4HS4RZ7UMvXbdKR21KhkHXj0FP9aF61SOSaVTMtW8lEBF
- daVfVdu4geWiI33STIV8c3pQred2MkcjQkgHjAx0xRqT0GEyGiFNpFu7WN87Im77Tt5J
- S4tJnIaSVj0TEJSX9MLKCRnEHCa40n9WbzW/Rup0gchL1KTH4r3pABB33iALLvlzKaTj
- nXeBl00PX6XduZ3IeYQnuKugYNAcR9gnGsi+maCKlWC+NgkvkbhdNUN+dBaUyl5JPZMs
- IoTQ==
-X-Gm-Message-State: AOAM5320Tsc37LgNeCJD0qt3JvlehM+pD+1R6KJASHdOZUzp5txGSDCj
- lJbkTj8LQVP/kFBIFYx9zfbojuMGMi77WJIe2Ek=
-X-Google-Smtp-Source: ABdhPJwmjqGvN4a+j3C220iTzyKPgVJJria+iIneKlGbcg1aJmnxM3IeYRl2ySuay3yttnhKKhZUrg==
-X-Received: by 2002:a17:902:d714:b029:d0:cbe1:e7a2 with SMTP id
- w20-20020a170902d714b02900d0cbe1e7a2mr18447239ply.19.1600172022299; 
- Tue, 15 Sep 2020 05:13:42 -0700 (PDT)
-Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id
- k28sm13683061pfh.196.2020.09.15.05.13.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Sep 2020 05:13:41 -0700 (PDT)
-From: Yonggang Luo <luoyonggang@gmail.com>
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kI9nN-0004tA-Dl
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:10:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37989)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kI9nI-0007ib-Lh
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:10:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600171843;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=S7l+P3buoZt7VTrit7Bgi07Dv5+mwhkNmD/cqJKlVcc=;
+ b=fIKLYnL8tUdA/xSoq2l9Ue6Bb5/MgkuhovKsyVNPgXwDAoT38pcWKMsPgyD9xWxTKMaKVh
+ SdXWOKafdCksjPC4DV22hz7JxpVWijFJXNB/xXcw0vuZg6oKlzbnLXMCevqzOULQz78fLd
+ 88gp18T76zeUHJOzScj3BClfYycdOMw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-247-5BU4jkNcMPK9Ob8JkhdGdw-1; Tue, 15 Sep 2020 08:09:33 -0400
+X-MC-Unique: 5BU4jkNcMPK9Ob8JkhdGdw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9390C64086;
+ Tue, 15 Sep 2020 12:09:31 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
+ [10.36.112.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BCFBA19D7D;
+ Tue, 15 Sep 2020 12:09:21 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id AC6B240820; Tue, 15 Sep 2020 14:09:09 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 01/26] rcu: Implement drain_call_rcu
-Date: Tue, 15 Sep 2020 20:12:53 +0800
-Message-Id: <20200915121318.247-2-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.28.0.windows.1
-In-Reply-To: <20200915121318.247-1-luoyonggang@gmail.com>
-References: <20200915121318.247-1-luoyonggang@gmail.com>
+Subject: [PATCH v8 05/21] acpi: ged: add x86 device variant.
+Date: Tue, 15 Sep 2020 14:08:53 +0200
+Message-Id: <20200915120909.20838-6-kraxel@redhat.com>
+In-Reply-To: <20200915120909.20838-1-kraxel@redhat.com>
+References: <20200915120909.20838-1-kraxel@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x644.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:23:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,113 +96,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- Ed Maste <emaste@freebsd.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>,
- Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>,
- Peter Lieven <pl@kamp.de>, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>,
+ qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Maxim Levitsky <mlevitsk@redhat.com>
+Set AcpiDeviceIfClass->madt_cpu,
+otherwise identical to TYPE_ACPI_GED.
 
-This will allow is to preserve the semantics of hmp_device_del,
-that the device is deleted immediatly which was changed by previos
-patch that delayed this to RCU callback
-
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Suggested-by: Stefan Hajnoczi <stefanha@gmail.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- include/qemu/rcu.h |  1 +
- util/rcu.c         | 55 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 56 insertions(+)
+ include/hw/acpi/generic_event_device.h |  4 +++
+ hw/i386/generic_event_device_x86.c     | 36 ++++++++++++++++++++++++++
+ hw/i386/meson.build                    |  1 +
+ 3 files changed, 41 insertions(+)
+ create mode 100644 hw/i386/generic_event_device_x86.c
 
-diff --git a/include/qemu/rcu.h b/include/qemu/rcu.h
-index 570aa603eb..0e375ebe13 100644
---- a/include/qemu/rcu.h
-+++ b/include/qemu/rcu.h
-@@ -133,6 +133,7 @@ struct rcu_head {
- };
+diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
+index 38aec526f944..241151662b45 100644
+--- a/include/hw/acpi/generic_event_device.h
++++ b/include/hw/acpi/generic_event_device.h
+@@ -71,6 +71,10 @@ typedef struct AcpiGedState AcpiGedState;
+ DECLARE_INSTANCE_CHECKER(AcpiGedState, ACPI_GED,
+                          TYPE_ACPI_GED)
  
- extern void call_rcu1(struct rcu_head *head, RCUCBFunc *func);
-+extern void drain_call_rcu(void);
++#define TYPE_ACPI_GED_X86 "acpi-ged-x86"
++#define ACPI_GED_X86(obj) \
++    OBJECT_CHECK(AcpiGedX86State, (obj), TYPE_ACPI_GED_X86)
++
+ #define ACPI_GED_EVT_SEL_OFFSET    0x0
+ #define ACPI_GED_EVT_SEL_LEN       0x4
  
- /* The operands of the minus operator must have the same type,
-  * which must be the one that we specify in the cast.
-diff --git a/util/rcu.c b/util/rcu.c
-index 60a37f72c3..c4fefa9333 100644
---- a/util/rcu.c
-+++ b/util/rcu.c
-@@ -293,6 +293,61 @@ void call_rcu1(struct rcu_head *node, void (*func)(struct rcu_head *node))
-     qemu_event_set(&rcu_call_ready_event);
- }
- 
-+
-+struct rcu_drain {
-+    struct rcu_head rcu;
-+    QemuEvent drain_complete_event;
-+};
-+
-+static void drain_rcu_callback(struct rcu_head *node)
-+{
-+    struct rcu_drain *event = (struct rcu_drain *)node;
-+    qemu_event_set(&event->drain_complete_event);
-+}
-+
+diff --git a/hw/i386/generic_event_device_x86.c b/hw/i386/generic_event_device_x86.c
+new file mode 100644
+index 000000000000..e26fb02a2ef6
+--- /dev/null
++++ b/hw/i386/generic_event_device_x86.c
+@@ -0,0 +1,36 @@
 +/*
-+ * This function ensures that all pending RCU callbacks
-+ * on the current thread are done executing
-+
-+ * drops big qemu lock during the wait to allow RCU thread
-+ * to process the callbacks
++ * x86 variant of the generic event device for hw reduced acpi
 + *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
 + */
 +
-+void drain_call_rcu(void)
++#include "qemu/osdep.h"
++#include "hw/acpi/generic_event_device.h"
++#include "hw/i386/pc.h"
++
++static void acpi_ged_x86_class_init(ObjectClass *class, void *data)
 +{
-+    struct rcu_drain rcu_drain;
-+    bool locked = qemu_mutex_iothread_locked();
++    AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_CLASS(class);
 +
-+    memset(&rcu_drain, 0, sizeof(struct rcu_drain));
-+    qemu_event_init(&rcu_drain.drain_complete_event, false);
-+
-+    if (locked) {
-+        qemu_mutex_unlock_iothread();
-+    }
-+
-+
-+    /*
-+     * RCU callbacks are invoked in the same order as in which they
-+     * are registered, thus we can be sure that when 'drain_rcu_callback'
-+     * is called, all RCU callbacks that were registered on this thread
-+     * prior to calling this function are completed.
-+     *
-+     * Note that since we have only one global queue of the RCU callbacks,
-+     * we also end up waiting for most of RCU callbacks that were registered
-+     * on the other threads, but this is a side effect that shoudn't be
-+     * assumed.
-+     */
-+
-+    call_rcu1(&rcu_drain.rcu, drain_rcu_callback);
-+    qemu_event_wait(&rcu_drain.drain_complete_event);
-+
-+    if (locked) {
-+        qemu_mutex_lock_iothread();
-+    }
-+
++    adevc->madt_cpu = pc_madt_cpu_entry;
 +}
 +
- void rcu_register_thread(void)
- {
-     assert(rcu_reader.ctr == 0);
++static const TypeInfo acpi_ged_x86_info = {
++    .name          = TYPE_ACPI_GED_X86,
++    .parent        = TYPE_ACPI_GED,
++    .class_init    = acpi_ged_x86_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_HOTPLUG_HANDLER },
++        { TYPE_ACPI_DEVICE_IF },
++        { }
++    }
++};
++
++static void acpi_ged_x86_register_types(void)
++{
++    type_register_static(&acpi_ged_x86_info);
++}
++
++type_init(acpi_ged_x86_register_types)
+diff --git a/hw/i386/meson.build b/hw/i386/meson.build
+index 63918fbe22f9..1a7d1a685d77 100644
+--- a/hw/i386/meson.build
++++ b/hw/i386/meson.build
+@@ -18,6 +18,7 @@ i386_ss.add(when: 'CONFIG_VMPORT', if_true: files('vmport.c'))
+ i386_ss.add(when: 'CONFIG_VTD', if_true: files('intel_iommu.c'))
+ 
+ i386_ss.add(when: 'CONFIG_ACPI', if_true: files('acpi-common.c'))
++i386_ss.add(when: 'CONFIG_ACPI_HW_REDUCED', if_true: files('generic_event_device_x86.c'))
+ i386_ss.add(when: 'CONFIG_PC', if_true: files(
+   'pc.c',
+   'pc_sysfw.c',
 -- 
-2.28.0.windows.1
+2.27.0
 
 
