@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93C10C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 02:41:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA3EFC43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 02:41:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5E2E20770
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 02:41:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5E2E20770
+	by mail.kernel.org (Postfix) with ESMTPS id 4BC8A20770
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 02:41:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BC8A20770
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kI0uK-0004ey-2i
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 22:41:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39632)
+	id 1kI0uT-0004kg-Ew
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 22:41:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39678)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kI0nP-0002T4-1N
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 22:34:15 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:49084 helo=huawei.com)
+ id 1kI0nR-0002ak-MP
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 22:34:17 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:34154 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kI0nM-0005tv-A9
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 22:34:14 -0400
+ id 1kI0nP-0005uY-Ky
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 22:34:17 -0400
 Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 4F40DA0BDEB33983EE16;
- Tue, 15 Sep 2020 10:34:07 +0800 (CST)
+ by Forcepoint Email with ESMTP id 84D2541C577D8AE60B72;
+ Tue, 15 Sep 2020 10:34:12 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS408-HUB.china.huawei.com
  (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Tue, 15 Sep 2020
- 10:33:57 +0800
+ 10:34:02 +0800
 From: Chuan Zheng <zhengchuan@huawei.com>
 To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>,
  <berrange@redhat.com>
-Subject: [PATCH v9 05/12] migration/dirtyrate: move
- RAMBLOCK_FOREACH_MIGRATABLE into ram.h
-Date: Tue, 15 Sep 2020 10:44:40 +0800
-Message-ID: <1600137887-58739-6-git-send-email-zhengchuan@huawei.com>
+Subject: [PATCH v9 12/12] migration/dirtyrate: Add trace_calls to make it
+ easier to debug
+Date: Tue, 15 Sep 2020 10:44:47 +0800
+Message-ID: <1600137887-58739-13-git-send-email-zhengchuan@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1600137887-58739-1-git-send-email-zhengchuan@huawei.com>
 References: <1600137887-58739-1-git-send-email-zhengchuan@huawei.com>
@@ -52,9 +52,9 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.175.101.6]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35; envelope-from=zhengchuan@huawei.com;
+Received-SPF: pass client-ip=45.249.212.32; envelope-from=zhengchuan@huawei.com;
  helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 22:34:04
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 21:28:41
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -81,78 +81,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-RAMBLOCK_FOREACH_MIGRATABLE is need in dirtyrate measure,
-move the existing definition up into migration/ram.h
+Add trace_calls to make it easier to debug
 
 Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: David Edmondson <david.edmondson@oracle.com>
 ---
- migration/dirtyrate.c |  1 +
- migration/ram.c       | 11 +----------
- migration/ram.h       | 10 ++++++++++
- 3 files changed, 12 insertions(+), 10 deletions(-)
+ migration/dirtyrate.c  | 9 +++++++++
+ migration/trace-events | 8 ++++++++
+ 2 files changed, 17 insertions(+)
 
 diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-index ab372ba..7366bf3 100644
+index 37d4bdf..0090efd 100644
 --- a/migration/dirtyrate.c
 +++ b/migration/dirtyrate.c
-@@ -20,6 +20,7 @@
- #include "qemu/rcu_queue.h"
+@@ -22,6 +22,7 @@
  #include "qapi/qapi-commands-migration.h"
  #include "migration.h"
-+#include "ram.h"
+ #include "ram.h"
++#include "trace.h"
  #include "dirtyrate.h"
  
  static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
-diff --git a/migration/ram.c b/migration/ram.c
-index 76d4fee..37ef0da 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -158,21 +158,12 @@ out:
-     return ret;
- }
- 
--static bool ramblock_is_ignored(RAMBlock *block)
-+bool ramblock_is_ignored(RAMBlock *block)
+@@ -54,6 +55,7 @@ static bool is_sample_period_valid(int64_t sec)
+ static int dirtyrate_set_state(int *state, int old_state, int new_state)
  {
-     return !qemu_ram_is_migratable(block) ||
-            (migrate_ignore_shared() && qemu_ram_is_shared(block));
+     assert(new_state < DIRTY_RATE_STATUS__MAX);
++    trace_dirtyrate_set_state(DirtyRateStatus_str(new_state));
+     if (atomic_cmpxchg(state, old_state, new_state) == old_state) {
+         return 0;
+     } else {
+@@ -76,6 +78,8 @@ static struct DirtyRateInfo *query_dirty_rate_info(void)
+     info->start_time = DirtyStat.start_time;
+     info->calc_time = DirtyStat.calc_time;
+ 
++    trace_query_dirty_rate_info(DirtyRateStatus_str(CalculatingState));
++
+     return info;
  }
  
--/* Should be holding either ram_list.mutex, or the RCU lock. */
--#define RAMBLOCK_FOREACH_NOT_IGNORED(block)            \
--    INTERNAL_RAMBLOCK_FOREACH(block)                   \
--        if (ramblock_is_ignored(block)) {} else
--
--#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
--    INTERNAL_RAMBLOCK_FOREACH(block)                   \
--        if (!qemu_ram_is_migratable(block)) {} else
--
- #undef RAMBLOCK_FOREACH
+@@ -123,6 +127,7 @@ static uint32_t get_ramblock_vfn_hash(struct RamblockDirtyInfo *info,
+     crc = crc32(0, (info->ramblock_addr +
+                 vfn * TARGET_PAGE_SIZE), TARGET_PAGE_SIZE);
  
- int foreach_not_ignored_block(RAMBlockIterFunc func, void *opaque)
-diff --git a/migration/ram.h b/migration/ram.h
-index 2eeaacf..011e854 100644
---- a/migration/ram.h
-+++ b/migration/ram.h
-@@ -37,6 +37,16 @@ extern MigrationStats ram_counters;
- extern XBZRLECacheStats xbzrle_counters;
- extern CompressionStats compression_counters;
++    trace_get_ramblock_vfn_hash(info->idstr, vfn, crc);
+     return crc;
+ }
  
-+bool ramblock_is_ignored(RAMBlock *block);
-+/* Should be holding either ram_list.mutex, or the RCU lock. */
-+#define RAMBLOCK_FOREACH_NOT_IGNORED(block)            \
-+    INTERNAL_RAMBLOCK_FOREACH(block)                   \
-+        if (ramblock_is_ignored(block)) {} else
+@@ -201,6 +206,8 @@ static bool skip_sample_ramblock(RAMBlock *block)
+      * Sample only blocks larger than MIN_RAMBLOCK_SIZE.
+      */
+     if (qemu_ram_get_used_length(block) < (MIN_RAMBLOCK_SIZE << 10)) {
++        trace_skip_sample_ramblock(block->idstr,
++                                   qemu_ram_get_used_length(block));
+         return true;
+     }
+ 
+@@ -260,6 +267,7 @@ static void calc_page_dirty_rate(struct RamblockDirtyInfo *info)
+     for (i = 0; i < info->sample_pages_count; i++) {
+         crc = get_ramblock_vfn_hash(info, info->sample_page_vfn[i]);
+         if (crc != info->hash_result[i]) {
++            trace_calc_page_dirty_rate(info->idstr, crc, info->hash_result[i]);
+             info->sample_dirty_count++;
+         }
+     }
+@@ -285,6 +293,7 @@ find_page_matched(RAMBlock *block, int count,
+     if (infos[i].ramblock_addr != qemu_ram_get_host_addr(block) ||
+         infos[i].ramblock_pages !=
+             (qemu_ram_get_used_length(block) >> TARGET_PAGE_BITS)) {
++        trace_find_page_matched(block->idstr);
+         return NULL;
+     }
+ 
+diff --git a/migration/trace-events b/migration/trace-events
+index 4ab0a50..8c2b58f 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -312,3 +312,11 @@ dirty_bitmap_load_bits_zeroes(void) ""
+ dirty_bitmap_load_header(uint32_t flags) "flags 0x%x"
+ dirty_bitmap_load_enter(void) ""
+ dirty_bitmap_load_success(void) ""
 +
-+#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
-+    INTERNAL_RAMBLOCK_FOREACH(block)                   \
-+        if (!qemu_ram_is_migratable(block)) {} else
-+
- int xbzrle_cache_resize(int64_t new_size, Error **errp);
- uint64_t ram_bytes_remaining(void);
- uint64_t ram_bytes_total(void);
++# dirtyrate.c
++dirtyrate_set_state(const char *new_state) "new state %s"
++query_dirty_rate_info(const char *new_state) "current state %s"
++get_ramblock_vfn_hash(const char *idstr, uint64_t vfn, uint32_t crc) "ramblock name: %s, vfn: %"PRIu64 ", crc: %" PRIu32
++calc_page_dirty_rate(const char *idstr, uint32_t new_crc, uint32_t old_crc) "ramblock name: %s, new crc: %" PRIu32 ", old crc: %" PRIu32
++skip_sample_ramblock(const char *idstr, uint64_t ramblock_size) "ramblock name: %s, ramblock size: %" PRIu64
++find_page_matched(const char *idstr) "ramblock %s addr or size changed"
 -- 
 1.8.3.1
 
