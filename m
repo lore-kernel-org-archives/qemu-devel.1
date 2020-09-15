@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC8C2C43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:51:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7D10C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:51:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6693F20738
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:51:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3958820770
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:51:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lcPT8Nt8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6693F20738
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H2vnkxql"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3958820770
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIBMP-0001z3-AB
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 09:51:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45314)
+	id 1kIBN5-0002hE-9O
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 09:51:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45450)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kIBEz-0000aD-Cj
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:43:25 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55638)
+ id 1kIBF9-000105-Hd
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:43:37 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:42452)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kIBEw-00047C-I1
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:43:25 -0400
-Received: by mail-wm1-x344.google.com with SMTP id d4so3417737wmd.5
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 06:43:20 -0700 (PDT)
+ id 1kIBF7-0004AX-MV
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:43:35 -0400
+Received: by mail-wr1-x433.google.com with SMTP id c18so3358796wrm.9
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 06:43:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=WnEEcW5T8TnW3Xg2cKGofSTt8rnGAByMYZea8oHCeVE=;
- b=lcPT8Nt8NDBiWax1mtggMu8WdBMIa5exaHhnN9E1LM4n6RThzzvWH0zY/SpsE8doIK
- TPk3C5YAvBu39S+nxRzC+hFOY/eGKBgKEgvqzXqOfQNJRaqwmseW1DS+72gPnaZzumG/
- Fb1lmHfbYb0kcY1PLES+TWeh8hEXDrBSezYSf8qJ2HkGMUksy++CGX3xRJmVTD0QcGxF
- LSNMiL460xOCrfYLk45fOrVe2ImcsxypaRxHezFJVT0bmhTiRJ1atHmMf9mbBCwmBnMw
- D1jnpaIUNgXtpKHXAttJrql1JRqt8ebo2UPZBOOevFdsWsG1zC4qwc6aIsLoXgsLEdl+
- yZaA==
+ bh=n0V6Bu8RWGghOYmLv1OjdGkvV4oOdhPqZhEkxs4b9EU=;
+ b=H2vnkxql5IsiZj2wrONjTlDcHa3iE/kWpls8iS4+KaWlFBuSPYMSGv9l2GoxAvCMZG
+ dkGjgUR5D7KTsXgrLs1FQO7HufB2RdZIwsRW+chgt14ZGHeAaIXppi51sC+4QPV8Ok5z
+ gVYpkOC4WNVoiK49kllgqxbT7t5f+/Pv0sX2sHfHeyhQldqqp1saD6t4uUjOMqogh7xQ
+ 5FTA5ibpy6da8crARTZB5BZ27vGn/wVq+ftL2T3Z+5QuXHIppvehpQpu00RquC28Ol/2
+ e5T1FJu1ULmO6CyAFoMzTFO4ubWLiVwQtsxkjsFLTG2m+Z88dmDt1JLZx7ZM9fLsI+nQ
+ mwfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=WnEEcW5T8TnW3Xg2cKGofSTt8rnGAByMYZea8oHCeVE=;
- b=sP9VYIEm2lBw1xr3Q9UqDyrG4EtJN2JhNhDyRLjGejaMuKF6aEMQ5gCQBgfjElAY9/
- 0IhcLRn9bJUInSw/yEwkvvazQQTNW0fhOVXxa03kkT1mDJkqFNtIq9xOXckKWA9EaRei
- Am+JTj+iznwzhRgB5VUQE4KkM7o66AtMFmRIpC8O9n+5qj8EqtPsfiiIDGRM7zAOQToR
- SqsimkdTBU1muspCqeL8Q1TjPmyhR/t6Sf97v2UEuBSdyoBnahuLu2WlSz3PeBL3mPfL
- 3huIM9OL83f1KlsEsv5YEmAI8VWBOVcdZqBmcf4MsAmgFZu60U40S61JJVhLhsGtxpup
- sppg==
-X-Gm-Message-State: AOAM530NbileDAMFdpWuBKSVZIrdzKKIDEfL1A2Z6dLnDGpNae8SYweL
- GYdNuAstY1Io2TEKIc+Sgoe3lQ==
-X-Google-Smtp-Source: ABdhPJxomF8lITxXQi/khxQxpuir52lK02fWHKRgWfYrFLmkYPsx/ouvQqMVLQb8r+nigqeuLffvxw==
-X-Received: by 2002:a1c:e919:: with SMTP id q25mr4736638wmc.123.1600177399761; 
- Tue, 15 Sep 2020 06:43:19 -0700 (PDT)
+ bh=n0V6Bu8RWGghOYmLv1OjdGkvV4oOdhPqZhEkxs4b9EU=;
+ b=bzs5GuOawusD2DWxY/U7eFWr0AWktp6c8liQsyUQC/A26dNVBLhScyYboFIuurazFW
+ k3RBPwm5CNF4luSxTxT7b2WMBphwhxQ7+Gdw4/lPCNcXruGQldZCU9qzA9CJAURvM7yS
+ IDWzjE7s1P8js/FmSLljIj/G0HhoMVvZ0HybdOew9o8EnMuIWrJJgKdbMg8wa60RsblN
+ Im7XV8hBHkKUq1K4z70x2FqTEjNsMq/MAy1WIe5BlJiL1jb9O/5Z1Xv0OpJoki863x4T
+ DkV8fBJvm2v6WlJ9zwPw2PICNZoltR4LGBr3qjmRZvDY6/S3k80/vC9rgl0gaRWXymHk
+ f0bg==
+X-Gm-Message-State: AOAM5332aJAqQmETyefTEnY1LFgHAkJA+2JeXLAEEsSza9q7yX9NCx5q
+ lsbZjBNlM5Qa/CxO+69rlIZpNA==
+X-Google-Smtp-Source: ABdhPJzW2Cd0n4aK73jPd61sj0jzRKoSP5x0JkdTAmEYLZtg1N0+BdU7HaWtRn2SqDiajI1HJkFblw==
+X-Received: by 2002:a5d:5404:: with SMTP id g4mr20660743wrv.134.1600177412260; 
+ Tue, 15 Sep 2020 06:43:32 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id f1sm26280408wrx.75.2020.09.15.06.43.17
+ by smtp.gmail.com with ESMTPSA id y1sm24111628wma.36.2020.09.15.06.43.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Sep 2020 06:43:17 -0700 (PDT)
+ Tue, 15 Sep 2020 06:43:24 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 406501FF87;
+ by zen.linaroharston (Postfix) with ESMTP id DB8F01FF96;
  Tue, 15 Sep 2020 14:43:17 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v2 1/8] linux-user: test,
- don't assert addr != test in pgb_reserved_va
-Date: Tue, 15 Sep 2020 14:43:10 +0100
-Message-Id: <20200915134317.11110-2-alex.bennee@linaro.org>
+Subject: [PATCH v2 8/8] configure: add [lm32|unicore32]-softmmu to deprecation
+ logic
+Date: Tue, 15 Sep 2020 14:43:17 +0100
+Message-Id: <20200915134317.11110-9-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200915134317.11110-1-alex.bennee@linaro.org>
 References: <20200915134317.11110-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::433;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x433.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,49 +104,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, Bug 1895080 <1895080@bugs.launchpad.net>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On older kernels which don't implement MAP_FIXED_NOREPLACE the kernel
-may still fail to give us the address we asked for despite having
-already probed the map for a valid hole. Asserting isn't particularly
-useful to the user so let us move the check up and expand the
-error_report a little to give them a fighting chance of working around
-the problem.
+While we are at it move the few places where they are into the
+deprecation build bucket.
 
-Ameliorates: ee94743034
-Cc: Bug 1895080 <1895080@bugs.launchpad.net>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- linux-user/elfload.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ configure      | 2 +-
+ .gitlab-ci.yml | 9 +++++----
+ .shippable.yml | 2 +-
+ 3 files changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 4961e6119e24..f6022fd70493 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -2331,14 +2331,13 @@ static void pgb_reserved_va(const char *image_name, abi_ulong guest_loaddr,
-     assert(guest_base != 0);
-     test = g2h(0);
-     addr = mmap(test, reserved_va, PROT_NONE, flags, -1, 0);
--    if (addr == MAP_FAILED) {
-+    if (addr == MAP_FAILED || addr != test) {
-         error_report("Unable to reserve 0x%lx bytes of virtual address "
--                     "space (%s) for use as guest address space (check your "
--                     "virtual memory ulimit setting or reserve less "
--                     "using -R option)", reserved_va, strerror(errno));
-+                     "space at %p (%s) for use as guest address space (check your"
-+                     "virtual memory ulimit setting, min_mmap_addr or reserve less "
-+                     "using -R option)", reserved_va, test, strerror(errno));
-         exit(EXIT_FAILURE);
-     }
--    assert(addr == test);
+diff --git a/configure b/configure
+index dfd7f18dcb24..756447900855 100755
+--- a/configure
++++ b/configure
+@@ -280,7 +280,7 @@ supported_whpx_target() {
+     return 1
  }
  
- void probe_guest_base(const char *image_name, abi_ulong guest_loaddr,
+-deprecated_targets_list=ppc64abi32-linux-user,tilegx-linux-user
++deprecated_targets_list=ppc64abi32-linux-user,tilegx-linux-user,lm32-softmmu,unicore32-softmmu
+ deprecated_features=""
+ 
+ supported_target() {
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index f027b55aef15..a18e18b57e54 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -134,7 +134,7 @@ build-system-fedora:
+   variables:
+     IMAGE: fedora
+     CONFIGURE_ARGS: --disable-gcrypt --enable-nettle
+-    TARGETS: tricore-softmmu unicore32-softmmu microblaze-softmmu mips-softmmu
++    TARGETS: tricore-softmmu microblaze-softmmu mips-softmmu
+       xtensa-softmmu m68k-softmmu riscv32-softmmu ppc-softmmu sparc64-softmmu
+     MAKE_CHECK_ARGS: check-build
+   artifacts:
+@@ -166,7 +166,7 @@ build-system-centos:
+   variables:
+     IMAGE: centos8
+     CONFIGURE_ARGS: --disable-nettle --enable-gcrypt
+-    TARGETS: ppc64-softmmu lm32-softmmu or1k-softmmu s390x-softmmu
++    TARGETS: ppc64-softmmu or1k-softmmu s390x-softmmu
+       x86_64-softmmu rx-softmmu sh4-softmmu nios2-softmmu
+     MAKE_CHECK_ARGS: check-build
+   artifacts:
+@@ -259,9 +259,10 @@ build-deprecated:
+   <<: *native_build_job_definition
+   variables:
+     IMAGE: debian-all-test-cross
+-    CONFIGURE_ARGS: --disable-docs --disable-tools --disable-system
++    CONFIGURE_ARGS: --disable-docs --disable-tools
+     MAKE_CHECK_ARGS: check-tcg
+-    TARGETS: ppc64abi32-linux-user tilegx-linux-user
++    TARGETS: ppc64abi32-linux-user tilegx-linux-user lm32-softmmu
++      unicore32-softmmu
+   allow_failure: true
+ 
+ build-oss-fuzz:
+diff --git a/.shippable.yml b/.shippable.yml
+index 89d8be4291b0..0b4fd6df1d81 100644
+--- a/.shippable.yml
++++ b/.shippable.yml
+@@ -8,7 +8,7 @@ env:
+     - IMAGE=debian-amd64
+       TARGET_LIST=x86_64-softmmu,x86_64-linux-user
+     - IMAGE=debian-win32-cross
+-      TARGET_LIST=arm-softmmu,i386-softmmu,lm32-softmmu
++      TARGET_LIST=arm-softmmu,i386-softmmu
+     - IMAGE=debian-win64-cross
+       TARGET_LIST=aarch64-softmmu,sparc64-softmmu,x86_64-softmmu
+     - IMAGE=debian-armel-cross
 -- 
 2.20.1
 
