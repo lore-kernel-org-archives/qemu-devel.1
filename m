@@ -2,81 +2,96 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88015C2D0E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:27:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2277AC43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:28:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7209208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:27:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7209208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 96AA1208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:28:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iVTNEhXM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96AA1208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIEjm-0008C0-PA
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 13:27:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44362)
+	id 1kIEka-0000ww-Ks
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 13:28:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44336)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIEX2-0000BW-2x
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 13:14:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41862)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kIEWy-00006l-4y; Tue, 15 Sep 2020 13:14:12 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:45701)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIEKE-0001NK-BE
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 13:01:06 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kIEKB-0006SU-Dk
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 17:00:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1F06C2E8082
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 17:00:59 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 15 Sep 2020 16:50:08 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1895703@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kIEWv-0002jn-DR; Tue, 15 Sep 2020 13:14:11 -0400
+Received: by mail-pf1-x444.google.com with SMTP id k15so2295824pfc.12;
+ Tue, 15 Sep 2020 10:14:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=xbLEoF58D0tbgLJVVq5i1Stm39rTFIriYnuaDpYR+rE=;
+ b=iVTNEhXMG+bRZESTBYZsOV+SeL1rGr6PS5e1uglyXscZlQbzAoEwZNzyo1HfcGukXH
+ 6g71QcC2ypIGPFJv9jFE69wKpCHhCufo/LPH1JsplLStUQZ96HjkZKQixmulUPa0Qvvy
+ Nz2AllzRK4ZC+bLTs3k89XhPf0oiB6K8lqbFEPz9CsAjV/nrxLy13mzw1hkqVziUmt+V
+ rqWDENh7/w8vWvgwX4ByDQeEcUJoT07epQeZxMVsXA5zlHGWQ6i/FOyL5hP1BHtR6uMm
+ voz5JcfDj2FHsj70+8uiVRe8wcde9SOnLx7A2RJL4cQo5UHIbaTNbmZ9yIB0EbL4NGHs
+ LVTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=xbLEoF58D0tbgLJVVq5i1Stm39rTFIriYnuaDpYR+rE=;
+ b=g4kJtZYuO6HzkqeeUGNEh7HDUa+rsSlut/6zM2IlEjLbtwmTXz2NgoP5xSLZgWm2/H
+ N5uS+uD15uAEIWHV9uZqORcFkci2t1hCE9/67QwjDDNWh99EmRFJR6io70cvnFiXrhb2
+ agNKzOd1PXhBgFElTUhRr9NnkQSAwwQnytmSpiN8GgQH2tuY+NYJq1UfTcyDsiue1q1V
+ miPlBGFanwElJKdNl6dwP8jTh08kwwLPLym5Gq6bZmLXEzVAUVW56a90AiK/w+C9+Y6j
+ 8j1Ed+FCaI12Oqd2/S0SJWvGzdJed1+V8/okdouPur6+4sBJsHL0C4Nt4zmoa7+55EV7
+ Vp3A==
+X-Gm-Message-State: AOAM530Oa/9Q+zO2IlV+8Lj7a7iS4+rb2a7F8E17yXteaw7BDgvgNpx3
+ Uz+PvZZSX8seAIFIe9ChfJWq+1dAjSmS7yThnUo=
+X-Google-Smtp-Source: ABdhPJzibWTPBroSY9dCwgfmTmEbO7hmur3M9u69JcqpQFdXr2JTXJ04mkZV0aFdrau8zw9YcsgXdA==
+X-Received: by 2002:a63:3046:: with SMTP id w67mr15184957pgw.45.1600190044765; 
+ Tue, 15 Sep 2020 10:14:04 -0700 (PDT)
+Received: from localhost.localdomain ([103.94.185.75])
+ by smtp.googlemail.com with ESMTPSA id j14sm124046pjz.21.2020.09.15.10.14.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 15 Sep 2020 10:14:04 -0700 (PDT)
+From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: buildsys tcg
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: philmd
-X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-Message-Id: <160018860889.17103.9156462398304890013.malonedeb@soybean.canonical.com>
-Subject: [Bug 1895703] [NEW] performance degradation in tcg since Meson switch
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: 2343c86e8878db7786e3b520f1f35dae45cebba0
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 09:50:55
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Subject: [PATCH v10 16/26] tests: Convert g_free to g_autofree macro in
+ test-logging.c
+Date: Wed, 16 Sep 2020 01:12:24 +0800
+Message-Id: <20200915171234.236-17-luoyonggang@gmail.com>
+X-Mailer: git-send-email 2.28.0.windows.1
+In-Reply-To: <20200915171234.236-1-luoyonggang@gmail.com>
+References: <20200915171234.236-1-luoyonggang@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,69 +100,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1895703 <1895703@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Ed Maste <emaste@freebsd.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Yonggang Luo <luoyonggang@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Wen Congyang <wencongyang2@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Li-Wen Hsu <lwhsu@freebsd.org>, Peter Lieven <pl@kamp.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+g_autofree are prefer than g_free when possible.
 
-The buildsys conversion to Meson (1d806cef0e3..7fd51e68c34)
-introduced a degradation in performance in some TCG targets:
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ tests/test-logging.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
---------------------------------------------------------
-Test Program: matmult_double
---------------------------------------------------------
-Target              Instructions     Previous    Latest
-                                     1d806cef   7fd51e68
-----------  --------------------  ----------  ----------
-alpha              3 233 957 639       -----     +7.472%
-m68k               3 919 110 506       -----    +18.433%
---------------------------------------------------------
+diff --git a/tests/test-logging.c b/tests/test-logging.c
+index 8a1161de1d..cec18b31b4 100644
+--- a/tests/test-logging.c
++++ b/tests/test-logging.c
+@@ -196,7 +196,8 @@ static void rmdir_full(gchar const *root)
+ 
+ int main(int argc, char **argv)
+ {
+-    gchar *tmp_path = g_dir_make_tmp("qemu-test-logging.XXXXXX", NULL);
++    g_autofree gchar *tmp_path = g_dir_make_tmp(
++        "qemu-test-logging.XXXXXX", NULL);
+     int rc;
+ 
+     g_test_init(&argc, &argv, NULL);
+@@ -212,6 +213,5 @@ int main(int argc, char **argv)
+     rc = g_test_run();
+ 
+     rmdir_full(tmp_path);
+-    g_free(tmp_path);
+     return rc;
+ }
+-- 
+2.28.0.windows.1
 
-Original report from Ahmed Karaman with further testing done
-by Aleksandar Markovic:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg740279.html
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: buildsys tcg
-
-** Tags added: buildsys tcg
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1895703
-
-Title:
-  performance degradation in tcg since Meson switch
-
-Status in QEMU:
-  New
-
-Bug description:
-  The buildsys conversion to Meson (1d806cef0e3..7fd51e68c34)
-  introduced a degradation in performance in some TCG targets:
-
-  --------------------------------------------------------
-  Test Program: matmult_double
-  --------------------------------------------------------
-  Target              Instructions     Previous    Latest
-                                       1d806cef   7fd51e68
-  ----------  --------------------  ----------  ----------
-  alpha              3 233 957 639       -----     +7.472%
-  m68k               3 919 110 506       -----    +18.433%
-  --------------------------------------------------------
-
-  Original report from Ahmed Karaman with further testing done
-  by Aleksandar Markovic:
-  https://www.mail-archive.com/qemu-devel@nongnu.org/msg740279.html
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1895703/+subscriptions
 
