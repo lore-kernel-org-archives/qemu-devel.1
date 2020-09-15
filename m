@@ -2,95 +2,88 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C0FDC43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 14:04:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 696E3C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 14:06:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C42722204
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 14:04:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D2644206A1
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 14:06:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="L9OUJmRD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C42722204
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZFd7ZZ/w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2644206A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIBZS-0005ja-Dw
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 10:04:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50354)
+	id 1kIBb4-0006zI-TS
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 10:06:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48508)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIBYk-0005Ec-1I
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 10:03:50 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41592)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kIBRb-0001Se-O3
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:56:28 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:45337)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIBYh-0006qc-BF
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 10:03:49 -0400
-Received: by mail-wr1-x444.google.com with SMTP id w5so3450382wrp.8
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 07:03:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kIBRZ-0005ph-W1
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:56:27 -0400
+Received: by mail-ej1-x643.google.com with SMTP id i26so5151298ejb.12
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 06:56:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=wFd3WS7eQqsmzOmLFMtGdl90am8FsRbNMR38y0v4vko=;
- b=L9OUJmRD0+WZtPxLZNmOirFXPsb4S2jmWNRsCJ/SakqR02ic/RApI/wY9ItjqugciU
- YrCw36ly/pdIaRSGWYcurGd4wz0S9G+w7Rh4n59+i3DaCRRe0C9ibnA+Vfc+FMEv02Bm
- m1Igeu9VvZJt0693bhe6ZAO09bhiOlKMUjVvFURFYPcQmlNvquDBVxKRU7Q7s9R7VgR3
- W5zIa2MyCQIEpGSb3lhEXi+AMejAObb08t/zjdGc0sYJVAa4q+2LqJPTWlHc2ggoyGfX
- 64d30dwyEEXc/HmW1HlngEKKBi4IQbKfwf4dsW2Enh2d0i0wL6iEml32bH08XNrtYV/6
- nw0g==
+ :cc; bh=oVMl4YHDbb2Q6RVR1bETZ1dfmb5fPIQISdobiw1cff4=;
+ b=ZFd7ZZ/w/aGpLHMBuYKTnrePzqU3IyciszstoDcr1UBkar2WhvbDEgDnr/atdtxWFb
+ eLsDTKwxDkrVRgseMvNfInypsD99taANnhZkldSfmbK2KaKkbay47/zRkwjuUGtEXsG2
+ mNGQlHjGpncp07WvTShQa91sT3395hF2VqrDbzyEsEcZBCmZKkTGYWqvw34hzmKVckw2
+ 4LoUuz8/tykxmvv0HiZfYeb3CmEZUH/kD3Rasu7GfnKggIwCo1vjmKutJ5Gs/ODUOVBB
+ m7usd94x73RRDExJbwJhDUY1ppt3ELKA27RZVIBAZNG/KWvM3uf+jKkknz+gRhhgOYJD
+ jAnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=wFd3WS7eQqsmzOmLFMtGdl90am8FsRbNMR38y0v4vko=;
- b=DS2E3v/03P1TnHvDlTRu+1o3sYBWn3jr9Ky/yxNHwtn1fnbKODvJkUXMF9SUo1dnCA
- ebOGGVnXuJE1Ih8YbSyoG5g9BNUtMrXUgGKmWXcmJPE3Bnw0u2/4U6HMGVK54Q2AVzsH
- b479F6pIWiYbSws4W9KEj/YW209W+4ISnnJp00euDE9ajuOxeexogYcaTQA2/gfdPD2m
- BBxGaw0rskNCgjcMWEmc6IdxbYrfOErM0VrZO0fNprB4VdsRBqGDETquTLaxRSDK2TEF
- MYrlRImPoGvr6i3bxN9ygyAZDMhTJXu0PMqZmIcclDEGTiPTA3PxbE5FvWCB845s7KgH
- BYHQ==
-X-Gm-Message-State: AOAM5315AbgzGfba47U6zCKRflrMNMQkLyJ4LuWapux1yTGI51aNNycL
- h7IYo9G0QSv6l/70dW7hoXDQcmbdioITaJjWgaieeg==
-X-Google-Smtp-Source: ABdhPJw+Ez+sWDFwYJc51NqwcOGUt/eJCPaY1IHJv/jrcOQ7ZW47udOC9YNlPoPD8Xy8QN45uPO0l7aWzrq4ogrt7cY=
-X-Received: by 2002:adf:e3cf:: with SMTP id k15mr20415630wrm.291.1600178625845; 
- Tue, 15 Sep 2020 07:03:45 -0700 (PDT)
+ bh=oVMl4YHDbb2Q6RVR1bETZ1dfmb5fPIQISdobiw1cff4=;
+ b=k7QiBmLIauhESWBm8hNStBHrSWNdi0H3ees/Eb7DLLnppiKRJ10NVfAZGjm957Hydo
+ RX7K8WKmTypgz8NcNwblrvFMoY9Wz7cqemVD1D0bFmjXNp8yRflE2RyYnNtr0XDuEVvR
+ np1jBRLStuf9otBdNjmIQrHX7RQHjd3+mKp0caJGKgtIF7qq/5vEzyq1msHQGXUOt5EX
+ ZzOLRwI4YZpV/afEL9DlQSaPIfDpb4R2yrp5bZyvwgQNXkBUDsJ71K6RSeFtMT8GUI1Z
+ cQvQSf9jl2La5WgG1Q7TUKfKxHuiFnujMKb4hthj3MYkVVKryBy5UaZ19GYWdoSrmNAJ
+ LJng==
+X-Gm-Message-State: AOAM5308X61QaoOE2wTPdaMU5yIwFr+lXrqZCTkQNTlNKVtrf8yVDsvi
+ sb/f3TcYoAMejBcghg6ZnYWw6aKfMb/BFNzHuS8=
+X-Google-Smtp-Source: ABdhPJykqNBHscYBWokUDMTSJgH+cM618/TRUkc4QFtNfBFNZQDnaHVej4xDAeqjynd4SFjAOkC3k43X1Z7wTyQlw8Y=
+X-Received: by 2002:a17:906:faec:: with SMTP id
+ lu44mr19901851ejb.527.1600178184018; 
+ Tue, 15 Sep 2020 06:56:24 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200911180755.28409-1-ani@anisinha.ca>
- <20200911180755.28409-9-ani@anisinha.ca>
- <20200914150550.23a91fa2@redhat.com>
- <CAARzgwyrSW4jjrPCc1SJkDZUV9C-e_96RNGytZ8VjpPzzrWfXg@mail.gmail.com>
- <CAARzgwx4T0MXtFTMe-b8DbAQCi7xq231kjOv8wRcRxwE5HPCyw@mail.gmail.com>
- <20200914160910.66785da8@redhat.com>
- <CAARzgwzSg7zCk_jaQ7iriC4_L+9oTykv0RhPdkTroP9pNtiMCg@mail.gmail.com>
- <20200915135141.585c767d@redhat.com>
- <CAARzgwzF4nwb8=ZQq5mhmDPQdgaen4Dy+_gXQVkW+Gw-_feMgw@mail.gmail.com>
- <20200915144859.4f929784@redhat.com>
- <CAARzgwyi2K_VS-dw2aoqy0tVy_VmGH+fM33BKB0q3-spCGgf+Q@mail.gmail.com>
- <20200915154200.06a58630@redhat.com>
-In-Reply-To: <20200915154200.06a58630@redhat.com>
-From: Ani Sinha <ani@anisinha.ca>
-Date: Tue, 15 Sep 2020 19:33:34 +0530
-Message-ID: <CAARzgwxyN5pSwxnQn0rjxM0f1qsye4KHVew+K94qGbZyP7itsw@mail.gmail.com>
-Subject: Re: [PATCH 9/9] piix4: don't reserve hw resources when hotplug is off
- globally
-To: Igor Mammedov <imammedo@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: none client-ip=2a00:1450:4864:20::444;
- envelope-from=ani@anisinha.ca; helo=mail-wr1-x444.google.com
+References: <20200915114757.55635-1-thuth@redhat.com>
+In-Reply-To: <20200915114757.55635-1-thuth@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 15 Sep 2020 17:56:12 +0400
+Message-ID: <CAJ+F1CLex1WJaHtMPU1Vo4UAUR9aO3ga3QJPNcZ5RWoVq6+dWA@mail.gmail.com>
+Subject: Re: [PATCH] qga/commands-win32: Fix problem with redundant protype
+ declaration
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000003c6c4605af5a84e8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=marcandre.lureau@gmail.com; helo=mail-ej1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,295 +96,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Julia Suvorova <jusual@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Richard Henderson <rth@twiddle.net>
+Cc: Stefan Weil <sw@weilnetz.de>, Yonggang Luo <luoyonggang@gmail.com>,
+ =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>,
+ QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 15, 2020 at 7:12 PM Igor Mammedov <imammedo@redhat.com> wrote:
->
-> On Tue, 15 Sep 2020 18:25:55 +0530
-> Ani Sinha <ani@anisinha.ca> wrote:
->
-> > On Tue, Sep 15, 2020 at 6:19 PM Igor Mammedov <imammedo@redhat.com> wrote:
-> > >
-> > > On Tue, 15 Sep 2020 17:40:25 +0530
-> > > Ani Sinha <ani@anisinha.ca> wrote:
-> > >
-> > > > On Tue, Sep 15, 2020 at 5:21 PM Igor Mammedov <imammedo@redhat.com> wrote:
-> > > > >
-> > > > > On Mon, 14 Sep 2020 20:20:21 +0530
-> > > > > Ani Sinha <ani@anisinha.ca> wrote:
-> > > > >
-> > > > > > On Mon, Sep 14, 2020 at 7:39 PM Igor Mammedov <imammedo@redhat.com> wrote:
-> > > > > > >
-> > > > > > > On Mon, 14 Sep 2020 18:58:19 +0530
-> > > > > > > Ani Sinha <ani@anisinha.ca> wrote:
-> > > > > > >
-> > > > > > > > On Mon, Sep 14, 2020 at 6:40 PM Ani Sinha <ani@anisinha.ca> wrote:
-> > > > > > > > >
-> > > > > > > > > On Mon, Sep 14, 2020 at 6:36 PM Igor Mammedov <imammedo@redhat.com> wrote:
-> > > > > > > > > >
-> > > > > > > > > > On Fri, 11 Sep 2020 23:37:55 +0530
-> > > > > > > > > > Ani Sinha <ani@anisinha.ca> wrote:
-> > > > > > > > > >
-> > > > > > > > > > > When acpi hotplug is turned off for both root pci bus as well as for pci
-> > > > > > > > > > > bridges, we should not generate the related amls for DSDT table or initialize
-> > > > > > > > > > > related hw ports or reserve hw resources. This change makes sure all those
-> > > > > > > > > > > operations are turned off in the case acpi pci hotplug is off globally.
-> > > > > > > > > >
-> > > > > > > > > > it still leaves around pure PCI hotplug ACPI code:
-> > > > > > > > > >
-> > > > > > > > > >             Method (PCNT, 0, NotSerialized)
-> > > > > > > > > >             {
-> > > > > > > > > >             }
-> > > > > > > > >
-> > > > > > > > > How do you suggest we fix this?
-> > > > > > > >
-> > > > > > > > One way to fix this would be to do this:
-> > > > > > > >
-> > > > > > > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > > > > > > > index 7e3cf3b57b..2bd0c37143 100644
-> > > > > > > > --- a/hw/i386/acpi-build.c
-> > > > > > > > +++ b/hw/i386/acpi-build.c
-> > > > > > > > @@ -483,7 +483,8 @@ static void build_append_pci_bus_devices(Aml
-> > > > > > > > *parent_scope, PCIBus *bus,
-> > > > > > > >              aml_append(method, aml_name("^S%.02X.PCNT", devfn));
-> > > > > > > >          }
-> > > > > > > >      }
-> > > > > > > > -    aml_append(parent_scope, method);
-> > > > > > > > +    if (bsel)
-> > > > > > > > +        aml_append(parent_scope, method);
-> > > > >
-> > > > > and this also introduces mem leak
-> > > > >
-> > > > >
-> > > > > > > >      qobject_unref(bsel);
-> > > > > > > >  }
-> > > > > > > >
-> > > > > > > > This means that if the hotplug on the root bus is disabled, we also
-> > > > > > > > disable PCNT. This will also need the unit test update as the unit
-> > > > > > > Does bridge hot-plug still work if we disable it only on root bus?
-> > > > > >
-> > > > > > Just did a quick test. Windows seems to eject devices on the bridge
-> > > > > > even when the root bus hot plug is off.
-> > > > >
-> > > > > well I'm not sure it works using ACPI hotplug,
-> > > > >
-> > > > > with
-> > > > > -global PIIX4_PM.acpi-root-pci-hotplug=off
-> > > > > -global PIIX4_PM.acpi-pci-hotplug-with-bridge-support=on
-> > > > >
-> > > > > DSDT ins't what I'd expect when bridge hp is on:
-> > > > >
-> > > > >     Scope (\_SB)
-> > > > >     {
-> > > > >         Scope (PCI0)
-> > > > >         {
-> > > > >             Device (S00)
-> > > > >             {
-> > > > >                 Name (_ADR, Zero)  // _ADR: Address
-> > > > >             }
-> > > > >
-> > > > >             Device (S08)
-> > > >
-> > > > I think you should look for AMLs for Device (S18) because the bridge
-> > > > goes into slot 3.
-> > >
-> > > as you see, there weren't any here. so maybe something else gone wrong
-> > > in earlier patches
-> >
-> > Can you send the full command line you are passing? You need to attach
-> > a bridge, then the function will recurse into it.
->
-> all your 9 pathes with this on top:
->
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 7e3cf3b57b..8339a3538a 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -483,7 +483,8 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
->              aml_append(method, aml_name("^S%.02X.PCNT", devfn));
->          }
->      }
-> -    aml_append(parent_scope, method);
-> +    if (bsel)
-> +       aml_append(parent_scope, method);
->      qobject_unref(bsel);
->  }
->
-> diff --git a/slirp b/slirp
-> --- a/slirp
-> +++ b/slirp
-> @@ -1 +1 @@
-> -Subproject commit ce94eba2042d52a0ba3d9e252ebce86715e94275
-> +Subproject commit ce94eba2042d52a0ba3d9e252ebce86715e94275-dirty
-> diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-> index 7632cfe1be..fb56c1eeb0 100644
-> --- a/tests/qtest/bios-tables-test.c
-> +++ b/tests/qtest/bios-tables-test.c
-> @@ -750,7 +750,7 @@ static void test_acpi_piix4_root_hotplug(void)
->      data.required_struct_types = base_required_struct_types;
->      data.required_struct_types_len = ARRAY_SIZE(base_required_struct_types);
->      test_acpi_one("-global PIIX4_PM.acpi-root-pci-hotplug=off "
-> -                  "-device pci-bridge,chassis_nr=1", &data);
-> +                  "-device pci-bridge,chassis_nr=1 -global PIIX4_PM.acpi-pci-hotplug-with-bridge-support=on", &data);
+--0000000000003c6c4605af5a84e8
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-That's a noop since by default its ON.
+Hi
 
-I ran the test and it passed. The disassembly of
-tests/data/acpi/pc/DSDT.roothp is here:
+On Tue, Sep 15, 2020 at 3:49 PM Thomas Huth <thuth@redhat.com> wrote:
 
-https://pastebin.ubuntu.com/p/52VS6HRPx8/
+> When compiling QEMU with MSYS2 on Windows, there is currently the
+> following error:
+>
+> ../qga/commands-win32.c:62:24: error: redundant redeclaration of
+>  'CM_Get_DevNode_PropertyW' [-Werror=3Dredundant-decls]
+>    62 | CMAPI CONFIGRET WINAPI CM_Get_DevNode_PropertyW(
+>       |                        ^~~~~~~~~~~~~~~~~~~~~~~~
+> In file included from ../qga/commands-win32.c:26:
+> C:/tools/msys64/mingw64/x86_64-w64-mingw32/include/cfgmgr32.h:840:26: not=
+e:
+>  previous declaration of 'CM_Get_DevNode_PropertyW' was here
+>   840 |   CMAPI CONFIGRET WINAPI CM_Get_DevNode_PropertyW(DEVINST
+> dnDevInst,
+>    const DEVPROPKEY *PropertyKey, DEVPROPTYPE *PropertyType, PBYTE
+> PropertyBuffer,
+>    PULONG PropertyBufferSize, ULONG ulFlags);
+>
+> Seems like this protype is sometimes available in the cfgmgr32.h
+> header, and sometimes not. Let's silence the compiler warning here
+> to let the build pass with -Werror, too.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>
 
-Seems OK to me. The table for the bridge slots starts from line 871.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
->      free_test_data(&data);
->  }
+---
+>  I can take this through my "testing" tree together with some other
+>  MSYS2 patches if there are no objections.
+>
+>  qga/commands-win32.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index 48d8bbe649..0c3c05484f 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -57,8 +57,10 @@ DEFINE_DEVPROPKEY(qga_DEVPKEY_Device_DriverDate,
+> 0xa8b865dd, 0x2e3d,
+>  DEFINE_DEVPROPKEY(qga_DEVPKEY_Device_DriverVersion, 0xa8b865dd, 0x2e3d,
+>      0x4094, 0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6, 3);
+>      /* DEVPROP_TYPE_STRING */
+> -/* The following shoud be in cfgmgr32.h, but it isn't */
+> +/* The CM_Get_DevNode_PropertyW prototype is only sometimes in cfgmgr32.=
+h
+> */
+>  #ifndef CM_Get_DevNode_Property
+> +#pragma GCC diagnostic push
+> +#pragma GCC diagnostic ignored "-Wredundant-decls"
+>  CMAPI CONFIGRET WINAPI CM_Get_DevNode_PropertyW(
+>      DEVINST          dnDevInst,
+>      CONST DEVPROPKEY * PropertyKey,
+> @@ -68,6 +70,7 @@ CMAPI CONFIGRET WINAPI CM_Get_DevNode_PropertyW(
+>      ULONG            ulFlags
+>  );
+>  #define CM_Get_DevNode_Property CM_Get_DevNode_PropertyW
+> +#pragma GCC diagnostic pop
+>  #endif
+>
+>  #ifndef SHTDN_REASON_FLAG_PLANNED
+> --
+> 2.18.2
 >
 >
-> and run test with:
 >
-> make -j32 && make tests/qtest/bios-tables-test && V=1 QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64 QTEST_QEMU_IMG=qemu-img tests/qtest/bios-tables-test
+
+--=20
+Marc-Andr=C3=A9 Lureau
+
+--0000000000003c6c4605af5a84e8
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Hi<br></div><br><div class=3D"gmail_quote"><div dir=
+=3D"ltr" class=3D"gmail_attr">On Tue, Sep 15, 2020 at 3:49 PM Thomas Huth &=
+lt;<a href=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt; wrote:<br><=
+/div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bo=
+rder-left:1px solid rgb(204,204,204);padding-left:1ex">When compiling QEMU =
+with MSYS2 on Windows, there is currently the<br>
+following error:<br>
+<br>
+../qga/commands-win32.c:62:24: error: redundant redeclaration of<br>
+=C2=A0&#39;CM_Get_DevNode_PropertyW&#39; [-Werror=3Dredundant-decls]<br>
+=C2=A0 =C2=A062 | CMAPI CONFIGRET WINAPI CM_Get_DevNode_PropertyW(<br>
+=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^~~~~~~~~~~~~~~~~~~~~~~~<br>
+In file included from ../qga/commands-win32.c:26:<br>
+C:/tools/msys64/mingw64/x86_64-w64-mingw32/include/cfgmgr32.h:840:26: note:=
+<br>
+=C2=A0previous declaration of &#39;CM_Get_DevNode_PropertyW&#39; was here<b=
+r>
+=C2=A0 840 |=C2=A0 =C2=A0CMAPI CONFIGRET WINAPI CM_Get_DevNode_PropertyW(DE=
+VINST dnDevInst,<br>
+=C2=A0 =C2=A0const DEVPROPKEY *PropertyKey, DEVPROPTYPE *PropertyType, PBYT=
+E PropertyBuffer,<br>
+=C2=A0 =C2=A0PULONG PropertyBufferSize, ULONG ulFlags);<br>
+<br>
+Seems like this protype is sometimes available in the cfgmgr32.h<br>
+header, and sometimes not. Let&#39;s silence the compiler warning here<br>
+to let the build pass with -Werror, too.<br>
+<br>
+Signed-off-by: Thomas Huth &lt;<a href=3D"mailto:thuth@redhat.com" target=
+=3D"_blank">thuth@redhat.com</a>&gt;<br></blockquote><div><br></div><div>Re=
+viewed-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@re=
+dhat.com">marcandre.lureau@redhat.com</a>&gt;=C2=A0 <br></div><div><br></di=
+v><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;borde=
+r-left:1px solid rgb(204,204,204);padding-left:1ex">
+---<br>
+=C2=A0I can take this through my &quot;testing&quot; tree together with som=
+e other<br>
+=C2=A0MSYS2 patches if there are no objections.<br>
+<br>
+=C2=A0qga/commands-win32.c | 5 ++++-<br>
+=C2=A01 file changed, 4 insertions(+), 1 deletion(-)<br>
+<br>
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c<br>
+index 48d8bbe649..0c3c05484f 100644<br>
+--- a/qga/commands-win32.c<br>
++++ b/qga/commands-win32.c<br>
+@@ -57,8 +57,10 @@ DEFINE_DEVPROPKEY(qga_DEVPKEY_Device_DriverDate, 0xa8b86=
+5dd, 0x2e3d,<br>
+=C2=A0DEFINE_DEVPROPKEY(qga_DEVPKEY_Device_DriverVersion, 0xa8b865dd, 0x2e3=
+d,<br>
+=C2=A0 =C2=A0 =C2=A00x4094, 0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6, =
+3);<br>
+=C2=A0 =C2=A0 =C2=A0/* DEVPROP_TYPE_STRING */<br>
+-/* The following shoud be in cfgmgr32.h, but it isn&#39;t */<br>
++/* The CM_Get_DevNode_PropertyW prototype is only sometimes in cfgmgr32.h =
+*/<br>
+=C2=A0#ifndef CM_Get_DevNode_Property<br>
++#pragma GCC diagnostic push<br>
++#pragma GCC diagnostic ignored &quot;-Wredundant-decls&quot;<br>
+=C2=A0CMAPI CONFIGRET WINAPI CM_Get_DevNode_PropertyW(<br>
+=C2=A0 =C2=A0 =C2=A0DEVINST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 dnDevInst,<br=
 >
-> >
-> > >
-> > > >
-> > > > >             {
-> > > > >                 Name (_ADR, 0x00010000)  // _ADR: Address
-> > > > >                 Method (_S1D, 0, NotSerialized)  // _S1D: S1 Device State
-> > > > >                 {
-> > > > >                     Return (Zero)
-> > > > >                 }
-> > > > >
-> > > > >                 Method (_S2D, 0, NotSerialized)  // _S2D: S2 Device State
-> > > > >                 {
-> > > > >                     Return (Zero)
-> > > > >                 }
-> > > > >
-> > > > >                 Method (_S3D, 0, NotSerialized)  // _S3D: S3 Device State
-> > > > >                 {
-> > > > >                     Return (Zero)
-> > > > >                 }
-> > > > >             }
-> > > > >         }
-> > > > >     }
-> > > > >
-> > > > >
-> > > > > >
-> > > > > > >
-> > > > > > > > test
-> > > > > > > > will fail with :
-> > > > > > > >
-> > > > > > > > @@ -3113,24 +3113,20 @@
-> > > > > > > >                  Name (_ADR, 0x00010000)  // _ADR: Address
-> > > > > > > >                  Method (_S1D, 0, NotSerialized)  // _S1D: S1 Device State
-> > > > > > > >                  {
-> > > > > > > >                      Return (Zero)
-> > > > > > > >                  }
-> > > > > > > >
-> > > > > > > >                  Method (_S2D, 0, NotSerialized)  // _S2D: S2 Device State
-> > > > > > > >                  {
-> > > > > > > >                      Return (Zero)
-> > > > > > > >                  }
-> > > > > > > >
-> > > > > > > >                  Method (_S3D, 0, NotSerialized)  // _S3D: S3 Device State
-> > > > > > > >                  {
-> > > > > > > >                      Return (Zero)
-> > > > > > > >                  }
-> > > > > > > >              }
-> > > > > > > > -
-> > > > > > > > -            Method (PCNT, 0, NotSerialized)
-> > > > > > > > -            {
-> > > > > > > > -            }
-> > > > > > > >          }
-> > > > > > > >      }
-> > > > > > > >  }
-> > > > > > > >
-> > > > > > > > Let's fix this as a separate patch.
-> > > > > > >
-> > > > > > > I'd rather fix up this patch, so it would do what it claims.
-> > > > > > >
-> > > > > > > > >
-> > > > > > > > > > >
-> > > > > > > > > > > Signed-off-by: Ani Sinha <ani@anisinha.ca>
-> > > > > > > > > > > ---
-> > > > > > > > > > >  hw/acpi/piix4.c      |  6 ++++--
-> > > > > > > > > > >  hw/i386/acpi-build.c | 10 ++++++++--
-> > > > > > > > > > >  2 files changed, 12 insertions(+), 4 deletions(-)
-> > > > > > > > > > >
-> > > > > > > > > > > diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> > > > > > > > > > > index e6163bb6ce..b70b1f98af 100644
-> > > > > > > > > > > --- a/hw/acpi/piix4.c
-> > > > > > > > > > > +++ b/hw/acpi/piix4.c
-> > > > > > > > > > > @@ -596,8 +596,10 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
-> > > > > > > > > > >                            "acpi-gpe0", GPE_LEN);
-> > > > > > > > > > >      memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
-> > > > > > > > > > >
-> > > > > > > > > > > -    acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
-> > > > > > > > > > > -                    s->use_acpi_hotplug_bridge);
-> > > > > > > > > > > +    if (s->use_acpi_hotplug_bridge || s->use_acpi_root_pci_hotplug) {
-> > > > > > > > > > > +        acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
-> > > > > > > > > > > +                        s->use_acpi_hotplug_bridge);
-> > > > > > > > > > > +    }
-> > > > > > > > > > >
-> > > > > > > > > > >      s->cpu_hotplug_legacy = true;
-> > > > > > > > > > >      object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
-> > > > > > > > > > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > > > > > > > > > > index e079b686f5..7e3cf3b57b 100644
-> > > > > > > > > > > --- a/hw/i386/acpi-build.c
-> > > > > > > > > > > +++ b/hw/i386/acpi-build.c
-> > > > > > > > > > > @@ -95,6 +95,7 @@ typedef struct AcpiPmInfo {
-> > > > > > > > > > >      bool s3_disabled;
-> > > > > > > > > > >      bool s4_disabled;
-> > > > > > > > > > >      bool pcihp_bridge_en;
-> > > > > > > > > > > +    bool pcihp_root_en;
-> > > > > > > > > > >      uint8_t s4_val;
-> > > > > > > > > > >      AcpiFadtData fadt;
-> > > > > > > > > > >      uint16_t cpu_hp_io_base;
-> > > > > > > > > > > @@ -245,6 +246,9 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
-> > > > > > > > > > >      pm->pcihp_bridge_en =
-> > > > > > > > > > >          object_property_get_bool(obj, "acpi-pci-hotplug-with-bridge-support",
-> > > > > > > > > > >                                   NULL);
-> > > > > > > > > > > +    pm->pcihp_root_en =
-> > > > > > > > > > > +        object_property_get_bool(obj, "acpi-root-pci-hotplug",
-> > > > > > > > > > > +                                 NULL);
-> > > > > > > > > > >  }
-> > > > > > > > > > >
-> > > > > > > > > > >  static void acpi_get_misc_info(AcpiMiscInfo *info)
-> > > > > > > > > > > @@ -1504,7 +1508,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-> > > > > > > > > > >          build_hpet_aml(dsdt);
-> > > > > > > > > > >          build_piix4_isa_bridge(dsdt);
-> > > > > > > > > > >          build_isa_devices_aml(dsdt);
-> > > > > > > > > > > -        build_piix4_pci_hotplug(dsdt);
-> > > > > > > > > > > +        if (pm->pcihp_bridge_en || pm->pcihp_root_en) {
-> > > > > > > > > > > +            build_piix4_pci_hotplug(dsdt);
-> > > > > > > > > > > +        }
-> > > > > > > > > > >          build_piix4_pci0_int(dsdt);
-> > > > > > > > > > >      } else {
-> > > > > > > > > > >          sb_scope = aml_scope("_SB");
-> > > > > > > > > > > @@ -1698,7 +1704,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-> > > > > > > > > > >      crs_range_set_free(&crs_range_set);
-> > > > > > > > > > >
-> > > > > > > > > > >      /* reserve PCIHP resources */
-> > > > > > > > > > > -    if (pm->pcihp_io_len) {
-> > > > > > > > > > > +    if (pm->pcihp_io_len && (pm->pcihp_bridge_en || pm->pcihp_root_en)) {
-> > > > > > > > > > >          dev = aml_device("PHPR");
-> > > > > > > > > > >          aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A06")));
-> > > > > > > > > > >          aml_append(dev,
-> > > > > > > > > >
-> > > > > > > >
-> > > > > > >
-> > > > > >
-> > > > >
-> > > >
-> > >
-> >
->
+=C2=A0 =C2=A0 =C2=A0CONST DEVPROPKEY * PropertyKey,<br>
+@@ -68,6 +70,7 @@ CMAPI CONFIGRET WINAPI CM_Get_DevNode_PropertyW(<br>
+=C2=A0 =C2=A0 =C2=A0ULONG=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ulFlags<=
+br>
+=C2=A0);<br>
+=C2=A0#define CM_Get_DevNode_Property CM_Get_DevNode_PropertyW<br>
++#pragma GCC diagnostic pop<br>
+=C2=A0#endif<br>
+<br>
+=C2=A0#ifndef SHTDN_REASON_FLAG_PLANNED<br>
+-- <br>
+2.18.2<br>
+<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
+
+--0000000000003c6c4605af5a84e8--
 
