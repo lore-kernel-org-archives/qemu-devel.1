@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8F17C43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 15:40:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B231C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 15:40:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A4CB206B2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 15:40:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 93955206B2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 15:40:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="Vz10bbju"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A4CB206B2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="Bo5Bldeo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93955206B2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kID46-0005wa-6h
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 11:40:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48772)
+	id 1kID4G-0006PV-8f
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 11:40:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kID2m-0004KT-DI
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 11:38:56 -0400
-Received: from mail-pg1-x535.google.com ([2607:f8b0:4864:20::535]:36122)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kID2v-0004ef-UI
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 11:39:05 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:35818)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kID2k-0004a0-GV
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 11:38:56 -0400
-Received: by mail-pg1-x535.google.com with SMTP id f2so2200015pgd.3
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 08:38:53 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kID2u-0004ab-30
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 11:39:05 -0400
+Received: by mail-pl1-x643.google.com with SMTP id bg9so1542808plb.2
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 08:39:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=Q9e5WoPP1IxGkMk/UfsIYmbQR1ZYEM3M7sDwaoDUZm8=;
- b=Vz10bbjud8YgR9oMFDaxUOQ/0nPEWFeSmYkIEyKd4p09dU9w8/ePKj5PVVIfmuYJ6+
- SJ/nVwQ/vzL1LX723eVc7dsPlFWFxjd68ciz+Bu7bjPYCekTQ0K09f+VvG76pEpDNHFn
- 1v90lOJdzNsESlJpySZuBGFo/h6mtil0M+sbESse5+JSpU3RDv5Pcxa+/19uvZ85t4kG
- 7zGA/ECV6NUNaizyH6aFG/XEvKcUzi2imUFI9N4ahqxUCEEl1oOwAHCh8B3yiXo7xfg8
- 7ERbDz8TITEFFlGwEGMsJnfPu/tVfswBAan6N8sJtf9mz63oQcVSqnQbQ/yRuchdqfq+
- kyOg==
+ bh=1HJAcNNwPJS7p1FkxDsM+O9s3xr3SqwAfIoNSM2l/6c=;
+ b=Bo5BldeofZNFTkhib8Ix36bXR5ZGImWy7Kvgoc+YxmbYZnbp9POTK4yyMKKAkAKYhZ
+ HOQoC8IgQdISfMWT1cMKg3lxpuql7xRCJRjwStMDomeFFUsAIOvHQJelwglc++iDWkln
+ cPtRmnFYqQjKtUvoAA0aX5mCCHgCBierHQ0o9DaGiNNOFU3Bf8fVCsl6KB1ehrErMlFr
+ aQ9ghUPnZN1aeW1Kbz5aErYkRD96aY2XSB+gnujR/duT9A527uDh5/yWhqamRNrGhyGE
+ zyekAwEsSV9laT1prkwehXSIz0vtVFwaC37TX/Di1boxUgjRe8Vjg3oKkxEknn6U6Vel
+ E56A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=Q9e5WoPP1IxGkMk/UfsIYmbQR1ZYEM3M7sDwaoDUZm8=;
- b=jGRM7neUXD39iyWjTvnJ1vbtVVg4IepLLxZ4FlIhfLEi9EVQH/430f0Qr7FttO1eD/
- 4s3qSnU5tkP5tImjymKe2iqf+KyYYMzSj9exIEOTKN3SUQFR2CGgqS0sayFdWyFZZywb
- cQ/JAF4CtFCFf5GKpGG5AtpRzOEjNb3m/jhTHkUF7GUdRDiieu9hVJKSiC6XO44EwoKV
- wISbddXUHiTsDW9+KO9qL5hPuGBQGQVWguGMz2CfZMkSk40kbIJT+erJjTa/xxsZVldi
- Ey5G532sTbhRgBV+tNkThPgPB0S0N9z+5WYVb1hslG80631qtg/rj2E/GE+G8dzeP+Sl
- kPIQ==
-X-Gm-Message-State: AOAM532U6EP2+CbeKLV7UUhD7dKSoX+qTEyDpeKkK57D+TyksMH96cao
- Xhg0PZ5XT8pYkzKnc/aPVTEv5GY7ppE3YgF5
-X-Google-Smtp-Source: ABdhPJxRsc1kEqYIfyKAo/jTCuiOxC6Tq6BkhBk+crRfxppAw4lOlhZviEYhVIrgUR1gaZoEzwKq0Q==
-X-Received: by 2002:aa7:9491:0:b029:142:2501:396b with SMTP id
- z17-20020aa794910000b02901422501396bmr2410714pfk.48.1600184332445; 
- Tue, 15 Sep 2020 08:38:52 -0700 (PDT)
+ bh=1HJAcNNwPJS7p1FkxDsM+O9s3xr3SqwAfIoNSM2l/6c=;
+ b=YfnY20k4oV64yqG+QCZ/vxLimVzW+q19YKnniBJ5ZMRUgDKIFSGbxXWzK348qwHHJi
+ j/TtDFje/ph8OpiDyq4jNETHftQz+s1L9nkY0uZSml2jj2fLTu54+Xqtp+qyJUniW9MF
+ YTiYwNpeFdUcI/TWXlxnDPjzS/ykyJAbzk0RrOiIGvzUE3+pAyEUc5/NN0jPcGr+Y5FZ
+ BW8yXfXhLi1TLAWrxFzoHPVN/Ty67nLcPYj7ExDs+oDXFOLspxb1flbC9aXBh1UkO+XZ
+ UvuYRAA6/ZeqmheXOaw2Y/qwvagP6EuNzXs9wiuMrwhcQRo3Zbm7jnrnF3bmoSqk74jG
+ 2jvw==
+X-Gm-Message-State: AOAM532ThLv7f5UuzPbZ+7WQp/+LG65BdDlxqT68Tnusz1YRqbn0yrWk
+ OCkCDOtzntK4wFKQ1wUFlZjeuk0kbERZoZLe
+X-Google-Smtp-Source: ABdhPJz1vekarnUew3B8cE7ywOW7/j0BdmyF8/lCJqo8JI67spFRbQ73snacrVJlLyKBVZoQokGJFQ==
+X-Received: by 2002:a17:902:34f:b029:d1:e5e7:bdcf with SMTP id
+ 73-20020a170902034fb02900d1e5e7bdcfmr2351590pld.47.1600184342378; 
+ Tue, 15 Sep 2020 08:39:02 -0700 (PDT)
 Received: from localhost.localdomain ([115.96.130.76])
- by smtp.googlemail.com with ESMTPSA id 194sm13283547pfy.44.2020.09.15.08.38.48
+ by smtp.googlemail.com with ESMTPSA id 194sm13283547pfy.44.2020.09.15.08.38.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Sep 2020 08:38:51 -0700 (PDT)
+ Tue, 15 Sep 2020 08:39:01 -0700 (PDT)
 From: Ani Sinha <ani@anisinha.ca>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 5/9] i440fx/acpi: do not add hotplug related amls for cold
- plugged bridges
-Date: Tue, 15 Sep 2020 21:08:14 +0530
-Message-Id: <20200915153818.13020-6-ani@anisinha.ca>
+Subject: [PATCH v3 7/9] tests/acpi: unit test for
+ 'acpi-pci-hotplug-with-bridge-support' bridge flag
+Date: Tue, 15 Sep 2020 21:08:16 +0530
+Message-Id: <20200915153818.13020-8-ani@anisinha.ca>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200915153818.13020-1-ani@anisinha.ca>
 References: <20200915153818.13020-1-ani@anisinha.ca>
-Received-SPF: none client-ip=2607:f8b0:4864:20::535;
- envelope-from=ani@anisinha.ca; helo=mail-pg1-x535.google.com
+Received-SPF: none client-ip=2607:f8b0:4864:20::643;
+ envelope-from=ani@anisinha.ca; helo=mail-pl1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -18
@@ -96,8 +96,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
@@ -107,145 +107,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cold plugged bridges are not hot unpluggable, even when their hotplug
-property (acpi-pci-hotplug-with-bridge-support) is turned off. Please see
-the function acpi_pcihp_pc_no_hotplug() (thanks Julia). However, with
-the current implementaton, windows would try to hot-unplug a pci bridge when
-it's hotplug switch is off. This is regardless of whether there are devices
-attached to the bridge. This is because we add amls like _EJ0 etc for the
-pci slot where the bridge is cold plugged. We have a demo video here:
-https://youtu.be/pME2sjyQweo
-
-In this fix, we identify a cold plugged bridge and for cold plugged bridges,
-we do not add the appropriate amls and acpi methods that are used by the OS
-to identify a hot-pluggable/unpluggable pci device. After this change, Windows
-does not show an option to eject the PCI bridge. A demo video is here:
-https://youtu.be/kbgej5B9Hgs
-
-As a result of the patch, the following are the changes to the DSDT ACPI table:
-
-@@ -858,38 +858,33 @@
-                     Return (Zero)
-                 }
-
-                 Method (_S2D, 0, NotSerialized)  // _S2D: S2 Device State
-                 {
-                     Return (Zero)
-                 }
-
-                 Method (_S3D, 0, NotSerialized)  // _S3D: S3 Device State
-                 {
-                     Return (Zero)
-                 }
-             }
-
-             Device (S18)
-             {
--                Name (_SUN, 0x03)  // _SUN: Slot User Number
-                 Name (_ADR, 0x00030000)  // _ADR: Address
--                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                {
--                    PCEJ (BSEL, _SUN)
--                }
-             }
-
-             Device (S20)
-             {
-                 Name (_SUN, 0x04)  // _SUN: Slot User Number
-                 Name (_ADR, 0x00040000)  // _ADR: Address
-                 Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
-                 {
-                     PCEJ (BSEL, _SUN)
-                 }
-             }
-
-             Device (S28)
-             {
-                 Name (_SUN, 0x05)  // _SUN: Slot User Number
-                 Name (_ADR, 0x00050000)  // _ADR: Address
-@@ -1148,37 +1143,32 @@
-                     PCEJ (BSEL, _SUN)
-                 }
-             }
-
-             Device (SF8)
-             {
-                 Name (_SUN, 0x1F)  // _SUN: Slot User Number
-                 Name (_ADR, 0x001F0000)  // _ADR: Address
-                 Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
-                 {
-                     PCEJ (BSEL, _SUN)
-                 }
-             }
-
-             Method (DVNT, 2, NotSerialized)
-             {
--                If ((Arg0 & 0x08))
--                {
--                    Notify (S18, Arg1)
--                }
--
-                 If ((Arg0 & 0x10))
-                 {
-                     Notify (S20, Arg1)
-                 }
-
-                 If ((Arg0 & 0x20))
-                 {
-                     Notify (S28, Arg1)
-                 }
-
-                 If ((Arg0 & 0x40))
-                 {
-                     Notify (S30, Arg1)
-                 }
-
-                 If ((Arg0 & 0x80))
-
-While at it, I have also updated a stale comment.
-
-This change is tested with a Windows 2012R2 guest image and Windows 2019 server
-guest image running on Ubuntu 18.04 host. This change is based off of upstream
-qemu master branch tag v5.1.0.
+This change adds a new unit test for the global flag
+'acpi-pci-hotplug-with-bridge-support' which is available for cold plugged pci
+bridges in i440fx. The flag can be used to turn off acpi based hotplug support
+for all pci bridges.
 
 Signed-off-by: Ani Sinha <ani@anisinha.ca>
 ---
- hw/i386/acpi-build.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ tests/qtest/bios-tables-test.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 7a5a8b3521..e079b686f5 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -359,6 +359,7 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-         int slot = PCI_SLOT(i);
-         bool hotplug_enabled_dev;
-         bool bridge_in_acpi;
-+        bool cold_plugged_bridge;
+diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
+index d8c7d57557..7632cfe1be 100644
+--- a/tests/qtest/bios-tables-test.c
++++ b/tests/qtest/bios-tables-test.c
+@@ -754,6 +754,20 @@ static void test_acpi_piix4_root_hotplug(void)
+     free_test_data(&data);
+ }
  
-         if (!pdev) {
-             if (bsel) { /* add hotplug slots for non present devices */
-@@ -380,15 +381,14 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-         pc = PCI_DEVICE_GET_CLASS(pdev);
-         dc = DEVICE_GET_CLASS(pdev);
- 
--        /* When hotplug for bridges is enabled, bridges are
--         * described in ACPI separately (see build_pci_bus_end).
--         * In this case they aren't themselves hot-pluggable.
-+        /*
-+         * Cold plugged bridges aren't themselves hot-pluggable.
-          * Hotplugged bridges *are* hot-pluggable.
-          */
--        bridge_in_acpi = pc->is_bridge && pcihp_bridge_en &&
--            !DEVICE(pdev)->hotplugged;
-+        cold_plugged_bridge = pc->is_bridge && !DEVICE(pdev)->hotplugged;
-+        bridge_in_acpi =  cold_plugged_bridge && pcihp_bridge_en;
- 
--        hotplug_enabled_dev = bsel && dc->hotpluggable && !bridge_in_acpi;
-+        hotplug_enabled_dev = bsel && dc->hotpluggable && !cold_plugged_bridge;
- 
-         if (pc->class_id == PCI_CLASS_BRIDGE_ISA) {
-             continue;
++static void test_acpi_piix4_bridge_hotplug(void)
++{
++    test_data data;
++
++    memset(&data, 0, sizeof(data));
++    data.machine = MACHINE_PC;
++    data.variant = ".hpbridge";
++    data.required_struct_types = base_required_struct_types;
++    data.required_struct_types_len = ARRAY_SIZE(base_required_struct_types);
++    test_acpi_one("-global PIIX4_PM.acpi-pci-hotplug-with-bridge-support=off "
++                  "-device pci-bridge,chassis_nr=1", &data);
++    free_test_data(&data);
++}
++
+ static void test_acpi_q35_tcg(void)
+ {
+     test_data data;
+@@ -1159,6 +1173,7 @@ int main(int argc, char *argv[])
+         qtest_add_func("acpi/piix4", test_acpi_piix4_tcg);
+         qtest_add_func("acpi/piix4/bridge", test_acpi_piix4_tcg_bridge);
+         qtest_add_func("acpi/piix4/hotplug", test_acpi_piix4_root_hotplug);
++        qtest_add_func("acpi/piix4/brhotplug", test_acpi_piix4_bridge_hotplug);
+         qtest_add_func("acpi/q35", test_acpi_q35_tcg);
+         qtest_add_func("acpi/q35/bridge", test_acpi_q35_tcg_bridge);
+         qtest_add_func("acpi/q35/mmio64", test_acpi_q35_tcg_mmio64);
 -- 
 2.17.1
 
