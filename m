@@ -2,127 +2,87 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E65E9C43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 11:55:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07030C43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 11:57:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7005F20732
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 11:55:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 987FC21D43
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 11:57:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="pwcl9F6y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7005F20732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d9XZykFT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 987FC21D43
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kI9Y8-0002AB-6Y
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 07:55:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40328)
+	id 1kI9aG-0003Io-Qt
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 07:57:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41272)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kI9XA-0001Y1-9J; Tue, 15 Sep 2020 07:54:04 -0400
-Received: from mail-vi1eur05on2137.outbound.protection.outlook.com
- ([40.107.21.137]:7059 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kI9X6-00057E-60; Tue, 15 Sep 2020 07:54:03 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HK+xbbg3GaorUC2bmBCPXpEwhaf0iddu/7cewK77WyiIc+57OVp8BrPjVF2Wp2J5koNOb0eHWsNd1g6ZQC+Z9TGxI/Xpj9TozHxpdFXwGRt0uO22qem2BesfPHwE09vtqIcrvh3QRiFHQLjA1if4+GIPOuZZ/J6xmNBjeDTsynnv90g62DJceYegTEXqZ2vpnJgBXF0qxPR2kaYkCM+qu/dlD8d92SNBfzrXSJndiPhdkXBEtBObhvCYhAy4A4RDBS5lu1pgUzB+Pwr1TNO4h3U/7Ze4x4GXxNr/Xnl3vCwew3kxqCTsOKqovDwPdAe0EyPtUiBKp5SJ8fS+4sNE/w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ES5LEVyE7FMJa3uMLs6tjNhPt6daxOv3qTZ7/d/5YpU=;
- b=FnJ6vGMpPOFe9o/mjukC9eJyuynWwJRQ3pjCGLbLUZeWbXg1tkMxlL9cIpFE7Qi3LtMd6dmGI8Eib6/bismIrdV9G/WCTtQntN45YjjB32LVemXH+aikVa69Pkp1JslT6y3fsNX3I3Jos4vcKVPJueC9Hclz2XyReQRuDEz6iimaGtspfL+an31m3kzsfbYZYL2cUe4EJpNyjn5DT9RMRdjhCbn6zXx4JL4qMI1L0c9GOnYDWVMdau7RnZZ9cnOzCrbU9CJPoMxnFp40DlE5vTcYuep6LzVSYoor9zvrkfCi3WDbyAT3rqSQKe24mZOiAN/KXsVqE5LyrGzjFjxaiQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ES5LEVyE7FMJa3uMLs6tjNhPt6daxOv3qTZ7/d/5YpU=;
- b=pwcl9F6yEC6auAHw5+Y/AVCSPnJIMvRSVQCOWn5AvpkYCZqlRoRduS/1TYX2yBJl8OxGFjQbb6gFzxVAOtB8QmoMjjRn8cqT9G9xbHrOCOwCH0WzfNno2RknFbPSzAGDYhqb1DW8QdwqH6b+0YmlBBPrfE78epFyoVJpqA2SqRo=
-Authentication-Results: gibson.dropbear.id.au; dkim=none (message not signed)
- header.d=none; gibson.dropbear.id.au;
- dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB4600.eurprd08.prod.outlook.com (2603:10a6:20b:84::29)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Tue, 15 Sep
- 2020 11:53:55 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::b179:9641:7589:d692%8]) with mapi id 15.20.3370.019; Tue, 15 Sep 2020
- 11:53:55 +0000
-Subject: Re: [SPAM] Re: [PATCH 14/15] spapr: Simplify error handling in
- spapr_memory_plug()
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
-References: <20200914123505.612812-1-groug@kaod.org>
- <20200914123505.612812-15-groug@kaod.org>
- <11f0dcb7-7923-0164-df69-4911b3293663@virtuozzo.com>
- <20200915134340.0cc3f9eb@bahia.lan>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <91774a03-3c70-4eab-8e02-137c6c151cb5@virtuozzo.com>
-Date: Tue, 15 Sep 2020 14:53:53 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
-In-Reply-To: <20200915134340.0cc3f9eb@bahia.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR10CA0130.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:e6::47) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kI9Zd-0002ns-CJ; Tue, 15 Sep 2020 07:56:37 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:34551)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kI9Zb-0005Xa-Kt; Tue, 15 Sep 2020 07:56:37 -0400
+Received: by mail-lj1-x243.google.com with SMTP id v23so2595227ljd.1;
+ Tue, 15 Sep 2020 04:56:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=ED5UUky6yiLiSJRG4QKPB61kDJSG5iPivMEPYgd7Pzw=;
+ b=d9XZykFTyJhbET9b3yGhrOR6RjJUm6SfWtBADorU3F55O97BfatFxzZZqi9W/+tDei
+ 9kkh4OjlbBMsNQFWvWhSvka223k/T0ea8Sq81U9KOWzcY+DvU2lE/vow0y5Ww8c9prSW
+ b4DJPiQQlW8TzFy1HI9sS1lDlCLxOd/8oWwcolYEjzRBJ8ShxZ3idgfe7lVNAa2LkWKT
+ LrPDuraZO37/AE9c+wGHqWsaRu7GUUYbz1dUrkiODZrP5AYqsgEYl+gOclwLMd/jg9te
+ FoRF7SyPcrCU5xZm51BhG/o1MA2KvRnYIxsrNBoJoaBU7ItNAbV2nw4SPF467K290IUB
+ yuSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=ED5UUky6yiLiSJRG4QKPB61kDJSG5iPivMEPYgd7Pzw=;
+ b=dmx7lPZxlUziaFIPd/trvRR6xR2kN01j3vBRMrivRnM/6Co/x9R8HbhvMOX2xGA9vT
+ mo1Wx8vp3gcANn66yRmj2F97P16iufJw+TD+/p+/bqKVtf+bsMyB1D3ub4GauxNC7DAO
+ cT1bXuOzd9pWpjl5g76fqB/WY2qOTpH0JswDfyh+WdwtyLyCQ0P1SZ/mPl81dUtw3BmL
+ JSYHXqD26LYQ3EUV1GcD+caAU3hvOf7mrW3tlWzyrep8L17dwDUWka9wxFTQliDISU71
+ IGAApCUL9t7rixr+c9VV9NYZtdtGfJ4rdlPSa2+9RLyIbK3nZ7D9kD6LcAwztFecJCfU
+ jvbg==
+X-Gm-Message-State: AOAM5315b63v5Gb+uYJ1Ltjjkj0i8RDtnTBJdMV2A26YTkTLYhCrpDeD
+ Nyw8pJ6AIVUjCL3vEU9+TX4H+9XC4d20tkHSzp4=
+X-Google-Smtp-Source: ABdhPJxaN0bbp7qFdle1e1sojeHA+hCx5aknZdUur31p27JeUl9vCJ+YkPhF7WBdEzUA2mUnA/DV5n8/9//pn6aqcpo=
+X-Received: by 2002:a05:651c:1119:: with SMTP id
+ d25mr6079481ljo.300.1600170991839; 
+ Tue, 15 Sep 2020 04:56:31 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.5] (185.215.60.75) by
- AM0PR10CA0130.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:e6::47) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3391.11 via Frontend Transport; Tue, 15 Sep 2020 11:53:55 +0000
-X-Originating-IP: [185.215.60.75]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: bda9a7f8-b640-4c29-99b4-08d8596e05ed
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4600:
-X-Microsoft-Antispam-PRVS: <AM6PR08MB46007D1D5231D6AADD9EC7BBC1200@AM6PR08MB4600.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: YI3Beixj5NR19LAFCa3HX2k08L1MLyseLWzeIIAcKqGnak1oXQfQL7JI8NEWXHE+TT7xn1e7hgZuC1SMdS2PTTPEj/FRMSgH4XrjBIjOjhChrUjhcQn2iiEBledbwfJUlbu9tFjNwbrdMrA6WC9EwWHjfF1naSeAvTF9M+pPodwHP5V+Wl5k+TnMvRzKZZth2PNfa7jMcUbYTKtR7O9jdimKi9X8AAAH/Npz/3UR8egMLA8cfM9oqMipa8DffcwsLPbVBeTLq3XRI/CoPbxf9MLtxfgIUCbQAuHRfIUpRawkYqDIxb4dCxLbndaA5nscgz/x13V2Tj/688GL/G7vPvSD7CQBjVKH1YbgjHtoNAiedwDg633uVKjIzwD1YUzILlUedpBhXDPmT3N250IQAInIWCJL7VykbQT16EPdVL0=
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(376002)(136003)(366004)(396003)(346002)(39840400004)(66476007)(86362001)(36756003)(8936002)(54906003)(5660300002)(83380400001)(31696002)(6486002)(2616005)(478600001)(26005)(52116002)(16526019)(66556008)(66946007)(31686004)(186003)(956004)(8676002)(16576012)(316002)(4326008)(6916009)(2906002)(43740500002)(217643003);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: HcyOSvwAoIOp5xsNWNmM2+gWonAobTCuWGxP/o9LDcXKHJ5oYphOj8+jz6Ky3hed3myOIzZy8f055LuSAC0MeS27co4hYB6hzdfVnAZ7nrhYdXj6eOQr0xGm7qkXt5cEaLbDjAUFLzrQfdGvKDK/EOKBckOkVqNwt+Fyda92OIPbqlwwL294EPBbQBBdL8HWyFdml/1im0IWddE8Jd87oh9qPbvvVQqvVURdc+XuTJ414cPrlAc3I/FlUiKXCmeG7bneZ2payUi02ZPv2XLfl2PidiSkC01FL0mKg9qZlcrR3Y1HK0Mc60ZYDCruSvGYIPld0GWhX6RLVtD8UrEB29ELf+xmWNITglWNOvshRmrcDBOYNLuWeaf3U5FUmvUC0QAhgQyVDU01Z1JZSH/nv2olZ4GAPAsQ7V307MAY0DVD+i21goJqXPrTP6jND43B6qPq+lryKrBFEOByTQIqpc/i2UBPrDcfPNFiZHepEKZeU+F/MDsj4lhT4q+JaKPJrbcEfxOV5nXsF8maGTiaDp7t3dv7rO+96eIL4Bnp+3p5/dtvIGnvRIs1piXI16rm62K6UZMfOFVQdQHdMEOqk/ivxQj7sQbIJIB1G0S4lCDe6FREolH8KS8kf4z89rTL5ewIGk5MeoGX/gQ1fJGEgA==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bda9a7f8-b640-4c29-99b4-08d8596e05ed
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2020 11:53:55.5210 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Bekg0fs5307RvFlD1acZ9VTqFPdDrNRFzFeGE+CzNSn/s3NzkR+LeoVd9KMeyuhqnKDctDwlAk5jhH512diAnC0zyHoMzSypRsUcTRtHB1k=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4600
-Received-SPF: pass client-ip=40.107.21.137;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 07:53:56
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+References: <20200912224431.1428-1-luoyonggang@gmail.com>
+ <20200912224431.1428-28-luoyonggang@gmail.com>
+ <34306ec4-bafb-20dc-f90f-ff320fa4b575@redhat.com>
+ <4b60c854-d11c-28fb-57cf-e6e922e57df1@redhat.com>
+In-Reply-To: <4b60c854-d11c-28fb-57cf-e6e922e57df1@redhat.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Tue, 15 Sep 2020 19:56:20 +0800
+Message-ID: <CAE2XoE92B8fXC39==OS+xmYzjCDKg6pM8cG3doyLQN9ir8VsOA@mail.gmail.com>
+Subject: Re: [PATCH v8 27/27] Revert "configure: add --ninja option"
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000008c6eeb05af58d7d7"
+Received-SPF: pass client-ip=2a00:1450:4864:20::243;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x243.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -136,60 +96,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: luoyonggang@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
+ Qemu-block <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>,
+ Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
+ qemu-level <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Li-Wen Hsu <lwhsu@freebsd.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-15.09.2020 14:43, Greg Kurz wrote:
-> On Tue, 15 Sep 2020 13:58:53 +0300
-> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
-> 
->> 14.09.2020 15:35, Greg Kurz wrote:
->>> As recommended in "qapi/error.h", add a bool return value to
->>> spapr_add_lmbs() and spapr_add_nvdimm(), and use them instead
->>> of local_err in spapr_memory_plug().
->>>
->>> Since object_property_get_uint() only returns 0 on failure, use
->>> that as well.
->>
->> Why are you sure? Can't the property be 0 itself?
->>
-> 
-> Hmmm... I've based this assumption on the header:
-> 
->   * Returns: the value of the property, converted to an unsigned integer, or 0
->   * an error occurs (including when the property value is not an integer).
-> 
-> but looking at the implementation, I don't see any check that
-> a property cannot be 0 indeed...
-> 
-> It's a bit misleading to mention this in the header though. I
-> understand that the function should return something, which
-> should have a some explicitly assigned value to avoid compilers
-> or static analyzers to yell, but the written contract should be
-> that the value is _undefined_ IMHO.
-> 
-> In its present form, the only way to know if the property is
-> valid is to pass a non-NULL errp actually. I'd rather even see
-> that in the contract, and an assert() in the code.
-> 
-> An alternative would be to convert it to have a bool return
-> value and get the actual uint result with a pointer argument.
-> 
->>>
->>> Also call ERRP_GUARD() to be able to check the status of void
->>> function pc_dimm_plug() with *errp.
->>>
->>
->>
-> 
-> I'm now hesitating to either check *errp for object_property_get_uint()
-> too or simply drop this patch...
-> 
+--0000000000008c6eeb05af58d7d7
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-.. and the following. If no more reviewers come to look at it, you can just merge first 13 patches, not resending the whole series for last two patches, which may be moved to round 3.
+On Tue, Sep 15, 2020 at 7:44 PM Thomas Huth <thuth@redhat.com> wrote:
 
--- 
-Best regards,
-Vladimir
+> On 13/09/2020 16.08, Paolo Bonzini wrote:
+> > On 13/09/20 00:44, Yonggang Luo wrote:
+> >> This reverts commit 48328880fddf0145bdccc499160fb24dfabfbd41.
+> >>
+> >> The --ninja option doesn't need anymore because of upgrade meson to
+> 0.55.2
+> >> At that version we can use ninjatool
+> >
+> > We might actually get rid of ninjatool before QEMU 5.2 goes out, if we
+> > decide to make Ninja a mandatory build dependency.  So we can hold on
+> > patches 26 and 27.  Thanks for testing though!
+> >
+> > I'm also not sure about patch 16, since that's not my area, but Daniel
+> > and Ed both reviewed it so that's okay.
+> >
+> > Finally, instead of checking !_WIN32 it's better to check CONFIG_POSIX
+> > or CONFIG_WIN32.  That can be changed on commit though.
+> >
+> > Everything else seems okay.  I'll wait a couple days and queue the whol=
+e
+> > bunch up to patch 25.
+>
+> Patch 13 definitely needs a replacement, and I think patch 2 should
+> likely go through the block tree instead...
+>
+I am prepareing V9, and move nfs related things to the end  patch 13 are
+re-implemented
+please wait for some minutes
+
+>
+> But I recently started to experiment with these patches, too, and I
+> think I got a reasonable subset now which should be OK for getting
+> merged (e.g. disabling NFS and the crypto test in the CI for now). I'll
+> take those through my testing tree. The remaining work can then be done
+> on top later.
+>
+>  Thomas
+>
+>
+
+--=20
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
+
+--0000000000008c6eeb05af58d7d7
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Tue, Sep 15, 2020 at 7:44 PM Thoma=
+s Huth &lt;<a href=3D"mailto:thuth@redhat.com" target=3D"_blank">thuth@redh=
+at.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
+:1ex">On 13/09/2020 16.08, Paolo Bonzini wrote:<br>
+&gt; On 13/09/20 00:44, Yonggang Luo wrote:<br>
+&gt;&gt; This reverts commit 48328880fddf0145bdccc499160fb24dfabfbd41.<br>
+&gt;&gt;<br>
+&gt;&gt; The --ninja option doesn&#39;t need anymore because of upgrade mes=
+on to 0.55.2<br>
+&gt;&gt; At that version we can use ninjatool<br>
+&gt; <br>
+&gt; We might actually get rid of ninjatool before QEMU 5.2 goes out, if we=
+<br>
+&gt; decide to make Ninja a mandatory build dependency.=C2=A0 So we can hol=
+d on<br>
+&gt; patches 26 and 27.=C2=A0 Thanks for testing though!<br>
+&gt; <br>
+&gt; I&#39;m also not sure about patch 16, since that&#39;s not my area, bu=
+t Daniel<br>
+&gt; and Ed both reviewed it so that&#39;s okay.<br>
+&gt; <br>
+&gt; Finally, instead of checking !_WIN32 it&#39;s better to check CONFIG_P=
+OSIX<br>
+&gt; or CONFIG_WIN32.=C2=A0 That can be changed on commit though.<br>
+&gt; <br>
+&gt; Everything else seems okay.=C2=A0 I&#39;ll wait a couple days and queu=
+e the whole<br>
+&gt; bunch up to patch 25.<br>
+<br>
+Patch 13 definitely needs a replacement, and I think patch 2 should<br>
+likely go through the block tree instead...<br></blockquote><div>I am prepa=
+reing V9, and move nfs related things to the end=C2=A0 patch 13 are re-impl=
+emented</div><div>please wait for some minutes</div><blockquote class=3D"gm=
+ail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,=
+204,204);padding-left:1ex">
+<br>
+But I recently started to experiment with these patches, too, and I<br>
+think I got a reasonable subset now which should be OK for getting<br>
+merged (e.g. disabling NFS and the crypto test in the CI for now). I&#39;ll=
+<br>
+take those through my testing tree. The remaining work can then be done<br>
+on top later.<br>
+<br>
+=C2=A0Thomas<br>
+<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+>=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=
+=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yonggang L=
+uo<br></div></div>
+
+--0000000000008c6eeb05af58d7d7--
 
