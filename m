@@ -2,79 +2,79 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 257FBC43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:01:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5922C43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:03:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 950A120684
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:01:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2346A20872
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:03:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ib59w8L/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 950A120684
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P2GgTnIs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2346A20872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIAaP-00009j-GB
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 09:01:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55672)
+	id 1kIAc5-0001WQ-Uw
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 09:03:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59830)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1kIAN7-0000vm-T8
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:47:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22705
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1kIAZL-0008Gy-FP
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:00:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42466
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1kIAN4-00040V-Ix
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:47:45 -0400
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1kIAZH-0005xa-8i
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:00:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600174060;
+ s=mimecast20190719; t=1600174818;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=KjG+0/tj55YxO1E0XUO7+Txkie7Mm/HIXVfH8GnHu7k=;
- b=ib59w8L//AVYvTy3T8c/lTS5tWhzfdfZgShXt6LWBuuYd5D28u1mHZB0d0NHDDPThBvzWu
- JOXKbCRV6E/+snnIgaUznrh/CMbmVx5FHcP7LH7HPVFNAgpxSgxUx0puQe4xDCam7fNN8L
- g3Zowruq1CdyylPjGABsvsRRAiPKLR0=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=MiqWmfo9obq9THM9dx2n99YXGugXv0XtHCg9e9fzYKE=;
+ b=P2GgTnIs0+ybRxHttZXIl2MOdgyg08RVfpVaqxzwkVPR9p52uO63KahWP4/nIENU5EjIi0
+ x+aMzvCFU+zR7Sw94fAOasrUvlai1SlWWsC836+54Cj3UPJaazvyenJcdFeShKWgR0DDYh
+ pOmSq1zhAhAcbMXvuBv5+FDZG7wNMvE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-190-rmwM5Vn7MiW1USqd-GiJlA-1; Tue, 15 Sep 2020 08:47:35 -0400
-X-MC-Unique: rmwM5Vn7MiW1USqd-GiJlA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-407-uJvMcD26M3iDB1frWVQctg-1; Tue, 15 Sep 2020 09:00:13 -0400
+X-MC-Unique: uJvMcD26M3iDB1frWVQctg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA493185A0C0;
- Tue, 15 Sep 2020 12:47:34 +0000 (UTC)
-Received: from kaapi (ovpn-116-229.sin2.redhat.com [10.67.116.229])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0593075143;
- Tue, 15 Sep 2020 12:47:32 +0000 (UTC)
-Date: Tue, 15 Sep 2020 18:17:30 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-X-X-Sender: pjp@kaapi
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH] fdc: check null block pointer before blk_pwrite
-In-Reply-To: <20200827113806.1850687-1-ppandit@redhat.com>
-Message-ID: <nycvar.YSQ.7.78.906.2009151817040.10832@xnncv>
-References: <20200827113806.1850687-1-ppandit@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D9A2ADC11;
+ Tue, 15 Sep 2020 13:00:12 +0000 (UTC)
+Received: from steredhat.redhat.com (ovpn-114-120.ams2.redhat.com
+ [10.36.114.120])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3D0047EB97;
+ Tue, 15 Sep 2020 13:00:01 +0000 (UTC)
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] virtio: skip legacy support check on machine types less than
+ 5.1
+Date: Tue, 15 Sep 2020 15:00:00 +0200
+Message-Id: <20200915130000.78334-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
-X-Mimecast-Spam-Score: 0.002
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=sgarzare@redhat.com
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=ppandit@redhat.com;
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=sgarzare@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:11:06
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:29:39
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
@@ -95,54 +95,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ruhr-University <bugs-syssec@rub.de>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+-- On Thu, 27 Aug 2020, P J P wrote --+
-| While transferring data via fdctrl_write_data(), check that
-| current drive does not have a null block pointer. Avoid
-| null pointer dereference.
-| 
-|  -> https://ruhr-uni-bochum.sciebo.de/s/NNWP2GfwzYKeKwE?path=%2Ffdc_nullptr1
-|     ==1658854==Hint: address points to the zero page.
-|     #0 blk_inc_in_flight block/block-backend.c:1327
-|     #1 blk_prw block/block-backend.c:1299
-|     #2 blk_pwrite block/block-backend.c:1464
-|     #3 fdctrl_write_data hw/block/fdc.c:2418
-|     #4 fdctrl_write hw/block/fdc.c:962
-|     #5 portio_write ioport.c:205
-|     #6 memory_region_write_accessor memory.c:483
-|     #7 access_with_adjusted_size memory.c:544
-|     #8 memory_region_dispatch_write memory.c:1476
-| 
-| Reported-by: Ruhr-University <bugs-syssec@rub.de>
-| Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-| ---
-|  hw/block/fdc.c | 3 ++-
-|  1 file changed, 2 insertions(+), 1 deletion(-)
-| 
-| diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-| index e9ed3eef45..dedadac68a 100644
-| --- a/hw/block/fdc.c
-| +++ b/hw/block/fdc.c
-| @@ -2419,7 +2419,8 @@ static void fdctrl_write_data(FDCtrl *fdctrl, uint32_t value)
-|          if (pos == FD_SECTOR_LEN - 1 ||
-|              fdctrl->data_pos == fdctrl->data_len) {
-|              cur_drv = get_cur_drv(fdctrl);
-| -            if (blk_pwrite(cur_drv->blk, fd_offset(cur_drv), fdctrl->fifo,
-| +            if (cur_drv->blk
-| +                && blk_pwrite(cur_drv->blk, fd_offset(cur_drv), fdctrl->fifo,
-|                             BDRV_SECTOR_SIZE, 0) < 0) {
-|                  FLOPPY_DPRINTF("error writing sector %d\n",
-|                                 fd_sector(cur_drv));
-| 
+Commit 9b3a35ec82 ("virtio: verify that legacy support is not accidentally
+on") added a check that returns an error if legacy support is on, but the
+device is not legacy.
 
-Ping...!
---
-Prasad J Pandit / Red Hat Product Security Team
-8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+Unfortunately some devices were wrongly declared legacy even if they
+were not (e.g vhost-vsock).
+
+To avoid migration issues, we disable this error for machine types < 5.1,
+but we print a warning.
+
+Cc: qemu-stable@nongnu.org
+Fixes: 9b3a35ec82 ("virtio: verify that legacy support is not accidentally on")
+Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Suggested-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ include/hw/virtio/virtio.h |  1 +
+ hw/core/machine.c          |  1 +
+ hw/virtio/virtio.c         | 18 ++++++++++++++++--
+ 3 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index 807280451b..ed7cee348b 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -103,6 +103,7 @@ struct VirtIODevice
+     bool use_started;
+     bool started;
+     bool start_on_kick; /* when virtio 1.0 feature has not been negotiated */
++    bool disable_legacy_check;
+     VMChangeStateEntry *vmstate;
+     char *bus_name;
+     uint8_t device_endian;
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index ea26d61237..b686eab798 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -44,6 +44,7 @@ GlobalProperty hw_compat_5_0[] = {
+     { "vmport", "x-signal-unsupported-cmd", "off" },
+     { "vmport", "x-report-vmx-type", "off" },
+     { "vmport", "x-cmds-v2", "off" },
++    { "virtio-device", "x-disable-legacy-check", "true" },
+ };
+ const size_t hw_compat_5_0_len = G_N_ELEMENTS(hw_compat_5_0);
+ 
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index e983025217..30ccc43b8c 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -3287,6 +3287,8 @@ void virtio_init(VirtIODevice *vdev, const char *name,
+  */
+ bool virtio_legacy_allowed(VirtIODevice *vdev)
+ {
++    bool ret = false;
++
+     switch (vdev->device_id) {
+     case VIRTIO_ID_NET:
+     case VIRTIO_ID_BLOCK:
+@@ -3298,10 +3300,20 @@ bool virtio_legacy_allowed(VirtIODevice *vdev)
+     case VIRTIO_ID_9P:
+     case VIRTIO_ID_RPROC_SERIAL:
+     case VIRTIO_ID_CAIF:
++        ret = true;
++    }
++
++    /*
++     * For backward compatibility, we allow legacy mode with old machine types
++     * to get the migration working.
++     */
++    if (!ret && vdev->disable_legacy_check) {
++        warn_report("device is modern-only, but for backward compatibility "
++                    "legacy is allowed");
+         return true;
+-    default:
+-        return false;
+     }
++
++    return ret;
+ }
+ 
+ hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n)
+@@ -3713,6 +3725,8 @@ static Property virtio_properties[] = {
+     DEFINE_VIRTIO_COMMON_FEATURES(VirtIODevice, host_features),
+     DEFINE_PROP_BOOL("use-started", VirtIODevice, use_started, true),
+     DEFINE_PROP_BOOL("use-disabled-flag", VirtIODevice, use_disabled_flag, true),
++    DEFINE_PROP_BOOL("x-disable-legacy-check", VirtIODevice,
++                     disable_legacy_check, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+-- 
+2.26.2
 
 
