@@ -2,124 +2,103 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B8A9C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 21:33:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37099C43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 21:33:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D30042078E
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 21:33:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 942DD2078E
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 21:33:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="0exTJDH5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D30042078E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nIREcKbx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 942DD2078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIIZx-0003Uf-GL
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 17:33:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46292)
+	id 1kIIZy-0003XD-FT
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 17:33:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46278)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
- id 1kIIXG-0001n8-FN
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 17:30:47 -0400
-Received: from mail-dm6nam10on2054.outbound.protection.outlook.com
- ([40.107.93.54]:28256 helo=NAM10-DM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
- id 1kIIXE-0002jx-Bk
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 17:30:46 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aNjYlSLEaXVAWq7mHbyJR92EYSjvUnLlW2/isflj+vwY8Mg5q3bxOwrf8nxSnF5BhfD3zK3y+671ZBsyzEdP28aRSByF2TP5SwBX/6m4i5uVXfWWRVlfKw7jEBoBL3IbGuyVixrlI5AGSJpx+qHRgl1y1kZIHl4OTII9Mh87D2WL6IdRzf1cdTuLgpfotErpjuTBpiOcdE+lONycrNB571a1cet56l7L0l3oI/oBJoh2FiKqp8R1w6SOPP8Ce8PaxEJbJFlyqF6UpDMaL5ZXxERF/FuBmljDq7axfXjqcMBIq70/GEVvdvWBBkIkx/hd38BwFr11ZYIHLvJ7GvQchg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MJ+BpJng5csN/LA+I/qcPQkYM/tISIORmRx+LOYMnks=;
- b=bfwY3oY3hj8nfswS/j2xKnUzgMi7NPWmwJbieQaGJiMcze+lTPgCKqjIMowIR6Ib1aCrBpZ11E7PDPEMsJ7EyRIeFg25r4LQBRszH/oQIUK6b1y4Galh9HVQzhwUK5pWwgTnmxF7T3WlT7RW/jjj1QI8GM3GY8ICsGZyUVPnv4tCqCIKqq7lanq8D1d5Wg6nI31wVjAhccjzvDmVuWw098n4iJjQ//7cSPwmM+5NUN6w+TORJeCxNVfDmFqjo6PdGF/nHqefPeSH/cCKE9OfCGHuYbVGh2Crxboh/OjYLIo0bQQnGmEn8uT4VTXOs9GFP50HSdw503qMIpJ9CRR/fg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MJ+BpJng5csN/LA+I/qcPQkYM/tISIORmRx+LOYMnks=;
- b=0exTJDH5sq9zBSGZtUC2wPy38PRzvE4az0GJIFUHwASHOsbf89iGW4bYdBmef54a2zCF6MOLfqwlyFW9uPHGYetS1psxUp6mTeIjjEQbr19rHTYePfAoCmy/ZaBBFGzZYYWFAmiG+jhVCfpHSJzOJ8HWlC2k1sOAmmRIjoSHPU0=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
-Received: from CY4PR12MB1352.namprd12.prod.outlook.com (2603:10b6:903:3a::13)
- by CY4PR12MB1607.namprd12.prod.outlook.com (2603:10b6:910:b::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Tue, 15 Sep
- 2020 21:30:08 +0000
-Received: from CY4PR12MB1352.namprd12.prod.outlook.com
- ([fe80::989b:b1b2:464c:443]) by CY4PR12MB1352.namprd12.prod.outlook.com
- ([fe80::989b:b1b2:464c:443%10]) with mapi id 15.20.3370.019; Tue, 15 Sep 2020
- 21:30:08 +0000
-From: Tom Lendacky <thomas.lendacky@amd.com>
-To: qemu-devel@nongnu.org,
-	kvm@vger.kernel.org
-Subject: [PATCH v3 1/5] sev/i386: Add initial support for SEV-ES
-Date: Tue, 15 Sep 2020 16:29:40 -0500
-Message-Id: <e2456cc461f329f52aa6eb3fcd0d0ce9451b8fa7.1600205384.git.thomas.lendacky@amd.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <cover.1600205384.git.thomas.lendacky@amd.com>
-References: <cover.1600205384.git.thomas.lendacky@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM5PR21CA0022.namprd21.prod.outlook.com
- (2603:10b6:3:ac::32) To CY4PR12MB1352.namprd12.prod.outlook.com
- (2603:10b6:903:3a::13)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kIIXC-0001l1-En
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 17:30:43 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:53785)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kIIX9-0002ix-4y
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 17:30:42 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id t7so457796pjd.3
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 14:30:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=zxy8V1MNkV+mqhUqTlm+FEkBAi1RK8rG5fspzNc+5Hw=;
+ b=nIREcKbxawTBr1qw3b8gEyS72A3YWaXu2fbFqReT7PqkMwOftoPzxV6hJpg+XsGVdE
+ xgincoC1CoJPho+OnHIJiuhMrUSa4jPoyaf6F1o7JImUrCITiAlWhQUaHepckN0egCnd
+ fSFqWWGutj1OsJYgkF9FTu4+LVZNzsnKqC/L/35jrBDvBoI8og3Ve4MRrRdJk1jC7BQf
+ M+3aLZm4A9ZA3RpY4u5RacexiiCW4ui50/4lGsW6cbEMM0Sr4JiBkEBZJh4tyIytO6Ku
+ Ja+m0L7uMdSd6jB/00TwnNtgsu0iRQ88ii6GOi4WQo3plBqocIRfLbAHaIxKSRUOGvhJ
+ oOLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=zxy8V1MNkV+mqhUqTlm+FEkBAi1RK8rG5fspzNc+5Hw=;
+ b=JwDn4FFYrMXuWo6S/Wf+fId4VkkB6wRDYIT93AkPlDMUTBh3LvyTRk5Ltyj/SLOGVd
+ DtlNSJQJLAY+F6YxZpMVkyOP2XiwaFu2zHXQJWEpcd8iNbigK2qGWWmPukqzOePALIEm
+ BHDlJ14xWuPOkRO8Gto4yG4+csPdbxrarjItvxS5naQI0H9q/G+scbmYm88PU5QhXL2H
+ drg8rYptd+A+ycsc7Qse3WiEOp/RABY+xu+C9oEaTn6uamlt0/5MbIE5LATsqTUSiIa6
+ nzLeRO+VsgxaBf9fekmG2FOZzr8NoCcdJfeE42adZ+OhuReDfcRm+DW04gwHF+tKHv9d
+ D2AA==
+X-Gm-Message-State: AOAM531kJnrlklJoqDqw8xk5aIu5HkV2lQVpG2xo0JISSsmLQCCF/9nr
+ nW0RuToVW2P29Z6XsXUsBqWHlg==
+X-Google-Smtp-Source: ABdhPJxytltE+/fLGA+hEcdOJLbjWxPv0hx2NAbR0EiWJU3pIRJYgtRfpEl/UNKhHYNt3Md3eGGnkg==
+X-Received: by 2002:a17:902:8f88:b029:d0:cbe1:e719 with SMTP id
+ z8-20020a1709028f88b02900d0cbe1e719mr21431895plo.39.1600205437147; 
+ Tue, 15 Sep 2020 14:30:37 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id y126sm14724600pfy.138.2020.09.15.14.30.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 15 Sep 2020 14:30:36 -0700 (PDT)
+Subject: Re: [PATCH 1/5] qom: Allow objects to be allocated with increased
+ alignment
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20200915174635.2333553-1-richard.henderson@linaro.org>
+ <20200915174635.2333553-2-richard.henderson@linaro.org>
+ <20200915180736.GB7594@habkost.net>
+ <6d6a80bf-a542-6818-1638-0318f4aab336@linaro.org>
+ <20200915201901.GD7594@habkost.net>
+ <74c1e091-63c4-9ea0-c515-ad977ffa1d98@linaro.org>
+ <20200915212732.GE7594@habkost.net>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7c827913-db00-ab68-94fb-8512f716356c@linaro.org>
+Date: Tue, 15 Sep 2020 14:30:34 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from tlendack-t1.amd.com (165.204.77.1) by
- DM5PR21CA0022.namprd21.prod.outlook.com (2603:10b6:3:ac::32) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3412.0 via Frontend Transport; Tue, 15 Sep 2020 21:30:07 +0000
-X-Mailer: git-send-email 2.28.0
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 7be9caef-abf7-4671-d990-08d859be84b6
-X-MS-TrafficTypeDiagnostic: CY4PR12MB1607:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CY4PR12MB16078003DCFFEDF511B73192EC200@CY4PR12MB1607.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2043;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 42NvKcwMhV+hkZ6a2o5icitj4a+1HG/0kwvwHUR5mq3zfejADqEhR/WTrUuvRQubbEbmEdMxGADIn1G/cY+fl7VPtH+np3xsl8zvlBYKOe8Pxk8tiADOA0BCOMZWhRf7KkvI3xc3vCn3OnIMc94lnCuH1/u1jUR2s9wToHMpy7Xmdw3ajG18vT0wKFfEiaKgAWPf1OnpbwpIbKkKDC6Mp0MJkij+G8H9sDVF00rja/OIPwzI5pfJ8HRIgJfv4Bn2M/dJ/+ib/VH+WJ+VLofALNQ8Q6YXcLtX/oWt5xxQ4DZQnWgKdkiwqLimF2ikzP/F/wFSoVfLLOru8X9y8G7KLKYKsXaGfpY5u1wnTiELRrKDXecHRH9KJPWOq3HF9XvX
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:CY4PR12MB1352.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(396003)(366004)(346002)(136003)(39860400002)(376002)(5660300002)(956004)(478600001)(6666004)(86362001)(52116002)(2616005)(2906002)(7696005)(36756003)(66476007)(8936002)(66556008)(66946007)(316002)(54906003)(7416002)(26005)(6486002)(4326008)(8676002)(16526019)(83380400001)(186003)(309714004);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: I051YFqFnSwiRy6dax9lhZVvzOPLBskuC1xd9oE2mwmBBsvAA4dp0MGUiIfTsYzRY8/pc8rR3DgrnfmiGocgjVCsHcQ/M1rOYQ1VLywqnktyNQWihODVBxywhFC7PI+9w38mmo5gVsJH2Sn3/PlkZ+fq+aWGlXRFJDVQ9jKBM1iCBW8y3jXj8hzOQSymcSc1QW9ANXtWIivN3IS9hU3CKTFzaCo5In9/j6+kk1i0+KLgEWiUZ54RITxlmoqwpi2pefMhBVrxYR81Rh9Fc3mndayjE4ZFY9vv6Y/RuzYnqiJqu872gBglBlo6O5L4mbguFp2B30zQxKLtAj9u1FXTnBS9Ao+w0l6mJ7i2eAD3uCm782dHuiiR6Ec76SbuYGJ562u+TBGiIe1cAohXxW5RbLO6lqZLvEeFRnBc2q8uAdDyvwBLEOJvDeQ6h71B1BgB15qk/ZNAdv9NYBnRc7ZJK7iVHghaY+Ld9I6BTOiB8Dc6IURZt2oiXFvJVlNNBKn+DQd/hUBmq97BG9F0fzc7rVX5U4tZ6vL+yvxew5fhb74EQrpn2w6rLY32AqEVCvEj+ZeaDsAvaulSBq8CPJrha709wxpitDtki4EyD9jm1iw9C+fProVruraDH/IMu6rqH1lLNrL5iNhFhrBoZnLkPQ==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7be9caef-abf7-4671-d990-08d859be84b6
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR12MB1352.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2020 21:30:08.0318 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: m3FA5ZZ4wdtW26EPYDOsjn4RbhO0jjfzZyMcQaABeu7xWAoBkyqxfreJxS9WXzZ85CW2kfqMHp/h253jxV108Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1607
-Received-SPF: none client-ip=40.107.93.54;
- envelope-from=Thomas.Lendacky@amd.com;
- helo=NAM10-DM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 17:30:43
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -8
-X-Spam_score: -0.9
-X-Spam_bar: /
-X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_NONE=0.001 autolearn=no autolearn_force=no
+In-Reply-To: <20200915212732.GE7594@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1044.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -132,157 +111,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Brijesh Singh <brijesh.singh@amd.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Connor Kuehl <ckuehl@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Jiri Slaby <jslaby@suse.cz>,
- Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Tom Lendacky <thomas.lendacky@amd.com>
+On 9/15/20 2:27 PM, Eduardo Habkost wrote:
+> On Tue, Sep 15, 2020 at 01:51:48PM -0700, Richard Henderson wrote:
+>> On 9/15/20 1:19 PM, Eduardo Habkost wrote:
+>>> Once we move to C11, we can just use max_align_t.
+>>
+>> Yes.
+>>
+>>> While we don't move to C11, why not just use
+>>>   __alignof__(union { long l; void *p; double d; long double ld;})
+>>> ?
+>>
+>> For i386, this is 4.
+> 
+> Is i386-linux the only case where there are additional alignment
+> guarantees not covered by C99?
 
-Provide initial support for SEV-ES. This includes creating a function to
-indicate the guest is an SEV-ES guest (which will return false until all
-support is in place), performing the proper SEV initialization and
-ensuring that the guest CPU state is measured as part of the launch.
+I think so.
 
-Co-developed-by: Jiri Slaby <jslaby@suse.cz>
-Signed-off-by: Jiri Slaby <jslaby@suse.cz>
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
----
- target/i386/cpu.c      |  1 +
- target/i386/sev-stub.c |  5 +++++
- target/i386/sev.c      | 46 ++++++++++++++++++++++++++++++++++++++++--
- target/i386/sev_i386.h |  1 +
- 4 files changed, 51 insertions(+), 2 deletions(-)
+> I would prefer a i386-linux-specific #ifdef for that case instead
+> of guessing based on undocumented libc internals.
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 588f32e136..bbbe581d35 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -5969,6 +5969,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         break;
-     case 0x8000001F:
-         *eax = sev_enabled() ? 0x2 : 0;
-+        *eax |= sev_es_enabled() ? 0x8 : 0;
-         *ebx = sev_get_cbit_position();
-         *ebx |= sev_get_reduced_phys_bits() << 6;
-         *ecx = 0;
-diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
-index 88e3f39a1e..040ac90563 100644
---- a/target/i386/sev-stub.c
-+++ b/target/i386/sev-stub.c
-@@ -49,3 +49,8 @@ SevCapability *sev_get_capabilities(Error **errp)
-     error_setg(errp, "SEV is not available in this QEMU");
-     return NULL;
- }
-+
-+bool sev_es_enabled(void)
-+{
-+    return false;
-+}
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index c3ecf86704..6c9cd0854b 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -359,6 +359,12 @@ sev_enabled(void)
-     return !!sev_guest;
- }
- 
-+bool
-+sev_es_enabled(void)
-+{
-+    return false;
-+}
-+
- uint64_t
- sev_get_me_mask(void)
- {
-@@ -578,6 +584,22 @@ sev_launch_update_data(SevGuestState *sev, uint8_t *addr, uint64_t len)
-     return ret;
- }
- 
-+static int
-+sev_launch_update_vmsa(SevGuestState *sev)
-+{
-+    int ret, fw_error;
-+
-+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL, &fw_error);
-+    if (ret) {
-+        error_report("%s: LAUNCH_UPDATE_VMSA ret=%d fw_error=%d '%s'",
-+                __func__, ret, fw_error, fw_error_to_str(fw_error));
-+        goto err;
-+    }
-+
-+err:
-+    return ret;
-+}
-+
- static void
- sev_launch_get_measure(Notifier *notifier, void *unused)
- {
-@@ -590,6 +612,14 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
-         return;
-     }
- 
-+    if (sev_es_enabled()) {
-+        /* measure all the VM save areas before getting launch_measure */
-+        ret = sev_launch_update_vmsa(sev);
-+        if (ret) {
-+            exit(1);
-+        }
-+    }
-+
-     measurement = g_new0(struct kvm_sev_launch_measure, 1);
- 
-     /* query the measurement blob length */
-@@ -684,7 +714,7 @@ sev_guest_init(const char *id)
- {
-     SevGuestState *sev;
-     char *devname;
--    int ret, fw_error;
-+    int ret, fw_error, cmd;
-     uint32_t ebx;
-     uint32_t host_cbitpos;
-     struct sev_user_data_status status = {};
-@@ -745,8 +775,20 @@ sev_guest_init(const char *id)
-     sev->api_major = status.api_major;
-     sev->api_minor = status.api_minor;
- 
-+    if (sev_es_enabled()) {
-+        if (!(status.flags & SEV_STATUS_FLAGS_CONFIG_ES)) {
-+            error_report("%s: guest policy requires SEV-ES, but "
-+                         "host SEV-ES support unavailable",
-+                         __func__);
-+            goto err;
-+        }
-+        cmd = KVM_SEV_ES_INIT;
-+    } else {
-+        cmd = KVM_SEV_INIT;
-+    }
-+
-     trace_kvm_sev_init();
--    ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
-+    ret = sev_ioctl(sev->sev_fd, cmd, NULL, &fw_error);
-     if (ret) {
-         error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
-                      __func__, ret, fw_error, fw_error_to_str(fw_error));
-diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
-index 4db6960f60..4f9a5e9b21 100644
---- a/target/i386/sev_i386.h
-+++ b/target/i386/sev_i386.h
-@@ -29,6 +29,7 @@
- #define SEV_POLICY_SEV          0x20
- 
- extern bool sev_enabled(void);
-+extern bool sev_es_enabled(void);
- extern uint64_t sev_get_me_mask(void);
- extern SevInfo *sev_get_info(void);
- extern uint32_t sev_get_cbit_position(void);
--- 
-2.28.0
+I was thinking abi, not internals.
+
+
+r~
 
 
