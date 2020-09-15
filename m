@@ -2,100 +2,91 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-17.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C4C9C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:50:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BED2BC43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:51:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79CC1206B6
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:50:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 40AF6206B6
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:51:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ky2QoLZj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79CC1206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h1Qi3xia"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40AF6206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIF6G-0007IB-HF
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 13:50:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52242)
+	id 1kIF77-0000S7-6m
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 13:51:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45012)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIF2a-0001eQ-L3
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 13:46:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23699)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIF2V-0007GY-7t
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 13:46:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600192004;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=V9E5diWhrRbicYgJlE9jOABL332i7DZaKEazsBktu98=;
- b=Ky2QoLZjYiJS1BBu6kMYjyhQ7mZROjbW5Zp1ht3UfBfyec0KzoCdju6Ij/pD49VlwcuwQX
- YS0w7XIt/cOkbS7IncIytTfl0Wau2lkcJDAQJYvTnHtEec8gZLF/jRgXfa2NaBrFun330q
- wepwDqzGjeQU0c7ae1n0Ib1iAvkX7Mg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-495-dNGBRbycPgSHNNitZul8tA-1; Tue, 15 Sep 2020 13:46:43 -0400
-X-MC-Unique: dNGBRbycPgSHNNitZul8tA-1
-Received: by mail-wm1-f70.google.com with SMTP id b14so117165wmj.3
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 10:46:43 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kIEZT-000391-2M; Tue, 15 Sep 2020 13:16:47 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40007)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kIEZR-0003La-8M; Tue, 15 Sep 2020 13:16:46 -0400
+Received: by mail-wr1-x442.google.com with SMTP id j2so4147442wrx.7;
+ Tue, 15 Sep 2020 10:16:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Qr6f9AT2xXhs7lC//zas/UKV7xxcJifoLxVHcysah5k=;
+ b=h1Qi3xiaYt8prZdLYkoydt/Ts2EM/G81Oy/MYE8D0ME+3m+3yljn0uRaAybQUIMh3W
+ Nado6YZSGhB6ZhYcwQQsT03cdYsLVnOM2Htd2lbhWpNMkhjbwdq8aS36w8hhHYz54BqG
+ bSzbDIu8Vj87fQu7FrCvNXmqG9Kjj/B2CpNGDbp0KBpEpdbbSNItezPYZ2I+ORhvzSEX
+ vnWttrnxe+sseZq81/iSYEDkcReIVN1RW1OI7U8mvO5JSvId+DrWQpqou5p9cD+B1ZGt
+ VP3F//bK1ztqVu6CPs8EgCQ3/kwvCJ5hDHmJ1A1nXGEB6GngIad6oNl+1hkVY5AQa87R
+ /Q8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=V9E5diWhrRbicYgJlE9jOABL332i7DZaKEazsBktu98=;
- b=cnZ2RaDLhUmN5/eK/PStoAMIvLJ7W1ibXxfT2aquRvLxHMfJcXgpFMhECjU2LUBkfe
- VH5KLvpKsRwo0oahZX34KzE2g/6VR1C8MfvpbDsnjcXQbXItoXffipvoZW38zCiXQEOG
- lSsBxanaXcB1VUiIr4iUCZOk5YkxoQZH0l/kbTsvE4+SnuPGTxphCR+4uGDf86c1GCYs
- 2miimNSoy3xRZbyaJw/dvUjJNZyqgf64Ha8Mqun2IXdBMEoG4R3DSYsFMfHzuO0Ojye6
- DU1gJUEDrZv06a6FCRvNL2MwV3zo60tWTcIfNS8kJvfEZo6FLbmzpSftrCl6pJEfGkDf
- BpiA==
-X-Gm-Message-State: AOAM533u3flHCs8cH4nJXu05kBRD74NDgLG/0fwC2zfPteEpG8iSe+XR
- Gs0SNBYTo8dPUcZzKXodWbDQgn2bv38iwFAfleAKwpkDKef1vqgoanImeMeYoXJYyPImFKZ3NZB
- 3MzRUmF9HjaYC13w=
-X-Received: by 2002:a7b:cf30:: with SMTP id m16mr543204wmg.0.1600192001867;
- Tue, 15 Sep 2020 10:46:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzn8hlVTm9vMvPskzb2OpiF/YlQkmj82TAZVB/hRy4HshHRviUWl4L8IXZZzAr1cLVjur3vRg==
-X-Received: by 2002:a7b:cf30:: with SMTP id m16mr543188wmg.0.1600192001640;
- Tue, 15 Sep 2020 10:46:41 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=Qr6f9AT2xXhs7lC//zas/UKV7xxcJifoLxVHcysah5k=;
+ b=GBjxLUlR8eWpfuvXbeWkG5PMD/L69eiZ2bNjppaihi0zdFeiWzdJoNRwbXRi4wzrCV
+ PMImlzdsxmiQJoJ0D2lmtSAWNngIhbRD7PyMynueixooeGOH1xH0RiDUD4mFfzzhLZH1
+ 1F41X3FoyTO/Q6plhYYBcxTC3sb9BIJq+5v4mSwpoPA/rmAk5tyYwywf4w73+6gvkQzl
+ nyRFLyo49i4VHCQq36HpRPuEHd8Ac4bUbdc2JHCer/CefatYqxWg1I56ilYQ0X0Eorf5
+ 8pXKDsVtRS6yHEPt3NmcZrEZrjhQd0sJvN8cqufxbWN6DkiImyRw4wPcNuqzP50r9eOk
+ aLrA==
+X-Gm-Message-State: AOAM5323QgqlBWnDzYr4i676FaVXOmaLwpZ8baDFv6+z5wGCtV1AbWWl
+ +iFi9VBTEhRCI9PidvYBeQIZg2VEaWc=
+X-Google-Smtp-Source: ABdhPJzv9Uh7vN0JyTqaVwcOozqvpudOawvj0Dv9nDBILhgiPRmUiaMsC8e0z1zxRWLIQBKrZjb5dQ==
+X-Received: by 2002:adf:a18c:: with SMTP id u12mr23499726wru.90.1600190202502; 
+ Tue, 15 Sep 2020 10:16:42 -0700 (PDT)
 Received: from x1w.redhat.com (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id q84sm578177wme.23.2020.09.15.10.46.40
+ by smtp.gmail.com with ESMTPSA id m23sm397726wmi.19.2020.09.15.10.16.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Sep 2020 10:46:41 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ Tue, 15 Sep 2020 10:16:40 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] hw/scsi/lsi53c895a: Sanitize some trace events format
-Date: Tue, 15 Sep 2020 19:46:39 +0200
-Message-Id: <20200915174639.1366226-1-philmd@redhat.com>
+Subject: [PATCH v2] hw/block/nand: Decommission the NAND museum
+Date: Tue, 15 Sep 2020 19:16:39 +0200
+Message-Id: <20200915171639.1355800-1-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:10:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,36 +99,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Max Reitz <mreitz@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make some lsi53c895a trace events more understandable.
+This is the QEMU equivalent of this Linux commit (but 7 years later):
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=f7025a43a9da2
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+    The MTD subsystem has its own small museum of ancient NANDs
+    in a form of the CONFIG_MTD_NAND_MUSEUM_IDS configuration option.
+    The museum contains stone age NANDs with 256 bytes pages, as well
+    as iron age NANDs with 512 bytes per page and up to 8MiB page size.
+
+    It is with great sorrow that I inform you that the museum is being
+    decommissioned. The MTD subsystem is out of budget for Kconfig
+    options and already has too many of them, and there is a general
+    kernel trend to simplify the configuration menu.
+
+    We remove the stone age exhibits along with closing the museum,
+    but some of the iron age ones are transferred to the regular NAND
+    depot. Namely, only those which have unique device IDs are
+    transferred, and the ones which have conflicting device IDs are
+    removed.
+
+The machine using this device are:
+- axis-dev88
+- tosa (via tc6393xb_init)
+- spitz based (akita, borzoi, terrier)
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/scsi/trace-events | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Peter, as 4 of the 5 machines are ARM-based, can this go via your tree?
+---
+ hw/block/nand.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/hw/scsi/trace-events b/hw/scsi/trace-events
-index 9a4a60ca635..ac4209f361e 100644
---- a/hw/scsi/trace-events
-+++ b/hw/scsi/trace-events
-@@ -234,9 +234,9 @@ spapr_vscsi_do_crq(unsigned c0, unsigned c1) "crq: %02x %02x ..."
+diff --git a/hw/block/nand.c b/hw/block/nand.c
+index 5c8112ed5a4..5f01ba2bc44 100644
+--- a/hw/block/nand.c
++++ b/hw/block/nand.c
+@@ -138,7 +138,7 @@ static void mem_and(uint8_t *dest, const uint8_t *src, size_t n)
+ # define ADDR_SHIFT		16
+ # include "nand.c"
  
- # lsi53c895a.c
- lsi_reset(void) "Reset"
--lsi_update_irq(int level, uint8_t dstat, uint8_t sist1, uint8_t sist0) "Update IRQ level %d dstat 0x%02x sist 0x%02x0x%02x"
-+lsi_update_irq(int level, uint8_t dstat, uint8_t sist1, uint8_t sist0) "Update IRQ level %d dstat 0x%02x sist 1:0x%02x 0:0x%02x"
- lsi_update_irq_disconnected(void) "Handled IRQs & disconnected, looking for pending processes"
--lsi_script_scsi_interrupt(uint8_t stat1, uint8_t stat0, uint8_t sist1, uint8_t sist0) "SCSI Interrupt 0x%02x0x%02x prev 0x%02x0x%02x"
-+lsi_script_scsi_interrupt(uint8_t stat1, uint8_t stat0, uint8_t sist1, uint8_t sist0) "SCSI Interrupt stat 1:0x%02x 0:0x%02x sist 1:0x%02x 0:0x%02x"
- lsi_script_dma_interrupt(uint8_t stat, uint8_t dstat) "DMA Interrupt 0x%x prev 0x%x"
- lsi_bad_phase_jump(uint32_t dsp) "Data phase mismatch jump to 0x%"PRIX32
- lsi_bad_phase_interrupt(void) "Phase mismatch interrupt"
+-/* Information based on Linux drivers/mtd/nand/nand_ids.c */
++/* Information based on Linux drivers/mtd/nand/raw/nand_ids.c */
+ static const struct {
+     int size;
+     int width;
+@@ -154,15 +154,14 @@ static const struct {
+     [0xe8] = { 1,	8,	8, 4, 0 },
+     [0xec] = { 1,	8,	8, 4, 0 },
+     [0xea] = { 2,	8,	8, 4, 0 },
+-    [0xd5] = { 4,	8,	9, 4, 0 },
+     [0xe3] = { 4,	8,	9, 4, 0 },
+     [0xe5] = { 4,	8,	9, 4, 0 },
+-    [0xd6] = { 8,	8,	9, 4, 0 },
+ 
+-    [0x39] = { 8,	8,	9, 4, 0 },
+-    [0xe6] = { 8,	8,	9, 4, 0 },
+-    [0x49] = { 8,	16,	9, 4, NAND_BUSWIDTH_16 },
+-    [0x59] = { 8,	16,	9, 4, NAND_BUSWIDTH_16 },
++    [0x6b] = { 4,        8,        9, 4, 0 },
++    [0xe3] = { 4,        8,        9, 4, 0 },
++    [0xe5] = { 4,        8,        9, 4, 0 },
++    [0xd6] = { 8,        8,        9, 4, 0 },
++    [0xe6] = { 8,        8,        9, 4, 0 },
+ 
+     [0x33] = { 16,	8,	9, 5, 0 },
+     [0x73] = { 16,	8,	9, 5, 0 },
 -- 
 2.26.2
 
