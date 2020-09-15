@@ -4,94 +4,88 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36E1FC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48453C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:59:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9E182080C
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:56:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CCD9421974
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:59:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="foZoX3V2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9E182080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sacv/hOt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCD9421974
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIFBe-0007y8-OZ
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 13:56:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52634)
+	id 1kIFER-00033j-Q2
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 13:59:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53830)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kIF40-0003jT-Jt; Tue, 15 Sep 2020 13:48:20 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54621)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kIF3y-0007Wa-Pd; Tue, 15 Sep 2020 13:48:20 -0400
-Received: by mail-wm1-x341.google.com with SMTP id s13so327014wmh.4;
- Tue, 15 Sep 2020 10:48:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=fV36Y5r0gmFeQyVZ8gYTumSHHgY8V/1e5xqNYgfi+RI=;
- b=foZoX3V25d1GYg5EfjnPoUJL2q/SL0wmg6pIz0p+0HDbjh/n6oE6fAhsOTfcgEnO+w
- qvFqjN1Ejkba7PDglmgFu7itDbRYc8ZNPa0rW7yfv7DJzNRyflBerZUy5PnnetCKm4Fu
- o8NACTRegvykzEIYc/nq+RQzRfykefOV2AV2wPJ3iYYEatP1PI4lDBXodSPyFNJNd51a
- ZsVQ8jO2VYg6Uhoh5CcHXk5c/tMj9QupSEjLVWS2bJOeOYcUq0SET05wfjtqR24synmu
- DvoQTtl14uJj5NIVlucsfdlsXi2giWSrOO9V6SFt6eeHqdwPt8SpTZNjQU+ChUcvSfE/
- UVGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=fV36Y5r0gmFeQyVZ8gYTumSHHgY8V/1e5xqNYgfi+RI=;
- b=Nxe07xBxXr79Rs6xd2DPn+j759Q0XrBQgHvdYEf/gn9V2K/OBDbxbNHitG2MapXFZQ
- KkUTCRpYm2qyoxxBPV92QOJH60f8My5ei9md6EJ3/LGht1BLs7wkiqMx3rU6ntkZv3zN
- o/6MnArSaknnfggrM7RAFMsULFoobWWB49usJd5Y27Ax3TFLLdpNg+GzN09yFwvDBfDt
- Zs3svTbAWt+MAsStJ9kdrgDVAtB02SdoJvqjQ+StUWZTdB8O3vbGuMdxQktCj6EKQ/Dl
- qTqJiH9Xb/b+gNow6pmkW6XFNsRVlA9uUwT/C6+r9uGTe8JvBpmGMxHVoT4EcDA/A0zv
- eN5w==
-X-Gm-Message-State: AOAM53235unr08GQ3ZnMm5hL2fm1u2fprBON4uTixHZC+iHW90DqP1gJ
- R7S580imAP0ruGo6DSN/Es4=
-X-Google-Smtp-Source: ABdhPJyyz93pJbkOE9E9kb81u5D9r035AS3AKBueogEO6PemiuFIwnwwm3OCjAbNAyI/YRvMY9Nq9w==
-X-Received: by 2002:a1c:b386:: with SMTP id c128mr525168wmf.82.1600192097000; 
- Tue, 15 Sep 2020 10:48:17 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id m10sm528256wmi.9.2020.09.15.10.48.15
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 15 Sep 2020 10:48:16 -0700 (PDT)
-Subject: Re: [PATCH v10 15/26] cirrus: Building freebsd in a single short
-To: Yonggang Luo <luoyonggang@gmail.com>, qemu-devel@nongnu.org
-References: <20200915171234.236-1-luoyonggang@gmail.com>
- <20200915171234.236-16-luoyonggang@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <2b577bdb-1f92-311a-82d7-d4aa4aa23c68@amsat.org>
-Date: Tue, 15 Sep 2020 19:48:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kIFA6-000684-NU
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 13:54:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54453
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kIFA3-0008L7-BV
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 13:54:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600192472;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=Rp1gXm/X6qihaf2u+bNhKyeZBEYYmEcPj2iLPkJ6CIg=;
+ b=Sacv/hOtzgmmO/9goF0iaTcHnZ7l3BwZymJZ+V62ZiL2n/uV0phauz6StDeRjrlI3VGp+s
+ lJBWnj1DO4FLMb2DfM7RHcTLA41NsVPTxNiFoieO34vrT7CMdBIIXRV7i3dPr01vR0UKco
+ tSPbIdFd8a/PY0c/KT6HAx/mtZfIxmo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-350-qO79X6XIOwuRVTY6jk6jMA-1; Tue, 15 Sep 2020 13:54:20 -0400
+X-MC-Unique: qO79X6XIOwuRVTY6jk6jMA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 856031007464;
+ Tue, 15 Sep 2020 17:54:19 +0000 (UTC)
+Received: from redhat.com (ovpn-113-234.ams2.redhat.com [10.36.113.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EAC3D19D6C;
+ Tue, 15 Sep 2020 17:54:01 +0000 (UTC)
+Date: Tue, 15 Sep 2020 18:53:59 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH V1 22/32] char: qio_channel_socket_accept reuse fd
+Message-ID: <20200915175359.GM1502912@redhat.com>
+References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
+ <1596122076-341293-23-git-send-email-steven.sistare@oracle.com>
+ <20200915173334.GD2922@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20200915171234.236-16-luoyonggang@gmail.com>
+In-Reply-To: <20200915173334.GD2922@work-vm>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:11:06
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,98 +98,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@FreeBSD.org>,
- qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>,
- Xie Changlong <xiechanglong.d@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>,
- Peter Lieven <pl@kamp.de>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Steve Sistare <steven.sistare@oracle.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Typo "single shot" in subject?
+On Tue, Sep 15, 2020 at 06:33:34PM +0100, Dr. David Alan Gilbert wrote:
+> * Steve Sistare (steven.sistare@oracle.com) wrote:
+> > From: Mark Kanda <mark.kanda@oracle.com>
+> > 
+> > Add an fd argument to qio_channel_socket_accept.  If not -1, the channel
+> > uses that fd instead of accepting a new socket connection.  All callers
+> > pass -1 in this patch, so no functional change.
+> 
+> Doesn't some of this just come from the fact you're insisting on reusing
+> the command line?   We should be able to open a chardev on an fd
+> shouldn't we?
 
-On 9/15/20 7:12 PM, Yonggang Luo wrote:
-> This reverts commit 45f7b7b9f38f5c4d1529a37c93dedfc26a231bba
-> ("cirrus.yml: Split FreeBSD job into two parts").
+Even ignoring that question, this patch looks pointless to me. The callers
+have to be modified to pass in the FD to use instead of accepting a new
+connection. Given that, you migt as well just modify the callers to use
+the FD immediately if valid and never call qio_channel_socket_accept at all.
+
+ie
+
+   if (reuse_fd)
+      fd = reuse_fd;
+   else
+      fd = qio_channel_socket_accept(ioc...)
+
 > 
-> freebsd 1 hour limit not hit anymore
+> Dave
 > 
-> I think we going to a wrong direction, I think there is some tests a stall the test runner,
-> please look at
-> https://cirrus-ci.com/task/5110577531977728
-> When its running properly, the consumed time are little, but when tests running too long,
-> look at the cpu usage, the cpu usage are nearly zero. doesn't consuming time.
-> 
-> And look at
-> https://cirrus-ci.com/task/6119341601062912
-> 
-> If the tests running properly, the time consuming are little
-> We should not hide the error by split them
-> 
-> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-> Reviewed-by: Ed Maste <emaste@FreeBSD.org>
-> ---
->  .cirrus.yml | 35 ++++++++---------------------------
->  1 file changed, 8 insertions(+), 27 deletions(-)
-> 
-> diff --git a/.cirrus.yml b/.cirrus.yml
-> index 3dd9fcff7f..25fb4add9b 100644
-> --- a/.cirrus.yml
-> +++ b/.cirrus.yml
-> @@ -1,38 +1,19 @@
->  env:
->    CIRRUS_CLONE_DEPTH: 1
->  
-> -freebsd_1st_task:
-> +freebsd_12_task:
->    freebsd_instance:
->      image_family: freebsd-12-1
-> -    cpu: 4
-> -    memory: 4G
-> -  install_script: ASSUME_ALWAYS_YES=yes pkg bootstrap -f ; pkg install -y
-> -    bash curl cyrus-sasl git glib gmake gnutls gsed
-> -    nettle perl5 pixman pkgconf png usbredir
-> +    cpu: 8
-> +    memory: 8G
-> +  install_script:
-> +    - ASSUME_ALWAYS_YES=yes pkg bootstrap -f ;
-> +    - pkg install -y bash curl cyrus-sasl git glib gmake gnutls gsed
-> +          nettle perl5 pixman pkgconf png usbredir
->    script:
->      - mkdir build
->      - cd build
-> -    - ../configure --disable-user --target-list-exclude='alpha-softmmu
-> -        ppc64-softmmu ppc-softmmu riscv32-softmmu riscv64-softmmu s390x-softmmu
-> -        sparc64-softmmu sparc-softmmu x86_64-softmmu i386-softmmu'
-> -        --enable-werror || { cat config.log; exit 1; }
-> -    - gmake -j$(sysctl -n hw.ncpu)
-> -    - gmake -j$(sysctl -n hw.ncpu) check
-> -
-> -freebsd_2nd_task:
-> -  freebsd_instance:
-> -    image_family: freebsd-12-1
-> -    cpu: 4
-> -    memory: 4G
-> -  install_script: ASSUME_ALWAYS_YES=yes pkg bootstrap -f ; pkg install -y
-> -    bash curl cyrus-sasl git glib gmake gnutls gtk3 gsed libepoxy mesa-libs
-> -    nettle perl5 pixman pkgconf png SDL2 usbredir
-> -  script:
-> -    - ./configure --enable-werror --target-list='alpha-softmmu ppc64-softmmu
-> -        ppc-softmmu riscv32-softmmu riscv64-softmmu s390x-softmmu
-> -        sparc64-softmmu sparc-softmmu x86_64-softmmu i386-softmmu
-> -        sparc-bsd-user sparc64-bsd-user x86_64-bsd-user i386-bsd-user'
-> -        || { cat config.log; exit 1; }
-> +    - ../configure --enable-werror || { cat config.log; exit 1; }
->      - gmake -j$(sysctl -n hw.ncpu)
->      - gmake -j$(sysctl -n hw.ncpu) check
->  
-> 
+> > Signed-off-by: Mark Kanda <mark.kanda@oracle.com>
+> > Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+> > ---
+> >  include/io/channel-socket.h    |  3 ++-
+> >  io/channel-socket.c            | 12 +++++++++---
+> >  io/net-listener.c              |  4 ++--
+> >  scsi/qemu-pr-helper.c          |  2 +-
+> >  tests/qtest/tpm-emu.c          |  2 +-
+> >  tests/test-char.c              |  2 +-
+> >  tests/test-io-channel-socket.c |  4 ++--
+> >  7 files changed, 18 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/include/io/channel-socket.h b/include/io/channel-socket.h
+> > index 777ff59..0ffc560 100644
+> > --- a/include/io/channel-socket.h
+> > +++ b/include/io/channel-socket.h
+> > @@ -248,6 +248,7 @@ qio_channel_socket_get_remote_address(QIOChannelSocket *ioc,
+> >  /**
+> >   * qio_channel_socket_accept:
+> >   * @ioc: the socket channel object
+> > + * @reuse_fd: fd to reuse; -1 otherwise
+> >   * @errp: pointer to a NULL-initialized error object
+> >   *
+> >   * If the socket represents a server, then this accepts
+> > @@ -258,7 +259,7 @@ qio_channel_socket_get_remote_address(QIOChannelSocket *ioc,
+> >   */
+> >  QIOChannelSocket *
+> >  qio_channel_socket_accept(QIOChannelSocket *ioc,
+> > -                          Error **errp);
+> > +                          int reuse_fd, Error **errp);
+> >  
+> >  
+> >  #endif /* QIO_CHANNEL_SOCKET_H */
+> > diff --git a/io/channel-socket.c b/io/channel-socket.c
+> > index e1b4667..dde12bf 100644
+> > --- a/io/channel-socket.c
+> > +++ b/io/channel-socket.c
+> > @@ -352,7 +352,7 @@ void qio_channel_socket_dgram_async(QIOChannelSocket *ioc,
+> >  
+> >  QIOChannelSocket *
+> >  qio_channel_socket_accept(QIOChannelSocket *ioc,
+> > -                          Error **errp)
+> > +                          int reuse_fd, Error **errp)
+> >  {
+> >      QIOChannelSocket *cioc;
+> >  
+> > @@ -362,8 +362,14 @@ qio_channel_socket_accept(QIOChannelSocket *ioc,
+> >  
+> >   retry:
+> >      trace_qio_channel_socket_accept(ioc);
+> > -    cioc->fd = qemu_accept(ioc->fd, (struct sockaddr *)&cioc->remoteAddr,
+> > -                           &cioc->remoteAddrLen);
+> > +
+> > +    if (reuse_fd != -1) {
+> > +        cioc->fd = reuse_fd;
+> > +    } else {
+> > +        cioc->fd = qemu_accept(ioc->fd, (struct sockaddr *)&cioc->remoteAddr,
+> > +                               &cioc->remoteAddrLen);
+> > +    }
+> > +
+> >      if (cioc->fd < 0) {
+> >          if (errno == EINTR) {
+> >              goto retry;
+> > diff --git a/io/net-listener.c b/io/net-listener.c
+> > index 5d8a226..bbdea1e 100644
+> > --- a/io/net-listener.c
+> > +++ b/io/net-listener.c
+> > @@ -45,7 +45,7 @@ static gboolean qio_net_listener_channel_func(QIOChannel *ioc,
+> >      QIOChannelSocket *sioc;
+> >  
+> >      sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
+> > -                                     NULL);
+> > +                                     -1, NULL);
+> >      if (!sioc) {
+> >          return TRUE;
+> >      }
+> > @@ -194,7 +194,7 @@ static gboolean qio_net_listener_wait_client_func(QIOChannel *ioc,
+> >      QIOChannelSocket *sioc;
+> >  
+> >      sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
+> > -                                     NULL);
+> > +                                     -1, NULL);
+> >      if (!sioc) {
+> >          return TRUE;
+> >      }
+> > diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
+> > index 57ad830..0e6d683 100644
+> > --- a/scsi/qemu-pr-helper.c
+> > +++ b/scsi/qemu-pr-helper.c
+> > @@ -800,7 +800,7 @@ static gboolean accept_client(QIOChannel *ioc, GIOCondition cond, gpointer opaqu
+> >      PRHelperClient *prh;
+> >  
+> >      cioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
+> > -                                     NULL);
+> > +                                     -1, NULL);
+> >      if (!cioc) {
+> >          return TRUE;
+> >      }
+> > diff --git a/tests/qtest/tpm-emu.c b/tests/qtest/tpm-emu.c
+> > index 2e8eb7b..19e5dab 100644
+> > --- a/tests/qtest/tpm-emu.c
+> > +++ b/tests/qtest/tpm-emu.c
+> > @@ -83,7 +83,7 @@ void *tpm_emu_ctrl_thread(void *data)
+> >      g_cond_signal(&s->data_cond);
+> >  
+> >      qio_channel_wait(QIO_CHANNEL(lioc), G_IO_IN);
+> > -    ioc = QIO_CHANNEL(qio_channel_socket_accept(lioc, &error_abort));
+> > +    ioc = QIO_CHANNEL(qio_channel_socket_accept(lioc, -1, &error_abort));
+> >      g_assert(ioc);
+> >  
+> >      {
+> > diff --git a/tests/test-char.c b/tests/test-char.c
+> > index 614bdac..1bb6ae0 100644
+> > --- a/tests/test-char.c
+> > +++ b/tests/test-char.c
+> > @@ -884,7 +884,7 @@ char_socket_client_server_thread(gpointer data)
+> >      QIOChannelSocket *cioc;
+> >  
+> >  retry:
+> > -    cioc = qio_channel_socket_accept(ioc, &error_abort);
+> > +    cioc = qio_channel_socket_accept(ioc, -1, &error_abort);
+> >      g_assert_nonnull(cioc);
+> >  
+> >      if (char_socket_ping_pong(QIO_CHANNEL(cioc), NULL) != 0) {
+> > diff --git a/tests/test-io-channel-socket.c b/tests/test-io-channel-socket.c
+> > index d43083a..0d410cf 100644
+> > --- a/tests/test-io-channel-socket.c
+> > +++ b/tests/test-io-channel-socket.c
+> > @@ -75,7 +75,7 @@ static void test_io_channel_setup_sync(SocketAddress *listen_addr,
+> >      qio_channel_set_delay(*src, false);
+> >  
+> >      qio_channel_wait(QIO_CHANNEL(lioc), G_IO_IN);
+> > -    *dst = QIO_CHANNEL(qio_channel_socket_accept(lioc, &error_abort));
+> > +    *dst = QIO_CHANNEL(qio_channel_socket_accept(lioc, -1, &error_abort));
+> >      g_assert(*dst);
+> >  
+> >      test_io_channel_set_socket_bufs(*src, *dst);
+> > @@ -143,7 +143,7 @@ static void test_io_channel_setup_async(SocketAddress *listen_addr,
+> >      g_assert(!data.err);
+> >  
+> >      qio_channel_wait(QIO_CHANNEL(lioc), G_IO_IN);
+> > -    *dst = QIO_CHANNEL(qio_channel_socket_accept(lioc, &error_abort));
+> > +    *dst = QIO_CHANNEL(qio_channel_socket_accept(lioc, -1, &error_abort));
+> >      g_assert(*dst);
+> >  
+> >      qio_channel_set_delay(*src, false);
+> > -- 
+> > 1.8.3.1
+> > 
+> -- 
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
