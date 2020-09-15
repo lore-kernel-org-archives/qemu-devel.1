@@ -7,83 +7,84 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F0E2C43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:11:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E8FCC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:11:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CE49206C9
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:10:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4B9A20829
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:11:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jl6EQsKz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CE49206C9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JHS3aIo1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4B9A20829
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIAja-0004fW-GD
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 09:10:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34774)
+	id 1kIAkE-00063r-Ll
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 09:11:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34890)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIAi1-0002yF-4v
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:09:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47738)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIAi5-00037X-FL
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:09:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29590
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIAhz-0007Mv-Gk
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:09:20 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIAi3-0007Ov-Fr
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:09:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600175358;
+ s=mimecast20190719; t=1600175362;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QNCV1DGX90U1EaGw/EzD/AYmgFleZOV911DDu+biJYA=;
- b=Jl6EQsKzMG9J9c60bKwVrC02bbHdoBr647uqpbU/3t1biohzyoC5GQE6mmDeFxbFg3iGbH
- P14atdKCszw/h/3Z8826ykNZfbHIAWSGZ8+qcG1wncNH97El8EkI2n7Z4+IU6nopriweLp
- GJVJDFAA6mRIk+vC1grMliHYHpntU7g=
+ bh=B3ZPtHfdJ4Gje3DB/qetfFNCeVgnpdH/NklhR+qZLNc=;
+ b=JHS3aIo1ROJIgJrH2iENEiMmn0RmOWIhnGMCbJ0Em9eVORWA7P6cec3/L+4w7v1l3uMs44
+ +O3hZSpHWAai6IIY2rxsN3WjAae69k8uXG3au0ND8l/lLaQjVaAbCog47FNu4VbyhEzPR+
+ CU6Sd3CC7yFt7WxPHnoo358f7t5arvM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-cezoBf5QO2eRqhmzKyTP7g-1; Tue, 15 Sep 2020 09:09:16 -0400
-X-MC-Unique: cezoBf5QO2eRqhmzKyTP7g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-562--Djaunf9NdmpCmUQLxwnzQ-1; Tue, 15 Sep 2020 09:09:20 -0400
+X-MC-Unique: -Djaunf9NdmpCmUQLxwnzQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4BC86190A3E2
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 13:09:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 056DEAF21C
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 13:09:20 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
  [10.36.112.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 61C226111F;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5D86C19D7C;
  Tue, 15 Sep 2020 13:09:09 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 9103F40840; Tue, 15 Sep 2020 15:09:08 +0200 (CEST)
+ id 7646F40830; Tue, 15 Sep 2020 15:09:08 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 4/6] object_initialize: try module load
-Date: Tue, 15 Sep 2020 15:09:06 +0200
-Message-Id: <20200915130908.12808-5-kraxel@redhat.com>
+Subject: [PULL 1/6] meson: fix qxl dependencies
+Date: Tue, 15 Sep 2020 15:09:03 +0200
+Message-Id: <20200915130908.12808-2-kraxel@redhat.com>
 In-Reply-To: <20200915130908.12808-1-kraxel@redhat.com>
 References: <20200915130908.12808-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:23:19
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:11:06
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
 X-Spam_bar: -----
 X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,32 +104,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Needed to allow virtio-gpu-pci initialize the
-virtio-gpu-device child device.
+Add pixman and spice deps to qxl module.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20200914134224.29769-5-kraxel@redhat.com
+Message-id: 20200914134224.29769-2-kraxel@redhat.com
 ---
- qom/object.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ hw/display/meson.build | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/qom/object.c b/qom/object.c
-index b1822a2ef4be..387efb25ebe9 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -518,6 +518,12 @@ void object_initialize(void *data, size_t size, const char *typename)
- {
-     TypeImpl *type = type_get_by_name(typename);
+diff --git a/hw/display/meson.build b/hw/display/meson.build
+index 78adaf9db463..2cc73fc2b927 100644
+--- a/hw/display/meson.build
++++ b/hw/display/meson.build
+@@ -41,7 +41,8 @@ specific_ss.add(when: 'CONFIG_VGA', if_true: files('vga.c'))
  
-+#ifdef CONFIG_MODULES
-+    if (!type) {
-+        module_load_qom_one(typename);
-+        type = type_get_by_name(typename);
-+    }
-+#endif
-     if (!type) {
-         error_report("missing object type '%s'", typename);
-         abort();
+ if config_all_devices.has_key('CONFIG_QXL')
+   qxl_ss = ss.source_set()
+-  qxl_ss.add(when: 'CONFIG_QXL', if_true: files('qxl.c', 'qxl-logger.c', 'qxl-render.c'))
++  qxl_ss.add(when: 'CONFIG_QXL', if_true: [files('qxl.c', 'qxl-logger.c', 'qxl-render.c'),
++                                           pixman, spice])
+   hw_display_modules += {'qxl': qxl_ss}
+ endif
+ 
 -- 
 2.27.0
 
