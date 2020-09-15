@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E57C43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:13:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B294C43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:14:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5954120872
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:13:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CEA0920829
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:14:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aere8qT8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5954120872
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ctzpP+Vt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEA0920829
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIAm6-0000Hf-0u
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 09:13:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32978)
+	id 1kIAn7-0001WX-Uv
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 09:14:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35498)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIAcT-0002gu-4A
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:03:38 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60253
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIAj4-0004rg-EB
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:10:26 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20845
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIAcN-0006Rn-Gj
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:03:36 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIAj0-0007p5-4v
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:10:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600175010;
+ s=mimecast20190719; t=1600175421;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=qYcZiZNRl5JU8vHoSrjghWuDec1gDkeesK2kW/6Shqc=;
- b=aere8qT8dKdZbXbPBHseBPpMZYFXIKBP+50yFyTd/dd0TDDjk12FXmOMtHa/2kl7KhLKrf
- Cbo0PQIsoDis4mchQR1L/+S+5+aKVHOtkGDUry/3kRtOet9Kad+xykXU8ydkUCFxQ9dNSH
- /wkerPWa7Wwe6EEfiTdHfCgPprbuj0Q=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-490-6Qrbgo5TPKWxbM41MzaLng-1; Tue, 15 Sep 2020 09:03:28 -0400
-X-MC-Unique: 6Qrbgo5TPKWxbM41MzaLng-1
-Received: by mail-wr1-f69.google.com with SMTP id s8so1190577wrb.15
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 06:03:27 -0700 (PDT)
+ bh=VElwLtldMdzAzbIH83dptm3TWF5gu9/Ka09EwJe1qJE=;
+ b=ctzpP+Vt4tiUkeFbCCZetzbBABybUynGLdKiImHpBWedVkg91g5/cx2NJMFn1GI6j/SRPY
+ Do1NGsi0dG7A0wUy3KtaFS5y3x2x3ckSQFMdkMmOtRJJUuipaXm8ApD4pPDQrTefGTXm05
+ G7TniqYHYfYJf+9G7mJPaMrOh098R14=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-482-PdQ4KeI8OMydub5fHDMqaA-1; Tue, 15 Sep 2020 09:10:19 -0400
+X-MC-Unique: PdQ4KeI8OMydub5fHDMqaA-1
+Received: by mail-wm1-f69.google.com with SMTP id d22so1150228wmd.6
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 06:10:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=FXGoxpyhJUcL0rqlP0I+dlFg8yz/90wEWy0PooaEUTo=;
- b=swz5xluKQAVO57pYq3hNxz8v8Xn2vZZPH84xw/6l+rzi4A/bsMbNJjtGGBKwLfKhnp
- 8Spyq7ZpsK8SqrxebpxiA1VgHw6zmWVNKgVVv7eNyeT3tua3sRAiqrsh2im54JKdMbzm
- h6XlKTXVinBKiLRvdVaLyWS8W4KVNgojRgxoQayIejxg7UXkcRquYdIGDOYpbSDj8G9d
- jpwwSJtIvChEHK2T7sX1A6hglGovSXhSo3hx8RpFN4jRcRk/IolVo4C1vupcfPWClv5s
- FrncBzgvEhSvW9aMwvlIE3+qyMYbNiqkm9bzugbxtcZRGqQixMr0P6OQIBlLUWmpX594
- f5Dw==
-X-Gm-Message-State: AOAM5302zJZv24eXHZHPZSn4/8I7j2UXay3SvY6Lba6xqtqdhntYGGkG
- 26S9pBU3maPGgKGzDp00ybEsiskJ7uoDpGdYmUQTMur25IeTAfC3mJpu+1lWxci0bPPD2IW7tCK
- S+6Obc6WZI5FhNzM=
-X-Received: by 2002:a5d:5281:: with SMTP id c1mr21155748wrv.184.1600175006808; 
- Tue, 15 Sep 2020 06:03:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyXT54RezlnIxUuIQgPsF+GzclLbIZkieIwbizLIkNzgzXcq9HQwLZ00lNA8N4FzzHXBQtfcg==
-X-Received: by 2002:a5d:5281:: with SMTP id c1mr21155722wrv.184.1600175006648; 
- Tue, 15 Sep 2020 06:03:26 -0700 (PDT)
+ bh=ZnmYLUJpxZini+8wtnPPPhWUisUNOVJvVQpp12RtXBw=;
+ b=ubkNe9e66eP1W8HyN6vGG8NJNRNcTbeK4mdsMAFr25S8pbwdMM3XzbRsHgaQM3oL3x
+ rPxGup7Z5zOzj4JQrtMkEuQMwuqeNuJJ7vNwqIUZODmf0/XRZKsXmbzsv/ojYsmczN2X
+ U2R3y5Ic9gq/Py7sB3ezBES34Q+JZkQHcQFmxXF4Stw/C2JRo5AcF4/aW19Cu6IVxxKs
+ UGBq98ux5G5xYCBb8SyNjThddNkcggZOyeDFjkDGqAsfVq9nt3i1xmv3trA9KiiB8TjJ
+ +uty3gXsUCR5kfu4Pm5hbF3AcshCj0B3rKx36t0MLkrTnSylltt5YAEADkZAXFQSEDbi
+ PBJA==
+X-Gm-Message-State: AOAM533YE4/O9jwjhj0v/W7n0lk9bKpmM6PBVoFctLo7ZmGT3UzBkifE
+ jLPtdN+OQvU/WPn4MUVN88nReah+zN5OLRxoqzOLuJ/Yw45fUds8B6caNPU3CuHFi7a6shRwhwO
+ Ejmh0HTl7aaRyC2M=
+X-Received: by 2002:adf:df05:: with SMTP id y5mr23302953wrl.39.1600175418054; 
+ Tue, 15 Sep 2020 06:10:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwvm60OC68Wii4jGXeK9dZ2I01GwLs+S4NZtUdzAbQ/2WDLVdKcu78xGX7zH461pDc5//tW2g==
+X-Received: by 2002:adf:df05:: with SMTP id y5mr23302929wrl.39.1600175417902; 
+ Tue, 15 Sep 2020 06:10:17 -0700 (PDT)
 Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id e18sm30808710wra.36.2020.09.15.06.03.25
+ by smtp.gmail.com with ESMTPSA id q18sm25854070wre.78.2020.09.15.06.10.16
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 15 Sep 2020 06:03:25 -0700 (PDT)
-Subject: Re: [PATCH 06/15] spapr: Simplify error handling in
- do_client_architecture_support()
+ Tue, 15 Sep 2020 06:10:17 -0700 (PDT)
+Subject: Re: [PATCH 13/15] spapr: Add a return value to spapr_check_pagesize()
 To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 References: <20200914123505.612812-1-groug@kaod.org>
- <20200914123505.612812-7-groug@kaod.org>
+ <20200914123505.612812-14-groug@kaod.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -103,12 +102,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <ce547d32-d547-1906-7df6-2d45ef170544@redhat.com>
-Date: Tue, 15 Sep 2020 15:03:24 +0200
+Message-ID: <630e183a-c090-3866-1ad0-d196f368ed48@redhat.com>
+Date: Tue, 15 Sep 2020 15:10:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200914123505.612812-7-groug@kaod.org>
+In-Reply-To: <20200914123505.612812-14-groug@kaod.org>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0.002
@@ -146,14 +145,16 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/14/20 2:34 PM, Greg Kurz wrote:
-> Use the return value of ppc_set_compat_all() to check failures,
-> which is preferred over hijacking local_err.
+On 9/14/20 2:35 PM, Greg Kurz wrote:
+> As recommended in "qapi/error.h", return true on success and false on
+> failure. This allows to reduce error propagation overhead in the callers.
 > 
 > Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  hw/ppc/spapr_hcall.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
+>  include/hw/ppc/spapr.h | 2 +-
+>  hw/ppc/spapr.c         | 4 +---
+>  hw/ppc/spapr_caps.c    | 7 +++++--
+>  3 files changed, 7 insertions(+), 6 deletions(-)
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
