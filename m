@@ -2,94 +2,88 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3996EC43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:32:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C6A5C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:33:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94FD320731
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:32:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E905620731
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:33:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M6gXfErn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94FD320731
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AfaWx+pr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E905620731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIA8a-00060q-I9
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:32:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48398)
+	id 1kIA9G-0006kj-2W
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:33:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46952)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kI9rO-0001Sl-BD; Tue, 15 Sep 2020 08:14:58 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:52972)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kI9rM-0008JL-M9; Tue, 15 Sep 2020 08:14:58 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id o16so1678388pjr.2;
- Tue, 15 Sep 2020 05:14:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=ks2bOk3jYOHrXnI/Shz64S+t7ePZagOpQ3Ju/TypT6Y=;
- b=M6gXfErnngeeKfFhqv+Vgr0UqpYON1RVKk6pPLvTxMyiNu0d5gXcwRDkLcZ/YVoF4w
- XzEw0VFbEMVfptJ5HLql9O9VlxiI5PR0DSNfoxU7jq0Ll/wbOIyvfkoOyXfKc+yovwIl
- rO2ZkXDGrZk6sOSeVMEv6+biNrBalW0EnDwVUFZuN3CgHoUMmfNeYFCh7lVAfIiwmDDf
- +nzfKyyZnVwTsIF+vuo3vlHYs+mIOVfN4V8jpwOCSNPBuJG06dVKDrb/e4JymgOc1475
- FDpJawkj3VIV28wET96wguSrm2BVBIJlH4g4xMihHanOkvTjsmsrD8WGWOA4fNSBolC8
- vtXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=ks2bOk3jYOHrXnI/Shz64S+t7ePZagOpQ3Ju/TypT6Y=;
- b=LNqMNFKXnAD1zKJ97ubSL4dXstxhBnQC8KMYCDkBlo1+QBsILzEpgUkqXDVCJXIAAZ
- GIzpVqd1iukiIR6Sic6onEhJZFZy3uhvgE0/qEe98dJP1dEIdKK4hTQmY85i37avecH/
- pbqTQ871ntiW8nZo6SvBK5+6HcdCMimiO84ywj1ZbXJJxXM1F/iARKXI9g/uyTRNbj7d
- 7jNRtSUdrNGs3zHddHU6DiLPW4KMcdB3SuQxMFxAvtZ/wNaPyVSEod7/GHYZTeoDXOzR
- PYLDRkJDD9hB0Z79SupqZW2pQyMEp1dvlcJOBWAH1xoN+lVkNN9xXFbCPufhOUtpU9oa
- a4xw==
-X-Gm-Message-State: AOAM530Ey0xcuNW3h5n8puZYrYqJmTtGabw9Hp2u/nAMd97uWZ1lZqJZ
- x464NzXwzWzON3yrol1DeY2x5P89jY4G3ABdT2A=
-X-Google-Smtp-Source: ABdhPJwSlyNgD9I3zY8yY0qa0o7rPRisuPynZNgZvdKZ5zYH9SXLM8+VTZprLTCqcerRG79GyK+V+Q==
-X-Received: by 2002:a17:902:74c1:b029:d1:e598:401b with SMTP id
- f1-20020a17090274c1b02900d1e598401bmr1557161plt.85.1600172094637; 
- Tue, 15 Sep 2020 05:14:54 -0700 (PDT)
-Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id
- k28sm13683061pfh.196.2020.09.15.05.14.50
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Sep 2020 05:14:53 -0700 (PDT)
-From: Yonggang Luo <luoyonggang@gmail.com>
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kI9nr-0005Iy-AN
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:11:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49581)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kI9na-0007p2-Qz
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:11:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600171861;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=q4xqrjBt9+K0AYOcFO9PWCCV/shKCcI1emzHoZPL8Jc=;
+ b=AfaWx+prRkTp3bjUy/cf91tnmf7xnBWgptmdk9toHhsJtmLBvra1Qw2a0K2EtPrwUOWuNH
+ 2LNqCHHX6Hdrbt0Owk2GNrcW6bJti1lCExw8b4KPJdoBL6Ou7F/Ss88n+ErF9ZqvG4dDm/
+ gZ+oS5wd2GOTQmI0vpWCav9lCvRXI1w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-FO519XIRON223aaivj0XvA-1; Tue, 15 Sep 2020 08:09:24 -0400
+X-MC-Unique: FO519XIRON223aaivj0XvA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F37F1009454;
+ Tue, 15 Sep 2020 12:09:23 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
+ [10.36.112.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1E1FB75138;
+ Tue, 15 Sep 2020 12:09:23 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id DF93B40839; Tue, 15 Sep 2020 14:09:09 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 17/26] tests: Fixes test-io-channel-socket.c tests under
- msys2/mingw
-Date: Tue, 15 Sep 2020 20:13:09 +0800
-Message-Id: <20200915121318.247-18-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.28.0.windows.1
-In-Reply-To: <20200915121318.247-1-luoyonggang@gmail.com>
-References: <20200915121318.247-1-luoyonggang@gmail.com>
+Subject: [PATCH v8 09/21] microvm/acpi: add acpi_dsdt_add_virtio() for x86
+Date: Tue, 15 Sep 2020 14:08:57 +0200
+Message-Id: <20200915120909.20838-10-kraxel@redhat.com>
+In-Reply-To: <20200915120909.20838-1-kraxel@redhat.com>
+References: <20200915120909.20838-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
- envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1041.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:23:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,63 +96,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Ed Maste <emaste@freebsd.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>,
- Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Yonggang Luo <luoyonggang@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Wen Congyang <wencongyang2@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>,
+ qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently test-io-channel-socket doesn't init with
-qemu_init_main_loop
-and that's cause the qemu_aio_context not inited,
-and the following is the stack when null pointer accessed:
+Makes x86 linux kernel find virtio-mmio devices automatically.
 
-qemu_fd_register (c:\work\xemu\qemu\util\main-loop.c:336)
-qemu_try_set_nonblock (c:\work\xemu\qemu\util\oslib-win32.c:224)
-qemu_set_nonblock (c:\work\xemu\qemu\util\oslib-win32.c:230)
-socket_can_bind_connect (c:\work\xemu\qemu\tests\socket-helpers.c:93)
-socket_check_protocol_support (c:\work\xemu\qemu\tests\socket-helpers.c:141)
-main (c:\work\xemu\qemu\tests\test-io-channel-socket.c:568)
-__tmainCRTStartup (@__tmainCRTStartup:142)
-mainCRTStartup (@1400014f6..140001539:3)
-BaseThreadInitThunk (@BaseThreadInitThunk:9)
-RtlUserThreadStart (@RtlUserThreadStart:12)
-
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Sergio Lopez <slp@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- tests/test-io-channel-socket.c | 2 ++
- 1 file changed, 2 insertions(+)
+ hw/i386/acpi-microvm.c | 52 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
 
-diff --git a/tests/test-io-channel-socket.c b/tests/test-io-channel-socket.c
-index d43083a766..743577d744 100644
---- a/tests/test-io-channel-socket.c
-+++ b/tests/test-io-channel-socket.c
-@@ -25,6 +25,7 @@
- #include "socket-helpers.h"
+diff --git a/hw/i386/acpi-microvm.c b/hw/i386/acpi-microvm.c
+index 06ef33949f5f..b9ce3768b263 100644
+--- a/hw/i386/acpi-microvm.c
++++ b/hw/i386/acpi-microvm.c
+@@ -21,6 +21,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/cutils.h"
  #include "qapi/error.h"
- #include "qemu/module.h"
-+#include "qemu/main-loop.h"
  
+ #include "exec/memory.h"
+@@ -32,10 +33,60 @@
+ #include "hw/boards.h"
+ #include "hw/i386/fw_cfg.h"
+ #include "hw/i386/microvm.h"
++#include "hw/virtio/virtio-mmio.h"
  
- static void test_io_channel_set_socket_bufs(QIOChannel *src,
-@@ -556,6 +557,7 @@ int main(int argc, char **argv)
-     bool has_ipv4, has_ipv6;
+ #include "acpi-common.h"
+ #include "acpi-microvm.h"
  
-     module_call_init(MODULE_INIT_QOM);
-+    qemu_init_main_loop(&error_abort);
-     socket_init();
++static void acpi_dsdt_add_virtio(Aml *scope,
++                                 MicrovmMachineState *mms)
++{
++    gchar *separator;
++    long int index;
++    BusState *bus;
++    BusChild *kid;
++
++    bus = sysbus_get_default();
++    QTAILQ_FOREACH(kid, &bus->children, sibling) {
++        DeviceState *dev = kid->child;
++        Object *obj = object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MMIO);
++
++        if (obj) {
++            VirtIOMMIOProxy *mmio = VIRTIO_MMIO(obj);
++            VirtioBusState *mmio_virtio_bus = &mmio->bus;
++            BusState *mmio_bus = &mmio_virtio_bus->parent_obj;
++
++            if (QTAILQ_EMPTY(&mmio_bus->children)) {
++                continue;
++            }
++            separator = g_strrstr(mmio_bus->name, ".");
++            if (!separator) {
++                continue;
++            }
++            if (qemu_strtol(separator + 1, NULL, 10, &index) != 0) {
++                continue;
++            }
++
++            uint32_t irq = mms->virtio_irq_base + index;
++            hwaddr base = VIRTIO_MMIO_BASE + index * 512;
++            hwaddr size = 512;
++
++            Aml *dev = aml_device("VR%02u", (unsigned)index);
++            aml_append(dev, aml_name_decl("_HID", aml_string("LNRO0005")));
++            aml_append(dev, aml_name_decl("_UID", aml_int(index)));
++            aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
++
++            Aml *crs = aml_resource_template();
++            aml_append(crs, aml_memory32_fixed(base, size, AML_READ_WRITE));
++            aml_append(crs,
++                       aml_interrupt(AML_CONSUMER, AML_LEVEL, AML_ACTIVE_HIGH,
++                                     AML_EXCLUSIVE, &irq, 1));
++            aml_append(dev, aml_name_decl("_CRS", crs));
++            aml_append(scope, dev);
++        }
++    }
++}
++
+ static void
+ build_dsdt_microvm(GArray *table_data, BIOSLinker *linker,
+                    MicrovmMachineState *mms)
+@@ -60,6 +111,7 @@ build_dsdt_microvm(GArray *table_data, BIOSLinker *linker,
+     build_ged_aml(sb_scope, GED_DEVICE, HOTPLUG_HANDLER(mms->acpi_dev),
+                   GED_MMIO_IRQ, AML_SYSTEM_MEMORY, GED_MMIO_BASE);
+     acpi_dsdt_add_power_button(sb_scope);
++    acpi_dsdt_add_virtio(sb_scope, mms);
+     aml_append(dsdt, sb_scope);
  
-     g_test_init(&argc, &argv, NULL);
+     /* ACPI 5.0: Table 7-209 System State Package */
 -- 
-2.28.0.windows.1
+2.27.0
 
 
