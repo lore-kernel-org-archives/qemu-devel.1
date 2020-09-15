@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04F95C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 06:15:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A150CC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 06:18:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8933B206B2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 06:15:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B3C3720732
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 06:18:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QdDzsBxW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8933B206B2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HtZghfhM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3C3720732
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kI4FL-0005M1-Le
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 02:15:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51326)
+	id 1kI4I0-0006SM-Lx
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 02:18:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52084)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kI4Eb-0004uy-62
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 02:14:33 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50387
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kI4H7-000607-Ud
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 02:17:09 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52526
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kI4EZ-0003mM-H6
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 02:14:32 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kI4H3-0004MP-5c
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 02:17:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600150470;
+ s=mimecast20190719; t=1600150624;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=XzH06oxUxO/xc1h4ZZpQYTzN39TDe8o6dWOtunp6qbY=;
- b=QdDzsBxWTFnBP9NQVmEJ8ZM507DK9hBGHYlcwmdTwcRGq4BHwzXwVAYIt7E1flgssK/yvD
- DJw/NIOntIk2nz96GQHHze3c4GupvyK+mnLtVENAHnZIsbRB+MjGs4UYK70sVWAqU7QmZf
- mkQeXzP185acVv7sA0wfBvufhjbCoPk=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-311-squVBAffMrqrzVqeuJuO0w-1; Tue, 15 Sep 2020 02:14:28 -0400
-X-MC-Unique: squVBAffMrqrzVqeuJuO0w-1
-Received: by mail-wr1-f71.google.com with SMTP id a10so777877wrw.22
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 23:14:28 -0700 (PDT)
+ bh=C0UQmO+27YOKqBXPt++CUZUgQwVTyyou4t1I2CBH484=;
+ b=HtZghfhMFCKPxBRYEx+3lCU5QolZIZlkgku8nSCgqkCun6NXJ3iqN4Cr4nnNUIGAkZClJK
+ BJNHrcMqmKNMPhB4Rr9eiOK6ikwMiiqI/vj9p0JFGwMyy8ZgwhhsJkFgcr4Zey6u6RBh0s
+ eOHcmRrDUqvKQeYl2uEvLfXh9jKwsts=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-223-TJvbqh4CNB2YGcnZHzwhDQ-1; Tue, 15 Sep 2020 02:17:02 -0400
+X-MC-Unique: TJvbqh4CNB2YGcnZHzwhDQ-1
+Received: by mail-wm1-f70.google.com with SMTP id b20so1732784wmj.1
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 23:17:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=XzH06oxUxO/xc1h4ZZpQYTzN39TDe8o6dWOtunp6qbY=;
- b=Kf2j+EaqLPSfOhKnbpUrqIAeJILAU4eWUQGobe1XnjGv4KJlB45WzGL6mvDqLjVrP2
- e8QdN1LwsTmdrqgWJ873cUthfXQlmlLwyLOMCUuHI3V2nUNPBYMH2ZxXNSYhnb6pHJvp
- Yfau06nWj2xsDb1pOfSPHv3dnc08NwwTYWOINXsdzi/yQw3wDPM8l4+oPYXq7hpbl6WU
- NcZ+zQUVOKd3S8OJH0Ry2smK3JZMm9KgBOdokaYx1l13nepZpZWI5TQWSe4ae7P2shvF
- 8vGPTELDvBwsydIGE10mOA1ARAh2LjbdoQ2g4HsjddkUARH7N2uV1G/3g1gA+CL3CIn1
- yC+Q==
-X-Gm-Message-State: AOAM5302Jgn1sW0c3ugnjhFyR2QH9PhqLHAp7vtm5Rds7gPqYLFUO7Pt
- 29IPkW5f+CwOY1h2nahXEPt3aAgzDUqIzCEnvjY0vUYIDCUQ9RlYcQPzxaB9qjpocbUGMIerI+V
- DolyKTJopyDmaVQY=
-X-Received: by 2002:a05:600c:2182:: with SMTP id
- e2mr2963749wme.102.1600150467437; 
- Mon, 14 Sep 2020 23:14:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx3/wP284OMPNCEmfKXTLz1EpacbQU7XqkLqWCtApExhXa4Ot1P7TKenr5Zi887J0VKX4PK+A==
-X-Received: by 2002:a05:600c:2182:: with SMTP id
- e2mr2963728wme.102.1600150467216; 
- Mon, 14 Sep 2020 23:14:27 -0700 (PDT)
+ bh=C0UQmO+27YOKqBXPt++CUZUgQwVTyyou4t1I2CBH484=;
+ b=beHyG5UssBnE0v6r1Ennk3z88uXcSpclbsM8+CzW86ZLyaKBSyv5fZ1aq00g0G1xOl
+ um7aNz97viUEnYkofuw53oFs+2GuOFBCpYweQLVV03FcD03dBo9eFylczjmFCgyeChtk
+ LRUngurLZLrTsC5htu3q1ir2UUxDHnjREoy/8N39IOV95rXsnkdfjxVb5KtA8Uq6FAd7
+ fvLjBd3+x5sLtVyWqFuPC8dOyIYJA4NWUPAFB/BxYOm/3+urfpnp65w43Ko2Ed5BsN4Y
+ ozqlioFcF3CAojQY4a4ENqo987NkkLof1WwRQieKZgLBM2mN0NWylRYpszUEkgxxuW7M
+ A09w==
+X-Gm-Message-State: AOAM532PjbT9WH2Ra4ppg5rJ9/PjmBlECYDSAHcl1cLZSNAu7olxa+p9
+ OUhQLNEsPX6RDbZOlCLuEgm8fcGr+EwpdA3LcwdKrxEVErcllO/XlmJShJWNM4dUZH2bofO/pwW
+ qkJc7k5WSQWyfV08=
+X-Received: by 2002:a1c:4c05:: with SMTP id z5mr2717923wmf.47.1600150621547;
+ Mon, 14 Sep 2020 23:17:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzeV9nYUb37iRYHMcbVKeb4xceCKX9ufBLQihnWlvokIVsAvjlgb0V9Qv7eG5B4wnWiCzdh2Q==
+X-Received: by 2002:a1c:4c05:: with SMTP id z5mr2717896wmf.47.1600150621376;
+ Mon, 14 Sep 2020 23:17:01 -0700 (PDT)
 Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id y2sm22134191wmg.23.2020.09.14.23.14.25
+ by smtp.gmail.com with ESMTPSA id s12sm15680272wmd.20.2020.09.14.23.17.00
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 14 Sep 2020 23:14:26 -0700 (PDT)
-Subject: Re: [PATCH v2 1/3] vfio: Find DMA available capability
+ Mon, 14 Sep 2020 23:17:00 -0700 (PDT)
+Subject: Re: [PATCH v2 3/3] vfio: Create shared routine for scanning info
+ capabilities
 To: Matthew Rosato <mjrosato@linux.ibm.com>, alex.williamson@redhat.com,
  cohuck@redhat.com
 References: <1600122570-12941-1-git-send-email-mjrosato@linux.ibm.com>
- <1600122570-12941-2-git-send-email-mjrosato@linux.ibm.com>
+ <1600122570-12941-4-git-send-email-mjrosato@linux.ibm.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -105,12 +104,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <fbd1df4e-8d51-87c8-2b07-5b65666342d0@redhat.com>
-Date: Tue, 15 Sep 2020 08:14:24 +0200
+Message-ID: <942e216a-f431-9eb2-c20b-e3733615601e@redhat.com>
+Date: Tue, 15 Sep 2020 08:16:59 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <1600122570-12941-2-git-send-email-mjrosato@linux.ibm.com>
+In-Reply-To: <1600122570-12941-4-git-send-email-mjrosato@linux.ibm.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0.002
@@ -128,7 +127,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -148,85 +147,79 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Matthew,
-
 On 9/15/20 12:29 AM, Matthew Rosato wrote:
-> The underlying host may be limiting the number of outstanding DMA
-> requests for type 1 IOMMU.  Add helper functions to check for the
-> DMA available capability and retrieve the current number of DMA
-> mappings allowed.
+> Rather than duplicating the same loop in multiple locations,
+> create a static function to do the work.
+
+Why not do that first in your series?
+
 > 
 > Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 > ---
->  hw/vfio/common.c              | 37 +++++++++++++++++++++++++++++++++++++
->  include/hw/vfio/vfio-common.h |  2 ++
->  2 files changed, 39 insertions(+)
+>  hw/vfio/common.c | 33 +++++++++++++++------------------
+>  1 file changed, 15 insertions(+), 18 deletions(-)
 > 
 > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 3335714..7f4a338 100644
+> index 7f4a338..bfbbfe4 100644
 > --- a/hw/vfio/common.c
 > +++ b/hw/vfio/common.c
-> @@ -844,6 +844,43 @@ vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id)
+> @@ -825,17 +825,12 @@ static void vfio_listener_release(VFIOContainer *container)
+>      }
+>  }
+>  
+> -struct vfio_info_cap_header *
+> -vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id)
+> +static struct vfio_info_cap_header *
+> +vfio_get_cap(void *ptr, uint32_t cap_offset, uint16_t id)
+>  {
+>      struct vfio_info_cap_header *hdr;
+> -    void *ptr = info;
+> -
+> -    if (!(info->flags & VFIO_REGION_INFO_FLAG_CAPS)) {
+> -        return NULL;
+> -    }
+>  
+> -    for (hdr = ptr + info->cap_offset; hdr != ptr; hdr = ptr + hdr->next) {
+> +    for (hdr = ptr + cap_offset; hdr != ptr; hdr = ptr + hdr->next) {
+>          if (hdr->id == id) {
+>              return hdr;
+>          }
+> @@ -844,23 +839,25 @@ vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id)
 >      return NULL;
 >  }
 >  
-> +static struct vfio_info_cap_header *
-> +vfio_get_iommu_type1_info_cap(struct vfio_iommu_type1_info *info, uint16_t id)
-> +{
-> +    struct vfio_info_cap_header *hdr;
-> +    void *ptr = info;
 > +
-> +    if (!(info->flags & VFIO_IOMMU_INFO_CAPS)) {
+> +struct vfio_info_cap_header *
+> +vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id)
+> +{
+> +    if (!(info->flags & VFIO_REGION_INFO_FLAG_CAPS)) {
 > +        return NULL;
 > +    }
 > +
-> +    for (hdr = ptr + info->cap_offset; hdr != ptr; hdr = ptr + hdr->next) {
-> +        if (hdr->id == id) {
-> +            return hdr;
-> +        }
-> +    }
-> +
-> +    return NULL;
+> +    return vfio_get_cap((void *)info, info->cap_offset, id);
 > +}
 > +
-> +bool vfio_get_info_dma_avail(struct vfio_iommu_type1_info *info,
-> +                             unsigned int *avail)
-> +{
-> +    struct vfio_info_cap_header *hdr;
-> +    struct vfio_iommu_type1_info_dma_avail *cap;
-> +
-> +    /* If the capability cannot be found, assume no DMA limiting */
-> +    hdr = vfio_get_iommu_type1_info_cap(info,
-> +                                        VFIO_IOMMU_TYPE1_INFO_DMA_AVAIL);
-> +    if (hdr == NULL || avail == NULL) {
-
-If you expect the caller to use avail=NULL, then why
-return false when there is available information?
-
-> +        return false;
-> +    }
-> +
-> +    cap = (void *) hdr;
-> +    *avail = cap->avail;
-> +    return true;
-> +}
-> +
->  static int vfio_setup_region_sparse_mmaps(VFIORegion *region,
->                                            struct vfio_region_info *info)
+>  static struct vfio_info_cap_header *
+>  vfio_get_iommu_type1_info_cap(struct vfio_iommu_type1_info *info, uint16_t id)
 >  {
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index c78f3ff..661a380 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -178,6 +178,8 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp);
->  void vfio_put_group(VFIOGroup *group);
->  int vfio_get_device(VFIOGroup *group, const char *name,
->                      VFIODevice *vbasedev, Error **errp);
-> +bool vfio_get_info_dma_avail(struct vfio_iommu_type1_info *info,
-> +                             unsigned int *avail);
+> -    struct vfio_info_cap_header *hdr;
+> -    void *ptr = info;
+> -
+>      if (!(info->flags & VFIO_IOMMU_INFO_CAPS)) {
+>          return NULL;
+>      }
 >  
->  extern const MemoryRegionOps vfio_region_ops;
->  typedef QLIST_HEAD(VFIOGroupList, VFIOGroup) VFIOGroupList;
+> -    for (hdr = ptr + info->cap_offset; hdr != ptr; hdr = ptr + hdr->next) {
+> -        if (hdr->id == id) {
+> -            return hdr;
+> -        }
+> -    }
+> -
+> -    return NULL;
+> +    return vfio_get_cap((void *)info, info->cap_offset, id);
+>  }
+>  
+>  bool vfio_get_info_dma_avail(struct vfio_iommu_type1_info *info,
 > 
 
 
