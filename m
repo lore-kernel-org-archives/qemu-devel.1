@@ -2,75 +2,91 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66FCBC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 09:36:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80AECC43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 09:37:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A04002080C
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 09:36:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A04002080C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id B59112080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 09:37:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZpQlacNA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B59112080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kI7NZ-0001SB-Ih
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 05:36:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38034)
+	id 1kI7P8-0002Ml-TV
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 05:37:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38076)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kI7Mg-0000g6-9o; Tue, 15 Sep 2020 05:35:06 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:48929)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kI7Ma-0003vR-6M; Tue, 15 Sep 2020 05:35:06 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.16.95])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 39FD55B3DEFC;
- Tue, 15 Sep 2020 11:34:44 +0200 (CEST)
-Received: from kaod.org (37.59.142.99) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Tue, 15 Sep
- 2020 11:34:43 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-99G00358657f03-8271-44a3-b3dd-269ad6536162,
- DB33878D1665C97D8818E18A24225F630DB8C599) smtp.auth=groug@kaod.org
-Date: Tue, 15 Sep 2020 11:34:42 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH 02/15] ppc: Add a return value to ppc_set_compat() and
- ppc_set_compat_all()
-Message-ID: <20200915113442.16640f8e@bahia.lan>
-In-Reply-To: <16946c40-751c-dfa8-a72a-f8575f6eb9a8@virtuozzo.com>
-References: <20200914123505.612812-1-groug@kaod.org>
- <20200914123505.612812-3-groug@kaod.org>
- <16946c40-751c-dfa8-a72a-f8575f6eb9a8@virtuozzo.com>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kI7Mn-0000ml-9e
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 05:35:13 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50763
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kI7Ml-0003wv-6D
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 05:35:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600162509;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bHsJZItKMAbKIDTNwQ5YORNCSCxCsxabdzrqsFe5Zi8=;
+ b=ZpQlacNAC4BKMkevMA4dLltbWdR85Nb9goFiyoaSxxTTwkiQovubwKjpfW/i83/fBAHRkW
+ FYOjp4A9Wj+tthBE4Pp6SWsbkwADTSYLW1jljQaPl897EyEmvc2ZZPwarBU9smb5Qk7dzv
+ SCCO4RTI/va+RfJgK6B3DjPtcKyBcU4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-127-5QtdpOHvMgK1DxHbo4XouQ-1; Tue, 15 Sep 2020 05:35:01 -0400
+X-MC-Unique: 5QtdpOHvMgK1DxHbo4XouQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 283BA100746A
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 09:35:00 +0000 (UTC)
+Received: from redhat.com (ovpn-113-234.ams2.redhat.com [10.36.113.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3D9ED1002D5E;
+ Tue, 15 Sep 2020 09:34:58 +0000 (UTC)
+Date: Tue, 15 Sep 2020 10:34:55 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v2] tests/qtest/qmp-cmd-test: Use inclusive language
+Message-ID: <20200915093455.GC1502912@redhat.com>
+References: <20200914163755.42618-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.99]
-X-ClientProxiedBy: DAG5EX2.mxp5.local (172.16.2.42) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: cd9d54a1-4c40-418a-b6fd-2f9b24e97e33
-X-Ovh-Tracer-Id: 9994613474042026403
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudeikedgudekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefuddtieejjeevheekieeltefgleetkeetheettdeifeffvefhffelffdtfeeljeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleelnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegurghvihgusehgihgsshhonhdrughrohhpsggvrghrrdhiugdrrghu
-Received-SPF: pass client-ip=178.32.125.2; envelope-from=groug@kaod.org;
- helo=smtpout1.mo529.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 05:34:57
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200914163755.42618-1-thuth@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 05:35:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -38
+X-Spam_score: -3.9
+X-Spam_bar: ---
+X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,43 +99,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ philmd@redhat.com, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 15 Sep 2020 12:18:35 +0300
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
-
-> 14.09.2020 15:34, Greg Kurz wrote:
-> > As recommended in "qapi/error.h", indicate success / failure with a
-> > return value. Since ppc_set_compat() is called from a VMState handler,
+On Mon, Sep 14, 2020 at 06:37:55PM +0200, Thomas Huth wrote:
+> We simply want to ignore certain queries here, so let's rather
+> use the term 'ignore' to express this intention.
 > 
-> What handler do you mean? You don't update any handlers here..
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  v2: Changed naming according to suggestions
 > 
+>  tests/qtest/qmp-cmd-test.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 
-One of the callers of ppc_set_compat() is
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
-static int cpu_post_load(void *opaque, int version_id)
-{
 
-}
-
-in target/ppc/machine.c, which gets fixed in patch 3. I mention this to
-justify the choice of an int rather than a bool.
-
-> > let's make it an int so that it propagates any negative errno returned
-> > by kvmppc_set_compat(). Do the same for ppc_set_compat_all() for
-> > consistency, even if it isn't called in a context where a negative errno
-> > is required on failure.
-> > 
-> > This will allow to simplify error handling in the callers.
-> > 
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> 
-> patch is OK:
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> 
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
