@@ -2,88 +2,131 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9D0AC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 06:23:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8FB9C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 06:24:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 427DD20732
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 06:23:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 636FF20732
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 06:24:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bwu7tX1I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 427DD20732
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gLjJNUXK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 636FF20732
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kI4NV-0002Gv-Bu
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 02:23:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53870)
+	id 1kI4O4-00039N-JN
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 02:24:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54102)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kI4ML-0001Qs-Hc
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 02:22:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24249)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kI4N8-0002Ei-8L
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 02:23:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21741)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kI4MI-00058c-4D
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 02:22:33 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kI4N6-0005D0-FW
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 02:23:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600150949;
+ s=mimecast20190719; t=1600150999;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=oWYytSFkAqGBw/VKRgaezBMDskRo4K9F7L+KmUFUusY=;
- b=Bwu7tX1IDs/Rq3vS1UZ+8D+k6yTNCV9sPDbCvQgmd/KfKgr4V2S4+LpDVAgLGJh6QXCqP3
- SFItLA6JIlEHXPXhV6vG7oKLojcWCOvwBPcMHyMKmdjoAD5QbH8/ST0JjEbpy35HhM6j8X
- t3w7f2U7g4iPqpwsOicDgrmsmVtAuU4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-377-4dogMC6ZOc64xal3SxyLoQ-1; Tue, 15 Sep 2020 02:22:25 -0400
-X-MC-Unique: 4dogMC6ZOc64xal3SxyLoQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 063FF801AC2;
- Tue, 15 Sep 2020 06:22:24 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.136])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3E3F97E731;
- Tue, 15 Sep 2020 06:22:22 +0000 (UTC)
-Date: Tue, 15 Sep 2020 08:22:19 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Haibo Xu <haibo.xu@linaro.org>
-Subject: Re: [PATCH v3 07/12] hw/arm/virt: Move post cpu realize check into
- its own function
-Message-ID: <20200915062219.dtnl6p3nan76xvv7@kamzik.brq.redhat.com>
-References: <cover.1600135462.git.haibo.xu@linaro.org>
- <20eedb95441ecec7b23527cde78aa5b63c67b400.1600135462.git.haibo.xu@linaro.org>
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=LGe8y7UV6NAxK0qYvu1cj4SZLFXWkX8Rd7oj3zj+qTw=;
+ b=gLjJNUXKwfTPNxLSdOO7QlmV3VAwmpBVKcl8DR14SVOHYVRRqGW/KwWm/D2BuyrCQhHUq0
+ /8GUcdxjQ9uRYtKV1UPfgD5NIJTL98H9DAcP3CizluQ3m4mke38aZxBBmxNTxbPoarRw3k
+ 1I9CMVlLH0j5BCjIVyTJQS2iZVLO6nM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-474-1VECNi3iPMOOM42GU0logQ-1; Tue, 15 Sep 2020 02:23:12 -0400
+X-MC-Unique: 1VECNi3iPMOOM42GU0logQ-1
+Received: by mail-wr1-f69.google.com with SMTP id k13so815834wrl.4
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 23:23:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=LGe8y7UV6NAxK0qYvu1cj4SZLFXWkX8Rd7oj3zj+qTw=;
+ b=SepWd0eFZYbO18pWOTRLTxEFLzhekt8+PfoEKXqfr7unl2gu3qC5hW4aRIuCVInmQ9
+ nDXoRpKr7R8G9m5gvFZyswhHCmfLPk5/r7aDAeBAPSnMzpv6RWcHSvYS5YdIMD450pCB
+ OCo8fv/75xzbqWOCND0v9+ygMbAWGbp7WrTT6oOsce8tUKzTErywTBhbLhSn8FGNVkNo
+ d+iqVUL/2iS7TWxQmXg2TYqscYRMiKGPBm2uJgKHitk6uka7BbHBdqklXomraX3pvFFR
+ QN6xjidWDInlZxFihR3Ba4alYvwkOgHFrrMcFrQPhq77wRiH8x/4uBxqDIQhyQIcreXo
+ 3wxw==
+X-Gm-Message-State: AOAM530bqKk5kihSg88CFPTnaYcahH1vML7cwO/Mmnx/+u+QwXs70QLY
+ 9N7LB1E9epZdTsNq8IYgC/jP2PQLAX/ZCjmYph50LTuVnevQ7/U4EWmQ8w3OFGZOnWUr+JIfkk1
+ rHJbZcS6BPxTP2wU=
+X-Received: by 2002:a1c:5641:: with SMTP id k62mr3079723wmb.13.1600150990952; 
+ Mon, 14 Sep 2020 23:23:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwsiU7afYJKVDIjcFv/1cC1WAKZxnXAmIVLLDvbeOvFZdrY3P36nhCxzcGrtqIezuO/FTe3Wg==
+X-Received: by 2002:a1c:5641:: with SMTP id k62mr3079702wmb.13.1600150990756; 
+ Mon, 14 Sep 2020 23:23:10 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id 18sm20922929wmj.28.2020.09.14.23.23.09
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 14 Sep 2020 23:23:10 -0700 (PDT)
+Subject: Re: [PATCH 3/3] gitmodules: add qemu.org vbootrom submodule
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+References: <20200909101642.17698-1-stefanha@redhat.com>
+ <20200909101642.17698-4-stefanha@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <03f18324-882c-d65d-b32d-b4610287ed1a@redhat.com>
+Date: Tue, 15 Sep 2020 08:23:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20eedb95441ecec7b23527cde78aa5b63c67b400.1600135462.git.haibo.xu@linaro.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200909101642.17698-4-stefanha@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0.003
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=drjones@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:10:32
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:23:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -38
 X-Spam_score: -3.9
 X-Spam_bar: ---
 X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,96 +139,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, philmd@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Havard Skinnemoen <hskinnemoen@google.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 15, 2020 at 03:11:43AM +0000, Haibo Xu wrote:
-> From: Andrew Jones <drjones@redhat.com>
+On 9/9/20 12:16 PM, Stefan Hajnoczi wrote:
+> The vbootrom module is needed for the new NPCM7xx ARM SoCs. The
+> vbootrom.git repo is now mirrored on qemu.org. QEMU mirrors third-party
+> code to ensure that users can always build QEMU even if the dependency
+> goes offline and so QEMU meets its responsibilities to provide full
+> source code under software licenses.
 > 
-> We'll add more to this new function in coming patches so we also
-> state the gic must be created and call it below create_gic().
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Havard Skinnemoen <hskinnemoen@google.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 > ---
->  hw/arm/virt.c | 38 ++++++++++++++++++++++----------------
->  1 file changed, 22 insertions(+), 16 deletions(-)
-
-This still isn't the right version of this patch. You need
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg727591.html
-
+> This patch can be rebased on top of "[PATCH v8 00/14] Add Nuvoton
+> NPCM730/NPCM750 SoCs and two BMC machines" and replaces the git URL in
+> the original patch.
+> ---
+>  .gitmodules | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 3f6d26c531..2ffcb073af 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1672,6 +1672,26 @@ static void finalize_gic_version(VirtMachineState *vms)
->      }
->  }
->  
-> +static void virt_cpu_post_init(VirtMachineState *vms)
-> +{
-> +    bool aarch64;
-> +
-> +    aarch64 = object_property_get_bool(OBJECT(first_cpu), "aarch64", NULL);
-> +
-> +    if (!kvm_enabled()) {
-> +        if (aarch64 && vms->highmem) {
-> +            int requested_pa_size = 64 - clz64(vms->highest_gpa);
-> +            int pamax = arm_pamax(ARM_CPU(first_cpu));
-> +
-> +            if (pamax < requested_pa_size) {
-> +                error_report("VCPU supports less PA bits (%d) than requested "
-> +                            "by the memory map (%d)", pamax, requested_pa_size);
-> +                exit(1);
-> +            }
-> +        }
-> +     }
-> +}
-> +
->  static void machvirt_init(MachineState *machine)
->  {
->      VirtMachineState *vms = VIRT_MACHINE(machine);
-> @@ -1890,22 +1910,6 @@ static void machvirt_init(MachineState *machine)
->      fdt_add_timer_nodes(vms);
->      fdt_add_cpu_nodes(vms);
->  
-> -   if (!kvm_enabled()) {
-> -        ARMCPU *cpu = ARM_CPU(first_cpu);
-> -        bool aarch64 = object_property_get_bool(OBJECT(cpu), "aarch64", NULL);
-> -
-> -        if (aarch64 && vms->highmem) {
-> -            int requested_pa_size, pamax = arm_pamax(cpu);
-> -
-> -            requested_pa_size = 64 - clz64(vms->highest_gpa);
-> -            if (pamax < requested_pa_size) {
-> -                error_report("VCPU supports less PA bits (%d) than requested "
-> -                            "by the memory map (%d)", pamax, requested_pa_size);
-> -                exit(1);
-> -            }
-> -        }
-> -    }
-> -
->      memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base,
->                                  machine->ram);
->      if (machine->device_memory) {
-> @@ -1917,6 +1921,8 @@ static void machvirt_init(MachineState *machine)
->  
->      create_gic(vms);
->  
-> +    virt_cpu_post_init(vms);
-> +
->      fdt_add_pmu_nodes(vms);
->  
->      create_uart(vms, VIRT_UART, sysmem, serial_hd(0));
-> -- 
-> 2.17.1
-> 
+> diff --git a/.gitmodules b/.gitmodules
+> index b8f8a143bf..5feabf64c2 100644
+> --- a/.gitmodules
+> +++ b/.gitmodules
+> @@ -61,3 +61,6 @@
+>  [submodule "meson"]
+>  	path = meson
+>  	url = https://git.qemu.org/git/meson.git
+> +[submodule "roms/vbootrom"]
+> +       path = roms/vbootrom
+> +       url = https://git.qemu.org/git/vbootrom.git
 > 
 
 
