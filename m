@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64AADC2BBD1
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 03:16:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9174C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 03:16:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F13EF208DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 03:16:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A3A2208DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 03:16:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r/eqxy6q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F13EF208DB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RHf8GeW8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A3A2208DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kI1Rz-0006Ih-3K
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 23:16:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48080)
+	id 1kI1SY-0007Ka-DH
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 23:16:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48294)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <haibo.xu@linaro.org>)
- id 1kI1O9-0000J4-Ol
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 23:12:13 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:37705)
+ id 1kI1OK-0000lr-Cl
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 23:12:24 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:54641)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <haibo.xu@linaro.org>)
- id 1kI1O7-0001iC-NY
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 23:12:13 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id kk9so1006958pjb.2
- for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 20:12:11 -0700 (PDT)
+ id 1kI1OH-0001mG-6c
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 23:12:23 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id mm21so1025400pjb.4
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 20:12:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=oRDNCGgDBV3Hs+I8rUYyH4/axR+nkyINEYfVA07Svm8=;
- b=r/eqxy6qNaDEoTjVfM6kNl/hY0aJpJrlyf1Oz3HZ4edMewD3MeeOniccB1j/AFr2Jh
- tEXsXevlGxa9TezG/q61uthkpCtsy48vvx4kUEoJRlFh6uCyT13O7llV1NobBI1frDPR
- VeCXMqNJx1y5xmkogrn3PIRXOIV10RYOPcAKwZOUu6eAK+HPPVNrpy8nlae9uLA+Im6L
- 1Zd/TDp8Yb22vn821HqZpR4doJj+JhH/0TBkb6UxW2A3vvpBlOvMOsVi3uSpeE8ng2DO
- 6+V32BJcGcMuMBq0v+YlKJGcSK9WGHqoClLpE+0E1T5sLStehreaoyNI8O6q0MptfkvK
- Pl+g==
+ bh=lp4BszfnJ+gdPupxEQ8UJGzcoaSEVDtxDHyalqIp0D8=;
+ b=RHf8GeW8AEcF92GFgKkUWgx5WG3YJ2UpWvclfMwROGJbx17e+BzUqG3qEM7wckkhEt
+ F1MEDsYjynMHnEEQJSOhUx1miUDypfSQbXEJaOZ7xrwcePJ4O4cuMKaRaKOGq5WKzOIs
+ 6y/wbF83g9cbpumm7OPRfniYgNdkiuyPJD9CXcZ5UCHfNdf2LhEPD9uWiCEEBLsyePkM
+ wEO5vYqPdAyO2e6U1N1VJdSkV4KF/bg2wz6d77WiW40q+wTaqphxosr6jbViJMb/9LmP
+ 11btLz78Et1s2MjI3B/T9TOoyvSbRKHSqjs2YCP6z5vMxImfdyMuK3CDwCB4HlP8LKnA
+ uF4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=oRDNCGgDBV3Hs+I8rUYyH4/axR+nkyINEYfVA07Svm8=;
- b=rNOlvq2ONmFFj9+8gYPU7isZo5nOrWLG2NhplcApbCoi9lioYAmRAhwdGoxGre7Olh
- z/uLzO+84ibH/SZDItz1FBh/mwasq8CStGeMFTgbOlNdKRPHBhYG2sXMYnSr8/qVIVZg
- pfuAPaBcRFB9PtDI7pLJpRQYUM8Tc4kuT+FyhVvX1qtzQBPM48qPPZE7xrvQEyJGAryG
- Y+CCawBF4VbYaWkMGjZiyQlNJOEwlN11qk4n7Nqqb/Me/H5OPA2Spojtj7v6VZ1zAi5c
- j8UBdiRRJqGcGHcyFBnJLZNPXBcd7gih0XaMiUBBp/pajEVwjBDWHwMpfnxx++5ShzhG
- djsw==
-X-Gm-Message-State: AOAM530Wls5SXunRkApecDeyHmOWBIIDbqUlA0S8Hl22CxKL+MFz0gr7
- fvn7IbjXPnhnJCdS0ADQ/yc2
-X-Google-Smtp-Source: ABdhPJxuEOCDRg0UG8MIYLPcNqws56UZZMTltBtxlLvuX9ljERXxRgDe6aqDErDytSVZ8Q/gX99ktw==
-X-Received: by 2002:a17:90a:4005:: with SMTP id u5mr2126190pjc.7.1600139530286; 
- Mon, 14 Sep 2020 20:12:10 -0700 (PDT)
+ bh=lp4BszfnJ+gdPupxEQ8UJGzcoaSEVDtxDHyalqIp0D8=;
+ b=F6t4RZ41o+FIaiftFzT06w9m1ecx73gqjkvqr21cTYcvCmz9zzjNLfnVEKs7+lfaRt
+ 2kOb0SxiAF+4fSVgdELlwUlE5pUonyVCphKtg/lrfRMrtX3Wmi3qz087lFp8hseWRPCB
+ JNkdRgBDGk/xx1CAl+b7Urol0CCzIXG9tNkk6m7ktj+3alI26XzruXCeGKlPB47g0JDW
+ 6wHVV5M7hB1VoDcHp8BWhPdQUT6jigFFyE6OqmUDX4TaulJgnGlPaAJPWPfL3djclRxR
+ lEGS1o31L+25xAz2wvSTgH6NH06bYcIk6ClBcgDZZe4wwD/nBeidrDG6XzzFPMlMgCVA
+ lV7A==
+X-Gm-Message-State: AOAM532gJQVVB8O0AMDKcnEy/NCP87IfphcgMB79WJHqOslhTBUPwnrP
+ 54uFgX2jckcBpS8w7gpPxXRZ
+X-Google-Smtp-Source: ABdhPJyD7Hnd+o0WdBhdPGftjYArmea1o5YPWFDqXsjLxZsFfMjuBLsbaBZLnsqbBOLPt8rq5UVgYg==
+X-Received: by 2002:a17:902:c407:: with SMTP id
+ k7mr17105381plk.95.1600139539771; 
+ Mon, 14 Sep 2020 20:12:19 -0700 (PDT)
 Received: from localhost.localdomain ([147.75.106.138])
- by smtp.gmail.com with ESMTPSA id g23sm11551776pfh.133.2020.09.14.20.12.09
+ by smtp.gmail.com with ESMTPSA id g23sm11551776pfh.133.2020.09.14.20.12.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Sep 2020 20:12:09 -0700 (PDT)
+ Mon, 14 Sep 2020 20:12:19 -0700 (PDT)
 From: Haibo Xu <haibo.xu@linaro.org>
 To: drjones@redhat.com,
 	richard.henderson@linaro.org
-Subject: [PATCH v3 05/12] target/arm/kvm: spe: Unify device attr operation
- helper
-Date: Tue, 15 Sep 2020 03:11:41 +0000
-Message-Id: <ed8d8d525139ac67569293d089e5508e37811b1c.1600135462.git.haibo.xu@linaro.org>
+Subject: [PATCH v3 12/12] target/arm: spe: Add corresponding test.
+Date: Tue, 15 Sep 2020 03:11:48 +0000
+Message-Id: <53adf9e25750962eca7dd09f924c97bb17c1214a.1600135462.git.haibo.xu@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1600135462.git.haibo.xu@linaro.org>
 References: <cover.1600135462.git.haibo.xu@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=haibo.xu@linaro.org; helo=mail-pj1-x1044.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
+ envelope-from=haibo.xu@linaro.org; helo=mail-pj1-x1041.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,63 +107,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Andrew Jones <drjones@redhat.com>
-
-Rename kvm_arm_pmu_set_attr() to kvm_arm_set_device_attr(),
-So both the vPMU and vSPE device can share the same API.
-
-Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Haibo Xu <haibo.xu@linaro.org>
 ---
- target/arm/kvm64.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ target/arm/monitor.c           | 2 +-
+ tests/qtest/arm-cpu-features.c | 9 +++++++++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index ef1e960285..8ffd31ffdf 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -397,19 +397,20 @@ static CPUWatchpoint *find_hw_watchpoint(CPUState *cpu, target_ulong addr)
-     return NULL;
- }
+diff --git a/target/arm/monitor.c b/target/arm/monitor.c
+index ba6e01abd0..1b8f08988a 100644
+--- a/target/arm/monitor.c
++++ b/target/arm/monitor.c
+@@ -99,7 +99,7 @@ QEMU_BUILD_BUG_ON(ARM_MAX_VQ > 16);
+  * then the order that considers those dependencies must be used.
+  */
+ static const char *cpu_model_advertised_features[] = {
+-    "aarch64", "pmu", "sve",
++    "aarch64", "pmu", "spe", "sve",
+     "sve128", "sve256", "sve384", "sve512",
+     "sve640", "sve768", "sve896", "sve1024", "sve1152", "sve1280",
+     "sve1408", "sve1536", "sve1664", "sve1792", "sve1920", "sve2048",
+diff --git a/tests/qtest/arm-cpu-features.c b/tests/qtest/arm-cpu-features.c
+index 77b5e30a9c..4d393fb2e2 100644
+--- a/tests/qtest/arm-cpu-features.c
++++ b/tests/qtest/arm-cpu-features.c
+@@ -494,6 +494,7 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
  
--static bool kvm_arm_pmu_set_attr(CPUState *cs, struct kvm_device_attr *attr)
-+static bool kvm_arm_set_device_attr(CPUState *cs, struct kvm_device_attr *attr,
-+                                    const char *name)
- {
-     int err;
+     if (g_str_equal(qtest_get_arch(), "aarch64")) {
+         bool kvm_supports_sve;
++        bool kvm_supports_spe;
+         char max_name[8], name[8];
+         uint32_t max_vq, vq;
+         uint64_t vls;
+@@ -512,8 +513,10 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+             "with KVM on this host", NULL);
  
-     err = kvm_vcpu_ioctl(cs, KVM_HAS_DEVICE_ATTR, attr);
-     if (err != 0) {
--        error_report("PMU: KVM_HAS_DEVICE_ATTR: %s", strerror(-err));
-+        error_report("%s: KVM_HAS_DEVICE_ATTR: %s", name, strerror(-err));
-         return false;
+         assert_has_feature(qts, "host", "sve");
++        assert_has_feature(qts, "host", "spe");
+         resp = do_query_no_props(qts, "host");
+         kvm_supports_sve = resp_get_feature(resp, "sve");
++        kvm_supports_spe = resp_get_feature(resp, "spe");
+         vls = resp_get_sve_vls(resp);
+         qobject_unref(resp);
+ 
+@@ -573,10 +576,16 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+         } else {
+             g_assert(vls == 0);
+         }
++
++        if (kvm_supports_spe) {
++                assert_set_feature(qts, "host", "spe", false);
++                assert_set_feature(qts, "host", "spe", true);
++        }
+     } else {
+         assert_has_not_feature(qts, "host", "aarch64");
+         assert_has_not_feature(qts, "host", "pmu");
+         assert_has_not_feature(qts, "host", "sve");
++        assert_has_not_feature(qts, "host", "spe");
      }
  
-     err = kvm_vcpu_ioctl(cs, KVM_SET_DEVICE_ATTR, attr);
-     if (err != 0) {
--        error_report("PMU: KVM_SET_DEVICE_ATTR: %s", strerror(-err));
-+        error_report("%s: KVM_SET_DEVICE_ATTR: %s", name, strerror(-err));
-         return false;
-     }
- 
-@@ -426,7 +427,7 @@ void kvm_arm_pmu_init(CPUState *cs)
-     if (!ARM_CPU(cs)->has_pmu) {
-         return;
-     }
--    if (!kvm_arm_pmu_set_attr(cs, &attr)) {
-+    if (!kvm_arm_set_device_attr(cs, &attr, "PMU")) {
-         error_report("failed to init PMU");
-         abort();
-     }
-@@ -443,7 +444,7 @@ void kvm_arm_pmu_set_irq(CPUState *cs, int irq)
-     if (!ARM_CPU(cs)->has_pmu) {
-         return;
-     }
--    if (!kvm_arm_pmu_set_attr(cs, &attr)) {
-+    if (!kvm_arm_set_device_attr(cs, &attr, "PMU")) {
-         error_report("failed to set irq for PMU");
-         abort();
-     }
+     qtest_quit(qts);
 -- 
 2.17.1
 
