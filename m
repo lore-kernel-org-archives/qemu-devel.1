@@ -2,86 +2,131 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3101C43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:29:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70422C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:30:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E8A221D1B
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:29:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A5C4021D1B
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 13:30:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J1m/rEXs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E8A221D1B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hSB699Ah"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5C4021D1B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIB1M-0004bY-Kt
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 09:29:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36898)
+	id 1kIB2B-0005ln-Ne
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 09:30:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34548)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIAn6-0001yl-PO
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:14:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43848)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIAhX-0002NA-N1
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:08:51 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37689
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIAn0-0008Kg-RC
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:14:36 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIAhV-0007BY-HK
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 09:08:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600175670;
+ s=mimecast20190719; t=1600175328;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Rz9Jm51kj73mosZ557Hsp/tSXRmLFADPr7uj31OObh8=;
- b=J1m/rEXsyXxGJRaAESf0xk5Ah7nTIdzPAIb0aa6NZDMNWb3Fu5roMZJa7lWsESads97ald
- tt+kdvCw57mlojhvEObcB48R+FfCAWBFHoCUYtQqy2W93sMREYioU3IYO2Nw8hUJGoC8qN
- yHp0kmkdutvhKZD2MhNHZXtsaMIjHzo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-574-QQ_SqMvpN0aB9ls7Fbvv4A-1; Tue, 15 Sep 2020 09:14:28 -0400
-X-MC-Unique: QQ_SqMvpN0aB9ls7Fbvv4A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F317C801FCC;
- Tue, 15 Sep 2020 13:14:25 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
- [10.36.112.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 72269702E7;
- Tue, 15 Sep 2020 13:14:20 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 8618531F96; Tue, 15 Sep 2020 15:14:19 +0200 (CEST)
-Date: Tue, 15 Sep 2020 15:14:19 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Subject: Re: [PATCH v5 0/7]  Make hcd-xhci independent of pci hooks
-Message-ID: <20200915131419.zmw26wy5k6hoxom7@sirius.home.kraxel.org>
-References: <1599719469-24062-1-git-send-email-sai.pavan.boddu@xilinx.com>
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=CVshP1UggCEPh2NWm940OOmHtzMtME3l6LQ9B/v/Xgo=;
+ b=hSB699Ah2ce8OcpTH+GHlnGZAcd/ixf0RpPTjnCYpsWXKUmcvJb1f1DhAB3O4LTTRHxsJz
+ s2AC9/Sw6FyUdnS2ygEwdLEYLN1E2MgAlpT6itrKilVzC9U+PmgjdRa0VI/8AJQONMUV2W
+ oXzOVEI7M3Kb9rzAHJoVuKybph97xng=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-220-jdZencXeMoiOzHt6DhiUHw-1; Tue, 15 Sep 2020 09:08:45 -0400
+X-MC-Unique: jdZencXeMoiOzHt6DhiUHw-1
+Received: by mail-wm1-f69.google.com with SMTP id x6so890986wmi.1
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 06:08:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=IeimsORhVLtHWtg1AmisuWNBgDHgUNfD0WHFZkW13MY=;
+ b=Ej5XeL5avohF8orPvbzIX2AUabFb9xOAKjiLOjla2vVd+u2JfpWKSpFZenlvCZ/MQF
+ bLya5kzEI23hM/BwnuTr0/SjuOm0rbQaKHfhUoFY3DxwbeY0WfBjdb/Bu4t7AkFK69Hm
+ mOq3OVxuXwqFvnOpivtV+kd4h++vjETYsyLKsI3BKnqR2bNudeHO60B6zc2fAkan08Ps
+ QlKdLqpJN9bOlzYAtFmmdhtYXMqUxxWXcRxTtjGEB9iRZcl1sKr1bUXH8AJDy0qQzASK
+ yDVVm+WaIDa0q81GGjjVuE9ylRvn5Uj/flXp5I8gBgHypi5yRmaBOMuJcMYy5DiX7CIc
+ awGg==
+X-Gm-Message-State: AOAM533hhmu2e1ksX5kSYjsZrGbnA5f477oEd673ibmVnMyuJpJ3Griw
+ yNoaq+4Na5C0L3pMjMK0NQQEr9yjEhpUVaXL3h8/Jk4OL6bXjYBhj4kCNCYEqpEcmcIbs4p/AZo
+ 5ODiAPEJ9j7u0ZP4=
+X-Received: by 2002:adf:e3cf:: with SMTP id k15mr20172868wrm.291.1600175324549; 
+ Tue, 15 Sep 2020 06:08:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyblZps6afhuJoH3iQvg57E35aq52LBxuOGaH/2jldk1uusqON81p25JHbS391e/RKzJNwaHw==
+X-Received: by 2002:adf:e3cf:: with SMTP id k15mr20172857wrm.291.1600175324402; 
+ Tue, 15 Sep 2020 06:08:44 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id 18sm22870842wmj.28.2020.09.15.06.08.43
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 15 Sep 2020 06:08:43 -0700 (PDT)
+Subject: Re: [PATCH 11/15] spapr: Simplify error handling in
+ spapr_cpu_core_realize()
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+References: <20200914123505.612812-1-groug@kaod.org>
+ <20200914123505.612812-12-groug@kaod.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <f96b768a-e5c5-aa10-16d8-0c6678c0a48f@redhat.com>
+Date: Tue, 15 Sep 2020 15:08:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <1599719469-24062-1-git-send-email-sai.pavan.boddu@xilinx.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200914123505.612812-12-groug@kaod.org>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.003
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:23:19
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 03:21:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
 X-Spam_bar: -----
 X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,30 +139,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Francisco Eduardo Iglesias <figlesia@xilinx.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Vikram Garhwal <fnuv@xilinx.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Edgar Iglesias <edgari@xilinx.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- =?utf-8?Q?'Marc-Andr=C3=A9?= Lureau' <marcandre.lureau@redhat.com>,
- Ying Fang <fangying1@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Paul Zimmerman <pauldzim@gmail.com>,
- 'Philippe =?utf-8?Q?Mathieu-Daud=C3=A9'?= <philmd@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-ppc@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 10, 2020 at 12:01:02PM +0530, Sai Pavan Boddu wrote:
-> This patch series attempts to make 'hcd-xhci' an independent model so
-> it can be used by both pci and system-bus interface.
+On 9/14/20 2:35 PM, Greg Kurz wrote:
+> As recommended in "qapi/error.h", add a bool return value to
+> spapr_realize_vcpu() and use it in spapr_cpu_core_realize()
+> in order to get rid of the error propagation overhead.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/ppc/spapr_cpu_core.c | 16 +++++++---------
+>  1 file changed, 7 insertions(+), 9 deletions(-)
 
-Fails to apply again.
-
-I guess this time the typedef / qom changes (I've just rebased my
-microvm series because of that ...).
-
-take care,
-  Gerd
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 
