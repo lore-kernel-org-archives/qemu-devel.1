@@ -7,86 +7,88 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48CFDC2D0E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 08:23:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 380CDC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 08:23:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71F0421D24
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 08:22:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB7C420771
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 08:23:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ovr4t6zo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71F0421D24
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JPCzkkDn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB7C420771
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kI6Es-0002mc-FY
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 04:22:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49832)
+	id 1kI6F6-0003aO-Q7
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 04:23:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49944)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kI6De-0007vl-8R
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 04:21:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60545)
+ id 1kI6E2-0000hU-EJ
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 04:22:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37342
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kI6Db-0002uz-SY
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 04:21:41 -0400
+ id 1kI6Dz-0002wf-QD
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 04:22:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600158098;
+ s=mimecast20190719; t=1600158122;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=YprQ2fpFnCuqK/4fHxJ9jQPB1736oLlQ4uX9B2BmRy4=;
- b=Ovr4t6zoPzmt4qde+i/Wpdw0v4bsa1F7qwQ0mF7OMyDHycclp9pPhT/Ceh6WueEIjmmAim
- CtyM5eZUzyKuv0TEf4EQwDQIUXRfigN/QWK2mhxG9/jMeMU4ASbtvwycsua+Lw3HBWkzM+
- 41ogpxxAElcb9H3zM8mO5CnXl55Aaqg=
+ bh=InU31kjhb3vW+YBEJVZN4lyjOl9ihRoH0I++26498ek=;
+ b=JPCzkkDnrqRA0LJ2dALaxhCuWdvlB9GKomCnF4XGjpIxy2J6RwMGd/bxjyki7AuWjuaWks
+ 2Ptt4QxcyRo/DjqIRcsyT8tIiPZJo4dGG1pupBQqlmF64u+m1v157X/0bn7RF2psyP6FbR
+ fSv4WaZJcg7zxaqsSkXzIfsCpzTadHA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-71-5xQDpKYQPAOfj6wHnvriYw-1; Tue, 15 Sep 2020 04:21:17 -0400
-X-MC-Unique: 5xQDpKYQPAOfj6wHnvriYw-1
+ us-mta-304-fi6xv64hMDKvsY0s0XhfDQ-1; Tue, 15 Sep 2020 04:22:00 -0400
+X-MC-Unique: fi6xv64hMDKvsY0s0XhfDQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C0089AD680;
- Tue, 15 Sep 2020 08:21:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DCF2610060C4;
+ Tue, 15 Sep 2020 08:21:58 +0000 (UTC)
 Received: from redhat.com (ovpn-113-234.ams2.redhat.com [10.36.113.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B3E727BC0;
- Tue, 15 Sep 2020 08:21:12 +0000 (UTC)
-Date: Tue, 15 Sep 2020 09:21:10 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BA45227BDD;
+ Tue, 15 Sep 2020 08:21:53 +0000 (UTC)
+Date: Tue, 15 Sep 2020 09:21:50 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Chuan Zheng <zhengchuan@huawei.com>
-Subject: Re: [PATCH v4 1/6] migration/tls: save hostname into MigrationState
-Message-ID: <20200915082110.GA1502912@redhat.com>
+Subject: Re: [PATCH v4 3/6] migration/tls: add tls_hostname into
+ MultiFDSendParams
+Message-ID: <20200915082150.GB1502912@redhat.com>
 References: <1600139042-104593-1-git-send-email-zhengchuan@huawei.com>
- <1600139042-104593-2-git-send-email-zhengchuan@huawei.com>
+ <1600139042-104593-4-git-send-email-zhengchuan@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <1600139042-104593-2-git-send-email-zhengchuan@huawei.com>
+In-Reply-To: <1600139042-104593-4-git-send-email-zhengchuan@huawei.com>
 User-Agent: Mutt/1.14.6 (2020-07-11)
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:10:32
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:11:06
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -38
 X-Spam_score: -3.9
 X-Spam_bar: ---
 X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,17 +109,16 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 15, 2020 at 11:03:57AM +0800, Chuan Zheng wrote:
-> hostname is need in multifd-tls, save hostname into MigrationState.
+On Tue, Sep 15, 2020 at 11:03:59AM +0800, Chuan Zheng wrote:
+> Since multifd creation is async with migration_channel_connect, we should
+> pass the hostname from MigrationState to MultiFDSendParams.
 > 
 > Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
 > Signed-off-by: Yan Jin <jinyan12@huawei.com>
 > ---
->  migration/channel.c   | 1 +
->  migration/migration.c | 1 +
->  migration/migration.h | 5 +++++
->  migration/tls.c       | 2 ++
->  4 files changed, 9 insertions(+)
+>  migration/multifd.c | 5 +++++
+>  migration/multifd.h | 2 ++
+>  2 files changed, 7 insertions(+)
 
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
