@@ -8,79 +8,77 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1691C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:36:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C445C2D0E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:38:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E31920731
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:36:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B49820731
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:38:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nglpp7Vb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E31920731
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GUe2lBps"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B49820731
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIACS-0003Ta-Q7
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:36:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48248)
+	id 1kIAEU-0006Sj-IM
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:38:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48126)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kI9qq-0000xI-NK; Tue, 15 Sep 2020 08:14:26 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:37085)
+ id 1kI9qb-0000hH-2O; Tue, 15 Sep 2020 08:14:09 -0400
+Received: from mail-pf1-x436.google.com ([2607:f8b0:4864:20::436]:37175)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kI9qn-0008Ce-3W; Tue, 15 Sep 2020 08:14:24 -0400
-Received: by mail-pl1-x644.google.com with SMTP id u9so1237967plk.4;
- Tue, 15 Sep 2020 05:14:20 -0700 (PDT)
+ id 1kI9qY-0008BP-8G; Tue, 15 Sep 2020 08:14:08 -0400
+Received: by mail-pf1-x436.google.com with SMTP id w7so1837632pfi.4;
+ Tue, 15 Sep 2020 05:14:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=08QvrHPKEN4GbCfMFC4QXPv5o40Q0NOGDJhtin5ahIA=;
- b=nglpp7Vbz1cImKfKJYdVyhKLTHX7VsUhuaJ2L1iNOr2eM6wwcUffLpLeYvSTeE1qa4
- m/bgsnCYj2c6ccaPnBiq6eZ2S1CrapAoGLuDz3q9Q1negU/X76+i1ZSqAWtbj9nN1tOk
- FkLE+ok8hErOm+8RFmMwNJga2I19+CRUakj6jlOzDircx9r8K/WBQ5Ikc8K35U9YcS+h
- HP7SnSczdtp5Lt9vahuNXGF9hvuNLHRd4RWzUO5PKoxdzGw96pGR1k9kam4mmsOhs15P
- gNeCBJteFSQj7EI8ZS/NtCDWItbRACx5lBsRzoekdnlmdHBKdjsf0erJzCUOj/04/CM8
- MKZQ==
+ bh=27ajP4GoRfKO+nbwUgNlBqHfhHBZSCkZ9ODFQ91KtVY=;
+ b=GUe2lBpstfxB3kYLuX7Wd6/cy1HN+HDs9AQtXVMtA7JUG6GM2Ot2H7N8z2nYXfHlxL
+ 08TMIqdH0HBRm+1aW2noJ/dpSN0b3bc8FStLKEh7IaqXzRg8e6vUxlvQIlxobKvq19nE
+ 79np6VzkMVF3L/1vx6qsvnoG7yDy+vtV4CzAHOrNCEvumtLgyhagptnyqyJ1wCgTYIrE
+ M09TeGjlPh5MOSwQkn9/6NSSckURiKbMI0NXlcclXW0gZ6CVXEUajIfEay+I8YnSUNlY
+ X/VyzxC0+XWljSobnjevawFjk3EIjZQBjPS0mPYXD4YdmpqZFaAPF5Ni3910TN0vpj3q
+ HJDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=08QvrHPKEN4GbCfMFC4QXPv5o40Q0NOGDJhtin5ahIA=;
- b=r1zluS8qOCyaJ/bxkc3ZcKDVG3yxFetQBluXJgOvu8c+5JGI+y0UySbPootkT8oIZP
- JRZSoPKwJy7wxNYDcS5A/G5H8zqNcIj66PNcEu3NU6b8uV6LQaTAcU6t9CeFL6EkIlEe
- sz8C7hj4GYiMcMsquyTI8UVCrcHv4V86wF71VebmoGSIJThOa3XtnjZkdis9shJxs6KK
- p2mUPVvxdebp2QeY8gaL/GL7TY8/q6nw2VvRm10XrdZhLuibaP9C8uyau/oRv+RIh0No
- r0+xPqywH2B14oBMi14UdGvVJdedBudr5NT8Rv+X0Ur6sn9OojCuPyCvkiwvk+H4ZPEW
- oafQ==
-X-Gm-Message-State: AOAM532HuP8Fs8FwMlhSJN5YMczU9Zu7u+DDF8iFhtDhoDQFtC9iyhzp
- rxEsaUK9ijU9uGSHfVbMQ47Xrw3mzlzaecvIl4I=
-X-Google-Smtp-Source: ABdhPJyWbrNn7g0s7T6NMINRHiBCQttHFQUCu5CFhAusmZBgyRdfLE6SZ5O9IOBpLbUGuQKHuTdK7g==
-X-Received: by 2002:a17:902:522:b029:d1:9bc8:15df with SMTP id
- 31-20020a1709020522b02900d19bc815dfmr19540125plf.25.1600172057481; 
- Tue, 15 Sep 2020 05:14:17 -0700 (PDT)
+ bh=27ajP4GoRfKO+nbwUgNlBqHfhHBZSCkZ9ODFQ91KtVY=;
+ b=WRqINx4jwrlsbGRiEMnpGXT9WQUL+qPEYoY1y44gQwBkhQeIksgoT1vH+97V/6y4Nb
+ hiImPv/VnFvf86Z0XPAxXe7NulN/i12C4OnLkrZkcTq5x5A8+K+w/MH2+gOl2Ns4GBgE
+ U6s2ICGZTSK/Nqf1Es2MMSzc/VIHIdBXcuTvsmZbGjs/P7Jf4IC8vtHd95cPsGIdtN6U
+ 5OEY2b/MEfj5Y0YiFnFleb18I+wVFT1uyoZgY549zP5VfH02Otj+sMEr9Pvc60wmvUXE
+ TvmfYWOFN0rDARjUzoDD70RXXr6uw2dqfl8FVvendTax8N55Ifz/AABcsqBsREQch8As
+ mOkA==
+X-Gm-Message-State: AOAM531s+gZF7XXRqPKr/nfhaQW4apv4/9x017BNgU4hssMtJtOPcthz
+ Fndkm6ySrTvMXCQ2OV2bGyMzbyuiVvh4vfUNdiM=
+X-Google-Smtp-Source: ABdhPJyp5ZHhYYbx9Isymvvx64yDk8hWtwos7sDORYs/JSs4diauC3d/hmzXj0nWh3gsfwT05tEklw==
+X-Received: by 2002:a63:4d5:: with SMTP id 204mr14831317pge.0.1600172043892;
+ Tue, 15 Sep 2020 05:14:03 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
  by smtp.googlemail.com with ESMTPSA id
- k28sm13683061pfh.196.2020.09.15.05.14.13
+ k28sm13683061pfh.196.2020.09.15.05.13.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Sep 2020 05:14:16 -0700 (PDT)
+ Tue, 15 Sep 2020 05:14:03 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 09/26] osdep: file locking functions are not available on
- Win32
-Date: Tue, 15 Sep 2020 20:13:01 +0800
-Message-Id: <20200915121318.247-10-luoyonggang@gmail.com>
+Subject: [PATCH v9 06/26] tests: disable /char/stdio/* tests in test-char.c on
+ win32
+Date: Tue, 15 Sep 2020 20:12:58 +0800
+Message-Id: <20200915121318.247-7-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200915121318.247-1-luoyonggang@gmail.com>
 References: <20200915121318.247-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x644.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::436;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x436.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -102,49 +100,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Ed Maste <emaste@freebsd.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>,
- Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Yonggang Luo <luoyonggang@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Wen Congyang <wencongyang2@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
+ Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>,
+ Peter Lieven <pl@kamp.de>, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>,
  Li-Wen Hsu <lwhsu@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Do not declare the following locking functions on Win32:
-int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive);
-int qemu_unlock_fd(int fd, int64_t start, int64_t len);
-int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive);
-bool qemu_has_ofd_lock(void);
+These tests are blocking test-char to be finished.
+Disable them by using variable is_win32, so we doesn't
+need macro to open it. and easy recover those function
+latter.
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- include/qemu/osdep.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/test-char.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 412962d91a..e80fddd1e8 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -502,11 +502,11 @@ int qemu_close(int fd);
- int qemu_unlink(const char *name);
- #ifndef _WIN32
- int qemu_dup(int fd);
+diff --git a/tests/test-char.c b/tests/test-char.c
+index d35cc839bc..184ddceab8 100644
+--- a/tests/test-char.c
++++ b/tests/test-char.c
+@@ -77,7 +77,6 @@ static void fe_event(void *opaque, QEMUChrEvent event)
+     }
+ }
+ 
+-#ifdef _WIN32
+ static void char_console_test_subprocess(void)
+ {
+     QemuOpts *opts;
+@@ -102,7 +101,7 @@ static void char_console_test(void)
+     g_test_trap_assert_passed();
+     g_test_trap_assert_stdout("CONSOLE");
+ }
 -#endif
- int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive);
- int qemu_unlock_fd(int fd, int64_t start, int64_t len);
- int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive);
- bool qemu_has_ofd_lock(void);
++
+ static void char_stdio_test_subprocess(void)
+ {
+     Chardev *chr;
+@@ -1448,7 +1447,11 @@ static SocketAddress unixaddr = {
+ 
+ int main(int argc, char **argv)
+ {
+-    bool has_ipv4, has_ipv6;
++    bool has_ipv4, has_ipv6, is_win32 = false;
++
++#ifdef _WIN32
++    is_win32 = true;
 +#endif
  
- #if defined(__HAIKU__) && defined(__i386__)
- #define FMT_pid "%ld"
+     qemu_init_main_loop(&error_abort);
+     socket_init();
+@@ -1467,12 +1470,15 @@ int main(int argc, char **argv)
+     g_test_add_func("/char/invalid", char_invalid_test);
+     g_test_add_func("/char/ringbuf", char_ringbuf_test);
+     g_test_add_func("/char/mux", char_mux_test);
+-#ifdef _WIN32
+-    g_test_add_func("/char/console/subprocess", char_console_test_subprocess);
+-    g_test_add_func("/char/console", char_console_test);
+-#endif
+-    g_test_add_func("/char/stdio/subprocess", char_stdio_test_subprocess);
+-    g_test_add_func("/char/stdio", char_stdio_test);
++    if (0) {
++        g_test_add_func("/char/console/subprocess", char_console_test_subprocess);
++        g_test_add_func("/char/console", char_console_test);
++    }
++
++    if (!is_win32) {
++        g_test_add_func("/char/stdio/subprocess", char_stdio_test_subprocess);
++        g_test_add_func("/char/stdio", char_stdio_test);
++    }
+ #ifndef _WIN32
+     g_test_add_func("/char/pipe", char_pipe_test);
+ #endif
+@@ -1534,7 +1540,7 @@ int main(int argc, char **argv)
+     g_test_add_data_func("/char/socket/client/dupid-reconnect/" # name, \
+                          &client8 ##name, char_socket_client_dupid_test)
+ 
+-    if (has_ipv4) {
++    if (has_ipv4 && !is_win32) {
+         SOCKET_SERVER_TEST(tcp, &tcpaddr);
+         SOCKET_CLIENT_TEST(tcp, &tcpaddr);
+         g_test_add_data_func("/char/socket/server/two-clients/tcp", &tcpaddr,
 -- 
 2.28.0.windows.1
 
