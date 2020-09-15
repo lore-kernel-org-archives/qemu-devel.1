@@ -2,90 +2,124 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E214C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 16:44:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 225BAC43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 16:46:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E2F0206B5
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 16:44:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A781420809
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 16:46:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pqmcqWU3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E2F0206B5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="bwQBtzEj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A781420809
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIE3n-000827-3z
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 12:44:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37228)
+	id 1kIE6F-00029i-Q3
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 12:46:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38332)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1kIDzf-0005Oq-PG
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 12:39:47 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42233)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1kIDzd-00076B-CB
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 12:39:47 -0400
-Received: by mail-wr1-x441.google.com with SMTP id c18so4019277wrm.9
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 09:39:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=VAVwptGPTZh8EsjK9BtVG0lVM8GWJY52hf6+eD9P9lg=;
- b=pqmcqWU32DwvPQ6x2Wun6WZ3vhocGPnTlc4PTZ4CNaEApQpIEoTlimQc/Sm6cBBo2X
- xWiL6nWz8w75Gcl0YuX/9SHpfCqmgYEuBjwTlxU5MbbYR6EqyUzXAOzt4R1LwvP9QrQU
- EhZmHB3+BcpgXLrIDKo59GogloUjGVNWc3ZFGbFAhFeyLF6mu0VlTN6bCRBAwVjvSzII
- /mpFyeHW2gRJEA/PsKE+elzLwm1RibZhP0cc4gVYt7oYBVGAboK71KQj0JvgVKa04/Qu
- UNceS30TDhMPBNTVbYIGlFoBrtWTDiaE1VFTIbXaq2jw5iKAHh7oyXL8xR9XqEfzC5Rz
- LqDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=VAVwptGPTZh8EsjK9BtVG0lVM8GWJY52hf6+eD9P9lg=;
- b=ganKM3M7ybBaSiY1nNLJoplTA8amAvAw3XzDmI5QHU4+/bIES5t0f/WLZLcAhStjSv
- eknldCyP+GFh4jSIm+3d0QIDMTvKkq9jcp3spcMR7Rsdsy0oYahoTjGhha2xIzgEi0oU
- Ei/Jy9CnXoqTHEZhS3eQ4IqNzvm8MsksvZuRrVw4hrdXMZ2ff83kugkinAMHQ3ChfEVm
- OAkt5DxmfSpU91hx0kEMJyc4kFLi0FIZZvpBztolQ/gOruhFuXsRz7nnPZ7oV6A6EZE2
- 3q3d0Z0rPn+g7/iwp7DDwuUSJcpw0xjj4JU8NLg749l1OPuhLldo4yeZ5DzwVNh8kJoc
- XoGQ==
-X-Gm-Message-State: AOAM531LP3oK4WiSng+/f75OmD+I7vC4XppJoN0sJiKyT53XUG2HCp1j
- pvFbIBfs1pml2V6nMh6+HqBK+EICkG1+pfomP98=
-X-Google-Smtp-Source: ABdhPJzuwfOsJzB76SzMSIFXtFkKSn4/kVXgHiGgjY30NVH54esNO+0jICzINnS/Y9TOrk9WmCR3KWWJ+ibW/+JGfYE=
-X-Received: by 2002:a5d:4c4c:: with SMTP id n12mr9103398wrt.162.1600187983245; 
- Tue, 15 Sep 2020 09:39:43 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kIE4N-0000Ef-6G; Tue, 15 Sep 2020 12:44:39 -0400
+Received: from mail-eopbgr00131.outbound.protection.outlook.com
+ ([40.107.0.131]:27107 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kIE4L-0007he-56; Tue, 15 Sep 2020 12:44:38 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=d3E3BfpNbSuzA8KOLlkE6FxGYTiBr9oCRO914bW5oRpjXbzLGoxMFYrrZaqAshCSctw8Ac6U9fGFMr/me9ns+HNfZbtP08L/RckYL0tuuI7zGslcuGpTRQzeeU10wFj26b14qxAfY1XYfmnkvl3+q1j7B/5bVWU8Dxm8A+WYJsak54dM1erkHRUm0fYviD2DFTPW4GmpVcyOLqnK4z3XngX6U6idb7Lvi5PIgE2/Qub8WhQW1KV3j1LZ5ktFeZwKrnTTNI2pxNJerle1BWgGl7i/9emPH4mGMAe+WVNNtbAnBrjPwgqeIbIbNeTj1qurFvJ5g50mX7R4hY492qVUAg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UXTc2vOBQaJj9s8IJxi73NFh1IaXpQ18epG4EPbK03A=;
+ b=CejFbMnxr/wzknJ/pD0xCPHpX/NESiCevPTkRx+nj2r/kilxFSFPi+EMnsrcQwHDHNos6YWaSADXOi0L+gBsSYi2y5c+slx5sol6qWrKWnK41sxXAEbE8RF805UEykXXrc7vgbE6UWGicEVXVx4lZBUofJPHP1aZfsww2Kytj8qVecVAjb5W3g4o0xgtyj3d4JkxpT1cMnnDjMnv4COD7zfRhSzXM4j8bCY79JFkYR+DZc5Xdp/Y6j99qejJj4rB+T9KMQZXjdQ40WzzFYgaFiGCrm9oQYJMQM6Y40XWdeQHgfU9zXQRNifiRjCmGNhMlhY0bwxzz8bXSFZizoeJ5Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UXTc2vOBQaJj9s8IJxi73NFh1IaXpQ18epG4EPbK03A=;
+ b=bwQBtzEjb5VXd1yAIenb3p0zLquMNQMFJhMgtNB111NczhPAdQAu8MMSEpWPALmFLy6Svz1aNTL5yG4UlG2rCUf6uoVOU6ztAv90Yx+UBGgP05gkw4iCJ4Slzwb3q7zGFGWD2M0/7EHsaSbrPhRaUCoozbpi21CyJpyH2YIpqkk=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM5PR0801MB1652.eurprd08.prod.outlook.com (2603:10a6:203:3c::21)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.17; Tue, 15 Sep
+ 2020 16:44:26 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692%8]) with mapi id 15.20.3370.019; Tue, 15 Sep 2020
+ 16:44:26 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, crosa@redhat.com, ehabkost@redhat.com,
+ fam@euphon.net, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com,
+ vsementsov@virtuozzo.com, den@openvz.org, eblake@redhat.com
+Subject: [PATCH v8 3/7] block: declare some coroutine functions in
+ block/coroutines.h
+Date: Tue, 15 Sep 2020 19:44:07 +0300
+Message-Id: <20200915164411.20590-4-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200915164411.20590-1-vsementsov@virtuozzo.com>
+References: <20200915164411.20590-1-vsementsov@virtuozzo.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR07CA0025.eurprd07.prod.outlook.com
+ (2603:10a6:208:ac::38) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Received: by 2002:a1c:7504:0:0:0:0:0 with HTTP; Tue, 15 Sep 2020 09:39:42
- -0700 (PDT)
-In-Reply-To: <87zh6848e2.fsf@linaro.org>
-References: <20200828104102.4490-1-ahmedkhaledkaraman@gmail.com>
- <20200828104102.4490-8-ahmedkhaledkaraman@gmail.com>
- <87zh6848e2.fsf@linaro.org>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Tue, 15 Sep 2020 18:39:42 +0200
-Message-ID: <CAHiYmc4_NkSxHJQSYDATPM5MnatO_PD3-MSGsLrQ2+HywsgAfw@mail.gmail.com>
-Subject: Re: [PATCH 7/9] tests/performance: Add nightly tests
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: multipart/alternative; boundary="00000000000050c23e05af5ccc59"
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from kvm.sw.ru (185.215.60.75) by
+ AM0PR07CA0025.eurprd07.prod.outlook.com (2603:10a6:208:ac::38) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3391.5 via Frontend Transport; Tue, 15 Sep 2020 16:44:25 +0000
+X-Mailer: git-send-email 2.21.3
+X-Originating-IP: [185.215.60.75]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 74a19726-ccdf-4d03-e3fb-08d859969b52
+X-MS-TrafficTypeDiagnostic: AM5PR0801MB1652:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM5PR0801MB165245A74E1E1F75B34828F2C1200@AM5PR0801MB1652.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Ybnpzw3g8i9hBTr5/bukS6h4MiuqfCv4MTKu8tnWeZu3IlGrL5KmIVajZohXkRg5tmJEcr68BwaToy7jipYBNtf4tfDWgjaovCjtoO5mvi5vIiJygScIa5baHmK2cpThjuna4JpI8yj5MCURUzv+oaDAwjciF1fd9DS5bTM2umMxFKF6YOgJAVvAyCKZG0C+D344SYNBSEqi38li+roDNfTOY7mI/u6kk0xqFOyp1kfa1iHfijJ0x4XgIu45sLcrXWahLBVFW0P8WCrN9nL3h4yOmbJdHpHwDYVrHo32tCiCEKS+/5CaZZQn6IrBPywUmnoooSpcaLFkquUe5KPySBZbY0IrY4qY/HWWV2WU9xgNfpLIKlhXKpHy2zOjlNZ1
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(376002)(346002)(366004)(396003)(136003)(39840400004)(6916009)(6512007)(2906002)(83380400001)(36756003)(478600001)(1076003)(6486002)(86362001)(2616005)(956004)(8676002)(316002)(186003)(16526019)(5660300002)(66946007)(6666004)(52116002)(66476007)(8936002)(26005)(66556008)(6506007)(4326008);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: wfJg3ePy4ZQ3FWpRARRc1NhFRIQ3KbL8N1HLZlnVkHklDDU2OoxEEGeyLqjs8bJiuKbdJM9Z/pj5x7BW6wJhpknWLR1OTVqezQ6Krh5ROplxY+PEKLT4dmn1p54o2AalP5V3eEmID15pLOd6RA0qyOsy9boQ0eacosMQwTdtXnowVJvJ/L8ZY1Xvv/HrMPAS08lodeH6Lt/W7spX73Pvp/qBuyZYZKkCLTbar2bztMyo5PlEJzZOSm5PzpfAT0RlFK9eXCL42Pz+/VGN6PlorKBe4fy6yXjQZUEY89z44BcqrVuGvo1RanEwUPYizQQmAGCD0/iIkD0zcqqCs17bW6RTTl/q+EekVmwJK1e9k+pWb5BWYlEYbDGFVXgsWJkAYl34mssSABqVIrJqLzI+2MeaGqEaUSoGae9lNfx8KgCIoADKdEpRBzBkhnWL7Is55pkQAAMJOPGO0KRE3ekD19EyMtKAI//q+6fn1AnqOUl6hC6rx/Zajs/KBKaAN9UK1J5EJO5QEttxeaSe7qOrQa+feiVLslgiK0nKuQbJSc+/0+08oaqudDuWA9uyLjWPTOEg9mSDRGT9ehGp72DfPThx943sI+eoXZCEK+iCOCuAhrfQBmo5o+Ia7IUl10B/uf/4qPU5ib4zzC26Lm/ikw==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 74a19726-ccdf-4d03-e3fb-08d859969b52
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2020 16:44:26.0972 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ndVXZgkq6nv8+EDpdEqyBBB8aemSqFXuLg73JjeGtJKDBu503ZBvJb0jMgvsgnmIAnGpI2as84VJvsha252uN/eZYhC/4SM1JhFsmbw8SQo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0801MB1652
+Received-SPF: pass client-ip=40.107.0.131;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR02-AM5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 12:44:35
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,412 +132,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ldoktor@redhat.com" <ldoktor@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "philmd@redhat.com" <philmd@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Ahmed Karaman <ahmedkhaledkaraman@gmail.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>, "crosa@redhat.com" <crosa@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000050c23e05af5ccc59
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+We are going to keep coroutine-wrappers code (structure-packing
+parameters, BDRV_POLL wrapper functions) in separate auto-generated
+files. So, we'll need a header with declaration of original _co_
+functions, for those which are static now. As well, we'll need
+declarations for wrapper functions. Do these declarations now, as a
+preparation step.
 
-On Wednesday, September 2, 2020, Alex Benn=C3=A9e <alex.bennee@linaro.org> =
-wrote:
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ block/coroutines.h | 67 ++++++++++++++++++++++++++++++++++++++++++++++
+ block.c            |  8 +++---
+ block/io.c         | 34 +++++++++++------------
+ 3 files changed, 88 insertions(+), 21 deletions(-)
+ create mode 100644 block/coroutines.h
 
->
-> Ahmed Karaman <ahmedkhaledkaraman@gmail.com> writes:
->
-> > A nightly performance testing system to monitor any change in QEMU
-> > performance across seventeen different targets.
-> >
-> > The system includes eight different benchmarks to provide a variety
-> > of testing workloads.
-> >
-> > dijkstra_double:
-> > Find the shortest path between the source node and all other nodes
-> > using Dijkstra=E2=80=99s algorithm. The graph contains n nodes where al=
-l nxn
-> > distances are double values. The value of n can be specified using
-> > the -n flag. The default value is 2000.
-> >
-> > dijkstra_int32:
-> > Find the shortest path between the source node and all other nodes
-> > using Dijkstra=E2=80=99s algorithm. The graph contains n nodes where al=
-l nxn
-> > distances are int32 values. The value of n can be specified using
-> > the -n flag. The default value is 2000.
-> >
-> > matmult_double:
-> > Standard matrix multiplication of an n*n matrix of randomly generated
-> > double numbers from 0 to 100. The value of n is passed as an argument
-> > with the -n flag. The default value is 200.
-> >
-> > matmult_int32:
-> > Standard matrix multiplication of an n*n matrix of randomly generated
-> > integer numbers from 0 to 100. The value of n is passed as an
-> > argument with the -n flag. The default value is 200.
-> >
-> > qsort_double:
-> > Quick sort of an array of n randomly generated double numbers from 0
-> > to 1000. The value of n is passed as an argument with the -n flag.
-> > The default value is 300000.
-> >
-> > qsort_int32:
-> > Quick sort of an array of n randomly generated integer numbers from 0
-> > to 50000000. The value of n is passed as an argument with the -n
-> > flag.The default value is 300000.
-> >
-> > qsort_string:
-> > Quick sort of an array of 10000 randomly generated strings of size 8
-> > (including null terminating character). The sort process is repeated
-> > n number of times. The value of n is passed as an argument with the
-> > -n flag. The default value is 20.
-> >
-> > search_string:
-> > Search for the occurrence of a small string in a much larger random
-> > string (=E2=80=9Cneedle in a hay=E2=80=9D). The search process is repea=
-ted n number
-> > of times and each time, a different large random string (=E2=80=9Chay=
-=E2=80=9D) is
-> > generated. The value of n can be specified using the -n flag. The
-> > default value is 20.
-> >
-> > Syntax:
-> >     nightly_tests_core.py [-h] [-r REF]
-> >     Optional arguments:
-> >         -h, --help            Show this help message and exit
-> >         -r REF, --reference REF
-> >                         Reference QEMU version - Default is v5.1.0
-> >     Example of usage:
-> >         nightly_tests_core.py -r v5.1.0 2>log.txt
-> >
-> > The following report includes detailed setup and execution details
-> > of the system:
-> > https://ahmedkrmn.github.io/TCG-Continuous-Benchmarking/
-> QEMU-Nightly-Performance-Tests/
-> >
-> > Signed-off-by: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-> > ---
-> >  tests/performance/nightly-tests/README.md     | 243 +++++
-> >  .../source/dijkstra_double/dijkstra_double.c  | 194 ++++
-> >  .../source/dijkstra_int32/dijkstra_int32.c    | 192 ++++
-> >  .../source/matmult_double/matmult_double.c    | 123 +++
-> >  .../source/matmult_int32/matmult_int32.c      | 121 +++
-> >  .../source/qsort_double/qsort_double.c        | 104 ++
-> >  .../source/qsort_int32/qsort_int32.c          | 103 ++
-> >  .../source/qsort_string/qsort_string.c        | 122 +++
-> >  .../source/search_string/search_string.c      | 110 +++
-> >  .../scripts/nightly_tests_core.py             | 920 ++++++++++++++++++
-> >  .../scripts/run_nightly_tests.py              | 135 +++
-> >  .../nightly-tests/scripts/send_email.py       |  56 ++
-> >  12 files changed, 2423 insertions(+)
-> >  create mode 100644 tests/performance/nightly-tests/README.md
-> >  create mode 100644 tests/performance/nightly-tests/benchmarks/source/
-> dijkstra_double/dijkstra_double.c
-> >  create mode 100644 tests/performance/nightly-tests/benchmarks/source/
-> dijkstra_int32/dijkstra_int32.c
-> >  create mode 100644 tests/performance/nightly-tests/benchmarks/source/
-> matmult_double/matmult_double.c
-> >  create mode 100644 tests/performance/nightly-tests/benchmarks/source/
-> matmult_int32/matmult_int32.c
-> >  create mode 100644 tests/performance/nightly-
-> tests/benchmarks/source/qsort_double/qsort_double.c
-> >  create mode 100644 tests/performance/nightly-
-> tests/benchmarks/source/qsort_int32/qsort_int32.c
-> >  create mode 100644 tests/performance/nightly-
-> tests/benchmarks/source/qsort_string/qsort_string.c
-> >  create mode 100644
-> > tests/performance/nightly-tests/benchmarks/source/
-> search_string/search_string.c
->
-> Perhaps we could compress these paths down to:
->
->   tests/tcg/benchmarks/foo.c
->   tests/tcg/benchmarks/bar.c
->
-> and then we can also ensure they are built using the existing TCG tests
-> cross compile framework.
->
->
-Hi,
+diff --git a/block/coroutines.h b/block/coroutines.h
+new file mode 100644
+index 0000000000..9ce1730a09
+--- /dev/null
++++ b/block/coroutines.h
+@@ -0,0 +1,67 @@
++/*
++ * Block layer I/O functions
++ *
++ * Copyright (c) 2003 Fabrice Bellard
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef BLOCK_COROUTINES_INT_H
++#define BLOCK_COROUTINES_INT_H
++
++#include "block/block_int.h"
++
++int coroutine_fn bdrv_co_check(BlockDriverState *bs,
++                               BdrvCheckResult *res, BdrvCheckMode fix);
++int coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs, Error **errp);
++
++int coroutine_fn
++bdrv_co_prwv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov,
++             bool is_write, BdrvRequestFlags flags);
++int
++bdrv_prwv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov,
++          bool is_write, BdrvRequestFlags flags);
++
++int coroutine_fn
++bdrv_co_common_block_status_above(BlockDriverState *bs,
++                                  BlockDriverState *base,
++                                  bool want_zero,
++                                  int64_t offset,
++                                  int64_t bytes,
++                                  int64_t *pnum,
++                                  int64_t *map,
++                                  BlockDriverState **file);
++int
++bdrv_common_block_status_above(BlockDriverState *bs,
++                               BlockDriverState *base,
++                               bool want_zero,
++                               int64_t offset,
++                               int64_t bytes,
++                               int64_t *pnum,
++                               int64_t *map,
++                               BlockDriverState **file);
++
++int coroutine_fn
++bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
++                   bool is_read);
++int
++bdrv_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
++                bool is_read);
++
++#endif /* BLOCK_COROUTINES_INT_H */
+diff --git a/block.c b/block.c
+index ccfe1d851b..ec5a8cbd7b 100644
+--- a/block.c
++++ b/block.c
+@@ -48,6 +48,7 @@
+ #include "qemu/timer.h"
+ #include "qemu/cutils.h"
+ #include "qemu/id.h"
++#include "block/coroutines.h"
+ 
+ #ifdef CONFIG_BSD
+ #include <sys/ioctl.h>
+@@ -4640,8 +4641,8 @@ static void bdrv_delete(BlockDriverState *bs)
+  * free of errors) or -errno when an internal error occurred. The results of the
+  * check are stored in res.
+  */
+-static int coroutine_fn bdrv_co_check(BlockDriverState *bs,
+-                                      BdrvCheckResult *res, BdrvCheckMode fix)
++int coroutine_fn bdrv_co_check(BlockDriverState *bs,
++                               BdrvCheckResult *res, BdrvCheckMode fix)
+ {
+     if (bs->drv == NULL) {
+         return -ENOMEDIUM;
+@@ -5649,8 +5650,7 @@ void bdrv_init_with_whitelist(void)
+     bdrv_init();
+ }
+ 
+-static int coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
+-                                                 Error **errp)
++int coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs, Error **errp)
+ {
+     BdrvChild *child, *parent;
+     uint64_t perm, shared_perm;
+diff --git a/block/io.c b/block/io.c
+index 2e2c89ce31..676c932caf 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -29,6 +29,7 @@
+ #include "block/blockjob.h"
+ #include "block/blockjob_int.h"
+ #include "block/block_int.h"
++#include "block/coroutines.h"
+ #include "qemu/cutils.h"
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+@@ -933,9 +934,9 @@ typedef struct RwCo {
+     BdrvRequestFlags flags;
+ } RwCo;
+ 
+-static int coroutine_fn bdrv_co_prwv(BdrvChild *child, int64_t offset,
+-                                     QEMUIOVector *qiov, bool is_write,
+-                                     BdrvRequestFlags flags)
++int coroutine_fn bdrv_co_prwv(BdrvChild *child, int64_t offset,
++                              QEMUIOVector *qiov, bool is_write,
++                              BdrvRequestFlags flags)
+ {
+     if (is_write) {
+         return bdrv_co_pwritev(child, offset, qiov->size, qiov, flags);
+@@ -955,9 +956,9 @@ static int coroutine_fn bdrv_rw_co_entry(void *opaque)
+ /*
+  * Process a vectored synchronous request using coroutines
+  */
+-static int bdrv_prwv(BdrvChild *child, int64_t offset,
+-                     QEMUIOVector *qiov, bool is_write,
+-                     BdrvRequestFlags flags)
++int bdrv_prwv(BdrvChild *child, int64_t offset,
++              QEMUIOVector *qiov, bool is_write,
++              BdrvRequestFlags flags)
+ {
+     RwCo rwco = {
+         .child = child,
+@@ -2468,7 +2469,7 @@ early_out:
+     return ret;
+ }
+ 
+-static int coroutine_fn
++int coroutine_fn
+ bdrv_co_common_block_status_above(BlockDriverState *bs,
+                                   BlockDriverState *base,
+                                   bool want_zero,
+@@ -2525,12 +2526,12 @@ static int coroutine_fn bdrv_block_status_above_co_entry(void *opaque)
+  *
+  * See bdrv_co_block_status_above() for details.
+  */
+-static int bdrv_common_block_status_above(BlockDriverState *bs,
+-                                          BlockDriverState *base,
+-                                          bool want_zero, int64_t offset,
+-                                          int64_t bytes, int64_t *pnum,
+-                                          int64_t *map,
+-                                          BlockDriverState **file)
++int bdrv_common_block_status_above(BlockDriverState *bs,
++                                   BlockDriverState *base,
++                                   bool want_zero, int64_t offset,
++                                   int64_t bytes, int64_t *pnum,
++                                   int64_t *map,
++                                   BlockDriverState **file)
+ {
+     BdrvCoBlockStatusData data = {
+         .bs = bs,
+@@ -2646,7 +2647,7 @@ typedef struct BdrvVmstateCo {
+     bool                is_read;
+ } BdrvVmstateCo;
+ 
+-static int coroutine_fn
++int coroutine_fn
+ bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
+                    bool is_read)
+ {
+@@ -2678,9 +2679,8 @@ static int coroutine_fn bdrv_co_rw_vmstate_entry(void *opaque)
+     return bdrv_co_rw_vmstate(co->bs, co->qiov, co->pos, co->is_read);
+ }
+ 
+-static inline int
+-bdrv_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
+-                bool is_read)
++int bdrv_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
++                    bool is_read)
+ {
+     BdrvVmstateCo data = {
+         .bs         = bs,
+-- 
+2.21.3
 
-May I just bring some alternative views on this topic of
-benchmarks/multiple cross-compiling/nightly tests?
-
-Having a known source code of any benchmark (and also license-compatible
-with QEMU) is, for sure, a good thing. However, for actual test execution,
-source code is not relevant, but the executables built for a diverse set of
-targets. Expectation that a test bed should be able to build let's say 17
-version for each benchmark is a tall order - and, in fact, unnecessary
-self-imposed limitation.
-
-My suggestion is that 17x8 executables needed for nightly tests in its
-current form should be prebuilt - and kept permanently in a separate
-repository (just not to burden QEMU repository). They are anyway built only
-once, there is no need to update them at all.
-
-This will allow nightly test execution on any system that can execute qemu,
-without any prerequisite for cross-compiling.
-
-Their source code could and should be integrated into QEMU tree, at the
-place of choice, but the test beds should not be subject to any burden of
-cross-compiling, simply because there is no need for that.
-
-Yours,
-Aleksandar
-
-
-
-
-> >  create mode 100755 tests/performance/nightly-
-> tests/scripts/nightly_tests_core.py
-> >  create mode 100755 tests/performance/nightly-tests/scripts/run_nightly=
-_
-> tests.py
-> >  create mode 100644 tests/performance/nightly-
-> tests/scripts/send_email.py
-> >
-> > diff --git a/tests/performance/nightly-tests/README.md
-> b/tests/performance/nightly-tests/README.md
-> > new file mode 100644
-> > index 0000000000..6db3b351b3
-> > --- /dev/null
-> > +++ b/tests/performance/nightly-tests/README.md
-> > @@ -0,0 +1,243 @@
-> > +### QEMU Nightly Tests
-> > +
-> > +**Required settings:**
-> > +
-> > +Update the `GMAIL_USER` object in `send_email.py` with your credential=
-s.
-> > +
-> > +For more details on how the system works, please check the [eighth
-> > report](https://ahmedkrmn.github.io/TCG-Continuous-
-> Benchmarking/QEMU-Nightly-Performance-Tests/)
-> > of the "TCG Continuos Benchmarking" series.
->
-> As external URLs are potentially unstable I think we want to distil the
-> details into a rst do in docs/devel/
->
-> <snip>
->
-> --
-> Alex Benn=C3=A9e
->
-
---00000000000050c23e05af5ccc59
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Wednesday, September 2, 2020, Alex Benn=C3=A9e &lt;<a href=3D"ma=
-ilto:alex.bennee@linaro.org">alex.bennee@linaro.org</a>&gt; wrote:<br><bloc=
-kquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #cc=
-c solid;padding-left:1ex"><br>
-Ahmed Karaman &lt;<a href=3D"mailto:ahmedkhaledkaraman@gmail.com">ahmedkhal=
-edkaraman@gmail.com</a>&gt; writes:<br>
-<br>
-&gt; A nightly performance testing system to monitor any change in QEMU<br>
-&gt; performance across seventeen different targets.<br>
-&gt;<br>
-&gt; The system includes eight different benchmarks to provide a variety<br=
->
-&gt; of testing workloads.<br>
-&gt;<br>
-&gt; dijkstra_double:<br>
-&gt; Find the shortest path between the source node and all other nodes<br>
-&gt; using Dijkstra=E2=80=99s algorithm. The graph contains n nodes where a=
-ll nxn<br>
-&gt; distances are double values. The value of n can be specified using<br>
-&gt; the -n flag. The default value is 2000.<br>
-&gt;<br>
-&gt; dijkstra_int32:<br>
-&gt; Find the shortest path between the source node and all other nodes<br>
-&gt; using Dijkstra=E2=80=99s algorithm. The graph contains n nodes where a=
-ll nxn<br>
-&gt; distances are int32 values. The value of n can be specified using<br>
-&gt; the -n flag. The default value is 2000.<br>
-&gt;<br>
-&gt; matmult_double:<br>
-&gt; Standard matrix multiplication of an n*n matrix of randomly generated<=
-br>
-&gt; double numbers from 0 to 100. The value of n is passed as an argument<=
-br>
-&gt; with the -n flag. The default value is 200.<br>
-&gt;<br>
-&gt; matmult_int32:<br>
-&gt; Standard matrix multiplication of an n*n matrix of randomly generated<=
-br>
-&gt; integer numbers from 0 to 100. The value of n is passed as an<br>
-&gt; argument with the -n flag. The default value is 200.<br>
-&gt;<br>
-&gt; qsort_double:<br>
-&gt; Quick sort of an array of n randomly generated double numbers from 0<b=
-r>
-&gt; to 1000. The value of n is passed as an argument with the -n flag.<br>
-&gt; The default value is 300000.<br>
-&gt;<br>
-&gt; qsort_int32:<br>
-&gt; Quick sort of an array of n randomly generated integer numbers from 0<=
-br>
-&gt; to 50000000. The value of n is passed as an argument with the -n<br>
-&gt; flag.The default value is 300000.<br>
-&gt;<br>
-&gt; qsort_string:<br>
-&gt; Quick sort of an array of 10000 randomly generated strings of size 8<b=
-r>
-&gt; (including null terminating character). The sort process is repeated<b=
-r>
-&gt; n number of times. The value of n is passed as an argument with the<br=
->
-&gt; -n flag. The default value is 20.<br>
-&gt;<br>
-&gt; search_string:<br>
-&gt; Search for the occurrence of a small string in a much larger random<br=
->
-&gt; string (=E2=80=9Cneedle in a hay=E2=80=9D). The search process is repe=
-ated n number<br>
-&gt; of times and each time, a different large random string (=E2=80=9Chay=
-=E2=80=9D) is<br>
-&gt; generated. The value of n can be specified using the -n flag. The<br>
-&gt; default value is 20.<br>
-&gt;<br>
-&gt; Syntax:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0nightly_tests_core.py [-h] [-r REF]<br>
-&gt;=C2=A0 =C2=A0 =C2=A0Optional arguments:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0-h, --help=C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 Show this help message and exit<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0-r REF, --reference REF<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0Reference QEMU version - Default is v5.1.0<br>
-&gt;=C2=A0 =C2=A0 =C2=A0Example of usage:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0nightly_tests_core.py -r v5.1.0 2&gt;=
-log.txt<br>
-&gt;<br>
-&gt; The following report includes detailed setup and execution details<br>
-&gt; of the system:<br>
-&gt; <a href=3D"https://ahmedkrmn.github.io/TCG-Continuous-Benchmarking/QEM=
-U-Nightly-Performance-Tests/" target=3D"_blank">https://ahmedkrmn.github.io=
-/<wbr>TCG-Continuous-Benchmarking/<wbr>QEMU-Nightly-Performance-<wbr>Tests/=
-</a><br>
-&gt;<br>
-&gt; Signed-off-by: Ahmed Karaman &lt;<a href=3D"mailto:ahmedkhaledkaraman@=
-gmail.com">ahmedkhaledkaraman@gmail.com</a>&gt;<br>
-&gt; ---<br>
-&gt;=C2=A0 tests/performance/nightly-<wbr>tests/README.md=C2=A0 =C2=A0 =C2=
-=A0| 243 +++++<br>
-&gt;=C2=A0 .../source/dijkstra_double/<wbr>dijkstra_double.c=C2=A0 | 194 ++=
-++<br>
-&gt;=C2=A0 .../source/dijkstra_int32/<wbr>dijkstra_int32.c=C2=A0 =C2=A0 | 1=
-92 ++++<br>
-&gt;=C2=A0 .../source/matmult_double/<wbr>matmult_double.c=C2=A0 =C2=A0 | 1=
-23 +++<br>
-&gt;=C2=A0 .../source/matmult_int32/<wbr>matmult_int32.c=C2=A0 =C2=A0 =C2=
-=A0 | 121 +++<br>
-&gt;=C2=A0 .../source/qsort_double/qsort_<wbr>double.c=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 | 104 ++<br>
-&gt;=C2=A0 .../source/qsort_int32/qsort_<wbr>int32.c=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 | 103 ++<br>
-&gt;=C2=A0 .../source/qsort_string/qsort_<wbr>string.c=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 | 122 +++<br>
-&gt;=C2=A0 .../source/search_string/<wbr>search_string.c=C2=A0 =C2=A0 =C2=
-=A0 | 110 +++<br>
-&gt;=C2=A0 .../scripts/nightly_tests_<wbr>core.py=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0| 920 ++++++++++++++++++<br>
-&gt;=C2=A0 .../scripts/run_nightly_tests.<wbr>py=C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 | 135 +++<br>
-&gt;=C2=A0 .../nightly-tests/scripts/<wbr>send_email.py=C2=A0 =C2=A0 =C2=A0=
- =C2=A0|=C2=A0 56 ++<br>
-&gt;=C2=A0 12 files changed, 2423 insertions(+)<br>
-&gt;=C2=A0 create mode 100644 tests/performance/nightly-<wbr>tests/README.m=
-d<br>
-&gt;=C2=A0 create mode 100644 tests/performance/nightly-<wbr>tests/benchmar=
-ks/source/<wbr>dijkstra_double/dijkstra_<wbr>double.c<br>
-&gt;=C2=A0 create mode 100644 tests/performance/nightly-<wbr>tests/benchmar=
-ks/source/<wbr>dijkstra_int32/dijkstra_int32.<wbr>c<br>
-&gt;=C2=A0 create mode 100644 tests/performance/nightly-<wbr>tests/benchmar=
-ks/source/<wbr>matmult_double/matmult_double.<wbr>c<br>
-&gt;=C2=A0 create mode 100644 tests/performance/nightly-<wbr>tests/benchmar=
-ks/source/<wbr>matmult_int32/matmult_int32.c<br>
-&gt;=C2=A0 create mode 100644 tests/performance/nightly-<wbr>tests/benchmar=
-ks/source/qsort_<wbr>double/qsort_double.c<br>
-&gt;=C2=A0 create mode 100644 tests/performance/nightly-<wbr>tests/benchmar=
-ks/source/qsort_<wbr>int32/qsort_int32.c<br>
-&gt;=C2=A0 create mode 100644 tests/performance/nightly-<wbr>tests/benchmar=
-ks/source/qsort_<wbr>string/qsort_string.c<br>
-&gt;=C2=A0 create mode 100644<br>
-&gt; tests/performance/nightly-<wbr>tests/benchmarks/source/<wbr>search_str=
-ing/search_string.c<br>
-<br>
-Perhaps we could compress these paths down to:<br>
-<br>
-=C2=A0 tests/tcg/benchmarks/foo.c<br>
-=C2=A0 tests/tcg/benchmarks/bar.c<br>
-<br>
-and then we can also ensure they are built using the existing TCG tests<br>
-cross compile framework.<br>
-<br></blockquote><div><br></div><div>Hi,</div><div><br></div><div>May I jus=
-t bring some alternative views on this topic of benchmarks/multiple cross-c=
-ompiling/nightly tests?</div><div><br></div><div>Having a known source code=
- of any benchmark (and also license-compatible with QEMU) is, for sure, a g=
-ood thing. However, for actual test execution, source code is not relevant,=
- but the executables built for a diverse set of targets. Expectation that a=
- test bed should be able to build let&#39;s say 17 version for each benchma=
-rk is a tall order - and, in fact, unnecessary self-imposed limitation.</di=
-v><div><br></div><div>My suggestion is that 17x8 executables needed for nig=
-htly tests in its current form should be prebuilt - and kept permanently in=
- a separate repository (just not to burden QEMU repository). They are anywa=
-y built only once, there is no need to update them at all.</div><div><br></=
-div><div>This will allow nightly test execution on any system that can exec=
-ute qemu, without any prerequisite for cross-compiling.</div><div><br></div=
-><div>Their source code could and should be integrated into QEMU tree, at t=
-he place of choice, but the test beds should not be subject to any burden o=
-f cross-compiling, simply because there is no need for that.</div><div><br>=
-</div><div>Yours,</div><div>Aleksandar</div><div><br></div><div><br></div><=
-div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8e=
-x;border-left:1px #ccc solid;padding-left:1ex">
-&gt;=C2=A0 create mode 100755 tests/performance/nightly-<wbr>tests/scripts/=
-nightly_tests_<wbr>core.py<br>
-&gt;=C2=A0 create mode 100755 tests/performance/nightly-<wbr>tests/scripts/=
-run_nightly_<wbr>tests.py<br>
-&gt;=C2=A0 create mode 100644 tests/performance/nightly-<wbr>tests/scripts/=
-send_email.py<br>
-&gt;<br>
-&gt; diff --git a/tests/performance/nightly-<wbr>tests/README.md b/tests/pe=
-rformance/nightly-<wbr>tests/README.md<br>
-&gt; new file mode 100644<br>
-&gt; index 0000000000..6db3b351b3<br>
-&gt; --- /dev/null<br>
-&gt; +++ b/tests/performance/nightly-<wbr>tests/README.md<br>
-&gt; @@ -0,0 +1,243 @@<br>
-&gt; +### QEMU Nightly Tests<br>
-&gt; +<br>
-&gt; +**Required settings:**<br>
-&gt; +<br>
-&gt; +Update the `GMAIL_USER` object in `send_email.py` with your credentia=
-ls.<br>
-&gt; +<br>
-&gt; +For more details on how the system works, please check the [eighth<br=
->
-&gt; report](<a href=3D"https://ahmedkrmn.github.io/TCG-Continuous-Benchmar=
-king/QEMU-Nightly-Performance-Tests/" target=3D"_blank">https://ahmedkrmn.<=
-wbr>github.io/TCG-Continuous-<wbr>Benchmarking/QEMU-Nightly-<wbr>Performanc=
-e-Tests/</a>)<br>
-&gt; of the &quot;TCG Continuos Benchmarking&quot; series.<br>
-<br>
-As external URLs are potentially unstable I think we want to distil the<br>
-details into a rst do in docs/devel/<br>
-<br>
-&lt;snip&gt;<br>
-<br>
--- <br>
-Alex Benn=C3=A9e<br>
-</blockquote>
-
---00000000000050c23e05af5ccc59--
 
