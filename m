@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99EC4C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:15:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49485C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:17:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C0BD2078E
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:15:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B441A2074B
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:17:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vmy76l+X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C0BD2078E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ElLj/4CY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B441A2074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kI9rg-0001TL-75
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:15:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46478)
+	id 1kI9tV-0003YX-LO
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:17:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46574)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kI9nD-0004no-Tb
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:10:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38908)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kI9nH-0004pK-8B
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:10:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49097)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kI9nB-0007gG-3S
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:10:39 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kI9nB-0007gj-7Q
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:10:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600171831;
+ s=mimecast20190719; t=1600171834;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1v/PAt3CshJX/VrDKv2rrFSFurASfaywl/Okvrdx+NQ=;
- b=Vmy76l+XquC0ETlELTvd/NlTIDCmxrQiALkhtJ0qSqwhTAV+4FM6FdqRrPbzAo2nF59BTm
- 650Fr9Ozqkgn84+hOSCU9DAPqT8fyAKVWVkMw2Cxord+86WBtuU+KdLAbv8ITfVHrbl0In
- P4V/Oy7Wm1w7AMQ2Gt0CFECYXLxVmkM=
+ bh=f7gcGwGKvQs66zPNjI3Utr4hWVSraR8+eNzLSiL1B7A=;
+ b=ElLj/4CYAPTKyPtwEKzUXBAkV0HYWSnKM+bNTS/CPZQ3d5aTqKaq9NLTst4BqdfRelwEGS
+ DwEAwN+osWbs4B6WcVM3XkgmAObSXlD0sSgN3C7zTxla7emUzgZXVdYQjtSKhVumDUTxcU
+ ph/1LoOlql8IpDaw/xkClcVRErpimeU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-V9BPZ5hfNo6jDbGDMAyNYw-1; Tue, 15 Sep 2020 08:09:25 -0400
-X-MC-Unique: V9BPZ5hfNo6jDbGDMAyNYw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-472-1lSCAGw_M7CRskbdED_EdQ-1; Tue, 15 Sep 2020 08:09:24 -0400
+X-MC-Unique: 1lSCAGw_M7CRskbdED_EdQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 76AA064087;
- Tue, 15 Sep 2020 12:09:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7974918BA284;
+ Tue, 15 Sep 2020 12:09:23 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
  [10.36.112.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1AA1C75138;
- Tue, 15 Sep 2020 12:09:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 231B75DE47;
+ Tue, 15 Sep 2020 12:09:23 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 4A18640BFC; Tue, 15 Sep 2020 14:09:10 +0200 (CEST)
+ id E8E504083F; Tue, 15 Sep 2020 14:09:09 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 17/21] tests/acpi: allow microvm test data updates.
-Date: Tue, 15 Sep 2020 14:09:05 +0200
-Message-Id: <20200915120909.20838-18-kraxel@redhat.com>
+Subject: [PATCH v8 10/21] microvm/acpi: use GSI 16-23 for virtio
+Date: Tue, 15 Sep 2020 14:08:58 +0200
+Message-Id: <20200915120909.20838-11-kraxel@redhat.com>
 In-Reply-To: <20200915120909.20838-1-kraxel@redhat.com>
 References: <20200915120909.20838-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
@@ -107,37 +107,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Also add empty test data files.
+With ACPI enabled and IO-APIC being properly declared in the ACPI tables
+we can use interrupt lines 16-23 for virtio and avoid shared interrupts.
+
+With acpi disabled we continue to use lines 5-12.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Sergio Lopez <slp@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- tests/qtest/bios-tables-test-allowed-diff.h | 3 +++
- tests/data/acpi/microvm/APIC                | 0
- tests/data/acpi/microvm/DSDT                | 0
- tests/data/acpi/microvm/FACP                | 0
- 4 files changed, 3 insertions(+)
- create mode 100644 tests/data/acpi/microvm/APIC
- create mode 100644 tests/data/acpi/microvm/DSDT
- create mode 100644 tests/data/acpi/microvm/FACP
+ hw/i386/microvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
-index dfb8523c8bf4..97c3fa621b7f 100644
---- a/tests/qtest/bios-tables-test-allowed-diff.h
-+++ b/tests/qtest/bios-tables-test-allowed-diff.h
-@@ -1 +1,4 @@
- /* List of comma-separated changed AML files to ignore */
-+"tests/data/acpi/microvm/APIC",
-+"tests/data/acpi/microvm/DSDT",
-+"tests/data/acpi/microvm/FACP",
-diff --git a/tests/data/acpi/microvm/APIC b/tests/data/acpi/microvm/APIC
-new file mode 100644
-index 000000000000..e69de29bb2d1
-diff --git a/tests/data/acpi/microvm/DSDT b/tests/data/acpi/microvm/DSDT
-new file mode 100644
-index 000000000000..e69de29bb2d1
-diff --git a/tests/data/acpi/microvm/FACP b/tests/data/acpi/microvm/FACP
-new file mode 100644
-index 000000000000..e69de29bb2d1
+diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
+index e1b86da8a92e..ca0c9983f137 100644
+--- a/hw/i386/microvm.c
++++ b/hw/i386/microvm.c
+@@ -125,7 +125,7 @@ static void microvm_devices_init(MicrovmMachineState *mms)
+ 
+     kvmclock_create();
+ 
+-    mms->virtio_irq_base = 5;
++    mms->virtio_irq_base = x86_machine_is_acpi_enabled(x86ms) ? 16 : 5;
+     for (i = 0; i < VIRTIO_NUM_TRANSPORTS; i++) {
+         sysbus_create_simple("virtio-mmio",
+                              VIRTIO_MMIO_BASE + i * 512,
 -- 
 2.27.0
 
