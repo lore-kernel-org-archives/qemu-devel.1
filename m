@@ -2,91 +2,86 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0A16C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:54:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25313C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:54:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27D4520756
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:54:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B3AC920756
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:54:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nwlFi4Cm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27D4520756
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T+Yi41MS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3AC920756
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIATR-00087T-Vj
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:54:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48654)
+	id 1kIATe-0008Rh-OK
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:54:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55852)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kI9ry-0002XU-7y; Tue, 15 Sep 2020 08:15:34 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:54356)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kIANq-0001QV-79
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:48:30 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:36447)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kI9rr-0008Om-G0; Tue, 15 Sep 2020 08:15:33 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id mm21so1672349pjb.4;
- Tue, 15 Sep 2020 05:15:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=MXs4ipB1qD/APQaGp4NB6LwTFDa75md5Tixi/bd+wws=;
- b=nwlFi4CmB5Yv1IMyFfl3JwKwhsfcYOAK0OYrOhytp0KCy3+F5pkV/RsNiuzYCJdvNy
- aWHwy3JGSb1PJY7YXJWyG4bSbu4EqTiGDFHGoLJbh4X/2jixgoSjFEuAMmaU1Ah1tlqP
- y7W3CJlRudntrfzG6QMSpCqEtMEhaBA1rOY3/kwoTbhJOcqJSkLg5CsoK8t7bZZruxjD
- g9M6+zBXcYFuUb8L2/h8PmoG7XYMSw5rBlAYhFOC2FqXGnS1Xwd0rzJCym4zLQcpH8QD
- BFEibcLqN3YAnshEVORGuztdMsmR4JrukaBFcJMC/+QzB8c2UxYV0Sat3ocv/blbKLZ9
- 3q3A==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kIANo-00045a-7y
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 08:48:29 -0400
+Received: by mail-ej1-x642.google.com with SMTP id e23so4880389eja.3
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 05:48:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=VKfWIAJMCrqN13rMR9SQ7Jx0m6rOpjBjAXOPQ7M9HEg=;
+ b=T+Yi41MSdfUBVHPbp7HFhmtKfCEhMfHdu1rfvEUGfoRklzGeKjf73UVQxrdhIRbzLk
+ WcV1i4ewJ2x3g0qCk8576MbsTdPPQcx02puYaUbrUhX4sciq7zycPfBsdA7FJJ2zSWCw
+ oikVUDIJ32UwoMoCm57a8/fzwY6NpXmdbVvYvkGBSCTooMDCo/zm8s5QMoc7VJZHXB5y
+ BsZJLRdwW1ZNkDOcfhsZ88i2YE1pH9DsWDqPHSGgi8tG1ie/26L449GkO8nRVsX1pDdl
+ o8oj5nl8mh+RJuVRUkJLM1Y2JfrhXm6MKHvh4uvmpJXfIU4/uneSbxTBTJBi4Byff8Es
+ YRmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=MXs4ipB1qD/APQaGp4NB6LwTFDa75md5Tixi/bd+wws=;
- b=iUySGA3PT7w4rDf5B7srGLn9qnNPIPSemWryII/pcEDwN6TJscFory6pGDIBJQreyk
- THvHRLWhBfJM2XrJfKtPNbcfFTgk9femAvQlR1rNl2BLZ/jdkhrHndAhiNodYkHZ51Bu
- Y1gjudMe5h0xRljQLblEmWirEDsdtS0O54M7eH/RxsCdpnmdKQ555EjUavWNXA8mYmH9
- nBGv5ptpAC8O5pOy14tJONFX9VhWq/yY+5PL/SchnvmSWFA9USDGbBXOmkz6q9qDyiyL
- 2YNwCWeqkdUJewjIks2JpAWkhiSsI915UVpJcb4VrLR5YhI4IfND0uutdxn5tsKvPltF
- khWw==
-X-Gm-Message-State: AOAM532MrRvCpikb7CcjKEQ+gNQwrzbaibyIFlX+q7ypMBEoOy74bjDA
- 3PClt9Z+tkFobarIFSiAC4RlDz8Jf5AzlatCUWc=
-X-Google-Smtp-Source: ABdhPJxd3BQykWPle45GVGpyNwux868NgnC7Uvnh1qJxkX6T5ezeAcpJEyJZ952QZVPBPrDgeMCEsw==
-X-Received: by 2002:a17:902:9f84:b029:d1:cc21:9a49 with SMTP id
- g4-20020a1709029f84b02900d1cc219a49mr7740070plq.9.1600172124975; 
- Tue, 15 Sep 2020 05:15:24 -0700 (PDT)
-Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id
- k28sm13683061pfh.196.2020.09.15.05.15.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Sep 2020 05:15:24 -0700 (PDT)
-From: Yonggang Luo <luoyonggang@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v9 24/26] ci: Enable msys2 ci in cirrus
-Date: Tue, 15 Sep 2020 20:13:16 +0800
-Message-Id: <20200915121318.247-25-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.28.0.windows.1
-In-Reply-To: <20200915121318.247-1-luoyonggang@gmail.com>
-References: <20200915121318.247-1-luoyonggang@gmail.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=VKfWIAJMCrqN13rMR9SQ7Jx0m6rOpjBjAXOPQ7M9HEg=;
+ b=D9Ghr7hRujVt4BaekzTcLstTq2WGAFacoPf6NqMM1wuXAWfJ/rRmXm1IArh+sw+2yQ
+ eXf/PxwmMSevJa1xxGLqdmbMZS76ifkg/8sayf3X7hWUYGggmrGDq5ajwpfGdmqIBkli
+ N8I52WAKndkLzPYAmVOOehLKZwCUk+sW45d5R1Nax6fjszJABuliucDiTj766UR6C445
+ niICV9fx4So80AYM78JJyqBhTtUy+K9ka+3SCqJLn8timzuLJhomubt1BuHttZQ3eyfO
+ KMFEXsoaVK2A+ASzNR2C0UuQZ54j3jb0Q30C2PMH3DVEH4G09oocnS+fys7cM5Y8Fai3
+ zhMQ==
+X-Gm-Message-State: AOAM530zT204YVdLcJzEBvVxjctcDT+vkUZcinVcAD3catY8vgWLWxzi
+ 2gRv5U+EgWMSfnNApAs2liddAMz9Q8pbG9KW79TPRg==
+X-Google-Smtp-Source: ABdhPJw4EM87P/Z63yVhZRnRmo4UFR4EmiWpGPOlo/ECkrvEXl3gl7m/POYGRnWvTsm6UAj+QDVnVqzXDCQGvnJOUpY=
+X-Received: by 2002:a17:907:20d9:: with SMTP id
+ qq25mr19003898ejb.382.1600174104979; 
+ Tue, 15 Sep 2020 05:48:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1042.google.com
+References: <20200915110155.15362-1-otubo@redhat.com>
+In-Reply-To: <20200915110155.15362-1-otubo@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 15 Sep 2020 13:48:13 +0100
+Message-ID: <CAFEAcA8J+8hMSQE36wYc6QMdtdMg-_ZSYbNKca1UQ9u2epWCQg@mail.gmail.com>
+Subject: Re: [PULL 0/1] seccomp branch queue
+To: Eduardo Otubo <otubo@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -101,106 +96,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Ed Maste <emaste@freebsd.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>,
- Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Yonggang Luo <luoyonggang@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Wen Congyang <wencongyang2@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Install msys2 in a proper way refer to https://github.com/cirruslabs/cirrus-ci-docs/issues/699
-The https://wiki.qemu.org/Hosts/W32#Native_builds_with_MSYS2 need to be updated.
-There is no need of --cross-prefix, open mingw64.exe instead of msys2.exe then we don't
-need the --cross-prefix, besides we using environment variable settings:
-    MSYS: winsymlinks:nativestrict
-    MSYSTEM: MINGW64
-    CHERE_INVOKING: 1
-to opening mingw64 native shell.
-We now running tests with make -i check to skip tests errors.
+On Tue, 15 Sep 2020 at 12:02, Eduardo Otubo <otubo@redhat.com> wrote:
+>
+> The following changes since commit 2d2c73d0e3d504a61f868e46e6abd5643f3809=
+1b:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-202=
+00914-1' into staging (2020-09-14 16:03:08 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/otubo/qemu.git tags/pull-seccomp-20200915
+>
+> for you to fetch changes up to e474e3aacf4276eb0781d11c45e2fab996f9dc56:
+>
+>   seccomp: fix killing of whole process instead of thread (2020-09-15 12:=
+56:26 +0200)
+>
+> ----------------------------------------------------------------
+> pull-seccomp-20200915
+>
+> ----------------------------------------------------------------
+> Daniel P. Berrang=C3=A9 (1):
+>       seccomp: fix killing of whole process instead of thread
+>
+>  qemu-seccomp.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
----
- .cirrus.yml | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
+Strictly speaking patches you send in a pullreq should have your
+signed-off-by, but I figured in this case the acked-by was
+close enough and it's only one patch.
 
-diff --git a/.cirrus.yml b/.cirrus.yml
-index 690c6882e8..176ccba76c 100644
---- a/.cirrus.yml
-+++ b/.cirrus.yml
-@@ -44,3 +44,64 @@ macos_xcode_task:
-                    --enable-werror --cc=clang || { cat config.log; exit 1; }
-     - gmake -j$(sysctl -n hw.ncpu)
-     - gmake check
-+
-+windows_msys2_task:
-+  windows_container:
-+    image: cirrusci/windowsservercore:cmake
-+    os_version: 2019
-+    cpu: 8
-+    memory: 8G
-+  env:
-+    MSYS: winsymlinks:nativestrict
-+    MSYSTEM: MINGW64
-+    CHERE_INVOKING: 1
-+  printenv_script:
-+    - C:\tools\msys64\usr\bin\bash.exe -lc 'printenv'
-+  install_script:
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools &&
-+        curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools &&
-+        curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools &&
-+        pacman -U --noconfirm msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Sy"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S --needed
-+        bash pacman pacman-mirrors msys2-runtime"
-+    - taskkill /F /IM gpg-agent.exe
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Su"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S --needed
-+        base-devel
-+        git
-+        mingw-w64-x86_64-python
-+        mingw-w64-x86_64-python-setuptools
-+        mingw-w64-x86_64-toolchain
-+        mingw-w64-x86_64-SDL2
-+        mingw-w64-x86_64-SDL2_image
-+        mingw-w64-x86_64-gtk3
-+        mingw-w64-x86_64-glib2
-+        mingw-w64-x86_64-ninja
-+        mingw-w64-x86_64-make
-+        mingw-w64-x86_64-lzo2
-+        mingw-w64-x86_64-zstd
-+        mingw-w64-x86_64-libjpeg-turbo
-+        mingw-w64-x86_64-pixman
-+        mingw-w64-x86_64-libgcrypt
-+        mingw-w64-x86_64-libpng
-+        mingw-w64-x86_64-libssh
-+        mingw-w64-x86_64-libxml2
-+        mingw-w64-x86_64-snappy
-+        mingw-w64-x86_64-libusb
-+        mingw-w64-x86_64-usbredir
-+        mingw-w64-x86_64-libtasn1
-+        mingw-w64-x86_64-nettle
-+        mingw-w64-x86_64-cyrus-sasl
-+        mingw-w64-x86_64-curl
-+        mingw-w64-x86_64-gnutls
-+        mingw-w64-x86_64-zstd"
-+  script:
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "mkdir build"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && ../configure --python=python3"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make -j$NUMBER_OF_PROCESSORS"
-+  test_script:
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make V=1 check"
-+
--- 
-2.28.0.windows.1
 
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
+
+-- PMM
 
