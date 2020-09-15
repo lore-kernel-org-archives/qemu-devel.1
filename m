@@ -2,80 +2,95 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07DE2C43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 20:56:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55759C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 21:28:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29BF020770
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 20:56:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29BF020770
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 942422078E
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 21:28:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E3+29Ojl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 942422078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kII0F-0007TT-4T
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 16:56:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39762)
+	id 1kIIUv-00017P-Ez
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 17:28:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45834)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIHzI-0006gk-CR
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 16:55:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48388)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIHzG-0006uQ-0u
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 16:55:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kIHzD-0005lX-Tp
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 20:55:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B993D2E8078
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 20:55:35 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kIIUF-0000hO-Ir
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 17:27:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34373)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kIIUD-0002Gq-Fr
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 17:27:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600205256;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=YKN6KhOWN9tCtnOtyFfx7krngg5zuIkxZDjI5Sh0soc=;
+ b=E3+29OjlIWp9Xj+HodOjrWmM4EjiKpcfMc18IqBEswFvh8SAOT0iIXDONzD1ZCKZe6rzL3
+ MesYZ2ulJL/TQmaG9XXnyixhmQRmfRNvtJ1YiEIXMjxOT0zKc9zNhtzESlNEVgmIZ1BrGD
+ poANJ1vGZVISZsyHvtW4xzClK3O8h/M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-5-1lvXGxtWN8CZfU-24Gee8Q-1; Tue, 15 Sep 2020 17:27:34 -0400
+X-MC-Unique: 1lvXGxtWN8CZfU-24Gee8Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B4BC1005E5E;
+ Tue, 15 Sep 2020 21:27:33 +0000 (UTC)
+Received: from localhost (ovpn-119-217.rdu2.redhat.com [10.10.119.217])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 41DB1702E7;
+ Tue, 15 Sep 2020 21:27:33 +0000 (UTC)
+Date: Tue, 15 Sep 2020 17:27:32 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 1/5] qom: Allow objects to be allocated with increased
+ alignment
+Message-ID: <20200915212732.GE7594@habkost.net>
+References: <20200915174635.2333553-1-richard.henderson@linaro.org>
+ <20200915174635.2333553-2-richard.henderson@linaro.org>
+ <20200915180736.GB7594@habkost.net>
+ <6d6a80bf-a542-6818-1638-0318f4aab336@linaro.org>
+ <20200915201901.GD7594@habkost.net>
+ <74c1e091-63c4-9ea0-c515-ad977ffa1d98@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 15 Sep 2020 20:49:10 -0000
-From: Petunia <1892604@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: brendandg pauldzim petunia2000 pmaydell
-X-Launchpad-Bug-Reporter: Brendan Dolan-Gavitt (brendandg)
-X-Launchpad-Bug-Modifier: Petunia (petunia2000)
-References: <159814309088.988.14645850566795174578.malonedeb@wampee.canonical.com>
-Message-Id: <160020295056.22223.3672640036013262934.malone@wampee.canonical.com>
-Subject: [Bug 1892604] Re: qemu-system-arm: ../hw/usb/hcd-dwc2.c:666:
- dwc2_glbreg_read: Assertion `addr <= GINTSTS2' failed.
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: 0861e1e2ef5a4eb66b9b5f0359d8f629be2d7254
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 09:50:55
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <74c1e091-63c4-9ea0-c515-ad977ffa1d98@linaro.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:10:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,85 +99,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1892604 <1892604@bugs.launchpad.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Nope:
+On Tue, Sep 15, 2020 at 01:51:48PM -0700, Richard Henderson wrote:
+> On 9/15/20 1:19 PM, Eduardo Habkost wrote:
+> > Once we move to C11, we can just use max_align_t.
+> 
+> Yes.
+> 
+> > While we don't move to C11, why not just use
+> >   __alignof__(union { long l; void *p; double d; long double ld;})
+> > ?
+> 
+> For i386, this is 4.
 
-qemu-system-arm -M raspi2 -m 1G -dtb bcm2709-rpi-2-b.dtb -kernel
-kernel7.img -append "rw earlyprintk loglevel=3D8 console=3DttyAMA0,115200
-dwc_otg.lpm_enable=3D0 root=3D/dev/mmcblk0p2 dwc_otg.fiq_fsm_enable=3D0" -sd
-2016-05-27-raspbian-jessie.img -smp 4 -serial stdio -display none
+Is i386-linux the only case where there are additional alignment
+guarantees not covered by C99?
 
-raspberrypi login: qemu-system-arm: /build/qemu/src/qemu-5.1.0/hw/usb/hcd-d=
-wc2.c:666: dwc2_glbreg_read: Assertion `addr <=3D GINTSTS2' failed.
-[1]    65608 abort (core dumped)  qemu-system-arm -M raspi2 -m 1G -dtb bcm2=
-709-rpi-2-b.dtb -kernel kernel7.img
+I would prefer a i386-linux-specific #ifdef for that case instead
+of guessing based on undocumented libc internals.
 
--- =
+-- 
+Eduardo
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1892604
-
-Title:
-  qemu-system-arm: ../hw/usb/hcd-dwc2.c:666: dwc2_glbreg_read: Assertion
-  `addr <=3D GINTSTS2' failed.
-
-Status in QEMU:
-  New
-
-Bug description:
-  When trying to run the 2016-05-27 Raspbian image on the emulated
-  raspi2 platform, the system boots but shortly after the login prompt
-  QEMU (master; commit ID ca489cd037e4d50dc6c40570a167504ad7e5a521) dies
-  with:
-
-  qemu-system-arm: ../hw/usb/hcd-dwc2.c:666: dwc2_glbreg_read: Assertion
-  `addr <=3D GINTSTS2' failed.
-
-  Steps to reproduce:
-
-  1. Get the image: wget
-  http://downloads.raspberrypi.org/raspbian/images/raspbian-2016-05-31/2016=
--05-27
-  -raspbian-jessie.zip
-
-  2. Extract the kernel image and DTB:
-
-  sudo losetup -f --show -P 2016-05-27-raspbian-jessie.img
-  sudo mkdir /mnt/rpi
-  sudo mount /dev/loop11p1 /mnt/rpi/
-  cp /mnt/rpi/kernel7.img .                                                =
-                                                                           =
-                                                                           =
-                                                                   =
-
-  cp /mnt/rpi/bcm2709-rpi-2-b.dtb .                                        =
-                                                                           =
-                                                                           =
-                                                                   =
-
-  sudo umount /mnt/rpi =
-
-  sudo losetup -d /dev/loop11 =
-
-
-  3. Run QEMU:
-  qemu-system-arm -M raspi2 -m 1G -dtb bcm2709-rpi-2-b.dtb -kernel kernel7.=
-img -append "rw earlyprintk loglevel=3D8 console=3DttyAMA0,115200 dwc_otg.l=
-pm_enable=3D0 root=3D/dev/mmcblk0p2" -sd 2016-05-27-raspbian-jessie.img -sm=
-p 4 -serial stdio -display none
-
-  A few seconds after the login prompt is displayed, QEMU will exit with
-  the assertion failure.
-
-  I also tried changing all of the asserts to if statements that (for
-  MMIO reads) returned 0 and (for writes) just returned, but this
-  resulted in a non-responsive system.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1892604/+subscriptions
 
