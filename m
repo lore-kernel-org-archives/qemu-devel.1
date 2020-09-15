@@ -8,78 +8,79 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49733C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:41:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9512C43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:42:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A738E2068D
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:41:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 63E1F20B1F
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:42:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F/P3YYzR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A738E2068D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oi0id3Ef"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63E1F20B1F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIAGu-0000wn-O8
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:41:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48148)
+	id 1kIAHX-0001wU-Hr
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:41:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48184)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kI9qf-0000px-Lc; Tue, 15 Sep 2020 08:14:13 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:35255)
+ id 1kI9qj-0000sK-6Y; Tue, 15 Sep 2020 08:14:17 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:38283)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kI9qc-0008Bm-LJ; Tue, 15 Sep 2020 08:14:13 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id jw11so1628426pjb.0;
- Tue, 15 Sep 2020 05:14:09 -0700 (PDT)
+ id 1kI9qh-0008C7-8r; Tue, 15 Sep 2020 08:14:16 -0400
+Received: by mail-pl1-x641.google.com with SMTP id c3so1240792plz.5;
+ Tue, 15 Sep 2020 05:14:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=7zvfu2AU8jmrgTOs2oC3Qnm1T8TZc9G/7u0+CpqNJic=;
- b=F/P3YYzR0YuSzBEdsJviIwBK2niP82FmxoDAU4tfieBU18a8Dx4laMQo3wDQy1MpXk
- 83EqUv6Bt/NQFVJhVFBpeDhQ6SLYY8HWHf7lLvsyd/aIeNmzaGTupDedAP28Dv21DF9/
- T3ogRMOMnbMOW2TSeUZqyLscsMAsUCgxs8qjIAZU86XeNkiQ85RH9EbDW5sSsV6flLT6
- 0qmPja7JUs7Rio3YPO4t4Sq3f3PHeY/76l3ki/EXLBaOwPNZZ9MkcyPVDKhDSydhHvxq
- glgdPFiciqfPurTyyY65xltp+gQaF4GUJ5+de0B9nxH1zB/oL3/no3VboKDcJ1zaUfLt
- yJsA==
+ bh=18mOftWXQC3Rn89AKTi/Z7fcDnMtQzhw+fXUDjoqjy0=;
+ b=oi0id3Ef5S21OscB0m0KS6YTaIT6lEmxCHYaY+qlayRdwcWNuseh3dILjroHdi3laW
+ nampCaDP2o4H2qk1z/gOe3ku/Whm9WfwaMuEAgl/VyQsksv8XhTH/aJssKdzouRp9R8S
+ +LLCIY5zoinDhAkLEE0NRv7gLBHtTIsiocR5KxXWQWhR3gqfwH6ok5Qf924T1e/6oOCx
+ 4L8tM40XFARGU4QW0VfDocPjYjzbIjdnczh/wrxaEz2RHeAzmMWcuVWq3+5Ec+ZwKfLP
+ O75C4Yp+QZwLl37rZHa0DiOFsEqKG3i8EOMUAOyiH5YAibZivZP2F/GsEOkbXd3Ax5pW
+ mTQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=7zvfu2AU8jmrgTOs2oC3Qnm1T8TZc9G/7u0+CpqNJic=;
- b=gYZWnT/Mya2gft3gThUrZEYEBhwLcI0JHNjd6YFaytYCgDkO+2++Y0AWvb0uyHVmZD
- /3rR6+udMlZPXx1TP8d6sXB9vLnCi7+zBRn3QAVSGDhBpVlOdVo+am1DphYGidU/s54y
- /YkKBwy9wHf+uWnQw+2dQ99Prn2j/5uemEKx+7ISclPdCEHmyB0dzXP3DvjZYccdiXR6
- 35+VQn2k+HM+gOf6OtGraxaebH8f6i/tPighc7n9R5GLlaq5ZHBZOAt1OMCvYxUHqlCA
- 184maczV1i32scu0iWUSzxdBvMkuYGn7CdPikTxiURzVXrcpyiA+VJ1rVOki7O/tIvHh
- W0fg==
-X-Gm-Message-State: AOAM530xYQI+zdi4wvFBbxrHs7fSWCMkZOwWC557aL5RD6xKo8VcoMlt
- t4MxG/YBBVJol0B5IVM8oYZg/jxJ7iffBNKKdd4=
-X-Google-Smtp-Source: ABdhPJxAJ3Q7byMBM1HV/edK0uLNbE0H4MLcNVMHoshKrEDVyrSu4I29uEnQ9PfyKsVM2BLofJjdvw==
-X-Received: by 2002:a17:902:7d95:b029:d1:c91f:5675 with SMTP id
- a21-20020a1709027d95b02900d1c91f5675mr9052078plm.34.1600172048586; 
- Tue, 15 Sep 2020 05:14:08 -0700 (PDT)
+ bh=18mOftWXQC3Rn89AKTi/Z7fcDnMtQzhw+fXUDjoqjy0=;
+ b=Deo9SPmxt1wxhc04eDV68bVvME4RzFr4B45wnxykp9MitWm7Mvjn7JNQgHLm1F8q90
+ NpBrwFUQc+YG03CyPfN8xQcBeOCXmCIjqOo5c5vM3fEF9diill9T2dFha1iAiX/Tkeji
+ I/fSVMRlL9AmpKMDApLHUAYwDc1R0e6iAvxsQU1smfz1AdZAAdgzu8l28n00wcqIRx4J
+ LOAR09iDVxotXFSQAniDrPEypKC/nCSjJsD+HM61U0jmtXjukjQ8ArHD74Odzfbmz1Z/
+ 8jYYhpmNmjTTey1BZ2LURkOjP5gBrbR+BIAR3btd9hqhQymy3fla8yxmjYq4XmV0/U+5
+ r4pg==
+X-Gm-Message-State: AOAM5305o/VSzYbBxZR4yAMNdVsMexGsL1XC2SShMVwtCEsTAodopOJ+
+ 0ZOBpb9+yaGJD5JXOvPsfrjk+oAL7TT/9h0qL4I=
+X-Google-Smtp-Source: ABdhPJytWGexA3ggBgj3K8R8B0dxuj/JCnV8HpPcMGBhbaHZxJXi4g1i+wk0CFMNnQ+c0eavPytQiw==
+X-Received: by 2002:a17:90a:a111:: with SMTP id
+ s17mr3883928pjp.28.1600172053114; 
+ Tue, 15 Sep 2020 05:14:13 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
  by smtp.googlemail.com with ESMTPSA id
- k28sm13683061pfh.196.2020.09.15.05.14.04
+ k28sm13683061pfh.196.2020.09.15.05.14.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Sep 2020 05:14:07 -0700 (PDT)
+ Tue, 15 Sep 2020 05:14:12 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 07/26] tests: Fixes test-replication.c on msys2/mingw.
-Date: Tue, 15 Sep 2020 20:12:59 +0800
-Message-Id: <20200915121318.247-8-luoyonggang@gmail.com>
+Subject: [PATCH v9 08/26] tests: test-replication disable
+ /replication/secondary/* on msys2/mingw.
+Date: Tue, 15 Sep 2020 20:13:00 +0800
+Message-Id: <20200915121318.247-9-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200915121318.247-1-luoyonggang@gmail.com>
 References: <20200915121318.247-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1044.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -115,61 +116,71 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Windows there is no path like /tmp/s_local_disk.XXXXXX
-Use g_get_tmp_dir instead of /tmp.
+They caused failure on msys2/mingw, that's because file-win32.c not implement
+.bdrv_reopen_prepare/commit/abort yet.
+
+This is the error message:
+> $ ./tests/test-replication.exe
+> # random seed: R02S3f4d1c01af2b0a046990e0235c481faf
+> 1..13
+> # Start of replication tests
+> # Start of primary tests
+> ok 1 /replication/primary/read
+> ok 2 /replication/primary/write
+> ok 3 /replication/primary/start
+> ok 4 /replication/primary/stop
+> ok 5 /replication/primary/do_checkpoint
+> ok 6 /replication/primary/get_error_all
+> # End of primary tests
+> # Start of secondary tests
+> ok 7 /replication/secondary/read
+> ok 8 /replication/secondary/write
+> Unexpected error in bdrv_reopen_prepare() at ../block.c:4191:
+> Block format 'file' used by node '#block4287' does not support reopening
+> files
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- tests/test-replication.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ tests/test-replication.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/tests/test-replication.c b/tests/test-replication.c
-index 9ab3666a90..e7cbd6b144 100644
+index e7cbd6b144..b067240add 100644
 --- a/tests/test-replication.c
 +++ b/tests/test-replication.c
-@@ -23,14 +23,14 @@
- 
- /* primary */
- #define P_ID "primary-id"
--static char p_local_disk[] = "/tmp/p_local_disk.XXXXXX";
-+static char *p_local_disk;
- 
- /* secondary */
- #define S_ID "secondary-id"
- #define S_LOCAL_DISK_ID "secondary-local-disk-id"
--static char s_local_disk[] = "/tmp/s_local_disk.XXXXXX";
--static char s_active_disk[] = "/tmp/s_active_disk.XXXXXX";
--static char s_hidden_disk[] = "/tmp/s_hidden_disk.XXXXXX";
-+static char *s_local_disk;
-+static char *s_active_disk;
-+static char *s_hidden_disk;
- 
- /* FIXME: steal from blockdev.c */
- QemuOptsList qemu_drive_opts = {
-@@ -571,6 +571,11 @@ static void setup_sigabrt_handler(void)
- int main(int argc, char **argv)
- {
-     int ret;
-+    const char *tmpdir = g_get_tmp_dir();
-+    p_local_disk = g_strdup_printf("%s/p_local_disk.XXXXXX", tmpdir);
-+    s_local_disk = g_strdup_printf("%s/s_local_disk.XXXXXX", tmpdir);
-+    s_active_disk = g_strdup_printf("%s/s_active_disk.XXXXXX", tmpdir);
-+    s_hidden_disk = g_strdup_printf("%s/s_hidden_disk.XXXXXX", tmpdir);
-     qemu_init_main_loop(&error_fatal);
-     bdrv_init();
- 
-@@ -605,5 +610,10 @@ int main(int argc, char **argv)
- 
-     cleanup_imgs();
- 
-+    g_free(p_local_disk);
-+    g_free(s_local_disk);
-+    g_free(s_active_disk);
-+    g_free(s_hidden_disk);
-+
-     return ret;
+@@ -392,6 +392,7 @@ static void test_secondary_write(void)
+     teardown_secondary();
  }
+ 
++#ifndef _WIN32
+ static void test_secondary_start(void)
+ {
+     BlockBackend *top_blk, *local_blk;
+@@ -546,6 +547,7 @@ static void test_secondary_get_error_all(void)
+ 
+     teardown_secondary();
+ }
++#endif
+ 
+ static void sigabrt_handler(int signo)
+ {
+@@ -597,6 +599,7 @@ int main(int argc, char **argv)
+     /* Secondary */
+     g_test_add_func("/replication/secondary/read",  test_secondary_read);
+     g_test_add_func("/replication/secondary/write", test_secondary_write);
++#ifndef _WIN32
+     g_test_add_func("/replication/secondary/start", test_secondary_start);
+     g_test_add_func("/replication/secondary/stop",  test_secondary_stop);
+     g_test_add_func("/replication/secondary/continuous_replication",
+@@ -605,6 +608,7 @@ int main(int argc, char **argv)
+                     test_secondary_do_checkpoint);
+     g_test_add_func("/replication/secondary/get_error_all",
+                     test_secondary_get_error_all);
++#endif
+ 
+     ret = g_test_run();
+ 
 -- 
 2.28.0.windows.1
 
