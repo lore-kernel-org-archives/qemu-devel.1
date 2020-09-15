@@ -8,71 +8,71 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D926C43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 01:24:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBB82C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 01:26:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEF1D206BE
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 01:24:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A88620738
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 01:26:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dQjJhOru"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEF1D206BE
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mFIQWrEL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A88620738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kHzi9-0003gz-NR
-	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 21:24:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53342)
+	id 1kHzjv-00059s-0R
+	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 21:26:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53616)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
- id 1kHzhN-0003AL-IQ; Mon, 14 Sep 2020 21:23:57 -0400
-Received: from mail-oo1-xc43.google.com ([2607:f8b0:4864:20::c43]:44194)
+ id 1kHzis-0004NE-Bw
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 21:25:30 -0400
+Received: from mail-oo1-xc41.google.com ([2607:f8b0:4864:20::c41]:38187)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
- id 1kHzhL-0005YA-TF; Mon, 14 Sep 2020 21:23:57 -0400
-Received: by mail-oo1-xc43.google.com with SMTP id 4so338653ooh.11;
- Mon, 14 Sep 2020 18:23:54 -0700 (PDT)
+ id 1kHziq-0005ne-1t
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 21:25:30 -0400
+Received: by mail-oo1-xc41.google.com with SMTP id r10so350309oor.5
+ for <qemu-devel@nongnu.org>; Mon, 14 Sep 2020 18:25:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=bxsujlZ8uYLEMwCUdtdyPzE4fQP4m9Ot6upgmK5mtC0=;
- b=dQjJhOruj3KReX8XTTTrMwmra2IIHOpcWNYhyCI0PTCa8mBcjFz03i6oMPgNEhk9/B
- R0chtE7wFIC64s776zbjXNALpuosyut++gPKTaNWW+6f5shhTBhD2TeFdVI3+trsnfgr
- f7Jz7kp6crd0cVs7KdrfhAhhd3zbFVrun3trD6OZptGH9vTcjG0Y+JYKh8leVwgIY+c9
- K7tb1R/iCp9FmnxeEb47fVF44vsKelFcUoxcURCERr+5Yxo2qxEa/mdjvoCXVUhCXXhP
- oDR2ouDMXO1zk0R1d+m8BS8NC0hJA/O+syhN17TzVTvSemZTlFXf4aEsLnM5iJn9tKj6
- vPcg==
+ :cc; bh=MBDCggUjZCm7UwpIgJEesq62UsKUfDNPE0DUreqbQrE=;
+ b=mFIQWrELFMrKYBpiT7NHKsIAqDPA+hUHKNOidvjGgCqcspKFKX9S5mOLQ2znyXdcI9
+ mBdKFfembq3XYI2lALIhtqFmG6jMCqIfbCrH7vXCPPxU97Qr0a/dukD8TyVKw2rWCvQO
+ jrkyXRHCgrp71CxVWMApMDNWrdPYqMQr2OII8kBW02zzE+kn2TweOWxsof1wcpNbE8sS
+ sDU0pUP16/cUEcQTlj6wbiPcCfhpv6oq1pu9s2Q2oUBCbrdbOh1rGcM2b0Q97Hr/pvVU
+ Z1ev3We3QkDV3Vd7BRO+nr7UqV3MUdGcnZD7lLhF70PuSCF35g6SKmCIAIRoBCXxPPwK
+ MixA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=bxsujlZ8uYLEMwCUdtdyPzE4fQP4m9Ot6upgmK5mtC0=;
- b=BNAHkIG87WAq6GK+DfB2bvCp7zJSBwRP3bDM0kf9cHHamIAbslCWnnjJzXvJ+4isr3
- SURBaln5x2BHMcOI5dSkwmtegpObv+VJFq5BKRCLWTxJtDkQ/+SA5e6kAreOLy1M+Bwz
- Z35mfT5XUKpqiTql7U7i6zAXyH0sIItyVG+rNoPp+M5q8I71S76nWjAFRGCaXVO+z+EZ
- b3drLVt5tHhLKzeZ+s+DT+JbJlOvhH7yN7Ce/ovg22iCcLpxYM/UTcOjfmMWV2mOXsUZ
- RrSxr+RAPugAy7KX2hbkTy4ifApR0Pa//Jz9/cW9z1G5HOjoryrtDqI7St8D9VbsS6Rl
- IolA==
-X-Gm-Message-State: AOAM53214coTEMAG2T2rWtg+M7HBS77BeVUs4i2uw36unKfAqIEVTQ0D
- fQwVCK/MT2y6PtwyxEQHaMFlZUP9Vwbs3JfR900=
-X-Google-Smtp-Source: ABdhPJyjZ9p5bkgMqoAVbLo3f6yYZzmSto3i+xdW0hDAWW/KwxZHEOE+ZHS2q4NX8evcDBQRJ/vf59WJbK6/xxdvLI8=
-X-Received: by 2002:a4a:d8ce:: with SMTP id c14mr12050434oov.90.1600133033598; 
- Mon, 14 Sep 2020 18:23:53 -0700 (PDT)
+ bh=MBDCggUjZCm7UwpIgJEesq62UsKUfDNPE0DUreqbQrE=;
+ b=bUg9M7mw3ufMsF3yyGfYceW081dsNKH8e4NAQ7IiFxhiZgmTHrxcTbtnS5Z5xhT1xv
+ fCr/gweKdfs0PMCcBDxAyLUx9zFnudyun3iZYlG7Ztw2TkqPgx2cEykDekJsoDdhp+qW
+ fQX2HouskFWPJ5CFy1zHlMKA7+41viCaI+qVzAm/xBqGtEDngOulQZp5G9k1H7fzBaPd
+ qsGDGJiMKcv4Sl31o5wwU9yn2kvNCn98NxAwvVp0j68bLNCQNsxDOwdjEDNoOuPCNnb2
+ a43aBnWSXCGLu8BC42ii4zhiALsKbAa0szoN8cmExCLoSdF7tnyTXwS1DxL8zlKS1VGP
+ SCRA==
+X-Gm-Message-State: AOAM533ZcPFCjK9nBQorv91oSKgLJy10epMklEZ1gBwPDt+ZzuU2uH6r
+ WMUoEZR0mP5SWR8FSldHpq06I5sPpGsMlwubqA1/OnADbuoVQIrE
+X-Google-Smtp-Source: ABdhPJx5rvN0YvNRqGp51O9xJqWTiHl1mKu9C+jYuMLGKD8I02jHBOz2IHCtsRMyoujNbUgbftlwNRjJchCzkZ08OTQ=
+X-Received: by 2002:a4a:614f:: with SMTP id u15mr12081621ooe.70.1600133126599; 
+ Mon, 14 Sep 2020 18:25:26 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.1599813294.git.dimastep@yandex-team.ru>
- <4d3e683a87557bcef520826c54aa3e5ab7c64111.1599813294.git.dimastep@yandex-team.ru>
-In-Reply-To: <4d3e683a87557bcef520826c54aa3e5ab7c64111.1599813294.git.dimastep@yandex-team.ru>
+References: <20200910134851.7817-1-jin.yu@intel.com>
+In-Reply-To: <20200910134851.7817-1-jin.yu@intel.com>
 From: Raphael Norwitz <raphael.s.norwitz@gmail.com>
-Date: Mon, 14 Sep 2020 21:23:42 -0400
-Message-ID: <CAFubqFssie0eqor4sL+v09kwam6aaoa8P7k+y0x=KHLZXs_7bA@mail.gmail.com>
-Subject: Re: [PATCH v5 4/7] tests/qtest/libqos/virtio-blk: add support for
- vhost-user-blk
-To: Dima Stepanov <dimastep@yandex-team.ru>
+Date: Mon, 14 Sep 2020 21:25:15 -0400
+Message-ID: <CAFubqFuBY9-KpxUfb7HorV-q960Ns4EiCLCzq-TRFciDuaUiUQ@mail.gmail.com>
+Subject: Re: [PATCH] vhost-blk: set features before setting inflight feature
+To: Jin Yu <jin.yu@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c43;
- envelope-from=raphael.s.norwitz@gmail.com; helo=mail-oo1-xc43.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c41;
+ envelope-from=raphael.s.norwitz@gmail.com; helo=mail-oo1-xc41.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -94,65 +94,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, stefanha@gmail.com, jasowang@redhat.com,
- QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>, fengli@smartx.com,
- yc-core@yandex-team.ru, Paolo Bonzini <pbonzini@redhat.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>, Max Reitz <mreitz@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 11, 2020 at 4:43 AM Dima Stepanov <dimastep@yandex-team.ru> wrote:
->
-> Add support for the vhost-user-blk-pci device. This node can be used by
-> the vhost-user-blk tests. Tests for the vhost-user-blk device are added
-> in the following patches.
->
-> Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+Backends already receive the format in vhost_dev_start before the
+memory tables are set or any of the virtqueues are started. Can you
+elaborate on why you need to know the virtqueue format before setting
+the inflight FD?
 
-Reviewed-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
-
+On Thu, Sep 10, 2020 at 2:15 AM Jin Yu <jin.yu@intel.com> wrote:
+>
+> Virtqueue has split and packed, so before setting inflight,
+> you need to inform the back-end virtqueue format.
+>
+> Signed-off-by: Jin Yu <jin.yu@intel.com>
 > ---
->  tests/qtest/libqos/virtio-blk.c | 14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
+>  hw/block/vhost-user-blk.c |  6 ++++++
+>  hw/virtio/vhost.c         | 18 ++++++++++++++++++
+>  include/hw/virtio/vhost.h |  1 +
+>  3 files changed, 25 insertions(+)
 >
-> diff --git a/tests/qtest/libqos/virtio-blk.c b/tests/qtest/libqos/virtio-blk.c
-> index 5da0259..c0fd9d2 100644
-> --- a/tests/qtest/libqos/virtio-blk.c
-> +++ b/tests/qtest/libqos/virtio-blk.c
-> @@ -30,7 +30,8 @@
->  static void *qvirtio_blk_get_driver(QVirtioBlk *v_blk,
->                                      const char *interface)
->  {
-> -    if (!g_strcmp0(interface, "virtio-blk")) {
-> +    if (!g_strcmp0(interface, "virtio-blk") ||
-> +            !g_strcmp0(interface, "vhost-user-blk")) {
->          return v_blk;
->      }
->      if (!g_strcmp0(interface, "virtio")) {
-> @@ -120,6 +121,17 @@ static void virtio_blk_register_nodes(void)
->      qos_node_produces("virtio-blk-pci", "virtio-blk");
+> diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+> index 39aec42dae..9e0e9ebec0 100644
+> --- a/hw/block/vhost-user-blk.c
+> +++ b/hw/block/vhost-user-blk.c
+> @@ -131,6 +131,12 @@ static int vhost_user_blk_start(VirtIODevice *vdev)
 >
->      g_free(arg);
+>      s->dev.acked_features = vdev->guest_features;
+>
+> +    ret = vhost_dev_prepare_inflight(&s->dev);
+> +    if (ret < 0) {
+> +        error_report("Error set inflight format: %d", -ret);
+> +        goto err_guest_notifiers;
+> +    }
 > +
-> +    /* vhost-user-blk-pci */
-> +    arg = g_strdup_printf("id=drv0,chardev=chdev0,addr=%x.%x",
-> +                                PCI_SLOT, PCI_FN);
-> +    opts.extra_device_opts = arg;
-> +    add_qpci_address(&opts, &addr);
-> +    qos_node_create_driver("vhost-user-blk-pci", virtio_blk_pci_create);
-> +    qos_node_consumes("vhost-user-blk-pci", "pci-bus", &opts);
-> +    qos_node_produces("vhost-user-blk-pci", "vhost-user-blk");
-> +
-> +    g_free(arg);
+>      if (!s->inflight->addr) {
+>          ret = vhost_dev_get_inflight(&s->dev, s->queue_size, s->inflight);
+>          if (ret < 0) {
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 1a1384e7a6..4027c11886 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -1616,6 +1616,24 @@ int vhost_dev_load_inflight(struct vhost_inflight *inflight, QEMUFile *f)
+>      return 0;
 >  }
 >
->  libqos_init(virtio_blk_register_nodes);
+> +int vhost_dev_prepare_inflight(struct vhost_dev *hdev)
+> +{
+> +    int r;
+> +
+> +    if (hdev->vhost_ops->vhost_get_inflight_fd == NULL ||
+> +        hdev->vhost_ops->vhost_set_inflight_fd == NULL) {
+> +        return 0;
+> +    }
+> +
+> +    r = vhost_dev_set_features(hdev, hdev->log_enabled);
+> +    if (r < 0) {
+> +        VHOST_OPS_DEBUG("vhost_dev_prepare_inflight failed");
+> +        return r;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+>  int vhost_dev_set_inflight(struct vhost_dev *dev,
+>                             struct vhost_inflight *inflight)
+>  {
+> diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
+> index 767a95ec0b..4e2fc75528 100644
+> --- a/include/hw/virtio/vhost.h
+> +++ b/include/hw/virtio/vhost.h
+> @@ -140,6 +140,7 @@ void vhost_dev_reset_inflight(struct vhost_inflight *inflight);
+>  void vhost_dev_free_inflight(struct vhost_inflight *inflight);
+>  void vhost_dev_save_inflight(struct vhost_inflight *inflight, QEMUFile *f);
+>  int vhost_dev_load_inflight(struct vhost_inflight *inflight, QEMUFile *f);
+> +int vhost_dev_prepare_inflight(struct vhost_dev *hdev);
+>  int vhost_dev_set_inflight(struct vhost_dev *dev,
+>                             struct vhost_inflight *inflight);
+>  int vhost_dev_get_inflight(struct vhost_dev *dev, uint16_t queue_size,
 > --
-> 2.7.4
+> 2.17.2
 >
 >
 
