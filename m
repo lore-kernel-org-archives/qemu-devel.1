@@ -2,91 +2,82 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2A9EC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 14:51:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9144CC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 14:52:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0ECE2206DC
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 14:51:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="Fq5CpwAi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ECE2206DC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
+	by mail.kernel.org (Postfix) with ESMTPS id E6C1820732
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 14:52:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6C1820732
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kICIl-0006HE-0y
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 10:51:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33222)
+	id 1kICJd-0007Kj-Qp
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 10:52:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34642)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kICBq-00066K-00
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 10:44:15 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:42024)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kICIF-00068J-RR
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 10:50:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38024)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kICBm-0003y1-HM
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 10:44:13 -0400
-Received: by mail-pf1-x441.google.com with SMTP id d6so2049492pfn.9
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 07:44:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=29JT28xmeW3jgfT6UGIG7f+UtiHgvWzqQ0aaiLG3mns=;
- b=Fq5CpwAiF92dlTSCVmKna8vNdURasdDvY630j+WPgYh0Hg4Ah6RH+Hhq5n504SCX07
- VpHHxV20R5vN8rgVodYr/ZQtRslcgoZIc70USn72LHHuBS3TfGUE/c7VUayaDvLGsG2q
- V7UkrHkWXMWUVYblxqzJjjq4itLtYmGQ1Xt+OgBDYhzg9Ua3MR4g2n7ymuM4ltTdSWTb
- BA+h+y9C6zY/4M3PzAWWjyukVccoAi+fguI3KJFUK/R0g0BOxlZog5FBGzB1TOTa892z
- tFekuVj+kbbpinWKQF9/P+J4wDIVrFmcntP6VxdS6szJqMTvkT0lFXoKz+svqkazdBkh
- VfsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=29JT28xmeW3jgfT6UGIG7f+UtiHgvWzqQ0aaiLG3mns=;
- b=ujb1A1FBLYlx4oy2VxNHCkAaRLQKH+ApiIe1N6yBQT+sTAeLOQVpNqXcdHdaYveeJ9
- +TDmHByHeh/PJ7Nfc/NnjOWqlEXgE31pKToTe1Hf+Y53VhF4uZq7teXki3a+li2U7anq
- MwVDFz0l32DMs2m5rhgr6FMUm1NUO/KAvvX2mSdN+7RT+DYmWS4mgXAJlBSeRVKrddnK
- hrGT1kH8uzNuwS+TtIqm89PTZECFWPrqA4INQRVGW5O9ZitNTW/uVSJInokFCV/87Im3
- XzVoRDqWX8K92K/KT3FwB8/47GwzVm+PFm6PakzlR0iYc90BlfzUA49Cp86z0QdzGryb
- Gvwg==
-X-Gm-Message-State: AOAM531U4es3kNHkSTgQCXbMXOQkiVQWx6PLkICkOvbmh2Sp7Gqkl7yJ
- 3dMUETi8Z4yOkxGLTeVKmhAfSmcR9uvhxhDH
-X-Google-Smtp-Source: ABdhPJzVTMEbynQ4wEB5QoB4Y8eO1hKu5R0uHePTxQdRvzSGrsgCsJLD67PfQJuAytWnMmENcC1wGQ==
-X-Received: by 2002:a63:1620:: with SMTP id w32mr10988632pgl.73.1600181048729; 
- Tue, 15 Sep 2020 07:44:08 -0700 (PDT)
-Received: from localhost.localdomain ([115.96.128.178])
- by smtp.googlemail.com with ESMTPSA id r2sm11520693pga.94.2020.09.15.07.44.04
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Sep 2020 07:44:07 -0700 (PDT)
-From: Ani Sinha <ani@anisinha.ca>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kICID-0004qA-Iq
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 10:50:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kICIA-0003zS-Dh
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 14:50:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 4BA962E8079
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 14:50:46 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 15 Sep 2020 14:41:44 -0000
+From: Alex Williamson <1894869@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 9/9] piix4: don't reserve hw resources when hotplug is off
- globally
-Date: Tue, 15 Sep 2020 20:13:13 +0530
-Message-Id: <20200915144314.4997-10-ani@anisinha.ca>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200915144314.4997-1-ani@anisinha.ca>
-References: <20200915144314.4997-1-ani@anisinha.ca>
-Received-SPF: none client-ip=2607:f8b0:4864:20::441;
- envelope-from=ani@anisinha.ca; helo=mail-pf1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=debian; sourcepackage=None; component=None;
+ status=In Progress; importance=Unknown; assignee=None; 
+X-Launchpad-Bug-Tags: chelsio t4
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: 1butteryadmin alex-l-williamson stefan-proxmox
+X-Launchpad-Bug-Reporter: Nick Bauer (1butteryadmin)
+X-Launchpad-Bug-Modifier: Alex Williamson (alex-l-williamson)
+References: <159958042175.17914.10047848067927369523.malonedeb@soybean.canonical.com>
+Message-Id: <160018090448.621.5036512890832739817.malone@chaenomeles.canonical.com>
+Subject: [Bug 1894869] Re: Chelsio T4 has old MSIX PBA offset bug
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: 0758a733b482df364e1e36901745ed870cf15612
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 09:50:55
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -95,291 +86,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
- Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1894869 <1894869@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When acpi hotplug is turned off for both root pci bus as well as for pci
-bridges, we should not generate the related amls for DSDT table or initialize
-related hw ports or reserve hw resources. This change makes sure all those
-operations are turned off in the case acpi pci hotplug is off globally.
+I don't understand the purpose of function 7 on these cards, the class
+code indicates an Ethernet device, but without any BARs, I very much
+doubt that the functions provide any useful service.  Config space is
+invalid for the function as QEMU identifies, the referenced BAR resource
+for the MSI-X vector table and PBA is invalid.  Without proving that the
+function provides an actual netdev interface in the host, I don't see
+any value to adding a quirk to work around the invalid MSI-X capability.
+The solution is to simply not assign this function to a VM.
 
-In this change, we also make sure AMLs for the PCNT method are only added when
-bsel is enabled for the corresponding pci bus or bridge hotplug is turned on.
-As a result, when the hotplug for both the root pci device and bridge are
-disabled, this AML in the DSDT acpi table is turned off.
+SR-IOV is not enable on these cards.  Perhaps enabling SR-IOV would
+provide the additional NICs you're trying to assign.
 
-As q35 machines do not use bsel for it's pci buses at this point in time, this
-change affects DSDT acpi table for q35 machines as well. Therefore, we also
-commit the updated golden master DSDT table acpi binary blobs as well.
+-- =
 
-Following is a typical diff between the q35 acpi DSDT table blobs:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1894869
 
-@@ -1,30 +1,30 @@
- /*
-  * Intel ACPI Component Architecture
-  * AML/ASL+ Disassembler version 20180105 (64-bit version)
-  * Copyright (c) 2000 - 2018 Intel Corporation
-  *
-  * Disassembling to symbolic ASL+ operators
-  *
-- * Disassembly of tests/data/acpi/q35/DSDT, Tue Sep 15 18:52:47 2020
-+ * Disassembly of /tmp/aml-3O0DR0, Tue Sep 15 18:52:47 2020
-  *
-  * Original Table Header:
-  *     Signature        "DSDT"
-- *     Length           0x00001DFE (7678)
-+ *     Length           0x00001DF6 (7670)
-  *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
-- *     Checksum         0xAC
-+ *     Checksum         0x17
-  *     OEM ID           "BOCHS "
-  *     OEM Table ID     "BXPCDSDT"
-  *     OEM Revision     0x00000001 (1)
-  *     Compiler ID      "BXPC"
-  *     Compiler Version 0x00000001 (1)
-  */
- DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPCDSDT", 0x00000001)
- {
-     Scope (\)
-     {
-         OperationRegion (DBG, SystemIO, 0x0402, One)
-         Field (DBG, ByteAcc, NoLock, Preserve)
-         {
-             DBGB,   8
-         }
+Title:
+  Chelsio T4 has old MSIX PBA offset bug
 
-@@ -3113,24 +3113,20 @@
-                 Name (_ADR, 0x00010000)  // _ADR: Address
-                 Method (_S1D, 0, NotSerialized)  // _S1D: S1 Device State
-                 {
-                     Return (Zero)
-                 }
+Status in QEMU:
+  New
+Status in Debian:
+  In Progress
 
-                 Method (_S2D, 0, NotSerialized)  // _S2D: S2 Device State
-                 {
-                     Return (Zero)
-                 }
+Bug description:
+  There exists a bug with Chelsio NICs T4 that causes the following
+  error:
 
-                 Method (_S3D, 0, NotSerialized)  // _S3D: S3 Device State
-                 {
-                     Return (Zero)
-                 }
-             }
--
--            Method (PCNT, 0, NotSerialized)
--            {
--            }
-         }
-     }
- }
+  kvm: -device vfio-
+  pci,host=3D0000:83:00.7,id=3Dhostpci1.7,bus=3Dpci.0,addr=3D0x11.7: vfio
+  0000:83:00.7: hardware reports invalid configuration, MSIX PBA outside
+  of specified BAR
 
-Signed-off-by: Ani Sinha <ani@anisinha.ca>
----
- hw/acpi/piix4.c                   |   6 ++++--
- hw/i386/acpi-build.c              |  23 +++++++++++++++++------
- tests/data/acpi/q35/DSDT          | Bin 7678 -> 7670 bytes
- tests/data/acpi/q35/DSDT.acpihmat | Bin 9002 -> 8994 bytes
- tests/data/acpi/q35/DSDT.bridge   | Bin 7695 -> 7688 bytes
- tests/data/acpi/q35/DSDT.cphp     | Bin 8141 -> 8133 bytes
- tests/data/acpi/q35/DSDT.dimmpxm  | Bin 9331 -> 9323 bytes
- tests/data/acpi/q35/DSDT.ipmibt   | Bin 7753 -> 7745 bytes
- tests/data/acpi/q35/DSDT.memhp    | Bin 9037 -> 9029 bytes
- tests/data/acpi/q35/DSDT.mmio64   | Bin 8808 -> 8801 bytes
- tests/data/acpi/q35/DSDT.numamem  | Bin 7684 -> 7676 bytes
- tests/data/acpi/q35/DSDT.tis      | Bin 8283 -> 8276 bytes
- 12 files changed, 21 insertions(+), 8 deletions(-)
+  I discovered this bug on a Proxmox system, and I was working with a
+  downstream Proxmox developer to try to fix this issue. They provided
+  me with the following change to make from line 1484 of hw/vfio/pci.c:
 
-changelog:
-v1: initial patch.
-v2: fixed a bug and added acpi DSDT table blobs for q35 to make unit tests pass.
+  static void vfio_msix_early_setup(VFIOPCIDevice *vdev, Error **errp)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* is 0x1000, =
+so we hard code that here.
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*/
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (vdev->vendor_id=
+ =3D=3D PCI_VENDOR_ID_CHELSIO &&
+  -            (vdev->device_id & 0xff00) =3D=3D 0x5800) {
+  +            ((vdev->device_id & 0xff00) =3D=3D 0x5800 ||
+  +             (vdev->device_id & 0xff00) =3D=3D 0x1425)) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0msix->pba_offset =3D 0x1000;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else if (vdev->ms=
+ix_relo =3D=3D OFF_AUTOPCIBAR_OFF) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0error_setg(errp, "hardware reports invalid configuration, "
 
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index e6163bb6ce..b70b1f98af 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -596,8 +596,10 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
-                           "acpi-gpe0", GPE_LEN);
-     memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
- 
--    acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
--                    s->use_acpi_hotplug_bridge);
-+    if (s->use_acpi_hotplug_bridge || s->use_acpi_root_pci_hotplug) {
-+        acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
-+                        s->use_acpi_hotplug_bridge);
-+    }
- 
-     s->cpu_hotplug_legacy = true;
-     object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index e079b686f5..91622e185b 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -95,6 +95,7 @@ typedef struct AcpiPmInfo {
-     bool s3_disabled;
-     bool s4_disabled;
-     bool pcihp_bridge_en;
-+    bool pcihp_root_en;
-     uint8_t s4_val;
-     AcpiFadtData fadt;
-     uint16_t cpu_hp_io_base;
-@@ -245,6 +246,9 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
-     pm->pcihp_bridge_en =
-         object_property_get_bool(obj, "acpi-pci-hotplug-with-bridge-support",
-                                  NULL);
-+    pm->pcihp_root_en =
-+        object_property_get_bool(obj, "acpi-root-pci-hotplug",
-+                                 NULL);
- }
- 
- static void acpi_get_misc_info(AcpiMiscInfo *info)
-@@ -450,10 +454,12 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-     }
- 
-     /* Append PCNT method to notify about events on local and child buses.
--     * Add unconditionally for root since DSDT expects it.
-+     * Add this method for root bus only when hotplug is enabled since DSDT
-+     * expects it.
-      */
--    method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
--
-+    if (bsel || pcihp_bridge_en) {
-+        method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
-+    }
-     /* If bus supports hotplug select it and notify about local events */
-     if (bsel) {
-         uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
-@@ -479,7 +485,10 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-             aml_append(method, aml_name("^S%.02X.PCNT", devfn));
-         }
-     }
--    aml_append(parent_scope, method);
-+
-+    if (bsel || pcihp_bridge_en) {
-+        aml_append(parent_scope, method);
-+    }
-     qobject_unref(bsel);
- }
- 
-@@ -1504,7 +1513,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         build_hpet_aml(dsdt);
-         build_piix4_isa_bridge(dsdt);
-         build_isa_devices_aml(dsdt);
--        build_piix4_pci_hotplug(dsdt);
-+        if (pm->pcihp_bridge_en || pm->pcihp_root_en) {
-+            build_piix4_pci_hotplug(dsdt);
-+        }
-         build_piix4_pci0_int(dsdt);
-     } else {
-         sb_scope = aml_scope("_SB");
-@@ -1698,7 +1709,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-     crs_range_set_free(&crs_range_set);
- 
-     /* reserve PCIHP resources */
--    if (pm->pcihp_io_len) {
-+    if (pm->pcihp_io_len && (pm->pcihp_bridge_en || pm->pcihp_root_en)) {
-         dev = aml_device("PHPR");
-         aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A06")));
-         aml_append(dev,
-diff --git a/tests/data/acpi/q35/DSDT b/tests/data/acpi/q35/DSDT
-index bba8884073a27427b88ac0d733c9c87330a59366..4fad91b72e279b744b0528fd687c862d3a3d5cfa 100644
-GIT binary patch
-delta 33
-pcmexo{mq)oCD<k8n=AtZqxeRyWwM-ZEHUxHPVoYElXuD50sy=Q3Pb<^
+  However, I found that this did not fix the issue, so the bug appears
+  to work differently than the one that was present on the T5 NICs which
+  has already been patched. I have attached the output of my lspci
+  -nnkvv
 
-delta 42
-ycmexn{m+`qCD<k8pDY6d<C=|J%VfFySYqOXo#F-DSSIh3wPhD!3vl)eVE_Owj0{Tv
-
-diff --git a/tests/data/acpi/q35/DSDT.acpihmat b/tests/data/acpi/q35/DSDT.acpihmat
-index 9cac92418b5fcc2767dc74603d599642b59623fe..e4df7d1ca89578dd81be3539c8f83f073bb8db25 100644
-GIT binary patch
-delta 33
-pcmZ4Gw#bdkCD<iINtuCx@ySN6OG=z>EHUxHPVoYElb<Qs0syHh3KIYT
-
-delta 42
-xcmZ4Fw#tpmCD<iIOPPUzv2r8VB_%FDmYDcpr+5K3mdQ_*Y}rNF0-XIq7y$jZ3mO0b
-
-diff --git a/tests/data/acpi/q35/DSDT.bridge b/tests/data/acpi/q35/DSDT.bridge
-index f08b7245f59aad491fcaa60e2bab1085c369ea1c..065399174575442201cc09ffa4939ddf90ac81b4 100644
-GIT binary patch
-delta 33
-ocmeCT>9FB)33dtLkYiwAT)&ZPnJlLVYfOBwQ@nt~<ejqq0G06xDgXcg
-
-delta 41
-wcmeCM>9^r>33dtLmt$aH^xnv|OqSE1H6}jTDPF*R@=jTQb`iD!XTJ~z0NaZSF#rGn
-
-diff --git a/tests/data/acpi/q35/DSDT.cphp b/tests/data/acpi/q35/DSDT.cphp
-index 57d859cef9fa16a8f125c4b338611c8472699f38..8d2395e3cb4383b30e3840caed0d09ccad0c7323 100644
-GIT binary patch
-delta 33
-ocmX?Wf7G7KCD<k8s5}D$<AjY|rShC^EHUxHPVoYElRM>Y0kO^r)&Kwi
-
-delta 42
-xcmX?Vf7YJMCD<k8tULn)qv}SkQh6>vmYDcpr+5K3mdPFRw(KHo0nUCQ3;+bB3f%wz
-
-diff --git a/tests/data/acpi/q35/DSDT.dimmpxm b/tests/data/acpi/q35/DSDT.dimmpxm
-index 9d5bd5744e2ba2e0f6126c3aba0bb36af865e499..df7422051c6feadeaa3b6733ad7efa67c339b49d 100644
-GIT binary patch
-delta 33
-ocmezD@!EsSCD<h-TZMsvF>)i9v<jyiOH6#QQ@nuPWPKG|0ILxQ{r~^~
-
-delta 42
-xcmaFu@!5mRCD<jTScQRs@!du)X%#L%mYDcpr+5K3mdSc5w(KHo0nUCQ3;+_P3k3iG
-
-diff --git a/tests/data/acpi/q35/DSDT.ipmibt b/tests/data/acpi/q35/DSDT.ipmibt
-index 5cd11de6a8fe47324e5f922823a22746882f19f5..c4ce5cc0ede822ea82656d078d7a8b7eee4a7516 100644
-GIT binary patch
-delta 33
-ocmX?UbI^v%CD<jzQI3Iu(Q6~uM_EocmYDcpr+5Lo$*gj=0Hl8i@&Et;
-
-delta 42
-xcmX?TbJB*(CD<jzQ;vaw@%~1xkFs2TEHUxHPVoY6ER$K}Y}rNF0-XIq7yt{`3i$v4
-
-diff --git a/tests/data/acpi/q35/DSDT.memhp b/tests/data/acpi/q35/DSDT.memhp
-index 05a7a73ec43130d5c3018bb462fd84981bfb151c..84614ffc1452358053b4c2be4b2edcb4d56a9ae6 100644
-GIT binary patch
-delta 33
-ocmX@>cGQi_CD<jzRhfZ-kz*s*S0zq2mYDcpr+5Lo$(+iz0Hk>c=Kufz
-
-delta 42
-xcmX@=cGiu{CD<jzSDAr<aqdR0uS#5gEHUxHPVoY6ER#8uZP`WG0-XIq7yt`p3hn>^
-
-diff --git a/tests/data/acpi/q35/DSDT.mmio64 b/tests/data/acpi/q35/DSDT.mmio64
-index efd3f1188f2b55da1514212d4be081a61c2a96e9..d8dd702b69cc24a6b58b8eaa79ea02439a2a7dd9 100644
-GIT binary patch
-delta 33
-ocmaFi^3a9LCD<h-QHg<paqmX1|B9R*tTFMyPVoW`lZBN00lUBo5&!@I
-
-delta 41
-wcmaFp^1_A7CD<h-Ly3WbF>)i<e??Az)|mKUr+5MP$wEs0>>_Ld&VC^b00^lI82|tP
-
-diff --git a/tests/data/acpi/q35/DSDT.numamem b/tests/data/acpi/q35/DSDT.numamem
-index 1978b55f1255402bf9bade0b91150b5cb49789a4..f36d22063a6eed4fb107ffd0e10477a2d6d7a983 100644
-GIT binary patch
-delta 33
-pcmZp%`D4xH66_N4N0xzs@!&?THL{#;EHUxHPVoYElMl$+0sy+k3XK2&
-
-delta 42
-xcmexk-D1P#66_MfBFDhM7`l;bjVzZROH6#QQ@ns1%jEsCw(KHo0nUCQ3;^@W3X}i<
-
-diff --git a/tests/data/acpi/q35/DSDT.tis b/tests/data/acpi/q35/DSDT.tis
-index 638de3872673d17b1958497d0e62c83653de1602..203030a61a92c204bb93c43fe79e546471ae2985 100644
-GIT binary patch
-delta 38
-ucmccZaK(YkCD<h-M1g^U@x?~2O|qOGnlbUgPVoW`laI>UZRU~-WC8&31`DbH
-
-delta 45
-zcmccOaNB{)CD<h-T7iLqv1KFICRt8@&6xOLr+5MP$wy`F*hJU@oc%&JGsy)p0RTF+
-B45<JB
-
--- 
-2.17.1
-
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1894869/+subscriptions
 
