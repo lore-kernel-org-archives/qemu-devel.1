@@ -2,101 +2,113 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0722C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 08:57:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6344C43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 08:58:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 857302078D
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 08:57:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20FA62078D
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 08:58:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PZOkbdnt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 857302078D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OSkJCt9U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20FA62078D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kI6mD-0002CW-JJ
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 04:57:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57822)
+	id 1kI6nY-0003OG-Bl
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 04:58:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58348)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
- id 1kI6ki-0001eS-Hj
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 04:55:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58644)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kI6mv-0002sB-SY
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 04:58:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38373)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
- id 1kI6kc-0007Zt-7Z
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 04:55:52 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kI6mr-0007pd-BZ
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 04:58:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600160144;
+ s=mimecast20190719; t=1600160284;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=SBQ1LTwfHgooJZ4henluDSAV84+F+Bz0lmuWkH4fzGQ=;
- b=PZOkbdntKydxDj0/dIrEjZ5l2LnbbnEUzmxC6Y5TtImis0tZ4hR0KK+HmM2+o1Fvp+kgVK
- CJn++5JZJ4RGbQGetDq6AjNJzrEiuc1cOn4rP3GjjGicV6WTPvzA+CQGq25+5gmt70G4sz
- FDAv14k6iJbn+dXl3bovOuItSMlrIF4=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-44-P-IbdzD_OyWK6VxfabPr8Q-1; Tue, 15 Sep 2020 04:55:36 -0400
-X-MC-Unique: P-IbdzD_OyWK6VxfabPr8Q-1
-Received: by mail-ot1-f69.google.com with SMTP id s3so821421otp.18
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 01:55:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=SBQ1LTwfHgooJZ4henluDSAV84+F+Bz0lmuWkH4fzGQ=;
- b=peE/RLe4CVjzOgTVl9pRWZFgOCJfKGpgZEQY7svxiZ1ZJv7hlKNzsEvL9v1dMKgbd2
- 1v09fDEpfsQ/0E0P41lLcv/Y9z6+KUSFPuNZ25qwDVsl0g81nT1JPJWh1/7d3SM5UvfA
- 9q1kIqUnH1JwsK8IZ0Xvn3viYisEJ3xTEKuVHKlKbUnG5EV3kfsHRngS9ufTENvuRrg7
- OvXQAMBWiABvHsp88cDaFJZqQm8u4RcxiOsFnWar2SWmFppWtOyKIKgoG6oD7s9DtUwi
- Mki87bvYs70ciJhvUGzQsq7hMSNcQCIkVPOIAAifU0n+37Ns+Wm5ZmPL/M6FARkgeJXC
- 2UtA==
-X-Gm-Message-State: AOAM533850cCovu5BrKO3FCoJDEQ2lbidJYGDcVkDiNszeh+SfjjCYAm
- JtHlT00LPMrXbNnyojtkvaoI37hutXCa18Ppik6i0f3tHu5ubdjcZS4TCU2YFOHyVyP/gbRAR6f
- DZfaDaolqa3n+lAqXdYFR9rXvyeK+wMU=
-X-Received: by 2002:a4a:bd90:: with SMTP id k16mr13513398oop.16.1600160134806; 
- Tue, 15 Sep 2020 01:55:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx2tu7cm2QgW6WddRfLIN+ghpoVQpBV5dOSyZ2hq0lhiwkuMa5kLzl15xPeyS3h6eAKfCFBPPHOapLc5P5LRFw=
-X-Received: by 2002:a4a:bd90:: with SMTP id k16mr13513388oop.16.1600160134504; 
- Tue, 15 Sep 2020 01:55:34 -0700 (PDT)
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=8dlLcDUjv1ge982E3wx6Gsjb8Qr4K09vgGrerog773Y=;
+ b=OSkJCt9UXIzKvyvkRk86rEo3QV0cuTiE8pJKZ9MhdgvQyHUQZf+rMkGt7D5GBxttAsx5ZH
+ vqnodytPomdkArWWK2KgQJWbwz11NYrNHLgrmYRuxCeAEMfYLtkEfT+toXfXDz5K0rhS6z
+ YqbGobedE8w11oFEQPTbx8s9LLBoSZg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-45-7fLesI3aO5KXwWOzZXBJLg-1; Tue, 15 Sep 2020 04:58:02 -0400
+X-MC-Unique: 7fLesI3aO5KXwWOzZXBJLg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7DEC6802B63;
+ Tue, 15 Sep 2020 08:57:54 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-7.ams2.redhat.com
+ [10.36.113.7])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D3B3310001B3;
+ Tue, 15 Sep 2020 08:57:52 +0000 (UTC)
+Subject: Re: [PATCH v2] qemu-img: Support bitmap --merge into backing image
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200914191009.644842-1-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <f4d640aa-6aec-7dbc-69ae-5a2a6921447d@redhat.com>
+Date: Tue, 15 Sep 2020 10:57:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200831140127.657134-1-nsoffer@redhat.com>
- <20200831140127.657134-3-nsoffer@redhat.com>
- <20200914173201.GR1252186@redhat.com>
-In-Reply-To: <20200914173201.GR1252186@redhat.com>
-From: Nir Soffer <nsoffer@redhat.com>
-Date: Tue, 15 Sep 2020 11:55:18 +0300
-Message-ID: <CAMRbyysRun-nkgugLuxHcBv3HJ2QqVs2rw9HO3CjgZEE5ftGjQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] block: file-posix: Replace posix_fallocate with
- fallocate
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+In-Reply-To: <20200914191009.644842-1-eblake@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=nsoffer@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=nsoffer@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="sR255QXvkRqlNS1GESAuupkLT47msuVIT"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:23:19
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:10:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -38
 X-Spam_score: -3.9
 X-Spam_bar: ---
 X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,90 +121,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nirsof@gmail.com>,
- qemu-block <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, eshenitz@redhat.com, vsementsov@virtuozzo.com,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 14, 2020 at 8:32 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
-m> wrote:
->
-> On Mon, Aug 31, 2020 at 05:01:27PM +0300, Nir Soffer wrote:
-> > If fallocate() is not supported, posix_fallocate() falls back to
-> > inefficient allocation, writing one byte for every 4k bytes[1]. This is
-> > very slow compared with writing zeros. In oVirt we measured ~400%
-> > improvement in allocation time when replacing posix_fallocate() with
-> > manually writing zeroes[2].
-> >
-> > We also know that posix_fallocated() does not work well when using OFD
-> > locks[3]. We don't know the reason yet for this issue yet.
-> >
-> > Change preallocate_falloc() to use fallocate() instead of
-> > posix_falloate(), and fall back to full preallocation if not supported.
-> >
-> > Here are quick test results with this change.
-> >
-> > Before (qemu-img-5.1.0-2.fc32.x86_64):
-> >
-> > $ time qemu-img create -f raw -o preallocation=3Dfalloc /tmp/nfs3/test.=
-raw 6g
-> > Formatting '/tmp/nfs3/test.raw', fmt=3Draw size=3D6442450944 preallocat=
-ion=3Dfalloc
-> >
-> > real 0m42.100s
-> > user 0m0.602s
-> > sys 0m4.137s
-> >
-> > NFS stats:
-> > calls      retrans    authrefrsh    write
-> > 1571583    0          1572205       1571321
-> >
-> > After:
-> >
-> > $ time ./qemu-img create -f raw -o preallocation=3Dfalloc /tmp/nfs3/tes=
-t.raw 6g
-> > Formatting '/tmp/nfs3/test.raw', fmt=3Draw size=3D6442450944 preallocat=
-ion=3Dfalloc
-> >
-> > real 0m15.551s
-> > user 0m0.070s
-> > sys 0m2.623s
-> >
-> > NFS stats:
-> > calls      retrans    authrefrsh    write
-> > 24620      0          24624         24567
-> >
-> > [1] https://code.woboq.org/userspace/glibc/sysdeps/posix/posix_fallocat=
-e.c.html#96
-> > [2] https://bugzilla.redhat.com/1850267#c25
-> > [3] https://bugzilla.redhat.com/1851097
->
-> This bug appears to be private to RH employees only, so rather than link
-> to it, please summarize any important facts in it for benefit of nonn-RH
-> QEMU contributors.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--sR255QXvkRqlNS1GESAuupkLT47msuVIT
+Content-Type: multipart/mixed; boundary="MPbcrqhdHwpipohjwNTDy08CXNAmSG3tA"
 
-Thanks, I missed that detail when linking to the bug. The bug is public now=
-.
+--MPbcrqhdHwpipohjwNTDy08CXNAmSG3tA
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> > Signed-off-by: Nir Soffer <nsoffer@redhat.com>
-> > ---
-> >  block/file-posix.c                     | 32 +++++++++-----------------
-> >  docs/system/qemu-block-drivers.rst.inc | 11 +++++----
-> >  docs/tools/qemu-img.rst                | 11 +++++----
-> >  qapi/block-core.json                   |  4 ++--
-> >  4 files changed, 25 insertions(+), 33 deletions(-)
->
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
->
+On 14.09.20 21:10, Eric Blake wrote:
+> If you have the chain 'base.qcow2 <- top.qcow2' and want to merge a
+> bitmap from top into base, qemu-img was failing with:
+>=20
+> qemu-img: Could not open 'top.qcow2': Could not open backing file: Failed=
+ to get shared "write" lock
+> Is another process using the image [base.qcow2]?
+>=20
+> The easiest fix is to not open the entire backing chain of either
+> image (source or destination); after all, the point of 'qemu-img
+> bitmap' is solely to manipulate bitmaps directly within a single qcow2
+> image, and this is made more precise if we don't pay attention to
+> other images in the chain that may happen to have a bitmap by the same
+> name.
+>=20
+> However, note that during normal usage, it is a feature that qemu will
+> allow a bitmap from a backing image to be exposed by an overlay BDS;
+> doing so makes it easier to perform incremental backup, where we have:
+>=20
+> Base <- Active <- temporrary
+
+*temporary
+
+(Also it=E2=80=99s a bit strange that =E2=80=9CBase=E2=80=9D and =E2=80=9CA=
+ctive=E2=80=9D are capitalized, but
+=E2=80=9Ctemporary=E2=80=9D isn=E2=80=99t)
+
+>           \--block job ->/
+>=20
+> with temporary being fed by a block-copy 'sync' job; when exposing
+
+s/block-copy 'sync'/backup 'sync=3Dnone'/?
+
+> temporary over NBD, referring to a bitmap that lives only in Active is
+> less effort than having to copy a bitmap into temporary [1].  So the
+> testsuite additions in this patch check both where bitmaps get
+> allocated (the qemu-img info output), and, when NOT using 'qemu-img
+> bitmap', that bitmaps are indeed visible through a backing chain.
+
+Well.  It is useful over NBD but I would doubt that it isn=E2=80=99t useful=
+ in
+general.  For example, the QMP commands that refer to bitmaps always do
+so through a node-name + bitmap-name combination, and they require that
+the given bitmap is exactly on the given node.
+
+So I think this is a very much a case-by-case question.  (And in
+practice, NBD seems to be the outlier, not qemu-img bitmap.)
+
+> [1] Full disclosure: prior to the recent commit 374eedd1c4 and
+> friends, we were NOT able to see bitmaps through filters, which meant
+> that we actually did not have nice clean semantics for uniformly being
+> able to pick up bitmaps from anywhere in the backing chain (seen as a
+> change in behavior between qemu 4.1 and 4.2 at commit 00e30f05de, when
+> block-copy swapped from a one-off to a filter).  Which means libvirt
+> was already coded to copy bitmaps around for the sake of older qemu,
+> even though modern qemu no longer needs it.  Oh well.
+>=20
+> Fixes: http://bugzilla.redhat.com/1877209
+> Reported-by: Eyal Shenitzky <eshenitz@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>=20
+> In v2:
+> - also use BDRV_O_NO_BACKING on source [Max]
+> - improved commit message [Max]
+>=20
+>  qemu-img.c                 | 11 ++++++--
+>  tests/qemu-iotests/291     | 12 ++++++++
+>  tests/qemu-iotests/291.out | 56 ++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 76 insertions(+), 3 deletions(-)
+
+The code looks good to me, but I wonder whether in the commit message it
+should be noted that we don=E2=80=99t want to let bitmaps from deeper nodes
+shine through by default everywhere, but just in specific cases where
+that=E2=80=99s useful (i.e. only NBD so far AFAIA).
+
+Max
+
+
+--MPbcrqhdHwpipohjwNTDy08CXNAmSG3tA--
+
+--sR255QXvkRqlNS1GESAuupkLT47msuVIT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9ggg8ACgkQ9AfbAGHV
+z0B1eAgAnc6YzQDYcvVAWDAviN4Hti7pLWYCwRv+vfIs0c/J/ZhxN/cYL6nkLlYz
+chQL3OGWZVtoHr7W8fNduiVBdJkdabPX3bmU5xMmlAtrVWZh0dkkf/m6HlurID1g
+hkdG0Tunaot/HQgMIrh6rFuhrbJS6umWWKiihIgxQbmLGcUjviFvDR1y5csT8wVK
+SpS31kF9EJJJQAKqHwRD5U7Ll0/sRmYn+Jo0mKe68qyDejn6xWN1upiKodcXP5Kt
+DCxlMLsd0WRyXhxj3YaeJKYI0fTtoJ8iMw7GJ95ioNegVQ+cPBvVcR3KE51hh8H4
+MdRzRCoa/6EK7EnCqCCpm8Yyv+Hn1g==
+=dOGK
+-----END PGP SIGNATURE-----
+
+--sR255QXvkRqlNS1GESAuupkLT47msuVIT--
 
 
