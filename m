@@ -2,86 +2,86 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B174C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 06:25:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA50C2D0E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 06:28:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2FD020732
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 06:25:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B7772076C
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 06:28:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QRmvqj8p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2FD020732
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y9U1uoaz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B7772076C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kI4PU-0004CA-0p
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 02:25:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54186)
+	id 1kI4Ry-0005UT-6u
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 02:28:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54570)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kI4OH-0003Z9-Hz
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 02:24:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24510)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kI4RG-0004pl-VP
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 02:27:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33879)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kI4OF-0005HH-IV
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 02:24:33 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kI4RF-0005bh-Ct
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 02:27:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600151071;
+ s=mimecast20190719; t=1600151256;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+XhwcOG+5QtjbNiJoNWdIrh8/0hDLrHMffqPgdMxxb0=;
- b=QRmvqj8pmkqAmlKYPkXrk27pQKny+1x6QGzkgjIAB+6+k/KFrIITtHj9Y/gIk42zK3DI8Q
- 413yIjDEjP8/c/LgA5/YFJQZ4kTYurxExKXwt03r3LxPO6bicvqFzILlWeW4xhxGreX4g2
- q+f7J0nhVtcjFl9gClti05zgbkJsoWA=
+ bh=I8AdB452kff1INhzPkhLt6QoWlRLjwwjHZvHrNxQULo=;
+ b=Y9U1uoazxuJaa6oFxEnu539ZYUUh7NNhdfqe4Z/unBr4vyeL+rQJrLWm2Z4wvDmUiwUAQU
+ MjYp9KvK2TKb0DimX4mA/liQAFfYB999CrAr+PsKbgnOZ5gcPY5poHCUlDny26BgPj8lIQ
+ ymsKVJGx1XunAPofEn4FtY+tuEPgoK8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-NtLRkGfGMc-8RPL9PCSNwg-1; Tue, 15 Sep 2020 02:24:27 -0400
-X-MC-Unique: NtLRkGfGMc-8RPL9PCSNwg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-328-oes8mQ--PmaUplEJl72Sgg-1; Tue, 15 Sep 2020 02:27:32 -0400
+X-MC-Unique: oes8mQ--PmaUplEJl72Sgg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3FBA41091065;
- Tue, 15 Sep 2020 06:24:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A34611007460;
+ Tue, 15 Sep 2020 06:27:31 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
  [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 39D1F5DC17;
- Tue, 15 Sep 2020 06:24:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6679E10021AA;
+ Tue, 15 Sep 2020 06:27:31 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C3D48113864A; Tue, 15 Sep 2020 08:24:21 +0200 (CEST)
+ id D95E5113864A; Tue, 15 Sep 2020 08:27:29 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v5 3/8] qapi: Restrict balloon-related commands to
- machine code
-References: <b9401e89-2598-74f7-5e92-885c522b7599@redhat.com>
- <CD01CCE8-2E17-4234-82E8-37DE94E62DD3@redhat.com>
- <87lfhcppsx.fsf@dusky.pond.sub.org>
- <d446f5a6-2547-b32b-75dd-f38410effc57@redhat.com>
-Date: Tue, 15 Sep 2020 08:24:21 +0200
-In-Reply-To: <d446f5a6-2547-b32b-75dd-f38410effc57@redhat.com> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 14 Sep 2020 14:15:17
+Subject: Re: [PATCH v5 1/8] qapi: Restrict LostTickPolicy enum to machine code
+References: <20200913195348.1064154-1-philmd@redhat.com>
+ <20200913195348.1064154-2-philmd@redhat.com>
+ <871rj4u3ct.fsf@dusky.pond.sub.org>
+ <d80894ba-9958-48e6-33cc-6356474fc2b7@redhat.com>
+Date: Tue, 15 Sep 2020 08:27:29 +0200
+In-Reply-To: <d80894ba-9958-48e6-33cc-6356474fc2b7@redhat.com> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 14 Sep 2020 11:37:07
  +0200")
-Message-ID: <87v9gfimlm.fsf@dusky.pond.sub.org>
+Message-ID: <87r1r3imge.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:10:32
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:23:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -38
 X-Spam_score: -3.9
@@ -102,72 +102,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>, David Hildenbrand <david@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Qemu-block <qemu-block@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> On 9/14/20 1:21 PM, Markus Armbruster wrote:
->> David Hildenbrand <david@redhat.com> writes:
->>=20
->>>> Am 14.09.2020 um 11:42 schrieb Philippe Mathieu-Daud=C3=A9 <philmd@red=
-hat.com>:
->>>>
->>>> =EF=BB=BF+Laurent and David
->>>>
->>>>> On 9/14/20 11:16 AM, Markus Armbruster wrote:
->>>>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->>>>>
->>>>>> Only qemu-system-FOO and qemu-storage-daemon provide QMP
->>>>>> monitors, therefore such declarations and definitions are
->>>>>> irrelevant for user-mode emulation.
->>>>>>
->>>>>> Restricting the balloon-related commands to machine.json
->>>>>> allows pulling less declarations/definitions to user-mode.
->>>>>
->>>>> How this affects user mode is not obvious to (ignorant) me.  Can you
->>>>> provide a clue?
->>>>
->>>> I guess this was discussed with David at some point.
->>>>
->>>> Maybe the QMP commands are not exposed via HMP, making this
->>>> code unreachable?
->>>>
->>>> Anyhow user-mode binaries don't use the memory ballooning feature,
->>>> this is specific to system-mode emulation.
->>>>
->>>> Laurent/David, do you have some more trivial explanation?
->>>
->>> Agreed.
->>>
->>> No memory ballooning device -> no memory ballooning :)
->>=20
->> I understand why user mode doesn't need device models.  What I don't
->> understand offhand is how balloon-related stuff in misc.json ends up
->> pulling "declarations/definitions to user-mode".  What exactly is being
->> pulled where before the series, and no more afterwards?
->>=20
->> Is it just the code generated for the QAPI stuff you move, or is it
->> more?
+> +Laurent + qemu-block@
 >
-> As of this series, this is only QAPI generated code.
-> (code which pulls in unwanted declarations/definitions
-> that should be poisoned, but we can't because of this).
+> On 9/14/20 11:14 AM, Markus Armbruster wrote:
+>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>>=20
+>>> Acked-by: Markus Armbruster <armbru@redhat.com>
+>>> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>=20
+>> Unlike the other patches that move code out of misc.json, this one
+>> doesn't say "allows pulling less declarations/definitions to user-mode."
+>> Intentional?
 >
-> I didn't feel the need to enumerate what is removed from
-> user-mode, because from the diff (and no link failure)
-> I thought it was obvious. I can do, but that would be
-> simply copy/pasting the QAPI changes.
+> TBH I don't remember as this is 6months old.
+>
+> IIUC the "tick lost" feature is only meaningful when running
+> virtualized with a RTC profile, so this is pointless for
+> user-mode binaries and tools.
 
-Suggest to replace "pulling less declarations/definitions to user-mode"
-by "pulling less QAPI-generated code into user-mode" in all the commit
-messages.
-
-> Part 3 start to remove things, but I kept that separated.
-
-That's okay.
+Your reply to my question on PATCH 3 "What exactly is being pulled
+where before the series, and no more afterwards?" leads me to believe
+this patch is no different.  Suggest to add the same rationale to this
+commit message.
 
 
