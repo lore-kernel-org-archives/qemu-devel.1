@@ -2,123 +2,108 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 471F1C43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 16:51:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77453C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 16:54:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFF5120809
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 16:51:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EAA062145D
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 16:54:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="S6hJvgfI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFF5120809
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bFONzF8H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAA062145D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIEB6-0001Dx-R7
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 12:51:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38402)
+	id 1kIEED-00045a-1P
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 12:54:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38896)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kIE4U-0000LR-HD; Tue, 15 Sep 2020 12:44:46 -0400
-Received: from mail-eopbgr00131.outbound.protection.outlook.com
- ([40.107.0.131]:27107 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kIE4Q-0007he-T7; Tue, 15 Sep 2020 12:44:46 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=k2UdzEKdil8twx5D4EGQKa3yjoVDZhEvg3EWBsnwiuodFxWulmG3VJRceLlK2zcgUecS0ZrXIRREXLjuBSkRzimq3iymgaiJzNS+fVOizIxW5mmRHz7dPxxUTM1vWEnOWOdXp0PrweLMMJg1CHLuT8J1AUes3ViYg4d4OVFayr1KQ8QDLEap/pE85jqW7Eo3ANHUHVPeUqrLWYbslse3kuYQ4QRo1ZtkxjZVXAhCItwTmzQYETNy2dUzDJc+gtN2Ke63P2wJ3iZHlCmRGru4yRoH7puVU9Nkc4TihIeAMesbZzJn7zVei98oHNM7CDvdIukir/1EA5vPQ+EJ0aSDmg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=m3Mfjs6F23/Apaan2wyhFR9NH3ancKVhc8mxe6uHokQ=;
- b=Rt8w+GUD/oqtKzX88VyUXzcYNySoD95MB4sW3xeG9ROAO0WG2Rf1dcfbKlZ6RMPab/AGwNS4AciPTJyX6d0noXV23PQti34OdiY8gwxpEs0qm68zUTW36SAH9DJuKaDMS3ipg/x6go1SNsaYpNyJkwdn+tnL6rePPoaxEfadMz8EOQW4NFTL0EH8X50sdOlO59WhDGwCwJXWXcIImyOzAhXYOAkYJStIAe8472/xuq0BooDGtHRBFNqCajzpgA9yBxzw1P08V+ORkDlBptNdCkwIdGBFPyw5NAoncaij6UPQZ+FbNgwkCukMPV5sfjo/e+8XWP0qnt+dfSO1mmbAFA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=m3Mfjs6F23/Apaan2wyhFR9NH3ancKVhc8mxe6uHokQ=;
- b=S6hJvgfIh//SE3IB4tO1lBaSod5WQ3jlyUsDzn+FogiqR57Y7fUyK+1CRMijN85tlg+Se62ZZyzjWcijirQW4LbydtoWZNFszx/kttDT0LFgrTSV9l39nNe2+wkzm07oXZf0MEAnAFhKg4gtxy0kZ2AWXn5we0Y417Y6V7qw6OY=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM5PR0801MB1652.eurprd08.prod.outlook.com (2603:10a6:203:3c::21)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.17; Tue, 15 Sep
- 2020 16:44:29 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::b179:9641:7589:d692%8]) with mapi id 15.20.3370.019; Tue, 15 Sep 2020
- 16:44:29 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, crosa@redhat.com, ehabkost@redhat.com,
- fam@euphon.net, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com,
- vsementsov@virtuozzo.com, den@openvz.org, eblake@redhat.com
-Subject: [PATCH v8 6/7] block: drop bdrv_prwv
-Date: Tue, 15 Sep 2020 19:44:10 +0300
-Message-Id: <20200915164411.20590-7-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200915164411.20590-1-vsementsov@virtuozzo.com>
-References: <20200915164411.20590-1-vsementsov@virtuozzo.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM0PR07CA0025.eurprd07.prod.outlook.com
- (2603:10a6:208:ac::38) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kIE7j-0004cw-DX
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 12:48:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35927)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kIE7g-0008BP-El
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 12:48:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600188483;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=lgItECeWvYTLmu2m7VBqMl/s+QqqN6gyY30+B6iwNZo=;
+ b=bFONzF8HJNTVYOKusPWe60hqtlBsto8E43LcTB6bf7cTqTO8Es6bH92wdIMTdAU+qq+1tK
+ 2x5szFN52iGB5lwl+3VO4GCJ5p61q6d5G8NeeoeXlytlDT890zsWJi6z0mVK40XcMVuUJy
+ 2H0p29i0s7Mt74ZkW44TzRNi+15qwws=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-487--MAK_58TOMelOKgPcagrpQ-1; Tue, 15 Sep 2020 12:47:59 -0400
+X-MC-Unique: -MAK_58TOMelOKgPcagrpQ-1
+Received: by mail-wr1-f72.google.com with SMTP id v12so1448966wrm.9
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 09:47:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=lgItECeWvYTLmu2m7VBqMl/s+QqqN6gyY30+B6iwNZo=;
+ b=pOmk+T8YLHujJRQ/hiKpVr3v/TO12DMLzcXVeRx4rOdzH6TraR+UTsEq98Njoazh63
+ TpdtduVvEucIUuRMSbcpTJ3e6GrL8FIHc/eR8NW4Jtc4KYhxhttituTTsKM480S50edH
+ e4lfo5pNY9TESvITlHae8G1LOSL37qx0j+cjn2SWIDaJeHkPKCpLYorRH97uEa944H5U
+ SvkVqvWI+xoe6tBdqK8l8F7CVz3A3ZwaXPgcXkJAW3TAyVRLTFDVYV48C1bmDWKZOEWQ
+ fljen8WMonZqCzCbyUXFLaemP9JLM6aKBg+kJhQBRn/A8PintWxQXreByx2LGyAAC64X
+ kqSA==
+X-Gm-Message-State: AOAM532J5AveS8vqmuoweqIXgbStj+MTTni+C17zRnbKuF6RNxQfjwjW
+ 50lIavd6pyoV9l48l03hnYfv9/HCmAqlL/5paCA68h8F8K93qxEEqzSuGvF7G237ZCKEo90S/CT
+ wv6BIa2JbFjlT2Dk=
+X-Received: by 2002:a5d:40c4:: with SMTP id b4mr19325022wrq.151.1600188477677; 
+ Tue, 15 Sep 2020 09:47:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzdo8GI8YstFgBIS3IZYLwYcdlpZRihPE6fTqu5OTA20VBH9ZlSrfK16u1IdDVZYbccv5ztbw==
+X-Received: by 2002:a5d:40c4:: with SMTP id b4mr19325007wrq.151.1600188477451; 
+ Tue, 15 Sep 2020 09:47:57 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:eac8:587f:8ca7:e1e8?
+ ([2001:b07:6468:f312:eac8:587f:8ca7:e1e8])
+ by smtp.gmail.com with ESMTPSA id v17sm27639581wrr.60.2020.09.15.09.47.56
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 15 Sep 2020 09:47:56 -0700 (PDT)
+Subject: Re: couple meson issues
+To: Andrew Jones <drjones@redhat.com>
+References: <20200915134412.5jmvbs7eqcv5sugc@kamzik.brq.redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <472c32dd-b6b2-2c71-9366-f92c3af5eba4@redhat.com>
+Date: Tue, 15 Sep 2020 18:47:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.sw.ru (185.215.60.75) by
- AM0PR07CA0025.eurprd07.prod.outlook.com (2603:10a6:208:ac::38) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3391.5 via Frontend Transport; Tue, 15 Sep 2020 16:44:28 +0000
-X-Mailer: git-send-email 2.21.3
-X-Originating-IP: [185.215.60.75]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ff160562-6e63-49a4-4f5b-08d859969d2f
-X-MS-TrafficTypeDiagnostic: AM5PR0801MB1652:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM5PR0801MB165295AC2648A53C981F14E3C1200@AM5PR0801MB1652.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1051;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: V0q4UdXYE3oPvibPknG4ZNNDVFv9esasRcKtsNMoUPt3SIw1bl+j8Z5T+aw6IvmwmVVR1Wkh7SGCUdiav4knXRJUb1w5fgD1qrG2MSbAjroXS0V2HtH9vZ3wws5fM85UB/v6ha7Tr3NE+x1Wf+0ZcOZJ+QRTHeWTyWTwdRsugArZEYV6HfkA86k5TJeRMh3sd8OloXGTwIyCPe5YjT/myXROZpHr/WmnO7brTgB9d6Qk1QZc3i8dshU7Ke2VMqeqJ7PGIGfDrH9aRyRExAfB5My1qlRepN2SNFVv4+MD3aFinbPIxwy4jb3eyKTd72kqzfTl8wrdDi2sQAfi85JI/soqC7wUZoCqjRMOEm8H54E=
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(376002)(346002)(366004)(396003)(136003)(39840400004)(6916009)(6512007)(2906002)(83380400001)(36756003)(478600001)(1076003)(6486002)(86362001)(2616005)(956004)(8676002)(316002)(186003)(16526019)(5660300002)(66946007)(6666004)(52116002)(66476007)(8936002)(26005)(66556008)(6506007)(4326008);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 9dO+RLJDlVlEpCBco0edIt9QyCiWehCJFPgLiD1dxXXKwfwYuvhAnLQgaZTT11WAUsPqNIDj4xFrwHk7NHuZeJ7hc7jkFUc4mZya3xQuxAil1pPm1oLAKePDPh5GyvRoT4pRj3VvnMHmIsEC5gP+zW+CdChDnPAknlq8k5dkVP5takpd3bmFMRoxiNrMqKIxAgwc3qOwv9m8CQ87IlaiZEyIGfqwgoxpvr6Q8EdqXa3QBxFvYoqHfpq/BCctF0vbG/Kyuxhy5m8ipykkW4W6NsGTOtyXU7LeN9GSCz4i9uio+Hvf9j4eE7pHuyZT3KEW3wGuR/E4c0Qm7OA3SwDLcw5X9pDiGOp/IEvJAgEXswTJtMV43tXatV3uqPOM78I4jh6mA5smDNIY+BBK2ROj92lT7PKlW09eyMaorDiHh4c3Z13kgRPl1rDy2KEsl12fyS2wKucRUfiOsSMWKA+Klbntquxm23tuHMjPxGRrE1t1x2aCTz5+AXfTCp43L80v5PTfjqdOqITmlpCwspsjvVYEGR+DtD1wL3o7ZHN11DXzAxlxcfGxTCSyFMdK5O7KjRgfpnRWIZ5hooKRyqkbSYny+SnlBQAGIqCUzM7S0nRtfcVDugSZ3cVNpDuom9rgcFoOHuDVBfKuUV/pHy+x2Q==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ff160562-6e63-49a4-4f5b-08d859969d2f
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2020 16:44:29.1707 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: S63iejeq6VLKDea5kKjYbs6nCiPeZ21dMh7bIh85fCckRmRHFBZk6I1VDyE3xl3yQYwpphnUwabVIfdduWNl0nImCBR8T59xgifw0E4gpXA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0801MB1652
-Received-SPF: pass client-ip=40.107.0.131;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR02-AM5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 12:44:35
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200915134412.5jmvbs7eqcv5sugc@kamzik.brq.redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:10:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -131,181 +116,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that we are not maintaining boilerplate code for coroutine
-wrappers, there is no more sense in keeping the extra indirection layer
-of bdrv_prwv().  Let's drop it and instead generate pure bdrv_preadv()
-and bdrv_pwritev().
+On 15/09/20 15:44, Andrew Jones wrote:
+> Hi Paolo,
+> 
+> I noticed that 'make check-qtest-aarch64' no longer runs the
+> arm-cpu-feature test. I simply did
+> 
+> diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
+> index 874b5be62be2..db169a53b530 100644
+> --- a/tests/qtest/meson.build
+> +++ b/tests/qtest/meson.build
+> @@ -146,7 +146,8 @@ qtests_aarch64 = \
+>    (cpu != 'arm' ? ['bios-tables-test'] : []) +                                                  \
+>    (config_all_devices.has_key('CONFIG_TPM_TIS_SYSBUS') ? ['tpm-tis-device-test'] : []) +        \
+>    (config_all_devices.has_key('CONFIG_TPM_TIS_SYSBUS') ? ['tpm-tis-device-swtpm-test'] : []) +  \
+> -  ['numa-test',
+> +  ['arm-cpu-features',
+> +   'numa-test',
+>     'boot-serial-test',
+>     'migration-test']
 
-Currently, bdrv_pwritev() and bdrv_preadv() are returning bytes on
-success, auto generated functions will instead return zero, as their
-_co_ prototype. Still, it's simple to make the conversion safe: the
-only external user of bdrv_pwritev() is test-bdrv-drain, and it is
-comfortable enough with bdrv_co_pwritev() instead. So prototypes are
-moved to local block/coroutines.h. Next, the only internal use is
-bdrv_pread() and bdrv_pwrite(), which are modified to return bytes on
-success.
+Yes, either that or "qtests_aarch64 = qtests_arm + <whatever is there now>".
 
-Of course, it would be great to convert bdrv_pread() and bdrv_pwrite()
-to return 0 on success. But this requires audit (and probably
-conversion) of all their users, let's leave it for another day
-refactoring.
+> to get it to run, but don't know if it should be done that way. Were you
+> planning to inherit tests for aarch64 from arm or something instead?
+> 
+> Also, I was surprised to not see something like "KVM supported" when I did
+> configure on an AArch64 machine with KVM.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- block/coroutines.h      | 10 ++++-----
- include/block/block.h   |  2 --
- block/io.c              | 49 ++++++++---------------------------------
- tests/test-bdrv-drain.c |  2 +-
- 4 files changed, 15 insertions(+), 48 deletions(-)
+That's a "TODO":
 
-diff --git a/block/coroutines.h b/block/coroutines.h
-index c62b3a2697..6c63a819c9 100644
---- a/block/coroutines.h
-+++ b/block/coroutines.h
-@@ -31,12 +31,12 @@ int coroutine_fn bdrv_co_check(BlockDriverState *bs,
-                                BdrvCheckResult *res, BdrvCheckMode fix);
- int coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs, Error **errp);
- 
--int coroutine_fn
--bdrv_co_prwv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov,
--             bool is_write, BdrvRequestFlags flags);
- int generated_co_wrapper
--bdrv_prwv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov,
--          bool is_write, BdrvRequestFlags flags);
-+bdrv_preadv(BdrvChild *child, int64_t offset, unsigned int bytes,
-+            QEMUIOVector *qiov, BdrvRequestFlags flags);
-+int generated_co_wrapper
-+bdrv_pwritev(BdrvChild *child, int64_t offset, unsigned int bytes,
-+             QEMUIOVector *qiov, BdrvRequestFlags flags);
- 
- int coroutine_fn
- bdrv_co_common_block_status_above(BlockDriverState *bs,
-diff --git a/include/block/block.h b/include/block/block.h
-index d8fb02fa2a..b8b4c177de 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -383,9 +383,7 @@ int bdrv_pwrite_zeroes(BdrvChild *child, int64_t offset,
-                        int bytes, BdrvRequestFlags flags);
- int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags flags);
- int bdrv_pread(BdrvChild *child, int64_t offset, void *buf, int bytes);
--int bdrv_preadv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov);
- int bdrv_pwrite(BdrvChild *child, int64_t offset, const void *buf, int bytes);
--int bdrv_pwritev(BdrvChild *child, int64_t offset, QEMUIOVector *qiov);
- int bdrv_pwrite_sync(BdrvChild *child, int64_t offset,
-                      const void *buf, int count);
- /*
-diff --git a/block/io.c b/block/io.c
-index 5270d68d72..68d7d9cf80 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -890,23 +890,11 @@ static int bdrv_check_byte_request(BlockDriverState *bs, int64_t offset,
-     return 0;
- }
- 
--int coroutine_fn bdrv_co_prwv(BdrvChild *child, int64_t offset,
--                              QEMUIOVector *qiov, bool is_write,
--                              BdrvRequestFlags flags)
--{
--    if (is_write) {
--        return bdrv_co_pwritev(child, offset, qiov->size, qiov, flags);
--    } else {
--        return bdrv_co_preadv(child, offset, qiov->size, qiov, flags);
--    }
--}
--
- int bdrv_pwrite_zeroes(BdrvChild *child, int64_t offset,
-                        int bytes, BdrvRequestFlags flags)
- {
--    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, NULL, bytes);
--
--    return bdrv_prwv(child, offset, &qiov, true, BDRV_REQ_ZERO_WRITE | flags);
-+    return bdrv_pwritev(child, offset, bytes, NULL,
-+                        BDRV_REQ_ZERO_WRITE | flags);
- }
- 
- /*
-@@ -950,41 +938,19 @@ int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags flags)
-     }
- }
- 
--/* return < 0 if error. See bdrv_pwrite() for the return codes */
--int bdrv_preadv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov)
--{
--    int ret;
--
--    ret = bdrv_prwv(child, offset, qiov, false, 0);
--    if (ret < 0) {
--        return ret;
--    }
--
--    return qiov->size;
--}
--
- /* See bdrv_pwrite() for the return codes */
- int bdrv_pread(BdrvChild *child, int64_t offset, void *buf, int bytes)
- {
-+    int ret;
-     QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
- 
-     if (bytes < 0) {
-         return -EINVAL;
-     }
- 
--    return bdrv_preadv(child, offset, &qiov);
--}
--
--int bdrv_pwritev(BdrvChild *child, int64_t offset, QEMUIOVector *qiov)
--{
--    int ret;
-+    ret = bdrv_preadv(child, offset, bytes, &qiov,  0);
- 
--    ret = bdrv_prwv(child, offset, qiov, true, 0);
--    if (ret < 0) {
--        return ret;
--    }
--
--    return qiov->size;
-+    return ret < 0 ? ret : bytes;
- }
- 
- /* Return no. of bytes on success or < 0 on error. Important errors are:
-@@ -995,13 +961,16 @@ int bdrv_pwritev(BdrvChild *child, int64_t offset, QEMUIOVector *qiov)
- */
- int bdrv_pwrite(BdrvChild *child, int64_t offset, const void *buf, int bytes)
- {
-+    int ret;
-     QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
- 
-     if (bytes < 0) {
-         return -EINVAL;
-     }
- 
--    return bdrv_pwritev(child, offset, &qiov);
-+    ret = bdrv_pwritev(child, offset, bytes, &qiov, 0);
-+
-+    return ret < 0 ? ret : bytes;
- }
- 
- /*
-diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index 1107271840..1595bbc92e 100644
---- a/tests/test-bdrv-drain.c
-+++ b/tests/test-bdrv-drain.c
-@@ -1872,7 +1872,7 @@ static int coroutine_fn bdrv_replace_test_co_preadv(BlockDriverState *bs,
-         }
-         s->io_co = NULL;
- 
--        ret = bdrv_preadv(bs->backing, offset, qiov);
-+        ret = bdrv_co_preadv(bs->backing, offset, bytes, qiov, 0);
-         s->has_read = true;
- 
-         /* Wake up drain_co if it runs */
--- 
-2.21.3
+# TODO: add back KVM/HAX/HVF/WHPX/TCG
+#summary_info += {'KVM support':       have_kvm}
+#summary_info += {'HAX support':       have_hax}
+#summary_info += {'HVF support':       have_hvf}
+#summary_info += {'WHPX support':      have_whpx}
+#summary_info += {'TCG support':       have_tcg}
+
+which I had honestly completely forgotten about.
+
+Accelerator support is per-target so it must be computed in the "foreach
+target : target_dirs" loop around line 550 of meson.build.  But I might
+even have the patch already, since it was meant to be temporary and
+fixed as soon as that loop was added to meson in the very first series.
+
+Paolo
 
 
