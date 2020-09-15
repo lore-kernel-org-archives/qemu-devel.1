@@ -2,88 +2,110 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10736C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 19:19:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3975AC43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 19:20:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E79B206B2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 19:19:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7AAC0206B2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 19:20:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K0/q2YBC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E79B206B2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PdSDEujn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AAC0206B2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIGUM-0006Un-JJ
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 15:19:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44540)
+	id 1kIGV2-0006x3-AP
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 15:20:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43982)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kIGSC-0004M1-8C; Tue, 15 Sep 2020 15:17:24 -0400
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:46818)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kIGS8-0002Rr-0J; Tue, 15 Sep 2020 15:17:23 -0400
-Received: by mail-lf1-x143.google.com with SMTP id b22so4258107lfs.13;
- Tue, 15 Sep 2020 12:17:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=gAQCC2THZ4BDSX7taD02VqYincq+fZsD23hrk3Iq2wU=;
- b=K0/q2YBCKdO16eP4S2kGd6BGZEwRPRgoQ+gEcYZx2xroZuwwqCcUbSBHNNajvN9i9A
- Hd2d8LBHt1unzbwGGzibObJqr4AP/Zjr1JCPqb9xydizNJLPVgb54pj6PbsQKctfgS+0
- 5f5qs6LzIWqM91tDYWZII9a+5eCA36hIMU1JP5efKDIfa3CdZzodirrVgTA3MYvkHxt6
- Jhd9s4PdeD6VpJvmijyGfts5aOjb/JnZTQPOod4rm03cbRNe0FuC8EsjjYurVR30JvJk
- VbbeZeKqhyElRil2x/NNxko3lOUtMzW5w7JkDY/fcIokZGCBNwUMUNX4l0pJiOggeTzZ
- z0mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=gAQCC2THZ4BDSX7taD02VqYincq+fZsD23hrk3Iq2wU=;
- b=lrIBCNpcs2bLdGv6TSikeGY+oDdKjfUahrq+XQ3QyH+1pvyMvqf43wsxwgQIvOnmId
- 4kqS07wLMBL+aa1yH+f18FpkUG232BOX5mY3Z/OD1MXf33q3VObWZ5CEtbsdhwKt1fqt
- sYXo2+8pZRmb9kDqr4xSTus1QZFDxblNujLmvW47n4mTk8eKpk909xVJAr7xEFRBuTuD
- CUjqoY/adu8dH1eJPNqgZVdMJtw837RFZulcrmfUmHUZThhm8wlxB1lttHQfxBiTpNQB
- GfOD0YrPqD9jvBV4ga+90/AbRnk/nWBxvXgu42Y4SFFsij0Xr/oq71v23BlZK6jMAKdK
- QBeA==
-X-Gm-Message-State: AOAM532dj3r1Y/D1zFgrfYeMgyAZSKlQZeeWBHecUdW1KSylq1k00cAO
- gI3rc2CAmCbYXmPPHBHKn4WXqsCvMKTQ6tTNGcQ=
-X-Google-Smtp-Source: ABdhPJwRC4fpqWvkiWcS03WUFZqzr/CbbdSFt7MhRIoCNzIs9vPUBUAfZT2buZJNSe1cG/bqgFucHQxw3qkLNbXpjhI=
-X-Received: by 2002:a19:9141:: with SMTP id y1mr5931227lfj.554.1600197437771; 
- Tue, 15 Sep 2020 12:17:17 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200915163343.1100-1-luoyonggang@gmail.com>
- <06c76888-b2c1-866f-f6f5-78ee9a2bac0c@redhat.com>
- <CAE2XoE8OmSSnzzUivS0jNQu=QEe8c_gPasfksoihdYhO6f4CYg@mail.gmail.com>
- <ba164474-7cb0-1f8f-ef01-2529954a1df9@amsat.org>
-In-Reply-To: <ba164474-7cb0-1f8f-ef01-2529954a1df9@amsat.org>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Wed, 16 Sep 2020 03:17:04 +0800
-Message-ID: <CAE2XoE_N=XWeg1y74=ohb_p5qiH+rewDtwSGfSwkhHJpA2V06A@mail.gmail.com>
-Subject: Re: [PATCH] guest agent: Fixes for windows guest agent building on
- msys2/mingw
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: multipart/alternative; boundary="000000000000d954f505af5eff65"
-Received-SPF: pass client-ip=2a00:1450:4864:20::143;
- envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x143.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kIGPu-0001qj-1J; Tue, 15 Sep 2020 15:15:02 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48858)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kIGPq-0001wm-9v; Tue, 15 Sep 2020 15:15:01 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 08FIXik1032819; Tue, 15 Sep 2020 15:14:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject
+ : date : message-id : in-reply-to : references; s=pp1;
+ bh=9OEVq9GR0dWFU4woffCFVhYENDP3UoRI7DXeNT+evTM=;
+ b=PdSDEujn5Qb6x1VQAu0o6CqrHjZEY+U0Cvuo4jINrLZ0sAvK+udMRSDQ4IfiSiYl4yrw
+ SdNcR7ak4gca3VLHVFfZJ0cTWsTIBXYoox4pDbHedBVZ+BLytyI6vj4gBrgBH/5e/IVr
+ WsNuTOW49kXfxkkvYGp6SvvktZUWXD76u6K7NppSVl6RVvA8ofGzo1Vc6ygLNuSVVtQo
+ v7Vn1pgSc669pCbDHHrbOeK5ty6PayqxNvlbPq0v6UkdRbqJER6feLBHqnlP6XiOxrrz
+ enUTJkcjAgYcdo00qEYM1NOSAgKr9wF2N9IZ7GI1IFYj0hch6eZYO/RxnYRCojewM6fY Mw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33k2q8sh79-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 15 Sep 2020 15:14:56 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08FIYmM7036442;
+ Tue, 15 Sep 2020 15:14:55 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.26])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33k2q8sh71-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 15 Sep 2020 15:14:55 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+ by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08FJ7lWd002857;
+ Tue, 15 Sep 2020 19:14:54 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com
+ [9.57.198.28]) by ppma04wdc.us.ibm.com with ESMTP id 33jgrgxv2u-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 15 Sep 2020 19:14:54 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
+ [9.57.199.109])
+ by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 08FJErlC54722984
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 15 Sep 2020 19:14:54 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id DC55E112065;
+ Tue, 15 Sep 2020 19:14:53 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 81E55112064;
+ Tue, 15 Sep 2020 19:14:51 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.163.85.51])
+ by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+ Tue, 15 Sep 2020 19:14:51 +0000 (GMT)
+From: Matthew Rosato <mjrosato@linux.ibm.com>
+To: alex.williamson@redhat.com, cohuck@redhat.com
+Subject: [PATCH v3 1/5] linux-headers: update against 5.9-rc5
+Date: Tue, 15 Sep 2020 15:14:39 -0400
+Message-Id: <1600197283-25274-2-git-send-email-mjrosato@linux.ibm.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1600197283-25274-1-git-send-email-mjrosato@linux.ibm.com>
+References: <1600197283-25274-1-git-send-email-mjrosato@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-15_12:2020-09-15,
+ 2020-09-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 impostorscore=0
+ malwarescore=0 suspectscore=0 phishscore=0 clxscore=1015 spamscore=0
+ bulkscore=0 adultscore=0 mlxlogscore=999 priorityscore=1501
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009150147
+Received-SPF: pass client-ip=148.163.156.1;
+ envelope-from=mjrosato@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 15:14:56
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,435 +119,867 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>,
- QEMU Trivial <qemu-trivial@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- qemu-level <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: thuth@redhat.com, kvm@vger.kernel.org, pmorel@linux.ibm.com,
+ david@redhat.com, schnelle@linux.ibm.com, qemu-devel@nongnu.org,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
+ mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000d954f505af5eff65
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+PLACEHOLDER as the kernel patch driving the need for this ("vfio iommu: Add
+dma available capability") is not merged yet.
 
-On Wed, Sep 16, 2020 at 1:55 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g>
-wrote:
->
-> On 9/15/20 7:41 PM, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
-> > On Wed, Sep 16, 2020 at 12:41 AM Philippe Mathieu-Daud=C3=A9
-> > <philmd@redhat.com <mailto:philmd@redhat.com>> wrote:
-> >>
-> >> On 9/15/20 6:33 PM, Yonggang Luo wrote:
-> >> > error message:
-> >> > "cc" "-Iqga/qemu-ga.exe.p" "-Iqga" "-I../qga" "-I." "-Iqapi"
-> > "-Itrace" "-Iui" "-Iui/shader" "-IC:/CI-Tools/msys64/mingw64/include"
-> > "-IC:/CI-Tools/msys64/mingw64/include/glib-2.0"
-> > "-IC:/CI-Tools/msys64/mingw64/lib/glib-2.0/include"
-> > "-fdiagnostics-color=3Dauto" "-pipe" "-Wall" "-Winvalid-pch" "-Werror"
-> > "-std=3Dgnu99" "-g" "-m64" "-mcx16" "-D_GNU_SOURCE"
-> > "-D_FILE_OFFSET_BITS=3D64" "-D_LARGEFILE_SOURCE" "-Wstrict-prototypes"
-> > "-Wredundant-decls" "-Wundef" "-Wwrite-strings" "-Wmissing-prototypes"
-> > "-fno-strict-aliasing" "-fno-common" "-fwrapv" "-Wold-style-declaration=
-"
-> > "-Wold-style-definition" "-Wtype-limits" "-Wformat-security"
-> > "-Wformat-y2k" "-Winit-self" "-Wignored-qualifiers" "-Wempty-body"
-> > "-Wnested-externs" "-Wendif-labels" "-Wexpansion-to-defined"
-> > "-Wno-missing-include-dirs" "-Wno-shift-negative-value" "-Wno-psabi"
-> > "-fstack-protector-strong" "-iquote" "/c/work/xemu/qemu/tcg/i386"
-> > "-iquote" "." "-iquote" "/c/work/xemu/qemu" "-iquote"
-> > "/c/work/xemu/qemu/accel/tcg" "-iquote" "/c/work/xemu/qemu/include"
-> > "-iquote" "/c/work/xemu/qemu/disas/libvixl" "-pthread" "-mms-bitfields"
-> > -MD -MQ qga/qemu-ga.exe.p/commands-win32.c.obj -MF
-> > "qga/qemu-ga.exe.p/commands-win32.c.obj.d" -o
-> > qga/qemu-ga.exe.p/commands-win32.c.obj "-c" ../qga/commands-win32.c -MP
-> >> > ../qga/commands-win32.c:62:24: error: redundant redeclaration of
-> > 'CM_Get_DevNode_PropertyW' [-Werror=3Dredundant-decls]
-> >> >    62 | CMAPI CONFIGRET WINAPI CM_Get_DevNode_PropertyW(
-> >> >       |                        ^~~~~~~~~~~~~~~~~~~~~~~~
-> >> > In file included from ../qga/commands-win32.c:26:
-> >> >
-> > C:/CI-Tools/msys64/mingw64/x86_64-w64-mingw32/include/cfgmgr32.h:840:26=
-:
-> > note: previous declaration of 'CM_Get_DevNode_PropertyW' was here
-> >> >   840 |   CMAPI CONFIGRET WINAPI CM_Get_DevNode_PropertyW(DEVINST
-> > dnDevInst, const DEVPROPKEY *PropertyKey, DEVPROPTYPE *PropertyType,
-> > PBYTE PropertyBuffer, PULONG PropertyBufferSize, ULONG ulFlags);
-> >> >       |                          ^~~~~~~~~~~~~~~~~~~~~~~~
-> >> > cc1.exe: all warnings being treated as errors
-> >> > make: [Makefile.ninja:5143=EF=BC=9Aqga/qemu-ga.exe.p/commands-win32.=
-c.obj]
-> > =E9=94=99=E8=AF=AF 1 (=E5=B7=B2=E5=BF=BD=E7=95=A5=EF=BC=89
-> >> >
-> >> > This error comes from qemu configure didn't add predefined macro
-> > -DUNICODE -D_UNICODE in QEMU_CFLAGS,
-> >> > and these too macro are standard config for win32 if using windows
-> > wide api.
-> >> >
-> >> > in cfgmgr32.h
-> >> >   CMAPI CONFIGRET WINAPI CM_Get_DevNode_PropertyW(DEVINST dnDevInst,
-> > const DEVPROPKEY *PropertyKey, DEVPROPTYPE *PropertyType, PBYTE
-> > PropertyBuffer, PULONG PropertyBufferSize, ULONG ulFlags);
-> >> > #ifdef UNICODE
-> >> > #define CM_Get_DevNode_Property CM_Get_DevNode_PropertyW
-> >> > #endif
-> >> >
-> >> > macro CM_Get_DevNode_Property defined only when UNICODE are defined.
-> >> > and in win32, UNICODE and _UNICODE should be defined at the same tim=
-e
-> >> >
-> >> > #endif
-> >> >
-> >> > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com
-> > <mailto:luoyonggang@gmail.com>>
-> >> > ---
-> >> >  configure | 1 +
-> >> >  1 file changed, 1 insertion(+)
-> >> >
-> >> > diff --git a/configure b/configure
-> >> > index 9f141891ea..f5d661af4a 100755
-> >> > --- a/configure
-> >> > +++ b/configure
-> >> > @@ -812,6 +812,7 @@ MINGW32*)
-> >> >    mingw32=3D"yes"
-> >> >    hax=3D"yes"
-> >> >    whpx=3D""
-> >> > +  QEMU_CFLAGS=3D"-DUNICODE -D_UNICODE $QEMU_CFLAGS"
-> >>
-> >> What about declaring them in include/qemu/osdep.h
-> >> instead?
-> > That's a good idea.
-> > But more compiling error warns me that the windows version of qemu are
-> > not in a good situation.
->
-> :)
->
-> > On Win32, all API should call the wide version so that support for
-> > Unicode properly.
-> > But obviously the currently qemu didn't do that
-> >
-> > ```
-> [...]
-> > ../util/qemu-sockets.c: In function 'socket_sockaddr_to_address_inet':
-> > C:/work/xemu/qemu/include/qapi/error.h:319:25: error: format '%s'
-> > expects argument of type 'char *', but argument 6 has type 'WCHAR *'
-> > {aka 'short unsigned int *'} [-Werror=3Dformat=3D]
-> >   319 |                         (fmt), ## __VA_ARGS__)
-> >       |                         ^~~~~
-> > ../util/qemu-sockets.c:1235:9: note: in expansion of macro 'error_setg'
-> >  1235 |         error_setg(errp, "Cannot format numeric socket address:
-%s",
-> >       |         ^~~~~~~~~~
-> > In file included from ../io/dns-resolver.c:26:
-> > ../io/dns-resolver.c: In function 'qio_dns_resolver_lookup_sync_inet':
-> > C:/work/xemu/qemu/include/qapi/error.h:319:25: error: format '%s'
-> > expects argument of type 'char *', but argument 8 has type 'WCHAR *'
-> > {aka 'short unsigned int *'} [-Werror=3Dformat=3D]
-> >   319 |                         (fmt), ## __VA_ARGS__)
-> >       |                         ^~~~~
-> > ../io/dns-resolver.c:93:9: note: in expansion of macro 'error_setg'
-> >    93 |         error_setg(errp, "address resolution failed for %s:%s:
-%s",
-> >       |         ^~~~~~~~~~
-> > cc1.exe: all warnings being treated as errors
-> > make: [Makefile.ninja:756=EF=BC=9Aio/libio.fa.p/dns-resolver.c.obj] =E9=
-=94=99=E8=AF=AF 1 (=E5=B7=B2
-> > =E5=BF=BD=E7=95=A5=EF=BC=89
-> > cc1.exe: all warnings being treated as errors
-> > make: [Makefile.ninja:697=EF=BC=9Alibqemuutil.a.p/util_qemu-sockets.c.o=
-bj] =E9=94=99=E8=AF=AF
-> > 1 (=E5=B7=B2=E5=BF=BD=E7=95=A5=EF=BC=89
-> > Linking static target io/libio.fa
-> > C:\CI-Tools\msys64\mingw64\bin\ar.exe: io/libio.fa.p/dns-resolver.c.obj=
-:
-> > No such file or directory
-> > make: [Makefile.ninja:764=EF=BC=9Aio/libio.fa] =E9=94=99=E8=AF=AF 1 (=
-=E5=B7=B2=E5=BF=BD=E7=95=A5=EF=BC=89
-> > ../net/tap-win32.c: In function 'is_tap_win32_dev':
-> > ../net/tap-win32.c:62:21: error: passing argument 2 of 'RegOpenKeyExW'
-> > from incompatible pointer type [-Werror=3Dincompatible-pointer-types]
-> >    62 | #define ADAPTER_KEY
-> >
-"SYSTEM\\CurrentControlSet\\Control\\Class\\{4D36E972-E325-11CE-BFC1-08002B=
-E10318}"
-> >       |
-> >
-^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~
-> >       |                     |
-> >       |                     const char *
-> > ../net/tap-win32.c:62:21: note: in definition of macro 'ADAPTER_KEY'
-> >    62 | #define ADAPTER_KEY
-> >
-"SYSTEM\\CurrentControlSet\\Control\\Class\\{4D36E972-E325-11CE-BFC1-08002B=
-E10318}"
-> >       |
-> >
-^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~
-> > In file included from
-> > C:/CI-Tools/msys64/mingw64/x86_64-w64-mingw32/include/windows.h:76,
-> >                  from
-> > C:/CI-Tools/msys64/mingw64/x86_64-w64-mingw32/include/winsock2.h:23,
-> >                  from C:/work/xemu/qemu/include/sysemu/os-win32.h:29,
-> >                  from C:/work/xemu/qemu/include/qemu/osdep.h:119,
-> >                  from ../net/tap-win32.c:29:
-> > C:/CI-Tools/msys64/mingw64/x86_64-w64-mingw32/include/winreg.h:195:57:
-> > note: expected 'LPCWSTR' {aka 'const short unsigned int *'} but argumen=
-t
-> > is of type 'const char *'
-> >   195 |   WINADVAPI LONG WINAPI RegOpenKeyExW(HKEY hKey,LPCWSTR
-> > lpSubKey,DWORD ulOptions,REGSAM samDesired,PHKEY phkResult);
-> >       |                                                 ~~~~~~~~^~~~~~~=
-~
-> > ../net/tap-win32.c:229:13: error: passing argument 3 of 'RegEnumKeyExW'
-> > from incompatible pointer type [-Werror=3Dincompatible-pointer-types]
-> >   229 |             enum_name,
-> >       |             ^~~~~~~~~
-> >       |             |
-> >       |             char *
-> > In file included from
-> > C:/CI-Tools/msys64/mingw64/x86_64-w64-mingw32/include/windows.h:76,
-> >                  from
-> > C:/CI-Tools/msys64/mingw64/x86_64-w64-mingw32/include/winsock2.h:23,
-> >                  from C:/work/xemu/qemu/include/sysemu/os-win32.h:29,
-> >                  from C:/work/xemu/qemu/include/qemu/osdep.h:119,
-> >                  from ../net/tap-win32.c:29:
-> > C:/CI-Tools/msys64/mingw64/x86_64-w64-mingw32/include/winreg.h:184:70:
-> > note: expected 'LPWSTR' {aka 'short unsigned int *'} but argument is of
-> > type 'char *'
-> >   184 |   WINADVAPI LONG WINAPI RegEnumKeyExW(HKEY hKey,DWORD
-> > dwIndex,LPWSTR lpName,LPDWORD lpcchName,LPDWORD lpReserved,LPWSTR
-> > lpClass,LPDWORD lpcchClass,PFILETIME lpftLastWriteTime);
-> >       |
-> > ~~~~~~~^~~~~~
-> > ../net/tap-win32.c:247:13: error: passing argument 2 of 'RegOpenKeyExW'
-> > from incompatible pointer type [-Werror=3Dincompatible-pointer-types]
-> >   247 |             unit_string,
-> >       |             ^~~~~~~~~~~
-> >       |             |
-> >       |             char *
->
-> I'm not sure fixing all these warnings would produce a
-> maintainable code base. I'd rather disable these 2 warning
-> classes on Windows.
-I agree with that, seems QEMU currently are calling ANSI api all the time,
-better not change that,
- so globally define -DUNICODE -D_UNICODE is not a option
+Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+---
+ include/standard-headers/drm/drm_fourcc.h          | 140 +++++++++++++++++++++
+ include/standard-headers/linux/ethtool.h           |  87 +++++++++++++
+ include/standard-headers/linux/input-event-codes.h |   3 +-
+ include/standard-headers/linux/vhost_types.h       |  11 ++
+ include/standard-headers/linux/virtio_9p.h         |   4 +-
+ include/standard-headers/linux/virtio_blk.h        |  26 ++--
+ include/standard-headers/linux/virtio_config.h     |   8 +-
+ include/standard-headers/linux/virtio_console.h    |   8 +-
+ include/standard-headers/linux/virtio_net.h        |   6 +-
+ include/standard-headers/linux/virtio_scsi.h       |  20 +--
+ linux-headers/asm-generic/unistd.h                 |   6 +-
+ linux-headers/asm-mips/unistd_n32.h                |   1 +
+ linux-headers/asm-mips/unistd_n64.h                |   1 +
+ linux-headers/asm-mips/unistd_o32.h                |   1 +
+ linux-headers/asm-powerpc/kvm.h                    |   5 +
+ linux-headers/asm-powerpc/unistd_32.h              |   1 +
+ linux-headers/asm-powerpc/unistd_64.h              |   1 +
+ linux-headers/asm-s390/kvm.h                       |   7 +-
+ linux-headers/asm-s390/unistd_32.h                 |   1 +
+ linux-headers/asm-s390/unistd_64.h                 |   1 +
+ linux-headers/asm-x86/unistd_32.h                  |   1 +
+ linux-headers/asm-x86/unistd_64.h                  |   1 +
+ linux-headers/asm-x86/unistd_x32.h                 |   1 +
+ linux-headers/linux/kvm.h                          |  10 +-
+ linux-headers/linux/vfio.h                         |  18 ++-
+ linux-headers/linux/vhost.h                        |   2 +
+ 26 files changed, 328 insertions(+), 43 deletions(-)
 
+diff --git a/include/standard-headers/drm/drm_fourcc.h b/include/standard-headers/drm/drm_fourcc.h
+index 909a667..0de1a55 100644
+--- a/include/standard-headers/drm/drm_fourcc.h
++++ b/include/standard-headers/drm/drm_fourcc.h
+@@ -235,6 +235,12 @@ extern "C" {
+ #define DRM_FORMAT_NV61		fourcc_code('N', 'V', '6', '1') /* 2x1 subsampled Cb:Cr plane */
+ #define DRM_FORMAT_NV24		fourcc_code('N', 'V', '2', '4') /* non-subsampled Cr:Cb plane */
+ #define DRM_FORMAT_NV42		fourcc_code('N', 'V', '4', '2') /* non-subsampled Cb:Cr plane */
++/*
++ * 2 plane YCbCr
++ * index 0 = Y plane, [39:0] Y3:Y2:Y1:Y0 little endian
++ * index 1 = Cr:Cb plane, [39:0] Cr1:Cb1:Cr0:Cb0 little endian
++ */
++#define DRM_FORMAT_NV15		fourcc_code('N', 'V', '1', '5') /* 2x2 subsampled Cr:Cb plane */
+ 
+ /*
+  * 2 plane YCbCr MSB aligned
+@@ -264,6 +270,22 @@ extern "C" {
+  */
+ #define DRM_FORMAT_P016		fourcc_code('P', '0', '1', '6') /* 2x2 subsampled Cr:Cb plane 16 bits per channel */
+ 
++/* 3 plane non-subsampled (444) YCbCr
++ * 16 bits per component, but only 10 bits are used and 6 bits are padded
++ * index 0: Y plane, [15:0] Y:x [10:6] little endian
++ * index 1: Cb plane, [15:0] Cb:x [10:6] little endian
++ * index 2: Cr plane, [15:0] Cr:x [10:6] little endian
++ */
++#define DRM_FORMAT_Q410		fourcc_code('Q', '4', '1', '0')
++
++/* 3 plane non-subsampled (444) YCrCb
++ * 16 bits per component, but only 10 bits are used and 6 bits are padded
++ * index 0: Y plane, [15:0] Y:x [10:6] little endian
++ * index 1: Cr plane, [15:0] Cr:x [10:6] little endian
++ * index 2: Cb plane, [15:0] Cb:x [10:6] little endian
++ */
++#define DRM_FORMAT_Q401		fourcc_code('Q', '4', '0', '1')
++
+ /*
+  * 3 plane YCbCr
+  * index 0: Y plane, [7:0] Y
+@@ -308,6 +330,7 @@ extern "C" {
+ #define DRM_FORMAT_MOD_VENDOR_BROADCOM 0x07
+ #define DRM_FORMAT_MOD_VENDOR_ARM     0x08
+ #define DRM_FORMAT_MOD_VENDOR_ALLWINNER 0x09
++#define DRM_FORMAT_MOD_VENDOR_AMLOGIC 0x0a
+ 
+ /* add more to the end as needed */
+ 
+@@ -322,8 +345,33 @@ extern "C" {
+  * When adding a new token please document the layout with a code comment,
+  * similar to the fourcc codes above. drm_fourcc.h is considered the
+  * authoritative source for all of these.
++ *
++ * Generic modifier names:
++ *
++ * DRM_FORMAT_MOD_GENERIC_* definitions are used to provide vendor-neutral names
++ * for layouts which are common across multiple vendors. To preserve
++ * compatibility, in cases where a vendor-specific definition already exists and
++ * a generic name for it is desired, the common name is a purely symbolic alias
++ * and must use the same numerical value as the original definition.
++ *
++ * Note that generic names should only be used for modifiers which describe
++ * generic layouts (such as pixel re-ordering), which may have
++ * independently-developed support across multiple vendors.
++ *
++ * In future cases where a generic layout is identified before merging with a
++ * vendor-specific modifier, a new 'GENERIC' vendor or modifier using vendor
++ * 'NONE' could be considered. This should only be for obvious, exceptional
++ * cases to avoid polluting the 'GENERIC' namespace with modifiers which only
++ * apply to a single vendor.
++ *
++ * Generic names should not be used for cases where multiple hardware vendors
++ * have implementations of the same standardised compression scheme (such as
++ * AFBC). In those cases, all implementations should use the same format
++ * modifier(s), reflecting the vendor of the standard.
+  */
+ 
++#define DRM_FORMAT_MOD_GENERIC_16_16_TILE DRM_FORMAT_MOD_SAMSUNG_16_16_TILE
++
+ /*
+  * Invalid Modifier
+  *
+@@ -891,6 +939,18 @@ drm_fourcc_canonicalize_nvidia_format_mod(uint64_t modifier)
+  */
+ #define AFBC_FORMAT_MOD_BCH     (1ULL << 11)
+ 
++/* AFBC uncompressed storage mode
++ *
++ * Indicates that the buffer is using AFBC uncompressed storage mode.
++ * In this mode all superblock payloads in the buffer use the uncompressed
++ * storage mode, which is usually only used for data which cannot be compressed.
++ * The buffer layout is the same as for AFBC buffers without USM set, this only
++ * affects the storage mode of the individual superblocks. Note that even a
++ * buffer without USM set may use uncompressed storage mode for some or all
++ * superblocks, USM just guarantees it for all.
++ */
++#define AFBC_FORMAT_MOD_USM	(1ULL << 12)
++
+ /*
+  * Arm 16x16 Block U-Interleaved modifier
+  *
+@@ -915,6 +975,86 @@ drm_fourcc_canonicalize_nvidia_format_mod(uint64_t modifier)
+  */
+ #define DRM_FORMAT_MOD_ALLWINNER_TILED fourcc_mod_code(ALLWINNER, 1)
+ 
++/*
++ * Amlogic Video Framebuffer Compression modifiers
++ *
++ * Amlogic uses a proprietary lossless image compression protocol and format
++ * for their hardware video codec accelerators, either video decoders or
++ * video input encoders.
++ *
++ * It considerably reduces memory bandwidth while writing and reading
++ * frames in memory.
++ *
++ * The underlying storage is considered to be 3 components, 8bit or 10-bit
++ * per component YCbCr 420, single plane :
++ * - DRM_FORMAT_YUV420_8BIT
++ * - DRM_FORMAT_YUV420_10BIT
++ *
++ * The first 8 bits of the mode defines the layout, then the following 8 bits
++ * defines the options changing the layout.
++ *
++ * Not all combinations are valid, and different SoCs may support different
++ * combinations of layout and options.
++ */
++#define __fourcc_mod_amlogic_layout_mask 0xf
++#define __fourcc_mod_amlogic_options_shift 8
++#define __fourcc_mod_amlogic_options_mask 0xf
++
++#define DRM_FORMAT_MOD_AMLOGIC_FBC(__layout, __options) \
++	fourcc_mod_code(AMLOGIC, \
++			((__layout) & __fourcc_mod_amlogic_layout_mask) | \
++			(((__options) & __fourcc_mod_amlogic_options_mask) \
++			 << __fourcc_mod_amlogic_options_shift))
++
++/* Amlogic FBC Layouts */
++
++/*
++ * Amlogic FBC Basic Layout
++ *
++ * The basic layout is composed of:
++ * - a body content organized in 64x32 superblocks with 4096 bytes per
++ *   superblock in default mode.
++ * - a 32 bytes per 128x64 header block
++ *
++ * This layout is transferrable between Amlogic SoCs supporting this modifier.
++ */
++#define AMLOGIC_FBC_LAYOUT_BASIC		(1ULL)
++
++/*
++ * Amlogic FBC Scatter Memory layout
++ *
++ * Indicates the header contains IOMMU references to the compressed
++ * frames content to optimize memory access and layout.
++ *
++ * In this mode, only the header memory address is needed, thus the
++ * content memory organization is tied to the current producer
++ * execution and cannot be saved/dumped neither transferrable between
++ * Amlogic SoCs supporting this modifier.
++ *
++ * Due to the nature of the layout, these buffers are not expected to
++ * be accessible by the user-space clients, but only accessible by the
++ * hardware producers and consumers.
++ *
++ * The user-space clients should expect a failure while trying to mmap
++ * the DMA-BUF handle returned by the producer.
++ */
++#define AMLOGIC_FBC_LAYOUT_SCATTER		(2ULL)
++
++/* Amlogic FBC Layout Options Bit Mask */
++
++/*
++ * Amlogic FBC Memory Saving mode
++ *
++ * Indicates the storage is packed when pixel size is multiple of word
++ * boudaries, i.e. 8bit should be stored in this mode to save allocation
++ * memory.
++ *
++ * This mode reduces body layout to 3072 bytes per 64x32 superblock with
++ * the basic layout and 3200 bytes per 64x32 superblock combined with
++ * the scatter layout.
++ */
++#define AMLOGIC_FBC_OPTION_MEM_SAVING		(1ULL << 0)
++
+ #if defined(__cplusplus)
+ }
+ #endif
+diff --git a/include/standard-headers/linux/ethtool.h b/include/standard-headers/linux/ethtool.h
+index fd8d2cc..e13eff4 100644
+--- a/include/standard-headers/linux/ethtool.h
++++ b/include/standard-headers/linux/ethtool.h
+@@ -579,6 +579,76 @@ struct ethtool_pauseparam {
+ 	uint32_t	tx_pause;
+ };
+ 
++/**
++ * enum ethtool_link_ext_state - link extended state
++ */
++enum ethtool_link_ext_state {
++	ETHTOOL_LINK_EXT_STATE_AUTONEG,
++	ETHTOOL_LINK_EXT_STATE_LINK_TRAINING_FAILURE,
++	ETHTOOL_LINK_EXT_STATE_LINK_LOGICAL_MISMATCH,
++	ETHTOOL_LINK_EXT_STATE_BAD_SIGNAL_INTEGRITY,
++	ETHTOOL_LINK_EXT_STATE_NO_CABLE,
++	ETHTOOL_LINK_EXT_STATE_CABLE_ISSUE,
++	ETHTOOL_LINK_EXT_STATE_EEPROM_ISSUE,
++	ETHTOOL_LINK_EXT_STATE_CALIBRATION_FAILURE,
++	ETHTOOL_LINK_EXT_STATE_POWER_BUDGET_EXCEEDED,
++	ETHTOOL_LINK_EXT_STATE_OVERHEAT,
++};
++
++/**
++ * enum ethtool_link_ext_substate_autoneg - more information in addition to
++ * ETHTOOL_LINK_EXT_STATE_AUTONEG.
++ */
++enum ethtool_link_ext_substate_autoneg {
++	ETHTOOL_LINK_EXT_SUBSTATE_AN_NO_PARTNER_DETECTED = 1,
++	ETHTOOL_LINK_EXT_SUBSTATE_AN_ACK_NOT_RECEIVED,
++	ETHTOOL_LINK_EXT_SUBSTATE_AN_NEXT_PAGE_EXCHANGE_FAILED,
++	ETHTOOL_LINK_EXT_SUBSTATE_AN_NO_PARTNER_DETECTED_FORCE_MODE,
++	ETHTOOL_LINK_EXT_SUBSTATE_AN_FEC_MISMATCH_DURING_OVERRIDE,
++	ETHTOOL_LINK_EXT_SUBSTATE_AN_NO_HCD,
++};
++
++/**
++ * enum ethtool_link_ext_substate_link_training - more information in addition to
++ * ETHTOOL_LINK_EXT_STATE_LINK_TRAINING_FAILURE.
++ */
++enum ethtool_link_ext_substate_link_training {
++	ETHTOOL_LINK_EXT_SUBSTATE_LT_KR_FRAME_LOCK_NOT_ACQUIRED = 1,
++	ETHTOOL_LINK_EXT_SUBSTATE_LT_KR_LINK_INHIBIT_TIMEOUT,
++	ETHTOOL_LINK_EXT_SUBSTATE_LT_KR_LINK_PARTNER_DID_NOT_SET_RECEIVER_READY,
++	ETHTOOL_LINK_EXT_SUBSTATE_LT_REMOTE_FAULT,
++};
++
++/**
++ * enum ethtool_link_ext_substate_logical_mismatch - more information in addition
++ * to ETHTOOL_LINK_EXT_STATE_LINK_LOGICAL_MISMATCH.
++ */
++enum ethtool_link_ext_substate_link_logical_mismatch {
++	ETHTOOL_LINK_EXT_SUBSTATE_LLM_PCS_DID_NOT_ACQUIRE_BLOCK_LOCK = 1,
++	ETHTOOL_LINK_EXT_SUBSTATE_LLM_PCS_DID_NOT_ACQUIRE_AM_LOCK,
++	ETHTOOL_LINK_EXT_SUBSTATE_LLM_PCS_DID_NOT_GET_ALIGN_STATUS,
++	ETHTOOL_LINK_EXT_SUBSTATE_LLM_FC_FEC_IS_NOT_LOCKED,
++	ETHTOOL_LINK_EXT_SUBSTATE_LLM_RS_FEC_IS_NOT_LOCKED,
++};
++
++/**
++ * enum ethtool_link_ext_substate_bad_signal_integrity - more information in
++ * addition to ETHTOOL_LINK_EXT_STATE_BAD_SIGNAL_INTEGRITY.
++ */
++enum ethtool_link_ext_substate_bad_signal_integrity {
++	ETHTOOL_LINK_EXT_SUBSTATE_BSI_LARGE_NUMBER_OF_PHYSICAL_ERRORS = 1,
++	ETHTOOL_LINK_EXT_SUBSTATE_BSI_UNSUPPORTED_RATE,
++};
++
++/**
++ * enum ethtool_link_ext_substate_cable_issue - more information in
++ * addition to ETHTOOL_LINK_EXT_STATE_CABLE_ISSUE.
++ */
++enum ethtool_link_ext_substate_cable_issue {
++	ETHTOOL_LINK_EXT_SUBSTATE_CI_UNSUPPORTED_CABLE = 1,
++	ETHTOOL_LINK_EXT_SUBSTATE_CI_CABLE_TEST_FAILURE,
++};
++
+ #define ETH_GSTRING_LEN		32
+ 
+ /**
+@@ -599,6 +669,7 @@ struct ethtool_pauseparam {
+  * @ETH_SS_SOF_TIMESTAMPING: SOF_TIMESTAMPING_* flags
+  * @ETH_SS_TS_TX_TYPES: timestamping Tx types
+  * @ETH_SS_TS_RX_FILTERS: timestamping Rx filters
++ * @ETH_SS_UDP_TUNNEL_TYPES: UDP tunnel types
+  */
+ enum ethtool_stringset {
+ 	ETH_SS_TEST		= 0,
+@@ -616,6 +687,7 @@ enum ethtool_stringset {
+ 	ETH_SS_SOF_TIMESTAMPING,
+ 	ETH_SS_TS_TX_TYPES,
+ 	ETH_SS_TS_RX_FILTERS,
++	ETH_SS_UDP_TUNNEL_TYPES,
+ 
+ 	/* add new constants above here */
+ 	ETH_SS_COUNT
+@@ -1530,6 +1602,21 @@ enum ethtool_link_mode_bit_indices {
+ 	ETHTOOL_LINK_MODE_400000baseDR8_Full_BIT	 = 72,
+ 	ETHTOOL_LINK_MODE_400000baseCR8_Full_BIT	 = 73,
+ 	ETHTOOL_LINK_MODE_FEC_LLRS_BIT			 = 74,
++	ETHTOOL_LINK_MODE_100000baseKR_Full_BIT		 = 75,
++	ETHTOOL_LINK_MODE_100000baseSR_Full_BIT		 = 76,
++	ETHTOOL_LINK_MODE_100000baseLR_ER_FR_Full_BIT	 = 77,
++	ETHTOOL_LINK_MODE_100000baseCR_Full_BIT		 = 78,
++	ETHTOOL_LINK_MODE_100000baseDR_Full_BIT		 = 79,
++	ETHTOOL_LINK_MODE_200000baseKR2_Full_BIT	 = 80,
++	ETHTOOL_LINK_MODE_200000baseSR2_Full_BIT	 = 81,
++	ETHTOOL_LINK_MODE_200000baseLR2_ER2_FR2_Full_BIT = 82,
++	ETHTOOL_LINK_MODE_200000baseDR2_Full_BIT	 = 83,
++	ETHTOOL_LINK_MODE_200000baseCR2_Full_BIT	 = 84,
++	ETHTOOL_LINK_MODE_400000baseKR4_Full_BIT	 = 85,
++	ETHTOOL_LINK_MODE_400000baseSR4_Full_BIT	 = 86,
++	ETHTOOL_LINK_MODE_400000baseLR4_ER4_FR4_Full_BIT = 87,
++	ETHTOOL_LINK_MODE_400000baseDR4_Full_BIT	 = 88,
++	ETHTOOL_LINK_MODE_400000baseCR4_Full_BIT	 = 89,
+ 	/* must be last entry */
+ 	__ETHTOOL_LINK_MODE_MASK_NBITS
+ };
+diff --git a/include/standard-headers/linux/input-event-codes.h b/include/standard-headers/linux/input-event-codes.h
+index ebf72c1..e740ad9 100644
+--- a/include/standard-headers/linux/input-event-codes.h
++++ b/include/standard-headers/linux/input-event-codes.h
+@@ -888,7 +888,8 @@
+ #define SW_LINEIN_INSERT	0x0d  /* set = inserted */
+ #define SW_MUTE_DEVICE		0x0e  /* set = device disabled */
+ #define SW_PEN_INSERTED		0x0f  /* set = pen inserted */
+-#define SW_MAX_			0x0f
++#define SW_MACHINE_COVER	0x10  /* set = cover closed */
++#define SW_MAX_			0x10
+ #define SW_CNT			(SW_MAX_+1)
+ 
+ /*
+diff --git a/include/standard-headers/linux/vhost_types.h b/include/standard-headers/linux/vhost_types.h
+index a678d8f..486630b 100644
+--- a/include/standard-headers/linux/vhost_types.h
++++ b/include/standard-headers/linux/vhost_types.h
+@@ -60,6 +60,17 @@ struct vhost_iotlb_msg {
+ #define VHOST_IOTLB_UPDATE         2
+ #define VHOST_IOTLB_INVALIDATE     3
+ #define VHOST_IOTLB_ACCESS_FAIL    4
++/*
++ * VHOST_IOTLB_BATCH_BEGIN and VHOST_IOTLB_BATCH_END allow modifying
++ * multiple mappings in one go: beginning with
++ * VHOST_IOTLB_BATCH_BEGIN, followed by any number of
++ * VHOST_IOTLB_UPDATE messages, and ending with VHOST_IOTLB_BATCH_END.
++ * When one of these two values is used as the message type, the rest
++ * of the fields in the message are ignored. There's no guarantee that
++ * these changes take place automatically in the device.
++ */
++#define VHOST_IOTLB_BATCH_BEGIN    5
++#define VHOST_IOTLB_BATCH_END      6
+ 	uint8_t type;
+ };
+ 
+diff --git a/include/standard-headers/linux/virtio_9p.h b/include/standard-headers/linux/virtio_9p.h
+index e68f71d..f5604fc 100644
+--- a/include/standard-headers/linux/virtio_9p.h
++++ b/include/standard-headers/linux/virtio_9p.h
+@@ -25,7 +25,7 @@
+  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+  * SUCH DAMAGE. */
+-#include "standard-headers/linux/types.h"
++#include "standard-headers/linux/virtio_types.h"
+ #include "standard-headers/linux/virtio_ids.h"
+ #include "standard-headers/linux/virtio_config.h"
+ 
+@@ -36,7 +36,7 @@
+ 
+ struct virtio_9p_config {
+ 	/* length of the tag name */
+-	uint16_t tag_len;
++	__virtio16 tag_len;
+ 	/* non-NULL terminated tag name */
+ 	uint8_t tag[0];
+ } QEMU_PACKED;
+diff --git a/include/standard-headers/linux/virtio_blk.h b/include/standard-headers/linux/virtio_blk.h
+index 0229b0f..2dcc908 100644
+--- a/include/standard-headers/linux/virtio_blk.h
++++ b/include/standard-headers/linux/virtio_blk.h
+@@ -55,20 +55,20 @@
+ 
+ struct virtio_blk_config {
+ 	/* The capacity (in 512-byte sectors). */
+-	uint64_t capacity;
++	__virtio64 capacity;
+ 	/* The maximum segment size (if VIRTIO_BLK_F_SIZE_MAX) */
+-	uint32_t size_max;
++	__virtio32 size_max;
+ 	/* The maximum number of segments (if VIRTIO_BLK_F_SEG_MAX) */
+-	uint32_t seg_max;
++	__virtio32 seg_max;
+ 	/* geometry of the device (if VIRTIO_BLK_F_GEOMETRY) */
+ 	struct virtio_blk_geometry {
+-		uint16_t cylinders;
++		__virtio16 cylinders;
+ 		uint8_t heads;
+ 		uint8_t sectors;
+ 	} geometry;
+ 
+ 	/* block size of device (if VIRTIO_BLK_F_BLK_SIZE) */
+-	uint32_t blk_size;
++	__virtio32 blk_size;
+ 
+ 	/* the next 4 entries are guarded by VIRTIO_BLK_F_TOPOLOGY  */
+ 	/* exponent for physical block per logical block. */
+@@ -76,42 +76,42 @@ struct virtio_blk_config {
+ 	/* alignment offset in logical blocks. */
+ 	uint8_t alignment_offset;
+ 	/* minimum I/O size without performance penalty in logical blocks. */
+-	uint16_t min_io_size;
++	__virtio16 min_io_size;
+ 	/* optimal sustained I/O size in logical blocks. */
+-	uint32_t opt_io_size;
++	__virtio32 opt_io_size;
+ 
+ 	/* writeback mode (if VIRTIO_BLK_F_CONFIG_WCE) */
+ 	uint8_t wce;
+ 	uint8_t unused;
+ 
+ 	/* number of vqs, only available when VIRTIO_BLK_F_MQ is set */
+-	uint16_t num_queues;
++	__virtio16 num_queues;
+ 
+ 	/* the next 3 entries are guarded by VIRTIO_BLK_F_DISCARD */
+ 	/*
+ 	 * The maximum discard sectors (in 512-byte sectors) for
+ 	 * one segment.
+ 	 */
+-	uint32_t max_discard_sectors;
++	__virtio32 max_discard_sectors;
+ 	/*
+ 	 * The maximum number of discard segments in a
+ 	 * discard command.
+ 	 */
+-	uint32_t max_discard_seg;
++	__virtio32 max_discard_seg;
+ 	/* Discard commands must be aligned to this number of sectors. */
+-	uint32_t discard_sector_alignment;
++	__virtio32 discard_sector_alignment;
+ 
+ 	/* the next 3 entries are guarded by VIRTIO_BLK_F_WRITE_ZEROES */
+ 	/*
+ 	 * The maximum number of write zeroes sectors (in 512-byte sectors) in
+ 	 * one segment.
+ 	 */
+-	uint32_t max_write_zeroes_sectors;
++	__virtio32 max_write_zeroes_sectors;
+ 	/*
+ 	 * The maximum number of segments in a write zeroes
+ 	 * command.
+ 	 */
+-	uint32_t max_write_zeroes_seg;
++	__virtio32 max_write_zeroes_seg;
+ 	/*
+ 	 * Set if a VIRTIO_BLK_T_WRITE_ZEROES request may result in the
+ 	 * deallocation of one or more of the sectors.
+diff --git a/include/standard-headers/linux/virtio_config.h b/include/standard-headers/linux/virtio_config.h
+index 9a69d9e..22e3a85 100644
+--- a/include/standard-headers/linux/virtio_config.h
++++ b/include/standard-headers/linux/virtio_config.h
+@@ -67,13 +67,15 @@
+ #define VIRTIO_F_VERSION_1		32
+ 
+ /*
+- * If clear - device has the IOMMU bypass quirk feature.
+- * If set - use platform tools to detect the IOMMU.
++ * If clear - device has the platform DMA (e.g. IOMMU) bypass quirk feature.
++ * If set - use platform DMA tools to access the memory.
+  *
+  * Note the reverse polarity (compared to most other features),
+  * this is for compatibility with legacy systems.
+  */
+-#define VIRTIO_F_IOMMU_PLATFORM		33
++#define VIRTIO_F_ACCESS_PLATFORM	33
++/* Legacy name for VIRTIO_F_ACCESS_PLATFORM (for compatibility with old userspace) */
++#define VIRTIO_F_IOMMU_PLATFORM		VIRTIO_F_ACCESS_PLATFORM
+ 
+ /* This feature indicates support for the packed virtqueue layout. */
+ #define VIRTIO_F_RING_PACKED		34
+diff --git a/include/standard-headers/linux/virtio_console.h b/include/standard-headers/linux/virtio_console.h
+index 0dedc9e..71f5f64 100644
+--- a/include/standard-headers/linux/virtio_console.h
++++ b/include/standard-headers/linux/virtio_console.h
+@@ -45,13 +45,13 @@
+ 
+ struct virtio_console_config {
+ 	/* colums of the screens */
+-	uint16_t cols;
++	__virtio16 cols;
+ 	/* rows of the screens */
+-	uint16_t rows;
++	__virtio16 rows;
+ 	/* max. number of ports this device can hold */
+-	uint32_t max_nr_ports;
++	__virtio32 max_nr_ports;
+ 	/* emergency write register */
+-	uint32_t emerg_wr;
++	__virtio32 emerg_wr;
+ } QEMU_PACKED;
+ 
+ /*
+diff --git a/include/standard-headers/linux/virtio_net.h b/include/standard-headers/linux/virtio_net.h
+index a90f79e..e0a0705 100644
+--- a/include/standard-headers/linux/virtio_net.h
++++ b/include/standard-headers/linux/virtio_net.h
+@@ -87,14 +87,14 @@ struct virtio_net_config {
+ 	/* The config defining mac address (if VIRTIO_NET_F_MAC) */
+ 	uint8_t mac[ETH_ALEN];
+ 	/* See VIRTIO_NET_F_STATUS and VIRTIO_NET_S_* above */
+-	uint16_t status;
++	__virtio16 status;
+ 	/* Maximum number of each of transmit and receive queues;
+ 	 * see VIRTIO_NET_F_MQ and VIRTIO_NET_CTRL_MQ.
+ 	 * Legal values are between 1 and 0x8000
+ 	 */
+-	uint16_t max_virtqueue_pairs;
++	__virtio16 max_virtqueue_pairs;
+ 	/* Default maximum transmit unit advice */
+-	uint16_t mtu;
++	__virtio16 mtu;
+ 	/*
+ 	 * speed, in units of 1Mb. All values 0 to INT_MAX are legal.
+ 	 * Any other value stands for unknown.
+diff --git a/include/standard-headers/linux/virtio_scsi.h b/include/standard-headers/linux/virtio_scsi.h
+index ab66166..663f36c 100644
+--- a/include/standard-headers/linux/virtio_scsi.h
++++ b/include/standard-headers/linux/virtio_scsi.h
+@@ -103,16 +103,16 @@ struct virtio_scsi_event {
+ } QEMU_PACKED;
+ 
+ struct virtio_scsi_config {
+-	uint32_t num_queues;
+-	uint32_t seg_max;
+-	uint32_t max_sectors;
+-	uint32_t cmd_per_lun;
+-	uint32_t event_info_size;
+-	uint32_t sense_size;
+-	uint32_t cdb_size;
+-	uint16_t max_channel;
+-	uint16_t max_target;
+-	uint32_t max_lun;
++	__virtio32 num_queues;
++	__virtio32 seg_max;
++	__virtio32 max_sectors;
++	__virtio32 cmd_per_lun;
++	__virtio32 event_info_size;
++	__virtio32 sense_size;
++	__virtio32 cdb_size;
++	__virtio16 max_channel;
++	__virtio16 max_target;
++	__virtio32 max_lun;
+ } QEMU_PACKED;
+ 
+ /* Feature Bits */
+diff --git a/linux-headers/asm-generic/unistd.h b/linux-headers/asm-generic/unistd.h
+index f4a0130..995b36c 100644
+--- a/linux-headers/asm-generic/unistd.h
++++ b/linux-headers/asm-generic/unistd.h
+@@ -606,9 +606,9 @@ __SYSCALL(__NR_sendto, sys_sendto)
+ #define __NR_recvfrom 207
+ __SC_COMP(__NR_recvfrom, sys_recvfrom, compat_sys_recvfrom)
+ #define __NR_setsockopt 208
+-__SC_COMP(__NR_setsockopt, sys_setsockopt, compat_sys_setsockopt)
++__SC_COMP(__NR_setsockopt, sys_setsockopt, sys_setsockopt)
+ #define __NR_getsockopt 209
+-__SC_COMP(__NR_getsockopt, sys_getsockopt, compat_sys_getsockopt)
++__SC_COMP(__NR_getsockopt, sys_getsockopt, sys_getsockopt)
+ #define __NR_shutdown 210
+ __SYSCALL(__NR_shutdown, sys_shutdown)
+ #define __NR_sendmsg 211
+@@ -850,6 +850,8 @@ __SYSCALL(__NR_pidfd_open, sys_pidfd_open)
+ #define __NR_clone3 435
+ __SYSCALL(__NR_clone3, sys_clone3)
+ #endif
++#define __NR_close_range 436
++__SYSCALL(__NR_close_range, sys_close_range)
+ 
+ #define __NR_openat2 437
+ __SYSCALL(__NR_openat2, sys_openat2)
+diff --git a/linux-headers/asm-mips/unistd_n32.h b/linux-headers/asm-mips/unistd_n32.h
+index 3b9eda7..246fbb6 100644
+--- a/linux-headers/asm-mips/unistd_n32.h
++++ b/linux-headers/asm-mips/unistd_n32.h
+@@ -365,6 +365,7 @@
+ #define __NR_fspick	(__NR_Linux + 433)
+ #define __NR_pidfd_open	(__NR_Linux + 434)
+ #define __NR_clone3	(__NR_Linux + 435)
++#define __NR_close_range	(__NR_Linux + 436)
+ #define __NR_openat2	(__NR_Linux + 437)
+ #define __NR_pidfd_getfd	(__NR_Linux + 438)
+ #define __NR_faccessat2	(__NR_Linux + 439)
+diff --git a/linux-headers/asm-mips/unistd_n64.h b/linux-headers/asm-mips/unistd_n64.h
+index 9cdf9b6..194d777 100644
+--- a/linux-headers/asm-mips/unistd_n64.h
++++ b/linux-headers/asm-mips/unistd_n64.h
+@@ -341,6 +341,7 @@
+ #define __NR_fspick	(__NR_Linux + 433)
+ #define __NR_pidfd_open	(__NR_Linux + 434)
+ #define __NR_clone3	(__NR_Linux + 435)
++#define __NR_close_range	(__NR_Linux + 436)
+ #define __NR_openat2	(__NR_Linux + 437)
+ #define __NR_pidfd_getfd	(__NR_Linux + 438)
+ #define __NR_faccessat2	(__NR_Linux + 439)
+diff --git a/linux-headers/asm-mips/unistd_o32.h b/linux-headers/asm-mips/unistd_o32.h
+index e3e5e23..3e093dd 100644
+--- a/linux-headers/asm-mips/unistd_o32.h
++++ b/linux-headers/asm-mips/unistd_o32.h
+@@ -411,6 +411,7 @@
+ #define __NR_fspick	(__NR_Linux + 433)
+ #define __NR_pidfd_open	(__NR_Linux + 434)
+ #define __NR_clone3	(__NR_Linux + 435)
++#define __NR_close_range	(__NR_Linux + 436)
+ #define __NR_openat2	(__NR_Linux + 437)
+ #define __NR_pidfd_getfd	(__NR_Linux + 438)
+ #define __NR_faccessat2	(__NR_Linux + 439)
+diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/kvm.h
+index 264e266..c3af3f3 100644
+--- a/linux-headers/asm-powerpc/kvm.h
++++ b/linux-headers/asm-powerpc/kvm.h
+@@ -640,6 +640,11 @@ struct kvm_ppc_cpu_char {
+ #define KVM_REG_PPC_ONLINE	(KVM_REG_PPC | KVM_REG_SIZE_U32 | 0xbf)
+ #define KVM_REG_PPC_PTCR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc0)
+ 
++/* POWER10 registers */
++#define KVM_REG_PPC_MMCR3	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc1)
++#define KVM_REG_PPC_SIER2	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc2)
++#define KVM_REG_PPC_SIER3	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc3)
++
+ /* Transactional Memory checkpointed state:
+  * This is all GPRs, all VSX regs and a subset of SPRs
+  */
+diff --git a/linux-headers/asm-powerpc/unistd_32.h b/linux-headers/asm-powerpc/unistd_32.h
+index 862edb7..0db9481d 100644
+--- a/linux-headers/asm-powerpc/unistd_32.h
++++ b/linux-headers/asm-powerpc/unistd_32.h
+@@ -418,6 +418,7 @@
+ #define __NR_fspick	433
+ #define __NR_pidfd_open	434
+ #define __NR_clone3	435
++#define __NR_close_range	436
+ #define __NR_openat2	437
+ #define __NR_pidfd_getfd	438
+ #define __NR_faccessat2	439
+diff --git a/linux-headers/asm-powerpc/unistd_64.h b/linux-headers/asm-powerpc/unistd_64.h
+index f553224..9f74310 100644
+--- a/linux-headers/asm-powerpc/unistd_64.h
++++ b/linux-headers/asm-powerpc/unistd_64.h
+@@ -390,6 +390,7 @@
+ #define __NR_fspick	433
+ #define __NR_pidfd_open	434
+ #define __NR_clone3	435
++#define __NR_close_range	436
+ #define __NR_openat2	437
+ #define __NR_pidfd_getfd	438
+ #define __NR_faccessat2	439
+diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
+index 0138ccb..f053b83 100644
+--- a/linux-headers/asm-s390/kvm.h
++++ b/linux-headers/asm-s390/kvm.h
+@@ -231,11 +231,13 @@ struct kvm_guest_debug_arch {
+ #define KVM_SYNC_GSCB   (1UL << 9)
+ #define KVM_SYNC_BPBC   (1UL << 10)
+ #define KVM_SYNC_ETOKEN (1UL << 11)
++#define KVM_SYNC_DIAG318 (1UL << 12)
+ 
+ #define KVM_SYNC_S390_VALID_FIELDS \
+ 	(KVM_SYNC_PREFIX | KVM_SYNC_GPRS | KVM_SYNC_ACRS | KVM_SYNC_CRS | \
+ 	 KVM_SYNC_ARCH0 | KVM_SYNC_PFAULT | KVM_SYNC_VRS | KVM_SYNC_RICCB | \
+-	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN)
++	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN | \
++	 KVM_SYNC_DIAG318)
+ 
+ /* length and alignment of the sdnx as a power of two */
+ #define SDNXC 8
+@@ -264,7 +266,8 @@ struct kvm_sync_regs {
+ 	__u8 reserved2 : 7;
+ 	__u8 padding1[51];	/* riccb needs to be 64byte aligned */
+ 	__u8 riccb[64];		/* runtime instrumentation controls block */
+-	__u8 padding2[192];	/* sdnx needs to be 256byte aligned */
++	__u64 diag318;		/* diagnose 0x318 info */
++	__u8 padding2[184];	/* sdnx needs to be 256byte aligned */
+ 	union {
+ 		__u8 sdnx[SDNXL];  /* state description annex */
+ 		struct {
+diff --git a/linux-headers/asm-s390/unistd_32.h b/linux-headers/asm-s390/unistd_32.h
+index e08233c..1803cd0 100644
+--- a/linux-headers/asm-s390/unistd_32.h
++++ b/linux-headers/asm-s390/unistd_32.h
+@@ -408,6 +408,7 @@
+ #define __NR_fspick 433
+ #define __NR_pidfd_open 434
+ #define __NR_clone3 435
++#define __NR_close_range 436
+ #define __NR_openat2 437
+ #define __NR_pidfd_getfd 438
+ #define __NR_faccessat2 439
+diff --git a/linux-headers/asm-s390/unistd_64.h b/linux-headers/asm-s390/unistd_64.h
+index 560e19a..228d500 100644
+--- a/linux-headers/asm-s390/unistd_64.h
++++ b/linux-headers/asm-s390/unistd_64.h
+@@ -356,6 +356,7 @@
+ #define __NR_fspick 433
+ #define __NR_pidfd_open 434
+ #define __NR_clone3 435
++#define __NR_close_range 436
+ #define __NR_openat2 437
+ #define __NR_pidfd_getfd 438
+ #define __NR_faccessat2 439
+diff --git a/linux-headers/asm-x86/unistd_32.h b/linux-headers/asm-x86/unistd_32.h
+index c727981..356c12c 100644
+--- a/linux-headers/asm-x86/unistd_32.h
++++ b/linux-headers/asm-x86/unistd_32.h
+@@ -426,6 +426,7 @@
+ #define __NR_fspick 433
+ #define __NR_pidfd_open 434
+ #define __NR_clone3 435
++#define __NR_close_range 436
+ #define __NR_openat2 437
+ #define __NR_pidfd_getfd 438
+ #define __NR_faccessat2 439
+diff --git a/linux-headers/asm-x86/unistd_64.h b/linux-headers/asm-x86/unistd_64.h
+index 843fa62..ef70e1c 100644
+--- a/linux-headers/asm-x86/unistd_64.h
++++ b/linux-headers/asm-x86/unistd_64.h
+@@ -348,6 +348,7 @@
+ #define __NR_fspick 433
+ #define __NR_pidfd_open 434
+ #define __NR_clone3 435
++#define __NR_close_range 436
+ #define __NR_openat2 437
+ #define __NR_pidfd_getfd 438
+ #define __NR_faccessat2 439
+diff --git a/linux-headers/asm-x86/unistd_x32.h b/linux-headers/asm-x86/unistd_x32.h
+index 7d63d70..84ae8e9 100644
+--- a/linux-headers/asm-x86/unistd_x32.h
++++ b/linux-headers/asm-x86/unistd_x32.h
+@@ -301,6 +301,7 @@
+ #define __NR_fspick (__X32_SYSCALL_BIT + 433)
+ #define __NR_pidfd_open (__X32_SYSCALL_BIT + 434)
+ #define __NR_clone3 (__X32_SYSCALL_BIT + 435)
++#define __NR_close_range (__X32_SYSCALL_BIT + 436)
+ #define __NR_openat2 (__X32_SYSCALL_BIT + 437)
+ #define __NR_pidfd_getfd (__X32_SYSCALL_BIT + 438)
+ #define __NR_faccessat2 (__X32_SYSCALL_BIT + 439)
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index a28c366..43580c7 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -289,6 +289,7 @@ struct kvm_run {
+ 		/* KVM_EXIT_FAIL_ENTRY */
+ 		struct {
+ 			__u64 hardware_entry_failure_reason;
++			__u32 cpu;
+ 		} fail_entry;
+ 		/* KVM_EXIT_EXCEPTION */
+ 		struct {
+@@ -789,9 +790,10 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_VM_PPC_HV 1
+ #define KVM_VM_PPC_PR 2
+ 
+-/* on MIPS, 0 forces trap & emulate, 1 forces VZ ASE */
+-#define KVM_VM_MIPS_TE		0
++/* on MIPS, 0 indicates auto, 1 forces VZ ASE, 2 forces trap & emulate */
++#define KVM_VM_MIPS_AUTO	0
+ #define KVM_VM_MIPS_VZ		1
++#define KVM_VM_MIPS_TE		2
+ 
+ #define KVM_S390_SIE_PAGE_OFFSET 1
+ 
+@@ -1031,6 +1033,10 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_PPC_SECURE_GUEST 181
+ #define KVM_CAP_HALT_POLL 182
+ #define KVM_CAP_ASYNC_PF_INT 183
++#define KVM_CAP_LAST_CPU 184
++#define KVM_CAP_SMALLER_MAXPHYADDR 185
++#define KVM_CAP_S390_DIAG318 186
++#define KVM_CAP_STEAL_TIME 187
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index f09df26..147317a 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -1030,7 +1030,7 @@ struct vfio_iommu_type1_info_cap_iova_range {
+  * size in bytes that can be used by user applications when getting the dirty
+  * bitmap.
+  */
+-#define VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION  1
++#define VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION  2
+ 
+ struct vfio_iommu_type1_info_cap_migration {
+ 	struct	vfio_info_cap_header header;
+@@ -1039,6 +1039,22 @@ struct vfio_iommu_type1_info_cap_migration {
+ 	__u64	max_dirty_bitmap_size;		/* in bytes */
+ };
+ 
++/*
++ * The DMA available capability allows to report the current number of
++ * simultaneously outstanding DMA mappings that are allowed.
++ *
++ * The structure below defines version 1 of this capability.
++ *
++ * avail: specifies the current number of outstanding DMA mappings allowed.
++ */
++#define VFIO_IOMMU_TYPE1_INFO_DMA_AVAIL 3
++
++struct vfio_iommu_type1_info_dma_avail {
++	struct	vfio_info_cap_header header;
++	__u32	avail;
++};
++
++
+ #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
+ 
+ /**
+diff --git a/linux-headers/linux/vhost.h b/linux-headers/linux/vhost.h
+index 0c23496..7523218 100644
+--- a/linux-headers/linux/vhost.h
++++ b/linux-headers/linux/vhost.h
+@@ -91,6 +91,8 @@
+ 
+ /* Use message type V2 */
+ #define VHOST_BACKEND_F_IOTLB_MSG_V2 0x1
++/* IOTLB can accept batching hints */
++#define VHOST_BACKEND_F_IOTLB_BATCH  0x2
+ 
+ #define VHOST_SET_BACKEND_FEATURES _IOW(VHOST_VIRTIO, 0x25, __u64)
+ #define VHOST_GET_BACKEND_FEATURES _IOR(VHOST_VIRTIO, 0x26, __u64)
+-- 
+1.8.3.1
 
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---000000000000d954f505af5eff65
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><br><br>On Wed, Sep 16, 2020 at 1:55 AM Philippe Mathieu-D=
-aud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsat.org">f4bug@amsat.org</a>&gt; wr=
-ote:<br>&gt;<br>&gt; On 9/15/20 7:41 PM, =E7=BD=97=E5=8B=87=E5=88=9A(Yongga=
-ng Luo) wrote:<br>&gt; &gt; On Wed, Sep 16, 2020 at 12:41 AM Philippe Mathi=
-eu-Daud=C3=A9<br>&gt; &gt; &lt;<a href=3D"mailto:philmd@redhat.com">philmd@=
-redhat.com</a> &lt;mailto:<a href=3D"mailto:philmd@redhat.com">philmd@redha=
-t.com</a>&gt;&gt; wrote:<br>&gt; &gt;&gt;<br>&gt; &gt;&gt; On 9/15/20 6:33 =
-PM, Yonggang Luo wrote:<br>&gt; &gt;&gt; &gt; error message:<br>&gt; &gt;&g=
-t; &gt; &quot;cc&quot; &quot;-Iqga/qemu-ga.exe.p&quot; &quot;-Iqga&quot; &q=
-uot;-I../qga&quot; &quot;-I.&quot; &quot;-Iqapi&quot;<br>&gt; &gt; &quot;-I=
-trace&quot; &quot;-Iui&quot; &quot;-Iui/shader&quot; &quot;-IC:/CI-Tools/ms=
-ys64/mingw64/include&quot;<br>&gt; &gt; &quot;-IC:/CI-Tools/msys64/mingw64/=
-include/glib-2.0&quot;<br>&gt; &gt; &quot;-IC:/CI-Tools/msys64/mingw64/lib/=
-glib-2.0/include&quot;<br>&gt; &gt; &quot;-fdiagnostics-color=3Dauto&quot; =
-&quot;-pipe&quot; &quot;-Wall&quot; &quot;-Winvalid-pch&quot; &quot;-Werror=
-&quot;<br>&gt; &gt; &quot;-std=3Dgnu99&quot; &quot;-g&quot; &quot;-m64&quot=
-; &quot;-mcx16&quot; &quot;-D_GNU_SOURCE&quot;<br>&gt; &gt; &quot;-D_FILE_O=
-FFSET_BITS=3D64&quot; &quot;-D_LARGEFILE_SOURCE&quot; &quot;-Wstrict-protot=
-ypes&quot;<br>&gt; &gt; &quot;-Wredundant-decls&quot; &quot;-Wundef&quot; &=
-quot;-Wwrite-strings&quot; &quot;-Wmissing-prototypes&quot;<br>&gt; &gt; &q=
-uot;-fno-strict-aliasing&quot; &quot;-fno-common&quot; &quot;-fwrapv&quot; =
-&quot;-Wold-style-declaration&quot;<br>&gt; &gt; &quot;-Wold-style-definiti=
-on&quot; &quot;-Wtype-limits&quot; &quot;-Wformat-security&quot;<br>&gt; &g=
-t; &quot;-Wformat-y2k&quot; &quot;-Winit-self&quot; &quot;-Wignored-qualifi=
-ers&quot; &quot;-Wempty-body&quot;<br>&gt; &gt; &quot;-Wnested-externs&quot=
-; &quot;-Wendif-labels&quot; &quot;-Wexpansion-to-defined&quot;<br>&gt; &gt=
-; &quot;-Wno-missing-include-dirs&quot; &quot;-Wno-shift-negative-value&quo=
-t; &quot;-Wno-psabi&quot;<br>&gt; &gt; &quot;-fstack-protector-strong&quot;=
- &quot;-iquote&quot; &quot;/c/work/xemu/qemu/tcg/i386&quot;<br>&gt; &gt; &q=
-uot;-iquote&quot; &quot;.&quot; &quot;-iquote&quot; &quot;/c/work/xemu/qemu=
-&quot; &quot;-iquote&quot;<br>&gt; &gt; &quot;/c/work/xemu/qemu/accel/tcg&q=
-uot; &quot;-iquote&quot; &quot;/c/work/xemu/qemu/include&quot;<br>&gt; &gt;=
- &quot;-iquote&quot; &quot;/c/work/xemu/qemu/disas/libvixl&quot; &quot;-pth=
-read&quot; &quot;-mms-bitfields&quot;<br>&gt; &gt; -MD -MQ qga/qemu-ga.exe.=
-p/commands-win32.c.obj -MF<br>&gt; &gt; &quot;qga/qemu-ga.exe.p/commands-wi=
-n32.c.obj.d&quot; -o<br>&gt; &gt; qga/qemu-ga.exe.p/commands-win32.c.obj &q=
-uot;-c&quot; ../qga/commands-win32.c -MP<br>&gt; &gt;&gt; &gt; ../qga/comma=
-nds-win32.c:62:24: error: redundant redeclaration of<br>&gt; &gt; &#39;CM_G=
-et_DevNode_PropertyW&#39; [-Werror=3Dredundant-decls]<br>&gt; &gt;&gt; &gt;=
- =C2=A0 =C2=A062 | CMAPI CONFIGRET WINAPI CM_Get_DevNode_PropertyW(<br>&gt;=
- &gt;&gt; &gt; =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^~~~~~~~~~~~~~~~~~~~~~~~<br=
->&gt; &gt;&gt; &gt; In file included from ../qga/commands-win32.c:26:<br>&g=
-t; &gt;&gt; &gt;<br>&gt; &gt; C:/CI-Tools/msys64/mingw64/x86_64-w64-mingw32=
-/include/cfgmgr32.h:840:26:<br>&gt; &gt; note: previous declaration of &#39=
-;CM_Get_DevNode_PropertyW&#39; was here<br>&gt; &gt;&gt; &gt; =C2=A0 840 | =
-=C2=A0 CMAPI CONFIGRET WINAPI CM_Get_DevNode_PropertyW(DEVINST<br>&gt; &gt;=
- dnDevInst, const DEVPROPKEY *PropertyKey, DEVPROPTYPE *PropertyType,<br>&g=
-t; &gt; PBYTE PropertyBuffer, PULONG PropertyBufferSize, ULONG ulFlags);<br=
->&gt; &gt;&gt; &gt; =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^~~~~~~~~~~~~~~~=
-~~~~~~~~<br>&gt; &gt;&gt; &gt; cc1.exe: all warnings being treated as error=
-s<br>&gt; &gt;&gt; &gt; make: [Makefile.ninja:5143=EF=BC=9Aqga/qemu-ga.exe.=
-p/commands-win32.c.obj]<br>&gt; &gt; =E9=94=99=E8=AF=AF 1 (=E5=B7=B2=E5=BF=
-=BD=E7=95=A5=EF=BC=89<br>&gt; &gt;&gt; &gt;<br>&gt; &gt;&gt; &gt; This erro=
-r comes from qemu configure didn&#39;t add predefined macro<br>&gt; &gt; -D=
-UNICODE -D_UNICODE in QEMU_CFLAGS,<br>&gt; &gt;&gt; &gt; and these too macr=
-o are standard config for win32 if using windows<br>&gt; &gt; wide api.<br>=
-&gt; &gt;&gt; &gt;<br>&gt; &gt;&gt; &gt; in cfgmgr32.h<br>&gt; &gt;&gt; &gt=
-; =C2=A0 CMAPI CONFIGRET WINAPI CM_Get_DevNode_PropertyW(DEVINST dnDevInst,=
-<br>&gt; &gt; const DEVPROPKEY *PropertyKey, DEVPROPTYPE *PropertyType, PBY=
-TE<br>&gt; &gt; PropertyBuffer, PULONG PropertyBufferSize, ULONG ulFlags);<=
-br>&gt; &gt;&gt; &gt; #ifdef UNICODE<br>&gt; &gt;&gt; &gt; #define CM_Get_D=
-evNode_Property CM_Get_DevNode_PropertyW<br>&gt; &gt;&gt; &gt; #endif<br>&g=
-t; &gt;&gt; &gt;<br>&gt; &gt;&gt; &gt; macro CM_Get_DevNode_Property define=
-d only when UNICODE are defined.<br>&gt; &gt;&gt; &gt; and in win32, UNICOD=
-E and _UNICODE should be defined at the same time<br>&gt; &gt;&gt; &gt;<br>=
-&gt; &gt;&gt; &gt; #endif<br>&gt; &gt;&gt; &gt;<br>&gt; &gt;&gt; &gt; Signe=
-d-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.com">luoyong=
-gang@gmail.com</a><br>&gt; &gt; &lt;mailto:<a href=3D"mailto:luoyonggang@gm=
-ail.com">luoyonggang@gmail.com</a>&gt;&gt;<br>&gt; &gt;&gt; &gt; ---<br>&gt=
-; &gt;&gt; &gt; =C2=A0configure | 1 +<br>&gt; &gt;&gt; &gt; =C2=A01 file ch=
-anged, 1 insertion(+)<br>&gt; &gt;&gt; &gt;<br>&gt; &gt;&gt; &gt; diff --gi=
-t a/configure b/configure<br>&gt; &gt;&gt; &gt; index 9f141891ea..f5d661af4=
-a 100755<br>&gt; &gt;&gt; &gt; --- a/configure<br>&gt; &gt;&gt; &gt; +++ b/=
-configure<br>&gt; &gt;&gt; &gt; @@ -812,6 +812,7 @@ MINGW32*)<br>&gt; &gt;&=
-gt; &gt; =C2=A0 =C2=A0mingw32=3D&quot;yes&quot;<br>&gt; &gt;&gt; &gt; =C2=
-=A0 =C2=A0hax=3D&quot;yes&quot;<br>&gt; &gt;&gt; &gt; =C2=A0 =C2=A0whpx=3D&=
-quot;&quot;<br>&gt; &gt;&gt; &gt; + =C2=A0QEMU_CFLAGS=3D&quot;-DUNICODE -D_=
-UNICODE $QEMU_CFLAGS&quot;<br>&gt; &gt;&gt;<br>&gt; &gt;&gt; What about dec=
-laring them in include/qemu/osdep.h<br>&gt; &gt;&gt; instead?<br>&gt; &gt; =
-That&#39;s a good idea.<br>&gt; &gt; But more compiling error warns me that=
- the windows version of qemu are<br>&gt; &gt; not in a good situation.<br>&=
-gt;<br>&gt; :)<br>&gt;<br>&gt; &gt; On Win32, all API should call the wide =
-version so that support for<br>&gt; &gt; Unicode properly.<br>&gt; &gt; But=
- obviously the currently qemu didn&#39;t do that<br>&gt; &gt;<br>&gt; &gt; =
-```<br>&gt; [...]<br>&gt; &gt; ../util/qemu-sockets.c: In function &#39;soc=
-ket_sockaddr_to_address_inet&#39;:<br>&gt; &gt; C:/work/xemu/qemu/include/q=
-api/error.h:319:25: error: format &#39;%s&#39;<br>&gt; &gt; expects argumen=
-t of type &#39;char *&#39;, but argument 6 has type &#39;WCHAR *&#39;<br>&g=
-t; &gt; {aka &#39;short unsigned int *&#39;} [-Werror=3Dformat=3D]<br>&gt; =
-&gt; =C2=A0 319 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 (fmt), ## __VA_ARGS__)<br>&gt; &gt; =C2=A0 =C2=
-=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 ^~~~~<br>&gt; &gt; ../util/qemu-sockets.c:1235:9: not=
-e: in expansion of macro &#39;error_setg&#39;<br>&gt; &gt; =C2=A01235 | =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 error_setg(errp, &quot;Cannot format numeric socke=
-t address: %s&quot;,<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 ^~~~~~~~~~<br>&gt; &gt; In file included from ../io/dns-resolver=
-.c:26:<br>&gt; &gt; ../io/dns-resolver.c: In function &#39;qio_dns_resolver=
-_lookup_sync_inet&#39;:<br>&gt; &gt; C:/work/xemu/qemu/include/qapi/error.h=
-:319:25: error: format &#39;%s&#39;<br>&gt; &gt; expects argument of type &=
-#39;char *&#39;, but argument 8 has type &#39;WCHAR *&#39;<br>&gt; &gt; {ak=
-a &#39;short unsigned int *&#39;} [-Werror=3Dformat=3D]<br>&gt; &gt; =C2=A0=
- 319 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 (fmt), ## __VA_ARGS__)<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =
-| =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 ^~~~~<br>&gt; &gt; ../io/dns-resolver.c:93:9: note: in expansion=
- of macro &#39;error_setg&#39;<br>&gt; &gt; =C2=A0 =C2=A093 | =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 error_setg(errp, &quot;address resolution failed for %s:%s: =
-%s&quot;,<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^=
-~~~~~~~~~<br>&gt; &gt; cc1.exe: all warnings being treated as errors<br>&gt=
-; &gt; make: [Makefile.ninja:756=EF=BC=9Aio/libio.fa.p/dns-resolver.c.obj] =
-=E9=94=99=E8=AF=AF 1 (=E5=B7=B2<br>&gt; &gt; =E5=BF=BD=E7=95=A5=EF=BC=89<br=
->&gt; &gt; cc1.exe: all warnings being treated as errors<br>&gt; &gt; make:=
- [Makefile.ninja:697=EF=BC=9Alibqemuutil.a.p/util_qemu-sockets.c.obj] =E9=
-=94=99=E8=AF=AF<br>&gt; &gt; 1 (=E5=B7=B2=E5=BF=BD=E7=95=A5=EF=BC=89<br>&gt=
-; &gt; Linking static target io/libio.fa<br>&gt; &gt; C:\CI-Tools\msys64\mi=
-ngw64\bin\ar.exe: io/libio.fa.p/dns-resolver.c.obj:<br>&gt; &gt; No such fi=
-le or directory<br>&gt; &gt; make: [Makefile.ninja:764=EF=BC=9Aio/libio.fa]=
- =E9=94=99=E8=AF=AF 1 (=E5=B7=B2=E5=BF=BD=E7=95=A5=EF=BC=89<br>&gt; &gt; ..=
-/net/tap-win32.c: In function &#39;is_tap_win32_dev&#39;:<br>&gt; &gt; ../n=
-et/tap-win32.c:62:21: error: passing argument 2 of &#39;RegOpenKeyExW&#39;<=
-br>&gt; &gt; from incompatible pointer type [-Werror=3Dincompatible-pointer=
--types]<br>&gt; &gt; =C2=A0 =C2=A062 | #define ADAPTER_KEY<br>&gt; &gt; &qu=
-ot;SYSTEM\\CurrentControlSet\\Control\\Class\\{4D36E972-E325-11CE-BFC1-0800=
-2BE10318}&quot;<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0<br>&gt; &gt; ^~~~~~~~~~~~~=
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<br>&=
-gt; &gt; =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 |<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const char *=
-<br>&gt; &gt; ../net/tap-win32.c:62:21: note: in definition of macro &#39;A=
-DAPTER_KEY&#39;<br>&gt; &gt; =C2=A0 =C2=A062 | #define ADAPTER_KEY<br>&gt; =
-&gt; &quot;SYSTEM\\CurrentControlSet\\Control\\Class\\{4D36E972-E325-11CE-B=
-FC1-08002BE10318}&quot;<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0<br>&gt; &gt; ^~~~~~=
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~<br>&gt; &gt; In file included from<br>&gt; &gt; C:/CI-Tools/msys64/mingw=
-64/x86_64-w64-mingw32/include/windows.h:76,<br>&gt; &gt; =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0from<br>&gt; &gt; C:/CI-Tools/=
-msys64/mingw64/x86_64-w64-mingw32/include/winsock2.h:23,<br>&gt; &gt; =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0from C:/work/xem=
-u/qemu/include/sysemu/os-win32.h:29,<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0from C:/work/xemu/qemu/include/qemu/o=
-sdep.h:119,<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0from ../net/tap-win32.c:29:<br>&gt; &gt; C:/CI-Tools/msys64/mi=
-ngw64/x86_64-w64-mingw32/include/winreg.h:195:57:<br>&gt; &gt; note: expect=
-ed &#39;LPCWSTR&#39; {aka &#39;const short unsigned int *&#39;} but argumen=
-t<br>&gt; &gt; is of type &#39;const char *&#39;<br>&gt; &gt; =C2=A0 195 | =
-=C2=A0 WINADVAPI LONG WINAPI RegOpenKeyExW(HKEY hKey,LPCWSTR<br>&gt; &gt; l=
-pSubKey,DWORD ulOptions,REGSAM samDesired,PHKEY phkResult);<br>&gt; &gt; =
-=C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ~~~~~~~~^~~~~~~~<br>&gt; &gt; ../=
-net/tap-win32.c:229:13: error: passing argument 3 of &#39;RegEnumKeyExW&#39=
-;<br>&gt; &gt; from incompatible pointer type [-Werror=3Dincompatible-point=
-er-types]<br>&gt; &gt; =C2=A0 229 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 enum_name,<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 ^~~~~~~~~<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 | =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 char *<br>&gt; &gt; In file included=
- from<br>&gt; &gt; C:/CI-Tools/msys64/mingw64/x86_64-w64-mingw32/include/wi=
-ndows.h:76,<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0from<br>&gt; &gt; C:/CI-Tools/msys64/mingw64/x86_64-w64-mingw3=
-2/include/winsock2.h:23,<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0from C:/work/xemu/qemu/include/sysemu/os-win32.h=
-:29,<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0from C:/work/xemu/qemu/include/qemu/osdep.h:119,<br>&gt; &gt; =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0from ../net/tap-win3=
-2.c:29:<br>&gt; &gt; C:/CI-Tools/msys64/mingw64/x86_64-w64-mingw32/include/=
-winreg.h:184:70:<br>&gt; &gt; note: expected &#39;LPWSTR&#39; {aka &#39;sho=
-rt unsigned int *&#39;} but argument is of<br>&gt; &gt; type &#39;char *&#3=
-9;<br>&gt; &gt; =C2=A0 184 | =C2=A0 WINADVAPI LONG WINAPI RegEnumKeyExW(HKE=
-Y hKey,DWORD<br>&gt; &gt; dwIndex,LPWSTR lpName,LPDWORD lpcchName,LPDWORD l=
-pReserved,LPWSTR<br>&gt; &gt; lpClass,LPDWORD lpcchClass,PFILETIME lpftLast=
-WriteTime);<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0<br>&gt; &gt; ~~~~~~~^~~~~~<br>&gt=
-; &gt; ../net/tap-win32.c:247:13: error: passing argument 2 of &#39;RegOpen=
-KeyExW&#39;<br>&gt; &gt; from incompatible pointer type [-Werror=3Dincompat=
-ible-pointer-types]<br>&gt; &gt; =C2=A0 247 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 unit_string,<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^~~~~~~~~~~<br>&gt; &gt; =C2=A0 =C2=A0 =C2=
-=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |<br>&gt; &gt; =C2=A0 =C2=
-=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 char *<br>&gt;<br>&g=
-t; I&#39;m not sure fixing all these warnings would produce a<br>&gt; maint=
-ainable code base. I&#39;d rather disable these 2 warning<br>&gt; classes o=
-n Windows.<br>I agree with that, seems QEMU currently are calling ANSI api =
-all the time, better not change that,<div>=C2=A0so globally define
-
--DUNICODE -D_UNICODE is not a option<br><br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A=
-<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo</div></div>
-
---000000000000d954f505af5eff65--
 
