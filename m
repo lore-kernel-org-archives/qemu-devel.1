@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AC71C43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 14:49:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2A9EC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 14:51:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D1AC206B5
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 14:49:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0ECE2206DC
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 14:51:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="Q0WzjNnl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D1AC206B5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="Fq5CpwAi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ECE2206DC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kICHH-0004pS-Jg
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 10:49:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33188)
+	id 1kICIl-0006HE-0y
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 10:51:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33222)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kICBk-00063f-Q7
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 10:44:08 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:52249)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kICBq-00066K-00
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 10:44:15 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:42024)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kICBi-0003xk-2Q
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 10:44:08 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id o16so1884357pjr.2
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 07:44:05 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kICBm-0003y1-HM
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 10:44:13 -0400
+Received: by mail-pf1-x441.google.com with SMTP id d6so2049492pfn.9
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 07:44:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=ARrqKiw0ZI71X/nMn8SUrP42xKqFqGltw1z766gv2gQ=;
- b=Q0WzjNnlE9i2LLiDDSjlbUwV/XIGeyxlx+zwhZPZt+QoVVwbdJkZ1S9lasvuUjy1B4
- XEw4OfR5lepxgetxfOLWFEFnh6HZQr4Iu8nQKi6hZYCYCFfHzKIaAHxm1pu1LII7lY7I
- UoN6JTIvzLEajrGisUyNHPknG6/XcOXVQsmjuFbx1p6oGLWnXlP2Y7XDsVvDTnYGH4hi
- EtNYHrKiv1tg8U1SsJFNWE/Fl7LwdNmbZRYbs2EuKUb4OlPE9a4iy+FU04ghRj6mBtkN
- jxaQZdKQOHtvHV0TZjy5NipY7s21TPUC2wjXJ8PE3b4d+/73hEo0VkOc8llyv0YuB2GI
- CzcQ==
+ bh=29JT28xmeW3jgfT6UGIG7f+UtiHgvWzqQ0aaiLG3mns=;
+ b=Fq5CpwAiF92dlTSCVmKna8vNdURasdDvY630j+WPgYh0Hg4Ah6RH+Hhq5n504SCX07
+ VpHHxV20R5vN8rgVodYr/ZQtRslcgoZIc70USn72LHHuBS3TfGUE/c7VUayaDvLGsG2q
+ V7UkrHkWXMWUVYblxqzJjjq4itLtYmGQ1Xt+OgBDYhzg9Ua3MR4g2n7ymuM4ltTdSWTb
+ BA+h+y9C6zY/4M3PzAWWjyukVccoAi+fguI3KJFUK/R0g0BOxlZog5FBGzB1TOTa892z
+ tFekuVj+kbbpinWKQF9/P+J4wDIVrFmcntP6VxdS6szJqMTvkT0lFXoKz+svqkazdBkh
+ VfsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=ARrqKiw0ZI71X/nMn8SUrP42xKqFqGltw1z766gv2gQ=;
- b=j5yU53WEybpiK9pK6D3Jimq6nEpZ4ZhzidSbBSDfnILkNnAAhlOBZ0HOeCNjJFe9rz
- LxLmPI2hdtn8Bq4u0xdDTIhMag+XuzpKL5PMCCnRe2HGYNMVCQ5+BL11uoK+Gs3O+uVG
- KSYWjeYzv4a9+MfOlfzktVjEPQ5yjS5WgDYI0rx9kAvwrR54ZDefb0zpMxmcYuIiIkK+
- 1DIeZvbctXnexK0kxXELoDm28paog9pUTMIpSijkwVibFyj76qYfVX5QW5Lr17XOMzHT
- ivRtRvSmKWD2wc3UiGt1IULFsu6qShTQysF3jMGXN2iSv0F+qDRV2oXgmK/WXAmtqtDZ
- AJIg==
-X-Gm-Message-State: AOAM530tumroQ0A2PVJtRA6cBD0ac4K0Ayz/r94spNU1IbgrbjS0w8W+
- PUbN7jyqBO/IoEZIXb8T4gTgIe0Lc+Zkra5J
-X-Google-Smtp-Source: ABdhPJwgEot1PHlftxMWkl0G3weMwH7vBdkTfpfHMxIaunxRTtcH+OdODAT9AsmpRBmuPsVoa8Hp0w==
-X-Received: by 2002:a17:902:9a88:b029:d1:e5e7:bdee with SMTP id
- w8-20020a1709029a88b02900d1e5e7bdeemr2079969plp.78.1600181044125; 
- Tue, 15 Sep 2020 07:44:04 -0700 (PDT)
+ bh=29JT28xmeW3jgfT6UGIG7f+UtiHgvWzqQ0aaiLG3mns=;
+ b=ujb1A1FBLYlx4oy2VxNHCkAaRLQKH+ApiIe1N6yBQT+sTAeLOQVpNqXcdHdaYveeJ9
+ +TDmHByHeh/PJ7Nfc/NnjOWqlEXgE31pKToTe1Hf+Y53VhF4uZq7teXki3a+li2U7anq
+ MwVDFz0l32DMs2m5rhgr6FMUm1NUO/KAvvX2mSdN+7RT+DYmWS4mgXAJlBSeRVKrddnK
+ hrGT1kH8uzNuwS+TtIqm89PTZECFWPrqA4INQRVGW5O9ZitNTW/uVSJInokFCV/87Im3
+ XzVoRDqWX8K92K/KT3FwB8/47GwzVm+PFm6PakzlR0iYc90BlfzUA49Cp86z0QdzGryb
+ Gvwg==
+X-Gm-Message-State: AOAM531U4es3kNHkSTgQCXbMXOQkiVQWx6PLkICkOvbmh2Sp7Gqkl7yJ
+ 3dMUETi8Z4yOkxGLTeVKmhAfSmcR9uvhxhDH
+X-Google-Smtp-Source: ABdhPJzVTMEbynQ4wEB5QoB4Y8eO1hKu5R0uHePTxQdRvzSGrsgCsJLD67PfQJuAytWnMmENcC1wGQ==
+X-Received: by 2002:a63:1620:: with SMTP id w32mr10988632pgl.73.1600181048729; 
+ Tue, 15 Sep 2020 07:44:08 -0700 (PDT)
 Received: from localhost.localdomain ([115.96.128.178])
- by smtp.googlemail.com with ESMTPSA id r2sm11520693pga.94.2020.09.15.07.43.59
+ by smtp.googlemail.com with ESMTPSA id r2sm11520693pga.94.2020.09.15.07.44.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Sep 2020 07:44:03 -0700 (PDT)
+ Tue, 15 Sep 2020 07:44:07 -0700 (PDT)
 From: Ani Sinha <ani@anisinha.ca>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 8/9] tests/acpi: add newly added acpi DSDT table blob for
- pci bridge hotplug flag
-Date: Tue, 15 Sep 2020 20:13:12 +0530
-Message-Id: <20200915144314.4997-9-ani@anisinha.ca>
+Subject: [PATCH v2 9/9] piix4: don't reserve hw resources when hotplug is off
+ globally
+Date: Tue, 15 Sep 2020 20:13:13 +0530
+Message-Id: <20200915144314.4997-10-ani@anisinha.ca>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200915144314.4997-1-ani@anisinha.ca>
 References: <20200915144314.4997-1-ani@anisinha.ca>
-Received-SPF: none client-ip=2607:f8b0:4864:20::1042;
- envelope-from=ani@anisinha.ca; helo=mail-pj1-x1042.google.com
+Received-SPF: none client-ip=2607:f8b0:4864:20::441;
+ envelope-from=ani@anisinha.ca; helo=mail-pf1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -18
@@ -107,15 +106,21 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds a binary blob corresponding to the DSDT acpi table. It is used
-to unit test the flag 'acpi-pci-hotplug-with-bridge-support' used with pci
-bridges.
+When acpi hotplug is turned off for both root pci bus as well as for pci
+bridges, we should not generate the related amls for DSDT table or initialize
+related hw ports or reserve hw resources. This change makes sure all those
+operations are turned off in the case acpi pci hotplug is off globally.
 
-This change also clears the file tests/qtest/bios-tables-test-allowed-diff.h
-so that future changes which affect the table can be caught.
+In this change, we also make sure AMLs for the PCNT method are only added when
+bsel is enabled for the corresponding pci bus or bridge hotplug is turned on.
+As a result, when the hotplug for both the root pci device and bridge are
+disabled, this AML in the DSDT acpi table is turned off.
 
-The following is the diff between files tests/data/acpi/pc/DSDT.bridge and
-tests/data/acpi/pc/DSDT.hpbridge after disassembly :
+As q35 machines do not use bsel for it's pci buses at this point in time, this
+change affects DSDT acpi table for q35 machines as well. Therefore, we also
+commit the updated golden master DSDT table acpi binary blobs as well.
+
+Following is a typical diff between the q35 acpi DSDT table blobs:
 
 @@ -1,30 +1,30 @@
  /*
@@ -125,16 +130,16 @@ tests/data/acpi/pc/DSDT.hpbridge after disassembly :
   *
   * Disassembling to symbolic ASL+ operators
   *
-- * Disassembly of tests/data/acpi/pc/DSDT.bridge, Fri Sep 11 23:21:34 2020
-+ * Disassembly of /tmp/aml-7UURQ0, Fri Sep 11 23:21:34 2020
+- * Disassembly of tests/data/acpi/q35/DSDT, Tue Sep 15 18:52:47 2020
++ * Disassembly of /tmp/aml-3O0DR0, Tue Sep 15 18:52:47 2020
   *
   * Original Table Header:
   *     Signature        "DSDT"
-- *     Length           0x00001A89 (6793)
-+ *     Length           0x0000131F (4895)
+- *     Length           0x00001DFE (7678)
++ *     Length           0x00001DF6 (7670)
   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
-- *     Checksum         0x09
-+ *     Checksum         0xF9
+- *     Checksum         0xAC
++ *     Checksum         0x17
   *     OEM ID           "BOCHS "
   *     OEM Table ID     "BXPCDSDT"
   *     OEM Revision     0x00000001 (1)
@@ -151,7 +156,11 @@ tests/data/acpi/pc/DSDT.hpbridge after disassembly :
              DBGB,   8
          }
 
-@@ -859,522 +859,32 @@
+@@ -3113,24 +3113,20 @@
+                 Name (_ADR, 0x00010000)  // _ADR: Address
+                 Method (_S1D, 0, NotSerialized)  // _S1D: S1 Device State
+                 {
+                     Return (Zero)
                  }
 
                  Method (_S2D, 0, NotSerialized)  // _S2D: S2 Device State
@@ -164,603 +173,212 @@ tests/data/acpi/pc/DSDT.hpbridge after disassembly :
                      Return (Zero)
                  }
              }
-
-             Device (S18)
-             {
-                 Name (_ADR, 0x00030000)  // _ADR: Address
--                Name (BSEL, One)
--                Device (S00)
--                {
--                    Name (_SUN, Zero)  // _SUN: Slot User Number
--                    Name (_ADR, Zero)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
 -
--                Device (S08)
--                {
--                    Name (_SUN, One)  // _SUN: Slot User Number
--                    Name (_ADR, 0x00010000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (S10)
--                {
--                    Name (_SUN, 0x02)  // _SUN: Slot User Number
--                    Name (_ADR, 0x00020000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (S18)
--                {
--                    Name (_SUN, 0x03)  // _SUN: Slot User Number
--                    Name (_ADR, 0x00030000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (S20)
--                {
--                    Name (_SUN, 0x04)  // _SUN: Slot User Number
--                    Name (_ADR, 0x00040000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (S28)
--                {
--                    Name (_SUN, 0x05)  // _SUN: Slot User Number
--                    Name (_ADR, 0x00050000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (S30)
--                {
--                    Name (_SUN, 0x06)  // _SUN: Slot User Number
--                    Name (_ADR, 0x00060000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (S38)
--                {
--                    Name (_SUN, 0x07)  // _SUN: Slot User Number
--                    Name (_ADR, 0x00070000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (S40)
--                {
--                    Name (_SUN, 0x08)  // _SUN: Slot User Number
--                    Name (_ADR, 0x00080000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (S48)
--                {
--                    Name (_SUN, 0x09)  // _SUN: Slot User Number
--                    Name (_ADR, 0x00090000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (S50)
--                {
--                    Name (_SUN, 0x0A)  // _SUN: Slot User Number
--                    Name (_ADR, 0x000A0000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (S58)
--                {
--                    Name (_SUN, 0x0B)  // _SUN: Slot User Number
--                    Name (_ADR, 0x000B0000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (S60)
--                {
--                    Name (_SUN, 0x0C)  // _SUN: Slot User Number
--                    Name (_ADR, 0x000C0000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (S68)
--                {
--                    Name (_SUN, 0x0D)  // _SUN: Slot User Number
--                    Name (_ADR, 0x000D0000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (S70)
--                {
--                    Name (_SUN, 0x0E)  // _SUN: Slot User Number
--                    Name (_ADR, 0x000E0000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (S78)
--                {
--                    Name (_SUN, 0x0F)  // _SUN: Slot User Number
--                    Name (_ADR, 0x000F0000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (S80)
--                {
--                    Name (_SUN, 0x10)  // _SUN: Slot User Number
--                    Name (_ADR, 0x00100000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (S88)
--                {
--                    Name (_SUN, 0x11)  // _SUN: Slot User Number
--                    Name (_ADR, 0x00110000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (S90)
--                {
--                    Name (_SUN, 0x12)  // _SUN: Slot User Number
--                    Name (_ADR, 0x00120000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (S98)
--                {
--                    Name (_SUN, 0x13)  // _SUN: Slot User Number
--                    Name (_ADR, 0x00130000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (SA0)
--                {
--                    Name (_SUN, 0x14)  // _SUN: Slot User Number
--                    Name (_ADR, 0x00140000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (SA8)
--                {
--                    Name (_SUN, 0x15)  // _SUN: Slot User Number
--                    Name (_ADR, 0x00150000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (SB0)
--                {
--                    Name (_SUN, 0x16)  // _SUN: Slot User Number
--                    Name (_ADR, 0x00160000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (SB8)
--                {
--                    Name (_SUN, 0x17)  // _SUN: Slot User Number
--                    Name (_ADR, 0x00170000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (SC0)
--                {
--                    Name (_SUN, 0x18)  // _SUN: Slot User Number
--                    Name (_ADR, 0x00180000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (SC8)
--                {
--                    Name (_SUN, 0x19)  // _SUN: Slot User Number
--                    Name (_ADR, 0x00190000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (SD0)
--                {
--                    Name (_SUN, 0x1A)  // _SUN: Slot User Number
--                    Name (_ADR, 0x001A0000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (SD8)
--                {
--                    Name (_SUN, 0x1B)  // _SUN: Slot User Number
--                    Name (_ADR, 0x001B0000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (SE0)
--                {
--                    Name (_SUN, 0x1C)  // _SUN: Slot User Number
--                    Name (_ADR, 0x001C0000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (SE8)
--                {
--                    Name (_SUN, 0x1D)  // _SUN: Slot User Number
--                    Name (_ADR, 0x001D0000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (SF0)
--                {
--                    Name (_SUN, 0x1E)  // _SUN: Slot User Number
--                    Name (_ADR, 0x001E0000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Device (SF8)
--                {
--                    Name (_SUN, 0x1F)  // _SUN: Slot User Number
--                    Name (_ADR, 0x001F0000)  // _ADR: Address
--                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
--                    {
--                        PCEJ (BSEL, _SUN)
--                    }
--                }
--
--                Method (DVNT, 2, NotSerialized)
--                {
--                    If ((Arg0 & One))
--                    {
--                        Notify (S00, Arg1)
--                    }
--
--                    If ((Arg0 & 0x02))
--                    {
--                        Notify (S08, Arg1)
--                    }
--
--                    If ((Arg0 & 0x04))
--                    {
--                        Notify (S10, Arg1)
--                    }
--
--                    If ((Arg0 & 0x08))
--                    {
--                        Notify (S18, Arg1)
--                    }
--
--                    If ((Arg0 & 0x10))
--                    {
--                        Notify (S20, Arg1)
--                    }
--
--                    If ((Arg0 & 0x20))
--                    {
--                        Notify (S28, Arg1)
--                    }
--
--                    If ((Arg0 & 0x40))
--                    {
--                        Notify (S30, Arg1)
--                    }
--
--                    If ((Arg0 & 0x80))
--                    {
--                        Notify (S38, Arg1)
--                    }
--
--                    If ((Arg0 & 0x0100))
--                    {
--                        Notify (S40, Arg1)
--                    }
--
--                    If ((Arg0 & 0x0200))
--                    {
--                        Notify (S48, Arg1)
--                    }
--
--                    If ((Arg0 & 0x0400))
--                    {
--                        Notify (S50, Arg1)
--                    }
--
--                    If ((Arg0 & 0x0800))
--                    {
--                        Notify (S58, Arg1)
--                    }
--
--                    If ((Arg0 & 0x1000))
--                    {
--                        Notify (S60, Arg1)
--                    }
--
--                    If ((Arg0 & 0x2000))
--                    {
--                        Notify (S68, Arg1)
--                    }
--
--                    If ((Arg0 & 0x4000))
--                    {
--                        Notify (S70, Arg1)
--                    }
--
--                    If ((Arg0 & 0x8000))
--                    {
--                        Notify (S78, Arg1)
--                    }
--
--                    If ((Arg0 & 0x00010000))
--                    {
--                        Notify (S80, Arg1)
--                    }
--
--                    If ((Arg0 & 0x00020000))
--                    {
--                        Notify (S88, Arg1)
--                    }
--
--                    If ((Arg0 & 0x00040000))
--                    {
--                        Notify (S90, Arg1)
--                    }
--
--                    If ((Arg0 & 0x00080000))
--                    {
--                        Notify (S98, Arg1)
--                    }
--
--                    If ((Arg0 & 0x00100000))
--                    {
--                        Notify (SA0, Arg1)
--                    }
--
--                    If ((Arg0 & 0x00200000))
--                    {
--                        Notify (SA8, Arg1)
--                    }
--
--                    If ((Arg0 & 0x00400000))
--                    {
--                        Notify (SB0, Arg1)
--                    }
--
--                    If ((Arg0 & 0x00800000))
--                    {
--                        Notify (SB8, Arg1)
--                    }
--
--                    If ((Arg0 & 0x01000000))
--                    {
--                        Notify (SC0, Arg1)
--                    }
--
--                    If ((Arg0 & 0x02000000))
--                    {
--                        Notify (SC8, Arg1)
--                    }
--
--                    If ((Arg0 & 0x04000000))
--                    {
--                        Notify (SD0, Arg1)
--                    }
--
--                    If ((Arg0 & 0x08000000))
--                    {
--                        Notify (SD8, Arg1)
--                    }
--
--                    If ((Arg0 & 0x10000000))
--                    {
--                        Notify (SE0, Arg1)
--                    }
--
--                    If ((Arg0 & 0x20000000))
--                    {
--                        Notify (SE8, Arg1)
--                    }
--
--                    If ((Arg0 & 0x40000000))
--                    {
--                        Notify (SF0, Arg1)
--                    }
--
--                    If ((Arg0 & 0x80000000))
--                    {
--                        Notify (SF8, Arg1)
--                    }
--                }
--
--                Method (PCNT, 0, NotSerialized)
--                {
--                    BNUM = One
--                    DVNT (PCIU, One)
--                    DVNT (PCID, 0x03)
--                }
-             }
-
-             Device (S20)
-             {
-                 Name (_SUN, 0x04)  // _SUN: Slot User Number
-                 Name (_ADR, 0x00040000)  // _ADR: Address
-                 Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
-                 {
-                     PCEJ (BSEL, _SUN)
-                 }
-             }
-
-             Device (S28)
-             {
-                 Name (_SUN, 0x05)  // _SUN: Slot User Number
-                 Name (_ADR, 0x00050000)  // _ADR: Address
-@@ -1779,22 +1289,21 @@
-                 If ((Arg0 & 0x40000000))
-                 {
-                     Notify (SF0, Arg1)
-                 }
-
-                 If ((Arg0 & 0x80000000))
-                 {
-                     Notify (SF8, Arg1)
-                 }
-             }
-
-             Method (PCNT, 0, NotSerialized)
-             {
-                 BNUM = Zero
-                 DVNT (PCIU, One)
-                 DVNT (PCID, 0x03)
--                ^S18.PCNT ()
-             }
+-            Method (PCNT, 0, NotSerialized)
+-            {
+-            }
          }
      }
  }
 
 Signed-off-by: Ani Sinha <ani@anisinha.ca>
 ---
- tests/data/acpi/pc/DSDT.hpbridge            | Bin 0 -> 4895 bytes
- tests/qtest/bios-tables-test-allowed-diff.h |   1 -
- 2 files changed, 1 deletion(-)
- create mode 100644 tests/data/acpi/pc/DSDT.hpbridge
+ hw/acpi/piix4.c                   |   6 ++++--
+ hw/i386/acpi-build.c              |  23 +++++++++++++++++------
+ tests/data/acpi/q35/DSDT          | Bin 7678 -> 7670 bytes
+ tests/data/acpi/q35/DSDT.acpihmat | Bin 9002 -> 8994 bytes
+ tests/data/acpi/q35/DSDT.bridge   | Bin 7695 -> 7688 bytes
+ tests/data/acpi/q35/DSDT.cphp     | Bin 8141 -> 8133 bytes
+ tests/data/acpi/q35/DSDT.dimmpxm  | Bin 9331 -> 9323 bytes
+ tests/data/acpi/q35/DSDT.ipmibt   | Bin 7753 -> 7745 bytes
+ tests/data/acpi/q35/DSDT.memhp    | Bin 9037 -> 9029 bytes
+ tests/data/acpi/q35/DSDT.mmio64   | Bin 8808 -> 8801 bytes
+ tests/data/acpi/q35/DSDT.numamem  | Bin 7684 -> 7676 bytes
+ tests/data/acpi/q35/DSDT.tis      | Bin 8283 -> 8276 bytes
+ 12 files changed, 21 insertions(+), 8 deletions(-)
 
-diff --git a/tests/data/acpi/pc/DSDT.hpbridge b/tests/data/acpi/pc/DSDT.hpbridge
-new file mode 100644
-index 0000000000000000000000000000000000000000..b0751398541bdf88ce405be9742aeba0b375dbc3
+changelog:
+v1: initial patch.
+v2: fixed a bug and added acpi DSDT table blobs for q35 to make unit tests pass.
+
+diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+index e6163bb6ce..b70b1f98af 100644
+--- a/hw/acpi/piix4.c
++++ b/hw/acpi/piix4.c
+@@ -596,8 +596,10 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
+                           "acpi-gpe0", GPE_LEN);
+     memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
+ 
+-    acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
+-                    s->use_acpi_hotplug_bridge);
++    if (s->use_acpi_hotplug_bridge || s->use_acpi_root_pci_hotplug) {
++        acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
++                        s->use_acpi_hotplug_bridge);
++    }
+ 
+     s->cpu_hotplug_legacy = true;
+     object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index e079b686f5..91622e185b 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -95,6 +95,7 @@ typedef struct AcpiPmInfo {
+     bool s3_disabled;
+     bool s4_disabled;
+     bool pcihp_bridge_en;
++    bool pcihp_root_en;
+     uint8_t s4_val;
+     AcpiFadtData fadt;
+     uint16_t cpu_hp_io_base;
+@@ -245,6 +246,9 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
+     pm->pcihp_bridge_en =
+         object_property_get_bool(obj, "acpi-pci-hotplug-with-bridge-support",
+                                  NULL);
++    pm->pcihp_root_en =
++        object_property_get_bool(obj, "acpi-root-pci-hotplug",
++                                 NULL);
+ }
+ 
+ static void acpi_get_misc_info(AcpiMiscInfo *info)
+@@ -450,10 +454,12 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+     }
+ 
+     /* Append PCNT method to notify about events on local and child buses.
+-     * Add unconditionally for root since DSDT expects it.
++     * Add this method for root bus only when hotplug is enabled since DSDT
++     * expects it.
+      */
+-    method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
+-
++    if (bsel || pcihp_bridge_en) {
++        method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
++    }
+     /* If bus supports hotplug select it and notify about local events */
+     if (bsel) {
+         uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
+@@ -479,7 +485,10 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+             aml_append(method, aml_name("^S%.02X.PCNT", devfn));
+         }
+     }
+-    aml_append(parent_scope, method);
++
++    if (bsel || pcihp_bridge_en) {
++        aml_append(parent_scope, method);
++    }
+     qobject_unref(bsel);
+ }
+ 
+@@ -1504,7 +1513,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+         build_hpet_aml(dsdt);
+         build_piix4_isa_bridge(dsdt);
+         build_isa_devices_aml(dsdt);
+-        build_piix4_pci_hotplug(dsdt);
++        if (pm->pcihp_bridge_en || pm->pcihp_root_en) {
++            build_piix4_pci_hotplug(dsdt);
++        }
+         build_piix4_pci0_int(dsdt);
+     } else {
+         sb_scope = aml_scope("_SB");
+@@ -1698,7 +1709,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+     crs_range_set_free(&crs_range_set);
+ 
+     /* reserve PCIHP resources */
+-    if (pm->pcihp_io_len) {
++    if (pm->pcihp_io_len && (pm->pcihp_bridge_en || pm->pcihp_root_en)) {
+         dev = aml_device("PHPR");
+         aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A06")));
+         aml_append(dev,
+diff --git a/tests/data/acpi/q35/DSDT b/tests/data/acpi/q35/DSDT
+index bba8884073a27427b88ac0d733c9c87330a59366..4fad91b72e279b744b0528fd687c862d3a3d5cfa 100644
 GIT binary patch
-literal 4895
-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
-S66ohVtr{L;J8bx3aOwYF+mJl~
+delta 33
+pcmexo{mq)oCD<k8n=AtZqxeRyWwM-ZEHUxHPVoYElXuD50sy=Q3Pb<^
 
-literal 0
-HcmV?d00001
+delta 42
+ycmexn{m+`qCD<k8pDY6d<C=|J%VfFySYqOXo#F-DSSIh3wPhD!3vl)eVE_Owj0{Tv
 
-diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
-index 96a9237355..dfb8523c8b 100644
---- a/tests/qtest/bios-tables-test-allowed-diff.h
-+++ b/tests/qtest/bios-tables-test-allowed-diff.h
-@@ -1,2 +1 @@
- /* List of comma-separated changed AML files to ignore */
--"tests/data/acpi/pc/DSDT.hpbridge",
+diff --git a/tests/data/acpi/q35/DSDT.acpihmat b/tests/data/acpi/q35/DSDT.acpihmat
+index 9cac92418b5fcc2767dc74603d599642b59623fe..e4df7d1ca89578dd81be3539c8f83f073bb8db25 100644
+GIT binary patch
+delta 33
+pcmZ4Gw#bdkCD<iINtuCx@ySN6OG=z>EHUxHPVoYElb<Qs0syHh3KIYT
+
+delta 42
+xcmZ4Fw#tpmCD<iIOPPUzv2r8VB_%FDmYDcpr+5K3mdQ_*Y}rNF0-XIq7y$jZ3mO0b
+
+diff --git a/tests/data/acpi/q35/DSDT.bridge b/tests/data/acpi/q35/DSDT.bridge
+index f08b7245f59aad491fcaa60e2bab1085c369ea1c..065399174575442201cc09ffa4939ddf90ac81b4 100644
+GIT binary patch
+delta 33
+ocmeCT>9FB)33dtLkYiwAT)&ZPnJlLVYfOBwQ@nt~<ejqq0G06xDgXcg
+
+delta 41
+wcmeCM>9^r>33dtLmt$aH^xnv|OqSE1H6}jTDPF*R@=jTQb`iD!XTJ~z0NaZSF#rGn
+
+diff --git a/tests/data/acpi/q35/DSDT.cphp b/tests/data/acpi/q35/DSDT.cphp
+index 57d859cef9fa16a8f125c4b338611c8472699f38..8d2395e3cb4383b30e3840caed0d09ccad0c7323 100644
+GIT binary patch
+delta 33
+ocmX?Wf7G7KCD<k8s5}D$<AjY|rShC^EHUxHPVoYElRM>Y0kO^r)&Kwi
+
+delta 42
+xcmX?Vf7YJMCD<k8tULn)qv}SkQh6>vmYDcpr+5K3mdPFRw(KHo0nUCQ3;+bB3f%wz
+
+diff --git a/tests/data/acpi/q35/DSDT.dimmpxm b/tests/data/acpi/q35/DSDT.dimmpxm
+index 9d5bd5744e2ba2e0f6126c3aba0bb36af865e499..df7422051c6feadeaa3b6733ad7efa67c339b49d 100644
+GIT binary patch
+delta 33
+ocmezD@!EsSCD<h-TZMsvF>)i9v<jyiOH6#QQ@nuPWPKG|0ILxQ{r~^~
+
+delta 42
+xcmaFu@!5mRCD<jTScQRs@!du)X%#L%mYDcpr+5K3mdSc5w(KHo0nUCQ3;+_P3k3iG
+
+diff --git a/tests/data/acpi/q35/DSDT.ipmibt b/tests/data/acpi/q35/DSDT.ipmibt
+index 5cd11de6a8fe47324e5f922823a22746882f19f5..c4ce5cc0ede822ea82656d078d7a8b7eee4a7516 100644
+GIT binary patch
+delta 33
+ocmX?UbI^v%CD<jzQI3Iu(Q6~uM_EocmYDcpr+5Lo$*gj=0Hl8i@&Et;
+
+delta 42
+xcmX?TbJB*(CD<jzQ;vaw@%~1xkFs2TEHUxHPVoY6ER$K}Y}rNF0-XIq7yt{`3i$v4
+
+diff --git a/tests/data/acpi/q35/DSDT.memhp b/tests/data/acpi/q35/DSDT.memhp
+index 05a7a73ec43130d5c3018bb462fd84981bfb151c..84614ffc1452358053b4c2be4b2edcb4d56a9ae6 100644
+GIT binary patch
+delta 33
+ocmX@>cGQi_CD<jzRhfZ-kz*s*S0zq2mYDcpr+5Lo$(+iz0Hk>c=Kufz
+
+delta 42
+xcmX@=cGiu{CD<jzSDAr<aqdR0uS#5gEHUxHPVoY6ER#8uZP`WG0-XIq7yt`p3hn>^
+
+diff --git a/tests/data/acpi/q35/DSDT.mmio64 b/tests/data/acpi/q35/DSDT.mmio64
+index efd3f1188f2b55da1514212d4be081a61c2a96e9..d8dd702b69cc24a6b58b8eaa79ea02439a2a7dd9 100644
+GIT binary patch
+delta 33
+ocmaFi^3a9LCD<h-QHg<paqmX1|B9R*tTFMyPVoW`lZBN00lUBo5&!@I
+
+delta 41
+wcmaFp^1_A7CD<h-Ly3WbF>)i<e??Az)|mKUr+5MP$wEs0>>_Ld&VC^b00^lI82|tP
+
+diff --git a/tests/data/acpi/q35/DSDT.numamem b/tests/data/acpi/q35/DSDT.numamem
+index 1978b55f1255402bf9bade0b91150b5cb49789a4..f36d22063a6eed4fb107ffd0e10477a2d6d7a983 100644
+GIT binary patch
+delta 33
+pcmZp%`D4xH66_N4N0xzs@!&?THL{#;EHUxHPVoYElMl$+0sy+k3XK2&
+
+delta 42
+xcmexk-D1P#66_MfBFDhM7`l;bjVzZROH6#QQ@ns1%jEsCw(KHo0nUCQ3;^@W3X}i<
+
+diff --git a/tests/data/acpi/q35/DSDT.tis b/tests/data/acpi/q35/DSDT.tis
+index 638de3872673d17b1958497d0e62c83653de1602..203030a61a92c204bb93c43fe79e546471ae2985 100644
+GIT binary patch
+delta 38
+ucmccZaK(YkCD<h-M1g^U@x?~2O|qOGnlbUgPVoW`laI>UZRU~-WC8&31`DbH
+
+delta 45
+zcmccOaNB{)CD<h-T7iLqv1KFICRt8@&6xOLr+5MP$wy`F*hJU@oc%&JGsy)p0RTF+
+B45<JB
+
 -- 
 2.17.1
 
