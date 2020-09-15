@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94A7DC43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 10:48:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA1B5C43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 10:50:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C88821D7B
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 10:48:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B444206B7
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 10:50:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MioPubEK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C88821D7B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WJd+r8e6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B444206B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kI8W7-0003Eb-1O
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 06:48:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52746)
+	id 1kI8Xj-0005fW-1M
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 06:50:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52382)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kI8UR-0000vr-9P
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 06:47:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28278
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kI8Tz-0000Km-SD
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 06:46:43 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24212
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kI8UP-0004da-GW
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 06:47:10 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kI8Tw-0004WW-Nb
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 06:46:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600166828;
+ s=mimecast20190719; t=1600166799;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=r7bomLHOqMKUeU1AC9hPJC8dPd2D9Dctugd/c7FolZg=;
- b=MioPubEKTGE8WyWUgN3XqF6rd9qdVr2ET7YheDtykgFjlzG8AB2nOjtRnl62PnN3xRpdK6
- 3G3vRMWK8boje7sjsM4N8cs2TmUY3CXWbvFxW9MElFnyJBxma3wkbo24IbNwYd119FmyE3
- /9Db8TxtoVXJv5ufh/2iQHvzj9WGwU4=
+ bh=jJPpvV6IltYiPr20vjj9EGkrUcbzVVF1bqmrz/6gk+c=;
+ b=WJd+r8e6vr64Hraa/m5W8OR0mS28yoGRRqGoW+V1kkDpK28eFPxU/gadOA8RObvFbF6AYg
+ uXzjt4P7baqoQTgvDOvKHP8gkTsqwwmmUAd0EPSpXQRmfEp/6BOo8UDwbVpijndNycSw1I
+ io3v8xOXMsfBw1fC2nkESlitDCCBbsE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-293-1bSZL-GsPBK2xlnuVADHRw-1; Tue, 15 Sep 2020 06:47:06 -0400
-X-MC-Unique: 1bSZL-GsPBK2xlnuVADHRw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-174-eY1XsI4mOOyxmnMdevQvwg-1; Tue, 15 Sep 2020 06:46:37 -0400
+X-MC-Unique: eY1XsI4mOOyxmnMdevQvwg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 682B01005E65;
- Tue, 15 Sep 2020 10:47:05 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64BEF801F9B;
+ Tue, 15 Sep 2020 10:46:36 +0000 (UTC)
 Received: from localhost (ovpn-113-7.ams2.redhat.com [10.36.113.7])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E24D275143;
- Tue, 15 Sep 2020 10:47:04 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 063F15DC08;
+ Tue, 15 Sep 2020 10:46:35 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 16/22] qcow2: Make qcow2_free_any_clusters() free only one
- cluster
-Date: Tue, 15 Sep 2020 12:46:21 +0200
-Message-Id: <20200915104627.699552-17-mreitz@redhat.com>
+Subject: [PULL 03/22] qemu-iotests: Support varargs syntax in FilePaths
+Date: Tue, 15 Sep 2020 12:46:08 +0200
+Message-Id: <20200915104627.699552-4-mreitz@redhat.com>
 In-Reply-To: <20200915104627.699552-1-mreitz@redhat.com>
 References: <20200915104627.699552-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:29:39
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 03:21:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -38
 X-Spam_score: -3.9
@@ -101,106 +100,107 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alberto Garcia <berto@igalia.com>
+From: Nir Soffer <nirsof@gmail.com>
 
-This function takes an L2 entry and a number of clusters to free.
-Although in principle it can free any type of cluster (using the L2
-entry to determine its type) in practice the API is broken because
-compressed clusters have a variable size and there is no way to free
-more than one without having the L2 entry of each one of them.
+Accept variable number of names instead of a sequence:
 
-The good news all callers are passing nb_clusters=1 so we can simply
-get rid of that parameter.
+    with FilePaths("a", "b", "c") as (a, b, c):
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Message-Id: <77cea0f4616f921d37e971b3c5b18a2faa24b173.1599573989.git.berto@igalia.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+The disadvantage is that base_dir must be used as kwarg:
+
+    with FilePaths("a", "b", base_dir=soc_dir) as (sock1, sock2):
+
+But this is more clear and calling optional argument as positional
+arguments is bad idea anyway.
+
+Signed-off-by: Nir Soffer <nsoffer@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-Id: <20200828232152.205833-4-nsoffer@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.h          | 4 ++--
- block/qcow2-cluster.c  | 6 +++---
- block/qcow2-refcount.c | 8 ++++----
- 3 files changed, 9 insertions(+), 9 deletions(-)
+ tests/qemu-iotests/194        |  4 ++--
+ tests/qemu-iotests/257        | 10 ++++------
+ tests/qemu-iotests/iotests.py |  8 ++++----
+ 3 files changed, 10 insertions(+), 12 deletions(-)
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 83cfa0c391..b73a4cf1f8 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -861,8 +861,8 @@ int64_t qcow2_alloc_bytes(BlockDriverState *bs, int size);
- void qcow2_free_clusters(BlockDriverState *bs,
-                           int64_t offset, int64_t size,
-                           enum qcow2_discard_type type);
--void qcow2_free_any_clusters(BlockDriverState *bs, uint64_t l2_entry,
--                             int nb_clusters, enum qcow2_discard_type type);
-+void qcow2_free_any_cluster(BlockDriverState *bs, uint64_t l2_entry,
-+                            enum qcow2_discard_type type);
+diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
+index da7c4265ec..08389f474e 100755
+--- a/tests/qemu-iotests/194
++++ b/tests/qemu-iotests/194
+@@ -26,8 +26,8 @@ iotests.script_initialize(supported_fmts=['qcow2', 'qed', 'raw'],
  
- int qcow2_update_snapshot_refcount(BlockDriverState *bs,
-     int64_t l1_table_offset, int l1_size, int addend);
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index ce1260e746..1a67b2d928 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -1096,7 +1096,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
-      */
-     if (!m->keep_old_clusters && j != 0) {
-         for (i = 0; i < j; i++) {
--            qcow2_free_any_clusters(bs, old_cluster[i], 1, QCOW2_DISCARD_NEVER);
-+            qcow2_free_any_cluster(bs, old_cluster[i], QCOW2_DISCARD_NEVER);
-         }
-     }
+ with iotests.FilePath('source.img') as source_img_path, \
+      iotests.FilePath('dest.img') as dest_img_path, \
+-     iotests.FilePaths(['migration.sock', 'nbd.sock'], iotests.sock_dir) as \
+-         [migration_sock_path, nbd_sock_path], \
++     iotests.FilePaths('migration.sock', 'nbd.sock', base_dir=iotests.sock_dir) \
++        as (migration_sock_path, nbd_sock_path), \
+      iotests.VM('source') as source_vm, \
+      iotests.VM('dest') as dest_vm:
  
-@@ -1913,7 +1913,7 @@ static int discard_in_l2_slice(BlockDriverState *bs, uint64_t offset,
-             set_l2_bitmap(s, l2_slice, l2_index + i, new_l2_bitmap);
-         }
-         /* Then decrease the refcount */
--        qcow2_free_any_clusters(bs, old_l2_entry, 1, type);
-+        qcow2_free_any_cluster(bs, old_l2_entry, type);
-     }
+diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
+index e1e6077219..a9aa65bbe3 100755
+--- a/tests/qemu-iotests/257
++++ b/tests/qemu-iotests/257
+@@ -275,10 +275,9 @@ def test_bitmap_sync(bsync_mode, msync_mode='bitmap', failure=None):
+                         an incomplete backup. Testing limitations prevent
+                         testing competing writes.
+     """
+-    with iotests.FilePaths(['img', 'bsync1', 'bsync2',
+-                            'fbackup0', 'fbackup1', 'fbackup2']) as \
+-                            (img_path, bsync1, bsync2,
+-                             fbackup0, fbackup1, fbackup2), \
++    with iotests.FilePaths(
++            'img', 'bsync1', 'bsync2', 'fbackup0', 'fbackup1', 'fbackup2') as \
++            (img_path, bsync1, bsync2, fbackup0, fbackup1, fbackup2), \
+          iotests.VM() as vm:
  
-     qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
-@@ -2005,7 +2005,7 @@ static int zero_in_l2_slice(BlockDriverState *bs, uint64_t offset,
+         mode = "Mode {:s}; Bitmap Sync {:s}".format(msync_mode, bsync_mode)
+@@ -441,8 +440,7 @@ def test_backup_api():
+     """
+     Test malformed and prohibited invocations of the backup API.
+     """
+-    with iotests.FilePaths(['img', 'bsync1']) as \
+-         (img_path, backup_path), \
++    with iotests.FilePaths('img', 'bsync1') as (img_path, backup_path), \
+          iotests.VM() as vm:
  
-         qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
-         if (unmap) {
--            qcow2_free_any_clusters(bs, old_l2_entry, 1, QCOW2_DISCARD_REQUEST);
-+            qcow2_free_any_cluster(bs, old_l2_entry, QCOW2_DISCARD_REQUEST);
-         }
-         set_l2_entry(s, l2_slice, l2_index + i, new_l2_entry);
-         if (has_subclusters(s)) {
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 51e9778ed8..8e649b008e 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -1157,8 +1157,8 @@ void qcow2_free_clusters(BlockDriverState *bs,
-  * Free a cluster using its L2 entry (handles clusters of all types, e.g.
-  * normal cluster, compressed cluster, etc.)
-  */
--void qcow2_free_any_clusters(BlockDriverState *bs, uint64_t l2_entry,
--                             int nb_clusters, enum qcow2_discard_type type)
-+void qcow2_free_any_cluster(BlockDriverState *bs, uint64_t l2_entry,
-+                            enum qcow2_discard_type type)
- {
-     BDRVQcow2State *s = bs->opaque;
-     QCow2ClusterType ctype = qcow2_get_cluster_type(bs, l2_entry);
-@@ -1169,7 +1169,7 @@ void qcow2_free_any_clusters(BlockDriverState *bs, uint64_t l2_entry,
-              ctype == QCOW2_CLUSTER_ZERO_ALLOC))
-         {
-             bdrv_pdiscard(s->data_file, l2_entry & L2E_OFFSET_MASK,
--                          nb_clusters << s->cluster_bits);
-+                          s->cluster_size);
-         }
-         return;
-     }
-@@ -1192,7 +1192,7 @@ void qcow2_free_any_clusters(BlockDriverState *bs, uint64_t l2_entry,
-                                     l2_entry & L2E_OFFSET_MASK);
-         } else {
-             qcow2_free_clusters(bs, l2_entry & L2E_OFFSET_MASK,
--                                nb_clusters << s->cluster_bits, type);
-+                                s->cluster_size, type);
-         }
-         break;
-     case QCOW2_CLUSTER_ZERO_PLAIN:
+         log("\n=== API failure tests ===\n")
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index bbe63a6da0..635ec99431 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -455,7 +455,7 @@ class FilePaths:
+ 
+     Example usage:
+ 
+-        with FilePaths(['a.img', 'b.img']) as (img_a, img_b):
++        with FilePaths('a.img', 'b.img') as (img_a, img_b):
+             # Use img_a and img_b here...
+ 
+         # a.img and b.img are automatically removed here.
+@@ -463,10 +463,10 @@ class FilePaths:
+     By default images are created in iotests.test_dir. To create sockets use
+     iotests.sock_dir:
+ 
+-       with FilePaths(['a.sock'], base_dir=iotests.sock_dir) as (sock,):
++       with FilePaths('a.sock', base_dir=iotests.sock_dir) as (sock,):
+ 
+     """
+-    def __init__(self, names, base_dir=test_dir):
++    def __init__(self, *names, base_dir=test_dir):
+         self.paths = []
+         for name in names:
+             self.paths.append(os.path.join(base_dir, file_pattern(name)))
+@@ -487,7 +487,7 @@ class FilePath(FilePaths):
+     FilePath is a specialization of FilePaths that takes a single filename.
+     """
+     def __init__(self, name, base_dir=test_dir):
+-        super(FilePath, self).__init__([name], base_dir)
++        super(FilePath, self).__init__(name, base_dir=base_dir)
+ 
+     def __enter__(self):
+         return self.paths[0]
 -- 
 2.26.2
 
