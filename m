@@ -2,90 +2,87 @@ Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1002BC43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 07:32:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D73D5C43461
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 07:34:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39E0720731
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 07:32:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F20520731
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 07:34:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hT6raCre"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39E0720731
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cUSkG0Tg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F20520731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kI5SB-0004SR-1p
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 03:32:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39292)
+	id 1kI5Tg-0005RS-B1
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 03:34:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39646)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kI5Qu-0003iB-Ja
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 03:31:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57601
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kI5Qs-00056W-2C
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 03:31:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600155077;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=+SUOQ4HllaTI6EgOEoM0vBxraz7MhS02dV6rnRn8yRU=;
- b=hT6raCreI3K8XxGHns+rE6/N86TJObiGlByxruH9Ix+0hhRCp7F6+iYOxtau0t/sue2HgO
- 38soM9st+3cmZPlBfG/gyNL5/C4F+HDadESbbjCSR7iu+sClgUW4Q/dh4od+AtU/U5f4qh
- ihNonByCfYMnnlmc7kSqtbMwRq4Zd4g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-525-TmNfgcAWONmc7d2NN7RaSA-1; Tue, 15 Sep 2020 03:31:11 -0400
-X-MC-Unique: TmNfgcAWONmc7d2NN7RaSA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A65E8014D8;
- Tue, 15 Sep 2020 07:31:10 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.136])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C23BC5DD6E;
- Tue, 15 Sep 2020 07:31:08 +0000 (UTC)
-Date: Tue, 15 Sep 2020 09:31:05 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Haibo Xu <haibo.xu@linaro.org>
-Subject: Re: [PATCH v3 07/12] hw/arm/virt: Move post cpu realize check into
- its own function
-Message-ID: <20200915073105.32zci2lukwgljvw4@kamzik.brq.redhat.com>
-References: <cover.1600135462.git.haibo.xu@linaro.org>
- <20eedb95441ecec7b23527cde78aa5b63c67b400.1600135462.git.haibo.xu@linaro.org>
- <20200915062219.dtnl6p3nan76xvv7@kamzik.brq.redhat.com>
- <CAJc+Z1Gk2pjiaMKxohj80x1YkvTw4eNW7BZxp_ztsF8E68pYeg@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <haibo.xu@linaro.org>)
+ id 1kI5Sk-0004uW-BJ
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 03:33:14 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:39693)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <haibo.xu@linaro.org>)
+ id 1kI5Sh-0005Dh-Ti
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 03:33:14 -0400
+Received: by mail-io1-xd43.google.com with SMTP id b6so2983347iof.6
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 00:33:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=y/s+UJ/Ysdcnsmt2V+//M/LWXL1ge5dmgeawBIC+2t0=;
+ b=cUSkG0Tg7qZiLWigWblG2NGWGNVkwgaY6C+WdmjM3qNjf2S3tLkKCURhkMYOJZcSJm
+ Ks/m6p6ipzflQ1gq7JKRFEJc7JTdNMhfNMNEru2CDiFZ4qctezW5ORibrPkChvXrEks8
+ YgPkDew0UEl97yWID5txZpoHV1cDKpX1cHuH9e7Lz0jQUazh62YiCnbMCNDZ1uH6WqgJ
+ SXbtm8Pb/eomXrQWfEfD1eqshd/ixT4GtnkVgOiMLUyrpB0yktKnQHNjXANdWhkZWi2Y
+ r4gRsQyhlvU5v+3LmlWTZlBhd/wL0xSR6T+NpAIR6JgQMYthCWfyM1+cfZak6kqLzedV
+ j96Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=y/s+UJ/Ysdcnsmt2V+//M/LWXL1ge5dmgeawBIC+2t0=;
+ b=dqygKmvBwXtpu87J4zyfIlQvLOmZ2BcmkBcg6Lth3ToLq43iYfLJ++eMj+UPf+N8zR
+ htHx+Ix0bNBNRNB9RtY/UE+UgRqn1c3g3N4q2/y/LJfN93I9D3E+S/B9yGT5cLapzs+Q
+ z4gc1mQr/nW0lvVhN2tuWVgfa+8VEbLxZr+6tr/KdeFWl3KdeiVC76W6/EbfvXB+JX2V
+ 25dzZcz9q0zI8Fc6WJcAXrX6lMCGgxhizn9i5c0rFIiWbkdWbPhzsYdGe8LRAKy1H7ZC
+ d4i7DhL2qPlq2siaGP4DBgK3Nfp8XYad3Oejbi6h3H3QxjCT9s30lihS4Dv7FfSTGmdO
+ +1Nw==
+X-Gm-Message-State: AOAM532ldf9a856Qx1jsiSAYZKxzVEYm5q5wZw2PMqqchJsmYTvVgHfs
+ cEr1n+iPOGLhTDT1EDNaxsXyz4pRaeBkXTG6XmMN
+X-Google-Smtp-Source: ABdhPJzYip+2fTa/EtT+UCLXuCzKqbqDtB8+IuFYNR7VmdxYG0TsqB2hX7bkj2p4VKzvqVT+L5engF1fi0D86bTaW54=
+X-Received: by 2002:a02:c72d:: with SMTP id h13mr17167274jao.17.1600155190602; 
+ Tue, 15 Sep 2020 00:33:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAJc+Z1Gk2pjiaMKxohj80x1YkvTw4eNW7BZxp_ztsF8E68pYeg@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0.003
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=drjones@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 02:29:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -38
-X-Spam_score: -3.9
-X-Spam_bar: ---
-X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.792,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+References: <cover.1600135462.git.haibo.xu@linaro.org>
+ <90fec9ff0da7595f52caccf052c019d9359c8724.1600135462.git.haibo.xu@linaro.org>
+ <20200915061058.zl7dbgmcjh5icu74@kamzik.brq.redhat.com>
+In-Reply-To: <20200915061058.zl7dbgmcjh5icu74@kamzik.brq.redhat.com>
+From: Haibo Xu <haibo.xu@linaro.org>
+Date: Tue, 15 Sep 2020 15:33:09 +0800
+Message-ID: <CAJc+Z1FmOOJVp5xqUZAf7eKmwS6UROJ7x4PSCh5ZcfYtstMoOQ@mail.gmail.com>
+Subject: Re: [PATCH v3 03/12] target/arm/cpu: spe: Add an option to turn
+ on/off vSPE support
+To: Andrew Jones <drjones@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
+ envelope-from=haibo.xu@linaro.org; helo=mail-io1-xd43.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,106 +103,173 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 15, 2020 at 03:03:49PM +0800, Haibo Xu wrote:
-> On Tue, 15 Sep 2020 at 14:22, Andrew Jones <drjones@redhat.com> wrote:
+On Tue, 15 Sep 2020 at 14:11, Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Tue, Sep 15, 2020 at 03:11:39AM +0000, Haibo Xu wrote:
+> > Adds a spe=[on/off] option to enable/disable vSPE support in
+> > guest vCPU.
 > >
-> > On Tue, Sep 15, 2020 at 03:11:43AM +0000, Haibo Xu wrote:
-> > > From: Andrew Jones <drjones@redhat.com>
-> > >
-> > > We'll add more to this new function in coming patches so we also
-> > > state the gic must be created and call it below create_gic().
-> > >
-> > > No functional change intended.
-> > >
-> > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> > > ---
-> > >  hw/arm/virt.c | 38 ++++++++++++++++++++++----------------
-> > >  1 file changed, 22 insertions(+), 16 deletions(-)
+> > Reviewed-by: Andrew Jones <drjones@redhat.com>
+> > Signed-off-by: Haibo Xu <haibo.xu@linaro.org>
+> > ---
+> >  target/arm/cpu.c   |  6 ++++++
+> >  target/arm/cpu.h   | 13 ++++++++++++
+> >  target/arm/cpu64.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++
+> >  3 files changed, 71 insertions(+)
 > >
-> > This still isn't the right version of this patch. You need
-> > https://www.mail-archive.com/qemu-devel@nongnu.org/msg727591.html
+> > diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> > index c179e0752d..f211958eaa 100644
+> > --- a/target/arm/cpu.c
+> > +++ b/target/arm/cpu.c
+> > @@ -1310,6 +1310,12 @@ void arm_cpu_finalize_features(ARMCPU *cpu, Error **errp)
+> >              error_propagate(errp, local_err);
+> >              return;
+> >          }
+> > +
+> > +        arm_cpu_spe_finalize(cpu, &local_err);
+> > +        if (local_err != NULL) {
+> > +            error_propagate(errp, local_err);
+> > +            return;
+> > +        }
+> >      }
+> >  }
 > >
-> 
-> My fault! Very sorry for forgetting to address that in this version.
-> Shall I re-send this patch with the fix? Or fix it in the next version?
+> > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> > index a1c7d8ebae..baf2bbcee8 100644
+> > --- a/target/arm/cpu.h
+> > +++ b/target/arm/cpu.h
+> > @@ -24,6 +24,7 @@
+> >  #include "hw/registerfields.h"
+> >  #include "cpu-qom.h"
+> >  #include "exec/cpu-defs.h"
+> > +#include "qapi/qapi-types-common.h"
+> >
+> >  /* ARM processors have a weak memory model */
+> >  #define TCG_GUEST_DEFAULT_MO      (0)
+> > @@ -196,9 +197,11 @@ typedef struct {
+> >  #ifdef TARGET_AARCH64
+> >  # define ARM_MAX_VQ    16
+> >  void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp);
+> > +void arm_cpu_spe_finalize(ARMCPU *cpu, Error **errp);
+> >  #else
+> >  # define ARM_MAX_VQ    1
+> >  static inline void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp) { }
+> > +static inline void arm_cpu_spe_finalize(ARMCPU *cpu, Error **errp) { }
+> >  #endif
+> >
+> >  typedef struct ARMVectorReg {
+> > @@ -829,6 +832,8 @@ struct ARMCPU {
+> >      bool has_el3;
+> >      /* CPU has PMU (Performance Monitor Unit) */
+> >      bool has_pmu;
+> > +    /* CPU has SPE (Statistical Profiling Extension) */
+> > +    OnOffAuto has_spe;
+> >      /* CPU has VFP */
+> >      bool has_vfp;
+> >      /* CPU has Neon */
+> > @@ -3869,6 +3874,14 @@ static inline bool isar_feature_aa64_pmu_8_4(const ARMISARegisters *id)
+> >          FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) != 0xf;
+> >  }
+> >
+> > +/*
+> > + * Currently we don't differentiate between the ARMv8.2-SPE and ARMv8.3-SPE.
+> > + */
+> > +static inline bool isar_feature_aa64_spe(const ARMISARegisters *id)
+> > +{
+> > +    return FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMSVER) != 0;
+> > +}
+> > +
+> >  static inline bool isar_feature_aa64_rcpc_8_3(const ARMISARegisters *id)
+> >  {
+> >      return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, LRCPC) != 0;
+> > diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> > index 3c2b3d9599..4997c4a3c0 100644
+> > --- a/target/arm/cpu64.c
+> > +++ b/target/arm/cpu64.c
+> > @@ -572,6 +572,55 @@ void aarch64_add_sve_properties(Object *obj)
+> >      }
+> >  }
+> >
+> > +void arm_cpu_spe_finalize(ARMCPU *cpu, Error **errp)
+> > +{
+> > +    uint64_t t;
+> > +    uint32_t value = 0;
+> > +
+> > +    if (cpu->has_spe == ON_OFF_AUTO_AUTO) {
+> > +        if (kvm_enabled() && kvm_arm_spe_supported()) {
+> > +            cpu->has_spe = ON_OFF_AUTO_ON;
+> > +        } else {
+> > +            cpu->has_spe = ON_OFF_AUTO_OFF;
+> > +        }
+> > +    } else if (cpu->has_spe == ON_OFF_AUTO_ON) {
+> > +        if (!kvm_enabled() || !kvm_arm_spe_supported()) {
+> > +            error_setg(errp, "'spe' cannot be enabled on this host");
+> > +            return;
+> > +        }
+> > +    }
+> > +
+> > +    /*
+> > +     * According to the ARM ARM, the ID_AA64DFR0[PMSVER] currently
+> > +     * support 3 values:
+> > +     *
+> > +     * 0b0000: SPE not implemented
+> > +     * 0b0001: ARMv8.2-SPE implemented
+> > +     * 0b0010: ARMv8.3-SPE implemented
+> > +     *
+> > +     * But the kernel KVM API didn't expose all these 3 values, and
+> > +     * we can only get whether the SPE feature is supported or not.
+> > +     * So here we just set the PMSVER to 1 if this feature was supported.
+> > +     */
+> > +    if (cpu->has_spe == ON_OFF_AUTO_ON) {
+> > +        value = 1;
+> > +    }
+> > +
+> > +    t = cpu->isar.id_aa64dfr0;
+> > +    t = FIELD_DP64(t, ID_AA64DFR0, PMSVER, value);
+> > +    cpu->isar.id_aa64dfr0 = t;
+> > +}
+> > +
+> > +static bool arm_spe_get(Object *obj, Error **errp)
+> > +{
+> > +    return ARM_CPU(obj)->has_spe != ON_OFF_AUTO_OFF;
+> > +}
+> > +
+> > +static void arm_spe_set(Object *obj, bool value, Error **errp)
+> > +{
+> > +    ARM_CPU(obj)->has_spe = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
+> > +}
+> > +
+> >  /* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
+> >   * otherwise, a CPU with as many features enabled as our emulation supports.
+> >   * The version of '-cpu max' for qemu-system-arm is defined in cpu.c;
+> > @@ -721,6 +770,9 @@ static void aarch64_max_initfn(Object *obj)
+> >      aarch64_add_sve_properties(obj);
+> >      object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve_max_vq,
+> >                          cpu_max_set_sve_max_vq, NULL, NULL);
+> > +
+> > +    cpu->has_spe = ON_OFF_AUTO_AUTO;
+> > +    object_property_add_bool(obj, "spe", arm_spe_get, arm_spe_set);
+> >  }
+>
+> The cover-letter says we're only providing the 'spe' property for KVM
+> enabled guests, but we're adding it here in the common part of the
+> max init function. It should be added in the kvm_enabled() part only.
+>
+> Thanks,
+> drew
+>
 
-I can wait. It'll be awhile before this series can be merged anyway, since
-the KVM patches haven't been merged yet.
+Yes,  It should be in the kvm_enabled() part.
+Will fix it in the next version.
 
 Thanks,
-drew
+Haibo
 
-> 
-> > >
-> > > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > > index 3f6d26c531..2ffcb073af 100644
-> > > --- a/hw/arm/virt.c
-> > > +++ b/hw/arm/virt.c
-> > > @@ -1672,6 +1672,26 @@ static void finalize_gic_version(VirtMachineState *vms)
-> > >      }
-> > >  }
-> > >
-> > > +static void virt_cpu_post_init(VirtMachineState *vms)
-> > > +{
-> > > +    bool aarch64;
-> > > +
-> > > +    aarch64 = object_property_get_bool(OBJECT(first_cpu), "aarch64", NULL);
-> > > +
-> > > +    if (!kvm_enabled()) {
-> > > +        if (aarch64 && vms->highmem) {
-> > > +            int requested_pa_size = 64 - clz64(vms->highest_gpa);
-> > > +            int pamax = arm_pamax(ARM_CPU(first_cpu));
-> > > +
-> > > +            if (pamax < requested_pa_size) {
-> > > +                error_report("VCPU supports less PA bits (%d) than requested "
-> > > +                            "by the memory map (%d)", pamax, requested_pa_size);
-> > > +                exit(1);
-> > > +            }
-> > > +        }
-> > > +     }
-> > > +}
-> > > +
-> > >  static void machvirt_init(MachineState *machine)
-> > >  {
-> > >      VirtMachineState *vms = VIRT_MACHINE(machine);
-> > > @@ -1890,22 +1910,6 @@ static void machvirt_init(MachineState *machine)
-> > >      fdt_add_timer_nodes(vms);
-> > >      fdt_add_cpu_nodes(vms);
-> > >
-> > > -   if (!kvm_enabled()) {
-> > > -        ARMCPU *cpu = ARM_CPU(first_cpu);
-> > > -        bool aarch64 = object_property_get_bool(OBJECT(cpu), "aarch64", NULL);
-> > > -
-> > > -        if (aarch64 && vms->highmem) {
-> > > -            int requested_pa_size, pamax = arm_pamax(cpu);
-> > > -
-> > > -            requested_pa_size = 64 - clz64(vms->highest_gpa);
-> > > -            if (pamax < requested_pa_size) {
-> > > -                error_report("VCPU supports less PA bits (%d) than requested "
-> > > -                            "by the memory map (%d)", pamax, requested_pa_size);
-> > > -                exit(1);
-> > > -            }
-> > > -        }
-> > > -    }
-> > > -
-> > >      memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base,
-> > >                                  machine->ram);
-> > >      if (machine->device_memory) {
-> > > @@ -1917,6 +1921,8 @@ static void machvirt_init(MachineState *machine)
-> > >
-> > >      create_gic(vms);
-> > >
-> > > +    virt_cpu_post_init(vms);
-> > > +
-> > >      fdt_add_pmu_nodes(vms);
-> > >
-> > >      create_uart(vms, VIRT_UART, sysmem, serial_hd(0));
-> > > --
-> > > 2.17.1
-> > >
-> > >
 > >
-> 
-
+> >  static const ARMCPUInfo aarch64_cpus[] = {
+> > --
+> > 2.17.1
+> >
+> >
+>
 
