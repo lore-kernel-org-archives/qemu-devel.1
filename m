@@ -8,78 +8,77 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05EF0C43461
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:34:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09AD1C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:35:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2AFC20731
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:34:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A6C2420731
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 12:35:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DSqmYusz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2AFC20731
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jotwSAVC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6C2420731
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIAA5-0008K2-TI
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:34:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48026)
+	id 1kIAAq-0000uM-Nw
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 08:35:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48440)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kI9qS-0000b3-NU; Tue, 15 Sep 2020 08:14:02 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:56016)
+ id 1kI9rY-0001lD-8a; Tue, 15 Sep 2020 08:15:08 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:41758)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kI9qQ-0008AD-Nm; Tue, 15 Sep 2020 08:14:00 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id q4so1668671pjh.5;
- Tue, 15 Sep 2020 05:13:56 -0700 (PDT)
+ id 1kI9rV-0008L6-9g; Tue, 15 Sep 2020 08:15:07 -0400
+Received: by mail-pf1-x441.google.com with SMTP id z19so1810642pfn.8;
+ Tue, 15 Sep 2020 05:15:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=lgYFFisioEl97r43OtBikET9wKvUFSMqnEjDRJxGeJs=;
- b=DSqmYuszXxPS5LG1pe5A6JX7lTPMlpa49EH+xIihxSHnBnCnO/82Tdz68pWEXIChL5
- kfQXWCLA5x5V2HAQ5cxq/VsHPhuUyfPMkBOUnZsNuAWiQLC1K/hV0b4dkN10QWRydjVo
- OBQjPTKrsEOGxrhZVawDjUV4v5YqoA+NIDQ+LD+n9EKZFXRXmizskXtDeIJ2aKI+USnT
- O4r32pFBJdBQYhsnXYfGiuhHcQOishSUr3bdAtW7lS7nagN/WbuPdtQ8fH/Csii1Za6+
- a8tgyVHIp0+peCgvnatbamPN0L1M3wDddR8p0y868PO3N7n06TajY8Af0rl9Er+NXC1H
- R0Pw==
+ bh=raGFyZs6MR9nEefX4kmRsgZPLq8a4zwcDe8/ve9JX8Y=;
+ b=jotwSAVCO7QCer34R2d8YwkPUZNp0uU6b594L7lhhvvII3ieMBMS2Y+ROEAgAM6/4j
+ 5m62ikOoprdB2JD1WDAt5wdOrmw8t1IrznnlXH878vzXMtMk8O2rD0RH3E6IMoE9lIJD
+ mVDZNbJQnjHq65hirPRahzokThVLRgum4K96wSHlGfB/s0o+AoEhnYXTrnTjl5bKdtI0
+ fvDghLpWXgrELkFB6QVVm7lI78ufT/eoEqz6MNLtGvGBWyi007vxmq1sj7+fTwhS7PhW
+ cF0rE9giAMK9+sbyRJaC5gOMlX9n9iikqFRBo6CciRYNjhx/3hQTRTdEZX+FiKj1Sq8t
+ iyKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=lgYFFisioEl97r43OtBikET9wKvUFSMqnEjDRJxGeJs=;
- b=hjnsG8TIaPtOxmA+B01RsldySZe+fqld+Glc95YguXg3k1/2IK7/L/VTyfzaoE8kkt
- rb9PRZTQBkm++QPFwVN+GVQV4XrRtZLNsCJvUS3BN7JnKvqR1Ot1jti+JTv+M83DMJBK
- jxPV4tv39QOQmnAb07vcpSimVowfipXBqYrtR2FzixSVSNWWUUA9G9uLbOxgoJ51tyzV
- FXvsrZJz80qYa++uQ3/yDuXABuYMiNV4PK3zWPFwvTPJS9Ucj/mNyf0c9P6DZIy9mLOx
- Aea2c1dUl8OCAbU166LNcsP00lneR7jcm1UUOPBjoFzN1tQO3W8nLrWavdzTAMzKgr06
- KT8A==
-X-Gm-Message-State: AOAM533wSdx3Qd2jDPiz8JqGnfSewOMvh9ho3ekCWGPXUp2oxpRBcoZZ
- qD5JsWCWMiBNDOUf1X59L6Fij5PxYMCMq/GlxBI=
-X-Google-Smtp-Source: ABdhPJzeoF8zMjcgl4UnoLgbJmK4WTcNahNp9a+LhUuY3heEySjnNWGPaVmKTVKvFT9YWLst7UnQ0w==
-X-Received: by 2002:a17:90b:1245:: with SMTP id
- gx5mr3696887pjb.193.1600172035259; 
- Tue, 15 Sep 2020 05:13:55 -0700 (PDT)
+ bh=raGFyZs6MR9nEefX4kmRsgZPLq8a4zwcDe8/ve9JX8Y=;
+ b=KUgHLQbQNcSTcgYmwVWHQVbcio9qVnwMaJoI8+1cTcj0XWENJ2WQMrCp2qIsKPH9rO
+ 5TEYQo9Rf8KFnwXplLKJUceTbNk3la7zQIELBL+Efe/uLQ3TrBUW8oBc6NQ5+Z4p1D+m
+ Ig0hZTpX6lq/Lig8KxANLrV5+jAE15gcfRQILFVTete7zggKliXrHxYpKng3Q8c3x2W6
+ k8KwFtX7TxVT3cosHWu5AiFceqfjAF/fS+n/SoRcqaghkVSvZwjAEdfAwRrkj5A+08hN
+ 6vdAg0R3y1Lv1wPhg7MAkVI28G/BlDDJNd6QDdEP1K6it6qv8B+L2E75bxvxj5UKrzMT
+ TKoA==
+X-Gm-Message-State: AOAM532q9CHDwew5iyT3VKM1Mn8aNFB56gF0TC2o35z/PKd4vlS1ksip
+ 4msxCcElQDZud1zU9kwR98MBOpJJV6knQPXzO1w=
+X-Google-Smtp-Source: ABdhPJyduO21GmjIrmdXNMu7zQnfW0lKAXbIwbo0BOdqY2z1Oiwo1EfWKWPq/9oLcKrZUOPulLNUlw==
+X-Received: by 2002:a63:580c:: with SMTP id m12mr13400026pgb.99.1600172103063; 
+ Tue, 15 Sep 2020 05:15:03 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
  by smtp.googlemail.com with ESMTPSA id
- k28sm13683061pfh.196.2020.09.15.05.13.51
+ k28sm13683061pfh.196.2020.09.15.05.14.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Sep 2020 05:13:54 -0700 (PDT)
+ Tue, 15 Sep 2020 05:15:02 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 04/26] win32: Simplify gmtime_r detection direct base on
- _POSIX_THREAD_SAFE_FUNCTIONS.
-Date: Tue, 15 Sep 2020 20:12:56 +0800
-Message-Id: <20200915121318.247-5-luoyonggang@gmail.com>
+Subject: [PATCH v9 19/26] tests: Fixes test-io-channel-file by mask only owner
+ file state mask bits
+Date: Tue, 15 Sep 2020 20:13:11 +0800
+Message-Id: <20200915121318.247-20-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200915121318.247-1-luoyonggang@gmail.com>
 References: <20200915121318.247-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1044.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -114,136 +113,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-First, this reduce the size of configure, configure are tending to removal in future,
-and this didn't introduce any new feature or remove any exist feature.
-Second, the current localtime_r detection are conflict with ncursesw detection in
-mingw, when ncursesw detected, it will provide the following compile flags
-pkg-config --cflags ncursesw
--D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=199506L -IC:/CI-Tools/msys64/mingw64/include/ncursesw
-And the compile flag _POSIX_C_SOURCE will always cause _POSIX_THREAD_SAFE_FUNCTIONS to
-be defined, in new version of mingw, that's will cause localtime_r to be defined.
-But the configure script didn't provide _POSIX_C_SOURCE macro, and that's will result
-localtime_r not detected because localtime_r are defined in forceinline manner.
-
-And finally cause conflict between QEMU defined localtime_r
-struct tm *localtime_r(const time_t *timep, struct tm *result);
-with mingw defined localtime_r
-
-```
-#if defined(_POSIX_C_SOURCE) && !defined(_POSIX_THREAD_SAFE_FUNCTIONS)
-#define _POSIX_THREAD_SAFE_FUNCTIONS 200112L
-#endif
-
-#ifdef _POSIX_THREAD_SAFE_FUNCTIONS
-__forceinline struct tm *__CRTDECL localtime_r(const time_t *_Time, struct tm *_Tm) {
-  return localtime_s(_Tm, _Time) ? NULL : _Tm;
-}
-__forceinline struct tm *__CRTDECL gmtime_r(const time_t *_Time, struct tm *_Tm) {
-  return gmtime_s(_Tm, _Time) ? NULL : _Tm;
-}
-__forceinline char *__CRTDECL ctime_r(const time_t *_Time, char *_Str) {
-  return ctime_s(_Str, 0x7fffffff, _Time) ? NULL : _Str;
-}
-__forceinline char *__CRTDECL asctime_r(const struct tm *_Tm, char * _Str) {
-  return asctime_s(_Str, 0x7fffffff, _Tm) ? NULL : _Str;
-}
-#endif
-```
-
-So I suggest remove this configure script, and restrict msys2/mingw version to easy to maintain.
-And use _POSIX_THREAD_SAFE_FUNCTIONS to guard the localtime_r and counterpart functions
+This is the error on msys2/mingw
+Running test test-io-channel-file
+**
+ERROR:../tests/test-io-channel-file.c:59:test_io_channel_file_helper: assertion failed (TEST_MASK & ~mask == st.st_mode & 0777): (384 == 438)
+ERROR test-io-channel-file - Bail out! ERROR:../tests/test-io-channel-file.c:59:test_io_channel_file_helper: assertion failed (TEST_MASK & ~mask == st.st_mode & 0777): (384 == 438)
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- configure                 | 34 ----------------------------------
- include/sysemu/os-win32.h |  4 ++--
- util/oslib-win32.c        |  2 +-
- 3 files changed, 3 insertions(+), 37 deletions(-)
+ tests/test-io-channel-file.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/configure b/configure
-index dc4b7a2e55..bac48b5b49 100755
---- a/configure
-+++ b/configure
-@@ -2496,37 +2496,6 @@ if test "$vhost_net" = ""; then
-   test "$vhost_kernel" = "yes" && vhost_net=yes
- fi
+diff --git a/tests/test-io-channel-file.c b/tests/test-io-channel-file.c
+index bac2b07562..1b0e8d7c1b 100644
+--- a/tests/test-io-channel-file.c
++++ b/tests/test-io-channel-file.c
+@@ -28,6 +28,12 @@
+ #define TEST_FILE "tests/test-io-channel-file.txt"
+ #define TEST_MASK 0600
  
--##########################################
--# MinGW / Mingw-w64 localtime_r/gmtime_r check
--
--if test "$mingw32" = "yes"; then
--    # Some versions of MinGW / Mingw-w64 lack localtime_r
--    # and gmtime_r entirely.
--    #
--    # Some versions of Mingw-w64 define a macro for
--    # localtime_r/gmtime_r.
--    #
--    # Some versions of Mingw-w64 will define functions
--    # for localtime_r/gmtime_r, but only if you have
--    # _POSIX_THREAD_SAFE_FUNCTIONS defined. For fun
--    # though, unistd.h and pthread.h both define
--    # that for you.
--    #
--    # So this #undef localtime_r and #include <unistd.h>
--    # are not in fact redundant.
--cat > $TMPC << EOF
--#include <unistd.h>
--#include <time.h>
--#undef localtime_r
--int main(void) { localtime_r(NULL, NULL); return 0; }
--EOF
--    if compile_prog "" "" ; then
--        localtime_r="yes"
--    else
--        localtime_r="no"
--    fi
--fi
--
- ##########################################
- # pkg-config probe
- 
-@@ -7088,9 +7057,6 @@ if [ "$bsd" = "yes" ] ; then
-   echo "CONFIG_BSD=y" >> $config_host_mak
- fi
- 
--if test "$localtime_r" = "yes" ; then
--  echo "CONFIG_LOCALTIME_R=y" >> $config_host_mak
--fi
- if test "$qom_cast_debug" = "yes" ; then
-   echo "CONFIG_QOM_CAST_DEBUG=y" >> $config_host_mak
- fi
-diff --git a/include/sysemu/os-win32.h b/include/sysemu/os-win32.h
-index d8978e28c0..3ac8a53bac 100644
---- a/include/sysemu/os-win32.h
-+++ b/include/sysemu/os-win32.h
-@@ -48,12 +48,12 @@
- #define siglongjmp(env, val) longjmp(env, val)
- 
- /* Missing POSIX functions. Don't use MinGW-w64 macros. */
--#ifndef CONFIG_LOCALTIME_R
-+#ifndef _POSIX_THREAD_SAFE_FUNCTIONS
- #undef gmtime_r
- struct tm *gmtime_r(const time_t *timep, struct tm *result);
- #undef localtime_r
- struct tm *localtime_r(const time_t *timep, struct tm *result);
--#endif /* CONFIG_LOCALTIME_R */
++#ifdef _WIN32
++#define TEST_MASK_EXPECT 0700
++#else
++#define TEST_MASK_EXPECT 0777
 +#endif
- 
- static inline void os_setup_signal_handling(void) {}
- static inline void os_daemonize(void) {}
-diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-index c654dafd93..f2fa9a3549 100644
---- a/util/oslib-win32.c
-+++ b/util/oslib-win32.c
-@@ -106,7 +106,7 @@ void qemu_anon_ram_free(void *ptr, size_t size)
-     }
- }
- 
--#ifndef CONFIG_LOCALTIME_R
-+#ifndef _POSIX_THREAD_SAFE_FUNCTIONS
- /* FIXME: add proper locking */
- struct tm *gmtime_r(const time_t *timep, struct tm *result)
++
+ static void test_io_channel_file_helper(int flags)
  {
+     QIOChannel *src, *dst;
+@@ -56,7 +62,9 @@ static void test_io_channel_file_helper(int flags)
+     umask(mask);
+     ret = stat(TEST_FILE, &st);
+     g_assert_cmpint(ret, >, -1);
+-    g_assert_cmpuint(TEST_MASK & ~mask, ==, st.st_mode & 0777);
++    /* On Windows the stat() function in the C library checks only
++     the FAT-style READONLY attribute and does not look at the ACL at all. */
++    g_assert_cmpuint(TEST_MASK & ~mask, ==, st.st_mode & TEST_MASK_EXPECT);
+ 
+     unlink(TEST_FILE);
+     object_unref(OBJECT(src));
 -- 
 2.28.0.windows.1
 
