@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B002C43461
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4265C2BBD1
 	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 02:39:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D057207EA
+	by mail.kernel.org (Postfix) with ESMTPS id 87041207EA
 	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 02:39:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D057207EA
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87041207EA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kI0sM-00023J-A2
+	id 1kI0sM-00023q-FF
 	for qemu-devel@archiver.kernel.org; Mon, 14 Sep 2020 22:39:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39630)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39672)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kI0nO-0002SH-Of
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 22:34:14 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:49086 helo=huawei.com)
+ id 1kI0nQ-0002YJ-RU
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 22:34:16 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:34158 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kI0nM-0005tu-9v
- for qemu-devel@nongnu.org; Mon, 14 Sep 2020 22:34:14 -0400
+ id 1kI0nO-0005uZ-O5
+ for qemu-devel@nongnu.org; Mon, 14 Sep 2020 22:34:16 -0400
 Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 4A155977810104AD6811;
- Tue, 15 Sep 2020 10:34:07 +0800 (CST)
+ by Forcepoint Email with ESMTP id 8A35ECD0F257DD5D63F8;
+ Tue, 15 Sep 2020 10:34:12 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS408-HUB.china.huawei.com
  (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Tue, 15 Sep 2020
- 10:33:59 +0800
+ 10:34:01 +0800
 From: Chuan Zheng <zhengchuan@huawei.com>
 To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>,
  <berrange@redhat.com>
-Subject: [PATCH v9 08/12] migration/dirtyrate: skip sampling ramblock with
- size below MIN_RAMBLOCK_SIZE
-Date: Tue, 15 Sep 2020 10:44:43 +0800
-Message-ID: <1600137887-58739-9-git-send-email-zhengchuan@huawei.com>
+Subject: [PATCH v9 11/12] migration/dirtyrate: Implement
+ qmp_cal_dirty_rate()/qmp_get_dirty_rate() function
+Date: Tue, 15 Sep 2020 10:44:46 +0800
+Message-ID: <1600137887-58739-12-git-send-email-zhengchuan@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1600137887-58739-1-git-send-email-zhengchuan@huawei.com>
 References: <1600137887-58739-1-git-send-email-zhengchuan@huawei.com>
@@ -52,9 +52,9 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.175.101.6]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35; envelope-from=zhengchuan@huawei.com;
+Received-SPF: pass client-ip=45.249.212.32; envelope-from=zhengchuan@huawei.com;
  helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 22:34:04
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/14 21:28:41
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -81,86 +81,156 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In order to sample real RAM, skip ramblock with size below MIN_RAMBLOCK_SIZE
-which is set as 128M.
+Implement qmp_cal_dirty_rate()/qmp_get_dirty_rate() function which could be called
 
 Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-Reviewed-by: David Edmondson <david.edmondson@oracle.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/dirtyrate.c | 21 +++++++++++++++++++++
- migration/dirtyrate.h |  5 +++++
- 2 files changed, 26 insertions(+)
+ migration/dirtyrate.c | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ qapi/migration.json   | 50 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 112 insertions(+)
 
 diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-index 2d48eb8..903f728 100644
+index af02647..37d4bdf 100644
 --- a/migration/dirtyrate.c
 +++ b/migration/dirtyrate.c
-@@ -138,6 +138,18 @@ static void get_ramblock_dirty_info(RAMBlock *block,
-     strcpy(info->idstr, qemu_ram_get_idstr(block));
+@@ -61,6 +61,24 @@ static int dirtyrate_set_state(int *state, int old_state, int new_state)
+     }
  }
  
-+static bool skip_sample_ramblock(RAMBlock *block)
++static struct DirtyRateInfo *query_dirty_rate_info(void)
 +{
-+    /*
-+     * Sample only blocks larger than MIN_RAMBLOCK_SIZE.
-+     */
-+    if (qemu_ram_get_used_length(block) < (MIN_RAMBLOCK_SIZE << 10)) {
-+        return true;
++    int64_t dirty_rate = DirtyStat.dirty_rate;
++    struct DirtyRateInfo *info = g_malloc0(sizeof(DirtyRateInfo));
++
++    if (atomic_read(&CalculatingState) == DIRTY_RATE_STATUS_MEASURED) {
++        info->dirty_rate = dirty_rate;
++    } else {
++        info->dirty_rate = -1;
 +    }
 +
-+    return false;
++    info->status = CalculatingState;
++    info->start_time = DirtyStat.start_time;
++    info->calc_time = DirtyStat.calc_time;
++
++    return info;
 +}
 +
- static bool record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
-                                       struct DirtyRateConfig config,
-                                       int *block_count)
-@@ -150,6 +162,9 @@ static bool record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
-     bool ret = false;
+ static void reset_dirtyrate_stat(void)
+ {
+     DirtyStat.total_dirty_samples = 0;
+@@ -318,6 +336,8 @@ static void calculate_dirtyrate(struct DirtyRateConfig config)
  
-     RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+        if (skip_sample_ramblock(block)) {
-+            continue;
-+        }
-         total_count++;
+     msec = config.sample_period_seconds * 1000;
+     msec = set_sample_page_period(msec, initial_time);
++    DirtyStat.start_time = initial_time / 1000;
++    DirtyStat.calc_time = msec / 1000;
+ 
+     rcu_read_lock();
+     if (!compare_page_hash_info(block_dinfo, block_count)) {
+@@ -353,3 +373,45 @@ void *get_dirtyrate_thread(void *arg)
      }
- 
-@@ -159,6 +174,9 @@ static bool record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
-     }
- 
-     RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+        if (skip_sample_ramblock(block)) {
-+            continue;
-+        }
-         if (index >= total_count) {
-             break;
-         }
-@@ -225,6 +243,9 @@ static bool compare_page_hash_info(struct RamblockDirtyInfo *info,
-     RAMBlock *block = NULL;
- 
-     RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+        if (skip_sample_ramblock(block)) {
-+            continue;
-+        }
-         block_dinfo = find_page_matched(block, block_count, info);
-         if (block_dinfo == NULL) {
-             continue;
-diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
-index a3ee305..faaf9da 100644
---- a/migration/dirtyrate.h
-+++ b/migration/dirtyrate.h
-@@ -24,6 +24,11 @@
-  */
- #define RAMBLOCK_INFO_MAX_LEN                     256
- 
-+/*
-+ * Minimum RAMBlock size to sample, in megabytes.
-+ */
-+#define MIN_RAMBLOCK_SIZE                         128
+     return NULL;
+ }
 +
- struct DirtyRateConfig {
-     uint64_t sample_pages_per_gigabytes; /* sample pages per GB */
-     int64_t sample_period_seconds; /* time duration between two sampling */
++void qmp_calc_dirty_rate(int64_t calc_time, Error **errp)
++{
++    static struct DirtyRateConfig config;
++    QemuThread thread;
++    int ret;
++
++    /*
++     * If the dirty rate is already being measured, don't attempt to start.
++     */
++    if (atomic_read(&CalculatingState) == DIRTY_RATE_STATUS_MEASURING) {
++        error_setg(errp, "the dirty rate is already being measured.");
++        return;
++    }
++
++    if (!is_sample_period_valid(calc_time)) {
++        error_setg(errp, "calc-time is out of range[%d, %d].",
++                         MIN_FETCH_DIRTYRATE_TIME_SEC,
++                         MAX_FETCH_DIRTYRATE_TIME_SEC);
++        return;
++    }
++
++    /*
++     * Init calculation state as unstarted.
++     */
++    ret = dirtyrate_set_state(&CalculatingState, CalculatingState,
++                              DIRTY_RATE_STATUS_UNSTARTED);
++    if (ret == -1) {
++        error_setg(errp, "init dirty rate calculation state failed.");
++        return;
++    }
++
++    config.sample_period_seconds = calc_time;
++    config.sample_pages_per_gigabytes = DIRTYRATE_DEFAULT_SAMPLE_PAGES;
++    qemu_thread_create(&thread, "get_dirtyrate", get_dirtyrate_thread,
++                       (void *)&config, QEMU_THREAD_DETACHED);
++}
++
++struct DirtyRateInfo *qmp_query_dirty_rate(Error **errp)
++{
++    return query_dirty_rate_info();
++}
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 061ff25..4b980a0 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -1737,3 +1737,53 @@
+ ##
+ { 'enum': 'DirtyRateStatus',
+   'data': [ 'unstarted', 'measuring', 'measured'] }
++
++##
++# @DirtyRateInfo:
++#
++# Information about current dirty page rate of vm.
++#
++# @dirty-rate: @dirtyrate describing the dirty page rate of vm
++#          in units of MB/s.
++#          If this field return '-1', it means querying is not
++#          start or not complete.
++#
++# @status: status containing dirtyrate query status includes
++#          'unstarted' or 'measuring' or 'measured'
++#
++# @start-time: start time in units of second for calculation
++#
++# @calc-time: time in units of second for sample dirty pages
++#
++# Since: 5.2
++#
++##
++{ 'struct': 'DirtyRateInfo',
++  'data': {'dirty-rate': 'int64',
++           'status': 'DirtyRateStatus',
++           'start-time': 'int64',
++           'calc-time': 'int64'} }
++
++##
++# @calc-dirty-rate:
++#
++# start calculating dirty page rate for vm
++#
++# @calc-time: time in units of second for sample dirty pages
++#
++# Since: 5.2
++#
++# Example:
++#   {"command": "calc-dirty-rate", "data": {"calc-time": 1} }
++#
++##
++{ 'command': 'calc-dirty-rate', 'data': {'calc-time': 'int64'} }
++
++##
++# @query-dirty-rate:
++#
++# query dirty page rate in units of MB/s for vm
++#
++# Since: 5.2
++##
++{ 'command': 'query-dirty-rate', 'returns': 'DirtyRateInfo' }
 -- 
 1.8.3.1
 
