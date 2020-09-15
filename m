@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2AD4C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:45:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2294C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:46:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53D8421D1B
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:45:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 84B1C208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 17:46:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T4ZzfeTE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53D8421D1B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WsyYCJmL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84B1C208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIF18-00007E-BV
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 13:45:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47686)
+	id 1kIF20-0000cP-EY
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 13:46:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47006)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIEmS-0005Ho-Oq
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 13:30:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52959)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIEkY-0001Ri-L5
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 13:28:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36192)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIEmQ-0004k2-Ii
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 13:30:12 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIEkW-0004Tm-67
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 13:28:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600191009;
+ s=mimecast20190719; t=1600190890;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=1LcT5BzyLP6uosH2WFbN7+xsz8nuKLNH3xU2MY3Wp2s=;
- b=T4ZzfeTE0zZlbu5QsoiGbjthykh9Ot1l9quEKOL6+IwGmXq/rs3vo5m6JljQNufjkgvqit
- eT9gJ2hk4qZ3EESSLhk4UDC2EoN+FOdSEEpGFJqkerAQTMBuFSsJe57I0oi9PVX+FamUQU
- DDQZNikcGu8AYfnsclOn7gQ40GULEyc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-6MOqvpGmNAmVEMWv5M_Pyg-1; Tue, 15 Sep 2020 13:30:04 -0400
-X-MC-Unique: 6MOqvpGmNAmVEMWv5M_Pyg-1
-Received: by mail-wm1-f70.google.com with SMTP id a7so82515wmc.2
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 10:30:03 -0700 (PDT)
+ bh=6/plQ62wU4RuI7IyczbzKXCfIn4xPKd2XrKSCbsK/nM=;
+ b=WsyYCJmLFzPaWNDwQ1yCUqv7EkvS58STfUokSabtEo/jhSetZ19uuHmewLG2Hxx5/mu+Pm
+ scp91DpKLqNSgSVoef7XqUqe+c7vFadA/2OJv4N01HsTth2pkikKWoCeY0VwOvAyQZfczS
+ rn2NUQnTr/h+dnW3xvJXXD1rVBazvHc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-40-FNuW9ihUMG-XbzIrBMSCtQ-1; Tue, 15 Sep 2020 13:28:06 -0400
+X-MC-Unique: FNuW9ihUMG-XbzIrBMSCtQ-1
+Received: by mail-wm1-f72.google.com with SMTP id m125so70129wmm.7
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 10:28:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=1LcT5BzyLP6uosH2WFbN7+xsz8nuKLNH3xU2MY3Wp2s=;
- b=KpP7pfvWyweuRibxGQykCzVsot0igUxmYryBe8gbNEgF/StPGJdK6hO1KbpGZW9ii6
- m65lflU6HRCh5cvgSFLrcp5WeMG6hsAZxqCWYQiZAd6BtuMCxmelGtYaAxZeKJ/Vn83P
- qO46SlU8q+wAeCA2R25x9OVzFc4P/KHjenqwOAXYXETGRJmZJHxH/NQNzn7jFRgdtFoa
- EePRLrr3EAh6rKDLAUh1M7/h2Ovjk9HkZPoQvvFuXCUVGrsVKSirtUoRsQreg1PfU5Jc
- BCN1IlhVEQTPaV5TN9JiDO0DJDMd44wz3GFPYkDMhpIIWyu6yj2liqbyPUUDzLTDSZJC
- 3U0A==
-X-Gm-Message-State: AOAM532WeoSMUINae+9k04Kg8ojHG65uxGDg3pd0LbC35Dij6+V0E9Dg
- lSkfl+4ZUC3n1Xfl65eFpL9/rZTOcOgU4iX/s92Jv7AeTAuiKuU03VGIpsynay17yJHfIAqJERt
- LqION4eFkp/9zDUc=
-X-Received: by 2002:adf:f04c:: with SMTP id t12mr23012340wro.121.1600191002708; 
- Tue, 15 Sep 2020 10:30:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyoJ5xgRu3cVHCiepHLa3BxF6jAEf4vvcQInO1g83a7v0bI/tOgNb9cdI5kINEzqoInAxvocA==
-X-Received: by 2002:adf:f04c:: with SMTP id t12mr23012322wro.121.1600191002502; 
- Tue, 15 Sep 2020 10:30:02 -0700 (PDT)
+ bh=6/plQ62wU4RuI7IyczbzKXCfIn4xPKd2XrKSCbsK/nM=;
+ b=JsfT1e61/Sc8/Nj6IHmY05UxpJdpids/SOEnheo7xAxLfeA7MJLNOw937fyloS5WiL
+ BRe9MXxMygWLxQhKWvVY3fZ64KuC97ZEMpLssFr0jY9FYx6TCvXd6E5VeBFev43ycP/Q
+ qaA9ME2yeg4g1D1eLdF2ke6ptGNrdm9fQ0EkxNCmdsNVpZ8Qc5S1ZymFAA2lWocxN7R2
+ mmyzLxxqs0kiCY+lxX8oX7kgyGlrQA9JCgMOQv9IpJL74/0ReiahDYFGObdg7u6C68rV
+ VmqMrQQpCkhFwG2nyRiRjc2kisWtM4iqgrJ85n0jnt/xh/x9twSoMw4yU3jxdkL8St0b
+ jBdw==
+X-Gm-Message-State: AOAM5317CDVXfJP2CyCRAZSM4E7MeGxZtOBCwIFiCGS7aS+teYRf5FYO
+ Jeo4fTYvIDpCjvTYhcH/ssQ8Az8t8BNKVMtLsQThdYlvuGjDbaJbSil8S/kMCho/setMk+ygUM2
+ qOQCMqdRXK5cdQ74=
+X-Received: by 2002:a7b:c453:: with SMTP id l19mr394478wmi.163.1600190884725; 
+ Tue, 15 Sep 2020 10:28:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyOi/nAFR+UtibIj6JBCznYRgV3QpPnfxRG+pSWECNZ8/6CFZdASfIsiLgU9QkCHU4Cn7VbGw==
+X-Received: by 2002:a7b:c453:: with SMTP id l19mr394458wmi.163.1600190884476; 
+ Tue, 15 Sep 2020 10:28:04 -0700 (PDT)
 Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id m185sm482793wmf.5.2020.09.15.10.30.01
+ by smtp.gmail.com with ESMTPSA id d23sm461447wmb.6.2020.09.15.10.28.02
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 15 Sep 2020 10:30:02 -0700 (PDT)
-Subject: Re: [PATCH 0/3] pci: Let PCI DMA API functions propagate a MemTxResult
-To: qemu-devel@nongnu.org
-References: <20200904162620.657726-1-philmd@redhat.com>
+ Tue, 15 Sep 2020 10:28:03 -0700 (PDT)
+Subject: Re: [PATCH 00/13] dma: Let the DMA API take MemTxAttrs argument and
+ propagate MemTxResult
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+References: <20200904154439.643272-1-philmd@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -100,15 +101,15 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <00303be5-8ddb-be84-0d15-3ea537f275e2@redhat.com>
-Date: Tue, 15 Sep 2020 19:30:01 +0200
+Message-ID: <060061dd-1241-d669-3fcc-e8cd03a67898@redhat.com>
+Date: Tue, 15 Sep 2020 19:28:01 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200904162620.657726-1-philmd@redhat.com>
+In-Reply-To: <20200904154439.643272-1-philmd@redhat.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
@@ -124,7 +125,7 @@ X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
  RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -137,37 +138,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Peter Xu <peterx@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-block@nongnu.org,
+ Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>,
+ Laszlo Ersek <lersek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Beniamino Galvani <b.galvani@gmail.com>, Eric Auger <eric.auger@redhat.com>,
+ qemu-arm@nongnu.org, Jan Kiszka <jan.kiszka@web.de>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Andrew Jeffery <andrew@aj.id.au>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-ppc@nongnu.org,
+ Peter Chubb <peter.chubb@nicta.com.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/4/20 6:26 PM, Philippe Mathieu-Daudé wrote:
-> The DMA API propagates MemTxResult:
-> - MEMTX_OK,
-> - MEMTX_device_ERROR,
-> - MEMTX_DECODE_ERROR.
-> 
-> Let the PCI DMA API propagate them, as they are
-> clearer than an undocumented 'int'.
-> 
-> Based-on: <20200904154439.643272-1-philmd@redhat.com>
-> https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg02048.html
-> 
-> Philippe Mathieu-Daudé (3):
->   pci: Let pci_dma_rw() propagate MemTxResult
->   pci: Let pci_dma_read() propagate MemTxResult
->   pci: Let pci_dma_write() propagate MemTxResult
-> 
->  include/hw/pci/pci.h | 50 ++++++++++++++++++++++++++++++++++++++------
->  1 file changed, 44 insertions(+), 6 deletions(-)
-> 
-
 This series is fully review.
 
-Paolo, if you take the DMA series on which this one
-is based, could you take this too?
+Paolo, does it belong to your tree?
 
-Thanks :)
+On 9/4/20 5:44 PM, Philippe Mathieu-Daudé wrote:
+> Salvaging cleanups patches from the RFC series "Forbid DMA write
+> accesses to MMIO regions" [*], propagating MemTxResult and
+> adding documentation.
+> 
+> [*] https://www.mail-archive.com/qemu-block@nongnu.org/msg72924.html
+> 
+> Klaus Jensen (1):
+>   pci: pass along the return value of dma_memory_rw
+> 
+> Philippe Mathieu-Daudé (12):
+>   docs/devel/loads-stores: Add regexp for DMA functions
+>   dma: Document address_space_map/address_space_unmap() prototypes
+>   dma: Let dma_memory_set() propagate MemTxResult
+>   dma: Let dma_memory_rw() propagate MemTxResult
+>   dma: Let dma_memory_read() propagate MemTxResult
+>   dma: Let dma_memory_write() propagate MemTxResult
+>   dma: Let dma_memory_valid() take MemTxAttrs argument
+>   dma: Let dma_memory_set() take MemTxAttrs argument
+>   dma: Let dma_memory_rw_relaxed() take MemTxAttrs argument
+>   dma: Let dma_memory_rw() take MemTxAttrs argument
+>   dma: Let dma_memory_read/write() take MemTxAttrs argument
+>   dma: Let dma_memory_map() take MemTxAttrs argument
+> 
+>  docs/devel/loads-stores.rst   |   2 +
+>  include/hw/pci/pci.h          |   7 +-
+>  include/hw/ppc/spapr_vio.h    |  11 ++-
+>  include/sysemu/dma.h          | 156 +++++++++++++++++++++++++++-------
+>  dma-helpers.c                 |  16 ++--
+>  hw/arm/musicpal.c             |  13 +--
+>  hw/arm/smmu-common.c          |   3 +-
+>  hw/arm/smmuv3.c               |  14 +--
+>  hw/core/generic-loader.c      |   3 +-
+>  hw/display/virtio-gpu.c       |   8 +-
+>  hw/dma/pl330.c                |  12 ++-
+>  hw/dma/sparc32_dma.c          |  16 ++--
+>  hw/dma/xlnx-zynq-devcfg.c     |   6 +-
+>  hw/dma/xlnx_dpdma.c           |  10 ++-
+>  hw/hyperv/vmbus.c             |   8 +-
+>  hw/i386/amd_iommu.c           |  16 ++--
+>  hw/i386/intel_iommu.c         |  28 +++---
+>  hw/ide/ahci.c                 |   9 +-
+>  hw/ide/macio.c                |   2 +-
+>  hw/intc/spapr_xive.c          |   3 +-
+>  hw/intc/xive.c                |   7 +-
+>  hw/misc/bcm2835_property.c    |   3 +-
+>  hw/misc/macio/mac_dbdma.c     |  10 ++-
+>  hw/net/allwinner-sun8i-emac.c |  21 +++--
+>  hw/net/ftgmac100.c            |  25 ++++--
+>  hw/net/imx_fec.c              |  32 ++++---
+>  hw/nvram/fw_cfg.c             |  12 ++-
+>  hw/pci-host/pnv_phb3.c        |   5 +-
+>  hw/pci-host/pnv_phb3_msi.c    |   9 +-
+>  hw/pci-host/pnv_phb4.c        |   7 +-
+>  hw/sd/allwinner-sdhost.c      |  14 +--
+>  hw/sd/sdhci.c                 |  35 +++++---
+>  hw/usb/hcd-dwc2.c             |   8 +-
+>  hw/usb/hcd-ehci.c             |   6 +-
+>  hw/usb/hcd-ohci.c             |  28 +++---
+>  hw/usb/libhw.c                |   3 +-
+>  hw/virtio/virtio.c            |   6 +-
+>  37 files changed, 385 insertions(+), 189 deletions(-)
+> 
 
 
