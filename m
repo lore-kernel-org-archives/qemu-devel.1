@@ -2,102 +2,122 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFAB6C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:52:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE63BC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:56:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04A3522272
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:52:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E97D322272
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:56:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UJHbcdQk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04A3522272
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Qn4wwkmF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E97D322272
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIWv0-0005Ci-Ks
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 08:52:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43356)
+	id 1kIWzR-0007st-PI
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 08:56:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44922)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kIWty-0004g8-1b
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 08:51:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35552)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kIWtr-0000AP-FL
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 08:51:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600260661;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=bu4gYb7/byEkLcKmvTbZ8ShzFxwDvBfzyulEj33tGV8=;
- b=UJHbcdQknv2jNc1LfT3SXs4D9Jl8SolnZp8j288fBUDnOdDYpXjJMyrIbBkcKmSOYAB/pF
- k+JpXA8BKpR77ATM+hD1kMgiyvKQwpCZ3wb3CMjCDlir7IYrtlefswIVoAe/vZvuE29Sz1
- 3z6GRjX+19/Szk3XWLH3I3ufuaDsLdg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-220-ytf6EWZaOda9ByPRkG8qpw-1; Wed, 16 Sep 2020 08:51:00 -0400
-X-MC-Unique: ytf6EWZaOda9ByPRkG8qpw-1
-Received: by mail-wr1-f69.google.com with SMTP id f18so2500222wrv.19
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 05:50:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
- :message-id:mime-version;
- bh=bu4gYb7/byEkLcKmvTbZ8ShzFxwDvBfzyulEj33tGV8=;
- b=LD0zwLFfu9XXqi1/DBwaLcbaB+KRVca6QY0igBpkWHExHPfywDe7/y4Y5sFKTDog9s
- 3jHte8Z34VqgNyospYn5eKtVOUXq8Lyhz6i9PFhXk+zApRcRVl/hkPVBZ5FNR9cmvfSk
- VOPkUf2o44frq+A6XvoxbseOT+RoaQYXB6NObaoW+xyBW2yCVHiUBcoXUUr9q+GWqUTm
- gyzClX/RwLR/TCoz3/4EPfJGtrikoVITwkeqyiW/derhtUStr8opl/YlWJEzNlORLJ4v
- 7crySj7lN5VROwnwVBK3cxZE1Z8kanKJuxVN+OW4ocT6s+wT/KtYbZRbjWPae38c4c9p
- crKg==
-X-Gm-Message-State: AOAM531lE0V4JgJSrDhH0ln9lpXZgJjPTP4qXsSiPoWRB/j8FGYLzfCR
- WfJOOlbgWJTf5V9D0esdMu4QpR5Uowj5bn2cs+STyYDiHFsvL96/KnfL9gJRk3R2DX4eUQahm7A
- Yq5f2z2bx8arq/gI=
-X-Received: by 2002:adf:e6c7:: with SMTP id y7mr25124190wrm.147.1600260658421; 
- Wed, 16 Sep 2020 05:50:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxqCiUmbdsgB08+TApOuWGFF/Fd0qlcevWhWoglRu1evyr0r69cJ34/X3RuTEYLDg1KsDo0BQ==
-X-Received: by 2002:adf:e6c7:: with SMTP id y7mr25124168wrm.147.1600260658173; 
- Wed, 16 Sep 2020 05:50:58 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
- by smtp.gmail.com with ESMTPSA id e1sm26019288wrp.49.2020.09.16.05.50.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 16 Sep 2020 05:50:57 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Antoine Damhet <antoine.damhet@blade-group.com>
-Subject: Re: [BUG] Migration hv_time rollback
-In-Reply-To: <878sd9j4s1.fsf@vitty.brq.redhat.com>
-References: <20200916090602.blkm7eym6g5bnvvk@tartarus>
- <20200916112956.GE2833@work-vm> <20200916115950.tsarwvk2dwgiceoe@tartarus>
- <878sd9j4s1.fsf@vitty.brq.redhat.com>
-Date: Wed, 16 Sep 2020 14:50:56 +0200
-Message-ID: <875z8dj367.fsf@vitty.brq.redhat.com>
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kIWxt-0006ns-FN; Wed, 16 Sep 2020 08:55:13 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51404)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kIWxr-0000cW-59; Wed, 16 Sep 2020 08:55:13 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 08GCWbEs117304; Wed, 16 Sep 2020 08:55:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=3ITlY2rzSr0X3crvr2mJz9ylgP54qmuygZyjBqSVzNE=;
+ b=Qn4wwkmFoAH765uJ+9LkqM/GBOSbd4C9ruHyS/FFTaXuzbDRnaOPNlVz5/mm5qT2TFoG
+ 7F0nkpRQPMMyBk5x4H3abGZYSJbBA81/geub3egwDPLDll7+kgRU+E7q1dPQzDRaNTqF
+ 1kk4wdVxgaXHGH1UURLO6O2IMwD/wqYt7HzqSJKezr09g5MMsHxzNU0j9AV0kxLlJRg+
+ dbLsnVLeBfG1Z0u5P35sHrT37PhEHfpmzZKxTl3dO/ArCkt3zhBJqdzTRfbak8/aLlVO
+ 1eq+9uuNIZ2Vv2KhiHi2pLtDc6aW8Hm8lkJVXx8BONLjaDT/zCmzbhoQhcxPdkAcCOO2 jA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33kgrn4qwe-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 16 Sep 2020 08:55:08 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08GCWkiE118271;
+ Wed, 16 Sep 2020 08:55:07 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.26])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33kgrn4qvv-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 16 Sep 2020 08:55:07 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+ by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08GClnZx002588;
+ Wed, 16 Sep 2020 12:55:06 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
+ [9.57.198.23]) by ppma04wdc.us.ibm.com with ESMTP id 33k6he4g7m-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 16 Sep 2020 12:55:06 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
+ [9.57.199.106])
+ by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 08GCt54R41091414
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 16 Sep 2020 12:55:05 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id BAB9E28058;
+ Wed, 16 Sep 2020 12:55:05 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5948628065;
+ Wed, 16 Sep 2020 12:55:02 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.163.85.51])
+ by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+ Wed, 16 Sep 2020 12:55:01 +0000 (GMT)
+Subject: Re: [PATCH v3 4/5] s390x/pci: Add routine to get the vfio dma
+ available count
+To: Cornelia Huck <cohuck@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <1600197283-25274-1-git-send-email-mjrosato@linux.ibm.com>
+ <1600197283-25274-5-git-send-email-mjrosato@linux.ibm.com>
+ <0b28ae63-faad-953d-85c2-04bcdefeb7bf@redhat.com>
+ <20200916122720.4c7d8671.cohuck@redhat.com>
+From: Matthew Rosato <mjrosato@linux.ibm.com>
+Message-ID: <a2599938-d0b8-4436-2cf6-ceed9bba28f3@linux.ibm.com>
+Date: Wed, 16 Sep 2020 08:55:00 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vkuznets@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=vkuznets@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:35:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <20200916122720.4c7d8671.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-16_07:2020-09-16,
+ 2020-09-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 bulkscore=0
+ clxscore=1015 priorityscore=1501 lowpriorityscore=0 mlxlogscore=999
+ mlxscore=0 suspectscore=2 phishscore=0 spamscore=0 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009160092
+Received-SPF: pass client-ip=148.163.156.1;
+ envelope-from=mjrosato@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 08:55:08
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.062,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,97 +130,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: thuth@redhat.com, alex.williamson@redhat.com, kvm@vger.kernel.org,
+ pmorel@linux.ibm.com, schnelle@linux.ibm.com, david@redhat.com,
+ qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ qemu-s390x@nongnu.org, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vitaly Kuznetsov <vkuznets@redhat.com> writes:
+On 9/16/20 6:27 AM, Cornelia Huck wrote:
+> On Wed, 16 Sep 2020 09:21:39 +0200
+> Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+> 
+>> On 9/15/20 9:14 PM, Matthew Rosato wrote:
+>>> Create new files for separating out vfio-specific work for s390
+>>> pci. Add the first such routine, which issues VFIO_IOMMU_GET_INFO
+>>> ioctl to collect the current dma available count.
+>>>
+>>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>>> ---
+>>>   hw/s390x/meson.build     |  1 +
+>>>   hw/s390x/s390-pci-vfio.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>>   hw/s390x/s390-pci-vfio.h | 17 +++++++++++++++
+>>>   3 files changed, 72 insertions(+)
+>>>   create mode 100644 hw/s390x/s390-pci-vfio.c
+>>>   create mode 100644 hw/s390x/s390-pci-vfio.h
+>>>
+> 
+> (...)
+> 
+>>> diff --git a/hw/s390x/s390-pci-vfio.c b/hw/s390x/s390-pci-vfio.c
+>>> new file mode 100644
+>>> index 0000000..75e3ac1
+>>> --- /dev/null
+>>> +++ b/hw/s390x/s390-pci-vfio.c
+>>> @@ -0,0 +1,54 @@
+>>> +/*
+>>> + * s390 vfio-pci interfaces
+>>> + *
+>>> + * Copyright 2020 IBM Corp.
+>>> + * Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
+>>> + *
+>>> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+>>> + * your option) any later version. See the COPYING file in the top-level
+>>> + * directory.
+>>> + */
+>>> +
+>>> +#include <sys/ioctl.h>
+>>> +
+>>> +#include "qemu/osdep.h"
+>>> +#include "s390-pci-vfio.h"
+>>> +#include "hw/vfio/vfio-common.h"
+>>> +
+>>> +/*
+>>> + * Get the current DMA available count from vfio.  Returns true if vfio is
+>>> + * limiting DMA requests, false otherwise.  The current available count read
+>>> + * from vfio is returned in avail.
+>>> + */
+>>> +bool s390_pci_update_dma_avail(int fd, unsigned int *avail)
+>>> +{
+>>> +    g_autofree struct vfio_iommu_type1_info *info;
+>>> +    uint32_t argsz;
+>>> +    int ret;
+>>> +
+>>> +    assert(avail);
+>>> +
+>>> +    argsz = sizeof(struct vfio_iommu_type1_info);
+>>> +    info = g_malloc0(argsz);
+>>> +    info->argsz = argsz;
+>>> +    /*
+>>> +     * If the specified argsz is not large enough to contain all
+>>> +     * capabilities it will be updated upon return.  In this case
+>>> +     * use the updated value to get the entire capability chain.
+>>> +     */
+>>> +    ret = ioctl(fd, VFIO_IOMMU_GET_INFO, info);
+>>> +    if (argsz != info->argsz) {
+>>> +        argsz = info->argsz;
+>>> +        info = g_realloc(info, argsz);
+>>
+>> Do we need to bzero [sizeof(struct vfio_iommu_type1_info)..argsz[?
+> 
+> If we do, I think we need to do the equivalent in
+> vfio_get_region_info() as well?
+> 
 
-> Antoine Damhet <antoine.damhet@blade-group.com> writes:
->
->> On Wed, Sep 16, 2020 at 12:29:56PM +0100, Dr. David Alan Gilbert wrote:
->>> cc'ing in Vitaly who knows about the hv stuff.
->>
->> Thanks
->>
->>> 
->>> * Antoine Damhet (antoine.damhet@blade-group.com) wrote:
->>> > Hi,
->>> > 
->>> > We are experiencing timestamp rollbacks during live-migration of
->>> > Windows 10 guests with the following qemu configuration (linux 5.4.46
->>> > and qemu master):
->>> > ```
->>> > $ qemu-system-x86_64 -enable-kvm -cpu host,kvm=off,hv_time [...]
->>> > ```
->>> 
->>> How big a jump are you seeing, and how did you notice it in the guest?
->>
->> I'm seeing jumps of about the guest uptime (indicating a reset of the
->> counter). It's expected because we won't call `KVM_SET_CLOCK` to
->> restore any value.
->>
->> We first noticed it because after some migrations `dwm.exe` crashes with
->> the "(NTSTATUS) 0x8898009b - QueryPerformanceCounter returned a time in
->> the past." error code.
->>
->> I can also confirm the following hack makes the behavior disappear:
->>
->> ```
->> diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
->> index 64283358f9..f334bdf35f 100644
->> --- a/hw/i386/kvm/clock.c
->> +++ b/hw/i386/kvm/clock.c
->> @@ -332,11 +332,7 @@ void kvmclock_create(void)
->>  {
->>      X86CPU *cpu = X86_CPU(first_cpu);
->>
->> -    if (kvm_enabled() &&
->> -        cpu->env.features[FEAT_KVM] & ((1ULL << KVM_FEATURE_CLOCKSOURCE) |
->> -                                       (1ULL << KVM_FEATURE_CLOCKSOURCE2))) {
->> -        sysbus_create_simple(TYPE_KVM_CLOCK, -1, NULL);
->> -    }
->> +    sysbus_create_simple(TYPE_KVM_CLOCK, -1, NULL);
->>  }
->>
->
->
-> Oh, I think I see what's going on. When you add 'kvm=off'
-> cpu->env.features[FEAT_KVM] is reset (see x86_cpu_expand_features()) so
-> kvmclock QEMU device is not created and nobody calls KVM_SET_CLOCK on
-> migration.
->
-> In case we really want to support 'kvm=off' I think we can add Hyper-V
-> features check here along with KVM, this should do the job.
+I agree that it would need to be in both places or neither -- I would 
+expect the re-driven ioctl to overwrite the prior contents of info 
+(unless we get a bad ret, but in this case we don't care what is in info)?
 
-Does the untested
+Perhaps the fundamental difference between this code and 
+vfio_get_region_info is that the latter checks for only a growing argsz 
+and retries, whereas this code checks for != so it's technically 
+possible for a smaller argsz to trigger the retry here, and we wouldn't 
+know for sure that all bytes from the first ioctl call were overwritten.
 
-diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
-index 64283358f91d..e03b2ca6d8f6 100644
---- a/hw/i386/kvm/clock.c
-+++ b/hw/i386/kvm/clock.c
-@@ -333,8 +333,9 @@ void kvmclock_create(void)
-     X86CPU *cpu = X86_CPU(first_cpu);
- 
-     if (kvm_enabled() &&
--        cpu->env.features[FEAT_KVM] & ((1ULL << KVM_FEATURE_CLOCKSOURCE) |
--                                       (1ULL << KVM_FEATURE_CLOCKSOURCE2))) {
-+        ((cpu->env.features[FEAT_KVM] & ((1ULL << KVM_FEATURE_CLOCKSOURCE) |
-+                                         (1ULL << KVM_FEATURE_CLOCKSOURCE2))) ||
-+         (cpu->env.features[FEAT_HYPERV_EAX] & HV_TIME_REF_COUNT_AVAILABLE))) {
-         sysbus_create_simple(TYPE_KVM_CLOCK, -1, NULL);
-     }
- }
+What if I adjust this code to look like vfio_get_region_info:
 
-help?
+retry:
+	info->argsz = argsz;
 
-(I don't think we need to remove all 'if (kvm_enabled())' checks from
-machine types as 'kvm=off' should not be related).
+	if (ioctl(fd, VFIO_IOMMU_GET_INFO, info)) {
+		// no need to g_free() bc of g_autofree
+		return false;	
+	}
 
--- 
-Vitaly
+	if (info->argsz > argsz) {
+		argsz = info->argsz;
+		info = g_realloc(info, argsz);
+		goto retry;
+	}
+
+	/* If the capability exists, update with the current value */
+	return vfio_get_info_dma_avail(info, avail);
+
+Now we would only trigger when we are told by the host that the buffer 
+must be larger.
+
+> (Also, shouldn't we check ret before looking at info->argsz?)
+> 
+
+Yes, you are correct.  The above proposal would fix that issue too.
+
+>>
+>>> +        info->argsz = argsz;
+>>> +        ret = ioctl(fd, VFIO_IOMMU_GET_INFO, info);
+>>> +    }
+>>> +
+>>> +    if (ret) {
+>>> +        return false;
+>>> +    }
+>>> +
+>>> +    /* If the capability exists, update with the current value */
+>>> +    return vfio_get_info_dma_avail(info, avail);
+>>> +}
+>>> +
+> 
+> (...)
+> 
+> 
 
 
