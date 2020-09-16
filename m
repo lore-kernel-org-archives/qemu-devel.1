@@ -2,90 +2,94 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6CCDC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:38:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E218DC43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:41:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9622B22224
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:38:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 59A0C20809
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:41:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="cW1enXkL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9622B22224
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ISxyJgoW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59A0C20809
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kITtQ-00035R-IU
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 05:38:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49466)
+	id 1kITw1-0004MG-Dq
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 05:41:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50296)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
- id 1kITsj-0002We-1i
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 05:37:41 -0400
-Received: from forwardcorp1p.mail.yandex.net
- ([2a02:6b8:0:1472:2741:0:8b6:217]:52162)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
- id 1kITse-0006xX-5o
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 05:37:39 -0400
-Received: from iva8-d077482f1536.qloud-c.yandex.net
- (iva8-d077482f1536.qloud-c.yandex.net
- [IPv6:2a02:6b8:c0c:2f26:0:640:d077:482f])
- by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 006DC2E1479;
- Wed, 16 Sep 2020 12:37:29 +0300 (MSK)
-Received: from localhost (localhost [::1])
- by iva8-d077482f1536.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
- 4cw7lI0dfQ-bRvqGa8M; Wed, 16 Sep 2020 12:37:28 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1600249048; bh=r5Re/4/+svCR7Rj7iXiKRnEI5cVuFJB3/vUFrP976+o=;
- h=Message-Id:Cc:Subject:In-Reply-To:Date:References:To:From;
- b=cW1enXkLzAw6gJu3DxHriVeXouK6YmhhW+iVxRtFVhDccf2gh45Z/BM11+qDJcIg7
- TMnwIkWUwGIUIyQ0E39JEP6tR/eStt3SlUtRfYqCO3xCOPtEe6DG6EwzsC5uA+8mUq
- Z7/nuxeO/CZouEkx/LIUe3Gx34NUhIKasJBT8gXk=
-Authentication-Results: iva8-d077482f1536.qloud-c.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-X-Yandex-Sender-Uid: 1120000000161690
-Received: by iva4-6d0ca09d92db.qloud-c.yandex.net with HTTP;
- Wed, 16 Sep 2020 12:37:27 +0300
-From: Alexey Kirillov <lekiravi@yandex-team.ru>
-To: Markus Armbruster <armbru@redhat.com>,
-	Eric Blake <eblake@redhat.com>
-In-Reply-To: <87tuw8731m.fsf@dusky.pond.sub.org>
-References: <20200901182326.59633-1-lekiravi@yandex-team.ru>
- <20200901182326.59633-2-lekiravi@yandex-team.ru>
- <87lfhsjubv.fsf@dusky.pond.sub.org>
- <37711599469320@mail.yandex-team.ru>
- <871rjdrca0.fsf@dusky.pond.sub.org>
- <b632d444-bdf9-648b-9d55-a9e72efb8fbc@redhat.com>
- <87tuw8731m.fsf@dusky.pond.sub.org>
-Subject: Re: [PATCH v3 1/4] qapi: net: Add query-netdevs command
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kITv6-0003oK-9T
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 05:40:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28121)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kITv3-0007Ew-La
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 05:40:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600249203;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=5YHReJg9ruLQPhx8Wm1nqEp9LLfabGow8aKg/1oCrcE=;
+ b=ISxyJgoWhhl8IhKuNRs9X4gDCxf327DiHFyDvmN2bRlsf8EL5dZBWWqpa8RThsxKsa5HSR
+ jxywiGrc8VxcMkejMHhyQbKOkSaX/zL6jrA6pnEYmpHa0byvCbR75IjGLmcWIlVA0kVdxT
+ hWi6tqmmYWu79Zsr+On2Rh0iRK8I3Hw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-432-PdneZ8RkOUm1jRq31pT6Bg-1; Wed, 16 Sep 2020 05:40:00 -0400
+X-MC-Unique: PdneZ8RkOUm1jRq31pT6Bg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 37F22CD05F;
+ Wed, 16 Sep 2020 09:39:56 +0000 (UTC)
+Received: from localhost (ovpn-115-47.ams2.redhat.com [10.36.115.47])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7134968D63;
+ Wed, 16 Sep 2020 09:39:55 +0000 (UTC)
+Date: Wed, 16 Sep 2020 10:39:54 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH 3/3] nvdimm: honor -object memory-backend-file,
+ readonly=on option
+Message-ID: <20200916093954.GB749356@stefanha-x1.localdomain>
+References: <20200804101244.1283503-1-stefanha@redhat.com>
+ <20200804101244.1283503-4-stefanha@redhat.com>
+ <db6f0cae-88ee-fba0-2d2c-82255f52e7f6@redhat.com>
 MIME-Version: 1.0
-X-Mailer: Yamail [ http://yandex.ru ] 5.0
-Date: Wed, 16 Sep 2020 12:37:27 +0300
-Message-Id: <32031600248373@mail.yandex-team.ru>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset=utf-8
-Received-SPF: pass client-ip=2a02:6b8:0:1472:2741:0:8b6:217;
- envelope-from=lekiravi@yandex-team.ru; helo=forwardcorp1p.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 05:37:29
-X-ACL-Warn: Detected OS   = ???
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <db6f0cae-88ee-fba0-2d2c-82255f52e7f6@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="cmJC7u66zC7hs+87"
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:35:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -94,62 +98,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>,
- Jason Wang <jasowang@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Vincenzo Maffione <v.maffione@gmail.com>,
- "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>
+Cc: Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Julio Montes <julio.montes@intel.com>,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-08.09.2020, 17:32, "Markus Armbruster" <armbru@redhat.com>:
-> Eric Blake <eblake@redhat.com> writes:
->
->>  On 9/7/20 7:39 AM, Markus Armbruster wrote:
->>
->>>>>  This is union Netdev plus a common member @peer-id, less the variant
->>>>>  members for NetClientDriver values 'nic' and 'hubport'.
->>>>>
->>>>>  Can 'type: 'nic' and 'type': 'hubport' occur?
->>>>
->>>>  No, it can't. We don't support NIC/hubport in query-netdevs, so we neither create this
->>>>  structure for them, nor store config.
->>>  Same for 'none', I guess.
->>>  As defined, NetdevInfo allows types 'none', 'nic', and 'hubport', it
->>>  just has no variant members for them. The fact that they can't occur is
->>>  not coded into the type, and therefore not visible in introspection.
->>>  To make introspection more precise, we'd have to define a new enum
->>>  type.
->>>  How much that would complicate the C code is unclear.
->>>  Do we need it to be more precise? Eric, got an opinion?
->>
->>  Is the problem that a new enum would be duplicating things?
->
-> Enumerating network drivers twice is mildly annoying. I worry more
-> about having to convert between the two enumerations in C.
->
-> My actual question: do we need query-qmp-schema report the precise set
-> of 'type' values? As is, it reports a few that can't actually occur.
->
->>                                                               Is it
->>  worth allowing one enum to have a 'base':'OtherEnum' in the schema to
->>  reduce some of the duplication?
->
-> We could then generate functions (or macros) to convert from base enum
-> to extended enum, and back, where the latter can fail.
->
-> Worthwhile only if we have sufficient use for it.
+--cmJC7u66zC7hs+87
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I'm sorry, did I understand correctly that at the moment I don't need any
-additional changes in the patch yet?
-If that is, I will continue using NetClientDriver as a discriminator.
+On Fri, Aug 21, 2020 at 03:03:50PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> On 8/4/20 12:12 PM, Stefan Hajnoczi wrote:
+> > Make it possible to present read-only files to the guest as "unarmed"
+> > NVDIMMs. The Linux NVDIMM device (/dev/pmemX) is read-only.
+> >=20
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> >  docs/nvdimm.txt | 8 +++++++-
+> >  hw/mem/nvdimm.c | 4 ++++
+> >  2 files changed, 11 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+> > index c2c6e441b3..c0b52de111 100644
+> > --- a/docs/nvdimm.txt
+> > +++ b/docs/nvdimm.txt
+> > @@ -17,7 +17,7 @@ following command line options:
+> > =20
+> >   -machine pc,nvdimm
+> >   -m $RAM_SIZE,slots=3D$N,maxmem=3D$MAX_SIZE
+> > - -object memory-backend-file,id=3Dmem1,share=3Don,mem-path=3D$PATH,siz=
+e=3D$NVDIMM_SIZE
+> > + -object memory-backend-file,id=3Dmem1,share=3Don,mem-path=3D$PATH,siz=
+e=3D$NVDIMM_SIZE,readonly=3Doff
+> >   -device nvdimm,id=3Dnvdimm1,memdev=3Dmem1
+> > =20
+> >  Where,
+> > @@ -42,6 +42,12 @@ Where,
+> >     "share=3Doff", then guest writes won't be applied to the backend
+> >     file and thus will be invisible to other guests.
+> > =20
+> > +   "readonly=3Don/off" controls whether the the file $PATH is opened r=
+ead-only or
+>=20
+> Double "the the".
 
--- 
-Alexey Kirillov
-Yandex.Cloud
+Will fix.
+
+> > diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+> > index e1574bc07c..694223450e 100644
+> > --- a/hw/mem/nvdimm.c
+> > +++ b/hw/mem/nvdimm.c
+> > @@ -151,6 +151,10 @@ static void nvdimm_prepare_memory_region(NVDIMMDev=
+ice *nvdimm, Error **errp)
+> >                               "nvdimm-memory", mr, 0, pmem_size);
+> >      memory_region_set_nonvolatile(nvdimm->nvdimm_mr, true);
+> >      nvdimm->nvdimm_mr->align =3D align;
+> > +
+> > +    if (memory_region_is_rom(mr)) {
+> > +        nvdimm->unarmed =3D true; /* this device is read-only */
+> > +    }
+>=20
+> Can you move this hunk before the alias creation?
+> (Just before nvdimm->nvdimm_mr =3D ...).
+
+Will fix.
+
+--cmJC7u66zC7hs+87
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9h3WoACgkQnKSrs4Gr
+c8gb7ggAqkYALCALUBNdThQO8k8pF+5vrmVRhoZNFDuzwKgF8eyxUFZYpbLUuwG7
+l6JNf4bq/Vl5ezcrOmqDfcwCL0AR5Zy+/0I9DhtQ6WkPbdfMFJQW/qPxNmi0EXYj
+J2QdwxeUz0WEJNBJTqotBE+K46S2RTnR4f6CmMbZhzExJ6uWvKK9y7AwmT4agw55
+Ya/hovmOUf8VmU4d/NgrBGUXXo2ReinH65lmRt6Y/J4Qm4t37Eo+Q5BHOZQEqnF8
+mtM5aiaOm5qsOJW8IMJaYCEpbTvGK6uACMwZ2+i1bSIUAupWS1XBPl/NHejGgu89
+2UgIR0yS5vVgeBw8okKG24gvfODULA==
+=FZnS
+-----END PGP SIGNATURE-----
+
+--cmJC7u66zC7hs+87--
+
 
