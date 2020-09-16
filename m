@@ -2,84 +2,87 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B29AC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:18:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57B4FC43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:20:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C2302222B
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:18:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A3D4B2222B
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:20:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i4G7wKqO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C2302222B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PbF9XNEr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3D4B2222B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIWOj-0002pM-JM
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 08:18:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58102)
+	id 1kIWPw-000488-Kb
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 08:20:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34448)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kIWBF-0006cR-K1; Wed, 16 Sep 2020 08:04:57 -0400
-Received: from mail-lf1-x12a.google.com ([2a00:1450:4864:20::12a]:36107)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kIWP5-0003B9-NL
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 08:19:15 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:41529)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kIWBC-0001vj-HT; Wed, 16 Sep 2020 08:04:57 -0400
-Received: by mail-lf1-x12a.google.com with SMTP id x69so6720604lff.3;
- Wed, 16 Sep 2020 05:04:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=28lA9K0Y7vK3gyOz2tFYnoRJMiI2arDvXFbLiyUK6+U=;
- b=i4G7wKqOgY3fkpd9WlZqCuEyRG+zU47T217XFo3Y2txyx4ir+S/58iZeaDEIeFMJX5
- nlkZnNlKXUIaeItF35IM0CDkkIJ4V1ED63+tlskB1jq4yJeWBE+VaDr1nCn7x4GZT2Gr
- TqUL+NhV7I4NZGI7xcx+yxDQNHnywb5ftEuP/QEDzBflaDX9xFgiZ1VHIdKwpmpHMVdr
- 6suf6fu6FZ1XzAdB5WL/ZYE3EaUyfSbvRxsC4sl6VWrR3yHkc8Zw4pKjpmF0i/azVW4l
- scpYRcdpGvIODN/G7RdgKGG8wZ2X+6eg8PZBOhHgfDCz0wrdBy6RClAq96jSdpTBj0C9
- dZtA==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kIWP3-00044c-N0
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 08:19:15 -0400
+Received: by mail-ej1-x642.google.com with SMTP id lo4so10016084ejb.8
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 05:19:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ch3go2Iv5BEcS4I8VhoKOTFCGmix6ZcVeHVdNwoCEQM=;
+ b=PbF9XNErm8KHROSnWowgJwtp/MbkI4shtXa6hoS7XWf1JRUUxNtDI8E3gq1aQKSJDz
+ 0UCU8LQvrFp+iciwIfAIuVJGrtZmhbwIzbHNroKqKLoUSQOktbUOnnisDMKgFDcmOPB6
+ nH6wQi7JxPRFbyTW+qQ3CLjsQ9j+4A+XZd9GfAkCaHin0P1ctMADc0ZURVzqoHn2kspa
+ Z/urQeSyduXcQdzD7GBfay2Em02hkiW7l1SEbrUt+Yfa7UDnQyGrjfmYJkPJ6EvWWUNQ
+ /tauIN1sQaHBAj6AYWWNEyMiPg0HKthRW6j0UsElYBIWlUCGkAqV8pBi9matShbuEi5Y
+ cKQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=28lA9K0Y7vK3gyOz2tFYnoRJMiI2arDvXFbLiyUK6+U=;
- b=B8Ei27CZcVbHiweUHmiQFL4GvuydetJdZg8LxRwvgISAfh3AVE7Mb/FIy7iV+MnnRw
- zqDj02Xy5DCN4T6tuT6CGwe1D10ixFVfGNHFZVUtAPs7J1nMSeMyRIrSx0USW3em20P0
- GNqYWk0O/gbvNPXf9Dt3GAJ+E5nWdb7cl40ct3jmikAOpUfgLVvNJrF+Z4buSFCdsxcp
- 9iw3pgogTXNBl59zZDJI78mLvEE2bibhHQQN4EUqvnz1cFXYVsHHDc8ZU0YFz3SKhDZV
- kr7v25sdODgL3PYKLy7+Dgo43+KU5Wto7s+Mw1jtnnZFnq42CXlbD1iKziDIkjPaoIT9
- PfTA==
-X-Gm-Message-State: AOAM531ENKSg6IPRAdNbo5xrZEE8l8K1jXzqMzJPOjuWoPgsJ8RxoILU
- 48sbfBp9dmSJEho8D78nTPe4aKo67maToYeohHA=
-X-Google-Smtp-Source: ABdhPJxnwwlGQQ4Pa1JFAZ1Hx1dRqFHqzBJrH0Po7haCtKiHFgvi3dlerMRX+KpW3aWG0TCTDaqmc6uu2qXQj94UEHc=
-X-Received: by 2002:a19:383:: with SMTP id 125mr8010907lfd.356.1600257890287; 
- Wed, 16 Sep 2020 05:04:50 -0700 (PDT)
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ch3go2Iv5BEcS4I8VhoKOTFCGmix6ZcVeHVdNwoCEQM=;
+ b=WAAXgO+kVoDcECWtLCpGC8ZCn02ahB2+2bWYbv+LgaXT4M5++c/LpTM5f88VH0CJkR
+ XSaPG0XTw88+Y0ODm0lJKfvhfPsb3fCCqOQJoarNO0wHyo3FBeudG9KxFLA70ZFZsrCa
+ fqjdA6dwg9xPLIYqFqaw/7LP+c9BTwJELj2nhsIRsDM4wm6AFNwC1jwJuFt2Sl6BALj1
+ fkzujtx+Q10f8k15ln5T9yEIiNxvh4b8846fL0FdcH6DuuBUezITmpfdjg+jBxgPF58X
+ bmBGjDSo5aROjzaDlY2aFJpbMNbDpfVPHkOvvsInTN++8k630RoKwnT+Ihdccs2Lad7O
+ ni6A==
+X-Gm-Message-State: AOAM5321l8Nkj9Nfo0fqUBt9smhpsKY7sJQFLbqtjyckfz7uaNs/S3yj
+ UK3DTXFdyjLh3oteIpkd63rfUTIP4OpDT3ZMDbaO8Q==
+X-Google-Smtp-Source: ABdhPJw1fJVDJRI/I1nToIj1KZH6DTU4N0DWHaTZaQGBFGuEZ9SLPNDWqiuIuBllQYm7JXMljbtpKUqlrA5pvrGp+vU=
+X-Received: by 2002:a17:906:4a53:: with SMTP id
+ a19mr26404027ejv.56.1600258751562; 
+ Wed, 16 Sep 2020 05:19:11 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200915171234.236-1-luoyonggang@gmail.com>
- <cd40da60-d03f-bf37-c0d7-1f362419cf75@redhat.com>
-In-Reply-To: <cd40da60-d03f-bf37-c0d7-1f362419cf75@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Wed, 16 Sep 2020 20:04:40 +0800
-Message-ID: <CAE2XoE9dJvwH_12XRo5c62D9x_akcuvO2EY5xCOm-E5Y8WysCw@mail.gmail.com>
-Subject: Re: [PATCH v10 00/26] W32, W64 msys2/mingw patches
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000001984bd05af6d135b"
-Received-SPF: pass client-ip=2a00:1450:4864:20::12a;
- envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x12a.google.com
+References: <20200827114917.1851111-1-ppandit@redhat.com>
+ <CAKXe6SJNio2cy05ecr_DyB0Z6WjxHN_X8ZiOU5By0jwdRq12fg@mail.gmail.com>
+ <b0859f8a-1224-66d0-7e32-091caa5cfcbe@redhat.com>
+ <nycvar.YSQ.7.78.906.2009161152040.10832@xnncv>
+In-Reply-To: <nycvar.YSQ.7.78.906.2009161152040.10832@xnncv>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 16 Sep 2020 13:19:00 +0100
+Message-ID: <CAFEAcA8Y+sJkapmrjNOdWP4xXa9kWTmSyXpthkvdb6QgUyDh5Q@mail.gmail.com>
+Subject: Re: [PATCH] pci: check bus pointer before dereference
+To: P J P <ppandit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,84 +96,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
- Qemu-block <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>,
- Xie Changlong <xiechanglong.d@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- qemu-level <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Li-Wen Hsu <lwhsu@freebsd.org>, Markus Armbruster <armbru@redhat.com>,
- Peter Lieven <pl@kamp.de>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Li Qiang <liq3ea@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Alexander Bulekov <alxndr@bu.edu>, Ruhr-University <bugs-syssec@rub.de>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000001984bd05af6d135b
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Sep 16, 2020 at 7:52 PM Thomas Huth <thuth@redhat.com> wrote:
+On Wed, 16 Sep 2020 at 07:28, P J P <ppandit@redhat.com> wrote:
+> ===
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index de0fae10ab..0ccb991410 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -253,6 +253,7 @@ static void pci_change_irq_level(PCIDevice *pci_dev, int
+> irq_num, int change)
+>      PCIBus *bus;
+>      for (;;) {
+>          bus = pci_get_bus(pci_dev);
+> +        assert(bus);
+>          irq_num = bus->map_irq(pci_dev, irq_num);
+>          if (bus->set_irq)
+>              break;
+> ===
 >
-> On 15/09/2020 19.12, Yonggang Luo wrote:
-> [...]
-> > It first introduce msys2 CI on cirrus by fixes nfs, capstone, curses an=
-d
-> > disable partial test-char tests.
-> > And then fixes all unit tests failure on msys2/mingw
-> > This fixes the reviews suggested in the mailling list
-> > All cirrus CI are passed
->
-> Thanks a lot for your work, I've added most of your patches to my latest
-> "testing" pull request now, so that we should get basic test coverage on
-> msys2 now in the Cirrus-CI if it gets merged.
->
-> I skipped the NFS, capstone, test-char and crypto patches for now (and
-> replaced them with older versions of your patches where you've disabled
-> them) - I think these patches still need some more review / work and
-> then should go through the trees of the corresponding maintainers later.
-Happy to see, once your branch merged, I'll rebase these patches and resend
-them
-separately
->
->  Cheers,
->   Thomas
->
+> This should be okay for now?
 
+Generally we don't bother to assert() that pointers that shouldn't be NULL
+really are NULL immediately before dereferencing them, because the
+dereference provides an equally easy-to-debug crash to the assert,
+and so the assert doesn't provide anything extra.
+assert()ing that a pointer is non-NULL is more useful if it is done in a
+place that identifies the problem at an earlier and easier-to-debug point
+in execution rather than at a later point which is distantly removed from
+the place where the bogus pointer was introduced.
 
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---0000000000001984bd05af6d135b
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><br><br>On Wed, Sep 16, 2020 at 7:52 PM Thomas Huth &lt;<a=
- href=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt; wrote:<br>&gt;<b=
-r>&gt; On 15/09/2020 19.12, Yonggang Luo wrote:<br>&gt; [...]<br>&gt; &gt; =
-It first introduce msys2 CI on cirrus by fixes nfs, capstone, curses and<br=
->&gt; &gt; disable partial test-char tests.<br>&gt; &gt; And then fixes all=
- unit tests failure on msys2/mingw<br>&gt; &gt; This fixes the reviews sugg=
-ested in the mailling list<br>&gt; &gt; All cirrus CI are passed<br>&gt;<br=
->&gt; Thanks a lot for your work, I&#39;ve added most of your patches to my=
- latest<br>&gt; &quot;testing&quot; pull request now, so that we should get=
- basic test coverage on<br>&gt; msys2 now in the Cirrus-CI if it gets merge=
-d.<br>&gt;<br>&gt; I skipped the NFS, capstone, test-char and crypto patche=
-s for now (and<br>&gt; replaced them with older versions of your patches wh=
-ere you&#39;ve disabled<br>&gt; them) - I think these patches still need so=
-me more review / work and<br>&gt; then should go through the trees of the c=
-orresponding maintainers later.<div>Happy to see, once your branch merged, =
-I&#39;ll rebase these patches and resend them</div><div>separately<br>&gt;<=
-br>&gt; =C2=A0Cheers,<br>&gt; =C2=A0 Thomas<br>&gt;<br><br><br>--<br>=C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=
-=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo</div><=
-/div>
-
---0000000000001984bd05af6d135b--
+thanks
+-- PMM
 
