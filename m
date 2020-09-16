@@ -2,131 +2,102 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 839D8C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 07:22:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44638C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 07:33:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0F8520771
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 07:22:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 710B72076C
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 07:33:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hlAxkVmw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0F8520771
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L97ZTrMj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 710B72076C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIRlr-0006qr-US
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 03:22:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45460)
+	id 1kIRwX-0003GW-A5
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 03:33:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47916)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIRlE-0006P0-9a
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 03:21:48 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30333
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1kIRvm-0002dv-A0
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 03:32:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20224)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIRlC-0005uF-MK
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 03:21:48 -0400
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1kIRvk-0007LJ-9O
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 03:32:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600240905;
+ s=mimecast20190719; t=1600241558;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=/ntZJ94sVhml7F6QGwY1ka6seOdgBVzBCWZIpJzkMdg=;
- b=hlAxkVmworZbdZFW/JswmDNH/ERmUq4Mof43jkLWVTrNtFB4LADGRknmro+DPIsUAf3UW6
- v1LIx7gh8cpQ6KRhLit2h93E5IosHqf6g5zfs59MMHnx+4WzDnKK/DXp3ND+ygmh9nrgFF
- jbiSbFUV1WiwdqR0nqZaDV2hc8bY34k=
+ in-reply-to:in-reply-to:references:references;
+ bh=CGvPBEo4zD5NZfEA6gJvov6sfZ5lqOn4xnIjNdFaZbY=;
+ b=L97ZTrMj46VpakskjbbokXI+rTa51yl0jwoIl4JG7w5HIGpbk54biz6Iw12cpCtGyiPlCV
+ 5AIvBHUMNyupDhFcsbGQQUeALo/kL6YNFGudSahnDZr+WCW7MGm1OnTu3wH/cUflEHcxcw
+ gS2p4n8apBsElcX/UbjTwx5RCeXKRyY=
 Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
  [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-530-NSK8_db-NH2ybo880qfICg-1; Wed, 16 Sep 2020 03:21:43 -0400
-X-MC-Unique: NSK8_db-NH2ybo880qfICg-1
-Received: by mail-wr1-f71.google.com with SMTP id 33so2179504wrk.12
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 00:21:43 -0700 (PDT)
+ us-mta-114-JlaMwr0SOUOLmO56b-1dNw-1; Wed, 16 Sep 2020 03:32:35 -0400
+X-MC-Unique: JlaMwr0SOUOLmO56b-1dNw-1
+Received: by mail-wr1-f71.google.com with SMTP id l9so2177985wrq.20
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 00:32:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=/ntZJ94sVhml7F6QGwY1ka6seOdgBVzBCWZIpJzkMdg=;
- b=iSLqqxNC16HTqgdB752Os0/LYuTiG2sJJrPxlEPvJslCSr1K7i4tGcgUKnTqBFpKes
- DNombqXFVNnXBC8FQVeniJx4VWHsBEamD0P1kOWV+F86jhyf3MKIcU29cP/L36UN3hRv
- tdhmuXb9ho9LzhVy5w0TsrFjLsOmJ+6nmq6C7WNXLL/RZ2i4ikamo4EPiskmoJyy/NJN
- ZiImU9xUckknG7gTkMQ+CjuAU2h575WzipD5cGOAHksdCzM+o58TuE+gs27JdXRaw9KR
- cu3CVHBxwWtUm1VSILt+WEba27Zh/WUNwpSXf24218HgouU2cTpEQcLBPT8wdbeLI9zi
- jCwA==
-X-Gm-Message-State: AOAM531aDCNFttODW8/slf76INjsfMXddmp9WcvrYYsJr67QdnvRVB1h
- z7YXzX5OBwLIPxalXzXLmT0o0kltRbJmSylfuMUUalgSdhWiYClvJz6z1jcLQUk/LqAlh6EwEwH
- KfAhn892IS3bOzXY=
-X-Received: by 2002:adf:8405:: with SMTP id 5mr26544675wrf.143.1600240902584; 
- Wed, 16 Sep 2020 00:21:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxxveW5ZKttEfu6YcpwQp97AFO4qzv+g2WbKR94OvaPDa2bskx5HAVRXek7bCtck0hCXJNX1g==
-X-Received: by 2002:adf:8405:: with SMTP id 5mr26544650wrf.143.1600240902384; 
- Wed, 16 Sep 2020 00:21:42 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id u12sm3553135wrt.81.2020.09.16.00.21.40
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 16 Sep 2020 00:21:41 -0700 (PDT)
-Subject: Re: [PATCH v3 4/5] s390x/pci: Add routine to get the vfio dma
- available count
-To: Matthew Rosato <mjrosato@linux.ibm.com>, alex.williamson@redhat.com,
- cohuck@redhat.com
-References: <1600197283-25274-1-git-send-email-mjrosato@linux.ibm.com>
- <1600197283-25274-5-git-send-email-mjrosato@linux.ibm.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <0b28ae63-faad-953d-85c2-04bcdefeb7bf@redhat.com>
-Date: Wed, 16 Sep 2020 09:21:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=CGvPBEo4zD5NZfEA6gJvov6sfZ5lqOn4xnIjNdFaZbY=;
+ b=ZNE/+M2VdgV3oqxjqko6yIYLc+6Ll2T+d2HFwSLcXrjtRnKYvc1TyksKCdc0ya/OlF
+ VzJD8/ZVLw+Rn4+BDZV3zIykWIYXwEMeu/envuXWIE0N0KupKL3OLeHqjZ7BKZC92pK5
+ i27lWy9lS619Hu6HPMR6raRpkEsBK9BDzXHEXWY3QJGgtx33OgkpSTRZqc9tC0Va77/h
+ Yi3+epNlcEMVQHs4eUzO/LlS/9c5awGqF3tNRNJjG2c1Etmss6x662NmsgwOH6ne/28Z
+ ecdIp9E2rVxU9C+NpRkoUiNi6Dqri3uywD75y4uz8zL3bqizbOnHJD6xVfGfT/twRayY
+ F/LQ==
+X-Gm-Message-State: AOAM533cdF6Q4+P6/B7a7NA71aRlQvuQ73W9wZQiHoVD5+bRHLyEL6R/
+ ChiKAAOnlv8ToD+IY6SuxWRUoK0gAx4f15shM/NWMNwCvZ5+YWwgLZnKM0SNjgFSQZY9/mGFPFL
+ 7lUBPWsEWbU6v7o0=
+X-Received: by 2002:a1c:5641:: with SMTP id k62mr3368159wmb.13.1600241553442; 
+ Wed, 16 Sep 2020 00:32:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxtPaK6feqM8QTC5DflQPG1aMBoDRhSpLoWw8xaRYu4sb1ReEAjPZwG5J4qcvlwWLsvRtH2FQ==
+X-Received: by 2002:a1c:5641:: with SMTP id k62mr3368142wmb.13.1600241553195; 
+ Wed, 16 Sep 2020 00:32:33 -0700 (PDT)
+Received: from steredhat (host-79-51-197-141.retail.telecomitalia.it.
+ [79.51.197.141])
+ by smtp.gmail.com with ESMTPSA id j14sm32587103wrr.66.2020.09.16.00.32.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 16 Sep 2020 00:32:32 -0700 (PDT)
+Date: Wed, 16 Sep 2020 09:32:30 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH v2] virtio: skip legacy support check on machine types
+ less than 5.1
+Message-ID: <20200916073230.tew74t5n3atgtsqa@steredhat>
+References: <20200915130514.80989-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1600197283-25274-5-git-send-email-mjrosato@linux.ibm.com>
+In-Reply-To: <20200915130514.80989-1-sgarzare@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=sgarzare@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 00:53:39
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=sgarzare@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:35:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
 X-Spam_bar: -----
 X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -140,126 +111,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, kvm@vger.kernel.org, pmorel@linux.ibm.com,
- schnelle@linux.ibm.com, david@redhat.com, qemu-devel@nongnu.org,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
- mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+Cc: Cornelia Huck <cohuck@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-stable@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/15/20 9:14 PM, Matthew Rosato wrote:
-> Create new files for separating out vfio-specific work for s390
-> pci. Add the first such routine, which issues VFIO_IOMMU_GET_INFO
-> ioctl to collect the current dma available count.
++Cc qemu-stable@nongnu.org
+
+It was not my day... I forgot to cc stable.
+
+Thanks,
+Stefano
+
+On Tue, Sep 15, 2020 at 03:05:14PM +0200, Stefano Garzarella wrote:
+> Commit 9b3a35ec82 ("virtio: verify that legacy support is not accidentally
+> on") added a check that returns an error if legacy support is on, but the
+> device is not legacy.
 > 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> Unfortunately some devices were wrongly declared legacy even if they
+> were not (e.g vhost-vsock).
+> 
+> To avoid migration issues, we disable this error for machine types < 5.1,
+> but we print a warning.
+> 
+> Cc: qemu-stable@nongnu.org
+> Fixes: 9b3a35ec82 ("virtio: verify that legacy support is not accidentally on")
+> Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Suggested-by: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 > ---
->  hw/s390x/meson.build     |  1 +
->  hw/s390x/s390-pci-vfio.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/s390x/s390-pci-vfio.h | 17 +++++++++++++++
->  3 files changed, 72 insertions(+)
->  create mode 100644 hw/s390x/s390-pci-vfio.c
->  create mode 100644 hw/s390x/s390-pci-vfio.h
+> v2:
+>  - fixed Cornelia's e-mail address
+> ---
+>  include/hw/virtio/virtio.h |  1 +
+>  hw/core/machine.c          |  1 +
+>  hw/virtio/virtio.c         | 18 ++++++++++++++++--
+>  3 files changed, 18 insertions(+), 2 deletions(-)
 > 
-> diff --git a/hw/s390x/meson.build b/hw/s390x/meson.build
-> index b63782d..ed2f66b 100644
-> --- a/hw/s390x/meson.build
-> +++ b/hw/s390x/meson.build
-> @@ -10,6 +10,7 @@ s390x_ss.add(files(
->    's390-ccw.c',
->    's390-pci-bus.c',
->    's390-pci-inst.c',
-> +  's390-pci-vfio.c',
->    's390-skeys.c',
->    's390-stattrib.c',
->    's390-virtio-hcall.c',
-> diff --git a/hw/s390x/s390-pci-vfio.c b/hw/s390x/s390-pci-vfio.c
-> new file mode 100644
-> index 0000000..75e3ac1
-> --- /dev/null
-> +++ b/hw/s390x/s390-pci-vfio.c
-> @@ -0,0 +1,54 @@
-> +/*
-> + * s390 vfio-pci interfaces
-> + *
-> + * Copyright 2020 IBM Corp.
-> + * Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
-> + * directory.
-> + */
+> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> index 807280451b..ed7cee348b 100644
+> --- a/include/hw/virtio/virtio.h
+> +++ b/include/hw/virtio/virtio.h
+> @@ -103,6 +103,7 @@ struct VirtIODevice
+>      bool use_started;
+>      bool started;
+>      bool start_on_kick; /* when virtio 1.0 feature has not been negotiated */
+> +    bool disable_legacy_check;
+>      VMChangeStateEntry *vmstate;
+>      char *bus_name;
+>      uint8_t device_endian;
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index ea26d61237..b686eab798 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -44,6 +44,7 @@ GlobalProperty hw_compat_5_0[] = {
+>      { "vmport", "x-signal-unsupported-cmd", "off" },
+>      { "vmport", "x-report-vmx-type", "off" },
+>      { "vmport", "x-cmds-v2", "off" },
+> +    { "virtio-device", "x-disable-legacy-check", "true" },
+>  };
+>  const size_t hw_compat_5_0_len = G_N_ELEMENTS(hw_compat_5_0);
+>  
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index e983025217..30ccc43b8c 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -3287,6 +3287,8 @@ void virtio_init(VirtIODevice *vdev, const char *name,
+>   */
+>  bool virtio_legacy_allowed(VirtIODevice *vdev)
+>  {
+> +    bool ret = false;
 > +
-> +#include <sys/ioctl.h>
+>      switch (vdev->device_id) {
+>      case VIRTIO_ID_NET:
+>      case VIRTIO_ID_BLOCK:
+> @@ -3298,10 +3300,20 @@ bool virtio_legacy_allowed(VirtIODevice *vdev)
+>      case VIRTIO_ID_9P:
+>      case VIRTIO_ID_RPROC_SERIAL:
+>      case VIRTIO_ID_CAIF:
+> +        ret = true;
+> +    }
 > +
-> +#include "qemu/osdep.h"
-> +#include "s390-pci-vfio.h"
-> +#include "hw/vfio/vfio-common.h"
-> +
-> +/*
-> + * Get the current DMA available count from vfio.  Returns true if vfio is
-> + * limiting DMA requests, false otherwise.  The current available count read
-> + * from vfio is returned in avail.
-> + */
-> +bool s390_pci_update_dma_avail(int fd, unsigned int *avail)
-> +{
-> +    g_autofree struct vfio_iommu_type1_info *info;
-> +    uint32_t argsz;
-> +    int ret;
-> +
-> +    assert(avail);
-> +
-> +    argsz = sizeof(struct vfio_iommu_type1_info);
-> +    info = g_malloc0(argsz);
-> +    info->argsz = argsz;
 > +    /*
-> +     * If the specified argsz is not large enough to contain all
-> +     * capabilities it will be updated upon return.  In this case
-> +     * use the updated value to get the entire capability chain.
+> +     * For backward compatibility, we allow legacy mode with old machine types
+> +     * to get the migration working.
 > +     */
-> +    ret = ioctl(fd, VFIO_IOMMU_GET_INFO, info);
-> +    if (argsz != info->argsz) {
-> +        argsz = info->argsz;
-> +        info = g_realloc(info, argsz);
-
-Do we need to bzero [sizeof(struct vfio_iommu_type1_info)..argsz[?
-
-> +        info->argsz = argsz;
-> +        ret = ioctl(fd, VFIO_IOMMU_GET_INFO, info);
-> +    }
+> +    if (!ret && vdev->disable_legacy_check) {
+> +        warn_report("device is modern-only, but for backward compatibility "
+> +                    "legacy is allowed");
+>          return true;
+> -    default:
+> -        return false;
+>      }
 > +
-> +    if (ret) {
-> +        return false;
-> +    }
-> +
-> +    /* If the capability exists, update with the current value */
-> +    return vfio_get_info_dma_avail(info, avail);
-> +}
-> +
-> diff --git a/hw/s390x/s390-pci-vfio.h b/hw/s390x/s390-pci-vfio.h
-> new file mode 100644
-> index 0000000..2a5a261
-> --- /dev/null
-> +++ b/hw/s390x/s390-pci-vfio.h
-> @@ -0,0 +1,17 @@
-> +/*
-> + * s390 vfio-pci interfaces
-> + *
-> + * Copyright 2020 IBM Corp.
-> + * Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
-> + * directory.
-> + */
-> +
-> +#ifndef HW_S390_PCI_VFIO_H
-> +#define HW_S390_PCI_VFIO_H
-> +
-> +bool s390_pci_update_dma_avail(int fd, unsigned int *avail);
-> +
-> +#endif
+> +    return ret;
+>  }
+>  
+>  hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n)
+> @@ -3713,6 +3725,8 @@ static Property virtio_properties[] = {
+>      DEFINE_VIRTIO_COMMON_FEATURES(VirtIODevice, host_features),
+>      DEFINE_PROP_BOOL("use-started", VirtIODevice, use_started, true),
+>      DEFINE_PROP_BOOL("use-disabled-flag", VirtIODevice, use_disabled_flag, true),
+> +    DEFINE_PROP_BOOL("x-disable-legacy-check", VirtIODevice,
+> +                     disable_legacy_check, false),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> -- 
+> 2.26.2
+> 
 > 
 
 
