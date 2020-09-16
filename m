@@ -2,79 +2,78 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3201C43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:01:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFFBEC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:04:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3812D2083B
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:01:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32939206B6
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:04:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="idT3QiXX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3812D2083B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fa7H3Zi0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32939206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kISNs-0004xf-7X
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 04:01:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53800)
+	id 1kISQ3-00063c-CM
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 04:03:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54336)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kISN3-0004Nc-3u
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 04:00:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53713)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kISPJ-0005eT-Fx
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 04:03:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25450)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kISMw-0002dy-GM
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 04:00:52 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kISPH-0002ra-FN
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 04:03:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600243245;
+ s=mimecast20190719; t=1600243390;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=TCGiChUSkYqdT+AHpHEpBa+8QltjNXCQrvKsHv1lud4=;
- b=idT3QiXXqld0FxJFLBoAluJ2X5kKeVfS9/YY62JpRInykufsFChrfsgqYHwNFsidl9wxHz
- 1nBnkPN1gZQeqWIDBv1MeUXZ9RQ25wCQ92S6+tEkGZx8kbvpmUjgHvU5G5z/78OvUA9Rog
- SHMVox+KNjVk7V5F4Kzz7+1rM3I6an0=
+ bh=eBccPDdnMa0EF4E+7IgQWnH+cX1TE13CXQdOFnGdenU=;
+ b=fa7H3Zi0FxlWV0Eo62xOzC4loiJ7nFMlOJ4rVFORtUAVw3A/n0FEf43ODTcLGv0vLlePKF
+ 9uQJJi/sadxjg8KRs49+E5wWuYx4Z6Q4xPv5bfry/gJm4y7xtjUZWyyjySj/WlxMA1w7/L
+ cq6bln9J0axfihJv3VCg0pLBFLuGClw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-533-Y5FvVkb-PlODYpO5ZQbxrA-1; Wed, 16 Sep 2020 04:00:43 -0400
-X-MC-Unique: Y5FvVkb-PlODYpO5ZQbxrA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-145-VC-47cxJMvK7eza1pZqKsQ-1; Wed, 16 Sep 2020 04:03:00 -0400
+X-MC-Unique: VC-47cxJMvK7eza1pZqKsQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3055989BBA1;
- Wed, 16 Sep 2020 08:00:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1B30802B51;
+ Wed, 16 Sep 2020 08:02:59 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-113-19.ams2.redhat.com [10.36.113.19])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B1C1E81C4D;
- Wed, 16 Sep 2020 08:00:16 +0000 (UTC)
-Subject: Re: [PATCH v6 3/8] s390/sclp: read sccb from mem based on provided
- length
-To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org
-References: <20200915194416.107460-1-walling@linux.ibm.com>
- <20200915194416.107460-4-walling@linux.ibm.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 944105DE89;
+ Wed, 16 Sep 2020 08:02:53 +0000 (UTC)
+Subject: Re: Python 3.5 EOL; when can require 3.6?
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <875z8eupyp.fsf@dusky.pond.sub.org>
+ <495bd2bd-4f38-8fe2-e758-82acbecd0d04@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <4bb9871d-e4d3-bd28-6718-548a32d21961@redhat.com>
-Date: Wed, 16 Sep 2020 10:00:15 +0200
+Message-ID: <436800a3-7645-52f7-5fea-134d883c0a7b@redhat.com>
+Date: Wed, 16 Sep 2020 10:02:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200915194416.107460-4-walling@linux.ibm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <495bd2bd-4f38-8fe2-e758-82acbecd0d04@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
@@ -87,7 +86,7 @@ X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
  RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,29 +99,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, mst@redhat.com,
- pbonzini@redhat.com, sumanthk@linux.ibm.com, mihajlov@linux.ibm.com,
- rth@twiddle.net
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/09/2020 21.44, Collin Walling wrote:
-> The header contained within the SCCB passed to the SCLP service call
-> contains the actual length of the SCCB. Instead of allocating a static
-> 4K size for the work sccb, let's allow for a variable size determined
-> by the value in the header. The proper checks are already in place to
-> ensure the SCCB length is sufficent to store a full response and that
-> the length does not cross any explicitly-set boundaries.
+On 16/09/2020 09.53, Philippe Mathieu-Daudé wrote:
+> On 9/16/20 9:43 AM, Markus Armbruster wrote:
+>> We require Python 3.5.  It will reach its "end of life" at the end of
+>> September 2020[*].  Any reason not to require 3.6 for 5.2?  qemu-iotests
+>> already does for its Python parts.
+>>
+>>
+>> [*] https://www.python.org/downloads/release/python-3510/
 > 
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
-> ---
->  hw/s390x/event-facility.c |  2 +-
->  hw/s390x/sclp.c           | 55 ++++++++++++++++++++++-----------------
->  include/hw/s390x/sclp.h   |  2 +-
->  3 files changed, 33 insertions(+), 26 deletions(-)
+> Not answering your question, but it would help to start a table
+> of "oldest package released" versions, with our supported distributions
+> as columns and package names as row.
+> 
+> This way when new distributions are released (and oldest dropped from
+> our side) we can add/remove a column and see the oldest version we aim
+> to support.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+That's quite a bit of extra work - I think it's enough to look up the
+versions on repology instead, e.g.:
+
+https://repology.org/project/python/versions
+
+ Thomas
 
 
