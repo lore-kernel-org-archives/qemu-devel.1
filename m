@@ -2,79 +2,77 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43ADCC43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:01:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CCA8C43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:01:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A08FC221E5
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:01:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF8EE221E5
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:01:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Flof6GiQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A08FC221E5
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LDjIlOPJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF8EE221E5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIW7e-0001fg-JB
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 08:01:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55680)
+	id 1kIW7j-0001py-Nz
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 08:01:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54408)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kIW1Y-0001Md-AQ
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:54:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50268)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kIVv1-0007G8-8c
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:48:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30495)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kIW1U-0000V8-Fo
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:54:55 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kIVuz-0008Ca-G7
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:48:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600257291;
+ s=mimecast20190719; t=1600256888;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8/WkIN3zqk/MjMLAzQ3kRjoBxXohAtKBI8IbighYvpQ=;
- b=Flof6GiQbULWy+mC4THtidgFsdwiHrEKrtay5VmOMCEdNmm100U7b3E9CVF37BA1JeobUN
- zl2n748O4WvwfcUthqnJfMIxjAm35KQXpKhgWX7fN5ggoZg2+9OqRVO/4YOM60n2XjE/nK
- eQFgc9I9leck0BXOOuFd1dl8jzNs4jI=
+ bh=08/OZLaHYaKtIXP4UD5zd+jhITM2zuxqFZNAPYjBMDc=;
+ b=LDjIlOPJIZiJOX1OOKeXp79+WG+WFnvbtCfzvKiyhO8tNi0o5bsZoSghwIu09xOQsG6sg1
+ P+acNylpmP8mRb7PzrJS/7WerrTVM4kIraWTQXr5M3kt8KTBgGJwZxZBMQsBjJaRlBdvt0
+ WfU2HfoFRNJNtxei7bPLsyc2x0utycQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-528-xRvwrIjfONmDgahGwoXJEw-1; Wed, 16 Sep 2020 07:54:48 -0400
-X-MC-Unique: xRvwrIjfONmDgahGwoXJEw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-398-rQqLPJ1dMcyMVqYKZeOeGw-1; Wed, 16 Sep 2020 07:48:06 -0400
+X-MC-Unique: rQqLPJ1dMcyMVqYKZeOeGw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44E98EA1C0;
- Wed, 16 Sep 2020 11:54:47 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
- [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 806A167CF9;
- Wed, 16 Sep 2020 11:54:45 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0DDE7113864A; Wed, 16 Sep 2020 13:54:44 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 04/37] qapi: move generator entrypoint into module
-References: <20200915224027.2529813-1-jsnow@redhat.com>
- <20200915224027.2529813-5-jsnow@redhat.com>
-Date: Wed, 16 Sep 2020 13:54:44 +0200
-In-Reply-To: <20200915224027.2529813-5-jsnow@redhat.com> (John Snow's message
- of "Tue, 15 Sep 2020 18:39:54 -0400")
-Message-ID: <877dsuos1n.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CAE2910BBED7;
+ Wed, 16 Sep 2020 11:48:05 +0000 (UTC)
+Received: from thuth.com (ovpn-113-19.ams2.redhat.com [10.36.113.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A184A5DA71;
+ Wed, 16 Sep 2020 11:48:04 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org,
+	Peter Maydell <peter.maydell@linaro.org>
+Subject: [PULL 20/24] tests: Fixes test-io-channel-file by mask only owner
+ file state mask bits
+Date: Wed, 16 Sep 2020 13:47:27 +0200
+Message-Id: <20200916114731.102080-21-thuth@redhat.com>
+In-Reply-To: <20200916114731.102080-1-thuth@redhat.com>
+References: <20200916114731.102080-1-thuth@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.003
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:35:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -97,78 +95,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <crosa@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Yonggang Luo <luoyonggang@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
+From: Yonggang Luo <luoyonggang@gmail.com>
 
-> As part of delinting and adding type hints to the QAPI generator, it's
-> helpful for the entrypoint to be part of the module, only leaving a very
-> tiny entrypoint shim outside of the module.
->
-> As a result, all of the include statements are reworked to be module-aware,
-> as explicit relative imports.
+This is the error on msys2/mingw
+Running test test-io-channel-file
+**
+ERROR:../tests/test-io-channel-file.c:59:test_io_channel_file_helper: assertion failed (TEST_MASK & ~mask == st.st_mode & 0777): (384 == 438)
+ERROR test-io-channel-file - Bail out! ERROR:../tests/test-io-channel-file.c:59:test_io_channel_file_helper: assertion failed (TEST_MASK & ~mask == st.st_mode & 0777): (384 == 438)
 
-Should this be split into two commits, one for each of the paragraphs
-above?
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Message-Id: <20200915171234.236-20-luoyonggang@gmail.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/test-io-channel-file.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-PEP 8 recommends absolute imports, with one exception:
-
-    However, explicit relative imports are an acceptable alternative to
-    absolute imports, especially when dealing with complex package
-    layouts where using absolute imports would be unnecessarily verbose:
-
-        from . import sibling
-        from .sibling import example
-
-    Standard library code should avoid complex package layouts and
-    always use absolute imports.
-
-Do you think it covers your use of relative imports?
-
-> This is done primarily for the benefit of python tooling (pylint, mypy,
-> flake8, et al) which otherwise has trouble consistently resolving
-> "qapi.x" to mean "a sibling file in this folder."
-
-Can you give me an example of some tool having troube?
-
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  scripts/qapi-gen.py        | 94 +++-----------------------------------
->  scripts/qapi/commands.py   |  4 +-
->  scripts/qapi/doc.py        |  2 +-
->  scripts/qapi/events.py     |  8 ++--
->  scripts/qapi/expr.py       |  4 +-
->  scripts/qapi/gen.py        |  4 +-
->  scripts/qapi/introspect.py |  8 ++--
->  scripts/qapi/parser.py     |  4 +-
->  scripts/qapi/schema.py     |  8 ++--
->  scripts/qapi/script.py     | 91 ++++++++++++++++++++++++++++++++++++
->  scripts/qapi/types.py      |  6 +--
->  scripts/qapi/visit.py      |  6 +--
->  12 files changed, 124 insertions(+), 115 deletions(-)
->  create mode 100644 scripts/qapi/script.py
-
-Naming is hard...  main.py?
-
->
-> diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
-> index 59becba3e1..e649f8dd44 100644
-> --- a/scripts/qapi-gen.py
-> +++ b/scripts/qapi-gen.py
-> @@ -1,97 +1,15 @@
->  #!/usr/bin/env python3
-> -
-> -# This work is licensed under the terms of the GNU GPL, version 2 or later.
-> -# See the COPYING file in the top-level directory.
-> -
-
-Keep the license blurb.
-
-[...]
+diff --git a/tests/test-io-channel-file.c b/tests/test-io-channel-file.c
+index bac2b07562..0aa0477541 100644
+--- a/tests/test-io-channel-file.c
++++ b/tests/test-io-channel-file.c
+@@ -28,6 +28,16 @@
+ #define TEST_FILE "tests/test-io-channel-file.txt"
+ #define TEST_MASK 0600
+ 
++/*
++ * On Windows the stat() function in the C library checks only
++ * the FAT-style READONLY attribute and does not look at the ACL at all.
++ */
++#ifdef _WIN32
++#define TEST_MASK_EXPECT 0700
++#else
++#define TEST_MASK_EXPECT 0777
++#endif
++
+ static void test_io_channel_file_helper(int flags)
+ {
+     QIOChannel *src, *dst;
+@@ -56,7 +66,7 @@ static void test_io_channel_file_helper(int flags)
+     umask(mask);
+     ret = stat(TEST_FILE, &st);
+     g_assert_cmpint(ret, >, -1);
+-    g_assert_cmpuint(TEST_MASK & ~mask, ==, st.st_mode & 0777);
++    g_assert_cmpuint(TEST_MASK & ~mask, ==, st.st_mode & TEST_MASK_EXPECT);
+ 
+     unlink(TEST_FILE);
+     object_unref(OBJECT(src));
+-- 
+2.18.2
 
 
