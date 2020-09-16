@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D069FC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 16:50:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFD4DC43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 16:52:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF977229C4
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 16:50:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7FE1D221F1
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 16:52:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ItdchixR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF977229C4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YEMSFewr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FE1D221F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIadS-0005jN-Pt
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 12:50:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60120)
+	id 1kIaf0-00085v-2U
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 12:51:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60464)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <abologna@redhat.com>)
- id 1kIacG-0004Mj-7v
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 12:49:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55572)
+ id 1kIada-0006Tu-Tf
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 12:50:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55479)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <abologna@redhat.com>)
- id 1kIacD-0004Ud-Jz
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 12:49:07 -0400
+ id 1kIadY-0004cN-AZ
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 12:50:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600274944;
+ s=mimecast20190719; t=1600275027;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=78ptYJF0a1spvRhiWagzrnpAvYN+bN18Y5w63SnF4u4=;
- b=ItdchixR5ECnd4O5ZmmewchKN8GGT9wiPTcDEwvhvQrM1Klbqd+bSopzgNGodmcuL6zrKV
- gqEW3z0mYjRDV2pBNv/+7YM0xwyOOVSvwPglIyv50mkoyhW55M+OyZki89gmDJicHEuJ5K
- VZdqc0JyDeCrGyJVDgNpZXNqbwOt/hY=
+ bh=sPn5+uqUpbmcoJWdVCPS/WvOMyDDZbYaATK656tACZQ=;
+ b=YEMSFewrnvV7URid2x9lhKaJ+JuGskYhPKem/ZBl6vxrSJ8Drkf99v2LzcNuZL9xM5Huqn
+ udelgkazEsYorUVtav3/h0zSs1MpNFyHOOKpHnkFfOdIWQF7fH1hU5DIOZKVH3Eb9niEkj
+ rgQMwHKlgxm3xBplMBCVHurKx182Skw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-542-CTb69B7TO8eTj2714vIapg-1; Wed, 16 Sep 2020 12:48:52 -0400
-X-MC-Unique: CTb69B7TO8eTj2714vIapg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-128-YMGMW7hePfyi5jE0csnuZQ-1; Wed, 16 Sep 2020 12:50:23 -0400
+X-MC-Unique: YMGMW7hePfyi5jE0csnuZQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3557E10BBEC3
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 16:48:51 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56B7F80EFA4
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 16:50:22 +0000 (UTC)
 Received: from harajuku.usersys.redhat.com (unknown [10.40.195.7])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B0802C31E;
- Wed, 16 Sep 2020 16:48:41 +0000 (UTC)
-Message-ID: <5ec07dad98aaea8f2d8c5f4bf54f852b9dab89f1.camel@redhat.com>
-Subject: [RFC DOCUMENT 04/12] kubevirt-and-kvm: Add Storage page
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 212FB100238C;
+ Wed, 16 Sep 2020 16:50:15 +0000 (UTC)
+Message-ID: <8f4e5ad1128b97cfb3821657e9ecaedca32045e6.camel@redhat.com>
+Subject: [RFC DOCUMENT 05/12] kubevirt-and-kvm: Add Networking page
 From: Andrea Bolognani <abologna@redhat.com>
 To: libvir-list@redhat.com, qemu-devel@nongnu.org
-Date: Wed, 16 Sep 2020 18:48:39 +0200
+Date: Wed, 16 Sep 2020 18:50:13 +0200
 In-Reply-To: <a6b5e34843b3f08994d4ffefadc5867001e0bc36.camel@redhat.com>
 References: <a6b5e34843b3f08994d4ffefadc5867001e0bc36.camel@redhat.com>
 User-Agent: Evolution 3.36.5 (3.36.5-1.fc32)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=abologna@redhat.com
-X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=abologna@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:35:56
@@ -96,275 +96,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vromanso@redhat.com, alitke@redhat.com, rmohr@redhat.com,
- stefanha@redhat.com, crobinso@redhat.com
+Cc: sbrivio@redhat.com, vromanso@redhat.com, alkaplan@redhat.com,
+ rmohr@redhat.com, crobinso@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-https://gitlab.com/abologna/kubevirt-and-kvm/-/blob/master/Storage.md
+https://gitlab.com/abologna/kubevirt-and-kvm/-/blob/master/Networking.md
 
-# Storage
-
-This document describes the known use-cases and architecture options
-we have for Linux Virtualization storage in [KubeVirt][].
+# Networking
 
 ## Problem description
 
-The main goal of Kubevirt is to leverage the storage subsystem of
-Kubernetes (built around [CSI][] and [Persistent Volumes][] aka PVs),
-in order to let both workloads (VMs and containers) leverage the same
-storage. As a consequence Kubevirt is limited in its use of QEMU
-storage subsystem and features. That means:
+Service meshes (such as [Istio][], [Linkerd][]) typically expect
+application processes to run on the same physical host, usually in a
+separate user namespace. Network namespaces might be used too, for
+additional isolation. Network traffic to and from local processes is
+monitored and proxied by redirection and observation of local
+sockets. `iptables` and `nftables` (collectively referred to as the
+`netfilter` framework) are the typical Linux facilities providing
+classification and redirection of packets.
 
-* Storage solutions should be implemented in k8s in a way that can be
-  consumed by both containers and VMs.
-* VMs can only consume (and provide) storage features which are
-  available in the pod, through k8s APIs. For example, a VM will not
-  support disk snapshots if it’s attached to a storage provider that
-  doesn’t support it. Ditto for incremental backup, block jobs,
-  encryption, etc.
+![containers][Networking-Containers]
+*Service meshes with containers. Typical ingress path:
+**1.** NIC driver queues buffers for IP processing
+**2.** `netfilter` rules installed by *service mesh* redirect packets
+       to proxy
+**3.** IP receive path completes, L4 protocol handler invoked
+**4.** TCP socket of proxy receives packets
+**5.** proxy opens TCP socket towards application service
+**6.** packets get TCP header, ready for classification
+**7.** `netfilter` rules installed by service mesh forward request to
+       service
+**8.** local IP routing queues packets for TCP protocol handler
+**9.** application process receives packets and handles request.
+Egress path is conceptually symmetrical.*
 
-## Current situation
+If we move application processes to VMs, sockets and processes are
+not visible anymore. All the traffic is typically forwarded via
+interfaces operating at data link level. Socket redirection and port
+mapping to local processes don't work.
 
-### Storage handled outside of QEMU
+![and now?][Networking-Challenge]
+*Application process moved to VM:
+**8.** IP layer enqueues packets to L2 interface towards application
+**9.** `tap` driver forwards L2 packets to guest
+**10.** packets are received on `virtio-net` ring buffer
+**11.** guest driver queues buffers for IP processing
+**12.** IP receive path completes, L4 protocol handler invoked
+**13.** TCP socket of application receives packets and handles request.
+**:warning: Proxy challenge**: the service mesh can't forward packets
+to local sockets via `netfilter` rules. *Add-on* NAT rules might
+conflict, as service meshes expect full control of the ruleset.
+Socket monitoring and PID/UID classification isn't possible.*
 
-In this scenario, the VM pod uses a [Persistent Volume Claim
-(PVC)][Persistent Volumes] to give QEMU access to a raw storage
-device or fs mount, which is provided by a [CSI][] driver. QEMU
-**doesn’t** handle any of the storage use-cases such as thin
-provisioning, snapshots, change block tracking, block jobs, etc.
+## Existing solutions
 
-This is how things work today in KubeVirt.
+Existing solutions typically implement a full TCP/IP stack, replaying
+traffic on sockets local to the Pod of the service mesh. This creates
+the illusion of application processes running on the same host,
+eventually separated by user namespaces.
 
-![Storage handled outside of QEMU][Storage-Current]
+![slirp][Networking-Slirp]
+*Existing solutions introduce a third TCP/IP stack:
+**8.** local IP routing queues packets for TCP protocol handler
+**9.** userspace implementation of TCP/IP stack receives packets on
+       local socket, and
+**10.** forwards L2 encapsulation to `tap` *QEMU* interface (socket
+        back-end).*
 
-Devices and interfaces:
+While being almost transparent to the service mesh infrastructure,
+this kind of solution comes with a number of downsides:
 
-* PVC: block or fs
-* QEMU backend: raw device or raw image
-* QEMU frontend: virtio-blk
-  * alternative: emulated device for wider compatibility and Windows
-    installations
-  * CDROM (sata)
-  * disk (sata)
+* three different TCP/IP stacks (guest, adaptation and host) need to
+  be traversed for every service request. There are no chances to
+  implement zero-copy mechanisms, and the amount of context switches
+  increases dramatically
+* addressing needs to be coordinated to create the pretense of
+  consistent addresses and routes between guest and host
+  environments. This typically needs a NAT with masquerading, or some
+  form of packet bridging
+* the traffic seen by the service mesh and observable externally is a
+  distant replica of the packets forwarded to and from the guest
+  environment:
+  * TCP congestion windows and network buffering mechanisms in
+    general operate differently from what would be naturally expected
+    by the application
+  * protocols carrying addressing information might pose additional
+    challenges, as the applications don't see the same set of
+    addresses and routes as they would if deployed with regular
+    containers
 
-Pros:
+## Experiments
 
-* Simplicity
-* Sharing the same storage model with other pods/containers
+![experiments: thin layer][Networking-Experiments-Thin-Layer]
+*How can we improve on the existing solutions while maintaining
+drop-in compatibility? A thin layer implements a TCP adaptation
+and IP services.*
 
-Cons:
+These are some directions we have been exploring so far:
 
-* Limited feature-set (fully off-loaded to the storage provider from
-  CSI).
-* No VM snapshots (disk + memory)
-* Limited opportunities for fine-tuning and optimizations for
-  high-performance.
-* Hotplug is challenging, because the set of PVCs in a pod is
-  immutable.
+* a thinner layer between guest and host, that only implements what's
+  strictly needed to pretend processes are running locally. A further
+  TCP/IP stack is not necessarily needed. Some sort of TCP adaptation
+  is needed, however, if this layer (currently implemented as
+  userspace process) runs without the `CAP_NET_RAW` capability: we
+  can't create raw IP sockets on the Pod, and therefore need to map
+  packets at layer 2 to layer 4 sockets offered by the host kernel
+  * to avoid implementing an actual TCP/IP stack like the one
+    offered by *libslirp*, we can align TCP parameters advertised
+    towards the guest (MSS, congestion window) to the socket
+    parameters provided by the host kernel, probing them via the
+    `TCP_INFO` socket option (introduced in Linux 2.4).
+    Segmentation and reassembly is therefore not needed, providing
+    solid chances to avoid dynamic memory allocation altogether, and
+    congestion control becomes implicitly equivalent as parameters
+    are mirrored between the two sides
+  * to reflect the actual receiving dynamic of the guest and support
+    retransmissions without a permanent userspace buffer, segments
+    are not dequeued (`MSG_PEEK`) until acknowledged by the receiver
+    (application)
+  * similarly, the implementation of the host-side sender adjusts MSS
+    (`TCP_MAXSEG` socket option, since Linux 2.6.28) and advertised
+    window (`TCP_WINDOW_CLAMP`, since Linux 2.4) to the parameters
+    observed from incoming packets
+  * this adaptation layer needs to maintain some of the TCP states,
+    but we can rely on the host kernel TCP implementation for the
+    different states of connections being closed
+  * no particular requirements are placed on the MTU of guest
+    interfaces: if fragments are received, payload from the single
+    fragmented packets can be reassembled by the host kernel as
+    needed, and out-of-order fragments can be safely discarded, as
+    there's no intermediate hop justifying the condition
+* this layer would connect to `qemu` over a *UNIX domain socket*,
+  instead of a `tap` interface, so that the `CAP_NET_ADMIN`
+  capability doesn't need to be granted to any process on the Pod:
+  no further network interfaces are created on the host
+* transparent, adaptive mapping of ports to the guest, to avoid the
+  need for explicit port forwarding
+* security and maintainability goals: no dynamic memory allocation,
+  ~2 000 *LoC* target, no external dependencies
 
-Questions and comments
+![experiments: ebpf][Networking-Experiments-eBPF]
+*Additionally, an `eBPF` fast path could be implemented
+**6.** hooking at socket level, and
+**7.** mapping IP and Ethernet addresses,
+with the existing layer implementing connection tracking and slow
+path*
 
-* How to optimize this in QEMU?
-  * Can we bypass the block layer for this use-case? Like having SPDK
-    inside the VM pod?
-    * Rust-based storage daemon (e.g. [vhost_user_block][]) running
-      inside the VM pod alongside QEMU (bypassing the block layer)
-  * We should be able to achieve high-performance with local NVME
-    storage here, with multiple polling IOThreads and multi queue.
-* See [this blog post][PVC resize blog] for information about the PVC
-  resize feature.  To implement this for VMs we could have kubevirt
-  watch PVCs and respond to capacity changes with a corresponding
-  call to resize the image file (if applicable) and to notify qemu of
-  the enlarged device.
-* Features such as incremental backup (CBT) and snapshots could be
-  implemented through a generic CSI backend... Device mapper?
-  Stratis? (See [Other Topics](#other-topics))
+If additional capabilities are granted, the data path can be
+optimised in several ways:
 
-## Possible alternatives
+* with `CAP_NET_RAW`:
+  * the adaptation layer can use raw IP sockets instead of L4 sockets,
+    implementing a pure connection tracking, without the need for any
+    TCP logic: the guest operating system implements the single TCP
+    stack needed with this variation
+  * zero-copy mechanisms could be implemented using `vhost-user` and
+    QEMU socket back-ends, instead of relying on a full-fledged layer 2
+    (Ethernet) interface
+* with `CAP_BPF` and `CAP_NET_ADMIN`:
+  * context switching in packet forwarding could be avoided by the
+    `sockmap` extension provided by `eBPF`, and programming the `XDP`
+    data hooks for in-kernel data transfers
+  * using eBPF programs, we might want to switch (dynamically?) to
+    the `vhost-net` facility
+  * the userspace process would still need to take care of
+    establishing in-kernel flows, and providing IP and IPv6
+    services (ARP, DHCP, NDP) for addressing transparency and to
+    avoid the need for further capabilities (e.g.
+    `CAP_NET_BIND_SERVICE`), but the main, fast datapath would
+    reside entirely in the kernel
 
-### Storage device passthrough (highest performance)
-
-Device passthrough via PCI VFIO, SCSI, or vDPA. No storage use-cases
-and no CSI, as the device is passed directly to the guest.
-
-![Storage device passthrough][Storage-Passthrough]
-
-Devices and interfaces:
-
-* N/A (hardware passthrough)
-
-Pros:
-
-* Highest possible performance (same as host)
-
-Cons:
-
-* No storage features anywhere outside of the guest.
-* No live-migration for most cases.
-
-### File-system passthrough (virtio-fs)
-
-File mount volumes (directories, actually) can be exposed to QEMU via
-[virtio-fs][] so that VMs have access to files and directories.
-
-![File-system passthrough (virtio-fs)][Storage-Virtiofs]
-
-Devices and interfaces:
-
-* PVC: file-system
-
-Pros:
-
-* Simplicity from the user-perspective
-* Flexibility
-* Great for heterogeneous workloads that share data between
-  containers and VMs (ie. OpenShift pipelines)
-
-Cons:
-
-* Performance when compared to block device passthrough
-
-Questions and comments:
-
-* Feature is still quite new (The Windows driver is fresh out of the
-  oven)
-
-### QEMU storage daemon in CSI for local storage
-
-The qemu-storage-daemon is a user-space daemon that exposes QEMU’s
-block layer to external users. It’s similar to [SPDK][], but includes
-the implementation of QEMU block layer features such as snapshots and
-bitmap tracking for incremental backup (CBT). It also allows the
-splitting of one single NVMe device, allowing multiple QEMU VMs to
-share one NVMe disk.
-
-In this architecture, the storage daemon runs as part of CSI (control
-plane), with the data-plane being either a vhost-user-blk interface
-for QEMU or a fs-mount export for containers.
-
-![QEMU storage daemon in CSI for local storage][Storage-QSD]
-
-Devices and interfaces:
-
-* CSI:
-  * fs mount with a vhost-user-blk socket for QEMU to open
-  * (OR) fs mount via NBD or FUSE with the actual file-system
-    contents
-* qemu-storage-daemon backend: NVMe local device w/ raw or qcow2
-  * alternative: any driver supported by QEMU, such as file-posix.
-* QEMU frontend: virtio-blk
-  * alternative: any emulated device (CDROM, virtio-scsi, etc)
-  * In this case QEMU itself would be consuming vhost-user-blk and
-    emulating the device for the guest
-
-Pros:
-
-* The NVMe driver from the storage daemon can support partitioning
-  one NVMe device into multiple blk devices, each shared via a
-  vhost-user-blk connection.
-* Rich feature set, exposing features already implemented in the QEMU
-  block layer to regular pods/containers:
-  * Snapshots and thin-provisioning (qcow2)
-  * Incremental Backup (CBT)
-* Compatibility with use-cases from other projects (oVirt, OpenStack,
-  etc)
-  * Snapshots, thin-provisioning, CBT and block jobs via QEMU
-
-Cons:
-
-* Complexity due to cascading and splitting of components.
-* Depends on the evolution of CSI APIs to provide the right
-  use-cases.
-
-Questions and comments:
-
-* Local restrictions: QEMU and qemu-storage-daemon should be running
-  on the same host (for vhost-user-blk shared memory to work).
-* Need to cascade CSI providers for volume management (resize,
-  creation, etc)
-* How to share a partitioned NVMe device (from one storage daemon)
-  with multiple pods?
-* See also: [kubevirt/kubevirt#3208][] (similar idea for
-  vhost-user-net).
-* We could do hotplugging under the hood with the storage daemon.
-  * To expose a new PV, a new qemu-storage-daemon pod can be created
-    with a corresponding PVC. Conversely, on unplug, the pod can be
-    deleted. Ideally, we might have a 1:1 relationship between PVs
-    and storage daemon pods (though 1:n for attaching multiple guests
-    to a single daemon).
-  * This requires that we can create a new unix socket connection
-    from new storage daemon pods to the VMs. The exact way to achieve
-    this is still to be figured out. According to Adam Litke, the
-    naive way would require elevated privileges for both pods.
-  * After having the socket (either the file or a file descriptor)
-    available in the VM pod, QEMU can connect to it.
-* In order to avoid a mix of block devices having a PVC in the VM pod
-  and others where we just passed the unix socket, we can completely
-  avoid the PVC case for the VM pod:
-  * For exposing a PV to QEMU, we would always go through the storage
-    daemon (i.e. the PVC moves from the VM pod to the storage daemon
-    pod), so the VM pod always only gets a unix socket connection,
-    unifying the two cases.
-  * Using vhost-user-blk from the storage daemon pod performs the
-    same (or potentially better if this allows for polling that we
-    wouldn’t have done otherwise) as having a PVC directly in the VM
-    pod, so while it looks like an indirection, the actual I/O path
-    would be comparable.
-  * This architecture would also allow using the native
-    Gluster/Ceph/NBD/… block drivers in the QEMU process without
-    making them special (because they wouldn’t use a PVC either),
-    unifying even more cases.
-  * Kubernetes has fairly low per-node Pod limits by default so we
-    may need to be careful about 1:1 Pod/PVC mapping.  We may want to
-    support aggregation of multiple storage connections into a single
-    q-s-d Pod.
-
-## Other topics
-
-### Device Mapper
-
-Another possibility is to leverage the device-mapper from Linux to
-provide features such as snapshots and even like Incremental Backup.
-For example, [dm-era][] seems to provide the basic primitives for
-bitmap tracking.
-
-This could be part of scenario number 1, or cascaded with other PVs
-somewhere else.
-
-Is this already being used? For example, [cybozu-go/topolvm][] is a
-CSI LVM Plugin for k8s.
-
-### Stratis
-
-[Stratis][] seems to be an interesting project to be leveraged in the
-world of Kubernetes.
-
-### vhost-user-blk in other CSI backends
-
-Would it make sense for other CSI backends to implement support for
-vhost-user-blk?
-
-[CSI]: https://kubernetes.io/blog/2019/01/15/container-storage-interface-ga/
-[KubeVirt]: https://kubevirt.io/
-[PVC resize blog]: 
-https://kubernetes.io/blog/2018/07/12/resizing-persistent-volumes-using-kubernetes/
-[Persistent Volumes]: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
-[SPDK]: https://spdk.io/
-[Storage-Current]: 
-https://gitlab.com/abologna/kubevirt-and-kvm/-/blob/master/Images/Storage-Current.png
-[Storage-Passthrough]: 
-https://gitlab.com/abologna/kubevirt-and-kvm/-/blob/master/Images/Storage-Passthrough.png
-[Storage-QSD]: https://gitlab.com/abologna/kubevirt-and-kvm/-/blob/master/Images/Storage-QSD.png
-[Storage-Virtiofs]: 
-https://gitlab.com/abologna/kubevirt-and-kvm/-/blob/master/Images/Storage-Virtiofs.png
-[Stratis]: https://stratis-storage.github.io/
-[cybozu-go/topolvm]: https://github.com/cybozu-go/topolvm
-[dm-era]: https://www.kernel.org/doc/html/latest/admin-guide/device-mapper/era.html
-[kubevirt/kubevirt#3208]: https://github.com/kubevirt/kubevirt/pull/3208
-[vhost_user_block]: 
-https://github.com/cloud-hypervisor/cloud-hypervisor/tree/master/vhost_user_block
-[virtio-fs]: https://virtio-fs.gitlab.io/
+[Istio]: https://istio.io/
+[Linkerd]: https://linkerd.io/
+[Networking-Challenge]: https://gitlab.com/abologna/kubevirt-and-kvm/-/blob/master/Images/Networking-Challenge.png
+[Networking-Containers]: https://gitlab.com/abologna/kubevirt-and-kvm/-/blob/master/Images/Networking-Containers.png
+[Networking-Experiments-Thin-Layer]: https://gitlab.com/abologna/kubevirt-and-kvm/-/blob/master/Images/Networking-Experiments-Thin-Layer.png
+[Networking-Experiments-eBPF]: https://gitlab.com/abologna/kubevirt-and-kvm/-/blob/master/Images/Networking-Experiments-eBPF.png
+[Networking-Slirp]: https://gitlab.com/abologna/kubevirt-and-kvm/-/blob/master/Images/Networking-Slirp.png
 
 
