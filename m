@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E0ACC43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 06:13:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEEADC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 06:13:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A61EA208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 06:13:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A61EA208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 429AE208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 06:13:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 429AE208E4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIQgr-0008HH-Iv
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 02:13:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58764)
+	id 1kIQgv-0008J0-60
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 02:13:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kIQfF-0006jH-5E
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 02:11:33 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:37008 helo=huawei.com)
+ id 1kIQfG-0006jS-Ml
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 02:11:34 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:37010 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kIQfC-0005XV-CZ
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 02:11:32 -0400
+ id 1kIQfC-0005XX-F6
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 02:11:34 -0400
 Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 225AF8B5049A6D4EF96B;
+ by Forcepoint Email with ESMTP id 12E40AB17F1773FD5DC5;
  Wed, 16 Sep 2020 14:11:25 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS409-HUB.china.huawei.com
  (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Wed, 16 Sep 2020
- 14:11:16 +0800
+ 14:11:18 +0800
 From: Chuan Zheng <zhengchuan@huawei.com>
 To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>,
  <berrange@redhat.com>
-Subject: [PATCH v10 03/12] migration/dirtyrate: Add RamblockDirtyInfo to store
- sampled page info
-Date: Wed, 16 Sep 2020 14:21:58 +0800
-Message-ID: <1600237327-33618-4-git-send-email-zhengchuan@huawei.com>
+Subject: [PATCH v10 05/12] migration/dirtyrate: move
+ RAMBLOCK_FOREACH_MIGRATABLE into ram.h
+Date: Wed, 16 Sep 2020 14:22:00 +0800
+Message-ID: <1600237327-33618-6-git-send-email-zhengchuan@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1600237327-33618-1-git-send-email-zhengchuan@huawei.com>
 References: <1600237327-33618-1-git-send-email-zhengchuan@huawei.com>
@@ -80,50 +80,79 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add RamblockDirtyInfo to store sampled page info of each ramblock.
+RAMBLOCK_FOREACH_MIGRATABLE is need in dirtyrate measure,
+move the existing definition up into migration/ram.h
 
 Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: David Edmondson <david.edmondson@oracle.com>
 Reviewed-by: Li Qiang <liq3ea@gmail.com>
 ---
- migration/dirtyrate.h | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ migration/dirtyrate.c |  1 +
+ migration/ram.c       | 11 +----------
+ migration/ram.h       | 10 ++++++++++
+ 3 files changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
-index 5be9714..479e222 100644
---- a/migration/dirtyrate.h
-+++ b/migration/dirtyrate.h
-@@ -19,11 +19,29 @@
-  */
- #define DIRTYRATE_DEFAULT_SAMPLE_PAGES            512
+diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+index ab372ba..7366bf3 100644
+--- a/migration/dirtyrate.c
++++ b/migration/dirtyrate.c
+@@ -20,6 +20,7 @@
+ #include "qemu/rcu_queue.h"
+ #include "qapi/qapi-commands-migration.h"
+ #include "migration.h"
++#include "ram.h"
+ #include "dirtyrate.h"
  
-+/*
-+ * Record ramblock idstr
-+ */
-+#define RAMBLOCK_INFO_MAX_LEN                     256
+ static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
+diff --git a/migration/ram.c b/migration/ram.c
+index 76d4fee..37ef0da 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -158,21 +158,12 @@ out:
+     return ret;
+ }
+ 
+-static bool ramblock_is_ignored(RAMBlock *block)
++bool ramblock_is_ignored(RAMBlock *block)
+ {
+     return !qemu_ram_is_migratable(block) ||
+            (migrate_ignore_shared() && qemu_ram_is_shared(block));
+ }
+ 
+-/* Should be holding either ram_list.mutex, or the RCU lock. */
+-#define RAMBLOCK_FOREACH_NOT_IGNORED(block)            \
+-    INTERNAL_RAMBLOCK_FOREACH(block)                   \
+-        if (ramblock_is_ignored(block)) {} else
+-
+-#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
+-    INTERNAL_RAMBLOCK_FOREACH(block)                   \
+-        if (!qemu_ram_is_migratable(block)) {} else
+-
+ #undef RAMBLOCK_FOREACH
+ 
+ int foreach_not_ignored_block(RAMBlockIterFunc func, void *opaque)
+diff --git a/migration/ram.h b/migration/ram.h
+index 2eeaacf..011e854 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -37,6 +37,16 @@ extern MigrationStats ram_counters;
+ extern XBZRLECacheStats xbzrle_counters;
+ extern CompressionStats compression_counters;
+ 
++bool ramblock_is_ignored(RAMBlock *block);
++/* Should be holding either ram_list.mutex, or the RCU lock. */
++#define RAMBLOCK_FOREACH_NOT_IGNORED(block)            \
++    INTERNAL_RAMBLOCK_FOREACH(block)                   \
++        if (ramblock_is_ignored(block)) {} else
 +
- struct DirtyRateConfig {
-     uint64_t sample_pages_per_gigabytes; /* sample pages per GB */
-     int64_t sample_period_seconds; /* time duration between two sampling */
- };
- 
-+/*
-+ * Store dirtypage info for each ramblock.
-+ */
-+struct RamblockDirtyInfo {
-+    char idstr[RAMBLOCK_INFO_MAX_LEN]; /* idstr for each ramblock */
-+    uint8_t *ramblock_addr; /* base address of ramblock we measure */
-+    uint64_t ramblock_pages; /* ramblock size in TARGET_PAGE_SIZE */
-+    uint64_t *sample_page_vfn; /* relative offset address for sampled page */
-+    uint64_t sample_pages_count; /* count of sampled pages */
-+    uint64_t sample_dirty_count; /* count of dirty pages we measure */
-+    uint32_t *hash_result; /* array of hash result for sampled pages */
-+};
++#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
++    INTERNAL_RAMBLOCK_FOREACH(block)                   \
++        if (!qemu_ram_is_migratable(block)) {} else
 +
- void *get_dirtyrate_thread(void *arg);
- #endif
- 
+ int xbzrle_cache_resize(int64_t new_size, Error **errp);
+ uint64_t ram_bytes_remaining(void);
+ uint64_t ram_bytes_total(void);
 -- 
 1.8.3.1
 
