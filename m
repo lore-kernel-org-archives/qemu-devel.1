@@ -2,93 +2,85 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98ADFC43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:16:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B29AC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:18:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F1F82222A
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:16:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C2302222B
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:18:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=blade-group.com header.i=@blade-group.com header.b="jCTf6WPL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F1F82222A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=blade-group.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i4G7wKqO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C2302222B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIWMr-0001Aj-55
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 08:16:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56624)
+	id 1kIWOj-0002pM-JM
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 08:18:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58102)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <antoine.damhet@blade-group.com>)
- id 1kIW6O-0000jM-3P
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:59:57 -0400
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:40701)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kIWBF-0006cR-K1; Wed, 16 Sep 2020 08:04:57 -0400
+Received: from mail-lf1-x12a.google.com ([2a00:1450:4864:20::12a]:36107)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <antoine.damhet@blade-group.com>)
- id 1kIW6L-0001DJ-Rv
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:59:55 -0400
-Received: by mail-wm1-x32e.google.com with SMTP id k18so2707369wmj.5
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 04:59:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=blade-group.com; s=google;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=QI8CHkdLFKbabYboce+LlxNHsg+oVRiDEvBQJwSrNCM=;
- b=jCTf6WPLKeGXUWZQU6MzY7erBulIkf+22dw1bTDHiX/oNPveJoUMMWleXbJrMtpZmo
- j5bxlL+UxnYGYcDrF+2IFGf65qZPT0AFagNd2nfZjtAn0bdB/HLtRfDwLE1eauqGR5PZ
- HqeepjfvvKc8kBQg8+aEYA9y+scE9Vc++qmw+jlHp+gVNE6U3eXxBuCVbQ30wncbN6se
- CQmWGJsf7YAth0pgF+kVaqrR9zY+lzY8kl8o0k58EtHcOh8I4Pe//mMzmHLXzooINSVS
- G8WQ6T5IsIrnMeO4UxItL0g97VZuv9LBrP0HbDcKon3mgMaopz63AZubGnJj43/KEPCT
- qrYA==
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kIWBC-0001vj-HT; Wed, 16 Sep 2020 08:04:57 -0400
+Received: by mail-lf1-x12a.google.com with SMTP id x69so6720604lff.3;
+ Wed, 16 Sep 2020 05:04:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=28lA9K0Y7vK3gyOz2tFYnoRJMiI2arDvXFbLiyUK6+U=;
+ b=i4G7wKqOgY3fkpd9WlZqCuEyRG+zU47T217XFo3Y2txyx4ir+S/58iZeaDEIeFMJX5
+ nlkZnNlKXUIaeItF35IM0CDkkIJ4V1ED63+tlskB1jq4yJeWBE+VaDr1nCn7x4GZT2Gr
+ TqUL+NhV7I4NZGI7xcx+yxDQNHnywb5ftEuP/QEDzBflaDX9xFgiZ1VHIdKwpmpHMVdr
+ 6suf6fu6FZ1XzAdB5WL/ZYE3EaUyfSbvRxsC4sl6VWrR3yHkc8Zw4pKjpmF0i/azVW4l
+ scpYRcdpGvIODN/G7RdgKGG8wZ2X+6eg8PZBOhHgfDCz0wrdBy6RClAq96jSdpTBj0C9
+ dZtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=QI8CHkdLFKbabYboce+LlxNHsg+oVRiDEvBQJwSrNCM=;
- b=HH6HhVZudc84xatHADhM5NtjKW6vQrSt4XGhpBO4ojtDcKcC6hgyfqvMjyXBIeLIm7
- lLMZCiLl7oEhhe8mVRovUFvagYv+WWZ89iwLLGYJxsjl18KcWPWw9pJx6Dzwsxmh1lEk
- q9YKOEG6OV6ffsiOI3J9hyVNEnm1neK4lu3sMgmT4igsJBiELN20BGCPvJOHhLJge4HZ
- PGGHINgGuJwKo9tII8CfFcwqx/H+iymyPC/6VFAEbtexMDW4Pia917AsSAPZgKGkm3s3
- nr53WdvQ/bjTP95SlM73Nosesc1fU5D4LFcllbTN6TA36BDYXymAda1VAQvSaWCvwGCr
- mGJA==
-X-Gm-Message-State: AOAM531zY/XccWqoqM3zlRI7X8a4ZQlkli/vGuDZQqBaGlvw29kWbJax
- xoR0SliAX6gVqk+rCUkGihYbtw==
-X-Google-Smtp-Source: ABdhPJxQ+5R7c3vXSDHCprkdV8DH9LMzbuSc7Jn5tCSiJWR8ym9yp7a5l61RwkCLrX386AMmrDgnOQ==
-X-Received: by 2002:a1c:6341:: with SMTP id x62mr4385766wmb.70.1600257592331; 
- Wed, 16 Sep 2020 04:59:52 -0700 (PDT)
-Received: from localhost ([2a01:e34:ec16:8a90:4e1d:96ff:fe49:7109])
- by smtp.gmail.com with ESMTPSA id q15sm30810594wrr.8.2020.09.16.04.59.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 16 Sep 2020 04:59:51 -0700 (PDT)
-Date: Wed, 16 Sep 2020 13:59:50 +0200
-From: Antoine Damhet <antoine.damhet@blade-group.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [BUG] Migration hv_time rollback
-Message-ID: <20200916115950.tsarwvk2dwgiceoe@tartarus>
-References: <20200916090602.blkm7eym6g5bnvvk@tartarus>
- <20200916112956.GE2833@work-vm>
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=28lA9K0Y7vK3gyOz2tFYnoRJMiI2arDvXFbLiyUK6+U=;
+ b=B8Ei27CZcVbHiweUHmiQFL4GvuydetJdZg8LxRwvgISAfh3AVE7Mb/FIy7iV+MnnRw
+ zqDj02Xy5DCN4T6tuT6CGwe1D10ixFVfGNHFZVUtAPs7J1nMSeMyRIrSx0USW3em20P0
+ GNqYWk0O/gbvNPXf9Dt3GAJ+E5nWdb7cl40ct3jmikAOpUfgLVvNJrF+Z4buSFCdsxcp
+ 9iw3pgogTXNBl59zZDJI78mLvEE2bibhHQQN4EUqvnz1cFXYVsHHDc8ZU0YFz3SKhDZV
+ kr7v25sdODgL3PYKLy7+Dgo43+KU5Wto7s+Mw1jtnnZFnq42CXlbD1iKziDIkjPaoIT9
+ PfTA==
+X-Gm-Message-State: AOAM531ENKSg6IPRAdNbo5xrZEE8l8K1jXzqMzJPOjuWoPgsJ8RxoILU
+ 48sbfBp9dmSJEho8D78nTPe4aKo67maToYeohHA=
+X-Google-Smtp-Source: ABdhPJxnwwlGQQ4Pa1JFAZ1Hx1dRqFHqzBJrH0Po7haCtKiHFgvi3dlerMRX+KpW3aWG0TCTDaqmc6uu2qXQj94UEHc=
+X-Received: by 2002:a19:383:: with SMTP id 125mr8010907lfd.356.1600257890287; 
+ Wed, 16 Sep 2020 05:04:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="h6abctsp65t6bzip"
-Content-Disposition: inline
-In-Reply-To: <20200916112956.GE2833@work-vm>
-Received-SPF: pass client-ip=2a00:1450:4864:20::32e;
- envelope-from=antoine.damhet@blade-group.com; helo=mail-wm1-x32e.google.com
+References: <20200915171234.236-1-luoyonggang@gmail.com>
+ <cd40da60-d03f-bf37-c0d7-1f362419cf75@redhat.com>
+In-Reply-To: <cd40da60-d03f-bf37-c0d7-1f362419cf75@redhat.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Wed, 16 Sep 2020 20:04:40 +0800
+Message-ID: <CAE2XoE9dJvwH_12XRo5c62D9x_akcuvO2EY5xCOm-E5Y8WysCw@mail.gmail.com>
+Subject: Re: [PATCH v10 00/26] W32, W64 msys2/mingw patches
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000001984bd05af6d135b"
+Received-SPF: pass client-ip=2a00:1450:4864:20::12a;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x12a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_INVALID=0.1,
- DKIM_SIGNED=0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,123 +93,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- vkuznets@redhat.com
+Reply-To: luoyonggang@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
+ Qemu-block <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ qemu-level <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Li-Wen Hsu <lwhsu@freebsd.org>, Markus Armbruster <armbru@redhat.com>,
+ Peter Lieven <pl@kamp.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---h6abctsp65t6bzip
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--0000000000001984bd05af6d135b
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 16, 2020 at 12:29:56PM +0100, Dr. David Alan Gilbert wrote:
-> cc'ing in Vitaly who knows about the hv stuff.
+On Wed, Sep 16, 2020 at 7:52 PM Thomas Huth <thuth@redhat.com> wrote:
+>
+> On 15/09/2020 19.12, Yonggang Luo wrote:
+> [...]
+> > It first introduce msys2 CI on cirrus by fixes nfs, capstone, curses an=
+d
+> > disable partial test-char tests.
+> > And then fixes all unit tests failure on msys2/mingw
+> > This fixes the reviews suggested in the mailling list
+> > All cirrus CI are passed
+>
+> Thanks a lot for your work, I've added most of your patches to my latest
+> "testing" pull request now, so that we should get basic test coverage on
+> msys2 now in the Cirrus-CI if it gets merged.
+>
+> I skipped the NFS, capstone, test-char and crypto patches for now (and
+> replaced them with older versions of your patches where you've disabled
+> them) - I think these patches still need some more review / work and
+> then should go through the trees of the corresponding maintainers later.
+Happy to see, once your branch merged, I'll rebase these patches and resend
+them
+separately
+>
+>  Cheers,
+>   Thomas
+>
 
-Thanks
 
->=20
-> * Antoine Damhet (antoine.damhet@blade-group.com) wrote:
-> > Hi,
-> >=20
-> > We are experiencing timestamp rollbacks during live-migration of
-> > Windows 10 guests with the following qemu configuration (linux 5.4.46
-> > and qemu master):
-> > ```
-> > $ qemu-system-x86_64 -enable-kvm -cpu host,kvm=3Doff,hv_time [...]
-> > ```
->=20
-> How big a jump are you seeing, and how did you notice it in the guest?
+--
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
 
-I'm seeing jumps of about the guest uptime (indicating a reset of the
-counter). It's expected because we won't call `KVM_SET_CLOCK` to
-restore any value.
+--0000000000001984bd05af6d135b
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-We first noticed it because after some migrations `dwm.exe` crashes with
-the "(NTSTATUS) 0x8898009b - QueryPerformanceCounter returned a time in
-the past." error code.
+<div dir=3D"ltr"><br><br>On Wed, Sep 16, 2020 at 7:52 PM Thomas Huth &lt;<a=
+ href=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt; wrote:<br>&gt;<b=
+r>&gt; On 15/09/2020 19.12, Yonggang Luo wrote:<br>&gt; [...]<br>&gt; &gt; =
+It first introduce msys2 CI on cirrus by fixes nfs, capstone, curses and<br=
+>&gt; &gt; disable partial test-char tests.<br>&gt; &gt; And then fixes all=
+ unit tests failure on msys2/mingw<br>&gt; &gt; This fixes the reviews sugg=
+ested in the mailling list<br>&gt; &gt; All cirrus CI are passed<br>&gt;<br=
+>&gt; Thanks a lot for your work, I&#39;ve added most of your patches to my=
+ latest<br>&gt; &quot;testing&quot; pull request now, so that we should get=
+ basic test coverage on<br>&gt; msys2 now in the Cirrus-CI if it gets merge=
+d.<br>&gt;<br>&gt; I skipped the NFS, capstone, test-char and crypto patche=
+s for now (and<br>&gt; replaced them with older versions of your patches wh=
+ere you&#39;ve disabled<br>&gt; them) - I think these patches still need so=
+me more review / work and<br>&gt; then should go through the trees of the c=
+orresponding maintainers later.<div>Happy to see, once your branch merged, =
+I&#39;ll rebase these patches and resend them</div><div>separately<br>&gt;<=
+br>&gt; =C2=A0Cheers,<br>&gt; =C2=A0 Thomas<br>&gt;<br><br><br>--<br>=C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=
+=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo</div><=
+/div>
 
-I can also confirm the following hack makes the behavior disappear:
-
-```
-diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
-index 64283358f9..f334bdf35f 100644
---- a/hw/i386/kvm/clock.c
-+++ b/hw/i386/kvm/clock.c
-@@ -332,11 +332,7 @@ void kvmclock_create(void)
- {
-     X86CPU *cpu =3D X86_CPU(first_cpu);
-
--    if (kvm_enabled() &&
--        cpu->env.features[FEAT_KVM] & ((1ULL << KVM_FEATURE_CLOCKSOURCE) |
--                                       (1ULL << KVM_FEATURE_CLOCKSOURCE2))=
-) {
--        sysbus_create_simple(TYPE_KVM_CLOCK, -1, NULL);
--    }
-+    sysbus_create_simple(TYPE_KVM_CLOCK, -1, NULL);
- }
-
- static void kvmclock_register_types(void)
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 32b1453e6a..11d980ba85 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -158,9 +158,7 @@ static void pc_init1(MachineState *machine,
-
-     x86_cpus_init(x86ms, pcmc->default_cpu_version);
-
--    if (kvm_enabled() && pcmc->kvmclock_enabled) {
--        kvmclock_create();
--    }
-+    kvmclock_create();
-
-     if (pcmc->pci_enabled) {
-         pci_memory =3D g_new(MemoryRegion, 1);
-```
-
->=20
-> Dave
->=20
-> > I have tracked the bug to the fact that `kvmclock` is not exposed and
-> > disabled from qemu PoV but is in fact used by `hv-time` (in KVM).
-> >=20
-> > I think we should enable the `kvmclock` (qemu device) if `hv-time` is
-> > present and add Hyper-V support for the `kvmclock_current_nsec`
-> > function.
-> >=20
-> > I'm asking for advice because I am unsure this is the _right_ approach
-> > and how to keep migration compatibility between qemu versions.
-> >=20
-> > Thank you all,
-> >=20
-> > --=20
-> > Antoine 'xdbob' Damhet
->=20
->=20
-> --=20
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->=20
-
---=20
-Antoine 'xdbob' Damhet
-
---h6abctsp65t6bzip
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEArm1WbQx2GmOsfF83AmjLzzljz4FAl9h/jEACgkQ3AmjLzzl
-jz6jiQf/fiNRX4JVTmByAlW305o0Mzih4RdUbZGFRm1ytGOv+ZhJVfynCGlXBZMQ
-P++lYJIzlt1gt6Uj4NNEgsbLP22hUiyRefjhTkNs9G7X6MpptIBcUJwihmSW1pnX
-DzpGcxkmLD2FhG2yu9yZBeFxQo2rIv/6UYDFjpFmGBWxl9yKKnvrNKs17bU5FhTb
-wEJ7Z0iQZRhl89uhuUgR/CQhcdaAWwK81j2X2yCNz/Xse6siVSOBHiNCOW8Bo+M7
-SilsZdFhKE65jAN41UelkUOGlKud/PUt/jQDO2SJ3mxVfD2+JA8ot+qfNsxesRwu
-V1wAgZDq+NpxR5Zf0NvU1F92ze1aVA==
-=zIp1
------END PGP SIGNATURE-----
-
---h6abctsp65t6bzip--
+--0000000000001984bd05af6d135b--
 
