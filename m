@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6A19C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 15:59:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97E0DC43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 16:02:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15FAA2246B
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 15:59:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D7AC221E3
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 16:02:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VVzI7ZX1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15FAA2246B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YtIzsDYD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D7AC221E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIZpn-0005D8-Vv
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 11:59:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43564)
+	id 1kIZsz-0007Za-JJ
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 12:02:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44864)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1kIZlz-0000xc-Rw
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 11:55:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44129)
+ id 1kIZpl-0005RL-BR
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 11:59:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36393)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1kIZlx-0003HW-V8
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 11:55:07 -0400
+ id 1kIZpj-0003rn-IH
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 11:59:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600271705;
+ s=mimecast20190719; t=1600271938;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=m3MZW5OLTnM99+aJ+tytQdErr+wtg8Rh/VKjTDSM4l4=;
- b=VVzI7ZX1rcLhOVVNnYyLiU9aFCKlx+F1DlHYn0Vjftl00BRn26rp6BB+0mpUR+EgboJ0YU
- SPcjjpGJk1HjjIod7l3oRBYuIB9ZY7Z8kGzAcCx3vMfjOx577VQzJicYh155tSUWSdrlRp
- O1hfl6upKrrXuc3gZ6obTBOhi/oCDx4=
+ bh=6+FRChds+8CJt6oyxyFRRgiv92TKsqeR73oxGzBH8w4=;
+ b=YtIzsDYDoUKHW1MEvKwKPiBsIXXIpylJN2EOQuzc48+2M7+kIJSpfEQ3G+xxm4f51MOEha
+ IHYG75mnw8HHlcFxkc9SzzFM66iSYJUSFRoRLqwvB5GGF9b1iIb9HsoHn9+CPogpC87NY+
+ UPKdxRbLPxIQLCWLUwPLxbCv79RQ1jU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-bpk71f1NN32NWoFTQWMoDg-1; Wed, 16 Sep 2020 11:55:03 -0400
-X-MC-Unique: bpk71f1NN32NWoFTQWMoDg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-52-Agv317uHMf2K-XH9gBCtWQ-1; Wed, 16 Sep 2020 11:58:56 -0400
+X-MC-Unique: Agv317uHMf2K-XH9gBCtWQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F34EB19611B9
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 15:54:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A2D9B57050
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 15:58:55 +0000 (UTC)
 Received: from [10.36.113.15] (ovpn-113-15.ams2.redhat.com [10.36.113.15])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A771D7839F;
- Wed, 16 Sep 2020 15:54:39 +0000 (UTC)
-Subject: Re: [PATCH 6/9] vhost-vdpa: remove the unnecessary queue index
- assignment
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6A87A71775;
+ Wed, 16 Sep 2020 15:58:51 +0000 (UTC)
+Subject: Re: [PATCH 7/9] vhost-vdpa: squash net_vhost_vdpa_init() into
+ net_init_vhost_vdpa()
 To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 References: <20200831082737.10983-1-jasowang@redhat.com>
- <20200831082737.10983-7-jasowang@redhat.com>
+ <20200831082737.10983-8-jasowang@redhat.com>
 From: Laurent Vivier <lvivier@redhat.com>
 Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -117,16 +117,16 @@ Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
  pt0DCMMTbiYIUcrhX8eveCJtY7NGWNyxFCRkhxRuGcpwPmRVDwOl39MB3iTsRighiMnijkbL
  XiKoJ5CDVvX5yicNqYJPKh5MFXN1bvsBkmYiStMRbrD0HoY1kx5/VozBtc70OU0EB8Wrv9hZ
  D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <019d7ecf-de19-1b43-e846-5f2a2f92652b@redhat.com>
-Date: Wed, 16 Sep 2020 17:54:38 +0200
+Message-ID: <c72da61f-0113-1236-19de-4bc5990490f8@redhat.com>
+Date: Wed, 16 Sep 2020 17:58:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200831082737.10983-7-jasowang@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200831082737.10983-8-jasowang@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lvivier@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
@@ -161,27 +161,84 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 31/08/2020 10:27, Jason Wang wrote:
-> The nc is allocated through g_malloc0(), so no need to assign its
-> queue_index to zero.
+> This patch squashes net_vhost_vdpa_init() into
+> net_init_vhost_vdpa(). This will simplify adding pre open file
+> descriptor support.
 > 
 > Signed-off-by: Jason Wang <jasowang@redhat.com>
 > ---
->  net/vhost-vdpa.c | 1 -
->  1 file changed, 1 deletion(-)
+>  net/vhost-vdpa.c | 41 +++++++++++++++++++----------------------
+>  1 file changed, 19 insertions(+), 22 deletions(-)
 > 
 > diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-> index bcbf49d55b..1d3ac89135 100644
+> index 1d3ac89135..f5cc4e8326 100644
 > --- a/net/vhost-vdpa.c
 > +++ b/net/vhost-vdpa.c
-> @@ -182,7 +182,6 @@ static int net_vhost_vdpa_init(NetClientState *peer, const char *device,
->      assert(name);
->      nc = qemu_new_net_client(&net_vhost_vdpa_info, peer, device, name);
->      snprintf(nc->info_str, sizeof(nc->info_str), "vhostdev=%s", vhostdev);
-> -    nc->queue_index = 0;
->      s = DO_UPCAST(VhostVDPAState, nc, nc);
->      vdpa_device_fd = qemu_open(vhostdev, O_RDWR);
->      if (vdpa_device_fd == -1) {
-> 
+> @@ -172,27 +172,6 @@ static NetClientInfo net_vhost_vdpa_info = {
+>          .has_ufo = vhost_vdpa_has_ufo,
+>  };
+>  
+> -static int net_vhost_vdpa_init(NetClientState *peer, const char *device,
+> -                               const char *name, const char *vhostdev)
+> -{
+> -    NetClientState *nc;
+> -    VhostVDPAState *s;
+> -    int vdpa_device_fd;
+> -    int ret;
+> -    assert(name);
+> -    nc = qemu_new_net_client(&net_vhost_vdpa_info, peer, device, name);
+> -    snprintf(nc->info_str, sizeof(nc->info_str), "vhostdev=%s", vhostdev);
+> -    s = DO_UPCAST(VhostVDPAState, nc, nc);
+> -    vdpa_device_fd = qemu_open(vhostdev, O_RDWR);
+> -    if (vdpa_device_fd == -1) {
+> -        return -errno;
+> -    }
+> -    s->vhost_vdpa.device_fd = vdpa_device_fd;
+> -    ret = vhost_vdpa_add(nc, (void *)&s->vhost_vdpa);
+> -
+> -    return ret;
+> -}
+> -
+>  static int net_vhost_check_net(void *opaque, QemuOpts *opts, Error **errp)
+>  {
+>      const char *name = opaque;
+> @@ -215,6 +194,10 @@ int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
+>                          NetClientState *peer, Error **errp)
+>  {
+>      const NetdevVhostVDPAOptions *opts;
+> +    NetClientState *nc;
+> +    VhostVDPAState *s;
+> +    int vdpa_device_fd;
+> +    int ret;
+>  
+>      assert(netdev->type == NET_CLIENT_DRIVER_VHOST_VDPA);
+>      opts = &netdev->u.vhost_vdpa;
+> @@ -227,5 +210,19 @@ int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
+>          error_setg(errp, "vhost-vdpa requires vhostdev to be set");
+>          return -1;
+>      }
+> -    return net_vhost_vdpa_init(peer, TYPE_VHOST_VDPA, name, opts->vhostdev);
+> +
+> +    assert(name);
+> +
+> +    nc = qemu_new_net_client(&net_vhost_vdpa_info, peer, TYPE_VHOST_VDPA, name);
+> +    snprintf(nc->info_str, sizeof(nc->info_str), "vhostdev=%s", opts->vhostdev);
+> +
+> +    s = DO_UPCAST(VhostVDPAState, nc, nc);
+> +    vdpa_device_fd = qemu_open(opts->vhostdev, O_RDWR);
+> +    if (vdpa_device_fd == -1) {
+> +        return -errno;
+> +    }
+> +    s->vhost_vdpa.device_fd = vdpa_device_fd;
+> +    ret = vhost_vdpa_add(nc, (void *)&s->vhost_vdpa);
+> +
+> +    return ret;
+
+You can avoid to declare and use "ret" by doing directly
+
+  "return vhost_vdpa_add()"
+
+Anyway, the code move is correct:
 
 Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 
