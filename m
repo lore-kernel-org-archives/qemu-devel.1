@@ -7,37 +7,38 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5029FC43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:46:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51ACBC43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:47:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB17F20872
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:46:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB17F20872
+	by mail.kernel.org (Postfix) with ESMTPS id B083D2083B
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:47:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B083D2083B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIT5B-0007Tj-S9
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 04:46:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35420)
+	id 1kIT6Q-0008OB-J6
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 04:47:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35472)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kIT4R-0006Un-PU; Wed, 16 Sep 2020 04:45:44 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:45273)
+ id 1kIT4Z-0006bG-Sp; Wed, 16 Sep 2020 04:45:51 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:53579)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kIT4P-00084p-Ey; Wed, 16 Sep 2020 04:45:43 -0400
+ id 1kIT4X-00088h-V3; Wed, 16 Sep 2020 04:45:51 -0400
 Received: from [192.168.100.1] ([82.252.129.222]) by mrelayeu.kundenserver.de
- (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MAfQk-1kBuXy0EGG-00B6rJ; Wed, 16 Sep 2020 10:45:30 +0200
-Subject: Re: [PATCH v2 1/2] hw/gpio/max7310: Remove impossible check
+ (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MEmtx-1kGZW21J87-00GJFR; Wed, 16 Sep 2020 10:45:41 +0200
+Subject: Re: [PATCH v2 2/2] hw/ppc/ppc4xx_pci: Replace magic value by the
+ PCI_NUM_PINS definition
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
 References: <20200910072325.439344-1-f4bug@amsat.org>
- <20200910072325.439344-2-f4bug@amsat.org>
+ <20200910072325.439344-3-f4bug@amsat.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,35 +82,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <ad3a983e-71f5-d7f3-6901-09627d32b126@vivier.eu>
-Date: Wed, 16 Sep 2020 10:45:27 +0200
+Message-ID: <a94af11c-7dbb-a7e8-3d5b-1f9568afe396@vivier.eu>
+Date: Wed, 16 Sep 2020 10:45:39 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200910072325.439344-2-f4bug@amsat.org>
+In-Reply-To: <20200910072325.439344-3-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:psvMSW/tZ423hpgguO+zFWCDIwwiAzjksEcPhkmjDLrgVbHPHZ3
- nMknlUm0hdqRzDTRPNvRTBcXh0oJOccwl+M5SjBpZKmmcWVpeurht/kxjuA+/oPTJQ9PYSQ
- jfgQ5unE84SJMa5s1J4iT8o6+8qN2ZvM1/FJxpFdNCKqBUJRd7hroYlzdK+sIl4kmfb1VBc
- DiX0/CqxNv0einvQc8c3Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:8P340mYI228=:ZYneblLv+bbUAJhDPdlBKp
- cHUvzdJAFAAq3bSTNvxM6zrDdLhRgFhc0Tuz3kv5ojCJFeaML9BXsIOn4gKOdZRVokrWr9ceF
- Tk2OWfv1Bm2k+tMViqqVzU7/IyaiXfTKQfWixSCTXwPF7gGI02XfUNQT8W63U4cMlbhaZeRvn
- 5OuLUUX73pNycEDE+O9QTvbK6pgJDpvtvbnDBLufnS7pYxAqn+wAXDYrjzQWMqRP4uwmwBfTh
- JtAb6wVhhx6Re+CUhFl6bLj8yCuaFEKuShmiF4tbU2HWKS6jrQMXXbZbmUl7I/Uh1an0/zdKe
- JIMG/vFM1Jth5x+wxdQxtDp3bWsckaugebSsVAfSXWe1uXI9n3g2sU7drjnVBYfH8FZoSS87q
- Gl4Bn3Ep4Ie3VRVXyZN11j+cU6fcOljQ87APx0fa0UhkjcMn+693ZQwky2ZysgmdtZmJrqZ6b
- nlwUrORE91aRYGCfumEHfi6jsDohUS02qZHLxi3UdyjmZJgFP5o0pfmpFU7xEm/WskO0H035B
- fFB+qLkGsHqV7E3gPfxJ3wNYPMwVBvE/R4SP7GdgMPVn5km6mG0/1xkN0QBWWLECM/Zz3ijMO
- dv+YcZEJfsvtHEdSEPKbiJmgpXjP9ODvvg8wzQLxqeUoKuTqcW+SBBvU4PQMyj0D2az9bU9d7
- ostjhtkHeeR58WBbdqICZxzI7mIylTVmau8rzLvi1GKp/C2pPCBrDcZfzQp1ZGjuB+hAHAHYJ
- uLBbqv8mcqq3h3uoGFYzs/NGrf918enr/NRIQzyTg4NYLXlyqajyhNjMSZ3pWwcDTU8tT7KSM
- PFLUzkchLldJ4HlogBFLoNfvDrnTgL+uZNApuGIAtmoWOBodPtii8GUgKtWn5psjjWieIgp
-Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:nSBBC5CmHjThdjhSNcaX+lJG2WIGU7spTWzn4t/BlWyLPuGFk0H
+ FJuUymQ+TLWUk2v6epo2wuu4Z57zLmKRVh6WEqAERlK8d+nA22kBWeYyiIKbBTSXiPGxNbS
+ YTxzmjm8OvXDppawAQBLp4PlbzsTi0619aQM+hbeLz8Q8R9lAzsxZsQvPTrAbm2050q/aIA
+ RZZh84ivP3JuN5z7wgGkg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:+kFn6nwhkvY=:AJiAz2KARQrI/HsUrc7f+g
+ /yN3dBJUJ7BhvUBAFreGBoydOm8qW1P+KCaqeYQyXV0CuB0Ti3HZ8OnurEspRhpQ4OGFz6jEn
+ KVK59PlWHfQTdR20W/ewOQ9fWTY2QahRpQDZ7htMwtpdeEZig5W1nDMLcGVF06pbJNu8wp4EK
+ n7ifcC0LqgAYM/uXFmTl2+ycqu9loyRCXBDkecZyv/LSW5iZb6/LwTQV9/l/UBpz9zXp6LR06
+ n9Y6UvhAIePAay+WBRGF0aekeuSAxicrLHVmI4RqgSnI1ApJkcTXKFENxo4LyczJQ2QrtQ79c
+ nV5dV56Lzuz0Z65acW+IZvCIctmg/QZGuHwhuqWJ+34bns99ktMQIYGuvBm1J9jpLIIopRGvG
+ rIcf8tvw1512hs8Ic+b0o/E12+MxJvkEVgVDxQWF4a6QXtA5wxanyjckUDw9GTv8Kjx5bD6ND
+ qPyjRXLsPGsrqrl5wpIW4sKKRw46S0odHEmRmC/ILOhUWxkp1coKL0+Vpe7vlQxp3MEudYELq
+ pkf9qfPWt5ti/Ac9GK2yqYpFBccsFIsZJs1uH/OcGXPEisn/c1p+DCu79scGdNCSKeVUYyaGE
+ UbXOTs3KqM96VN1mCqHfXkvGU1JdRjvr3IDYyA+PIQYnEsR6fyME+6eyM6lWOCRcnHEQteYhr
+ 1IqBt1C8/N/2BExyM662bxTOicTRmrVeye3m7jvgKVAh1ixA8CNRlOjhqL07uRctNh2BLtOBy
+ BFdkKuM6AARRWMkWDGkks8QbE9cffzlLvoqj+wpxmDaT03ZuIRAYVxogSvTVeSjH+PAor2MQ5
+ zV7Wl8nmlkZMpkCEIk+jP/4qRkVce14rSKA2D09Zk7jTCtj2dhJ9PWpc4a44hdQWs305vto
+Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 04:45:38
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 04:45:47
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -131,47 +132,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org,
  qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 10/09/2020 à 09:23, Philippe Mathieu-Daudé a écrit :
-> The max7310_gpio_set() handler is static and only used by
-> qdev_init_gpio_in, initialized with 8 IRQs. The 'line'
-> argument can not be out of the [0-8[ range.
-> Replace the dead code by an assertion.
+> Replace the magic '4' value by the PCI_NUM_PINS definition.
 > 
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Suggested-by: Cédric Le Goater <clg@kaod.org>
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  hw/gpio/max7310.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
+>  hw/ppc/ppc4xx_pci.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/hw/gpio/max7310.c b/hw/gpio/max7310.c
-> index 4f78774dc8f..158b0a074e5 100644
-> --- a/hw/gpio/max7310.c
-> +++ b/hw/gpio/max7310.c
-> @@ -8,9 +8,7 @@
->   */
+> diff --git a/hw/ppc/ppc4xx_pci.c b/hw/ppc/ppc4xx_pci.c
+> index 503ef46b39a..930be78361d 100644
+> --- a/hw/ppc/ppc4xx_pci.c
+> +++ b/hw/ppc/ppc4xx_pci.c
+> @@ -54,7 +54,7 @@ struct PPC4xxPCIState {
 >  
->  #include "qemu/osdep.h"
-> -#include "hw/hw.h"
->  #include "hw/i2c/i2c.h"
-> -#include "hw/hw.h"
->  #include "hw/irq.h"
->  #include "migration/vmstate.h"
->  #include "qemu/module.h"
-> @@ -173,8 +171,7 @@ static const VMStateDescription vmstate_max7310 = {
->  static void max7310_gpio_set(void *opaque, int line, int level)
->  {
->      MAX7310State *s = (MAX7310State *) opaque;
-> -    if (line >= ARRAY_SIZE(s->handler) || line  < 0)
-> -        hw_error("bad GPIO line");
-> +    assert(line >= 0 && line < ARRAY_SIZE(s->handler));
+>      struct PCIMasterMap pmm[PPC4xx_PCI_NR_PMMS];
+>      struct PCITargetMap ptm[PPC4xx_PCI_NR_PTMS];
+> -    qemu_irq irq[4];
+> +    qemu_irq irq[PCI_NUM_PINS];
 >  
->      if (level)
->          s->level |= s->direction & (1 << line);
+>      MemoryRegion container;
+>      MemoryRegion iomem;
 > 
 
 Applied to my trivial-patches branch.
