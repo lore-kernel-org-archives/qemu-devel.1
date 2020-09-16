@@ -2,89 +2,93 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BC26C43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:15:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DBBEC43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:16:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FE0F22228
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:15:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7414422225
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:16:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zif7J8Vr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FE0F22228
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=blade-group.com header.i=@blade-group.com header.b="K8XWKn49"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7414422225
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=blade-group.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIWKx-0007iN-Ly
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 08:14:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60818)
+	id 1kIWMi-0000vs-Au
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 08:16:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33078)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kIWIl-0006gA-1z
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 08:12:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46054)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kIWIh-0003BM-5n
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 08:12:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600258357;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=MjdqkQrNCOU8qKuPolN4l93DFE+SPQoKiV9fCSz9RZc=;
- b=Zif7J8Vr3yxZXc50tplzQKtX7fAe1+Pnd6NT+qWUZwQX3W+oWtUh+SCZRwc3RYfv0Ojxrq
- W0R/x6dfQVCUIuRTVp86ebIE3yVd5E+5bByTY+EiuyKXyEoux/miWoBvUBXTgXwdHkj/55
- DcVvJIMK9ahPCzCujK1adcYKQHbsCeg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-594-IiN73Xa5Pcqu5f1kPbdRbA-1; Wed, 16 Sep 2020 08:12:36 -0400
-X-MC-Unique: IiN73Xa5Pcqu5f1kPbdRbA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1416A56B35;
- Wed, 16 Sep 2020 12:12:35 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
- [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 995855DA71;
- Wed, 16 Sep 2020 12:12:32 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 254C2113864A; Wed, 16 Sep 2020 14:12:31 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 06/37] qapi: delint using flake8
-References: <20200915224027.2529813-1-jsnow@redhat.com>
- <20200915224027.2529813-7-jsnow@redhat.com>
-Date: Wed, 16 Sep 2020 14:12:31 +0200
-In-Reply-To: <20200915224027.2529813-7-jsnow@redhat.com> (John Snow's message
- of "Tue, 15 Sep 2020 18:39:56 -0400")
-Message-ID: <87wo0tor80.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <antoine.damhet@blade-group.com>)
+ id 1kIWKE-0007mt-Uv
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 08:14:20 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:41758)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <antoine.damhet@blade-group.com>)
+ id 1kIWKC-0003L8-RH
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 08:14:14 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id w5so6657807wrp.8
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 05:14:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=blade-group.com; s=google;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=KCNq1kcLAzch4JZNKsiYZ2eTwrfwnQJKJpGA55R7N+o=;
+ b=K8XWKn49ExH6luNHgZPmjXtRGWw2wWQ757wus7WEVlqYGrWeGlv/18G6+zCHrQJyfD
+ j3l2FVnYuR6q1m+RrzNukyb0E79lupQNP5ukzMwlClRupiQ93KPsLmRRfJw6o8GNzaoq
+ TGoAXC0r+Krty4yupNVZDkG/HP3rlCDWmngJSuePfD8NnE4NIbBtb989CRYYERGuh4hz
+ YUIIeckh6OLYplKcFgyCC16ELq/Q1roxAdUP/PYaYijQf4nvakwXB1gMOfoccbFY/8x6
+ I2/dHQvCoCX1hLZqVkAphlQ+XuBdmNic9uZ7Wm/BSsjuEM5G0ha+Lq3we6GLf+yB0Dun
+ kVHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=KCNq1kcLAzch4JZNKsiYZ2eTwrfwnQJKJpGA55R7N+o=;
+ b=EZdBkvLu3+3hE2KgDMhTPW1bE1oes+YAf97ezDYjvRLGsjXTyJbZVM90Rspd9e4yUW
+ g5hqJ//FP5j+8kzBnp25aca8NNBw58rTwZ2YuX2p2Ya1X4q7UVeAUEClbp+xLUN3ri4d
+ pXkCSlCFSOnzYczXGhwuqkT6mkZ0RujUN/AfuJnrCAXmpSzlnFxBODogp4Ha/ZADg1Va
+ +x4VmGEwInMZEAAghSDKtSfItIbe06d8zhDaNECHOXv2N4tFD2Btq8U2FdkCQD3v+j4P
+ 1IxgvjOmd71rm5eRaj825sqL0UIMeqTtEoPmCFp//acPV6yCrCcokwU5jhJypgLqrCwB
+ oX7w==
+X-Gm-Message-State: AOAM533I2aHFyTvtsInpQmdCF1o6AgOmsHUTqzkqGSqumqtcpdehEv9d
+ o+k332xLdxLguk/SnnN7uqKd6A==
+X-Google-Smtp-Source: ABdhPJyl6+kUlaBmAvxl/GxulULSQJQNAt9lx1T5MXU64rpoOKuJ+9BvPNvYhcFJhCJxSiz13V0OIw==
+X-Received: by 2002:adf:fed1:: with SMTP id q17mr25338531wrs.85.1600258450592; 
+ Wed, 16 Sep 2020 05:14:10 -0700 (PDT)
+Received: from localhost ([2a01:e34:ec16:8a90:4e1d:96ff:fe49:7109])
+ by smtp.gmail.com with ESMTPSA id 91sm35867338wrq.9.2020.09.16.05.14.09
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 16 Sep 2020 05:14:09 -0700 (PDT)
+Date: Wed, 16 Sep 2020 14:14:09 +0200
+From: Antoine Damhet <antoine.damhet@blade-group.com>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [BUG] Migration hv_time rollback
+Message-ID: <20200916121409.sid2vs3fjuktfude@tartarus>
+References: <20200916090602.blkm7eym6g5bnvvk@tartarus>
+ <20200916112956.GE2833@work-vm>
+ <87bli6hqz4.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:35:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="llfv5it77tqeiclu"
+Content-Disposition: inline
+In-Reply-To: <87bli6hqz4.fsf@vitty.brq.redhat.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
+ envelope-from=antoine.damhet@blade-group.com; helo=mail-wr1-x42e.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_INVALID=0.1,
+ DKIM_SIGNED=0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,71 +101,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <crosa@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Marcelo Tosatti <mtosatti@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
 
-> Petty style guide fixes and line length enforcement.  Not a big win, not
-> a big loss, but flake8 passes 100% on the qapi module, which gives us an
-> easy baseline to enforce hereafter.
->
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  scripts/qapi/.flake8     |  2 ++
->  scripts/qapi/commands.py |  3 ++-
->  scripts/qapi/schema.py   |  8 +++++---
->  scripts/qapi/visit.py    | 15 ++++++++++-----
->  4 files changed, 19 insertions(+), 9 deletions(-)
->  create mode 100644 scripts/qapi/.flake8
->
-> diff --git a/scripts/qapi/.flake8 b/scripts/qapi/.flake8
-> new file mode 100644
-> index 0000000000..45d8146f3f
-> --- /dev/null
-> +++ b/scripts/qapi/.flake8
-> @@ -0,0 +1,2 @@
-> +[flake8]
-> +extend-ignore = E722  # Pylint handles this, but smarter.
+--llfv5it77tqeiclu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I guess you mean pylint's W0702 a.k.a. bare-except.  What's wrong with
-flake8's E722 compared to pylint's W0702?
+On Wed, Sep 16, 2020 at 01:59:43PM +0200, Vitaly Kuznetsov wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+>=20
+> > cc'ing in Vitaly who knows about the hv stuff.
+> >
+>=20
+> cc'ing Marcelo who knows about clocksources :-)
+>=20
+> > * Antoine Damhet (antoine.damhet@blade-group.com) wrote:
+> >> Hi,
+> >>=20
+> >> We are experiencing timestamp rollbacks during live-migration of
+> >> Windows 10 guests
+>=20
+> Are you migrating to the same hardware (with the same TSC frequency)? Is
+> TSC used as the clocksource on the host?
 
-> \ No newline at end of file
+Yes we are migrating to the exact same hardware. And yes TSC is used as
+a clocksource in the host (but the bug is still happening with `hpet` as
+a clocksource).
 
-So put one there :)
+>=20
+> >>  with the following qemu configuration (linux 5.4.46
+> >> and qemu master):
+> >> ```
+> >> $ qemu-system-x86_64 -enable-kvm -cpu host,kvm=3Doff,hv_time [...]
+> >> ```
+>=20
+> Out of pure curiosity, what's the purpose of doing 'kvm=3Doff'? Windows is
+> not going to check for KVM identification anyway so we pretend we're
+> Hyper-V.=20
 
-> diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
-> index e1df0e341f..2e4b4de0fa 100644
-> --- a/scripts/qapi/commands.py
-> +++ b/scripts/qapi/commands.py
-> @@ -69,7 +69,8 @@ def gen_call(name, arg_type, boxed, ret_type):
->  def gen_marshal_output(ret_type):
->      return mcgen('''
->  
-> -static void qmp_marshal_output_%(c_name)s(%(c_type)s ret_in, QObject **ret_out, Error **errp)
-> +static void qmp_marshal_output_%(c_name)s(%(c_type)s ret_in, QObject **ret_out,
-> +                                          Error **errp)
+Some softwares explicitly checks for the presence of KVM and then crash
+if they find it in CPUID :/
 
-The continued parameter list may become misalignd in generated C.  E.g.
+>=20
+> Also, have you tried adding more Hyper-V enlightenments?=20
 
-    static void qmp_marshal_output_BlockInfoList(BlockInfoList *ret_in, QObject **ret_out,
-                                              Error **errp)
-    {
-    ...
-    }
+Yes, I published a stripped-down command-line for a minimal reproducer
+but even `hv-frequencies` and `hv-reenlightenment` don't help.
 
-Do we care?
+>=20
+> >
+> > How big a jump are you seeing, and how did you notice it in the guest?
+> >
+> > Dave
+> >
+> >> I have tracked the bug to the fact that `kvmclock` is not exposed and
+> >> disabled from qemu PoV but is in fact used by `hv-time` (in KVM).
+> >>=20
+> >> I think we should enable the `kvmclock` (qemu device) if `hv-time` is
+> >> present and add Hyper-V support for the `kvmclock_current_nsec`
+> >> function.
+>=20
+> AFAICT kvmclock_current_nsec() checks whether kvmclock was enabled by
+> the guest:
+>=20
+>    if (!(env->system_time_msr & 1ULL)) {
+>         /* KVM clock not active */
+>         return 0;
+>     }
+>=20
+> and this is (and way) always false for Windows guests.
 
-More of the same below.
+Hooo, I missed this piece. When is `clock_is_reliable` expected to be
+false ? Because if it is I still think we should be able to query at
+least `HV_X64_MSR_REFERENCE_TSC`
 
->  {
->      Visitor *v;
->  
-[...]
+>=20
+> >>=20
+> >> I'm asking for advice because I am unsure this is the _right_ approach
+> >> and how to keep migration compatibility between qemu versions.
+> >>=20
+> >> Thank you all,
+> >>=20
+> >> --=20
+> >> Antoine 'xdbob' Damhet
+>=20
+> --=20
+> Vitaly
+>=20
 
+--=20
+Antoine 'xdbob' Damhet
+
+--llfv5it77tqeiclu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEArm1WbQx2GmOsfF83AmjLzzljz4FAl9iAY4ACgkQ3AmjLzzl
+jz7lQQf+N2hB4FMN4JDTKZvMjhAqhObrr+c/CNGSBRkMNFV5mSA3gAimHGzpzpyV
+YKvBxkFj0TpUBJ99FUD9ut2CMS1pmi/swAW7gSHpW+vQbgjlfLny/G6c0tMqu9cn
+vQJIp3v0WQ5UNxjQZhiwT55eKJb/XLffZftLazSRD1yeiK1qU0xO7R/AHyUsg50b
+FzmTVe4xh/boourn/DT+ii8fWbF38PO7z1rOSLaK9qmWUwgyPeWoAe8rPzCigVZj
+NzpkCLa2KvW7PEv3zCudysq3VPqvt0nsqSeusCll5qe9GZ3msfibwQmoGehKPZ4U
+8axHH4maS9TBbYhkMZ5AK/liWKiDtw==
+=jRc5
+-----END PGP SIGNATURE-----
+
+--llfv5it77tqeiclu--
 
