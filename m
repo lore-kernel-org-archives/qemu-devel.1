@@ -2,83 +2,81 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94C19C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 05:11:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E960AC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 05:52:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6746920936
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 05:11:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6746920936
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 39B2C21D7D
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 05:52:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39B2C21D7D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIPjV-0002Zi-BU
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 01:11:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48754)
+	id 1kIQMN-000282-AZ
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 01:52:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55696)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIPiU-0001kH-LQ
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 01:10:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45938)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIPiR-0006Y2-OV
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 01:10:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kIPiP-00062E-Ky
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 05:10:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 9D1382E806F
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 05:10:45 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kIQLj-0001Zv-Bg; Wed, 16 Sep 2020 01:51:23 -0400
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:45127)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kIQLf-0003UY-L4; Wed, 16 Sep 2020 01:51:23 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.108.1.108])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 6F9EE62142D3;
+ Wed, 16 Sep 2020 07:51:08 +0200 (CEST)
+Received: from kaod.org (37.59.142.105) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Wed, 16 Sep
+ 2020 07:51:07 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-105G006f62c1393-4430-41ca-b1fd-b82882e93c8a,
+ 282F6B8BB580550643A9CB45D70726BD5CC915E6) smtp.auth=clg@kaod.org
+Subject: Re: [PATCH] hw/arm/aspeed: Map the UART5 device unconditionally
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ <qemu-devel@nongnu.org>
+References: <20200905212415.760452-1-f4bug@amsat.org>
+ <e640309b-b694-e815-d64d-40dd453e52ef@amsat.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <5e27c1f9-6d11-fa62-ba71-0020ce9d595b@kaod.org>
+Date: Wed, 16 Sep 2020 07:51:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
+In-Reply-To: <e640309b-b694-e815-d64d-40dd453e52ef@amsat.org>
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 16 Sep 2020 05:01:46 -0000
-From: Alex Williamson <1894869@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=debian; sourcepackage=None; component=None;
- status=In Progress; importance=Unknown; assignee=None; 
-X-Launchpad-Bug-Tags: chelsio t4
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 1butteryadmin alex-l-williamson stefan-proxmox
-X-Launchpad-Bug-Reporter: Nick Bauer (1butteryadmin)
-X-Launchpad-Bug-Modifier: Alex Williamson (alex-l-williamson)
-References: <159958042175.17914.10047848067927369523.malonedeb@soybean.canonical.com>
-Message-Id: <160023250670.685.17500246527594321783.malone@chaenomeles.canonical.com>
-Subject: [Bug 1894869] Re: Chelsio T4 has old MSIX PBA offset bug
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: e7c175a36d034b5d784bcdf310976f67a081f5d3
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 01:10:46
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [37.59.142.105]
+X-ClientProxiedBy: DAG8EX2.mxp5.local (172.16.2.72) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: a58f799c-3962-4c12-8c8b-e0285d6d319b
+X-Ovh-Tracer-Id: 12090757628491369254
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrtddugdelgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgihesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeejhedtveeihffguefgveejieevfeevtddvhefhjeeludevjeeifefhfeefteefueenucffohhmrghinhepohiilhgrsghsrdhorhhgnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehfgegsuhhgsegrmhhsrghtrdhorhhg
+Received-SPF: pass client-ip=79.137.123.220; envelope-from=clg@kaod.org;
+ helo=smtpout1.mo804.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 01:51:09
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,67 +85,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1894869 <1894869@bugs.launchpad.net>
+Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The device ID on function 7 is 0x0000 which is typically not valid,
-there's no entry for it in the PCI IDs database.  Someone from Chelsio
-would need to explain why it's even exposed, but there doesn't seem to
-be any value in quirking it since it provides no useful function.
+On 9/15/20 7:23 PM, Philippe Mathieu-Daudé wrote:
+> ping?
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+It's reviewed : 
 
--- =
+  http://patchwork.ozlabs.org/project/qemu-devel/patch/20200905212415.760452-1-f4bug@amsat.org/
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1894869
+I will send a PR when I have more patches.
 
-Title:
-  Chelsio T4 has old MSIX PBA offset bug
+Thanks,
 
-Status in QEMU:
-  Invalid
-Status in Debian:
-  In Progress
+C. 
 
-Bug description:
-  There exists a bug with Chelsio NICs T4 that causes the following
-  error:
+> On 9/5/20 11:24 PM, Philippe Mathieu-Daudé wrote:
+>> The UART5 is present on the machine regardless there is a
+>> character device connected to it. Map it unconditionally.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  hw/arm/aspeed_ast2600.c | 8 +++-----
+>>  hw/arm/aspeed_soc.c     | 8 +++-----
+>>  2 files changed, 6 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
+>> index 9d95e421435..1450bde7cf2 100644
+>> --- a/hw/arm/aspeed_ast2600.c
+>> +++ b/hw/arm/aspeed_ast2600.c
+>> @@ -325,11 +325,9 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
+>>      }
+>>  
+>>      /* UART - attach an 8250 to the IO space as our UART5 */
+>> -    if (serial_hd(0)) {
+>> -        qemu_irq uart5 = aspeed_soc_get_irq(s, ASPEED_DEV_UART5);
+>> -        serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
+>> -                       uart5, 38400, serial_hd(0), DEVICE_LITTLE_ENDIAN);
+>> -    }
+>> +    serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
+>> +                   aspeed_soc_get_irq(s, ASPEED_DEV_UART5),
+>> +                   38400, serial_hd(0), DEVICE_LITTLE_ENDIAN);
+>>  
+>>      /* I2C */
+>>      object_property_set_link(OBJECT(&s->i2c), "dram", OBJECT(s->dram_mr),
+>> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+>> index 35be126db6f..7eefd54ac07 100644
+>> --- a/hw/arm/aspeed_soc.c
+>> +++ b/hw/arm/aspeed_soc.c
+>> @@ -283,11 +283,9 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+>>      }
+>>  
+>>      /* UART - attach an 8250 to the IO space as our UART5 */
+>> -    if (serial_hd(0)) {
+>> -        qemu_irq uart5 = aspeed_soc_get_irq(s, ASPEED_DEV_UART5);
+>> -        serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
+>> -                       uart5, 38400, serial_hd(0), DEVICE_LITTLE_ENDIAN);
+>> -    }
+>> +    serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
+>> +                   aspeed_soc_get_irq(s, ASPEED_DEV_UART5), 38400,
+>> +                   serial_hd(0), DEVICE_LITTLE_ENDIAN);
+>>  
+>>      /* I2C */
+>>      object_property_set_link(OBJECT(&s->i2c), "dram", OBJECT(s->dram_mr),
+>>
 
-  kvm: -device vfio-
-  pci,host=3D0000:83:00.7,id=3Dhostpci1.7,bus=3Dpci.0,addr=3D0x11.7: vfio
-  0000:83:00.7: hardware reports invalid configuration, MSIX PBA outside
-  of specified BAR
-
-  I discovered this bug on a Proxmox system, and I was working with a
-  downstream Proxmox developer to try to fix this issue. They provided
-  me with the following change to make from line 1484 of hw/vfio/pci.c:
-
-  static void vfio_msix_early_setup(VFIOPCIDevice *vdev, Error **errp)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* is 0x1000, =
-so we hard code that here.
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*/
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (vdev->vendor_id=
- =3D=3D PCI_VENDOR_ID_CHELSIO &&
-  -            (vdev->device_id & 0xff00) =3D=3D 0x5800) {
-  +            ((vdev->device_id & 0xff00) =3D=3D 0x5800 ||
-  +             (vdev->device_id & 0xff00) =3D=3D 0x1425)) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0msix->pba_offset =3D 0x1000;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else if (vdev->ms=
-ix_relo =3D=3D OFF_AUTOPCIBAR_OFF) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0error_setg(errp, "hardware reports invalid configuration, "
-
-  However, I found that this did not fix the issue, so the bug appears
-  to work differently than the one that was present on the T5 NICs which
-  has already been patched. I have attached the output of my lspci
-  -nnkvv
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1894869/+subscriptions
 
