@@ -2,87 +2,137 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A61EC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:28:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C313C43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:29:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 102DC20872
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:28:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E708C20872
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:29:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="Sj7vrBrC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 102DC20872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DYK2s5iG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E708C20872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kISnk-0002nf-7l
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 04:28:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58048)
+	id 1kISp5-0004TC-3N
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 04:29:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58298)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kISfs-0000or-6v
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 04:20:22 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:39809)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kISfm-0004sh-7B
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 04:20:18 -0400
-Received: by mail-pf1-x441.google.com with SMTP id n14so3524856pff.6
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 01:20:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=JGmQF7dBOvevh3gZbauSGv+D+CEUL1Y8510g7/95cwg=;
- b=Sj7vrBrC6dn//bK7TWr5jvM9ByhPfO9RIwpDeJYDsDt+YXaBrmtXHl8D88cNbrflL7
- wKSuaQIjP1RKQneYpnwiBOCCGK7LuHGDt2hhoyHi47luXZeS8cmcZlpwukZmnagUHlQ9
- xSnSIH5x9ToaPUci9h+Mo9QBCBOlqxiNxNaf0aXe/x6uDnh1bfUCO0IVj6CTqCsNJxgI
- 6XJjpAFKwp/SjgEnXBqRBZayJKzGpp9nT1He2shn3QoKsNPyL9uIii+nEmS+a4uDBwtY
- HHr8bFan+Ty8fWRHk11HpMsW11Z14e24m6dGfiINncWujZvgNPcfFNVjG8fOfu9i6Ay3
- d6Lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=JGmQF7dBOvevh3gZbauSGv+D+CEUL1Y8510g7/95cwg=;
- b=IUZq7Q69MQWLEioAQ+2c3Uv+z4/w/+nlRyS/2AQLPW2QcVetH2IcWsRBRxqSIUVrHK
- +SIz3kZE3YXPEeII7yMPLNOFR5zvDC8G1Ec0fl3c9W5MKzMFKvmycEvDgkpYRyeIXjnn
- u0GPx1zHU6LVD5J/i+8c8nleKmzDzlXTrFj7LEGSt8PUn3JMnvEJTfhsUdR57RsTkYQo
- ElVZSY/I5aOlP5pJksXWTzEvA1YVarwALFbgO8FMzFfLQcsHY2c/Y3vq7C5wtiill/W1
- UAK1ORWSeVUwZF3tDbm3/Eol50ECZKaj6lHwP+FfGkPi3Y/k3kL+etOHlIcV/akJ/W3Q
- PSFA==
-X-Gm-Message-State: AOAM531R8kHzTPGqMYPnHQ3r0nauGlCW8TVJ8tWVP3eHrTTltqjs0WA5
- dCLnZ0a/AapFp/XvwUIbmJeZ1g6uUSZtW3Gt
-X-Google-Smtp-Source: ABdhPJwrRM6wuhGA30L/A8v8H88aBGYlQE9gN9C7HQrlxYJ/Mywc1gM/U6E3NXipvoeRt8GTWYWP0w==
-X-Received: by 2002:a63:1257:: with SMTP id 23mr16286564pgs.401.1600244412416; 
- Wed, 16 Sep 2020 01:20:12 -0700 (PDT)
-Received: from localhost.localdomain ([203.163.234.244])
- by smtp.googlemail.com with ESMTPSA id nl10sm1658254pjb.11.2020.09.16.01.20.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 16 Sep 2020 01:20:11 -0700 (PDT)
-From: Ani Sinha <ani@anisinha.ca>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v5 10/11] tests/acpi: unit test exercising hotplug off for pci
- root bus & bridge in i440fx
-Date: Wed, 16 Sep 2020 13:49:09 +0530
-Message-Id: <20200916081910.977-11-ani@anisinha.ca>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200916081910.977-1-ani@anisinha.ca>
-References: <20200916081910.977-1-ani@anisinha.ca>
-Received-SPF: none client-ip=2607:f8b0:4864:20::441;
- envelope-from=ani@anisinha.ca; helo=mail-pf1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kISh1-0002Cj-NP
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 04:21:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45847
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kISh0-00058U-95
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 04:21:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600244488;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=VYvRFxpsVGgYFgfmmNinnOuwPhsFrAlZHH7shdw5yuY=;
+ b=DYK2s5iGMYpXPltWUmUduEKzy1xTUbmGCoP1cEQTu6SCRXcCa9wqj5JSyRbqMfxmdRIqF9
+ Bh2TnAaZ4LwVNdJ00zg37ZMtetJgD9jYCjgfSEI9uLZsvVSlYfkgTlD/DX2R/9L5B91k+J
+ ejCjNy22sQ6YaqrWAKVMIMLOokfMmAE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-581-g0YuVt-xN52K1aLZJ8gn9Q-1; Wed, 16 Sep 2020 04:21:25 -0400
+X-MC-Unique: g0YuVt-xN52K1aLZJ8gn9Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83CA410BBEC3;
+ Wed, 16 Sep 2020 08:21:23 +0000 (UTC)
+Received: from [10.36.113.190] (ovpn-113-190.ams2.redhat.com [10.36.113.190])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7240F610F2;
+ Wed, 16 Sep 2020 08:21:17 +0000 (UTC)
+Subject: Re: [PATCH v6 8/8] s390: guest support for diagnose 0x318
+To: Thomas Huth <thuth@redhat.com>, Collin Walling <walling@linux.ibm.com>,
+ qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+References: <20200915194416.107460-1-walling@linux.ibm.com>
+ <20200915194416.107460-9-walling@linux.ibm.com>
+ <30a23907-7ed7-0361-7943-5b938a8f6c68@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat GmbH
+Message-ID: <a667faf0-360b-0f67-aada-e185acacd684@redhat.com>
+Date: Wed, 16 Sep 2020 10:21:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+MIME-Version: 1.0
+In-Reply-To: <30a23907-7ed7-0361-7943-5b938a8f6c68@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:37:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,76 +145,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- jusual@redhat.com, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
- Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Richard Henderson <rth@twiddle.net>
+Cc: frankja@linux.ibm.com, mst@redhat.com, cohuck@redhat.com,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, pbonzini@redhat.com,
+ sumanthk@linux.ibm.com, mihajlov@linux.ibm.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This change adds a unit test to exercise the case when hotplug is disabled both for
-pci root bus and the pci bridges by passing the following two switches to qemu:
+On 16.09.20 10:11, Thomas Huth wrote:
+> On 15/09/2020 21.44, Collin Walling wrote:
+>> DIAGNOSE 0x318 (diag318) is an s390 instruction that allows the storage
+>> of diagnostic information that is collected by the firmware in the case
+>> of hardware/firmware service events.
+>>
+>> QEMU handles the instruction by storing the info in the CPU state. A
+>> subsequent register sync will communicate the data to the hypervisor.
+>>
+>> QEMU handles the migration via a VM State Description.
+>>
+>> This feature depends on the Extended-Length SCCB (els) feature. If
+>> els is not present, then a warning will be printed and the SCLP bit
+>> that allows the Linux kernel to execute the instruction will not be
+>> set.
+>>
+>> Availability of this instruction is determined by byte 134 (aka fac134)
+>> bit 0 of the SCLP Read Info block. This coincidentally expands into the
+>> space used for CPU entries, which means VMs running with the diag318
+>> capability may not be able to read information regarding all CPUs
+>> unless the guest kernel supports an extended-length SCCB.
+>>
+>> This feature is not supported in protected virtualization mode.
+>>
+>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+>> Acked-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>  hw/s390x/sclp.c                     |  5 ++++
+>>  include/hw/s390x/sclp.h             |  8 ++++++
+>>  target/s390x/cpu.h                  |  2 ++
+>>  target/s390x/cpu_features.h         |  1 +
+>>  target/s390x/cpu_features_def.h.inc |  3 +++
+>>  target/s390x/cpu_models.c           |  1 +
+>>  target/s390x/gen-features.c         |  1 +
+>>  target/s390x/kvm.c                  | 39 +++++++++++++++++++++++++++++
+>>  target/s390x/machine.c              | 17 +++++++++++++
+>>  9 files changed, 77 insertions(+)
+> 
+> Acked-by: Thomas Huth <thuth@redhat.com>
+> 
+> (I hope David could still comment on the CPU model stuff ... it looks ok
+> to me here, but I got that wrong a couple of times in the past already...)
+> 
 
-  -global PIIX4_PM.acpi-root-pci-hotplug=off
-  -global PIIX4_PM.acpi-pci-hotplug-with-bridge-support=off
+Had a skim over it and it looks good to me!
 
-bios-tables-test-allowed-diff.h documents the fact that a new DSDT acpi gold master
-binary blob we need to be added to test this. We will do the actual addition in the
-next patch in the series.
+Acked-by: David Hildenbrand <david@redhat.com>
 
-Signed-off-by: Ani Sinha <ani@anisinha.ca>
----
- tests/qtest/bios-tables-test-allowed-diff.h |  1 +
- tests/qtest/bios-tables-test.c              | 17 +++++++++++++++++
- 2 files changed, 18 insertions(+)
-
-diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
-index dfb8523c8b..dea61d94f1 100644
---- a/tests/qtest/bios-tables-test-allowed-diff.h
-+++ b/tests/qtest/bios-tables-test-allowed-diff.h
-@@ -1 +1,2 @@
- /* List of comma-separated changed AML files to ignore */
-+"tests/data/acpi/pc/DSDT.hpbrroot",
-diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-index e989afe35c..a9d41fc06a 100644
---- a/tests/qtest/bios-tables-test.c
-+++ b/tests/qtest/bios-tables-test.c
-@@ -768,6 +768,21 @@ static void test_acpi_piix4_no_bridge_hotplug(void)
-     free_test_data(&data);
- }
- 
-+static void test_acpi_piix4_no_acpi_pci_hotplug(void)
-+{
-+    test_data data;
-+
-+    memset(&data, 0, sizeof(data));
-+    data.machine = MACHINE_PC;
-+    data.variant = ".hpbrroot";
-+    data.required_struct_types = base_required_struct_types;
-+    data.required_struct_types_len = ARRAY_SIZE(base_required_struct_types);
-+    test_acpi_one("-global PIIX4_PM.acpi-root-pci-hotplug=off "
-+                  "-global PIIX4_PM.acpi-pci-hotplug-with-bridge-support=off "
-+                  "-device pci-bridge,chassis_nr=1", &data);
-+    free_test_data(&data);
-+}
-+
- static void test_acpi_q35_tcg(void)
- {
-     test_data data;
-@@ -1176,6 +1191,8 @@ int main(int argc, char *argv[])
-                        test_acpi_piix4_no_root_hotplug);
-         qtest_add_func("acpi/piix4/nobrhotplug",
-                        test_acpi_piix4_no_bridge_hotplug);
-+        qtest_add_func("acpi/piix4/pci-hotplug/off",
-+                       test_acpi_piix4_no_acpi_pci_hotplug);
-         qtest_add_func("acpi/q35", test_acpi_q35_tcg);
-         qtest_add_func("acpi/q35/bridge", test_acpi_q35_tcg_bridge);
-         qtest_add_func("acpi/q35/mmio64", test_acpi_q35_tcg_mmio64);
 -- 
-2.17.1
+Thanks,
+
+David / dhildenb
 
 
