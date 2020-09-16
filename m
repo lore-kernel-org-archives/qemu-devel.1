@@ -1,87 +1,90 @@
-Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E0C4C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 23:11:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FE99C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 00:58:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB98722205
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 23:11:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC38F206C9
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 00:58:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TijStcC4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB98722205
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sfconservancy.org header.i=@sfconservancy.org header.b="YOI4Ozb+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC38F206C9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sfconservancy.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIgaF-0001lZ-OI
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 19:11:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35386)
+	id 1kIiFV-0002D5-Mf
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 20:58:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50676)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1kIgZX-00010a-Fb; Wed, 16 Sep 2020 19:10:43 -0400
-Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:35406)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1kIgZV-0004eV-Jo; Wed, 16 Sep 2020 19:10:43 -0400
-Received: by mail-ej1-x643.google.com with SMTP id u21so295558eja.2;
- Wed, 16 Sep 2020 16:10:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=e/5UsAxmnUVzHtcRiKgjko8kzeK/JClDw+iiIgx2Wt4=;
- b=TijStcC4qTgcCiKSfqYclsF3ShCwkaO011hiDb+F8ga8jaZPalNV6ork+vKaU7b879
- KntwheqJF5Ibo5aSChkzI5XGSONP9chJZ/khcPhqc1+VgrZqaIydKyB8x8YmRLpHzG9l
- VCQlRIluZ2qwQIVByStM5GHMAWJjeCgq85ItA18VlOnrmkUF5WgqkqSTjAO53plUYx6x
- B6xM8rKaIiNw2SE7uAHTGLKxJAMqSDra2OmW/MNbbLJk0KP8xD+hbgF/mdowqCBI7t3Y
- cKku+z7T400ZcMyJzvUbbrgTi08w75DGLiJayvzn3GUp8EW0aYZUjSSP3mcoO3tPebPU
- aStw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=e/5UsAxmnUVzHtcRiKgjko8kzeK/JClDw+iiIgx2Wt4=;
- b=ZYROy+dvMUMwl9QE2L4LLQUXPC3JspNq1zGZCMTkgaFODF1ys1g/q3C0NrCZycT4CE
- vIg87LAmG4DUFqdP9TFNmiyOtIAY19bWS3zoykOsVtk/zp2KgAa3QrKgUzxgC8lD3nnV
- jS6EjPj/L9qZPIZz5cRuqtJqkEQNbi/1BG2X/yugzJFV2pNAiYcCzBIj19SPao6ws8u7
- 2clat2UPJ8v3fSRtyre+WDGTF0V0eALW3MJTGlN5qHHZj82tAmKhgiqvp8NBXprobCD1
- ctR2aorS01NYwLh5j8uKHPIwjZNEjFyyob9Q8kBhh7kBJYDslsKALhVRs/f6yGMwXJXO
- K2KQ==
-X-Gm-Message-State: AOAM5302nC93KBoufvua7nzcP4zEzWFtnfh5QApQ4bp/U3uj3Mi0LrWd
- RwbakxdsCbfTEmatQEOD/GLQHTwdTlPTbnAeJTE=
-X-Google-Smtp-Source: ABdhPJzc7BlSAPfzS21Ik1TTeZBU6LobHGxgZYARHjBENQ7qG2hCbTR5eN/yY24vmL8gFtunnjxHbhkch+F63rBcMFY=
-X-Received: by 2002:a17:906:7856:: with SMTP id
- p22mr27216395ejm.262.1600297838469; 
- Wed, 16 Sep 2020 16:10:38 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bkuhn@sfconservancy.org>)
+ id 1kIiE3-0001Gn-Sy
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 20:56:39 -0400
+Received: from pine.sfconservancy.org
+ ([2001:4801:7822:103:be76:4eff:fe10:7c55]:47802)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <bkuhn@sfconservancy.org>)
+ id 1kIiDt-0007xu-0L
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 20:56:38 -0400
+Received: from localhost (unknown [216.161.86.19])
+ (Authenticated sender: bkuhn)
+ by pine.sfconservancy.org (Postfix) with ESMTPSA id 3FE47E833;
+ Thu, 17 Sep 2020 00:56:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=sfconservancy.org;
+ s=pine; t=1600304186;
+ bh=FqiHtaCeMiUCXARQ/S2ALeC80mn1verlRPHJodx0xFY=;
+ h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+ b=YOI4Ozb+aP1hiX1l9gtBjBaYqjoM8fPDcvI8Oudec7OfqoWzGktNlm/U0Ryci0DcK
+ +kO+nrtNb1t8PsjodICppBpH00hYtpFlEjPS4ppDalHgs1QJ3WfBbwEvk4Ffj/tN3c
+ t78vFfRPJAMR4dX+O7ghU4msXQkuzRKGnO98oQdLAPjEykDruRtb3dVU5Bk4bjRnoi
+ gVvrHtWV6K/YXOgbo3kUFj0guROMrm9XG3AIFkjYUbQmvcQQhsh4QHgFxp8AODKOLe
+ 5utObTfkGBZ+2SJKnI0t4EtvmBQiHpD1OCCUqUHPjjg2eETLS+vrF9UYgqbrBLqc0s
+ HeRefbcNpXenA==
+From: "Bradley M. Kuhn" <bkuhn@sfconservancy.org>
+To: "qemu\@sfconservancy.org" <qemu@sfconservancy.org>
+Subject: Re: Should we apply for GitLab's open source program?
+Organization: Software Freedom Conservancy
+References: <878sdp4ks9.fsf@linaro.org>
+ <20200908141701.GB7154@stefanha-x1.localdomain>
+Face: iVBORw0KGgoAAAANSUhEUgAAADAAAAAwBAMAAAClLOS0AAAABGdBTUEAALGPC/xhBQAAABVQ
+ TFRFAAAAWjotvpiH/PHt27Sj7sq8lXFeBchlBgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsT
+ AQCanBgAAAAHdElNRQfiCx4VFw6omMmeAAACAklEQVQ4y43UPZPbIBAGYGdu0puzQ51bI+qMdXId
+ r0F1RoLrwfb+/5+QF307VVR4PDxiF14h7Xa7t3q8LJGjavj7a1euCYiZnaPnv9DF4FyMLKdXOPs4
+ XM7KKzzKaF83gem+hUuF8QYUg7Fb4LEQAK1OG3hu4bbC3LpUC87+B9AMfQOg0yv0owEOK4x1+gnu
+ M3yaV3jOMGxvKoXEKC9gAoabJtZYlXO8wJcb1hMHQClZgSj7cbzsY4a2vSqltIlz8nMpZnMkEmVw
+ N4DtcYJo3AMPXFIMRMax/BjhOxZi2CpKKpWSZCd4C8aZ4CpzjR+Cint9WEp5H12IbbySEpHdaYVh
+ OY9onf0Qq9//zDCFEW0MbFjUz7mHD1UdO4B3iErk9whdKdWVRuW5YLl5KnU2rjTBDyPmQImm5mec
+ WQx7X3fBNwAzQ9kvBTKR0BwR3Bewhisn2mpkhea3BZwBcdorRlQk9QKecyZukRPeHTmuEL1FdjlJ
+ tmTlvoAJPnRaMnKinNICn4QthNaKlNAlLae9sc5UODaelVh+l345u7ZMIY89GNdmWV8cIaTFlLGm
+ QKLrzQykh/Aw02WsdoE2l1g7JIPdyWGFL6Hy1uJZsEjavLUXkVyeIdrbpPoXQHxDG0l68wEoW8vG
+ BLI6qc2XoUEWCUI26aQfK1wypuwV7v6mtMhtgL8avOP/pBCiigAAAABJRU5ErkJggg==
+Date: Wed, 16 Sep 2020 16:39:55 -0700
+In-Reply-To: <20200908141701.GB7154@stefanha-x1.localdomain> (Stefan
+ Hajnoczi's message of "Tue, 8 Sep 2020 15:17:01 +0100")
+Message-ID: <87zh5puw8k.fsf@ebb.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-References: <20200904154439.643272-1-philmd@redhat.com>
- <69f3f4d6-de7d-9535-03b3-a57ca8f041d6@redhat.com>
-In-Reply-To: <69f3f4d6-de7d-9535-03b3-a57ca8f041d6@redhat.com>
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Thu, 17 Sep 2020 01:10:28 +0200
-Message-ID: <CAJy5ezqT2vuhFG6n4cAHsB4NwDjC8EdbC=A3aJ94hu+u831vYQ@mail.gmail.com>
-Subject: Re: [PATCH 00/13] dma: Let the DMA API take MemTxAttrs argument and
- propagate MemTxResult
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000032673d05af76601a"
-Received-SPF: pass client-ip=2a00:1450:4864:20::643;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-ej1-x643.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2001:4801:7822:103:be76:4eff:fe10:7c55;
+ envelope-from=bkuhn@sfconservancy.org; helo=pine.sfconservancy.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 20:56:26
+X-ACL-Warn: Detected OS   = ???
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,108 +97,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- qemu-devel <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, qemu-block@nongnu.org,
- Li Qiang <liq3ea@gmail.com>, Peter Chubb <peter.chubb@nicta.com.au>,
- Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>,
- Laszlo Ersek <lersek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Beniamino Galvani <b.galvani@gmail.com>, Eric Auger <eric.auger@redhat.com>,
- qemu-arm@nongnu.org, Jan Kiszka <jan.kiszka@web.de>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Andrew Jeffery <andrew@aj.id.au>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: , QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000032673d05af76601a
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> On Fri, Sep 04, 2020 at 04:35:34PM +0100, Alex Benn=C3=A9e wrote:
+>> Given our growing reliance on GitLab and the recent announcement about
+>> free tier minutes:
+>>=20
+>>   https://about.gitlab.com/pricing/faq-consumption-cicd/
+>>=20
+>> is it time we officially apply for GitLab's Open Source Program:
+>>=20
+>>   https://about.gitlab.com/solutions/open-source/program/
 
-On Wed, 16 Sep 2020, 15:48 Philippe Mathieu-Daud=C3=A9, <philmd@redhat.com>
-wrote:
+Sorry for my late response on this thread.  Since GitLab is requiring that
+organizations be non-profits as part of this program, Conservancy will need
+to coordinate your application with you as we're the parent non-profit for
+this purpose.
 
-> On 9/4/20 5:44 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> > Salvaging cleanups patches from the RFC series "Forbid DMA write
-> > accesses to MMIO regions" [*], propagating MemTxResult and
-> > adding documentation.
-> >
-> > Philippe Mathieu-Daud=C3=A9 (12):
-> >   dma: Let dma_memory_valid() take MemTxAttrs argument
-> >   dma: Let dma_memory_set() take MemTxAttrs argument
-> >   dma: Let dma_memory_rw_relaxed() take MemTxAttrs argument
-> >   dma: Let dma_memory_rw() take MemTxAttrs argument
-> >   dma: Let dma_memory_read/write() take MemTxAttrs argument
-> >   dma: Let dma_memory_map() take MemTxAttrs argument
->
-> Talking with Laszlo, he wonders if we shouldn't enforce setting
-> MemTxAttrs attrs.secure =3D 0 in these calls.
->
-> Is there a concept of "secure DMA controller" in QEMU?
->
-> Thanks,
->
-> Phil.
->
+Given my late reply, you may already be coordinating with my colleague Brett
+about this, but I'll check in with him tomorrow to verify.
 
-Hi,
+One thing to note is that my understanding is that most of what you're
+getting access to through this program is proprietary software features that
+GitLab offers as add-ons.  I really encourage you as a project not enable
+such features, as ultimately you'll probably start to rely on them, and then
+you'll be effectively relying on proprietary software infrastructure to
+develop your project.
 
-Yes, we have models of secure DMA devices out of tree. Actually, on the
-ZynqMP and Versal SoCs, there are secure registers that can configure any
-DMA device to issue secure or non-secure transactions at runtime. We just
-haven't modelled all of the control regs that allow that in upstream QEMU.
-
-Cheers,
-Edgar
-
---00000000000032673d05af76601a
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
-class=3D"gmail_attr">On Wed, 16 Sep 2020, 15:48 Philippe Mathieu-Daud=C3=A9=
-, &lt;<a href=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:=
-<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bord=
-er-left:1px #ccc solid;padding-left:1ex">On 9/4/20 5:44 PM, Philippe Mathie=
-u-Daud=C3=A9 wrote:<br>
-&gt; Salvaging cleanups patches from the RFC series &quot;Forbid DMA write<=
-br>
-&gt; accesses to MMIO regions&quot; [*], propagating MemTxResult and<br>
-&gt; adding documentation.<br>
-&gt; <br>
-&gt; Philippe Mathieu-Daud=C3=A9 (12):<br>
-&gt;=C2=A0 =C2=A0dma: Let dma_memory_valid() take MemTxAttrs argument<br>
-&gt;=C2=A0 =C2=A0dma: Let dma_memory_set() take MemTxAttrs argument<br>
-&gt;=C2=A0 =C2=A0dma: Let dma_memory_rw_relaxed() take MemTxAttrs argument<=
-br>
-&gt;=C2=A0 =C2=A0dma: Let dma_memory_rw() take MemTxAttrs argument<br>
-&gt;=C2=A0 =C2=A0dma: Let dma_memory_read/write() take MemTxAttrs argument<=
-br>
-&gt;=C2=A0 =C2=A0dma: Let dma_memory_map() take MemTxAttrs argument<br>
-<br>
-Talking with Laszlo, he wonders if we shouldn&#39;t enforce setting<br>
-MemTxAttrs attrs.secure =3D 0 in these calls.<br>
-<br>
-Is there a concept of &quot;secure DMA controller&quot; in QEMU?<br>
-<br>
-Thanks,<br>
-<br>
-Phil.<br></blockquote></div></div><div dir=3D"auto"><br></div><div dir=3D"a=
-uto">Hi,=C2=A0</div><div dir=3D"auto"><br></div><div dir=3D"auto">Yes, we h=
-ave models of secure DMA devices out of tree. Actually, on the ZynqMP and V=
-ersal SoCs, there are secure registers that can configure any DMA device to=
- issue secure or non-secure transactions at runtime. We just haven&#39;t mo=
-delled all of the control regs that allow that in upstream QEMU.</div><div =
-dir=3D"auto"><br></div><div dir=3D"auto">Cheers,</div><div dir=3D"auto">Edg=
-ar=C2=A0</div><div dir=3D"auto"><br></div><div dir=3D"auto"><br></div><div =
-dir=3D"auto"><div class=3D"gmail_quote"><blockquote class=3D"gmail_quote" s=
-tyle=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"></bl=
-ockquote></div></div></div>
-
---00000000000032673d05af76601a--
+I'm also curious: is there something you need now from the GitLab software
+that self-hosting might improve?
+--=20
+Bradley M. Kuhn - he/him
+Policy Fellow & Hacker-in-Residence at Software Freedom Conservancy
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Become a Conservancy Supporter today: https://sfconservancy.org/supporter
 
