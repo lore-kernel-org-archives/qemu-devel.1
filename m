@@ -7,88 +7,87 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D11BC43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 14:22:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18076C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 14:22:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFE7A223E8
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 14:22:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 87341223E8
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 14:22:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="gk9ErJ8d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFE7A223E8
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="EQ993Bop"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87341223E8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIYKZ-0005kc-PJ
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 10:22:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39924)
+	id 1kIYKd-0005up-FA
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 10:22:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39902)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1kIYI0-0002dn-Ke
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 10:20:04 -0400
-Received: from mail-bn8nam11on2059.outbound.protection.outlook.com
- ([40.107.236.59]:16224 helo=NAM11-BN8-obe.outbound.protection.outlook.com)
+ id 1kIYHz-0002cV-1T
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 10:20:03 -0400
+Received: from mail-dm6nam10on2082.outbound.protection.outlook.com
+ ([40.107.93.82]:5729 helo=NAM10-DM6-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1kIYHm-0003jC-Eu
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 10:20:04 -0400
+ id 1kIYHq-0003jm-Ct
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 10:20:02 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JKfXhCm5dqTIqrpJW3Nq7e226bj+eOYVHADKOA+mOkYMuNh8rZDMcLgBk7TkEI2laRD1OoxTpWjV9PPzSTIAjD1EhC29ApjCJqDkSoJhxuEbDx8YNbj6haug0uvbJErzJtEVeaJxRL5GO0CYdLm6AYN4OGbI5L/uN+fUfMu0AEU0K64Ar+m3dS6P2ge/l8uw05/5xIfA3b8N5nuBFLJzTucEdV+70moU48QL2F/BoiM5BczQOIlhtz9ExFE0fQbtmBGVdXsiyyGoMrbGi1BxvgeglfM/51KM2Qy+DoWppLT2hvblI5tDPBoYRNYFHn1Tplb6rAqVQO9fTsFCUd3ZNw==
+ b=jaEW6Pq/H+JM5DI+W/n7ageIqlOUi9XFcPNXmP3D+kV/sbsYtowT4p0T/emGCezopQh2H9+nGAgIjEs0F+JJtwEpSGkf9qMSptdNt3ElvFUm2bvC/wNvrDb5Pdl9hN1rcZw4hegxg82/Lrd/eU2Hn2w/2a/L6Pon/wTyJzyPilyu12noNA1jGV+sv08zoA0BUMEJksK64KcahasYE7aX6dLqEyAmRAz9oPl4h/p5TJC8y5MUo2V7SLwfSEPf0CJ3NliMY+ClvhlAnsapLMwduRQQP512wUSt8dSHDRGWep19apEAEMgAuqAun8W6mwIJ5ONn2wRBKpd1X1KZGJg1Iw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OabyTJfZNT7yw+eAWBRwavkvMnq3lyEJeAN0FPisZKQ=;
- b=QWsfPwzbh64nv9xzaGRgUm32gL/M50NQqWfe8i++RsI4+SQKxs5RJfPPiCZSMFyJozskMjTCEA763q0kxaNgJWDZ3FEF2Fg/b+oIq1kmY7jh0U/h5SP522Qw7t+dzIn5b9kb6N9LFFX4x6JQZqHdwCljholVvCSXvQmSnaI1gu/v2o1Z7PhRfAC4EAxdqxYMex74RfgnEZUeY2AVV0mu3nis0JP9YAuwr1Ftd/pQvP/NFBWs4aA9eABR+M6tDUwW+x1/u8oCLlfBipNZdvFsOhnQU0fb1vaNjglCWynHgXbV52S6g3OPd+b6gz5jvFfWG7p0AhGjGJzADrvgvVvuqQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=wdc.com smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
+ bh=lhqol3J5PEhRN+c5qSB5pA7oHepPyhzt6q1bqBB2faM=;
+ b=XtCPiGGi/MzGJqwZWwpcmUR2AH7NcRkz48ctD/oLyBBWtzW36XfFuu33mv3TY/HL5dPXEhfU66zHjre0XGfgF9MVqkif279eGrSUoPfUhwAjiBfhkRuPT4pLrLx+9FevvxfJKCucRHe6UM6i1o3vp9C4ah3pqQ1PUjLH77x1IZn7dqqUsmA3gSQhWe+1zzZnfx4+byZwzyujLb5pxTGvt91Tg6MMbW5oNkjZLppqTcg4x1IS9lI1hUSXODCHbci5aqBn/Mje60RYSEvzyxT8V6xbo5y9UkqlPaD4popVCNd73tgHnxmgh6JUsEaW9yNT9fBPfLGaTBNtgUyr9DH+6A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=temperror (sender ip
+ is 149.199.60.83) smtp.rcpttodomain=wdc.com
+ smtp.mailfrom=xilinx.com; 
+ dmarc=none action=none header.from=xilinx.com; dkim=none (message not
+ signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OabyTJfZNT7yw+eAWBRwavkvMnq3lyEJeAN0FPisZKQ=;
- b=gk9ErJ8d2UIEvKUqPHqGtvuTFONX4RqucaFl6mwaFiSp4WpYWJpFPWaEqdrWKXiiqut+LpAtFDSgryL4d0anT13zZUXxOc0RhTAfc55Wr7k3TDvPW4zAtTk1DyqjK7wSRn3PS69AWSVQBTJ/S53/gpej6r0RTD2s0L8dniUFm/I=
-Received: from MN2PR20CA0034.namprd20.prod.outlook.com (2603:10b6:208:e8::47)
- by CH2PR02MB6492.namprd02.prod.outlook.com (2603:10b6:610:67::14)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Wed, 16 Sep
- 2020 14:19:44 +0000
-Received: from BL2NAM02FT036.eop-nam02.prod.protection.outlook.com
- (2603:10b6:208:e8:cafe::ca) by MN2PR20CA0034.outlook.office365.com
- (2603:10b6:208:e8::47) with Microsoft SMTP Server (version=TLS1_2,
+ bh=lhqol3J5PEhRN+c5qSB5pA7oHepPyhzt6q1bqBB2faM=;
+ b=EQ993BopVvgx+0Z+BMG93hC5awYDLiX9rHmDcYSsPcRDXr/ixbpFObUq02YNMh6XOmfUbhGtk1wQTM8bXkmSsPYgeagot7T3M2GcgqXCfvRZ2Zv32/yh+AklL1nzY5zH8RFlsXWRS8i3lQXrmRvWpod8YaHw3AVF+ueKtVax8NI=
+Received: from DM5PR2201CA0001.namprd22.prod.outlook.com (2603:10b6:4:14::11)
+ by DM6PR02MB5162.namprd02.prod.outlook.com (2603:10b6:5:47::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.11; Wed, 16 Sep
+ 2020 14:19:48 +0000
+Received: from CY1NAM02FT053.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:4:14:cafe::68) by DM5PR2201CA0001.outlook.office365.com
+ (2603:10b6:4:14::11) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.14 via Frontend
- Transport; Wed, 16 Sep 2020 14:19:44 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; wdc.com; dkim=none (message not signed)
- header.d=none;wdc.com; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
+ Transport; Wed, 16 Sep 2020 14:19:48 +0000
+X-MS-Exchange-Authentication-Results: spf=temperror (sender IP is
+ 149.199.60.83) smtp.mailfrom=xilinx.com; wdc.com; dkim=none (message not
+ signed) header.d=none; wdc.com; dmarc=none action=none header.from=xilinx.com; 
+Received-SPF: TempError (protection.outlook.com: error in processing during
+ lookup of xilinx.com: DNS Timeout)
 Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- BL2NAM02FT036.mail.protection.outlook.com (10.152.77.154) with Microsoft SMTP
- Server id 15.20.3370.16 via Frontend Transport; Wed, 16 Sep 2020 14:19:43
+ CY1NAM02FT053.mail.protection.outlook.com (10.152.74.165) with Microsoft SMTP
+ Server id 15.20.3370.16 via Frontend Transport; Wed, 16 Sep 2020 14:19:45
  +0000
-Received: from [149.199.38.66] (port=43144 helo=smtp.xilinx.com)
+Received: from [149.199.38.66] (port=43185 helo=smtp.xilinx.com)
  by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
  (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1kIYHY-0004A7-JH; Wed, 16 Sep 2020 07:19:36 -0700
-Received: from [127.0.0.1] (helo=xsj-smtp-dlp2.xlnx.xilinx.com)
+ id 1kIYHa-0004AI-NQ; Wed, 16 Sep 2020 07:19:38 -0700
+Received: from [127.0.0.1] (helo=xsj-smtp-dlp1.xlnx.xilinx.com)
  by smtp.xilinx.com with esmtp (Exim 4.63)
  (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1kIYHf-0004q9-8i; Wed, 16 Sep 2020 07:19:43 -0700
-Received: from xsj-pvapsmtp01 (smtp3.xilinx.com [149.199.38.66])
- by xsj-smtp-dlp2.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 08GEJgGZ010163; 
- Wed, 16 Sep 2020 07:19:42 -0700
+ id 1kIYHh-0004qf-CB; Wed, 16 Sep 2020 07:19:45 -0700
+Received: from xsj-pvapsmtp01 (maildrop.xilinx.com [149.199.38.66])
+ by xsj-smtp-dlp1.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 08GEJijn017278; 
+ Wed, 16 Sep 2020 07:19:44 -0700
 Received: from [10.140.6.35] (helo=xhdsaipava40.xilinx.com)
  by xsj-pvapsmtp01 with esmtp (Exim 4.63)
  (envelope-from <saipava@xhdsaipava40.xilinx.com>)
- id 1kIYHd-0004pe-MA; Wed, 16 Sep 2020 07:19:42 -0700
+ id 1kIYHf-0004pp-Nc; Wed, 16 Sep 2020 07:19:44 -0700
 Received: by xhdsaipava40.xilinx.com (Postfix, from userid 14131)
- id C396413C0235; Wed, 16 Sep 2020 19:53:24 +0530 (IST)
+ id 4E98013C029D; Wed, 16 Sep 2020 19:53:27 +0530 (IST)
 From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Markus Armbruster <armbru@redhat.com>,
@@ -96,9 +95,9 @@ To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
  Edgar Iglesias <edgari@xilinx.com>,
  Francisco Eduardo Iglesias <figlesia@xilinx.com>
-Subject: [PATCH v7 3/7] usb/hcd-xhci: Split pci wrapper for xhci base model
-Date: Wed, 16 Sep 2020 19:52:16 +0530
-Message-Id: <1600266140-20763-4-git-send-email-sai.pavan.boddu@xilinx.com>
+Subject: [PATCH v7 6/7] usb: Add DWC3 model
+Date: Wed, 16 Sep 2020 19:52:19 +0530
+Message-Id: <1600266140-20763-7-git-send-email-sai.pavan.boddu@xilinx.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1600266140-20763-1-git-send-email-sai.pavan.boddu@xilinx.com>
 References: <1600266140-20763-1-git-send-email-sai.pavan.boddu@xilinx.com>
@@ -110,31 +109,31 @@ X-MS-Office365-Filtering-HT: Tenant
 X-MS-PublicTrafficType: Email
 MIME-Version: 1.0
 Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: c975f53a-328d-4cd9-0de3-08d85a4b8ee2
-X-MS-TrafficTypeDiagnostic: CH2PR02MB6492:
-X-Microsoft-Antispam-PRVS: <CH2PR02MB64924A7B2F13BCEA5F9FFB61CA210@CH2PR02MB6492.namprd02.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 32eba6f6-bfd3-46a9-a9fe-08d85a4b9008
+X-MS-TrafficTypeDiagnostic: DM6PR02MB5162:
+X-Microsoft-Antispam-PRVS: <DM6PR02MB51629E338654D286BE5DF2E8CA210@DM6PR02MB5162.namprd02.prod.outlook.com>
 X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:98;
+X-MS-Oob-TLC-OOBClassifiers: OLM:287;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 3pB6jRoJ7kwAMHTFbx1WD3r0sqxx5S2vV6tCKdXn5PTme6BWqVjDXfvgxkk5Q2/8d/fPiU00JQiUkDwOj07MNA+MFI44uHNASAVu8ww0+Moq0+bUCc8ekT0BlnKtIiC2iRYQYe8HaBow6QXSm7gzsaNHy5MG1sElvX4y7yji7NV9VNAMgxIOHQ+mFBZE9hV9svrRu4dtlSM7LO5eB8NdFoy6mZ7KXhw6ERPaC1pfE65EHfsuqGwRGU1lSI/ZcLbxk/8Mv6YRddNmOAYEW+zJWOsd68WRsw3FRFW5FNu+e3vPI/Adh5RiXN5/E0IkVky/e0iz4BzZ417vnO0gSJIvAYpdSl32zTpdgOvXWLSlVBDOovFSSvVeHECtQX/Sd4DLAJRyDCgxIZSS+mBxgmMOYloVtf7DwZBevpXrHHzZQE2YcM9wRozgXbcGeZatSV+6QmSQ/mzIrq0S6bqHC035B4aia/bMkJ07aZBvuUUywSSfZCbETf7ZucpRy4Ix7V7vbydpr8ZqnMAtnWS7zr2GyQ==
+X-Microsoft-Antispam-Message-Info: Snft5UF0foXsnljMeUpxJ91BO9nLOfFxaFW4otXzuhaTG71d8PKY8lop1LOXv2mZEcK/bHggQHWSdUlvpuJVPUagjmxotruhvH4cbkPfWJCeiDIy7KtKDR1xiwrGM/FWZfM3MP/JfpVNU97II5x7df1WHXqTBk/tpDUF/ytpJOMQG/Bb5cqhApraxn3IYPRA6mnQbbCmS4YdnR+a4JyndqbRaKfF6bk7Mt2Jnz85SNc4eiP7UwfIgEEpCyk7INhZ9Rv5XYmp06hYDEE/MuwKMkGdjdwCFrNjKWBi8tpyKhjvKYA9xQcxCN8ERGTku6O+S4YkhLx8n6pilHG6ZeagQhSqy84MvTS8HwRSrw61o1qWV4FhBZRunWxxWnw/6Wj6OxXosalb7lHDjRr6LpTbtw==
 X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
- SFS:(39850400004)(346002)(136003)(396003)(376002)(46966005)(8936002)(5660300002)(30864003)(6636002)(8676002)(426003)(7416002)(336012)(316002)(4326008)(6666004)(82310400003)(42186006)(6266002)(107886003)(36756003)(2616005)(186003)(47076004)(110136005)(26005)(81166007)(356005)(54906003)(82740400003)(478600001)(83380400001)(70586007)(70206006)(2906002)(2004002)(309714004);
+ SFS:(396003)(136003)(346002)(376002)(39850400004)(46966005)(36756003)(70206006)(82310400003)(5660300002)(6266002)(4326008)(30864003)(83380400001)(42186006)(107886003)(478600001)(6666004)(316002)(8676002)(426003)(54906003)(186003)(8936002)(26005)(63350400001)(70586007)(336012)(110136005)(2906002)(82740400003)(7416002)(356005)(47076004)(2616005)(6636002)(81166007);
  DIR:OUT; SFP:1101; 
 X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2020 14:19:43.9001 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c975f53a-328d-4cd9-0de3-08d85a4b8ee2
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2020 14:19:45.8319 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32eba6f6-bfd3-46a9-a9fe-08d85a4b9008
 X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
  Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-AuthSource: BL2NAM02FT036.eop-nam02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: CY1NAM02FT053.eop-nam02.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR02MB6492
-Received-SPF: pass client-ip=40.107.236.59; envelope-from=saipava@xilinx.com;
- helo=NAM11-BN8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 10:19:46
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR02MB5162
+Received-SPF: pass client-ip=40.107.93.82; envelope-from=saipava@xilinx.com;
+ helo=NAM10-DM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 10:19:51
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -163,781 +162,835 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch sets the base to use xhci as sysbus model, for which pci
-specific hooks are moved to hcd-xhci-pci.c. As a part of this requirment
-msi/msix interrupts handling is moved under XHCIPCIState. Made required
-changes for qemu-xhci-nec.
+From: Vikram Garhwal <fnu.vikram@xilinx.com>
 
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+This patch adds skeleton model of dwc3 usb controller attached to
+xhci-sysbus device. It defines global register space of DWC3 controller,
+global registers control the AXI/AHB interfaces properties, external FIFO
+support and event count support. All of which are unimplemented at
+present,we are only supporting core reset and read of ID register.
 
-fixup
-
+Signed-off-by: Vikram Garhwal <fnu.vikram@xilinx.com>
 Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 ---
- hw/usb/hcd-xhci-nec.c |  18 ++---
- hw/usb/hcd-xhci-pci.c | 188 +++++++++++++++++++++++++++++++++++++++++++--
- hw/usb/hcd-xhci-pci.h |  45 +++++++++++
- hw/usb/hcd-xhci.c     | 205 ++++++++++----------------------------------------
- hw/usb/hcd-xhci.h     |  16 ++--
- 5 files changed, 285 insertions(+), 187 deletions(-)
- create mode 100644 hw/usb/hcd-xhci-pci.h
+ hw/usb/Kconfig            |   6 +
+ hw/usb/hcd-dwc3.c         | 717 ++++++++++++++++++++++++++++++++++++++++++++++
+ hw/usb/meson.build        |   1 +
+ include/hw/usb/hcd-dwc3.h |  55 ++++
+ 4 files changed, 779 insertions(+)
+ create mode 100644 hw/usb/hcd-dwc3.c
+ create mode 100644 include/hw/usb/hcd-dwc3.h
 
-diff --git a/hw/usb/hcd-xhci-nec.c b/hw/usb/hcd-xhci-nec.c
-index e6a5a22..2efa6fa 100644
---- a/hw/usb/hcd-xhci-nec.c
-+++ b/hw/usb/hcd-xhci-nec.c
-@@ -25,17 +25,17 @@
- #include "hw/pci/pci.h"
- #include "hw/qdev-properties.h"
- 
--#include "hcd-xhci.h"
-+#include "hcd-xhci-pci.h"
- 
- static Property nec_xhci_properties[] = {
--    DEFINE_PROP_ON_OFF_AUTO("msi", XHCIState, msi, ON_OFF_AUTO_AUTO),
--    DEFINE_PROP_ON_OFF_AUTO("msix", XHCIState, msix, ON_OFF_AUTO_AUTO),
--    DEFINE_PROP_BIT("superspeed-ports-first",
--                    XHCIState, flags, XHCI_FLAG_SS_FIRST, true),
--    DEFINE_PROP_BIT("force-pcie-endcap", XHCIState, flags,
-+    DEFINE_PROP_ON_OFF_AUTO("msi", XHCIPciState, msi, ON_OFF_AUTO_AUTO),
-+    DEFINE_PROP_ON_OFF_AUTO("msix", XHCIPciState, msix, ON_OFF_AUTO_AUTO),
-+    DEFINE_PROP_BIT("superspeed-ports-first", XHCIPciState,
-+                    xhci.flags, XHCI_FLAG_SS_FIRST, true),
-+    DEFINE_PROP_BIT("force-pcie-endcap", XHCIPciState, xhci.flags,
-                     XHCI_FLAG_FORCE_PCIE_ENDCAP, false),
--    DEFINE_PROP_UINT32("intrs", XHCIState, numintrs, MAXINTRS),
--    DEFINE_PROP_UINT32("slots", XHCIState, numslots, MAXSLOTS),
-+    DEFINE_PROP_UINT32("intrs", XHCIPciState, xhci.numintrs, MAXINTRS),
-+    DEFINE_PROP_UINT32("slots", XHCIPciState, xhci.numslots, MAXSLOTS),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-@@ -52,7 +52,7 @@ static void nec_xhci_class_init(ObjectClass *klass, void *data)
- 
- static const TypeInfo nec_xhci_info = {
-     .name          = TYPE_NEC_XHCI,
--    .parent        = TYPE_XHCI,
-+    .parent        = TYPE_XHCI_PCI,
-     .class_init    = nec_xhci_class_init,
- };
- 
-diff --git a/hw/usb/hcd-xhci-pci.c b/hw/usb/hcd-xhci-pci.c
-index 1562757..15d288c 100644
---- a/hw/usb/hcd-xhci-pci.c
-+++ b/hw/usb/hcd-xhci-pci.c
-@@ -25,12 +25,188 @@
- #include "qemu/osdep.h"
- #include "hw/pci/pci.h"
- #include "hw/qdev-properties.h"
+diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
+index 4dd2ba9..f5762f0 100644
+--- a/hw/usb/Kconfig
++++ b/hw/usb/Kconfig
+@@ -116,3 +116,9 @@ config IMX_USBPHY
+     bool
+     default y
+     depends on USB
++
++config USB_DWC3
++    bool
++    default y if USB_XHCI_SYSBUS
++    select USB
++    select REGISTER
+diff --git a/hw/usb/hcd-dwc3.c b/hw/usb/hcd-dwc3.c
+new file mode 100644
+index 0000000..de8be7a
+--- /dev/null
++++ b/hw/usb/hcd-dwc3.c
+@@ -0,0 +1,717 @@
++/*
++ * QEMU model of the USB DWC3 host controller emulation.
++ *
++ * This model defines global register space of DWC3 controller. Global
++ * registers control the AXI/AHB interfaces properties, external FIFO support
++ * and event count support. All of which are unimplemented at present. We are
++ * only supporting core reset and read of ID register.
++ *
++ * Copyright (c) 2020 Xilinx Inc. Vikram Garhwal<fnu.vikram@xilinx.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/sysbus.h"
++#include "hw/register.h"
++#include "qemu/bitops.h"
++#include "qemu/log.h"
++#include "qom/object.h"
 +#include "migration/vmstate.h"
- #include "hw/pci/msi.h"
- #include "hw/pci/msix.h"
--#include "hcd-xhci.h"
-+#include "hcd-xhci-pci.h"
- #include "trace.h"
- #include "qapi/error.h"
- 
-+#define OFF_MSIX_TABLE  0x3000
-+#define OFF_MSIX_PBA    0x3800
++#include "hw/qdev-properties.h"
++#include "hw/usb/hcd-dwc3.h"
++#include "qapi/error.h"
 +
-+static void xhci_pci_intr_update(XHCIState *xhci, int n, bool enable)
++#ifndef USB_DWC3_ERR_DEBUG
++#define USB_DWC3_ERR_DEBUG 0
++#endif
++
++#define HOST_MODE           1
++#define FIFO_LEN         0x1000
++
++REG32(GSBUSCFG0, 0x00)
++    FIELD(GSBUSCFG0, DATRDREQINFO, 28, 4)
++    FIELD(GSBUSCFG0, DESRDREQINFO, 24, 4)
++    FIELD(GSBUSCFG0, DATWRREQINFO, 20, 4)
++    FIELD(GSBUSCFG0, DESWRREQINFO, 16, 4)
++    FIELD(GSBUSCFG0, RESERVED_15_12, 12, 4)
++    FIELD(GSBUSCFG0, DATBIGEND, 11, 1)
++    FIELD(GSBUSCFG0, DESBIGEND, 10, 1)
++    FIELD(GSBUSCFG0, RESERVED_9_8, 8, 2)
++    FIELD(GSBUSCFG0, INCR256BRSTENA, 7, 1)
++    FIELD(GSBUSCFG0, INCR128BRSTENA, 6, 1)
++    FIELD(GSBUSCFG0, INCR64BRSTENA, 5, 1)
++    FIELD(GSBUSCFG0, INCR32BRSTENA, 4, 1)
++    FIELD(GSBUSCFG0, INCR16BRSTENA, 3, 1)
++    FIELD(GSBUSCFG0, INCR8BRSTENA, 2, 1)
++    FIELD(GSBUSCFG0, INCR4BRSTENA, 1, 1)
++    FIELD(GSBUSCFG0, INCRBRSTENA, 0, 1)
++REG32(GSBUSCFG1, 0x04)
++    FIELD(GSBUSCFG1, RESERVED_31_13, 13, 19)
++    FIELD(GSBUSCFG1, EN1KPAGE, 12, 1)
++    FIELD(GSBUSCFG1, PIPETRANSLIMIT, 8, 4)
++    FIELD(GSBUSCFG1, RESERVED_7_0, 0, 8)
++REG32(GTXTHRCFG, 0x08)
++    FIELD(GTXTHRCFG, RESERVED_31, 31, 1)
++    FIELD(GTXTHRCFG, RESERVED_30, 30, 1)
++    FIELD(GTXTHRCFG, USBTXPKTCNTSEL, 29, 1)
++    FIELD(GTXTHRCFG, RESERVED_28, 28, 1)
++    FIELD(GTXTHRCFG, USBTXPKTCNT, 24, 4)
++    FIELD(GTXTHRCFG, USBMAXTXBURSTSIZE, 16, 8)
++    FIELD(GTXTHRCFG, RESERVED_15, 15, 1)
++    FIELD(GTXTHRCFG, RESERVED_14, 14, 1)
++    FIELD(GTXTHRCFG, RESERVED_13_11, 11, 3)
++    FIELD(GTXTHRCFG, RESERVED_10_0, 0, 11)
++REG32(GRXTHRCFG, 0x0c)
++    FIELD(GRXTHRCFG, RESERVED_31_30, 30, 2)
++    FIELD(GRXTHRCFG, USBRXPKTCNTSEL, 29, 1)
++    FIELD(GRXTHRCFG, RESERVED_28, 28, 1)
++    FIELD(GRXTHRCFG, USBRXPKTCNT, 24, 4)
++    FIELD(GRXTHRCFG, USBMAXRXBURSTSIZE, 19, 5)
++    FIELD(GRXTHRCFG, RESERVED_18_16, 16, 3)
++    FIELD(GRXTHRCFG, RESERVED_15, 15, 1)
++    FIELD(GRXTHRCFG, RESERVED_14_13, 13, 2)
++    FIELD(GRXTHRCFG, RESVISOCOUTSPC, 0, 13)
++REG32(GCTL, 0x10)
++    FIELD(GCTL, PWRDNSCALE, 19, 13)
++    FIELD(GCTL, MASTERFILTBYPASS, 18, 1)
++    FIELD(GCTL, BYPSSETADDR, 17, 1)
++    FIELD(GCTL, U2RSTECN, 16, 1)
++    FIELD(GCTL, FRMSCLDWN, 14, 2)
++    FIELD(GCTL, PRTCAPDIR, 12, 2)
++    FIELD(GCTL, CORESOFTRESET, 11, 1)
++    FIELD(GCTL, U1U2TIMERSCALE, 9, 1)
++    FIELD(GCTL, DEBUGATTACH, 8, 1)
++    FIELD(GCTL, RAMCLKSEL, 6, 2)
++    FIELD(GCTL, SCALEDOWN, 4, 2)
++    FIELD(GCTL, DISSCRAMBLE, 3, 1)
++    FIELD(GCTL, U2EXIT_LFPS, 2, 1)
++    FIELD(GCTL, GBLHIBERNATIONEN, 1, 1)
++    FIELD(GCTL, DSBLCLKGTNG, 0, 1)
++REG32(GPMSTS, 0x14)
++REG32(GSTS, 0x18)
++    FIELD(GSTS, CBELT, 20, 12)
++    FIELD(GSTS, RESERVED_19_12, 12, 8)
++    FIELD(GSTS, SSIC_IP, 11, 1)
++    FIELD(GSTS, OTG_IP, 10, 1)
++    FIELD(GSTS, BC_IP, 9, 1)
++    FIELD(GSTS, ADP_IP, 8, 1)
++    FIELD(GSTS, HOST_IP, 7, 1)
++    FIELD(GSTS, DEVICE_IP, 6, 1)
++    FIELD(GSTS, CSRTIMEOUT, 5, 1)
++    FIELD(GSTS, BUSERRADDRVLD, 4, 1)
++    FIELD(GSTS, RESERVED_3_2, 2, 2)
++    FIELD(GSTS, CURMOD, 0, 2)
++REG32(GUCTL1, 0x1c)
++    FIELD(GUCTL1, RESUME_OPMODE_HS_HOST, 10, 1)
++REG32(GSNPSID, 0x20)
++REG32(GGPIO, 0x24)
++    FIELD(GGPIO, GPO, 16, 16)
++    FIELD(GGPIO, GPI, 0, 16)
++REG32(GUID, 0x28)
++REG32(GUCTL, 0x2c)
++    FIELD(GUCTL, REFCLKPER, 22, 10)
++    FIELD(GUCTL, NOEXTRDL, 21, 1)
++    FIELD(GUCTL, RESERVED_20_18, 18, 3)
++    FIELD(GUCTL, SPRSCTRLTRANSEN, 17, 1)
++    FIELD(GUCTL, RESBWHSEPS, 16, 1)
++    FIELD(GUCTL, RESERVED_15, 15, 1)
++    FIELD(GUCTL, USBHSTINAUTORETRYEN, 14, 1)
++    FIELD(GUCTL, ENOVERLAPCHK, 13, 1)
++    FIELD(GUCTL, EXTCAPSUPPTEN, 12, 1)
++    FIELD(GUCTL, INSRTEXTRFSBODI, 11, 1)
++    FIELD(GUCTL, DTCT, 9, 2)
++    FIELD(GUCTL, DTFT, 0, 9)
++REG32(GBUSERRADDRLO, 0x30)
++REG32(GBUSERRADDRHI, 0x34)
++REG32(GHWPARAMS0, 0x40)
++    FIELD(GHWPARAMS0, GHWPARAMS0_31_24, 24, 8)
++    FIELD(GHWPARAMS0, GHWPARAMS0_23_16, 16, 8)
++    FIELD(GHWPARAMS0, GHWPARAMS0_15_8, 8, 8)
++    FIELD(GHWPARAMS0, GHWPARAMS0_7_6, 6, 2)
++    FIELD(GHWPARAMS0, GHWPARAMS0_5_3, 3, 3)
++    FIELD(GHWPARAMS0, GHWPARAMS0_2_0, 0, 3)
++REG32(GHWPARAMS1, 0x44)
++    FIELD(GHWPARAMS1, GHWPARAMS1_31, 31, 1)
++    FIELD(GHWPARAMS1, GHWPARAMS1_30, 30, 1)
++    FIELD(GHWPARAMS1, GHWPARAMS1_29, 29, 1)
++    FIELD(GHWPARAMS1, GHWPARAMS1_28, 28, 1)
++    FIELD(GHWPARAMS1, GHWPARAMS1_27, 27, 1)
++    FIELD(GHWPARAMS1, GHWPARAMS1_26, 26, 1)
++    FIELD(GHWPARAMS1, GHWPARAMS1_25_24, 24, 2)
++    FIELD(GHWPARAMS1, GHWPARAMS1_23, 23, 1)
++    FIELD(GHWPARAMS1, GHWPARAMS1_22_21, 21, 2)
++    FIELD(GHWPARAMS1, GHWPARAMS1_20_15, 15, 6)
++    FIELD(GHWPARAMS1, GHWPARAMS1_14_12, 12, 3)
++    FIELD(GHWPARAMS1, GHWPARAMS1_11_9, 9, 3)
++    FIELD(GHWPARAMS1, GHWPARAMS1_8_6, 6, 3)
++    FIELD(GHWPARAMS1, GHWPARAMS1_5_3, 3, 3)
++    FIELD(GHWPARAMS1, GHWPARAMS1_2_0, 0, 3)
++REG32(GHWPARAMS2, 0x48)
++REG32(GHWPARAMS3, 0x4c)
++    FIELD(GHWPARAMS3, GHWPARAMS3_31, 31, 1)
++    FIELD(GHWPARAMS3, GHWPARAMS3_30_23, 23, 8)
++    FIELD(GHWPARAMS3, GHWPARAMS3_22_18, 18, 5)
++    FIELD(GHWPARAMS3, GHWPARAMS3_17_12, 12, 6)
++    FIELD(GHWPARAMS3, GHWPARAMS3_11, 11, 1)
++    FIELD(GHWPARAMS3, GHWPARAMS3_10, 10, 1)
++    FIELD(GHWPARAMS3, GHWPARAMS3_9_8, 8, 2)
++    FIELD(GHWPARAMS3, GHWPARAMS3_7_6, 6, 2)
++    FIELD(GHWPARAMS3, GHWPARAMS3_5_4, 4, 2)
++    FIELD(GHWPARAMS3, GHWPARAMS3_3_2, 2, 2)
++    FIELD(GHWPARAMS3, GHWPARAMS3_1_0, 0, 2)
++REG32(GHWPARAMS4, 0x50)
++    FIELD(GHWPARAMS4, GHWPARAMS4_31_28, 28, 4)
++    FIELD(GHWPARAMS4, GHWPARAMS4_27_24, 24, 4)
++    FIELD(GHWPARAMS4, GHWPARAMS4_23, 23, 1)
++    FIELD(GHWPARAMS4, GHWPARAMS4_22, 22, 1)
++    FIELD(GHWPARAMS4, GHWPARAMS4_21, 21, 1)
++    FIELD(GHWPARAMS4, GHWPARAMS4_20_17, 17, 4)
++    FIELD(GHWPARAMS4, GHWPARAMS4_16_13, 13, 4)
++    FIELD(GHWPARAMS4, GHWPARAMS4_12, 12, 1)
++    FIELD(GHWPARAMS4, GHWPARAMS4_11, 11, 1)
++    FIELD(GHWPARAMS4, GHWPARAMS4_10_9, 9, 2)
++    FIELD(GHWPARAMS4, GHWPARAMS4_8_7, 7, 2)
++    FIELD(GHWPARAMS4, GHWPARAMS4_6, 6, 1)
++    FIELD(GHWPARAMS4, GHWPARAMS4_5_0, 0, 6)
++REG32(GHWPARAMS5, 0x54)
++    FIELD(GHWPARAMS5, GHWPARAMS5_31_28, 28, 4)
++    FIELD(GHWPARAMS5, GHWPARAMS5_27_22, 22, 6)
++    FIELD(GHWPARAMS5, GHWPARAMS5_21_16, 16, 6)
++    FIELD(GHWPARAMS5, GHWPARAMS5_15_10, 10, 6)
++    FIELD(GHWPARAMS5, GHWPARAMS5_9_4, 4, 6)
++    FIELD(GHWPARAMS5, GHWPARAMS5_3_0, 0, 4)
++REG32(GHWPARAMS6, 0x58)
++    FIELD(GHWPARAMS6, GHWPARAMS6_31_16, 16, 16)
++    FIELD(GHWPARAMS6, BUSFLTRSSUPPORT, 15, 1)
++    FIELD(GHWPARAMS6, BCSUPPORT, 14, 1)
++    FIELD(GHWPARAMS6, OTG_SS_SUPPORT, 13, 1)
++    FIELD(GHWPARAMS6, ADPSUPPORT, 12, 1)
++    FIELD(GHWPARAMS6, HNPSUPPORT, 11, 1)
++    FIELD(GHWPARAMS6, SRPSUPPORT, 10, 1)
++    FIELD(GHWPARAMS6, GHWPARAMS6_9_8, 8, 2)
++    FIELD(GHWPARAMS6, GHWPARAMS6_7, 7, 1)
++    FIELD(GHWPARAMS6, GHWPARAMS6_6, 6, 1)
++    FIELD(GHWPARAMS6, GHWPARAMS6_5_0, 0, 6)
++REG32(GHWPARAMS7, 0x5c)
++    FIELD(GHWPARAMS7, GHWPARAMS7_31_16, 16, 16)
++    FIELD(GHWPARAMS7, GHWPARAMS7_15_0, 0, 16)
++REG32(GDBGFIFOSPACE, 0x60)
++    FIELD(GDBGFIFOSPACE, SPACE_AVAILABLE, 16, 16)
++    FIELD(GDBGFIFOSPACE, RESERVED_15_9, 9, 7)
++    FIELD(GDBGFIFOSPACE, FIFO_QUEUE_SELECT, 0, 9)
++REG32(GUCTL2, 0x9c)
++    FIELD(GUCTL2, RESERVED_31_26, 26, 6)
++    FIELD(GUCTL2, EN_HP_PM_TIMER, 19, 7)
++    FIELD(GUCTL2, NOLOWPWRDUR, 15, 4)
++    FIELD(GUCTL2, RST_ACTBITLATER, 14, 1)
++    FIELD(GUCTL2, RESERVED_13, 13, 1)
++    FIELD(GUCTL2, DISABLECFC, 11, 1)
++REG32(GUSB2PHYCFG, 0x100)
++    FIELD(GUSB2PHYCFG, U2_FREECLK_EXISTS, 30, 1)
++    FIELD(GUSB2PHYCFG, ULPI_LPM_WITH_OPMODE_CHK, 29, 1)
++    FIELD(GUSB2PHYCFG, RESERVED_25, 25, 1)
++    FIELD(GUSB2PHYCFG, LSTRD, 22, 3)
++    FIELD(GUSB2PHYCFG, LSIPD, 19, 3)
++    FIELD(GUSB2PHYCFG, ULPIEXTVBUSINDIACTOR, 18, 1)
++    FIELD(GUSB2PHYCFG, ULPIEXTVBUSDRV, 17, 1)
++    FIELD(GUSB2PHYCFG, RESERVED_16, 16, 1)
++    FIELD(GUSB2PHYCFG, ULPIAUTORES, 15, 1)
++    FIELD(GUSB2PHYCFG, RESERVED_14, 14, 1)
++    FIELD(GUSB2PHYCFG, USBTRDTIM, 10, 4)
++    FIELD(GUSB2PHYCFG, XCVRDLY, 9, 1)
++    FIELD(GUSB2PHYCFG, ENBLSLPM, 8, 1)
++    FIELD(GUSB2PHYCFG, PHYSEL, 7, 1)
++    FIELD(GUSB2PHYCFG, SUSPENDUSB20, 6, 1)
++    FIELD(GUSB2PHYCFG, FSINTF, 5, 1)
++    FIELD(GUSB2PHYCFG, ULPI_UTMI_SEL, 4, 1)
++    FIELD(GUSB2PHYCFG, PHYIF, 3, 1)
++    FIELD(GUSB2PHYCFG, TOUTCAL, 0, 3)
++REG32(GUSB2I2CCTL, 0x140)
++REG32(GUSB2PHYACC_ULPI, 0x180)
++    FIELD(GUSB2PHYACC_ULPI, RESERVED_31_27, 27, 5)
++    FIELD(GUSB2PHYACC_ULPI, DISUIPIDRVR, 26, 1)
++    FIELD(GUSB2PHYACC_ULPI, NEWREGREQ, 25, 1)
++    FIELD(GUSB2PHYACC_ULPI, VSTSDONE, 24, 1)
++    FIELD(GUSB2PHYACC_ULPI, VSTSBSY, 23, 1)
++    FIELD(GUSB2PHYACC_ULPI, REGWR, 22, 1)
++    FIELD(GUSB2PHYACC_ULPI, REGADDR, 16, 6)
++    FIELD(GUSB2PHYACC_ULPI, EXTREGADDR, 8, 8)
++    FIELD(GUSB2PHYACC_ULPI, REGDATA, 0, 8)
++REG32(GTXFIFOSIZ0, 0x200)
++    FIELD(GTXFIFOSIZ0, TXFSTADDR_N, 16, 16)
++    FIELD(GTXFIFOSIZ0, TXFDEP_N, 0, 16)
++REG32(GTXFIFOSIZ1, 0x204)
++    FIELD(GTXFIFOSIZ1, TXFSTADDR_N, 16, 16)
++    FIELD(GTXFIFOSIZ1, TXFDEP_N, 0, 16)
++REG32(GTXFIFOSIZ2, 0x208)
++    FIELD(GTXFIFOSIZ2, TXFSTADDR_N, 16, 16)
++    FIELD(GTXFIFOSIZ2, TXFDEP_N, 0, 16)
++REG32(GTXFIFOSIZ3, 0x20c)
++    FIELD(GTXFIFOSIZ3, TXFSTADDR_N, 16, 16)
++    FIELD(GTXFIFOSIZ3, TXFDEP_N, 0, 16)
++REG32(GTXFIFOSIZ4, 0x210)
++    FIELD(GTXFIFOSIZ4, TXFSTADDR_N, 16, 16)
++    FIELD(GTXFIFOSIZ4, TXFDEP_N, 0, 16)
++REG32(GTXFIFOSIZ5, 0x214)
++    FIELD(GTXFIFOSIZ5, TXFSTADDR_N, 16, 16)
++    FIELD(GTXFIFOSIZ5, TXFDEP_N, 0, 16)
++REG32(GRXFIFOSIZ0, 0x280)
++    FIELD(GRXFIFOSIZ0, RXFSTADDR_N, 16, 16)
++    FIELD(GRXFIFOSIZ0, RXFDEP_N, 0, 16)
++REG32(GRXFIFOSIZ1, 0x284)
++    FIELD(GRXFIFOSIZ1, RXFSTADDR_N, 16, 16)
++    FIELD(GRXFIFOSIZ1, RXFDEP_N, 0, 16)
++REG32(GRXFIFOSIZ2, 0x288)
++    FIELD(GRXFIFOSIZ2, RXFSTADDR_N, 16, 16)
++    FIELD(GRXFIFOSIZ2, RXFDEP_N, 0, 16)
++REG32(GEVNTADRLO_0, 0x300)
++REG32(GEVNTADRHI_0, 0x304)
++REG32(GEVNTSIZ_0, 0x308)
++    FIELD(GEVNTSIZ_0, EVNTINTRPTMASK, 31, 1)
++    FIELD(GEVNTSIZ_0, RESERVED_30_16, 16, 15)
++    FIELD(GEVNTSIZ_0, EVENTSIZ, 0, 16)
++REG32(GEVNTCOUNT_0, 0x30c)
++    FIELD(GEVNTCOUNT_0, EVNT_HANDLER_BUSY, 31, 1)
++    FIELD(GEVNTCOUNT_0, RESERVED_30_16, 16, 15)
++    FIELD(GEVNTCOUNT_0, EVNTCOUNT, 0, 16)
++REG32(GEVNTADRLO_1, 0x310)
++REG32(GEVNTADRHI_1, 0x314)
++REG32(GEVNTSIZ_1, 0x318)
++    FIELD(GEVNTSIZ_1, EVNTINTRPTMASK, 31, 1)
++    FIELD(GEVNTSIZ_1, RESERVED_30_16, 16, 15)
++    FIELD(GEVNTSIZ_1, EVENTSIZ, 0, 16)
++REG32(GEVNTCOUNT_1, 0x31c)
++    FIELD(GEVNTCOUNT_1, EVNT_HANDLER_BUSY, 31, 1)
++    FIELD(GEVNTCOUNT_1, RESERVED_30_16, 16, 15)
++    FIELD(GEVNTCOUNT_1, EVNTCOUNT, 0, 16)
++REG32(GEVNTADRLO_2, 0x320)
++REG32(GEVNTADRHI_2, 0x324)
++REG32(GEVNTSIZ_2, 0x328)
++    FIELD(GEVNTSIZ_2, EVNTINTRPTMASK, 31, 1)
++    FIELD(GEVNTSIZ_2, RESERVED_30_16, 16, 15)
++    FIELD(GEVNTSIZ_2, EVENTSIZ, 0, 16)
++REG32(GEVNTCOUNT_2, 0x32c)
++    FIELD(GEVNTCOUNT_2, EVNT_HANDLER_BUSY, 31, 1)
++    FIELD(GEVNTCOUNT_2, RESERVED_30_16, 16, 15)
++    FIELD(GEVNTCOUNT_2, EVNTCOUNT, 0, 16)
++REG32(GEVNTADRLO_3, 0x330)
++REG32(GEVNTADRHI_3, 0x334)
++REG32(GEVNTSIZ_3, 0x338)
++    FIELD(GEVNTSIZ_3, EVNTINTRPTMASK, 31, 1)
++    FIELD(GEVNTSIZ_3, RESERVED_30_16, 16, 15)
++    FIELD(GEVNTSIZ_3, EVENTSIZ, 0, 16)
++REG32(GEVNTCOUNT_3, 0x33c)
++    FIELD(GEVNTCOUNT_3, EVNT_HANDLER_BUSY, 31, 1)
++    FIELD(GEVNTCOUNT_3, RESERVED_30_16, 16, 15)
++    FIELD(GEVNTCOUNT_3, EVNTCOUNT, 0, 16)
++REG32(GHWPARAMS8, 0x500)
++REG32(GTXFIFOPRIDEV, 0x510)
++    FIELD(GTXFIFOPRIDEV, RESERVED_31_N, 6, 26)
++    FIELD(GTXFIFOPRIDEV, GTXFIFOPRIDEV, 0, 6)
++REG32(GTXFIFOPRIHST, 0x518)
++    FIELD(GTXFIFOPRIHST, RESERVED_31_16, 3, 29)
++    FIELD(GTXFIFOPRIHST, GTXFIFOPRIHST, 0, 3)
++REG32(GRXFIFOPRIHST, 0x51c)
++    FIELD(GRXFIFOPRIHST, RESERVED_31_16, 3, 29)
++    FIELD(GRXFIFOPRIHST, GRXFIFOPRIHST, 0, 3)
++REG32(GDMAHLRATIO, 0x524)
++    FIELD(GDMAHLRATIO, RESERVED_31_13, 13, 19)
++    FIELD(GDMAHLRATIO, HSTRXFIFO, 8, 5)
++    FIELD(GDMAHLRATIO, RESERVED_7_5, 5, 3)
++    FIELD(GDMAHLRATIO, HSTTXFIFO, 0, 5)
++REG32(GFLADJ, 0x530)
++    FIELD(GFLADJ, GFLADJ_REFCLK_240MHZDECR_PLS1, 31, 1)
++    FIELD(GFLADJ, GFLADJ_REFCLK_240MHZ_DECR, 24, 7)
++    FIELD(GFLADJ, GFLADJ_REFCLK_LPM_SEL, 23, 1)
++    FIELD(GFLADJ, RESERVED_22, 22, 1)
++    FIELD(GFLADJ, GFLADJ_REFCLK_FLADJ, 8, 14)
++    FIELD(GFLADJ, GFLADJ_30MHZ_SDBND_SEL, 7, 1)
++    FIELD(GFLADJ, GFLADJ_30MHZ, 0, 6)
++
++static void reset_csr(USBDWC3 * s)
 +{
-+    XHCIPciState *s = container_of(xhci, XHCIPciState, xhci);
-+    PCIDevice *pci_dev = PCI_DEVICE(s);
++    int i = 0;
++    /*
++     * We reset all CSR regs except GCTL, GUCTL, GSTS, GSNPSID, GGPIO, GUID,
++     * GUSB2PHYCFGn registers and GUSB3PIPECTLn registers. We will skip PHY
++     * register as we don't implement them.
++     */
++    for (i = 0; i < R_GCTL; i++) {
++        register_reset(&s->regs_info[i]);
++    }
 +
-+    if (!msix_enabled(pci_dev)) {
-+        return;
++    for (i = R_GCTL; i < R_GBUSERRADDRLO; i++) {
++        if (i == R_GUCTL1 || i == R_GPMSTS) {
++            register_reset(&s->regs_info[i]);
++        } else {
++            continue;
++        }
 +    }
-+    if (enable == !!s->msix_used[n]) {
-+        return;
++
++    for (i = R_GBUSERRADDRLO; i < USB_DWC3_R_MAX; i++) {
++        register_reset(&s->regs_info[i]);
 +    }
-+    if (enable) {
-+        trace_usb_xhci_irq_msix_use(n);
-+        msix_vector_use(pci_dev, n);
-+        s->msix_used[n] = 1;
-+    } else {
-+        trace_usb_xhci_irq_msix_unuse(n);
-+        msix_vector_unuse(pci_dev, n);
-+        s->msix_used[n] = 0;
++
++    xhci_sysbus_reset(DEVICE(&s->sysbus_xhci));
++}
++
++static void usb_dwc3_gctl_postw(RegisterInfo *reg, uint64_t val64)
++{
++    USBDWC3 *s = USB_DWC3(reg->opaque);
++
++    if (ARRAY_FIELD_EX32(s->regs, GCTL, CORESOFTRESET)) {
++        reset_csr(s);
 +    }
 +}
 +
-+static void xhci_pci_intr_raise(XHCIState *xhci, int n, bool level)
++static void usb_dwc3_guid_postw(RegisterInfo *reg, uint64_t val64)
 +{
-+    XHCIPciState *s = container_of(xhci, XHCIPciState, xhci);
-+    PCIDevice *pci_dev = PCI_DEVICE(s);
++    USBDWC3 *s = USB_DWC3(reg->opaque);
 +
-+    if (n == 0 &&
-+        !(msix_enabled(pci_dev) ||
-+         msi_enabled(pci_dev))) {
-+        pci_set_irq(pci_dev, level);
-+    }
-+    if (msix_enabled(pci_dev)) {
-+        msix_notify(pci_dev, n);
-+        return;
-+    }
-+
-+    if (msi_enabled(pci_dev)) {
-+        msi_notify(pci_dev, n);
-+        return;
-+    }
++    s->regs[R_GUID] = s->cfg.dwc_usb3_user;
 +}
 +
-+static void xhci_pci_reset(DeviceState *dev)
++static void usb_dwc3_unimpl_postw(RegisterInfo *reg, uint64_t val64)
 +{
-+    XHCIPciState *s = XHCI_PCI(dev);
-+
-+    device_legacy_reset(DEVICE(&s->xhci));
++    qemu_log_mask(LOG_UNIMP, "%s not supported\n", reg->access->name);
 +}
 +
-+static void usb_xhci_pci_realize(struct PCIDevice *dev, Error **errp)
++static uint64_t usb_dwc3_unimpl_postr(RegisterInfo *reg, uint64_t val64)
 +{
-+    int ret;
++    qemu_log_mask(LOG_UNIMP, "%s not supported\n", reg->access->name);
++    return val64;
++}
++
++static const RegisterAccessInfo usb_dwc3_regs_info[] = {
++    {   .name = "GSBUSCFG0",  .addr = A_GSBUSCFG0,
++        .ro = 0xf300,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GSBUSCFG1",  .addr = A_GSBUSCFG1,
++        .reset = 0x300,
++        .ro = 0xffffe0ff,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GTXTHRCFG",  .addr = A_GTXTHRCFG,
++        .ro = 0xd000ffff,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GRXTHRCFG",  .addr = A_GRXTHRCFG,
++        .ro = 0xd007e000,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GCTL",  .addr = A_GCTL,
++        .reset = 0x30c13004, .post_write = usb_dwc3_gctl_postw,
++    },{ .name = "GPMSTS",  .addr = A_GPMSTS,
++        .ro = 0xfffffff,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GSTS",  .addr = A_GSTS,
++        .reset = 0x7e800000,
++        .ro = 0xffffffcf,
++        .w1c = 0x30,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GUCTL1",  .addr = A_GUCTL1,
++        .reset = 0x198a,
++        .ro = 0x7800,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GSNPSID",  .addr = A_GSNPSID,
++        .reset = 0x5533330a,
++        .ro = 0xffffffff,
++    },{ .name = "GGPIO",  .addr = A_GGPIO,
++        .ro = 0xffff,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GUID",  .addr = A_GUID,
++        .reset = 0x12345678, .post_write = usb_dwc3_guid_postw,
++    },{ .name = "GUCTL",  .addr = A_GUCTL,
++        .reset = 0x0c808010,
++        .ro = 0x1c8000,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GBUSERRADDRLO",  .addr = A_GBUSERRADDRLO,
++        .ro = 0xffffffff,
++        .post_read = usb_dwc3_unimpl_postr,
++    },{ .name = "GBUSERRADDRHI",  .addr = A_GBUSERRADDRHI,
++        .ro = 0xffffffff,
++        .post_read = usb_dwc3_unimpl_postr,
++    },{ .name = "GHWPARAMS0",  .addr = A_GHWPARAMS0,
++        .ro = 0xffffffff,
++    },{ .name = "GHWPARAMS1",  .addr = A_GHWPARAMS1,
++        .ro = 0xffffffff,
++    },{ .name = "GHWPARAMS2",  .addr = A_GHWPARAMS2,
++        .ro = 0xffffffff,
++    },{ .name = "GHWPARAMS3",  .addr = A_GHWPARAMS3,
++        .ro = 0xffffffff,
++    },{ .name = "GHWPARAMS4",  .addr = A_GHWPARAMS4,
++        .ro = 0xffffffff,
++    },{ .name = "GHWPARAMS5",  .addr = A_GHWPARAMS5,
++        .ro = 0xffffffff,
++    },{ .name = "GHWPARAMS6",  .addr = A_GHWPARAMS6,
++        .ro = 0xffffffff,
++    },{ .name = "GHWPARAMS7",  .addr = A_GHWPARAMS7,
++        .ro = 0xffffffff,
++    },{ .name = "GDBGFIFOSPACE",  .addr = A_GDBGFIFOSPACE,
++        .reset = 0xa0000,
++        .ro = 0xfffffe00,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GUCTL2",  .addr = A_GUCTL2,
++        .reset = 0x40d,
++        .ro = 0x2000,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GUSB2PHYCFG",  .addr = A_GUSB2PHYCFG,
++        .reset = 0x40102410,
++        .ro = 0x1e014030,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GUSB2I2CCTL",  .addr = A_GUSB2I2CCTL,
++        .ro = 0xffffffff,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GUSB2PHYACC_ULPI",  .addr = A_GUSB2PHYACC_ULPI,
++        .ro = 0xfd000000,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GTXFIFOSIZ0",  .addr = A_GTXFIFOSIZ0,
++        .reset = 0x2c7000a,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GTXFIFOSIZ1",  .addr = A_GTXFIFOSIZ1,
++        .reset = 0x2d10103,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GTXFIFOSIZ2",  .addr = A_GTXFIFOSIZ2,
++        .reset = 0x3d40103,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GTXFIFOSIZ3",  .addr = A_GTXFIFOSIZ3,
++        .reset = 0x4d70083,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GTXFIFOSIZ4",  .addr = A_GTXFIFOSIZ4,
++        .reset = 0x55a0083,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GTXFIFOSIZ5",  .addr = A_GTXFIFOSIZ5,
++        .reset = 0x5dd0083,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GRXFIFOSIZ0",  .addr = A_GRXFIFOSIZ0,
++        .reset = 0x1c20105,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GRXFIFOSIZ1",  .addr = A_GRXFIFOSIZ1,
++        .reset = 0x2c70000,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GRXFIFOSIZ2",  .addr = A_GRXFIFOSIZ2,
++        .reset = 0x2c70000,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GEVNTADRLO_0",  .addr = A_GEVNTADRLO_0,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GEVNTADRHI_0",  .addr = A_GEVNTADRHI_0,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GEVNTSIZ_0",  .addr = A_GEVNTSIZ_0,
++        .ro = 0x7fff0000,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GEVNTCOUNT_0",  .addr = A_GEVNTCOUNT_0,
++        .ro = 0x7fff0000,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GEVNTADRLO_1",  .addr = A_GEVNTADRLO_1,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GEVNTADRHI_1",  .addr = A_GEVNTADRHI_1,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GEVNTSIZ_1",  .addr = A_GEVNTSIZ_1,
++        .ro = 0x7fff0000,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GEVNTCOUNT_1",  .addr = A_GEVNTCOUNT_1,
++        .ro = 0x7fff0000,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GEVNTADRLO_2",  .addr = A_GEVNTADRLO_2,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GEVNTADRHI_2",  .addr = A_GEVNTADRHI_2,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GEVNTSIZ_2",  .addr = A_GEVNTSIZ_2,
++        .ro = 0x7fff0000,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GEVNTCOUNT_2",  .addr = A_GEVNTCOUNT_2,
++        .ro = 0x7fff0000,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GEVNTADRLO_3",  .addr = A_GEVNTADRLO_3,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GEVNTADRHI_3",  .addr = A_GEVNTADRHI_3,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GEVNTSIZ_3",  .addr = A_GEVNTSIZ_3,
++        .ro = 0x7fff0000,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GEVNTCOUNT_3",  .addr = A_GEVNTCOUNT_3,
++        .ro = 0x7fff0000,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GHWPARAMS8",  .addr = A_GHWPARAMS8,
++        .ro = 0xffffffff,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GTXFIFOPRIDEV",  .addr = A_GTXFIFOPRIDEV,
++        .ro = 0xffffffc0,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GTXFIFOPRIHST",  .addr = A_GTXFIFOPRIHST,
++        .ro = 0xfffffff8,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GRXFIFOPRIHST",  .addr = A_GRXFIFOPRIHST,
++        .ro = 0xfffffff8,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GDMAHLRATIO",  .addr = A_GDMAHLRATIO,
++        .ro = 0xffffe0e0,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    },{ .name = "GFLADJ",  .addr = A_GFLADJ,
++        .reset = 0xc83f020,
++        .rsvd = 0x40,
++        .ro = 0x400040,
++        .post_read = usb_dwc3_unimpl_postr,
++        .post_write = usb_dwc3_unimpl_postw,
++    }
++};
++
++static void usb_dwc3_reset(DeviceState *dev)
++{
++    USBDWC3 *s = USB_DWC3(dev);
++    unsigned int i;
++
++    for (i = 0; i < ARRAY_SIZE(s->regs_info); ++i) {
++        register_reset(&s->regs_info[i]);
++    }
++
++    /*
++     * Device Configuration
++     */
++    s->regs[R_GHWPARAMS0] = 0x40204048 | s->cfg.mode;
++    s->regs[R_GHWPARAMS1] = 0x222493b;
++    s->regs[R_GHWPARAMS2] = 0x12345678;
++    s->regs[R_GHWPARAMS3] = 0x618c088;
++    s->regs[R_GHWPARAMS4] = 0x47822004;
++    s->regs[R_GHWPARAMS5] = 0x4202088;
++    s->regs[R_GHWPARAMS6] = 0x7850c20;
++    s->regs[R_GHWPARAMS7] = 0x0;
++    s->regs[R_GHWPARAMS8] = 0x478;
++
++    xhci_sysbus_reset(DEVICE(&s->sysbus_xhci));
++}
++
++static const MemoryRegionOps usb_dwc3_ops = {
++    .read = register_read_memory,
++    .write = register_write_memory,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++    },
++};
++
++static void usb_dwc3_realize(DeviceState *dev, Error **errp)
++{
++    USBDWC3 *s = USB_DWC3(dev);
 +    Error *err = NULL;
-+    XHCIPciState *s = XHCI_PCI(dev);
 +
-+    dev->config[PCI_CLASS_PROG] = 0x30;    /* xHCI */
-+    dev->config[PCI_INTERRUPT_PIN] = 0x01; /* interrupt pin 1 */
-+    dev->config[PCI_CACHE_LINE_SIZE] = 0x10;
-+    dev->config[0x60] = 0x30; /* release number */
-+
-+    object_property_set_link(OBJECT(&s->xhci), "host", OBJECT(s), NULL);
-+    s->xhci.intr_update = xhci_pci_intr_update;
-+    s->xhci.intr_raise = xhci_pci_intr_raise;
-+    object_property_set_bool(OBJECT(&s->xhci), "realized", true, &err);
++    sysbus_realize(SYS_BUS_DEVICE(&s->sysbus_xhci), &err);
 +    if (err) {
 +        error_propagate(errp, err);
 +        return;
 +    }
-+    if (strcmp(object_get_typename(OBJECT(dev)), TYPE_NEC_XHCI) == 0) {
-+        s->xhci.nec_quirks = true;
-+    }
-+
-+    if (s->msi != ON_OFF_AUTO_OFF) {
-+        ret = msi_init(dev, 0x70, s->xhci.numintrs, true, false, &err);
-+        /*
-+         * Any error other than -ENOTSUP(board's MSI support is broken)
-+         * is a programming error
-+         */
-+        assert(!ret || ret == -ENOTSUP);
-+        if (ret && s->msi == ON_OFF_AUTO_ON) {
-+            /* Can't satisfy user's explicit msi=on request, fail */
-+            error_append_hint(&err, "You have to use msi=auto (default) or "
-+                    "msi=off with this machine type.\n");
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        assert(!err || s->msi == ON_OFF_AUTO_AUTO);
-+        /* With msi=auto, we fall back to MSI off silently */
-+        error_free(err);
-+    }
-+    pci_register_bar(dev, 0,
-+                     PCI_BASE_ADDRESS_SPACE_MEMORY |
-+                     PCI_BASE_ADDRESS_MEM_TYPE_64,
-+                     &s->xhci.mem);
-+
-+    if (pci_bus_is_express(pci_get_bus(dev)) ||
-+        xhci_get_flag(&s->xhci, XHCI_FLAG_FORCE_PCIE_ENDCAP)) {
-+        ret = pcie_endpoint_cap_init(dev, 0xa0);
-+        assert(ret > 0);
-+    }
-+
-+    if (s->msix != ON_OFF_AUTO_OFF) {
-+        /* TODO check for errors, and should fail when msix=on */
-+        msix_init(dev, s->xhci.numintrs,
-+                  &s->xhci.mem, 0, OFF_MSIX_TABLE,
-+                  &s->xhci.mem, 0, OFF_MSIX_PBA,
-+                  0x90, NULL);
-+    }
-+    s->xhci.as = pci_get_address_space(dev);
 +}
 +
-+static void usb_xhci_pci_exit(PCIDevice *dev)
++static void usb_dwc3_init(Object *obj)
 +{
-+    XHCIPciState *s = XHCI_PCI(dev);
-+    /* destroy msix memory region */
-+    if (dev->msix_table && dev->msix_pba
-+        && dev->msix_entry_used) {
-+        msix_uninit(dev, &s->xhci.mem, &s->xhci.mem);
-+    }
++    USBDWC3 *s = USB_DWC3(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    RegisterInfoArray *reg_array;
++
++    memory_region_init(&s->iomem, obj, TYPE_USB_DWC3, USB_DWC3_R_MAX * 4);
++    reg_array =
++        register_init_block32(DEVICE(obj), usb_dwc3_regs_info,
++                              ARRAY_SIZE(usb_dwc3_regs_info),
++                              s->regs_info, s->regs,
++                              &usb_dwc3_ops,
++                              USB_DWC3_ERR_DEBUG,
++                              USB_DWC3_R_MAX * 4);
++    memory_region_add_subregion(&s->iomem,
++                                0x0,
++                                &reg_array->mem);
++    sysbus_init_mmio(sbd, &s->iomem);
++    object_initialize_child(obj, "dwc3-xhci", &s->sysbus_xhci,
++                            TYPE_XHCI_SYSBUS);
++    qdev_alias_all_properties(DEVICE(&s->sysbus_xhci), obj);
++
++    s->cfg.mode = HOST_MODE;
 +}
 +
-+static const VMStateDescription vmstate_xhci_pci = {
-+    .name = "xhci-pci",
-+    .version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_PCI_DEVICE(parent_obj, XHCIPciState),
-+        VMSTATE_MSIX(parent_obj, XHCIPciState),
-+        VMSTATE_UINT8_ARRAY(msix_used, XHCIPciState, MAXINTRS),
-+        VMSTATE_END_OF_LIST()
-+    }
++static Property usb_dwc3_properties[] = {
++    DEFINE_PROP_UINT32("DWC_USB3_USERID", USBDWC3, cfg.dwc_usb3_user,
++                       0x12345678),
++    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void xhci_instance_init(Object *obj)
++static void usb_dwc3_class_init(ObjectClass *klass, void *data)
 +{
-+    XHCIPciState *s = XHCI_PCI(obj);
-+    /*
-+     * QEMU_PCI_CAP_EXPRESS initialization does not depend on QEMU command
-+     * line, therefore, no need to wait to realize like other devices
-+     */
-+    PCI_DEVICE(obj)->cap_present |= QEMU_PCI_CAP_EXPRESS;
-+    object_initialize_child(obj, "xhci-core", &s->xhci, TYPE_XHCI);
-+    qdev_alias_all_properties(DEVICE(&s->xhci), obj);
-+}
-+
-+static void xhci_class_init(ObjectClass *klass, void *data)
-+{
-+    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->reset   = xhci_pci_reset;
-+    dc->vmsd    = &vmstate_xhci_pci;
-+    set_bit(DEVICE_CATEGORY_USB, dc->categories);
-+    k->realize      = usb_xhci_pci_realize;
-+    k->exit         = usb_xhci_pci_exit;
-+    k->class_id     = PCI_CLASS_SERIAL_USB;
++    dc->reset = usb_dwc3_reset;
++    dc->realize = usb_dwc3_realize;
++    device_class_set_props(dc, usb_dwc3_properties);
 +}
 +
-+static const TypeInfo xhci_pci_info = {
-+    .name          = TYPE_XHCI_PCI,
-+    .parent        = TYPE_PCI_DEVICE,
-+    .instance_size = sizeof(XHCIPciState),
-+    .class_init    = xhci_class_init,
-+    .instance_init = xhci_instance_init,
-+    .abstract      = true,
-+    .interfaces = (InterfaceInfo[]) {
-+        { INTERFACE_PCIE_DEVICE },
-+        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-+        { }
-+    },
++static const TypeInfo usb_dwc3_info = {
++    .name          = TYPE_USB_DWC3,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(USBDWC3),
++    .class_init    = usb_dwc3_class_init,
++    .instance_init = usb_dwc3_init,
 +};
 +
- static void qemu_xhci_class_init(ObjectClass *klass, void *data)
- {
-     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-@@ -42,10 +218,11 @@ static void qemu_xhci_class_init(ObjectClass *klass, void *data)
++static void usb_dwc3_register_types(void)
++{
++    type_register_static(&usb_dwc3_info);
++}
++
++type_init(usb_dwc3_register_types)
+diff --git a/hw/usb/meson.build b/hw/usb/meson.build
+index 934e4fa..962fbc0 100644
+--- a/hw/usb/meson.build
++++ b/hw/usb/meson.build
+@@ -26,6 +26,7 @@ softmmu_ss.add(when: 'CONFIG_USB_XHCI_SYSBUS', if_true: files('hcd-xhci-sysbus.c
+ softmmu_ss.add(when: 'CONFIG_USB_XHCI_NEC', if_true: files('hcd-xhci-nec.c'))
+ softmmu_ss.add(when: 'CONFIG_USB_MUSB', if_true: files('hcd-musb.c'))
+ softmmu_ss.add(when: 'CONFIG_USB_DWC2', if_true: files('hcd-dwc2.c'))
++softmmu_ss.add(when: 'CONFIG_USB_DWC3', if_true: files('hcd-dwc3.c'))
  
- static void qemu_xhci_instance_init(Object *obj)
- {
--    XHCIState *xhci = XHCI(obj);
-+    XHCIPciState *s = XHCI_PCI(obj);
-+    XHCIState *xhci = &s->xhci;
- 
--    xhci->msi      = ON_OFF_AUTO_OFF;
--    xhci->msix     = ON_OFF_AUTO_AUTO;
-+    s->msi      = ON_OFF_AUTO_OFF;
-+    s->msix     = ON_OFF_AUTO_AUTO;
-     xhci->numintrs = MAXINTRS;
-     xhci->numslots = MAXSLOTS;
-     xhci_set_flag(xhci, XHCI_FLAG_SS_FIRST);
-@@ -53,13 +230,14 @@ static void qemu_xhci_instance_init(Object *obj)
- 
- static const TypeInfo qemu_xhci_info = {
-     .name          = TYPE_QEMU_XHCI,
--    .parent        = TYPE_XHCI,
-+    .parent        = TYPE_XHCI_PCI,
-     .class_init    = qemu_xhci_class_init,
-     .instance_init = qemu_xhci_instance_init,
- };
- 
- static void xhci_register_types(void)
- {
-+    type_register_static(&xhci_pci_info);
-     type_register_static(&qemu_xhci_info);
- }
- 
-diff --git a/hw/usb/hcd-xhci-pci.h b/hw/usb/hcd-xhci-pci.h
+ softmmu_ss.add(when: 'CONFIG_TUSB6010', if_true: files('tusb6010.c'))
+ softmmu_ss.add(when: 'CONFIG_IMX', if_true: files('chipidea.c'))
+diff --git a/include/hw/usb/hcd-dwc3.h b/include/hw/usb/hcd-dwc3.h
 new file mode 100644
-index 0000000..e7c005e
+index 0000000..586968d
 --- /dev/null
-+++ b/hw/usb/hcd-xhci-pci.h
-@@ -0,0 +1,45 @@
++++ b/include/hw/usb/hcd-dwc3.h
+@@ -0,0 +1,55 @@
 +/*
-+ * USB xHCI controller emulation
++ * QEMU model of the USB DWC3 host controller emulation.
 + *
-+ * Copyright (c) 2011 Securiforest
-+ * Date: 2011-05-11 ;  Author: Hector Martin <hector@marcansoft.com>
-+ * Based on usb-ohci.c, emulates Renesas NEC USB 3.0
-+ * Date: 2020-01-1; Author: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-+ * PCI hooks are moved from XHCIState to XHCIPciState
++ * Copyright (c) 2020 Xilinx Inc.
 + *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
++ * Written by Vikram Garhwal<fnu.vikram@xilinx.com>
 + *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
 + *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
 + */
++#ifndef HCD_DWC3_H
++#define HCD_DWC3_H
 +
-+#ifndef HW_USB_HCD_XHCI_PCI_H
-+#define HW_USB_HCD_XHCI_PCI_H
++#include "hw/usb/hcd-xhci.h"
++#include "hw/usb/hcd-xhci-sysbus.h"
 +
-+#include "hw/usb.h"
-+#include "hcd-xhci.h"
++#define TYPE_USB_DWC3 "usb_dwc3"
 +
-+#define TYPE_XHCI_PCI "pci-xhci"
-+#define XHCI_PCI(obj) \
-+    OBJECT_CHECK(XHCIPciState, (obj), TYPE_XHCI_PCI)
++#define USB_DWC3(obj) \
++     OBJECT_CHECK(USBDWC3, (obj), TYPE_USB_DWC3)
 +
++#define USB_DWC3_R_MAX ((0x530 / 4) + 1)
 +
-+typedef struct XHCIPciState {
-+    /*< private >*/
-+    PCIDevice parent_obj;
-+    /*< public >*/
-+    XHCIState xhci;
-+    OnOffAuto msi;
-+    OnOffAuto msix;
-+    uint8_t msix_used[MAXINTRS];
-+} XHCIPciState;
++typedef struct USBDWC3 {
++    SysBusDevice parent_obj;
++    MemoryRegion iomem;
++    MemoryRegion fifos;
++    XHCISysbusState sysbus_xhci;
++
++    uint32_t regs[USB_DWC3_R_MAX];
++    RegisterInfo regs_info[USB_DWC3_R_MAX];
++
++    struct {
++        uint8_t     mode;
++        uint32_t    dwc_usb3_user;
++    } cfg;
++
++} USBDWC3;
 +
 +#endif
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index f927567..6a03edd 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -24,10 +24,7 @@
- #include "qemu/module.h"
- #include "qemu/queue.h"
- #include "migration/vmstate.h"
--#include "hw/pci/pci.h"
- #include "hw/qdev-properties.h"
--#include "hw/pci/msi.h"
--#include "hw/pci/msix.h"
- #include "trace.h"
- #include "qapi/error.h"
- 
-@@ -56,8 +53,6 @@
- #define OFF_OPER        LEN_CAP
- #define OFF_RUNTIME     0x1000
- #define OFF_DOORBELL    0x2000
--#define OFF_MSIX_TABLE  0x3000
--#define OFF_MSIX_PBA    0x3800
- /* must be power of 2 */
- #define LEN_REGS        0x4000
- 
-@@ -547,54 +542,28 @@ static XHCIPort *xhci_lookup_port(XHCIState *xhci, struct USBPort *uport)
-     return &xhci->ports[index];
- }
- 
--static void xhci_intx_update(XHCIState *xhci)
-+static void xhci_intr_update(XHCIState *xhci, int v)
- {
--    PCIDevice *pci_dev = PCI_DEVICE(xhci);
-     int level = 0;
- 
--    if (msix_enabled(pci_dev) ||
--        msi_enabled(pci_dev)) {
--        return;
--    }
--
--    if (xhci->intr[0].iman & IMAN_IP &&
--        xhci->intr[0].iman & IMAN_IE &&
--        xhci->usbcmd & USBCMD_INTE) {
--        level = 1;
--    }
--
--    trace_usb_xhci_irq_intx(level);
--    pci_set_irq(pci_dev, level);
--}
--
--static void xhci_msix_update(XHCIState *xhci, int v)
--{
--    PCIDevice *pci_dev = PCI_DEVICE(xhci);
--    bool enabled;
--
--    if (!msix_enabled(pci_dev)) {
--        return;
--    }
--
--    enabled = xhci->intr[v].iman & IMAN_IE;
--    if (enabled == xhci->intr[v].msix_used) {
--        return;
-+    if (v == 0) {
-+        if (xhci->intr[0].iman & IMAN_IP &&
-+            xhci->intr[0].iman & IMAN_IE &&
-+            xhci->usbcmd & USBCMD_INTE) {
-+            level = 1;
-+        }
-+        if (xhci->intr_raise) {
-+            xhci->intr_raise(xhci, 0, level);
-+        }
-     }
--
--    if (enabled) {
--        trace_usb_xhci_irq_msix_use(v);
--        msix_vector_use(pci_dev, v);
--        xhci->intr[v].msix_used = true;
--    } else {
--        trace_usb_xhci_irq_msix_unuse(v);
--        msix_vector_unuse(pci_dev, v);
--        xhci->intr[v].msix_used = false;
-+    if (xhci->intr_update) {
-+        xhci->intr_update(xhci, v,
-+                     xhci->intr[v].iman & IMAN_IE);
-     }
- }
- 
- static void xhci_intr_raise(XHCIState *xhci, int v)
- {
--    PCIDevice *pci_dev = PCI_DEVICE(xhci);
-     bool pending = (xhci->intr[v].erdp_low & ERDP_EHB);
- 
-     xhci->intr[v].erdp_low |= ERDP_EHB;
-@@ -611,22 +580,8 @@ static void xhci_intr_raise(XHCIState *xhci, int v)
-     if (!(xhci->usbcmd & USBCMD_INTE)) {
-         return;
-     }
--
--    if (msix_enabled(pci_dev)) {
--        trace_usb_xhci_irq_msix(v);
--        msix_notify(pci_dev, v);
--        return;
--    }
--
--    if (msi_enabled(pci_dev)) {
--        trace_usb_xhci_irq_msi(v);
--        msi_notify(pci_dev, v);
--        return;
--    }
--
--    if (v == 0) {
--        trace_usb_xhci_irq_intx(1);
--        pci_irq_assert(pci_dev);
-+    if (xhci->intr_raise) {
-+        xhci->intr_raise(xhci, v, true);
-     }
- }
- 
-@@ -2717,7 +2672,6 @@ static void xhci_reset(DeviceState *dev)
-         xhci->intr[i].erstba_high = 0;
-         xhci->intr[i].erdp_low = 0;
-         xhci->intr[i].erdp_high = 0;
--        xhci->intr[i].msix_used = 0;
- 
-         xhci->intr[i].er_ep_idx = 0;
-         xhci->intr[i].er_pcs = 1;
-@@ -2939,8 +2893,7 @@ static uint64_t xhci_oper_read(void *ptr, hwaddr reg, unsigned size)
- static void xhci_oper_write(void *ptr, hwaddr reg,
-                             uint64_t val, unsigned size)
- {
--    XHCIState *xhci = ptr;
--    DeviceState *d = DEVICE(ptr);
-+    XHCIState *xhci = XHCI(ptr);
- 
-     trace_usb_xhci_oper_write(reg, val);
- 
-@@ -2962,15 +2915,15 @@ static void xhci_oper_write(void *ptr, hwaddr reg,
-         xhci->usbcmd = val & 0xc0f;
-         xhci_mfwrap_update(xhci);
-         if (val & USBCMD_HCRST) {
--            xhci_reset(d);
-+            xhci_reset(DEVICE(xhci));
-         }
--        xhci_intx_update(xhci);
-+        xhci_intr_update(xhci, 0);
-         break;
- 
-     case 0x04: /* USBSTS */
-         /* these bits are write-1-to-clear */
-         xhci->usbsts &= ~(val & (USBSTS_HSE|USBSTS_EINT|USBSTS_PCD|USBSTS_SRE));
--        xhci_intx_update(xhci);
-+        xhci_intr_update(xhci, 0);
-         break;
- 
-     case 0x14: /* DNCTRL */
-@@ -3073,10 +3026,7 @@ static void xhci_runtime_write(void *ptr, hwaddr reg,
-         }
-         intr->iman &= ~IMAN_IE;
-         intr->iman |= val & IMAN_IE;
--        if (v == 0) {
--            xhci_intx_update(xhci);
--        }
--        xhci_msix_update(xhci, v);
-+        xhci_intr_update(xhci, v);
-         break;
-     case 0x04: /* IMOD */
-         intr->imod = val;
-@@ -3321,7 +3271,6 @@ static USBBusOps xhci_bus_ops = {
- 
- static void usb_xhci_init(XHCIState *xhci)
- {
--    DeviceState *dev = DEVICE(xhci);
-     XHCIPort *port;
-     unsigned int i, usbports, speedmask;
- 
-@@ -3336,7 +3285,7 @@ static void usb_xhci_init(XHCIState *xhci)
-     usbports = MAX(xhci->numports_2, xhci->numports_3);
-     xhci->numports = xhci->numports_2 + xhci->numports_3;
- 
--    usb_bus_new(&xhci->bus, sizeof(xhci->bus), &xhci_bus_ops, dev);
-+    usb_bus_new(&xhci->bus, sizeof(xhci->bus), &xhci_bus_ops, xhci->hostOpaque);
- 
-     for (i = 0; i < usbports; i++) {
-         speedmask = 0;
-@@ -3376,21 +3325,12 @@ static void usb_xhci_init(XHCIState *xhci)
-     }
- }
- 
--static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
-+static void usb_xhci_realize(DeviceState *dev, Error **errp)
- {
--    int i, ret;
--    Error *err = NULL;
-+    int i;
- 
-     XHCIState *xhci = XHCI(dev);
- 
--    dev->config[PCI_CLASS_PROG] = 0x30;    /* xHCI */
--    dev->config[PCI_INTERRUPT_PIN] = 0x01; /* interrupt pin 1 */
--    dev->config[PCI_CACHE_LINE_SIZE] = 0x10;
--    dev->config[0x60] = 0x30; /* release number */
--
--    if (strcmp(object_get_typename(OBJECT(dev)), TYPE_NEC_XHCI) == 0) {
--        xhci->nec_quirks = true;
--    }
-     if (xhci->numintrs > MAXINTRS) {
-         xhci->numintrs = MAXINTRS;
-     }
-@@ -3412,36 +3352,18 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
-         xhci->max_pstreams_mask = 0;
-     }
- 
--    if (xhci->msi != ON_OFF_AUTO_OFF) {
--        ret = msi_init(dev, 0x70, xhci->numintrs, true, false, &err);
--        /* Any error other than -ENOTSUP(board's MSI support is broken)
--         * is a programming error */
--        assert(!ret || ret == -ENOTSUP);
--        if (ret && xhci->msi == ON_OFF_AUTO_ON) {
--            /* Can't satisfy user's explicit msi=on request, fail */
--            error_append_hint(&err, "You have to use msi=auto (default) or "
--                    "msi=off with this machine type.\n");
--            error_propagate(errp, err);
--            return;
--        }
--        assert(!err || xhci->msi == ON_OFF_AUTO_AUTO);
--        /* With msi=auto, we fall back to MSI off silently */
--        error_free(err);
--    }
--
-     usb_xhci_init(xhci);
--    xhci->as = pci_get_address_space(dev);
-     xhci->mfwrap_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, xhci_mfwrap_timer, xhci);
- 
--    memory_region_init(&xhci->mem, OBJECT(xhci), "xhci", LEN_REGS);
--    memory_region_init_io(&xhci->mem_cap, OBJECT(xhci), &xhci_cap_ops, xhci,
-+    memory_region_init(&xhci->mem, OBJECT(dev), "xhci", LEN_REGS);
-+    memory_region_init_io(&xhci->mem_cap, OBJECT(dev), &xhci_cap_ops, xhci,
-                           "capabilities", LEN_CAP);
--    memory_region_init_io(&xhci->mem_oper, OBJECT(xhci), &xhci_oper_ops, xhci,
-+    memory_region_init_io(&xhci->mem_oper, OBJECT(dev), &xhci_oper_ops, xhci,
-                           "operational", 0x400);
--    memory_region_init_io(&xhci->mem_runtime, OBJECT(xhci), &xhci_runtime_ops, xhci,
--                          "runtime", LEN_RUNTIME);
--    memory_region_init_io(&xhci->mem_doorbell, OBJECT(xhci), &xhci_doorbell_ops, xhci,
--                          "doorbell", LEN_DOORBELL);
-+    memory_region_init_io(&xhci->mem_runtime, OBJECT(dev), &xhci_runtime_ops,
-+                           xhci, "runtime", LEN_RUNTIME);
-+    memory_region_init_io(&xhci->mem_doorbell, OBJECT(dev), &xhci_doorbell_ops,
-+                           xhci, "doorbell", LEN_DOORBELL);
- 
-     memory_region_add_subregion(&xhci->mem, 0,            &xhci->mem_cap);
-     memory_region_add_subregion(&xhci->mem, OFF_OPER,     &xhci->mem_oper);
-@@ -3452,31 +3374,13 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
-         XHCIPort *port = &xhci->ports[i];
-         uint32_t offset = OFF_OPER + 0x400 + 0x10 * i;
-         port->xhci = xhci;
--        memory_region_init_io(&port->mem, OBJECT(xhci), &xhci_port_ops, port,
-+        memory_region_init_io(&port->mem, OBJECT(dev), &xhci_port_ops, port,
-                               port->name, 0x10);
-         memory_region_add_subregion(&xhci->mem, offset, &port->mem);
-     }
--
--    pci_register_bar(dev, 0,
--                     PCI_BASE_ADDRESS_SPACE_MEMORY|PCI_BASE_ADDRESS_MEM_TYPE_64,
--                     &xhci->mem);
--
--    if (pci_bus_is_express(pci_get_bus(dev)) ||
--        xhci_get_flag(xhci, XHCI_FLAG_FORCE_PCIE_ENDCAP)) {
--        ret = pcie_endpoint_cap_init(dev, 0xa0);
--        assert(ret > 0);
--    }
--
--    if (xhci->msix != ON_OFF_AUTO_OFF) {
--        /* TODO check for errors, and should fail when msix=on */
--        msix_init(dev, xhci->numintrs,
--                  &xhci->mem, 0, OFF_MSIX_TABLE,
--                  &xhci->mem, 0, OFF_MSIX_PBA,
--                  0x90, NULL);
--    }
- }
- 
--static void usb_xhci_exit(PCIDevice *dev)
-+static void usb_xhci_unrealize(DeviceState *dev)
- {
-     int i;
-     XHCIState *xhci = XHCI(dev);
-@@ -3503,19 +3407,12 @@ static void usb_xhci_exit(PCIDevice *dev)
-         memory_region_del_subregion(&xhci->mem, &port->mem);
-     }
- 
--    /* destroy msix memory region */
--    if (dev->msix_table && dev->msix_pba
--        && dev->msix_entry_used) {
--        msix_uninit(dev, &xhci->mem, &xhci->mem);
--    }
--
-     usb_bus_release(&xhci->bus);
- }
- 
- static int usb_xhci_post_load(void *opaque, int version_id)
- {
-     XHCIState *xhci = opaque;
--    PCIDevice *pci_dev = PCI_DEVICE(xhci);
-     XHCISlot *slot;
-     XHCIEPContext *epctx;
-     dma_addr_t dcbaap, pctx;
-@@ -3561,11 +3458,7 @@ static int usb_xhci_post_load(void *opaque, int version_id)
-     }
- 
-     for (intr = 0; intr < xhci->numintrs; intr++) {
--        if (xhci->intr[intr].msix_used) {
--            msix_vector_use(pci_dev, intr);
--        } else {
--            msix_vector_unuse(pci_dev, intr);
--        }
-+        xhci_intr_update(xhci, intr);
-     }
- 
-     return 0;
-@@ -3634,7 +3527,6 @@ static const VMStateDescription vmstate_xhci_intr = {
-         VMSTATE_UINT32(erdp_high,     XHCIInterrupter),
- 
-         /* state */
--        VMSTATE_BOOL(msix_used,       XHCIInterrupter),
-         VMSTATE_BOOL(er_pcs,          XHCIInterrupter),
-         VMSTATE_UINT64(er_start,      XHCIInterrupter),
-         VMSTATE_UINT32(er_size,       XHCIInterrupter),
-@@ -3657,9 +3549,6 @@ static const VMStateDescription vmstate_xhci = {
-     .version_id = 1,
-     .post_load = usb_xhci_post_load,
-     .fields = (VMStateField[]) {
--        VMSTATE_PCI_DEVICE(parent_obj, XHCIState),
--        VMSTATE_MSIX(parent_obj, XHCIState),
--
-         VMSTATE_STRUCT_VARRAY_UINT32(ports, XHCIState, numports, 1,
-                                      vmstate_xhci_port, XHCIPort),
-         VMSTATE_STRUCT_VARRAY_UINT32(slots, XHCIState, numslots, 1,
-@@ -3691,42 +3580,28 @@ static Property xhci_properties[] = {
-                     XHCI_FLAG_ENABLE_STREAMS, true),
-     DEFINE_PROP_UINT32("p2",    XHCIState, numports_2, 4),
-     DEFINE_PROP_UINT32("p3",    XHCIState, numports_3, 4),
-+    DEFINE_PROP_LINK("host",    XHCIState, hostOpaque, TYPE_DEVICE,
-+                     DeviceState *),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
--static void xhci_instance_init(Object *obj)
--{
--    /* QEMU_PCI_CAP_EXPRESS initialization does not depend on QEMU command
--     * line, therefore, no need to wait to realize like other devices */
--    PCI_DEVICE(obj)->cap_present |= QEMU_PCI_CAP_EXPRESS;
--}
--
- static void xhci_class_init(ObjectClass *klass, void *data)
- {
--    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-+    dc->realize = usb_xhci_realize;
-+    dc->unrealize = usb_xhci_unrealize;
-+    dc->reset   = xhci_reset;
-     dc->vmsd    = &vmstate_xhci;
-     device_class_set_props(dc, xhci_properties);
--    dc->reset   = xhci_reset;
--    set_bit(DEVICE_CATEGORY_USB, dc->categories);
--    k->realize      = usb_xhci_realize;
--    k->exit         = usb_xhci_exit;
--    k->class_id     = PCI_CLASS_SERIAL_USB;
-+    dc->user_creatable = false;
- }
- 
- static const TypeInfo xhci_info = {
-     .name          = TYPE_XHCI,
--    .parent        = TYPE_PCI_DEVICE,
-+    .parent        = TYPE_DEVICE,
-     .instance_size = sizeof(XHCIState),
-     .class_init    = xhci_class_init,
--    .instance_init = xhci_instance_init,
--    .abstract      = true,
--    .interfaces = (InterfaceInfo[]) {
--        { INTERFACE_PCIE_DEVICE },
--        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
--        { }
--    },
- };
- 
- static void xhci_register_types(void)
-diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
-index dab3424..525291b 100644
---- a/hw/usb/hcd-xhci.h
-+++ b/hw/usb/hcd-xhci.h
-@@ -24,6 +24,7 @@
- #include "qom/object.h"
- 
- #include "hw/usb.h"
-+#include "sysemu/dma.h"
- 
- #define TYPE_XHCI "base-xhci"
- #define TYPE_NEC_XHCI "nec-usb-xhci"
-@@ -171,7 +172,7 @@ typedef struct XHCIInterrupter {
-     uint32_t erdp_low;
-     uint32_t erdp_high;
- 
--    bool msix_used, er_pcs;
-+    bool er_pcs;
- 
-     dma_addr_t er_start;
-     uint32_t er_size;
-@@ -185,10 +186,8 @@ typedef struct XHCIInterrupter {
- 
- } XHCIInterrupter;
- 
--struct XHCIState {
--    /*< private >*/
--    PCIDevice parent_obj;
--    /*< public >*/
-+typedef struct XHCIState {
-+    DeviceState parent;
- 
-     USBBus bus;
-     MemoryRegion mem;
-@@ -205,8 +204,9 @@ struct XHCIState {
-     uint32_t numslots;
-     uint32_t flags;
-     uint32_t max_pstreams_mask;
--    OnOffAuto msi;
--    OnOffAuto msix;
-+    void (*intr_update)(XHCIState *s, int n, bool enable);
-+    void (*intr_raise)(XHCIState *s, int n, bool level);
-+    DeviceState *hostOpaque;
- 
-     /* Operational Registers */
-     uint32_t usbcmd;
-@@ -231,7 +231,7 @@ struct XHCIState {
-     XHCIRing cmd_ring;
- 
-     bool nec_quirks;
--};
-+} XHCIState;
- 
- bool xhci_get_flag(XHCIState *xhci, enum xhci_flags bit);
- void xhci_set_flag(XHCIState *xhci, enum xhci_flags bit);
 -- 
 2.7.4
 
