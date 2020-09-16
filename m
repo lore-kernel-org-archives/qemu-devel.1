@@ -2,76 +2,91 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ADF9C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:02:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8427C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:04:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F49A2220E
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:02:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6714B2220E
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:04:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WCMw7FvJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F49A2220E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WfKCUzvp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6714B2220E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIW9F-0003nK-77
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 08:02:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54370)
+	id 1kIWAL-00058M-CH
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 08:04:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56594)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kIVuw-00074G-Lh
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:48:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21764)
+ (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
+ id 1kIW6L-0000hU-03
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:59:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34530)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kIVuu-0008Bq-Sa
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:48:06 -0400
+ (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
+ id 1kIW6I-0001C0-KM
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:59:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600256884;
+ s=mimecast20190719; t=1600257587;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=HuiDXMcON1NzKj/dAWVPuUogvuM/Y+oabFxej02umqw=;
- b=WCMw7FvJWw5F0ANNIL+gFDklMdmAeqTWVBZkMeGXdg659RyfCgmTCtnTK5ieaLljyCjt3D
- CZ8nHTpgBcwy5a4XnmxPVEpmvy8+Jb6s4hkI964KtZWE0trK7IHlrW++ESE6DPKkPVrb63
- czKM6KHiOQtrByowidafSB5RGqj4jIM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-fvPXXXnMMCi3yhuKwxAYfQ-1; Wed, 16 Sep 2020 07:48:02 -0400
-X-MC-Unique: fvPXXXnMMCi3yhuKwxAYfQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0FAAF87A831;
- Wed, 16 Sep 2020 11:48:01 +0000 (UTC)
-Received: from thuth.com (ovpn-113-19.ams2.redhat.com [10.36.113.19])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BBE625DE4A;
- Wed, 16 Sep 2020 11:47:59 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 17/24] vmstate: Fixes test-vmstate.c on msys2/mingw
-Date: Wed, 16 Sep 2020 13:47:24 +0200
-Message-Id: <20200916114731.102080-18-thuth@redhat.com>
-In-Reply-To: <20200916114731.102080-1-thuth@redhat.com>
-References: <20200916114731.102080-1-thuth@redhat.com>
+ bh=hH624yEul52ULnR9EqiYlG9OV+Yh9dZyn6ubeR2SBAc=;
+ b=WfKCUzvp5H8oc2mvpOuHOqP/jBmwroZoDK1nUfoGVGUiAqChz85DVEZLRdJUCl1sKrtGTo
+ IU6mDJwxX5PNG9ADNeJVfXCkPrkTc1ujgNMb1W3mfrzfLkXU04x2sbOyfg8GnfDoXpQoJO
+ bVc+9q81qNuiR395+0rbbRKEtJlmcF4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-59-0bK3UGZEMC6MpdEgRxvWoA-1; Wed, 16 Sep 2020 07:59:46 -0400
+X-MC-Unique: 0bK3UGZEMC6MpdEgRxvWoA-1
+Received: by mail-wr1-f71.google.com with SMTP id v12so2460041wrm.9
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 04:59:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+ :message-id:mime-version;
+ bh=hH624yEul52ULnR9EqiYlG9OV+Yh9dZyn6ubeR2SBAc=;
+ b=ciX6+FLKAxox+BoiGAB6f/zfqn5yKjcrfX94TJRmOs0nQfpRfq2at5v90V/7MPQiVq
+ L3Z0M88M6QMpkwa7Cm/Zq3DHw4nApZvT6vnE0VRcU4ACwidGvmXuzKnOG9IN2aRAsrcM
+ BTg/5LoHmWqRbe769IFwbRkEBFXIf0PK92QsqcBodpxii6eReOInIld+mKjX1cv4zmcf
+ mhf5I1F8yQ0b5YBYRucK5NgsQagd1IZkJdy/FybinOI3ZUuzNf8RJWIGaAuYTtmlgeeY
+ xnjPz9CVx6/1dZiNJOkehkaF+lz7BldimFJupW65LLVizk17be//NNSCljm7fTtMZ8JR
+ FXUg==
+X-Gm-Message-State: AOAM530bsjebM8li4yopiLWSc3k5FjdTlZ+Cn9v+7cYMYa0jM1n3jTEA
+ /0mESum6sqS1SV7Dqk++WBFzX9ESsJKC6XfKQYKAAnRsX75YMRYgQaKFGrRGD/msMLmtdPFI382
+ fbItqW79Oapiia+o=
+X-Received: by 2002:a5d:4c4c:: with SMTP id n12mr13041362wrt.162.1600257585028; 
+ Wed, 16 Sep 2020 04:59:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxHPoIjRdathkMPoqSzY2w6iy/fDaeOn+3czvQg8WRyYQiy+NMGDrZg08acIK48s/qcHGuXgA==
+X-Received: by 2002:a5d:4c4c:: with SMTP id n12mr13041342wrt.162.1600257584816; 
+ Wed, 16 Sep 2020 04:59:44 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+ by smtp.gmail.com with ESMTPSA id y6sm32981201wrn.41.2020.09.16.04.59.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 16 Sep 2020 04:59:44 -0700 (PDT)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Antoine Damhet <antoine.damhet@blade-group.com>
+Subject: Re: [BUG] Migration hv_time rollback
+In-Reply-To: <20200916112956.GE2833@work-vm>
+References: <20200916090602.blkm7eym6g5bnvvk@tartarus>
+ <20200916112956.GE2833@work-vm>
+Date: Wed, 16 Sep 2020 13:59:43 +0200
+Message-ID: <87bli6hqz4.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vkuznets@redhat.com
+X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=vkuznets@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:16:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -94,48 +109,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yonggang Luo <luoyonggang@gmail.com>
+Cc: Juan Quintela <quintela@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yonggang Luo <luoyonggang@gmail.com>
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
 
-The vmstate are valid on win32, just need generate tmp path properly
+> cc'ing in Vitaly who knows about the hv stuff.
+>
 
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200910103059.987-17-luoyonggang@gmail.com>
-[thuth: Make indentation a little bit nicer]
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/test-vmstate.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+cc'ing Marcelo who knows about clocksources :-)
 
-diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-index 1c763015d0..a001879585 100644
---- a/tests/test-vmstate.c
-+++ b/tests/test-vmstate.c
-@@ -34,7 +34,6 @@
- #include "qemu/module.h"
- #include "io/channel-file.h"
- 
--static char temp_file[] = "/tmp/vmst.test.XXXXXX";
- static int temp_fd;
- 
- 
-@@ -1484,6 +1483,8 @@ static void test_tmp_struct(void)
- 
- int main(int argc, char **argv)
- {
-+    g_autofree char *temp_file = g_strdup_printf("%s/vmst.test.XXXXXX",
-+                                                 g_get_tmp_dir());
-     temp_fd = mkstemp(temp_file);
- 
-     module_call_init(MODULE_INIT_QOM);
+> * Antoine Damhet (antoine.damhet@blade-group.com) wrote:
+>> Hi,
+>> 
+>> We are experiencing timestamp rollbacks during live-migration of
+>> Windows 10 guests
+
+Are you migrating to the same hardware (with the same TSC frequency)? Is
+TSC used as the clocksource on the host?
+
+>>  with the following qemu configuration (linux 5.4.46
+>> and qemu master):
+>> ```
+>> $ qemu-system-x86_64 -enable-kvm -cpu host,kvm=off,hv_time [...]
+>> ```
+
+Out of pure curiosity, what's the purpose of doing 'kvm=off'? Windows is
+not going to check for KVM identification anyway so we pretend we're
+Hyper-V. 
+
+Also, have you tried adding more Hyper-V enlightenments? 
+
+>
+> How big a jump are you seeing, and how did you notice it in the guest?
+>
+> Dave
+>
+>> I have tracked the bug to the fact that `kvmclock` is not exposed and
+>> disabled from qemu PoV but is in fact used by `hv-time` (in KVM).
+>> 
+>> I think we should enable the `kvmclock` (qemu device) if `hv-time` is
+>> present and add Hyper-V support for the `kvmclock_current_nsec`
+>> function.
+
+AFAICT kvmclock_current_nsec() checks whether kvmclock was enabled by
+the guest:
+
+   if (!(env->system_time_msr & 1ULL)) {
+        /* KVM clock not active */
+        return 0;
+    }
+
+and this is (and way) always false for Windows guests.
+
+>> 
+>> I'm asking for advice because I am unsure this is the _right_ approach
+>> and how to keep migration compatibility between qemu versions.
+>> 
+>> Thank you all,
+>> 
+>> -- 
+>> Antoine 'xdbob' Damhet
+
 -- 
-2.18.2
+Vitaly
 
 
