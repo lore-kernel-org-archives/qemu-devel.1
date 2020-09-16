@@ -2,91 +2,87 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA383C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 14:48:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7CC3C43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 14:51:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43A1A206B6
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 14:48:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 40359206A2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 14:51:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PT5B2iYH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43A1A206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kkt+/L37"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40359206A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIYjC-0007WR-A9
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 10:48:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45152)
+	id 1kIYm0-0001Wa-7K
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 10:51:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49580)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kIYaQ-0005S3-H8
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 10:39:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38441)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kIYaM-0006Go-Jq
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 10:39:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600267138;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=R6fPnA29b8vf7iGASP7uT335/2td1i6AEAx1ei5gSac=;
- b=PT5B2iYH6/vrM7z3eHeCliZgsJYxnF1fR2bNjR7ehYjK3UYFwrAOBfVgwjmYRRpoJb+nqu
- Ylfed+rR6mwrrEqnB7i7Nb29gesYqGxP9jIRMYNqvwwLy+9VAwIDOYzEdsbzwnuK0xfeKH
- K+CVll5MBI2OjbxUuXpID6jB1/5YmPY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-HRZJjEAbML20p6_LbAkGNw-1; Wed, 16 Sep 2020 10:38:57 -0400
-X-MC-Unique: HRZJjEAbML20p6_LbAkGNw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E76E64093;
- Wed, 16 Sep 2020 14:38:56 +0000 (UTC)
-Received: from [10.10.119.140] (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 85E7075141;
- Wed, 16 Sep 2020 14:38:55 +0000 (UTC)
-Subject: Re: [PATCH 08/37] qapi/common.py: Remove python compatibility
- workaround
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200915224027.2529813-1-jsnow@redhat.com>
- <20200915224027.2529813-9-jsnow@redhat.com>
- <87ft7hoq6y.fsf@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <1d33b2b6-afe8-333d-a8fe-fd972ed068b0@redhat.com>
-Date: Wed, 16 Sep 2020 10:38:55 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kIYkl-0000Wz-2y
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 10:49:47 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:37428)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kIYki-0008JA-Ub
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 10:49:46 -0400
+Received: by mail-ot1-x344.google.com with SMTP id o8so6964458otl.4
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 07:49:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=yoQwZ1yv/zPKg5lJjkoCwnAWXu3hQl29vyl4bu0QTkw=;
+ b=Kkt+/L37juJR8SWpE5jU4FX+yRfqRqB0Blc8z7QvnQJ7ip+Qp2Jn3YcBlFu2jZi6jW
+ VLvUHqXxteBJEaBeou7Sl+PHm+XCM3kryyWfjiDSYFKq3k1MMKkmhKgi66kTKnWJDA24
+ 5EqG/K5z0BoozPLB+1mZ5YCCZc+UV/OumCSfTHt4/+Jmj/89k4H+8HaiDizMIiFRkgFl
+ IS1inAom9cooD4ECfYCn502xcrHFXcLNtjWyfiW2JOMIsTDf+hAr9luIUDdC0rMfDwpT
+ QZazWAUxw2iHwMy26CY73+Xds+rV9UEWWhE57oD4FrqSfEZ3VPdjKXHW73b1CCKRLHF0
+ D6MA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=yoQwZ1yv/zPKg5lJjkoCwnAWXu3hQl29vyl4bu0QTkw=;
+ b=FHO0uQnwUz8wifRQo5PjIpmindNjs11Qm5hzRSKaVeCSEIU4grycYeY/ahbjouiIqM
+ nabXBWVtrygugVnQ8ZkpBABI0sGY1OSprbUHHxjMyccDQMiodgumKpXb0ZGEVEJeN3N+
+ 0PWtkv71fuDjAJzizXNIpydpq0VZA+TnoUSR3b2J7ibQljviRWklGEnNreW5eipwve1k
+ 8S617fIJ6pyqnBSmETj5LPhUM7CLYBhUEweUuRlSpW1gMbP2Wg6sNDl7fUPTB5XqRIT9
+ uVCqsMimNXnltVpyZ+ouORHwGZEjBOEsTpVR9ZeN0InQ+efYVd2NvBQvhajS5mhvvKFs
+ VpRA==
+X-Gm-Message-State: AOAM532LDCSSZfZIaD29cfwRBVWvIBUhIduB/0WUc72K4dIL37AK8S26
+ ClyfMzyZZ5aiwuM2qB0KCZE25bmdQYbK9tgOC94=
+X-Google-Smtp-Source: ABdhPJx9JWPCqCKA+mhzhWlmlKxD5Og3iwXDBnZF+lY9xsSA7LF1Djw6ew71amOSRDX7N8rm8SrGPDKA4r2ZWVxDMjo=
+X-Received: by 2002:a9d:5e11:: with SMTP id d17mr16224395oti.333.1600267783460; 
+ Wed, 16 Sep 2020 07:49:43 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87ft7hoq6y.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:35:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -51
-X-Spam_score: -5.2
-X-Spam_bar: -----
-X-Spam_report: (-5.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.062, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+References: <1600237327-33618-1-git-send-email-zhengchuan@huawei.com>
+ <1600237327-33618-8-git-send-email-zhengchuan@huawei.com>
+In-Reply-To: <1600237327-33618-8-git-send-email-zhengchuan@huawei.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Wed, 16 Sep 2020 22:49:07 +0800
+Message-ID: <CAKXe6SLgL5DkRM6VSF88gc9msW_SPLj-QK56Pi0w9Gp5FE-Q-g@mail.gmail.com>
+Subject: Re: [PATCH v10 07/12] migration/dirtyrate: Compare page hash results
+ for recorded sampled page
+To: Chuan Zheng <zhengchuan@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=liq3ea@gmail.com; helo=mail-ot1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,41 +96,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, xiexiangyou@huawei.com,
+ Qemu Developers <qemu-devel@nongnu.org>, AlexChen <alex.chen@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/16/20 8:34 AM, Markus Armbruster wrote:
-> John Snow <jsnow@redhat.com> writes:
-> 
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>   scripts/qapi/common.py | 5 +----
->>   1 file changed, 1 insertion(+), 4 deletions(-)
->>
->> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
->> index ba35abea47..4fb265a8bf 100644
->> --- a/scripts/qapi/common.py
->> +++ b/scripts/qapi/common.py
->> @@ -119,10 +119,7 @@ def cgen(code, **kwds):
->>       raw = code % kwds
->>       if indent_level:
->>           indent = genindent(indent_level)
->> -        # re.subn() lacks flags support before Python 2.7, use re.compile()
->> -        raw = re.subn(re.compile(r'^(?!(#|$))', re.MULTILINE),
->> -                      indent, raw)
->> -        raw = raw[0]
->> +        raw, _ = re.subn(r'^(?!(#|$))', indent, raw, flags=re.MULTILINE)
->>       return re.sub(re.escape(eatspace) + r' *', '', raw)
-> 
-> I missed this one in my "qapi: Bye-bye Python 2" series.
-> 
-> Can we use re.sub() instead?
-> 
+Chuan Zheng <zhengchuan@huawei.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=8816=E6=
+=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=882:11=E5=86=99=E9=81=93=EF=BC=9A
+>
+> Compare page hash results for recorded sampled page.
+>
+> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+> Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Yup.
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
 
+> ---
+>  migration/dirtyrate.c | 63 +++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  1 file changed, 63 insertions(+)
+>
+> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+> index 5e6eedf..68561af 100644
+> --- a/migration/dirtyrate.c
+> +++ b/migration/dirtyrate.c
+> @@ -177,6 +177,69 @@ out:
+>      return ret;
+>  }
+>
+> +static void calc_page_dirty_rate(struct RamblockDirtyInfo *info)
+> +{
+> +    uint32_t crc;
+> +    int i;
+> +
+> +    for (i =3D 0; i < info->sample_pages_count; i++) {
+> +        crc =3D get_ramblock_vfn_hash(info, info->sample_page_vfn[i]);
+> +        if (crc !=3D info->hash_result[i]) {
+> +            info->sample_dirty_count++;
+> +        }
+> +    }
+> +}
+> +
+> +static struct RamblockDirtyInfo *
+> +find_block_matched(RAMBlock *block, int count,
+> +                  struct RamblockDirtyInfo *infos)
+> +{
+> +    int i;
+> +    struct RamblockDirtyInfo *matched;
+> +
+> +    for (i =3D 0; i < count; i++) {
+> +        if (!strcmp(infos[i].idstr, qemu_ram_get_idstr(block))) {
+> +            break;
+> +        }
+> +    }
+> +
+> +    if (i =3D=3D count) {
+> +        return NULL;
+> +    }
+> +
+> +    if (infos[i].ramblock_addr !=3D qemu_ram_get_host_addr(block) ||
+> +        infos[i].ramblock_pages !=3D
+> +            (qemu_ram_get_used_length(block) >> TARGET_PAGE_BITS)) {
+> +        return NULL;
+> +    }
+> +
+> +    matched =3D &infos[i];
+> +
+> +    return matched;
+> +}
+> +
+> +static bool compare_page_hash_info(struct RamblockDirtyInfo *info,
+> +                                  int block_count)
+> +{
+> +    struct RamblockDirtyInfo *block_dinfo =3D NULL;
+> +    RAMBlock *block =3D NULL;
+> +
+> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+> +        block_dinfo =3D find_block_matched(block, block_count, info);
+> +        if (block_dinfo =3D=3D NULL) {
+> +            continue;
+> +        }
+> +        calc_page_dirty_rate(block_dinfo);
+> +        update_dirtyrate_stat(block_dinfo);
+> +    }
+> +
+> +    if (DirtyStat.total_sample_count =3D=3D 0) {
+> +        return false;
+> +    }
+> +
+> +    return true;
+> +}
+> +
+>  static void calculate_dirtyrate(struct DirtyRateConfig config)
+>  {
+>      /* todo */
+> --
+> 1.8.3.1
+>
 
