@@ -2,125 +2,96 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71CD2C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:28:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAA37C43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:28:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99A9A21D24
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:28:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0048F206E6
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:28:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="dbitehDw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99A9A21D24
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KjnfAnTD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0048F206E6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIWXZ-0003Hk-JF
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 08:28:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34814)
+	id 1kIWXi-0003gH-Tz
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 08:28:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36622)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kIWQd-0004ii-Dn; Wed, 16 Sep 2020 08:20:52 -0400
-Received: from mail-eopbgr40130.outbound.protection.outlook.com
- ([40.107.4.130]:3150 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kIWQZ-0004Gb-Co; Wed, 16 Sep 2020 08:20:51 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=g28Ze0l9FastYGLK0cfSlEma3WVlaLbXDR8H16LkuyIEW1Oxm2SqBLB44n0nIt1ruGWRpFmJbMMaTz9g4DjVizhbyJ87Kx8gisf2tCoLTcaS573e4l2yO/Onr3WfXNPOANDE6p4aQs1rwhVaTNRnuVwuDRB3wqI+pKMHHaT1/4SKR8agqGoIVrXu1/XIayNvBOeePQYBM+DAD4Ti2uRmFTp29dl3YuxNqbhTFsQMSZ4koG4M/2Hzfto8ngiV7y2bLt1zliXtM/HTJzzTQ5J7KRwX/yW/eMmuM0LRNPwuqzCtIrc99/z2GSCOC49OLyZpgCtp6IrYzjqdM931LspB+g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Qk6mX2hGgoIVZs4ZKciVH8v7c8cE9zkajaY2lLjmRk0=;
- b=IXjZ/2fUpgnMZf/UUsqJVHCyUjrXUR17OMo7HmrmnPliwkpW49xrq3vXOIyw5U+sZTg/IFCxSPHUIrD6WuxpoCouUjA0Sx7uJSSlKf9uPMxxywF3vTdNkeKYxyZ2MOtgw4toJNqW4A19Hri59Q/8LPciHokVvIAFVgnyJ23NCbVBgK0NXy1t+q15OBJ0Rceou0OZNx5X6L/oI7Q3LiiUDoo06KzpEAqZdzjnmmX8G3YDtdVRBqPrYPvRXG3+0t41hsS5RhfSRCJATSdi0OusABaU6uc3mOMlCJ0xDitOFCO7BFFJuurdSo3YWQmiCTgqOkTFREs0x5kfL2Mj711ERQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Qk6mX2hGgoIVZs4ZKciVH8v7c8cE9zkajaY2lLjmRk0=;
- b=dbitehDw9JZ3ioj9T3TJCh4wVh2hWCLyFkCnl5mvObpDnMTKYpV6l587vq8eLR2GW1a/0seieluCzutlZSH4wa9ojcG422nMRLsOUPslDlg7CfZaU2SuTIcB0S5vK4QnCS5tcV2Pxr+zsKeSwMOwV1I5Ktq1GKc3ncMpHzZ9SGs=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB5077.eurprd08.prod.outlook.com (2603:10a6:20b:e6::15)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.14; Wed, 16 Sep
- 2020 12:20:25 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::b179:9641:7589:d692%8]) with mapi id 15.20.3370.019; Wed, 16 Sep 2020
- 12:20:25 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, fam@euphon.net, stefanha@redhat.com,
- mreitz@redhat.com, kwolf@redhat.com, eblake@redhat.com, den@openvz.org,
- vsementsov@virtuozzo.com
-Subject: [PATCH v6 3/5] block/io: bdrv_common_block_status_above: support bs
- == base
-Date: Wed, 16 Sep 2020 15:20:06 +0300
-Message-Id: <20200916122008.20303-4-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200916122008.20303-1-vsementsov@virtuozzo.com>
-References: <20200916122008.20303-1-vsementsov@virtuozzo.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM0PR04CA0018.eurprd04.prod.outlook.com
- (2603:10a6:208:122::31) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kIWWU-0002Ho-Es
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 08:26:54 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:37865)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kIWWS-00058w-NX
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 08:26:54 -0400
+Received: by mail-wr1-x433.google.com with SMTP id z4so6733290wrr.4
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 05:26:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=8nU58X0zzaaWcyDZcOEKgi4a/LGSYI6Yhv+R+cwBRHY=;
+ b=KjnfAnTD231rc79q8Rhs6Zt0DC9lJ3L+MkUjPYjiOgIUHkVsV+eC36s1SooEmZyalS
+ 5XDsOhVuPtHPx/K8X9JOkroILp2n5SH/PWv3XBFq3YKnKUWveqmbv5zOM3sFgDQ5hdNw
+ ghaB3di6pa7VpBZIZ/7czHCGn7JVDIurR99L8VAli7RoU8lv1hCRSJz6i/+TYa9QIJkA
+ Ln3Tdp8brxQL9N7PcNcSSiPg8mUyJTie69HOMbVFRvXTidGB+LWc7368e03MUxxvvr4M
+ C7OsIyHo6mx/Y1bes+fmUJbc7zqV80vEiVIs5wqA2QlwOkXaGcS4Ocvy3pquU3WfQIS4
+ dJmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=8nU58X0zzaaWcyDZcOEKgi4a/LGSYI6Yhv+R+cwBRHY=;
+ b=bW1mrAzcWmdtKGAIBy/Zy4VeIb5L1NxDwuScTjDDoD00sJSW1xtXFR3XbZRb74puxZ
+ XhmKAEJc5hTxsPDcHDCQoxhkOfTaQYl6DFqS5EFRbWDdf0B1pr0myLWpODY7RrR6XOof
+ 8glAd76W137DN0TosscxOCOuvz2pwe+7hNlSqWexIyeX0K7YMSoPle/Tr2dNFz5acZNX
+ Wu4WUOiRu5+0edDlO3vphSjhhvyNVCtGdTQQGSkyATMK2trOqMlMYZoaNakS3aK65H/r
+ Bj11mXLq5Y2AuPwjCqbGKTK8bm25d19a2W11umSIPmKCVM9qt2BbehbHiTkTXPi3eSS7
+ kLQw==
+X-Gm-Message-State: AOAM533Rh7q9nzZ1+cpECMeFfw2ywMBP9wt1cAONLxfDonW3F7RlNr9s
+ QqaVphRuWM/u6NYhelDI150wq/pfftjkiw==
+X-Google-Smtp-Source: ABdhPJzyhcrE8OAxIZrYbE64qLwGY43/x7qy28RN6VZsNX3nbiwXvvDPg4ifZtP3MeB14eTUT+wfAQ==
+X-Received: by 2002:adf:e481:: with SMTP id i1mr26324512wrm.391.1600259211249; 
+ Wed, 16 Sep 2020 05:26:51 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id q12sm31148471wrs.48.2020.09.16.05.26.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 16 Sep 2020 05:26:49 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 8DC921FF87;
+ Wed, 16 Sep 2020 13:26:48 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Subject: [PULL 1/8] linux-user: test,
+ don't assert addr != test in pgb_reserved_va
+Date: Wed, 16 Sep 2020 13:26:41 +0100
+Message-Id: <20200916122648.17468-2-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200916122648.17468-1-alex.bennee@linaro.org>
+References: <20200916122648.17468-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.sw.ru (185.215.60.75) by
- AM0PR04CA0018.eurprd04.prod.outlook.com (2603:10a6:208:122::31) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.11 via Frontend
- Transport; Wed, 16 Sep 2020 12:20:24 +0000
-X-Mailer: git-send-email 2.21.3
-X-Originating-IP: [185.215.60.75]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a6d9865c-1ef5-484c-9f89-08d85a3ae407
-X-MS-TrafficTypeDiagnostic: AM6PR08MB5077:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB50775C00D5EECC8D1B012F29C1210@AM6PR08MB5077.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1417;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7MBYcV+cbDPOGU+Q7o2zKXPpW3cRd8sldzJZUjiAvOzeHFn/0fHR4lqn6npNWXMUIbZ5R9rEot24azUOAWW5VZtIhZYw3sWc/aaGqMa8NDM5bBUGd75GJCs0JZEjK3cMrvpBhjAHizfcHrH8fIRKAKuIXL9JTkQ0M+XSMr1O7e0apMZV8jQFrWadRR/4iInFNy0dCf2YWM2Qm247xjscabJwLBSaOcJQzQaaJvFqSlGVye87Q515K1EMC1fV8HcuFQA88u3c0NiaMIzyoNTwjc+bPVt46r5mH83WX7+ojYIJ8UkPv2freQVztW6BG899gRxqd/VDPDucR+k0px6OSw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(376002)(346002)(136003)(39830400003)(366004)(396003)(26005)(16526019)(6486002)(316002)(478600001)(6506007)(186003)(5660300002)(6512007)(2616005)(956004)(1076003)(36756003)(6916009)(2906002)(8676002)(66556008)(66476007)(86362001)(52116002)(107886003)(4326008)(66946007)(83380400001)(6666004)(8936002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: Py9um2yHlQh6nYQ0ouCUBYN9kKbP5q8HXlfTQmw77gZuBKAZHXLMwYd5pdtsuo7UvBcxvYOEFEuN6g2oFmh4vjnoDjsiH7wKWfpv7drxtGyrutBbpsWdUdX2mjH42mRSz6Uka8TxjNLjmFtlw7OzRC8ZOPid/nYBX2q/QsThCAglo/74V/auFMqeQfqy4GntnIvxLtuCj5Z1BJCNH0eQ/HcrXsnDB8VB+TkalZ73Az38/+jh2IzckZOIQw+l5egtO7w7+c568w9TjKcY5Mc0lropUEYYlHZB83Ps4Ajz3KV01qCog+BSXkIhCTdN5FkN4xc3KuZJx/Z0clxilig5DEsvgMJP61bU7Y30Bgu79uPoEqjC5Y/XJ9PDW33KVYJqHtQ5by278K3/e14nn2eRFxJTav1lvFTnjLVQu+5FhanDw8q0ME9tWyqsyVwz2uUfe+N/SeJXNKBEzzimCVs79nbFvbHMjIuZzCcAJIKPIz6px29xoA3JhQlqchqX6u1UEdI2qz6f0fiAOTfnKyw/1xoMn4UQ6k+m0nvEzjizAj56uY1I9ZozwWSbjyaWroOwzBKfixvIzVh3WVtrKrgKR+q2akXdgkvxuRWqAbvkHithl0VOmlHRkExmCKff5HSY0zjig42ZVA7i4KgAtDst0w==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a6d9865c-1ef5-484c-9f89-08d85a3ae407
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2020 12:20:25.6020 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VH6EUWBrCr0l/Cmm0yslBOjcY1/in7/Y4Hq9L6wPme3eQ3j8Svh+M7PO1Ov1wn2QWwq5i0VCxbSUU2hNw+TNM08ALZ4cf3qYK7d5utt7hTo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5077
-Received-SPF: pass client-ip=40.107.4.130;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR03-DB5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 08:20:24
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::433;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x433.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,43 +104,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ Bug 1895080 <1895080@bugs.launchpad.net>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We are going to reuse bdrv_common_block_status_above in
-bdrv_is_allocated_above. bdrv_is_allocated_above may be called with
-include_base == false and still bs == base (for ex. from img_rebase()).
+On older kernels which don't implement MAP_FIXED_NOREPLACE the kernel
+may still fail to give us the address we asked for despite having
+already probed the map for a valid hole. Asserting isn't particularly
+useful to the user so let us move the check up and expand the
+error_report a little to give them a fighting chance of working around
+the problem.
 
-So, support this corner case.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Cc: Bug 1895080 <1895080@bugs.launchpad.net>
+Ameliorates: ee94743034
+Message-Id: <20200915134317.11110-2-alex.bennee@linaro.org>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- block/io.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/block/io.c b/block/io.c
-index 0cc2dd7a3e..d864d035ac 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2371,9 +2371,13 @@ bdrv_co_common_block_status_above(BlockDriverState *bs,
-     BlockDriverState *p;
-     int64_t eof = 0;
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 4961e6119e24..f6022fd70493 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -2331,14 +2331,13 @@ static void pgb_reserved_va(const char *image_name, abi_ulong guest_loaddr,
+     assert(guest_base != 0);
+     test = g2h(0);
+     addr = mmap(test, reserved_va, PROT_NONE, flags, -1, 0);
+-    if (addr == MAP_FAILED) {
++    if (addr == MAP_FAILED || addr != test) {
+         error_report("Unable to reserve 0x%lx bytes of virtual address "
+-                     "space (%s) for use as guest address space (check your "
+-                     "virtual memory ulimit setting or reserve less "
+-                     "using -R option)", reserved_va, strerror(errno));
++                     "space at %p (%s) for use as guest address space (check your"
++                     "virtual memory ulimit setting, min_mmap_addr or reserve less "
++                     "using -R option)", reserved_va, test, strerror(errno));
+         exit(EXIT_FAILURE);
+     }
+-    assert(addr == test);
+ }
  
--    assert(include_base || bs != base);
-     assert(!include_base || base); /* Can't include NULL base */
- 
-+    if (!include_base && bs == base) {
-+        *pnum = bytes;
-+        return 0;
-+    }
-+
-     ret = bdrv_co_block_status(bs, want_zero, offset, bytes, pnum, map, file);
-     if (ret < 0 || *pnum == 0 || ret & BDRV_BLOCK_ALLOCATED || bs == base) {
-         return ret;
+ void probe_guest_base(const char *image_name, abi_ulong guest_loaddr,
 -- 
-2.21.3
+2.20.1
 
 
