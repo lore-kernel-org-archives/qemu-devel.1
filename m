@@ -2,88 +2,84 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-2.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NORMAL_HTTP_TO_IP,
+	NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66CBDC43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 18:27:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3444C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 18:27:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2E6F206B5
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 18:27:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RLFVzf/O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2E6F206B5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 25753206B5
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 18:27:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25753206B5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59340 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIc9i-0000N4-Ls
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 14:27:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58818)
+	id 1kIc9m-0000VR-1y
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 14:27:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58908)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kIc7e-0007JI-03
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 14:25:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43948)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kIc7T-00011U-Gf
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 14:25:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600280724;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=Ua/JPcaXcTwVTSXFhXBd8ky0UDiTDJR8Lf1n8scmRrk=;
- b=RLFVzf/OfyF76s0aqe03qVSYF3pCJoA8OEFVSTa/m8Rk8HWyaTlk36Vd7KVSQMsSKgiMer
- L/3Jlb+ma95QXOl/6OQDvOvx1NMigCvMTWCMJmysNfRkwHKqzIm9HkIfqa8qkBqIsFvgax
- Q2GxDb9+pSSkMooHW/5mWsq724eizGg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-PxAovXaJM3yDaQx8Mx_0kA-1; Wed, 16 Sep 2020 14:25:22 -0400
-X-MC-Unique: PxAovXaJM3yDaQx8Mx_0kA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D649802B6D
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 18:25:21 +0000 (UTC)
-Received: from localhost (ovpn-119-217.rdu2.redhat.com [10.10.119.217])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CA7ED100238C;
- Wed, 16 Sep 2020 18:25:20 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 0/5] qom: Convert more declarations to OBJECT_DECLARE*
-Date: Wed, 16 Sep 2020 14:25:14 -0400
-Message-Id: <20200916182519.415636-1-ehabkost@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kIc7o-0007Lu-G4
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 14:25:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54942)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kIc7k-00015D-3A
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 14:25:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kIc7g-0000Xx-MM
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 18:25:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id A6C292E8026
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 18:25:40 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:35:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
+Date: Wed, 16 Sep 2020 18:19:25 -0000
+From: sean mooney <1894804@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=New; importance=Undecided; assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange kashyapc lyarwood sean-k-mooney
+X-Launchpad-Bug-Reporter: Lee Yarwood (lyarwood)
+X-Launchpad-Bug-Modifier: sean mooney (sean-k-mooney)
+References: <159955374051.12161.5076756019458607363.malonedeb@chaenomeles.canonical.com>
+Message-Id: <160028036632.17103.16332526350361842067.malone@soybean.canonical.com>
+Subject: [Bug 1894804] Re: Second DEVICE_DELETED event missing during
+ virtio-blk disk device detach
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: d79eb99e18b893b556bebd531062a883d5844568
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 14:25:41
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -53
+X-Spam_score: -5.4
 X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-5.4 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, NORMAL_HTTP_TO_IP=0.001,
+ NUMERIC_HTTP_ADDR=1.242, RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ WEIRD_PORT=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -92,665 +88,624 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>
+Reply-To: Bug 1894804 <1894804@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This converts many QOM types to use OBJECT_DECLARE* instead of=0D
-manually using DECLARE*_CHECKER*.=0D
-=0D
-Before doing that, I'm simplifying the OBJECT_DECLARE* API to=0D
-make it easier to use and more difficult to misuse.  The=0D
-module_obj_name and ParentClassType parameters were removed=0D
-because they are not needed.=0D
-=0D
-Eduardo Habkost (5):=0D
-  scripts/codeconverter: Update to latest version=0D
-  qom: Remove ParentClassType argument from OBJECT_DECLARE_SIMPLE_TYPE=0D
-  qom: Remove module_obj_name parameter from OBJECT_DECLARE* macros=0D
-  [automated] Use OBJECT_DECLARE_TYPE when possible=0D
-  [automated] Use OBJECT_DECLARE_SIMPLE_TYPE when possible=0D
-=0D
- hw/9pfs/virtio-9p.h                           |   4 +-=0D
- hw/audio/intel-hda.h                          |   6 +-=0D
- hw/display/ati_int.h                          |   4 +-=0D
- hw/display/qxl.h                              |   4 +-=0D
- hw/display/virtio-vga.h                       |   2 +-=0D
- hw/i386/amd_iommu.h                           |   4 +-=0D
- hw/misc/tmp105.h                              |   4 +-=0D
- hw/net/fsl_etsec/etsec.h                      |   3 +-=0D
- hw/net/tulip.h                                |   4 +-=0D
- hw/ppc/e500-ccsr.h                            |   4 +-=0D
- hw/ppc/e500.h                                 |   5 +-=0D
- hw/ppc/mac.h                                  |   4 +-=0D
- hw/s390x/ccw-device.h                         |   4 +-=0D
- hw/s390x/ipl.h                                |   4 +-=0D
- hw/s390x/s390-pci-bus.h                       |  16 +-=0D
- hw/s390x/virtio-ccw.h                         |  57 +-=0D
- hw/usb/ccid.h                                 |   5 +-=0D
- hw/usb/hcd-dwc2.h                             |   3 +-=0D
- hw/usb/hcd-ehci.h                             |  13 +-=0D
- hw/usb/hcd-ohci.h                             |   4 +-=0D
- hw/usb/hcd-xhci.h                             |   4 +-=0D
- hw/vfio/pci.h                                 |   4 +-=0D
- hw/virtio/virtio-pci.h                        |   5 +-=0D
- hw/xen/xen_pt.h                               |   4 +-=0D
- include/authz/base.h                          |   2 +-=0D
- include/authz/list.h                          |   4 +-=0D
- include/authz/listfile.h                      |   4 +-=0D
- include/authz/pamacct.h                       |   4 +-=0D
- include/authz/simple.h                        |   4 +-=0D
- include/block/throttle-groups.h               |   4 +-=0D
- include/chardev/char.h                        |   4 +-=0D
- include/crypto/secret_common.h                |   2 +-=0D
- include/crypto/secret_keyring.h               |   4 +-=0D
- include/hw/acpi/generic_event_device.h        |   4 +-=0D
- include/hw/acpi/vmgenid.h                     |   4 +-=0D
- include/hw/adc/stm32f2xx_adc.h                |   4 +-=0D
- include/hw/arm/allwinner-a10.h                |   4 +-=0D
- include/hw/arm/allwinner-h3.h                 |   4 +-=0D
- include/hw/arm/armsse.h                       |   2 +-=0D
- include/hw/arm/armv7m.h                       |   8 +-=0D
- include/hw/arm/aspeed_soc.h                   |   5 +-=0D
- include/hw/arm/bcm2835_peripherals.h          |   4 +-=0D
- include/hw/arm/bcm2836.h                      |   5 +-=0D
- include/hw/arm/digic.h                        |   4 +-=0D
- include/hw/arm/exynos4210.h                   |   4 +-=0D
- include/hw/arm/fsl-imx25.h                    |   4 +-=0D
- include/hw/arm/fsl-imx31.h                    |   4 +-=0D
- include/hw/arm/fsl-imx6.h                     |   4 +-=0D
- include/hw/arm/fsl-imx6ul.h                   |   4 +-=0D
- include/hw/arm/fsl-imx7.h                     |   4 +-=0D
- include/hw/arm/msf2-soc.h                     |   4 +-=0D
- include/hw/arm/nrf51_soc.h                    |   4 +-=0D
- include/hw/arm/omap.h                         |   4 +-=0D
- include/hw/arm/pxa.h                          |  15 +-=0D
- include/hw/arm/smmu-common.h                  |   5 +-=0D
- include/hw/arm/smmuv3.h                       |   5 +-=0D
- include/hw/arm/stm32f205_soc.h                |   4 +-=0D
- include/hw/arm/stm32f405_soc.h                |   4 +-=0D
- include/hw/arm/virt.h                         |   5 +-=0D
- include/hw/arm/xlnx-versal.h                  |   4 +-=0D
- include/hw/arm/xlnx-zynqmp.h                  |   4 +-=0D
- include/hw/block/flash.h                      |   8 +-=0D
- include/hw/block/swim.h                       |  12 +-=0D
- include/hw/boards.h                           |   3 +-=0D
- include/hw/char/avr_usart.h                   |   4 +-=0D
- include/hw/char/bcm2835_aux.h                 |   4 +-=0D
- include/hw/char/cadence_uart.h                |   4 +-=0D
- include/hw/char/cmsdk-apb-uart.h              |   4 +-=0D
- include/hw/char/digic-uart.h                  |   4 +-=0D
- include/hw/char/escc.h                        |   4 +-=0D
- include/hw/char/ibex_uart.h                   |   4 +-=0D
- include/hw/char/imx_serial.h                  |   4 +-=0D
- include/hw/char/nrf51_uart.h                  |   4 +-=0D
- include/hw/char/pl011.h                       |   4 +-=0D
- include/hw/char/serial.h                      |  11 +-=0D
- include/hw/char/stm32f2xx_usart.h             |   4 +-=0D
- include/hw/clock.h                            |   4 +-=0D
- include/hw/core/generic-loader.h              |   4 +-=0D
- include/hw/core/split-irq.h                   |   4 +-=0D
- include/hw/cpu/a15mpcore.h                    |   4 +-=0D
- include/hw/cpu/a9mpcore.h                     |   4 +-=0D
- include/hw/cpu/arm11mpcore.h                  |   4 +-=0D
- include/hw/cpu/cluster.h                      |   4 +-=0D
- include/hw/cpu/core.h                         |   4 +-=0D
- include/hw/display/bcm2835_fb.h               |   4 +-=0D
- include/hw/display/dpcd.h                     |   4 +-=0D
- include/hw/display/i2c-ddc.h                  |   4 +-=0D
- include/hw/display/macfb.h                    |   9 +-=0D
- include/hw/display/xlnx_dp.h                  |   4 +-=0D
- include/hw/dma/bcm2835_dma.h                  |   4 +-=0D
- include/hw/dma/i8257.h                        |   4 +-=0D
- include/hw/dma/pl080.h                        |   4 +-=0D
- include/hw/dma/xlnx-zdma.h                    |   4 +-=0D
- include/hw/dma/xlnx-zynq-devcfg.h             |   4 +-=0D
- include/hw/dma/xlnx_dpdma.h                   |   4 +-=0D
- include/hw/gpio/aspeed_gpio.h                 |   5 +-=0D
- include/hw/gpio/bcm2835_gpio.h                |   4 +-=0D
- include/hw/gpio/imx_gpio.h                    |   4 +-=0D
- include/hw/gpio/nrf51_gpio.h                  |   4 +-=0D
- include/hw/hyperv/vmbus-bridge.h              |   4 +-=0D
- include/hw/hyperv/vmbus.h                     |   6 +-=0D
- include/hw/i2c/aspeed_i2c.h                   |   5 +-=0D
- include/hw/i2c/i2c.h                          |   5 +-=0D
- include/hw/i2c/imx_i2c.h                      |   4 +-=0D
- include/hw/i2c/microbit_i2c.h                 |   4 +-=0D
- include/hw/i2c/ppc4xx_i2c.h                   |   4 +-=0D
- include/hw/i2c/smbus_slave.h                  |   2 +-=0D
- include/hw/i386/ich9.h                        |   4 +-=0D
- include/hw/i386/intel_iommu.h                 |   4 +-=0D
- include/hw/i386/ioapic_internal.h             |   5 +-=0D
- include/hw/i386/microvm.h                     |   5 +-=0D
- include/hw/i386/pc.h                          |   4 +-=0D
- include/hw/i386/x86-iommu.h                   |   5 +-=0D
- include/hw/i386/x86.h                         |   5 +-=0D
- include/hw/ide/ahci.h                         |  12 +-=0D
- include/hw/ide/internal.h                     |   8 +-=0D
- include/hw/ide/pci.h                          |   4 +-=0D
- include/hw/input/adb.h                        |   8 +-=0D
- include/hw/input/i8042.h                      |   4 +-=0D
- include/hw/intc/allwinner-a10-pic.h           |   4 +-=0D
- include/hw/intc/aspeed_vic.h                  |   4 +-=0D
- include/hw/intc/bcm2835_ic.h                  |   4 +-=0D
- include/hw/intc/bcm2836_control.h             |   4 +-=0D
- include/hw/intc/heathrow_pic.h                |   4 +-=0D
- include/hw/intc/ibex_plic.h                   |   4 +-=0D
- include/hw/intc/imx_avic.h                    |   4 +-=0D
- include/hw/intc/imx_gpcv2.h                   |   4 +-=0D
- include/hw/intc/mips_gic.h                    |   4 +-=0D
- include/hw/intc/realview_gic.h                |   4 +-=0D
- include/hw/intc/rx_icu.h                      |   4 +-=0D
- include/hw/intc/xlnx-pmu-iomod-intc.h         |   4 +-=0D
- include/hw/intc/xlnx-zynqmp-ipi.h             |   4 +-=0D
- include/hw/ipack/ipack.h                      |   6 +-=0D
- include/hw/ipmi/ipmi.h                        |   6 +-=0D
- include/hw/isa/i8259_internal.h               |   5 +-=0D
- include/hw/isa/isa.h                          |   7 +-=0D
- include/hw/isa/pc87312.h                      |   4 +-=0D
- include/hw/m68k/mcf_fec.h                     |   4 +-=0D
- include/hw/mem/nvdimm.h                       |   5 +-=0D
- include/hw/mem/pc-dimm.h                      |   2 +-=0D
- include/hw/mips/cps.h                         |   4 +-=0D
- include/hw/misc/a9scu.h                       |   4 +-=0D
- include/hw/misc/allwinner-cpucfg.h            |   4 +-=0D
- include/hw/misc/allwinner-h3-ccu.h            |   4 +-=0D
- include/hw/misc/allwinner-h3-dramc.h          |   4 +-=0D
- include/hw/misc/allwinner-h3-sysctrl.h        |   4 +-=0D
- include/hw/misc/allwinner-sid.h               |   4 +-=0D
- include/hw/misc/arm11scu.h                    |   4 +-=0D
- include/hw/misc/armsse-cpuid.h                |   4 +-=0D
- include/hw/misc/armsse-mhu.h                  |   4 +-=0D
- include/hw/misc/aspeed_scu.h                  |   5 +-=0D
- include/hw/misc/aspeed_sdmc.h                 |   5 +-=0D
- include/hw/misc/aspeed_xdma.h                 |   4 +-=0D
- include/hw/misc/auxbus.h                      |  11 +-=0D
- include/hw/misc/avr_power.h                   |   4 +-=0D
- include/hw/misc/bcm2835_mbox.h                |   4 +-=0D
- include/hw/misc/bcm2835_mphi.h                |   3 +-=0D
- include/hw/misc/bcm2835_property.h            |   4 +-=0D
- include/hw/misc/bcm2835_rng.h                 |   4 +-=0D
- include/hw/misc/bcm2835_thermal.h             |   4 +-=0D
- include/hw/misc/grlib_ahb_apb_pnp.h           |   8 +-=0D
- include/hw/misc/imx25_ccm.h                   |   4 +-=0D
- include/hw/misc/imx31_ccm.h                   |   4 +-=0D
- include/hw/misc/imx6_ccm.h                    |   4 +-=0D
- include/hw/misc/imx6_src.h                    |   4 +-=0D
- include/hw/misc/imx6ul_ccm.h                  |   4 +-=0D
- include/hw/misc/imx7_ccm.h                    |   8 +-=0D
- include/hw/misc/imx7_gpr.h                    |   4 +-=0D
- include/hw/misc/imx7_snvs.h                   |   4 +-=0D
- include/hw/misc/imx_ccm.h                     |   5 +-=0D
- include/hw/misc/imx_rngc.h                    |   4 +-=0D
- include/hw/misc/iotkit-secctl.h               |   4 +-=0D
- include/hw/misc/iotkit-sysctl.h               |   4 +-=0D
- include/hw/misc/iotkit-sysinfo.h              |   4 +-=0D
- include/hw/misc/mac_via.h                     |  12 +-=0D
- include/hw/misc/macio/cuda.h                  |   8 +-=0D
- include/hw/misc/macio/gpio.h                  |   4 +-=0D
- include/hw/misc/macio/macio.h                 |  20 +-=0D
- include/hw/misc/macio/pmu.h                   |   8 +-=0D
- include/hw/misc/max111x.h                     |   4 +-=0D
- include/hw/misc/mips_cmgcr.h                  |   4 +-=0D
- include/hw/misc/mips_cpc.h                    |   4 +-=0D
- include/hw/misc/mips_itu.h                    |   4 +-=0D
- include/hw/misc/mos6522.h                     |   5 +-=0D
- include/hw/misc/mps2-fpgaio.h                 |   4 +-=0D
- include/hw/misc/mps2-scc.h                    |   4 +-=0D
- include/hw/misc/msf2-sysreg.h                 |   4 +-=0D
- include/hw/misc/nrf51_rng.h                   |   4 +-=0D
- include/hw/misc/stm32f2xx_syscfg.h            |   4 +-=0D
- include/hw/misc/stm32f4xx_exti.h              |   4 +-=0D
- include/hw/misc/stm32f4xx_syscfg.h            |   4 +-=0D
- include/hw/misc/tz-mpc.h                      |   4 +-=0D
- include/hw/misc/tz-msc.h                      |   4 +-=0D
- include/hw/misc/tz-ppc.h                      |   4 +-=0D
- include/hw/misc/unimp.h                       |   4 +-=0D
- include/hw/misc/zynq-xadc.h                   |   4 +-=0D
- include/hw/net/allwinner-sun8i-emac.h         |   4 +-=0D
- include/hw/net/allwinner_emac.h               |   4 +-=0D
- include/hw/net/cadence_gem.h                  |   4 +-=0D
- include/hw/net/ftgmac100.h                    |   8 +-=0D
- include/hw/net/imx_fec.h                      |   4 +-=0D
- include/hw/net/msf2-emac.h                    |   4 +-=0D
- include/hw/nubus/mac-nubus-bridge.h           |   4 +-=0D
- include/hw/nubus/nubus.h                      |   8 +-=0D
- include/hw/nvram/fw_cfg.h                     |   9 +-=0D
- include/hw/nvram/nrf51_nvm.h                  |   4 +-=0D
- include/hw/pci-bridge/simba.h                 |   4 +-=0D
- include/hw/pci-host/designware.h              |   8 +-=0D
- include/hw/pci-host/gpex.h                    |   8 +-=0D
- include/hw/pci-host/i440fx.h                  |   4 +-=0D
- include/hw/pci-host/pnv_phb3.h                |   7 +-=0D
- include/hw/pci-host/pnv_phb4.h                |  11 +-=0D
- include/hw/pci-host/q35.h                     |   8 +-=0D
- include/hw/pci-host/sabre.h                   |   8 +-=0D
- include/hw/pci-host/spapr.h                   |   4 +-=0D
- include/hw/pci-host/uninorth.h                |   4 +-=0D
- include/hw/pci-host/xilinx-pcie.h             |   8 +-=0D
- include/hw/pci/pci.h                          |   4 +-=0D
- include/hw/pci/pci_bridge.h                   |   3 +-=0D
- include/hw/pci/pci_host.h                     |   4 +-=0D
- include/hw/pci/pcie_host.h                    |   3 +-=0D
- include/hw/pci/pcie_port.h                    |   6 +-=0D
- include/hw/pcmcia.h                           |   5 +-=0D
- include/hw/platform-bus.h                     |   4 +-=0D
- include/hw/ppc/mac_dbdma.h                    |   3 +-=0D
- include/hw/ppc/openpic.h                      |   4 +-=0D
- include/hw/ppc/pnv.h                          |   2 +-=0D
- include/hw/ppc/pnv_core.h                     |   6 +-=0D
- include/hw/ppc/pnv_homer.h                    |   2 +-=0D
- include/hw/ppc/pnv_occ.h                      |   2 +-=0D
- include/hw/ppc/pnv_pnor.h                     |   4 +-=0D
- include/hw/ppc/pnv_psi.h                      |  10 +-=0D
- include/hw/ppc/pnv_xive.h                     |   2 +-=0D
- include/hw/ppc/spapr.h                        |  13 +-=0D
- include/hw/ppc/spapr_cpu_core.h               |   2 +-=0D
- include/hw/ppc/spapr_tpm_proxy.h              |   4 +-=0D
- include/hw/ppc/spapr_vio.h                    |   6 +-=0D
- include/hw/ppc/xics.h                         |   2 +-=0D
- include/hw/ppc/xive.h                         |  14 +-=0D
- include/hw/qdev-core.h                        |   4 +-=0D
- include/hw/riscv/opentitan.h                  |   4 +-=0D
- include/hw/riscv/riscv_hart.h                 |   4 +-=0D
- include/hw/rtc/allwinner-rtc.h                |   5 +-=0D
- include/hw/rtc/aspeed_rtc.h                   |   4 +-=0D
- include/hw/rtc/goldfish_rtc.h                 |   4 +-=0D
- include/hw/rtc/mc146818rtc.h                  |   4 +-=0D
- include/hw/rtc/pl031.h                        |   4 +-=0D
- include/hw/rtc/xlnx-zynqmp-rtc.h              |   4 +-=0D
- include/hw/s390x/3270-ccw.h                   |   5 +-=0D
- include/hw/s390x/css-bridge.h                 |   8 +-=0D
- include/hw/s390x/event-facility.h             |   2 +-=0D
- include/hw/s390x/s390-virtio-ccw.h            |   5 +-=0D
- include/hw/s390x/s390_flic.h                  |   6 +-=0D
- include/hw/s390x/sclp.h                       |   2 +-=0D
- include/hw/s390x/storage-attributes.h         |   5 +-=0D
- include/hw/s390x/storage-keys.h               |   5 +-=0D
- include/hw/s390x/tod.h                        |   5 +-=0D
- include/hw/s390x/vfio-ccw.h                   |   4 +-=0D
- include/hw/scsi/esp.h                         |   4 +-=0D
- include/hw/scsi/scsi.h                        |   7 +-=0D
- include/hw/sd/allwinner-sdhost.h              |   5 +-=0D
- include/hw/sd/aspeed_sdhci.h                  |   4 +-=0D
- include/hw/sd/bcm2835_sdhost.h                |   4 +-=0D
- include/hw/sd/sd.h                            |   7 +-=0D
- include/hw/sparc/sparc32_dma.h                |  16 +-=0D
- include/hw/ssi/aspeed_smc.h                   |   5 +-=0D
- include/hw/ssi/imx_spi.h                      |   4 +-=0D
- include/hw/ssi/mss-spi.h                      |   4 +-=0D
- include/hw/ssi/pl022.h                        |   4 +-=0D
- include/hw/ssi/ssi.h                          |   2 +-=0D
- include/hw/ssi/stm32f2xx_spi.h                |   4 +-=0D
- include/hw/ssi/xilinx_spips.h                 |  11 +-=0D
- include/hw/sysbus.h                           |   2 +-=0D
- include/hw/timer/a9gtimer.h                   |   4 +-=0D
- include/hw/timer/allwinner-a10-pit.h          |   4 +-=0D
- include/hw/timer/arm_mptimer.h                |   4 +-=0D
- include/hw/timer/armv7m_systick.h             |   4 +-=0D
- include/hw/timer/aspeed_timer.h               |   5 +-=0D
- include/hw/timer/avr_timer16.h                |   4 +-=0D
- include/hw/timer/bcm2835_systmr.h             |   4 +-=0D
- include/hw/timer/cmsdk-apb-dualtimer.h        |   4 +-=0D
- include/hw/timer/cmsdk-apb-timer.h            |   4 +-=0D
- include/hw/timer/digic-timer.h                |   4 +-=0D
- include/hw/timer/i8254.h                      |   5 +-=0D
- include/hw/timer/imx_epit.h                   |   4 +-=0D
- include/hw/timer/mss-timer.h                  |   4 +-=0D
- include/hw/timer/nrf51_timer.h                |   4 +-=0D
- include/hw/usb.h                              |   8 +-=0D
- include/hw/usb/chipidea.h                     |   4 +-=0D
- include/hw/usb/imx-usb-phy.h                  |   4 +-=0D
- include/hw/virtio/vhost-scsi-common.h         |   4 +-=0D
- include/hw/virtio/vhost-scsi.h                |   4 +-=0D
- include/hw/virtio/vhost-user-blk.h            |   4 +-=0D
- include/hw/virtio/vhost-user-fs.h             |   4 +-=0D
- include/hw/virtio/vhost-user-scsi.h           |   4 +-=0D
- include/hw/virtio/vhost-user-vsock.h          |   4 +-=0D
- include/hw/virtio/vhost-vsock-common.h        |   4 +-=0D
- include/hw/virtio/vhost-vsock.h               |   4 +-=0D
- include/hw/virtio/virtio-balloon.h            |   4 +-=0D
- include/hw/virtio/virtio-blk.h                |   4 +-=0D
- include/hw/virtio/virtio-crypto.h             |   4 +-=0D
- include/hw/virtio/virtio-gpu-pci.h            |   4 +-=0D
- include/hw/virtio/virtio-gpu.h                |  10 +-=0D
- include/hw/virtio/virtio-input.h              |  14 +-=0D
- include/hw/virtio/virtio-iommu.h              |   4 +-=0D
- include/hw/virtio/virtio-mem.h                |   2 +-=0D
- include/hw/virtio/virtio-mmio.h               |   4 +-=0D
- include/hw/virtio/virtio-net.h                |   4 +-=0D
- include/hw/virtio/virtio-pmem.h               |   2 +-=0D
- include/hw/virtio/virtio-rng.h                |   4 +-=0D
- include/hw/virtio/virtio-scsi.h               |   8 +-=0D
- include/hw/virtio/virtio-serial.h             |   9 +-=0D
- include/hw/virtio/virtio.h                    |   4 +-=0D
- include/hw/watchdog/cmsdk-apb-watchdog.h      |   4 +-=0D
- include/hw/watchdog/wdt_aspeed.h              |   5 +-=0D
- include/hw/watchdog/wdt_imx2.h                |   4 +-=0D
- include/hw/xen/xen-block.h                    |  12 +-=0D
- include/hw/xen/xen-bus.h                      |   6 +-=0D
- include/io/channel-buffer.h                   |   4 +-=0D
- include/io/channel-command.h                  |   4 +-=0D
- include/io/channel-file.h                     |   4 +-=0D
- include/io/channel-socket.h                   |   4 +-=0D
- include/io/channel-tls.h                      |   4 +-=0D
- include/io/channel-websock.h                  |   4 +-=0D
- include/io/channel.h                          |   2 +-=0D
- include/io/dns-resolver.h                     |   4 +-=0D
- include/io/net-listener.h                     |   4 +-=0D
- include/net/can_emu.h                         |   3 +-=0D
- include/net/can_host.h                        |   5 +-=0D
- include/net/filter.h                          |   4 +-=0D
- include/qom/object.h                          |  20 +-=0D
- include/scsi/pr-manager.h                     |   2 +-=0D
- include/sysemu/cryptodev.h                    |   2 +-=0D
- include/sysemu/hostmem.h                      |   2 +-=0D
- include/sysemu/rng-random.h                   |   4 +-=0D
- include/sysemu/rng.h                          |   2 +-=0D
- include/sysemu/tpm_backend.h                  |   2 +-=0D
- include/sysemu/vhost-user-backend.h           |   4 +-=0D
- include/ui/console.h                          |   4 +-=0D
- target/alpha/cpu-qom.h                        |   2 +-=0D
- target/arm/cpu-qom.h                          |   2 +-=0D
- target/avr/cpu-qom.h                          |   2 +-=0D
- target/cris/cpu-qom.h                         |   2 +-=0D
- target/hppa/cpu-qom.h                         |   2 +-=0D
- target/i386/cpu-qom.h                         |   2 +-=0D
- target/lm32/cpu-qom.h                         |   2 +-=0D
- target/m68k/cpu-qom.h                         |   2 +-=0D
- target/microblaze/cpu-qom.h                   |   2 +-=0D
- target/mips/cpu-qom.h                         |   2 +-=0D
- target/moxie/cpu.h                            |   2 +-=0D
- target/nios2/cpu.h                            |   2 +-=0D
- target/openrisc/cpu.h                         |   2 +-=0D
- target/ppc/cpu-qom.h                          |   2 +-=0D
- target/riscv/cpu.h                            |   2 +-=0D
- target/rx/cpu-qom.h                           |   2 +-=0D
- target/s390x/cpu-qom.h                        |   2 +-=0D
- target/sh4/cpu-qom.h                          |   2 +-=0D
- target/sparc/cpu-qom.h                        |   2 +-=0D
- target/tilegx/cpu.h                           |   2 +-=0D
- target/tricore/cpu-qom.h                      |   2 +-=0D
- target/unicore32/cpu-qom.h                    |   2 +-=0D
- target/xtensa/cpu-qom.h                       |   2 +-=0D
- authz/list.c                                  |   1 -=0D
- authz/listfile.c                              |   1 -=0D
- authz/pamacct.c                               |   1 -=0D
- authz/simple.c                                |   1 -=0D
- backends/cryptodev-builtin.c                  |   5 +-=0D
- backends/cryptodev-vhost-user.c               |   4 +-=0D
- backends/dbus-vmstate.c                       |   5 +-=0D
- backends/hostmem-file.c                       |   4 +-=0D
- backends/hostmem-memfd.c                      |   4 +-=0D
- backends/rng-builtin.c                        |   4 +-=0D
- backends/rng-egd.c                            |   4 +-=0D
- backends/tpm/tpm_emulator.c                   |   4 +-=0D
- backends/tpm/tpm_passthrough.c                |   4 +-=0D
- backends/vhost-user.c                         |   1 -=0D
- crypto/secret_keyring.c                       |   1 -=0D
- hw/acpi/piix4.c                               |   4 +-=0D
- hw/alpha/typhoon.c                            |   4 +-=0D
- hw/arm/collie.c                               |   4 +-=0D
- hw/arm/highbank.c                             |   4 +-=0D
- hw/arm/integratorcp.c                         |  12 +-=0D
- hw/arm/microbit.c                             |   4 +-=0D
- hw/arm/mps2-tz.c                              |   5 +-=0D
- hw/arm/mps2.c                                 |   5 +-=0D
- hw/arm/musca.c                                |   5 +-=0D
- hw/arm/musicpal.c                             |  32 +-=0D
- hw/arm/palm.c                                 |   4 +-=0D
- hw/arm/pxa2xx.c                               |  12 +-=0D
- hw/arm/pxa2xx_gpio.c                          |   4 +-=0D
- hw/arm/pxa2xx_pic.c                           |   4 +-=0D
- hw/arm/sbsa-ref.c                             |   4 +-=0D
- hw/arm/spitz.c                                |  25 +-=0D
- hw/arm/stellaris.c                            |   8 +-=0D
- hw/arm/strongarm.c                            |  24 +-=0D
- hw/arm/tosa.c                                 |   8 +-=0D
- hw/arm/versatilepb.c                          |   4 +-=0D
- hw/arm/vexpress.c                             |   5 +-=0D
- hw/arm/xilinx_zynq.c                          |   4 +-=0D
- hw/arm/xlnx-versal-virt.c                     |   4 +-=0D
- hw/arm/xlnx-zcu102.c                          |   4 +-=0D
- hw/arm/z2.c                                   |   8 +-=0D
- hw/audio/ac97.c                               |   4 +-=0D
- hw/audio/adlib.c                              |   4 +-=0D
- hw/audio/es1370.c                             |   3 +-=0D
- hw/audio/gus.c                                |   4 +-=0D
- hw/audio/hda-codec.c                          |   3 +-=0D
- hw/audio/marvell_88w8618.c                    |   4 +-=0D
- hw/audio/milkymist-ac97.c                     |   4 +-=0D
- hw/audio/pcspk.c                              |   4 +-=0D
- hw/audio/pl041.c                              |   4 +-=0D
- hw/audio/sb16.c                               |   4 +-=0D
- hw/audio/wm8750.c                             |   4 +-=0D
- hw/block/fdc.c                                |  16 +-=0D
- hw/block/m25p80.c                             |   5 +-=0D
- hw/block/nand.c                               |   3 +-=0D
- hw/block/onenand.c                            |   4 +-=0D
- hw/char/debugcon.c                            |   4 +-=0D
- hw/char/exynos4210_uart.c                     |   4 +-=0D
- hw/char/grlib_apbuart.c                       |   4 +-=0D
- hw/char/ipoctal232.c                          |   3 +-=0D
- hw/char/lm32_juart.c                          |   4 +-=0D
- hw/char/lm32_uart.c                           |   4 +-=0D
- hw/char/mcf_uart.c                            |   4 +-=0D
- hw/char/milkymist-uart.c                      |   4 +-=0D
- hw/char/parallel.c                            |   4 +-=0D
- hw/char/serial-isa.c                          |   4 +-=0D
- hw/char/serial-pci.c                          |   4 +-=0D
- hw/char/spapr_vty.c                           |   4 +-=0D
- hw/char/xilinx_uartlite.c                     |   4 +-=0D
- hw/cpu/realview_mpcore.c                      |   4 +-=0D
- hw/display/ads7846.c                          |   4 +-=0D
- hw/display/artist.c                           |   4 +-=0D
- hw/display/bochs-display.c                    |   4 +-=0D
- hw/display/cg3.c                              |   4 +-=0D
- hw/display/cirrus_vga.c                       |   4 +-=0D
- hw/display/cirrus_vga_isa.c                   |   4 +-=0D
- hw/display/exynos4210_fimd.c                  |   4 +-=0D
- hw/display/g364fb.c                           |   4 +-=0D
- hw/display/jazz_led.c                         |   4 +-=0D
- hw/display/milkymist-tmu2.c                   |   4 +-=0D
- hw/display/milkymist-vgafb.c                  |   4 +-=0D
- hw/display/next-fb.c                          |   4 +-=0D
- hw/display/pl110.c                            |   4 +-=0D
- hw/display/sii9022.c                          |   4 +-=0D
- hw/display/sm501.c                            |   8 +-=0D
- hw/display/ssd0303.c                          |   4 +-=0D
- hw/display/ssd0323.c                          |   4 +-=0D
- hw/display/tcx.c                              |   4 +-=0D
- hw/display/vga-isa.c                          |   4 +-=0D
- hw/display/vga-pci.c                          |   4 +-=0D
- hw/dma/i82374.c                               |   4 +-=0D
- hw/dma/pl330.c                                |   3 +-=0D
- hw/dma/puv3_dma.c                             |   4 +-=0D
- hw/dma/pxa2xx_dma.c                           |   4 +-=0D
- hw/dma/rc4030.c                               |   4 +-=0D
- hw/dma/xilinx_axidma.c                        |   4 +-=0D
- hw/gpio/gpio_key.c                            |   4 +-=0D
- hw/gpio/max7310.c                             |   4 +-=0D
- hw/gpio/mpc8xxx.c                             |   4 +-=0D
- hw/gpio/pl061.c                               |   4 +-=0D
- hw/gpio/puv3_gpio.c                           |   4 +-=0D
- hw/gpio/zaurus.c                              |   4 +-=0D
- hw/hppa/dino.c                                |   4 +-=0D
- hw/hppa/lasi.c                                |   4 +-=0D
- hw/hyperv/hyperv.c                            |   4 +-=0D
- hw/hyperv/hyperv_testdev.c                    |   4 +-=0D
- hw/i2c/bitbang_i2c.c                          |   4 +-=0D
- hw/i2c/exynos4210_i2c.c                       |   4 +-=0D
- hw/i2c/mpc_i2c.c                              |   4 +-=0D
- hw/i2c/smbus_eeprom.c                         |   4 +-=0D
- hw/i2c/smbus_ich9.c                           |   4 +-=0D
- hw/i386/kvm/clock.c                           |   4 +-=0D
- hw/i386/kvmvapic.c                            |   4 +-=0D
- hw/i386/port92.c                              |   4 +-=0D
- hw/i386/vmmouse.c                             |   4 +-=0D
- hw/i386/vmport.c                              |   4 +-=0D
- hw/i386/xen/xen_platform.c                    |   4 +-=0D
- hw/i386/xen/xen_pvdevice.c                    |   4 +-=0D
- hw/ide/isa.c                                  |   4 +-=0D
- hw/ide/microdrive.c                           |   4 +-=0D
- hw/ide/sii3112.c                              |   4 +-=0D
- hw/input/adb-kbd.c                            |   5 +-=0D
- hw/input/adb-mouse.c                          |   5 +-=0D
- hw/input/lm832x.c                             |   4 +-=0D
- hw/input/milkymist-softusb.c                  |   4 +-=0D
- hw/input/pl050.c                              |   4 +-=0D
- hw/intc/arm_gicv2m.c                          |   4 +-=0D
- hw/intc/exynos4210_combiner.c                 |   4 +-=0D
- hw/intc/exynos4210_gic.c                      |   8 +-=0D
- hw/intc/grlib_irqmp.c                         |   4 +-=0D
- hw/intc/lm32_pic.c                            |   4 +-=0D
- hw/intc/nios2_iic.c                           |   4 +-=0D
- hw/intc/ompic.c                               |   4 +-=0D
- hw/intc/openpic_kvm.c                         |   4 +-=0D
- hw/intc/pl190.c                               |   4 +-=0D
- hw/intc/puv3_intc.c                           |   4 +-=0D
- hw/intc/slavio_intctl.c                       |   4 +-=0D
- hw/ipack/tpci200.c                            |   4 +-=0D
- hw/ipmi/ipmi_bmc_extern.c                     |   4 +-=0D
- hw/ipmi/isa_ipmi_bt.c                         |   4 +-=0D
- hw/ipmi/isa_ipmi_kcs.c                        |   4 +-=0D
- hw/ipmi/pci_ipmi_bt.c                         |   4 +-=0D
- hw/ipmi/pci_ipmi_kcs.c                        |   4 +-=0D
- hw/ipmi/smbus_ipmi.c                          |   4 +-=0D
- hw/isa/i82378.c                               |   4 +-=0D
- hw/isa/piix4.c                                |   4 +-=0D
- hw/isa/vt82c686.c                             |  16 +-=0D
- hw/m68k/mcf_intc.c                            |   4 +-=0D
- hw/m68k/next-cube.c                           |   4 +-=0D
- hw/m68k/next-kbd.c                            |   4 +-=0D
- hw/microblaze/xlnx-zynqmp-pmu.c               |   4 +-=0D
- hw/mips/gt64xxx_pci.c                         |   4 +-=0D
- hw/mips/malta.c                               |   4 +-=0D
- hw/misc/applesmc.c                            |   4 +-=0D
- hw/misc/arm_integrator_debug.c                |   4 +-=0D
- hw/misc/arm_l2x0.c                            |   4 +-=0D
- hw/misc/arm_sysctl.c                          |   4 +-=0D
- hw/misc/debugexit.c                           |   4 +-=0D
- hw/misc/eccmemctl.c                           |   4 +-=0D
- hw/misc/empty_slot.c                          |   4 +-=0D
- hw/misc/exynos4210_clk.c                      |   4 +-=0D
- hw/misc/exynos4210_pmu.c                      |   4 +-=0D
- hw/misc/exynos4210_rng.c                      |   4 +-=0D
- hw/misc/milkymist-hpdmc.c                     |   4 +-=0D
- hw/misc/milkymist-pfpu.c                      |   4 +-=0D
- hw/misc/mst_fpga.c                            |   4 +-=0D
- hw/misc/pc-testdev.c                          |   4 +-=0D
- hw/misc/pci-testdev.c                         |   4 +-=0D
- hw/misc/puv3_pm.c                             |   4 +-=0D
- hw/misc/sga.c                                 |   4 +-=0D
- hw/misc/slavio_misc.c                         |   4 +-=0D
- hw/misc/tmp421.c                              |   5 +-=0D
- hw/misc/zynq_slcr.c                           |   4 +-=0D
- hw/net/dp8393x.c                              |   4 +-=0D
- hw/net/e1000e.c                               |   4 +-=0D
- hw/net/etraxfs_eth.c                          |   4 +-=0D
- hw/net/lan9118.c                              |   4 +-=0D
- hw/net/milkymist-minimac2.c                   |   4 +-=0D
- hw/net/mipsnet.c                              |   4 +-=0D
- hw/net/ne2000-isa.c                           |   4 +-=0D
- hw/net/opencores_eth.c                        |   4 +-=0D
- hw/net/pcnet-pci.c                            |   4 +-=0D
- hw/net/rtl8139.c                              |   4 +-=0D
- hw/net/smc91c111.c                            |   4 +-=0D
- hw/net/spapr_llan.c                           |   4 +-=0D
- hw/net/stellaris_enet.c                       |   4 +-=0D
- hw/net/sungem.c                               |   4 +-=0D
- hw/net/sunhme.c                               |   4 +-=0D
- hw/net/xgmac.c                                |   4 +-=0D
- hw/net/xilinx_axienet.c                       |   4 +-=0D
- hw/nvram/ds1225y.c                            |   4 +-=0D
- hw/nvram/spapr_nvram.c                        |   4 +-=0D
- hw/pci-bridge/dec.c                           |   4 +-=0D
- hw/pci-bridge/gen_pcie_root_port.c            |   4 +-=0D
- hw/pci-bridge/pci_bridge_dev.c                |   4 +-=0D
- hw/pci-bridge/pcie_pci_bridge.c               |   4 +-=0D
- hw/pci-host/bonito.c                          |   6 +-=0D
- hw/pci-host/grackle.c                         |   4 +-=0D
- hw/pci-host/i440fx.c                          |   4 +-=0D
- hw/pci-host/ppce500.c                         |   8 +-=0D
- hw/pci-host/prep.c                            |   4 +-=0D
- hw/ppc/mpc8544_guts.c                         |   4 +-=0D
- hw/ppc/ppc440_pcix.c                          |   4 +-=0D
- hw/ppc/ppc440_uc.c                            |   4 +-=0D
- hw/ppc/ppc4xx_pci.c                           |   4 +-=0D
- hw/ppc/ppce500_spin.c                         |   4 +-=0D
- hw/ppc/prep_systemio.c                        |   4 +-=0D
- hw/ppc/rs6000_mc.c                            |   4 +-=0D
- hw/ppc/spapr_rng.c                            |   4 +-=0D
- hw/rtc/ds1338.c                               |   4 +-=0D
- hw/rtc/exynos4210_rtc.c                       |   4 +-=0D
- hw/rtc/m41t80.c                               |   4 +-=0D
- hw/rtc/sun4v-rtc.c                            |   4 +-=0D
- hw/rtc/twl92230.c                             |   4 +-=0D
- hw/scsi/lsi53c895a.c                          |   4 +-=0D
- hw/scsi/scsi-disk.c                           |   5 +-=0D
- hw/scsi/spapr_vscsi.c                         |   4 +-=0D
- hw/scsi/vmw_pvscsi.c                          |   5 +-=0D
- hw/sd/milkymist-memcard.c                     |   4 +-=0D
- hw/sd/pl181.c                                 |   4 +-=0D
- hw/sd/ssi-sd.c                                |   4 +-=0D
- hw/sh4/sh_pci.c                               |   4 +-=0D
- hw/sparc/sun4m.c                              |   8 +-=0D
- hw/sparc64/sun4u.c                            |   8 +-=0D
- hw/ssi/ssi.c                                  |   3 +-=0D
- hw/ssi/xilinx_spi.c                           |   4 +-=0D
- hw/timer/altera_timer.c                       |   4 +-=0D
- hw/timer/arm_timer.c                          |   8 +-=0D
- hw/timer/cadence_ttc.c                        |   4 +-=0D
- hw/timer/exynos4210_mct.c                     |   4 +-=0D
- hw/timer/exynos4210_pwm.c                     |   4 +-=0D
- hw/timer/grlib_gptimer.c                      |   4 +-=0D
- hw/timer/hpet.c                               |   4 +-=0D
- hw/timer/lm32_timer.c                         |   4 +-=0D
- hw/timer/milkymist-sysctl.c                   |   4 +-=0D
- hw/timer/puv3_ost.c                           |   4 +-=0D
- hw/timer/pxa2xx_timer.c                       |   4 +-=0D
- hw/timer/slavio_timer.c                       |   4 +-=0D
- hw/tpm/tpm_tis_isa.c                          |   4 +-=0D
- hw/tpm/tpm_tis_sysbus.c                       |   4 +-=0D
- hw/usb/dev-audio.c                            |   4 +-=0D
- hw/usb/dev-hid.c                              |   4 +-=0D
- hw/usb/dev-hub.c                              |   4 +-=0D
- hw/usb/dev-mtp.c                              |   3 +-=0D
- hw/usb/dev-network.c                          |   4 +-=0D
- hw/usb/dev-serial.c                           |   4 +-=0D
- hw/usb/dev-smartcard-reader.c                 |   7 +-=0D
- hw/usb/dev-uas.c                              |   3 +-=0D
- hw/usb/dev-wacom.c                            |   4 +-=0D
- hw/usb/hcd-ohci-pci.c                         |   4 +-=0D
- hw/usb/host-libusb.c                          |   4 +-=0D
- hw/usb/tusb6010.c                             |   4 +-=0D
- hw/vfio/ap.c                                  |   4 +-=0D
- hw/virtio/virtio-input-pci.c                  |   8 +-=0D
- hw/watchdog/wdt_i6300esb.c                    |   4 +-=0D
- io/dns-resolver.c                             |   1 -=0D
- io/net-listener.c                             |   1 -=0D
- migration/rdma.c                              |   4 +-=0D
- net/can/can_socketcan.c                       |   4 +-=0D
- net/dump.c                                    |   4 +-=0D
- net/filter-buffer.c                           |   4 +-=0D
- net/filter-replay.c                           |   4 +-=0D
- net/filter-rewriter.c                         |   4 +-=0D
- scsi/pr-manager-helper.c                      |   4 +-=0D
- target/i386/sev.c                             |   4 +-=0D
- ui/input-barrier.c                            |   5 +-=0D
- ui/input-linux.c                              |   5 +-=0D
- .../codeconverter/codeconverter/patching.py   | 193 +++--=0D
- .../codeconverter/codeconverter/qom_macros.py | 327 ++++++--=0D
- .../codeconverter/qom_type_info.py            | 741 +++++++++++++++---=0D
- .../codeconverter/test_patching.py            |   3 +-=0D
- .../codeconverter/test_regexps.py             |  26 +-=0D
- scripts/codeconverter/converter.py            |  12 +-=0D
- 634 files changed, 1828 insertions(+), 2401 deletions(-)=0D
-=0D
---=20=0D
-2.26.2=0D
-=0D
+hum i was hoping to indicate this affect focal in some what but not sure ho=
+w to do that but this issue
+happens with the ubunutu 20.04 version of qemu 4.2
+it does not seam to happen with the centos 8 build of the same qemu so i do=
+nt know if there is a delta in packages or if its just a case that in the o=
+penstack ci we have more testing based on ubuntu 20.04 and its appearing th=
+ere more as a result.
 
+
+** Also affects: ubuntu
+   Importance: Undecided
+       Status: New
+
+** Package changed: ubuntu =3D> qemu (Ubuntu)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1894804
+
+Title:
+  Second DEVICE_DELETED event missing during virtio-blk disk device
+  detach
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  New
+
+Bug description:
+  We are in the process of moving OpenStack CI across to use 20.04 Focal
+  as the underlying OS and encountering the following issue in any test
+  attempting to detach disk devices from running QEMU instances.
+
+  We can see a single DEVICE_DELETED event raised to libvirtd for the
+  /machine/peripheral/virtio-disk1/virtio-backend device but we do not
+  see a second event for the actual disk. As a result the device is
+  still marked as present in libvirt but QEMU reports it as missing in
+  subsequent attempts to remove the device.
+
+  The following log snippets can also be found in the following pastebin
+  that's slightly easier to gork:
+
+  http://paste.openstack.org/show/797564/
+
+  https://review.opendev.org/#/c/746981/ libvirt: Bump
+  MIN_{LIBVIRT,QEMU}_VERSION and NEXT_MIN_{LIBVIRT,QEMU}_VERSION
+
+  https://zuul.opendev.org/t/openstack/build/4c56def513884c5eb3ba7b0adf7fa2=
+60
+  nova-ceph-multistore
+
+  https://zuul.opendev.org/t/openstack/build/4c56def513884c5eb3ba7b0adf7fa2=
+60/log/controller/logs/dpkg-l.txt
+
+  ii  libvirt-daemon                       6.0.0-0ubuntu8.3                =
+      amd64        Virtualization daemon
+  ii  libvirt-daemon-driver-qemu           6.0.0-0ubuntu8.3                =
+      amd64        Virtualization daemon QEMU connection driver
+  ii  libvirt-daemon-system                6.0.0-0ubuntu8.3                =
+      amd64        Libvirt daemon configuration files
+  ii  libvirt-daemon-system-systemd        6.0.0-0ubuntu8.3                =
+      amd64        Libvirt daemon configuration files (systemd)
+  ii  libvirt-dev:amd64                    6.0.0-0ubuntu8.3                =
+      amd64        development files for the libvirt library
+  ii  libvirt0:amd64                       6.0.0-0ubuntu8.3                =
+      amd64        library for interfacing with different virtualization sy=
+stems
+  [..]
+  ii  qemu-block-extra:amd64               1:4.2-3ubuntu6.4                =
+      amd64        extra block backend modules for qemu-system and qemu-uti=
+ls
+  ii  qemu-slof                            20191209+dfsg-1                 =
+      all          Slimline Open Firmware -- QEMU PowerPC version
+  ii  qemu-system                          1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries
+  ii  qemu-system-arm                      1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (arm)
+  ii  qemu-system-common                   1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (common files)
+  ii  qemu-system-data                     1:4.2-3ubuntu6.4                =
+      all          QEMU full system emulation (data files)
+  ii  qemu-system-mips                     1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (mips)
+  ii  qemu-system-misc                     1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (miscellaneous)
+  ii  qemu-system-ppc                      1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (ppc)
+  ii  qemu-system-s390x                    1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (s390x)
+  ii  qemu-system-sparc                    1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (sparc)
+  ii  qemu-system-x86                      1:4.2-3ubuntu6.4                =
+      amd64        QEMU full system emulation binaries (x86)
+  ii  qemu-utils                           1:4.2-3ubuntu6.4                =
+      amd64        QEMU utilities
+
+  https://zuul.opendev.org/t/openstack/build/4c56def513884c5eb3ba7b0adf7fa2=
+60/log/controller/logs/libvirt/qemu
+  /instance-0000003a_log.txt
+
+  2020-09-07 19:29:55.021+0000: starting up libvirt version: 6.0.0, package=
+: 0ubuntu8.3 (Marc Deslauriers <marc.deslauriers@ubuntu.com> Thu, 30 Jul 20=
+20 06:40:28 -0400), qemu version: 4.2.0Debian 1:4.2-3ubuntu6.4, kernel: 5.4=
+.0-45-generic, hostname: ubuntu-focal-ovh-bhs1-0019682147
+  LC_ALL=3DC \
+  PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+  HOME=3D/var/lib/libvirt/qemu/domain-86-instance-0000003a \
+  XDG_DATA_HOME=3D/var/lib/libvirt/qemu/domain-86-instance-0000003a/.local/=
+share \
+  XDG_CACHE_HOME=3D/var/lib/libvirt/qemu/domain-86-instance-0000003a/.cache=
+ \
+  XDG_CONFIG_HOME=3D/var/lib/libvirt/qemu/domain-86-instance-0000003a/.conf=
+ig \
+  QEMU_AUDIO_DRV=3Dnone \
+  /usr/bin/qemu-system-x86_64 \
+  -name guest=3Dinstance-0000003a,debug-threads=3Don \
+  -S \
+  -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/=
+domain-86-instance-0000003a/master-key.aes \
+  -machine pc-i440fx-4.2,accel=3Dtcg,usb=3Doff,dump-guest-core=3Doff \
+  -cpu qemu64 \
+  -m 128 \
+  -overcommit mem-lock=3Doff \
+  -smp 1,sockets=3D1,cores=3D1,threads=3D1 \
+  -uuid 0d59f238-daef-40d4-adf9-a4fa24c35231 \
+  -smbios 'type=3D1,manufacturer=3DOpenStack Foundation,product=3DOpenStack=
+ Nova,version=3D21.1.0,serial=3D0d59f238-daef-40d4-adf9-a4fa24c35231,uuid=
+=3D0d59f238-daef-40d4-adf9-a4fa24c35231,family=3DVirtual Machine' \
+  -no-user-config \
+  -nodefaults \
+  -chardev socket,id=3Dcharmonitor,fd=3D39,server,nowait \
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
+  -rtc base=3Dutc \
+  -no-shutdown \
+  -boot strict=3Don \
+  -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 \
+  -object secret,id=3Dlibvirt-3-storage-secret0,data=3DzT+XibedVJZM2du1+PXp=
+IXHMVJ9a0pVcKihOtCGwlB0=3D,keyid=3DmasterKey0,iv=3D536Lfw+nsyvDhFBTOQG4zA=
+=3D=3D,format=3Dbase64 \
+  -blockdev '{"driver":"rbd","pool":"vms","image":"0d59f238-daef-40d4-adf9-=
+a4fa24c35231_disk","server":[{"host":"158.69.70.115","port":"6789"}],"user"=
+:"cinder","auth-client-required":["cephx","none"],"key-secret":"libvirt-3-s=
+torage-secret0","node-name":"libvirt-3-storage","cache":{"direct":false,"no=
+-flush":false},"auto-read-only":true,"discard":"unmap"}' \
+  -blockdev '{"node-name":"libvirt-3-format","read-only":false,"cache":{"di=
+rect":false,"no-flush":false},"driver":"raw","file":"libvirt-3-storage"}' \
+  -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dlibvirt-=
+3-format,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don \
+  -object secret,id=3Dlibvirt-2-storage-secret0,data=3DSO9AgCCTvkBBMYHZe+LV=
+zoCF4GUNgvBtkFwRRIji7WI=3D,keyid=3DmasterKey0,iv=3DMzGu/h2Api4mMG9lL8hvdg=
+=3D=3D,format=3Dbase64 \
+  -blockdev '{"driver":"rbd","pool":"volumes","image":"volume-04dd79b2-3c05=
+-4492-b1d7-7969d24df768","server":[{"host":"158.69.70.115","port":"6789"}],=
+"user":"cinder","auth-client-required":["cephx","none"],"key-secret":"libvi=
+rt-2-storage-secret0","node-name":"libvirt-2-storage","cache":{"direct":fal=
+se,"no-flush":false},"auto-read-only":true,"discard":"unmap"}' \
+  -blockdev '{"node-name":"libvirt-2-format","read-only":false,"discard":"u=
+nmap","cache":{"direct":false,"no-flush":false},"driver":"raw","file":"libv=
+irt-2-storage"}' \
+  -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x7,drive=3Dlibvirt-=
+2-format,id=3Dvirtio-disk1,write-cache=3Don,serial=3D04dd79b2-3c05-4492-b1d=
+7-7969d24df768 \
+  -object secret,id=3Dlibvirt-1-storage-secret0,data=3DlhbR9+ewiXiaf3dKoQWP=
+3bk6hlLMLRXnbhh9ZkjZ9dQ=3D,keyid=3DmasterKey0,iv=3DWWHpGuOHkwXqxlLxGUqpcA=
+=3D=3D,format=3Dbase64 \
+  -blockdev '{"driver":"rbd","pool":"vms","image":"0d59f238-daef-40d4-adf9-=
+a4fa24c35231_disk.config","server":[{"host":"158.69.70.115","port":"6789"}]=
+,"user":"cinder","auth-client-required":["cephx","none"],"key-secret":"libv=
+irt-1-storage-secret0","node-name":"libvirt-1-storage","cache":{"direct":fa=
+lse,"no-flush":false},"auto-read-only":true,"discard":"unmap"}' \
+  -blockdev '{"node-name":"libvirt-1-format","read-only":true,"cache":{"dir=
+ect":false,"no-flush":false},"driver":"raw","file":"libvirt-1-storage"}' \
+  -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Dlibvirt-1-format,id=3Dide0-0-=
+0,write-cache=3Don \
+  -netdev tap,fd=3D41,id=3Dhostnet0 \
+  -device virtio-net-pci,host_mtu=3D1400,netdev=3Dhostnet0,id=3Dnet0,mac=3D=
+fa:16:3e:4d:bb:0b,bus=3Dpci.0,addr=3D0x3 \
+  -add-fd set=3D2,fd=3D43 \
+  -chardev pty,id=3Dcharserial0,logfile=3D/dev/fdset/2,logappend=3Don \
+  -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 \
+  -vnc 0.0.0.0:3 \
+  -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 \
+  -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 \
+  -object rng-random,id=3Dobjrng0,filename=3D/dev/urandom \
+  -device virtio-rng-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x6 \
+  -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourc=
+econtrol=3Ddeny \
+  -msg timestamp=3Don
+  char device redirected to /dev/pts/1 (label charserial0)
+
+  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
+c/zuul_opendev_logs_4c5/746981/5/check
+  /nova-ceph-multistore/4c56def/testr_results.html
+
+  tempest.api.compute.servers.test_server_rescue_negative.ServerRescueNegat=
+iveTestJSON.test_rescued_vm_detach_volume
+
+  2020-09-07 19:30:13,764 100285 INFO     [tempest.lib.common.rest_client] =
+Request (ServerRescueNegativeTestJSON:_run_cleanups): 202 DELETE https://15=
+8.69.70.115/compute/v2.1/servers/0d59f238-daef-40d4-adf9-a4fa24c35231/os-vo=
+lume_attachments/04dd79b2-3c05-4492-b1d7-7969d24df768 1.261s
+  2020-09-07 19:30:13,764 100285 DEBUG    [tempest.lib.common.rest_client] =
+Request - Headers: {'Content-Type': 'application/json', 'Accept': 'applicat=
+ion/json', 'X-Auth-Token': '<omitted>'}
+          Body: None
+      Response - Headers: {'date': 'Mon, 07 Sep 2020 19:30:12 GMT', 'server=
+': 'Apache/2.4.41 (Ubuntu)', 'content-length': '0', 'content-type': 'applic=
+ation/json', 'openstack-api-version': 'compute 2.1', 'x-openstack-nova-api-=
+version': '2.1', 'vary': 'OpenStack-API-Version,X-OpenStack-Nova-API-Versio=
+n', 'x-openstack-request-id': 'req-502a0106-3eb9-4d42-9dd4-c43ba89187b6', '=
+x-compute-request-id': 'req-502a0106-3eb9-4d42-9dd4-c43ba89187b6', 'connect=
+ion': 'close', 'status': '202', 'content-location': 'https://158.69.70.115/=
+compute/v2.1/servers/0d59f238-daef-40d4-adf9-a4fa24c35231/os-volume_attachm=
+ents/04dd79b2-3c05-4492-b1d7-7969d24df768'}
+          Body: b''
+
+  # First attempt to detach the device  by n-cpu
+
+  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
+c/zuul_opendev_logs_4c5/746981/5/check
+  /nova-ceph-multistore/4c56def/controller/logs/screen-n-cpu.txt
+  (gzipped)
+
+  29957 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [None req-502a0106-3eb9-4d42-9dd4-c=
+43ba89187b6 tempest-ServerRescueNegativeTestJSON-73411582 tempest-ServerRes=
+cueNegativeTestJSON-73411582] detach device xml: <disk type=3D"network" de
+  29958 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  29959 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  29960 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  29961 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  29962 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  29963 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  29964 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  29965 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+  29966 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:  {{(pid=3D92697) detach_device /opt/stack/nova/nova/virt/libvirt/=
+guest.py:510}}
+
+  # DEVICE_DELETED only raised for /machine/peripheral/virtio-disk1
+  /virtio-backend
+
+  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
+c/zuul_opendev_logs_4c5/746981/5/check
+  /nova-ceph-multistore/4c56def/controller/logs/libvirt/libvirtd_log.txt
+  (gzipped)
+
+  329344 2020-09-07 19:30:14.165+0000: 65559: debug : qemuDomainObjEnterMon=
+itorInternal:9869 : Entering monitor (mon=3D0x7f769405e470 vm=3D0x7f768c0df=
+0b0 name=3Dinstance-0000003a)
+  329345 2020-09-07 19:30:14.165+0000: 65559: debug : qemuMonitorDelDevice:=
+2848 : devalias=3Dvirtio-disk1
+  329346 2020-09-07 19:30:14.165+0000: 65559: debug : qemuMonitorDelDevice:=
+2850 : mon:0x7f769405e470 vm:0x7f768c0df0b0 fd:39
+  329347 2020-09-07 19:30:14.165+0000: 65559: info : qemuMonitorSend:993 : =
+QEMU_MONITOR_SEND_MSG: mon=3D0x7f769405e470 msg=3D{"execute":"device_del","=
+arguments":{"id":"virtio-disk1"},"id":"libvirt-367"}^M
+  329348  fd=3D-1                                                          =
+                =
+
+  329349 2020-09-07 19:30:14.165+0000: 65555: info : qemuMonitorIOWrite:450=
+ : QEMU_MONITOR_IO_WRITE: mon=3D0x7f769405e470 buf=3D{"execute":"device_del=
+","arguments":{"id":"virtio-disk1"},"id":"libvirt-367"}^M
+  329350  len=3D79 ret=3D79 errno=3D0                                      =
+                    =
+
+  329351 2020-09-07 19:30:14.168+0000: 65555: debug : qemuMonitorJSONIOProc=
+essLine:220 : Line [{"return": {}, "id": "libvirt-367"}]
+  329352 2020-09-07 19:30:14.168+0000: 65555: info : qemuMonitorJSONIOProce=
+ssLine:239 : QEMU_MONITOR_RECV_REPLY: mon=3D0x7f769405e470 reply=3D{"return=
+": {}, "id": "libvirt-367"}
+  329353 2020-09-07 19:30:14.168+0000: 65559: debug : qemuDomainObjExitMoni=
+torInternal:9892 : Exited monitor (mon=3D0x7f769405e470 vm=3D0x7f768c0df0b0=
+ name=3Dinstance-0000003a)
+  329354 2020-09-07 19:30:14.201+0000: 65555: debug : qemuMonitorJSONIOProc=
+essLine:220 : Line [{"timestamp": {"seconds": 1599507014, "microseconds": 2=
+01037}, "event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/vi=
+rtio-disk1/virtio-backend"}}]
+  329355 2020-09-07 19:30:14.208+0000: 65555: info : qemuMonitorJSONIOProce=
+ssLine:234 : QEMU_MONITOR_RECV_EVENT: mon=3D0x7f769405e470 event=3D{"timest=
+amp": {"seconds": 1599507014, "microseconds": 201037}, "event": "DEVICE_DEL=
+ETED", "data": {"path": "/machine/peripheral/virtio-disk1/virtio-backend"}}
+  329356 2020-09-07 19:30:14.208+0000: 65555: debug : qemuMonitorJSONIOProc=
+essEvent:181 : mon=3D0x7f769405e470 obj=3D0x55dd95d0cba0
+  329357 2020-09-07 19:30:14.208+0000: 65555: debug : qemuMonitorEmitEvent:=
+1198 : mon=3D0x7f769405e470 event=3DDEVICE_DELETED
+  329358 2020-09-07 19:30:14.208+0000: 65555: debug : qemuProcessHandleEven=
+t:549 : vm=3D0x7f768c0df0b0
+  329359 2020-09-07 19:30:14.208+0000: 65555: debug : virObjectEventNew:631=
+ : obj=3D0x55dd95d3bf60
+  329360 2020-09-07 19:30:14.208+0000: 65555: debug : qemuMonitorJSONIOProc=
+essEvent:205 : handle DEVICE_DELETED handler=3D0x7f7691732840 data=3D0x55dd=
+95eae3c0
+  329361 2020-09-07 19:30:14.208+0000: 65555: debug : qemuMonitorJSONHandle=
+DeviceDeleted:1287 : missing device in device deleted event
+
+  # Second attempt to detach the device by n-cpu
+
+  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
+c/zuul_opendev_logs_4c5/746981/5/check
+  /nova-ceph-multistore/4c56def/controller/logs/screen-n-cpu.txt
+  (gzipped)
+
+  30046 Sep 07 19:30:19.192548 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG oslo.service.loopingcall [None req-502a0106-3eb9-4d42-9dd4-=
+c43ba89187b6 tempest-ServerRescueNegativeTestJSON-73411582 tempest-ServerRe=
+scueNegativeTestJSON-73411582] Waiting for function nova.virt.libvirt.gu
+  30047 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30048 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30049 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30050 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30051 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30052 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30053 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30054 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30055 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+  30056 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:  {{(pid=3D92697) detach_device /opt/stack/nova/nova/virt/libvirt/=
+guest.py:510}}
+
+  # DeviceNotFound raised by QEMU
+
+  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
+c/zuul_opendev_logs_4c5/746981/5/check
+  /nova-ceph-multistore/4c56def/controller/logs/libvirt/libvirtd_log.txt
+  (gzipped)
+
+  332479 2020-09-07 19:30:19.196+0000: 65560: debug : qemuDomainObjBeginJob=
+Internal:9416 : Starting job: job=3Dmodify agentJob=3Dnone asyncJob=3Dnone =
+(vm=3D0x7f768c0df0b0 name=3Dinstance-0000003a, current job=3Dnone agentJob=
+=3Dnone async=3Dnone)
+  332480 2020-09-07 19:30:19.196+0000: 65560: debug : qemuDomainObjBeginJob=
+Internal:9470 : Started job: modify (async=3Dnone vm=3D0x7f768c0df0b0 name=
+=3Dinstance-0000003a)
+  332481 2020-09-07 19:30:19.196+0000: 65560: debug : qemuDomainObjEnterMon=
+itorInternal:9869 : Entering monitor (mon=3D0x7f769405e470 vm=3D0x7f768c0df=
+0b0 name=3Dinstance-0000003a)
+  332482 2020-09-07 19:30:19.196+0000: 65560: debug : qemuMonitorDelDevice:=
+2848 : devalias=3Dvirtio-disk1
+  332483 2020-09-07 19:30:19.196+0000: 65560: debug : qemuMonitorDelDevice:=
+2850 : mon:0x7f769405e470 vm:0x7f768c0df0b0 fd:39
+  332484 2020-09-07 19:30:19.196+0000: 65560: info : qemuMonitorSend:993 : =
+QEMU_MONITOR_SEND_MSG: mon=3D0x7f769405e470 msg=3D{"execute":"device_del","=
+arguments":{"id":"virtio-disk1"},"id":"libvirt-369"}^M
+  332485  fd=3D-1                                                          =
+                =
+
+  332486 2020-09-07 19:30:19.196+0000: 65555: info : qemuMonitorIOWrite:450=
+ : QEMU_MONITOR_IO_WRITE: mon=3D0x7f769405e470 buf=3D{"execute":"device_del=
+","arguments":{"id":"virtio-disk1"},"id":"libvirt-369"}^M
+  332487  len=3D79 ret=3D79 errno=3D0                                      =
+                    =
+
+  332488 2020-09-07 19:30:19.197+0000: 65555: debug : qemuMonitorJSONIOProc=
+essLine:220 : Line [{"id": "libvirt-369", "error": {"class": "DeviceNotFoun=
+d", "desc": "Device 'virtio-disk1' not found"}}]
+  332489 2020-09-07 19:30:19.197+0000: 65555: info : qemuMonitorJSONIOProce=
+ssLine:239 : QEMU_MONITOR_RECV_REPLY: mon=3D0x7f769405e470 reply=3D{"id": "=
+libvirt-369", "error": {"class": "DeviceNotFound", "desc": "Device 'virtio-=
+disk1' not found"}}
+  332490 2020-09-07 19:30:19.197+0000: 65560: debug : qemuDomainObjExitMoni=
+torInternal:9892 : Exited monitor (mon=3D0x7f769405e470 vm=3D0x7f768c0df0b0=
+ name=3Dinstance-0000003a)
+  332491 2020-09-07 19:30:19.197+0000: 65560: debug : qemuDomainDeleteDevic=
+e:128 : Detaching of device virtio-disk1 failed and no event arrived
+
+  # n-cpu continues to retry the detach
+
+  30245 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30246 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30247 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30248 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30249 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30250 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30251 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30252 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30253 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  30276 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30277 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30278 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30279 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30280 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30281 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30282 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30283 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30284 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  30356 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30357 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30358 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30359 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30360 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30361 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30362 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30363 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30364 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  30381 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30382 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30383 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30384 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30385 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30386 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30387 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30388 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30389 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  30478 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30479 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30480 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30481 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30482 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30483 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30484 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30485 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30486 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  30796 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  30797 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  30798 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  30799 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  30800 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  30801 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  30802 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  30803 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  30804 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  31050 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
+=3D"network" device=3D"disk">
+  31051 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
+=3D"unmap"/>
+  31052 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
+492-b1d7-7969d24df768">
+  31053 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
+  31054 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   </source>
+  31055 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
+  31056 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
+  31057 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
+07" function=3D"0x0"/>
+  31058 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: </disk>
+
+  # n-cpu eventually gives up trying to detach the device
+
+  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
+c/zuul_opendev_logs_4c5/746981/5/check
+  /nova-ceph-multistore/4c56def/controller/logs/screen-n-cpu.txt
+  (gzipped)
+
+  31102 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall [-] Dynamic interval looping call =
+'oslo_service.loopingcall.RetryDecorator.__call__.<locals>._func' failed: n=
+ova.exception.DeviceDetachFailed: Device detach failed for vdb: Unable t
+  31103 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall Traceback (most recent call last):
+  31104 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
+ist-packages/oslo_service/loopingcall.py", line 150, in _run_loop
+  31105 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     result =3D func(*self.args, **=
+self.kw)
+  31106 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
+ist-packages/oslo_service/loopingcall.py", line 428, in _func
+  31107 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     return self._sleep_time
+  31108 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
+ist-packages/oslo_utils/excutils.py", line 220, in __exit__
+  31109 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     self.force_reraise()
+  31110 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
+ist-packages/oslo_utils/excutils.py", line 196, in force_reraise
+  31111 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     six.reraise(self.type_, self.v=
+alue, self.tb)
+  31112 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
+ist-packages/six.py", line 703, in reraise
+  31113 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     raise value
+  31114 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
+ist-packages/oslo_service/loopingcall.py", line 407, in _func
+  31115 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     result =3D f(*args, **kwargs)
+  31116 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall   File "/opt/stack/nova/nova/virt/=
+libvirt/guest.py", line 489, in _do_wait_and_retry_detach
+  31117 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall     raise exception.DeviceDetachFa=
+iled(
+  31118 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall nova.exception.DeviceDetachFailed:=
+ Device detach failed for vdb: Unable to detach the device from the live co=
+nfig.
+  31119 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
+e[92697]: ERROR oslo.service.loopingcall
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1894804/+subscriptions
 
