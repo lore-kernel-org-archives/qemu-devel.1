@@ -2,88 +2,93 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6430C43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 15:30:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88B0FC43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 15:32:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 322AE22450
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 15:30:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B7E222274
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 15:32:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D9J/5Sq6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 322AE22450
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="et/4/Exo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B7E222274
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIZO0-0004Za-MG
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 11:30:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34952)
+	id 1kIZQ0-0005nL-CZ
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 11:32:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35268)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kIZNK-00049E-Lk
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 11:29:38 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:40948)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kIZO8-0004tL-RR
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 11:30:28 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:41880)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kIZNJ-00072D-1y
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 11:29:38 -0400
-Received: by mail-io1-xd44.google.com with SMTP id j2so8687759ioj.7
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 08:29:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=mj+hkOo1gmvDN5xY/KyOKc3yiTF7uHE8zreCZ8haNaU=;
- b=D9J/5Sq6bDPqkI17u2d2WQsanKKZb2cYMi0Lmu7UShJKLQA995PaKZgHLIJkurl3ox
- MLf9nY5PeIUvUXpikz5TvDQU7ZuXAV/jSG72CVHWyX1fJU+Py/xnkCPg1Qg6D3j8HXpe
- b04UTSzyoyLPxVQt8iMAXNayPgS9Ma7JBDrAUnsjwIeVCRfyjdnDkBLNuzIkgbw21hck
- cENUa2X/mytYHUh9peSNilPHiVLIA+XbYzkZsdCE8mE8KsMzHSpG6TF3gNtcae3rSZSv
- h72rRZLmHQYYpNGavaHuKji1ZwVP7f4GTwbPuIe4mJGrA/OLBRt+RoDAaOXFNjt3Mswc
- eOsQ==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kIZO6-0007O6-Tb
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 11:30:28 -0400
+Received: by mail-pg1-x544.google.com with SMTP id y1so4097494pgk.8
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 08:30:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=rSWWkHT5REPj+U406wKkSIIkVRw68xksXwdGYcOT8mk=;
+ b=et/4/ExoyYbazr9D3uzFBUX2MZvrivdI63k5wYo0kPoBufwdUG5iWOybCHA+Jr9em5
+ SzyIXsDPiOYnCPqnGQVSw8GYsjxeAhqLv8UdbyOAFAxcgSjVlsn5Ee4oSu6FGLVkShuF
+ NuXg7MEaYejGok4W5JHHi264MQ1+FxCXVoV2w3bOVGKGwDiHV1a94uwqMuLTeULcMkQl
+ JoKkuKKwbMH+LY4SSK+PlX3OMdJ4BAftI2isbrOdy8+Za2g2EPJpUOFEnpX293Qe1twm
+ 7WfNq5tUI6df9LsejkhWoCJ0gYhDRWJz94fXymuIVqI1RXUjNdue1wa5Gvk6Ly83+9n4
+ OvJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=mj+hkOo1gmvDN5xY/KyOKc3yiTF7uHE8zreCZ8haNaU=;
- b=BMYFTTtlOC20kC3jmgbb70GZcoqw6OcfkpxdCA6mOe1O5/gEglPrlwbEcsbxQYgKfd
- jY58E1bSDqAWoI3kVigUZMMSpwAjk+06YXmvnQDC0FpMmkJ+dknxd0FHrZEWDesoVCvu
- Jq2pT6m7RbTySYZFTlgoIa+LMnKUjUv3cwcXS+WKHCx8qcP/gBKRT/+0D8hJ/EPMkOk3
- 3hdFGg/OUFk9OutWpPGkG5FjlIAEpFlpiSOxqIJxQ4hWk4vRKHYySJcIGfX2RqxU2eGA
- pGqXglbZpTB0sSAUxrwxGEGdUmgue+oxs8yxAHQRFGcA/zUXHLETuptKpx8/NQ6bJOC4
- Al2g==
-X-Gm-Message-State: AOAM530u4XZ6CG18ANSagftJ6nt8WDjmm8JsKBZLxaxowwz64Fj2FWHu
- vh50xlKlCgiimmcQ1o5503WkORj6mixOa4ghhPA=
-X-Google-Smtp-Source: ABdhPJwqGm1J/+01BCe1vjtUaf8+71wl8ICEF/eI6eTSwtQiyXR1u419THPNWSiiWtd6u20nT0L2uEuOeJb85SC+jzo=
-X-Received: by 2002:a05:6602:2245:: with SMTP id
- o5mr20396049ioo.105.1600270175940; 
- Wed, 16 Sep 2020 08:29:35 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=rSWWkHT5REPj+U406wKkSIIkVRw68xksXwdGYcOT8mk=;
+ b=ItJ3mWzNRrNrs4iHkE5DpT9jhjXJHS4oG6bLfkCcq0YQta0EpCXfDrr/6K5U44cuCH
+ FVN5X38txDTsd6qMfQ6birb3ETv25e1BHtQrnk6NprmmYaM8uAOMhn9irZYxM2C3+iKr
+ we5IBIqldWBSjvkQmz4eXWx9Y93fI1csS4Rf5KnIksm5P2rd3rNn+XL+lxkD61ArCB2l
+ ZhPhh4NWp2IsKe376w4uNrFXDnGd9ZRnhgvKN2BbSjm9r8TRF2Mmul2ayZS/c0OP11Rz
+ dqcnuWEwsUNXklppOYRKEx+PLwGl8VhTJl7LeIvYYs3kJ9RsQRykQMH4mm1s3JQ0NubD
+ +Fsg==
+X-Gm-Message-State: AOAM533k7cuZnvtlnXXIHjzw8/suy7ZHy5qWjlI3+z4CNscixV7G4era
+ XLv1tJMmjD2yTt1MFmMgLvwr7+kRgazKAw==
+X-Google-Smtp-Source: ABdhPJwNrgULf0JyvmDAe331s0g9VAFOvorK74alrB4hxkepsqb323s122/LNyR1fnyWKiqCDECSNg==
+X-Received: by 2002:a63:342:: with SMTP id 63mr19603756pgd.134.1600270225441; 
+ Wed, 16 Sep 2020 08:30:25 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id r123sm18010723pfc.187.2020.09.16.08.30.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 16 Sep 2020 08:30:24 -0700 (PDT)
+Subject: Re: [PATCH] configure: move cocoa option to Meson
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20200916081131.21775-1-pbonzini@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <4a101a38-cf97-f155-9b89-cfd70a35fe8b@linaro.org>
+Date: Wed, 16 Sep 2020 08:30:22 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <9435182.tdPhlSkOF2@farino>
-In-Reply-To: <9435182.tdPhlSkOF2@farino>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 16 Sep 2020 08:18:25 -0700
-Message-ID: <CAKmqyKPqg4no7DM+z-EdJAAKzta9Mcfn=Fz0DjC5dbSKEtDtCg@mail.gmail.com>
-Subject: Re: riscv32 wait() problem, qemu or glibc?
-To: =?UTF-8?B?QW5kcmVhcyBLLiBIw7x0dGVs?= <dilfridge@gentoo.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
+In-Reply-To: <20200916081131.21775-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+X-Spam_score_int: -21
+X-Spam_score: -2.2
+X-Spam_bar: --
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.062,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -98,102 +103,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: GNU C Library <libc-alpha@sourceware.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Christophe de Dinechin <dinechin@redhat.com>, r.bolshakov@yadro.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 14, 2020 at 1:14 AM Andreas K. H=C3=BCttel via Libc-alpha
-<libc-alpha@sourceware.org> wrote:
->
-> Hi,
->
-> first of all, sorry for crossposting, but I'm dealing with many moving an=
-d
-> experimental parts here...
->
-> Situation: riscv32 (ilp32) qemu-user [1] chroot, Linux [2], glibc [3], gc=
-c [4]
->
-> The following small program outputs "child exited with status 40", which =
-is
-> rather unexpected (it should be 42). Any idea what is going on?
->
-> (This is a simplified version of code in a configure test. The test has o=
-ther
-> potential issues [5], but in any case it cant produce useful results on
-> riscv32 right now.)
->
-> TIA,
-> Andreas
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> #include <stdlib.h>
-> #include <unistd.h>
-> #include <stdio.h>
-> #include <sys/wait.h>
->
-> main(c, v)
->      int c;
->      char **v;
-> {
->   pid_t pid, p;
->   int s, i, n;
->
->   s =3D 0;
->   pid =3D fork();
->   if (pid =3D=3D 0)
->     exit (42);
->
->   /* wait for the process */
->   p =3D wait(&s);
+On 9/16/20 1:11 AM, Paolo Bonzini wrote:
+>    --enable-cocoa)
+> -      cocoa="yes" ;
+> +      cocoa="enabled" ;
 
-The wait() function internally in glibc calls waitid()
-(https://github.com/bminor/glibc/blob/master/posix/wait.c#L25)
+Lose the stray ; at the same time?
 
-The waitid() function then does a waitid syscall
-(https://github.com/bminor/glibc/blob/master/sysdeps/unix/sysv/linux/waitid=
-.c#L29)
+> @@ -101,7 +101,7 @@ if targetos == 'windows'
+>  elif targetos == 'darwin'
+>    coref = dependency('appleframeworks', modules: 'CoreFoundation')
+>    iokit = dependency('appleframeworks', modules: 'IOKit')
+> -  cocoa = dependency('appleframeworks', modules: 'Cocoa')
+> +  cocoa = dependency('appleframeworks', modules: 'Cocoa', required: get_option('cocoa'))
+>    hvf = dependency('appleframeworks', modules: 'Hypervisor')
+>  elif targetos == 'sunos'
+>    socket = [cc.find_library('socket'),
+> @@ -112,6 +112,11 @@ elif targetos == 'haiku'
+>              cc.find_library('network'),
+>              cc.find_library('bsd')]
+>  endif
+> +
+> +if not cocoa.found() and get_option('cocoa').enabled()
+> +  error('Cocoa not available on this platform')
+> +endif
 
-QEMU has support for waitid()
-(https://github.com/qemu/qemu/blob/master/linux-user/syscall.c#L8308)
-so this should work.
+Isn't the error redundant with the required above?
 
-I also don't see any obvious size mismatches.
 
-My guess is that somewhere in QEMU the types don't match what RV32 is
-using. It's probably worth printing out the size, alignment and value
-of everything at every stage and see what breaks.
-
-AFAIK RV32 linux-user mode is pretty much un-tested. So their might be
-all sorts of issues with it unfortunately.
-
-Alistair
-
->   if (p !=3D pid)
->     exit (255);
->
->   if (WIFEXITED(s))
->   {
->      int r=3DWEXITSTATUS(s);
->      printf("child exited with status %i\n",r);
->   }
-> }
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
->
-> [1] qemu built from git master, Sep 12, 2020 16:30:37 EEST
-> [2] host kernel is 5.8.8
-> [3] glibc-2.32 with the rv32 patch series backported from master
-> [4] (Gentoo 10.2.0-r1 p2)
-> [5] https://lists.gnu.org/archive/html/bug-bash/2020-09/msg00033.html
->
-> --
-> Andreas K. H=C3=BCttel
-> dilfridge@gentoo.org
-> Gentoo Linux developer
-> (council, qa, toolchain, base-system, perl, libreoffice)
+r~
 
