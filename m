@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2718DC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:57:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C270C43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:59:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD11122208
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:57:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3751322208
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:59:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RHbWvxo5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD11122208
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BBXmJns8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3751322208
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIW4K-00054c-A9
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 07:57:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54298)
+	id 1kIW5W-0006Wb-74
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 07:59:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54330)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kIVur-0006pt-1N
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:48:01 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46129
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kIVuu-0006xn-Dp
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:48:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45962
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kIVup-00089s-7Y
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:48:00 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kIVus-0008AP-Gt
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:48:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600256878;
+ s=mimecast20190719; t=1600256881;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GMroMXGtE6vqLVUYuRAwoouHI145DINyzRRsqwIB/r4=;
- b=RHbWvxo5RTV4grURNTaolLvCiQgpi8E0r/8F3aYIS9GqsVwQ4tX6jy7NFGRne6Ima5bf4u
- iwNLsC9ZimV6dLi0AxG8t127uZySYS3XufcKL0+t8C5odQaBuqLW5iuGzEFZSL11FChlfA
- dhqxa/BVxL+194SvZiD81wTtoiASKYk=
+ bh=NDra1uvSiA+8iPP6dcWC7ah4TaMXB/37gOa2qLElVAc=;
+ b=BBXmJns8ESDQDLxya1B+erkGpkLPQi5wN4iThrP9goVVXIzwHC+JmpgH/So7b55eQmYCiK
+ gDbFkF9wTyceTe/3kEzZN734+pgeFvkKz54R4kajEoJTiTbXHHQf66KUWoH3hfx/zOBRDp
+ FEjoueIytaa5jadyGMlBKgLSVwmVC8Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-596-EMG1zDUlPsGxT-N1jNDC6g-1; Wed, 16 Sep 2020 07:47:54 -0400
-X-MC-Unique: EMG1zDUlPsGxT-N1jNDC6g-1
+ us-mta-200-omUVpJNMPLKMs10rlb9mYw-1; Wed, 16 Sep 2020 07:47:57 -0400
+X-MC-Unique: omUVpJNMPLKMs10rlb9mYw-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13735100670C;
- Wed, 16 Sep 2020 11:47:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82DCE1006713;
+ Wed, 16 Sep 2020 11:47:56 +0000 (UTC)
 Received: from thuth.com (ovpn-113-19.ams2.redhat.com [10.36.113.19])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 08CB55DA71;
- Wed, 16 Sep 2020 11:47:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0E8805DA71;
+ Wed, 16 Sep 2020 11:47:54 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 12/24] tests: Fixes test-replication.c on msys2/mingw.
-Date: Wed, 16 Sep 2020 13:47:19 +0200
-Message-Id: <20200916114731.102080-13-thuth@redhat.com>
+Subject: [PULL 14/24] osdep: file locking functions are not available on Win32
+Date: Wed, 16 Sep 2020 13:47:21 +0200
+Message-Id: <20200916114731.102080-15-thuth@redhat.com>
 In-Reply-To: <20200916114731.102080-1-thuth@redhat.com>
 References: <20200916114731.102080-1-thuth@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 00:53:39
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 03:05:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
@@ -102,63 +102,37 @@ Sender: "Qemu-devel"
 
 From: Yonggang Luo <luoyonggang@gmail.com>
 
-On Windows there is no path like /tmp/s_local_disk.XXXXXX
-Use g_get_tmp_dir instead of /tmp.
+Do not declare the following locking functions on Win32:
+int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive);
+int qemu_unlock_fd(int fd, int64_t start, int64_t len);
+int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive);
+bool qemu_has_ofd_lock(void);
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200915121318.247-8-luoyonggang@gmail.com>
+Message-Id: <20200915121318.247-10-luoyonggang@gmail.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/test-replication.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ include/qemu/osdep.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/test-replication.c b/tests/test-replication.c
-index 9ab3666a90..e7cbd6b144 100644
---- a/tests/test-replication.c
-+++ b/tests/test-replication.c
-@@ -23,14 +23,14 @@
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 412962d91a..e80fddd1e8 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -502,11 +502,11 @@ int qemu_close(int fd);
+ int qemu_unlink(const char *name);
+ #ifndef _WIN32
+ int qemu_dup(int fd);
+-#endif
+ int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive);
+ int qemu_unlock_fd(int fd, int64_t start, int64_t len);
+ int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive);
+ bool qemu_has_ofd_lock(void);
++#endif
  
- /* primary */
- #define P_ID "primary-id"
--static char p_local_disk[] = "/tmp/p_local_disk.XXXXXX";
-+static char *p_local_disk;
- 
- /* secondary */
- #define S_ID "secondary-id"
- #define S_LOCAL_DISK_ID "secondary-local-disk-id"
--static char s_local_disk[] = "/tmp/s_local_disk.XXXXXX";
--static char s_active_disk[] = "/tmp/s_active_disk.XXXXXX";
--static char s_hidden_disk[] = "/tmp/s_hidden_disk.XXXXXX";
-+static char *s_local_disk;
-+static char *s_active_disk;
-+static char *s_hidden_disk;
- 
- /* FIXME: steal from blockdev.c */
- QemuOptsList qemu_drive_opts = {
-@@ -571,6 +571,11 @@ static void setup_sigabrt_handler(void)
- int main(int argc, char **argv)
- {
-     int ret;
-+    const char *tmpdir = g_get_tmp_dir();
-+    p_local_disk = g_strdup_printf("%s/p_local_disk.XXXXXX", tmpdir);
-+    s_local_disk = g_strdup_printf("%s/s_local_disk.XXXXXX", tmpdir);
-+    s_active_disk = g_strdup_printf("%s/s_active_disk.XXXXXX", tmpdir);
-+    s_hidden_disk = g_strdup_printf("%s/s_hidden_disk.XXXXXX", tmpdir);
-     qemu_init_main_loop(&error_fatal);
-     bdrv_init();
- 
-@@ -605,5 +610,10 @@ int main(int argc, char **argv)
- 
-     cleanup_imgs();
- 
-+    g_free(p_local_disk);
-+    g_free(s_local_disk);
-+    g_free(s_active_disk);
-+    g_free(s_hidden_disk);
-+
-     return ret;
- }
+ #if defined(__HAIKU__) && defined(__i386__)
+ #define FMT_pid "%ld"
 -- 
 2.18.2
 
