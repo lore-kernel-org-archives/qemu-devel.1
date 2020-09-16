@@ -2,41 +2,44 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16DE1C43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:12:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B008C43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:17:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A9B92076C
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:12:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A9B92076C
+	by mail.kernel.org (Postfix) with ESMTPS id 37ACD2076C
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:17:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37ACD2076C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kITTv-0008Th-Hu
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 05:12:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42594)
+	id 1kITYj-0002Dh-9V
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 05:17:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43628)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kITT5-0007rP-M7; Wed, 16 Sep 2020 05:11:11 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:41929)
+ id 1kITXU-0001Yb-Pt; Wed, 16 Sep 2020 05:15:44 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:57243)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kITSz-0003Kh-1I; Wed, 16 Sep 2020 05:11:11 -0400
+ id 1kITXS-0003ub-68; Wed, 16 Sep 2020 05:15:44 -0400
 Received: from [192.168.100.1] ([82.252.129.222]) by mrelayeu.kundenserver.de
  (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MjSDU-1klWch3SHq-00kxbc; Wed, 16 Sep 2020 11:10:38 +0200
-Subject: Re: [PATCH v10 13/26] meson: remove empty else and duplicated gio deps
-To: Yonggang Luo <luoyonggang@gmail.com>, qemu-devel@nongnu.org
-References: <20200915171234.236-1-luoyonggang@gmail.com>
- <20200915171234.236-14-luoyonggang@gmail.com>
+ 1N4R0a-1kSkJZ33va-011OJ2; Wed, 16 Sep 2020 11:15:31 +0200
+Subject: Re: [PATCH 0/2] hw/timer/hpet: Fix compiler errors with -DHPET_DEBUG
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Dov Murik <dovmurik@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+References: <20200909083650.46771-1-dovmurik@linux.vnet.ibm.com>
+ <8d9ae068-77cc-6152-7b90-a51bf70648a0@redhat.com>
+ <4918b958-dbd4-bd18-bb75-da7386124886@linux.vnet.ibm.com>
+ <f246ada9-bf7d-2c94-e24e-e28bf3d2efc2@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -80,35 +83,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <917241ce-5dae-02ba-687b-aed3a942bfd8@vivier.eu>
-Date: Wed, 16 Sep 2020 11:10:32 +0200
+Message-ID: <f866b06f-b499-a940-2f60-520eb75f0a3e@vivier.eu>
+Date: Wed, 16 Sep 2020 11:15:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200915171234.236-14-luoyonggang@gmail.com>
+In-Reply-To: <f246ada9-bf7d-2c94-e24e-e28bf3d2efc2@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:S3OTOLvd8t97gDsj6byXb6h999CXlUEpYP7WcLtNM49YWHm5DCt
- z8/IcP/F8Vzna9EGvlIaNyK6WMRrYnyR60W8ePKcWlb2TPEsOufCPkSOci0ecu055KZNuOB
- mwveySDD/UpgF85kNUMbxM6SUsuFwnbg5Q7CQBO4q+xBYHyGHHgmwtwv04D1j+yQs/4WBxU
- 6GdL3jAeGZ6Hkc5li139Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:H/amolakits=:+kPPcW6uI8NRfN29PKvpx+
- aDifL4T3U1s0UQYc8YUJ5nOL8tH3Q9b3NiGHpai1gxzwCyyduRiL402witwgZhTHBWvTlGm6g
- IsNA6K1pqzLEOLlJuqohPWBoBN0C/WY2kPKpPveUXe+3qSOT6RBaKt/0nJwxxYoim678dvXIr
- W4RDu4dLHzPpRh5a5DKq/N+4Ipq5pA+tM+jwntEMV6H3rewLyGvRGF5IKCkTS5iBJnes1++6h
- EAY1x0JNTXLAiDLsSalcJ4FwlEdmt9LgUrOq1HxBFyU7NzpC7szWwigWEK2Jez91uz6fUiKww
- F2ulVrz7hnJPzzaxAPAq5xUO9XTCtUBvgiwa7WNx98cV2E6l3yNP3Grc5CpCFsEO3VfkorEt3
- MqlpeEaY/kiLgXOsKowH2qa14Yo7FEHRWtJtA553UcNO0qAFPjV8xu8buLSMzgellRbyHbfbG
- KrFetRjM0s4Kaf6UA8rjpXoHVOk2EqnF7YZnghXVuUM1fLqUm5Qt55+9xsasWBKGeSE+pUHFO
- Uqqf3b2vero5sofu1LgUCu2oH9Dc0OVLUzIj6xIlDhnpNHPPGgSOb74InLEllEtpz1WWsa5Cq
- Cpn/dj6VOwQ3hybkVGdYlJGeKzUGkJo37DpC7Ey7W2lK5O+4TckU4/lVhjXY4YaXyKMUP8xTf
- KEB+Y/TGVVzcwhkN+MF/0gDBWIm5dbU6Y+0q1SN/JULBAHbDbPISYdUSCf44bR7aWOgFT7RoV
- tYUfjb9sQJDGjEu10NsFqoPPiZio9R2Sgxcy+xiECOTUTG8C0qJOXTFVnZTdrJmISMR1/WIKD
- xTXNbpgHpKHE7ZV/o5Bb/W+ej4sENyDAjEwGkqQ9IgecKyI9cMoVDDK1QOUuPSvl14TxLq4
-Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:LqhXqvuUu1stUfqsIkDhnd6J3Nw5qjCK/v3+F6/jWCB65lS0f5h
+ rvgU+AtTczUqgyOgPuJ4Nh82unrhHfmNRjquw0eAdRkSMKiO0raRHjYbiyqTihfRnL3yNeU
+ FK/mTznEt8hYslYRMaUVV9CN4LriQN2y4za5Xa7oaUtRGV/BwoT72pJGMkCeyDAZHYCfBSe
+ NBeSYbQYBZPAkmvaPoJbA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:O+UKZ3fl2tk=:F2AntRaaJBpV4itj4La3B9
+ NyXJ519w9Ol6XUWwT1BSaFhhbM82UugiOB6szd723PkstxiL/O4cNSfpH5nrqwM2m4eFP7IkE
+ qbiJcXy+3u61/zlCYmzcl8pzuVNH5PrsDgFMBCOtVzQqopNo/WY/wFio5l/fELBw87NE2kV7/
+ gBzW7FsFdHnuYZhycScSXeWAmmNzIRi6EvDCiyUmq4FjEH5ukMmGU9//YUOuzbl8otJi+9o7i
+ TK8pQ0ZZzxE0JZ1Yy7sVq7H6Mmc/qrorn+6Iu5PoeJ0rYhetoC38qQCJvuPn1za6X5FRKpdvD
+ vh1fakwMRrbuVe7WlprlruYDJDp8H3kFkMrTYkPdF03L3xj9Zi4VXpoPBeHZ59ShdDyMcU7Hy
+ X0LJu55ULBAwYHSF5TmYWZjUbirMTWZh3fZMprLZesAo0aG42XG71nT3Ez1SzYCPF0oDM0hZE
+ XQgFRj87dl8p+93xhM84FRoJ8wNt9Nd5hggzvPudpsSC+sh9FhiYkVIkM3Zfp/R/qLdpxUHaR
+ cA8Lq4fbcBbQRdUhUGiPkuTTssOHzn1nNraCPaDMVMzvGbqjvbfgfiR4Rr5dWJwLoEufBq8iR
+ 7HkqM3+nMT0IzLZ74r7EAjKESDnK3Bx5FQvgHVyAGYU2WPxuFo4ZX0Jsf3Q0smT6D/rQ/oFKy
+ B9QqQKbqTRE/jMtsVsDZIfXTfeN35oAvK8CIhQ1KQo/qd0m0Gis8+SSwsE30/O5vrDx1wGK/1
+ Y0K8Hq0k9Sn/vDiudUQPRuh72fgMkemqiYoPVZsMwVt1SxCxOZp9ASNvueiUeHc2zytJ+Emy3
+ HbL8GHR5SVMrwimJkyBMvwk+kQD8VAEfn6jtenwJD5dGMNk71tx/kpe60OIkE/hRlVqdvA5
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 05:11:02
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 04:53:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -128,57 +131,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
- "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>,
- Peter Lieven <pl@kamp.de>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 15/09/2020 à 19:12, Yonggang Luo a écrit :
-> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-> ---
->  meson.build | 6 ------
->  1 file changed, 6 deletions(-)
+Le 13/09/2020 à 13:42, Philippe Mathieu-Daudé a écrit :
+> Cc'ing qemu-trivial@
 > 
-> diff --git a/meson.build b/meson.build
-> index 690723b470..23cb1b8742 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -317,7 +317,6 @@ opengl = not_found
->  if 'CONFIG_OPENGL' in config_host
->    opengl = declare_dependency(compile_args: config_host['OPENGL_CFLAGS'].split(),
->                                link_args: config_host['OPENGL_LIBS'].split())
-> -else
->  endif
->  gtk = not_found
->  if 'CONFIG_GTK' in config_host
-> @@ -344,11 +343,6 @@ if 'CONFIG_ICONV' in config_host
->    iconv = declare_dependency(compile_args: config_host['ICONV_CFLAGS'].split(),
->                               link_args: config_host['ICONV_LIBS'].split())
->  endif
-> -gio = not_found
-> -if 'CONFIG_GIO' in config_host
-> -  gio = declare_dependency(compile_args: config_host['GIO_CFLAGS'].split(),
-> -                           link_args: config_host['GIO_LIBS'].split())
-> -endif
->  vnc = not_found
->  png = not_found
->  jpeg = not_found
+> On 9/10/20 2:53 PM, Dov Murik wrote:
+>> On 09/09/2020 20:24, Philippe Mathieu-Daudé wrote:
+>>> On 9/9/20 10:36 AM, Dov Murik wrote:
+>>>> Fix several compiler errors when compiling withe -DHPET_DEBUG.
+>>>>
+>>>> Steps to reproduce the issue:
+>>>>
+>>>>      mkdir build
+>>>>      cd build
+>>>>      ../configure --target-list=x86_64-softmmu
+>>>> --extra-cflags=-DHPET_DEBUG
+>>>>      make
+>>>>
+>>>> Dov Murik (2):
+>>>>    hw/timer/hpet: Remove unused functions hpet_ram_readb, hpet_ram_readw
+>>>>    hw/timer/hpet: Fix debug format strings
+>>>>
+>>>>   hw/timer/hpet.c | 27 +++++++--------------------
+>>>>   1 file changed, 7 insertions(+), 20 deletions(-)
+>>>>
+>>>
+>>> I sent almost the same patches last week :)
+>>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg736836.html
+>>
+>> Oops, missed that. You're right.
+>>
+>>> You seem to fix a 4th format, can you rebase on top? (As these
+>>> patches have already been queued).
+>>
+>> Actually there's a small issue in one of your suggested fixes: you added
+>> "0x" but kept the "%#".  I think it should be without the "#" (also
+>> according to the coding style document).
+>>
+>> I suggest you fix this small issue, and also add any changes you wish
+>> from this patchset; then we can throw my patchset to the bin.
+> 
+> Let's use your patchset instead.
+> 
+> Series:
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > 
 
-Applied to my trivial-patches branch.
+Series applied to my trivial-patches branch.
 
 Thanks,
 Laurent
+
+
 
 
