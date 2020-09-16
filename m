@@ -2,88 +2,117 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB59C2D0E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 02:27:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE89EC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 03:26:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9421B20BED
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 02:27:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9421B20BED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id F370A20731
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 03:26:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F370A20731
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIN9z-0005D2-Kb
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 22:27:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47690)
+	id 1kIO5X-00066m-1j
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 23:26:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57150)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIN93-0004NS-Kr
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 22:26:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54070)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIN91-0005ep-7F
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 22:26:05 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kIN8z-0007g4-Gy
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 02:26:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 66F2B2E8084
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 02:26:01 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <sw@weilnetz.de>) id 1kIO4O-0005f7-EU
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 23:25:20 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:59748
+ helo=v2201612906741603.powersrv.de)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <sw@weilnetz.de>) id 1kIO4J-0000tu-JI
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 23:25:19 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by v2201612906741603.powersrv.de (Postfix) with ESMTP id 1E6AFDB25ED;
+ Wed, 16 Sep 2020 05:25:12 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
+Received: from v2201612906741603.powersrv.de ([127.0.0.1])
+ by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
+ port 10024)
+ with ESMTP id Kb1KrXDak3VO; Wed, 16 Sep 2020 05:25:11 +0200 (CEST)
+Received: from macbook02.fritz.box (pd9ec31d2.dip0.t-ipconnect.de
+ [217.236.49.210])
+ (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+ key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+ (No client certificate requested)
+ by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 25DE1DA0226;
+ Wed, 16 Sep 2020 05:25:11 +0200 (CEST)
+Subject: Re: [PATCH 0/5] qom: Allow object to be aligned
+To: Richard Henderson <richard.henderson@linaro.org>
+References: <20200915174635.2333553-1-richard.henderson@linaro.org>
+ <3c8dead2-b5f4-e988-3fbc-7b30183f0f2e@linaro.org>
+From: Stefan Weil <sw@weilnetz.de>
+Autocrypt: addr=sw@weilnetz.de; keydata=
+ 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
+Message-ID: <63e49d75-179c-cf71-cca5-2e088317b7c7@weilnetz.de>
+Date: Wed, 16 Sep 2020 05:25:10 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <3c8dead2-b5f4-e988-3fbc-7b30183f0f2e@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 16 Sep 2020 02:18:43 -0000
-From: Launchpad Bug Tracker <1883984@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Fix Released; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
- component=main; status=Fix Released; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug-Tags: verification-done verification-done-focal
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bruno-clisp janitor nhfbeebe paelzer raof rth
- tjaalton ubuntu-sru-bot
-X-Launchpad-Bug-Reporter: Nelson H F Beebe (nhfbeebe)
-X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <159243063748.16697.11009205973276249282.malonedeb@chaenomeles.canonical.com>
-Message-Id: <160022272617.24055.3016817148738602034.malone@ackee.canonical.com>
-Subject: [Bug 1883984] Re: QEMU S/390x sqxbr (128-bit IEEE 754 square root)
- crashes qemu-system-s390x
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: c1f9a71b545fd65c6b840c6240061449e3cc7005
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 22:25:59
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=37.120.169.71; envelope-from=sw@weilnetz.de;
+ helo=v2201612906741603.powersrv.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 23:25:12
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -92,140 +121,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1883984 <1883984@bugs.launchpad.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This bug was fixed in the package qemu - 1:4.2-3ubuntu6.5
+Am 16.09.20 um 00:47 schrieb Richard Henderson:
 
----------------
-qemu (1:4.2-3ubuntu6.5) focal; urgency=3Dmedium
+> On 9/15/20 10:46 AM, Richard Henderson wrote:
+>> We already have a function that can alloc with alignment,
+>> but we need to pass this down from the structure.  We also
+>> don't want to use this function unconditionally, because
+>> the windows version does page allocation, which would be
+>> overkill for the vast majority of the objects allocated.
+> Stefan, why are we using VirtualAlloc in util/oslib-win32.c, qemu_try_m=
+emalign,
+> instead of _aligned_malloc?
 
-  * further stabilize qemu by importing patches of qemu v4.2.1
-    Fixes (LP: #1891203) and (LP: #1891877)
-    - d/p/stable/lp-1891877-*
-    - as part of the stabilization this also fixes an
-      riscv emulation issue due to the CVE-2020-13754 fixes via
-      d/p/ubuntu/hw-riscv-Allow-64-bit-access-to-SiFive-CLINT.patch
-  * fix s390x SQXBR emulation (LP: #1883984)
-    - d/p/ubuntu/lp-1883984-target-s390x-Fix-SQXBR.patch
-  * fix -no-reboot for s390x protvirt guests (LP: #1890154)
-    - d/p/ubuntu/lp-1890154-s390x-protvirt-allow-to-IPL-secure-guests-with-*
 
- -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Wed, 19 Aug
-2020 13:40:49 +0200
+I think we use it because Fabrice introduced VirtualAlloc in commit
+6e4255f6a65091fbe7d17bfda546e2aa1b72f9a6 (with a comment "FIXME: this is
+not exactly optimal solution [...]"). Maybe there was no _aligned_malloc
+available 15 years ago. Commit 33f002714be2ed58ed05ae3870d5ea6915df4b47
+then reused VirtualAlloc for qemu_try_memalign (without a FIXME comment).=
 
-** Changed in: qemu (Ubuntu Focal)
-       Status: Fix Committed =3D> Fix Released
 
-** CVE added: https://cve.mitre.org/cgi-bin/cvename.cgi?name=3D2020-13754
+Obviously nobody cared to find a better solution until now.
 
--- =
+Stefan
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1883984
 
-Title:
-  QEMU S/390x sqxbr (128-bit IEEE 754 square root) crashes qemu-system-
-  s390x
 
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Focal:
-  Fix Released
-
-Bug description:
-  [Impact]
-
-   * An instruction was described wrong so that on usage the program would =
-
-     crash.
-
-  [Test Case]
-
-   * Run s390x in emulation and there use this program:
-     For simplicity and speed you can use KVM guest as usual on s390x, that =
-
-     after prep&install&compile of the test you run in qemu-tcg like:
-
-     $ sudo qemu-system-s390x -machine s390-ccw-virtio,accel=3Dtcg -cpu max=
-,zpci=3Don -serial mon:stdio -display none -m 4096 -nic user,model=3Dvirtio=
-,hostfwd=3Dtcp::2222-:22 -drive file=3D/var/lib/uvtool/libvirt/images/focal=
--sqxbr.qcow,if=3Dnone,id=3Ddrive-virtio-disk0,format=3Dqcow2,cache=3Dnone -=
-device virtio-blk-ccw,devno=3Dfe.0.0001,drive=3Ddrive-virtio-disk0,id=3Dvir=
-tio-disk0,bootindex=3D1,scsi=3Doff
-     Obviously is you have no s390x access you need to use emulation right =
-
-     away.
-
-   * Build and run failing program
-     $ sudo apt install clang
-     $ cat > bug-sqrtl-one-line.c << EOF
-  int main(void) { volatile long double x, r; x =3D 4.0L; __asm__ =
-
-  __volatile__("sqxbr %0, %1" : "=3Df" (r) : "f" (x)); return (0);}
-  EOF
-     $ cc bug-sqrtl-one-line.c
-     $ ./a.out
-     Segmentation fault (core dumped)
-
-     qemu is dead by now as long as the bug is present
-
-  [Regression Potential]
-
-   * The change only modifies 128 bit square root on s390x so regressions
-     should be limited to exactly that - which formerly before this fix was =
-
-     a broken instruction.
-
-  [Other Info]
-   =
-
-   * n/a
-
-  ---
-
-  In porting software to guest Ubuntu 18.04 and 20.04 VMs for S/390x, I dis=
-covered
-  that some of my own numerical programs, and also a GNU configure script f=
-or at
-  least one package with CC=3Dclang, would cause an instant crash of the VM=
-, sometimes
-  also destroying recently opened files, and producing long strings of NUL =
-characters
-  in /var/log/syslog in the S/390 guest O/S.
-
-  Further detective work narrowed the cause of the crash down to a single I=
-BM S/390
-  instruction: sqxbr (128-bit IEEE 754 square root).  Here is a one-line pr=
-ogram
-  that when compiled and run on a VM hosted on QEMUcc emulator version 4.2.0
-  (Debian 1:4.2-3ubuntu6.1) [hosted on Ubuntu 20.04 on a Dell Precision 7920
-  workstation with an Intel Xeon Platinum 8253 CPU],  and also on QEMU emul=
-ator
-  version 5.0.0, reproducibly produces a VM crash under qemu-system-s390x.
-
-  % cat bug-sqrtl-one-line.c
-  int main(void) { volatile long double x, r; x =3D 4.0L; __asm__ __volatil=
-e__("sqxbr %0, %1" : "=3Df" (r) : "f" (x)); return (0);}
-
-  % cc bug-sqrtl-one-line.c && ./a.out
-  Segmentation fault (core dumped)
-
-  The problem code may be the function float128_sqrt() defined in qemu-5.0.=
-0/fpu/softfloat.c
-  starting at line 7619.  I have NOT attempted to run the qemu-system-s390x=
- executable
-  under a debugger.  However, I observe that S/390 is the only CPU family t=
-hat I know of,
-  except possibly for a Fujitsu SPARC-64, that has a 128-bit square root in=
- hardware.
-  Thus, this instruction bug may not have been seen before.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1883984/+subscriptions
 
