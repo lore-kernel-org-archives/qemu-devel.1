@@ -2,150 +2,80 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC288C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:43:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71145C43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:44:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A98D22209
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:43:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="Tkk9yB0i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A98D22209
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9E3B222209
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:44:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E3B222209
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIVqu-0002Jr-11
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 07:43:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52160)
+	id 1kIVrF-0002np-PG
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 07:44:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52692)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1kIVmF-0006Nr-B9
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:39:08 -0400
-Received: from mail-dm6nam12on2069.outbound.protection.outlook.com
- ([40.107.243.69]:37345 helo=NAM12-DM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1kIVmC-0006pD-5F
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:39:07 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P+wrPvRknNvL6nT+GDXwFw0YTlgNWF642ANdGTyxJXRLzxnzGRVh7p/EWPvetvJR7dDhIHfLcL+96BkpOBFYdrI+2mMR50N0N1aRfcHmMSq1bHlbCkCgE5pxWXmJwNwd+EtRFqZ3ZvuvsF93GdblRMzC+HlnWjVrpV7HNIEsy8nhhK8ipvVcTkfdCFlxB0Rdp/JQuCGR6AJH3TOpl7CW8cbxesX1Wu2KhziVT/hJKSyGSJufI0cZ9L+nXkf63IQhi/d5wFiveSn/jkPJP/JvpgJJxTbv0bELosFfauO4ZYtF7aDfv8NzWFbnmnzBlgo+lI0PpUcSJPicNA0ml8XTDA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hqR/3x7/h/vE0Iove5QMCJbn2MqiD96QXWHQCbAlVRE=;
- b=VhnrwNh+p4J0i0wpZlqsY7TpBbIZVdIDH0yVbwiFy8RhBwPxBu0jVysnZcloHxqJZQUibuZiPbLMHfv6Y/ZiawiHslAJK/xauGMDDlVUjcwlowoyp0ZAJTk95T4hFBRnYLNzlITD+7E5n8fUaprM1XFt5uDTuZD2ONvG7ed+nExUTV2801Xye+j9MGY7hcg8trEojjFJkl6aSndk0IlCFEIgqzK/eiveVjnAZeAerNTXxEU1HIUk99JEER3MvQVGEnNjJjrg+nCnwBNJNhJZ++JJ/hXqmupdrRtLzgCt6GR+4sbZQVKxk+KC1QnPsS8OTXvn5A8i1mnGwIXUGmcVrg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=wdc.com smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hqR/3x7/h/vE0Iove5QMCJbn2MqiD96QXWHQCbAlVRE=;
- b=Tkk9yB0iebX1fxF5JgwCrZJRCNAJCl+4DBVBw15QpZ1lwurkYtqAD8w6YjwV/rQY760dF6AiC+Rhs5ZlYEodWHzEjMFs2dIuaEw3f0Zwy8Jhozi1v8df2nr0wslFWG1P8IW0z0NVa4YJSPD1OQ1E4HzOel6eKfJtzjaX//syeJo=
-Received: from SA0PR11CA0044.namprd11.prod.outlook.com (2603:10b6:806:d0::19)
- by DM6PR02MB5770.namprd02.prod.outlook.com (2603:10b6:5:17a::31) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Wed, 16 Sep
- 2020 11:39:01 +0000
-Received: from SN1NAM02FT059.eop-nam02.prod.protection.outlook.com
- (2603:10b6:806:d0:cafe::3e) by SA0PR11CA0044.outlook.office365.com
- (2603:10b6:806:d0::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.13 via Frontend
- Transport; Wed, 16 Sep 2020 11:39:01 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; wdc.com; dkim=none (message not signed)
- header.d=none;wdc.com; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- SN1NAM02FT059.mail.protection.outlook.com (10.152.72.177) with Microsoft SMTP
- Server id 15.20.3370.16 via Frontend Transport; Wed, 16 Sep 2020 11:39:01
- +0000
-Received: from [149.199.38.66] (port=45713 helo=smtp.xilinx.com)
- by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
- (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1kIVm2-0001bp-Ne; Wed, 16 Sep 2020 04:38:54 -0700
-Received: from [127.0.0.1] (helo=xsj-smtp-dlp1.xlnx.xilinx.com)
- by smtp.xilinx.com with esmtp (Exim 4.63)
- (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1kIVm9-0007OM-8W; Wed, 16 Sep 2020 04:39:01 -0700
-Received: from xsj-pvapsmtp01 (mailman.xilinx.com [149.199.38.66])
- by xsj-smtp-dlp1.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 08GBd0MR002845; 
- Wed, 16 Sep 2020 04:39:00 -0700
-Received: from [10.140.6.35] (helo=xhdsaipava40.xilinx.com)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <saipava@xhdsaipava40.xilinx.com>)
- id 1kIVm7-0007NW-Nc; Wed, 16 Sep 2020 04:39:00 -0700
-Received: by xhdsaipava40.xilinx.com (Postfix, from userid 14131)
- id 36FA713C0573; Wed, 16 Sep 2020 17:12:43 +0530 (IST)
-From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
- Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?q?=27Marc-Andr=C3=A9=20Lureau=27?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Edgar Iglesias <edgari@xilinx.com>,
- Francisco Eduardo Iglesias <figlesia@xilinx.com>
-Subject: [PATCH v6 4/7] usb: hcd-xhci-sysbus: Attach xhci to sysbus device
-Date: Wed, 16 Sep 2020 17:11:05 +0530
-Message-Id: <1600256469-13130-5-git-send-email-sai.pavan.boddu@xilinx.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1600256469-13130-1-git-send-email-sai.pavan.boddu@xilinx.com>
-References: <1600256469-13130-1-git-send-email-sai.pavan.boddu@xilinx.com>
-X-RCIS-Action: ALLOW
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-PublicTrafficType: Email
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kIVo3-0000LM-Dr
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:41:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47030)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kIVnz-0007EJ-H0
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:40:58 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kIVnx-00008x-DB
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 11:40:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 61D262E80E7
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 11:40:53 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: 4315abfe-2998-4966-73d7-08d85a351bb4
-X-MS-TrafficTypeDiagnostic: DM6PR02MB5770:
-X-Microsoft-Antispam-PRVS: <DM6PR02MB57700849EDF689662030D1E1CA210@DM6PR02MB5770.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:130;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: u9NyXheFttC2j4RgXgMP55cjaTtMmbmrmcTYXCMjtdDg0vDdeF1Oq5vgnwOLyJm/y4oE3xyMgx/M9xJdTq31PhX4cXcYwxVzBasvHNPTZG6qxU7e5gU4Lmj6tTwzIpr7X0yu/UAtwtraFjqQP6J31KUzoHnT6oZMWfNJ7E413jFFLea4GTF1jI8D0quIyid9f1qYcRvxdjeWmY02samarWGUCCNj7bwV8gaflif/4yw7milopDtviQMPOu3zcrWLwTf42u4j99AGV75gNB1LWpKuAtKMGyujpWZnFuGudvqxinyc+EDiobcs/A+ZsQVQJkAcO2CYWWjZqC4Qjf66pb7nwV6rXgyW/GW1wEECr4evu2P4L3uNuynhGJ38Ad6vVqI5tgtIFixDW0vbKxSJzcGi3lSohgzLTsPTEu5RbUCwg1DSet1ngp6FfbZPB2aU
-X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
- SFS:(396003)(39850400004)(136003)(346002)(376002)(46966005)(5660300002)(82310400003)(426003)(107886003)(478600001)(7416002)(6666004)(6266002)(83380400001)(70206006)(4326008)(2616005)(70586007)(336012)(81166007)(2906002)(110136005)(356005)(6636002)(47076004)(82740400003)(8676002)(36756003)(186003)(42186006)(316002)(8936002)(54906003)(26005);
- DIR:OUT; SFP:1101; 
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2020 11:39:01.7362 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4315abfe-2998-4966-73d7-08d85a351bb4
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
- Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-AuthSource: SN1NAM02FT059.eop-nam02.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR02MB5770
-Received-SPF: pass client-ip=40.107.243.69; envelope-from=saipava@xilinx.com;
- helo=NAM12-DM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 07:39:02
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 16 Sep 2020 11:33:09 -0000
+From: Stefan Hajnoczi <1895471@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ameynarkhede stefanha
+X-Launchpad-Bug-Reporter: Amey Narkhede (ameynarkhede)
+X-Launchpad-Bug-Modifier: Stefan Hajnoczi (stefanha)
+References: <160002337216.747.16078826830052525094.malonedeb@chaenomeles.canonical.com>
+ <160008073620.20744.1634136206585369571.malone@wampee.canonical.com>
+Message-ID: <20200916113309.GD756728@stefanha-x1.localdomain>
+Subject: Re: [Bug 1895471] Re: compilation error with clang in util/async.c
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: e5b85c20c293371e45f099cc76201255e07c1dae
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 05:50:35
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -154,213 +84,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Vikram Garhwal <fnuv@xilinx.com>,
- qemu-devel@nongnu.org, Paul Zimmerman <pauldzim@gmail.com>,
- Sai Pavan Boddu <saipava@xilinx.com>,
- Alistair Francis <alistair.francis@wdc.com>, Ying Fang <fangying1@huawei.com>,
- =?UTF-8?q?=27Philippe=20Mathieu-Daud=C3=A9=27?= <philmd@redhat.com>
+Reply-To: Bug 1895471 <1895471@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200916113309._lYrmxKoYWVyGL17EvnWL3he2bL-oY7gb0niBXUPY1I@z>
 
-Use XHCI as sysbus device, add memory region property to get the
-address space instance for dma read/write.
+On Mon, Sep 14, 2020 at 10:52:16AM -0000, Amey Narkhede wrote:
+> Ok. So I attached the util_async.o file below
 
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
----
- hw/usb/Kconfig           |  5 +++
- hw/usb/hcd-xhci-sysbus.c | 99 ++++++++++++++++++++++++++++++++++++++++++++++++
- hw/usb/hcd-xhci-sysbus.h | 32 ++++++++++++++++
- hw/usb/hcd-xhci.h        |  1 +
- hw/usb/meson.build       |  1 +
- 5 files changed, 138 insertions(+)
- create mode 100644 hw/usb/hcd-xhci-sysbus.c
- create mode 100644 hw/usb/hcd-xhci-sysbus.h
+It looks like you can work around this issue with ./configure --disable-
+linux-io-uring.
 
-diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
-index bab582f..4dd2ba9 100644
---- a/hw/usb/Kconfig
-+++ b/hw/usb/Kconfig
-@@ -48,6 +48,11 @@ config USB_XHCI_NEC
-     depends on PCI
-     select USB_XHCI
- 
-+config USB_XHCI_SYSBUS
-+    bool
-+    default y if USB_XHCI
-+    select USB
-+
- config USB_MUSB
-     bool
-     select USB
-diff --git a/hw/usb/hcd-xhci-sysbus.c b/hw/usb/hcd-xhci-sysbus.c
-new file mode 100644
-index 0000000..d5b4656
---- /dev/null
-+++ b/hw/usb/hcd-xhci-sysbus.c
-@@ -0,0 +1,99 @@
-+/*
-+ * USB xHCI controller for system-bus interface
-+ * Based on hcd-echi-sysbus.c
-+
-+ * SPDX-FileCopyrightText: 2020 Xilinx
-+ * SPDX-FileContributor: Author: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+#include "qemu/osdep.h"
-+#include "hw/qdev-properties.h"
-+#include "migration/vmstate.h"
-+#include "trace.h"
-+#include "qapi/error.h"
-+#include "hcd-xhci-sysbus.h"
-+#include "hw/irq.h"
-+
-+static void xhci_sysbus_intr_raise(XHCIState *xhci, int n, bool level)
-+{
-+    XHCISysbusState *s = container_of(xhci, XHCISysbusState, xhci);
-+
-+    qemu_set_irq(s->irq[n], level);
-+}
-+
-+void xhci_sysbus_reset(DeviceState *dev)
-+{
-+    XHCISysbusState *s = XHCI_SYSBUS(dev);
-+
-+    device_legacy_reset(DEVICE(&s->xhci));
-+}
-+
-+static void xhci_sysbus_realize(DeviceState *dev, Error **errp)
-+{
-+    XHCISysbusState *s = XHCI_SYSBUS(dev);
-+    Error *err = NULL;
-+
-+    object_property_set_link(OBJECT(&s->xhci), "host", OBJECT(s), NULL);
-+    object_property_set_bool(OBJECT(&s->xhci), "realized", true, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    s->irq = g_new0(qemu_irq, s->xhci.numintrs);
-+    qdev_init_gpio_out_named(dev, s->irq, SYSBUS_DEVICE_GPIO_IRQ,
-+                             s->xhci.numintrs);
-+    if (s->xhci.dma_mr) {
-+        s->xhci.as =  g_malloc0(sizeof(AddressSpace));
-+        address_space_init(s->xhci.as, s->xhci.dma_mr, NULL);
-+    } else {
-+        s->xhci.as = &address_space_memory;
-+    }
-+
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->xhci.mem);
-+}
-+
-+static void xhci_sysbus_instance_init(Object *obj)
-+{
-+    XHCISysbusState *s = XHCI_SYSBUS(obj);
-+
-+    object_initialize_child(obj, "xhci-core", &s->xhci, TYPE_XHCI);
-+    qdev_alias_all_properties(DEVICE(&s->xhci), obj);
-+
-+    object_property_add_link(obj, "dma", TYPE_MEMORY_REGION,
-+                             (Object **)&s->xhci.dma_mr,
-+                             qdev_prop_allow_set_link_before_realize,
-+                             OBJ_PROP_LINK_STRONG);
-+    s->xhci.intr_update = NULL;
-+    s->xhci.intr_raise = xhci_sysbus_intr_raise;
-+}
-+
-+static Property xhci_sysbus_props[] = {
-+    DEFINE_PROP_UINT32("intrs", XHCISysbusState, xhci.numintrs, MAXINTRS),
-+    DEFINE_PROP_UINT32("slots", XHCISysbusState, xhci.numslots, MAXSLOTS),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void xhci_sysbus_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->reset = xhci_sysbus_reset;
-+    dc->realize = xhci_sysbus_realize;
-+    device_class_set_props(dc, xhci_sysbus_props);
-+}
-+
-+static const TypeInfo xhci_sysbus_info = {
-+    .name          = TYPE_XHCI_SYSBUS,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(XHCISysbusState),
-+    .class_init    = xhci_sysbus_class_init,
-+    .instance_init = xhci_sysbus_instance_init
-+};
-+
-+static void xhci_sysbus_register_types(void)
-+{
-+    type_register_static(&xhci_sysbus_info);
-+}
-+
-+type_init(xhci_sysbus_register_types);
-diff --git a/hw/usb/hcd-xhci-sysbus.h b/hw/usb/hcd-xhci-sysbus.h
-new file mode 100644
-index 0000000..a308753
---- /dev/null
-+++ b/hw/usb/hcd-xhci-sysbus.h
-@@ -0,0 +1,32 @@
-+/*
-+ * USB xHCI controller for system-bus interface
-+ *
-+ * SPDX-FileCopyrightText: 2020 Xilinx
-+ * SPDX-FileContributor: Author: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-+ * SPDX-sourceInfo: Based on hcd-echi-sysbus
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#ifndef HW_USB_HCD_XHCI_SYSBUS_H
-+#define HW_USB_HCD_XHCI_SYSBUS_H
-+
-+#include "hw/usb.h"
-+#include "hcd-xhci.h"
-+#include "hw/sysbus.h"
-+
-+#define TYPE_XHCI_SYSBUS "sysbus-xhci"
-+#define XHCI_SYSBUS(obj) \
-+    OBJECT_CHECK(XHCISysbusState, (obj), TYPE_XHCI_SYSBUS)
-+
-+
-+typedef struct XHCISysbusState {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
-+    XHCIState xhci;
-+    qemu_irq *irq;
-+} XHCISysbusState;
-+
-+void xhci_sysbus_reset(DeviceState *dev);
-+#endif
-diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
-index 525291b..4108a65 100644
---- a/hw/usb/hcd-xhci.h
-+++ b/hw/usb/hcd-xhci.h
-@@ -191,6 +191,7 @@ typedef struct XHCIState {
- 
-     USBBus bus;
-     MemoryRegion mem;
-+    MemoryRegion *dma_mr;
-     AddressSpace *as;
-     MemoryRegion mem_cap;
-     MemoryRegion mem_oper;
-diff --git a/hw/usb/meson.build b/hw/usb/meson.build
-index 90dc54f..934e4fa 100644
---- a/hw/usb/meson.build
-+++ b/hw/usb/meson.build
-@@ -22,6 +22,7 @@ softmmu_ss.add(when: 'CONFIG_USB_EHCI_PCI', if_true: files('hcd-ehci-pci.c'))
- softmmu_ss.add(when: 'CONFIG_USB_EHCI_SYSBUS', if_true: files('hcd-ehci.c', 'hcd-ehci-sysbus.c'))
- softmmu_ss.add(when: 'CONFIG_USB_XHCI', if_true: files('hcd-xhci.c'))
- softmmu_ss.add(when: 'CONFIG_USB_XHCI_PCI', if_true: files('hcd-xhci-pci.c'))
-+softmmu_ss.add(when: 'CONFIG_USB_XHCI_SYSBUS', if_true: files('hcd-xhci-sysbus.c'))
- softmmu_ss.add(when: 'CONFIG_USB_XHCI_NEC', if_true: files('hcd-xhci-nec.c'))
- softmmu_ss.add(when: 'CONFIG_USB_MUSB', if_true: files('hcd-musb.c'))
- softmmu_ss.add(when: 'CONFIG_USB_DWC2', if_true: files('hcd-dwc2.c'))
--- 
-2.7.4
+I'll investigate what can be done to solve the interference between
+<stdatomic.h> and QEMU's "atomic.h" next week.
 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1895471
+
+Title:
+  compilation error with clang in util/async.c
+
+Status in QEMU:
+  New
+
+Bug description:
+  configured with ` CC=3Dclang CXX=3Dclang++ ../configure --target-
+  list=3Dx86_64-softmmu --enable-kvm --enable-curl --enable-debug
+  --enable-jemalloc --enable-fuzzing --enable-sdl` and after make I get
+  the following error related to c11 atomics. I'm using clang because
+  I'm experimenting with fuzzer
+
+  [glitz@archlinux /code/qemu/build]$ ninja -j5
+  [479/2290] Compiling C object libqemuutil.a.p/util_async.c.o
+  FAILED: libqemuutil.a.p/util_async.c.o
+  clang -Ilibqemuutil.a.p -I. -I.. -Iqapi -Itrace -Iui -Iui/shader -I/usr/i=
+nclude/p11-kit-1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr=
+/include/libmount -I/usr/include/blkid -I/usr/include/gio-unix-2.0 -Ilinux-=
+headers -Xclang -fcolor-diagnostics -pipe -Wall -Winvalid-pch -Werror -std=
+=3Dgnu99 -g -m64 -mcx16 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE=
+_SOURCE -Wstrict-prototypes -Wredundant-decls -Wundef -Wwrite-strings -Wmis=
+sing-prototypes -fno-strict-aliasing -fno-common -fwrapv -Wold-style-defini=
+tion -Wtype-limits -Wformat-security -Wformat-y2k -Winit-self -Wignored-qua=
+lifiers -Wempty-body -Wnested-externs -Wendif-labels -Wexpansion-to-defined=
+ -Wno-initializer-overrides -Wno-missing-include-dirs -Wno-shift-negative-v=
+alue -Wno-string-plus-int -Wno-typedef-redefinition -Wno-tautological-type-=
+limit-compare -fstack-protector-strong -fsanitize=3Dfuzzer-no-link -iquote =
+/code/qemu/tcg/i386 -isystem /code/qemu/linux-headers -iquote . -iquote /co=
+de/qemu -iquote /code/qemu/accel/tcg -iquote /code/qemu/include -iquote /co=
+de/qemu/disas/libvixl -pthread -fPIC -MD -MQ libqemuutil.a.p/util_async.c.o=
+ -MF libqemuutil.a.p/util_async.c.o.d -o libqemuutil.a.p/util_async.c.o -c =
+../util/async.c
+  ../util/async.c:79:17: error: address argument to atomic operation must b=
+e a pointer to _Atomic type ('unsigned int *' invalid)
+      old_flags =3D atomic_fetch_or(&bh->flags, BH_PENDING | new_flags);
+                  ^               ~~~~~~~~~~
+  /usr/lib/clang/10.0.1/include/stdatomic.h:138:42: note: expanded from mac=
+ro 'atomic_fetch_or'
+  #define atomic_fetch_or(object, operand) __c11_atomic_fetch_or(object, op=
+erand, __ATOMIC_SEQ_CST)
+                                           ^                     ~~~~~~
+  ../util/async.c:105:14: error: address argument to atomic operation must =
+be a pointer to _Atomic type ('unsigned int *' invalid)
+      *flags =3D atomic_fetch_and(&bh->flags,
+               ^                ~~~~~~~~~~
+  /usr/lib/clang/10.0.1/include/stdatomic.h:144:43: note: expanded from mac=
+ro 'atomic_fetch_and'
+  #define atomic_fetch_and(object, operand) __c11_atomic_fetch_and(object, =
+operand, __ATOMIC_SEQ_CST)
+                                            ^                      ~~~~~~
+  2 errors generated.
+  [483/2290] Compiling C object libqemuutil.a.p/util_qemu-error.c.o
+  ninja: build stopped: subcommand failed.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1895471/+subscriptions
 
