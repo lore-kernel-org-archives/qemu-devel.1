@@ -2,91 +2,94 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 268FCC43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:32:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A6A1C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:34:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 784CC21D7D
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:32:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 86245221E8
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:34:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J9smYp4T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 784CC21D7D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iP0Occ9w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86245221E8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIVg3-00006D-HK
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 07:32:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49552)
+	id 1kIVhU-0001b9-OP
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 07:34:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50336)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kIVeh-0007fA-7E
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:31:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46435)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kIVee-0005mJ-Dh
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:31:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600255874;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=w9JceFoepaeBtg+amNpuy8AkT/yCci2mWWvCUd+bqeo=;
- b=J9smYp4T1bWcTnuVOQTY4bVKKAn8NcYG/l6NWOii9kqVe6RriN+/yM2s/zRTUdnVnMNeBn
- cpOT76V2PGf5eGEv0Oc6AWmyuoGCcKjxtZ2dVCBSf/pyNzoSZQeaFoS4bgRhIKLF2roX2l
- EXN1fP2zrZZs5FsLATlF27el1PpzsuY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-521-GkoOLPkyMZaowLxmtnb3aA-1; Wed, 16 Sep 2020 07:31:10 -0400
-X-MC-Unique: GkoOLPkyMZaowLxmtnb3aA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5F5084E246;
- Wed, 16 Sep 2020 11:31:08 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-113-213.ams2.redhat.com
- [10.36.113.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 76FB4100239F;
- Wed, 16 Sep 2020 11:31:06 +0000 (UTC)
-Subject: Re: PATCH: Increase System Firmware Max Size
-To: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>
-References: <CS1PR8401MB0327EF9D532330BA44257AFCF3240@CS1PR8401MB0327.NAMPRD84.PROD.OUTLOOK.COM>
- <CS1PR8401MB0327959D96C84FB32E071E49F3200@CS1PR8401MB0327.NAMPRD84.PROD.OUTLOOK.COM>
- <CS1PR8401MB03279AC1D869BBBA8D810A19F3200@CS1PR8401MB0327.NAMPRD84.PROD.OUTLOOK.COM>
- <eaa64c6a-18cb-69df-3154-614744e1bfa9@redhat.com>
- <20200916095633.GJ1535709@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <712696ed-8f23-d8e6-f765-df7aa68f1013@redhat.com>
-Date: Wed, 16 Sep 2020 13:31:05 +0200
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1kIVga-0000xe-0E
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:33:16 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:51628)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1kIVgY-0005zM-18
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:33:15 -0400
+Received: by mail-wm1-x331.google.com with SMTP id w2so2429772wmi.1
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 04:33:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=zACBbkyoDMQvkjs81ee4kpE6MrjpE9NbVDn9qdgYmck=;
+ b=iP0Occ9ww6afWly0Vb21tI24Zk3pCjrC19Ge+99yq1fiQ0B5GBSFe5NSQ6TL7ale0S
+ N1CEpudLGRP7BvbNiOvt9Ez8XkLSMgOgOIn1+PlAddVvxCNZMJyD5Uh1OXWil4ySEH1+
+ F/uk/T8mS80tn3eGZ52zdVcNWMYawCTgjaVvSu+CIUtty7lUV1DPhBqxJCinSdXPvMPE
+ hPVk3iboUr9JiluRLt1/qKF9aLgnaAhg1Nhb2vtJoSmThFs7Jqn04A0yrF0ZIa7NXkAR
+ /WKaYzjiqs1aFWxiNiB+TqcRnCZipIPQuGeh6ynJCNaBuYyTivmyDbtOye3fuLRVo05B
+ +BLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=zACBbkyoDMQvkjs81ee4kpE6MrjpE9NbVDn9qdgYmck=;
+ b=SfBETE1GD0cvjHM6JVug6hxe7Si21zSaqBDxS6x/BxWndB9EYpFwFU+OSxQDKG9dzX
+ DEQmZLYKVjf6oaCvihhWno7fO3lME3ZGYbRgeTx5J25TC9Qt61hI3IixHsHeJHSTRj5t
+ iAE/w0gvH6OSg8oXCK4A1UqFdIAiXS7AH8jpEpBn1We9HFOiYXocJasE8ywIlKrdkh2i
+ /7GthJSojRV5oCEPibKQQ+VyTGbFMM9D2apqy4HdTbVMfgJogp26qCt74rrSySkHoBu0
+ PtDkMktz/JCfKxQJGpsmiVV/sgoYPouycYqKLwo06WNs0RlCnP/s1d2aM/3jkb/Hmvuf
+ Yu7Q==
+X-Gm-Message-State: AOAM531Am8Q4S8X3lDaFAOwvCeGIBG4wi1aVMGMLDgqI6CcODyNyWjoX
+ BnPVE5NBBIhwZuLNvXAvpUY=
+X-Google-Smtp-Source: ABdhPJy+AKc8XXy67Ek2BgrZ6CcX9jNMAxJ0uG4DX6zi3H9jjvmiMJ2f6vCYVSgdpFt51PPEkOg/5g==
+X-Received: by 2002:a05:600c:21c4:: with SMTP id
+ x4mr4341001wmj.107.1600255992504; 
+ Wed, 16 Sep 2020 04:33:12 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id l8sm31777385wrx.22.2020.09.16.04.33.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 16 Sep 2020 04:33:11 -0700 (PDT)
+Date: Wed, 16 Sep 2020 12:33:09 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Bug 1895471 <1895471@bugs.launchpad.net>
+Subject: Re: [Bug 1895471] Re: compilation error with clang in util/async.c
+Message-ID: <20200916113309.GD756728@stefanha-x1.localdomain>
+References: <160002337216.747.16078826830052525094.malonedeb@chaenomeles.canonical.com>
+ <160008073620.20744.1634136206585369571.malone@wampee.canonical.com>
 MIME-Version: 1.0
-In-Reply-To: <20200916095633.GJ1535709@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=lersek@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:16:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="g7w8+K/95kPelPD2"
+Content-Disposition: inline
+In-Reply-To: <160008073620.20744.1634136206585369571.malone@wampee.canonical.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::331;
+ envelope-from=stefanha@gmail.com; helo=mail-wm1-x331.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,224 +102,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "mst@redhat.com" <mst@redhat.com>,
- "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "McMillan,
- Erich" <erich.mcmillan@hp.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/16/20 11:56, Daniel P. Berrangé wrote:
-> On Wed, Sep 16, 2020 at 11:52:41AM +0200, Laszlo Ersek wrote:
->> Hi Erich,
->>
->> (1) this patch is really not trivial; please do not continue CC'ing
->> qemu-trivial
->>
->> (2) Please do CC people that have given you feedback previously. I
->> primarily mean Daniel and David.
->>
->> (3) Generally speaking, please post new versions of a patch stand-alone
->> (not in reply to another message) on the list.
->>
->> (4) Please use git-send-email (or suitable wrapper utilities) for
->> sending your patch.
->>
->> https://wiki.qemu.org/Contribute/SubmitAPatch
->>
->>
->> One non-meta comment below:
->>
->> On 09/15/20 21:10, McMillan, Erich via wrote:
->>> Apologies, ignore previous patch. The relevant patch is below:
->>>
->>> From 473daf6129debf8d158a9ae1aff788c5bdbbc799 Mon Sep 17 00:00:00 2001
->>> From: Erich McMillan <erich.mcmillan@hp.com>
->>> Date: Tue, 15 Sep 2020 13:23:25 -0500
->>> Subject: [PATCH 2/2] Add max firmware size as optional parameter
->>>
->>> Signed-off-by: Erich McMillan <erich.mcmillan@hp.com>
->>> ---
->>>  hw/i386/pc_sysfw.c  | 13 ++-----------
->>>  include/hw/loader.h |  9 +++++++++
->>>  qemu-options.hx     |  8 ++++++++
->>>  softmmu/vl.c        | 40 ++++++++++++++++++++++++++++++++++++++++
->>>  4 files changed, 59 insertions(+), 11 deletions(-)
->>>
->>> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
->>> index b6c0822..ba6c99d 100644
->>> --- a/hw/i386/pc_sysfw.c
->>> +++ b/hw/i386/pc_sysfw.c
->>> @@ -39,15 +39,6 @@
->>>  #include "hw/block/flash.h"
->>>  #include "sysemu/kvm.h"
->>>
->>> -/*
->>> - * We don't have a theoretically justifiable exact lower bound on the base
->>> - * address of any flash mapping. In practice, the IO-APIC MMIO range is
->>> - * [0xFEE00000..0xFEE01000] -- see IO_APIC_DEFAULT_ADDRESS --, leaving free
->>> - * only 18MB-4KB below 4G. For now, restrict the cumulative mapping to 8MB in
->>> - * size.
->>> - */
->>> -#define FLASH_SIZE_LIMIT (8 * MiB)
->>> -
->>>  #define FLASH_SECTOR_SIZE 4096
->>>
->>>  static void pc_isa_bios_init(MemoryRegion *rom_memory,
->>> @@ -182,10 +173,10 @@ static void pc_system_flash_map(PCMachineState *pcms,
->>>          }
->>>          if ((hwaddr)size != size
->>>              || total_size > HWADDR_MAX - size
->>> -            || total_size + size > FLASH_SIZE_LIMIT) {
->>> +            || total_size + size > MaxCombinedFirmwareSize) {
->>>              error_report("combined size of system firmware exceeds "
->>>                           "%" PRIu64 " bytes",
->>> -                         FLASH_SIZE_LIMIT);
->>> +                         MaxCombinedFirmwareSize);
->>>              exit(1);
->>>          }
->>>
->>> diff --git a/include/hw/loader.h b/include/hw/loader.h
->>> index a9eeea3..7898b63 100644
->>> --- a/include/hw/loader.h
->>> +++ b/include/hw/loader.h
->>> @@ -318,4 +318,13 @@ int rom_add_option(const char *file, int32_t bootindex);
->>>   * overflow on real hardware too. */
->>>  #define UBOOT_MAX_GUNZIP_BYTES (64 << 20)
->>>
->>> +/*
->>> + * We don't have a theoretically justifiable exact lower bound on the base
->>> + * address of any flash mapping. In practice, the IO-APIC MMIO range is
->>> + * [0xFEE00000..0xFEE01000] -- see IO_APIC_DEFAULT_ADDRESS --, leaving free
->>> + * only 18MB-4KB below 4G. For now, restrict the cumulative mapping to 8MB in
->>> + * size, but allow user to specify larger size via command line.
->>> + */
->>> +extern uint64_t MaxCombinedFirmwareSize;
->>> +
->>>  #endif
->>> diff --git a/qemu-options.hx b/qemu-options.hx
->>> index b0f0205..32eed3a 100644
->>> --- a/qemu-options.hx
->>> +++ b/qemu-options.hx
->>> @@ -1377,6 +1377,14 @@ SRST
->>>          |qemu_system_x86| -hda a -hdb b
->>>  ERST
->>>
->>> +DEF("maxfirmwaresize", HAS_ARG, QEMU_OPTION_maxfirmwaresize,
->>> +    "-maxfirmwaresize [size=]megs  specify maximum combined firmware size, default is 8MiB. Known issues if value exceeds 16MiB.\n",
->>> +    QEMU_ARCH_ALL)
->>> +SRST
->>> +``-maxfirmwaresize [size=]megs``
->>> +    Specify maximum combined firmware size, default is 8MiB. Known issues if value exceeds 16MiB.
->>> +ERST
->>> +
->>>  DEF("mtdblock", HAS_ARG, QEMU_OPTION_mtdblock,
->>>      "-mtdblock file  use 'file' as on-board Flash memory image\n",
->>>      QEMU_ARCH_ALL)
->>> diff --git a/softmmu/vl.c b/softmmu/vl.c
->>> index 0cc86b0..fcf41d2 100644
->>> --- a/softmmu/vl.c
->>> +++ b/softmmu/vl.c
->>> @@ -116,6 +116,8 @@
->>>
->>>  #define MAX_VIRTIO_CONSOLES 1
->>>
->>> +uint64_t MaxCombinedFirmwareSize = 8 * MiB;
->>> +
->>>  static const char *data_dir[16];
->>>  static int data_dir_idx;
->>>  const char *bios_name = NULL;
->>> @@ -448,6 +450,20 @@ static QemuOptsList qemu_mem_opts = {
->>>      },
->>>  };
->>>
->>> +static QemuOptsList qemu_max_fw_size_opts = {
->>> +    .name = "maxfirmwaresize",
->>> +    .implied_opt_name = "size",
->>> +    .head = QTAILQ_HEAD_INITIALIZER(qemu_max_fw_size_opts.head),
->>> +    .merge_lists = true,
->>> +    .desc = {
->>> +        {
->>> +            .name = "size",
->>> +            .type = QEMU_OPT_SIZE,
->>> +        },
->>> +        { /* end of list */ }
->>> +    },
->>> +};
->>> +
->>>  static QemuOptsList qemu_icount_opts = {
->>>      .name = "icount",
->>>      .implied_opt_name = "shift",
->>> @@ -2576,6 +2592,23 @@ static bool object_create_delayed(const char *type, QemuOpts *opts)
->>>      return !object_create_initial(type, opts);
->>>  }
->>>
->>> +static void set_max_firmware_size(uint64_t *maxfwsize)
->>> +{
->>> +    const char *max_fw_size_str;
->>> +    QemuOpts *opts = qemu_find_opts_singleton("maxfirmwaresize");
->>> +
->>> +    max_fw_size_str = qemu_opt_get(opts, "size");
->>> +
->>> +    if (max_fw_size_str) {
->>> +        if (!*max_fw_size_str) {
->>> +            error_report("missing 'size' option value");
->>> +            exit(EXIT_FAILURE);
->>> +        }
->>> +
->>> +        *maxfwsize = qemu_opt_get_size(opts, "size", 8 * MiB);
->>> +    }
->>> +}
->>> +
->>>
->>>  static bool set_memory_options(uint64_t *ram_slots, ram_addr_t *maxram_size,
->>>                                 MachineClass *mc)
->>> @@ -2904,6 +2937,7 @@ void qemu_init(int argc, char **argv, char **envp)
->>>      qemu_add_opts(&qemu_machine_opts);
->>>      qemu_add_opts(&qemu_accel_opts);
->>>      qemu_add_opts(&qemu_mem_opts);
->>> +    qemu_add_opts(&qemu_max_fw_size_opts);
->>>      qemu_add_opts(&qemu_smp_opts);
->>>      qemu_add_opts(&qemu_boot_opts);
->>>      qemu_add_opts(&qemu_add_fd_opts);
->>> @@ -3160,6 +3194,10 @@ void qemu_init(int argc, char **argv, char **envp)
->>>                      exit(EXIT_FAILURE);
->>>                  }
->>>                  break;
->>> +            case QEMU_OPTION_maxfirmwaresize:
->>> +                opts = qemu_opts_parse_noisily(qemu_find_opts("maxfirmwaresize"),
->>> +                                               optarg, true);
->>> +                break;
->>>  #ifdef CONFIG_TPM
->>>              case QEMU_OPTION_tpmdev:
->>>                  if (tpm_config_parse(qemu_find_opts("tpmdev"), optarg) < 0) {
->>> @@ -3845,6 +3883,8 @@ void qemu_init(int argc, char **argv, char **envp)
->>>      have_custom_ram_size = set_memory_options(&ram_slots, &maxram_size,
->>>                                                machine_class);
->>>
->>> +    set_max_firmware_size(&MaxCombinedFirmwareSize);
->>> +
->>>      os_daemonize();
->>>      rcu_disable_atfork();
->>>
->>
->> (5) In my opinion (which could be wrong of course), we shouldn't
->> introduce a new command line option for this, but a new PC machine type
->> property called "x-firmware-max-size".
-> 
-> Yeah, we definitely do not want a new top level CLI arg, just a
-> machine type property.  We don't need any "x-" prefix on it
-> though, just a plain "firmware-max-size" prop is fine.
 
-According to the previous discussion, I'd like to request that we add
-the x- prefix (showing that either the property is experimental, or that
-it is intended in support of experimental use cases).
+--g7w8+K/95kPelPD2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-If you disagree, I'll accept that though.
+On Mon, Sep 14, 2020 at 10:52:16AM -0000, Amey Narkhede wrote:
+> Ok. So I attached the util_async.o file below
 
-Thanks
-Laszlo
+It looks like you can work around this issue with ./configure --disable-linux-io-uring.
 
+I'll investigate what can be done to solve the interference between
+<stdatomic.h> and QEMU's "atomic.h" next week.
+
+--g7w8+K/95kPelPD2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9h9/UACgkQnKSrs4Gr
+c8jb5Af7BFFcAJdYZsfI/AW/GRuEL3EKBFJQZIqM2AHoiDB80TFChQd9JqWChEO/
+BdzVEvXiYsMTPTqNJ3OOK3FtcOxZ1r6R3H42oj4KpHL/j3D8JH2GgSIKtfzSQbGv
+T7amQLhCif1qitLfSvDr7pAVJ7ALqojyo+d1WRjwvOBxBcWwvsr1NXC1tLVyIPpb
+DlYgEhmw55nRou8q5adoCpzBqnDAl1GwajVOfnS5mb4IT7Qvvp4JbjRI5V9J8YKm
+a57dWIEX6ZXSm+9+DXnZ8nZWxgqJ/ZvXinhOexkBXVXM3+CupFYgbcMvCR2mlFdO
+dSP8JDP+TfiLxczEJa+uPJN+S0YRsQ==
+=7qFb
+-----END PGP SIGNATURE-----
+
+--g7w8+K/95kPelPD2--
 
