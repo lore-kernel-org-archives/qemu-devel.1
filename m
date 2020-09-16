@@ -2,79 +2,90 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D289C43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6CCDC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:38:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 766B722225
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:36:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 766B722225
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9622B22224
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:38:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="cW1enXkL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9622B22224
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kITrv-0001C2-Dr
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 05:36:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49018)
+	id 1kITtQ-00035R-IU
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 05:38:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49466)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1kITrH-0000cJ-Fy; Wed, 16 Sep 2020 05:36:11 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:58515)
+ (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
+ id 1kITsj-0002We-1i
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 05:37:41 -0400
+Received: from forwardcorp1p.mail.yandex.net
+ ([2a02:6b8:0:1472:2741:0:8b6:217]:52162)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1kITrF-0006oz-CY; Wed, 16 Sep 2020 05:36:11 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.109.138.5])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 47C095BA5584;
- Wed, 16 Sep 2020 11:36:05 +0200 (CEST)
-Received: from kaod.org (37.59.142.98) by DAG4EX1.mxp5.local (172.16.2.31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Wed, 16 Sep
- 2020 11:36:04 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-98R002d8faa596-42f9-4ba5-b35b-f4766ec82383,
- 282F6B8BB580550643A9CB45D70726BD5CC915E6) smtp.auth=clg@kaod.org
-Subject: Re: [PATCH] misc: aspeed_scu: Update AST2600 silicon id register
-To: Joel Stanley <joel@jms.id.au>
-References: <20200916082012.776628-1-joel@jms.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <6d66e2ac-44d6-955b-7f67-6b2faf69aa43@kaod.org>
-Date: Wed, 16 Sep 2020 11:36:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
+ id 1kITse-0006xX-5o
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 05:37:39 -0400
+Received: from iva8-d077482f1536.qloud-c.yandex.net
+ (iva8-d077482f1536.qloud-c.yandex.net
+ [IPv6:2a02:6b8:c0c:2f26:0:640:d077:482f])
+ by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 006DC2E1479;
+ Wed, 16 Sep 2020 12:37:29 +0300 (MSK)
+Received: from localhost (localhost [::1])
+ by iva8-d077482f1536.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ 4cw7lI0dfQ-bRvqGa8M; Wed, 16 Sep 2020 12:37:28 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1600249048; bh=r5Re/4/+svCR7Rj7iXiKRnEI5cVuFJB3/vUFrP976+o=;
+ h=Message-Id:Cc:Subject:In-Reply-To:Date:References:To:From;
+ b=cW1enXkLzAw6gJu3DxHriVeXouK6YmhhW+iVxRtFVhDccf2gh45Z/BM11+qDJcIg7
+ TMnwIkWUwGIUIyQ0E39JEP6tR/eStt3SlUtRfYqCO3xCOPtEe6DG6EwzsC5uA+8mUq
+ Z7/nuxeO/CZouEkx/LIUe3Gx34NUhIKasJBT8gXk=
+Authentication-Results: iva8-d077482f1536.qloud-c.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+X-Yandex-Sender-Uid: 1120000000161690
+Received: by iva4-6d0ca09d92db.qloud-c.yandex.net with HTTP;
+ Wed, 16 Sep 2020 12:37:27 +0300
+From: Alexey Kirillov <lekiravi@yandex-team.ru>
+To: Markus Armbruster <armbru@redhat.com>,
+	Eric Blake <eblake@redhat.com>
+In-Reply-To: <87tuw8731m.fsf@dusky.pond.sub.org>
+References: <20200901182326.59633-1-lekiravi@yandex-team.ru>
+ <20200901182326.59633-2-lekiravi@yandex-team.ru>
+ <87lfhsjubv.fsf@dusky.pond.sub.org>
+ <37711599469320@mail.yandex-team.ru>
+ <871rjdrca0.fsf@dusky.pond.sub.org>
+ <b632d444-bdf9-648b-9d55-a9e72efb8fbc@redhat.com>
+ <87tuw8731m.fsf@dusky.pond.sub.org>
+Subject: Re: [PATCH v3 1/4] qapi: net: Add query-netdevs command
 MIME-Version: 1.0
-In-Reply-To: <20200916082012.776628-1-joel@jms.id.au>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+X-Mailer: Yamail [ http://yandex.ru ] 5.0
+Date: Wed, 16 Sep 2020 12:37:27 +0300
+Message-Id: <32031600248373@mail.yandex-team.ru>
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [37.59.142.98]
-X-ClientProxiedBy: DAG3EX1.mxp5.local (172.16.2.21) To DAG4EX1.mxp5.local
- (172.16.2.31)
-X-Ovh-Tracer-GUID: 5a4ea273-a2f0-4cc5-a380-35045013cd0b
-X-Ovh-Tracer-Id: 15889825387306519459
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrtddvgddukecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgihesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeejkeduueduveelgeduueegkeelffevledujeetffeivdelvdfgkeeufeduheehfeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehjohgvlhesjhhmshdrihgurdgruh
-Received-SPF: pass client-ip=178.32.125.2; envelope-from=clg@kaod.org;
- helo=smtpout1.mo529.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 05:36:06
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset=utf-8
+Received-SPF: pass client-ip=2a02:6b8:0:1472:2741:0:8b6:217;
+ envelope-from=lekiravi@yandex-team.ru; helo=forwardcorp1p.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 05:37:29
+X-ACL-Warn: Detected OS   = ???
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,56 +94,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+ Jason Wang <jasowang@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Vincenzo Maffione <v.maffione@gmail.com>,
+ "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/16/20 10:20 AM, Joel Stanley wrote:
-> Aspeed have released an updated datasheet (v7) containing the silicon id
-> for the AST2600 A2. It looks like this:
-> 
->               SCU004      SCU014
->   AST2600-A0  0x05000303  0x05000303
->   AST2600-A1  0x05010303  0x05010303
->   AST2600-A2  0x05010303  0x05020303
->   AST2620-A1  0x05010203  0x05010203
->   AST2620-A2  0x05010203  0x05020203
-> 
-> The SCU004 (silicon id 1) value matches SCU014 for A0, but for
-> subsequent revisions it is hard coded to the A1 value.
-> 
-> Qemu effectively dropped support for the A0 in 7582591ae745 ("aspeed:
-> Support AST2600A1 silicon revision") as the A0 reset table was removed,
-> so it makes sense to only support the behaviour of A1 and onwards.
-> 
-> Signed-off-by: Joel Stanley <joel@jms.id.au>
+08.09.2020, 17:32, "Markus Armbruster" <armbru@redhat.com>:
+> Eric Blake <eblake@redhat.com> writes:
+>
+>>  On 9/7/20 7:39 AM, Markus Armbruster wrote:
+>>
+>>>>>  This is union Netdev plus a common member @peer-id, less the variant
+>>>>>  members for NetClientDriver values 'nic' and 'hubport'.
+>>>>>
+>>>>>  Can 'type: 'nic' and 'type': 'hubport' occur?
+>>>>
+>>>>  No, it can't. We don't support NIC/hubport in query-netdevs, so we neither create this
+>>>>  structure for them, nor store config.
+>>>  Same for 'none', I guess.
+>>>  As defined, NetdevInfo allows types 'none', 'nic', and 'hubport', it
+>>>  just has no variant members for them. The fact that they can't occur is
+>>>  not coded into the type, and therefore not visible in introspection.
+>>>  To make introspection more precise, we'd have to define a new enum
+>>>  type.
+>>>  How much that would complicate the C code is unclear.
+>>>  Do we need it to be more precise? Eric, got an opinion?
+>>
+>>  Is the problem that a new enum would be duplicating things?
+>
+> Enumerating network drivers twice is mildly annoying. I worry more
+> about having to convert between the two enumerations in C.
+>
+> My actual question: do we need query-qmp-schema report the precise set
+> of 'type' values? As is, it reports a few that can't actually occur.
+>
+>>                                                               Is it
+>>  worth allowing one enum to have a 'base':'OtherEnum' in the schema to
+>>  reduce some of the duplication?
+>
+> We could then generate functions (or macros) to convert from base enum
+> to extended enum, and back, where the latter can fail.
+>
+> Worthwhile only if we have sufficient use for it.
 
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
+I'm sorry, did I understand correctly that at the moment I don't need any
+additional changes in the patch yet?
+If that is, I will continue using NetClientDriver as a discriminator.
 
-> ---
->  hw/misc/aspeed_scu.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
-> index dc6dd87c22f4..40a38ebd8549 100644
-> --- a/hw/misc/aspeed_scu.c
-> +++ b/hw/misc/aspeed_scu.c
-> @@ -670,7 +670,12 @@ static void aspeed_ast2600_scu_reset(DeviceState *dev)
->  
->      memcpy(s->regs, asc->resets, asc->nr_regs * 4);
->  
-> -    s->regs[AST2600_SILICON_REV] = s->silicon_rev;
-> +    /*
-> +     * A0 reports A0 in _REV, but subsequent revisions report A1 regardless
-> +     * of actual revision. QEMU and Linux only support A1 onwards so this is
-> +     * sufficient.
-> +     */
-> +    s->regs[AST2600_SILICON_REV] = AST2600_A1_SILICON_REV;
->      s->regs[AST2600_SILICON_REV2] = s->silicon_rev;
->      s->regs[AST2600_HW_STRAP1] = s->hw_strap1;
->      s->regs[AST2600_HW_STRAP2] = s->hw_strap2;
-> 
-
+-- 
+Alexey Kirillov
+Yandex.Cloud
 
