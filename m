@@ -2,81 +2,93 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3BDAC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 14:06:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A1CEC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 14:07:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04F42223B0
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 14:06:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04F42223B0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 8D846223B0
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 14:07:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IogKJaAd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D846223B0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIY4z-0001xi-0A
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 10:06:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35642)
+	id 1kIY5j-0003AB-M7
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 10:07:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIY4F-0000rc-7L
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 10:05:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54088)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIY4C-0001nQ-Ii
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 10:05:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kIY49-0005JE-EU
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 14:05:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6C7242E80DC
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 14:05:45 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kIY4o-0001w5-3k
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 10:06:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50155)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kIY4m-0001yt-9b
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 10:06:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600265182;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=2POS4tR5DDdWPJj7M6IYrwS5GbzewCMxC4xuj+CcEmg=;
+ b=IogKJaAd+EvCVJ0Cwk5nZIqCe42G+/vkrv+XKl12esm/B41V1h8m9tjt4YUzkn+ViV8s18
+ x5KfIXDUsHi6QmFyOS1iEgit7Oc946KNkaxHoUcBl4wNSZDqLTuUI2NZbjBPGCizqZCO2G
+ qVNDtYofVmGj+LFUjp4iJ33XHQgFMYo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-474-fbALcrTJMjmqI_pvnTMLpw-1; Wed, 16 Sep 2020 10:06:03 -0400
+X-MC-Unique: fbALcrTJMjmqI_pvnTMLpw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80D771891E9B;
+ Wed, 16 Sep 2020 14:06:02 +0000 (UTC)
+Received: from redhat.com (ovpn-113-248.ams2.redhat.com [10.36.113.248])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9BFC21002397;
+ Wed, 16 Sep 2020 14:05:53 +0000 (UTC)
+Date: Wed, 16 Sep 2020 15:05:50 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: Python 3.5 EOL; when can require 3.6?
+Message-ID: <20200916140550.GQ1535709@redhat.com>
+References: <875z8eupyp.fsf@dusky.pond.sub.org>
+ <CAFEAcA8q8J1n2UqsNbHgNwEedA8pZ6fNA7obCR1REN-33nvmkg@mail.gmail.com>
+ <d07189e2-0683-2eb9-44e0-a275688fa8b4@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 16 Sep 2020 13:57:02 -0000
-From: Petunia <1895053@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: laurent-vivier pauldzim petunia2000
-X-Launchpad-Bug-Reporter: Petunia (petunia2000)
-X-Launchpad-Bug-Modifier: Petunia (petunia2000)
-References: <159968542073.11462.1191604929312152807.malonedeb@chaenomeles.canonical.com>
-Message-Id: <160026462290.747.4720196370523334944.malone@chaenomeles.canonical.com>
-Subject: [Bug 1895053] Re: Cannot nspawn raspbian 10 [FAILED] Failed to start
- Journal Service.
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: e89bb0cac75ad1d6758398340fc0c6f235ab1515
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 05:50:35
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <d07189e2-0683-2eb9-44e0-a275688fa8b4@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:35:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,68 +97,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1895053 <1895053@bugs.launchpad.net>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I had the same idea but didnt know about the restart part :D
+On Wed, Sep 16, 2020 at 04:00:14PM +0200, Thomas Huth wrote:
+> On 16/09/2020 14.30, Peter Maydell wrote:
+> > On Wed, 16 Sep 2020 at 08:43, Markus Armbruster <armbru@redhat.com> wrote:
+> >> We require Python 3.5.  It will reach its "end of life" at the end of
+> >> September 2020[*].  Any reason not to require 3.6 for 5.2?  qemu-iotests
+> >> already does for its Python parts.
+> [...]
+> > The default should be
+> > "leave the version dependency where it is", not "bump the version
+> > dependency as soon as we can".
+> 
+> OTOH, if none of our supported build systems uses python 3.5 by default
+> anymore, it also will not get tested anymore, so bugs might creep in,
+> which will of course end up in a bad experience for the users, too, that
+> still try to build with such an old version. So limiting the version to
+> the level that we also test is IMHO very reasonable.
+> 
+> Let's have a look at the (older) systems that we support and the python
+> versions according to repology.org:
+> 
+> - RHEL7 / CentOS 7 : 3.6.8
+> - Ubuntu 18.04 (Bionic) : >= 3.6.5
+> - openSUSE Leap 15.0 : >= 3.6.5
+> - OpenBSD Ports : >= 3.7.9
+> - FreeBSD Ports : >= 3.5.10 - but there is also 3.6 or newer
 
-attached is the strace =3D)
-Thx
+"pkg install python3" will give you python 3.7 right now.
 
-** Attachment added: "strace2"
-   https://bugs.launchpad.net/qemu/+bug/1895053/+attachment/5411345/+files/=
-strace2
+> - Homebrew : >= 3.7.9
+> 
+> ... so I think it should be fine to retire 3.5 nowadays.
 
--- =
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1895053
-
-Title:
-  Cannot nspawn raspbian 10 [FAILED] Failed to start Journal Service.
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hi, I'm using nspawn and asked the question @systemd-devel. They redirect=
-ed me to you, guessing that nspawn calls a syscall or ioctl qemu isnt aware=
- of and can't implement properly?
-  They were like: "Sorry, that's not my department." ^^
-
-  Maybe you can reproduce the issue or help me investigating whats wrong
-  or put the ball right back into their court? :D
-
-  Testscript:
-  wget https://downloads.raspberrypi.org/raspios_lite_armhf_latest -o r.zip
-  unzip r.zip
-  LOOP=3D$(losetup --show -Pf *raspios-buster-armhf-lite.img)
-  mount ${LOOP}p2 /mnt
-  mount ${LOOP}p1 /mnt/boot
-  systemd-nspawn --bind /usr/bin/qemu-arm-static --boot --directory=3D/mnt =
--- systemd.log_level=3Ddebug
-
-  Output:
-  see attachment
-
-  System:
-  uname -a
-  Linux MArch 5.8.7-arch1-1 #1 SMP PREEMPT Sat, 05 Sep 2020 12:31:32 +0000
-  x86_64 GNU/Linux
-
-  qemu-arm-static --version
-  qemu-arm version 5.1.0
-
-  systemd-nspawn --version
-  systemd 246 (246.4-1-arch)
-  +PAM +AUDIT -SELINUX -IMA -APPARMOR +SMACK -SYSVINIT +UTMP +LIBCRYPTSETUP
-  +GCRYPT +GNUTLS +ACL +XZ +LZ4 +ZSTD +SECCOMP +BLKID +ELFUTILS +KMOD +IDN2=
- -IDN
-  +PCRE2 default-hierarchy=3Dhybrid
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1895053/+subscriptions
 
