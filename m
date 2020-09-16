@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2550C43461
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB59C2D0E3
 	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 02:27:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 263AB20809
+	by mail.kernel.org (Postfix) with ESMTPS id 9421B20BED
 	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 02:27:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 263AB20809
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9421B20BED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIN9z-0005CR-2v
+	id 1kIN9z-0005D2-Kb
 	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 22:27:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47676)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIN91-0004Mq-1b
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 22:26:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53906)
+ id 1kIN93-0004NS-Kr
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 22:26:06 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54070)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIN8y-0005eg-Ku
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 22:26:02 -0400
+ id 1kIN91-0005ep-7F
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 22:26:05 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kIN8w-0007Zy-FV
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 02:25:58 +0000
+ id 1kIN8z-0007g4-Gy
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 02:26:01 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 129DE2E8106
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 02:25:58 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 66F2B2E8084
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 02:26:01 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 16 Sep 2020 02:18:01 -0000
-From: Chris Halse Rogers <1883984@bugs.launchpad.net>
+Date: Wed, 16 Sep 2020 02:18:43 -0000
+From: Launchpad Bug Tracker <1883984@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
@@ -59,16 +59,17 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: bruno-clisp janitor nhfbeebe paelzer raof rth
  tjaalton ubuntu-sru-bot
 X-Launchpad-Bug-Reporter: Nelson H F Beebe (nhfbeebe)
-X-Launchpad-Bug-Modifier: Chris Halse Rogers (raof)
+X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
 References: <159243063748.16697.11009205973276249282.malonedeb@chaenomeles.canonical.com>
-Message-Id: <160022268174.1133.4878316977179668171.malone@chaenomeles.canonical.com>
-Subject: [Bug 1883984] Update Released
+Message-Id: <160022272617.24055.3016817148738602034.malone@ackee.canonical.com>
+Subject: [Bug 1883984] Re: QEMU S/390x sqxbr (128-bit IEEE 754 square root)
+ crashes qemu-system-s390x
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: ac9407201403dfb1f82ae01515a464d4a5744f68
+X-Launchpad-Hash: c1f9a71b545fd65c6b840c6240061449e3cc7005
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 22:25:59
@@ -96,13 +97,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The verification of the Stable Release Update for qemu has completed
-successfully and the package is now being released to -updates.
-Subsequently, the Ubuntu Stable Release Updates Team is being
-unsubscribed and will not receive messages about this bug report.  In
-the event that you encounter a regression using the package from
--updates please report a new bug using ubuntu-bug and tag the bug report
-regression-update so we can easily find any regressions.
+This bug was fixed in the package qemu - 1:4.2-3ubuntu6.5
+
+---------------
+qemu (1:4.2-3ubuntu6.5) focal; urgency=3Dmedium
+
+  * further stabilize qemu by importing patches of qemu v4.2.1
+    Fixes (LP: #1891203) and (LP: #1891877)
+    - d/p/stable/lp-1891877-*
+    - as part of the stabilization this also fixes an
+      riscv emulation issue due to the CVE-2020-13754 fixes via
+      d/p/ubuntu/hw-riscv-Allow-64-bit-access-to-SiFive-CLINT.patch
+  * fix s390x SQXBR emulation (LP: #1883984)
+    - d/p/ubuntu/lp-1883984-target-s390x-Fix-SQXBR.patch
+  * fix -no-reboot for s390x protvirt guests (LP: #1890154)
+    - d/p/ubuntu/lp-1890154-s390x-protvirt-allow-to-IPL-secure-guests-with-*
+
+ -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Wed, 19 Aug
+2020 13:40:49 +0200
+
+** Changed in: qemu (Ubuntu Focal)
+       Status: Fix Committed =3D> Fix Released
+
+** CVE added: https://cve.mitre.org/cgi-bin/cvename.cgi?name=3D2020-13754
 
 -- =
 
