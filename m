@@ -2,97 +2,95 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AF46C43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 13:24:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13F6BC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 13:26:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6AB8C22286
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 13:24:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6CC2720771
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 13:26:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vtgk5I+S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AB8C22286
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=blade-group.com header.i=@blade-group.com header.b="slpJXFeP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CC2720771
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=blade-group.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIXQb-0004pW-HQ
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 09:24:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52802)
+	id 1kIXSI-0006Ad-F2
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 09:26:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53110)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kIXPN-0003z7-RA
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 09:23:37 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:35367)
+ (Exim 4.90_1) (envelope-from <antoine.damhet@blade-group.com>)
+ id 1kIXQr-0005B1-4A
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 09:25:09 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38771)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kIXPM-0004Fz-28
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 09:23:37 -0400
-Received: by mail-wm1-x343.google.com with SMTP id y15so3044408wmi.0
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 06:23:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=5GytSI5sRwxpnxdo7rNoJNsGc/17TFxhpkWskb5BqDI=;
- b=Vtgk5I+ScY7lEPtMPeCaBXO2RRWts11b9phqTOTO/+L0yoZ5XDAAf8toshfWBjApB/
- dMh20jtVtoMc48x6F9vEIErJbtE7Z2oCSp+rnDMQZf14KyohXPG9VFItXXiWvh6MbMoF
- ebAt5hP1eBNYOPvw45U1Bp0JjKRWxFnlo0jpe3PpTEONTiuEWbNeq4MPHYpSZXyf2Wfs
- iUmwkDfB19B2ZgxE8uZcXHb1Kup4OCZg/Wq5hvJ1JKwJ0DuhmEvBR8BdSAARrlBMdmsn
- ypoSrKNbp8YavGEQ0XCITnVT2aiH9P7sxJmfOZweFxNfBhds99lT5tcUHwUXijTuGUsh
- 9uGA==
+ (Exim 4.90_1) (envelope-from <antoine.damhet@blade-group.com>)
+ id 1kIXQo-0004V0-Qi
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 09:25:08 -0400
+Received: by mail-wr1-x444.google.com with SMTP id g4so6930724wrs.5
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 06:25:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=blade-group.com; s=google;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=SlmJPF4x1wZbMthVYIT+8Nt2l4p3ZqF+QSLiYEXwP4I=;
+ b=slpJXFePhA0BHGYw4aTAb3bzUrsgPmCsP3FN1M7jWZqKdLmg/lzdFx+clInzDsdvfI
+ +69UCU+sWqyUWYRMmYeRpUgvpAPfmaI/zc7ulAw6AwTOwdQc3IigZUWE/ubqD1mn9wgX
+ M+Y0UtprWRfEblqcG/Co8fcW8GtxSO3VVpHCOhlNWevMi8Y9Xd84wRVFmDNsNNCQeAqQ
+ 5IzijgGn+aSY5lnixk9lk0kr/IF+KEWS07pabhMQVgcbWcgs9sLy7jDKzfCfpQ/2iNWV
+ 04a7U9Bm2SqPDvdcmNN+anLQOtKTf/8+Q/fHygFWyDh1QoEHN1pZSYSn7Yyff1hf6S+A
+ Jq4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=5GytSI5sRwxpnxdo7rNoJNsGc/17TFxhpkWskb5BqDI=;
- b=WynfXcuAOycT3AMWHzInk0t+8fAX00lmTG3IjyuQZOnu//Y/E3ByGQVCWqHfPxA74E
- G2130mB0XMPChGNiN8LLepkN9eZmaDuN5Y9FG2wMPE9pp79wHHtsr4h4Ae7rlGf/2CRL
- Y4D3GpPL/lLK104/B8pjtKxEjQ7QWdxGe5wuEPKbX6YHvH3kA5HaDPauDD10Z9vAVf0g
- Almk9lshXpFeVjbUmXHD5OyCs+xzUrlflEujSfN8pWSPsu0DL4H35z5KKBGtFfDyylIM
- NrpXoNuq+qNPv2PoSl7g81yrXtWeiuX4teSGH2a4JsqmVzAWouc/AabvRVC8qo4aSfhI
- RgaA==
-X-Gm-Message-State: AOAM533WqymbPmrdnhaTd/dioIZf/aGNpVJZPT3G6g6rGV54Qn7leB2h
- 2NK47oO8qJ4inD0wThInt/Lyjg==
-X-Google-Smtp-Source: ABdhPJw/xaqpPC+d5L9CDEdftWz34YQessHKnL3uT/+5soH+1fyHni109QWkR6LSiOBzGNevyp/9Rg==
-X-Received: by 2002:a1c:7d4d:: with SMTP id y74mr4723689wmc.73.1600262614834; 
- Wed, 16 Sep 2020 06:23:34 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a17sm35597406wra.24.2020.09.16.06.23.33
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=SlmJPF4x1wZbMthVYIT+8Nt2l4p3ZqF+QSLiYEXwP4I=;
+ b=iozm+4AvS79apqsHwUMAKVw+e7JJT/4ZjyNqNZc2VNbJZhSKtlItnfl2HdHikqZj8y
+ spAd6Iyd7oAt+sOteiR0QFxIsO6IUEx8at0a3KQQEx+ekXIlioxZkbM4evL1o7Zdl696
+ 2B8xqCNlBRUj9C/E3PTkTN2mYRRdclv0tHRtGz1vZZFoCua4JCt2jgW8iCD61Cwh6iHI
+ +K021wYBWU1VPVD5mn69vxY2Fm+3IH9ZVTgfzxEKQFy4ku1OE7Gx3xdNyyMervYZf64Z
+ UKn1ssFFMBuV0OeC0kTRdRU2Fjci8WzZV45vhgu/7wpVPpgXNpxgsi93V/YQomUQzOvZ
+ P9NQ==
+X-Gm-Message-State: AOAM531hqfhdLR+p4KXf79CPqoT/rVI7FNY885MAvZuAQRMtwJ/EM3v0
+ ADmA6CiH3mBKpIVPZAklCLLvDA==
+X-Google-Smtp-Source: ABdhPJyo/LS06psBs8yolMfHpx7eosKjUrHkmxB8Xy34Zw+2khkGuV8O57LrdF2UQjzwQ7k3uMKdOA==
+X-Received: by 2002:adf:f14f:: with SMTP id y15mr25906538wro.69.1600262705148; 
+ Wed, 16 Sep 2020 06:25:05 -0700 (PDT)
+Received: from localhost ([2a01:e34:ec16:8a90:4e1d:96ff:fe49:7109])
+ by smtp.gmail.com with ESMTPSA id d18sm33170353wrm.10.2020.09.16.06.25.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 16 Sep 2020 06:23:33 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E560D1FF7E;
- Wed, 16 Sep 2020 14:23:32 +0100 (BST)
-References: <20200916122648.17468-1-alex.bennee@linaro.org>
- <20200916122648.17468-8-alex.bennee@linaro.org>
- <CAFEAcA_UEoe2H5zc=L1T3p31FoxKSfG0mRznN-68FQmGTp3+pg@mail.gmail.com>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PULL 7/8] gitlab: create a build-deprecated target
-In-reply-to: <CAFEAcA_UEoe2H5zc=L1T3p31FoxKSfG0mRznN-68FQmGTp3+pg@mail.gmail.com>
-Date: Wed, 16 Sep 2020 14:23:32 +0100
-Message-ID: <87imcdzwh7.fsf@linaro.org>
+ Wed, 16 Sep 2020 06:25:04 -0700 (PDT)
+Date: Wed, 16 Sep 2020 15:25:03 +0200
+From: Antoine Damhet <antoine.damhet@blade-group.com>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [BUG] Migration hv_time rollback
+Message-ID: <20200916132503.mrfdjaghblkhxocd@tartarus>
+References: <20200916090602.blkm7eym6g5bnvvk@tartarus>
+ <20200916112956.GE2833@work-vm>
+ <20200916115950.tsarwvk2dwgiceoe@tartarus>
+ <878sd9j4s1.fsf@vitty.brq.redhat.com>
+ <875z8dj367.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="ddcko4qldhsydqz2"
+Content-Disposition: inline
+In-Reply-To: <875z8dj367.fsf@vitty.brq.redhat.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=antoine.damhet@blade-group.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_INVALID=0.1,
+ DKIM_SIGNED=0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,69 +103,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Da?= =?utf-8?Q?ud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+--ddcko4qldhsydqz2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On Wed, 16 Sep 2020 at 13:27, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->>
->> These targets might be deprecated but we should keep them building
->> before the final axe comes down. Lets keep them all in one place and
->> don't hold up the CI if they do fail. They are either poorly tested or
->> already flaky anyway.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> Acked-by: Thomas Huth <thuth@redhat.com>
->> Message-Id: <20200915134317.11110-8-alex.bennee@linaro.org>
->>
->> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
->> index 72e8604579ee..f027b55aef15 100644
->> --- a/.gitlab-ci.yml
->> +++ b/.gitlab-ci.yml
->> @@ -254,6 +254,16 @@ build-clang:
->>        ppc-softmmu s390x-softmmu arm-linux-user
->>      MAKE_CHECK_ARGS: check
->>
->> +# These targets are on the way out
->> +build-deprecated:
->> +  <<: *native_build_job_definition
->> +  variables:
->> +    IMAGE: debian-all-test-cross
->> +    CONFIGURE_ARGS: --disable-docs --disable-tools --disable-system
->> +    MAKE_CHECK_ARGS: check-tcg
->> +    TARGETS: ppc64abi32-linux-user tilegx-linux-user
->> +  allow_failure: true
->
-> It's kind of awkward to have the CI config need to be updated when
-> we mark a config as deprecated. Can we have something so that
-> the CI just arranges to build all of the deprecated targets?
+On Wed, Sep 16, 2020 at 02:50:56PM +0200, Vitaly Kuznetsov wrote:
+[...]
 
-You mean a configure --enable-deprecated-targets?
+> >>
+> >
+> >
+> > Oh, I think I see what's going on. When you add 'kvm=3Doff'
+> > cpu->env.features[FEAT_KVM] is reset (see x86_cpu_expand_features()) so
+> > kvmclock QEMU device is not created and nobody calls KVM_SET_CLOCK on
+> > migration.
+> >
+> > In case we really want to support 'kvm=3Doff' I think we can add Hyper-V
+> > features check here along with KVM, this should do the job.
+>=20
+> Does the untested
+>=20
+> diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
+> index 64283358f91d..e03b2ca6d8f6 100644
+> --- a/hw/i386/kvm/clock.c
+> +++ b/hw/i386/kvm/clock.c
+> @@ -333,8 +333,9 @@ void kvmclock_create(void)
+>      X86CPU *cpu =3D X86_CPU(first_cpu);
+> =20
+>      if (kvm_enabled() &&
+> -        cpu->env.features[FEAT_KVM] & ((1ULL << KVM_FEATURE_CLOCKSOURCE)=
+ |
+> -                                       (1ULL << KVM_FEATURE_CLOCKSOURCE2=
+))) {
+> +        ((cpu->env.features[FEAT_KVM] & ((1ULL << KVM_FEATURE_CLOCKSOURC=
+E) |
+> +                                         (1ULL << KVM_FEATURE_CLOCKSOURC=
+E2))) ||
+> +         (cpu->env.features[FEAT_HYPERV_EAX] & HV_TIME_REF_COUNT_AVAILAB=
+LE))) {
+>          sysbus_create_simple(TYPE_KVM_CLOCK, -1, NULL);
+>      }
+>  }
+>=20
+> help?
 
->
-> (As demonstration, this list is missing unicore32, which is also
-> deprecated.)
+It appears to work :)
 
-That was fixed up in the next patch.
+>=20
+> (I don't think we need to remove all 'if (kvm_enabled())' checks from
+> machine types as 'kvm=3Doff' should not be related).
 
-> Also, "allow_failure: true" seems wrong to me. These targets
-> are only deprecated, which means we promise that the feature
-> should still work (to whatever extent it already did) for the 2
-> releases in which it is deprecated. We want our CI to tell us
-> if it fails to compile or fails tests, because we would need to
-> fix those bugs for a release.
+Indeed (I didn't look at the macro, it was just quick & dirty).
 
-I can revert that bit.
+>=20
+> --=20
+> Vitaly
+>=20
+>=20
 
 --=20
-Alex Benn=C3=A9e
+Antoine 'xdbob' Damhet
+
+--ddcko4qldhsydqz2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEArm1WbQx2GmOsfF83AmjLzzljz4FAl9iEiwACgkQ3AmjLzzl
+jz67kAf/Sg4zQ7EnL88len0Pu3qNaJsnCtb+87dK1B8dSdTSrFU0dohbB8kB6XX0
+lBaCVjEV8qJT2DePBl8TCoMegpKQ7lW28jAKEDldFdnouOgIIs1wpweGfQhEsyUJ
+YywIWBDX1fDlt27auV7Wl79KzVmJRN+rFIzJbIq7WO87gvmDAUsNTwimyCbmJl71
+ldSLkWPkm+PCaPZ/TP5vhE/ZLoJpPoVaKhquMcLFoFGP6OhfafhGRkTEQdFOXGOz
+q8j1jctp98YkREkQnTX/Rq5FRTEV36Apy2tATu004wBzjPPJ+0/LtzH8znGVeaav
+uirQYi4zDrgGClC+BtsoPNwR7PmY7w==
+=qkcP
+-----END PGP SIGNATURE-----
+
+--ddcko4qldhsydqz2--
 
