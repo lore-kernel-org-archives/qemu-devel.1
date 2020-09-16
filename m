@@ -7,38 +7,36 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51ACBC43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FEB1C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:49:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B083D2083B
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:47:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B083D2083B
+	by mail.kernel.org (Postfix) with ESMTPS id E9BF120872
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:49:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9BF120872
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIT6Q-0008OB-J6
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 04:47:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35472)
+	id 1kIT7y-0001JE-1p
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 04:49:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36326)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kIT4Z-0006bG-Sp; Wed, 16 Sep 2020 04:45:51 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:53579)
+ id 1kIT7C-0000XI-1E; Wed, 16 Sep 2020 04:48:34 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:57227)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kIT4X-00088h-V3; Wed, 16 Sep 2020 04:45:51 -0400
+ id 1kIT7A-00008r-Ai; Wed, 16 Sep 2020 04:48:33 -0400
 Received: from [192.168.100.1] ([82.252.129.222]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MEmtx-1kGZW21J87-00GJFR; Wed, 16 Sep 2020 10:45:41 +0200
-Subject: Re: [PATCH v2 2/2] hw/ppc/ppc4xx_pci: Replace magic value by the
- PCI_NUM_PINS definition
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MVNEv-1jtPr90bJv-00SNl2; Wed, 16 Sep 2020 10:48:28 +0200
+Subject: Re: [PATCH] ui/spice-input: Remove superfluous forward declaration
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
-References: <20200910072325.439344-1-f4bug@amsat.org>
- <20200910072325.439344-3-f4bug@amsat.org>
+References: <20200909171145.350360-1-f4bug@amsat.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -82,32 +80,32 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <a94af11c-7dbb-a7e8-3d5b-1f9568afe396@vivier.eu>
-Date: Wed, 16 Sep 2020 10:45:39 +0200
+Message-ID: <08800cd4-8f7e-33d5-ce69-95ce8723267d@vivier.eu>
+Date: Wed, 16 Sep 2020 10:48:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200910072325.439344-3-f4bug@amsat.org>
+In-Reply-To: <20200909171145.350360-1-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:nSBBC5CmHjThdjhSNcaX+lJG2WIGU7spTWzn4t/BlWyLPuGFk0H
- FJuUymQ+TLWUk2v6epo2wuu4Z57zLmKRVh6WEqAERlK8d+nA22kBWeYyiIKbBTSXiPGxNbS
- YTxzmjm8OvXDppawAQBLp4PlbzsTi0619aQM+hbeLz8Q8R9lAzsxZsQvPTrAbm2050q/aIA
- RZZh84ivP3JuN5z7wgGkg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:+kFn6nwhkvY=:AJiAz2KARQrI/HsUrc7f+g
- /yN3dBJUJ7BhvUBAFreGBoydOm8qW1P+KCaqeYQyXV0CuB0Ti3HZ8OnurEspRhpQ4OGFz6jEn
- KVK59PlWHfQTdR20W/ewOQ9fWTY2QahRpQDZ7htMwtpdeEZig5W1nDMLcGVF06pbJNu8wp4EK
- n7ifcC0LqgAYM/uXFmTl2+ycqu9loyRCXBDkecZyv/LSW5iZb6/LwTQV9/l/UBpz9zXp6LR06
- n9Y6UvhAIePAay+WBRGF0aekeuSAxicrLHVmI4RqgSnI1ApJkcTXKFENxo4LyczJQ2QrtQ79c
- nV5dV56Lzuz0Z65acW+IZvCIctmg/QZGuHwhuqWJ+34bns99ktMQIYGuvBm1J9jpLIIopRGvG
- rIcf8tvw1512hs8Ic+b0o/E12+MxJvkEVgVDxQWF4a6QXtA5wxanyjckUDw9GTv8Kjx5bD6ND
- qPyjRXLsPGsrqrl5wpIW4sKKRw46S0odHEmRmC/ILOhUWxkp1coKL0+Vpe7vlQxp3MEudYELq
- pkf9qfPWt5ti/Ac9GK2yqYpFBccsFIsZJs1uH/OcGXPEisn/c1p+DCu79scGdNCSKeVUYyaGE
- UbXOTs3KqM96VN1mCqHfXkvGU1JdRjvr3IDYyA+PIQYnEsR6fyME+6eyM6lWOCRcnHEQteYhr
- 1IqBt1C8/N/2BExyM662bxTOicTRmrVeye3m7jvgKVAh1ixA8CNRlOjhqL07uRctNh2BLtOBy
- BFdkKuM6AARRWMkWDGkks8QbE9cffzlLvoqj+wpxmDaT03ZuIRAYVxogSvTVeSjH+PAor2MQ5
- zV7Wl8nmlkZMpkCEIk+jP/4qRkVce14rSKA2D09Zk7jTCtj2dhJ9PWpc4a44hdQWs305vto
+X-Provags-ID: V03:K1:L/ghuPTEHj+MsWebif9e1UtgWUtTRI4fQiSmVsic+JQkNG+PaF4
+ fbkG9sTbLKvi3O/vCKpsPWtOzXnnhl06PS/TyOySs/IK0Bh5pIZA/3n5Q0VzsK2iy4PECea
+ W48jEHPg06ejtFj1yG5AemLV0YQbztKA3u4Cb59/AlDnM1apyBpMOHUONdfgs8WqLSgkIpT
+ 1QeHuCtMYWN8vfPuIy3uQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:cNVYhS5mD6o=:0fFpkqf/ktfRMqPFD6m5nv
+ TuT8g/1UD5/TU6YWcSITM3EO31pcPQ0H4qEd7DrpOI0rpNxs36l5cQpCGBOVNydY1DALcXXPw
+ Xq6YXz4/r+0sGB1UlvsMZF2R/7bbiummiFBczTK7caTTeDihVikq/m3RVwnwxMCu9ogP7Nsfr
+ N1JILp9ZOUNdH9iTdJFH/urXz9zIvaljC0KCSXurjBboEPHHzzvTshf2UVWWSX89rI7cB0xYJ
+ xalhjVybzLDFZaHiHu+Hep84J2JxgNC1X+lytuuWXWLqxws5iKcydogf+LssFAKS87S4g3BtI
+ cvBTIy2fIWOHlk+dS3GvP7dnaCViulq/IHqwCoUwWe1mZ0Q3KZ11rsLi/ST8nRrYXdvWxiJbk
+ +JpfBMnnNJYiOZZMXYMtlvKoEETBJtON8/XDrvW1T+oHtIwJBtTLZhYdIeV6g07wku6LLWWkx
+ 6aK5HIAdgyrWjzB9fyX3fcn4tOWhpVFYGAqSUc01OJXsxkIhcN4pBorWSzpUVqvo2vwb/fOaG
+ /MZH4/uTOp3vtR0bgvAZJ46DxgYSs9DrRvH+9RhsLJG7Rhl7lNblrMO+bNJmTWRNhbSAI4W8k
+ b1UGOL4+eX0Z2L1BWh5D+7vj+EMUzC+P/v9lWIobqBbEbPo6YHS3uA7H8OEh+k+55MWtRmUw5
+ 90SjYuci2sNATJF2j0IfrWTj1QiL/HSsHxLk16SUjvLDktp+v1OXAWuS/TikIFJLPlfAcgXH3
+ tHgH9ARN1v6LwlFRY0GGOpmqLdYgW55bw2mArYB4NtV8p/E/OSOqgC4jfQb2KtIO1wWbiwSUf
+ /J1wD5OdMRayhT0lyd6e+Pyg9Kj74AcgK4U4HRBjEq7xUJkUQz1VUgfSZG5tyKhWQ88XMop
 Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 04:45:47
@@ -130,41 +128,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-trivial@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 10/09/2020 à 09:23, Philippe Mathieu-Daudé a écrit :
-> Replace the magic '4' value by the PCI_NUM_PINS definition.
+Le 09/09/2020 à 19:11, Philippe Mathieu-Daudé a écrit :
+> We only need to forward-declare kbd_push_key() and kbd_get_leds()
+> which are used in kbd_interface, not kbd_leds(). Remove this
+> superfluous forward declaration.
 > 
-> Suggested-by: Cédric Le Goater <clg@kaod.org>
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  hw/ppc/ppc4xx_pci.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  ui/spice-input.c | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> diff --git a/hw/ppc/ppc4xx_pci.c b/hw/ppc/ppc4xx_pci.c
-> index 503ef46b39a..930be78361d 100644
-> --- a/hw/ppc/ppc4xx_pci.c
-> +++ b/hw/ppc/ppc4xx_pci.c
-> @@ -54,7 +54,7 @@ struct PPC4xxPCIState {
+> diff --git a/ui/spice-input.c b/ui/spice-input.c
+> index d5bba231c95..21990fa9962 100644
+> --- a/ui/spice-input.c
+> +++ b/ui/spice-input.c
+> @@ -36,7 +36,6 @@ typedef struct QemuSpiceKbd {
 >  
->      struct PCIMasterMap pmm[PPC4xx_PCI_NR_PMMS];
->      struct PCITargetMap ptm[PPC4xx_PCI_NR_PTMS];
-> -    qemu_irq irq[4];
-> +    qemu_irq irq[PCI_NUM_PINS];
+>  static void kbd_push_key(SpiceKbdInstance *sin, uint8_t frag);
+>  static uint8_t kbd_get_leds(SpiceKbdInstance *sin);
+> -static void kbd_leds(void *opaque, int l);
 >  
->      MemoryRegion container;
->      MemoryRegion iomem;
+>  static const SpiceKbdInterface kbd_interface = {
+>      .base.type          = SPICE_INTERFACE_KEYBOARD,
 > 
 
 Applied to my trivial-patches branch.
 
 Thanks,
 Laurent
-
 
