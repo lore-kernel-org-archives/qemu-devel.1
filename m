@@ -2,146 +2,120 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68B43C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 16:11:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCDAC43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 16:13:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B670B22261
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 16:11:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4A2222581
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 16:13:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bvBjckGM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B670B22261
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SQlFHRZT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4A2222581
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIa2H-0000Uv-Mo
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 12:11:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48474)
+	id 1kIa49-0003Pq-Mf
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 12:13:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49100)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1kIa0L-0007UM-Aj
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 12:09:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46321)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1kIa0H-0006L3-Uc
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 12:09:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600272593;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=SJ8J8MLR3BEPxdkoZH8UKXXLRkg793rL990mneSeea0=;
- b=bvBjckGM69mIDj6kT8SidfPjH0FWq6t52zB1TbyK2gLHYnZ1sYcG9d0ablCttw1tdsEc4B
- s06V1LrPs7hz5L9DY09ns6VCyJrlVTNN7ENM0TWroSlK8HVFvomk7tezapHxDRXzGReaKz
- XEYX6I8sIUFqo5AnHemYOKmu7RtfxZM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-491-rib_UnkoPHmecOFOYt6S0w-1; Wed, 16 Sep 2020 12:09:50 -0400
-X-MC-Unique: rib_UnkoPHmecOFOYt6S0w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 434378015C6
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 16:09:49 +0000 (UTC)
-Received: from [10.36.113.15] (ovpn-113-15.ams2.redhat.com [10.36.113.15])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EC90419728;
- Wed, 16 Sep 2020 16:09:44 +0000 (UTC)
-Subject: Re: [PATCH 8/9] vhost-vdpa: add accurate error string when fail to
- open vhost vDPA device
-To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
-References: <20200831082737.10983-1-jasowang@redhat.com>
- <20200831082737.10983-9-jasowang@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <4b53c3b2-bf9a-11fd-3da3-8356b3214955@redhat.com>
-Date: Wed, 16 Sep 2020 18:09:43 +0200
+ (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
+ id 1kIa2C-0000oy-T8; Wed, 16 Sep 2020 12:11:52 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56354
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
+ id 1kIa2A-0006om-UV; Wed, 16 Sep 2020 12:11:52 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 08GG1Ref053874; Wed, 16 Sep 2020 12:11:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Sn5zI0ONIMkBdcYEwMSqeb8CFOTNwvDCsyMB+Oxfq5E=;
+ b=SQlFHRZTjqDZ7bdMXWhIf31tkeFXLKP39EFWeIhFoujQdpXbCYPaJFQDExImOz89JfYp
+ OUaDg6WYuZpsEm3jv2xMw/PBFdUccuf/v1VaTahr3fHwqxnRIY8DhUWlCC2tRIaAOzNn
+ VSK8mliSoX/HDo4WD34L3EPffXEEBhWkkxqJXrXhJhBs9SjvVk+jB7haHBBt4E+1Ntad
+ UEAyz1IGQVaofc+2SNKDpHzyP9Pan0WqMiZ/6BwH8dmNMQgLbwy2kI4hQz1YgmvInQRo
+ PiS9TvZhsZBZbnbLErL+Mywy5RcDw9sHyYu2M/rdGl1B8b1PHr5Zysh4Z60dbwDEgl3j 9w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33knq10npy-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 16 Sep 2020 12:11:47 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08GG2JI5058251;
+ Wed, 16 Sep 2020 12:11:47 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
+ [169.53.41.122])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33knq10npp-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 16 Sep 2020 12:11:47 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+ by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08GFwQjr021342;
+ Wed, 16 Sep 2020 16:11:46 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com
+ (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+ by ppma04dal.us.ibm.com with ESMTP id 33k5xs7cvt-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 16 Sep 2020 16:11:46 +0000
+Received: from b03ledav003.gho.boulder.ibm.com
+ (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+ by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 08GGBfSU34472538
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 16 Sep 2020 16:11:41 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 05AC26A047;
+ Wed, 16 Sep 2020 16:11:45 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E75AF6A054;
+ Wed, 16 Sep 2020 16:11:43 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.149.137])
+ by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTPS;
+ Wed, 16 Sep 2020 16:11:43 +0000 (GMT)
+Subject: Re: [PATCH v6 7/8] s390/kvm: header sync for diag318
+To: Cornelia Huck <cohuck@redhat.com>
+References: <20200915194416.107460-1-walling@linux.ibm.com>
+ <20200915194416.107460-8-walling@linux.ibm.com>
+ <20200916175235.6b5c22c6.cohuck@redhat.com>
+From: Collin Walling <walling@linux.ibm.com>
+Message-ID: <db79b747-9b07-c957-93b4-51a26118f67c@linux.ibm.com>
+Date: Wed, 16 Sep 2020 12:11:43 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200831082737.10983-9-jasowang@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lvivier@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200916175235.6b5c22c6.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=lvivier@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:16:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -51
-X-Spam_score: -5.2
-X-Spam_bar: -----
-X-Spam_report: (-5.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.062, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-16_10:2020-09-16,
+ 2020-09-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 phishscore=0
+ lowpriorityscore=0 priorityscore=1501 mlxlogscore=999 clxscore=1015
+ suspectscore=0 mlxscore=0 bulkscore=0 malwarescore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009160114
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=walling@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 12:11:48
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.062,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -155,44 +129,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lulu@redhat.com, mst@redhat.com
+Cc: thuth@redhat.com, frankja@linux.ibm.com, david@redhat.com, mst@redhat.com,
+ qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ qemu-s390x@nongnu.org, pbonzini@redhat.com, sumanthk@linux.ibm.com,
+ mihajlov@linux.ibm.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 31/08/2020 10:27, Jason Wang wrote:
-> This patch adds more accurate error string when fail to open vhost
-> vDPA device.
+On 9/16/20 11:52 AM, Cornelia Huck wrote:
+> On Tue, 15 Sep 2020 15:44:15 -0400
+> Collin Walling <walling@linux.ibm.com> wrote:
 > 
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->  net/vhost-vdpa.c | 1 +
->  1 file changed, 1 insertion(+)
+>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+>> ---
+>>  linux-headers/asm-s390/kvm.h | 7 +++++--
+>>  linux-headers/linux/kvm.h    | 1 +
+>>  2 files changed, 6 insertions(+), 2 deletions(-)
 > 
-> diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-> index f5cc4e8326..9a6f0b63d3 100644
-> --- a/net/vhost-vdpa.c
-> +++ b/net/vhost-vdpa.c
-> @@ -219,6 +219,7 @@ int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
-
-I think you can also remove the "assert(name)", qemu_net_client_setup()
-in qemu_new_net_client() uses a default value if NULL.
-
->      s = DO_UPCAST(VhostVDPAState, nc, nc);
->      vdpa_device_fd = qemu_open(opts->vhostdev, O_RDWR);
->      if (vdpa_device_fd == -1) {
-> +        error_setg(errp, "Fail to open vhost-vdpa device %s", opts->vhostdev);
->          return -errno;
-
-you can "return -1" now: no one checks for the exact returned value, all
-the other init functions from net_client_init_fun[] return -1 or 0, and
-the errno is now in the error string.
-
->      }
->      s->vhost_vdpa.device_fd = vdpa_device_fd;
+> I've replaced this with an update against 5.9-rc5.
+> 
 > 
 
-Thanks,
-Laurent
+Thanks, Conny
 
+-- 
+Regards,
+Collin
+
+Stay safe and stay healthy
 
