@@ -2,53 +2,55 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE89EC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 03:26:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E0AC43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 03:40:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F370A20731
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 03:26:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F370A20731
+	by mail.kernel.org (Postfix) with ESMTPS id 5FA2B221E5
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 03:40:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FA2B221E5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIO5X-00066m-1j
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 23:26:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57150)
+	id 1kIOIi-0000SY-6n
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 23:40:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60470)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sw@weilnetz.de>) id 1kIO4O-0005f7-EU
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 23:25:20 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:59748
+ (Exim 4.90_1) (envelope-from <sw@weilnetz.de>) id 1kIOHv-0008R7-Cj
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 23:39:19 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:59896
  helo=v2201612906741603.powersrv.de)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sw@weilnetz.de>) id 1kIO4J-0000tu-JI
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 23:25:19 -0400
+ (Exim 4.90_1) (envelope-from <sw@weilnetz.de>) id 1kIOHs-00032K-Vt
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 23:39:19 -0400
 Received: from localhost (localhost [127.0.0.1])
- by v2201612906741603.powersrv.de (Postfix) with ESMTP id 1E6AFDB25ED;
- Wed, 16 Sep 2020 05:25:12 +0200 (CEST)
+ by v2201612906741603.powersrv.de (Postfix) with ESMTP id 9A3B0DB25ED;
+ Wed, 16 Sep 2020 05:39:14 +0200 (CEST)
 X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
 Received: from v2201612906741603.powersrv.de ([127.0.0.1])
  by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
  port 10024)
- with ESMTP id Kb1KrXDak3VO; Wed, 16 Sep 2020 05:25:11 +0200 (CEST)
+ with ESMTP id CZsOWEZbwmyq; Wed, 16 Sep 2020 05:39:13 +0200 (CEST)
 Received: from macbook02.fritz.box (pd9ec31d2.dip0.t-ipconnect.de
  [217.236.49.210])
  (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
- key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+ key-exchange X25519 server-signature RSA-PSS (2048 bits))
  (No client certificate requested)
- by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 25DE1DA0226;
- Wed, 16 Sep 2020 05:25:11 +0200 (CEST)
-Subject: Re: [PATCH 0/5] qom: Allow object to be aligned
-To: Richard Henderson <richard.henderson@linaro.org>
-References: <20200915174635.2333553-1-richard.henderson@linaro.org>
- <3c8dead2-b5f4-e988-3fbc-7b30183f0f2e@linaro.org>
+ by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 2AB07DA0226;
+ Wed, 16 Sep 2020 05:39:13 +0200 (CEST)
+Subject: Re: [PATCH v2 1/6] util/oslib-win32: Use _aligned_malloc for
+ qemu_try_memalign
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200916004638.2444147-1-richard.henderson@linaro.org>
+ <20200916004638.2444147-2-richard.henderson@linaro.org>
 From: Stefan Weil <sw@weilnetz.de>
 Autocrypt: addr=sw@weilnetz.de; keydata=
  mQINBFXCNBcBEACUbHx9FWsS1ATrhLGAS+Nc6bFQHPR3CpUQ4v++RiMg25bF6Ov1RsYEcovI
@@ -92,12 +94,12 @@ Autocrypt: addr=sw@weilnetz.de; keydata=
  Rm8B6J2ZK6ci1TRDiMpCUWefpnIuE+TibC5VJR5zx0Yh11rxxBFob8mWktRmLZyeEoCcZoBo
  sbJxD80QxWO03zPpkcJ7d4BrVsQ/BJkBtEe4Jn4iqHqA/OcrzwuEZSv+/MdgoqfblBZhDusm
  LYfVy7wFDeVClG6eQIiK2EnmDChLRkVIQzbkV0iG+NJVVJHLGK7/OsO47+zq
-Message-ID: <63e49d75-179c-cf71-cca5-2e088317b7c7@weilnetz.de>
-Date: Wed, 16 Sep 2020 05:25:10 +0200
+Message-ID: <6f21ba2b-48f5-63e9-3154-6d0714e96dc5@weilnetz.de>
+Date: Wed, 16 Sep 2020 05:39:12 +0200
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
  Gecko/20100101 Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <3c8dead2-b5f4-e988-3fbc-7b30183f0f2e@linaro.org>
+In-Reply-To: <20200916004638.2444147-2-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Received-SPF: pass client-ip=37.120.169.71; envelope-from=sw@weilnetz.de;
@@ -121,37 +123,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 16.09.20 um 00:47 schrieb Richard Henderson:
+Am 16.09.20 um 02:46 schrieb Richard Henderson:
 
-> On 9/15/20 10:46 AM, Richard Henderson wrote:
->> We already have a function that can alloc with alignment,
->> but we need to pass this down from the structure.  We also
->> don't want to use this function unconditionally, because
->> the windows version does page allocation, which would be
->> overkill for the vast majority of the objects allocated.
-> Stefan, why are we using VirtualAlloc in util/oslib-win32.c, qemu_try_m=
-emalign,
-> instead of _aligned_malloc?
+> We do not need or want to be allocating page sized quanta.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+> Cc: Stefan Weil <sw@weilnetz.de>
+> ---
+>  util/oslib-win32.c | 10 +++-------
+>  1 file changed, 3 insertions(+), 7 deletions(-)
+>
+> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
+> index c654dafd93..8d838bf342 100644
+> --- a/util/oslib-win32.c
+> +++ b/util/oslib-win32.c
+> @@ -56,10 +56,8 @@ void *qemu_try_memalign(size_t alignment, size_t siz=
+e)
+>  {
+>      void *ptr;
+> =20
+> -    if (!size) {
+> -        abort();
+> -    }
+> -    ptr =3D VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_READWRITE);
+> +    assert(size !=3D 0);
+> +    ptr =3D _aligned_malloc(alignment, size);
+>      trace_qemu_memalign(alignment, size, ptr);
+>      return ptr;
+>  }
+> @@ -93,9 +91,7 @@ void *qemu_anon_ram_alloc(size_t size, uint64_t *alig=
+n, bool shared)
+>  void qemu_vfree(void *ptr)
+>  {
+>      trace_qemu_vfree(ptr);
+> -    if (ptr) {
+> -        VirtualFree(ptr, 0, MEM_RELEASE);
+> -    }
+> +    _aligned_free(ptr);
+>  }
+> =20
+>  void qemu_anon_ram_free(void *ptr, size_t size)
 
 
-I think we use it because Fabrice introduced VirtualAlloc in commit
-6e4255f6a65091fbe7d17bfda546e2aa1b72f9a6 (with a comment "FIXME: this is
-not exactly optimal solution [...]"). Maybe there was no _aligned_malloc
-available 15 years ago. Commit 33f002714be2ed58ed05ae3870d5ea6915df4b47
-then reused VirtualAlloc for qemu_try_memalign (without a FIXME comment).=
+According to the documentation, malloc.h should be included for
+_aligned_malloc. See
+https://docs.microsoft.com/de-de/cpp/c-runtime-library/reference/aligned-=
+malloc?view=3Dvs-2019
 
+I'd also use g_assert instead of assert to make sure that it is not
+removed by NDEBUG.
 
-Obviously nobody cared to find a better solution until now.
+Thanks,
 
 Stefan
-
 
 
 
