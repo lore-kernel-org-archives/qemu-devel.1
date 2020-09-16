@@ -2,78 +2,80 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 425F2C43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:08:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0856DC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:09:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B507222209
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:08:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 977E22220B
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 12:09:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bMTPCcuP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B507222209
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ISg2e/yx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 977E22220B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIWF7-0002Zz-Ik
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 08:08:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54456)
+	id 1kIWFp-0003aD-KV
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 08:09:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57554)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kIVv8-0007TD-AU
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:48:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28823)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIW91-0003vK-An
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 08:02:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27472)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kIVv5-0008DC-OD
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:48:17 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIW8z-0001k2-HT
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 08:02:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600256895;
+ s=mimecast20190719; t=1600257756;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=B50KFT+WxoEd/xATwyMJxBjBez5n+Hf8OzuZBjfkAUg=;
- b=bMTPCcuPZR2x2R7Kh59R2OckNGy0o6yq4LCpYk49cNv+X80KFV9WqWBgvcfB/ErPmOFEV4
- Y6SLkhDFVOJl8kmUNKpOCk67KFV4gWktyXYIh58mPB5fK3U9YG7Sh4+ZzoxrGgE8FaTrqt
- SPsTQhuW53ODZpwr96mt6yY+6+ujcwY=
+ bh=RmUEaE/aeDV8bp1qZTfRZNF5mJMFZH0rskrDJo0E9xs=;
+ b=ISg2e/yxIn9bv8JvF9XMd3NlS5qJranmKw7WpiDO32SoKQHEOWifNGIce8LNxj+oSPHqtj
+ aKXOwKVdKJRfHferaJ8Ovcvr6hknU7CXajaI8VZ/s+3opooY72mpKETRR1d+tYrbHoD1Qa
+ kN8QkH07oKAIjVcJea73kPDSSR1OrUA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-21-s-8nDXDLN7iZCyKgao5zKw-1; Wed, 16 Sep 2020 07:48:08 -0400
-X-MC-Unique: s-8nDXDLN7iZCyKgao5zKw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-588-4x-s4GDgN0mFIPHNZUoufQ-1; Wed, 16 Sep 2020 08:02:35 -0400
+X-MC-Unique: 4x-s4GDgN0mFIPHNZUoufQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 428ED186DD23;
- Wed, 16 Sep 2020 11:48:07 +0000 (UTC)
-Received: from thuth.com (ovpn-113-19.ams2.redhat.com [10.36.113.19])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 35D1D5DA71;
- Wed, 16 Sep 2020 11:48:06 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 21/24] tests: fix test-util-sockets.c
-Date: Wed, 16 Sep 2020 13:47:28 +0200
-Message-Id: <20200916114731.102080-22-thuth@redhat.com>
-In-Reply-To: <20200916114731.102080-1-thuth@redhat.com>
-References: <20200916114731.102080-1-thuth@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E7F784E245;
+ Wed, 16 Sep 2020 12:02:33 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
+ [10.36.112.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 747DC7E731;
+ Wed, 16 Sep 2020 12:02:32 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id B82CA16E16; Wed, 16 Sep 2020 14:02:28 +0200 (CEST)
+Date: Wed, 16 Sep 2020 14:02:28 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Subject: Re: [PATCH v6 5/7] misc: Add versal-usb2-ctrl-regs module
+Message-ID: <20200916120228.e5hrxabhwde2gl6u@sirius.home.kraxel.org>
+References: <1600256469-13130-1-git-send-email-sai.pavan.boddu@xilinx.com>
+ <1600256469-13130-6-git-send-email-sai.pavan.boddu@xilinx.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <1600256469-13130-6-git-send-email-sai.pavan.boddu@xilinx.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:16:02
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:35:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
@@ -94,79 +96,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yonggang Luo <luoyonggang@gmail.com>
+Cc: Francisco Eduardo Iglesias <figlesia@xilinx.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Vikram Garhwal <fnuv@xilinx.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ =?utf-8?Q?'Marc-Andr=C3=A9?= Lureau' <marcandre.lureau@redhat.com>,
+ Ying Fang <fangying1@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Paul Zimmerman <pauldzim@gmail.com>,
+ 'Philippe =?utf-8?Q?Mathieu-Daud=C3=A9'?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yonggang Luo <luoyonggang@gmail.com>
+On Wed, Sep 16, 2020 at 05:11:06PM +0530, Sai Pavan Boddu wrote:
+> This module emulates control registers of versal usb2 controller, this is added
+> just to make guest happy. In general this module would control the phy-reset
+> signal from usb controller, data coherency of the transactions, signals
+> the host system errors received from controller.
+> 
+> Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+> Signed-off-by: Vikram Garhwal <fnu.vikram@xilinx.com>
 
-Fixes following errors:
-Running test test-util-sockets
-ERROR test-util-sockets - missing test plan
+Huh?  Patch 5/7 is twice in this series ...
 
-# Start of name tests
-**
-ERROR:../tests/test-util-sockets.c:93:test_socket_fd_pass_name_good: assertion failed (fd != -1): (-1 != -1)
-Bail out! ERROR:../tests/test-util-sockets.c:93:test_socket_fd_pass_name_good: assertion failed (fd != -1): (-1 != -1)
-
-First should call to qemu_init_main_loop before socket_init,
-then on win32 doesn't support for SOCKET_ADDRESS_TYPE_FD socket type
-
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200915121318.247-21-luoyonggang@gmail.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/test-util-sockets.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
-index af9f5c0c70..1bbb16d9b1 100644
---- a/tests/test-util-sockets.c
-+++ b/tests/test-util-sockets.c
-@@ -75,7 +75,7 @@ int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap) { abort(); }
- void monitor_init_qmp(Chardev *chr, bool pretty, Error **errp) {}
- void monitor_init_hmp(Chardev *chr, bool use_readline, Error **errp) {}
- 
--
-+#ifndef _WIN32
- static void test_socket_fd_pass_name_good(void)
- {
-     SocketAddress addr;
-@@ -227,6 +227,7 @@ static void test_socket_fd_pass_num_nocli(void)
- 
-     g_free(addr.u.fd.str);
- }
-+#endif
- 
- #ifdef __linux__
- static gchar *abstract_sock_name;
-@@ -321,6 +322,7 @@ int main(int argc, char **argv)
- {
-     bool has_ipv4, has_ipv6;
- 
-+    qemu_init_main_loop(&error_abort);
-     socket_init();
- 
-     g_test_init(&argc, &argv, NULL);
-@@ -340,6 +342,7 @@ int main(int argc, char **argv)
-                         test_fd_is_socket_bad);
-         g_test_add_func("/util/socket/is-socket/good",
-                         test_fd_is_socket_good);
-+#ifndef _WIN32
-         g_test_add_func("/socket/fd-pass/name/good",
-                         test_socket_fd_pass_name_good);
-         g_test_add_func("/socket/fd-pass/name/bad",
-@@ -352,6 +355,7 @@ int main(int argc, char **argv)
-                         test_socket_fd_pass_num_bad);
-         g_test_add_func("/socket/fd-pass/num/nocli",
-                         test_socket_fd_pass_num_nocli);
-+#endif
-     }
- 
- #ifdef __linux__
--- 
-2.18.2
+take care,
+  Gerd
 
 
