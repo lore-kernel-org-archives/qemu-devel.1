@@ -2,44 +2,42 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B008C43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:17:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 422FAC43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:18:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37ACD2076C
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:17:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37ACD2076C
+	by mail.kernel.org (Postfix) with ESMTPS id A029D2076C
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:18:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A029D2076C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kITYj-0002Dh-9V
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 05:17:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43628)
+	id 1kITa2-0003Ob-Rg
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 05:18:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43968)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kITXU-0001Yb-Pt; Wed, 16 Sep 2020 05:15:44 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:57243)
+ id 1kITZF-0002m9-TO; Wed, 16 Sep 2020 05:17:33 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:34727)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kITXS-0003ub-68; Wed, 16 Sep 2020 05:15:44 -0400
+ id 1kITZE-00043h-5j; Wed, 16 Sep 2020 05:17:33 -0400
 Received: from [192.168.100.1] ([82.252.129.222]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N4R0a-1kSkJZ33va-011OJ2; Wed, 16 Sep 2020 11:15:31 +0200
-Subject: Re: [PATCH 0/2] hw/timer/hpet: Fix compiler errors with -DHPET_DEBUG
+ (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1N6t3Z-1kZ3oL1pXz-018HQj; Wed, 16 Sep 2020 11:17:14 +0200
+Subject: Re: [PATCH v2] scripts/git.orderfile: Display meson files along with
+ buildsys ones
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Dov Murik <dovmurik@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-References: <20200909083650.46771-1-dovmurik@linux.vnet.ibm.com>
- <8d9ae068-77cc-6152-7b90-a51bf70648a0@redhat.com>
- <4918b958-dbd4-bd18-bb75-da7386124886@linux.vnet.ibm.com>
- <f246ada9-bf7d-2c94-e24e-e28bf3d2efc2@redhat.com>
+ qemu-devel@nongnu.org
+References: <20200907161222.41915-1-philmd@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -83,32 +81,33 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <f866b06f-b499-a940-2f60-520eb75f0a3e@vivier.eu>
-Date: Wed, 16 Sep 2020 11:15:30 +0200
+Message-ID: <63775093-0f82-4c35-4722-c6f62ed9d2c6@vivier.eu>
+Date: Wed, 16 Sep 2020 11:17:12 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <f246ada9-bf7d-2c94-e24e-e28bf3d2efc2@redhat.com>
+In-Reply-To: <20200907161222.41915-1-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:LqhXqvuUu1stUfqsIkDhnd6J3Nw5qjCK/v3+F6/jWCB65lS0f5h
- rvgU+AtTczUqgyOgPuJ4Nh82unrhHfmNRjquw0eAdRkSMKiO0raRHjYbiyqTihfRnL3yNeU
- FK/mTznEt8hYslYRMaUVV9CN4LriQN2y4za5Xa7oaUtRGV/BwoT72pJGMkCeyDAZHYCfBSe
- NBeSYbQYBZPAkmvaPoJbA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:O+UKZ3fl2tk=:F2AntRaaJBpV4itj4La3B9
- NyXJ519w9Ol6XUWwT1BSaFhhbM82UugiOB6szd723PkstxiL/O4cNSfpH5nrqwM2m4eFP7IkE
- qbiJcXy+3u61/zlCYmzcl8pzuVNH5PrsDgFMBCOtVzQqopNo/WY/wFio5l/fELBw87NE2kV7/
- gBzW7FsFdHnuYZhycScSXeWAmmNzIRi6EvDCiyUmq4FjEH5ukMmGU9//YUOuzbl8otJi+9o7i
- TK8pQ0ZZzxE0JZ1Yy7sVq7H6Mmc/qrorn+6Iu5PoeJ0rYhetoC38qQCJvuPn1za6X5FRKpdvD
- vh1fakwMRrbuVe7WlprlruYDJDp8H3kFkMrTYkPdF03L3xj9Zi4VXpoPBeHZ59ShdDyMcU7Hy
- X0LJu55ULBAwYHSF5TmYWZjUbirMTWZh3fZMprLZesAo0aG42XG71nT3Ez1SzYCPF0oDM0hZE
- XQgFRj87dl8p+93xhM84FRoJ8wNt9Nd5hggzvPudpsSC+sh9FhiYkVIkM3Zfp/R/qLdpxUHaR
- cA8Lq4fbcBbQRdUhUGiPkuTTssOHzn1nNraCPaDMVMzvGbqjvbfgfiR4Rr5dWJwLoEufBq8iR
- 7HkqM3+nMT0IzLZ74r7EAjKESDnK3Bx5FQvgHVyAGYU2WPxuFo4ZX0Jsf3Q0smT6D/rQ/oFKy
- B9QqQKbqTRE/jMtsVsDZIfXTfeN35oAvK8CIhQ1KQo/qd0m0Gis8+SSwsE30/O5vrDx1wGK/1
- Y0K8Hq0k9Sn/vDiudUQPRuh72fgMkemqiYoPVZsMwVt1SxCxOZp9ASNvueiUeHc2zytJ+Emy3
- HbL8GHR5SVMrwimJkyBMvwk+kQD8VAEfn6jtenwJD5dGMNk71tx/kpe60OIkE/hRlVqdvA5
+X-Provags-ID: V03:K1:/dYyqX2hf6ng91zR2/od23aSuP7lWEVRs7SjO6i77xcp/BpFDdo
+ Qm44T4SwEZ+c6DRLEJXUH1LzQaBf4lzsO3p0Tz2B8ieYq6LNnV3a0cUXgHZmVQ3pgmoLvpM
+ Jr1ZIO/cqLSJfQjJjy86TONrrSUSZ4DIrN8tYjTyLb29uHNltF12dzxKeoOsOpNsWce4vIr
+ 9ANxOPVUkRQOhn/qK1WUw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:z/WG4jNhjvM=:hLhNFUnXwjpS2q663prQcG
+ mPRxmwEwSlnjfLWlaGAZG93zMoEi3MURLVHZd7ymEvz+XbOWl7p5K2XuWAqBwLnlq1OA4KVVl
+ VTC9JYb7FVI7SvJGCF6F0ut8NENYLDifUmD0UGYJOr5yfonl4/+v3O2zz0QWT0K2KMsB+r/+R
+ QqIjBCUQVgRyc7m1DeXRnHaEGjg2yiRI5+ZGs3PxoB0X/xhDsy/zvlCf+564YPWDETarg/VyB
+ VxR5I94YwuuKR1O6D5vlMlyD7jTc+2fnZuDUue0RXhZVDDyaEnyoUviLZGQi/mnmXmPejdRTJ
+ +0ngRRI+XjajVbORQIiL38eJCouIW68uPYAlheBD8CxGjaE9JZl+tEn8Uk2cgW1+V4PzIqYuL
+ Yp/afnJrUQhOio0jLnTcl0/M1mFnCwJJbTbh8Mqs351dIImXKt5A26ImfDhcodCsLuD3Ee/my
+ XbUxa5kQV/EjWK9qcJ5NumHgFViCvV5Z8/c/QSi6LyVyWaByPsI7YvqwEJ9RLuoqAepRQSzUG
+ RlEm/G4KxgsiNMWMs2+u0y6N4ks4KAATkcZyKNZAtIFwZP3OZQmXrMCASoKCmvrC/Nou0ea8Q
+ tcpcpH84/5RaQ+bpmPxnY/OuKniWZk4Vc/PxkHoqORx4a+NVfcvAkDkYhDu1PgdEUY2PAAI4z
+ UptVRpg93+9JHDgKG3qvEkJZplFxyzjqLnqz7HNgH4EM4QDMKxJyQ5U5xZoF72Sv30hNBO9d0
+ VKh456IpLpLVualDfiwgHKh5O2AKbc8OsRTf8UnC9+Gbr/GknU7ze1YAIkElJg0bOXTNrJEd7
+ MolV7n0F2OfmIPUqMTkGhTxBUJE+qmTFZEoXVXgvTZ6XAT8ex+woWxaicLIi+ietx3g5LmeEK
+ /WuFbtsK7rRjW+ErXuKbxvUj9xukmbmJJZAL8p/nI=
 Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 04:53:54
@@ -131,62 +130,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 13/09/2020 à 13:42, Philippe Mathieu-Daudé a écrit :
-> Cc'ing qemu-trivial@
+Le 07/09/2020 à 18:12, Philippe Mathieu-Daudé a écrit :
+> Since commit a56650518f5 ("configure: integrate Meson in the build
+> system") we replaced many Makefile by Meson files. Adapt the
+> git.orderfile script to display the new file at the same position.
 > 
-> On 9/10/20 2:53 PM, Dov Murik wrote:
->> On 09/09/2020 20:24, Philippe Mathieu-Daudé wrote:
->>> On 9/9/20 10:36 AM, Dov Murik wrote:
->>>> Fix several compiler errors when compiling withe -DHPET_DEBUG.
->>>>
->>>> Steps to reproduce the issue:
->>>>
->>>>      mkdir build
->>>>      cd build
->>>>      ../configure --target-list=x86_64-softmmu
->>>> --extra-cflags=-DHPET_DEBUG
->>>>      make
->>>>
->>>> Dov Murik (2):
->>>>    hw/timer/hpet: Remove unused functions hpet_ram_readb, hpet_ram_readw
->>>>    hw/timer/hpet: Fix debug format strings
->>>>
->>>>   hw/timer/hpet.c | 27 +++++++--------------------
->>>>   1 file changed, 7 insertions(+), 20 deletions(-)
->>>>
->>>
->>> I sent almost the same patches last week :)
->>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg736836.html
->>
->> Oops, missed that. You're right.
->>
->>> You seem to fix a 4th format, can you rebase on top? (As these
->>> patches have already been queued).
->>
->> Actually there's a small issue in one of your suggested fixes: you added
->> "0x" but kept the "%#".  I think it should be without the "#" (also
->> according to the coding style document).
->>
->> I suggest you fix this small issue, and also add any changes you wish
->> from this patchset; then we can throw my patchset to the bin.
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  scripts/git.orderfile | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> Let's use your patchset instead.
-> 
-> Series:
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> diff --git a/scripts/git.orderfile b/scripts/git.orderfile
+> index 73fd818d7f3..a021afc2d51 100644
+> --- a/scripts/git.orderfile
+> +++ b/scripts/git.orderfile
+> @@ -18,6 +18,7 @@ docs/*
+>  configure
+>  Makefile*
+>  *.mak
+> +meson.build
+>  
+>  # qapi schema
+>  qapi/*.json
 > 
 
-Series applied to my trivial-patches branch.
+Applied to my trivial-patches branch.
 
 Thanks,
 Laurent
-
-
 
 
