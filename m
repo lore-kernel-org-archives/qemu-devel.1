@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E092C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 14:32:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01122C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 14:33:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9A4C2078D
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 14:32:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9A4C2078D
+	by mail.kernel.org (Postfix) with ESMTPS id 8F129221E3
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 14:33:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F129221E3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIYTz-0003ef-LL
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 10:32:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40290)
+	id 1kIYVH-0005VU-KR
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 10:33:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40304)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kIYIh-0003RW-JA
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 10:20:47 -0400
-Received: from mx2.suse.de ([195.135.220.15]:47938)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kIYIj-0003Xv-At
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 10:20:49 -0400
+Received: from mx2.suse.de ([195.135.220.15]:47962)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kIYId-0003uT-I9
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 10:20:47 -0400
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kIYIe-0003uf-K8
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 10:20:48 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id CDFD6B53B;
- Wed, 16 Sep 2020 14:20:36 +0000 (UTC)
+ by mx2.suse.de (Postfix) with ESMTP id 8E73DB53E;
+ Wed, 16 Sep 2020 14:20:38 +0000 (UTC)
 From: Claudio Fontana <cfontana@suse.de>
 To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Peter Maydell <peter.maydell@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Roman Bolshakov <r.bolshakov@yadro.com>
-Subject: [PATCH v8 15/17] hax: remove hax specific functions from global
- includes
-Date: Wed, 16 Sep 2020 16:20:02 +0200
-Message-Id: <20200916142004.27429-16-cfontana@suse.de>
+Subject: [PATCH v8 17/17] accel/tcg: use current_machine as it is always set
+ for softmmu
+Date: Wed, 16 Sep 2020 16:20:04 +0200
+Message-Id: <20200916142004.27429-18-cfontana@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200916142004.27429-1-cfontana@suse.de>
 References: <20200916142004.27429-1-cfontana@suse.de>
@@ -74,183 +74,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
  Alberto Garcia <berto@igalia.com>, Eduardo Habkost <ehabkost@redhat.com>,
  Pavel Dovgalyuk <dovgaluk@ispras.ru>, Marcelo Tosatti <mtosatti@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Colin Xu <colin.xu@intel.com>,
- Wenchao Wang <wenchao.wang@intel.com>, haxm-team@intel.com,
- Sunil Muthuswamy <sunilmut@microsoft.com>, Claudio Fontana <cfontana@suse.de>
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Colin Xu <colin.xu@intel.com>, Wenchao Wang <wenchao.wang@intel.com>,
+ haxm-team@intel.com, Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Claudio Fontana <cfontana@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Claudio Fontana <cfontana@suse.de>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- accel/stubs/hax-stub.c    | 10 ----------
- include/sysemu/hax.h      | 17 -----------------
- target/i386/hax-all.c     |  1 -
- target/i386/hax-cpus.c    |  1 -
- target/i386/hax-cpus.h    | 16 ++++++++++++++++
- target/i386/hax-mem.c     |  2 +-
- target/i386/hax-posix.c   |  3 +--
- target/i386/hax-windows.c |  2 +-
- target/i386/hax-windows.h |  2 ++
- 9 files changed, 21 insertions(+), 33 deletions(-)
+current_machine is always set before accelerators are initialized,
+so use that instead of MACHINE(qdev_get_machine()).
 
-diff --git a/accel/stubs/hax-stub.c b/accel/stubs/hax-stub.c
-index 7ad190cae2..1a9da83185 100644
---- a/accel/stubs/hax-stub.c
-+++ b/accel/stubs/hax-stub.c
-@@ -21,13 +21,3 @@ int hax_sync_vcpus(void)
- {
-     return 0;
- }
--
--int hax_init_vcpu(CPUState *cpu)
--{
--    return -ENOSYS;
--}
--
--int hax_smp_cpu_exec(CPUState *cpu)
--{
--    return -ENOSYS;
--}
-diff --git a/include/sysemu/hax.h b/include/sysemu/hax.h
-index 9b27e65cc7..12fb54f990 100644
---- a/include/sysemu/hax.h
-+++ b/include/sysemu/hax.h
-@@ -22,29 +22,12 @@
- #ifndef QEMU_HAX_H
- #define QEMU_HAX_H
- 
--
- int hax_sync_vcpus(void);
--int hax_init_vcpu(CPUState *cpu);
--int hax_smp_cpu_exec(CPUState *cpu);
--int hax_populate_ram(uint64_t va, uint64_t size);
--
--void hax_cpu_synchronize_state(CPUState *cpu);
--void hax_cpu_synchronize_post_reset(CPUState *cpu);
--void hax_cpu_synchronize_post_init(CPUState *cpu);
--void hax_cpu_synchronize_pre_loadvm(CPUState *cpu);
- 
- #ifdef CONFIG_HAX
- 
- int hax_enabled(void);
- 
--#include "qemu/bitops.h"
--#include "exec/memory.h"
--int hax_vcpu_destroy(CPUState *cpu);
--void hax_raise_event(CPUState *cpu);
--void hax_reset_vcpu_state(void *opaque);
--#include "target/i386/hax-interface.h"
--#include "target/i386/hax-i386.h"
--
- #else /* CONFIG_HAX */
- 
- #define hax_enabled() (0)
-diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-index fd1ab673d7..fecfe8cd6e 100644
---- a/target/i386/hax-all.c
-+++ b/target/i386/hax-all.c
-@@ -28,7 +28,6 @@
- #include "exec/address-spaces.h"
- 
- #include "qemu-common.h"
--#include "hax-i386.h"
- #include "sysemu/accel.h"
- #include "sysemu/reset.h"
- #include "sysemu/runstate.h"
-diff --git a/target/i386/hax-cpus.c b/target/i386/hax-cpus.c
-index 9aad98bc7a..99770e590c 100644
---- a/target/i386/hax-cpus.c
-+++ b/target/i386/hax-cpus.c
-@@ -22,7 +22,6 @@
- #include "qemu/osdep.h"
- #include "qemu/error-report.h"
- #include "qemu/main-loop.h"
--#include "hax-i386.h"
- #include "sysemu/runstate.h"
- #include "sysemu/cpus.h"
- #include "qemu/guest-random.h"
-diff --git a/target/i386/hax-cpus.h b/target/i386/hax-cpus.h
-index a64417fe2d..ee8ab7a631 100644
---- a/target/i386/hax-cpus.h
-+++ b/target/i386/hax-cpus.h
-@@ -14,4 +14,20 @@
- 
- extern const CpusAccel hax_cpus;
- 
-+#include "hax-interface.h"
-+#include "hax-i386.h"
-+
-+int hax_init_vcpu(CPUState *cpu);
-+int hax_smp_cpu_exec(CPUState *cpu);
-+int hax_populate_ram(uint64_t va, uint64_t size);
-+
-+void hax_cpu_synchronize_state(CPUState *cpu);
-+void hax_cpu_synchronize_post_reset(CPUState *cpu);
-+void hax_cpu_synchronize_post_init(CPUState *cpu);
-+void hax_cpu_synchronize_pre_loadvm(CPUState *cpu);
-+
-+int hax_vcpu_destroy(CPUState *cpu);
-+void hax_raise_event(CPUState *cpu);
-+void hax_reset_vcpu_state(void *opaque);
-+
- #endif /* HAX_CPUS_H */
-diff --git a/target/i386/hax-mem.c b/target/i386/hax-mem.c
-index 6bb5a24917..71e637cf16 100644
---- a/target/i386/hax-mem.c
-+++ b/target/i386/hax-mem.c
-@@ -13,7 +13,7 @@
- #include "exec/address-spaces.h"
- #include "qemu/error-report.h"
- 
--#include "target/i386/hax-i386.h"
-+#include "hax-cpus.h"
- #include "qemu/queue.h"
- 
- #define DEBUG_HAX_MEM 0
-diff --git a/target/i386/hax-posix.c b/target/i386/hax-posix.c
-index 6fb7867d11..735a749d4b 100644
---- a/target/i386/hax-posix.c
-+++ b/target/i386/hax-posix.c
-@@ -14,9 +14,8 @@
- #include "qemu/osdep.h"
- #include <sys/ioctl.h>
- 
--#include "target/i386/hax-i386.h"
--
- #include "sysemu/cpus.h"
-+#include "hax-cpus.h"
- 
- hax_fd hax_mod_open(void)
- {
-diff --git a/target/i386/hax-windows.c b/target/i386/hax-windows.c
-index 469b48e608..6c82dfb54f 100644
---- a/target/i386/hax-windows.c
-+++ b/target/i386/hax-windows.c
-@@ -12,7 +12,7 @@
- 
- #include "qemu/osdep.h"
- #include "cpu.h"
--#include "hax-i386.h"
-+#include "hax-cpus.h"
- 
- /*
-  * return 0 when success, -1 when driver not loaded,
-diff --git a/target/i386/hax-windows.h b/target/i386/hax-windows.h
-index 12cbd813dc..a5ce12d663 100644
---- a/target/i386/hax-windows.h
-+++ b/target/i386/hax-windows.h
-@@ -23,6 +23,8 @@
- #include <winioctl.h>
- #include <windef.h>
- 
-+#include "hax-cpus.h"
-+
- #define HAX_INVALID_FD INVALID_HANDLE_VALUE
- 
- static inline void hax_mod_close(struct hax_state *hax)
+Signed-off-by: Claudio Fontana <cfontana@suse.de>
+---
+ accel/tcg/tcg-cpus.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/accel/tcg/tcg-cpus.c b/accel/tcg/tcg-cpus.c
+index ec7158b55e..05af1168a2 100644
+--- a/accel/tcg/tcg-cpus.c
++++ b/accel/tcg/tcg-cpus.c
+@@ -484,7 +484,7 @@ static void tcg_start_vcpu_thread(CPUState *cpu)
+          * then we will have cpus running in parallel.
+          */
+         if (qemu_tcg_mttcg_enabled()) {
+-            MachineState *ms = MACHINE(qdev_get_machine());
++            MachineState *ms = current_machine;
+             if (ms->smp.max_cpus > 1) {
+                 parallel_cpus = true;
+             }
 -- 
 2.26.2
 
