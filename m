@@ -2,74 +2,83 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13CE5C43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 03:42:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94C19C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 05:11:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E97A21D94
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 03:42:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E97A21D94
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6746920936
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 05:11:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6746920936
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIOKW-0001u4-JU
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 23:42:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60896)
+	id 1kIPjV-0002Zi-BU
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 01:11:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48754)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kIOJM-0000yH-R1
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 23:40:54 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4746 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kIOJJ-0003IG-MB
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 23:40:48 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id B7AE65C415DB4BBF0C9F;
- Wed, 16 Sep 2020 11:40:34 +0800 (CST)
-Received: from [10.174.186.4] (10.174.186.4) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0;
- Wed, 16 Sep 2020 11:40:28 +0800
-Subject: Re: [PATCH v9 07/12] migration/dirtyrate: Compare page hash results
- for recorded sampled page
-To: Li Qiang <liq3ea@gmail.com>
-References: <1600137887-58739-1-git-send-email-zhengchuan@huawei.com>
- <1600137887-58739-8-git-send-email-zhengchuan@huawei.com>
- <CAKXe6SLR1X+O-GCJYXtBZ4Vz17o4gSK3WUYaCc6hD0h0OfbCwg@mail.gmail.com>
-From: Zheng Chuan <zhengchuan@huawei.com>
-Message-ID: <7784ed9f-e368-8156-5112-94bf956f3acd@huawei.com>
-Date: Wed, 16 Sep 2020 11:40:28 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kIPiU-0001kH-LQ
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 01:10:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45938)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kIPiR-0006Y2-OV
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 01:10:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kIPiP-00062E-Ky
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 05:10:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 9D1382E806F
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 05:10:45 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAKXe6SLR1X+O-GCJYXtBZ4Vz17o4gSK3WUYaCc6hD0h0OfbCwg@mail.gmail.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.186.4]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.191;
- envelope-from=zhengchuan@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 23:40:35
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 16 Sep 2020 05:01:46 -0000
+From: Alex Williamson <1894869@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: distribution=debian; sourcepackage=None; component=None;
+ status=In Progress; importance=Unknown; assignee=None; 
+X-Launchpad-Bug-Tags: chelsio t4
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: 1butteryadmin alex-l-williamson stefan-proxmox
+X-Launchpad-Bug-Reporter: Nick Bauer (1butteryadmin)
+X-Launchpad-Bug-Modifier: Alex Williamson (alex-l-williamson)
+References: <159958042175.17914.10047848067927369523.malonedeb@soybean.canonical.com>
+Message-Id: <160023250670.685.17500246527594321783.malone@chaenomeles.canonical.com>
+Subject: [Bug 1894869] Re: Chelsio T4 has old MSIX PBA offset bug
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: e7c175a36d034b5d784bcdf310976f67a081f5d3
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 01:10:46
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,113 +87,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>,
- Juan Quintela <quintela@redhat.com>, yuxiating@huawei.com, "Dr.
- David Alan Gilbert" <dgilbert@redhat.com>, xiexiangyou@huawei.com,
- Qemu Developers <qemu-devel@nongnu.org>, AlexChen <alex.chen@huawei.com>,
- jinyan12@huawei.com
+Reply-To: Bug 1894869 <1894869@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The device ID on function 7 is 0x0000 which is typically not valid,
+there's no entry for it in the PCI IDs database.  Someone from Chelsio
+would need to explain why it's even exposed, but there doesn't seem to
+be any value in quirking it since it provides no useful function.
 
+** Changed in: qemu
+       Status: New =3D> Invalid
 
-On 2020/9/16 0:30, Li Qiang wrote:
-> Chuan Zheng <zhengchuan@huawei.com> 于2020年9月15日周二 上午10:34写道：
->>
->> Compare page hash results for recorded sampled page.
->>
->> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
->> Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
->> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> ---
->>  migration/dirtyrate.c | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 63 insertions(+)
->>
->> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
->> index 5e6eedf..2d48eb8 100644
->> --- a/migration/dirtyrate.c
->> +++ b/migration/dirtyrate.c
->> @@ -177,6 +177,69 @@ out:
->>      return ret;
->>  }
->>
->> +static void calc_page_dirty_rate(struct RamblockDirtyInfo *info)
->> +{
->> +    uint32_t crc;
->> +    int i;
->> +
->> +    for (i = 0; i < info->sample_pages_count; i++) {
->> +        crc = get_ramblock_vfn_hash(info, info->sample_page_vfn[i]);
->> +        if (crc != info->hash_result[i]) {
->> +            info->sample_dirty_count++;
->> +        }
->> +    }
->> +}
->> +
->> +static struct RamblockDirtyInfo *
->> +find_page_matched(RAMBlock *block, int count,
->> +                  struct RamblockDirtyInfo *infos)
->> +{
->> +    int i;
->> +    struct RamblockDirtyInfo *matched;
->> +
->> +    for (i = 0; i <= count; i++) {
-> 
-> 'i < count'?
-> 
-Oops, it should be.
-Will fix it asap.
+-- =
 
->> +        if (!strcmp(infos[i].idstr, qemu_ram_get_idstr(block))) {
->> +            break;
->> +        }
->> +    }
->> +
->> +    if (i == count) {
->> +        return NULL;
->> +    }
->> +
->> +    if (infos[i].ramblock_addr != qemu_ram_get_host_addr(block) ||
->> +        infos[i].ramblock_pages !=
->> +            (qemu_ram_get_used_length(block) >> TARGET_PAGE_BITS)) {
->> +        return NULL;
->> +    }
->> +
->> +    matched = &infos[i];
->> +
->> +    return matched;
->> +}
->> +
->> +static bool compare_page_hash_info(struct RamblockDirtyInfo *info,
->> +                                  int block_count)
->> +{
->> +    struct RamblockDirtyInfo *block_dinfo = NULL;
->> +    RAMBlock *block = NULL;
->> +
->> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
->> +        block_dinfo = find_page_matched(block, block_count, info);
->> +        if (block_dinfo == NULL) {
->> +            continue;
->> +        }
->> +        calc_page_dirty_rate(block_dinfo);
->> +        update_dirtyrate_stat(block_dinfo);
->> +    }
->> +
->> +    if (DirtyStat.total_sample_count == 0) {
->> +        return false;
->> +    }
->> +
->> +    return true;
->> +}
->> +
->>  static void calculate_dirtyrate(struct DirtyRateConfig config)
->>  {
->>      /* todo */
->> --
->> 1.8.3.1
->>
-> .
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1894869
+
+Title:
+  Chelsio T4 has old MSIX PBA offset bug
+
+Status in QEMU:
+  Invalid
+Status in Debian:
+  In Progress
+
+Bug description:
+  There exists a bug with Chelsio NICs T4 that causes the following
+  error:
+
+  kvm: -device vfio-
+  pci,host=3D0000:83:00.7,id=3Dhostpci1.7,bus=3Dpci.0,addr=3D0x11.7: vfio
+  0000:83:00.7: hardware reports invalid configuration, MSIX PBA outside
+  of specified BAR
+
+  I discovered this bug on a Proxmox system, and I was working with a
+  downstream Proxmox developer to try to fix this issue. They provided
+  me with the following change to make from line 1484 of hw/vfio/pci.c:
+
+  static void vfio_msix_early_setup(VFIOPCIDevice *vdev, Error **errp)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* is 0x1000, =
+so we hard code that here.
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*/
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (vdev->vendor_id=
+ =3D=3D PCI_VENDOR_ID_CHELSIO &&
+  -            (vdev->device_id & 0xff00) =3D=3D 0x5800) {
+  +            ((vdev->device_id & 0xff00) =3D=3D 0x5800 ||
+  +             (vdev->device_id & 0xff00) =3D=3D 0x1425)) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0msix->pba_offset =3D 0x1000;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else if (vdev->ms=
+ix_relo =3D=3D OFF_AUTOPCIBAR_OFF) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0error_setg(errp, "hardware reports invalid configuration, "
+
+  However, I found that this did not fix the issue, so the bug appears
+  to work differently than the one that was present on the T5 NICs which
+  has already been patched. I have attached the output of my lspci
+  -nnkvv
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1894869/+subscriptions
 
