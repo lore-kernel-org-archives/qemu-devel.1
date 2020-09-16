@@ -2,88 +2,109 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F258C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 16:57:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94923C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 16:57:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3223223EA
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 16:57:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 415BD223EA
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 16:57:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="coy38HcS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3223223EA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iIVc3GQJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 415BD223EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIakH-0006no-RF
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 12:57:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33064)
+	id 1kIakO-000740-5u
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 12:57:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33242)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <abologna@redhat.com>)
- id 1kIahy-0003sS-33
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 12:55:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37152
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kIaiq-0005C8-Hl
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 12:55:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34731)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <abologna@redhat.com>)
- id 1kIahv-0005A7-Pf
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 12:55:01 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kIaio-0005Nj-NS
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 12:55:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600275298;
+ s=mimecast20190719; t=1600275353;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hU94UgIS7Y1inKRFiuVDTpvF27PzAWrRwxDLgo89gq8=;
- b=coy38HcSoc5HdSLm/pWWtwSKBex8fAhiz5iBll0DHrlecYV+xNhY9uFE5+P4Yb5ntxGvCr
- SVZa3XEK24JYfReKJK764IUZEGIZcT6raI7+WM7S8gm5PuJnJvpcA0bbZMTgItHh7+xSZ3
- Q4G1Gowh/uzNq8iiTSqFTqZh+bXkvnM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-502-nUD7uqK1OT6PFXe1K9qd8g-1; Wed, 16 Sep 2020 12:54:50 -0400
-X-MC-Unique: nUD7uqK1OT6PFXe1K9qd8g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B20D81F03B
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 16:54:50 +0000 (UTC)
-Received: from harajuku.usersys.redhat.com (unknown [10.40.195.7])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EA6015DA71;
- Wed, 16 Sep 2020 16:54:27 +0000 (UTC)
-Message-ID: <7569a17e836616459154a60e9a601edbc8003d3f.camel@redhat.com>
-Subject: [RFC DOCUMENT 09/12] kubevirt-and-kvm: Add Isolation page
-From: Andrea Bolognani <abologna@redhat.com>
-To: libvir-list@redhat.com, qemu-devel@nongnu.org
-Date: Wed, 16 Sep 2020 18:54:25 +0200
-In-Reply-To: <a6b5e34843b3f08994d4ffefadc5867001e0bc36.camel@redhat.com>
-References: <a6b5e34843b3f08994d4ffefadc5867001e0bc36.camel@redhat.com>
-User-Agent: Evolution 3.36.5 (3.36.5-1.fc32)
+ bh=3sYm1l5EYSHhjLYsHCWeMbwuD9LSZQ5+tMb8TWqnxYY=;
+ b=iIVc3GQJQHNvPcrqIZKFUBSXvB11tr18lsBg2SVx+TCNw+qbrgUzrjCI32nAgHBO3kap+7
+ XyHFvLgdwElX/ChCtmnpVp7OwfDK3R4qHTR5lbpHwa0VGwHvoynk6UCN/9XsGt1xi3mn+O
+ coR3uU9Uy9i/b2fZRx5flmZEqZhxHS8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-278-gNNWjlWfMDy4D3XIjTWlzA-1; Wed, 16 Sep 2020 12:55:51 -0400
+X-MC-Unique: gNNWjlWfMDy4D3XIjTWlzA-1
+Received: by mail-wr1-f70.google.com with SMTP id y3so2777853wrl.21
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 09:55:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=3sYm1l5EYSHhjLYsHCWeMbwuD9LSZQ5+tMb8TWqnxYY=;
+ b=XXyQq82BhyH6UJrx+wsfF/hPT05q9pwBg/N9VHDzWPElI7BIPtALqREhiwXaGPcQok
+ hn6R1qJLXSTXkoZwYMAwiRXXJ2nKV0Qnn/ss5eGFOlvv77FF2RHOg0a9GdIRde2mwl/S
+ de68j+8vhhzvv/XyvMI7KRLL9eL+VMvkLvDbK9LwUbCpJV7orol5S/Lq1eF7BWCEUczd
+ GRxkrJ0j0iJ9QhmLnzRzUisLj/AIeu/hedh+jGvxndimL04NEsPRfxqdb9TmGyPNxE9X
+ OWq5Nlupw8d3I/bTpDYXaeCXnQOI6+oTyTMD4Zxo+wMtgI72V7LahQtD7bH0TBtY2i+I
+ xKUQ==
+X-Gm-Message-State: AOAM531ho3l2eyQxYmrnP40CfFnooi5vV/O96/2KbTgsFRUpIj+HVLcz
+ QdRvlfNAK9qq0tVmbSSNcI2erAJnSkVnfcCHSLYtAURWOYyFN1O9TVIWWztxCpX/yykVwboSoNa
+ DQT/HE96uiOVL7JI=
+X-Received: by 2002:a1c:678a:: with SMTP id b132mr6025778wmc.10.1600275350223; 
+ Wed, 16 Sep 2020 09:55:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx87Hr/v2p/Un8UOkycLUHO0a8boSP7Qjrz9rywcUGZfeW+IRU6rmRdRvv4Fk5+PaakyKEIyg==
+X-Received: by 2002:a1c:678a:: with SMTP id b132mr6025753wmc.10.1600275349971; 
+ Wed, 16 Sep 2020 09:55:49 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:cf8e:a9a0:1aed:9a37?
+ ([2001:b07:6468:f312:cf8e:a9a0:1aed:9a37])
+ by smtp.gmail.com with ESMTPSA id n66sm6539991wmb.35.2020.09.16.09.55.48
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 16 Sep 2020 09:55:49 -0700 (PDT)
+Subject: Re: [PATCH-for-5.2] hw/i386/q35: Remove unreachable Xen code on Q35
+ machine
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200722082517.18708-1-philmd@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4a921f1b-b559-6c0c-641b-4451ae3ec479@redhat.com>
+Date: Wed, 16 Sep 2020 18:55:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200722082517.18708-1-philmd@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=abologna@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=abologna@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 11:53:15
+Content-Language: en-US
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:35:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
+X-Spam_score_int: -51
+X-Spam_score: -5.2
 X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
+X-Spam_report: (-5.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ NICE_REPLY_A=-0.062, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,144 +118,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vromanso@redhat.com, rmohr@redhat.com, crobinso@redhat.com
+Cc: Stefano Stabellini <sstabellini@kernel.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paul Durrant <paul@xen.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-https://gitlab.com/abologna/kubevirt-and-kvm/-/blob/master/Isolation.md
+On 22/07/20 10:25, Philippe Mathieu-Daudé wrote:
+> Xen accelerator requires specific changes to a machine to be able
+> to use it. See for example the 'Xen PC' machine configure its PCI
+> bus calling pc_xen_hvm_init_pci(). There is no 'Xen Q35' machine
+> declared. This code was probably added while introducing the Q35
+> machine, based on the existing PC machine (see commit df2d8b3ed4
+> "Introduce q35 pc based chipset emulator"). Remove the unreachable
+> code to simplify this file.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  hw/i386/pc_q35.c | 13 ++-----------
+>  1 file changed, 2 insertions(+), 11 deletions(-)
+> 
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index a3e607a544..12f5934241 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -34,9 +34,7 @@
+>  #include "sysemu/arch_init.h"
+>  #include "hw/i2c/smbus_eeprom.h"
+>  #include "hw/rtc/mc146818rtc.h"
+> -#include "hw/xen/xen.h"
+>  #include "sysemu/kvm.h"
+> -#include "sysemu/xen.h"
+>  #include "hw/kvm/clock.h"
+>  #include "hw/pci-host/q35.h"
+>  #include "hw/qdev-properties.h"
+> @@ -179,10 +177,6 @@ static void pc_q35_init(MachineState *machine)
+>          x86ms->below_4g_mem_size = machine->ram_size;
+>      }
+>  
+> -    if (xen_enabled()) {
+> -        xen_hvm_init(pcms, &ram_memory);
+> -    }
+> -
+>      x86_cpus_init(x86ms, pcmc->default_cpu_version);
+>  
+>      kvmclock_create();
+> @@ -208,10 +202,7 @@ static void pc_q35_init(MachineState *machine)
+>      }
+>  
+>      /* allocate ram and load rom/bios */
+> -    if (!xen_enabled()) {
+> -        pc_memory_init(pcms, get_system_memory(),
+> -                       rom_memory, &ram_memory);
+> -    }
+> +    pc_memory_init(pcms, get_system_memory(), rom_memory, &ram_memory);
+>  
+>      /* create pci host bus */
+>      q35_host = Q35_HOST_DEVICE(qdev_new(TYPE_Q35_HOST_DEVICE));
+> @@ -271,7 +262,7 @@ static void pc_q35_init(MachineState *machine)
+>  
+>      assert(pcms->vmport != ON_OFF_AUTO__MAX);
+>      if (pcms->vmport == ON_OFF_AUTO_AUTO) {
+> -        pcms->vmport = xen_enabled() ? ON_OFF_AUTO_OFF : ON_OFF_AUTO_ON;
+> +        pcms->vmport = ON_OFF_AUTO_ON;
+>      }
+>  
+>      /* init basic PC hardware */
+> 
 
-# Isolation
+Queued, thanks.
 
-How is the QEMU process isolated from the host and from other VMs?
-
-## Traditional virtualization
-
-cgroups
-
-* managed by libvirt
-
-SELinux
-
-* libvirt is privileged and QEMU is protected by SELinux policies set
-  by libvirt (SVirt)
-* QEMU runs with SELinux type `svirt_t`
-
-## KubeVirt
-
-cgroups
-
-* Managed by kubelet
-  * No involvement from libvirt
-* Memory limits
-  * When using hard limits, the entire VM can be killed by Kubernetes
-  * Memory consumption estimates are based on heuristics
-
-SELinux
-
-* KubeVirt is not using SVirt and there are no plans to do so
-* At the moment, the custom [KubeVirt SELinux policy][] is used to
-  ensure libvirt has sufficient privilege to perform its own setup
-  steps
-  * The standard SELinux type used by containers is `container_t`
-  * KubeVirt would like to eventually use the same for VMs as well
-
-Capabilities
-
-* The default set of capabilities is fairly conservative
-  * Privileged operation should happen outside of the pod: in
-    KubeVirt's case, a good candidate is `virt-handler`, the
-    privileged components that runs at the node level
-* Additional capabilities can be requested for a pod
-  * However, this is frowned upon and considered a liability from the
-    security point of view
-  * The cluster admin may even set a security policy that prevent
-    pods from using certain capabilities
-    * In such a scenario, KubeVirt workloads may be entirely unable
-      to run
-
-## Specific examples
-
-The following is a list of examples, either historical or current, of
-scenarios where libvirt's approach to isolation clashed with
-Kubernetes' and changes on either component were necessary.
-
-SELinux
-
-* libvirt use of hugetlbfs for hugepages config is disallowed by
-  `container_t`
-  * Possibly fixable by using memfd
-    * [libvirt memoryBacking docs][]
-    * [KubeVirt memfd issue][]
-* Use of libvirt+QEMU multiqueue tap support is disallowed by
-  `container_t`
-  * And there’s no way to pass in this setup from outside the
-    existing stack
-  * [KubeVirt multiqueue workaround][] extending their SELinux policy to allow
-    `attach_queue`
-* Passing precreated tap devices to libvirt triggers
-  relabelfrom+relabelto `tun_socket` SELinux access
-  * This may not be virt stacks fault, seems to happen automatically
-    when permissions aren’t correct
-
-Capabilities
-
-* libvirt performs memory locking for VFIO devices unconditionally
-  * Previously KubeVirt had to grant `CAP_SYS_RESOURCE` to pods.
-    KubeVirt worked around it by duplicating libvirt’s memory pinning
-    calculations so the libvirt action would be a no-op, but that is
-    fragile and may cause the issue to resurface if libvirt
-    calculation logic changes.
-  * References: [libvir-list memlock thread][], [KubeVirt memlock
-    PR][], [libvirt qemuDomainGetMemLockLimitBytes][], [KubeVirt
-    VMI.getMemlockSize][]
-* virtiofsd requires `CAP_SYS_ADMIN` capability to perform
-  `unshare(CLONE_NEWPID|CLONE_NEWNS)`
-  * This is required for certain use cases like running overlayfs in
-    the VM on top of virtiofs, but is not a requirement for all
-    usecases.
-  * References: [KubeVirt virtiofs PR][], [RHEL virtiofs bug][]
-* KubeVirt uses libvirt for CPU pinning, which requires the pod to
-  have `CAP_SYS_NICE`.
-  * Long term, KubeVirt would like to handle that pinning in their
-    privileged component virt-handler, so `CAP_SYS_NICE` can be
-    dropped.
-    * Sidenote: libvirt unconditionally requires `CAP_SYS_NICE` when
-      any other running VM is using CPU pinning, however this sounds
-      like a plain old bug.
-  * References: [KubeVirt CPU pinning PR][], [KubeVirt CPU pinning
-    workaround PR][], [RHEL CPU pinning bug][]
-* libvirt bridge usage used to require `CAP_NET_ADMIN`
-  * This is a historical example for reference. libvirt usage of a
-    bridge device always implied tap device creation, which required
-    `CAP_NET_ADMIN` privileges for the pod
-  * The fix was to teach libvirt to accept a precreated tap device
-    and skip some setup operations on it
-    * Example XML: `<interface type='ethernet'><target dev='mytap0'
-      managed='no'/></interface>`
-  * Kubevirt still hasn’t fully managed to drop `CAP_NET_ADMIN`
-    though
-  * References: [RHEL precreated TAP bug][], [libvirt precreated TAP
-    patches][], [KubeVirt precreated TAP PR][], [KubeVirt NET_ADMIN
-    issue][], [KubeVirt NET_ADMIN issue][]
-
-[KubeVirt CPU pinning PR]: https://github.com/kubevirt/kubevirt/pull/1381
-[KubeVirt CPU pinning workaround PR]: https://github.com/kubevirt/kubevirt/pull/1648
-[KubeVirt NET_ADMIN PR]: https://github.com/kubevirt/kubevirt/pull/3290
-[KubeVirt NET_ADMIN issue]: https://github.com/kubevirt/kubevirt/issues/3085
-[KubeVirt SELinux policy]: https://github.com/kubevirt/kubevirt/blob/master/cmd/virt-handler/virt_launcher.cil
-[KubeVirt VMI.getMemlockSize]: https://github.com/kubevirt/kubevirt/blob/f5ffba5f84365155c81d0e2cda4aa709da062230/pkg/virt-handler/isolation/isolation.go#L206
-[KubeVirt memfd issue]: https://github.com/kubevirt/kubevirt/issues/3781
-[KubeVirt memlock PR]: https://github.com/kubevirt/kubevirt/pull/2584
-[KubeVirt multiqueue workaround]: https://github.com/kubevirt/kubevirt/pull/2941/commits/bc55cb916003c54f6cbf329112a4e36d0d874836
-[KubeVirt precreated TAP PR]: https://github.com/kubevirt/kubevirt/pull/2837
-[KubeVirt virtiofs PR]: https://github.com/kubevirt/kubevirt/pull/3493
-[RHEL CPU pinning bug]: https://bugzilla.redhat.com/show_bug.cgi?id=1819801
-[RHEL precreated TAP bug]: https://bugzilla.redhat.com/show_bug.cgi?id=1723367
-[RHEL virtiofs bug]: https://bugzilla.redhat.com/show_bug.cgi?id=1854595
-[libvir-list memlock thread]: https://www.redhat.com/archives/libvirt-users/2019-August/msg00046.html
-[libvirt memoryBacking docs]: https://libvirt.org/formatdomain.html#elementsMemoryBacking
-[libvirt precreated TAP patches]: https://www.redhat.com/archives/libvir-list/2019-August/msg01256.html
-[libvirt qemuDomainGetMemLockLimitBytes]: https://gitlab.com/libvirt/libvirt/-/blob/84bb5fd1ab2bce88e508d416f4bcea520c803ea8/src/qemu/qemu_domain.c#L8712
+Paolo
 
 
