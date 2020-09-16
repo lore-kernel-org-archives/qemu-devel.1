@@ -7,31 +7,30 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFDC9C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:42:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2BF6C43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:42:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97C2D20872
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:42:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4759620872
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:42:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NhjTiCUv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97C2D20872
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KOj2K+21"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4759620872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIT1Q-0003Sn-Ln
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 04:42:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34566)
+	id 1kIT1h-0003wV-Dv
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 04:42:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34564)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIT0J-00028Q-A3
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIT0J-00027y-22
  for qemu-devel@nongnu.org; Wed, 16 Sep 2020 04:41:27 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43869
- helo=us-smtp-delivery-1.mimecast.com)
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36808)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIT0H-0007cy-Kk
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIT0H-0007cw-6D
  for qemu-devel@nongnu.org; Wed, 16 Sep 2020 04:41:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1600245684;
@@ -39,31 +38,31 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/N1RtEVHhfKvdVUQ4ybw9x1AsoKfn07Qb3S13HMz1mM=;
- b=NhjTiCUvXUKFqYxJQu9uvoUXLAOxpsdgp5Di5gtipN9RyVLFP6psJxFJOg5Bek7Do4XQuH
- GW/fH9sTY8MXuNlrXtR6Li5fmaDaHewcQ8FpIUmXcBQSWSUgSnAmHjiigLD87r/3ldgFHB
- irCQ9k8szPrLCdPEHb38mnnDzH419fQ=
+ bh=N+FjKg8oo5cNEfttX5NKNmNNbXL3EFFNgq297qDRIYU=;
+ b=KOj2K+21sxi5kusyoTe7MEn/gncKHVZx+JU2d3Jj8ve9018FoF6zvChMwl3yjMWWczD29y
+ +GYlQdlfpWwkIBEo9mnCYjAJHdwF4aXiwzHQTv4aSnpdE0g2lJL9HXApAQpM0xu6A6HRHT
+ wvwiQPMSxfedtlHz+hVVrtmmP+Akrz8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-555-rIXJOjvTNRS-4sHSpD_cJA-1; Wed, 16 Sep 2020 04:41:22 -0400
-X-MC-Unique: rIXJOjvTNRS-4sHSpD_cJA-1
+ us-mta-232-VUWi8bJLMtq-QlIQ-VdhyQ-1; Wed, 16 Sep 2020 04:41:22 -0400
+X-MC-Unique: VUWi8bJLMtq-QlIQ-VdhyQ-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B629280733A
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C831D10A7AE2
  for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 08:41:21 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
  [10.36.112.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 734CE610F3;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7029660CCC;
  Wed, 16 Sep 2020 08:41:18 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 9DA299D78; Wed, 16 Sep 2020 10:41:17 +0200 (CEST)
+ id 94EB69D77; Wed, 16 Sep 2020 10:41:17 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] audio: build spiceaudio as module
-Date: Wed, 16 Sep 2020 10:41:17 +0200
-Message-Id: <20200916084117.21828-3-kraxel@redhat.com>
+Subject: [PATCH 1/2] audio: remove qemu_spice_audio_init()
+Date: Wed, 16 Sep 2020 10:41:16 +0200
+Message-Id: <20200916084117.21828-2-kraxel@redhat.com>
 In-Reply-To: <20200916084117.21828-1-kraxel@redhat.com>
 References: <20200916084117.21828-1-kraxel@redhat.com>
 MIME-Version: 1.0
@@ -74,17 +73,17 @@ X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:41:36
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:35:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
 X-Spam_bar: -----
 X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,33 +101,93 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Handle the spice special case in audio_init instead.
+
+With the qemu_spice_audio_init() symbol dependency being
+gone we can build spiceaudio as module.
+
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- audio/meson.build | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/ui/qemu-spice.h |  1 -
+ audio/audio.c           | 16 ++++++++++++++++
+ audio/spiceaudio.c      |  5 -----
+ ui/spice-core.c         |  1 -
+ 4 files changed, 16 insertions(+), 7 deletions(-)
 
-diff --git a/audio/meson.build b/audio/meson.build
-index 15c06ba0453b..18a831129ed0 100644
---- a/audio/meson.build
-+++ b/audio/meson.build
-@@ -7,7 +7,6 @@ softmmu_ss.add(files(
-   'wavcapture.c',
- ))
+diff --git a/include/ui/qemu-spice.h b/include/ui/qemu-spice.h
+index 8c23dfe71797..12474d88f40e 100644
+--- a/include/ui/qemu-spice.h
++++ b/include/ui/qemu-spice.h
+@@ -29,7 +29,6 @@ extern int using_spice;
  
--softmmu_ss.add(when: [spice, 'CONFIG_SPICE'], if_true: files('spiceaudio.c'))
- softmmu_ss.add(when: [coreaudio, 'CONFIG_AUDIO_COREAUDIO'], if_true: files('coreaudio.c'))
- softmmu_ss.add(when: [dsound, 'CONFIG_AUDIO_DSOUND'], if_true: files('dsoundaudio.c'))
- softmmu_ss.add(when: ['CONFIG_AUDIO_WIN_INT'], if_true: files('audio_win_int.c'))
-@@ -18,7 +17,8 @@ foreach m : [
-   ['CONFIG_AUDIO_OSS', 'oss', oss, 'ossaudio.c'],
-   ['CONFIG_AUDIO_PA', 'pa', pulse, 'paaudio.c'],
-   ['CONFIG_AUDIO_SDL', 'sdl', sdl, 'sdlaudio.c'],
--  ['CONFIG_AUDIO_JACK', 'jack', jack, 'jackaudio.c']
-+  ['CONFIG_AUDIO_JACK', 'jack', jack, 'jackaudio.c'],
-+  ['CONFIG_SPICE', 'spice', spice, 'spiceaudio.c']
- ]
-   if config_host.has_key(m[0])
-     module_ss = ss.source_set()
+ void qemu_spice_init(void);
+ void qemu_spice_input_init(void);
+-void qemu_spice_audio_init(void);
+ void qemu_spice_display_init(void);
+ int qemu_spice_display_add_client(int csock, int skipauth, int tls);
+ int qemu_spice_add_interface(SpiceBaseInstance *sin);
+diff --git a/audio/audio.c b/audio/audio.c
+index ce8c6dec5f47..76cdba0943d1 100644
+--- a/audio/audio.c
++++ b/audio/audio.c
+@@ -34,6 +34,7 @@
+ #include "qemu/module.h"
+ #include "sysemu/replay.h"
+ #include "sysemu/runstate.h"
++#include "ui/qemu-spice.h"
+ #include "trace.h"
+ 
+ #define AUDIO_CAP "audio"
+@@ -1658,6 +1659,21 @@ static AudioState *audio_init(Audiodev *dev, const char *name)
+     /* silence gcc warning about uninitialized variable */
+     AudiodevListHead head = QSIMPLEQ_HEAD_INITIALIZER(head);
+ 
++    if (using_spice) {
++        /*
++         * When using spice allow the spice audio driver being picked
++         * as default.
++         *
++         * Temporary hack.  Using audio devices without explicit
++         * audiodev= property is already deprecated.  Same goes for
++         * the -soundhw switch.  Once this support gets finally
++         * removed we can also drop the concept of a default audio
++         * backend and this can go away.
++         */
++        driver = audio_driver_lookup("spice");
++        driver->can_be_default = 1;
++    }
++
+     if (dev) {
+         /* -audiodev option */
+         legacy_config = false;
+diff --git a/audio/spiceaudio.c b/audio/spiceaudio.c
+index b6b5da4812f2..aae420cff997 100644
+--- a/audio/spiceaudio.c
++++ b/audio/spiceaudio.c
+@@ -310,11 +310,6 @@ static struct audio_driver spice_audio_driver = {
+     .voice_size_in  = sizeof (SpiceVoiceIn),
+ };
+ 
+-void qemu_spice_audio_init (void)
+-{
+-    spice_audio_driver.can_be_default = 1;
+-}
+-
+ static void register_audio_spice(void)
+ {
+     audio_driver_register(&spice_audio_driver);
+diff --git a/ui/spice-core.c b/ui/spice-core.c
+index ecc2ec2c55c2..10aa309f78f7 100644
+--- a/ui/spice-core.c
++++ b/ui/spice-core.c
+@@ -804,7 +804,6 @@ void qemu_spice_init(void)
+     qemu_spice_add_interface(&spice_migrate.base);
+ 
+     qemu_spice_input_init();
+-    qemu_spice_audio_init();
+ 
+     qemu_add_vm_change_state_handler(vm_change_state_handler, NULL);
+     qemu_spice_display_stop();
 -- 
 2.27.0
 
