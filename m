@@ -1,4 +1,4 @@
-Return-Path: <SRS0=sZ46=CY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -6,62 +6,64 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4423C2D0E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 23:51:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D502C43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 00:26:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51BED2078D
-	for <qemu-devel@archiver.kernel.org>; Tue, 15 Sep 2020 23:51:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51BED2078D
+	by mail.kernel.org (Postfix) with ESMTPS id 517F22076B
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 00:26:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 517F22076B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIKjm-0001BA-58
-	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 19:51:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44482)
+	id 1kILHi-0001em-0T
+	for qemu-devel@archiver.kernel.org; Tue, 15 Sep 2020 20:26:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50588)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIKig-0000d3-Hq
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 19:50:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38158)
+ id 1kILGY-0001BJ-Lw
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 20:25:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43666)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIKid-0002iO-9d
- for qemu-devel@nongnu.org; Tue, 15 Sep 2020 19:50:41 -0400
+ id 1kILGW-0006np-Fx
+ for qemu-devel@nongnu.org; Tue, 15 Sep 2020 20:25:42 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kIKib-0003We-3i
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 23:50:37 +0000
+ id 1kILGR-0006x4-PO
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 00:25:35 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id EA0842E8078
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 23:50:36 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id B37822E8075
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 00:25:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 15 Sep 2020 23:44:29 -0000
-From: Paul Zimmerman <1892604@bugs.launchpad.net>
+Date: Wed, 16 Sep 2020 00:19:51 -0000
+From: Nick Bauer <1894869@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=debian; sourcepackage=None; component=None;
+ status=In Progress; importance=Unknown; assignee=None; 
+X-Launchpad-Bug-Tags: chelsio t4
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: brendandg pauldzim petunia2000 pmaydell
-X-Launchpad-Bug-Reporter: Brendan Dolan-Gavitt (brendandg)
-X-Launchpad-Bug-Modifier: Paul Zimmerman (pauldzim)
-References: <159814309088.988.14645850566795174578.malonedeb@wampee.canonical.com>
-Message-Id: <160021346917.21601.6151223364578022486.malone@wampee.canonical.com>
-Subject: [Bug 1892604] Re: qemu-system-arm: ../hw/usb/hcd-dwc2.c:666:
- dwc2_glbreg_read: Assertion `addr <= GINTSTS2' failed.
+X-Launchpad-Bug-Commenters: 1butteryadmin alex-l-williamson stefan-proxmox
+X-Launchpad-Bug-Reporter: Nick Bauer (1butteryadmin)
+X-Launchpad-Bug-Modifier: Nick Bauer (1butteryadmin)
+References: <159958042175.17914.10047848067927369523.malonedeb@soybean.canonical.com>
+Message-Id: <160021559131.14245.15334349735713405251.malone@gac.canonical.com>
+Subject: [Bug 1894869] Re: Chelsio T4 has old MSIX PBA offset bug
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: 2b9b9081fae824273c3056efa202a08e747796a3
+X-Launchpad-Hash: 6e11858917e049317bce06bc2bff2589242741df
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/15 19:50:37
@@ -84,75 +86,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1892604 <1892604@bugs.launchpad.net>
+Reply-To: Bug 1894869 <1894869@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hmm, that's odd. I will try to reproduce this.
+I was able to boot a VM with just the functions of the device with the
+ethernet controller function ID added as PCI devices. Something I
+noticed while adding in those devices though is that all of the others
+have a description associated with them in Proxmox, but the one that's
+causing the boot to fail doesn't. I attached a picture of the menu,
+81:00.7 has no functions associated with it. So it seems like it just
+doesn't have any function at all? Unless it benefits QEMU to know
+whether turning SR-IOV on for these cards fixes the problem, I don't
+think I'm going to go through the process of turning  it on, since the
+process looks terrible. Thank you for your help.
+
+** Attachment added: "no 7th.JPG"
+   https://bugs.launchpad.net/qemu/+bug/1894869/+attachment/5411172/+files/=
+no%207th.JPG
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1892604
+https://bugs.launchpad.net/bugs/1894869
 
 Title:
-  qemu-system-arm: ../hw/usb/hcd-dwc2.c:666: dwc2_glbreg_read: Assertion
-  `addr <=3D GINTSTS2' failed.
+  Chelsio T4 has old MSIX PBA offset bug
 
 Status in QEMU:
   New
+Status in Debian:
+  In Progress
 
 Bug description:
-  When trying to run the 2016-05-27 Raspbian image on the emulated
-  raspi2 platform, the system boots but shortly after the login prompt
-  QEMU (master; commit ID ca489cd037e4d50dc6c40570a167504ad7e5a521) dies
-  with:
+  There exists a bug with Chelsio NICs T4 that causes the following
+  error:
 
-  qemu-system-arm: ../hw/usb/hcd-dwc2.c:666: dwc2_glbreg_read: Assertion
-  `addr <=3D GINTSTS2' failed.
+  kvm: -device vfio-
+  pci,host=3D0000:83:00.7,id=3Dhostpci1.7,bus=3Dpci.0,addr=3D0x11.7: vfio
+  0000:83:00.7: hardware reports invalid configuration, MSIX PBA outside
+  of specified BAR
 
-  Steps to reproduce:
+  I discovered this bug on a Proxmox system, and I was working with a
+  downstream Proxmox developer to try to fix this issue. They provided
+  me with the following change to make from line 1484 of hw/vfio/pci.c:
 
-  1. Get the image: wget
-  http://downloads.raspberrypi.org/raspbian/images/raspbian-2016-05-31/2016=
--05-27
-  -raspbian-jessie.zip
+  static void vfio_msix_early_setup(VFIOPCIDevice *vdev, Error **errp)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* is 0x1000, =
+so we hard code that here.
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*/
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (vdev->vendor_id=
+ =3D=3D PCI_VENDOR_ID_CHELSIO &&
+  -            (vdev->device_id & 0xff00) =3D=3D 0x5800) {
+  +            ((vdev->device_id & 0xff00) =3D=3D 0x5800 ||
+  +             (vdev->device_id & 0xff00) =3D=3D 0x1425)) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0msix->pba_offset =3D 0x1000;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else if (vdev->ms=
+ix_relo =3D=3D OFF_AUTOPCIBAR_OFF) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0error_setg(errp, "hardware reports invalid configuration, "
 
-  2. Extract the kernel image and DTB:
-
-  sudo losetup -f --show -P 2016-05-27-raspbian-jessie.img
-  sudo mkdir /mnt/rpi
-  sudo mount /dev/loop11p1 /mnt/rpi/
-  cp /mnt/rpi/kernel7.img .                                                =
-                                                                           =
-                                                                           =
-                                                                   =
-
-  cp /mnt/rpi/bcm2709-rpi-2-b.dtb .                                        =
-                                                                           =
-                                                                           =
-                                                                   =
-
-  sudo umount /mnt/rpi =
-
-  sudo losetup -d /dev/loop11 =
-
-
-  3. Run QEMU:
-  qemu-system-arm -M raspi2 -m 1G -dtb bcm2709-rpi-2-b.dtb -kernel kernel7.=
-img -append "rw earlyprintk loglevel=3D8 console=3DttyAMA0,115200 dwc_otg.l=
-pm_enable=3D0 root=3D/dev/mmcblk0p2" -sd 2016-05-27-raspbian-jessie.img -sm=
-p 4 -serial stdio -display none
-
-  A few seconds after the login prompt is displayed, QEMU will exit with
-  the assertion failure.
-
-  I also tried changing all of the asserts to if statements that (for
-  MMIO reads) returned 0 and (for writes) just returned, but this
-  resulted in a non-responsive system.
+  However, I found that this did not fix the issue, so the bug appears
+  to work differently than the one that was present on the T5 NICs which
+  has already been patched. I have attached the output of my lspci
+  -nnkvv
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1892604/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1894869/+subscriptions
 
