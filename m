@@ -2,67 +2,98 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DATE_IN_PAST_03_06,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17B2CC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:33:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 936CBC43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:34:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D57A206DC
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:33:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C729206DC
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 08:34:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="hj0KQ0Yx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D57A206DC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BwZec3o0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C729206DC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kISsy-0001hB-D0
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 04:33:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58644)
+	id 1kIStQ-00025k-6b
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 04:34:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60374)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kISii-0004kE-3R; Wed, 16 Sep 2020 04:23:16 -0400
-Received: from ozlabs.org ([203.11.71.1]:38907)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kISig-0005FH-32; Wed, 16 Sep 2020 04:23:15 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BrtQH728Yz9sTs; Wed, 16 Sep 2020 18:23:03 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1600244583;
- bh=7crGrX784o8VR9fYf+XTvBKCri4oNb6QzGod350j46U=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=hj0KQ0Yx0xPvzTVcsA0v5kRXiOJPNnOQcL1/vt1t9D8zAYVCwB009kN43+TUx1Rs0
- SpiIy0Vm4mPlMhAXy5IeXjNYXczhsQuaSaETZ7hm7nrJCYyMDbTZUVbvmAkbkW2hZd
- Mqih3hxCsshwLM9HYe541RZnWXvWFeag2Oq6HuHQ=
-Date: Wed, 16 Sep 2020 12:50:22 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH] hw/rtc/m48t59: Simplify m48t59_init()
-Message-ID: <20200916025022.GE5258@yekko.fritz.box>
-References: <20200914102425.1152962-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kISqo-0007aS-Fi
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 04:31:38 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38073)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kISql-0006WR-MA
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 04:31:38 -0400
+Received: by mail-wm1-x341.google.com with SMTP id l9so2027050wme.3
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 01:31:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=ipHoX8sk+0gkq6DGf5VUYKL9RMBkt8r9GNgCJyicNoE=;
+ b=BwZec3o0IhxLmTO5X/RY62JNJvipEmRXZ7OBGP9+ClrIXoL2XQSy9u0/DRz3RPcFLY
+ 7/Feu+HgbTnA7fil+lsZAgZRRI51Btwg6Q85s0xA+z3/4ILF1+//BXM810OxFZFCGDcr
+ vX3YKo3/nJkmsG6zEL7ED3XC6SJ3HmbJYzOIKeZbqxjiRK+dNkFvh5bwd6pLK2pn6C/O
+ ETGzShfw2y9J1jG+XVZ2LTXTNLrow/RlWU9fEMlikps3Ssg1t5lohKpgpMz/RqMDdtl7
+ UggAPiLoaCGFro8M1fYkj6ZPHpjfEDF9xWvc0imH26yhYnyY0XFkSL+shS0nOBOoPrZv
+ FH9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=ipHoX8sk+0gkq6DGf5VUYKL9RMBkt8r9GNgCJyicNoE=;
+ b=MdbnFWqop5OGPvZPy91OzFlbvMBQM9taSGP9/xU48G+9vu4MWfxku8ycmbJwLleVCC
+ l52l8K01tOflG/5F2HWRgBG5n+LQWGDicpHuxh1ily181qsJBlhZn9PIOFO163nCKNuc
+ MDBghGM3pnU7/8zPFmDKWM/lhQyqgdakIsWvzJE2YLmsNNJvlKzRNdRTR0+XzFZvj2D0
+ qjfRF3lgOCtkJXGqQLQ2GdfBSEDr76oeh2Na9Cl0WlcVsLRxAsvcRyjHOyZU4CBX1Sih
+ Nlh6mwma7+0PVizaDtZNkHwQcrrFTEpNuZVHpBW1JPDkG2qFuqY0f3jRD2zRTLoomLkF
+ t5ig==
+X-Gm-Message-State: AOAM5306GrHYvYdA/ufqsbpEOv4dKJvyLi41HLnZBS62TTxxSepfG6DJ
+ 2D/Eodl344rROI7rtTlChS8P+Q==
+X-Google-Smtp-Source: ABdhPJwTX8OjyeA3cL9DHaukfHm+uIc9G0yE/VOy0Zld++BtkzAGKxvbxlPEh8cYpUoHke/qlq6o8g==
+X-Received: by 2002:a1c:b703:: with SMTP id h3mr3313508wmf.131.1600245093792; 
+ Wed, 16 Sep 2020 01:31:33 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id p3sm3802418wmm.40.2020.09.16.01.31.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 16 Sep 2020 01:31:32 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 01D531FF7E;
+ Wed, 16 Sep 2020 09:31:32 +0100 (BST)
+References: <20200828104102.4490-1-ahmedkhaledkaraman@gmail.com>
+ <20200828104102.4490-8-ahmedkhaledkaraman@gmail.com>
+ <87zh6848e2.fsf@linaro.org>
+ <CAHiYmc4_NkSxHJQSYDATPM5MnatO_PD3-MSGsLrQ2+HywsgAfw@mail.gmail.com>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Subject: Re: [PATCH 7/9] tests/performance: Add nightly tests
+In-reply-to: <CAHiYmc4_NkSxHJQSYDATPM5MnatO_PD3-MSGsLrQ2+HywsgAfw@mail.gmail.com>
+Date: Wed, 16 Sep 2020 09:31:31 +0100
+Message-ID: <87zh5qyvfg.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="pY3vCvL1qV+PayAL"
-Content-Disposition: inline
-In-Reply-To: <20200914102425.1152962-1-f4bug@amsat.org>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 04:23:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -1
-X-Spam_score: -0.2
-X-Spam_bar: /
-X-Spam_report: (-0.2 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_03_06=1.592,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,150 +106,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- qemu-devel@nongnu.org,
- =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
- qemu-ppc@nongnu.org, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: "ldoktor@redhat.com" <ldoktor@redhat.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "philmd@redhat.com" <philmd@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Ahmed Karaman <ahmedkhaledkaraman@gmail.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>, "crosa@redhat.com" <crosa@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---pY3vCvL1qV+PayAL
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> writes:
 
-On Mon, Sep 14, 2020 at 12:24:25PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> As the 'io_base' argument of m48t59_init() is unused (set to 0),
-> remove it to simplify.
-> To create a device on the ISA bus, m48t59_init_isa() is the
-> preferred function to use.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
->  include/hw/rtc/m48t59.h |  2 +-
->  hw/ppc/ppc405_boards.c  |  2 +-
->  hw/rtc/m48t59.c         | 10 ++--------
->  hw/sparc/sun4m.c        |  2 +-
->  hw/sparc64/sun4u.c      |  2 +-
->  5 files changed, 6 insertions(+), 12 deletions(-)
+> On Wednesday, September 2, 2020, Alex Benn=C3=A9e <alex.bennee@linaro.org=
+> wrote:
+>
+>>
+>> Ahmed Karaman <ahmedkhaledkaraman@gmail.com> writes:
+>>
+>> > A nightly performance testing system to monitor any change in QEMU
+>> > performance across seventeen different targets.
+>> >
+>> > The system includes eight different benchmarks to provide a variety
+>> > of testing workloads.
+>> >
+>> > dijkstra_double:
+>> > Find the shortest path between the source node and all other nodes
+>> > using Dijkstra=E2=80=99s algorithm. The graph contains n nodes where a=
+ll nxn
+>> > distances are double values. The value of n can be specified using
+>> > the -n flag. The default value is 2000.
+>> >
+>> > dijkstra_int32:
+>> > Find the shortest path between the source node and all other nodes
+>> > using Dijkstra=E2=80=99s algorithm. The graph contains n nodes where a=
+ll nxn
+>> > distances are int32 values. The value of n can be specified using
+>> > the -n flag. The default value is 2000.
+>> >
+>> > matmult_double:
+>> > Standard matrix multiplication of an n*n matrix of randomly generated
+>> > double numbers from 0 to 100. The value of n is passed as an argument
+>> > with the -n flag. The default value is 200.
+>> >
+>> > matmult_int32:
+>> > Standard matrix multiplication of an n*n matrix of randomly generated
+>> > integer numbers from 0 to 100. The value of n is passed as an
+>> > argument with the -n flag. The default value is 200.
+>> >
+>> > qsort_double:
+>> > Quick sort of an array of n randomly generated double numbers from 0
+>> > to 1000. The value of n is passed as an argument with the -n flag.
+>> > The default value is 300000.
+>> >
+>> > qsort_int32:
+>> > Quick sort of an array of n randomly generated integer numbers from 0
+>> > to 50000000. The value of n is passed as an argument with the -n
+>> > flag.The default value is 300000.
+>> >
+>> > qsort_string:
+>> > Quick sort of an array of 10000 randomly generated strings of size 8
+>> > (including null terminating character). The sort process is repeated
+>> > n number of times. The value of n is passed as an argument with the
+>> > -n flag. The default value is 20.
+>> >
+>> > search_string:
+>> > Search for the occurrence of a small string in a much larger random
+>> > string (=E2=80=9Cneedle in a hay=E2=80=9D). The search process is repe=
+ated n number
+>> > of times and each time, a different large random string (=E2=80=9Chay=
+=E2=80=9D) is
+>> > generated. The value of n can be specified using the -n flag. The
+>> > default value is 20.
+>> >
+>> > Syntax:
+>> >     nightly_tests_core.py [-h] [-r REF]
+>> >     Optional arguments:
+>> >         -h, --help            Show this help message and exit
+>> >         -r REF, --reference REF
+>> >                         Reference QEMU version - Default is v5.1.0
+>> >     Example of usage:
+>> >         nightly_tests_core.py -r v5.1.0 2>log.txt
+>> >
+>> > The following report includes detailed setup and execution details
+>> > of the system:
+>> > https://ahmedkrmn.github.io/TCG-Continuous-Benchmarking/
+>> QEMU-Nightly-Performance-Tests/
+>> >
+>> > Signed-off-by: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+>> > ---
+>> >  tests/performance/nightly-tests/README.md     | 243 +++++
+>> >  .../source/dijkstra_double/dijkstra_double.c  | 194 ++++
+>> >  .../source/dijkstra_int32/dijkstra_int32.c    | 192 ++++
+>> >  .../source/matmult_double/matmult_double.c    | 123 +++
+>> >  .../source/matmult_int32/matmult_int32.c      | 121 +++
+>> >  .../source/qsort_double/qsort_double.c        | 104 ++
+>> >  .../source/qsort_int32/qsort_int32.c          | 103 ++
+>> >  .../source/qsort_string/qsort_string.c        | 122 +++
+>> >  .../source/search_string/search_string.c      | 110 +++
+>> >  .../scripts/nightly_tests_core.py             | 920 ++++++++++++++++++
+>> >  .../scripts/run_nightly_tests.py              | 135 +++
+>> >  .../nightly-tests/scripts/send_email.py       |  56 ++
+>> >  12 files changed, 2423 insertions(+)
+>> >  create mode 100644 tests/performance/nightly-tests/README.md
+>> >  create mode 100644 tests/performance/nightly-tests/benchmarks/source/
+>> dijkstra_double/dijkstra_double.c
+>> >  create mode 100644 tests/performance/nightly-tests/benchmarks/source/
+>> dijkstra_int32/dijkstra_int32.c
+>> >  create mode 100644 tests/performance/nightly-tests/benchmarks/source/
+>> matmult_double/matmult_double.c
+>> >  create mode 100644 tests/performance/nightly-tests/benchmarks/source/
+>> matmult_int32/matmult_int32.c
+>> >  create mode 100644 tests/performance/nightly-
+>> tests/benchmarks/source/qsort_double/qsort_double.c
+>> >  create mode 100644 tests/performance/nightly-
+>> tests/benchmarks/source/qsort_int32/qsort_int32.c
+>> >  create mode 100644 tests/performance/nightly-
+>> tests/benchmarks/source/qsort_string/qsort_string.c
+>> >  create mode 100644
+>> > tests/performance/nightly-tests/benchmarks/source/
+>> search_string/search_string.c
+>>
+>> Perhaps we could compress these paths down to:
+>>
+>>   tests/tcg/benchmarks/foo.c
+>>   tests/tcg/benchmarks/bar.c
+>>
+>> and then we can also ensure they are built using the existing TCG tests
+>> cross compile framework.
+>>
+>>
+> Hi,
+>
+> May I just bring some alternative views on this topic of
+> benchmarks/multiple cross-compiling/nightly tests?
+>
+> Having a known source code of any benchmark (and also license-compatible
+> with QEMU) is, for sure, a good thing. However, for actual test execution,
+> source code is not relevant, but the executables built for a diverse set =
+of
+> targets. Expectation that a test bed should be able to build let's say 17
+> version for each benchmark is a tall order - and, in fact, unnecessary
+> self-imposed limitation.
+>
+> My suggestion is that 17x8 executables needed for nightly tests in its
+> current form should be prebuilt - and kept permanently in a separate
+> repository (just not to burden QEMU repository). They are anyway built on=
+ly
+> once, there is no need to update them at all.
+>
+> This will allow nightly test execution on any system that can execute qem=
+u,
+> without any prerequisite for cross-compiling.
+>
+> Their source code could and should be integrated into QEMU tree, at the
+> place of choice, but the test beds should not be subject to any burden of
+> cross-compiling, simply because there is no need for that.
 
-ppc part
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
->=20
-> diff --git a/include/hw/rtc/m48t59.h b/include/hw/rtc/m48t59.h
-> index 04abedf3b2b..62297ee0db1 100644
-> --- a/include/hw/rtc/m48t59.h
-> +++ b/include/hw/rtc/m48t59.h
-> @@ -50,7 +50,7 @@ struct NvramClass {
->  Nvram *m48t59_init_isa(ISABus *bus, uint32_t io_base, uint16_t size,
->                         int base_year, int type);
->  Nvram *m48t59_init(qemu_irq IRQ, hwaddr mem_base,
-> -                   uint32_t io_base, uint16_t size, int base_year,
-> +                   uint16_t size, int base_year,
->                     int type);
-> =20
->  #endif /* HW_M48T59_H */
-> diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-> index 6198ec1035b..93ffee801a3 100644
-> --- a/hw/ppc/ppc405_boards.c
-> +++ b/hw/ppc/ppc405_boards.c
-> @@ -227,7 +227,7 @@ static void ref405ep_init(MachineState *machine)
->      /* Register FPGA */
->      ref405ep_fpga_init(sysmem, 0xF0300000);
->      /* Register NVRAM */
-> -    m48t59_init(NULL, 0xF0000000, 0, 8192, 1968, 8);
-> +    m48t59_init(NULL, 0xF0000000, 8192, 1968, 8);
->      /* Load kernel */
->      linux_boot =3D (kernel_filename !=3D NULL);
->      if (linux_boot) {
-> diff --git a/hw/rtc/m48t59.c b/hw/rtc/m48t59.c
-> index 6525206976b..2d6a095c4e4 100644
-> --- a/hw/rtc/m48t59.c
-> +++ b/hw/rtc/m48t59.c
-> @@ -566,7 +566,7 @@ const MemoryRegionOps m48t59_io_ops =3D {
-> =20
->  /* Initialisation routine */
->  Nvram *m48t59_init(qemu_irq IRQ, hwaddr mem_base,
-> -                   uint32_t io_base, uint16_t size, int base_year,
-> +                   uint16_t size, int base_year,
->                     int model)
->  {
->      DeviceState *dev;
-> @@ -584,13 +584,7 @@ Nvram *m48t59_init(qemu_irq IRQ, hwaddr mem_base,
->          s =3D SYS_BUS_DEVICE(dev);
->          sysbus_realize_and_unref(s, &error_fatal);
->          sysbus_connect_irq(s, 0, IRQ);
-> -        if (io_base !=3D 0) {
-> -            memory_region_add_subregion(get_system_io(), io_base,
-> -                                        sysbus_mmio_get_region(s, 1));
-> -        }
-> -        if (mem_base !=3D 0) {
-> -            sysbus_mmio_map(s, 0, mem_base);
-> -        }
-> +        sysbus_mmio_map(s, 0, mem_base);
-> =20
->          return NVRAM(s);
->      }
-> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-> index 947b69d1597..56a0d38f274 100644
-> --- a/hw/sparc/sun4m.c
-> +++ b/hw/sparc/sun4m.c
-> @@ -970,7 +970,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef *h=
-wdef,
->          create_unimplemented_device("SUNW,sx", hwdef->sx_base, 0x2000);
->      }
-> =20
-> -    nvram =3D m48t59_init(slavio_irq[0], hwdef->nvram_base, 0, 0x2000, 1=
-968, 8);
-> +    nvram =3D m48t59_init(slavio_irq[0], hwdef->nvram_base, 0x2000, 1968=
-, 8);
-> =20
->      slavio_timer_init_all(hwdef->counter_base, slavio_irq[19], slavio_cp=
-u_irq, smp_cpus);
-> =20
-> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> index b4aabfc076f..1cc57b030a7 100644
-> --- a/hw/sparc64/sun4u.c
-> +++ b/hw/sparc64/sun4u.c
-> @@ -675,7 +675,7 @@ static void sun4uv_init(MemoryRegion *address_space_m=
-em,
->      pci_ide_create_devs(pci_dev);
-> =20
->      /* Map NVRAM into I/O (ebus) space */
-> -    nvram =3D m48t59_init(NULL, 0, 0, NVRAM_SIZE, 1968, 59);
-> +    nvram =3D m48t59_init(NULL, 0, NVRAM_SIZE, 1968, 59);
->      s =3D SYS_BUS_DEVICE(nvram);
->      memory_region_add_subregion(pci_address_space_io(ebus), 0x2000,
->                                  sysbus_mmio_get_region(s, 0));
+I have no problem with the test binaries being stored somewhere and
+accessed when needed - as long as we have a source build-able version in
+the tree. It would seem silly not to at least integrate the build for
+the 19 different cross compilers we already support for the check-tcg
+tests.
+
+I'm not proposing we run them every test either, but at least have the
+option to do:
+
+  make build-tcg-benchmark
+  make run-tcg-benchmark
+
+so it's easy for a developer to get to a state when they can tinker and
+debug.
+
+
+>
+> Yours,
+> Aleksandar
+>
+>
+>
+>
+>> >  create mode 100755 tests/performance/nightly-
+>> tests/scripts/nightly_tests_core.py
+>> >  create mode 100755 tests/performance/nightly-tests/scripts/run_nightl=
+y_
+>> tests.py
+>> >  create mode 100644 tests/performance/nightly-
+>> tests/scripts/send_email.py
+>> >
+>> > diff --git a/tests/performance/nightly-tests/README.md
+>> b/tests/performance/nightly-tests/README.md
+>> > new file mode 100644
+>> > index 0000000000..6db3b351b3
+>> > --- /dev/null
+>> > +++ b/tests/performance/nightly-tests/README.md
+>> > @@ -0,0 +1,243 @@
+>> > +### QEMU Nightly Tests
+>> > +
+>> > +**Required settings:**
+>> > +
+>> > +Update the `GMAIL_USER` object in `send_email.py` with your credentia=
+ls.
+>> > +
+>> > +For more details on how the system works, please check the [eighth
+>> > report](https://ahmedkrmn.github.io/TCG-Continuous-
+>> Benchmarking/QEMU-Nightly-Performance-Tests/)
+>> > of the "TCG Continuos Benchmarking" series.
+>>
+>> As external URLs are potentially unstable I think we want to distil the
+>> details into a rst do in docs/devel/
+>>
+>> <snip>
+>>
+>> --
+>> Alex Benn=C3=A9e
+>>
+
 
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---pY3vCvL1qV+PayAL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9hfW4ACgkQbDjKyiDZ
-s5IV/BAAjXVTtfVkiyfGVtxJFGfYhd1uOef7EUmCXuB1FRxUwOyHhqgQdHubeXGi
-anlq4rVhM9rR0D9kuRtzMC1ARA6eVrMkYIeikoYdwdXN7rwjyvHMsKEkMQ0s2LB4
-XxA3lVuPSgrF2Fh6/xxM5ay3KCr8DxIR2/cmqV7EIww9eUMc94iNSeOtCGlcwqsG
-XKBA+WOTvnNGIdmIAUbs6rUtLUrq6f3SzD9CMY+kssES5l6g8ES8r1bvyy9+HS4l
-f3EaPhmZxOxnVCOdArUW0P6HHfgJcvBuDB2e9I1IvM6hMciAZXKfS77OW3ivFQko
-rHCRTVSn6dC3An/KqS8d5h3HCLVduhCSs3L59TkXQKjIha7dEwfnbJOeYMkq1csD
-FuDjcSIVAY79orbaGmi/WtSTm8tAnCAhDsHFWrVQ/YDb1DkMsn64JDaIcMwcmoAs
-WgWctM8ESi94R/MwdSZSYJFmrOo9Lob2Y4uoTCwzbj/Gv/mxLdjvD6FgmyyWdK5A
-E9WaBimzjNNY+T8+XoL82KWNEFoqiYKAA7iQarnQPqt1YD0rsQQGL73+C1/vzPaT
-fxMUOlE6HjELYul26sSNo4Bvt8UlZtQpAX9suViTrQR/w1bDW0zHihqsVHME58dJ
-7X/FFtp6fqOwGCaoBln608t0a1t4cNqZxGklXGhW6iDq9kt3iGo=
-=SU0y
------END PGP SIGNATURE-----
-
---pY3vCvL1qV+PayAL--
+Alex Benn=C3=A9e
 
