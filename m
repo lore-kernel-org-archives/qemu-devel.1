@@ -2,102 +2,86 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D1DAC43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 15:24:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF423C43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 15:26:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC5FA22450
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 15:24:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B047223E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 15:26:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZKbMCPjP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC5FA22450
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gGvloTBK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B047223E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIZIi-0007C0-Od
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 11:24:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33308)
+	id 1kIZKK-0000Qk-3O
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 11:26:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kIZIA-0006mv-P8
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 11:24:18 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52255)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kIZJN-0007xQ-CS
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 11:25:35 -0400
+Received: from mail-ej1-x635.google.com ([2a00:1450:4864:20::635]:40982)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kIZI9-0006Fn-9E
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 11:24:18 -0400
-Received: by mail-wm1-x344.google.com with SMTP id q9so3202912wmj.2
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 08:24:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=20WbA9wOq3ZAuxXbWRa7WibPAeveEVz7aPvxcSQF6Ew=;
- b=ZKbMCPjPiMEAMLiCHhw3WDlbRXD96qMkzlLpIX5fonLfhTDOcDo8f/e5WDyr/SBIQJ
- YeUXYoJg+ETM79NTMiZ593ofVNHwLSBqywXr5XZNvyFzQEbpBDMKWpZnu69fvp4QDSUq
- Gc7Y/Iu9iU1UOiuimzp+HXJix4NlZTNqtIs1rNwdWwmvgk2TjHcaxXqcT55A18JUm2zX
- qqxEiLzCkjz/mJuPKYEGWe6eocQPyDEmMmfOp88CTX1XQWbZGQQ4Y19cSfPV9nuQ0wtw
- 7Z0mOFVaCmQ1VoAQX+GKL2TQqkDfc/w4zOEpKBhNcs/vXDBnx/LXMA2WSPva8mqxtwuo
- nkiA==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kIZJJ-0006WE-S6
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 11:25:33 -0400
+Received: by mail-ej1-x635.google.com with SMTP id lo4so10916226ejb.8
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 08:25:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ppm9q28Vz2KwjW+qPAh6rN14WopKJOI8E/r8dfHdhYU=;
+ b=gGvloTBKXjpP+/vju3Mag60eOr2SblOXeWg86FIaVCQlmotf9aqPkqUsYnyQzh1Nli
+ a9V8j1XBIX1z7mQV3IEbn7iZc7q3s5VFRpK7pi/rQiA0kHNhiyoRjTRGq4ECYdws9k9K
+ xf3lyitBFLs7YI9KJfq/helNkvPdL1haIrsZKjplfEWdGbfv3kfRjyT3Lg8wIyBeP4pD
+ FqMxBWgWaBbKZz4mnsAwHZcDHE+l5VdCYB6qtapNRxpzzPJGDxeCynO0l5VJ+CjQtwIz
+ HSK4nL3BM8JSrUBQyMNvvpbj6qvsucQpdSRTNudNeO762/GJp2VdOwp5T8jKAnlnCa7U
+ E4Hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=20WbA9wOq3ZAuxXbWRa7WibPAeveEVz7aPvxcSQF6Ew=;
- b=TPmcf6O1TZTzMp24ldM3NLZURuK4QZnFauZRARXW3eb7cv7PWPdH93IpFB2cF0bfSG
- tXwGuK4P8FbUwR09jFQXapwL8DL/5eZFnrdDtl1Trjgu4kyC0gLTBErttDBRzr5DeSxA
- AcMd8/OFjEJUS+R1naRuJBzI6ACOWreoxydXuHiKe7Ukroa3n5BUobJ5zfffBOvP8NNS
- zEbqIPcccCx5tu7Sy7dEgbmfGn/N7YgMNXwXKNeNVA8DTHF6ceqIc4N8dRJ8vn2/dDse
- zXgr+oUtEXahBGKY3siYblfjGCpc/AR6O8LwgEMdnUODZcpk85XMjha/vPl4oxCzEX+u
- c1Fg==
-X-Gm-Message-State: AOAM532t3xVWxnD27iG8BJFcsXq9BM5l/2fIMW2i3p/2HcI9jzQUn5sl
- ulVjGfhdit37BhRdYEyDrAY=
-X-Google-Smtp-Source: ABdhPJyL1LIftjItt02WbmfVPuv+1XptMf8sUkMLwAd/8lnSfwl4T3QLZ6ygjtlwzVfkSS98B7yetQ==
-X-Received: by 2002:a7b:ce8d:: with SMTP id q13mr5262981wmj.119.1600269855495; 
- Wed, 16 Sep 2020 08:24:15 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id c4sm33179569wrp.85.2020.09.16.08.24.13
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 16 Sep 2020 08:24:14 -0700 (PDT)
-Subject: Re: [PATCH v8 17/17] accel/tcg: use current_machine as it is always
- set for softmmu
-To: Claudio Fontana <cfontana@suse.de>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>,
- Roman Bolshakov <r.bolshakov@yadro.com>
-References: <20200916142004.27429-1-cfontana@suse.de>
- <20200916142004.27429-18-cfontana@suse.de>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <d2339c8e-ffe4-b774-0b36-7a64c7efa9fb@amsat.org>
-Date: Wed, 16 Sep 2020 17:24:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ppm9q28Vz2KwjW+qPAh6rN14WopKJOI8E/r8dfHdhYU=;
+ b=JehMltIyJ/LEf+u6KM5V2LXq8lUFTyAsW/DXB21WgQjMIhrGsCEAOUaKXDwch2UjLe
+ bxRKIaHWLN2yZy+F8yM6+4lEIb9LF1BpgluSZAb+fn/yDeVOrl9H5FTYP05+m7CgEGj/
+ GsZiY/xw4kHVicwaTYu4zQsDKOyNIVLe5o5FdXSZVbOvW0+FdZSFkBe4d5uvWy6evyXt
+ 8dY/8KTTOlsUNMQ57XYcNRJaig5e8I/IR1THlN6P3U8L+vOTiWi2+h1ucTW5X97T1C5l
+ 6WBuhtaYhP1rZGPku5mv9PY4MwvuldjmtR7SqY7VYjn7ANItXNwIfdWuYp5F8QlKHn96
+ 3weQ==
+X-Gm-Message-State: AOAM533F2M+A7zLYK+i2fbtdYJjN0Dh4D6URTo22YGnoV5zJXimRNYHL
+ USUCbGVRhs/O0AEgA/P6+W07+0RR6zcmhrKRxCadMA==
+X-Google-Smtp-Source: ABdhPJwkF+2CNoyqXpfzmDjRIGcgpRrF+sh01HbGMJGWZR5BTpRjRob4vgHY5JniRyM1PwqZnwethgcbsSQIfv8Syl4=
+X-Received: by 2002:a17:906:24d6:: with SMTP id
+ f22mr25381756ejb.85.1600269927639; 
+ Wed, 16 Sep 2020 08:25:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200916142004.27429-18-cfontana@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+References: <cover.1600166281.git.qemu_oss@crudebyte.com>
+In-Reply-To: <cover.1600166281.git.qemu_oss@crudebyte.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 16 Sep 2020 16:25:16 +0100
+Message-ID: <CAFEAcA-awt=bm0yhk6_My5tcLzwODipYBbVsxVcdKihXiV6Spg@mail.gmail.com>
+Subject: Re: [PULL 0/2] 9p queue
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::635;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x635.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -15
-X-Spam_score: -1.6
-X-Spam_bar: -
-X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.062,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,47 +94,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Alberto Garcia <berto@igalia.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, haxm-team@intel.com,
- Colin Xu <colin.xu@intel.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- Sunil Muthuswamy <sunilmut@microsoft.com>,
- Wenchao Wang <wenchao.wang@intel.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/16/20 4:20 PM, Claudio Fontana wrote:
-> current_machine is always set before accelerators are initialized,
-> so use that instead of MACHINE(qdev_get_machine()).
-> 
-> Signed-off-by: Claudio Fontana <cfontana@suse.de>
-> ---
->  accel/tcg/tcg-cpus.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/accel/tcg/tcg-cpus.c b/accel/tcg/tcg-cpus.c
-> index ec7158b55e..05af1168a2 100644
-> --- a/accel/tcg/tcg-cpus.c
-> +++ b/accel/tcg/tcg-cpus.c
-> @@ -484,7 +484,7 @@ static void tcg_start_vcpu_thread(CPUState *cpu)
->           * then we will have cpus running in parallel.
->           */
->          if (qemu_tcg_mttcg_enabled()) {
-> -            MachineState *ms = MACHINE(qdev_get_machine());
-> +            MachineState *ms = current_machine;
->              if (ms->smp.max_cpus > 1) {
+On Wed, 16 Sep 2020 at 10:20, Christian Schoenebeck
+<qemu_oss@crudebyte.com> wrote:
+>
+> The following changes since commit 2d2c73d0e3d504a61f868e46e6abd5643f38091b:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200914-1' into staging (2020-09-14 16:03:08 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/cschoenebeck/qemu.git tags/pull-9p-20200915
+>
+> for you to fetch changes up to c418f935ac6aed9aa1dc0ceb4b19044a9b7b7968:
+>
+>   9pfs: disable msize warning for synth driver (2020-09-15 12:12:03 +0200)
+>
+> ----------------------------------------------------------------
+> The intention of the following two patches is making users aware about
+> the negative file I/O performance impact when using a very low value
+> for 9P client parameter 'msize', which especially is the case if no
+> 'msize' parameter was supplied by the user with a 9P Linux client at all.
+>
+> All it does is logging a performance warning on host side (once) in
+> that case. By setting 'msize' on client side to any value larger than
+> 8192 the performance warning will disappear.
+>
+> See https://wiki.qemu.org/Documentation/9psetup#msize for details.
+>
+> ----------------------------------------------------------------
 
-What about simply using:
 
-               if (current_machine->smp.max_cpus > 1) {
+Applied, thanks.
 
->                  parallel_cpus = true;
->              }
-> 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
 
-Regardless:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+-- PMM
 
