@@ -2,88 +2,81 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFDC8C433E2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA91CC2BB84
 	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 16:54:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 873B8224D4
+	by mail.kernel.org (Postfix) with ESMTPS id 77C50221F1
 	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 16:54:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RbsZSNB1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 873B8224D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77C50221F1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxera.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIahG-0002Mj-Ep
+	id 1kIahG-0002P4-GS
 	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 12:54:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59604)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <abologna@redhat.com>)
- id 1kIaaN-0002US-Ht
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 12:47:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58887)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <abologna@redhat.com>)
- id 1kIaaL-0004Ha-9R
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 12:47:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600274828;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=X0LKG1YKxt/3zUKXuTaCRFAy5rqBc0p5rbc3NArpcyE=;
- b=RbsZSNB1Iszx3XZoT/tex5xwrwdLsonyvd618lX7D1AORGuRMrMYcNCjHdZj0DhZ0sYQm6
- GZEKV0g8DAz076efIQSWIEj2mNiQQJTz4BawL5U7srR71LjZTxgnABawMme3HlR6EjcN01
- okQI43/Bjem3zCgIlqP3kclP74rfTCk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-9PqgpOYBPqmYr0JPNj5Omw-1; Wed, 16 Sep 2020 12:47:03 -0400
-X-MC-Unique: 9PqgpOYBPqmYr0JPNj5Omw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5141C80EF8A
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 16:47:02 +0000 (UTC)
-Received: from harajuku.usersys.redhat.com (unknown [10.40.195.7])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 420171002D42;
- Wed, 16 Sep 2020 16:46:59 +0000 (UTC)
-Message-ID: <b665189d8343e29f96c6649f3d5309f9ff8af844.camel@redhat.com>
-Subject: [RFC DOCUMENT 02/12] kubevirt-and-kvm: Add Components page
-From: Andrea Bolognani <abologna@redhat.com>
-To: libvir-list@redhat.com, qemu-devel@nongnu.org
-Date: Wed, 16 Sep 2020 18:46:57 +0200
-In-Reply-To: <a6b5e34843b3f08994d4ffefadc5867001e0bc36.camel@redhat.com>
-References: <a6b5e34843b3f08994d4ffefadc5867001e0bc36.camel@redhat.com>
-User-Agent: Evolution 3.36.5 (3.36.5-1.fc32)
+ (Exim 4.90_1) (envelope-from <ari@tuxera.com>)
+ id 1kIafi-0000dz-In; Wed, 16 Sep 2020 12:52:42 -0400
+Received: from mgw-02.mpynet.fi ([82.197.21.91]:53692)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <ari@tuxera.com>)
+ id 1kIafe-0004zi-T4; Wed, 16 Sep 2020 12:52:41 -0400
+Received: from pps.filterd (mgw-02.mpynet.fi [127.0.0.1])
+ by mgw-02.mpynet.fi (8.16.0.42/8.16.0.42) with SMTP id 08GGi13E028423;
+ Wed, 16 Sep 2020 19:52:02 +0300
+Received: from ex13.tuxera.com (ex13.tuxera.com [178.16.184.72])
+ by mgw-02.mpynet.fi with ESMTP id 33k5pf12d2-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+ Wed, 16 Sep 2020 19:52:02 +0300
+Received: from [192.168.0.79] (62.78.240.173) by tuxera-exch.ad.tuxera.com
+ (10.20.48.11) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 16 Sep
+ 2020 19:52:02 +0300
+Subject: Re: [PATCH 07/14] block/blklogwrites: drop error propagation
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200909185930.26524-1-vsementsov@virtuozzo.com>
+ <20200909185930.26524-8-vsementsov@virtuozzo.com>
+ <8856cf15-4092-55b7-6537-a6beb4ce8a18@tuxera.com>
+ <87k0x0g2pu.fsf@dusky.pond.sub.org>
+From: Ari Sundholm <ari@tuxera.com>
+Message-ID: <dd40693c-2dda-895d-f372-662b0071ee62@tuxera.com>
+Date: Wed, 16 Sep 2020 19:52:01 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=abologna@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <87k0x0g2pu.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=abologna@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:16:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Originating-IP: [62.78.240.173]
+X-ClientProxiedBy: tuxera-exch.ad.tuxera.com (10.20.48.11) To
+ tuxera-exch.ad.tuxera.com (10.20.48.11)
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-16_11:2020-09-16,
+ 2020-09-16 signatures=0
+X-Proofpoint-Spam-Details: rule=mpy_notspam policy=mpy score=0 spamscore=0
+ phishscore=0 mlxscore=0
+ suspectscore=0 malwarescore=0 bulkscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009160119
+Received-SPF: pass client-ip=82.197.21.91; envelope-from=ari@tuxera.com;
+ helo=mgw-02.mpynet.fi
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 12:52:32
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -42
+X-Spam_score: -4.3
+X-Spam_bar: ----
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.062,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,147 +89,273 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vromanso@redhat.com, rmohr@redhat.com, crobinso@redhat.com
+Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ berto@igalia.com, stefanha@redhat.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, groug@kaod.org, pavel.dovgaluk@ispras.ru,
+ pbonzini@redhat.com, mreitz@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-https://gitlab.com/abologna/kubevirt-and-kvm/-/blob/master/Components.md
+Hi,
 
-# Components
+On 9/11/20 11:03 AM, Markus Armbruster wrote:
+> Ari Sundholm <ari@tuxera.com> writes:
+> 
+>> Hi Vladimir!
+>>
+>> Thank you for working on this. My comments below.
+>>
+>> On 9/9/20 9:59 PM, Vladimir Sementsov-Ogievskiy wrote:
+>>> It's simple to avoid error propagation in blk_log_writes_open(), we
+>>> just need to refactor blk_log_writes_find_cur_log_sector() a bit.
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy
+>>> <vsementsov@virtuozzo.com>
+>>> ---
+>>>    block/blklogwrites.c | 23 +++++++++++------------
+>>>    1 file changed, 11 insertions(+), 12 deletions(-)
+>>> diff --git a/block/blklogwrites.c b/block/blklogwrites.c
+>>> index 7ef046cee9..c7da507b2d 100644
+>>> --- a/block/blklogwrites.c
+>>> +++ b/block/blklogwrites.c
+>>> @@ -96,10 +96,10 @@ static inline bool blk_log_writes_sector_size_valid(uint32_t sector_size)
+>>>            sector_size < (1ull << 24);
+>>>    }
+>>>    -static uint64_t blk_log_writes_find_cur_log_sector(BdrvChild
+>>> *log,
+>>> -                                                   uint32_t sector_size,
+>>> -                                                   uint64_t nr_entries,
+>>> -                                                   Error **errp)
+>>> +static int64_t blk_log_writes_find_cur_log_sector(BdrvChild *log,
+>>
+>> I'd rather not change the return type for reasons detailed below.
+>>
+>>> +                                                  uint32_t sector_size,
+>>> +                                                  uint64_t nr_entries,
+>>> +                                                  Error **errp)
+>>>    {
+>>>        uint64_t cur_sector = 1;
+>>>        uint64_t cur_idx = 0;
+>>> @@ -112,13 +112,13 @@ static uint64_t blk_log_writes_find_cur_log_sector(BdrvChild *log,
+>>>            if (read_ret < 0) {
+>>>                error_setg_errno(errp, -read_ret,
+>>>                                 "Failed to read log entry %"PRIu64, cur_idx);
+>>> -            return (uint64_t)-1ull;
+>>> +            return read_ret;
+>>
+>> This is OK, provided the change in return type signedness is necessary
+>> in the first place.
+>>
+>>>            }
+>>>              if (cur_entry.flags & ~cpu_to_le64(LOG_FLAG_MASK)) {
+>>>                error_setg(errp, "Invalid flags 0x%"PRIx64" in log entry %"PRIu64,
+>>>                           le64_to_cpu(cur_entry.flags), cur_idx);
+>>> -            return (uint64_t)-1ull;
+>>> +            return -EINVAL;
+>>
+>> This is OK, provided the return type signedness change is necessary,
+>> although we already do have errp to indicate any errors.
+>>
+>>>            }
+>>>              /* Account for the sector of the entry itself */
+>>> @@ -143,7 +143,6 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
+>>>    {
+>>>        BDRVBlkLogWritesState *s = bs->opaque;
+>>>        QemuOpts *opts;
+>>> -    Error *local_err = NULL;
+>>>        int ret;
+>>>        uint64_t log_sector_size;
+>>>        bool log_append;
+>>> @@ -215,15 +214,15 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
+>>>            s->nr_entries = 0;
+>>>              if (blk_log_writes_sector_size_valid(log_sector_size)) {
+>>> -            s->cur_log_sector =
+>>> +            int64_t cur_log_sector =
+>>>                    blk_log_writes_find_cur_log_sector(s->log_file, log_sector_size,
+>>> -                                    le64_to_cpu(log_sb.nr_entries), &local_err);
+>>> -            if (local_err) {
+>>> -                ret = -EINVAL;
+>>> -                error_propagate(errp, local_err);
+>>> +                                    le64_to_cpu(log_sb.nr_entries), errp);
+>>> +            if (cur_log_sector < 0) {
+>>> +                ret = cur_log_sector;
+>>
+>> This changes the semantics slightly. Changing the return type to int64
+>> may theoretically cause valid return values to be interpreted as
+>> errors. Since we already do have a dedicated out pointer for the error
+>> value (errp), why not use it?
+> 
+> Error.h's big comment:
+> 
+>   * Error reporting system loosely patterned after Glib's GError.
+>   *
+>   * = Rules =
+>   [...]
+>   * - Whenever practical, also return a value that indicates success /
+>   *   failure.  This can make the error checking more concise, and can
+>   *   avoid useless error object creation and destruction.  Note that
+>   *   we still have many functions returning void.  We recommend
+>   *   • bool-valued functions return true on success / false on failure,
+>   *   • pointer-valued functions return non-null / null pointer, and
+>   *   • integer-valued functions return non-negative / negative.
+> 
+> blk_log_writes_find_cur_log_sector() does return such an error value
+> before the patch: (uint64_t)-1.
+> 
+> The caller does not use it to check for errors.  It uses @err instead.
+> Awkward, has to error_propagate().
+> 
+> Avoiding error_propagate() reduces the error handling boileplate.  It
+> also improves behavior when @errp is &error_abort: we get the abort
+> right where the error happens instead of where we propagate it.
+> 
+> Furthermore, caller has to make an error code (-EINVAL), because
+> returning (uint64_t)-1 throws it away.  Yes, a detailed error is stored
+> into @err, but you can't cleanly extract the error code.
+> 
+> Using a signed integer for returning "non-negative offset or negative
+> errno code" is pervasive, starting with read() and write().  It hasn't
+> been a problem there, and it hasn't been a problem in the block layer.
+> 8 exbi-blocks should do for a while.  Should it become troublesome, we
+> won't solve the problem by going unsigned and adding one bit, we'll
+> double the width and add 64.
+> 
 
-This document describes the various components of the KubeVirt
-architecture, how they fit together, and how they compare to the
-traditional virtualization architecture (QEMU + libvirt).
+I am in complete agreement with eliminating error propagation within the 
+blklogwrites driver. This was never a point of disagreement.
 
-## Traditional architecture
+As error propagation is dropped in this patch, the awkwardness referred 
+to above will be no more, making that a moot point.
 
-For the comparison to make sense, let's start by reviewing the
-architecture used for traditional virtualization.
+My main issue was that this patch does more than just the mechanical 
+transformation required. Changes that are not strictly necessary are 
+made, and they slightly change the semantics while duplicating the error 
+code and halving the range of the return type (instead of just returning 
+*some* value in the absence of a possibility to return nothing, which 
+will be thrown away by the caller anyway when an error has occurred).
 
-![libvirt architecture][Components-Libvirt]
+However, as the consensus seems to be that it is best to change the 
+return type to int64_t for consistency with the rest of the codebase, I 
+will not object any further regarding that point. Having conceded that, 
+this makes the difference between my preferred minimalistic approach and 
+this patch insignificant, and it is not my intention to needlessly 
+obstruct a perfectly fine patch series.
 
-(Image taken from the "[Look into libvirt][]" presentation by Osier
-Yang, which is a bit old but still mostly accurate from a high-level
-perspective.)
+BTW, I do not think it would be difficult at all to extend the code in 
+error.h to make it convenient to extract errno and/or win32 error values 
+that have been explicitly provided, but this is a matter best discussed 
+separately and left for a later patch.
 
-In particular, the `libvirtd` process runs with high privileges on
-the host and is responsible for managing all VMs.
+As for general matters regarding error handling and separation between 
+results and errors, I am open to discussing these off-list.
 
-When asked to start a VM, the management process will
+Best regards,
+Ari Sundholm
+ari@tuxera.com
 
-* Prepare the environment by performing a number of privileged
-  operations upfront
-* Set up CGroups
-* Set up kernel namespaces
-* Apply SELinux labels
-* Configure network devices
-* Open host files
-* ...
-* Start a non-privileged QEMU process in that environment
-
-## Kubernetes
-
-To understand how KubeVirt works, it's first necessary to have some
-knowledge of Kubernetes.
-
-In Kubernetes, every user workload runs inside [Pods][]. The pod is
-the smallest unit of work that Kubernetes will schedule.
-
-Some facts about pods:
-
-* They consist of multiple containers
-* The containers share a network namespace
-* The containers have their own PID and mount namespace
-* The containers have their own CGroups for CPU, memory, devices and
-  so forth. They are controlled by k8s and can’t be modified from
-  outside.
-* Pods can be started with extended privileges (`CAP_NICE`,
-  `CAP_NET_RAW`, root user, ...)
-* The app in the pods can drop the privileges, but the pod can not
-  drop them (`kubectl exec` gives you a shell with the full
-  privileges).
-
-Creating pods with elevated privileges is generally frowned upon, and
-depending on the policy decided by the cluster administrator it might
-be outright impossible.
-
-## KubeVirt architecture
-
-Let's now discuss how KubeVirt is structured.
-
-![KubeVirt architecture][Components-Kubevirt]
-
-The main components are:
-
-* `virt-launcher`, a copy of which runs inside each pod besides QEMU
-  and libvirt, is the unprivileged component responsible for
-  receiving commands from other KubeVirt components and reporting
-  back events such as VM crashes;
-* `virt-handler` runs at the node level via a DaemonSet, and is the
-  privileged component which takes care of the VM setup by reaching
-  into the corresponding pod and modifying its namespaces;
-* `virt-controller` runs at the cluster level and monitors the API
-  server so that it can react to user requests and VM events;
-* `virt-api`, also running at the cluster level, exposes a few
-  additional APIs that only apply to VMs, such as the "console" and
-  "vnc" actions.
-
-When a KubeVirt VM is started:
-
-* We request a Pod with certain privileges and resources from
-  Kubernetes.
-* The kubelet (the node daemon of kubernetes) prepares the
-  environment with the help of a container runtime.
-* A shim process (virt-launcher) is our main entrypoint in the pod,
-  which starts libvirt
-* Once our node-daemon (virt-handler) can reach our shim process, it
-  does privileged setup from outside. It reaches into the namespaces
-  and modifies their content as needed. We mostly have to modify the
-  mount and network namespaces.
-* Once the environment is prepared, virt-handler asks virt-launcher
-  to start a VM via its libvirt component.
-
-More information can be found in the [KubeVirt architecture][] page.
-
-## Comparison
-
-The two architectures are quite similar from the high-level point of
-view: in both cases there are a number of privileged components which
-take care of preparing an environment suitable for running an
-unprivileged QEMU process in.
-
-The difference, however, is that while libvirtd takes care of all
-this setup itself, in the case of KubeVirt several smaller components
-are involved: some of these components are privileged just as libvirtd
-is, but others are not, and some of the tasks are not even performed
-by KubeVirt itself but rather delegated to the existing Kubernetes
-infrastructure.
-
-## Use of libvirtd in KubeVirt
-
-In the traditional virtualization scenario, `libvirtd` provides a
-number of useful features on top of those available with plain QEMU,
-including
-
-* support for multiple clients connecting at the same time
-* management of multiple VMs through a single entry point
-* remote API access
-
-KubeVirt interacts with libvirt under certain conditions that make
-the features described above irrelevant:
-
-* there's only one client talking to libvirt: `virt-handler`
-* libvirt is only asked to manage a single VM
-* client and libvirt are running in the same pod, no remote libvirt
-  access
-
-[Components-Kubevirt]: 
-https://gitlab.com/abologna/kubevirt-and-kvm/-/blob/master/Images/Components-Kubevirt.png
-[Components-Libvirt]: 
-https://gitlab.com/abologna/kubevirt-and-kvm/-/blob/master/Images/Components-Libvirt.png
-[KubeVirt architecture]: https://github.com/kubevirt/kubevirt/blob/master/docs/architecture.md
-[Look into libvirt]: https://www.slideshare.net/ben_duyujie/look-into-libvirt-osier-yang
-[Pods]: https://kubernetes.io/docs/concepts/workloads/pods/
+> Additional rationale for returning recognizable error values:
+> 
+> commit e3fe3988d7851cac30abffae06d2f555ff7bee62
+> Author: Markus Armbruster <armbru@redhat.com>
+> Date:   Tue Jul 7 18:05:31 2020 +0200
+> 
+>      error: Document Error API usage rules
+>      
+>      This merely codifies existing practice, with one exception: the rule
+>      advising against returning void, where existing practice is mixed.
+>      
+>      When the Error API was created, we adopted the (unwritten) rule to
+>      return void when the function returns no useful value on success,
+>      unlike GError, which recommends to return true on success and false on
+>      error then.
+>      
+>      When a function returns a distinct error value, say false, a checked
+>      call that passes the error up looks like
+>      
+>          if (!frobnicate(..., errp)) {
+>              handle the error...
+>          }
+>      
+>      When it returns void, we need
+>      
+>          Error *err = NULL;
+>      
+>          frobnicate(..., &err);
+>          if (err) {
+>              handle the error...
+>              error_propagate(errp, err);
+>          }
+>      
+>      Not only is this more verbose, it also creates an Error object even
+>      when @errp is null, &error_abort or &error_fatal.
+>      
+>      People got tired of the additional boilerplate, and started to ignore
+>      the unwritten rule.  The result is confusion among developers about
+>      the preferred usage.
+>      
+>      Make the rule advising against returning void official by putting it
+>      in writing.  This will hopefully reduce confusion.
+>      [...]
+> 
+> Additional rationale for avoiding error_propagate():
+> 
+> commit ae7c80a7bd73685437bf6ba9d7c26098351f4166
+> Author: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Date:   Tue Jul 7 18:50:30 2020 +0200
+> 
+>      error: New macro ERRP_GUARD()
+>      
+>      Introduce a new ERRP_GUARD() macro, to be used at start of functions
+>      with an errp OUT parameter.
+>      
+>      It has three goals:
+>      
+>      1. Fix issue with error_fatal and error_prepend/error_append_hint: the
+>      user can't see this additional information, because exit() happens in
+>      error_setg earlier than information is added. [Reported by Greg Kurz]
+>      
+>      2. Fix issue with error_abort and error_propagate: when we wrap
+>      error_abort by local_err+error_propagate, the resulting coredump will
+>      refer to error_propagate and not to the place where error happened.
+>      (the macro itself doesn't fix the issue, but it allows us to [3.] drop
+>      the local_err+error_propagate pattern, which will definitely fix the
+>      issue) [Reported by Kevin Wolf]
+>      
+>      3. Drop local_err+error_propagate pattern, which is used to workaround
+>      void functions with errp parameter, when caller wants to know resulting
+>      status. (Note: actually these functions could be merely updated to
+>      return int error code).
+>      [...]
+> 
+>> Assigning cur_log_sector to ret looks a bit odd to me. Why not use the
+>> original -EINVAL - or maybe some more appropriate errno value than
+>> -EINVAL?
+> 
+> We assign the error code returned by
+> blk_log_writes_find_cur_log_sector(), which seems proper to me.
+> 
+> Care to suggest a better variable name?
+> 
+>> I think the desired effect of this change could be achieved with less
+>> churn. How about just making just the following change in addition to
+>> adding ERRP_GUARD() to the beginning of the function and getting rid
+>> of local_err:
+>>
+>> -                                    le64_to_cpu(log_sb.nr_entries),
+>>                                       &local_err);
+>> +                                    le64_to_cpu(log_sb.nr_entries), errp);
+>> -            if (local_err) {
+>> +            if (*errp) {
+>>                   ret = -EINVAL;
+>> -                error_propagate(errp, local_err);
+>>>                    goto fail_log;
+>>>                }
+>>>    +            s->cur_log_sector = cur_log_sector;
+>>>                s->nr_entries = le64_to_cpu(log_sb.nr_entries);
+>>>            }
+>>>        } else {
+> 
+> I prefer this patch.  But it's up to the block maintainers.
+> 
 
 
