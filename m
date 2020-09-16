@@ -2,85 +2,86 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A6A1C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:34:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60EE4C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:35:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86245221E8
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:34:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 801F6221E5
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:35:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iP0Occ9w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86245221E8
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ISEDhDy5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 801F6221E5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIVhU-0001b9-OP
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 07:34:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50336)
+	id 1kIVih-0002WV-IV
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 07:35:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50680)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1kIVga-0000xe-0E
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:33:16 -0400
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:51628)
+ id 1kIVhj-00020U-6K
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:34:27 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:37390)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1kIVgY-0005zM-18
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:33:15 -0400
-Received: by mail-wm1-x331.google.com with SMTP id w2so2429772wmi.1
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 04:33:13 -0700 (PDT)
+ id 1kIVhg-00066K-W7
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:34:26 -0400
+Received: by mail-wr1-x430.google.com with SMTP id z4so6557053wrr.4
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 04:34:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=zACBbkyoDMQvkjs81ee4kpE6MrjpE9NbVDn9qdgYmck=;
- b=iP0Occ9ww6afWly0Vb21tI24Zk3pCjrC19Ge+99yq1fiQ0B5GBSFe5NSQ6TL7ale0S
- N1CEpudLGRP7BvbNiOvt9Ez8XkLSMgOgOIn1+PlAddVvxCNZMJyD5Uh1OXWil4ySEH1+
- F/uk/T8mS80tn3eGZ52zdVcNWMYawCTgjaVvSu+CIUtty7lUV1DPhBqxJCinSdXPvMPE
- hPVk3iboUr9JiluRLt1/qKF9aLgnaAhg1Nhb2vtJoSmThFs7Jqn04A0yrF0ZIa7NXkAR
- /WKaYzjiqs1aFWxiNiB+TqcRnCZipIPQuGeh6ynJCNaBuYyTivmyDbtOye3fuLRVo05B
- +BLQ==
+ bh=39Yh7WvnMUHO8U2HwGDZ9APJKe/qVKadkuEKShwpdao=;
+ b=ISEDhDy53+hWAG2O0i8wtcLxI0sCD9eUeBrL5RQt5y1G5c/SOlKHoUmlKluWVEgeVd
+ b65E0V6/7CaCkalM0TtOgpkcfbR5mHSpiC9ygUGBlL0pFiXR/XYS+8qmgmOPHXYTzlNm
+ CIE3TzH5fLRDRgipkVbUfEGgwDcwxE8NZiUh5N8Zou+FQgHpPY01on8/KdzQhFuVr2jK
+ KKrZX45J77gAz9yQhrt2VB85utg/0d2EdHj2Bm80dcroX8rIlKwYiuAMVbUCSXzfmdVF
+ lK9q1w3plqnw7aAXSL3rmKU0qBhrIom1Hgn/XaKX6kq2J3fRNi2ufwN6VjpOglPSWJ2h
+ IjyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=zACBbkyoDMQvkjs81ee4kpE6MrjpE9NbVDn9qdgYmck=;
- b=SfBETE1GD0cvjHM6JVug6hxe7Si21zSaqBDxS6x/BxWndB9EYpFwFU+OSxQDKG9dzX
- DEQmZLYKVjf6oaCvihhWno7fO3lME3ZGYbRgeTx5J25TC9Qt61hI3IixHsHeJHSTRj5t
- iAE/w0gvH6OSg8oXCK4A1UqFdIAiXS7AH8jpEpBn1We9HFOiYXocJasE8ywIlKrdkh2i
- /7GthJSojRV5oCEPibKQQ+VyTGbFMM9D2apqy4HdTbVMfgJogp26qCt74rrSySkHoBu0
- PtDkMktz/JCfKxQJGpsmiVV/sgoYPouycYqKLwo06WNs0RlCnP/s1d2aM/3jkb/Hmvuf
- Yu7Q==
-X-Gm-Message-State: AOAM531Am8Q4S8X3lDaFAOwvCeGIBG4wi1aVMGMLDgqI6CcODyNyWjoX
- BnPVE5NBBIhwZuLNvXAvpUY=
-X-Google-Smtp-Source: ABdhPJy+AKc8XXy67Ek2BgrZ6CcX9jNMAxJ0uG4DX6zi3H9jjvmiMJ2f6vCYVSgdpFt51PPEkOg/5g==
-X-Received: by 2002:a05:600c:21c4:: with SMTP id
- x4mr4341001wmj.107.1600255992504; 
- Wed, 16 Sep 2020 04:33:12 -0700 (PDT)
+ bh=39Yh7WvnMUHO8U2HwGDZ9APJKe/qVKadkuEKShwpdao=;
+ b=e3LKFE6GzD5UxW8EDmnuYe8F9hzbj9/uWPw8c3CrwAsY1rfDJZyF/Nb5kXXCIcid3W
+ YSjOjCsrDSoeX2ddiEMR1VmYXbDMxMzJju/3H44M6Z77gkhsWsuyyWFBC8mUdn6BXz9m
+ c5g6Muaf9vB2xNRXbPFiWNZvq2Ahmc2mh2k8Y3WzJvifacxpE9YVKMp4REHTbzzWzK4y
+ BY9HwmiFfzAnjb+ZTYAr35Q6o65W3RLqqwouQuPCts/priyuD+N7Y1ggCIoiQIfSvXGK
+ BvFuPPI4J0lXz7IldROzTzQzHil1i8iiy0ypxd3bTDN4KoAh33Y2IJYCeIUaoUzM2ljE
+ j6uQ==
+X-Gm-Message-State: AOAM530EvX4H3nnxwQp/NNi4ordRRQXKIlBKWN006ZbGV8bim8d42S+w
+ z87FwiA478RMYRPDjh143QEk7tY8GxNNLA==
+X-Google-Smtp-Source: ABdhPJyAAxp4/Yvap7+pl2nJ9DwOr6KXSyakR9e82HQOrIQ+MyStMcURJBgGyRkBpxmOsWyd1UpyBA==
+X-Received: by 2002:adf:e44b:: with SMTP id t11mr3349007wrm.101.1600256063365; 
+ Wed, 16 Sep 2020 04:34:23 -0700 (PDT)
 Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id l8sm31777385wrx.22.2020.09.16.04.33.10
+ by smtp.gmail.com with ESMTPSA id e1sm25683077wrp.49.2020.09.16.04.34.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 16 Sep 2020 04:33:11 -0700 (PDT)
-Date: Wed, 16 Sep 2020 12:33:09 +0100
+ Wed, 16 Sep 2020 04:34:22 -0700 (PDT)
+Date: Wed, 16 Sep 2020 12:34:20 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Bug 1895471 <1895471@bugs.launchpad.net>
-Subject: Re: [Bug 1895471] Re: compilation error with clang in util/async.c
-Message-ID: <20200916113309.GD756728@stefanha-x1.localdomain>
-References: <160002337216.747.16078826830052525094.malonedeb@chaenomeles.canonical.com>
- <160008073620.20744.1634136206585369571.malone@wampee.canonical.com>
+To: Bug 1895399 <1895399@bugs.launchpad.net>
+Subject: Re: [Bug 1895399] [NEW] Docfix: add missing virtiofsd cache default
+ 'auto'
+Message-ID: <20200916113420.GE756728@stefanha-x1.localdomain>
+References: <159992963448.16886.7579356964954187024.malonedeb@soybean.canonical.com>
+ <20200914100806.GC579094@stefanha-x1.localdomain>
+ <5d7c2982-4282-d521-82d7-196468b45fee@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="g7w8+K/95kPelPD2"
+ protocol="application/pgp-signature"; boundary="vmttodhTwj0NAgWp"
 Content-Disposition: inline
-In-Reply-To: <160008073620.20744.1634136206585369571.malone@wampee.canonical.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::331;
- envelope-from=stefanha@gmail.com; helo=mail-wm1-x331.google.com
+In-Reply-To: <5d7c2982-4282-d521-82d7-196468b45fee@gmail.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::430;
+ envelope-from=stefanha@gmail.com; helo=mail-wr1-x430.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -108,32 +109,34 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---g7w8+K/95kPelPD2
-Content-Type: text/plain; charset=us-ascii
+--vmttodhTwj0NAgWp
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 14, 2020 at 10:52:16AM -0000, Amey Narkhede wrote:
-> Ok. So I attached the util_async.o file below
+On Mon, Sep 14, 2020 at 02:53:57PM -0000, Harry Coin wrote:
+> OK.=A0 First time for everything:
+>=20
+> Signed-off-by: Harry G. Coin <hgcoin@gmail.com>
 
-It looks like you can work around this issue with ./configure --disable-linux-io-uring.
+Thank you. I posted your patch to the QEMU mailing list with your
+authorship information:
+https://patchew.org/QEMU/20200916112250.760245-1-stefanha@redhat.com/
 
-I'll investigate what can be done to solve the interference between
-<stdatomic.h> and QEMU's "atomic.h" next week.
-
---g7w8+K/95kPelPD2
+--vmttodhTwj0NAgWp
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9h9/UACgkQnKSrs4Gr
-c8jb5Af7BFFcAJdYZsfI/AW/GRuEL3EKBFJQZIqM2AHoiDB80TFChQd9JqWChEO/
-BdzVEvXiYsMTPTqNJ3OOK3FtcOxZ1r6R3H42oj4KpHL/j3D8JH2GgSIKtfzSQbGv
-T7amQLhCif1qitLfSvDr7pAVJ7ALqojyo+d1WRjwvOBxBcWwvsr1NXC1tLVyIPpb
-DlYgEhmw55nRou8q5adoCpzBqnDAl1GwajVOfnS5mb4IT7Qvvp4JbjRI5V9J8YKm
-a57dWIEX6ZXSm+9+DXnZ8nZWxgqJ/ZvXinhOexkBXVXM3+CupFYgbcMvCR2mlFdO
-dSP8JDP+TfiLxczEJa+uPJN+S0YRsQ==
-=7qFb
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9h+DwACgkQnKSrs4Gr
+c8gLNwgAkIqE4kY1Wwh07wENPBfa2OuWJXL9sCcL6FZP0y9pP8AAPh3DvrUPE7wN
+V7KUu5tmCzO9H2/oMk+7rdfpghMoutgdwODNwv9+0RwRYITfXXqsQL9Xm41RsJZt
+BayREG/6bSI5xG/UuY5vI3lHGxxxpM3SwJ9jgjLDEJxQlisvYbbFubp32Re8luyg
+5yiowAfrZnz5oOVBAAPuEZLsviV5JAbkJSc2DhE7J5z8YLmLV5orZTpV9yzVZRr8
+VvZ477BvOJj0Vhre1e1SSu9uJDcGNpRvbGq3m8sz1hOkgsF1liu93cjehs3V82tZ
+/ArliB4sLbSTD7TFJMcmZQ1teB8nHg==
+=Xzp6
 -----END PGP SIGNATURE-----
 
---g7w8+K/95kPelPD2--
+--vmttodhTwj0NAgWp--
 
