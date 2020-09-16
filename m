@@ -2,76 +2,65 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E960AC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 05:52:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E0ACC43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 06:13:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39B2C21D7D
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 05:52:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39B2C21D7D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id A61EA208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 06:13:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A61EA208E4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIQMN-000282-AZ
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 01:52:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55696)
+	id 1kIQgr-0008HH-Iv
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 02:13:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58764)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1kIQLj-0001Zv-Bg; Wed, 16 Sep 2020 01:51:23 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:45127)
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1kIQfF-0006jH-5E
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 02:11:33 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:37008 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1kIQLf-0003UY-L4; Wed, 16 Sep 2020 01:51:23 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.1.108])
- by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 6F9EE62142D3;
- Wed, 16 Sep 2020 07:51:08 +0200 (CEST)
-Received: from kaod.org (37.59.142.105) by DAG4EX1.mxp5.local (172.16.2.31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Wed, 16 Sep
- 2020 07:51:07 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-105G006f62c1393-4430-41ca-b1fd-b82882e93c8a,
- 282F6B8BB580550643A9CB45D70726BD5CC915E6) smtp.auth=clg@kaod.org
-Subject: Re: [PATCH] hw/arm/aspeed: Map the UART5 device unconditionally
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- <qemu-devel@nongnu.org>
-References: <20200905212415.760452-1-f4bug@amsat.org>
- <e640309b-b694-e815-d64d-40dd453e52ef@amsat.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <5e27c1f9-6d11-fa62-ba71-0020ce9d595b@kaod.org>
-Date: Wed, 16 Sep 2020 07:51:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1kIQfC-0005XV-CZ
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 02:11:32 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 225AF8B5049A6D4EF96B;
+ Wed, 16 Sep 2020 14:11:25 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Wed, 16 Sep 2020
+ 14:11:16 +0800
+From: Chuan Zheng <zhengchuan@huawei.com>
+To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>,
+ <berrange@redhat.com>
+Subject: [PATCH v10 03/12] migration/dirtyrate: Add RamblockDirtyInfo to store
+ sampled page info
+Date: Wed, 16 Sep 2020 14:21:58 +0800
+Message-ID: <1600237327-33618-4-git-send-email-zhengchuan@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1600237327-33618-1-git-send-email-zhengchuan@huawei.com>
+References: <1600237327-33618-1-git-send-email-zhengchuan@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <e640309b-b694-e815-d64d-40dd453e52ef@amsat.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [37.59.142.105]
-X-ClientProxiedBy: DAG8EX2.mxp5.local (172.16.2.72) To DAG4EX1.mxp5.local
- (172.16.2.31)
-X-Ovh-Tracer-GUID: a58f799c-3962-4c12-8c8b-e0285d6d319b
-X-Ovh-Tracer-Id: 12090757628491369254
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrtddugdelgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgihesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeejhedtveeihffguefgveejieevfeevtddvhefhjeeludevjeeifefhfeefteefueenucffohhmrghinhepohiilhgrsghsrdhorhhgnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehfgegsuhhgsegrmhhsrghtrdhorhhg
-Received-SPF: pass client-ip=79.137.123.220; envelope-from=clg@kaod.org;
- helo=smtpout1.mo804.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 01:51:09
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.32; envelope-from=zhengchuan@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:11:25
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -85,73 +74,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>
+Cc: zhengchuan@huawei.com, zhang.zhanghailiang@huawei.com, liq3ea@gmail.com,
+ qemu-devel@nongnu.org, xiexiangyou@huawei.com, alex.chen@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/15/20 7:23 PM, Philippe Mathieu-Daudé wrote:
-> ping?
+Add RamblockDirtyInfo to store sampled page info of each ramblock.
 
-It's reviewed : 
+Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: David Edmondson <david.edmondson@oracle.com>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+---
+ migration/dirtyrate.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-  http://patchwork.ozlabs.org/project/qemu-devel/patch/20200905212415.760452-1-f4bug@amsat.org/
-
-I will send a PR when I have more patches.
-
-Thanks,
-
-C. 
-
-> On 9/5/20 11:24 PM, Philippe Mathieu-Daudé wrote:
->> The UART5 is present on the machine regardless there is a
->> character device connected to it. Map it unconditionally.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  hw/arm/aspeed_ast2600.c | 8 +++-----
->>  hw/arm/aspeed_soc.c     | 8 +++-----
->>  2 files changed, 6 insertions(+), 10 deletions(-)
->>
->> diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
->> index 9d95e421435..1450bde7cf2 100644
->> --- a/hw/arm/aspeed_ast2600.c
->> +++ b/hw/arm/aspeed_ast2600.c
->> @@ -325,11 +325,9 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
->>      }
->>  
->>      /* UART - attach an 8250 to the IO space as our UART5 */
->> -    if (serial_hd(0)) {
->> -        qemu_irq uart5 = aspeed_soc_get_irq(s, ASPEED_DEV_UART5);
->> -        serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
->> -                       uart5, 38400, serial_hd(0), DEVICE_LITTLE_ENDIAN);
->> -    }
->> +    serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
->> +                   aspeed_soc_get_irq(s, ASPEED_DEV_UART5),
->> +                   38400, serial_hd(0), DEVICE_LITTLE_ENDIAN);
->>  
->>      /* I2C */
->>      object_property_set_link(OBJECT(&s->i2c), "dram", OBJECT(s->dram_mr),
->> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
->> index 35be126db6f..7eefd54ac07 100644
->> --- a/hw/arm/aspeed_soc.c
->> +++ b/hw/arm/aspeed_soc.c
->> @@ -283,11 +283,9 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
->>      }
->>  
->>      /* UART - attach an 8250 to the IO space as our UART5 */
->> -    if (serial_hd(0)) {
->> -        qemu_irq uart5 = aspeed_soc_get_irq(s, ASPEED_DEV_UART5);
->> -        serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
->> -                       uart5, 38400, serial_hd(0), DEVICE_LITTLE_ENDIAN);
->> -    }
->> +    serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
->> +                   aspeed_soc_get_irq(s, ASPEED_DEV_UART5), 38400,
->> +                   serial_hd(0), DEVICE_LITTLE_ENDIAN);
->>  
->>      /* I2C */
->>      object_property_set_link(OBJECT(&s->i2c), "dram", OBJECT(s->dram_mr),
->>
+diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
+index 5be9714..479e222 100644
+--- a/migration/dirtyrate.h
++++ b/migration/dirtyrate.h
+@@ -19,11 +19,29 @@
+  */
+ #define DIRTYRATE_DEFAULT_SAMPLE_PAGES            512
+ 
++/*
++ * Record ramblock idstr
++ */
++#define RAMBLOCK_INFO_MAX_LEN                     256
++
+ struct DirtyRateConfig {
+     uint64_t sample_pages_per_gigabytes; /* sample pages per GB */
+     int64_t sample_period_seconds; /* time duration between two sampling */
+ };
+ 
++/*
++ * Store dirtypage info for each ramblock.
++ */
++struct RamblockDirtyInfo {
++    char idstr[RAMBLOCK_INFO_MAX_LEN]; /* idstr for each ramblock */
++    uint8_t *ramblock_addr; /* base address of ramblock we measure */
++    uint64_t ramblock_pages; /* ramblock size in TARGET_PAGE_SIZE */
++    uint64_t *sample_page_vfn; /* relative offset address for sampled page */
++    uint64_t sample_pages_count; /* count of sampled pages */
++    uint64_t sample_dirty_count; /* count of dirty pages we measure */
++    uint32_t *hash_result; /* array of hash result for sampled pages */
++};
++
+ void *get_dirtyrate_thread(void *arg);
+ #endif
+ 
+-- 
+1.8.3.1
 
 
