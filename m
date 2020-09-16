@@ -2,84 +2,95 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2834EC43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:06:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24E01C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:11:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 103CD20838
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:06:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7777721655
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 11:11:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JiJWWFjS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 103CD20838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NHmVRqnB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7777721655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIVGY-0004Sb-1N
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 07:06:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43028)
+	id 1kIVL9-0006SD-7b
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 07:11:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kIVG0-00040z-Q9
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:05:48 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38899
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kIVFy-0002CZ-Ap
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:05:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600254344;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZLmHQQTvYZ1vyzqk0TBru3JZL4lsKVfVuFbc/jCl0b0=;
- b=JiJWWFjSkPfvcV72RlPGCCx8bMOPPO3V+l+4dhPh9DVqLN4BRx5fGOnHV3qlMkV4fWfKky
- jfFYBIZJPoYpM8XiVIFKXYC5L2xgauWWgc8RyOtIb0t9L/zGTsyIfP+bFRY10AVG10orz7
- hobfOjimAbYt9J/kRM0vdZG8dtp/1T8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-XOPxXcRAN1KoDzSHz7IBQQ-1; Wed, 16 Sep 2020 07:05:42 -0400
-X-MC-Unique: XOPxXcRAN1KoDzSHz7IBQQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5300080EF84;
- Wed, 16 Sep 2020 11:05:41 +0000 (UTC)
-Received: from gondolin (ovpn-112-252.ams2.redhat.com [10.36.112.252])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7815F5FC36;
- Wed, 16 Sep 2020 11:05:27 +0000 (UTC)
-Date: Wed, 16 Sep 2020 13:05:24 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Matthew Rosato <mjrosato@linux.ibm.com>
-Subject: Re: [PATCH v3 5/5] s390x/pci: Honor DMA limits set by vfio
-Message-ID: <20200916130524.48e11b26.cohuck@redhat.com>
-In-Reply-To: <1600197283-25274-6-git-send-email-mjrosato@linux.ibm.com>
-References: <1600197283-25274-1-git-send-email-mjrosato@linux.ibm.com>
- <1600197283-25274-6-git-send-email-mjrosato@linux.ibm.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1kIVKa-0005xZ-JA
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:10:33 -0400
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:50241)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1kIVKY-0002xh-BK
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 07:10:32 -0400
+Received: by mail-wm1-x333.google.com with SMTP id e17so2372775wme.0
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 04:10:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=cTOOgJawC+D28LtZqTAkElvRwhrjcXoWLqGjM6pqQS0=;
+ b=NHmVRqnBrGKMTdkzuAKvGPIgOI2vOCGnTi5DzV048v0QAtxePngcbsm2nqVDyUY6p5
+ Shf7P8xE2CpP3ZDE06+2kQzTpYqYd4VQUZERDSyhzCCnRfx8QBiryKJdHTTFHVkxcir6
+ xmpP9Pb9Tx/Qxx4z6v9ycH/yNNWrv+WnZu3zBXmDGrH7PAb0RhebNbw1/q9UR4YlJ9gL
+ jeG7r7yidAWdC3s2XfYRl8Pf5gG5CuTquGYZDZ11nVsEynvNxL6Y/CzxzQXYcXSOohpz
+ DAY82lS7uU+7MB4B4tBV3xJs1ocycxgBlDWN6QlDDKykPK+KLnRsW0gnLC6eoaeInJSF
+ rQEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=cTOOgJawC+D28LtZqTAkElvRwhrjcXoWLqGjM6pqQS0=;
+ b=lT14+cCfzbiID6DBaJB+xkg3n7N9a/ECLCI3jBrDAFFuRnWVz9w3zExb11r6TCbUsN
+ +5p75B4dYToWJLxdtbfpHsGT8/LmWk2RJAgWSnDsX6yo3M8wnLRENJUz1F4JqMBlNxY0
+ uathDz6JwTr/ysGfBwv8dACuuKx02RscIlCbAEYkiIsok5mT4p4j/Hiq4cXanapEfbxz
+ OAeGSLwGvvwh7rs0JtvqBc6SNDQ9naiOqheAdOH1ZVmnjWnIXhCnAKuKmL0uieFfpYgV
+ UMlIDQXsBnOywY41Yr66qGhqwKXKVbF0a9sjdqyJQQQlscslmVuOnwFYWJf9snzE8JCu
+ P8kA==
+X-Gm-Message-State: AOAM531yVLGziQxyJxX9RPA75BZ9j7BulO4MNQiNuHXNEg8AZroAuvgN
+ jDI39jXRMmAlc31gxczp2vc=
+X-Google-Smtp-Source: ABdhPJzNg5f0wBF+TO1WhwG9dTw5Ig/1ZS3lqGB567yrZ/sS78wjdL/RA7HV93AorSFRV1CqP5Gy+w==
+X-Received: by 2002:a1c:e4c5:: with SMTP id b188mr3302884wmh.67.1600254628207; 
+ Wed, 16 Sep 2020 04:10:28 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id a81sm5024629wmf.32.2020.09.16.04.10.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 16 Sep 2020 04:10:26 -0700 (PDT)
+Date: Wed, 16 Sep 2020 12:10:25 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: P J P <ppandit@redhat.com>
+Subject: Re: About 'qemu-security' mailing list
+Message-ID: <20200916111025.GA756728@stefanha-x1.localdomain>
+References: <nycvar.YSQ.7.78.906.2009111910280.36374@xnncv>
+ <CAFEAcA_9BVbqFCHJqS8jj6L3OqVNc60NCjAjRs516VyLH2EFfw@mail.gmail.com>
+ <20200914101517.GD579094@stefanha-x1.localdomain>
+ <nycvar.YSQ.7.78.906.2009151536090.10832@xnncv>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 00:53:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="T4sUOijqQbZv57TR"
+Content-Disposition: inline
+In-Reply-To: <nycvar.YSQ.7.78.906.2009151536090.10832@xnncv>
+Received-SPF: pass client-ip=2a00:1450:4864:20::333;
+ envelope-from=stefanha@gmail.com; helo=mail-wm1-x333.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,153 +103,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, kvm@vger.kernel.org, pmorel@linux.ibm.com,
- david@redhat.com, schnelle@linux.ibm.com, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
- alex.williamson@redhat.com, mst@redhat.com, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: peter.maydell@linaro.org,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 15 Sep 2020 15:14:43 -0400
-Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-> When an s390 guest is using lazy unmapping, it can result in a very
-> large number of oustanding DMA requests, far beyond the default
-> limit configured for vfio.  Let's track DMA usage similar to vfio
-> in the host, and trigger the guest to flush their DMA mappings
-> before vfio runs out.
-> 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->  hw/s390x/s390-pci-bus.c  | 56 +++++++++++++++++++++++++++++++++++++++++++-----
->  hw/s390x/s390-pci-bus.h  |  9 ++++++++
->  hw/s390x/s390-pci-inst.c | 34 +++++++++++++++++++++++------
->  hw/s390x/s390-pci-inst.h |  3 +++
->  4 files changed, 91 insertions(+), 11 deletions(-)
+--T4sUOijqQbZv57TR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-(...)
+On Tue, Sep 15, 2020 at 04:18:47PM +0530, P J P wrote:
+> +-- On Fri, 11 Sep 2020, Peter Maydell wrote --+
+> | Way way back, the idea of a qemu-security list was proposed, and it was=
+=20
+> | decided against because there wasn't a clear way that people could send=
+=20
+> | encrypted mail to the security team if it was just a mailing list. So t=
+hat's=20
+> | why we have the "handful of individual contacts" approach. Is that stil=
+l=20
+> | something people care about ?
+>=20
+> * So far issue reports have mostly been unencrypted.
+>=20
+> * All issue reports may not need encryption.
+>=20
+> * If someone still wants to send an encrypted report, few contacts with t=
+heir=20
+>   GPG keys could be made available, as is available now.
 
-> @@ -737,6 +740,41 @@ static void s390_pci_iommu_free(S390pciState *s, PCIBus *bus, int32_t devfn)
->      object_unref(OBJECT(iommu));
->  }
->  
-> +static S390PCIDMACount *s390_start_dma_count(S390pciState *s, VFIODevice *vdev)
+I'm surprised the lack of encryption doesn't bother you. The security
+bug reporting process should be confidential to prevent disclosure of
+0-days.
 
-Should these go into the new vfio-related file?
+I think it's worth investigating whether GitLab Issues can be configured
+in a secure-enough way for security bug reporting. That way HTTPS is
+used and only GitLab stores the confidential information (this isn't
+end-to-end encryption but seems better than unencrypted SMTP and
+plaintext emails copied across machines).
 
-> +{
-> +    int id = vdev->group->container->fd;
-> +    S390PCIDMACount *cnt;
-> +    uint32_t avail;
-> +
-> +    if (!s390_pci_update_dma_avail(id, &avail)) {
-> +        return NULL;
-> +    }
-> +
-> +    QTAILQ_FOREACH(cnt, &s->zpci_dma_limit, link) {
-> +        if (cnt->id  == id) {
-> +            cnt->users++;
-> +            return cnt;
-> +        }
-> +    }
-> +
-> +    cnt = g_new0(S390PCIDMACount, 1);
-> +    cnt->id = id;
-> +    cnt->users = 1;
-> +    cnt->avail = avail;
-> +    QTAILQ_INSERT_TAIL(&s->zpci_dma_limit, cnt, link);
-> +    return cnt;
-> +}
-> +
-> +static void s390_end_dma_count(S390pciState *s, S390PCIDMACount *cnt)
-> +{
-> +    assert(cnt);
-> +
-> +    cnt->users--;
-> +    if (cnt->users == 0) {
-> +        QTAILQ_REMOVE(&s->zpci_dma_limit, cnt, link);
-> +    }
-> +}
-> +
->  static void s390_pcihost_realize(DeviceState *dev, Error **errp)
->  {
->      PCIBus *b;
-> @@ -764,6 +802,7 @@ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
->      s->bus_no = 0;
->      QTAILQ_INIT(&s->pending_sei);
->      QTAILQ_INIT(&s->zpci_devs);
-> +    QTAILQ_INIT(&s->zpci_dma_limit);
->  
->      css_register_io_adapters(CSS_IO_ADAPTER_PCI, true, false,
->                               S390_ADAPTER_SUPPRESSIBLE, errp);
-> @@ -902,6 +941,7 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->  {
->      S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
->      PCIDevice *pdev = NULL;
-> +    VFIOPCIDevice *vpdev = NULL;
->      S390PCIBusDevice *pbdev = NULL;
->  
->      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
-> @@ -941,17 +981,20 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->              }
->          }
->  
-> +        pbdev->pdev = pdev;
-> +        pbdev->iommu = s390_pci_get_iommu(s, pci_get_bus(pdev), pdev->devfn);
-> +        pbdev->iommu->pbdev = pbdev;
-> +        pbdev->state = ZPCI_FS_DISABLED;
-> +
->          if (object_dynamic_cast(OBJECT(dev), "vfio-pci")) {
->              pbdev->fh |= FH_SHM_VFIO;
-> +            vpdev = container_of(pbdev->pdev, VFIOPCIDevice, pdev);
-> +            pbdev->iommu->dma_limit = s390_start_dma_count(s,
-> +                                                           &vpdev->vbasedev);
+> +-- On Mon, 14 Sep 2020, Stefan Hajnoczi wrote --+
+> | On Fri, Sep 11, 2020 at 04:51:49PM +0100, Peter Maydell wrote:
+> | > want it to be a larger grouping than that and maybe also want to use =
+it as=20
+> | > a mechanism for informing downstream distros etc about QEMU security=
+=20
+> | > issues, which is to say you're proposing an overhaul and change to ou=
+r=20
+> | > security process, not merely "we'd like to create a mailing list" ?
+> |=20
+> | Yes, please discuss the reasons for wanting a mailing list:
+> |=20
+> | Is the goal to involve more people in triaging CVEs in a timely manner?
+>=20
+>   This will be welcome for fix patches.
 
-I think you can just pass s and pbdev to that function... that would
-move dealing with vfio specifics from this file.
+Triaging and fixing are different things. Where is the bottleneck,
+triaging or fixing?
 
->          } else {
->              pbdev->fh |= FH_SHM_EMUL;
->          }
->  
-> -        pbdev->pdev = pdev;
-> -        pbdev->iommu = s390_pci_get_iommu(s, pci_get_bus(pdev), pdev->devfn);
-> -        pbdev->iommu->pbdev = pbdev;
-> -        pbdev->state = ZPCI_FS_DISABLED;
-> -
->          if (s390_pci_msix_init(pbdev)) {
->              error_setg(errp, "MSI-X support is mandatory "
->                         "in the S390 architecture");
+> | Is the goal to include new people who have recently asked to participat=
+e?
+>=20
+>   We've not received such request yet.
+>=20
+> | Is the goal to use an easier workflow than manually sending encrypted
+> | email to a handful of people?
+>=20
+> * Current proposal is more for enabling communities and downstream distro=
+s to=20
+>   know about the issues as and when they are reported. Ie. heads-up mecha=
+nism.
+>=20
+>   Just to note, we've not received any request for such notifications.
 
-(...)
+Do downstream maintainers want to know about potential security bug
+reports that have not been triaged yet?
 
-> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-> index 2f7a7d7..cc34b17 100644
-> --- a/hw/s390x/s390-pci-inst.c
-> +++ b/hw/s390x/s390-pci-inst.c
-> @@ -32,6 +32,9 @@
->          }                                                          \
->      } while (0)
->  
-> +#define inc_dma_avail(iommu) if (iommu->dma_limit) iommu->dma_limit->avail++;
+Maybe there should there be a pre-announce list for bugs that have been
+triaged?
 
-I was thinking more of something like
+That saves downstream from being spammed with confidential info
+that they probably can't use.
 
-static inline void inc_dma_avail(S390PCIIOMMU *iommu)
-{
-    if (iommu->dma_limit) {
-        iommu->dma_limit->avail++;
-    }
-}
+> * If maintainers are on this list, that could help with the triage and fi=
+x=20
+>   patches.
 
-> +#define dec_dma_avail(iommu) if (iommu->dma_limit) iommu->dma_limit->avail--;
-> +
->  static void s390_set_status_code(CPUS390XState *env,
->                                   uint8_t r, uint64_t status_code)
->  {
+I don't think a broadcast model works well for assigning responsibility.
+If maintainers constantly receive security-related emails (most of which
+don't affect them), they will ignore them. This is what happens with
+broadcast CI and fuzzing results.
 
-(...)
+Instead someone should assign security bug reports to relevant maintainers.
 
+Another option is to let reporters directly contact the maintainers
+(e.g. QEMU's MAINTAINERS file), but this is hard to get right and if a
+maintainer is on vacation the report may go unnoticed.
+
+Anyway, it's unclear to me what the motivation for creating a list and
+changing the process is. Please share your goals and reasoning in more
+detail.
+
+Stefan
+
+--T4sUOijqQbZv57TR
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9h8qEACgkQnKSrs4Gr
+c8hEhAf/SUfGhhzQxDgxGk5IuErzcYXEGhph6vciDQTU4Do1T/j/nDiOybcc9Ay+
+acCx/eoihtBO3AkLg2Vvjcu36G+bptRD/4eSHNoJqXV6A27YMxkty4gfEZLPZCvC
+eVgZlOnBwn0286MbDvSn+mZ2iEiwZIFucOC+sgjrSsplPw+b3IFiGBbV4CJqHhdG
+kVynd25VNiPil/Q8FIANPsSxi/FzpLQjO/Z9HUwhatuEUCsUKz/FSgV1C7p2UFFV
+swgx3yUaLh+PYEp17Hrov8JIdAtbSudCBsm8yE9bes3IyGecDXEVmqWaO/8SjM/e
+rF/65E1eiphkgVtN/mobp2nTgCpMEA==
+=wq8k
+-----END PGP SIGNATURE-----
+
+--T4sUOijqQbZv57TR--
 
