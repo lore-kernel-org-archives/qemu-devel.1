@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56918C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 06:19:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6D2DC43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 06:20:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B18B32065E
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 06:19:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 528C02067C
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 06:20:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="CtAL8nJL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B18B32065E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="o3qwXZHl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 528C02067C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIQmY-0007Na-Jh
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 02:19:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59436)
+	id 1kIQo5-0000jK-AV
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 02:20:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59510)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIQhp-0001hW-Fi
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 02:14:13 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:38372)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIQhx-00022Q-Iz
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 02:14:21 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:43709)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIQhn-0005lC-FI
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 02:14:13 -0400
-Received: by mail-pl1-x643.google.com with SMTP id c3so2624572plz.5
- for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 23:14:11 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIQhv-0005mU-Q1
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 02:14:21 -0400
+Received: by mail-pf1-x444.google.com with SMTP id f18so3336017pfa.10
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 23:14:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=tX9XLbRzvavvjyMGPc0edB0FeNbRKcsKHFO3wqmL2TY=;
- b=CtAL8nJLWNFsdH7iXEqobHGm3zrCOJZYbETTxmud7Rnuf/1hcBvSnjWiv9EL8V72pz
- mFDduJd/FDvru8WvMnSdm9dLMLjSouH6mbG/4EKjc9o4nta56Xh9pFgMizWpgXIiTrwO
- UawBrCxo3hgpVT9pc87WBjZ0HKr4eRfPDp5GEUZvo/BacJxgc5JmItSLXs6K/ugw4jHk
- M8QE5O2/ugT7oQCqjsCoues4c++gBfWuckSWF+S2SErxOCbjUKLfpEOpgmMWUCkNZY0W
- tUKFK1v/a3eZA5W1VKXLwihSvNM5RD0tIWtY5AixlilHPPw79qJecRQtIsfhoghcVbUf
- 1Png==
+ bh=fmZ0zShxvpsHgpLnoq8aruXTkYTNo4xgCabQ1KXMZUo=;
+ b=o3qwXZHlstNr1lKXanIrCPjDnUDYaRnRTolEGqaDHNDtDLQBdXb1pa1dKHGV3HntjW
+ /sOcDC3JM4cEaqKyUqMGf2vpovwyUKg5CMT8EtRUN9b0mgRVLjhB1Pe55qwG6GoPK8H7
+ XBoyQbGC04k+rnOlH8QjCJM09pewt1lGRictVL9mCvlu0tCsRxLB8pG8gUhmcEBO9PNR
+ DEjn3qWSsvP9d+WSIHbI/TWyKUTUmzYBJjCfTZJpaOa1KzAkkFO9NejloIBe+EqUKj/r
+ bN4kK56nXDPTVdx9ClKzzC8V5mQFonfZ4sTcyE99T8NYyiOkKx4SJmCaCpoYRQE+QS+H
+ 1pXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=tX9XLbRzvavvjyMGPc0edB0FeNbRKcsKHFO3wqmL2TY=;
- b=a0/dKNFJ4GMw82F4xfoahyvoM5z0aLmuy6MezIEgoEIv+bIm/XsSUAV0Bw5IPzS3kI
- /8ibfSD6C6nbmhPtA5o26oMDhZTBau8rAS0XcBt7aje459/kzX995xiPu3BOY8SsJMpm
- 3p507iURloyYDSZW9YH8WsbteT8wXOew2m6NG3QIuIMEYSoHgw/phPOa8+TEg+ixm2CV
- 3qeqGkJxZyck/Bmdu50lOXY0hIju67r7r9L2ysWca0cDJQ0YXFSPD9tnGVvkiHx5nmgC
- cwBC/1d2fDJyBRTqhZSP1PuPSh2BV81vNSCMRjlWIeBTIQf8diwuB4JAZ+4uHqwa/NL5
- 5NUw==
-X-Gm-Message-State: AOAM531xFuxZQdVh0ECzXrE0Z5w9nduVxVaH6Qu8lr8ggeRxzQHk7AOV
- gu97F7jqAYtlAbyQ4ZemJh7RYvZfAkTQSOfp
-X-Google-Smtp-Source: ABdhPJziqO7SF8PYcMidjTSWzmqJ2Byf0cFS5hDjHliajpEiCSIpuL4KXrHtJswzhGcf9ytZecwQeA==
-X-Received: by 2002:a17:902:8c8c:b029:d1:cc21:9056 with SMTP id
- t12-20020a1709028c8cb02900d1cc219056mr11302303plo.22.1600236848628; 
- Tue, 15 Sep 2020 23:14:08 -0700 (PDT)
+ bh=fmZ0zShxvpsHgpLnoq8aruXTkYTNo4xgCabQ1KXMZUo=;
+ b=INB85eDtAj65ihyfFBDH0n+5a7s2uzD1JERSxwsunRY+/nNkOWUUAOniFRLJ6Y0mBP
+ J087rEh+/fjI3L3yi+IFfIWSDpFPG/yBofDGrDNCgG3HqyOGr7snOa0pxpe1/IK6NVf7
+ 7tkSAIYXhGCZSgc4O/yO7mRkJwqIsipYDULeNOymQiBfTAhju3KfSWHabnavDqeCOHjH
+ oWagGqGnLnWhGdPIGCe/w1b8WcNwUmOz24Py9MbZCdUYNuWgKxN6rw1dS8WqOmBkr2g5
+ CD4AoCQ0diZY12f8n2Cqq1+0gVPVcZjGz0UktSczbi5RJZol8eJVi2e8UUtppvjXBWsm
+ KJrA==
+X-Gm-Message-State: AOAM532a/ALJT9Gwwr2PCRj4tIbsF+9fZjOrFZCHe5Ju2mzjv4nAqnHQ
+ bA0tsZMiI3iKpqsrCYXMJHRLdgHmfuYEFcl1
+X-Google-Smtp-Source: ABdhPJyFq0CWY8fBpUHXvxc5uTl0gVpG6Vz4UtCQKPyFIMolv7N1XFNor56Me1jD5C9UedCF8JRlCw==
+X-Received: by 2002:a63:4a19:: with SMTP id x25mr16774931pga.56.1600236858247; 
+ Tue, 15 Sep 2020 23:14:18 -0700 (PDT)
 Received: from localhost.localdomain ([203.163.234.244])
- by smtp.googlemail.com with ESMTPSA id c20sm583164pfc.209.2020.09.15.23.14.04
+ by smtp.googlemail.com with ESMTPSA id c20sm583164pfc.209.2020.09.15.23.14.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Sep 2020 23:14:07 -0700 (PDT)
+ Tue, 15 Sep 2020 23:14:17 -0700 (PDT)
 From: Ani Sinha <ani@anisinha.ca>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 04/11] Fix a gap where acpi_pcihp_find_hotplug_bus()
- returns a non-hotpluggable bus
-Date: Wed, 16 Sep 2020 11:43:28 +0530
-Message-Id: <20200916061335.14045-5-ani@anisinha.ca>
+Subject: [PATCH v4 06/11] tests/acpi: list added acpi table binary file for
+ pci bridge hotplug test
+Date: Wed, 16 Sep 2020 11:43:30 +0530
+Message-Id: <20200916061335.14045-7-ani@anisinha.ca>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200916061335.14045-1-ani@anisinha.ca>
 References: <20200916061335.14045-1-ani@anisinha.ca>
-Received-SPF: none client-ip=2607:f8b0:4864:20::643;
- envelope-from=ani@anisinha.ca; helo=mail-pl1-x643.google.com
+Received-SPF: none client-ip=2607:f8b0:4864:20::444;
+ envelope-from=ani@anisinha.ca; helo=mail-pf1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -18
@@ -107,60 +106,22 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When ACPI hotplug for the root bus is disabled, the bsel property for that
-bus is not set. Please see the following commit:
-
-3d7e78aa7777f ("Introduce a new flag for i440fx to disable PCI hotplug on the root bus").
-
-As a result, when acpi_pcihp_find_hotplug_bus() is called
-with bsel set to 0, it may return the root bus. This can cause devices attached to
-the root bus to get hot-unplugged if the user issues the following set of commmands:
-
-outl 0xae10 0
-outl 0xae08 your_slot
-
-Thanks to Julia for pointing this out here:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg734548.html
-
-In this patch, we fix the issue in this function by checking if the bus which is
-returned by the function is actually hotpluggable. If not, we simply return NULL.
-This avoids the scenario where we were returning a non-hotpluggable bus.
+The file 'tests/data/acpi/pc/DSDT.hpbridge' is a newly added acpi table file for
+testing the pci bridge option 'acpi-pci-hotplug-with-bridge-support' under i440fx.
+This change documents this fact.
 
 Signed-off-by: Ani Sinha <ani@anisinha.ca>
 ---
- hw/acpi/pcihp.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ tests/qtest/bios-tables-test-allowed-diff.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-change log:
-v1: initial patch
-v4: commit log updated as per suggestion.
-
-diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-index 39b1f74442..32ae8b2c0a 100644
---- a/hw/acpi/pcihp.c
-+++ b/hw/acpi/pcihp.c
-@@ -147,6 +147,21 @@ static PCIBus *acpi_pcihp_find_hotplug_bus(AcpiPciHpState *s, int bsel)
-     if (!bsel && !find.bus) {
-         find.bus = s->root;
-     }
-+
-+    /*
-+     * Check if find.bus is actually hotpluggable. If bsel is set to
-+     * NULL for example on the root bus in order to make it
-+     * non-hotpluggable, find.bus will match the root bus when bsel
-+     * is 0. See acpi_pcihp_test_hotplug_bus() above. Since the
-+     * bus is not hotpluggable however, we should not select the bus.
-+     * Instead, we should set find.bus to NULL in that case. In the check
-+     * below, we generalize this case for all buses, not just the root bus.
-+     * The callers of this function check for a null return value and
-+     * handle them appropriately.
-+     */
-+    if (find.bus && !qbus_is_hotpluggable(BUS(find.bus))) {
-+        find.bus = NULL;
-+    }
-     return find.bus;
- }
- 
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index dfb8523c8b..96a9237355 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1 +1,2 @@
+ /* List of comma-separated changed AML files to ignore */
++"tests/data/acpi/pc/DSDT.hpbridge",
 -- 
 2.17.1
 
