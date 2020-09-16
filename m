@@ -2,67 +2,88 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DATE_IN_PAST_12_24,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD8ECC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:53:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C34DC2BB84
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:54:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F965221E8
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:53:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 53543221EB
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 09:54:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="euLCYRSG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F965221E8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i0QStMea"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53543221EB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIU8F-0007pS-Fo
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 05:53:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53838)
+	id 1kIU8k-00007v-8J
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 05:54:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <c418f935ac6aed9aa1dc0ceb4b19044a9b7b7968@lizzy.crudebyte.com>)
- id 1kIU79-0006Yb-HK
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 05:52:35 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:33753)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <c418f935ac6aed9aa1dc0ceb4b19044a9b7b7968@lizzy.crudebyte.com>)
- id 1kIU77-0000Zv-NN
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 05:52:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:Message-Id:Content-Type:
- Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Content-ID:
- Content-Description; bh=NfMJPFHOyqNdikdMcNm3dv6BKxSuV/xvG2I7xLjgPgY=; b=euLCY
- RSGI3na/zFRfVSPgmJ32N+3h8S0GSeMdsG2JeR3O2MZdPU1kaIkNYLYRdjfuFRMecgm1Qbp/6HQvR
- 4ruTOCVuVhkhR94S3q1K9GJ+I8A2+jyo+s/yTPh3SVb0x07VHp3BUAE+mmWcF/xzz6ghzVyD11jv1
- aDll0Oyfr5Yr0VTYFzt1NIl7rpAs5nK6NdlvxouI8AYTzyrjr061MuIv26m5VnbgtGUBTys0tjCbD
- NYmTXyqsrTLHWxTClMB6mC/l+nInsUjPsZj1dITdAuGYUtNNKck4k1t+iT7knhKkYDmSyqgdD4CcA
- PJVcOzIQoAXU5XWl82Zgbk3wVZDCw==;
-Message-Id: <cover.1600166281.git.qemu_oss@crudebyte.com>
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Tue, 15 Sep 2020 12:38:01 +0200
-Subject: [PULL 0/2] 9p queue
-To: qemu-devel@nongnu.org,
-    Peter Maydell <peter.maydell@linaro.org>
-Cc: Greg Kurz <groug@kaod.org>
-Received-SPF: none client-ip=91.194.90.13;
- envelope-from=c418f935ac6aed9aa1dc0ceb4b19044a9b7b7968@lizzy.crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 05:20:12
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kIU2J-0006i1-5J
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 05:47:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39185)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kIU2H-0008Pr-DC
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 05:47:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600249651;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3JXPYA2yrsOAf5k3nPhmksH7m/JuM8SwBbaZNJhTJO8=;
+ b=i0QStMeaQNEIe6d1kjuUgBC0C8wvun0diO4DGOC2h/D+olZeZlFG6JzKXBwl/eGLQJb9MD
+ 1CSWxBeXTgDrp4gc6e6C73SqxHLrPpiA24Kr/NIoCnFli0SxDVw1d9UfRBTjasdti5WoAp
+ 1apVNenuNakUsRXAAjLS472TQj51378=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-101-GhTuMSsfNduf39b4GBHcnA-1; Wed, 16 Sep 2020 05:47:30 -0400
+X-MC-Unique: GhTuMSsfNduf39b4GBHcnA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 420F7425CE;
+ Wed, 16 Sep 2020 09:47:29 +0000 (UTC)
+Received: from localhost.localdomain.com (unknown [10.36.110.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8F14D75123;
+ Wed, 16 Sep 2020 09:47:26 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 7/8] util: give a specific error message when O_DIRECT doesn't
+ work
+Date: Wed, 16 Sep 2020 10:47:04 +0100
+Message-Id: <20200916094705.2625331-8-berrange@redhat.com>
+In-Reply-To: <20200916094705.2625331-1-berrange@redhat.com>
+References: <20200916094705.2625331-1-berrange@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:16:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_12_24=1.049,
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=no autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,41 +96,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 2d2c73d0e3d504a61f868e46e6abd5643f38091b:
+A common error scenario is to tell QEMU to use O_DIRECT in combination
+with a filesystem that doesn't support it. To aid users to diagnosing
+their mistake we want to provide a clear error message when this happens.
 
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200914-1' into staging (2020-09-14 16:03:08 +0100)
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ util/osdep.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-are available in the Git repository at:
+diff --git a/util/osdep.c b/util/osdep.c
+index c99f1e7db2..8ea7a807c1 100644
+--- a/util/osdep.c
++++ b/util/osdep.c
+@@ -332,11 +332,24 @@ qemu_open_internal(const char *name, int flags, mode_t mode, Error **errp)
+ 
+     if (ret == -1) {
+         const char *action = flags & O_CREAT ? "create" : "open";
++#ifdef O_DIRECT
++        /* Give more helpful error message for O_DIRECT */
++        if (errno == EINVAL && (flags & O_DIRECT)) {
++            ret = open(name, flags & ~O_DIRECT, mode);
++            if (ret != -1) {
++                close(ret);
++                error_setg(errp, "Could not %s '%s': "
++                           "filesystem does not support O_DIRECT",
++                           action, name);
++                errno = EINVAL; /* restore first open()'s errno */
++                return -1;
++            }
++        }
++#endif /* O_DIRECT */
+         error_setg_errno(errp, errno, "Could not %s '%s'",
+                          action, name);
+     }
+ 
+-
+     return ret;
+ }
+ 
+-- 
+2.26.2
 
-  https://github.com/cschoenebeck/qemu.git tags/pull-9p-20200915
-
-for you to fetch changes up to c418f935ac6aed9aa1dc0ceb4b19044a9b7b7968:
-
-  9pfs: disable msize warning for synth driver (2020-09-15 12:12:03 +0200)
-
-----------------------------------------------------------------
-The intention of the following two patches is making users aware about
-the negative file I/O performance impact when using a very low value
-for 9P client parameter 'msize', which especially is the case if no
-'msize' parameter was supplied by the user with a 9P Linux client at all.
-
-All it does is logging a performance warning on host side (once) in
-that case. By setting 'msize' on client side to any value larger than
-8192 the performance warning will disappear.
-
-See https://wiki.qemu.org/Documentation/9psetup#msize for details.
-
-----------------------------------------------------------------
-Christian Schoenebeck (2):
-      9pfs: log warning if msize <= 8192
-      9pfs: disable msize warning for synth driver
-
- fsdev/file-op-9p.h | 4 ++++
- hw/9pfs/9p-synth.c | 2 ++
- hw/9pfs/9p.c       | 9 +++++++++
- 3 files changed, 15 insertions(+)
 
