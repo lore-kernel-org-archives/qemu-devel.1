@@ -2,101 +2,96 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AB43C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 13:53:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58ABAC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 13:54:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C670522240
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 13:53:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A5FB822288
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 13:54:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U+R25vh3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C670522240
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tUb9a+65"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5FB822288
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIXrt-0002q6-TP
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 09:53:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60160)
+	id 1kIXtV-0003k6-LY
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 09:54:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60500)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kIXrA-0002RA-LD
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 09:52:20 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45506)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kIXsn-0003Je-R6
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 09:54:01 -0400
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:39480)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kIXr9-0008TS-1G
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 09:52:20 -0400
-Received: by mail-wr1-x444.google.com with SMTP id x14so6972945wrl.12
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 06:52:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=8sW5cr/41cCmNzoYf61jU9R1aVXLS+FjN79KF0tXiZ8=;
- b=U+R25vh3e9hl6eKp6KKSyYUjZ6TMDuTm5Ht98Bcmo3xqTvRK6X8iAqjA4/M6cvnv1+
- PYTKn3Dht/VeYQYrnCYT7LQqcTL9i0glQDq0Dmzzd3SOH3//8Vc5E1z5TOSyUfbMHHPG
- WGMAGs+xU6He1+d8HCqr6Dy+wTLM8ezWYkcS97YHWiveJeuDYWn1HQzOTo2pAh+nDtXo
- FDf3knlfilnz9tVogI0nh35uj0JWsBYHhVliPM9ATJmq0MSP31X++CpP6dXWhxPeO5AJ
- 9QbptRznBz+WU2JBAkibQbT7/RVCMFHKFUTjfI9RLJc+z5MtVBI4o/oELNIHRkfmyPC2
- q7LA==
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kIXsl-000084-Pr
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 09:54:01 -0400
+Received: by mail-wm1-x32e.google.com with SMTP id b79so3133107wmb.4
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 06:53:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=Xo2xv+zF5NO/fS89ubpJ+prjmYFNpyi3Uo5iYF+lzqI=;
+ b=tUb9a+65C3OxtYepAv6a0ZCAYtHRjpm+E+YOZhod+tnWpu+Q+RXLCFdtLsR2eJD4xx
+ jKJf0W8bNzrTHMyGrnEye4cUsaQokrK4KbudlpmZ80juT9jZV3onM1G2etApj0thEMtY
+ FfqwuXK1BN08SSHdAmmN1YdVKvc9OeM2MOUOOXnnCnNpz+D8qkkP567wNUeLBHiWg6Qq
+ cDTWEBIBR9GnmFyneCqrdLj3WTSv5i6jqDwU72Y47re9D7/XEY6Qlt0JvkYvwqSCoDEH
+ efdUajE8W+1XPpTa2WAcWHau6HLCyLoOlPP8NNvMYocVTPP5RnxI9qC0Qo2ZRekR4x90
+ piVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=8sW5cr/41cCmNzoYf61jU9R1aVXLS+FjN79KF0tXiZ8=;
- b=QuueI4oQLtakAW9t+eHG65goET5oq9hMV3l2QdzUqzzIljf0xMhIZIdgLMHgtbL5zo
- u1X5MFejpmZUklHxbDN0Qu8bO27k/3YQU4JVZXbVjgiqXUoWoI3UXalJq+jxMJNQ79wd
- gj86iFk6UDq6aJq2fgZ9LGbKmp6LAQZNqYHei8+chUOSkcAEw5M2wcVYrU/lHRxGBMOu
- X+FXVMATE6jeuv6SRXRpszscBt4vzgTOg6YhIs6WLcFDWygLhD/jpm8vkRRLXAkurowY
- +z0Seo/kGLn+FgpB8TOrp3EwVPKGMFUJHRPODBAOFzpXJfprDNQz57NFkJezOv9QntdD
- A1nw==
-X-Gm-Message-State: AOAM53282AERvBA3fWDMvSG6MTJ22k6obyzwb6Cdat5XpZ8qzQi3Hc5Z
- ajejIQy9pzTpD6NuYChZjm0=
-X-Google-Smtp-Source: ABdhPJwqVA3jhKWXeyUNvF9PTO0lt8PCCxBPfXNRYEnVPQPFmcUVJPht3sXMUiVBXXEUD+mQ/pFHIg==
-X-Received: by 2002:adf:e304:: with SMTP id b4mr25984830wrj.141.1600264337040; 
- Wed, 16 Sep 2020 06:52:17 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id d6sm33680271wrq.67.2020.09.16.06.52.16
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 16 Sep 2020 06:52:16 -0700 (PDT)
-Subject: Re: [PULL 7/8] gitlab: create a build-deprecated target
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200916122648.17468-1-alex.bennee@linaro.org>
- <20200916122648.17468-8-alex.bennee@linaro.org>
- <CAFEAcA_UEoe2H5zc=L1T3p31FoxKSfG0mRznN-68FQmGTp3+pg@mail.gmail.com>
- <87imcdzwh7.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <d04bee00-624f-c48c-89a1-d5e6cbbddb76@amsat.org>
-Date: Wed, 16 Sep 2020 15:52:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=Xo2xv+zF5NO/fS89ubpJ+prjmYFNpyi3Uo5iYF+lzqI=;
+ b=MmZkgpEmaaRS+q4IzGBKfw8q6FHDm4/VC4MEmMpqXx3KcBZE+k/qGAufCUfdoi33DJ
+ 5l/nn3UmU0dUn7p8zkoDCcV7J2BT1RPYne+9FbQGAmvxzFQqeu5bM3CyB9wo74INROSQ
+ hEIDhNnKYrNXFuuDwvqDn+FX3Xv/BsES6IHBq7GadTligO5UBFdaCyYOPeToE2h02mR0
+ jNmfuXZOmI8AfQAj9wbS8xlR0SqFEcZvCWmm5MvZ8PikhJ1grEH14ld/S7wudeByensg
+ nSULIrqLJUIIyT193xMWbs6RBafdmRmAW4gz44UeszWByuRkdFo34vDaKoUVPAmDE0YH
+ yxGQ==
+X-Gm-Message-State: AOAM530PDi+O2IIJ8wubsrw1lWLzeWr1B6+RUCbNK4aWW2PRFVJoSA1a
+ rR9Sjt7QMm2FWSbSPcwYJtd4UA==
+X-Google-Smtp-Source: ABdhPJwg67Dm7Qdv1daeKnirYKrXnm0w3pI3/LZr+aJhMJ7qTH4VPfxYgPsggrG/N1U+YDYt4jgQ+A==
+X-Received: by 2002:a1c:a557:: with SMTP id o84mr4752556wme.96.1600264437199; 
+ Wed, 16 Sep 2020 06:53:57 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id b187sm5545498wmb.8.2020.09.16.06.53.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 16 Sep 2020 06:53:56 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 85FE81FF7E;
+ Wed, 16 Sep 2020 14:53:55 +0100 (BST)
+References: <875z8eupyp.fsf@dusky.pond.sub.org>
+ <495bd2bd-4f38-8fe2-e758-82acbecd0d04@redhat.com>
+ <436800a3-7645-52f7-5fea-134d883c0a7b@redhat.com>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: Python 3.5 EOL; when can require 3.6?
+In-reply-to: <436800a3-7645-52f7-5fea-134d883c0a7b@redhat.com>
+Date: Wed, 16 Sep 2020 14:53:55 +0100
+Message-ID: <87d02lzv2k.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <87imcdzwh7.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::32e;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -15
-X-Spam_score: -1.6
-X-Spam_bar: -
-X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.062,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,77 +104,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ John Snow <jsnow@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/16/20 3:23 PM, Alex Bennée wrote:
-> 
-> Peter Maydell <peter.maydell@linaro.org> writes:
-> 
->> On Wed, 16 Sep 2020 at 13:27, Alex Bennée <alex.bennee@linaro.org> wrote:
+
+Thomas Huth <thuth@redhat.com> writes:
+
+> On 16/09/2020 09.53, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 9/16/20 9:43 AM, Markus Armbruster wrote:
+>>> We require Python 3.5.  It will reach its "end of life" at the end of
+>>> September 2020[*].  Any reason not to require 3.6 for 5.2?  qemu-iotests
+>>> already does for its Python parts.
 >>>
->>> These targets might be deprecated but we should keep them building
->>> before the final axe comes down. Lets keep them all in one place and
->>> don't hold up the CI if they do fail. They are either poorly tested or
->>> already flaky anyway.
 >>>
->>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>> Acked-by: Thomas Huth <thuth@redhat.com>
->>> Message-Id: <20200915134317.11110-8-alex.bennee@linaro.org>
->>>
->>> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
->>> index 72e8604579ee..f027b55aef15 100644
->>> --- a/.gitlab-ci.yml
->>> +++ b/.gitlab-ci.yml
->>> @@ -254,6 +254,16 @@ build-clang:
->>>        ppc-softmmu s390x-softmmu arm-linux-user
->>>      MAKE_CHECK_ARGS: check
->>>
->>> +# These targets are on the way out
->>> +build-deprecated:
->>> +  <<: *native_build_job_definition
->>> +  variables:
->>> +    IMAGE: debian-all-test-cross
->>> +    CONFIGURE_ARGS: --disable-docs --disable-tools --disable-system
->>> +    MAKE_CHECK_ARGS: check-tcg
->>> +    TARGETS: ppc64abi32-linux-user tilegx-linux-user
->>> +  allow_failure: true
->>
->> It's kind of awkward to have the CI config need to be updated when
->> we mark a config as deprecated. Can we have something so that
->> the CI just arranges to build all of the deprecated targets?
-> 
-> You mean a configure --enable-deprecated-targets?
-> 
->>
->> (As demonstration, this list is missing unicore32, which is also
->> deprecated.)
-> 
-> That was fixed up in the next patch.
-> 
->> Also, "allow_failure: true" seems wrong to me. These targets
->> are only deprecated, which means we promise that the feature
->> should still work (to whatever extent it already did) for the 2
->> releases in which it is deprecated. We want our CI to tell us
->> if it fails to compile or fails tests, because we would need to
->> fix those bugs for a release.
+>>> [*] https://www.python.org/downloads/release/python-3510/
+>>=20
+>> Not answering your question, but it would help to start a table
+>> of "oldest package released" versions, with our supported distributions
+>> as columns and package names as row.
+>>=20
+>> This way when new distributions are released (and oldest dropped from
+>> our side) we can add/remove a column and see the oldest version we aim
+>> to support.
+>
+> That's quite a bit of extra work - I think it's enough to look up the
+> versions on repology instead, e.g.:
+>
+> https://repology.org/project/python/versions
 
-Should we stop building the ppc64abi32 target instead?
+Hmm are there any magic runes to limit the list to only the distros we
+care about?
 
-From c609274b853 ("docs/system/deprecated: mark
-ppc64abi32-linux-user for deprecation"):
-
- The ppc64abi32 architecture has a number of issues which regularly
- trip up our CI testing and is suspected to be quite broken. For that
- reason the maintainers strongly suspect no one actually uses it.
-
-> 
-> I can revert that bit.
-> 
-
+--=20
+Alex Benn=C3=A9e
 
