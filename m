@@ -2,62 +2,88 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7837CC43461
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 06:26:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B37DDC43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 06:26:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD640206DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 06:26:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD640206DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 49C1620684
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 06:26:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="CEBULknC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49C1620684
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIQtg-0008KW-NU
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 02:26:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58920)
+	id 1kIQtq-0008MG-6X
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 02:26:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59316)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kIQfQ-0006xi-D5
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 02:11:44 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:37292 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kIQfJ-0005YT-Lc
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 02:11:43 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 323A2909E7B9AD6185F8;
- Wed, 16 Sep 2020 14:11:25 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Wed, 16 Sep 2020
- 14:11:15 +0800
-From: Chuan Zheng <zhengchuan@huawei.com>
-To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>,
- <berrange@redhat.com>
-Subject: [PATCH v10 00/12] *** A Method for evaluating dirty page rate ***
-Date: Wed, 16 Sep 2020 14:21:55 +0800
-Message-ID: <1600237327-33618-1-git-send-email-zhengchuan@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.101.6]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32; envelope-from=zhengchuan@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:11:25
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIQha-0001SZ-7X
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 02:13:58 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:36744)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIQhW-0005hg-Tk
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 02:13:57 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id b17so999452pji.1
+ for <qemu-devel@nongnu.org>; Tue, 15 Sep 2020 23:13:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=HHdiOGLkXts4NNVu4SCMzFcJi56aYTGQpkW5PEoj6js=;
+ b=CEBULknCTRQF7PfgSYBeZ8rGdbc9UpqyIMiSlrkOMB/y6ZVVFmB2nN0nL3rDSBhUe2
+ ghNfKqKVXMjmvJS8NcqzNuqunsMR0RkCb1ejC2b3fJ1Io/FkPY2lWJ29klH5o+SouE55
+ +APEOcNyqt6IZSSOLaiRfTc3IxKMUzknQi0meJ0i+LLc1ebcof1ujeyopyCcbj7kt2H4
+ KjFtvqnYdxcGOcQ8ztqojVPKmXRemEF8R7MSo/vjFT/aGW8pY1z6Q+dCnhbX3dLKYLJ3
+ Kd02L4mEVYLq0S+btu6fAi5r8RPBz9TeBvA4M6wW7YsxfQvEl6o6yDmJKMZmsulR3xOM
+ jYBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=HHdiOGLkXts4NNVu4SCMzFcJi56aYTGQpkW5PEoj6js=;
+ b=q7rPoEtEf65BXcONaohoj5HlaGB34loo+ZFiq9PUJeAlVoLAKjD2pjYafCdXG4nky6
+ aAHQsEOnjhmbvTGjhBrypszQ5sRnMg3kZ3i1eCLoGSC7Y6yPGQar3xAyicjAF50uOIsh
+ D58FSJrnzlxpNsgGt9fZVWQV1TVWy+RxzqpzRUpaWrRXBSMjvrIqKjUp6TcM/HohKWU4
+ NfuE2Fj/H1WLcpT5+fZPcJrwj7pEpK8vEiKSza7s6P+UbcNizSRnTw44MEjc3oMC2Kmz
+ rOKZNbUXBz4Kc7lAlUoxG7gRu2L7z6Hv0Xr6uv7tRP30z6of75zxHrRcsYZ/9Up1Ha7z
+ iFcA==
+X-Gm-Message-State: AOAM5324ekuBrCAI1QsK0mUiBhg54/BHsI+lVlx/8FB2KsOQ9/Bjacqa
+ 6YdWC8FkS5z2e4+eQlfJ3KuZNzDw+//6vnAP
+X-Google-Smtp-Source: ABdhPJzEZLj8HxdjUKRyrml4a0Mh+Yjva2nXP9Jfpi38ky6zXKAiBDzYdFYQumvUymmkGrDdZGDl0g==
+X-Received: by 2002:a17:902:a706:b029:d0:89f3:28c9 with SMTP id
+ w6-20020a170902a706b02900d089f328c9mr22400984plq.5.1600236833243; 
+ Tue, 15 Sep 2020 23:13:53 -0700 (PDT)
+Received: from localhost.localdomain ([203.163.234.244])
+ by smtp.googlemail.com with ESMTPSA id c20sm583164pfc.209.2020.09.15.23.13.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 15 Sep 2020 23:13:52 -0700 (PDT)
+From: Ani Sinha <ani@anisinha.ca>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 01/11] tests/acpi: document addition of table DSDT.roothp
+ for unit testing root pci hotplug on/off
+Date: Wed, 16 Sep 2020 11:43:25 +0530
+Message-Id: <20200916061335.14045-2-ani@anisinha.ca>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200916061335.14045-1-ani@anisinha.ca>
+References: <20200916061335.14045-1-ani@anisinha.ca>
+Received-SPF: none client-ip=2607:f8b0:4864:20::1041;
+ envelope-from=ani@anisinha.ca; helo=mail-pj1-x1041.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,128 +96,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhengchuan@huawei.com, zhang.zhanghailiang@huawei.com, liq3ea@gmail.com,
- qemu-devel@nongnu.org, xiexiangyou@huawei.com, alex.chen@huawei.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, jusual@redhat.com,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
+ Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v9 -> v10:
-    rename find_page_matched as find_block_matched
-    fix wrong termination condition in find_block_matched
-    add review-by for patches
+A new binary acpi table tests/data/acpi/pc/DSDT.roothp is added in order to unit test
+the feature flag that can disable/enable root pci bus hotplug on i440fx. This feature was
+added with the commit:
+3d7e78aa7777f0 ("Introduce a new flag for i440fx to disable PCI hotplug on the root bus")
 
-v8 -> v9:
-    fix wrong index return of record_ramblock_hash_info
-    optimize variable name according to review
-    reset dirty_rate as -1
-    change returns of compare_page_hash_info to bool
+This change documents the fact that this new file addition was made as a part of the
+unit test change.
 
-v7 -> v8:
-    add atomic_read for dirtyrate status
-    add error_report if set dirtyrate state failed
-    change returns of save_ramblock_hash and record_ramblock_hash_info to bool
-    alloc ramblock dirtyinfo array at one time
-    add review-by for patches
+Signed-off-by: Ani Sinha <ani@anisinha.ca>
+---
+ tests/qtest/bios-tables-test-allowed-diff.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-v6 -> v7:
-    fix minior comments and coding style by review
-    add review-by for patches
-
-v5 -> v6:
-    fix coding style according to review
-    use TARGET_PAGE_SIZE and TARGET_PAGE_BITS instead of self-defined macros
-    return start-time and calc-time by qmp command
-
-v4 -> v5:
-    fix git apply failed due to meson-build
-    add review-by for patches in v3
-
-v3 -> v4:
-    use crc32 to get hash result instead of md5
-    add DirtyRateStatus to denote calculation status
-    add some trace_calls to make it easier to debug
-    fix some comments accroding to review
-
-v2 -> v3:
-    fix size_t compile warning
-    fix codestyle checked by checkpatch.pl
-
-v1 -> v2:
-    use g_rand_new() to generate rand_buf
-    move RAMBLOCK_FOREACH_MIGRATABLE into migration/ram.h
-    add skip_sample_ramblock to filter sampled ramblock
-    fix multi-numa vm coredump when query dirtyrate
-    rename qapi interface and rename some structures and functions
-    succeed to compile by appling each patch
-    add test for migrating vm
-
-Sometimes it is neccessary to evaluate dirty page rate before migration.
-Users could decide whether to proceed migration based on the evaluation
-in case of vm performance loss due to heavy workload.
-Unlikey simulating dirtylog sync which could do harm on runnning vm,
-we provide a sample-hash method to compare hash results for samping page.
-In this way, it would have hardly no impact on vm performance.
-
-Evaluate the dirtypage rate both on running and migration vm.
-The VM specifications for migration are as follows:
-- VM use 4-K page;
-- the number of VCPU is 32;
-- the total memory is 32Gigabit;
-- use 'mempress' tool to pressurize VM(mempress 4096 1024);
-- migration bandwidth is 1GB/s
-
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-|                      |  running  |                  migrating                           |
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-| no mempress          |   4MB/s   |          8MB/s      (migrated success)               |
--------------------------------------------------------------------------------------------
-| mempress 4096 1024   |  1060MB/s |     456MB/s ~ 1142MB/s (cpu throttle triggered)      |
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-| mempress 4096 4096   |  4114MB/s |     688MB/s ~ 4132MB/s (cpu throttle triggered)      |
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-Test dirtyrate by qmp command like this:
-1.  virsh qemu-monitor-command [vmname] '{"execute":"calc-dirty-rate", "arguments": {"calc-time": [sleep-time]}}'; 
-2.  sleep specific time which is a bit larger than sleep-time
-3.  virsh qemu-monitor-command [vmname] '{"execute":"query-dirty-rate"}'
-
-The qmp command returns like this:
-{"return":{"status":"measured","dirty-rate":374,"start-time":3718293,"calc-time":1},"id":"libvirt-15"}
-
-Further test dirtyrate by libvirt api like this:
-virsh getdirtyrate [vmname] [sleep-time]
-
-Chuan Zheng (12):
-  migration/dirtyrate: setup up query-dirtyrate framwork
-  migration/dirtyrate: add DirtyRateStatus to denote calculation status
-  migration/dirtyrate: Add RamblockDirtyInfo to store sampled page info
-  migration/dirtyrate: Add dirtyrate statistics series functions
-  migration/dirtyrate: move RAMBLOCK_FOREACH_MIGRATABLE into ram.h
-  migration/dirtyrate: Record hash results for each sampled page
-  migration/dirtyrate: Compare page hash results for recorded sampled
-    page
-  migration/dirtyrate: skip sampling ramblock with size below
-    MIN_RAMBLOCK_SIZE
-  migration/dirtyrate: Implement set_sample_page_period() and
-    is_sample_period_valid()
-  migration/dirtyrate: Implement calculate_dirtyrate() function
-  migration/dirtyrate: Implement
-    qmp_cal_dirty_rate()/qmp_get_dirty_rate() function
-  migration/dirtyrate: Add trace_calls to make it easier to debug
-
- migration/dirtyrate.c  | 426 +++++++++++++++++++++++++++++++++++++++++++++++++
- migration/dirtyrate.h  |  70 ++++++++
- migration/meson.build  |   2 +-
- migration/ram.c        |  11 +-
- migration/ram.h        |  10 ++
- migration/trace-events |   8 +
- qapi/migration.json    |  67 ++++++++
- 7 files changed, 583 insertions(+), 11 deletions(-)
- create mode 100644 migration/dirtyrate.c
- create mode 100644 migration/dirtyrate.h
-
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index dfb8523c8b..ac864fc982 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1 +1,2 @@
+ /* List of comma-separated changed AML files to ignore */
++"tests/data/acpi/pc/DSDT.roothp",
 -- 
-1.8.3.1
+2.17.1
 
 
