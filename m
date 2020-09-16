@@ -2,84 +2,91 @@ Return-Path: <SRS0=+YCa=CZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NORMAL_HTTP_TO_IP,
-	NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3444C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 18:27:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80760C43461
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 18:29:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25753206B5
-	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 18:27:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25753206B5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id D038C206B5
+	for <qemu-devel@archiver.kernel.org>; Wed, 16 Sep 2020 18:29:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KYbHGUiB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D038C206B5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIc9m-0000VR-1y
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 14:27:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58908)
+	id 1kIcAw-0001vH-Q2
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 14:29:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIc7o-0007Lu-G4
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 14:25:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54942)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIc7k-00015D-3A
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 14:25:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kIc7g-0000Xx-MM
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 18:25:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A6C292E8026
- for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 18:25:40 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 16 Sep 2020 18:19:25 -0000
-From: sean mooney <1894804@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kIc8N-00082W-Uw
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 14:26:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33778)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kIc8I-0001E3-3A
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 14:26:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600280777;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=OtlOxk4wxiQ7KWb/6EBmhRDNmPG/ZzyVq9i5rDVuZKA=;
+ b=KYbHGUiBtIKTW+liCiHCvvTa9Vl1oJaRP5yC6rQ7hUBHhTItMUEEDVwTuGO+dVpXlt2leR
+ kckaD4xqeRep0jIlmvc9SbvSoNUrXPUDn4dlFMP4pGjNXIj8jlWTSBcsrUVYDgapgINSqh
+ WAOujK5aGG4PALQs+AZIabZfHuuI0uU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-120-xGMfrFtcM4KgG0d78t-SOw-1; Wed, 16 Sep 2020 14:26:15 -0400
+X-MC-Unique: xGMfrFtcM4KgG0d78t-SOw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B235100746B;
+ Wed, 16 Sep 2020 18:26:11 +0000 (UTC)
+Received: from localhost (ovpn-119-217.rdu2.redhat.com [10.10.119.217])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 43BC619D61;
+ Wed, 16 Sep 2020 18:25:52 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=New; importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange kashyapc lyarwood sean-k-mooney
-X-Launchpad-Bug-Reporter: Lee Yarwood (lyarwood)
-X-Launchpad-Bug-Modifier: sean mooney (sean-k-mooney)
-References: <159955374051.12161.5076756019458607363.malonedeb@chaenomeles.canonical.com>
-Message-Id: <160028036632.17103.16332526350361842067.malone@soybean.canonical.com>
-Subject: [Bug 1894804] Re: Second DEVICE_DELETED event missing during
- virtio-blk disk device detach
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: d79eb99e18b893b556bebd531062a883d5844568
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 14:25:41
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -53
-X-Spam_score: -5.4
+Subject: [PATCH 4/5] [automated] Use OBJECT_DECLARE_TYPE when possible
+Date: Wed, 16 Sep 2020 14:25:18 -0400
+Message-Id: <20200916182519.415636-5-ehabkost@redhat.com>
+In-Reply-To: <20200916182519.415636-1-ehabkost@redhat.com>
+References: <20200916182519.415636-1-ehabkost@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 02:35:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
 X-Spam_bar: -----
-X-Spam_report: (-5.4 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, NORMAL_HTTP_TO_IP=0.001,
- NUMERIC_HTTP_ADDR=1.242, RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- WEIRD_PORT=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,624 +95,1423 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1894804 <1894804@bugs.launchpad.net>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ David Hildenbrand <david@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Laurent Vivier <laurent@vivier.eu>, Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, Paul Durrant <paul@xen.org>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, Joel Stanley <joel@jms.id.au>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>,
+ Sergio Lopez <slp@redhat.com>, Alistair Francis <alistair@alistair23.me>,
+ Beniamino Galvani <b.galvani@gmail.com>, Eric Auger <eric.auger@redhat.com>,
+ qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
+ Peter Chubb <peter.chubb@nicta.com.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ xen-devel@lists.xenproject.org, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+ Andrew Jeffery <andrew@aj.id.au>, Cornelia Huck <cohuck@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-hum i was hoping to indicate this affect focal in some what but not sure ho=
-w to do that but this issue
-happens with the ubunutu 20.04 version of qemu 4.2
-it does not seam to happen with the centos 8 build of the same qemu so i do=
-nt know if there is a delta in packages or if its just a case that in the o=
-penstack ci we have more testing based on ubuntu 20.04 and its appearing th=
-ere more as a result.
+This converts existing DECLARE_OBJ_CHECKERS usage to
+OBJECT_DECLARE_TYPE when possible.
 
+ $ ./scripts/codeconverter/converter.py -i \
+   --pattern=AddObjectDeclareType $(git grep -l '' -- '*.[ch]')
 
-** Also affects: ubuntu
-   Importance: Undecided
-       Status: New
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Andrzej Zaborowski <balrogg@gmail.com>
+Cc: Alistair Francis <alistair@alistair23.me>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: David Hildenbrand <david@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>
+Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: "Marc-André Lureau" <marcandre.lureau@redhat.com>
+Cc: "Cédric Le Goater" <clg@kaod.org>
+Cc: Andrew Jeffery <andrew@aj.id.au>
+Cc: Joel Stanley <joel@jms.id.au>
+Cc: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Cc: "Philippe Mathieu-Daudé" <f4bug@amsat.org>
+Cc: Eric Auger <eric.auger@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: Sergio Lopez <slp@redhat.com>
+Cc: John Snow <jsnow@redhat.com>
+Cc: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Cc: Peter Chubb <peter.chubb@nicta.com.au>
+Cc: "Daniel P. Berrangé" <berrange@redhat.com>
+Cc: Beniamino Galvani <b.galvani@gmail.com>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: Paul Durrant <paul@xen.org>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: qemu-arm@nongnu.org
+Cc: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
+Cc: qemu-ppc@nongnu.org
+Cc: qemu-s390x@nongnu.org
+Cc: xen-devel@lists.xenproject.org
+---
+ hw/ppc/e500.h                         | 5 +----
+ hw/s390x/ccw-device.h                 | 4 +---
+ hw/s390x/virtio-ccw.h                 | 5 +----
+ hw/usb/ccid.h                         | 5 +----
+ hw/usb/hcd-dwc2.h                     | 3 +--
+ hw/usb/hcd-ehci.h                     | 5 +----
+ hw/virtio/virtio-pci.h                | 5 +----
+ include/chardev/char.h                | 4 +---
+ include/hw/arm/aspeed_soc.h           | 5 +----
+ include/hw/arm/bcm2836.h              | 5 +----
+ include/hw/arm/smmu-common.h          | 5 +----
+ include/hw/arm/smmuv3.h               | 5 +----
+ include/hw/arm/virt.h                 | 5 +----
+ include/hw/boards.h                   | 3 +--
+ include/hw/display/macfb.h            | 5 +----
+ include/hw/gpio/aspeed_gpio.h         | 5 +----
+ include/hw/i2c/aspeed_i2c.h           | 5 +----
+ include/hw/i386/ioapic_internal.h     | 5 +----
+ include/hw/i386/microvm.h             | 5 +----
+ include/hw/i386/pc.h                  | 4 +---
+ include/hw/i386/x86-iommu.h           | 5 +----
+ include/hw/i386/x86.h                 | 5 +----
+ include/hw/ide/internal.h             | 4 +---
+ include/hw/input/adb.h                | 4 +---
+ include/hw/isa/i8259_internal.h       | 5 +----
+ include/hw/isa/isa.h                  | 4 +---
+ include/hw/mem/nvdimm.h               | 5 +----
+ include/hw/misc/aspeed_scu.h          | 5 +----
+ include/hw/misc/aspeed_sdmc.h         | 5 +----
+ include/hw/misc/imx_ccm.h             | 5 +----
+ include/hw/misc/mos6522.h             | 5 +----
+ include/hw/pci-host/pnv_phb4.h        | 5 +----
+ include/hw/pci/pci.h                  | 4 +---
+ include/hw/pci/pci_host.h             | 4 +---
+ include/hw/pcmcia.h                   | 5 +----
+ include/hw/ppc/spapr.h                | 5 +----
+ include/hw/qdev-core.h                | 4 +---
+ include/hw/rtc/allwinner-rtc.h        | 5 +----
+ include/hw/s390x/3270-ccw.h           | 5 +----
+ include/hw/s390x/s390-virtio-ccw.h    | 5 +----
+ include/hw/s390x/storage-attributes.h | 5 +----
+ include/hw/s390x/storage-keys.h       | 5 +----
+ include/hw/s390x/tod.h                | 5 +----
+ include/hw/scsi/scsi.h                | 4 +---
+ include/hw/sd/allwinner-sdhost.h      | 5 +----
+ include/hw/sd/sd.h                    | 5 +----
+ include/hw/ssi/aspeed_smc.h           | 5 +----
+ include/hw/ssi/xilinx_spips.h         | 4 +---
+ include/hw/timer/aspeed_timer.h       | 5 +----
+ include/hw/timer/i8254.h              | 5 +----
+ include/hw/usb.h                      | 4 +---
+ include/hw/virtio/virtio.h            | 4 +---
+ include/hw/watchdog/wdt_aspeed.h      | 5 +----
+ include/hw/xen/xen-block.h            | 4 +---
+ include/hw/xen/xen-bus.h              | 4 +---
+ include/net/can_host.h                | 5 +----
+ include/net/filter.h                  | 4 +---
+ include/ui/console.h                  | 4 +---
+ hw/arm/mps2-tz.c                      | 5 +----
+ hw/arm/mps2.c                         | 5 +----
+ hw/arm/musca.c                        | 5 +----
+ hw/arm/spitz.c                        | 5 +----
+ hw/arm/vexpress.c                     | 5 +----
+ hw/block/m25p80.c                     | 5 +----
+ hw/input/adb-kbd.c                    | 5 +----
+ hw/input/adb-mouse.c                  | 5 +----
+ hw/misc/tmp421.c                      | 5 +----
+ hw/scsi/scsi-disk.c                   | 5 +----
+ hw/scsi/vmw_pvscsi.c                  | 5 +----
+ 69 files changed, 69 insertions(+), 255 deletions(-)
 
-** Package changed: ubuntu =3D> qemu (Ubuntu)
+diff --git a/hw/ppc/e500.h b/hw/ppc/e500.h
+index 63870751ff..1e5853b032 100644
+--- a/hw/ppc/e500.h
++++ b/hw/ppc/e500.h
+@@ -14,7 +14,6 @@ struct PPCE500MachineState {
+      */
+     PlatformBusDevice *pbus_dev;
+ };
+-typedef struct PPCE500MachineState PPCE500MachineState;
+ 
+ struct PPCE500MachineClass {
+     /*< private >*/
+@@ -39,14 +38,12 @@ struct PPCE500MachineClass {
+     hwaddr pci_mmio_bus_base;
+     hwaddr spin_base;
+ };
+-typedef struct PPCE500MachineClass PPCE500MachineClass;
+ 
+ void ppce500_init(MachineState *machine);
+ 
+ hwaddr booke206_page_size_to_tlb(uint64_t size);
+ 
+ #define TYPE_PPCE500_MACHINE      "ppce500-base-machine"
+-DECLARE_OBJ_CHECKERS(PPCE500MachineState, PPCE500MachineClass,
+-                     PPCE500_MACHINE, TYPE_PPCE500_MACHINE)
++OBJECT_DECLARE_TYPE(PPCE500MachineState, PPCE500MachineClass, PPCE500_MACHINE)
+ 
+ #endif
+diff --git a/hw/s390x/ccw-device.h b/hw/s390x/ccw-device.h
+index cf7d492084..832c78cd42 100644
+--- a/hw/s390x/ccw-device.h
++++ b/hw/s390x/ccw-device.h
+@@ -38,7 +38,6 @@ struct CCWDeviceClass {
+     void (*realize)(CcwDevice *, Error **);
+     void (*refill_ids)(CcwDevice *);
+ };
+-typedef struct CCWDeviceClass CCWDeviceClass;
+ 
+ static inline CcwDevice *to_ccw_dev_fast(DeviceState *d)
+ {
+@@ -47,7 +46,6 @@ static inline CcwDevice *to_ccw_dev_fast(DeviceState *d)
+ 
+ #define TYPE_CCW_DEVICE "ccw-device"
+ 
+-DECLARE_OBJ_CHECKERS(CcwDevice, CCWDeviceClass,
+-                     CCW_DEVICE, TYPE_CCW_DEVICE)
++OBJECT_DECLARE_TYPE(CcwDevice, CCWDeviceClass, CCW_DEVICE)
+ 
+ #endif
+diff --git a/hw/s390x/virtio-ccw.h b/hw/s390x/virtio-ccw.h
+index cea259685d..21790608b4 100644
+--- a/hw/s390x/virtio-ccw.h
++++ b/hw/s390x/virtio-ccw.h
+@@ -54,10 +54,7 @@
+ #define CCW_CMD_SET_VIRTIO_REV 0x83
+ 
+ #define TYPE_VIRTIO_CCW_DEVICE "virtio-ccw-device"
+-typedef struct VirtIOCCWDeviceClass VirtIOCCWDeviceClass;
+-typedef struct VirtioCcwDevice VirtioCcwDevice;
+-DECLARE_OBJ_CHECKERS(VirtioCcwDevice, VirtIOCCWDeviceClass,
+-                     VIRTIO_CCW_DEVICE, TYPE_VIRTIO_CCW_DEVICE)
++OBJECT_DECLARE_TYPE(VirtioCcwDevice, VirtIOCCWDeviceClass, VIRTIO_CCW_DEVICE)
+ 
+ typedef struct VirtioBusState VirtioCcwBusState;
+ typedef struct VirtioBusClass VirtioCcwBusClass;
+diff --git a/hw/usb/ccid.h b/hw/usb/ccid.h
+index ef2bb3462d..6b82a55bd4 100644
+--- a/hw/usb/ccid.h
++++ b/hw/usb/ccid.h
+@@ -13,13 +13,10 @@
+ #include "hw/qdev-core.h"
+ #include "qom/object.h"
+ 
+-typedef struct CCIDCardState CCIDCardState;
+ typedef struct CCIDCardInfo CCIDCardInfo;
+ 
+ #define TYPE_CCID_CARD "ccid-card"
+-typedef struct CCIDCardClass CCIDCardClass;
+-DECLARE_OBJ_CHECKERS(CCIDCardState, CCIDCardClass,
+-                     CCID_CARD, TYPE_CCID_CARD)
++OBJECT_DECLARE_TYPE(CCIDCardState, CCIDCardClass, CCID_CARD)
+ 
+ /*
+  * callbacks to be used by the CCID device (hw/usb-ccid.c) to call
+diff --git a/hw/usb/hcd-dwc2.h b/hw/usb/hcd-dwc2.h
+index 919e3e43b1..6998b04706 100644
+--- a/hw/usb/hcd-dwc2.h
++++ b/hw/usb/hcd-dwc2.h
+@@ -181,7 +181,6 @@ struct DWC2Class {
+ };
+ 
+ #define TYPE_DWC2_USB   "dwc2-usb"
+-DECLARE_OBJ_CHECKERS(DWC2State, DWC2Class,
+-                     DWC2_USB, TYPE_DWC2_USB)
++OBJECT_DECLARE_TYPE(DWC2State, DWC2Class, DWC2_USB)
+ 
+ #endif
+diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
+index 1301ce0be7..199913bca5 100644
+--- a/hw/usb/hcd-ehci.h
++++ b/hw/usb/hcd-ehci.h
+@@ -350,10 +350,7 @@ struct EHCIPCIState {
+ #define TYPE_PPC4xx_EHCI "ppc4xx-ehci-usb"
+ #define TYPE_FUSBH200_EHCI "fusbh200-ehci-usb"
+ 
+-typedef struct EHCISysBusState EHCISysBusState;
+-typedef struct SysBusEHCIClass SysBusEHCIClass;
+-DECLARE_OBJ_CHECKERS(EHCISysBusState, SysBusEHCIClass,
+-                     SYS_BUS_EHCI, TYPE_SYS_BUS_EHCI)
++OBJECT_DECLARE_TYPE(EHCISysBusState, SysBusEHCIClass, SYS_BUS_EHCI)
+ 
+ struct EHCISysBusState {
+     /*< private >*/
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index 47b6bb4e26..06e2af12de 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -19,7 +19,6 @@
+ #include "hw/virtio/virtio-bus.h"
+ #include "qom/object.h"
+ 
+-typedef struct VirtIOPCIProxy VirtIOPCIProxy;
+ 
+ /* virtio-pci-bus */
+ 
+@@ -91,9 +90,7 @@ typedef struct {
+  * virtio-pci: This is the PCIDevice which has a virtio-pci-bus.
+  */
+ #define TYPE_VIRTIO_PCI "virtio-pci"
+-typedef struct VirtioPCIClass VirtioPCIClass;
+-DECLARE_OBJ_CHECKERS(VirtIOPCIProxy, VirtioPCIClass,
+-                     VIRTIO_PCI, TYPE_VIRTIO_PCI)
++OBJECT_DECLARE_TYPE(VirtIOPCIProxy, VirtioPCIClass, VIRTIO_PCI)
+ 
+ struct VirtioPCIClass {
+     PCIDeviceClass parent_class;
+diff --git a/include/chardev/char.h b/include/chardev/char.h
+index 5874de57ea..db42f0a8c6 100644
+--- a/include/chardev/char.h
++++ b/include/chardev/char.h
+@@ -226,9 +226,7 @@ int qemu_chr_write(Chardev *s, const uint8_t *buf, int len, bool write_all);
+ int qemu_chr_wait_connected(Chardev *chr, Error **errp);
+ 
+ #define TYPE_CHARDEV "chardev"
+-typedef struct ChardevClass ChardevClass;
+-DECLARE_OBJ_CHECKERS(Chardev, ChardevClass,
+-                     CHARDEV, TYPE_CHARDEV)
++OBJECT_DECLARE_TYPE(Chardev, ChardevClass, CHARDEV)
+ 
+ #define TYPE_CHARDEV_NULL "chardev-null"
+ #define TYPE_CHARDEV_MUX "chardev-mux"
+diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
+index 05c7d53df3..11cfe6e358 100644
+--- a/include/hw/arm/aspeed_soc.h
++++ b/include/hw/arm/aspeed_soc.h
+@@ -62,12 +62,9 @@ struct AspeedSoCState {
+     AspeedSDHCIState sdhci;
+     AspeedSDHCIState emmc;
+ };
+-typedef struct AspeedSoCState AspeedSoCState;
+ 
+ #define TYPE_ASPEED_SOC "aspeed-soc"
+-typedef struct AspeedSoCClass AspeedSoCClass;
+-DECLARE_OBJ_CHECKERS(AspeedSoCState, AspeedSoCClass,
+-                     ASPEED_SOC, TYPE_ASPEED_SOC)
++OBJECT_DECLARE_TYPE(AspeedSoCState, AspeedSoCClass, ASPEED_SOC)
+ 
+ struct AspeedSoCClass {
+     DeviceClass parent_class;
+diff --git a/include/hw/arm/bcm2836.h b/include/hw/arm/bcm2836.h
+index 181d9563d0..428c15d316 100644
+--- a/include/hw/arm/bcm2836.h
++++ b/include/hw/arm/bcm2836.h
+@@ -18,10 +18,7 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_BCM283X "bcm283x"
+-typedef struct BCM283XClass BCM283XClass;
+-typedef struct BCM283XState BCM283XState;
+-DECLARE_OBJ_CHECKERS(BCM283XState, BCM283XClass,
+-                     BCM283X, TYPE_BCM283X)
++OBJECT_DECLARE_TYPE(BCM283XState, BCM283XClass, BCM283X)
+ 
+ #define BCM283X_NCPUS 4
+ 
+diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+index 54d0872fd8..706be3c6d0 100644
+--- a/include/hw/arm/smmu-common.h
++++ b/include/hw/arm/smmu-common.h
+@@ -118,7 +118,6 @@ struct SMMUState {
+     uint8_t bus_num;
+     PCIBus *primary_bus;
+ };
+-typedef struct SMMUState SMMUState;
+ 
+ struct SMMUBaseClass {
+     /* <private> */
+@@ -129,11 +128,9 @@ struct SMMUBaseClass {
+     DeviceRealize parent_realize;
+ 
+ };
+-typedef struct SMMUBaseClass SMMUBaseClass;
+ 
+ #define TYPE_ARM_SMMU "arm-smmu"
+-DECLARE_OBJ_CHECKERS(SMMUState, SMMUBaseClass,
+-                     ARM_SMMU, TYPE_ARM_SMMU)
++OBJECT_DECLARE_TYPE(SMMUState, SMMUBaseClass, ARM_SMMU)
+ 
+ /* Return the SMMUPciBus handle associated to a PCI bus number */
+ SMMUPciBus *smmu_find_smmu_pcibus(SMMUState *s, uint8_t bus_num);
+diff --git a/include/hw/arm/smmuv3.h b/include/hw/arm/smmuv3.h
+index 2a3f6dd197..c641e60735 100644
+--- a/include/hw/arm/smmuv3.h
++++ b/include/hw/arm/smmuv3.h
+@@ -63,7 +63,6 @@ struct SMMUv3State {
+     qemu_irq     irq[4];
+     QemuMutex mutex;
+ };
+-typedef struct SMMUv3State SMMUv3State;
+ 
+ typedef enum {
+     SMMU_IRQ_EVTQ,
+@@ -80,10 +79,8 @@ struct SMMUv3Class {
+     DeviceRealize parent_realize;
+     DeviceReset   parent_reset;
+ };
+-typedef struct SMMUv3Class SMMUv3Class;
+ 
+ #define TYPE_ARM_SMMUV3   "arm-smmuv3"
+-DECLARE_OBJ_CHECKERS(SMMUv3State, SMMUv3Class,
+-                     ARM_SMMUV3, TYPE_ARM_SMMUV3)
++OBJECT_DECLARE_TYPE(SMMUv3State, SMMUv3Class, ARM_SMMUV3)
+ 
+ #endif
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 392b0bd571..d018a4f297 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -128,7 +128,6 @@ struct VirtMachineClass {
+     bool kvm_no_adjvtime;
+     bool acpi_expose_flash;
+ };
+-typedef struct VirtMachineClass VirtMachineClass;
+ 
+ struct VirtMachineState {
+     MachineState parent;
+@@ -165,13 +164,11 @@ struct VirtMachineState {
+     DeviceState *acpi_dev;
+     Notifier powerdown_notifier;
+ };
+-typedef struct VirtMachineState VirtMachineState;
+ 
+ #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
+ 
+ #define TYPE_VIRT_MACHINE   MACHINE_TYPE_NAME("virt")
+-DECLARE_OBJ_CHECKERS(VirtMachineState, VirtMachineClass,
+-                     VIRT_MACHINE, TYPE_VIRT_MACHINE)
++OBJECT_DECLARE_TYPE(VirtMachineState, VirtMachineClass, VIRT_MACHINE)
+ 
+ void virt_acpi_setup(VirtMachineState *vms);
+ bool virt_is_acpi_enabled(VirtMachineState *vms);
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 795910d01b..56aa1ca335 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -21,8 +21,7 @@
+ 
+ #define TYPE_MACHINE "machine"
+ #undef MACHINE  /* BSD defines it and QEMU does not use it */
+-DECLARE_OBJ_CHECKERS(MachineState, MachineClass,
+-                     MACHINE, TYPE_MACHINE)
++OBJECT_DECLARE_TYPE(MachineState, MachineClass, MACHINE)
+ 
+ extern MachineState *current_machine;
+ 
+diff --git a/include/hw/display/macfb.h b/include/hw/display/macfb.h
+index 0960480b75..4adfaa725a 100644
+--- a/include/hw/display/macfb.h
++++ b/include/hw/display/macfb.h
+@@ -43,10 +43,7 @@ struct MacfbSysBusState {
+ };
+ 
+ #define TYPE_NUBUS_MACFB "nubus-macfb"
+-typedef struct MacfbNubusDeviceClass MacfbNubusDeviceClass;
+-typedef struct MacfbNubusState MacfbNubusState;
+-DECLARE_OBJ_CHECKERS(MacfbNubusState, MacfbNubusDeviceClass,
+-                     NUBUS_MACFB, TYPE_NUBUS_MACFB)
++OBJECT_DECLARE_TYPE(MacfbNubusState, MacfbNubusDeviceClass, NUBUS_MACFB)
+ 
+ struct MacfbNubusDeviceClass {
+     DeviceClass parent_class;
+diff --git a/include/hw/gpio/aspeed_gpio.h b/include/hw/gpio/aspeed_gpio.h
+index 2582e6e0dc..e1636ce7fe 100644
+--- a/include/hw/gpio/aspeed_gpio.h
++++ b/include/hw/gpio/aspeed_gpio.h
+@@ -14,10 +14,7 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_ASPEED_GPIO "aspeed.gpio"
+-typedef struct AspeedGPIOClass AspeedGPIOClass;
+-typedef struct AspeedGPIOState AspeedGPIOState;
+-DECLARE_OBJ_CHECKERS(AspeedGPIOState, AspeedGPIOClass,
+-                     ASPEED_GPIO, TYPE_ASPEED_GPIO)
++OBJECT_DECLARE_TYPE(AspeedGPIOState, AspeedGPIOClass, ASPEED_GPIO)
+ 
+ #define ASPEED_GPIO_MAX_NR_SETS 8
+ #define ASPEED_REGS_PER_BANK 14
+diff --git a/include/hw/i2c/aspeed_i2c.h b/include/hw/i2c/aspeed_i2c.h
+index 695e1c0928..565f833066 100644
+--- a/include/hw/i2c/aspeed_i2c.h
++++ b/include/hw/i2c/aspeed_i2c.h
+@@ -29,10 +29,7 @@
+ #define TYPE_ASPEED_2400_I2C TYPE_ASPEED_I2C "-ast2400"
+ #define TYPE_ASPEED_2500_I2C TYPE_ASPEED_I2C "-ast2500"
+ #define TYPE_ASPEED_2600_I2C TYPE_ASPEED_I2C "-ast2600"
+-typedef struct AspeedI2CClass AspeedI2CClass;
+-typedef struct AspeedI2CState AspeedI2CState;
+-DECLARE_OBJ_CHECKERS(AspeedI2CState, AspeedI2CClass,
+-                     ASPEED_I2C, TYPE_ASPEED_I2C)
++OBJECT_DECLARE_TYPE(AspeedI2CState, AspeedI2CClass, ASPEED_I2C)
+ 
+ #define ASPEED_I2C_NR_BUSSES 16
+ #define ASPEED_I2C_MAX_POOL_SIZE 0x800
+diff --git a/include/hw/i386/ioapic_internal.h b/include/hw/i386/ioapic_internal.h
+index e9cc2eaf54..0ac9e2400d 100644
+--- a/include/hw/i386/ioapic_internal.h
++++ b/include/hw/i386/ioapic_internal.h
+@@ -82,12 +82,9 @@
+ 
+ #define IOAPIC_VER_ENTRIES_SHIFT        16
+ 
+-typedef struct IOAPICCommonState IOAPICCommonState;
+ 
+ #define TYPE_IOAPIC_COMMON "ioapic-common"
+-typedef struct IOAPICCommonClass IOAPICCommonClass;
+-DECLARE_OBJ_CHECKERS(IOAPICCommonState, IOAPICCommonClass,
+-                     IOAPIC_COMMON, TYPE_IOAPIC_COMMON)
++OBJECT_DECLARE_TYPE(IOAPICCommonState, IOAPICCommonClass, IOAPIC_COMMON)
+ 
+ struct IOAPICCommonClass {
+     SysBusDeviceClass parent_class;
+diff --git a/include/hw/i386/microvm.h b/include/hw/i386/microvm.h
+index 36dbcdd123..7aab509fbf 100644
+--- a/include/hw/i386/microvm.h
++++ b/include/hw/i386/microvm.h
+@@ -45,7 +45,6 @@ struct MicrovmMachineClass {
+     HotplugHandler *(*orig_hotplug_handler)(MachineState *machine,
+                                            DeviceState *dev);
+ };
+-typedef struct MicrovmMachineClass MicrovmMachineClass;
+ 
+ struct MicrovmMachineState {
+     X86MachineState parent;
+@@ -61,10 +60,8 @@ struct MicrovmMachineState {
+     /* Machine state */
+     bool kernel_cmdline_fixed;
+ };
+-typedef struct MicrovmMachineState MicrovmMachineState;
+ 
+ #define TYPE_MICROVM_MACHINE   MACHINE_TYPE_NAME("microvm")
+-DECLARE_OBJ_CHECKERS(MicrovmMachineState, MicrovmMachineClass,
+-                     MICROVM_MACHINE, TYPE_MICROVM_MACHINE)
++OBJECT_DECLARE_TYPE(MicrovmMachineState, MicrovmMachineClass, MICROVM_MACHINE)
+ 
+ #endif
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 421a77acc2..533658e9a9 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -120,11 +120,9 @@ struct PCMachineClass {
+     /* use PVH to load kernels that support this feature */
+     bool pvh_enabled;
+ };
+-typedef struct PCMachineClass PCMachineClass;
+ 
+ #define TYPE_PC_MACHINE "generic-pc-machine"
+-DECLARE_OBJ_CHECKERS(PCMachineState, PCMachineClass,
+-                     PC_MACHINE, TYPE_PC_MACHINE)
++OBJECT_DECLARE_TYPE(PCMachineState, PCMachineClass, PC_MACHINE)
+ 
+ /* ioapic.c */
+ 
+diff --git a/include/hw/i386/x86-iommu.h b/include/hw/i386/x86-iommu.h
+index bbfaf44e79..9de92d33a1 100644
+--- a/include/hw/i386/x86-iommu.h
++++ b/include/hw/i386/x86-iommu.h
+@@ -26,10 +26,7 @@
+ #include "qom/object.h"
+ 
+ #define  TYPE_X86_IOMMU_DEVICE  ("x86-iommu")
+-typedef struct X86IOMMUClass X86IOMMUClass;
+-typedef struct X86IOMMUState X86IOMMUState;
+-DECLARE_OBJ_CHECKERS(X86IOMMUState, X86IOMMUClass,
+-                     X86_IOMMU_DEVICE, TYPE_X86_IOMMU_DEVICE)
++OBJECT_DECLARE_TYPE(X86IOMMUState, X86IOMMUClass, X86_IOMMU_DEVICE)
+ 
+ #define X86_IOMMU_SID_INVALID             (0xffff)
+ 
+diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
+index 1a188a7dea..68b0193e89 100644
+--- a/include/hw/i386/x86.h
++++ b/include/hw/i386/x86.h
+@@ -39,7 +39,6 @@ struct X86MachineClass {
+     /* Enables contiguous-apic-ID mode */
+     bool compat_apic_id_mode;
+ };
+-typedef struct X86MachineClass X86MachineClass;
+ 
+ struct X86MachineState {
+     /*< private >*/
+@@ -71,14 +70,12 @@ struct X86MachineState {
+      */
+     AddressSpace *ioapic_as;
+ };
+-typedef struct X86MachineState X86MachineState;
+ 
+ #define X86_MACHINE_SMM              "smm"
+ #define X86_MACHINE_ACPI             "acpi"
+ 
+ #define TYPE_X86_MACHINE   MACHINE_TYPE_NAME("x86")
+-DECLARE_OBJ_CHECKERS(X86MachineState, X86MachineClass,
+-                     X86_MACHINE, TYPE_X86_MACHINE)
++OBJECT_DECLARE_TYPE(X86MachineState, X86MachineClass, X86_MACHINE)
+ 
+ void init_topo_info(X86CPUTopoInfo *topo_info, const X86MachineState *x86ms);
+ 
+diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
+index eb9eb4e0ae..77c9372c27 100644
+--- a/include/hw/ide/internal.h
++++ b/include/hw/ide/internal.h
+@@ -488,9 +488,7 @@ struct IDEBus {
+ };
+ 
+ #define TYPE_IDE_DEVICE "ide-device"
+-typedef struct IDEDeviceClass IDEDeviceClass;
+-DECLARE_OBJ_CHECKERS(IDEDevice, IDEDeviceClass,
+-                     IDE_DEVICE, TYPE_IDE_DEVICE)
++OBJECT_DECLARE_TYPE(IDEDevice, IDEDeviceClass, IDE_DEVICE)
+ 
+ struct IDEDeviceClass {
+     DeviceClass parent_class;
+diff --git a/include/hw/input/adb.h b/include/hw/input/adb.h
+index 285f70db55..3d1c2f4b10 100644
+--- a/include/hw/input/adb.h
++++ b/include/hw/input/adb.h
+@@ -43,9 +43,7 @@ typedef int ADBDeviceRequest(ADBDevice *d, uint8_t *buf_out,
+ typedef bool ADBDeviceHasData(ADBDevice *d);
+ 
+ #define TYPE_ADB_DEVICE "adb-device"
+-typedef struct ADBDeviceClass ADBDeviceClass;
+-DECLARE_OBJ_CHECKERS(ADBDevice, ADBDeviceClass,
+-                     ADB_DEVICE, TYPE_ADB_DEVICE)
++OBJECT_DECLARE_TYPE(ADBDevice, ADBDeviceClass, ADB_DEVICE)
+ 
+ struct ADBDevice {
+     /*< private >*/
+diff --git a/include/hw/isa/i8259_internal.h b/include/hw/isa/i8259_internal.h
+index cd050bb9f2..a6ae8a583f 100644
+--- a/include/hw/isa/i8259_internal.h
++++ b/include/hw/isa/i8259_internal.h
+@@ -30,12 +30,9 @@
+ #include "hw/intc/i8259.h"
+ #include "qom/object.h"
+ 
+-typedef struct PICCommonState PICCommonState;
+ 
+ #define TYPE_PIC_COMMON "pic-common"
+-typedef struct PICCommonClass PICCommonClass;
+-DECLARE_OBJ_CHECKERS(PICCommonState, PICCommonClass,
+-                     PIC_COMMON, TYPE_PIC_COMMON)
++OBJECT_DECLARE_TYPE(PICCommonState, PICCommonClass, PIC_COMMON)
+ 
+ struct PICCommonClass {
+     ISADeviceClass parent_class;
+diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
+index ddb6a2d168..5f7943fa67 100644
+--- a/include/hw/isa/isa.h
++++ b/include/hw/isa/isa.h
+@@ -11,9 +11,7 @@
+ #define ISA_NUM_IRQS 16
+ 
+ #define TYPE_ISA_DEVICE "isa-device"
+-typedef struct ISADeviceClass ISADeviceClass;
+-DECLARE_OBJ_CHECKERS(ISADevice, ISADeviceClass,
+-                     ISA_DEVICE, TYPE_ISA_DEVICE)
++OBJECT_DECLARE_TYPE(ISADevice, ISADeviceClass, ISA_DEVICE)
+ 
+ #define TYPE_ISA_BUS "ISA"
+ DECLARE_INSTANCE_CHECKER(ISABus, ISA_BUS,
+diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
+index 19e3d3092d..c699842dd0 100644
+--- a/include/hw/mem/nvdimm.h
++++ b/include/hw/mem/nvdimm.h
+@@ -46,10 +46,7 @@
+ #define MIN_NAMESPACE_LABEL_SIZE      (128UL << 10)
+ 
+ #define TYPE_NVDIMM      "nvdimm"
+-typedef struct NVDIMMClass NVDIMMClass;
+-typedef struct NVDIMMDevice NVDIMMDevice;
+-DECLARE_OBJ_CHECKERS(NVDIMMDevice, NVDIMMClass,
+-                     NVDIMM, TYPE_NVDIMM)
++OBJECT_DECLARE_TYPE(NVDIMMDevice, NVDIMMClass, NVDIMM)
+ 
+ #define NVDIMM_LABEL_SIZE_PROP "label-size"
+ #define NVDIMM_UUID_PROP       "uuid"
+diff --git a/include/hw/misc/aspeed_scu.h b/include/hw/misc/aspeed_scu.h
+index 8d3b14acd4..d49bfb02fb 100644
+--- a/include/hw/misc/aspeed_scu.h
++++ b/include/hw/misc/aspeed_scu.h
+@@ -15,10 +15,7 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_ASPEED_SCU "aspeed.scu"
+-typedef struct AspeedSCUClass AspeedSCUClass;
+-typedef struct AspeedSCUState AspeedSCUState;
+-DECLARE_OBJ_CHECKERS(AspeedSCUState, AspeedSCUClass,
+-                     ASPEED_SCU, TYPE_ASPEED_SCU)
++OBJECT_DECLARE_TYPE(AspeedSCUState, AspeedSCUClass, ASPEED_SCU)
+ #define TYPE_ASPEED_2400_SCU TYPE_ASPEED_SCU "-ast2400"
+ #define TYPE_ASPEED_2500_SCU TYPE_ASPEED_SCU "-ast2500"
+ #define TYPE_ASPEED_2600_SCU TYPE_ASPEED_SCU "-ast2600"
+diff --git a/include/hw/misc/aspeed_sdmc.h b/include/hw/misc/aspeed_sdmc.h
+index 3375afc89b..ec2d59a14f 100644
+--- a/include/hw/misc/aspeed_sdmc.h
++++ b/include/hw/misc/aspeed_sdmc.h
+@@ -13,10 +13,7 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_ASPEED_SDMC "aspeed.sdmc"
+-typedef struct AspeedSDMCClass AspeedSDMCClass;
+-typedef struct AspeedSDMCState AspeedSDMCState;
+-DECLARE_OBJ_CHECKERS(AspeedSDMCState, AspeedSDMCClass,
+-                     ASPEED_SDMC, TYPE_ASPEED_SDMC)
++OBJECT_DECLARE_TYPE(AspeedSDMCState, AspeedSDMCClass, ASPEED_SDMC)
+ #define TYPE_ASPEED_2400_SDMC TYPE_ASPEED_SDMC "-ast2400"
+ #define TYPE_ASPEED_2500_SDMC TYPE_ASPEED_SDMC "-ast2500"
+ #define TYPE_ASPEED_2600_SDMC TYPE_ASPEED_SDMC "-ast2600"
+diff --git a/include/hw/misc/imx_ccm.h b/include/hw/misc/imx_ccm.h
+index e9d82a2a50..7e5678e972 100644
+--- a/include/hw/misc/imx_ccm.h
++++ b/include/hw/misc/imx_ccm.h
+@@ -28,10 +28,7 @@
+ #define PLL_MFN(x)              (((x) & 0x3ff) << 0)
+ 
+ #define TYPE_IMX_CCM "imx.ccm"
+-typedef struct IMXCCMClass IMXCCMClass;
+-typedef struct IMXCCMState IMXCCMState;
+-DECLARE_OBJ_CHECKERS(IMXCCMState, IMXCCMClass,
+-                     IMX_CCM, TYPE_IMX_CCM)
++OBJECT_DECLARE_TYPE(IMXCCMState, IMXCCMClass, IMX_CCM)
+ 
+ struct IMXCCMState {
+     /* <private> */
+diff --git a/include/hw/misc/mos6522.h b/include/hw/misc/mos6522.h
+index f73271ba67..fc95d22b0f 100644
+--- a/include/hw/misc/mos6522.h
++++ b/include/hw/misc/mos6522.h
+@@ -122,12 +122,9 @@ struct MOS6522State {
+ 
+     qemu_irq irq;
+ };
+-typedef struct MOS6522State MOS6522State;
+ 
+ #define TYPE_MOS6522 "mos6522"
+-typedef struct MOS6522DeviceClass MOS6522DeviceClass;
+-DECLARE_OBJ_CHECKERS(MOS6522State, MOS6522DeviceClass,
+-                     MOS6522, TYPE_MOS6522)
++OBJECT_DECLARE_TYPE(MOS6522State, MOS6522DeviceClass, MOS6522)
+ 
+ struct MOS6522DeviceClass {
+     DeviceClass parent_class;
+diff --git a/include/hw/pci-host/pnv_phb4.h b/include/hw/pci-host/pnv_phb4.h
+index 15a4633178..05efb4e6b9 100644
+--- a/include/hw/pci-host/pnv_phb4.h
++++ b/include/hw/pci-host/pnv_phb4.h
+@@ -15,7 +15,6 @@
+ #include "hw/ppc/xive.h"
+ #include "qom/object.h"
+ 
+-typedef struct PnvPhb4PecState PnvPhb4PecState;
+ typedef struct PnvPhb4PecStack PnvPhb4PecStack;
+ typedef struct PnvPHB4 PnvPHB4;
+ typedef struct PnvChip PnvChip;
+@@ -142,9 +141,7 @@ extern const MemoryRegionOps pnv_phb4_xscom_ops;
+  * PHB4 PEC (PCI Express Controller)
+  */
+ #define TYPE_PNV_PHB4_PEC "pnv-phb4-pec"
+-typedef struct PnvPhb4PecClass PnvPhb4PecClass;
+-DECLARE_OBJ_CHECKERS(PnvPhb4PecState, PnvPhb4PecClass,
+-                     PNV_PHB4_PEC, TYPE_PNV_PHB4_PEC)
++OBJECT_DECLARE_TYPE(PnvPhb4PecState, PnvPhb4PecClass, PNV_PHB4_PEC)
+ 
+ #define TYPE_PNV_PHB4_PEC_STACK "pnv-phb4-pec-stack"
+ DECLARE_INSTANCE_CHECKER(PnvPhb4PecStack, PNV_PHB4_PEC_STACK,
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index c13ae1f858..0a59a06b14 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -394,9 +394,7 @@ typedef int (*pci_map_irq_fn)(PCIDevice *pci_dev, int irq_num);
+ typedef PCIINTxRoute (*pci_route_irq_fn)(void *opaque, int pin);
+ 
+ #define TYPE_PCI_BUS "PCI"
+-typedef struct PCIBusClass PCIBusClass;
+-DECLARE_OBJ_CHECKERS(PCIBus, PCIBusClass,
+-                     PCI_BUS, TYPE_PCI_BUS)
++OBJECT_DECLARE_TYPE(PCIBus, PCIBusClass, PCI_BUS)
+ #define TYPE_PCIE_BUS "PCIE"
+ 
+ bool pci_bus_is_express(PCIBus *bus);
+diff --git a/include/hw/pci/pci_host.h b/include/hw/pci/pci_host.h
+index d1fc1c3604..52e038c019 100644
+--- a/include/hw/pci/pci_host.h
++++ b/include/hw/pci/pci_host.h
+@@ -32,9 +32,7 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_PCI_HOST_BRIDGE "pci-host-bridge"
+-typedef struct PCIHostBridgeClass PCIHostBridgeClass;
+-DECLARE_OBJ_CHECKERS(PCIHostState, PCIHostBridgeClass,
+-                     PCI_HOST_BRIDGE, TYPE_PCI_HOST_BRIDGE)
++OBJECT_DECLARE_TYPE(PCIHostState, PCIHostBridgeClass, PCI_HOST_BRIDGE)
+ 
+ struct PCIHostState {
+     SysBusDevice busdev;
+diff --git a/include/hw/pcmcia.h b/include/hw/pcmcia.h
+index fb40ae7e09..e3ba44e0bf 100644
+--- a/include/hw/pcmcia.h
++++ b/include/hw/pcmcia.h
+@@ -12,10 +12,7 @@ typedef struct PCMCIASocket {
+ } PCMCIASocket;
+ 
+ #define TYPE_PCMCIA_CARD "pcmcia-card"
+-typedef struct PCMCIACardClass PCMCIACardClass;
+-typedef struct PCMCIACardState PCMCIACardState;
+-DECLARE_OBJ_CHECKERS(PCMCIACardState, PCMCIACardClass,
+-                     PCMCIA_CARD, TYPE_PCMCIA_CARD)
++OBJECT_DECLARE_TYPE(PCMCIACardState, PCMCIACardClass, PCMCIA_CARD)
+ 
+ struct PCMCIACardState {
+     /*< private >*/
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index c8cd63bc06..eea7ac8624 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -39,12 +39,9 @@ struct SpaprRtcState {
+ };
+ 
+ typedef struct SpaprDimmState SpaprDimmState;
+-typedef struct SpaprMachineClass SpaprMachineClass;
+ 
+ #define TYPE_SPAPR_MACHINE      "spapr-machine"
+-typedef struct SpaprMachineState SpaprMachineState;
+-DECLARE_OBJ_CHECKERS(SpaprMachineState, SpaprMachineClass,
+-                     SPAPR_MACHINE, TYPE_SPAPR_MACHINE)
++OBJECT_DECLARE_TYPE(SpaprMachineState, SpaprMachineClass, SPAPR_MACHINE)
+ 
+ typedef enum {
+     SPAPR_RESIZE_HPT_DEFAULT = 0,
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index e025ba9653..72064f4dd4 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -12,9 +12,7 @@ enum {
+ };
+ 
+ #define TYPE_DEVICE "device"
+-typedef struct DeviceClass DeviceClass;
+-DECLARE_OBJ_CHECKERS(DeviceState, DeviceClass,
+-                     DEVICE, TYPE_DEVICE)
++OBJECT_DECLARE_TYPE(DeviceState, DeviceClass, DEVICE)
+ 
+ typedef enum DeviceCategory {
+     DEVICE_CATEGORY_BRIDGE,
+diff --git a/include/hw/rtc/allwinner-rtc.h b/include/hw/rtc/allwinner-rtc.h
+index 5a6e9fff32..bf415431cd 100644
+--- a/include/hw/rtc/allwinner-rtc.h
++++ b/include/hw/rtc/allwinner-rtc.h
+@@ -60,10 +60,7 @@
+  * @{
+  */
+ 
+-typedef struct AwRtcClass AwRtcClass;
+-typedef struct AwRtcState AwRtcState;
+-DECLARE_OBJ_CHECKERS(AwRtcState, AwRtcClass,
+-                     AW_RTC, TYPE_AW_RTC)
++OBJECT_DECLARE_TYPE(AwRtcState, AwRtcClass, AW_RTC)
+ 
+ /** @} */
+ 
+diff --git a/include/hw/s390x/3270-ccw.h b/include/hw/s390x/3270-ccw.h
+index 9a11093192..1439882294 100644
+--- a/include/hw/s390x/3270-ccw.h
++++ b/include/hw/s390x/3270-ccw.h
+@@ -31,10 +31,7 @@
+ #define TC_EWRITEA 0x0d         /* Erase write alternate */
+ #define TC_WRITESF 0x11         /* Write structured field */
+ 
+-typedef struct EmulatedCcw3270Class EmulatedCcw3270Class;
+-typedef struct EmulatedCcw3270Device EmulatedCcw3270Device;
+-DECLARE_OBJ_CHECKERS(EmulatedCcw3270Device, EmulatedCcw3270Class,
+-                     EMULATED_CCW_3270, TYPE_EMULATED_CCW_3270)
++OBJECT_DECLARE_TYPE(EmulatedCcw3270Device, EmulatedCcw3270Class, EMULATED_CCW_3270)
+ 
+ struct EmulatedCcw3270Device {
+     CcwDevice parent_obj;
+diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
+index 54d14da0a6..3331990e02 100644
+--- a/include/hw/s390x/s390-virtio-ccw.h
++++ b/include/hw/s390x/s390-virtio-ccw.h
+@@ -16,10 +16,7 @@
+ 
+ #define TYPE_S390_CCW_MACHINE               "s390-ccw-machine"
+ 
+-typedef struct S390CcwMachineClass S390CcwMachineClass;
+-typedef struct S390CcwMachineState S390CcwMachineState;
+-DECLARE_OBJ_CHECKERS(S390CcwMachineState, S390CcwMachineClass,
+-                     S390_CCW_MACHINE, TYPE_S390_CCW_MACHINE)
++OBJECT_DECLARE_TYPE(S390CcwMachineState, S390CcwMachineClass, S390_CCW_MACHINE)
+ 
+ 
+ struct S390CcwMachineState {
+diff --git a/include/hw/s390x/storage-attributes.h b/include/hw/s390x/storage-attributes.h
+index efb28c48be..5239eb538c 100644
+--- a/include/hw/s390x/storage-attributes.h
++++ b/include/hw/s390x/storage-attributes.h
+@@ -20,10 +20,7 @@
+ #define TYPE_QEMU_S390_STATTRIB "s390-storage_attributes-qemu"
+ #define TYPE_KVM_S390_STATTRIB "s390-storage_attributes-kvm"
+ 
+-typedef struct S390StAttribClass S390StAttribClass;
+-typedef struct S390StAttribState S390StAttribState;
+-DECLARE_OBJ_CHECKERS(S390StAttribState, S390StAttribClass,
+-                     S390_STATTRIB, TYPE_S390_STATTRIB)
++OBJECT_DECLARE_TYPE(S390StAttribState, S390StAttribClass, S390_STATTRIB)
+ 
+ struct S390StAttribState {
+     DeviceState parent_obj;
+diff --git a/include/hw/s390x/storage-keys.h b/include/hw/s390x/storage-keys.h
+index 40f042f54e..2888d42d0b 100644
+--- a/include/hw/s390x/storage-keys.h
++++ b/include/hw/s390x/storage-keys.h
+@@ -17,10 +17,7 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_S390_SKEYS "s390-skeys"
+-typedef struct S390SKeysClass S390SKeysClass;
+-typedef struct S390SKeysState S390SKeysState;
+-DECLARE_OBJ_CHECKERS(S390SKeysState, S390SKeysClass,
+-                     S390_SKEYS, TYPE_S390_SKEYS)
++OBJECT_DECLARE_TYPE(S390SKeysState, S390SKeysClass, S390_SKEYS)
+ 
+ struct S390SKeysState {
+     DeviceState parent_obj;
+diff --git a/include/hw/s390x/tod.h b/include/hw/s390x/tod.h
+index c02498f65e..ff3195a4bf 100644
+--- a/include/hw/s390x/tod.h
++++ b/include/hw/s390x/tod.h
+@@ -21,10 +21,7 @@ typedef struct S390TOD {
+ } S390TOD;
+ 
+ #define TYPE_S390_TOD "s390-tod"
+-typedef struct S390TODClass S390TODClass;
+-typedef struct S390TODState S390TODState;
+-DECLARE_OBJ_CHECKERS(S390TODState, S390TODClass,
+-                     S390_TOD, TYPE_S390_TOD)
++OBJECT_DECLARE_TYPE(S390TODState, S390TODClass, S390_TOD)
+ #define TYPE_KVM_S390_TOD TYPE_S390_TOD "-kvm"
+ #define TYPE_QEMU_S390_TOD TYPE_S390_TOD "-qemu"
+ 
+diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
+index 3818e3fa46..b1e2ed7c35 100644
+--- a/include/hw/scsi/scsi.h
++++ b/include/hw/scsi/scsi.h
+@@ -50,9 +50,7 @@ struct SCSIRequest {
+ };
+ 
+ #define TYPE_SCSI_DEVICE "scsi-device"
+-typedef struct SCSIDeviceClass SCSIDeviceClass;
+-DECLARE_OBJ_CHECKERS(SCSIDevice, SCSIDeviceClass,
+-                     SCSI_DEVICE, TYPE_SCSI_DEVICE)
++OBJECT_DECLARE_TYPE(SCSIDevice, SCSIDeviceClass, SCSI_DEVICE)
+ 
+ struct SCSIDeviceClass {
+     DeviceClass parent_class;
+diff --git a/include/hw/sd/allwinner-sdhost.h b/include/hw/sd/allwinner-sdhost.h
+index 7bccc06d1c..bfe08ff4ef 100644
+--- a/include/hw/sd/allwinner-sdhost.h
++++ b/include/hw/sd/allwinner-sdhost.h
+@@ -45,10 +45,7 @@
+  * @{
+  */
+ 
+-typedef struct AwSdHostClass AwSdHostClass;
+-typedef struct AwSdHostState AwSdHostState;
+-DECLARE_OBJ_CHECKERS(AwSdHostState, AwSdHostClass,
+-                     AW_SDHOST, TYPE_AW_SDHOST)
++OBJECT_DECLARE_TYPE(AwSdHostState, AwSdHostClass, AW_SDHOST)
+ 
+ /** @} */
+ 
+diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
+index 8dd4c363f5..59d108d453 100644
+--- a/include/hw/sd/sd.h
++++ b/include/hw/sd/sd.h
+@@ -89,12 +89,9 @@ typedef struct {
+     uint8_t crc;
+ } SDRequest;
+ 
+-typedef struct SDState SDState;
+ 
+ #define TYPE_SD_CARD "sd-card"
+-typedef struct SDCardClass SDCardClass;
+-DECLARE_OBJ_CHECKERS(SDState, SDCardClass,
+-                     SD_CARD, TYPE_SD_CARD)
++OBJECT_DECLARE_TYPE(SDState, SDCardClass, SD_CARD)
+ 
+ struct SDCardClass {
+     /*< private >*/
+diff --git a/include/hw/ssi/aspeed_smc.h b/include/hw/ssi/aspeed_smc.h
+index 8e023d8ff6..3dd354b52e 100644
+--- a/include/hw/ssi/aspeed_smc.h
++++ b/include/hw/ssi/aspeed_smc.h
+@@ -68,10 +68,7 @@ typedef struct AspeedSMCFlash {
+ } AspeedSMCFlash;
+ 
+ #define TYPE_ASPEED_SMC "aspeed.smc"
+-typedef struct AspeedSMCClass AspeedSMCClass;
+-typedef struct AspeedSMCState AspeedSMCState;
+-DECLARE_OBJ_CHECKERS(AspeedSMCState, AspeedSMCClass,
+-                     ASPEED_SMC, TYPE_ASPEED_SMC)
++OBJECT_DECLARE_TYPE(AspeedSMCState, AspeedSMCClass, ASPEED_SMC)
+ 
+ struct AspeedSMCClass {
+     SysBusDevice parent_obj;
+diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
+index b1ab347617..a2bf2cf3c7 100644
+--- a/include/hw/ssi/xilinx_spips.h
++++ b/include/hw/ssi/xilinx_spips.h
+@@ -130,14 +130,12 @@ struct XilinxSPIPSClass {
+     uint32_t rx_fifo_size;
+     uint32_t tx_fifo_size;
+ };
+-typedef struct XilinxSPIPSClass XilinxSPIPSClass;
+ 
+ #define TYPE_XILINX_SPIPS "xlnx.ps7-spi"
+ #define TYPE_XILINX_QSPIPS "xlnx.ps7-qspi"
+ #define TYPE_XLNX_ZYNQMP_QSPIPS "xlnx.usmp-gqspi"
+ 
+-DECLARE_OBJ_CHECKERS(XilinxSPIPS, XilinxSPIPSClass,
+-                     XILINX_SPIPS, TYPE_XILINX_SPIPS)
++OBJECT_DECLARE_TYPE(XilinxSPIPS, XilinxSPIPSClass, XILINX_SPIPS)
+ 
+ DECLARE_INSTANCE_CHECKER(XilinxQSPIPS, XILINX_QSPIPS,
+                          TYPE_XILINX_QSPIPS)
+diff --git a/include/hw/timer/aspeed_timer.h b/include/hw/timer/aspeed_timer.h
+index 4c76f955c9..d36034a10c 100644
+--- a/include/hw/timer/aspeed_timer.h
++++ b/include/hw/timer/aspeed_timer.h
+@@ -27,10 +27,7 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_ASPEED_TIMER "aspeed.timer"
+-typedef struct AspeedTimerClass AspeedTimerClass;
+-typedef struct AspeedTimerCtrlState AspeedTimerCtrlState;
+-DECLARE_OBJ_CHECKERS(AspeedTimerCtrlState, AspeedTimerClass,
+-                     ASPEED_TIMER, TYPE_ASPEED_TIMER)
++OBJECT_DECLARE_TYPE(AspeedTimerCtrlState, AspeedTimerClass, ASPEED_TIMER)
+ #define TYPE_ASPEED_2400_TIMER TYPE_ASPEED_TIMER "-ast2400"
+ #define TYPE_ASPEED_2500_TIMER TYPE_ASPEED_TIMER "-ast2500"
+ #define TYPE_ASPEED_2600_TIMER TYPE_ASPEED_TIMER "-ast2600"
+diff --git a/include/hw/timer/i8254.h b/include/hw/timer/i8254.h
+index 1a522a2457..3e569f42b6 100644
+--- a/include/hw/timer/i8254.h
++++ b/include/hw/timer/i8254.h
+@@ -40,10 +40,7 @@ typedef struct PITChannelInfo {
+ } PITChannelInfo;
+ 
+ #define TYPE_PIT_COMMON "pit-common"
+-typedef struct PITCommonState PITCommonState;
+-typedef struct PITCommonClass PITCommonClass;
+-DECLARE_OBJ_CHECKERS(PITCommonState, PITCommonClass,
+-                     PIT_COMMON, TYPE_PIT_COMMON)
++OBJECT_DECLARE_TYPE(PITCommonState, PITCommonClass, PIT_COMMON)
+ 
+ #define TYPE_I8254 "isa-pit"
+ #define TYPE_KVM_I8254 "kvm-pit"
+diff --git a/include/hw/usb.h b/include/hw/usb.h
+index 5783635491..355745c23a 100644
+--- a/include/hw/usb.h
++++ b/include/hw/usb.h
+@@ -265,9 +265,7 @@ struct USBDevice {
+ };
+ 
+ #define TYPE_USB_DEVICE "usb-device"
+-typedef struct USBDeviceClass USBDeviceClass;
+-DECLARE_OBJ_CHECKERS(USBDevice, USBDeviceClass,
+-                     USB_DEVICE, TYPE_USB_DEVICE)
++OBJECT_DECLARE_TYPE(USBDevice, USBDeviceClass, USB_DEVICE)
+ 
+ typedef void (*USBDeviceRealize)(USBDevice *dev, Error **errp);
+ typedef void (*USBDeviceUnrealize)(USBDevice *dev);
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index 807280451b..28cf3b9120 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -68,9 +68,7 @@ typedef struct VirtQueueElement
+ #define VIRTIO_NO_VECTOR 0xffff
+ 
+ #define TYPE_VIRTIO_DEVICE "virtio-device"
+-typedef struct VirtioDeviceClass VirtioDeviceClass;
+-DECLARE_OBJ_CHECKERS(VirtIODevice, VirtioDeviceClass,
+-                     VIRTIO_DEVICE, TYPE_VIRTIO_DEVICE)
++OBJECT_DECLARE_TYPE(VirtIODevice, VirtioDeviceClass, VIRTIO_DEVICE)
+ 
+ enum virtio_device_endian {
+     VIRTIO_DEVICE_ENDIAN_UNKNOWN,
+diff --git a/include/hw/watchdog/wdt_aspeed.h b/include/hw/watchdog/wdt_aspeed.h
+index 2ca1eb5432..80b03661e3 100644
+--- a/include/hw/watchdog/wdt_aspeed.h
++++ b/include/hw/watchdog/wdt_aspeed.h
+@@ -15,10 +15,7 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_ASPEED_WDT "aspeed.wdt"
+-typedef struct AspeedWDTClass AspeedWDTClass;
+-typedef struct AspeedWDTState AspeedWDTState;
+-DECLARE_OBJ_CHECKERS(AspeedWDTState, AspeedWDTClass,
+-                     ASPEED_WDT, TYPE_ASPEED_WDT)
++OBJECT_DECLARE_TYPE(AspeedWDTState, AspeedWDTClass, ASPEED_WDT)
+ #define TYPE_ASPEED_2400_WDT TYPE_ASPEED_WDT "-ast2400"
+ #define TYPE_ASPEED_2500_WDT TYPE_ASPEED_WDT "-ast2500"
+ #define TYPE_ASPEED_2600_WDT TYPE_ASPEED_WDT "-ast2600"
+diff --git a/include/hw/xen/xen-block.h b/include/hw/xen/xen-block.h
+index 8ff5421dc3..a74fd9384f 100644
+--- a/include/hw/xen/xen-block.h
++++ b/include/hw/xen/xen-block.h
+@@ -68,11 +68,9 @@ struct XenBlockDeviceClass {
+     XenBlockDeviceRealize realize;
+     XenBlockDeviceUnrealize unrealize;
+ };
+-typedef struct XenBlockDeviceClass XenBlockDeviceClass;
+ 
+ #define TYPE_XEN_BLOCK_DEVICE  "xen-block"
+-DECLARE_OBJ_CHECKERS(XenBlockDevice, XenBlockDeviceClass,
+-                     XEN_BLOCK_DEVICE, TYPE_XEN_BLOCK_DEVICE)
++OBJECT_DECLARE_TYPE(XenBlockDevice, XenBlockDeviceClass, XEN_BLOCK_DEVICE)
+ 
+ struct XenDiskDevice {
+     XenBlockDevice blockdev;
+diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
+index 1924d93c6c..3df696136f 100644
+--- a/include/hw/xen/xen-bus.h
++++ b/include/hw/xen/xen-bus.h
+@@ -57,11 +57,9 @@ struct XenDeviceClass {
+     XenDeviceFrontendChanged frontend_changed;
+     XenDeviceUnrealize unrealize;
+ };
+-typedef struct XenDeviceClass XenDeviceClass;
+ 
+ #define TYPE_XEN_DEVICE "xen-device"
+-DECLARE_OBJ_CHECKERS(XenDevice, XenDeviceClass,
+-                     XEN_DEVICE, TYPE_XEN_DEVICE)
++OBJECT_DECLARE_TYPE(XenDevice, XenDeviceClass, XEN_DEVICE)
+ 
+ struct XenBus {
+     BusState qbus;
+diff --git a/include/net/can_host.h b/include/net/can_host.h
+index 18979c2e2d..4e3ce3f954 100644
+--- a/include/net/can_host.h
++++ b/include/net/can_host.h
+@@ -32,10 +32,7 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_CAN_HOST "can-host"
+-typedef struct CanHostClass CanHostClass;
+-typedef struct CanHostState CanHostState;
+-DECLARE_OBJ_CHECKERS(CanHostState, CanHostClass,
+-                     CAN_HOST, TYPE_CAN_HOST)
++OBJECT_DECLARE_TYPE(CanHostState, CanHostClass, CAN_HOST)
+ 
+ struct CanHostState {
+     ObjectClass oc;
+diff --git a/include/net/filter.h b/include/net/filter.h
+index e7e593128a..27ffc630df 100644
+--- a/include/net/filter.h
++++ b/include/net/filter.h
+@@ -15,9 +15,7 @@
+ #include "net/queue.h"
+ 
+ #define TYPE_NETFILTER "netfilter"
+-typedef struct NetFilterClass NetFilterClass;
+-DECLARE_OBJ_CHECKERS(NetFilterState, NetFilterClass,
+-                     NETFILTER, TYPE_NETFILTER)
++OBJECT_DECLARE_TYPE(NetFilterState, NetFilterClass, NETFILTER)
+ 
+ typedef void (FilterSetup) (NetFilterState *nf, Error **errp);
+ typedef void (FilterCleanup) (NetFilterState *nf);
+diff --git a/include/ui/console.h b/include/ui/console.h
+index 8602203523..d091c2e1e2 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -106,9 +106,7 @@ void kbd_put_keysym(int keysym);
+ /* consoles */
+ 
+ #define TYPE_QEMU_CONSOLE "qemu-console"
+-typedef struct QemuConsoleClass QemuConsoleClass;
+-DECLARE_OBJ_CHECKERS(QemuConsole, QemuConsoleClass,
+-                     QEMU_CONSOLE, TYPE_QEMU_CONSOLE)
++OBJECT_DECLARE_TYPE(QemuConsole, QemuConsoleClass, QEMU_CONSOLE)
+ 
+ 
+ struct QemuConsoleClass {
+diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
+index dbf7d63dc8..3707876d6d 100644
+--- a/hw/arm/mps2-tz.c
++++ b/hw/arm/mps2-tz.c
+@@ -77,7 +77,6 @@ struct MPS2TZMachineClass {
+     uint32_t scc_id;
+     const char *armsse_type;
+ };
+-typedef struct MPS2TZMachineClass MPS2TZMachineClass;
+ 
+ struct MPS2TZMachineState {
+     MachineState parent;
+@@ -102,14 +101,12 @@ struct MPS2TZMachineState {
+     DeviceState *lan9118;
+     SplitIRQ cpu_irq_splitter[MPS2TZ_NUMIRQ];
+ };
+-typedef struct MPS2TZMachineState MPS2TZMachineState;
+ 
+ #define TYPE_MPS2TZ_MACHINE "mps2tz"
+ #define TYPE_MPS2TZ_AN505_MACHINE MACHINE_TYPE_NAME("mps2-an505")
+ #define TYPE_MPS2TZ_AN521_MACHINE MACHINE_TYPE_NAME("mps2-an521")
+ 
+-DECLARE_OBJ_CHECKERS(MPS2TZMachineState, MPS2TZMachineClass,
+-                     MPS2TZ_MACHINE, TYPE_MPS2TZ_MACHINE)
++OBJECT_DECLARE_TYPE(MPS2TZMachineState, MPS2TZMachineClass, MPS2TZ_MACHINE)
+ 
+ /* Main SYSCLK frequency in Hz */
+ #define SYSCLK_FRQ 20000000
+diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
+index 5d47160850..9a8b23c64c 100644
+--- a/hw/arm/mps2.c
++++ b/hw/arm/mps2.c
+@@ -63,7 +63,6 @@ struct MPS2MachineClass {
+     hwaddr ethernet_base;
+     hwaddr psram_base;
+ };
+-typedef struct MPS2MachineClass MPS2MachineClass;
+ 
+ struct MPS2MachineState {
+     MachineState parent;
+@@ -85,7 +84,6 @@ struct MPS2MachineState {
+     CMSDKAPBDualTimer dualtimer;
+     CMSDKAPBWatchdog watchdog;
+ };
+-typedef struct MPS2MachineState MPS2MachineState;
+ 
+ #define TYPE_MPS2_MACHINE "mps2"
+ #define TYPE_MPS2_AN385_MACHINE MACHINE_TYPE_NAME("mps2-an385")
+@@ -93,8 +91,7 @@ typedef struct MPS2MachineState MPS2MachineState;
+ #define TYPE_MPS2_AN500_MACHINE MACHINE_TYPE_NAME("mps2-an500")
+ #define TYPE_MPS2_AN511_MACHINE MACHINE_TYPE_NAME("mps2-an511")
+ 
+-DECLARE_OBJ_CHECKERS(MPS2MachineState, MPS2MachineClass,
+-                     MPS2_MACHINE, TYPE_MPS2_MACHINE)
++OBJECT_DECLARE_TYPE(MPS2MachineState, MPS2MachineClass, MPS2_MACHINE)
+ 
+ /* Main SYSCLK frequency in Hz */
+ #define SYSCLK_FRQ 25000000
+diff --git a/hw/arm/musca.c b/hw/arm/musca.c
+index 16015255c8..b50157f63a 100644
+--- a/hw/arm/musca.c
++++ b/hw/arm/musca.c
+@@ -55,7 +55,6 @@ struct MuscaMachineClass {
+     const MPCInfo *mpc_info;
+     int num_mpcs;
+ };
+-typedef struct MuscaMachineClass MuscaMachineClass;
+ 
+ struct MuscaMachineState {
+     MachineState parent;
+@@ -84,14 +83,12 @@ struct MuscaMachineState {
+     UnimplementedDeviceState gpio;
+     UnimplementedDeviceState cryptoisland;
+ };
+-typedef struct MuscaMachineState MuscaMachineState;
+ 
+ #define TYPE_MUSCA_MACHINE "musca"
+ #define TYPE_MUSCA_A_MACHINE MACHINE_TYPE_NAME("musca-a")
+ #define TYPE_MUSCA_B1_MACHINE MACHINE_TYPE_NAME("musca-b1")
+ 
+-DECLARE_OBJ_CHECKERS(MuscaMachineState, MuscaMachineClass,
+-                     MUSCA_MACHINE, TYPE_MUSCA_MACHINE)
++OBJECT_DECLARE_TYPE(MuscaMachineState, MuscaMachineClass, MUSCA_MACHINE)
+ 
+ /*
+  * Main SYSCLK frequency in Hz
+diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
+index a7ad667f06..b5b867e6ed 100644
+--- a/hw/arm/spitz.c
++++ b/hw/arm/spitz.c
+@@ -43,7 +43,6 @@ struct SpitzMachineClass {
+     enum spitz_model_e model;
+     int arm_id;
+ };
+-typedef struct SpitzMachineClass SpitzMachineClass;
+ 
+ struct SpitzMachineState {
+     MachineState parent;
+@@ -56,11 +55,9 @@ struct SpitzMachineState {
+     DeviceState *scp1;
+     DeviceState *misc_gpio;
+ };
+-typedef struct SpitzMachineState SpitzMachineState;
+ 
+ #define TYPE_SPITZ_MACHINE "spitz-common"
+-DECLARE_OBJ_CHECKERS(SpitzMachineState, SpitzMachineClass,
+-                     SPITZ_MACHINE, TYPE_SPITZ_MACHINE)
++OBJECT_DECLARE_TYPE(SpitzMachineState, SpitzMachineClass, SPITZ_MACHINE)
+ 
+ #define zaurus_printf(format, ...)                              \
+     fprintf(stderr, "%s: " format, __func__, ##__VA_ARGS__)
+diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+index 01bb4bba1e..94ff094ab3 100644
+--- a/hw/arm/vexpress.c
++++ b/hw/arm/vexpress.c
+@@ -171,20 +171,17 @@ struct VexpressMachineClass {
+     MachineClass parent;
+     VEDBoardInfo *daughterboard;
+ };
+-typedef struct VexpressMachineClass VexpressMachineClass;
+ 
+ struct VexpressMachineState {
+     MachineState parent;
+     bool secure;
+     bool virt;
+ };
+-typedef struct VexpressMachineState VexpressMachineState;
+ 
+ #define TYPE_VEXPRESS_MACHINE   "vexpress"
+ #define TYPE_VEXPRESS_A9_MACHINE   MACHINE_TYPE_NAME("vexpress-a9")
+ #define TYPE_VEXPRESS_A15_MACHINE   MACHINE_TYPE_NAME("vexpress-a15")
+-DECLARE_OBJ_CHECKERS(VexpressMachineState, VexpressMachineClass,
+-                     VEXPRESS_MACHINE, TYPE_VEXPRESS_MACHINE)
++OBJECT_DECLARE_TYPE(VexpressMachineState, VexpressMachineClass, VEXPRESS_MACHINE)
+ 
+ typedef void DBoardInitFn(const VexpressMachineState *machine,
+                           ram_addr_t ram_size,
+diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+index 8dae779c76..483925f57a 100644
+--- a/hw/block/m25p80.c
++++ b/hw/block/m25p80.c
+@@ -456,17 +456,14 @@ struct Flash {
+     const FlashPartInfo *pi;
+ 
+ };
+-typedef struct Flash Flash;
+ 
+ struct M25P80Class {
+     SSISlaveClass parent_class;
+     FlashPartInfo *pi;
+ };
+-typedef struct M25P80Class M25P80Class;
+ 
+ #define TYPE_M25P80 "m25p80-generic"
+-DECLARE_OBJ_CHECKERS(Flash, M25P80Class,
+-                     M25P80, TYPE_M25P80)
++OBJECT_DECLARE_TYPE(Flash, M25P80Class, M25P80)
+ 
+ static inline Manufacturer get_man(Flash *s)
+ {
+diff --git a/hw/input/adb-kbd.c b/hw/input/adb-kbd.c
+index fe0c363d64..a9088c910c 100644
+--- a/hw/input/adb-kbd.c
++++ b/hw/input/adb-kbd.c
+@@ -32,10 +32,7 @@
+ #include "trace.h"
+ #include "qom/object.h"
+ 
+-typedef struct ADBKeyboardClass ADBKeyboardClass;
+-typedef struct KBDState KBDState;
+-DECLARE_OBJ_CHECKERS(KBDState, ADBKeyboardClass,
+-                     ADB_KEYBOARD, TYPE_ADB_KEYBOARD)
++OBJECT_DECLARE_TYPE(KBDState, ADBKeyboardClass, ADB_KEYBOARD)
+ 
+ struct KBDState {
+     /*< private >*/
+diff --git a/hw/input/adb-mouse.c b/hw/input/adb-mouse.c
+index f5750909b4..e6b341f028 100644
+--- a/hw/input/adb-mouse.c
++++ b/hw/input/adb-mouse.c
+@@ -31,10 +31,7 @@
+ #include "trace.h"
+ #include "qom/object.h"
+ 
+-typedef struct ADBMouseClass ADBMouseClass;
+-typedef struct MouseState MouseState;
+-DECLARE_OBJ_CHECKERS(MouseState, ADBMouseClass,
+-                     ADB_MOUSE, TYPE_ADB_MOUSE)
++OBJECT_DECLARE_TYPE(MouseState, ADBMouseClass, ADB_MOUSE)
+ 
+ struct MouseState {
+     /*< public >*/
+diff --git a/hw/misc/tmp421.c b/hw/misc/tmp421.c
+index 212d6e0e83..ef3c682e32 100644
+--- a/hw/misc/tmp421.c
++++ b/hw/misc/tmp421.c
+@@ -65,17 +65,14 @@ struct TMP421State {
+     uint8_t pointer;
+ 
+ };
+-typedef struct TMP421State TMP421State;
+ 
+ struct TMP421Class {
+     I2CSlaveClass parent_class;
+     DeviceInfo *dev;
+ };
+-typedef struct TMP421Class TMP421Class;
+ 
+ #define TYPE_TMP421 "tmp421-generic"
+-DECLARE_OBJ_CHECKERS(TMP421State, TMP421Class,
+-                     TMP421, TYPE_TMP421)
++OBJECT_DECLARE_TYPE(TMP421State, TMP421Class, TMP421)
+ 
+ 
+ /* the TMP421 registers */
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 1f0388a755..e859534eaf 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -55,10 +55,7 @@
+ 
+ #define TYPE_SCSI_DISK_BASE         "scsi-disk-base"
+ 
+-typedef struct SCSIDiskClass SCSIDiskClass;
+-typedef struct SCSIDiskState SCSIDiskState;
+-DECLARE_OBJ_CHECKERS(SCSIDiskState, SCSIDiskClass,
+-                     SCSI_DISK_BASE, TYPE_SCSI_DISK_BASE)
++OBJECT_DECLARE_TYPE(SCSIDiskState, SCSIDiskClass, SCSI_DISK_BASE)
+ 
+ struct SCSIDiskClass {
+     SCSIDeviceClass parent_class;
+diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
+index 40095bed09..a63d25de48 100644
+--- a/hw/scsi/vmw_pvscsi.c
++++ b/hw/scsi/vmw_pvscsi.c
+@@ -61,12 +61,9 @@ struct PVSCSIClass {
+     PCIDeviceClass parent_class;
+     DeviceRealize parent_dc_realize;
+ };
+-typedef struct PVSCSIClass PVSCSIClass;
+ 
+ #define TYPE_PVSCSI "pvscsi"
+-typedef struct PVSCSIState PVSCSIState;
+-DECLARE_OBJ_CHECKERS(PVSCSIState, PVSCSIClass,
+-                     PVSCSI, TYPE_PVSCSI)
++OBJECT_DECLARE_TYPE(PVSCSIState, PVSCSIClass, PVSCSI)
+ 
+ 
+ /* Compatibility flags for migration */
+-- 
+2.26.2
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1894804
-
-Title:
-  Second DEVICE_DELETED event missing during virtio-blk disk device
-  detach
-
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  New
-
-Bug description:
-  We are in the process of moving OpenStack CI across to use 20.04 Focal
-  as the underlying OS and encountering the following issue in any test
-  attempting to detach disk devices from running QEMU instances.
-
-  We can see a single DEVICE_DELETED event raised to libvirtd for the
-  /machine/peripheral/virtio-disk1/virtio-backend device but we do not
-  see a second event for the actual disk. As a result the device is
-  still marked as present in libvirt but QEMU reports it as missing in
-  subsequent attempts to remove the device.
-
-  The following log snippets can also be found in the following pastebin
-  that's slightly easier to gork:
-
-  http://paste.openstack.org/show/797564/
-
-  https://review.opendev.org/#/c/746981/ libvirt: Bump
-  MIN_{LIBVIRT,QEMU}_VERSION and NEXT_MIN_{LIBVIRT,QEMU}_VERSION
-
-  https://zuul.opendev.org/t/openstack/build/4c56def513884c5eb3ba7b0adf7fa2=
-60
-  nova-ceph-multistore
-
-  https://zuul.opendev.org/t/openstack/build/4c56def513884c5eb3ba7b0adf7fa2=
-60/log/controller/logs/dpkg-l.txt
-
-  ii  libvirt-daemon                       6.0.0-0ubuntu8.3                =
-      amd64        Virtualization daemon
-  ii  libvirt-daemon-driver-qemu           6.0.0-0ubuntu8.3                =
-      amd64        Virtualization daemon QEMU connection driver
-  ii  libvirt-daemon-system                6.0.0-0ubuntu8.3                =
-      amd64        Libvirt daemon configuration files
-  ii  libvirt-daemon-system-systemd        6.0.0-0ubuntu8.3                =
-      amd64        Libvirt daemon configuration files (systemd)
-  ii  libvirt-dev:amd64                    6.0.0-0ubuntu8.3                =
-      amd64        development files for the libvirt library
-  ii  libvirt0:amd64                       6.0.0-0ubuntu8.3                =
-      amd64        library for interfacing with different virtualization sy=
-stems
-  [..]
-  ii  qemu-block-extra:amd64               1:4.2-3ubuntu6.4                =
-      amd64        extra block backend modules for qemu-system and qemu-uti=
-ls
-  ii  qemu-slof                            20191209+dfsg-1                 =
-      all          Slimline Open Firmware -- QEMU PowerPC version
-  ii  qemu-system                          1:4.2-3ubuntu6.4                =
-      amd64        QEMU full system emulation binaries
-  ii  qemu-system-arm                      1:4.2-3ubuntu6.4                =
-      amd64        QEMU full system emulation binaries (arm)
-  ii  qemu-system-common                   1:4.2-3ubuntu6.4                =
-      amd64        QEMU full system emulation binaries (common files)
-  ii  qemu-system-data                     1:4.2-3ubuntu6.4                =
-      all          QEMU full system emulation (data files)
-  ii  qemu-system-mips                     1:4.2-3ubuntu6.4                =
-      amd64        QEMU full system emulation binaries (mips)
-  ii  qemu-system-misc                     1:4.2-3ubuntu6.4                =
-      amd64        QEMU full system emulation binaries (miscellaneous)
-  ii  qemu-system-ppc                      1:4.2-3ubuntu6.4                =
-      amd64        QEMU full system emulation binaries (ppc)
-  ii  qemu-system-s390x                    1:4.2-3ubuntu6.4                =
-      amd64        QEMU full system emulation binaries (s390x)
-  ii  qemu-system-sparc                    1:4.2-3ubuntu6.4                =
-      amd64        QEMU full system emulation binaries (sparc)
-  ii  qemu-system-x86                      1:4.2-3ubuntu6.4                =
-      amd64        QEMU full system emulation binaries (x86)
-  ii  qemu-utils                           1:4.2-3ubuntu6.4                =
-      amd64        QEMU utilities
-
-  https://zuul.opendev.org/t/openstack/build/4c56def513884c5eb3ba7b0adf7fa2=
-60/log/controller/logs/libvirt/qemu
-  /instance-0000003a_log.txt
-
-  2020-09-07 19:29:55.021+0000: starting up libvirt version: 6.0.0, package=
-: 0ubuntu8.3 (Marc Deslauriers <marc.deslauriers@ubuntu.com> Thu, 30 Jul 20=
-20 06:40:28 -0400), qemu version: 4.2.0Debian 1:4.2-3ubuntu6.4, kernel: 5.4=
-.0-45-generic, hostname: ubuntu-focal-ovh-bhs1-0019682147
-  LC_ALL=3DC \
-  PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
-  HOME=3D/var/lib/libvirt/qemu/domain-86-instance-0000003a \
-  XDG_DATA_HOME=3D/var/lib/libvirt/qemu/domain-86-instance-0000003a/.local/=
-share \
-  XDG_CACHE_HOME=3D/var/lib/libvirt/qemu/domain-86-instance-0000003a/.cache=
- \
-  XDG_CONFIG_HOME=3D/var/lib/libvirt/qemu/domain-86-instance-0000003a/.conf=
-ig \
-  QEMU_AUDIO_DRV=3Dnone \
-  /usr/bin/qemu-system-x86_64 \
-  -name guest=3Dinstance-0000003a,debug-threads=3Don \
-  -S \
-  -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/=
-domain-86-instance-0000003a/master-key.aes \
-  -machine pc-i440fx-4.2,accel=3Dtcg,usb=3Doff,dump-guest-core=3Doff \
-  -cpu qemu64 \
-  -m 128 \
-  -overcommit mem-lock=3Doff \
-  -smp 1,sockets=3D1,cores=3D1,threads=3D1 \
-  -uuid 0d59f238-daef-40d4-adf9-a4fa24c35231 \
-  -smbios 'type=3D1,manufacturer=3DOpenStack Foundation,product=3DOpenStack=
- Nova,version=3D21.1.0,serial=3D0d59f238-daef-40d4-adf9-a4fa24c35231,uuid=
-=3D0d59f238-daef-40d4-adf9-a4fa24c35231,family=3DVirtual Machine' \
-  -no-user-config \
-  -nodefaults \
-  -chardev socket,id=3Dcharmonitor,fd=3D39,server,nowait \
-  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
-  -rtc base=3Dutc \
-  -no-shutdown \
-  -boot strict=3Don \
-  -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 \
-  -object secret,id=3Dlibvirt-3-storage-secret0,data=3DzT+XibedVJZM2du1+PXp=
-IXHMVJ9a0pVcKihOtCGwlB0=3D,keyid=3DmasterKey0,iv=3D536Lfw+nsyvDhFBTOQG4zA=
-=3D=3D,format=3Dbase64 \
-  -blockdev '{"driver":"rbd","pool":"vms","image":"0d59f238-daef-40d4-adf9-=
-a4fa24c35231_disk","server":[{"host":"158.69.70.115","port":"6789"}],"user"=
-:"cinder","auth-client-required":["cephx","none"],"key-secret":"libvirt-3-s=
-torage-secret0","node-name":"libvirt-3-storage","cache":{"direct":false,"no=
--flush":false},"auto-read-only":true,"discard":"unmap"}' \
-  -blockdev '{"node-name":"libvirt-3-format","read-only":false,"cache":{"di=
-rect":false,"no-flush":false},"driver":"raw","file":"libvirt-3-storage"}' \
-  -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dlibvirt-=
-3-format,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don \
-  -object secret,id=3Dlibvirt-2-storage-secret0,data=3DSO9AgCCTvkBBMYHZe+LV=
-zoCF4GUNgvBtkFwRRIji7WI=3D,keyid=3DmasterKey0,iv=3DMzGu/h2Api4mMG9lL8hvdg=
-=3D=3D,format=3Dbase64 \
-  -blockdev '{"driver":"rbd","pool":"volumes","image":"volume-04dd79b2-3c05=
--4492-b1d7-7969d24df768","server":[{"host":"158.69.70.115","port":"6789"}],=
-"user":"cinder","auth-client-required":["cephx","none"],"key-secret":"libvi=
-rt-2-storage-secret0","node-name":"libvirt-2-storage","cache":{"direct":fal=
-se,"no-flush":false},"auto-read-only":true,"discard":"unmap"}' \
-  -blockdev '{"node-name":"libvirt-2-format","read-only":false,"discard":"u=
-nmap","cache":{"direct":false,"no-flush":false},"driver":"raw","file":"libv=
-irt-2-storage"}' \
-  -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x7,drive=3Dlibvirt-=
-2-format,id=3Dvirtio-disk1,write-cache=3Don,serial=3D04dd79b2-3c05-4492-b1d=
-7-7969d24df768 \
-  -object secret,id=3Dlibvirt-1-storage-secret0,data=3DlhbR9+ewiXiaf3dKoQWP=
-3bk6hlLMLRXnbhh9ZkjZ9dQ=3D,keyid=3DmasterKey0,iv=3DWWHpGuOHkwXqxlLxGUqpcA=
-=3D=3D,format=3Dbase64 \
-  -blockdev '{"driver":"rbd","pool":"vms","image":"0d59f238-daef-40d4-adf9-=
-a4fa24c35231_disk.config","server":[{"host":"158.69.70.115","port":"6789"}]=
-,"user":"cinder","auth-client-required":["cephx","none"],"key-secret":"libv=
-irt-1-storage-secret0","node-name":"libvirt-1-storage","cache":{"direct":fa=
-lse,"no-flush":false},"auto-read-only":true,"discard":"unmap"}' \
-  -blockdev '{"node-name":"libvirt-1-format","read-only":true,"cache":{"dir=
-ect":false,"no-flush":false},"driver":"raw","file":"libvirt-1-storage"}' \
-  -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Dlibvirt-1-format,id=3Dide0-0-=
-0,write-cache=3Don \
-  -netdev tap,fd=3D41,id=3Dhostnet0 \
-  -device virtio-net-pci,host_mtu=3D1400,netdev=3Dhostnet0,id=3Dnet0,mac=3D=
-fa:16:3e:4d:bb:0b,bus=3Dpci.0,addr=3D0x3 \
-  -add-fd set=3D2,fd=3D43 \
-  -chardev pty,id=3Dcharserial0,logfile=3D/dev/fdset/2,logappend=3Don \
-  -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 \
-  -vnc 0.0.0.0:3 \
-  -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 \
-  -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 \
-  -object rng-random,id=3Dobjrng0,filename=3D/dev/urandom \
-  -device virtio-rng-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x6 \
-  -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourc=
-econtrol=3Ddeny \
-  -msg timestamp=3Don
-  char device redirected to /dev/pts/1 (label charserial0)
-
-  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
-c/zuul_opendev_logs_4c5/746981/5/check
-  /nova-ceph-multistore/4c56def/testr_results.html
-
-  tempest.api.compute.servers.test_server_rescue_negative.ServerRescueNegat=
-iveTestJSON.test_rescued_vm_detach_volume
-
-  2020-09-07 19:30:13,764 100285 INFO     [tempest.lib.common.rest_client] =
-Request (ServerRescueNegativeTestJSON:_run_cleanups): 202 DELETE https://15=
-8.69.70.115/compute/v2.1/servers/0d59f238-daef-40d4-adf9-a4fa24c35231/os-vo=
-lume_attachments/04dd79b2-3c05-4492-b1d7-7969d24df768 1.261s
-  2020-09-07 19:30:13,764 100285 DEBUG    [tempest.lib.common.rest_client] =
-Request - Headers: {'Content-Type': 'application/json', 'Accept': 'applicat=
-ion/json', 'X-Auth-Token': '<omitted>'}
-          Body: None
-      Response - Headers: {'date': 'Mon, 07 Sep 2020 19:30:12 GMT', 'server=
-': 'Apache/2.4.41 (Ubuntu)', 'content-length': '0', 'content-type': 'applic=
-ation/json', 'openstack-api-version': 'compute 2.1', 'x-openstack-nova-api-=
-version': '2.1', 'vary': 'OpenStack-API-Version,X-OpenStack-Nova-API-Versio=
-n', 'x-openstack-request-id': 'req-502a0106-3eb9-4d42-9dd4-c43ba89187b6', '=
-x-compute-request-id': 'req-502a0106-3eb9-4d42-9dd4-c43ba89187b6', 'connect=
-ion': 'close', 'status': '202', 'content-location': 'https://158.69.70.115/=
-compute/v2.1/servers/0d59f238-daef-40d4-adf9-a4fa24c35231/os-volume_attachm=
-ents/04dd79b2-3c05-4492-b1d7-7969d24df768'}
-          Body: b''
-
-  # First attempt to detach the device  by n-cpu
-
-  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
-c/zuul_opendev_logs_4c5/746981/5/check
-  /nova-ceph-multistore/4c56def/controller/logs/screen-n-cpu.txt
-  (gzipped)
-
-  29957 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: DEBUG nova.virt.libvirt.guest [None req-502a0106-3eb9-4d42-9dd4-c=
-43ba89187b6 tempest-ServerRescueNegativeTestJSON-73411582 tempest-ServerRes=
-cueNegativeTestJSON-73411582] detach device xml: <disk type=3D"network" de
-  29958 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
-=3D"unmap"/>
-  29959 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
-492-b1d7-7969d24df768">
-  29960 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
-  29961 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   </source>
-  29962 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
-  29963 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
-  29964 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
-07" function=3D"0x0"/>
-  29965 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: </disk>
-  29966 Sep 07 19:30:14.185403 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:  {{(pid=3D92697) detach_device /opt/stack/nova/nova/virt/libvirt/=
-guest.py:510}}
-
-  # DEVICE_DELETED only raised for /machine/peripheral/virtio-disk1
-  /virtio-backend
-
-  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
-c/zuul_opendev_logs_4c5/746981/5/check
-  /nova-ceph-multistore/4c56def/controller/logs/libvirt/libvirtd_log.txt
-  (gzipped)
-
-  329344 2020-09-07 19:30:14.165+0000: 65559: debug : qemuDomainObjEnterMon=
-itorInternal:9869 : Entering monitor (mon=3D0x7f769405e470 vm=3D0x7f768c0df=
-0b0 name=3Dinstance-0000003a)
-  329345 2020-09-07 19:30:14.165+0000: 65559: debug : qemuMonitorDelDevice:=
-2848 : devalias=3Dvirtio-disk1
-  329346 2020-09-07 19:30:14.165+0000: 65559: debug : qemuMonitorDelDevice:=
-2850 : mon:0x7f769405e470 vm:0x7f768c0df0b0 fd:39
-  329347 2020-09-07 19:30:14.165+0000: 65559: info : qemuMonitorSend:993 : =
-QEMU_MONITOR_SEND_MSG: mon=3D0x7f769405e470 msg=3D{"execute":"device_del","=
-arguments":{"id":"virtio-disk1"},"id":"libvirt-367"}^M
-  329348  fd=3D-1                                                          =
-                =
-
-  329349 2020-09-07 19:30:14.165+0000: 65555: info : qemuMonitorIOWrite:450=
- : QEMU_MONITOR_IO_WRITE: mon=3D0x7f769405e470 buf=3D{"execute":"device_del=
-","arguments":{"id":"virtio-disk1"},"id":"libvirt-367"}^M
-  329350  len=3D79 ret=3D79 errno=3D0                                      =
-                    =
-
-  329351 2020-09-07 19:30:14.168+0000: 65555: debug : qemuMonitorJSONIOProc=
-essLine:220 : Line [{"return": {}, "id": "libvirt-367"}]
-  329352 2020-09-07 19:30:14.168+0000: 65555: info : qemuMonitorJSONIOProce=
-ssLine:239 : QEMU_MONITOR_RECV_REPLY: mon=3D0x7f769405e470 reply=3D{"return=
-": {}, "id": "libvirt-367"}
-  329353 2020-09-07 19:30:14.168+0000: 65559: debug : qemuDomainObjExitMoni=
-torInternal:9892 : Exited monitor (mon=3D0x7f769405e470 vm=3D0x7f768c0df0b0=
- name=3Dinstance-0000003a)
-  329354 2020-09-07 19:30:14.201+0000: 65555: debug : qemuMonitorJSONIOProc=
-essLine:220 : Line [{"timestamp": {"seconds": 1599507014, "microseconds": 2=
-01037}, "event": "DEVICE_DELETED", "data": {"path": "/machine/peripheral/vi=
-rtio-disk1/virtio-backend"}}]
-  329355 2020-09-07 19:30:14.208+0000: 65555: info : qemuMonitorJSONIOProce=
-ssLine:234 : QEMU_MONITOR_RECV_EVENT: mon=3D0x7f769405e470 event=3D{"timest=
-amp": {"seconds": 1599507014, "microseconds": 201037}, "event": "DEVICE_DEL=
-ETED", "data": {"path": "/machine/peripheral/virtio-disk1/virtio-backend"}}
-  329356 2020-09-07 19:30:14.208+0000: 65555: debug : qemuMonitorJSONIOProc=
-essEvent:181 : mon=3D0x7f769405e470 obj=3D0x55dd95d0cba0
-  329357 2020-09-07 19:30:14.208+0000: 65555: debug : qemuMonitorEmitEvent:=
-1198 : mon=3D0x7f769405e470 event=3DDEVICE_DELETED
-  329358 2020-09-07 19:30:14.208+0000: 65555: debug : qemuProcessHandleEven=
-t:549 : vm=3D0x7f768c0df0b0
-  329359 2020-09-07 19:30:14.208+0000: 65555: debug : virObjectEventNew:631=
- : obj=3D0x55dd95d3bf60
-  329360 2020-09-07 19:30:14.208+0000: 65555: debug : qemuMonitorJSONIOProc=
-essEvent:205 : handle DEVICE_DELETED handler=3D0x7f7691732840 data=3D0x55dd=
-95eae3c0
-  329361 2020-09-07 19:30:14.208+0000: 65555: debug : qemuMonitorJSONHandle=
-DeviceDeleted:1287 : missing device in device deleted event
-
-  # Second attempt to detach the device by n-cpu
-
-  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
-c/zuul_opendev_logs_4c5/746981/5/check
-  /nova-ceph-multistore/4c56def/controller/logs/screen-n-cpu.txt
-  (gzipped)
-
-  30046 Sep 07 19:30:19.192548 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: DEBUG oslo.service.loopingcall [None req-502a0106-3eb9-4d42-9dd4-=
-c43ba89187b6 tempest-ServerRescueNegativeTestJSON-73411582 tempest-ServerRe=
-scueNegativeTestJSON-73411582] Waiting for function nova.virt.libvirt.gu
-  30047 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
-=3D"network" device=3D"disk">
-  30048 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
-=3D"unmap"/>
-  30049 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
-492-b1d7-7969d24df768">
-  30050 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
-  30051 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   </source>
-  30052 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
-  30053 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
-  30054 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
-07" function=3D"0x0"/>
-  30055 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: </disk>
-  30056 Sep 07 19:30:19.194846 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:  {{(pid=3D92697) detach_device /opt/stack/nova/nova/virt/libvirt/=
-guest.py:510}}
-
-  # DeviceNotFound raised by QEMU
-
-  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
-c/zuul_opendev_logs_4c5/746981/5/check
-  /nova-ceph-multistore/4c56def/controller/logs/libvirt/libvirtd_log.txt
-  (gzipped)
-
-  332479 2020-09-07 19:30:19.196+0000: 65560: debug : qemuDomainObjBeginJob=
-Internal:9416 : Starting job: job=3Dmodify agentJob=3Dnone asyncJob=3Dnone =
-(vm=3D0x7f768c0df0b0 name=3Dinstance-0000003a, current job=3Dnone agentJob=
-=3Dnone async=3Dnone)
-  332480 2020-09-07 19:30:19.196+0000: 65560: debug : qemuDomainObjBeginJob=
-Internal:9470 : Started job: modify (async=3Dnone vm=3D0x7f768c0df0b0 name=
-=3Dinstance-0000003a)
-  332481 2020-09-07 19:30:19.196+0000: 65560: debug : qemuDomainObjEnterMon=
-itorInternal:9869 : Entering monitor (mon=3D0x7f769405e470 vm=3D0x7f768c0df=
-0b0 name=3Dinstance-0000003a)
-  332482 2020-09-07 19:30:19.196+0000: 65560: debug : qemuMonitorDelDevice:=
-2848 : devalias=3Dvirtio-disk1
-  332483 2020-09-07 19:30:19.196+0000: 65560: debug : qemuMonitorDelDevice:=
-2850 : mon:0x7f769405e470 vm:0x7f768c0df0b0 fd:39
-  332484 2020-09-07 19:30:19.196+0000: 65560: info : qemuMonitorSend:993 : =
-QEMU_MONITOR_SEND_MSG: mon=3D0x7f769405e470 msg=3D{"execute":"device_del","=
-arguments":{"id":"virtio-disk1"},"id":"libvirt-369"}^M
-  332485  fd=3D-1                                                          =
-                =
-
-  332486 2020-09-07 19:30:19.196+0000: 65555: info : qemuMonitorIOWrite:450=
- : QEMU_MONITOR_IO_WRITE: mon=3D0x7f769405e470 buf=3D{"execute":"device_del=
-","arguments":{"id":"virtio-disk1"},"id":"libvirt-369"}^M
-  332487  len=3D79 ret=3D79 errno=3D0                                      =
-                    =
-
-  332488 2020-09-07 19:30:19.197+0000: 65555: debug : qemuMonitorJSONIOProc=
-essLine:220 : Line [{"id": "libvirt-369", "error": {"class": "DeviceNotFoun=
-d", "desc": "Device 'virtio-disk1' not found"}}]
-  332489 2020-09-07 19:30:19.197+0000: 65555: info : qemuMonitorJSONIOProce=
-ssLine:239 : QEMU_MONITOR_RECV_REPLY: mon=3D0x7f769405e470 reply=3D{"id": "=
-libvirt-369", "error": {"class": "DeviceNotFound", "desc": "Device 'virtio-=
-disk1' not found"}}
-  332490 2020-09-07 19:30:19.197+0000: 65560: debug : qemuDomainObjExitMoni=
-torInternal:9892 : Exited monitor (mon=3D0x7f769405e470 vm=3D0x7f768c0df0b0=
- name=3Dinstance-0000003a)
-  332491 2020-09-07 19:30:19.197+0000: 65560: debug : qemuDomainDeleteDevic=
-e:128 : Detaching of device virtio-disk1 failed and no event arrived
-
-  # n-cpu continues to retry the detach
-
-  30245 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
-=3D"network" device=3D"disk">
-  30246 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
-=3D"unmap"/>
-  30247 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
-492-b1d7-7969d24df768">
-  30248 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
-  30249 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   </source>
-  30250 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
-  30251 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
-  30252 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
-07" function=3D"0x0"/>
-  30253 Sep 07 19:30:26.209322 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: </disk>
-
-  30276 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
-=3D"network" device=3D"disk">
-  30277 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
-=3D"unmap"/>
-  30278 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
-492-b1d7-7969d24df768">
-  30279 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
-  30280 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   </source>
-  30281 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
-  30282 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
-  30283 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
-07" function=3D"0x0"/>
-  30284 Sep 07 19:30:42.028517 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: </disk>
-
-  30356 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
-=3D"network" device=3D"disk">
-  30357 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
-=3D"unmap"/>
-  30358 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
-492-b1d7-7969d24df768">
-  30359 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
-  30360 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   </source>
-  30361 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
-  30362 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
-  30363 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
-07" function=3D"0x0"/>
-  30364 Sep 07 19:30:53.232072 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: </disk>
-
-  30381 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
-=3D"network" device=3D"disk">
-  30382 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
-=3D"unmap"/>
-  30383 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
-492-b1d7-7969d24df768">
-  30384 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
-  30385 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   </source>
-  30386 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
-  30387 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
-  30388 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
-07" function=3D"0x0"/>
-  30389 Sep 07 19:31:06.239532 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: </disk>
-
-  30478 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
-=3D"network" device=3D"disk">
-  30479 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
-=3D"unmap"/>
-  30480 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
-492-b1d7-7969d24df768">
-  30481 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
-  30482 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   </source>
-  30483 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
-  30484 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
-  30485 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
-07" function=3D"0x0"/>
-  30486 Sep 07 19:31:21.369016 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: </disk>
-
-  30796 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
-=3D"network" device=3D"disk">
-  30797 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
-=3D"unmap"/>
-  30798 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
-492-b1d7-7969d24df768">
-  30799 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
-  30800 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   </source>
-  30801 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
-  30802 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
-  30803 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
-07" function=3D"0x0"/>
-  30804 Sep 07 19:31:42.590535 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: </disk>
-
-  31050 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: DEBUG nova.virt.libvirt.guest [-] detach device xml: <disk type=
-=3D"network" device=3D"disk">
-  31051 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <driver name=3D"qemu" type=3D"raw" cache=3D"writeback" discard=
-=3D"unmap"/>
-  31052 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <source protocol=3D"rbd" name=3D"volumes/volume-04dd79b2-3c05-4=
-492-b1d7-7969d24df768">
-  31053 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:     <host name=3D"158.69.70.115" port=3D"6789"/>
-  31054 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   </source>
-  31055 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <target dev=3D"vdb" bus=3D"virtio"/>
-  31056 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <serial>04dd79b2-3c05-4492-b1d7-7969d24df768</serial>
-  31057 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]:   <address type=3D"pci" domain=3D"0x0000" bus=3D"0x00" slot=3D"0x=
-07" function=3D"0x0"/>
-  31058 Sep 07 19:32:01.613201 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: </disk>
-
-  # n-cpu eventually gives up trying to detach the device
-
-  https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644=
-c/zuul_opendev_logs_4c5/746981/5/check
-  /nova-ceph-multistore/4c56def/controller/logs/screen-n-cpu.txt
-  (gzipped)
-
-  31102 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: ERROR oslo.service.loopingcall [-] Dynamic interval looping call =
-'oslo_service.loopingcall.RetryDecorator.__call__.<locals>._func' failed: n=
-ova.exception.DeviceDetachFailed: Device detach failed for vdb: Unable t
-  31103 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: ERROR oslo.service.loopingcall Traceback (most recent call last):
-  31104 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
-ist-packages/oslo_service/loopingcall.py", line 150, in _run_loop
-  31105 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: ERROR oslo.service.loopingcall     result =3D func(*self.args, **=
-self.kw)
-  31106 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
-ist-packages/oslo_service/loopingcall.py", line 428, in _func
-  31107 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: ERROR oslo.service.loopingcall     return self._sleep_time
-  31108 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
-ist-packages/oslo_utils/excutils.py", line 220, in __exit__
-  31109 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: ERROR oslo.service.loopingcall     self.force_reraise()
-  31110 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
-ist-packages/oslo_utils/excutils.py", line 196, in force_reraise
-  31111 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: ERROR oslo.service.loopingcall     six.reraise(self.type_, self.v=
-alue, self.tb)
-  31112 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
-ist-packages/six.py", line 703, in reraise
-  31113 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: ERROR oslo.service.loopingcall     raise value
-  31114 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: ERROR oslo.service.loopingcall   File "/usr/local/lib/python3.8/d=
-ist-packages/oslo_service/loopingcall.py", line 407, in _func
-  31115 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: ERROR oslo.service.loopingcall     result =3D f(*args, **kwargs)
-  31116 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: ERROR oslo.service.loopingcall   File "/opt/stack/nova/nova/virt/=
-libvirt/guest.py", line 489, in _do_wait_and_retry_detach
-  31117 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: ERROR oslo.service.loopingcall     raise exception.DeviceDetachFa=
-iled(
-  31118 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: ERROR oslo.service.loopingcall nova.exception.DeviceDetachFailed:=
- Device detach failed for vdb: Unable to detach the device from the live co=
-nfig.
-  31119 Sep 07 19:32:06.850434 ubuntu-focal-ovh-bhs1-0019682147 nova-comput=
-e[92697]: ERROR oslo.service.loopingcall
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1894804/+subscriptions
 
