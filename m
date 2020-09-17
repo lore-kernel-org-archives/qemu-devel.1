@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20F2CC2BBD1
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 10:12:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AC46C2BBD1
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 10:12:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95AFD2083B
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 10:12:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BEE802087D
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 10:12:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="oHRy+U40"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95AFD2083B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="YlohiK5u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEE802087D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIqtb-0002EF-Cs
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 06:12:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60274)
+	id 1kIqti-0002Tn-Pd
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 06:12:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIqs8-0000XV-DO
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 06:10:37 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:50245)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIqsN-0000iZ-Oh
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 06:10:51 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:36522)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIqrs-0003SM-3J
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 06:10:36 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id fa1so1031895pjb.0
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 03:10:19 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIqsK-0003YP-VE
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 06:10:51 -0400
+Received: by mail-pf1-x441.google.com with SMTP id d9so920084pfd.3
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 03:10:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=ughGQhnpv0vI//S8mrXDQnorJKmr6CWqkbIT0eqOuAw=;
- b=oHRy+U40gY7WXpeiPdpLewoi1bxzHQURaFqm0qVchkCkLQStqgbbFDT3tBhaNF+JGc
- aE/lvNRBIZsNs8kJ2POASt3/xjRKlHRY4/+J9aIZrWZ5FpqjGw1dkwhCMygGiRzsuIsQ
- GIDjcXcIyq575q46w86gGhAKEnE8CR8L2EXHjwWXasBr5JNQgvDFptlBvD6fcYQGlxsi
- r1WQGXgMbyQNHIUbkeh00pWC6KSyz+UNyGX6NxQq6Jy5oz7tHr7kH+HZaL0Acx5hm9LB
- dxB0NLlE5v/BSNjGGyD0AA6WK1Z7DD50g35fC9ZrhfSj2mtszLLcut7n911HDvtUqw6U
- MrCQ==
+ bh=PZ0t5l0h/1dEpMOLrSPH28d48Nu+Fe9SZlr/r+Ye7Vw=;
+ b=YlohiK5u0FQMqe3rZkTvpQJyo014+HvRvxKp5MBw6tPZGBzRPdAqxuUgO9PNJQzlCk
+ nEJk95Hb3hyGbxAl5c1mya8BTkcq72QymbkXBNPxSPFL8ClUowECWrglZA+UTUkTojcK
+ +tleuM/6hRwgB+MhBb/nKY7khYj8MbtNdDBcyhTrWoFcwbzRgmT1W2kLTi4FnRDWdvDK
+ AW2goKSX5kjb7cKRQAFxaEYCXl2Q14d7LrPpvPN8+wwnPzerj9GrApmKXn6v787F09NV
+ qtsF0Ha7eS3dmT0Z8kTJaLjS0ukWBbBDG7wJO6i3BpcnIqmL71b3lXnHPIMVmfxgol7Q
+ bwcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=ughGQhnpv0vI//S8mrXDQnorJKmr6CWqkbIT0eqOuAw=;
- b=c861biIORGDrxm2k6T1Rfub69Bwsn3dn/IYa2WluOenKv/WnVtRWa8FATATMFkYfts
- 9qjelW2aoVtGjvx8UMYeBqhDttaL0kTiZtGUtgjy1z7fyK9fn4a3d1ROKbUnm/saKrRr
- m/pevhKn/HOsBJtLxgcCKWHcGTLJCSv5z12FQZf+bihw7pIUdxwzFlTCcPTO80zj+6Q9
- VKAiWoWYLPz9hVosKcLLP1oYGDkTDSe7buO4Rq58W4CjwTm+VHHcjOtpM1O9mKxtU2pe
- 6a4thBOq567QUAAlGC3WVZgn1vRoSsc3z3WWAjKwmYp2uHiHgGwnqpZCp4gY3l+llz2O
- M0pg==
-X-Gm-Message-State: AOAM5331TOQouH0AH0Q77IQbNDNvXqDM0vMw+lllwwxdDxvtVJPi+Hwx
- jLPZxc/+FbWHdzIp3K/olhmQLDPzIdy5X/mL
-X-Google-Smtp-Source: ABdhPJzfFvhXFfyqGWZp2LkCT8QCHCevyBJWAQBs0a71k7Z0QqxYqCGc5wCbsuHtOIyEBjxDJ3Xr8A==
-X-Received: by 2002:a17:902:b413:b029:d1:f3d7:2674 with SMTP id
- x19-20020a170902b413b02900d1f3d72674mr5001587plr.53.1600337418314; 
- Thu, 17 Sep 2020 03:10:18 -0700 (PDT)
+ bh=PZ0t5l0h/1dEpMOLrSPH28d48Nu+Fe9SZlr/r+Ye7Vw=;
+ b=gBQU4dwKqBfReKzH7c3CWlD/yKt49iY2JoqkY02ZUYHCcolSWnLRRVRUqOcLHGzvMw
+ 1eguc1SH8HnbAe0qAiHpwuFVngp0atlxEUSeV2EL3gS/xbXykJKctyNhpHSYImXQ1/LZ
+ FtdJuA2HkXFwewpaCi8cqkZXopm6oeoYybWClN/wf2CGjIjaKoDf2/JGEM9jsTAhiURw
+ gnm2ADzwDhRQLTjTn8H2rY8rrM87sVL+tP1nZanFI0eiI6GXpbk45qyj+ftvz1xoHeED
+ 1tJ8TvMk9v24wLHfncNfFTI72gwdb5dQfOuW+L4T1+s8dhruGrcVgIr7ojPW1eg67edo
+ VEtg==
+X-Gm-Message-State: AOAM532IhQELwRyIs9yjykqUQMPwFCFIbaUUcaJ/+iZKoiE89x3VL6X0
+ z0K0MXfZ+KzjmJRpAI1gPzgwFH99IwmIxGTe
+X-Google-Smtp-Source: ABdhPJyWY20HHsRxOXA6lQdjOIPnj2Nj5HDBPT8TAvLTX0xKnDIRhfUk7sY9cnx+h5EUDwrk4clHQQ==
+X-Received: by 2002:a65:60c6:: with SMTP id r6mr21065742pgv.186.1600337446905; 
+ Thu, 17 Sep 2020 03:10:46 -0700 (PDT)
 Received: from localhost.localdomain ([115.96.122.113])
- by smtp.googlemail.com with ESMTPSA id d20sm5241559pjv.39.2020.09.17.03.10.14
+ by smtp.googlemail.com with ESMTPSA id d20sm5241559pjv.39.2020.09.17.03.10.43
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Sep 2020 03:10:17 -0700 (PDT)
+ Thu, 17 Sep 2020 03:10:46 -0700 (PDT)
 From: Ani Sinha <ani@anisinha.ca>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 05/12] i440fx/acpi: do not add hotplug related amls for
- cold plugged bridges
-Date: Thu, 17 Sep 2020 15:39:40 +0530
-Message-Id: <20200917100947.21106-6-ani@anisinha.ca>
+Subject: [PATCH v7 12/12] tests/acpi: add DSDT.hpbrroot DSDT table blob to
+ test global i440fx hotplug
+Date: Thu, 17 Sep 2020 15:39:47 +0530
+Message-Id: <20200917100947.21106-13-ani@anisinha.ca>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200917100947.21106-1-ani@anisinha.ca>
 References: <20200917100947.21106-1-ani@anisinha.ca>
-Received-SPF: none client-ip=2607:f8b0:4864:20::1044;
- envelope-from=ani@anisinha.ca; helo=mail-pj1-x1044.google.com
+Received-SPF: none client-ip=2607:f8b0:4864:20::441;
+ envelope-from=ani@anisinha.ca; helo=mail-pf1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -18
@@ -97,31 +96,235 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- jusual@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
- Ani Sinha <ani@anisinha.ca>, Igor Mammedov <imammedo@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+ "Michael S. Tsirkin" <mst@redhat.com>, jusual@redhat.com,
+ Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cold plugged bridges are not hot unpluggable, even when their hotplug
-property (acpi-pci-hotplug-with-bridge-support) is turned off. Please see
-the function acpi_pcihp_pc_no_hotplug(). However, with
-the current implementaton, Windows would try to hot-unplug a pci bridge when
-it's hotplug switch is off. This is regardless of whether there are devices
-attached to the bridge. This is because we add ACPI code like _EJ0 etc for the
-pci slot where the bridge is cold plugged.
+This change adds a new DSDT golden master table blob to test disabling
+hotplug on both pci root bus and pci bridges. Also reverts the change
+in file bios-tables-test-allowed-diff.h to make sure its now empty so that
+future modifications to acpi tables can be caught.
 
-In this fix, we identify a cold plugged bridge and for cold plugged bridges,
-we do not add the appropriate ACPI methods that are used by the OS
-to identify a hot-pluggable/unpluggable pci device. After this change, Windows
-does not detect the cold plugged pci bridge as ejectable.
+The following is the disassembled diff between DSDT.hpbridge and DSDT.hpbrroot:
 
-As a result of the patch, the following are the changes to the DSDT ACPI
-table:
+@@ -1,30 +1,30 @@
+ /*
+  * Intel ACPI Component Architecture
+  * AML/ASL+ Disassembler version 20180105 (64-bit version)
+  * Copyright (c) 2000 - 2018 Intel Corporation
+  *
+  * Disassembling to symbolic ASL+ operators
+  *
+- * Disassembly of tests/data/acpi/pc/DSDT.hpbridge, Wed Sep 16 09:45:56 2020
++ * Disassembly of /tmp/aml-ECV9Q0, Wed Sep 16 09:45:56 2020
+  *
+  * Original Table Header:
+  *     Signature        "DSDT"
+- *     Length           0x0000131F (4895)
++ *     Length           0x00000B89 (2953)
+  *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+- *     Checksum         0xF9
++ *     Checksum         0xA2
+  *     OEM ID           "BOCHS "
+  *     OEM Table ID     "BXPCDSDT"
+  *     OEM Revision     0x00000001 (1)
+  *     Compiler ID      "BXPC"
+  *     Compiler Version 0x00000001 (1)
+  */
+ DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPCDSDT", 0x00000001)
+ {
+     Scope (\)
+     {
+         OperationRegion (DBG, SystemIO, 0x0402, One)
+         Field (DBG, ByteAcc, NoLock, Preserve)
+         {
+             DBGB,   8
+         }
 
-@@ -858,38 +858,33 @@
+@@ -234,64 +234,32 @@
+         {
+             Name (_HID, EisaId ("PNP0B00") /* AT Real-Time Clock */)  // _HID: Hardware ID
+             Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+             {
+                 IO (Decode16,
+                     0x0070,             // Range Minimum
+                     0x0070,             // Range Maximum
+                     0x01,               // Alignment
+                     0x08,               // Length
+                     )
+                 IRQNoFlags ()
+                     {8}
+             })
+         }
+     }
+
+-    Scope (_SB.PCI0)
+-    {
+-        OperationRegion (PCST, SystemIO, 0xAE00, 0x08)
+-        Field (PCST, DWordAcc, NoLock, WriteAsZeros)
+-        {
+-            PCIU,   32,
+-            PCID,   32
+-        }
+-
+-        OperationRegion (SEJ, SystemIO, 0xAE08, 0x04)
+-        Field (SEJ, DWordAcc, NoLock, WriteAsZeros)
+-        {
+-            B0EJ,   32
+-        }
+-
+-        OperationRegion (BNMR, SystemIO, 0xAE10, 0x04)
+-        Field (BNMR, DWordAcc, NoLock, WriteAsZeros)
+-        {
+-            BNUM,   32
+-        }
+-
+-        Mutex (BLCK, 0x00)
+-        Method (PCEJ, 2, NotSerialized)
+-        {
+-            Acquire (BLCK, 0xFFFF)
+-            BNUM = Arg0
+-            B0EJ = (One << Arg1)
+-            Release (BLCK)
+-            Return (Zero)
+-        }
+-    }
+-
+     Scope (_SB)
+     {
+         Scope (PCI0)
+         {
+             Method (_PRT, 0, NotSerialized)  // _PRT: PCI Routing Table
+             {
+                 Local0 = Package (0x80){}
+                 Local1 = Zero
+                 While ((Local1 < 0x80))
+                 {
+                     Local2 = (Local1 >> 0x02)
+                     Local3 = ((Local1 + Local2) & 0x03)
+                     If ((Local3 == Zero))
+                     {
+                         Local4 = Package (0x04)
+                             {
+@@ -690,38 +658,32 @@
+                 Method (_OST, 3, Serialized)  // _OST: OSPM Status Indication
+                 {
+                     COST (Zero, Arg0, Arg1, Arg2)
+                 }
+             }
+         }
+     }
+
+     Method (\_GPE._E02, 0, NotSerialized)  // _Exx: Edge-Triggered GPE
+     {
+         \_SB.CPUS.CSCN ()
+     }
+
+     Scope (_GPE)
+     {
+         Name (_HID, "ACPI0006" /* GPE Block Device */)  // _HID: Hardware ID
+-        Method (_E01, 0, NotSerialized)  // _Exx: Edge-Triggered GPE
+-        {
+-            Acquire (\_SB.PCI0.BLCK, 0xFFFF)
+-            \_SB.PCI0.PCNT ()
+-            Release (\_SB.PCI0.BLCK)
+-        }
+     }
+
+     Scope (\_SB.PCI0)
+     {
+         Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+         {
+             WordBusNumber (ResourceProducer, MinFixed, MaxFixed, PosDecode,
+                 0x0000,             // Granularity
+                 0x0000,             // Range Minimum
+                 0x00FF,             // Range Maximum
+                 0x0000,             // Translation Offset
+                 0x0100,             // Length
+                 ,, )
+             IO (Decode16,
+                 0x0CF8,             // Range Minimum
+                 0x0CF8,             // Range Maximum
+@@ -766,48 +728,32 @@
+         })
+         Device (GPE0)
+         {
+             Name (_HID, "PNP0A06" /* Generic Container Device */)  // _HID: Hardware ID
+             Name (_UID, "GPE0 resources")  // _UID: Unique ID
+             Name (_STA, 0x0B)  // _STA: Status
+             Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+             {
+                 IO (Decode16,
+                     0xAFE0,             // Range Minimum
+                     0xAFE0,             // Range Maximum
+                     0x01,               // Alignment
+                     0x04,               // Length
+                     )
+             })
+         }
+-
+-        Device (PHPR)
+-        {
+-            Name (_HID, "PNP0A06" /* Generic Container Device */)  // _HID: Hardware ID
+-            Name (_UID, "PCI Hotplug resources")  // _UID: Unique ID
+-            Name (_STA, 0x0B)  // _STA: Status
+-            Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+-            {
+-                IO (Decode16,
+-                    0xAE00,             // Range Minimum
+-                    0xAE00,             // Range Maximum
+-                    0x01,               // Alignment
+-                    0x14,               // Length
+-                    )
+-            })
+-        }
+     }
+
+     Scope (\)
+     {
+         Name (_S3, Package (0x04)  // _S3_: S3 System State
+         {
+             One,
+             One,
+             Zero,
+             Zero
+         })
+         Name (_S4, Package (0x04)  // _S4_: S4 System State
+         {
+             0x02,
+             0x02,
+             Zero,
+@@ -831,479 +777,48 @@
+             Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+             {
+                 IO (Decode16,
+                     0x0510,             // Range Minimum
+                     0x0510,             // Range Maximum
+                     0x01,               // Alignment
+                     0x0C,               // Length
+                     )
+             })
+         }
+     }
+
+     Scope (\_SB)
+     {
+         Scope (PCI0)
+         {
+-            Name (BSEL, Zero)
+             Device (S00)
+             {
+                 Name (_ADR, Zero)  // _ADR: Address
+             }
+
+             Device (S10)
+             {
+                 Name (_ADR, 0x00020000)  // _ADR: Address
+                 Method (_S1D, 0, NotSerialized)  // _S1D: S1 Device State
+                 {
                      Return (Zero)
                  }
 
@@ -138,110 +341,496 @@ table:
 
              Device (S18)
              {
--                Name (_SUN, 0x03)  // _SUN: Slot User Number
                  Name (_ADR, 0x00030000)  // _ADR: Address
+             }
+-
+-            Device (S20)
+-            {
+-                Name (_SUN, 0x04)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00040000)  // _ADR: Address
 -                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
 -                {
 -                    PCEJ (BSEL, _SUN)
 -                }
-             }
-
-             Device (S20)
-             {
-                 Name (_SUN, 0x04)  // _SUN: Slot User Number
-                 Name (_ADR, 0x00040000)  // _ADR: Address
-                 Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
-                 {
-                     PCEJ (BSEL, _SUN)
-                 }
-             }
-
-             Device (S28)
-             {
-                 Name (_SUN, 0x05)  // _SUN: Slot User Number
-                 Name (_ADR, 0x00050000)  // _ADR: Address
-@@ -1148,37 +1143,32 @@
-                     PCEJ (BSEL, _SUN)
-                 }
-             }
-
-             Device (SF8)
-             {
-                 Name (_SUN, 0x1F)  // _SUN: Slot User Number
-                 Name (_ADR, 0x001F0000)  // _ADR: Address
-                 Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
-                 {
-                     PCEJ (BSEL, _SUN)
-                 }
-             }
-
-             Method (DVNT, 2, NotSerialized)
-             {
--                If ((Arg0 & 0x08))
+-            }
+-
+-            Device (S28)
+-            {
+-                Name (_SUN, 0x05)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00050000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
 -                {
--                    Notify (S18, Arg1)
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S30)
+-            {
+-                Name (_SUN, 0x06)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00060000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S38)
+-            {
+-                Name (_SUN, 0x07)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00070000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S40)
+-            {
+-                Name (_SUN, 0x08)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00080000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S48)
+-            {
+-                Name (_SUN, 0x09)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00090000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S50)
+-            {
+-                Name (_SUN, 0x0A)  // _SUN: Slot User Number
+-                Name (_ADR, 0x000A0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S58)
+-            {
+-                Name (_SUN, 0x0B)  // _SUN: Slot User Number
+-                Name (_ADR, 0x000B0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S60)
+-            {
+-                Name (_SUN, 0x0C)  // _SUN: Slot User Number
+-                Name (_ADR, 0x000C0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S68)
+-            {
+-                Name (_SUN, 0x0D)  // _SUN: Slot User Number
+-                Name (_ADR, 0x000D0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S70)
+-            {
+-                Name (_SUN, 0x0E)  // _SUN: Slot User Number
+-                Name (_ADR, 0x000E0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S78)
+-            {
+-                Name (_SUN, 0x0F)  // _SUN: Slot User Number
+-                Name (_ADR, 0x000F0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S80)
+-            {
+-                Name (_SUN, 0x10)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00100000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S88)
+-            {
+-                Name (_SUN, 0x11)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00110000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S90)
+-            {
+-                Name (_SUN, 0x12)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00120000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S98)
+-            {
+-                Name (_SUN, 0x13)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00130000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SA0)
+-            {
+-                Name (_SUN, 0x14)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00140000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SA8)
+-            {
+-                Name (_SUN, 0x15)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00150000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SB0)
+-            {
+-                Name (_SUN, 0x16)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00160000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SB8)
+-            {
+-                Name (_SUN, 0x17)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00170000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SC0)
+-            {
+-                Name (_SUN, 0x18)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00180000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SC8)
+-            {
+-                Name (_SUN, 0x19)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00190000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SD0)
+-            {
+-                Name (_SUN, 0x1A)  // _SUN: Slot User Number
+-                Name (_ADR, 0x001A0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SD8)
+-            {
+-                Name (_SUN, 0x1B)  // _SUN: Slot User Number
+-                Name (_ADR, 0x001B0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SE0)
+-            {
+-                Name (_SUN, 0x1C)  // _SUN: Slot User Number
+-                Name (_ADR, 0x001C0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SE8)
+-            {
+-                Name (_SUN, 0x1D)  // _SUN: Slot User Number
+-                Name (_ADR, 0x001D0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SF0)
+-            {
+-                Name (_SUN, 0x1E)  // _SUN: Slot User Number
+-                Name (_ADR, 0x001E0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SF8)
+-            {
+-                Name (_SUN, 0x1F)  // _SUN: Slot User Number
+-                Name (_ADR, 0x001F0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Method (DVNT, 2, NotSerialized)
+-            {
+-                If ((Arg0 & 0x10))
+-                {
+-                    Notify (S20, Arg1)
 -                }
 -
-                 If ((Arg0 & 0x10))
-                 {
-                     Notify (S20, Arg1)
-                 }
-
-                 If ((Arg0 & 0x20))
-                 {
-                     Notify (S28, Arg1)
-                 }
-
-                 If ((Arg0 & 0x40))
-                 {
-                     Notify (S30, Arg1)
-                 }
-
-                 If ((Arg0 & 0x80))
-
-While at it, I have also updated a stale comment.
+-                If ((Arg0 & 0x20))
+-                {
+-                    Notify (S28, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x40))
+-                {
+-                    Notify (S30, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x80))
+-                {
+-                    Notify (S38, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x0100))
+-                {
+-                    Notify (S40, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x0200))
+-                {
+-                    Notify (S48, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x0400))
+-                {
+-                    Notify (S50, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x0800))
+-                {
+-                    Notify (S58, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x1000))
+-                {
+-                    Notify (S60, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x2000))
+-                {
+-                    Notify (S68, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x4000))
+-                {
+-                    Notify (S70, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x8000))
+-                {
+-                    Notify (S78, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00010000))
+-                {
+-                    Notify (S80, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00020000))
+-                {
+-                    Notify (S88, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00040000))
+-                {
+-                    Notify (S90, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00080000))
+-                {
+-                    Notify (S98, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00100000))
+-                {
+-                    Notify (SA0, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00200000))
+-                {
+-                    Notify (SA8, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00400000))
+-                {
+-                    Notify (SB0, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00800000))
+-                {
+-                    Notify (SB8, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x01000000))
+-                {
+-                    Notify (SC0, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x02000000))
+-                {
+-                    Notify (SC8, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x04000000))
+-                {
+-                    Notify (SD0, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x08000000))
+-                {
+-                    Notify (SD8, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x10000000))
+-                {
+-                    Notify (SE0, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x20000000))
+-                {
+-                    Notify (SE8, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x40000000))
+-                {
+-                    Notify (SF0, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x80000000))
+-                {
+-                    Notify (SF8, Arg1)
+-                }
+-            }
+-
+-            Method (PCNT, 0, NotSerialized)
+-            {
+-                BNUM = Zero
+-                DVNT (PCIU, One)
+-                DVNT (PCID, 0x03)
+-            }
+         }
+     }
+ }
 
 Signed-off-by: Ani Sinha <ani@anisinha.ca>
-Suggested-by: Julia Suvorova <jusual@redhat.com>
-Reviewed-by: Julia Suvorova <jusual@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/i386/acpi-build.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ tests/data/acpi/pc/DSDT.hpbrroot            | Bin 0 -> 2953 bytes
+ tests/qtest/bios-tables-test-allowed-diff.h |   1 -
+ 2 files changed, 1 deletion(-)
+ create mode 100644 tests/data/acpi/pc/DSDT.hpbrroot
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 7a5a8b3521..e079b686f5 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -359,6 +359,7 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-         int slot = PCI_SLOT(i);
-         bool hotplug_enabled_dev;
-         bool bridge_in_acpi;
-+        bool cold_plugged_bridge;
- 
-         if (!pdev) {
-             if (bsel) { /* add hotplug slots for non present devices */
-@@ -380,15 +381,14 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-         pc = PCI_DEVICE_GET_CLASS(pdev);
-         dc = DEVICE_GET_CLASS(pdev);
- 
--        /* When hotplug for bridges is enabled, bridges are
--         * described in ACPI separately (see build_pci_bus_end).
--         * In this case they aren't themselves hot-pluggable.
-+        /*
-+         * Cold plugged bridges aren't themselves hot-pluggable.
-          * Hotplugged bridges *are* hot-pluggable.
-          */
--        bridge_in_acpi = pc->is_bridge && pcihp_bridge_en &&
--            !DEVICE(pdev)->hotplugged;
-+        cold_plugged_bridge = pc->is_bridge && !DEVICE(pdev)->hotplugged;
-+        bridge_in_acpi =  cold_plugged_bridge && pcihp_bridge_en;
- 
--        hotplug_enabled_dev = bsel && dc->hotpluggable && !bridge_in_acpi;
-+        hotplug_enabled_dev = bsel && dc->hotpluggable && !cold_plugged_bridge;
- 
-         if (pc->class_id == PCI_CLASS_BRIDGE_ISA) {
-             continue;
+diff --git a/tests/data/acpi/pc/DSDT.hpbrroot b/tests/data/acpi/pc/DSDT.hpbrroot
+new file mode 100644
+index 0000000000000000000000000000000000000000..14518bb843059a0db1d216543f632d5a00c1a695
+GIT binary patch
+literal 2953
+zcmb7GUvJY^6hAk1igTSbPV23RzC;B!4JL3BhLH9`Vy8*gBz5DIZE__$ZO{Tj!U8Js
+zM`&q~pzww=rakN-RC(`5*ggUufqez0L7&LZv71oRR02zJ?mhS1^ZT7Y_xc!?QGY4}
+zu$|npUbK?ApG@6A83O<s)4x&@*T8NYxq`#wkjU&U*&pL8C#l~Wxzz&uqvihYx_6$q
+ztl`1>j`Cu?;XT@R*MXEa*FDZ@pe#66&apf5re4w{r&uzg*;ibUoUBm;$yqHKpj4zl
+zCodJve0`|IP>Gi9cG0X?APVs6y$qtgrO<r#O1^3&&6?pP)r*c*&w@u1*CSEmzRMN2
+z7k%D!q3g<nK_7b4&$|uytr3NP{tNe^&*PG#*Q`W>Pd|>J$7mcxfP0{Pb&l8&UAuFl
+zWMv(nE5b9RVqVbn5O=w#ROikMLq*cEI~SI61}X<G3dkN=4PlP+FAB^B7Z@wBCN%MX
+zA%tjl=Tv2Rb+ju!`_V3mhZjI0t*o?Y=%e@@!^jc&d49aW-Ux355DV;`@J;}>a2d{s
+zzTwnj*~|{(yl9kWk_zxJU*;O)yFA2C<8Ow~^8vrX-|{$@BxljcC+4_H6>#tg;l%Ew
+z%Vs?_bWaR&$3CK~@K}M}748a>w9xiBr1j;>XipfmF`*Oo><N1UNDGR;=X9;Ej{+j^
+zd+M9^zyl^N0K+U*G3hx+S>lu^)!>d<tAjTaYP%jZc5;yy4c_+dH+Trvy$81%>%axr
+z=qcR|REl7t%he?Vn!Quq4c1F^8(bWTEoi=sjb>R?N_01PXe7z)ON5a`ho<-N-a1zR
+zOAWT00N#TJ;%zq>c+G9M0h^7!Yj2%8FA!U*7OEp=)>bqLUnzQ}>6MYx+0u$tXT8V+
+z-fm%;M*3V<FP2vHS_BnpT4I{ZPp2T_=ja|hBN-3lyVR3kw9w}kjr%0FJLO~OCe}bu
+zl2I&qI#3eE%1V66XP-_(L<nPYIsWiQ!0@Ya|19;11kqCyj#0AUA&q(4m&B>`05$ZQ
+zKc91~n#G>A0v34wY9*5IqvyuZG5ep4o;rY@^3hYs?;v_gos6EcI~DR>A4BJ%&wx)K
+zfKU7I=`r~95%B4Kcw-zMFNII`K63y*<HKjh;4??SXY9_hh~8V{@L~WzEFrr0Fy)aT
+z<ydD^ezH|Lh%r$`5oK2?`^U}h=zQ(NwP)7yBM3g_7gtO-SChq?cf1>$za(#6y?t}@
+z*2dM_U^Cq;FYTY@80Q5ByRgfmc(q|sVZF<+%cJ(zNt$FKshjyK(@Ry0>9xugrssdq
+z7>K%FF(i9yhLi-|%9oR<X=Lk3HR_bACCLL4qVs3h{5u@E1pH!I-7INZN+Slr7bvVI
+z^!nn@p&swH;IXc0+BLN}r6YR8KDl;Y9A53@BXJ)Lyw<oF!8~w#C%WSc#NOj^*Z%s@
+zN_na8s+BN#^m#yR+!R`vXkRT(>y}=Xj&g&!J6XBwGNkUoxKWI7uOJ?B$j=0ZYg`?J
+z&%8s-P}^hf%O$Z_JZ#F(=VVh{IBW~m(bi-~D-nI!sz;A<bYi{^kwuTaYZLtPcxYTo
+zs@KPb7=nrH>_?ZVs_=;6g9VC}CH1Mkum&sHdP3$BNYqr|>a>G?$m9&Pu3cB>v3v_=
+z-pOleOpxDYP$^SZ6_r-}bG={G+C@+b@u1*?9*a7I%bfqY9fJ_IE%*%Rg^kBvbT7&z
+zl(VQnqIbBw7ah%G`1Jz#_sJYUuuflw!GOLD^n}1)8FmNKVDQ)bVCC<(&(40>6Uazy
+zFc|zgR1c)krhn>abP*j1I+~bSHMJ}{5?mo9KX7*hEruL)JpSGBdiV7%6R`>SW(~Jk
+z8E0lnWQc>~3(kxrVq=3X3(mfy6#`Vg{}3R%b8hiReKCmPO1`p+SxS>Oc54Swl&}(}
+z8%imL*Zf}NayV!TWlPh7rV!mYW2N>d7|Rf-XeVVr-yfuhgA5JqPTWde3O1sy0RICI
+C_`Dwg
+
+literal 0
+HcmV?d00001
+
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index dea61d94f1..dfb8523c8b 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1,2 +1 @@
+ /* List of comma-separated changed AML files to ignore */
+-"tests/data/acpi/pc/DSDT.hpbrroot",
 -- 
 2.17.1
 
