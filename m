@@ -2,62 +2,98 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E89DC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:07:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 954EFC2BBD1
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:08:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9B6D221E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:07:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9B6D221E3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 28610221E7
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:08:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FNSk40xn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28610221E7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIowg-0000NC-1O
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 04:07:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51658)
+	id 1kIoxn-0002Y7-79
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 04:08:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52946)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kIohS-0004mN-Vz; Thu, 17 Sep 2020 03:51:27 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4755 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kIohQ-0005MI-O9; Thu, 17 Sep 2020 03:51:26 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 892602E1AAE689C3AAC3;
- Thu, 17 Sep 2020 15:51:17 +0800 (CST)
-Received: from localhost (10.174.187.87) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
- 15:51:09 +0800
-From: zhaolichang <zhaolichang@huawei.com>
-To: <qemu-trivial@nongnu.org>
-Subject: [PATCH V3 04/10] scripts/: fix some comment spelling errors
-Date: Thu, 17 Sep 2020 15:50:23 +0800
-Message-ID: <20200917075029.313-5-zhaolichang@huawei.com>
-X-Mailer: git-send-email 2.26.2.windows.1
-In-Reply-To: <20200917075029.313-1-zhaolichang@huawei.com>
-References: <20200917075029.313-1-zhaolichang@huawei.com>
+ (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
+ id 1kIons-0004hA-0P; Thu, 17 Sep 2020 03:58:04 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53485)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
+ id 1kIonp-0005yJ-2A; Thu, 17 Sep 2020 03:58:03 -0400
+Received: by mail-wm1-x341.google.com with SMTP id x23so999544wmi.3;
+ Thu, 17 Sep 2020 00:57:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:reply-to:to:cc:references:in-reply-to:subject:date:message-id
+ :mime-version:content-transfer-encoding:content-language
+ :thread-index; bh=F5tUFeKbpaEUrhow1U7w2I/lFPTZrbFATqkKv3cbFJA=;
+ b=FNSk40xnigWgLlCaL62kHnc+P/yjp8QdcnH0aWaO96WYn0BmXic2joO/YFkThuDp4m
+ gjGwwcqEO0+wPsVkP+Kv78yf9OIjYzMi88kt9zd/WrUMdtldCiDvzcoK4pTIbMfTaurL
+ hjpUAji34/NkrNUAWEKQDPs8/MGafty1jcLdq6ZVTOouX5+NS7gKeW0YkOEdgIUZG7Fh
+ Mmdh3S6nhYIVzKsTbpD3eCHB13hvKV6FRo7HTNrkU2pyGy2weIaKXKxC9vCF2qNpNJQh
+ LtSUJD8k7S9juvysgja6hanFQKMglfE6PTxmx80iyLzWhPZeUndH30FwDZHOLlG9Hc51
+ qQHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:reply-to:to:cc:references:in-reply-to
+ :subject:date:message-id:mime-version:content-transfer-encoding
+ :content-language:thread-index;
+ bh=F5tUFeKbpaEUrhow1U7w2I/lFPTZrbFATqkKv3cbFJA=;
+ b=JLRE6qahk9QmVoRg4pysLzFMp1HhRWx9wgRurscD+oTtnc7L/DRDXnld+dyd403cD1
+ qr4Pu30f1x1tprw28etHZtZlTEBPvYnZFF1upsFhirukE9g6b3gvUhutHgyQe51LyLwH
+ PAKQ2n1f37IhIlNEoVb8ArRDmHkIdHQSJf1HZhTkkD11Ao7fllTTMDJM0A/2xIqjq3Ps
+ nZmFxyUCByUSV+4SfXx5TLIQSAJD6vHqzzn1p4XRjAE0bggb4OXAUEnXNzsuZ3fcsTsY
+ cjHpFaGpehlg2J+J9TQtLM9WtLcDs0z5St7bsTmhAiBPIOyWPMnJ5g+aN9K6sxbKPG+B
+ /21Q==
+X-Gm-Message-State: AOAM5315eRqHJAelyAIYZL13EOQDJZfPQiopQ1sGqq8MDZvxeNLXldzN
+ YwdpRfMkWMlcjdZ9eI9joyw=
+X-Google-Smtp-Source: ABdhPJxkLn4nLGdKW7V2mqOMQI69SYGDw7w/jcuyd53OGVblkZrELtEp9tgShRP5K992kz6iGt4boQ==
+X-Received: by 2002:a1c:6a11:: with SMTP id f17mr8064960wmc.143.1600329477743; 
+ Thu, 17 Sep 2020 00:57:57 -0700 (PDT)
+Received: from CBGR90WXYV0 (host86-176-94-160.range86-176.btcentralplus.com.
+ [86.176.94.160])
+ by smtp.gmail.com with ESMTPSA id c25sm9433892wml.31.2020.09.17.00.57.54
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 17 Sep 2020 00:57:57 -0700 (PDT)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: "Paul Durrant" <paul@xen.org>
+To: "'Eduardo Habkost'" <ehabkost@redhat.com>,
+	<qemu-devel@nongnu.org>
+References: <20200916182519.415636-1-ehabkost@redhat.com>
+ <20200916182519.415636-6-ehabkost@redhat.com>
+In-Reply-To: <20200916182519.415636-6-ehabkost@redhat.com>
+Subject: RE: [PATCH 5/5] [automated] Use OBJECT_DECLARE_SIMPLE_TYPE when
+ possible
+Date: Thu, 17 Sep 2020 08:57:54 +0100
+Message-ID: <007d01d68cc8$4146b8b0$c3d42a10$@xen.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.187.87]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.191;
- envelope-from=zhaolichang@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 03:37:07
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: en-gb
+Thread-Index: AQIelPz0+HUIa2jn7mxP/pozU40YBAFKLlCOqNIUBNA=
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=xadimgnik@gmail.com; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -71,111 +107,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter
- Maydell <peter.maydell@linaro.org>, zhaolichang <zhaolichang@huawei.com>,
- qemu-devel@nongnu.org
+Reply-To: paul@xen.org
+Cc: 'Corey Minyard' <cminyard@mvista.com>, 'Jan Kiszka' <jan.kiszka@web.de>,
+ 'KONRAD Frederic' <frederic.konrad@adacore.com>,
+ 'Alberto Garcia' <berto@igalia.com>, 'Paul Burton' <paulburton@kernel.org>,
+ 'Halil Pasic' <pasic@linux.ibm.com>,
+ =?utf-8?Q?'Herv=C3=A9_Poussineau'?= <hpoussin@reactos.org>,
+ 'Anthony Perard' <anthony.perard@citrix.com>,
+ 'Samuel Thibault' <samuel.thibault@ens-lyon.org>, qemu-block@nongnu.org,
+ 'Laurent Vivier' <lvivier@redhat.com>,
+ "'Dr. David Alan Gilbert'" <dgilbert@redhat.com>,
+ 'Beniamino Galvani' <b.galvani@gmail.com>,
+ 'Eric Auger' <eric.auger@redhat.com>,
+ 'Alex Williamson' <alex.williamson@redhat.com>, 'Peter Xu' <peterx@redhat.com>,
+ 'Stefan Hajnoczi' <stefanha@redhat.com>, 'John Snow' <jsnow@redhat.com>,
+ 'Richard Henderson' <rth@twiddle.net>, 'Kevin Wolf' <kwolf@redhat.com>,
+ 'Andrew Jeffery' <andrew@aj.id.au>, 'Chris Wulff' <crwulff@gmail.com>,
+ =?utf-8?Q?'Philippe_Mathieu-Daud=C3=A9'?= <f4bug@amsat.org>,
+ 'Subbaraya Sundeep' <sundeep.lkml@gmail.com>,
+ 'Zhang Chen' <chen.zhang@intel.com>, 'Michael Walle' <michael@walle.cc>,
+ qemu-ppc@nongnu.org, 'Igor Mammedov' <imammedo@redhat.com>,
+ 'Fam Zheng' <fam@euphon.net>, 'Peter Maydell' <peter.maydell@linaro.org>,
+ 'Sarah Harris' <S.E.Harris@kent.ac.uk>, 'Anup Patel' <anup.patel@wdc.com>,
+ 'Matthew Rosato' <mjrosato@linux.ibm.com>,
+ 'David Hildenbrand' <david@redhat.com>, 'Max Filippov' <jcmvbkbc@gmail.com>,
+ 'Huacai Chen' <chenhc@lemote.com>,
+ 'Raphael Norwitz' <raphael.norwitz@nutanix.com>,
+ 'Stefano Stabellini' <sstabellini@kernel.org>,
+ 'Yoshinori Sato' <ysato@users.sourceforge.jp>,
+ 'Andrey Smirnov' <andrew.smirnov@gmail.com>, 'Helge Deller' <deller@gmx.de>,
+ 'Aleksandar Markovic' <aleksandar.qemu.devel@gmail.com>,
+ "'Gonglei \(Arei\)'" <arei.gonglei@huawei.com>,
+ 'Artyom Tarasenko' <atar4qemu@gmail.com>, 'Eric Farman' <farman@linux.ibm.com>,
+ 'Amit Shah' <amit@kernel.org>, 'Greg Kurz' <groug@kaod.org>,
+ 'Niek Linnenbank' <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org,
+ 'Michael Rolnik' <mrolnik@gmail.com>,
+ =?utf-8?Q?'C=C3=A9dric_Le_Goater'?= <clg@kaod.org>, qemu-riscv@nongnu.org,
+ 'Ben Warren' <ben@skyportsystems.com>,
+ 'Igor Mitsyanko' <i.mitsyanko@gmail.com>,
+ 'Radoslaw Biernacki' <rad@semihalf.com>, qemu-s390x@nongnu.org,
+ 'Peter Chubb' <peter.chubb@nicta.com.au>,
+ 'Aurelien Jarno' <aurelien@aurel32.net>,
+ 'Sagar Karandikar' <sagark@eecs.berkeley.edu>,
+ 'Jason Wang' <jasowang@redhat.com>, 'Jiaxun Yang' <jiaxun.yang@flygoat.com>,
+ 'Gerd Hoffmann' <kraxel@redhat.com>,
+ "'Edgar E. Iglesias'" <edgar.iglesias@gmail.com>,
+ 'Guan Xuetao' <gxt@mprc.pku.edu.cn>, 'Rob Herring' <robh@kernel.org>,
+ kvm@vger.kernel.org, 'Juan Quintela' <quintela@redhat.com>,
+ 'Laszlo Ersek' <lersek@redhat.com>,
+ 'Christian Borntraeger' <borntraeger@de.ibm.com>,
+ 'Joel Stanley' <joel@jms.id.au>, 'Leif Lindholm' <leif@nuviainc.com>,
+ 'Antony Pavlov' <antonynpavlov@gmail.com>,
+ 'Aleksandar Rikalo' <aleksandar.rikalo@syrmia.com>,
+ 'Mark Cave-Ayland' <mark.cave-ayland@ilande.co.uk>,
+ 'Fabien Chouteau' <chouteau@adacore.com>, xen-devel@lists.xenproject.org,
+ 'Bastian Koppelmann' <kbastian@mail.uni-paderborn.de>,
+ 'Andrew Baumann' <Andrew.Baumann@microsoft.com>,
+ 'Max Reitz' <mreitz@redhat.com>, 'Dmitry Fleytman' <dmitry.fleytman@gmail.com>,
+ 'Li Zhijian' <lizhijian@cn.fujitsu.com>,
+ "'Michael S. Tsirkin'" <mst@redhat.com>,
+ 'Christian Schoenebeck' <qemu_oss@crudebyte.com>,
+ 'Sven Schnelle' <svens@stackframe.org>, 'Marek Vasut' <marex@denx.de>,
+ =?utf-8?Q?'Marc-Andr=C3=A9_Lureau'?= <marcandre.lureau@redhat.com>,
+ 'Alistair Francis' <alistair@alistair23.me>,
+ 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>,
+ 'David Gibson' <david@gibson.dropbear.id.au>,
+ 'Tony Krowiak' <akrowiak@linux.ibm.com>,
+ "'Daniel P. Berrange'" <berrange@redhat.com>,
+ 'Pierre Morel' <pmorel@linux.ibm.com>, 'Thomas Huth' <huth@tuxfamily.org>,
+ 'Jean-Christophe Dubois' <jcd@tribudubois.net>,
+ 'Palmer Dabbelt' <palmer@dabbelt.com>, 'Cornelia Huck' <cohuck@redhat.com>,
+ 'Paolo Bonzini' <pbonzini@redhat.com>, 'Stefan Berger' <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I found that there are many spelling errors in the comments of qemu,
-so I used the spellcheck tool to check the spelling errors
-and finally found some spelling errors in the scripts folder.
+> -----Original Message-----
+> From: Eduardo Habkost <ehabkost@redhat.com>
+> Sent: 16 September 2020 19:25
+> To: qemu-devel@nongnu.org
+> Cc: Paolo Bonzini <pbonzini@redhat.com>; Daniel P. Berrange =
+<berrange@redhat.com>; Gonglei (Arei)
+> <arei.gonglei@huawei.com>; Igor Mammedov <imammedo@redhat.com>; =
+Laurent Vivier <lvivier@redhat.com>;
+> Amit Shah <amit@kernel.org>; Stefan Berger <stefanb@linux.ibm.com>; =
+Michael S. Tsirkin
+> <mst@redhat.com>; Greg Kurz <groug@kaod.org>; Christian Schoenebeck =
+<qemu_oss@crudebyte.com>; Marcel
+> Apfelbaum <marcel.apfelbaum@gmail.com>; Aleksandar Markovic =
+<aleksandar.qemu.devel@gmail.com>;
+> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>; Aurelien Jarno =
+<aurelien@aurel32.net>; Richard Henderson
+> <rth@twiddle.net>; Peter Maydell <peter.maydell@linaro.org>; Rob =
+Herring <robh@kernel.org>; Joel
+> Stanley <joel@jms.id.au>; Jan Kiszka <jan.kiszka@web.de>; Andrzej =
+Zaborowski <balrogg@gmail.com>;
+> Radoslaw Biernacki <rad@semihalf.com>; Leif Lindholm =
+<leif@nuviainc.com>; Edgar E. Iglesias
+> <edgar.iglesias@gmail.com>; Alistair Francis <alistair@alistair23.me>; =
+Gerd Hoffmann
+> <kraxel@redhat.com>; Michael Walle <michael@walle.cc>; John Snow =
+<jsnow@redhat.com>; Kevin Wolf
+> <kwolf@redhat.com>; Max Reitz <mreitz@redhat.com>; Marc-Andr=C3=A9 =
+Lureau <marcandre.lureau@redhat.com>;
+> Igor Mitsyanko <i.mitsyanko@gmail.com>; Fabien Chouteau =
+<chouteau@adacore.com>; KONRAD Frederic
+> <frederic.konrad@adacore.com>; Alberto Garcia <berto@igalia.com>; =
+Thomas Huth <huth@tuxfamily.org>;
+> David Gibson <david@gibson.dropbear.id.au>; Mark Cave-Ayland =
+<mark.cave-ayland@ilande.co.uk>; Herv=C3=A9
+> Poussineau <hpoussin@reactos.org>; Aleksandar Rikalo =
+<aleksandar.rikalo@syrmia.com>; BALATON Zoltan
+> <balaton@eik.bme.hu>; Guan Xuetao <gxt@mprc.pku.edu.cn>; Helge Deller =
+<deller@gmx.de>; Corey Minyard
+> <cminyard@mvista.com>; Stefano Stabellini <sstabellini@kernel.org>; =
+Anthony Perard
+> <anthony.perard@citrix.com>; Paul Durrant <paul@xen.org>; Chris Wulff =
+<crwulff@gmail.com>; Marek Vasut
+> <marex@denx.de>; Huacai Chen <chenhc@lemote.com>; Jiaxun Yang =
+<jiaxun.yang@flygoat.com>; Artyom
+> Tarasenko <atar4qemu@gmail.com>; Jason Wang <jasowang@redhat.com>; =
+Dmitry Fleytman
+> <dmitry.fleytman@gmail.com>; Max Filippov <jcmvbkbc@gmail.com>; Sven =
+Schnelle <svens@stackframe.org>;
+> Christian Borntraeger <borntraeger@de.ibm.com>; Cornelia Huck =
+<cohuck@redhat.com>; Halil Pasic
+> <pasic@linux.ibm.com>; David Hildenbrand <david@redhat.com>; Matthew =
+Rosato <mjrosato@linux.ibm.com>;
+> Fam Zheng <fam@euphon.net>; Yoshinori Sato =
+<ysato@users.sourceforge.jp>; Samuel Thibault
+> <samuel.thibault@ens-lyon.org>; Tony Krowiak <akrowiak@linux.ibm.com>; =
+Pierre Morel
+> <pmorel@linux.ibm.com>; Alex Williamson <alex.williamson@redhat.com>; =
+Ben Warren
+> <ben@skyportsystems.com>; Beniamino Galvani <b.galvani@gmail.com>; =
+Niek Linnenbank
+> <nieklinnenbank@gmail.com>; Andrew Baumann =
+<Andrew.Baumann@microsoft.com>; Antony Pavlov
+> <antonynpavlov@gmail.com>; Jean-Christophe Dubois =
+<jcd@tribudubois.net>; Peter Chubb
+> <peter.chubb@nicta.com.au>; Andrey Smirnov <andrew.smirnov@gmail.com>; =
+Subbaraya Sundeep
+> <sundeep.lkml@gmail.com>; Michael Rolnik <mrolnik@gmail.com>; Sarah =
+Harris <S.E.Harris@kent.ac.uk>;
+> Peter Xu <peterx@redhat.com>; C=C3=A9dric Le Goater <clg@kaod.org>; =
+Andrew Jeffery <andrew@aj.id.au>;
+> Laszlo Ersek <lersek@redhat.com>; Paul Burton <paulburton@kernel.org>; =
+Palmer Dabbelt
+> <palmer@dabbelt.com>; Sagar Karandikar <sagark@eecs.berkeley.edu>; =
+Bastian Koppelmann
+> <kbastian@mail.uni-paderborn.de>; Anup Patel <anup.patel@wdc.com>; =
+Eric Farman <farman@linux.ibm.com>;
+> Raphael Norwitz <raphael.norwitz@nutanix.com>; Dr. David Alan Gilbert =
+<dgilbert@redhat.com>; Stefan
+> Hajnoczi <stefanha@redhat.com>; Eric Auger <eric.auger@redhat.com>; =
+Juan Quintela
+> <quintela@redhat.com>; Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>; =
+Zhang Chen <chen.zhang@intel.com>;
+> Li Zhijian <lizhijian@cn.fujitsu.com>; qemu-arm@nongnu.org; =
+qemu-block@nongnu.org; qemu-
+> ppc@nongnu.org; kvm@vger.kernel.org; xen-devel@lists.xenproject.org; =
+qemu-s390x@nongnu.org; qemu-
+> riscv@nongnu.org
+> Subject: [PATCH 5/5] [automated] Use OBJECT_DECLARE_SIMPLE_TYPE when =
+possible
+>=20
+> This converts existing DECLARE_INSTANCE_CHECKER usage to
+> OBJECT_DECLARE_SIMPLE_TYPE when possible.
+>=20
+> $ ./scripts/codeconverter/converter.py -i \
+>   --pattern=3DAddObjectDeclareSimpleType $(git grep -l '' -- '*.[ch]')
+>=20
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-Signed-off-by: zhaolichang <zhaolichang@huawei.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- scripts/checkpatch.pl          | 2 +-
- scripts/clean-header-guards.pl | 2 +-
- scripts/decodetree.py          | 6 +++---
- scripts/oss-fuzz/build.sh      | 2 +-
- scripts/tracetool/__init__.py  | 2 +-
- 5 files changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index bd3faa154c..50910899f2 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -1870,7 +1870,7 @@ sub process {
- 			substr($s, 0, length($c), '');
- 
- 			# Make sure we remove the line prefixes as we have
--			# none on the first line, and are going to readd them
-+			# none on the first line, and are going to re-add them
- 			# where necessary.
- 			$s =~ s/\n./\n/gs;
- 
-diff --git a/scripts/clean-header-guards.pl b/scripts/clean-header-guards.pl
-index f47d673ad5..a6680253b1 100755
---- a/scripts/clean-header-guards.pl
-+++ b/scripts/clean-header-guards.pl
-@@ -19,7 +19,7 @@
- # Does the following:
- # - Header files without a recognizable header guard are skipped.
- # - Clean up any untidy header guards in-place.  Warn if the cleanup
--#   renames guard symbols, and explain how to find occurences of these
-+#   renames guard symbols, and explain how to find occurrences of these
- #   symbols that may have to be updated manually.
- # - Warn about duplicate header guard symbols.  To make full use of
- #   this warning, you should clean up *all* headers in one run.
-diff --git a/scripts/decodetree.py b/scripts/decodetree.py
-index c02de9865b..60fd3b5e5f 100644
---- a/scripts/decodetree.py
-+++ b/scripts/decodetree.py
-@@ -94,7 +94,7 @@ def str_indent(c):
- 
- 
- def str_fields(fields):
--    """Return a string uniquely identifing FIELDS"""
-+    """Return a string uniquely identifying FIELDS"""
-     r = ''
-     for n in sorted(fields.keys()):
-         r += '_' + n
-@@ -814,7 +814,7 @@ def parse_generic(lineno, parent_pat, name, toks):
-     arg = None
-     fmt = None
-     for t in toks:
--        # '&Foo' gives a format an explcit argument set.
-+        # '&Foo' gives a format an explicit argument set.
-         if re.fullmatch(re_arg_ident, t):
-             tt = t[1:]
-             if arg:
-@@ -903,7 +903,7 @@ def parse_generic(lineno, parent_pat, name, toks):
-     elif not (is_format and width == 0) and width != insnwidth:
-         error(lineno, 'definition has {0} bits'.format(width))
- 
--    # Do not check for fields overlaping fields; one valid usage
-+    # Do not check for fields overlapping fields; one valid usage
-     # is to be able to duplicate fields via import.
-     fieldmask = 0
-     for f in flds.values():
-diff --git a/scripts/oss-fuzz/build.sh b/scripts/oss-fuzz/build.sh
-index d16207eb67..0c3ca9e06f 100755
---- a/scripts/oss-fuzz/build.sh
-+++ b/scripts/oss-fuzz/build.sh
-@@ -69,7 +69,7 @@ mkdir -p "$DEST_DIR/lib/"  # Copy the shared libraries here
- 
- if ! make "-j$(nproc)" qemu-fuzz-i386; then
-     fatal "Build failed. Please specify a compiler with fuzzing support"\
--          "using the \$CC and \$CXX environemnt variables"\
-+          "using the \$CC and \$CXX environment variables"\
-           "\nFor example: CC=clang CXX=clang++ $0"
- fi
- 
-diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.py
-index 3ccfa1e116..3ee54be223 100644
---- a/scripts/tracetool/__init__.py
-+++ b/scripts/tracetool/__init__.py
-@@ -34,7 +34,7 @@ def error(*lines):
- def out(*lines, **kwargs):
-     """Write a set of output lines.
- 
--    You can use kwargs as a shorthand for mapping variables when formating all
-+    You can use kwargs as a shorthand for mapping variables when formatting all
-     the strings in lines.
-     """
-     lines = [ l % kwargs for l in lines ]
--- 
-2.26.2.windows.1
+Acked-by: Paul Durrant <paul@xen.org>
 
 
