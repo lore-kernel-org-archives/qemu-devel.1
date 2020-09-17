@@ -2,74 +2,108 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4A1DC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:07:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87DF7C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:10:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0ACE42087D
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:07:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A6AC2087D
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:10:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="IJTbp8Mi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ACE42087D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qy5XReJV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A6AC2087D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIshY-0002d2-73
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 08:07:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59040)
+	id 1kIskC-0003Y7-Vm
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 08:10:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59728)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kIsgV-0001hD-Cu
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 08:06:43 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:34855)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kIsgT-0001WB-6V
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 08:06:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=lpDs5ndcla7kARbzQpLHTUruuOvr/hxUdCSnIvShhmI=; b=IJTbp8MiUmbflQ+sAYtLj1jS0T
- Ho/nxCFhKeJv5bh6Hq8OsoCz2+mRlLaCLPskKwVZv/IQbzkMY6S+DEQnONNW9H3+7RjHxnwalT5zj
- 81YrsEW17vXulHV5PboM6Y3MBGIts6k6Qvc7L9MwgBykmQzgWmcvjqv0kmwRzqChW7ocqwNQhDIou
- xLcGnnwVPMGyd15z2yNVlDDrpFNBezQuO5fqBT4SgM0Vg14pHkKyvcua7n22N0r5OGXypDoUNio4x
- aZtwusBEQVzJT+hxS0THi2t+vk5ggH7HPal8lQh73k4Ic+Ks74IFWG294jMFU4mN2M3p8sGiomtba
- /uO43KnQ==;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>,
- Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Laurent Vivier <lvivier@redhat.com>, Greg Kurz <groug@kaod.org>,
- Max Reitz <mreitz@redhat.com>
-Subject: Re: QEMU policy for real file tests
-Date: Thu, 17 Sep 2020 14:06:33 +0200
-Message-ID: <2029663.ApTj1TM13Z@silver>
-In-Reply-To: <8e3f59a3-925e-d89f-2073-6c9654bff75f@redhat.com>
-References: <1836935.RIYQIvKipu@silver> <20200917093756.GC1568038@redhat.com>
- <8e3f59a3-925e-d89f-2073-6c9654bff75f@redhat.com>
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1kIsjb-000384-RE
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 08:09:55 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46751
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1kIsja-0001kh-8w
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 08:09:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600344593;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=abBBFR1Y2UxM9EfpNxeZU8aFA0XSAIUvz2SAb7IJX6E=;
+ b=Qy5XReJVRL+N9CQCyaAOSQWk7+kq41TWSjMXER10v3WA0MQmpuB3jKgPFY+iHrt4S1VrAY
+ v50T25AVPSgzzh9zewFh9ddAGAqV+l58X5XZ5f/fYV2bjGbniCUsPmOdoL/vx0fQZwEu4c
+ xsrJuNRya5iCD39rwo3U6v14kc2og9A=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-185-yejLpCJJM8aSP5jHneAoZw-1; Thu, 17 Sep 2020 08:09:51 -0400
+X-MC-Unique: yejLpCJJM8aSP5jHneAoZw-1
+Received: by mail-wr1-f72.google.com with SMTP id 33so796963wrk.12
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 05:09:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=abBBFR1Y2UxM9EfpNxeZU8aFA0XSAIUvz2SAb7IJX6E=;
+ b=VOR+x377wUSXl5ubM3NliQSQTLc3QfZKevtKyiL0YW9rUuY4cqJl2mRDLDFeAlqxF+
+ cHPl0X3I0TkgYypbFHmFzovW1AWMAC0woLP+ws+zidPUyZfpkJWmcB6gekOFohYoLLKh
+ xC4QqV7G74UMaVpFEVxy7wEQ/v5tVrL4c7YLogD2GAu0vEY3hSFeAWEln9EfZBNZJLZ2
+ V02TKflfXa2uYOO93dijsKQxmawZauFgBSjWFJ4uRu66Nd48+SoDCP9kDEznwg7fGef4
+ hqUR2ljTW1HjO8BXpJ09ZGLBHDdLPxTr3juE7e9gbdZtkIxLazBeZGPCH5FAr7lgQiDy
+ kkeg==
+X-Gm-Message-State: AOAM530PKVoisEaJqDWXE1aaKcEWobx7AmpsbAzRBHsiRKfx5VAZEZg3
+ NtvqBa/W/Q0gySjpNJoUZKXITVQO4gAUJodUdL4xQJu9aW6vyWsW73u46MnAwk/Te1j6ky4VPNC
+ NLw5KDEw3KTucAt4=
+X-Received: by 2002:a5d:4e8a:: with SMTP id e10mr32327915wru.329.1600344590370; 
+ Thu, 17 Sep 2020 05:09:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwxAO3INnUiOiMhp0EGBV7+U3Gm7i7B2sFdVkPfz+6GKH83fukFr+2UP/C2AxOTHVaS62UUaQ==
+X-Received: by 2002:a5d:4e8a:: with SMTP id e10mr32327895wru.329.1600344590170; 
+ Thu, 17 Sep 2020 05:09:50 -0700 (PDT)
+Received: from steredhat (host-79-51-197-141.retail.telecomitalia.it.
+ [79.51.197.141])
+ by smtp.gmail.com with ESMTPSA id f14sm38549606wrv.72.2020.09.17.05.09.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 17 Sep 2020 05:09:49 -0700 (PDT)
+Date: Thu, 17 Sep 2020 14:09:46 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v2] virtio: skip legacy support check on machine types
+ less than 5.1
+Message-ID: <20200917120946.i4phvtpbkgyuouxk@steredhat>
+References: <20200915130514.80989-1-sgarzare@redhat.com>
+ <20200916110848.47395807.cohuck@redhat.com>
+ <20200917084828.p7j3fc6p4almxbxw@steredhat>
+ <20200917112256.796f620d.cohuck@redhat.com>
+ <20200917100000.GF2793@work-vm>
+ <20200917104721.pbfik4t6zszflama@steredhat>
+ <20200917130008.79a1637b.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
-Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 08:06:35
+In-Reply-To: <20200917130008.79a1637b.cohuck@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=sgarzare@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=sgarzare@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 03:47:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,48 +117,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Donnerstag, 17. September 2020 11:55:00 CEST Thomas Huth wrote:
-> On 17/09/2020 11.37, Daniel P. Berrang=E9 wrote:
-> > On Thu, Sep 17, 2020 at 10:26:36AM +0100, Alex Benn=E9e wrote:
-> >> Christian Schoenebeck <qemu_oss@crudebyte.com> writes:
-> >>> Hi,
-> >>>=20
-> >>> is there a QEMU policy for test cases that create/write/read/delete r=
-eal
-> >>> files and directories? E.g. should they be situated at a certain
-> >>> location and is any measure of sandboxing required?
-> >>=20
-> >> I don't think we have a hard and fast policy. It also depends on what
-> >> you are doing the test in - but ideally you should use a secure mktempd
-> >> (that can't clash) and clean-up after you are finished. This is a bit
-> >> easier in python than shell I think.
-> >=20
-> > mktempd will end up on /tmp usually which can be tmpfs and size limited,
-> > so be mindful of the size of files you create. Don't assume you can
-> > create multi-GB sized files !  Creating a temp dir underneath the build
-> > dir (effectively CWD of the test) is a reasonable alternative.
->=20
-> Another thing to consider: If you want to create Unix sockets in your
-> tests, make sure that the file name does not get too long, since there
-> are limits on certain systems - i.e. socket files should be created in a
-> /tmp subdirectory, indeed.
->=20
->  Thomas
+On Thu, Sep 17, 2020 at 01:00:08PM +0200, Cornelia Huck wrote:
+> On Thu, 17 Sep 2020 12:47:21 +0200
+> Stefano Garzarella <sgarzare@redhat.com> wrote:
+> 
+> > Okay, so I'll leave the device property.
+> > 
+> > 
+> > I also need to update a series [1] that I sent to force virtio version 1
+> > on vhost-vsock devices.
+> > Also in this case I need to care about migration and force it only on new
+> > machine types.
+> > 
+> > Do you think I can reuse the same property also in vhost-vsock-pci and
+> > vhost-vsock-ccw to force virtio version 1, or it is better to add a new
+> > property for each device.
+> > 
+> > The two things (disable legacy check and force version 1) are related,
+> > so maybe I can use a single property in the virtio-device class,
+> 
+> So, 'x-disable-legacy-check==false' -> 'we need to force version 1'?
 
-These answers already cover everything I need right now. Thanks!
+Exaclty :-)
 
-=46inal question: if at some later point one large file needs to be created=
- for=20
-some test case, is there some approximate size limit to stay below for not=
-=20
-causing issues with free CI cloud services?
+> Seems reasonable to me.
 
-Best regards,
-Christian Schoenebeck
+Thanks for the feedback, I'll go this way!
 
+Stefano
 
 
