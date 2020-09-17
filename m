@@ -2,130 +2,93 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 507F0C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:04:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4274FC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:06:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F6D3206CA
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:04:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C918E21D24
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:06:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="egV3DjpR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F6D3206CA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iw7d448i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C918E21D24
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIxKd-0006dG-HB
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 13:04:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59822)
+	id 1kIxMa-0008K5-Vi
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 13:06:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60196)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIxHt-0003iq-Ge
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 13:01:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24502)
+ (Exim 4.90_1) (envelope-from <abologna@redhat.com>)
+ id 1kIxJG-0005I7-KE
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 13:03:02 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47481
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIxHq-0005Q4-Ev
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 13:01:37 -0400
+ (Exim 4.90_1) (envelope-from <abologna@redhat.com>)
+ id 1kIxJF-0005Zz-02
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 13:03:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600362093;
+ s=mimecast20190719; t=1600362179;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=67fKgAft+sJNq/MKgW8S3a1w3i5qeWx6p/YWGXtSgNU=;
- b=egV3DjpRiv5Rv3XxyHJu8nFfq1SK8VOeMkOeK2PQjBBAzTvUS8/xHT/YzIMILP8+ry1ZMm
- v95gJ+ijPu/p/G9feBX/BPw5EaDVNapHQcgfzRJLYspn9ALS/MkgzrzONwI0PCvGGq/O1j
- +b4my987pFBjxTJYgrOHKLgOsDVqGqg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-89-1ndBMkNCNtiRrJCa50egXw-1; Thu, 17 Sep 2020 13:01:26 -0400
-X-MC-Unique: 1ndBMkNCNtiRrJCa50egXw-1
-Received: by mail-wr1-f71.google.com with SMTP id x15so1112992wrm.7
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 10:01:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=67fKgAft+sJNq/MKgW8S3a1w3i5qeWx6p/YWGXtSgNU=;
- b=OMB1rYqyHlhoqsp+dPnRWq+Yhpy0c2VPKzucomjvwl9ALL7tbtSgF/dLllNmkd1C82
- 4o7n2+cyjYJ6//WIlR5gJ0uPRlAr6bFw3p35kaZVtlSHunDQRAE/CNJvGekdPVwW6W12
- /LWpsNZ6OUw2HwU311b/X1RMBoScfaUojgSHGDfAcFdIvqGouTIPgYbLrngW7gKktqdF
- +oH15YcqzU+VwP1JN+f7WLP/Rht35bF44w9ySsqHQ4qwPx1TXUcpXqSSZsrmq8wY4q5C
- BawmxRKnjWzGq7FrsxVok4EISImS+aJgiPib/Y0Cknzy+6rD6LEaz5u38E+T7gaZkSVP
- /Y9A==
-X-Gm-Message-State: AOAM532DBX1ct5HLsAiDu1K4jz7qG/aeAE0BJSGTlgW8qhZrPq/MGHdS
- wKsaYUCjg11prcEd/CPdD2bVlVkIe6CBlSoKULwjnOHEbJ2P2xeZ0Ncenb7DtJ4VFSTxsya3Bu7
- tPrnf9PPEkOoo8j8=
-X-Received: by 2002:a1c:c256:: with SMTP id s83mr11115083wmf.93.1600362085010; 
- Thu, 17 Sep 2020 10:01:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx9oMil8bqOf42o26mbehVUW5BTH8Go5KvmsJx2kSHEnzFUJf46geowch8uHLOdQs8LSgyvpQ==
-X-Received: by 2002:a1c:c256:: with SMTP id s83mr11115048wmf.93.1600362084787; 
- Thu, 17 Sep 2020 10:01:24 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id k8sm245041wrl.42.2020.09.17.10.01.23
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 17 Sep 2020 10:01:24 -0700 (PDT)
-Subject: Re: [PATCH] tests/acceptance: Disable tests dependent of unreliable
- apt.armbian.com
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <20200917163954.50514-1-philmd@redhat.com>
- <308aaf63-a9a4-256e-a29f-9d0bd1c53532@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <450f5b49-6309-5806-9ab2-4fad6a06e180@redhat.com>
-Date: Thu, 17 Sep 2020 19:01:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ in-reply-to:in-reply-to:references:references;
+ bh=2mo2MqNBsnSdUGZ4o89PbvBJNpPYbOLW5c0subifov0=;
+ b=iw7d448iQXEG7IsFcQcrgD5Y+lxD+iewuQYcAuuvhoDWOBwLAvSpo+AgZydefPNUmkhscK
+ ibkcAU/4rAbudqGZVKsVzMIj4RwAl6Vga+iCLNyxdhNwvo9HnXyr49A/CQBDyqDFqNIOmr
+ 3YWq4+xuyUu/T/MWTIyi+yiDEN+zeNA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-265-rMzbCKlTPiitxwYeF3nyjg-1; Thu, 17 Sep 2020 13:02:42 -0400
+X-MC-Unique: rMzbCKlTPiitxwYeF3nyjg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C58B1107AD64;
+ Thu, 17 Sep 2020 17:02:41 +0000 (UTC)
+Received: from harajuku.usersys.redhat.com (unknown [10.40.192.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 98EF719D6C;
+ Thu, 17 Sep 2020 17:02:35 +0000 (UTC)
+Message-ID: <2a2f4c3504b5c00018907997f52df211b01d1f99.camel@redhat.com>
+Subject: Re: Python 3.5 EOL; when can require 3.6?
+From: Andrea Bolognani <abologna@redhat.com>
+To: "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>
+Date: Thu, 17 Sep 2020 19:02:32 +0200
+In-Reply-To: <20200917163545.GN1597829@redhat.com>
+References: <875z8eupyp.fsf@dusky.pond.sub.org>
+ <CAFEAcA8q8J1n2UqsNbHgNwEedA8pZ6fNA7obCR1REN-33nvmkg@mail.gmail.com>
+ <d07189e2-0683-2eb9-44e0-a275688fa8b4@redhat.com>
+ <9d4363e8-7bb8-8255-9914-6d9bc36cec79@redhat.com>
+ <871rj0o1yk.fsf@dusky.pond.sub.org>
+ <b679e646f4dd8ebea753892c0cec27e54ba8f407.camel@redhat.com>
+ <20200917163545.GN1597829@redhat.com>
+User-Agent: Evolution 3.36.5 (3.36.5-1.fc32)
 MIME-Version: 1.0
-In-Reply-To: <308aaf63-a9a4-256e-a29f-9d0bd1c53532@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=abologna@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 02:01:40
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=abologna@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 02:16:16
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
 X-Spam_bar: -----
 X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -139,45 +102,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/17/20 6:53 PM, Thomas Huth wrote:
-> On 17/09/2020 18.39, Philippe Mathieu-Daudé wrote:
->> Armbian servers are not very reliable and confused the GitLab CI
->> users a few times this month (path updated, archives moved, and
->> now the SSL: CERTIFICATE_VERIFY_FAILED "certificate has expired"
->> error). Time to disable these tests.
->> Users can still use the artifacts from the cache (or manually add
->> them to the cache).
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>  tests/acceptance/boot_linux_console.py | 10 ++++++++++
->>  tests/acceptance/replay_kernel.py      |  2 ++
->>  2 files changed, 12 insertions(+)
+On Thu, 2020-09-17 at 17:35 +0100, Daniel P. Berrangé wrote:
+> On Thu, Sep 17, 2020 at 06:07:00PM +0200, Andrea Bolognani wrote:
+> > It would be *fantastic* if we could keep the platform support policy
+> > used by QEMU and libvirt as aligned as reasonably possible.
 > 
-> These failures in the Gitlab-CI are quite annoying, indeed.
-
-I'd rather not go via this path, but since we don't save the
-artifacts cache, I can't find a better way to not block all
-the other developers using GitLab CI.
-
-But I prefer we disable the tests until something better
-emerge, rather that having the developers stopping running
-these tests. So this is a quick band-aid patch.
-
+> The current QEMU policy was a copy+paste of the same policy I wrote for
+> libvirt originally, just adding OpenBSD/NetBSD.
 > 
-> Acked-by: Thomas Huth <thuth@redhat.com>
+> I've just posted an update for QEMU which matches the latest libvirt
+> policy, again just adding the extra BSDs.
 > 
+> https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg06371.html
 
-Thanks!
+That's even better than I hoped for! Thank you so much :)
 
-Phil.
+-- 
+Andrea Bolognani / Red Hat / Virtualization
 
 
