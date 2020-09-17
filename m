@@ -2,94 +2,98 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4A24C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:05:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD7A3C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:06:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20E8620678
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:05:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 13C0A2075B
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:06:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b4wxPjhJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20E8620678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RZ3vWpcE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13C0A2075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIovR-0006AU-9G
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 04:05:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54088)
+	id 1kIow4-0007fk-3K
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 04:06:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52774)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kIosT-0002rK-D4
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 04:02:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30386)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kIosR-0006nd-2q
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 04:02:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600329766;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=aKI6bO+KewDYGFWVcYwjFlONiDmtVuiiQyHIWHQgN3o=;
- b=b4wxPjhJ1/kGNfs9ZfuxVx5hDXayXNd+kAajDXOPcvsuManL13tIudwnXyP71xrcbFA6/L
- przaqqsEi0xfdU1puFvRyaTSEDOijx6wviJAPkevA7D+8t7GTwZIHMHV2VAaaj0J2t9Pon
- ZFgmRyMAo4kw8qUmrQ3lbONoiOGGjRM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-402-zom9mg6lPtWg0DfAtieuDw-1; Thu, 17 Sep 2020 04:02:43 -0400
-X-MC-Unique: zom9mg6lPtWg0DfAtieuDw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DABD48030AA;
- Thu, 17 Sep 2020 08:02:42 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-113-38.ams2.redhat.com [10.36.113.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 55E8610027AB;
- Thu, 17 Sep 2020 08:02:38 +0000 (UTC)
-Subject: Re: [PATCH v2] migration: Silence compiler warning in
- global_state_store_running()
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
-References: <20200917074344.168785-1-thuth@redhat.com>
- <da9ed157-dd81-c486-e4ac-d98ca3ac0ee3@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <46f47558-7881-6856-f68b-b4963f39949d@redhat.com>
-Date: Thu, 17 Sep 2020 10:02:37 +0200
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kIomo-0003Ew-Bp
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:57:02 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43028)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kIomm-0005uX-Lj
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:56:58 -0400
+Received: by mail-wr1-x443.google.com with SMTP id k15so948954wrn.10
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 00:56:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=HL3zRK0nuV3qNcHAHpU0fldw/pUl1Ru8nVonYr0YVZM=;
+ b=RZ3vWpcEmpJ0UDZFie0YopmhFjEJZ8hNzMsKpUB8u/4EHsB8C8Zjv/RU+gnNELZhDP
+ hF3pQMwRDM5TcL635z3hWV8m9o/Ru+noH0C9B1wptzdafcIbJDkHRMZszEeBOGoTwop6
+ g23CJ/ps1ZRBIBhFQQhhahamqo+XbVtk7khMk9Bi4qka3zyDtAlZRD6H7EOsELBgQkLS
+ fEYrKR/WE5dfzTYM1DtJ+KoDClj0K0q/jnODOYxV3OOIXwxn826wUtZwi+fT5H10xmYa
+ pakBXzLtRIjvuARDgG/WveHOrlVL1eBsZ/QQqDJA/hSYoDAQGIap8/G7JI+4B132y0/9
+ /Zbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=HL3zRK0nuV3qNcHAHpU0fldw/pUl1Ru8nVonYr0YVZM=;
+ b=TBIV2CZYAglYryWOAKRT9ZqbVJnOJcKeqCc60ADKoMxHkFt0a1pl9I2u9F2QkOvy4D
+ kz+t5vHKY15nD2tEZMHaru8MUAFIDLmN/sniBWH3gifIdM+w6l07xIZkprZ/CMF1fRmx
+ bFU1Z3N64l6bTrTwVv0e6dFLdyRP9vWgNZTaY5+atwimcbzvg/HO5CowE3PW3agaw3r+
+ u0GXY7UY3j6nYFMs4YvRN/GHAkTEgF68Ppx6SozJgraOhNvR8PpYWQmaUMQZKLDf9Tfb
+ eSubl4WL1V2V2+5i/jPsvrng9vu/Xx0iowQs6WguSLXmPIoEOVa2mcJnOAL5olEmer/m
+ obfA==
+X-Gm-Message-State: AOAM530TDxQcvOI0pseYm5DmvB0eNf9mWErOaGsS8aA3l784DK4z+ar8
+ N9AMhN3zORobDRN8Oafemyo=
+X-Google-Smtp-Source: ABdhPJyJTJtOnQIBEp/YJxcUOSVMejGylzWkj3l4DmUs7xaaTJuc4WuL3hey1vA7e7wlnw9/OO8RUQ==
+X-Received: by 2002:adf:e488:: with SMTP id i8mr32670030wrm.116.1600329414267; 
+ Thu, 17 Sep 2020 00:56:54 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id 63sm10910765wrc.63.2020.09.17.00.56.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 17 Sep 2020 00:56:53 -0700 (PDT)
+Subject: Re: [PATCH V9 0/6] mips: Add Loongson-3 machine support
+To: Huacai Chen <zltjiangshi@gmail.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+References: <1600222344-16808-1-git-send-email-chenhc@lemote.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7c38105a-831f-b306-9250-8d0c43fc4108@amsat.org>
+Date: Thu, 17 Sep 2020 09:56:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <da9ed157-dd81-c486-e4ac-d98ca3ac0ee3@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.003
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <1600222344-16808-1-git-send-email-chenhc@lemote.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 20:51:18
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -51
-X-Spam_score: -5.2
-X-Spam_bar: -----
-X-Spam_report: (-5.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.062, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -15
+X-Spam_score: -1.6
+X-Spam_bar: -
+X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.062,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,57 +106,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Huacai Chen <chenhuacai@gmail.com>, qemu-devel@nongnu.org,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, Huacai Chen <chenhc@lemote.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/09/2020 09.47, Philippe Mathieu-Daudé wrote:
-> On 9/17/20 9:43 AM, Thomas Huth wrote:
->> GCC 9.3.0 on Ubuntu complains:
->>
->> In file included from /usr/include/string.h:495,
->>                  from /home/travis/build/huth/qemu/include/qemu/osdep.h:87,
->>                  from ../migration/global_state.c:13:
->> In function ‘strncpy’,
->>     inlined from ‘global_state_store_running’ at ../migration/global_state.c:47:5:
->> /usr/include/x86_64-linux-gnu/bits/string_fortified.h:106:10: error:
->>  ‘__builtin_strncpy’ specified bound 100 equals destination size [-Werror=stringop-truncation]
->>   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
->>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>
->> ... but we apparently really want to do a strncpy here - the size is already
->> checked with the assert() statement right in front of it. To silence the
->> warning, simply replace it with our strpadcpy() function.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  v2: Use strpadcpy instead of QEMU_NONSTRING (and yes, this time it seems
->>      to really silence the compiler warning :-))
->>
->>  migration/global_state.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/migration/global_state.c b/migration/global_state.c
->> index 25311479a4..a33947ca32 100644
->> --- a/migration/global_state.c
->> +++ b/migration/global_state.c
->> @@ -44,8 +44,8 @@ void global_state_store_running(void)
->>  {
->>      const char *state = RunState_str(RUN_STATE_RUNNING);
->>      assert(strlen(state) < sizeof(global_state.runstate));
->> -    strncpy((char *)global_state.runstate,
->> -           state, sizeof(global_state.runstate));
->> +    strpadcpy((char *)global_state.runstate, sizeof(global_state.runstate),
->> +              state, '\0');
+Hi Huacai,
+
+On 9/16/20 4:12 AM, Huacai Chen wrote:
+> Loongson-3 CPU family include Loongson-3A R1/R2/R3/R4 and Loongson-3B
+> R1/R2. Loongson-3A R1 is the oldest and its ISA is the smallest, while
+> Loongson-3A R4 is the newest and its ISA is almost the superset of all
+> others. To reduce complexity, in QEMU we just define two CPU types:
 > 
-> https://www.mail-archive.com/qemu-block@nongnu.org/msg44925.html
-> ;)
+> 1, "Loongson-3A1000" CPU which is corresponding to Loongson-3A R1. It is
+>    suitable for TCG because Loongson-3A R1 has fewest ASE.
+> 2, "Loongson-3A4000" CPU which is corresponding to Loongson-3A R4. It is
+>    suitable for KVM because Loongson-3A R4 has the VZ ASE.
+> 
+[...]
 
-Oh, well :-) ... but why did you never pushed to get that merged?
+> Of course the upstream kernel is also usable (though it is "unstable"
+> now):
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+> 
+> How to use QEMU/Loongson-3?
+> 1, Download kernel source from the above URL;
+> 2, Build a kernel with arch/mips/configs/loongson3_{def,hpc}config;
+> 3, Boot a Loongson-3A4000 host with this kernel (for KVM mode);
+> 4, Build QEMU-master with this patchset;
+> 5, modprobe kvm (only necessary for KVM mode);
+> 6, Use QEMU with TCG:
+>        qemu-system-mips64el -M loongson3-virt,accel=tcg -cpu Loongson-3A1000 -kernel <path_to_kernel> -append ...
+>    Use QEMU with KVM:
+>        qemu-system-mips64el -M loongson3-virt,accel=kvm -cpu Loongson-3A4000 -kernel <path_to_kernel> -append ...
 
- Thomas
+Can you add a KVM-only build CI job?
+Simply building, not running test, as there is no MIPS CI.
 
+See for example commit 41e1f0e2256 (".travis.yml: Add a KVM-only
+s390x job"), but add it to GitLab instead.
+
+Thanks!
+
+Phil.
 
