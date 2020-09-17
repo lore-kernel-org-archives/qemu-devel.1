@@ -2,63 +2,88 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89479C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:00:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 042EAC43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:01:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E731420665
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:00:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E731420665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 53FB6206B2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:01:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="kDmaYvME"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53FB6206B2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIoqB-0007zH-Pt
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 04:00:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51628)
+	id 1kIorC-0000gb-4K
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 04:01:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50948)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kIohN-0004kA-Qd; Thu, 17 Sep 2020 03:51:23 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4753 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kIohJ-0005Lm-BZ; Thu, 17 Sep 2020 03:51:21 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 3AA8B569386E998D60E2;
- Thu, 17 Sep 2020 15:51:13 +0800 (CST)
-Received: from localhost (10.174.187.87) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
- 15:51:02 +0800
-From: zhaolichang <zhaolichang@huawei.com>
-To: <qemu-trivial@nongnu.org>
-Subject: [PATCH V3 02/10] migration/: fix some comment spelling errors
-Date: Thu, 17 Sep 2020 15:50:21 +0800
-Message-ID: <20200917075029.313-3-zhaolichang@huawei.com>
-X-Mailer: git-send-email 2.26.2.windows.1
-In-Reply-To: <20200917075029.313-1-zhaolichang@huawei.com>
-References: <20200917075029.313-1-zhaolichang@huawei.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.187.87]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.191;
- envelope-from=zhaolichang@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 03:37:07
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIoey-0000r4-Cv
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:48:52 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:41889)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIoev-0004v5-8o
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:48:52 -0400
+Received: by mail-pl1-x642.google.com with SMTP id m15so685028pls.8
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 00:48:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=PZ0t5l0h/1dEpMOLrSPH28d48Nu+Fe9SZlr/r+Ye7Vw=;
+ b=kDmaYvMEsYW53x+5zdhJcvurY+y/WnvhRJxbbmTkt/W+XgDahNKOaT+N9ROd9SnbpQ
+ 26Qd25hNhxKclHVqMbnYmI3u42tCkLtHETIOgrCUa4UC4fuDhZvyD3QBAifA8PqTFCmb
+ YZPwPYfnRebJRsA67lHtmjBTkhJuIkfqfaaNKpVg09q0yOGVHOoGstMknBKrooHCP/PN
+ /Ah1WrrR+zq+MzCS0vjVlYorMrROfv0QBdZKeBgFKhQBloY8RGQ6Se9PQ0UuIAE/KaVG
+ OQ79fKXVy3fzIonbv2vuna2cgjk6EPokdi8IJUpQYFd0eHiFRMArgcNham1MzF4c2FWt
+ AmcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=PZ0t5l0h/1dEpMOLrSPH28d48Nu+Fe9SZlr/r+Ye7Vw=;
+ b=Vvhy9JqC4j7u4BmXaUQXUGY22ng2/7/91KMnHWtIiA0H6IvRKkmStrn6UmCCgvc0lU
+ 5xmYve5ot8yt53I+x457RmDrzZEg44Z3hHCbfy1/I9T1Hg1f4mDxclXwGxeu76sgR+S+
+ /6VnKVpEVce6Pn0EbX6IZ/qWphBuQcURlu8MaT/5xyZUAKj236dElRwh+BtvO2idlXDp
+ SSd9n0BmauJWbCSUQ28sruRAiZHkS2CMdrm5RDlOZUz0bfxlJqXyHneRgqgGive5lJb9
+ 0/cIOdW/FAPjErRohzRbcTKp1jaFYGp7DfiblkUYVLO+hwNP55FXFFzhDMyOWzhixKyC
+ ol1g==
+X-Gm-Message-State: AOAM530J6Zh0BT2tjP24qV1VYRGb0Iww7zyQhch3otCQQv1D42tvd/ll
+ d6yLghlRxPJ9KbEQFoYt4fg+NxxehNSXa+uN
+X-Google-Smtp-Source: ABdhPJy42MYSFVOpMBhXGnb6PfITd8TZcP8PpF/MUVuFSKne1ZUQesLfds/szNZB3luWlsGaNeZgCg==
+X-Received: by 2002:a17:902:9695:b029:d1:e598:4007 with SMTP id
+ n21-20020a1709029695b02900d1e5984007mr9961796plp.65.1600328927228; 
+ Thu, 17 Sep 2020 00:48:47 -0700 (PDT)
+Received: from localhost.localdomain ([115.96.122.113])
+ by smtp.googlemail.com with ESMTPSA id y3sm20572516pfb.18.2020.09.17.00.48.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 17 Sep 2020 00:48:46 -0700 (PDT)
+From: Ani Sinha <ani@anisinha.ca>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 12/12] tests/acpi: add DSDT.hpbrroot DSDT table blob to
+ test global i440fx hotplug
+Date: Thu, 17 Sep 2020 13:17:32 +0530
+Message-Id: <20200917074733.13612-13-ani@anisinha.ca>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200917074733.13612-1-ani@anisinha.ca>
+References: <20200917074733.13612-1-ani@anisinha.ca>
+Received-SPF: none client-ip=2607:f8b0:4864:20::642;
+ envelope-from=ani@anisinha.ca; helo=mail-pl1-x642.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,225 +96,746 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter
- Maydell <peter.maydell@linaro.org>, zhaolichang <zhaolichang@huawei.com>,
- qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, jusual@redhat.com,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
+ Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I found that there are many spelling errors in the comments of qemu,
-so I used the spellcheck tool to check the spelling errors
-and finally found some spelling errors in the migration folder.
+This change adds a new DSDT golden master table blob to test disabling
+hotplug on both pci root bus and pci bridges. Also reverts the change
+in file bios-tables-test-allowed-diff.h to make sure its now empty so that
+future modifications to acpi tables can be caught.
 
-Signed-off-by: zhaolichang <zhaolichang@huawei.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- migration/colo-failover.c |  2 +-
- migration/colo.c          |  2 +-
- migration/multifd.c       |  4 ++--
- migration/postcopy-ram.c  |  4 ++--
- migration/postcopy-ram.h  |  2 +-
- migration/ram.c           | 10 +++++-----
- migration/rdma.c          |  8 ++++----
- migration/savevm.c        |  4 ++--
- 8 files changed, 18 insertions(+), 18 deletions(-)
+The following is the disassembled diff between DSDT.hpbridge and DSDT.hpbrroot:
 
-diff --git a/migration/colo-failover.c b/migration/colo-failover.c
-index e9ca0b4774..b717edc8e2 100644
---- a/migration/colo-failover.c
-+++ b/migration/colo-failover.c
-@@ -46,7 +46,7 @@ void failover_request_active(Error **errp)
- {
-    if (failover_set_state(FAILOVER_STATUS_NONE,
-         FAILOVER_STATUS_REQUIRE) != FAILOVER_STATUS_NONE) {
--        error_setg(errp, "COLO failover is already actived");
-+        error_setg(errp, "COLO failover is already activated");
-         return;
-     }
-     failover_bh = qemu_bh_new(colo_failover_bh, NULL);
-diff --git a/migration/colo.c b/migration/colo.c
-index ea7d1e9d4e..80788d46b5 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -632,7 +632,7 @@ out:
-     /*
-      * It is safe to unregister notifier after failover finished.
-      * Besides, colo_delay_timer and colo_checkpoint_sem can't be
--     * released befor unregister notifier, or there will be use-after-free
-+     * released before unregister notifier, or there will be use-after-free
-      * error.
-      */
-     colo_compare_unregister_notifier(&packets_compare_notifier);
-diff --git a/migration/multifd.c b/migration/multifd.c
-index d0441202aa..ac84a61797 100644
---- a/migration/multifd.c
-+++ b/migration/multifd.c
-@@ -731,7 +731,7 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
-         qemu_sem_post(&p->sem_sync);
-         /*
-          * Although multifd_send_thread is not created, but main migration
--         * thread neet to judge whether it is running, so we need to mark
-+         * thread needs to judge whether it is running, so we need to mark
-          * its status.
-          */
-         p->quit = true;
-@@ -1042,7 +1042,7 @@ bool multifd_recv_all_channels_created(void)
- 
+@@ -1,30 +1,30 @@
  /*
-  * Try to receive all multifd channels to get ready for the migration.
-- * - Return true and do not set @errp when correctly receving all channels;
-+ * - Return true and do not set @errp when correctly receiving all channels;
-  * - Return false and do not set @errp when correctly receiving the current one;
-  * - Return false and set @errp when failing to receive the current channel.
-  */
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 1bb22f2b6c..baf094ba3a 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -237,7 +237,7 @@ release_ufd:
-  * request_ufd_features: this function should be called only once on a newly
-  * opened ufd, subsequent calls will lead to error.
+  * Intel ACPI Component Architecture
+  * AML/ASL+ Disassembler version 20180105 (64-bit version)
+  * Copyright (c) 2000 - 2018 Intel Corporation
   *
-- * Returns: true on succes
-+ * Returns: true on success
+  * Disassembling to symbolic ASL+ operators
   *
-  * @ufd: fd obtained from userfaultfd syscall
-  * @features: bit mask see UFFD_API_FEATURES
-@@ -807,7 +807,7 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
- 
-     low_time_offset = get_low_time_offset(dc);
-     /* lookup cpu, to clear it,
--     * that algorithm looks straighforward, but it's not
-+     * that algorithm looks straightforward, but it's not
-      * optimal, more optimal algorithm is keeping tree or hash
-      * where key is address value is a list of  */
-     for (i = 0; i < smp_cpus; i++) {
-diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
-index 9941feb63a..6d2b3cf124 100644
---- a/migration/postcopy-ram.h
-+++ b/migration/postcopy-ram.h
-@@ -161,7 +161,7 @@ struct PostCopyFD {
+- * Disassembly of tests/data/acpi/pc/DSDT.hpbridge, Wed Sep 16 09:45:56 2020
++ * Disassembly of /tmp/aml-ECV9Q0, Wed Sep 16 09:45:56 2020
+  *
+  * Original Table Header:
+  *     Signature        "DSDT"
+- *     Length           0x0000131F (4895)
++ *     Length           0x00000B89 (2953)
+  *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+- *     Checksum         0xF9
++ *     Checksum         0xA2
+  *     OEM ID           "BOCHS "
+  *     OEM Table ID     "BXPCDSDT"
+  *     OEM Revision     0x00000001 (1)
+  *     Compiler ID      "BXPC"
+  *     Compiler Version 0x00000001 (1)
   */
- void postcopy_register_shared_ufd(struct PostCopyFD *pcfd);
- void postcopy_unregister_shared_ufd(struct PostCopyFD *pcfd);
--/* Call each of the shared 'waker's registerd telling them of
-+/* Call each of the shared 'waker's registered telling them of
-  * availability of a block.
-  */
- int postcopy_notify_shared_wake(RAMBlock *rb, uint64_t offset);
-diff --git a/migration/ram.c b/migration/ram.c
-index 76d4fee5d5..c5f36aeae5 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -256,7 +256,7 @@ int64_t ramblock_recv_bitmap_send(QEMUFile *file,
-     /*
-      * Always use little endian when sending the bitmap. This is
-      * required that when source and destination VMs are not using the
--     * same endianess. (Note: big endian won't work.)
-+     * same endianness. (Note: big endian won't work.)
-      */
-     bitmap_to_le(le_bitmap, block->receivedmap, nbits);
- 
-@@ -275,7 +275,7 @@ int64_t ramblock_recv_bitmap_send(QEMUFile *file,
-     qemu_put_buffer(file, (const uint8_t *)le_bitmap, size);
-     /*
-      * Mark as an end, in case the middle part is screwed up due to
--     * some "misterious" reason.
-+     * some "mysterious" reason.
-      */
-     qemu_put_be64(file, RAMBLOCK_RECV_BITMAP_ENDING);
-     qemu_fflush(file);
-@@ -718,7 +718,7 @@ static int save_xbzrle_page(RAMState *rs, uint8_t **current_data,
-     /*
-      * Reaching here means the page has hit the xbzrle cache, no matter what
-      * encoding result it is (normal encoding, overflow or skipping the page),
--     * count the page as encoded. This is used to caculate the encoding rate.
-+     * count the page as encoded. This is used to calculate the encoding rate.
-      *
-      * Example: 2 pages (8KB) being encoded, first page encoding generates 2KB,
-      * 2nd page turns out to be skipped (i.e. no new bytes written to the
-@@ -3705,7 +3705,7 @@ int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *block)
- 
-     /*
-      * Note: see comments in ramblock_recv_bitmap_send() on why we
--     * need the endianess convertion, and the paddings.
-+     * need the endianness conversion, and the paddings.
-      */
-     local_size = ROUND_UP(local_size, 8);
- 
-@@ -3743,7 +3743,7 @@ int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *block)
+ DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPCDSDT", 0x00000001)
+ {
+     Scope (\)
+     {
+         OperationRegion (DBG, SystemIO, 0x0402, One)
+         Field (DBG, ByteAcc, NoLock, Preserve)
+         {
+             DBGB,   8
+         }
+
+@@ -234,64 +234,32 @@
+         {
+             Name (_HID, EisaId ("PNP0B00") /* AT Real-Time Clock */)  // _HID: Hardware ID
+             Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+             {
+                 IO (Decode16,
+                     0x0070,             // Range Minimum
+                     0x0070,             // Range Maximum
+                     0x01,               // Alignment
+                     0x08,               // Length
+                     )
+                 IRQNoFlags ()
+                     {8}
+             })
+         }
      }
- 
-     /*
--     * Endianess convertion. We are during postcopy (though paused).
-+     * Endianness conversion. We are during postcopy (though paused).
-      * The dirty bitmap won't change. We can directly modify it.
-      */
-     bitmap_from_le(block->bmap, le_bitmap, nbits);
-diff --git a/migration/rdma.c b/migration/rdma.c
-index 1dc563ec3f..8f43d69b06 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -1511,7 +1511,7 @@ static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
-     } else {
-         /* This is the source side, we're in a separate thread
-          * or destination prior to migration_fd_process_incoming()
--         * after postcopy, the destination also in a seprate thread.
-+         * after postcopy, the destination also in a separate thread.
-          * we can't yield; so we have to poll the fd.
-          * But we need to be able to handle 'cancel' or an error
-          * without hanging forever.
-@@ -2268,7 +2268,7 @@ static inline int qemu_rdma_buffer_mergable(RDMAContext *rdma,
-  *    chunk, then start a new chunk and flush() the old chunk.
-  * 3. To keep the hardware busy, we also group chunks into batches
-  *    and only require that a batch gets acknowledged in the completion
-- *    qeueue instead of each individual chunk.
-+ *    queue instead of each individual chunk.
-  */
- static int qemu_rdma_write(QEMUFile *f, RDMAContext *rdma,
-                            uint64_t block_offset, uint64_t offset,
-@@ -3150,7 +3150,7 @@ static size_t qemu_rdma_save_page(QEMUFile *f, void *opaque,
-     if (size > 0) {
-         /*
-          * Add this page to the current 'chunk'. If the chunk
--         * is full, or the page doen't belong to the current chunk,
-+         * is full, or the page doesn't belong to the current chunk,
-          * an actual RDMA write will occur and a new chunk will be formed.
-          */
-         ret = qemu_rdma_write(f, rdma, block_offset, offset, size);
-@@ -4103,7 +4103,7 @@ void rdma_start_outgoing_migration(void *opaque,
-         goto err;
+
+-    Scope (_SB.PCI0)
+-    {
+-        OperationRegion (PCST, SystemIO, 0xAE00, 0x08)
+-        Field (PCST, DWordAcc, NoLock, WriteAsZeros)
+-        {
+-            PCIU,   32,
+-            PCID,   32
+-        }
+-
+-        OperationRegion (SEJ, SystemIO, 0xAE08, 0x04)
+-        Field (SEJ, DWordAcc, NoLock, WriteAsZeros)
+-        {
+-            B0EJ,   32
+-        }
+-
+-        OperationRegion (BNMR, SystemIO, 0xAE10, 0x04)
+-        Field (BNMR, DWordAcc, NoLock, WriteAsZeros)
+-        {
+-            BNUM,   32
+-        }
+-
+-        Mutex (BLCK, 0x00)
+-        Method (PCEJ, 2, NotSerialized)
+-        {
+-            Acquire (BLCK, 0xFFFF)
+-            BNUM = Arg0
+-            B0EJ = (One << Arg1)
+-            Release (BLCK)
+-            Return (Zero)
+-        }
+-    }
+-
+     Scope (_SB)
+     {
+         Scope (PCI0)
+         {
+             Method (_PRT, 0, NotSerialized)  // _PRT: PCI Routing Table
+             {
+                 Local0 = Package (0x80){}
+                 Local1 = Zero
+                 While ((Local1 < 0x80))
+                 {
+                     Local2 = (Local1 >> 0x02)
+                     Local3 = ((Local1 + Local2) & 0x03)
+                     If ((Local3 == Zero))
+                     {
+                         Local4 = Package (0x04)
+                             {
+@@ -690,38 +658,32 @@
+                 Method (_OST, 3, Serialized)  // _OST: OSPM Status Indication
+                 {
+                     COST (Zero, Arg0, Arg1, Arg2)
+                 }
+             }
+         }
      }
- 
--    /* RDMA postcopy need a seprate queue pair for return path */
-+    /* RDMA postcopy need a separate queue pair for return path */
-     if (migrate_postcopy()) {
-         rdma_return_path = qemu_rdma_data_init(host_port, errp);
- 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 304d98ff78..ee21e981ba 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2795,7 +2795,7 @@ void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
- 
-     if (!has_live) {
-         /* live default to true so old version of Xen tool stack can have a
--         * successfull live migration */
-+         * successful live migration */
-         live = true;
+
+     Method (\_GPE._E02, 0, NotSerialized)  // _Exx: Edge-Triggered GPE
+     {
+         \_SB.CPUS.CSCN ()
      }
- 
-@@ -2818,7 +2818,7 @@ void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
-          * "xen-save-devices-state" and in case of migration failure, libxl
-          * would call "cont".
-          * So call bdrv_inactivate_all (release locks) here to let the other
--         * side of the migration take controle of the images.
-+         * side of the migration take control of the images.
-          */
-         if (live && !saved_vm_running) {
-             ret = bdrv_inactivate_all();
+
+     Scope (_GPE)
+     {
+         Name (_HID, "ACPI0006" /* GPE Block Device */)  // _HID: Hardware ID
+-        Method (_E01, 0, NotSerialized)  // _Exx: Edge-Triggered GPE
+-        {
+-            Acquire (\_SB.PCI0.BLCK, 0xFFFF)
+-            \_SB.PCI0.PCNT ()
+-            Release (\_SB.PCI0.BLCK)
+-        }
+     }
+
+     Scope (\_SB.PCI0)
+     {
+         Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+         {
+             WordBusNumber (ResourceProducer, MinFixed, MaxFixed, PosDecode,
+                 0x0000,             // Granularity
+                 0x0000,             // Range Minimum
+                 0x00FF,             // Range Maximum
+                 0x0000,             // Translation Offset
+                 0x0100,             // Length
+                 ,, )
+             IO (Decode16,
+                 0x0CF8,             // Range Minimum
+                 0x0CF8,             // Range Maximum
+@@ -766,48 +728,32 @@
+         })
+         Device (GPE0)
+         {
+             Name (_HID, "PNP0A06" /* Generic Container Device */)  // _HID: Hardware ID
+             Name (_UID, "GPE0 resources")  // _UID: Unique ID
+             Name (_STA, 0x0B)  // _STA: Status
+             Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+             {
+                 IO (Decode16,
+                     0xAFE0,             // Range Minimum
+                     0xAFE0,             // Range Maximum
+                     0x01,               // Alignment
+                     0x04,               // Length
+                     )
+             })
+         }
+-
+-        Device (PHPR)
+-        {
+-            Name (_HID, "PNP0A06" /* Generic Container Device */)  // _HID: Hardware ID
+-            Name (_UID, "PCI Hotplug resources")  // _UID: Unique ID
+-            Name (_STA, 0x0B)  // _STA: Status
+-            Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+-            {
+-                IO (Decode16,
+-                    0xAE00,             // Range Minimum
+-                    0xAE00,             // Range Maximum
+-                    0x01,               // Alignment
+-                    0x14,               // Length
+-                    )
+-            })
+-        }
+     }
+
+     Scope (\)
+     {
+         Name (_S3, Package (0x04)  // _S3_: S3 System State
+         {
+             One,
+             One,
+             Zero,
+             Zero
+         })
+         Name (_S4, Package (0x04)  // _S4_: S4 System State
+         {
+             0x02,
+             0x02,
+             Zero,
+@@ -831,479 +777,48 @@
+             Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+             {
+                 IO (Decode16,
+                     0x0510,             // Range Minimum
+                     0x0510,             // Range Maximum
+                     0x01,               // Alignment
+                     0x0C,               // Length
+                     )
+             })
+         }
+     }
+
+     Scope (\_SB)
+     {
+         Scope (PCI0)
+         {
+-            Name (BSEL, Zero)
+             Device (S00)
+             {
+                 Name (_ADR, Zero)  // _ADR: Address
+             }
+
+             Device (S10)
+             {
+                 Name (_ADR, 0x00020000)  // _ADR: Address
+                 Method (_S1D, 0, NotSerialized)  // _S1D: S1 Device State
+                 {
+                     Return (Zero)
+                 }
+
+                 Method (_S2D, 0, NotSerialized)  // _S2D: S2 Device State
+                 {
+                     Return (Zero)
+                 }
+
+                 Method (_S3D, 0, NotSerialized)  // _S3D: S3 Device State
+                 {
+                     Return (Zero)
+                 }
+             }
+
+             Device (S18)
+             {
+                 Name (_ADR, 0x00030000)  // _ADR: Address
+             }
+-
+-            Device (S20)
+-            {
+-                Name (_SUN, 0x04)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00040000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S28)
+-            {
+-                Name (_SUN, 0x05)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00050000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S30)
+-            {
+-                Name (_SUN, 0x06)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00060000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S38)
+-            {
+-                Name (_SUN, 0x07)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00070000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S40)
+-            {
+-                Name (_SUN, 0x08)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00080000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S48)
+-            {
+-                Name (_SUN, 0x09)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00090000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S50)
+-            {
+-                Name (_SUN, 0x0A)  // _SUN: Slot User Number
+-                Name (_ADR, 0x000A0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S58)
+-            {
+-                Name (_SUN, 0x0B)  // _SUN: Slot User Number
+-                Name (_ADR, 0x000B0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S60)
+-            {
+-                Name (_SUN, 0x0C)  // _SUN: Slot User Number
+-                Name (_ADR, 0x000C0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S68)
+-            {
+-                Name (_SUN, 0x0D)  // _SUN: Slot User Number
+-                Name (_ADR, 0x000D0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S70)
+-            {
+-                Name (_SUN, 0x0E)  // _SUN: Slot User Number
+-                Name (_ADR, 0x000E0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S78)
+-            {
+-                Name (_SUN, 0x0F)  // _SUN: Slot User Number
+-                Name (_ADR, 0x000F0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S80)
+-            {
+-                Name (_SUN, 0x10)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00100000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S88)
+-            {
+-                Name (_SUN, 0x11)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00110000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S90)
+-            {
+-                Name (_SUN, 0x12)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00120000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S98)
+-            {
+-                Name (_SUN, 0x13)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00130000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SA0)
+-            {
+-                Name (_SUN, 0x14)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00140000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SA8)
+-            {
+-                Name (_SUN, 0x15)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00150000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SB0)
+-            {
+-                Name (_SUN, 0x16)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00160000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SB8)
+-            {
+-                Name (_SUN, 0x17)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00170000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SC0)
+-            {
+-                Name (_SUN, 0x18)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00180000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SC8)
+-            {
+-                Name (_SUN, 0x19)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00190000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SD0)
+-            {
+-                Name (_SUN, 0x1A)  // _SUN: Slot User Number
+-                Name (_ADR, 0x001A0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SD8)
+-            {
+-                Name (_SUN, 0x1B)  // _SUN: Slot User Number
+-                Name (_ADR, 0x001B0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SE0)
+-            {
+-                Name (_SUN, 0x1C)  // _SUN: Slot User Number
+-                Name (_ADR, 0x001C0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SE8)
+-            {
+-                Name (_SUN, 0x1D)  // _SUN: Slot User Number
+-                Name (_ADR, 0x001D0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SF0)
+-            {
+-                Name (_SUN, 0x1E)  // _SUN: Slot User Number
+-                Name (_ADR, 0x001E0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SF8)
+-            {
+-                Name (_SUN, 0x1F)  // _SUN: Slot User Number
+-                Name (_ADR, 0x001F0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Method (DVNT, 2, NotSerialized)
+-            {
+-                If ((Arg0 & 0x10))
+-                {
+-                    Notify (S20, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x20))
+-                {
+-                    Notify (S28, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x40))
+-                {
+-                    Notify (S30, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x80))
+-                {
+-                    Notify (S38, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x0100))
+-                {
+-                    Notify (S40, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x0200))
+-                {
+-                    Notify (S48, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x0400))
+-                {
+-                    Notify (S50, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x0800))
+-                {
+-                    Notify (S58, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x1000))
+-                {
+-                    Notify (S60, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x2000))
+-                {
+-                    Notify (S68, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x4000))
+-                {
+-                    Notify (S70, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x8000))
+-                {
+-                    Notify (S78, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00010000))
+-                {
+-                    Notify (S80, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00020000))
+-                {
+-                    Notify (S88, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00040000))
+-                {
+-                    Notify (S90, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00080000))
+-                {
+-                    Notify (S98, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00100000))
+-                {
+-                    Notify (SA0, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00200000))
+-                {
+-                    Notify (SA8, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00400000))
+-                {
+-                    Notify (SB0, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00800000))
+-                {
+-                    Notify (SB8, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x01000000))
+-                {
+-                    Notify (SC0, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x02000000))
+-                {
+-                    Notify (SC8, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x04000000))
+-                {
+-                    Notify (SD0, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x08000000))
+-                {
+-                    Notify (SD8, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x10000000))
+-                {
+-                    Notify (SE0, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x20000000))
+-                {
+-                    Notify (SE8, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x40000000))
+-                {
+-                    Notify (SF0, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x80000000))
+-                {
+-                    Notify (SF8, Arg1)
+-                }
+-            }
+-
+-            Method (PCNT, 0, NotSerialized)
+-            {
+-                BNUM = Zero
+-                DVNT (PCIU, One)
+-                DVNT (PCID, 0x03)
+-            }
+         }
+     }
+ }
+
+Signed-off-by: Ani Sinha <ani@anisinha.ca>
+Acked-by: Igor Mammedov <imammedo@redhat.com>
+---
+ tests/data/acpi/pc/DSDT.hpbrroot            | Bin 0 -> 2953 bytes
+ tests/qtest/bios-tables-test-allowed-diff.h |   1 -
+ 2 files changed, 1 deletion(-)
+ create mode 100644 tests/data/acpi/pc/DSDT.hpbrroot
+
+diff --git a/tests/data/acpi/pc/DSDT.hpbrroot b/tests/data/acpi/pc/DSDT.hpbrroot
+new file mode 100644
+index 0000000000000000000000000000000000000000..14518bb843059a0db1d216543f632d5a00c1a695
+GIT binary patch
+literal 2953
+zcmb7GUvJY^6hAk1igTSbPV23RzC;B!4JL3BhLH9`Vy8*gBz5DIZE__$ZO{Tj!U8Js
+zM`&q~pzww=rakN-RC(`5*ggUufqez0L7&LZv71oRR02zJ?mhS1^ZT7Y_xc!?QGY4}
+zu$|npUbK?ApG@6A83O<s)4x&@*T8NYxq`#wkjU&U*&pL8C#l~Wxzz&uqvihYx_6$q
+ztl`1>j`Cu?;XT@R*MXEa*FDZ@pe#66&apf5re4w{r&uzg*;ibUoUBm;$yqHKpj4zl
+zCodJve0`|IP>Gi9cG0X?APVs6y$qtgrO<r#O1^3&&6?pP)r*c*&w@u1*CSEmzRMN2
+z7k%D!q3g<nK_7b4&$|uytr3NP{tNe^&*PG#*Q`W>Pd|>J$7mcxfP0{Pb&l8&UAuFl
+zWMv(nE5b9RVqVbn5O=w#ROikMLq*cEI~SI61}X<G3dkN=4PlP+FAB^B7Z@wBCN%MX
+zA%tjl=Tv2Rb+ju!`_V3mhZjI0t*o?Y=%e@@!^jc&d49aW-Ux355DV;`@J;}>a2d{s
+zzTwnj*~|{(yl9kWk_zxJU*;O)yFA2C<8Ow~^8vrX-|{$@BxljcC+4_H6>#tg;l%Ew
+z%Vs?_bWaR&$3CK~@K}M}748a>w9xiBr1j;>XipfmF`*Oo><N1UNDGR;=X9;Ej{+j^
+zd+M9^zyl^N0K+U*G3hx+S>lu^)!>d<tAjTaYP%jZc5;yy4c_+dH+Trvy$81%>%axr
+z=qcR|REl7t%he?Vn!Quq4c1F^8(bWTEoi=sjb>R?N_01PXe7z)ON5a`ho<-N-a1zR
+zOAWT00N#TJ;%zq>c+G9M0h^7!Yj2%8FA!U*7OEp=)>bqLUnzQ}>6MYx+0u$tXT8V+
+z-fm%;M*3V<FP2vHS_BnpT4I{ZPp2T_=ja|hBN-3lyVR3kw9w}kjr%0FJLO~OCe}bu
+zl2I&qI#3eE%1V66XP-_(L<nPYIsWiQ!0@Ya|19;11kqCyj#0AUA&q(4m&B>`05$ZQ
+zKc91~n#G>A0v34wY9*5IqvyuZG5ep4o;rY@^3hYs?;v_gos6EcI~DR>A4BJ%&wx)K
+zfKU7I=`r~95%B4Kcw-zMFNII`K63y*<HKjh;4??SXY9_hh~8V{@L~WzEFrr0Fy)aT
+z<ydD^ezH|Lh%r$`5oK2?`^U}h=zQ(NwP)7yBM3g_7gtO-SChq?cf1>$za(#6y?t}@
+z*2dM_U^Cq;FYTY@80Q5ByRgfmc(q|sVZF<+%cJ(zNt$FKshjyK(@Ry0>9xugrssdq
+z7>K%FF(i9yhLi-|%9oR<X=Lk3HR_bACCLL4qVs3h{5u@E1pH!I-7INZN+Slr7bvVI
+z^!nn@p&swH;IXc0+BLN}r6YR8KDl;Y9A53@BXJ)Lyw<oF!8~w#C%WSc#NOj^*Z%s@
+zN_na8s+BN#^m#yR+!R`vXkRT(>y}=Xj&g&!J6XBwGNkUoxKWI7uOJ?B$j=0ZYg`?J
+z&%8s-P}^hf%O$Z_JZ#F(=VVh{IBW~m(bi-~D-nI!sz;A<bYi{^kwuTaYZLtPcxYTo
+zs@KPb7=nrH>_?ZVs_=;6g9VC}CH1Mkum&sHdP3$BNYqr|>a>G?$m9&Pu3cB>v3v_=
+z-pOleOpxDYP$^SZ6_r-}bG={G+C@+b@u1*?9*a7I%bfqY9fJ_IE%*%Rg^kBvbT7&z
+zl(VQnqIbBw7ah%G`1Jz#_sJYUuuflw!GOLD^n}1)8FmNKVDQ)bVCC<(&(40>6Uazy
+zFc|zgR1c)krhn>abP*j1I+~bSHMJ}{5?mo9KX7*hEruL)JpSGBdiV7%6R`>SW(~Jk
+z8E0lnWQc>~3(kxrVq=3X3(mfy6#`Vg{}3R%b8hiReKCmPO1`p+SxS>Oc54Swl&}(}
+z8%imL*Zf}NayV!TWlPh7rV!mYW2N>d7|Rf-XeVVr-yfuhgA5JqPTWde3O1sy0RICI
+C_`Dwg
+
+literal 0
+HcmV?d00001
+
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index dea61d94f1..dfb8523c8b 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1,2 +1 @@
+ /* List of comma-separated changed AML files to ignore */
+-"tests/data/acpi/pc/DSDT.hpbrroot",
 -- 
-2.26.2.windows.1
+2.17.1
 
 
