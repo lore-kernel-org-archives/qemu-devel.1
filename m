@@ -2,80 +2,87 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 622E8C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:42:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B705C2BBD1
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:44:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8F5D2087D
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:42:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8F5D2087D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id E1EED21582
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:44:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rJCwUVoR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1EED21582
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kItF3-0004JG-Qh
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 08:42:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39698)
+	id 1kItHN-0007VE-LA
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 08:44:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39884)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kItDm-000311-N9; Thu, 17 Sep 2020 08:41:06 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:45399)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kItDk-0005rr-8W; Thu, 17 Sep 2020 08:41:06 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.109.146.241])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 7F9285C19013;
- Thu, 17 Sep 2020 14:41:00 +0200 (CEST)
-Received: from kaod.org (37.59.142.103) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 17 Sep
- 2020 14:41:00 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-103G0051453eb26-7ba2-471e-8540-048e502fffdc,
- CCC0D77BD3F1F8C36E09B026C91493862201CFF2) smtp.auth=groug@kaod.org
-Date: Thu, 17 Sep 2020 14:40:58 +0200
-From: Greg Kurz <groug@kaod.org>
-To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
-Subject: Re: [PATCH 14/15] spapr: Simplify error handling in
- spapr_memory_plug()
-Message-ID: <20200917144058.3075e5ac@bahia.lan>
-In-Reply-To: <20200917121851.GA1597829@redhat.com>
-References: <20200914123505.612812-1-groug@kaod.org>
- <20200914123505.612812-15-groug@kaod.org>
- <11f0dcb7-7923-0164-df69-4911b3293663@virtuozzo.com>
- <20200915134340.0cc3f9eb@bahia.lan>
- <20200917011525.GI5258@yekko.fritz.box>
- <87lfh8g8dy.fsf@dusky.pond.sub.org>
- <20200917120437.6ab60ca4@bahia.lan>
- <87ft7g1uee.fsf@dusky.pond.sub.org>
- <20200917121851.GA1597829@redhat.com>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1kItEN-0003rV-MX
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 08:41:44 -0400
+Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:38334)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1kItEK-0005wi-DW
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 08:41:43 -0400
+Received: by mail-pf1-x431.google.com with SMTP id l126so1141404pfd.5
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 05:41:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=2OdJQRLcdOum/QgVtr/P1Vx3YmopOHbavwZGRPWAftY=;
+ b=rJCwUVoRuLNCbzr1KEP5QVECzw9BVWCXL8ciUkI1TBd/7M/c2bPHHtkmHZy3lXXs46
+ XCew32pMks8tUIcL71VxE/28Zz0Z1n79ACsS2WASSylHiFcGHvxQRq9c1Pb98bHMsMEs
+ abEcg1j0Wtpa/vMI1T45ssA9Kg5frBeGg61/3TX+n0XFByV2DQjF/HUhlVlDQaGzvTWS
+ 2nRcjIJW45xJf+/dXjx74KWv20LcCtPqltSgcgXyCDTeGnUUiC2ncQ1EmJOS+SV5Dua0
+ rIfwlHKcr+SjuPj23vYU1gKvIIDBJXXsO1w9ilBOV3kkUKI/SoWc77Gd1ypSwzjFwV6P
+ rrWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=2OdJQRLcdOum/QgVtr/P1Vx3YmopOHbavwZGRPWAftY=;
+ b=XYBpjzWncthM18EdQ/2c6qQcT6W+s3gEQo+sXQEjy2KcJ2HEc4cdBbgDTuPsGfxWVf
+ jI9mdew/VU3jy8qsTi3SPCc1kwDZuXeEXWVTQvGnGVkf96v+ien/vsSsh9Hi/wkxVeOj
+ pZxQYnzKOVY+FOJiI2aeceXxeRd8jQbbSrvohl7CO3gJy4NgwheKTNL/IMh4IjJGMjui
+ SEC/twAV0W0cLvZzws/wqcNelvFxPids2UZDKkmsnRj5A8W3CCob3e/4zGbHMeWHoeGC
+ f0rkywMOat/T5kSPF9GI6vLge3ARhgUIF25cANbANa+K2ekn76HZDKmgMT3nITkgBLTK
+ za9Q==
+X-Gm-Message-State: AOAM532Og3w9vDJz8s0qHVn0Ghyatz8nGbhoECm0sf2q1wB+tgnXOkvc
+ OiBos+PKEIZutwfUqwSB6zzJr2sSFBXn4vL2jsB0P5l+qt8=
+X-Google-Smtp-Source: ABdhPJwxTnBu5K2lZGsDWA49dRqz3zdX1eLtixQmO5zEnRPDQAEqItICqQoSnbjSwet1O2AWlsBYTVVBlx9VgcGaoGA=
+X-Received: by 2002:a63:6346:: with SMTP id x67mr22721848pgb.121.1600346497434; 
+ Thu, 17 Sep 2020 05:41:37 -0700 (PDT)
 MIME-Version: 1.0
+References: <20200824134431.GA35623@stefanha-x1.localdomain>
+ <CAJSP0QW3xniHzHS=_Ok1D-NuAViHUShCxYs38YDo-YjUxC_+ZA@mail.gmail.com>
+ <709da6a3-d158-270b-fb63-43ef65dfe668@virtuozzo.com>
+ <dd5d6d0f-cc52-d3d5-0bbc-c57dcfef6842@virtuozzo.com>
+In-Reply-To: <dd5d6d0f-cc52-d3d5-0bbc-c57dcfef6842@virtuozzo.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Thu, 17 Sep 2020 13:41:26 +0100
+Message-ID: <CAJSP0QVRMzw5AAJEPpOChyFK4hUuEe1VE909QvYb6HQGOV_8XA@mail.gmail.com>
+Subject: Re: QEMU 5.0 virtio-blk performance regression with high queue depths
+To: "Denis V. Lunev" <den@virtuozzo.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [37.59.142.103]
-X-ClientProxiedBy: DAG4EX1.mxp5.local (172.16.2.31) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: 5e765845-a1e2-4518-8036-58db5d91190a
-X-Ovh-Tracer-Id: 6439021568538810662
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrtdeggdehiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepveelhfdtudffhfeiveehhfelgeellefgteffteekudegheejfffghefhfeeuudffnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegurghvihgusehgihgsshhonhdrughrohhpsggvrghrrdhiugdrrghu
-Received-SPF: pass client-ip=178.32.125.2; envelope-from=groug@kaod.org;
- helo=smtpout1.mo529.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 08:41:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+Received-SPF: pass client-ip=2607:f8b0:4864:20::431;
+ envelope-from=stefanha@gmail.com; helo=mail-pf1-x431.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -89,81 +96,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-ppc@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org
+Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 17 Sep 2020 13:18:51 +0100
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+On Wed, Sep 16, 2020 at 5:43 PM Denis V. Lunev <den@virtuozzo.com> wrote:
+> On 9/16/20 5:07 PM, Denis V. Lunev wrote:
+> > I will make a check today.
+> >
+> > Talking about our performance measurements, we have not
+> > seen ANY performance degradation, especially 30-40%.
+> > This looking quite strange to me.
+> >
+> > Though there is quite important difference. We are always
+> > using O_DIRECT and 'native' AIO engine.
+> >
+> > Den
+>
+> I have put my hands into this and it looks like you are right. There is
+> a difference. It is not as significant for me as in your case, but I observe
+> stable around 10% difference with 128 vs 256 queue size.
+>
+> I have checked with:
+> - QEMU 5.1
+> - Fedora 31 in guest
+> - qcow2 (64k, 1Mb) and raw image on host
+> - nocache and both threaded/native IO modes
+>
+> The test was run on Thinkpad Carbon X1 gen 6 laptop.
+>
+> For the reference, I have seen 330k IOPS for read
+> at max which is looking awesome for native and 220k
+> IOPS for threads.
 
-> On Thu, Sep 17, 2020 at 02:04:41PM +0200, Markus Armbruster wrote:
-> > Greg Kurz <groug@kaod.org> writes:
-> >=20
-> > > $ git grep object_property_get_uint -- :^{include,qom/object.c} | wc =
--l
-> > > 60
-> > >
-> > > Manual inspecting the output of
-> > >
-> > > $ git grep -W object_property_get_uint -- :^{include,qom/object.c}
-> > > ...
-> > >
-> > > seems to be showing that most users simply ignore errors (ie. pass NU=
-LL
-> > > as 3rd argument). Then some users pass &error_abort and only a few
-> > > pass a &err or errp.
-> > >
-> > > Assuming that users know what they're doing, I guess my proposal
-> > > wouldn't bring much to the code base in the end... I'm not even
-> > > sure now that it's worth changing the contract.
-> >=20
-> > We'd change
-> >=20
-> >     val =3D object_property_get_uint(obj, name, &error_abort);
-> >=20
-> > to
-> >=20
-> >     object_property_get_uint(obj, name, &val, &error_abort);
-> >=20
-> > which is not an improvement.
-> >=20
-> > Most of the ones passing NULL should probably pass &error_abort
-> > instead.  Doesn't change the argument.
->=20
-> I wonder if we actually need to have an Error  parameter at all for
-> the getters. IIUC the only valid runtime error  is probably the case
-> where the property has not been set, and even then, I think properties
-> usually have a default value that would be returned.  All the other
-> errors look like programmer errors.
->=20
-> IOW, can we remove the Error parameter and have all the o_p_get*
-> method impls use error_abort.
->=20
-> In the rare case where a caller needs to handle a property not
-> being set, they can use object_property_find() as a test before
-> invoking the getter.
->=20
+Thanks for confirming! Reverting the commit is unattractive since it
+does improve performance in some cases.
 
-I tend to agree.
+It would be good to understand the root cause so the regression can be
+fixed without reducing queue-size again.
 
-> Of course requires someone motivated to audit all the case that
-> are not using NULL or error_abort and decide whether the attempt
-> at passing a local errp was actually justified or not.
->=20
+Do you have time to investigate?
 
-Since I've open the can of worms, I'm volunteering to do that if
-we have a consensus on the fact that "the only valid runtime
-error os the case the property has not been set".
-
-Cheers,
-
---
-Greg
-
-> Regards,
-> Daniel
-
+Thanks,
+Stefan
 
