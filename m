@@ -2,94 +2,82 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 183DDC43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 15:06:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95F11C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 15:07:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8ABEF2220A
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 15:06:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D4F1020708
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 15:07:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gddyZt56"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8ABEF2220A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WP9wnNne"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4F1020708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIvU8-00079u-G5
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 11:06:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53384)
+	id 1kIvUz-00082O-Ix
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 11:07:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52740)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kIvMb-00076C-CM
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 10:58:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43312)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kIvKb-0004qm-Ml
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 10:56:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48635)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kIvMX-0000Lp-Nq
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 10:58:20 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kIvKZ-0008UD-4x
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 10:56:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600354696;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=GC0+2S6Hmg1bC/CU+/xWdfNkCLAvxRqEFlCfr9UBf0g=;
- b=gddyZt56dm+TZKn7YxWoKGgo2Z+lLOK2BmE+W1GHl6dfveIemHnx3U785J2uIqr4nnm2Qw
- sTxQZmHSRjT9LVDIFm5SXdO6NjwsrF33uxR7SuuDR8doVJHXZvnWxHCAVnoCdpQZszFifS
- 0PjGBaDFfFCA/VBiUqo4pJ1n0XQEBME=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-388--Z8eaRn1NuG-bBbBwiD_ig-1; Thu, 17 Sep 2020 10:58:14 -0400
-X-MC-Unique: -Z8eaRn1NuG-bBbBwiD_ig-1
-Received: by mail-wm1-f69.google.com with SMTP id u5so847492wme.3
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 07:58:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
- :message-id:mime-version;
- bh=GC0+2S6Hmg1bC/CU+/xWdfNkCLAvxRqEFlCfr9UBf0g=;
- b=cgrpOthAqrN3pA3jqT4cJRokkLAtSlxotauimB/8zcJGsPr16wHqCecF1Iq63txQKW
- Bzu3w0P1Z/EKHkN6UhciliE0zBZbgnr3h+HUqBdc5rf0MrRsnWVS8UzS2aQ6W79Yfldg
- IDC0ITyMhm9O/hovoQZs9M6/xT1gZtaydaVHvxaZJLgGc+7UjXsKD/DdQXFQF0FmM5ko
- cSQnm6TUYrq/5c6Sph1dCpH0wP0lO6o64DpLWN8CqmIEMwQPRwkqnMk1gLmMyZRaxbgX
- Wa3keVNuFkTrL2C7P9dgLcmrXa2pzQkNxkbO8cNTSAkT3ChoUKqXYSzSHNAHYd/B5pnW
- ilyw==
-X-Gm-Message-State: AOAM532ivZaWdjhF5AhFZFVCxMK+hxBbRpuLErIvo//oK1ROQHbNEWrV
- foEzekECTHJabyW8n8iVFEc8skg1QpREPAg+Ro3CA7hvfxcMoBQPmKbA6GO/tRDG1nPt9IDI3ar
- l7C6tFgCqJ8iWaN4=
-X-Received: by 2002:a1c:7911:: with SMTP id l17mr10359096wme.179.1600354692897; 
- Thu, 17 Sep 2020 07:58:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzEMt0Yb9u0xaRJD3EyRvrVO/Bg2NQs8Cu7mwJUBve+xzOVP8VtbHlLopiHL6tJkFC2bkBzvg==
-X-Received: by 2002:a1c:7911:: with SMTP id l17mr10359072wme.179.1600354692639; 
- Thu, 17 Sep 2020 07:58:12 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
- by smtp.gmail.com with ESMTPSA id d6sm39843040wrq.67.2020.09.17.07.58.10
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Sep 2020 07:58:10 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH] target/i386: always create kvmclock device
-In-Reply-To: <20200917144237.GK2793@work-vm>
-References: <20200917111306.819263-1-vkuznets@redhat.com>
- <20200917122559.e7i5o64k7rw7urdh@tartarus>
- <87ft7gh6gy.fsf@vitty.brq.redhat.com> <20200917144237.GK2793@work-vm>
-Date: Thu, 17 Sep 2020 16:58:09 +0200
-Message-ID: <875z8ch2m6.fsf@vitty.brq.redhat.com>
+ s=mimecast20190719; t=1600354574;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=nFM8E3hTOUzSiG+Tc0+yuHZdnRbcpjIvigoJNmnTkqM=;
+ b=WP9wnNneHMqU/bbCYvY7x4bL9ShQQdmBTgWCkYjgxsCK+jf6Zh/Q3XPtT7mrojas5rX1Lp
+ jDPvBqrF5rX9441Lnj93g7F1Ctz6WAnYaH4Ce/tjgP7kJ9LBCr1aLavAXvNIlOUcVdMrpP
+ 6I2gPa4k8yxaMlrmKXYN1+YADa8X3+4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-585-197ZgDaOObezgoeR1WZScQ-1; Thu, 17 Sep 2020 10:56:01 -0400
+X-MC-Unique: 197ZgDaOObezgoeR1WZScQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 421901103D5C;
+ Thu, 17 Sep 2020 14:55:17 +0000 (UTC)
+Received: from redhat.com (ovpn-114-29.ams2.redhat.com [10.36.114.29])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1116378A98;
+ Thu, 17 Sep 2020 14:55:14 +0000 (UTC)
+Date: Thu, 17 Sep 2020 15:55:12 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: Python 3.5 EOL; when can require 3.6?
+Message-ID: <20200917145512.GF1597829@redhat.com>
+References: <875z8eupyp.fsf@dusky.pond.sub.org>
+ <CAFEAcA8q8J1n2UqsNbHgNwEedA8pZ6fNA7obCR1REN-33nvmkg@mail.gmail.com>
+ <d07189e2-0683-2eb9-44e0-a275688fa8b4@redhat.com>
+ <9d4363e8-7bb8-8255-9914-6d9bc36cec79@redhat.com>
 MIME-Version: 1.0
+In-Reply-To: <9d4363e8-7bb8-8255-9914-6d9bc36cec79@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vkuznets@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=vkuznets@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 20:51:18
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 02:01:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
@@ -110,126 +98,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Antoine Damhet <antoine.damhet@blade-group.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+On Thu, Sep 17, 2020 at 04:10:55PM +0200, Thomas Huth wrote:
+> On 16/09/2020 16.00, Thomas Huth wrote:
+> > On 16/09/2020 14.30, Peter Maydell wrote:
+> >> On Wed, 16 Sep 2020 at 08:43, Markus Armbruster <armbru@redhat.com> wrote:
+> >>> We require Python 3.5.  It will reach its "end of life" at the end of
+> >>> September 2020[*].  Any reason not to require 3.6 for 5.2?  qemu-iotests
+> >>> already does for its Python parts.
+> > [...]
+> >> The default should be
+> >> "leave the version dependency where it is", not "bump the version
+> >> dependency as soon as we can".
+> > 
+> > OTOH, if none of our supported build systems uses python 3.5 by default
+> > anymore, it also will not get tested anymore, so bugs might creep in,
+> > which will of course end up in a bad experience for the users, too, that
+> > still try to build with such an old version. So limiting the version to
+> > the level that we also test is IMHO very reasonable.
+> > 
+> > Let's have a look at the (older) systems that we support and the python
+> > versions according to repology.org:
+> > 
+> > - RHEL7 / CentOS 7 : 3.6.8
+> > - Ubuntu 18.04 (Bionic) : >= 3.6.5
+> > - openSUSE Leap 15.0 : >= 3.6.5
+> > - OpenBSD Ports : >= 3.7.9
+> > - FreeBSD Ports : >= 3.5.10 - but there is also 3.6 or newer
+> > - Homebrew : >= 3.7.9
+> > 
+> > ... so I think it should be fine to retire 3.5 nowadays.
+> 
+> Sorry, I forgot to check Debian. If I got that right, Debian 9 still
+> uses Python 3.5 by default. So I guess that means we can not deprecate
+> Python 3.5 yet?
 
-> * Vitaly Kuznetsov (vkuznets@redhat.com) wrote:
->> Antoine Damhet <antoine.damhet@blade-group.com> writes:
->> 
->> > On Thu, Sep 17, 2020 at 01:13:06PM +0200, Vitaly Kuznetsov wrote:
->> >> QEMU's kvmclock device is only created when KVM PV feature bits for
->> >> kvmclock (KVM_FEATURE_CLOCKSOURCE/KVM_FEATURE_CLOCKSOURCE2) are
->> >> exposed to the guest. With 'kvm=off' cpu flag the device is not
->> >> created and we don't call KVM_GET_CLOCK/KVM_SET_CLOCK upon migration.
->> >> It was reported that without these call at least Hyper-V TSC page
->> >> clocksouce (which can be enabled independently) gets broken after
->> >> migration.
->> >> 
->> >> Switch to creating kvmclock QEMU device unconditionally, it seems
->> >> to always make sense to call KVM_GET_CLOCK/KVM_SET_CLOCK on migration.
->> >> Use KVM_CAP_ADJUST_CLOCK check instead of CPUID feature bits.
->> >> 
->> >> Reported-by: Antoine Damhet <antoine.damhet@blade-group.com>
->> >> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
->> >> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> >> ---
->> >>  hw/i386/kvm/clock.c    | 6 +-----
->> >>  target/i386/kvm.c      | 5 +++++
->> >>  target/i386/kvm_i386.h | 1 +
->> >>  3 files changed, 7 insertions(+), 5 deletions(-)
->> >> 
->> >> diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
->> >> index 64283358f91d..526c9ea5172b 100644
->> >> --- a/hw/i386/kvm/clock.c
->> >> +++ b/hw/i386/kvm/clock.c
->> >> @@ -330,11 +330,7 @@ static const TypeInfo kvmclock_info = {
->> >>  /* Note: Must be called after VCPU initialization. */
->> >>  void kvmclock_create(void)
->> >>  {
->> >> -    X86CPU *cpu = X86_CPU(first_cpu);
->> >> -
->> >> -    if (kvm_enabled() &&
->> >> -        cpu->env.features[FEAT_KVM] & ((1ULL << KVM_FEATURE_CLOCKSOURCE) |
->> >> -                                       (1ULL << KVM_FEATURE_CLOCKSOURCE2))) {
->> >> +    if (kvm_enabled() && kvm_has_adjust_clock()) {
->> >
->> > Shouldn't the old check used when machine type <= 5.1 in order to avoid
->> > migration incompatibility ?
->> 
->> Hm, when the check fails we just don't create the device and no error is
->> reported, so even if we have kvmclock data in the migration stream but
->> fail to create it migration will still succeed, right? (not a migration
->> expert here :-)
->
-> When the migration stream is parsed, it'll try and find a "kvmclock"
-> device to pass the data it's reading to; if one doesn't exist it'll
-> fail.
+FWIW, Debian 9 EOL was July this year, if you only count the regular
+lifetime, not the LTS.
 
-This may happen with an older machine type when the destination is
-running an unfixed QEMU and the source has the fix, right? The solution
-would be to introduce a flag for older machine types (or for new ones)
-like 'kvmclock_always'.
-
->
-> The other question is in the incoming direction from an older VM;
-> you'll have a kvm clock created here, but you won't load the kvm clock
-> state from the migration stream - what is this clock going to do?
-
-This is not really a problem I believe: the clock was absent on the
-source and things somehow worked for the guest so even if we don't
-initialize kvmclock properly on the destination nothing bad is expected.
-
->
-> Dave
->
->> >
->> >>          sysbus_create_simple(TYPE_KVM_CLOCK, -1, NULL);
->> >>      }
->> >>  }
->> >> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->> >> index 4a8b3a41c1bc..20b31b65307b 100644
->> >> --- a/target/i386/kvm.c
->> >> +++ b/target/i386/kvm.c
->> >> @@ -143,6 +143,11 @@ bool kvm_has_adjust_clock_stable(void)
->> >>      return (ret == KVM_CLOCK_TSC_STABLE);
->> >>  }
->> >>  
->> >> +bool kvm_has_adjust_clock(void)
->> >> +{
->> >> +    return kvm_check_extension(kvm_state, KVM_CAP_ADJUST_CLOCK);
->> >> +}
->> >> +
->> >>  bool kvm_has_exception_payload(void)
->> >>  {
->> >>      return has_exception_payload;
->> >> diff --git a/target/i386/kvm_i386.h b/target/i386/kvm_i386.h
->> >> index 064b8798a26c..0fce4e51d2d6 100644
->> >> --- a/target/i386/kvm_i386.h
->> >> +++ b/target/i386/kvm_i386.h
->> >> @@ -34,6 +34,7 @@
->> >>  
->> >>  bool kvm_allows_irq0_override(void);
->> >>  bool kvm_has_smm(void);
->> >> +bool kvm_has_adjust_clock(void);
->> >>  bool kvm_has_adjust_clock_stable(void);
->> >>  bool kvm_has_exception_payload(void);
->> >>  void kvm_synchronize_all_tsc(void);
->> >> -- 
->> >> 2.25.4
->> >> 
->> >> 
->> 
->> -- 
->> Vitaly
->> 
-
+Regards,
+Daniel
 -- 
-Vitaly
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
