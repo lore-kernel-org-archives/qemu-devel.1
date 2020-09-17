@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CCFAC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 04:28:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16A37C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 04:30:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3AEB42075E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 04:28:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AEB42075E
+	by mail.kernel.org (Postfix) with ESMTPS id C0CB52075E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 04:30:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0CB52075E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIlXJ-0001IA-Ch
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 00:28:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34208)
+	id 1kIlZN-0002nM-Sc
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 00:30:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35208)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIlUb-00075G-Dx
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 00:25:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41364)
+ id 1kIlYB-0002JB-EW
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 00:29:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41542)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIlUU-0004aK-4g
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 00:25:57 -0400
+ id 1kIlY9-0004xa-Ez
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 00:29:39 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kIlUS-0005fr-OV
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 04:25:48 +0000
+ id 1kIlY8-00062w-0c
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 04:29:36 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 929D82E8107
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 04:25:48 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id E9D2A2E80EE
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 04:29:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 17 Sep 2020 04:17:20 -0000
-From: Launchpad Bug Tracker <1629483@bugs.launchpad.net>
+Date: Thu, 17 Sep 2020 04:17:19 -0000
+From: Launchpad Bug Tracker <1603970@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
@@ -50,18 +50,18 @@ X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dkerr64 janitor kamath-ben th-huth
-X-Launchpad-Bug-Reporter: Benjamin Kamath (kamath-ben)
+X-Launchpad-Bug-Commenters: 7-mair-g janitor th-huth
+X-Launchpad-Bug-Reporter: Kilian Ries (7-mair-g)
 X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <20160930224644.27765.63692.malonedeb@chaenomeles.canonical.com>
-Message-Id: <160031624013.27044.13973847429577215201.malone@loganberry.canonical.com>
-Subject: [Bug 1629483] Re: Build fails on optionrom
+References: <20160718121144.22648.14707.malonedeb@chaenomeles.canonical.com>
+Message-Id: <160031623948.27044.1191177869704517423.malone@loganberry.canonical.com>
+Subject: [Bug 1603970] Re: KVM freezes after live migration (AMD 4184 -> 4234)
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: 385e39f7c3d2cdd1795de94c03d25bc9373a0e5f
+X-Launchpad-Hash: c03f651711e894b76cd277d349ec0239585a14c6
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 00:25:47
@@ -84,7 +84,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1629483 <1629483@bugs.launchpad.net>
+Reply-To: Bug 1603970 <1603970@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -98,48 +98,79 @@ Sender: "Qemu-devel"
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1629483
+https://bugs.launchpad.net/bugs/1603970
 
 Title:
-  Build fails on optionrom
+  KVM freezes after live migration (AMD 4184 -> 4234)
 
 Status in QEMU:
   Expired
 
 Bug description:
-  Git pseudo-bisected (focused on optionrom commits) it to this commit.
+  Hi,
 
-  commit cdbd727c20ad7aac7797dc8c95e485e1a4c6901b
-  Author: Richard Henderson <rth@twiddle.net>
-  Date:   Thu Jul 7 21:49:36 2016 -0700
+  i have two host systems with different CPU types:
 
-      build: Use $(AS) for optionrom explicitly
+  Host A:
+  AMD Opteron(tm) Processor 4234
+
+  Host B:
+  AMD Opteron(tm) Processor 4184
+
+  Live migration from B -> A works as expected, migration from A -> B
+  always ends in a freezed KVM. If the KVM is frozen, VNC output is
+  still present, however, you can't type anything. CPU usage is always
+  at 100% for one core (so if i set two cores, one is at 100% the other
+  one at 0% usage).
+
+  My command to launch the KVM is the following:
+
+  /usr/bin/kvm -id 104 -chardev socket,id=3Dqmp,path=3D/var/run/qemu-
+  server/104.qmp,server,nowait -mon chardev=3Dqmp,mode=3Dcontrol -pidfile
+  /var/run/qemu-server/104.pid -daemonize -smbios
+  type=3D1,uuid=3D26dd83a9-b9bd-4641-8016-c55f255f1bdf -name kilian-test
+  -smp 1,sockets=3D1,cores=3D1,maxcpus=3D1 -nodefaults -boot menu=3Don,stri=
+ct=3Don
+  ,reboot-timeout=3D1000 -vga cirrus -vnc unix:/var/run/qemu-
+  server/104.vnc,x509,password -cpu
+  kvm64,+lahf_lm,+sep,+kvm_pv_unhalt,+kvm_pv_eoi,enforce -m 512 -object
+  memory-backend-ram,id=3Dram-node0,size=3D512M -numa
+  node,nodeid=3D0,cpus=3D0,memdev=3Dram-node0 -k de -device pci-
+  bridge,id=3Dpci.2,chassis_nr=3D2,bus=3Dpci.0,addr=3D0x1f -device pci-
+  bridge,id=3Dpci.1,chassis_nr=3D1,bus=3Dpci.0,addr=3D0x1e -device piix3-us=
+b-
+  uhci,id=3Duhci,bus=3Dpci.0,addr=3D0x1.0x2 -device usb-
+  tablet,id=3Dtablet,bus=3Duhci.0,port=3D1 -device virtio-balloon-
+  pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x3 -iscsi initiator-
+  name=3Diqn.1993-08.org.debian:01:5ca1e9d334b2 -drive
+  file=3D/mnt/pve/nfs_synology/images/104/vm-104-disk-2.qcow2,if=3Dnone,id
+  =3Ddrive-virtio0,format=3Dqcow2,cache=3Dnone,aio=3Dnative,detect-zeroes=
+=3Don
+  -device virtio-blk-pci,drive=3Ddrive-
+  virtio0,id=3Dvirtio0,bus=3Dpci.0,addr=3D0xa,bootindex=3D100 -netdev
+  type=3Dtap,id=3Dnet0,ifname=3Dtap104i0,script=3D/var/lib/qemu-server/pve-
+  bridge,downscript=3D/var/lib/qemu-server/pve-bridgedown,vhost=3Don -device
+  virtio-net-
+  pci,mac=3D66:33:31:36:35:36,netdev=3Dnet0,bus=3Dpci.0,addr=3D0x12,id=3Dne=
+t0,bootindex=3D300
 
   =
 
-  Build output (non-verbose):
+  KVM / QEMU version: QEMU emulator version 2.5.1.1
 
-    AS    optionrom/linuxboot.o
-  cpp: fatal error: '-c' is not a valid option to the preprocessor
-  compilation terminated.
-  cpp: fatal error: '-c' is not a valid option to the preprocessor
-  compilation terminated.
-    CC    optionrom/linuxboot_dma.o
-    CC    /home/bkamath/dev/workspace/block-2/mothra/output/sp0/targetqga/m=
-ain.o
-    AS    optionrom/kvmvapic.o
-  cpp: fatal error: '-c' is not a valid option to the preprocessor
-  compilation terminated.
+  I have tried to set different CPU types, but no one works (qemu64,
+  vm64, Opteron_G1, ...).
 
-  Steps to reproduce:
-  Using buildroot and overriding qemu version to 2.7.0
-  Fedora 24, cpp (GCC) 6.2.1 20160916 (Red Hat 6.2.1-2)
+  =
 
-  I tried first just building without the -c option but it hangs
-  indefinitely. Reverting the above listed commit fixes the problem on
-  my platform. I didn't dive much further into this, because this seems
-  like a regression.
+  I have found an email from 2014 where another user reports exactly the sa=
+me problem:
+
+  http://lists.gnu.org/archive/html/qemu-discuss/2014-02/msg00002.html
+
+  Greets
+  Kilian
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1629483/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1603970/+subscriptions
 
