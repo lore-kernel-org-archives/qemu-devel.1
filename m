@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9282C43463
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 00:01:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83032C43465
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 00:01:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7373620789
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 00:01:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1956320789
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 00:01:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lew08UDB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7373620789
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uG+j9eba"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1956320789
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJ3qP-0000GD-42
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 20:01:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36318)
+	id 1kJ3qU-0000Qs-5q
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 20:01:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36242)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kJ3mS-0003xC-Md
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 19:57:36 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:54849)
+ id 1kJ3mN-0003li-OW
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 19:57:31 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:39000)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kJ3mQ-0006fk-Ri
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 19:57:36 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id mm21so2151651pjb.4
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 16:57:34 -0700 (PDT)
+ id 1kJ3mL-0006eV-VC
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 19:57:31 -0400
+Received: by mail-pf1-x443.google.com with SMTP id n14so2252868pff.6
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 16:57:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=SKvqAs5Pc8xJl/wXmoS7uW6crsC2A5uj0Z02CZTb6j4=;
- b=lew08UDBi/ZTnefrK49cbOEQ9tgyvmsJ5HL4LWy9qf7kjKTXb4+j7psOmaXpNTOm5M
- FNZJyK/2Zshr8OutpwXmtuhTATBoyNdlg4ukZ08Wk6kxOvEIN0/qw+Kvu1BP0gFJe/5V
- vWoQaFIEkTM7dmCB3e3ORzcpKYkKbtgbMT7UGrKCZOax8JIaGOxQCyuOf/+v4HacnnsC
- BsuW/SNK3zzdYDvGMJHycDl58x8z+JSkFNbJpdelsw1ALkkF94AIoENvN3Sr0g/4+SII
- liGddFg0z+/KiVtHFM41c5X/YC2os+udspAJdAeOdVXnlq0I40oyXqdaARLV8zJcsyql
- iT3g==
+ bh=kjSlGDaz/gKdqZUsB3eBl8fd3FyvHs6q0rMsilYCIuA=;
+ b=uG+j9ebaGVqMlWfPMwT/68dawIqiIiGUB+ERUgi86sesnpmmGo8xnWTzWVJe4dBboG
+ J1G7pbaCg+c8Opm9x0WkUkMYBjucs4ktez7L/XtQg4VCZnzyaGTLkWXGGhLm/D+PtQEa
+ oFIXPblM+dednCrgGLMF9ZatPdaupiLCQjSgDrmGyIXeWO9hNXwI6KbZK58/zg46ZPRf
+ uV26wBzrRDnm7ODSU3Ed0TeI3N9ijm1VvZkzRzWD8qcoRTy+eaRHfhCyd6/6AAhk6yD4
+ 0zpkxXlJvGfsOgmRLBRhAjX37DVIosM43azM3d+JqY1gBgTNYTNP9GLLbvOfkY2isNIQ
+ ws7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=SKvqAs5Pc8xJl/wXmoS7uW6crsC2A5uj0Z02CZTb6j4=;
- b=anH0BxZDgsBgyOxoVi7B1C1nl6M5c33stWHexC2qzZkAFfyrHLxgeYq/2Con4PR1Ls
- xhrFWiODQAdvKbM0CMokrXncKk54wlUEXi5vZyPhfLX8JLGVS/qt7f0uE9a7EF5Hsa73
- sWHpc1KUXRlDwj3UQyxtP2sgix5JAX2Ae1bYzTlKsa4n4HYRnPv7jModYjlyBY6sy51Q
- Sxf6uMKVvNmMNAPLb2bjM/2rRVv/X6tQP47vxSzhgLQh3oAe/zn2sIwOyy2K2Re4Twg2
- 5x2BtibAbqM7G11rseSycpSwcY+PKXJQZtJUKmBjZWykrBH6llzzhCBYx0M3DsLLN03T
- /8Lw==
-X-Gm-Message-State: AOAM531KWgPCJQjNXzTPcrZ2ZT0xBB9gDNs42zWp9rRs7YkJHHZlrmD2
- CLuiQRw+myT9T3ez/gMSrLkIc8ryCGxQjw==
-X-Google-Smtp-Source: ABdhPJzLDYmfhr8Amz3zEtMFPgLisPRuyEiM/qFlg4eyvwj5XZEpN6Azg6E82bUIabPUwidFEuezhA==
-X-Received: by 2002:a17:902:b216:b029:d1:e5e7:be05 with SMTP id
- t22-20020a170902b216b02900d1e5e7be05mr13092874plr.56.1600387053072; 
- Thu, 17 Sep 2020 16:57:33 -0700 (PDT)
+ bh=kjSlGDaz/gKdqZUsB3eBl8fd3FyvHs6q0rMsilYCIuA=;
+ b=GrVgWBTJYyDerijxXGR6fIahSNRK/iRRR04YSuWu9C82lyTsf7US9OdPwzoM871j0K
+ zNg8qsEcUiQKOcoIlwC9zx9Y0HAa8Y1fsn1KOEWZlfule2TrZkhOzd9mCbVQ1lHWoH6f
+ stve5eAqfmhzakLKu9dTT33tc9o/lCUQWOid6z0iC0KU5FjmHDXeF2fCZiXl8XjkMyQu
+ g/AsDCZHSSSlDAVDDk4uy18e3AGVZMwLOqiBaZo9spRWjsYCEYUGEw1lafoaJW8sTnZS
+ jkNARn+VMmJ5j/C3OSiT0eOp1JAlGXn1+d+UfKyads1/wjN/O+39gJqTTP12A1gYnzM1
+ Nz0A==
+X-Gm-Message-State: AOAM531muz51qzKi3StxL3JqMAmdu4+W7awWwJiImtlZ/6BP0yvj/xT/
+ SuH8bMTQPLR7J6eggJxUKmAAucgMwEu/CQ==
+X-Google-Smtp-Source: ABdhPJwVuMJVl0M0z68cph5gwoBFTtm01irYEYWcznLzZ8zG+hMkAGEenSwJ1qicZUcGkuH9cebiyw==
+X-Received: by 2002:a63:6fc6:: with SMTP id
+ k189mr23895970pgc.165.1600387048333; 
+ Thu, 17 Sep 2020 16:57:28 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id m13sm772699pfk.103.2020.09.17.16.57.32
+ by smtp.gmail.com with ESMTPSA id m13sm772699pfk.103.2020.09.17.16.57.27
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Sep 2020 16:57:32 -0700 (PDT)
+ Thu, 17 Sep 2020 16:57:27 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 09/10] disas: Enable capstone disassembly for s390x
-Date: Thu, 17 Sep 2020 16:57:19 -0700
-Message-Id: <20200917235720.2685978-10-richard.henderson@linaro.org>
+Subject: [PATCH v3 05/10] disas: Use qemu/bswap.h for bfd endian loads
+Date: Thu, 17 Sep 2020 16:57:15 -0700
+Message-Id: <20200917235720.2685978-6-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200917235720.2685978-1-richard.henderson@linaro.org>
 References: <20200917235720.2685978-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -100,80 +101,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Enable s390x, aka SYSZ, in the git submodule build.
-Set the capstone parameters for both s390x host and guest.
+Use the routines we have already instead of open-coding.
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- disas.c            |  3 +++
- target/s390x/cpu.c |  4 ++++
- meson.build        | 11 +++++++++++
- 3 files changed, 18 insertions(+)
+ include/disas/dis-asm.h | 32 ++++++++++++++++++++----
+ disas.c                 | 55 -----------------------------------------
+ 2 files changed, 27 insertions(+), 60 deletions(-)
 
+diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
+index dda247eaf2..6b45aa9898 100644
+--- a/include/disas/dis-asm.h
++++ b/include/disas/dis-asm.h
+@@ -466,11 +466,33 @@ int print_insn_rx(bfd_vma, disassemble_info *);
+ 
+ /* from libbfd */
+ 
+-bfd_vma bfd_getl64 (const bfd_byte *addr);
+-bfd_vma bfd_getl32 (const bfd_byte *addr);
+-bfd_vma bfd_getb32 (const bfd_byte *addr);
+-bfd_vma bfd_getl16 (const bfd_byte *addr);
+-bfd_vma bfd_getb16 (const bfd_byte *addr);
++#include "qemu/bswap.h"
++
++static inline bfd_vma bfd_getl64(const bfd_byte *addr)
++{
++    return ldq_le_p(addr);
++}
++
++static inline bfd_vma bfd_getl32(const bfd_byte *addr)
++{
++    return (uint32_t)ldl_le_p(addr);
++}
++
++static inline bfd_vma bfd_getl16(const bfd_byte *addr)
++{
++    return lduw_le_p(addr);
++}
++
++static inline bfd_vma bfd_getb32(const bfd_byte *addr)
++{
++    return (uint32_t)ldl_be_p(addr);
++}
++
++static inline bfd_vma bfd_getb16(const bfd_byte *addr)
++{
++    return lduw_be_p(addr);
++}
++
+ typedef bool bfd_boolean;
+ 
+ #endif /* DISAS_DIS_ASM_H */
 diff --git a/disas.c b/disas.c
-index e27dea2c19..c4cd305190 100644
+index 7bc8e9a037..bf19b1b0bf 100644
 --- a/disas.c
 +++ b/disas.c
-@@ -201,6 +201,9 @@ static void initialize_debug_host(CPUDebug *s)
-     s->info.print_insn = print_insn_m68k;
- #elif defined(__s390__)
-     s->info.print_insn = print_insn_s390;
-+    s->info.cap_arch = CS_ARCH_SYSZ;
-+    s->info.cap_insn_unit = 2;
-+    s->info.cap_insn_split = 6;
- #elif defined(__hppa__)
-     s->info.print_insn = print_insn_hppa;
- #endif
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 749cd548f0..2a96692691 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -44,6 +44,7 @@
- #include "sysemu/tcg.h"
- #endif
- #include "fpu/softfloat-helpers.h"
-+#include "disas/capstone.h"
- 
- #define CR0_RESET       0xE0UL
- #define CR14_RESET      0xC2000000UL;
-@@ -182,6 +183,9 @@ static void s390_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
- {
-     info->mach = bfd_mach_s390_64;
-     info->print_insn = print_insn_s390;
-+    info->cap_arch = CS_ARCH_SYSZ;
-+    info->cap_insn_unit = 2;
-+    info->cap_insn_split = 6;
+@@ -78,61 +78,6 @@ static int symbol_at_address(bfd_vma addr, struct disassemble_info *info)
+     return 1;
  }
  
- static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
-diff --git a/meson.build b/meson.build
-index e16a2b051d..a2bff9d4ae 100644
---- a/meson.build
-+++ b/meson.build
-@@ -670,6 +670,17 @@ if capstone_opt == 'internal'
-     )
-   endif
- 
-+  if 'CONFIG_S390_DIS' in config_all_disas
-+    capstone_data.set('CAPSTONE_HAS_SYSZ', '1')
-+    capstone_files += files(
-+      'capstone/arch/SystemZ/SystemZDisassembler.c',
-+      'capstone/arch/SystemZ/SystemZInstPrinter.c',
-+      'capstone/arch/SystemZ/SystemZMapping.c',
-+      'capstone/arch/SystemZ/SystemZModule.c',
-+      'capstone/arch/SystemZ/SystemZMCTargetDesc.c'
-+    )
-+  endif
-+
-   if 'CONFIG_I386_DIS' in config_all_disas
-     capstone_data.set('CAPSTONE_HAS_X86', 1)
-     capstone_files += files(
+-bfd_vma bfd_getl64 (const bfd_byte *addr)
+-{
+-  unsigned long long v;
+-
+-  v = (unsigned long long) addr[0];
+-  v |= (unsigned long long) addr[1] << 8;
+-  v |= (unsigned long long) addr[2] << 16;
+-  v |= (unsigned long long) addr[3] << 24;
+-  v |= (unsigned long long) addr[4] << 32;
+-  v |= (unsigned long long) addr[5] << 40;
+-  v |= (unsigned long long) addr[6] << 48;
+-  v |= (unsigned long long) addr[7] << 56;
+-  return (bfd_vma) v;
+-}
+-
+-bfd_vma bfd_getl32 (const bfd_byte *addr)
+-{
+-  unsigned long v;
+-
+-  v = (unsigned long) addr[0];
+-  v |= (unsigned long) addr[1] << 8;
+-  v |= (unsigned long) addr[2] << 16;
+-  v |= (unsigned long) addr[3] << 24;
+-  return (bfd_vma) v;
+-}
+-
+-bfd_vma bfd_getb32 (const bfd_byte *addr)
+-{
+-  unsigned long v;
+-
+-  v = (unsigned long) addr[0] << 24;
+-  v |= (unsigned long) addr[1] << 16;
+-  v |= (unsigned long) addr[2] << 8;
+-  v |= (unsigned long) addr[3];
+-  return (bfd_vma) v;
+-}
+-
+-bfd_vma bfd_getl16 (const bfd_byte *addr)
+-{
+-  unsigned long v;
+-
+-  v = (unsigned long) addr[0];
+-  v |= (unsigned long) addr[1] << 8;
+-  return (bfd_vma) v;
+-}
+-
+-bfd_vma bfd_getb16 (const bfd_byte *addr)
+-{
+-  unsigned long v;
+-
+-  v = (unsigned long) addr[0] << 24;
+-  v |= (unsigned long) addr[1] << 16;
+-  return (bfd_vma) v;
+-}
+-
+ static int print_insn_objdump(bfd_vma pc, disassemble_info *info,
+                               const char *prefix)
+ {
 -- 
 2.25.1
 
