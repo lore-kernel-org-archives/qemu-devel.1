@@ -2,95 +2,60 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B7F8C2BBD1
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:20:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EA66C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:25:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2C2A2087D
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:20:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ewzKi6tC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2C2A2087D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D9DCB2087D
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:25:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9DCB2087D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIsuE-0007EL-NB
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 08:20:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34086)
+	id 1kIsyc-00017v-Tb
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 08:25:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34958)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kIsse-0006h9-8F
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 08:19:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50601)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kIssb-0002xN-E2
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 08:19:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600345151;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=FW9AtZT0GN6kcCA8NMnMBkyX5mFSXFUFAqtljCaz70M=;
- b=ewzKi6tCdcZPXDzRtAS4IJRX0qz+/Uynj0+ZIWXiPYzq2glO7iwjVErXGpSczWLd4QO0TB
- Y6DwJOyGt1pgq1tts4mGqwKMyGi2ez0y/Zg9L070kVf0MjG0f20h8orepf6i5oIZz1XUhV
- Xk7yb/fc0ADwlsTtKfJrEeK0Lc8+osk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-7x5ARQlHPHa_9xz5HK3TOQ-1; Thu, 17 Sep 2020 08:18:58 -0400
-X-MC-Unique: 7x5ARQlHPHa_9xz5HK3TOQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA219100746D;
- Thu, 17 Sep 2020 12:18:56 +0000 (UTC)
-Received: from redhat.com (ovpn-114-29.ams2.redhat.com [10.36.114.29])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D76A1002388;
- Thu, 17 Sep 2020 12:18:54 +0000 (UTC)
-Date: Thu, 17 Sep 2020 13:18:51 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH 14/15] spapr: Simplify error handling in
- spapr_memory_plug()
-Message-ID: <20200917121851.GA1597829@redhat.com>
-References: <20200914123505.612812-1-groug@kaod.org>
- <20200914123505.612812-15-groug@kaod.org>
- <11f0dcb7-7923-0164-df69-4911b3293663@virtuozzo.com>
- <20200915134340.0cc3f9eb@bahia.lan>
- <20200917011525.GI5258@yekko.fritz.box>
- <87lfh8g8dy.fsf@dusky.pond.sub.org>
- <20200917120437.6ab60ca4@bahia.lan>
- <87ft7g1uee.fsf@dusky.pond.sub.org>
+ (Exim 4.90_1) (envelope-from <liangpeng10@huawei.com>)
+ id 1kIswf-00085t-85; Thu, 17 Sep 2020 08:23:25 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:51242 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <liangpeng10@huawei.com>)
+ id 1kIswc-0003O4-Ed; Thu, 17 Sep 2020 08:23:24 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 586CDECE9633EE63C126;
+ Thu, 17 Sep 2020 20:23:08 +0800 (CST)
+Received: from localhost.localdomain (10.175.104.175) by
+ DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
+ 14.3.487.0; Thu, 17 Sep 2020 20:22:58 +0800
+From: Peng Liang <liangpeng10@huawei.com>
+To: <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>
+Subject: [RFC v2 00/10] Support disable/enable CPU features for AArch64
+Date: Thu, 17 Sep 2020 20:14:39 +0800
+Message-ID: <20200917121449.3442059-1-liangpeng10@huawei.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <87ft7g1uee.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 02:01:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.104.175]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35;
+ envelope-from=liangpeng10@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 08:23:09
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,68 +68,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, drjones@redhat.com,
+ zhang.zhanghailiang@huawei.com, mst@redhat.com, cohuck@redhat.com,
+ xiexiangyou@huawei.com, Peng Liang <liangpeng10@huawei.com>,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 17, 2020 at 02:04:41PM +0200, Markus Armbruster wrote:
-> Greg Kurz <groug@kaod.org> writes:
-> 
-> > $ git grep object_property_get_uint -- :^{include,qom/object.c} | wc -l
-> > 60
-> >
-> > Manual inspecting the output of
-> >
-> > $ git grep -W object_property_get_uint -- :^{include,qom/object.c}
-> > ...
-> >
-> > seems to be showing that most users simply ignore errors (ie. pass NULL
-> > as 3rd argument). Then some users pass &error_abort and only a few
-> > pass a &err or errp.
-> >
-> > Assuming that users know what they're doing, I guess my proposal
-> > wouldn't bring much to the code base in the end... I'm not even
-> > sure now that it's worth changing the contract.
-> 
-> We'd change
-> 
->     val = object_property_get_uint(obj, name, &error_abort);
-> 
-> to
-> 
->     object_property_get_uint(obj, name, &val, &error_abort);
-> 
-> which is not an improvement.
-> 
-> Most of the ones passing NULL should probably pass &error_abort
-> instead.  Doesn't change the argument.
+QEMU does not support disable/enable CPU features in AArch64 for now.
+This patch series add support for CPU features in AArch64.
 
-I wonder if we actually need to have an Error  parameter at all for
-the getters. IIUC the only valid runtime error  is probably the case
-where the property has not been set, and even then, I think properties
-usually have a default value that would be returned.  All the other
-errors look like programmer errors.
+Firstly, we change the isar struct in ARMCPU to an array for
+convenience.  Secondly, we add support to configure CPU feautres in
+AArch64 and make sure that the ID registers can be synchronized to KVM
+so that guest can read the value we configure.  Thirdly, we add a
+mechanism to solve the dependency relationship of some CPU features.
+Last, we add a KVM_CAP_ARM_CPU_FEATURE to check whether KVM supports to
+set CPU features in AArch64.
 
-IOW, can we remove the Error parameter and have all the o_p_get*
-method impls use error_abort.
+Also export CPU features to the result of qmp query-cpu-model-expansion
+so that libvirt can get the supported CPU features.
 
-In the rare case where a caller needs to handle a property not
-being set, they can use object_property_find() as a test before
-invoking the getter.
+Update the ID fields to ARMv8.6 and add some CPU features according to
+the new ID fields.
 
-Of course requires someone motivated to audit all the case that
-are not using NULL or error_abort and decide whether the attempt
-at passing a local errp was actually justified or not.
+With related KVM patch set[1], we can disable/enable CPU features in
+AArch64.
 
-Regards,
-Daniel
+[1] https://patchwork.kernel.org/patch/11782361/
+
+v1 -> v2:
+ - adjust the order of patches
+ - only expose AArch64 features which are exposed by kernel via /proc/cpuinfo
+ - add check for conflict CPU features set by user
+ - split the change in linux-headers/linux/kvm.h
+
+Peng Liang (10):
+  linux-header: Introduce KVM_CAP_ARM_CPU_FEATURE
+  target/arm: Update ID fields
+  target/arm: only set ID_PFR1_EL1.GIC for AArch32 guest
+  target/arm: convert isar regs to array
+  target/arm: Introduce kvm_arm_cpu_feature_supported
+  target/arm: register CPU features for property
+  target/arm: Allow ID registers to synchronize to KVM
+  target/arm: Introduce user_mask to indicate whether the feature is set
+    explicitly
+  target/arm: introduce CPU feature dependency mechanism
+  target/arm: Add CPU features to query-cpu-model-expansion
+
+ linux-headers/linux/kvm.h |   1 +
+ target/arm/cpu.h          | 243 +++++++++--------
+ target/arm/internals.h    |  15 +-
+ target/arm/kvm_arm.h      |  10 +
+ hw/intc/armv7m_nvic.c     |  28 +-
+ target/arm/cpu.c          | 555 ++++++++++++++++++++++++++++++--------
+ target/arm/cpu64.c        | 174 ++++++------
+ target/arm/cpu_tcg.c      | 250 ++++++++---------
+ target/arm/helper.c       | 102 ++++---
+ target/arm/kvm.c          |  38 +++
+ target/arm/kvm64.c        |  86 +++---
+ target/arm/monitor.c      |   4 +
+ 12 files changed, 976 insertions(+), 530 deletions(-)
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.26.2
 
 
