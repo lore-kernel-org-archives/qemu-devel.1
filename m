@@ -2,94 +2,68 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A0E3C2BBD1
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 09:20:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 092C2C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 09:23:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 724AB2083B
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 09:20:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iMKSA2Qy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 724AB2083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5734F206E6
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 09:23:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5734F206E6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIq5T-0001nW-23
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 05:20:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46506)
+	id 1kIq8B-0003CG-6Z
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 05:23:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47166)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kIq4o-0001Mk-AD
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 05:19:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23038)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kIq4i-00052w-Pa
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 05:19:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600334371;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZlZDsJMadSg9vCknRiH6mTTxvtTFtF9sHp1UJ3DTgXk=;
- b=iMKSA2QyuqUZk07SssmyqdJaKTTc4s+b4YTXT7Zzcyr/Q2g5Dlgtnl3YnwpcBDlorWVaON
- ci9+0SCvTUmprPXbYt/dXcnInQjMyezgYqt+deI/gUXHdKCcvn05y8i//uqmY0M8Q8zKZ0
- 5BG59+MdJm9YV1GB6d97zk47KJIkUAY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-562-Sk5bpiUgPBmLiLMeIj5yfg-1; Thu, 17 Sep 2020 05:19:15 -0400
-X-MC-Unique: Sk5bpiUgPBmLiLMeIj5yfg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C48881F009;
- Thu, 17 Sep 2020 09:19:14 +0000 (UTC)
-Received: from redhat.com (ovpn-114-29.ams2.redhat.com [10.36.114.29])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 82F267E46E;
- Thu, 17 Sep 2020 09:19:12 +0000 (UTC)
-Date: Thu, 17 Sep 2020 10:19:09 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: Should we apply for GitLab's open source program?
-Message-ID: <20200917091909.GA1568038@redhat.com>
-References: <878sdp4ks9.fsf@linaro.org>
- <20200908141701.GB7154@stefanha-x1.localdomain>
- <87zh5puw8k.fsf@ebb.org>
- <bf85f4c7-bbea-bb33-3455-222d7f101b9a@gnu.org>
- <877dssztty.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1kIq7c-0002mI-Db
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 05:22:32 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:4759 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1kIq7Z-0005RI-Qb
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 05:22:32 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 36F5F96C5BEDAE2981C4;
+ Thu, 17 Sep 2020 17:22:18 +0800 (CST)
+Received: from [10.174.186.4] (10.174.186.4) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0;
+ Thu, 17 Sep 2020 17:22:11 +0800
+Subject: Re: [PATCH v10 00/12] *** A Method for evaluating dirty page rate ***
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <1600237327-33618-1-git-send-email-zhengchuan@huawei.com>
+ <20200917091504.GD2793@work-vm>
+From: Zheng Chuan <zhengchuan@huawei.com>
+Message-ID: <2863327b-67ee-a440-1a2d-e439ecbbeb84@huawei.com>
+Date: Thu, 17 Sep 2020 17:22:10 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <877dssztty.fsf@linaro.org>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 20:51:18
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <20200917091504.GD2793@work-vm>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.186.4]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.191;
+ envelope-from=zhengchuan@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 03:37:07
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -42
+X-Spam_score: -4.3
+X-Spam_bar: ----
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.062,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,115 +76,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Paolo Bonzini <bonzini@gnu.org>,
- "Bradley M. Kuhn" <bkuhn@sfconservancy.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- "qemu@sfconservancy.org" <qemu@sfconservancy.org>
+Cc: berrange@redhat.com, zhang.zhanghailiang@huawei.com, quintela@redhat.com,
+ liq3ea@gmail.com, qemu-devel@nongnu.org, xiexiangyou@huawei.com,
+ alex.chen@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 17, 2020 at 09:32:57AM +0100, Alex Bennée wrote:
+
+
+On 2020/9/17 17:15, Dr. David Alan Gilbert wrote:
+> * Chuan Zheng (zhengchuan@huawei.com) wrote:
+>> v9 -> v10:
+>>     rename find_page_matched as find_block_matched
+>>     fix wrong termination condition in find_block_matched
+>>     add review-by for patches
+>>
+>> v8 -> v9:
+>>     fix wrong index return of record_ramblock_hash_info
+>>     optimize variable name according to review
+>>     reset dirty_rate as -1
+>>     change returns of compare_page_hash_info to bool
+>>
+>> v7 -> v8:
+>>     add atomic_read for dirtyrate status
+>>     add error_report if set dirtyrate state failed
+>>     change returns of save_ramblock_hash and record_ramblock_hash_info to bool
+>>     alloc ramblock dirtyinfo array at one time
+>>     add review-by for patches
+>>
+>> v6 -> v7:
+>>     fix minior comments and coding style by review
+>>     add review-by for patches
+>>
+>> v5 -> v6:
+>>     fix coding style according to review
+>>     use TARGET_PAGE_SIZE and TARGET_PAGE_BITS instead of self-defined macros
+>>     return start-time and calc-time by qmp command
+>>
+>> v4 -> v5:
+>>     fix git apply failed due to meson-build
+>>     add review-by for patches in v3
+>>
+>> v3 -> v4:
+>>     use crc32 to get hash result instead of md5
+>>     add DirtyRateStatus to denote calculation status
+>>     add some trace_calls to make it easier to debug
+>>     fix some comments accroding to review
+>>
+>> v2 -> v3:
+>>     fix size_t compile warning
+>>     fix codestyle checked by checkpatch.pl
+>>
+>> v1 -> v2:
+>>     use g_rand_new() to generate rand_buf
+>>     move RAMBLOCK_FOREACH_MIGRATABLE into migration/ram.h
+>>     add skip_sample_ramblock to filter sampled ramblock
+>>     fix multi-numa vm coredump when query dirtyrate
+>>     rename qapi interface and rename some structures and functions
+>>     succeed to compile by appling each patch
+>>     add test for migrating vm
+>>
+>> Sometimes it is neccessary to evaluate dirty page rate before migration.
+>> Users could decide whether to proceed migration based on the evaluation
+>> in case of vm performance loss due to heavy workload.
+>> Unlikey simulating dirtylog sync which could do harm on runnning vm,
+>> we provide a sample-hash method to compare hash results for samping page.
+>> In this way, it would have hardly no impact on vm performance.
+>>
+>> Evaluate the dirtypage rate both on running and migration vm.
+>> The VM specifications for migration are as follows:
+>> - VM use 4-K page;
+>> - the number of VCPU is 32;
+>> - the total memory is 32Gigabit;
+>> - use 'mempress' tool to pressurize VM(mempress 4096 1024);
+>> - migration bandwidth is 1GB/s
+>>
+>> +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>> |                      |  running  |                  migrating                           |
+>> +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>> | no mempress          |   4MB/s   |          8MB/s      (migrated success)               |
+>> -------------------------------------------------------------------------------------------
+>> | mempress 4096 1024   |  1060MB/s |     456MB/s ~ 1142MB/s (cpu throttle triggered)      |
+>> +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>> | mempress 4096 4096   |  4114MB/s |     688MB/s ~ 4132MB/s (cpu throttle triggered)      |
+>> +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>
+>> Test dirtyrate by qmp command like this:
+>> 1.  virsh qemu-monitor-command [vmname] '{"execute":"calc-dirty-rate", "arguments": {"calc-time": [sleep-time]}}'; 
+>> 2.  sleep specific time which is a bit larger than sleep-time
+>> 3.  virsh qemu-monitor-command [vmname] '{"execute":"query-dirty-rate"}'
 > 
-> Paolo Bonzini <bonzini@gnu.org> writes:
+> Thanks; it looks like we have a full set of reviews; I'll try and add
+> this for the next migration pull.
 > 
-> > On 17/09/20 01:39, Bradley M. Kuhn wrote:
-> >> One thing to note is that my understanding is that most of what you're
-> >> getting access to through this program is proprietary software features that
-> >> GitLab offers as add-ons.
-> >
-> > Basically all we need is the increased access to the CI environment (not
-> > just 400 minutes), and none of the add-on features.  Self-hosting would
-> > of course help but we'd have to pay for the hardware resources to run
-> > the CI, and have someone that can keep the hardware running.
+>> The qmp command returns like this:
+>> {"return":{"status":"measured","dirty-rate":374,"start-time":3718293,"calc-time":1},"id":"libvirt-15"}
+>>
+>> Further test dirtyrate by libvirt api like this:
+>> virsh getdirtyrate [vmname] [sleep-time]
 > 
-> It seems for the time being that public CI is still unlimited. The idea
-> of making our position as an FLOSS project "official" was to preempt any
-> changes to that might come down the track.
+> So do you have some libvirt patches you're going to post?
 > 
-> The question of using proprietary features hadn't come up beyond a
-> hand-waving of "ohh there is a long list". We are however thinking about
-> consolidating some of our more disparate infrastructure onto gitlab so
-> it's mostly in one place - for example the bug tracker currently hosted
-> on launchpad. Personally I'd think it's unlikely we want to move things
-> like the mailing lists which are currently on nongnu (via Savannah).
+> Dave
 > 
-> Ultimately as developers having to manage infrastructure is a bit of a
-> time-sink and currently it's hard for volunteer admins to be as
-> responsive as cloud-scale hosting companies who's income from non-free
-> software hosting pays for all our server time.
 
-All the evidence we have is that developers generally do not do a good
-job at maintaining infrastructure in their spare time. This is largely
-unavoidable since a developer is always going to treat sysadmin tasks as
-a part time thing to spend as little time as possible on, prioritizing
-their coding work. So we end up either with unreliable services that
-continuously break (look how many times has Patchew died from ENOSPC
-this year), or the service happens to work reliably but is unmaintained
-becoming increasingly out of date and thus vulnerable, or the service
-simply ends up lagging behind state of the art offered by alternatives.
+Hi, Dave.
 
->                                                 If there was a free
-> software only instance of GitLab which offered the same level of service
-> I would personally be interested but I don't know how much of the
-> projects income could be diverted to supporting that versus the travel
-> bursaries and other such things we usually spend our money on.
+Yes, libvirt(including libvirt-python) interface will come after this qemu series patch:)
 
-Clearly the ideal situation would be 100% free software infrastructure
-we can use at zero cost, while still being state of the art in terms
-of services available to support our workflow. This doesn't exist, so
-we have to figure out the most effective tradeoff to make that supports
-QEMU's needs in an effective manner.
-
-GitLab's open core model means we're at least partially using open
-source infra, even if some features are closed. The basic GitLab CI
-features are actually open source AFAIK, so we're not relying on the
-closed source infra part of GitLab in that area. IOW, joining the
-open source program there is simply about getting an increased grant
-of free hardware resources to use.
-
-This is certainly preferrable to us making more use of Travis or
-Cirrus CI, or GitHub Actions, all of which are 100% closed CI
-systems AFAIK.
-
-Some projects have deployed their own GitLab instances (GNOME,
-FreeDesktop), but that is not without significant challenges in
-terms of deploying and maintaining the software as well as
-providing sufficient hardware to go along. eg See the surprising
-effect this self-hosting had on FreeDesktop costs:
-
-  https://lists.freedesktop.org/archives/wayland-devel/2020-February/041232.html
-
-It has been a long tedious road merely to bring up a small number
-of CI runners on hardware sponsored by Red Hat, let alone get
-enough hardware to replace everything that we and our contributors
-currentl get for free via various public services. 
-
-There's ultimately a big gap that exists in terms of a publically
-host Git Forge that offers state of the art features, based on
-100% open source infra. I'm not seeing anyone being able to solve
-that in the forseeable future, and it doesn't seem like a sane use
-of QEMU's limited contributor time to divert resources away from
-development into infrastructure. We need to make a pragmatic
-tradeoff, certainly favouring open source where possible, but if
-we need to use other services too that's acceptable.
-
-Our switch to increasingly use GitLab for CI is certainly an
-improvement over our historical use of Travis, Shippable and
-Cirrus, and better for our contributors than our reliance on
-a handful of machines that only the QEMU Git maintainer can
-access, or the patchew system that breaks multiple times a
-year.
-
-> In this regard FLOSS projects are both leaches on paid for services as
-> well as being useful public facing PR for a SaaS platforms abilities.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+>> Chuan Zheng (12):
+>>   migration/dirtyrate: setup up query-dirtyrate framwork
+>>   migration/dirtyrate: add DirtyRateStatus to denote calculation status
+>>   migration/dirtyrate: Add RamblockDirtyInfo to store sampled page info
+>>   migration/dirtyrate: Add dirtyrate statistics series functions
+>>   migration/dirtyrate: move RAMBLOCK_FOREACH_MIGRATABLE into ram.h
+>>   migration/dirtyrate: Record hash results for each sampled page
+>>   migration/dirtyrate: Compare page hash results for recorded sampled
+>>     page
+>>   migration/dirtyrate: skip sampling ramblock with size below
+>>     MIN_RAMBLOCK_SIZE
+>>   migration/dirtyrate: Implement set_sample_page_period() and
+>>     is_sample_period_valid()
+>>   migration/dirtyrate: Implement calculate_dirtyrate() function
+>>   migration/dirtyrate: Implement
+>>     qmp_cal_dirty_rate()/qmp_get_dirty_rate() function
+>>   migration/dirtyrate: Add trace_calls to make it easier to debug
+>>
+>>  migration/dirtyrate.c  | 426 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>  migration/dirtyrate.h  |  70 ++++++++
+>>  migration/meson.build  |   2 +-
+>>  migration/ram.c        |  11 +-
+>>  migration/ram.h        |  10 ++
+>>  migration/trace-events |   8 +
+>>  qapi/migration.json    |  67 ++++++++
+>>  7 files changed, 583 insertions(+), 11 deletions(-)
+>>  create mode 100644 migration/dirtyrate.c
+>>  create mode 100644 migration/dirtyrate.h
+>>
+>> -- 
+>> 1.8.3.1
+>>
 
