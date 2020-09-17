@@ -2,127 +2,129 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B775C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:45:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47D3EC43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:46:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12FBA20872
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:45:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4F50206C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:46:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="sMMOC8Qb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12FBA20872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i7evsNds"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4F50206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIxyJ-0001SQ-OB
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 13:45:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44294)
+	id 1kIxz6-00029o-NT
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 13:46:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44414)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kIxx8-0000XB-H6; Thu, 17 Sep 2020 13:44:14 -0400
-Received: from mail-eopbgr50111.outbound.protection.outlook.com
- ([40.107.5.111]:40967 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kIxx5-00031m-HW; Thu, 17 Sep 2020 13:44:13 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B0dVs4x1JsHYiESZjY6uVFW6k1+bxxcxMuVMj8C2X8S3FQ7PlFKanyK0meDZldQeWbdEKAuF0XRJq1SLA1bVlnWt0SHbZqZl9ARzrP5oWIKt+7OOFLyEbiz1kDdVzTamWyHDHbBK0sFbjbSmG8/zuTCHsTyz2+kcczd+RTmX5EZaWDeGcBlM/fUyPrESbAhmeTqCae0+KLJRehpGC61Ipfcc6O6pU3WL6nJFyu+QrflPE3dV7vHp1DK8YdSkhPeeZc1yEe4rq9jROslG9M1icR1Ut9OgJbBrP2A7ey+rZUsJezgLcLvoR2Gjo3IXzgK8ecIwVMTLoqK1klZIvqsxxQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kIoTNMPdIXEP0r/LPxyxr1peL9JaQWB0nMretqCu0Ww=;
- b=HXHwfC0PDloBBtYCtnxp9TwG2tolnU7TSKdE0KxTmPIoEuG81A1FQ/wgoTCcEb96LBY6/3apAFo/4F6WwXGhH7XQZZwzlCKt91HFBNn8418zmlk04qH/eCRS/ktcv+ZGNqQns59o6mtmpfS8HLJwnZj+Y2BBok6RPMbtruqYsXqmcht5TlqW/nAfjCntiC4ZT1eu6Q8hI1D5yNSZqyKY3F0hENKFpYIaqb/4gUiAOw8q5yL9UrNmq5PFGy3eBPSRm39/4Mz0LaqLtR07z5E/y8edycaLRG8UaelIPcjyzYW6df/L1T6U5FbvwQo2OaJZgB4XlZNLKSrKYblmg9/c9w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kIoTNMPdIXEP0r/LPxyxr1peL9JaQWB0nMretqCu0Ww=;
- b=sMMOC8QbCpb1WzK4wFGF8JWNoaYPOgamaO1VOi4ReffHVOSfceOtqi9gIdnEpf52tmx32PDNW4QX3BDkcNfsAci9b2HxdYMWNzrGN5yjUcYjJqU4E5/NrnR7WRGU0UTOOsoezMcEINjxnespSv+/Y5U7IJ7NzD48qKR9Y4FvSeg=
-Authentication-Results: kaod.org; dkim=none (message not signed)
- header.d=none;kaod.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5448.eurprd08.prod.outlook.com (2603:10a6:20b:106::10)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.13; Thu, 17 Sep
- 2020 17:44:07 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::b179:9641:7589:d692%8]) with mapi id 15.20.3370.019; Thu, 17 Sep 2020
- 17:44:06 +0000
-Subject: Re: [PATCH 13/14] block/qcow2: qcow2_do_open: deal with errp
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, eblake@redhat.com,
- jsnow@redhat.com, stefanha@redhat.com, pbonzini@redhat.com,
- pavel.dovgaluk@ispras.ru, ari@tuxera.com, mreitz@redhat.com,
- kwolf@redhat.com, groug@kaod.org
-References: <20200909185930.26524-1-vsementsov@virtuozzo.com>
- <20200909185930.26524-14-vsementsov@virtuozzo.com>
- <w517dsspe3e.fsf@maestria.local.igalia.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <2c3af56c-e894-b677-3a5a-1111e04dedd9@virtuozzo.com>
-Date: Thu, 17 Sep 2020 20:44:04 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
-In-Reply-To: <w517dsspe3e.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM3PR05CA0137.eurprd05.prod.outlook.com
- (2603:10a6:207:3::15) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIxxP-0000rv-Bb
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 13:44:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33502)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIxxN-00036F-3H
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 13:44:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600364666;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=ptAipXyzmutnE6nWZPhfpYge1peg14tFDvE/WTnlswY=;
+ b=i7evsNdsPmWoiLAdsmjbxrzThFZYZ68sU7veEyxA30I7gKQ/mA3oAHrN4r9B+YTK38essq
+ q0rB0m1IZB+cGyTOzAOmD0JpphcvTHn931AHrgUjLFGsGC5GeckNaeAGXNVBiVkZzuaa4e
+ GqH+Pc+rLDnX64pPtT0HPMGFxEcTrrU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-324-bfked0z3NgCCur2SvLks1A-1; Thu, 17 Sep 2020 13:44:25 -0400
+X-MC-Unique: bfked0z3NgCCur2SvLks1A-1
+Received: by mail-wr1-f70.google.com with SMTP id j7so1162102wro.14
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 10:44:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=ptAipXyzmutnE6nWZPhfpYge1peg14tFDvE/WTnlswY=;
+ b=prFPt2iUW7jPzkmzJREsJENcwkf0GPhzfCk/GIBHEOBUe45kuoa9VKmNcpuUlP2mE7
+ w41KtBBE2Pwg/9wpdf1xMUcwUP4Us1/i+05DLBya+jprWaMEUt9Zks70fjH9ach3fDD0
+ FHhhXmMnwTow9mgR5mPE5V+Z4vppfhs9qbo+2gbDi1ft3KD/+It4Sn5MN3EyPYr8c2IB
+ xsBQXtAMy+94GeyPjgaH1lDT/n1llROptwft1xy+EIgfZvNRsu4BYm7VAMh62CXwTcq/
+ n+C4xFPQhTEQQDVXROUXyJ5fsit7K7UCxv3v2tuDJaSqRXr3S2inDYLGxExhxCE2Ae57
+ fY7w==
+X-Gm-Message-State: AOAM532ARLhiU8hsEstyQZpKER0tEvSrLJw3IS2e10LTV3Mb00CJXqJx
+ klrAKcsZFl4uPlYhkywVNHyjOG0OXmbS+AEyxiBeTV4uPc5y1MfyXB8A07aUzthD7M6dI1DynyL
+ p+ypXItQ0LUgwFc0=
+X-Received: by 2002:a1c:f619:: with SMTP id w25mr10951146wmc.62.1600364663757; 
+ Thu, 17 Sep 2020 10:44:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyRunJ1OeqMk2dAzV+vpyFRjzFeteuayzoR6Z6Y9MLXU9DeXz6t19IFqrmgO2xZvYlT7SF5kQ==
+X-Received: by 2002:a1c:f619:: with SMTP id w25mr10951122wmc.62.1600364663500; 
+ Thu, 17 Sep 2020 10:44:23 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id s12sm277654wmd.20.2020.09.17.10.44.21
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 17 Sep 2020 10:44:22 -0700 (PDT)
+Subject: Re: [PATCH] checkpatch: avoid error on cover letter files
+To: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org
+References: <20200917170212.92672-1-sgarzare@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <d5a967e3-ab0d-621f-45fc-d2d4a2bc116b@redhat.com>
+Date: Thu, 17 Sep 2020 19:44:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.5] (185.215.60.75) by
- AM3PR05CA0137.eurprd05.prod.outlook.com (2603:10a6:207:3::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3391.15 via Frontend Transport; Thu, 17 Sep 2020 17:44:05 +0000
-X-Originating-IP: [185.215.60.75]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 902910ae-73e4-4f74-4291-08d85b31464b
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5448:
-X-Microsoft-Antispam-PRVS: <AM7PR08MB544860DEEDA026E1C48A3B42C13E0@AM7PR08MB5448.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:195;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: TaTVxFihMuHNN4lhZxYfV8MqE+EaeGtoV/EnBOOEFmhz93EZo/PZ7TkNUburgYdF+nwoz1gu+Zpf30Jgtv0j4dRRtzzwL0z8vegm/9fsHPqK5u45jI7YcSdbH3l2fUnCTRM84MNdYghCjoJJEfROGw9w3e55FE5v1KX6nGQlPa5ELAH5JoUVVl0GSMKNtVHve5DbiiaomDEbxF/FEL7HW7G7j7NJtKrI78TTZ2pXBBLb5q7xRaAKwWNx13b09zy+mJzQFPCeiVYajR4STsNmjX+Y6WQpgg6xTIHzk9+2ZL9IOus5BjRhiQui/omf9gie178jSR3+7++wuNeUrC3jNTDAK34h1FhtwoHlSfYaV//EzL2r6NVP38Gn0zgs/7AS
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(396003)(366004)(39840400004)(136003)(346002)(376002)(7416002)(2906002)(66476007)(4326008)(66946007)(31686004)(6486002)(31696002)(66556008)(83380400001)(86362001)(8676002)(5660300002)(52116002)(956004)(16526019)(186003)(316002)(26005)(36756003)(2616005)(8936002)(478600001)(16576012)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: VMzDWML6mbzlOcQvVX4H5Ri9YLhuiTFfxXMTWqX8Q4Tn9+Xw0zX5HwRBVQ9BKssG7ACDRFqzFDk9xxla7nEJd8pa38oUqVOmkLTNiK8M79mBeevVfBg13xyI0cwluFkUYdquF4S5812yFgYpe/esEyD4YeNEIVsMwqemaKVfZ9UoCXgrVgcoW91+Mx83Q9AU6cxSYxxaM7fW+qrg12AzczSzj7A5+EGKMHLL1nECJFiV+lIot2M9Zy8SKeciAMXBOqOsp0tLzKjc8FmeOZkhQhDJ8GYEGpa9DF9GJ6Ca9XZyQyJwidlXJG4CGlhE5BWJKrx3zwFoAVrZWfYKbIbPBI3Cnt4gNBx3dxHzCCOar84aGY8+KNKDcSkJjN5mYRvrIw1EFJVktOQGF+R4LCJRDpk1g+UfzfQFWADUa/h4AsIHB4fpyi4RDAOKXHmMR4shocf/eyL83GUzJcVhfVTk8NdeeZc6f+pJltIj2qwxZGEqLTxBUOXr8GwwW3zXfFtICugywIr+bAYSm/e8zNLa9G7alipKlv1HJQ2y6oMFvARj6BBMl8zJfu/5w+gC/qSuDBVVXGWjTPhuA9g6aojZcKUGzTdZkZecSNOuUdEG5woXNi9jiDbM+3GrtXMrtP4oI5MPa9svp08CQvYhr8hEVA==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 902910ae-73e4-4f74-4291-08d85b31464b
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Sep 2020 17:44:06.6127 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YizHYcQNsXlIfpFWodgeSK2k+dNWJ3pnD98uapnS5+Ic4oJ+9QhaDNvg+tF8ZBM7st46kXMZ12SSaNdc0JGDZ/3nVi5MAtmLOj1x9gc8HH0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5448
-Received-SPF: pass client-ip=40.107.5.111;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR03-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 13:44:08
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+In-Reply-To: <20200917170212.92672-1-sgarzare@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 20:51:18
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -136,73 +138,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-17.09.2020 19:23, Alberto Garcia wrote:
-> On Wed 09 Sep 2020 08:59:29 PM CEST, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
->> 1. Drop extra error propagation
->>
->> 2. Set errp always on failure. Generic bdrv_open_driver supports driver
->> functions which can return negative value and forget to set errp.
->> That's a strange thing.. Let's improve qcow2_do_open to not behave this
->> way. This allows to simplify code in qcow2_co_invalidate_cache().
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   block/qcow2.c | 16 +++++++---------
->>   1 file changed, 7 insertions(+), 9 deletions(-)
->>
->> diff --git a/block/qcow2.c b/block/qcow2.c
->> index 31dd28d19e..cc4e7dd461 100644
->> --- a/block/qcow2.c
->> +++ b/block/qcow2.c
->> @@ -1292,6 +1292,7 @@ static int validate_compression_type(BDRVQcow2State *s, Error **errp)
->>   static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
->>                                         int flags, Error **errp)
->>   {
->> +    ERRP_GUARD();
+On 9/17/20 7:02 PM, Stefano Garzarella wrote:
+> Running checkpatch on a directory that contains a cover letter reports
+> this error:
 > 
-> Why is this necessary?
+>     Checking /tmp/tmpbnngauy3/0000-cover-letter.patch...
+>     ERROR: Does not appear to be a unified-diff format patch
+> 
+>     total: 1 errors, 0 warnings, 0 lines checked
+> 
+> Let's skip cover letter as it is already done in the Linux kernel.
 
-Because error_append_hint() used in the function. Without ERRP_GUARD, error_append_hint won't work if errp = &error_fatal
-Read more in include/qapi/error.h near ERRP_GUARD definition.
+.. "commits 06330fc40e3f ("checkpatch: avoid NOT_UNIFIED_DIFF errors
+ on cover-letter.patch files") and a08ffbef4ab7 ("checkpatch: fix
+ignoring cover-letter logic")."
 
-But yes, it's good to not it in commit message.
+Maybe complete with that ^^^ ?
+
+Regardless:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 > 
->>       BDRVQcow2State *s = bs->opaque;
->>       unsigned int len, i;
->>       int ret = 0;
->> @@ -1426,6 +1427,8 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
->>           report_unsupported_feature(errp, feature_table,
->>                                      s->incompatible_features &
->>                                      ~QCOW2_INCOMPAT_MASK);
->> +        error_setg(errp,
->> +                   "qcow2 header contains unknown
->>       incompatible_feature bits");
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  scripts/checkpatch.pl | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> I think that this is a mistake because the previous call to
-> report_unsupported_feature() already calls error_setg();
-
-Oops, you are right.
-
-> 
->> @@ -2709,11 +2712,11 @@ static void qcow2_close(BlockDriverState *bs)
->>   static void coroutine_fn qcow2_co_invalidate_cache(BlockDriverState *bs,
->>                                                      Error **errp)
->>   {
->> +    ERRP_GUARD();
-> 
-> Again, why is this necessary?
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index bd3faa154c..3c898f878a 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -3005,7 +3005,7 @@ sub process {
+>  		return 1;
+>  	}
+>  
+> -	if (!$is_patch) {
+> +	if (!$is_patch && $filename !~ /cover-letter\.patch$/) {
+>  		ERROR("Does not appear to be a unified-diff format patch\n");
+>  	}
+>  
 > 
 
-Because it uses error_prepend() after conversion (same reason as for error_append_hint()).
-
-Thanks for review! I'll post v2 soon.
-
--- 
-Best regards,
-Vladimir
 
