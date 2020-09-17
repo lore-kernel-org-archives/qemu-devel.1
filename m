@@ -2,84 +2,73 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89BF9C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 11:14:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AD77C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 11:19:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E28302075E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 11:14:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LOhpAJkQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E28302075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A5D3820838
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 11:19:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5D3820838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIrrs-0004Xe-1T
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 07:14:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46294)
+	id 1kIrwk-00063o-If
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 07:19:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47378)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kIrqq-00046f-IK
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 07:13:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25253)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kIrqn-0002ug-VK
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 07:13:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600341196;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=pplzKFZUoIjGfxypuC03DYnXPnAd5yOOVhb45BPdp2s=;
- b=LOhpAJkQFDwSxfpq+aArvwG0ly/rCWp6Q6cWdsW6SBZlsq0KgghnTzZL/TR3roHG86oBVP
- F/XvISCGYoRFamign+uQVnRTy/O+54YX92LW2kzIiKn+AIPGJHtoybLzY+RMYxg6Up/0L3
- 7WW7L4IOt6nztCyDS3tMv5Pkjz3SlIk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-VkaTea-mN-SYo-MqOVhf_w-1; Thu, 17 Sep 2020 07:13:12 -0400
-X-MC-Unique: VkaTea-mN-SYo-MqOVhf_w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 34635186DD27;
- Thu, 17 Sep 2020 11:13:11 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.195.92])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 76DE275132;
- Thu, 17 Sep 2020 11:13:09 +0000 (UTC)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] target/i386: always create kvmclock device
-Date: Thu, 17 Sep 2020 13:13:06 +0200
-Message-Id: <20200917111306.819263-1-vkuznets@redhat.com>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kIrwA-0005ed-BQ
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 07:18:50 -0400
+Resent-Date: Thu, 17 Sep 2020 07:18:50 -0400
+Resent-Message-Id: <E1kIrwA-0005ed-BQ@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21737)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kIrw7-0003Wu-W8
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 07:18:50 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1600341518; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=OLry8nIVunfV6KlbkvjnPXzdC+GQJHbFYbpvbcsNLthsBnMQD4foixVH6uDie71DXLxZJnYV52yxjGhjchp7IQXzwfzEF8fbL9SmAoA6IDlH7HUM33+CzIwXsgTyF8isITNbaK9KveLibtHk4uV7mdYn2QufpgVqetkX84cCUPg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1600341518;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=ZcfeHBuEFhJOQ03vZDNsNJ4wR3Dhn+6zQnNUkXNW9Ok=; 
+ b=Dxs8RTPJA/Gq5wPRxHN+a/QmfG64reXfLZ7w8TME7FUqoFUIQGWn0JQzReNXW4I6qlmsYFIZXHMushY4UQbaz2y+zgDnkHhj/ChGhZYOCR4FFJjhj3sp3G6PYNzhfXi0UZsjc3zcLoL8qss5MDEMqiwdPGw1LU8JCPhjVNOF4TA=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1600341518260253.39924761160808;
+ Thu, 17 Sep 2020 04:18:38 -0700 (PDT)
+Subject: Re: [PATCH] target/i386: always create kvmclock device
+Message-ID: <160034151689.8478.18235018336121752129@66eaa9a8a123>
+In-Reply-To: <20200917111306.819263-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vkuznets@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=vkuznets@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 02:01:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: vkuznets@redhat.com
+Date: Thu, 17 Sep 2020 04:18:38 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 04:07:10
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,81 +81,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Antoine Damhet <antoine.damhet@blade-group.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, antoine.damhet@blade-group.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QEMU's kvmclock device is only created when KVM PV feature bits for
-kvmclock (KVM_FEATURE_CLOCKSOURCE/KVM_FEATURE_CLOCKSOURCE2) are
-exposed to the guest. With 'kvm=off' cpu flag the device is not
-created and we don't call KVM_GET_CLOCK/KVM_SET_CLOCK upon migration.
-It was reported that without these call at least Hyper-V TSC page
-clocksouce (which can be enabled independently) gets broken after
-migration.
-
-Switch to creating kvmclock QEMU device unconditionally, it seems
-to always make sense to call KVM_GET_CLOCK/KVM_SET_CLOCK on migration.
-Use KVM_CAP_ADJUST_CLOCK check instead of CPUID feature bits.
-
-Reported-by: Antoine Damhet <antoine.damhet@blade-group.com>
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- hw/i386/kvm/clock.c    | 6 +-----
- target/i386/kvm.c      | 5 +++++
- target/i386/kvm_i386.h | 1 +
- 3 files changed, 7 insertions(+), 5 deletions(-)
-
-diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
-index 64283358f91d..526c9ea5172b 100644
---- a/hw/i386/kvm/clock.c
-+++ b/hw/i386/kvm/clock.c
-@@ -330,11 +330,7 @@ static const TypeInfo kvmclock_info = {
- /* Note: Must be called after VCPU initialization. */
- void kvmclock_create(void)
- {
--    X86CPU *cpu = X86_CPU(first_cpu);
--
--    if (kvm_enabled() &&
--        cpu->env.features[FEAT_KVM] & ((1ULL << KVM_FEATURE_CLOCKSOURCE) |
--                                       (1ULL << KVM_FEATURE_CLOCKSOURCE2))) {
-+    if (kvm_enabled() && kvm_has_adjust_clock()) {
-         sysbus_create_simple(TYPE_KVM_CLOCK, -1, NULL);
-     }
- }
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 4a8b3a41c1bc..20b31b65307b 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -143,6 +143,11 @@ bool kvm_has_adjust_clock_stable(void)
-     return (ret == KVM_CLOCK_TSC_STABLE);
- }
- 
-+bool kvm_has_adjust_clock(void)
-+{
-+    return kvm_check_extension(kvm_state, KVM_CAP_ADJUST_CLOCK);
-+}
-+
- bool kvm_has_exception_payload(void)
- {
-     return has_exception_payload;
-diff --git a/target/i386/kvm_i386.h b/target/i386/kvm_i386.h
-index 064b8798a26c..0fce4e51d2d6 100644
---- a/target/i386/kvm_i386.h
-+++ b/target/i386/kvm_i386.h
-@@ -34,6 +34,7 @@
- 
- bool kvm_allows_irq0_override(void);
- bool kvm_has_smm(void);
-+bool kvm_has_adjust_clock(void);
- bool kvm_has_adjust_clock_stable(void);
- bool kvm_has_exception_payload(void);
- void kvm_synchronize_all_tsc(void);
--- 
-2.25.4
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkxNzExMTMwNi44MTky
+NjMtMS12a3V6bmV0c0ByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
+dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
+aW5mb3JtYXRpb246CgpOL0EuIEludGVybmFsIGVycm9yIHdoaWxlIHJlYWRpbmcgbG9nIGZpbGUK
+CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8y
+MDIwMDkxNzExMTMwNi44MTkyNjMtMS12a3V6bmV0c0ByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2tw
+YXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
+UGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
+IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
