@@ -2,95 +2,92 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 488E3C2BBD1
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 16:58:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 108D4C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 16:58:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6B2D206A4
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 16:58:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F16E206A4
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 16:58:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nvTnFCKJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6B2D206A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cYlkShnW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F16E206A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIxF2-0000TK-Eg
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 12:58:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57928)
+	id 1kIxFE-0000fO-Mr
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 12:58:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58722)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kIx9d-00047K-Vw
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 12:53:06 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:33743)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kIx9c-0004Gg-43
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 12:53:05 -0400
-Received: by mail-wm1-x344.google.com with SMTP id e11so4839838wme.0
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 09:53:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=ZurrNfZeEolKdKhZeySicSYVuuOV/5QvZiscbHtkLco=;
- b=nvTnFCKJuNEf3W2gU3TTgIJLBDXhCFYFWCgNKwnSWPQeJnxozUQ0JFJpo8/xU81xN9
- qagBDEhFEEGwSzLn8qzPpBH7FXDnNL49r5YVvE5kqvYvgZS7e57FUsA9H45Q1Ba6Q+st
- N3+M/3Gm963cnZSHtlo1VONA+knoSODShok8Os3JO3AR7Tr3/QWUi05xB2iHKebZRuOs
- MVZ94P3JeTxG5txZXQyOowRb4fMdGFOtvoX+w3RKOJDSzLnEuOWcwf1afcmhSapjVcGZ
- KX7KvzQ8p/BNus9gizjFVyX3lHJmZ2J/AMlk0kx1SEcKaC+AOSP7jh6zMBY+q6ELc2xq
- kiNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=ZurrNfZeEolKdKhZeySicSYVuuOV/5QvZiscbHtkLco=;
- b=iUetyfXHEoFPBCBEENTSIcXMUBKOuzOTBqLPddpLwh6+B0mLJCi5uhJHAUtzoY7tCE
- xfKHNvr4cwXebBptQubEJuvahQDJxn004Dap8DNO8R4eWmjQfwYisXZfkpXyljrThzJH
- 55DlbrwOXBiD/yzrRrLVUYsdWBROttR8YfMfjoeHLjXpa5vh/5VMzW1qceg1sl+6JNO+
- oPFjrXf61rnN7FvflCkrtWv9Os4Ey29QwUwnd5yJ4DCscpGADX7SzKCEK4GnA+cokAM3
- i2TKJeIOkx4KK2wsmM1n/e6iZNXeI14XAe6Vi5oo2g+IAic1p0VA94WXubg6BKIv/4Ys
- J8Sg==
-X-Gm-Message-State: AOAM531iCdt3VOnb/2yZLtHxlgOgciaH8+fej3gOWwroAq412D9Wb5KT
- WV6ya45wZn6lYTSZoey3gUy2MA==
-X-Google-Smtp-Source: ABdhPJy1tydIrTraTqhDoVQko9w7QMdt9xgmsjB+jyVX3YIelzdoWIqiYUQ9rZU63QbEe/lglxN1gw==
-X-Received: by 2002:a7b:c24a:: with SMTP id b10mr10467944wmj.149.1600361581846; 
- Thu, 17 Sep 2020 09:53:01 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id q4sm182317wru.65.2020.09.17.09.53.00
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Sep 2020 09:53:00 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E2FF71FF7E;
- Thu, 17 Sep 2020 17:52:59 +0100 (BST)
-References: <20200917104441.31738-1-pbonzini@redhat.com>
- <faab2d69-4bd1-4878-d638-4c9414e56499@amsat.org>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH] docker.py: always use --rm
-In-reply-to: <faab2d69-4bd1-4878-d638-4c9414e56499@amsat.org>
-Date: Thu, 17 Sep 2020 17:52:59 +0100
-Message-ID: <87een0xs44.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kIxDc-0007Od-Ei
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 12:57:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47197)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kIxDa-0004jC-CG
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 12:57:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600361828;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cHi/FS9ZkLfc6OxGqJH+wdpswdE1G6P1BDfuRKq+Gcc=;
+ b=cYlkShnWOKAbmCVIPqMKghXo38kp5U3N71cMaIUq4I7i3lYkumWZ9HB9FGvK804zXiTP1e
+ qhdxmhBE06cmWVXrA59MfuX8tlKqMqP+SXx/mSl4hu/zCWApIN27E1+XTIPrCx9LYzlYOK
+ timJ31295eEO4oxaUfnGXplcdZPau7c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-580-aT9GY8f8OruK51sRfcXGqA-1; Thu, 17 Sep 2020 12:57:05 -0400
+X-MC-Unique: aT9GY8f8OruK51sRfcXGqA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE7071007383;
+ Thu, 17 Sep 2020 16:57:03 +0000 (UTC)
+Received: from [10.10.119.140] (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F12FC1002D59;
+ Thu, 17 Sep 2020 16:57:02 +0000 (UTC)
+Subject: Re: [PATCH 06/37] qapi: delint using flake8
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200915224027.2529813-1-jsnow@redhat.com>
+ <20200915224027.2529813-7-jsnow@redhat.com>
+ <87wo0tor80.fsf@dusky.pond.sub.org>
+ <8238685e-f4a4-cf2f-2511-5e4473f5fdd3@redhat.com>
+ <87a6xog7n8.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <82b4b8ce-b348-75fd-bd44-d96303a4875d@redhat.com>
+Date: Thu, 17 Sep 2020 12:57:02 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <87a6xog7n8.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 20:51:18
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,81 +101,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, berrange@redhat.com,
- qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 9/17/20 3:54 AM, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
+> 
+>> On 9/16/20 8:12 AM, Markus Armbruster wrote:
+>>> John Snow <jsnow@redhat.com> writes:
+>>>
+>>>> Petty style guide fixes and line length enforcement.  Not a big win, not
+>>>> a big loss, but flake8 passes 100% on the qapi module, which gives us an
+>>>> easy baseline to enforce hereafter.
+>>>>
+>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>> ---
+>>>>    scripts/qapi/.flake8     |  2 ++
+>>>>    scripts/qapi/commands.py |  3 ++-
+>>>>    scripts/qapi/schema.py   |  8 +++++---
+>>>>    scripts/qapi/visit.py    | 15 ++++++++++-----
+>>>>    4 files changed, 19 insertions(+), 9 deletions(-)
+>>>>    create mode 100644 scripts/qapi/.flake8
+>>>>
+>>>> diff --git a/scripts/qapi/.flake8 b/scripts/qapi/.flake8
+>>>> new file mode 100644
+>>>> index 0000000000..45d8146f3f
+>>>> --- /dev/null
+>>>> +++ b/scripts/qapi/.flake8
+>>>> @@ -0,0 +1,2 @@
+>>>> +[flake8]
+>>>> +extend-ignore = E722  # Pylint handles this, but smarter.
+>>> I guess you mean pylint's W0702 a.k.a. bare-except.  What's wrong
+>>> with
+>>> flake8's E722 compared to pylint's W0702?
+>>>
+>>
+>> Flake8 will warn on *any* bare except, but Pylint's is context-aware
+>> and will suppress the warning if you re-raise the exception.
+> 
+> Should this information be worked into the comment?
+> 
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+I'll improve it a little, but I'll add what I wrote above to the commit 
+message.
 
-> On 9/17/20 12:44 PM, Paolo Bonzini wrote:
->> Avoid that containers pile up.
->>=20
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  tests/docker/Makefile.include | 1 -
->>  tests/docker/docker.py        | 4 ++--
->>  2 files changed, 2 insertions(+), 3 deletions(-)
->>=20
->> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.inclu=
-de
->> index 3daabaa2fd..75704268ff 100644
->> --- a/tests/docker/Makefile.include
->> +++ b/tests/docker/Makefile.include
->> @@ -243,7 +243,6 @@ docker-run: docker-qemu-src
->>  		$(DOCKER_SCRIPT) run 					\
->>  			$(if $(NOUSER),,--run-as-current-user) 		\
->>  			--security-opt seccomp=3Dunconfined		\
->> -			$(if $V,,--rm) 					\
->>  			$(if $(DEBUG),-ti,)				\
->
-> Alternatively:
->
-> -                       $(if $V,,--rm)
-> -                       $(if $(DEBUG),-ti,)
-> +                       $(if $(DEBUG),-ti,--rm)
+>> I don't actually think this comes up in the qapi code base, but it
+>> does come up in the ./python/qemu code base.
+>>
+>> (One of my goals is unifying the lint checking regime for both packages.)
+>>
+>>>> \ No newline at end of file
+>>> So put one there :)
+>>>
+>>
+>> Whupps, okay.
+>>
+>>>> diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+>>>> index e1df0e341f..2e4b4de0fa 100644
+>>>> --- a/scripts/qapi/commands.py
+>>>> +++ b/scripts/qapi/commands.py
+>>>> @@ -69,7 +69,8 @@ def gen_call(name, arg_type, boxed, ret_type):
+>>>>    def gen_marshal_output(ret_type):
+>>>>        return mcgen('''
+>>>>    -static void qmp_marshal_output_%(c_name)s(%(c_type)s ret_in,
+>>>> QObject **ret_out, Error **errp)
+>>>> +static void qmp_marshal_output_%(c_name)s(%(c_type)s ret_in, QObject **ret_out,
+>>>> +                                          Error **errp)
+>>> The continued parameter list may become misalignd in generated C.
+>>> E.g.
+>>>       static void qmp_marshal_output_BlockInfoList(BlockInfoList
+>>> *ret_in, QObject **ret_out,
+>>>                                                 Error **errp)
+>>>       {
+>>>       ...
+>>>       }
+>>> Do we care?
+>>>
+>>
+>> Yeah, I don't know. Do we?
+> 
+> I care, but I also care for automated style checks.
+> 
+>> It actually seemed more annoying to try and get flake8 to make an
+>> exception for these handful of examples.
+>>
+>> Path of least resistance led me here, but I can try and appease both
+>> systems if you'd prefer.
+> 
+> Up to now, I ran the style checkers manually, and this was just one of
+> several complaints to ignore, so I left the code alone.
+> 
+> If it gets in the way of running them automatically, and messing up the
+> generated code slightly is the easiest way to get it out of the way,
+> then I can accept the slight mess.
+> 
 
-Surely that should b:
+I changed this a little to put all the args on the next line, which is 
+slightly unusual but works okay.
 
-  $(if $(DEBUG),-ti --rm,)
+I think that's a fine middle ground, because the alternative (to me) is 
+to start using abstracted code generation tokens in a tree structure, 
+etc etc etc.
 
-I think being able to keep the container around is useful for debug, I
-have no problem with changing the behaviour for V=3D1.
+Embedded templates are always gonna look kinda nasty, I think, because 
+you're trying to fight style guidelines in two languages simultaneously 
+and it's never gonna quite work out exactly how you want without some 
+pretty complex abstraction mechanisms that are well beyond the power we 
+need right now.
 
->
-> Anyhow:
-> Acked-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
->>  			$(if $(NETWORK),$(if $(subst $(NETWORK),,1),--net=3D$(NETWORK)),--ne=
-t=3Dnone) \
->>  			-e TARGET_LIST=3D$(subst $(SPACE),$(COMMA),$(TARGET_LIST))	\
->> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
->> index 356d7618f1..36b7868406 100755
->> --- a/tests/docker/docker.py
->> +++ b/tests/docker/docker.py
->> @@ -377,7 +377,7 @@ class Docker(object):
->>              if self._command[0] =3D=3D "podman":
->>                  cmd.insert(0, '--userns=3Dkeep-id')
->>=20=20
->> -        ret =3D self._do_check(["run", "--label",
->> +        ret =3D self._do_check(["run", "--rm", "--label",
->>                               "com.qemu.instance.uuid=3D" + label] + cmd,
->>                               quiet=3Dquiet)
->>          if not keep:
->> @@ -616,7 +616,7 @@ class CcCommand(SubCommand):
->>          if argv and argv[0] =3D=3D "--":
->>              argv =3D argv[1:]
->>          cwd =3D os.getcwd()
->> -        cmd =3D ["--rm", "-w", cwd,
->> +        cmd =3D ["-w", cwd,
->>                 "-v", "%s:%s:rw" % (cwd, cwd)]
->>          if args.paths:
->>              for p in args.paths:
->>=20
+>>> More of the same below.
+>>>
+>>>>    {
+>>>>        Visitor *v;
+>>>>    
+>>> [...]
+>>>
 
-
---=20
-Alex Benn=C3=A9e
 
