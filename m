@@ -2,97 +2,89 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB689C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 13:42:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29240C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 13:48:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 180B320771
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 13:42:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 37F1D21582
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 13:48:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gOrr+XY+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 180B320771
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jtix4XoE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37F1D21582
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIuAx-0007K6-0R
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 09:42:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57856)
+	id 1kIuGv-0004pX-W3
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 09:48:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60688)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kIu7B-000360-Ht
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 09:38:21 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:40943)
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1kIuFM-0003Wy-I1
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 09:46:48 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:35218)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kIu79-0005t4-Re
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 09:38:21 -0400
-Received: by mail-wr1-x432.google.com with SMTP id j2so2116359wrx.7
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 06:38:19 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1kIuFI-0007H2-3a
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 09:46:48 -0400
+Received: by mail-lf1-x142.google.com with SMTP id w11so2269509lfn.2
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 06:46:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=XwZN53n/qLErPz/2T0k6PxKoB8ZjIsCh1yqgRl2+UOI=;
- b=gOrr+XY+s3GNA1FYo26sdI7+LlJtB6DCYutk2KjEMfBgJ5v35CU9MPOZun3HHeJk2L
- WQy+9TkNApai2cZSKH8ACROgJWnlltp3vG8lZ4W/H23VEBxiIjq1tg3FgR5NT24IFdhg
- GLX49K4pPBfqY/m6mtHKxu8DMRfqeImDYxwFDX4U1qvQ7LKrElqn/kdLV1nG6jV6XSjs
- 28C+FtoFhNKHx1hMfeRg1g3gie662mTfq1BLb8uwk7ksY/g4R8Flu8y9HPuIEmqBKs7o
- 43qVIxLONqIrYGhnccv1sJbTTGkXKLCZyW2UR8X37qor+I+xwQkeO6GOyHSkjvQKvH3T
- u1pQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=iXNFHSRQglQY+1I+99tORADaBVR0wdySI3wB/Bbhu0g=;
+ b=Jtix4XoEL6/kAvFeCAPJp9pKBSewcCSfuuYgip4G+km73PG14riOOtN/A75oiVQ3BO
+ F3O9gP7XiWUm0X3AKerwPZObCFa37J8oskCR4JGGKZqhbB3yn3kkYppnWD2VEYt5KG6e
+ C122Fz9eEY9c2c+j7S19wWvz4dAW9/nBd7ri0ESOCzzBVnWUaIuOk9u7OiDzz/bYHmO0
+ HRMrFGm9kJPOsetB8V2R7bu/vMc49FfVSj6fR2IAlg2laz7AVKvzyGEi0/M6B7UtbWdh
+ 6WZ3N3+MEWPykYpoD18CE2hZftruubTF8alid9W1/RNchEA5E7vNWqepSs4F1tOkxKc/
+ fGeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=XwZN53n/qLErPz/2T0k6PxKoB8ZjIsCh1yqgRl2+UOI=;
- b=c4WPTNF0IaNSonejiVchv75oBWKAn+ICyW2PZZQXgLdLlXSSCG1DEREpUzPgoLlKud
- o4MO+HGRJ8Rg6J1Cq6AzMoj334P0luCR8JgHJadpb76jkto3z5dhlI0RtuzpfO3vzHO2
- ACKA7GtQU774Gigq6L3vB8Jp1Ik40lU+AkBGUEmTW0Joupj+axl3zfWINkcu/xPfomR2
- uUn9EKKewytNc5zYyj/KICnR6jnKWcH+dSNdw7IAaX5gCWxCooCQMA+3dmB3K3aKOGqx
- aYN3F+XRf3BTZ3EcDCCnWSPxe8DHfrJETizwFItyGuF2kj4hzk1xBzKzvQxn0j4EEoQN
- BnWg==
-X-Gm-Message-State: AOAM532EjW/I6zWCRuRE4HEpJOf4iL1stMUrfGrpjv+bUvsmP40ObMy+
- YZ4eGtdYCkwMOclkjVfqZxw=
-X-Google-Smtp-Source: ABdhPJx4FG86W34I1EmekpMCrqzxw7ssjtFUCdR0iQVgya5Rb6Ejp3dvAbcJzuKxQVB93ZgPIOi2MQ==
-X-Received: by 2002:adf:ce01:: with SMTP id p1mr15881897wrn.61.1600349898318; 
- Thu, 17 Sep 2020 06:38:18 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id n4sm38465244wrp.61.2020.09.17.06.38.17
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 17 Sep 2020 06:38:17 -0700 (PDT)
-Subject: Re: [PATCH] docker.py: always use --rm
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20200917104441.31738-1-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <faab2d69-4bd1-4878-d638-4c9414e56499@amsat.org>
-Date: Thu, 17 Sep 2020 15:38:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=iXNFHSRQglQY+1I+99tORADaBVR0wdySI3wB/Bbhu0g=;
+ b=VipXB/H1WlxTzm4q3PF0EuTX3GUlXx8FJm1oV3o6DsbT/aIVqIv1D55j8unm+dQLQL
+ M6yiG6VX7ftOznABkZOoI0wuw74onbuFZ6ag0Y1FIb76Jzty/7/OC+tWP7obZvHeXeZ8
+ B4wTTqPYwGw17J6L1tLR6mWG8V36pcEuSe2fawiJWnoOZa1rybiE8G6OhNq8T9YuGQZ4
+ UpMasOLQqFkNwnxJN63OdwTjSm0wVmjyXO5sbYxylLVAJGwtoQ5hjS5igWcwF1Y8+y32
+ bYuUEtMwnl+9i+d39lahq6JLbSgwkqixH/Z09mXA55OWqaLIB07xuKHYzsFZ/pb2mf7K
+ lGQw==
+X-Gm-Message-State: AOAM531+tpIKN7CG7BsXiyn4BubbzxVb4nSuiRTU0PNE+tCQFgeOpxHg
+ WdhcxzUFnMxYRXCudst0KTgvoApyBYKlJiPn0Es=
+X-Google-Smtp-Source: ABdhPJwpz0mK66ZXPIE7KrFreClOWEpoWcXQH4FddCYnFEVNMB24UCmwphrR3fpfreahWVuKITJOP2s5be4TwiQws9I=
+X-Received: by 2002:ac2:5a1b:: with SMTP id q27mr9203761lfn.57.1600350399857; 
+ Thu, 17 Sep 2020 06:46:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200917104441.31738-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::432;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x432.google.com
+References: <5f628ca9.1c69fb81.a40be.a654@mx.google.com>
+ <CALTWKrUgbOmsJ75M68EfvgG_o7G_hkiXJiqSTBCdZ0pTsu6Sqg@mail.gmail.com>
+ <9e1b693b-3d83-1bdf-a7b7-fa0ee8fa106e@redhat.com>
+In-Reply-To: <9e1b693b-3d83-1bdf-a7b7-fa0ee8fa106e@redhat.com>
+From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+Date: Thu, 17 Sep 2020 15:46:05 +0200
+Message-ID: <CALTWKrU47gZEmQy9M1JBD5hzzuA9E2e_qS=8M6mW+9_5tmP2ww@mail.gmail.com>
+Subject: Re: [REPORT] Nightly Performance Tests - Wednesday, September 16, 2020
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::142;
+ envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-lf1-x142.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.248, NICE_REPLY_A=-0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,64 +97,263 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, berrange@redhat.com
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/17/20 12:44 PM, Paolo Bonzini wrote:
-> Avoid that containers pile up.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  tests/docker/Makefile.include | 1 -
->  tests/docker/docker.py        | 4 ++--
->  2 files changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-> index 3daabaa2fd..75704268ff 100644
-> --- a/tests/docker/Makefile.include
-> +++ b/tests/docker/Makefile.include
-> @@ -243,7 +243,6 @@ docker-run: docker-qemu-src
->  		$(DOCKER_SCRIPT) run 					\
->  			$(if $(NOUSER),,--run-as-current-user) 		\
->  			--security-opt seccomp=unconfined		\
-> -			$(if $V,,--rm) 					\
->  			$(if $(DEBUG),-ti,)				\
+On Thu, Sep 17, 2020 at 3:28 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> On 9/17/20 10:02 AM, Ahmed Karaman wrote:
+> > On Thu, Sep 17, 2020 at 12:07 AM Ahmed Karaman
+> > <ahmedkhaledkaraman@gmail.com> wrote:
+> >>
+> >> Host CPU         : Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz
+> >> Host Memory      : 15.49 GB
+> >>
+> >> Start Time (UTC) : 2020-09-16 21:35:02
+> >> End Time (UTC)   : 2020-09-16 22:07:32
+> >> Execution Time   : 0:32:29.941492
+> >>
+> >> Status           : SUCCESS
+> >>
+> >> Note:
+> >> Changes denoted by '-----' are less than 0.01%.
+> >>
+> >> --------------------------------------------------------
+> >>             SUMMARY REPORT - COMMIT 8ee61272
+> >> --------------------------------------------------------
+> >>                     AVERAGE RESULTS
+> >> --------------------------------------------------------
+> >> Target              Instructions      Latest      v5.1.0
+> >> ----------  --------------------  ----------  ----------
+> >> aarch64            2 158 513 150       -----     +1.703%
+> >> alpha              1 914 947 541       -----     +3.522%
+> >> arm                8 076 527 003       -----     +2.308%
+> >> hppa               4 261 673 329       -----     +3.163%
+> >> m68k               2 690 293 359       -----     +7.134%
+> >> mips               1 861 902 263       -----     +2.484%
+> >> mipsel             2 008 240 685       -----     +2.676%
+> >> mips64             1 918 624 648       -----     +2.817%
+> >> mips64el           2 051 554 799       -----     +3.025%
+> >> ppc                2 480 174 328       -----     +3.109%
+> >> ppc64              2 576 701 038       -----     +3.142%
+> >> ppc64le            2 558 820 807       -----     +3.171%
+> >> riscv64            1 406 685 833       -----     +2.648%
+> >> s390x              3 158 140 071       -----     +3.119%
+> >> sh4                2 364 606 066       -----     +3.341%
+> >> sparc64            3 318 698 928       -----     +3.855%
+> >> x86_64             1 775 941 661       -----     +2.167%
+> >> --------------------------------------------------------
+> >>
+> >>                    DETAILED RESULTS
+> >> --------------------------------------------------------
+> >> Test Program: dijkstra_double
+> >> --------------------------------------------------------
+> >> Target              Instructions      Latest      v5.1.0
+> >> ----------  --------------------  ----------  ----------
+> >> aarch64            3 062 745 624       -----     +1.429%
+> >> alpha              3 191 842 908       -----     +3.695%
+> >> arm               16 357 299 506       -----     +2.348%
+> >> hppa               7 228 387 843       -----     +3.086%
+> >> m68k               4 294 056 834       -----     +9.693%
+> >> mips               3 051 314 790       -----     +2.423%
+> >> mipsel             3 231 546 887       -----      +2.87%
+> >> mips64             3 245 814 633       -----     +2.596%
+> >> mips64el           3 414 215 768       -----     +3.021%
+> >> ppc                4 914 556 467       -----      +4.74%
+> >> ppc64              5 098 137 458       -----     +4.565%
+> >> ppc64le            5 082 383 704       -----     +4.579%
+> >> riscv64            2 192 269 006       -----     +1.954%
+> >> s390x              4 584 587 692       -----     +2.898%
+> >> sh4                3 949 197 667       -----     +3.468%
+> >> sparc64            4 586 104 947       -----     +4.235%
+> >> x86_64             2 484 245 797       -----     +1.757%
+> >> --------------------------------------------------------
+> >> --------------------------------------------------------
+> >> Test Program: dijkstra_int32
+> >> --------------------------------------------------------
+> >> Target              Instructions      Latest      v5.1.0
+> >> ----------  --------------------  ----------  ----------
+> >> aarch64            2 210 360 293       -----     +1.501%
+> >> alpha              1 494 111 691       -----     +2.149%
+> >> arm                8 263 044 506       -----     +2.667%
+> >> hppa               5 207 306 045       -----     +3.047%
+> >> m68k               1 725 880 564       -----     +2.528%
+> >> mips               1 495 110 368       -----     +1.484%
+> >> mipsel             1 497 169 328       -----     +1.481%
+> >> mips64             1 715 421 334       -----     +1.894%
+> >> mips64el           1 695 209 677       -----     +1.909%
+> >> ppc                2 014 602 126       -----     +1.822%
+> >> ppc64              2 206 256 217       -----     +2.138%
+> >> ppc64le            2 197 967 863       -----     +2.145%
+> >> riscv64            1 354 884 068       -----     +2.394%
+> >> s390x              2 916 098 604       -----     +1.236%
+> >> sh4                1 990 693 666       -----     +2.678%
+> >> sparc64            2 874 142 164       -----     +3.827%
+> >> x86_64             1 554 138 606       -----      +2.13%
+> >> --------------------------------------------------------
+> >> --------------------------------------------------------
+> >> Test Program: matmult_double
+> >> --------------------------------------------------------
+> >> Target              Instructions      Latest      v5.1.0
+> >> ----------  --------------------  ----------  ----------
+> >> aarch64            1 412 417 224       -----     +0.312%
+> >> alpha              3 233 972 467       -----     +7.473%
+> >> arm                8 545 300 144       -----      +1.09%
+> >> hppa               3 483 516 785       -----     +4.466%
+> >> m68k               3 919 111 292       -----    +18.433%
+> >> mips               2 344 644 680       -----     +4.085%
+> >> mipsel             3 329 922 415       -----     +5.178%
+> >> mips64             2 359 029 035       -----     +4.075%
+> >> mips64el           3 343 640 141       -----     +5.166%
+> >> ppc                3 209 498 342       -----     +3.247%
+> >> ppc64              3 287 492 489       -----     +3.173%
+> >> ppc64le            3 287 139 805       -----     +3.172%
+> >> riscv64            1 221 606 224       -----     +0.277%
+> >> s390x              2 874 163 578       -----     +5.826%
+> >> sh4                3 544 104 659       -----      +6.42%
+> >> sparc64            3 426 093 790       -----     +7.138%
+> >> x86_64             1 249 074 159       -----     +0.335%
+> >> --------------------------------------------------------
+> >> --------------------------------------------------------
+> >> Test Program: matmult_int32
+> >> --------------------------------------------------------
+> >> Target              Instructions      Latest      v5.1.0
+> >> ----------  --------------------  ----------  ----------
+> >> aarch64              598 849 290       -----     +0.614%
+> >> alpha                372 421 527       -----     +0.673%
+> >> arm                  746 701 945       -----     +1.479%
+> >> hppa                 674 262 347       -----     +1.181%
+> >> m68k                 410 573 125       -----     +0.919%
+> >> mips                 499 569 698       -----     +0.505%
+> >> mipsel               499 534 043       -----     +0.504%
+> >> mips64               481 536 611       -----     +0.595%
+> >> mips64el             465 055 187       -----     +0.619%
+> >> ppc                  341 373 763       -----     +0.956%
+> >> ppc64                393 782 076       -----     +0.962%
+> >> ppc64le              393 946 608       -----     +0.957%
+> >> riscv64              351 686 870       -----     +0.778%
+> >> s390x                494 453 514       -----     +0.604%
+> >> sh4                  402 832 141       -----      +0.94%
+> >> sparc64              495 859 747       -----     +1.173%
+> >> x86_64               403 090 322       -----     +0.874%
+> >> --------------------------------------------------------
+> >> --------------------------------------------------------
+> >> Test Program: qsort_double
+> >> --------------------------------------------------------
+> >> Target              Instructions      Latest      v5.1.0
+> >> ----------  --------------------  ----------  ----------
+> >> aarch64            2 709 844 598       -----     +2.423%
+> >> alpha              1 969 441 131       -----     +3.679%
+> >> arm                8 323 162 789       -----     +2.589%
+> >> hppa               3 188 306 263       -----       +2.9%
+> >> m68k               4 953 945 309       -----    +15.153%
+> >> mips               2 123 792 134       -----     +3.049%
+> >> mipsel             2 124 245 545       -----     +3.049%
+> >> mips64             1 999 032 821       -----     +3.404%
+> >> mips64el           1 996 422 106       -----     +3.408%
+> >> ppc                2 819 292 527       -----     +5.436%
+> >> ppc64              2 768 174 645       -----     +5.512%
+> >> ppc64le            2 724 770 326       -----     +5.602%
+> >> riscv64            1 638 311 731       -----      +4.02%
+> >> s390x              2 519 121 025       -----     +3.364%
+> >> sh4                2 595 705 920       -----     +3.001%
+> >> sparc64            3 988 891 870       -----     +2.744%
+> >> x86_64             2 033 622 123       -----     +3.242%
+> >> --------------------------------------------------------
+> >> --------------------------------------------------------
+> >> Test Program: qsort_int32
+> >> --------------------------------------------------------
+> >> Target              Instructions      Latest      v5.1.0
+> >> ----------  --------------------  ----------  ----------
+> >> aarch64            2 193 564 781       -----     +2.924%
+> >> alpha              1 521 270 291       -----     +4.191%
+> >> arm                3 465 576 821       -----     +2.759%
+> >> hppa               2 280 027 399       -----     +3.821%
+> >> m68k               1 843 184 147       -----     +3.583%
+> >> mips               1 557 902 048       -----     +3.854%
+> >> mipsel             1 560 659 413       -----     +3.851%
+> >> mips64             1 563 400 635       -----     +4.411%
+> >> mips64el           1 542 675 391       -----     +4.474%
+> >> ppc                1 728 740 551       -----     +3.667%
+> >> ppc64              1 842 432 964       -----     +3.555%
+> >> ppc64le            1 791 790 880       -----     +3.659%
+> >> riscv64            1 348 869 693       -----     +4.654%
+> >> s390x              2 184 089 336       -----      +3.32%
+> >> sh4                1 946 651 461       -----     +3.632%
+> >> sparc64            3 452 122 741       -----     +2.934%
+> >> x86_64             1 813 701 223       -----     +3.546%
+> >> --------------------------------------------------------
+> >> --------------------------------------------------------
+> >> Test Program: qsort_string
+> >> --------------------------------------------------------
+> >> Target              Instructions      Latest      v5.1.0
+> >> ----------  --------------------  ----------  ----------
+> >> aarch64            2 592 362 540       -----     +2.473%
+> >> alpha              1 855 815 639       -----     +3.486%
+> >> arm                7 347 821 471       -----     +2.684%
+> >> hppa               4 758 745 598       -----     +3.542%
+> >> m68k               2 376 781 988       -----     +3.566%
+> >> mips               2 166 448 905       -----     +2.525%
+> >> mipsel             2 163 390 872       -----     +2.528%
+> >> mips64             2 029 239 289       -----     +3.117%
+> >> mips64el           2 011 623 990       -----     +3.144%
+> >> ppc                2 492 961 613       -----     +2.674%
+> >> ppc64              2 464 688 318       -----     +2.487%
+> >> ppc64le            2 445 219 975       -----     +2.504%
+> >> riscv64            1 625 026 163       -----     +3.952%
+> >> s390x              4 194 618 628       -----     +6.623%
+> >> sh4                2 164 283 129       -----     +3.173%
+> >> sparc64            4 299 396 665       -----     +4.062%
+> >> x86_64             2 940 164 421       -----     +2.639%
+> >> --------------------------------------------------------
+> >> --------------------------------------------------------
+> >> Test Program: search_string
+> >> --------------------------------------------------------
+> >> Target              Instructions      Latest      v5.1.0
+> >> ----------  --------------------  ----------  ----------
+> >> aarch64            2 487 960 855       -----     +1.946%
+> >> alpha              1 680 704 675       -----     +2.834%
+> >> arm               11 563 308 846       -----     +2.849%
+> >> hppa               7 272 834 358       -----     +3.263%
+> >> m68k               1 998 813 614       -----     +3.198%
+> >> mips               1 656 435 485       -----     +1.949%
+> >> mipsel             1 659 456 983       -----     +1.947%
+> >> mips64             1 955 522 831       -----     +2.446%
+> >> mips64el           1 943 596 136       -----     +2.462%
+> >> ppc                2 320 369 235       -----     +2.333%
+> >> ppc64              2 552 644 142       -----     +2.742%
+> >> ppc64le            2 547 347 296       -----     +2.747%
+> >> riscv64            1 520 832 915       -----     +3.157%
+> >> s390x              5 497 988 198       -----     +1.078%
+> >> sh4                2 323 379 889       -----     +3.417%
+> >> sparc64            3 426 979 505       -----     +4.726%
+> >> x86_64             1 729 496 637       -----     +2.814%
+> >> --------------------------------------------------------
+> >>
+> >>
+> >
+> > Hi,
+> >
+> > For anyone following these nightly tests, I will not be able to send
+> > the performance reports starting from today until the end of next week
+> > as I won't be able to access my PC for this period of time.
+> > I've been running these nightly tests locally on my machine for about
+> > a month now. I'm currently in contact with Mr. Alex Benn=C3=A9e to run =
+the
+> > tests independently on QEMU servers.
+>
+> FYI I filled the m68k perf degradation here:
+> https://bugs.launchpad.net/qemu/+bug/1895703
+> (I didn't add you because I couldn't find you on Launchpad).
+>
+> Enjoy this time without PC! :)
+>
+> Phil.
+>
 
-Alternatively:
-
--                       $(if $V,,--rm)
--                       $(if $(DEBUG),-ti,)
-+                       $(if $(DEBUG),-ti,--rm)
-
-Anyhow:
-Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
->  			$(if $(NETWORK),$(if $(subst $(NETWORK),,1),--net=$(NETWORK)),--net=none) \
->  			-e TARGET_LIST=$(subst $(SPACE),$(COMMA),$(TARGET_LIST))	\
-> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-> index 356d7618f1..36b7868406 100755
-> --- a/tests/docker/docker.py
-> +++ b/tests/docker/docker.py
-> @@ -377,7 +377,7 @@ class Docker(object):
->              if self._command[0] == "podman":
->                  cmd.insert(0, '--userns=keep-id')
->  
-> -        ret = self._do_check(["run", "--label",
-> +        ret = self._do_check(["run", "--rm", "--label",
->                               "com.qemu.instance.uuid=" + label] + cmd,
->                               quiet=quiet)
->          if not keep:
-> @@ -616,7 +616,7 @@ class CcCommand(SubCommand):
->          if argv and argv[0] == "--":
->              argv = argv[1:]
->          cwd = os.getcwd()
-> -        cmd = ["--rm", "-w", cwd,
-> +        cmd = ["-w", cwd,
->                 "-v", "%s:%s:rw" % (cwd, cwd)]
->          if args.paths:
->              for p in args.paths:
-> 
-
+Awesome, thanks!
 
