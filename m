@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AD50C43464
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 00:03:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7824C43463
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 00:04:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E223B20789
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 00:03:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1735320789
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 00:04:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="paVyLvqk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E223B20789
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O6QV+zb/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1735320789
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJ3sK-0002yP-Va
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 20:03:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36282)
+	id 1kJ3tN-0003aK-1B
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 20:04:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kJ3mQ-0003rD-Eg
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 19:57:34 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:45132)
+ id 1kJ3mU-00043V-Rh
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 19:57:38 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:45133)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kJ3mL-0006eN-Bi
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 19:57:34 -0400
-Received: by mail-pl1-x643.google.com with SMTP id q12so1981990plr.12
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 16:57:28 -0700 (PDT)
+ id 1kJ3mQ-0006fZ-3r
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 19:57:38 -0400
+Received: by mail-pl1-x644.google.com with SMTP id q12so1982064plr.12
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 16:57:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=U6fE0rS6g/PgpT0BfNKV2MVny74HOKVIxnGhNrYyK/8=;
- b=paVyLvqkUpPo6A0HhT0885UlO5hdOBlxDtK/BJx7m4oUzHB/dJbEV6I+mWcHLEfTnO
- LOgqDg46ax/9qYACPUgY8EKPeveyCCf+V8xCNTfmku1wx5enPsMxGpmNWjWRH9ecEhop
- GtZElnClStPtj2BRIt41ZmlNwSTWh2aLbWLFL/bGTI3z5/0Glg2bpIZqMKVLpcLQfUfx
- 80lQaVpmF+c11tNUwTrHZkHZGfS/LOPICyBvFGKtlhaa/fhjqRbX7CylSFMVUNYxnsTl
- e5HgwQaUKKP0x1QpnPgd0BsE3PxjRyuaRp8Rjqn5GXu9PKtfU0s1sxi/wJyl67DTt9oo
- mu8w==
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=kxms3FS2kG3VRY7JUUSIn+glY/IToVYjcyoEFpFah2g=;
+ b=O6QV+zb/y53SRC4TFEzwK9dUcydWiEW53l+OR1r/9kD6SCXaJ3eCZZe7UPr2Cj2Zas
+ Dz3lwlHRWnwBxhJc17hpEIcF2elj9ouaY7jVg1CUa6f/Z3Qj/5KDh3hUYVo/mzY6Qiqj
+ tM4tNsuxWsUOdTqNe49NI6Gc4Ltw+/AVLtbRbIRtNditK2b0gjO74IgE97CHvGOJYtim
+ 0eVDGh2uQu03Llrtkypl5oRY5EBkOD7setJn+IGFSqkaCg0eS9/DYXE7FbL8tWlZ0KK0
+ 5enJ0NghF1BM5Kr6IOyAk3Ez8MRpd44C+wI9MksV5C7xHuzaARBNpl0sZNBrEoe9u2/3
+ dYpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=U6fE0rS6g/PgpT0BfNKV2MVny74HOKVIxnGhNrYyK/8=;
- b=EdMChsmJvndcsuzwTQG1f8RKyu3kbe9YpTqHh8gXliToviaZxyTSg2pEHLV55K/f9N
- omOTKNg0BinyrJLSU9CXVDi5SYdGbOB3cBDFGgfSDBJnWhvltj99peVerI5Z82risxy2
- rtvJul0cSKljqpZxTmYmDD5rzn8tnzEQ+JuJJ5DWebiAKHuVGs6RKdtpj3zcywpmd72C
- /CdcSMPAX5mrKyM33o8Bw0eMeG0C3uRNUmjiUgmQL8OWNhek2SefsQOeyt5OuDFgoyER
- jcm2qjXN8aYfII02DbGpv4Fw66ckNBBCOJga5kzBBmQtKS4GXKWTfiFv+z4qIhirccf+
- wk1g==
-X-Gm-Message-State: AOAM530EEook1Ic6ZpGJ3vgLMV6Cg5gYLk7axR/kEj2M17xS6uHRxwLn
- 2+1qnIoBcJVcUD2oY/C1B3bLYqQhbC8f2Q==
-X-Google-Smtp-Source: ABdhPJyAwk+4Ns5d43zIJy4yI+eXdrTo8lVx3pUJVUK+vgHzgcjXOQjdm9HkuEnmLzsNcla3uVZD3g==
-X-Received: by 2002:a17:902:9692:b029:d1:e5e7:be18 with SMTP id
- n18-20020a1709029692b02900d1e5e7be18mr12313497plp.75.1600387047197; 
- Thu, 17 Sep 2020 16:57:27 -0700 (PDT)
+ bh=kxms3FS2kG3VRY7JUUSIn+glY/IToVYjcyoEFpFah2g=;
+ b=bUACco9TzwJlYbz+p9Q6rbmY65XSJV62rdQgyT9FU9clsF8M13hfdYcTu8d5k2a9eM
+ PFIYAxDQlCEonRU/NKg8d6BWfECNBhMP59gfNuuBuDBA8zqqkiyXytad3PkSLOae4E6h
+ RsWtoq73XdnpF9FO2ItHymqmhIdwarN3T+YpzXs5KYHeQhiROpIiR+ryILQgoRUlrLh4
+ fFz8cb12kH7BmAXKleC0SDqQjAif21m0yfeu93ftgqxQ269J6N2f1CTAASx10tWw8pwD
+ efDsJLmw4yZhoFYA+g7onLUO+rRCLmaQRfeYzrMHoIPoL7p+XOCvs2qtaecWS/8ugy76
+ mWjA==
+X-Gm-Message-State: AOAM531Xp6z9jQVTVbPfJhtEKmvK5Lgby8gnYWGmu+WmcF1i5v0n9c8A
+ zWfBglKld+VZ4fnCYxSaKJfilTW0LLRWiQ==
+X-Google-Smtp-Source: ABdhPJxQwn6/fJwkEddjUihdiWpzYU1DmU0zX2cFAFN6eyCiaXkiyeHaOCHuWzW+ril+/UcOyi2ksQ==
+X-Received: by 2002:a17:902:b086:b029:d1:e5e7:bddb with SMTP id
+ p6-20020a170902b086b02900d1e5e7bddbmr12621604plr.59.1600387051902; 
+ Thu, 17 Sep 2020 16:57:31 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id m13sm772699pfk.103.2020.09.17.16.57.26
+ by smtp.gmail.com with ESMTPSA id m13sm772699pfk.103.2020.09.17.16.57.30
+ for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Sep 2020 16:57:26 -0700 (PDT)
+ Thu, 17 Sep 2020 16:57:31 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 04/10] disas: Clean up CPUDebug initialization
-Date: Thu, 17 Sep 2020 16:57:14 -0700
-Message-Id: <20200917235720.2685978-5-richard.henderson@linaro.org>
+Subject: [PATCH v3 08/10] disas: Split out capstone code to disas/capstone.c
+Date: Thu, 17 Sep 2020 16:57:18 -0700
+Message-Id: <20200917235720.2685978-9-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200917235720.2685978-1-richard.henderson@linaro.org>
 References: <20200917235720.2685978-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -86,8 +87,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- T_PDS_OTHER_BAD_TLD=0.01 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,528 +101,656 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rename several functions, dropping "generic" and making "host"
-vs "target" clearer.  Make a bunch of functions static that are
-not used outside this file. Replace INIT_DISASSEMBLE_INFO with
-a trio of functions.
+There is nothing target-specific about this code, so it
+can be added to common_ss.  This also requires that the
+base capstone dependency be added to common_ss, so that
+we get the correct include paths added to CFLAGS.
 
-Acked-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/disas/dis-asm.h |  62 --------
- disas.c                 | 326 ++++++++++++++++++----------------------
- 2 files changed, 148 insertions(+), 240 deletions(-)
+ include/disas/dis-asm.h |  12 ++
+ disas.c                 | 275 --------------------------------------
+ disas/capstone.c        | 286 ++++++++++++++++++++++++++++++++++++++++
+ disas/meson.build       |   1 +
+ meson.build             |   1 +
+ 5 files changed, 300 insertions(+), 275 deletions(-)
+ create mode 100644 disas/capstone.c
 
 diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
-index 9856bf7921..dda247eaf2 100644
+index 6b45aa9898..2164762b46 100644
 --- a/include/disas/dis-asm.h
 +++ b/include/disas/dis-asm.h
-@@ -406,7 +406,6 @@ typedef struct disassemble_info {
- 
- } disassemble_info;
- 
--
- /* Standard disassemblers.  Disassemble one instruction at the given
-    target address.  Return number of bytes processed.  */
- typedef int (*disassembler_ftype) (bfd_vma, disassemble_info *);
-@@ -461,67 +460,6 @@ int print_insn_riscv32          (bfd_vma, disassemble_info*);
+@@ -460,6 +460,18 @@ int print_insn_riscv32          (bfd_vma, disassemble_info*);
  int print_insn_riscv64          (bfd_vma, disassemble_info*);
  int print_insn_rx(bfd_vma, disassemble_info *);
  
--#if 0
--/* Fetch the disassembler for a given BFD, if that support is available.  */
--disassembler_ftype disassembler(bfd *);
--#endif
--
--
--/* This block of definitions is for particular callers who read instructions
--   into a buffer before calling the instruction decoder.  */
--
--/* Here is a function which callers may wish to use for read_memory_func.
--   It gets bytes from a buffer.  */
--int buffer_read_memory(bfd_vma, bfd_byte *, int, struct disassemble_info *);
--
--/* This function goes with buffer_read_memory.
--   It prints a message using info->fprintf_func and info->stream.  */
--void perror_memory(int, bfd_vma, struct disassemble_info *);
--
--
--/* Just print the address in hex.  This is included for completeness even
--   though both GDB and objdump provide their own (to print symbolic
--   addresses).  */
--void generic_print_address(bfd_vma, struct disassemble_info *);
--
--/* Always true.  */
--int generic_symbol_at_address(bfd_vma, struct disassemble_info *);
--
--/* Macro to initialize a disassemble_info struct.  This should be called
--   by all applications creating such a struct.  */
--#define INIT_DISASSEMBLE_INFO(INFO, STREAM, FPRINTF_FUNC) \
--  (INFO).flavour = bfd_target_unknown_flavour, \
--  (INFO).arch = bfd_arch_unknown, \
--  (INFO).mach = 0, \
--  (INFO).endian = BFD_ENDIAN_UNKNOWN, \
--  INIT_DISASSEMBLE_INFO_NO_ARCH(INFO, STREAM, FPRINTF_FUNC)
--
--/* Call this macro to initialize only the internal variables for the
--   disassembler.  Architecture dependent things such as byte order, or machine
--   variant are not touched by this macro.  This makes things much easier for
--   GDB which must initialize these things separately.  */
--
--#define INIT_DISASSEMBLE_INFO_NO_ARCH(INFO, STREAM, FPRINTF_FUNC) \
--  (INFO).fprintf_func = (FPRINTF_FUNC), \
--  (INFO).stream = (STREAM), \
--  (INFO).symbols = NULL, \
--  (INFO).num_symbols = 0, \
--  (INFO).private_data = NULL, \
--  (INFO).buffer = NULL, \
--  (INFO).buffer_vma = 0, \
--  (INFO).buffer_length = 0, \
--  (INFO).read_memory_func = buffer_read_memory, \
--  (INFO).memory_error_func = perror_memory, \
--  (INFO).print_address_func = generic_print_address, \
--  (INFO).print_insn = NULL, \
--  (INFO).symbol_at_address_func = generic_symbol_at_address, \
--  (INFO).flags = 0, \
--  (INFO).bytes_per_line = 0, \
--  (INFO).bytes_per_chunk = 0, \
--  (INFO).display_endian = BFD_ENDIAN_UNKNOWN, \
--  (INFO).disassembler_options = NULL, \
--  (INFO).insn_info_valid = 0
--
++#ifdef CONFIG_CAPSTONE
++bool cap_disas_target(disassemble_info *info, uint64_t pc, size_t size);
++bool cap_disas_host(disassemble_info *info, void *code, size_t size);
++bool cap_disas_monitor(disassemble_info *info, uint64_t pc, int count);
++bool cap_disas_plugin(disassemble_info *info, uint64_t pc, size_t size);
++#else
++# define cap_disas_target(i, p, s)  false
++# define cap_disas_host(i, p, s)    false
++# define cap_disas_monitor(i, p, c) false
++# define cap_disas_plugin(i, p, c)  false
++#endif /* CONFIG_CAPSTONE */
++
  #ifndef ATTRIBUTE_UNUSED
  #define ATTRIBUTE_UNUSED __attribute__((unused))
  #endif
 diff --git a/disas.c b/disas.c
-index a4304e8137..7bc8e9a037 100644
+index 01c8bc6c9e..e27dea2c19 100644
 --- a/disas.c
 +++ b/disas.c
-@@ -16,78 +16,66 @@ typedef struct CPUDebug {
- /* Filled in by elfload.c.  Simplistic, but will do for now. */
- struct syminfo *syminfos = NULL;
+@@ -107,255 +107,6 @@ static int print_insn_od_target(bfd_vma pc, disassemble_info *info)
+     return print_insn_objdump(pc, info, "OBJD-T");
+ }
  
--/* Get LENGTH bytes from info's buffer, at target address memaddr.
--   Transfer them to myaddr.  */
--int
--buffer_read_memory(bfd_vma memaddr, bfd_byte *myaddr, int length,
--                   struct disassemble_info *info)
-+/*
-+ * Get LENGTH bytes from info's buffer, at host address memaddr.
-+ * Transfer them to myaddr.
-+ */
-+static int host_read_memory(bfd_vma memaddr, bfd_byte *myaddr, int length,
-+                            struct disassemble_info *info)
+-#ifdef CONFIG_CAPSTONE
+-/* Temporary storage for the capstone library.  This will be alloced via
+-   malloc with a size private to the library; thus there's no reason not
+-   to share this across calls and across host vs target disassembly.  */
+-static __thread cs_insn *cap_insn;
+-
+-/* Initialize the Capstone library.  */
+-/* ??? It would be nice to cache this.  We would need one handle for the
+-   host and one for the target.  For most targets we can reset specific
+-   parameters via cs_option(CS_OPT_MODE, new_mode), but we cannot change
+-   CS_ARCH_* in this way.  Thus we would need to be able to close and
+-   re-open the target handle with a different arch for the target in order
+-   to handle AArch64 vs AArch32 mode switching.  */
+-static cs_err cap_disas_start(disassemble_info *info, csh *handle)
+-{
+-    cs_mode cap_mode = info->cap_mode;
+-    cs_err err;
+-
+-    cap_mode += (info->endian == BFD_ENDIAN_BIG ? CS_MODE_BIG_ENDIAN
+-                 : CS_MODE_LITTLE_ENDIAN);
+-
+-    err = cs_open(info->cap_arch, cap_mode, handle);
+-    if (err != CS_ERR_OK) {
+-        return err;
+-    }
+-
+-    /* ??? There probably ought to be a better place to put this.  */
+-    if (info->cap_arch == CS_ARCH_X86) {
+-        /* We don't care about errors (if for some reason the library
+-           is compiled without AT&T syntax); the user will just have
+-           to deal with the Intel syntax.  */
+-        cs_option(*handle, CS_OPT_SYNTAX, CS_OPT_SYNTAX_ATT);
+-    }
+-
+-    /* "Disassemble" unknown insns as ".byte W,X,Y,Z".  */
+-    cs_option(*handle, CS_OPT_SKIPDATA, CS_OPT_ON);
+-
+-    /* Allocate temp space for cs_disasm_iter.  */
+-    if (cap_insn == NULL) {
+-        cap_insn = cs_malloc(*handle);
+-        if (cap_insn == NULL) {
+-            cs_close(handle);
+-            return CS_ERR_MEM;
+-        }
+-    }
+-    return CS_ERR_OK;
+-}
+-
+-static void cap_dump_insn_units(disassemble_info *info, cs_insn *insn,
+-                                int i, int n)
+-{
+-    fprintf_function print = info->fprintf_func;
+-    FILE *stream = info->stream;
+-
+-    switch (info->cap_insn_unit) {
+-    case 4:
+-        if (info->endian == BFD_ENDIAN_BIG) {
+-            for (; i < n; i += 4) {
+-                print(stream, " %08x", ldl_be_p(insn->bytes + i));
+-
+-            }
+-        } else {
+-            for (; i < n; i += 4) {
+-                print(stream, " %08x", ldl_le_p(insn->bytes + i));
+-            }
+-        }
+-        break;
+-
+-    case 2:
+-        if (info->endian == BFD_ENDIAN_BIG) {
+-            for (; i < n; i += 2) {
+-                print(stream, " %04x", lduw_be_p(insn->bytes + i));
+-            }
+-        } else {
+-            for (; i < n; i += 2) {
+-                print(stream, " %04x", lduw_le_p(insn->bytes + i));
+-            }
+-        }
+-        break;
+-
+-    default:
+-        for (; i < n; i++) {
+-            print(stream, " %02x", insn->bytes[i]);
+-        }
+-        break;
+-    }
+-}
+-
+-static void cap_dump_insn(disassemble_info *info, cs_insn *insn)
+-{
+-    fprintf_function print = info->fprintf_func;
+-    int i, n, split;
+-
+-    print(info->stream, "0x%08" PRIx64 ": ", insn->address);
+-
+-    n = insn->size;
+-    split = info->cap_insn_split;
+-
+-    /* Dump the first SPLIT bytes of the instruction.  */
+-    cap_dump_insn_units(info, insn, 0, MIN(n, split));
+-
+-    /* Add padding up to SPLIT so that mnemonics line up.  */
+-    if (n < split) {
+-        int width = (split - n) / info->cap_insn_unit;
+-        width *= (2 * info->cap_insn_unit + 1);
+-        print(info->stream, "%*s", width, "");
+-    }
+-
+-    /* Print the actual instruction.  */
+-    print(info->stream, "  %-8s %s\n", insn->mnemonic, insn->op_str);
+-
+-    /* Dump any remaining part of the insn on subsequent lines.  */
+-    for (i = split; i < n; i += split) {
+-        print(info->stream, "0x%08" PRIx64 ": ", insn->address + i);
+-        cap_dump_insn_units(info, insn, i, MIN(n, i + split));
+-        print(info->stream, "\n");
+-    }
+-}
+-
+-/* Disassemble SIZE bytes at PC for the target.  */
+-static bool cap_disas_target(disassemble_info *info, uint64_t pc, size_t size)
+-{
+-    uint8_t cap_buf[1024];
+-    csh handle;
+-    cs_insn *insn;
+-    size_t csize = 0;
+-
+-    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
+-        return false;
+-    }
+-    insn = cap_insn;
+-
+-    while (1) {
+-        size_t tsize = MIN(sizeof(cap_buf) - csize, size);
+-        const uint8_t *cbuf = cap_buf;
+-
+-        target_read_memory(pc + csize, cap_buf + csize, tsize, info);
+-        csize += tsize;
+-        size -= tsize;
+-
+-        while (cs_disasm_iter(handle, &cbuf, &csize, &pc, insn)) {
+-            cap_dump_insn(info, insn);
+-        }
+-
+-        /* If the target memory is not consumed, go back for more... */
+-        if (size != 0) {
+-            /* ... taking care to move any remaining fractional insn
+-               to the beginning of the buffer.  */
+-            if (csize != 0) {
+-                memmove(cap_buf, cbuf, csize);
+-            }
+-            continue;
+-        }
+-
+-        /* Since the target memory is consumed, we should not have
+-           a remaining fractional insn.  */
+-        if (csize != 0) {
+-            (*info->fprintf_func)(info->stream,
+-                "Disassembler disagrees with translator "
+-                "over instruction decoding\n"
+-                "Please report this to qemu-devel@nongnu.org\n");
+-        }
+-        break;
+-    }
+-
+-    cs_close(&handle);
+-    return true;
+-}
+-
+-/* Disassemble SIZE bytes at CODE for the host.  */
+-static bool cap_disas_host(disassemble_info *info, void *code, size_t size)
+-{
+-    csh handle;
+-    const uint8_t *cbuf;
+-    cs_insn *insn;
+-    uint64_t pc;
+-
+-    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
+-        return false;
+-    }
+-    insn = cap_insn;
+-
+-    cbuf = code;
+-    pc = (uintptr_t)code;
+-
+-    while (cs_disasm_iter(handle, &cbuf, &size, &pc, insn)) {
+-        cap_dump_insn(info, insn);
+-    }
+-    if (size != 0) {
+-        (*info->fprintf_func)(info->stream,
+-            "Disassembler disagrees with TCG over instruction encoding\n"
+-            "Please report this to qemu-devel@nongnu.org\n");
+-    }
+-
+-    cs_close(&handle);
+-    return true;
+-}
+-
+-#if !defined(CONFIG_USER_ONLY)
+-/* Disassemble COUNT insns at PC for the target.  */
+-static bool cap_disas_monitor(disassemble_info *info, uint64_t pc, int count)
+-{
+-    uint8_t cap_buf[32];
+-    csh handle;
+-    cs_insn *insn;
+-    size_t csize = 0;
+-
+-    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
+-        return false;
+-    }
+-    insn = cap_insn;
+-
+-    while (1) {
+-        /* We want to read memory for one insn, but generically we do not
+-           know how much memory that is.  We have a small buffer which is
+-           known to be sufficient for all supported targets.  Try to not
+-           read beyond the page, Just In Case.  For even more simplicity,
+-           ignore the actual target page size and use a 1k boundary.  If
+-           that turns out to be insufficient, we'll come back around the
+-           loop and read more.  */
+-        uint64_t epc = QEMU_ALIGN_UP(pc + csize + 1, 1024);
+-        size_t tsize = MIN(sizeof(cap_buf) - csize, epc - pc);
+-        const uint8_t *cbuf = cap_buf;
+-
+-        /* Make certain that we can make progress.  */
+-        assert(tsize != 0);
+-        info->read_memory_func(pc, cap_buf + csize, tsize, info);
+-        csize += tsize;
+-
+-        if (cs_disasm_iter(handle, &cbuf, &csize, &pc, insn)) {
+-            cap_dump_insn(info, insn);
+-            if (--count <= 0) {
+-                break;
+-            }
+-        }
+-        memmove(cap_buf, cbuf, csize);
+-    }
+-
+-    cs_close(&handle);
+-    return true;
+-}
+-#endif /* !CONFIG_USER_ONLY */
+-#else
+-# define cap_disas_target(i, p, s)  false
+-# define cap_disas_host(i, p, s)  false
+-# define cap_disas_monitor(i, p, c)  false
+-# define cap_disas_plugin(i, p, c) false
+-#endif /* CONFIG_CAPSTONE */
+-
+ static void initialize_debug(CPUDebug *s)
  {
-     if (memaddr < info->buffer_vma
--        || memaddr + length > info->buffer_vma + info->buffer_length)
-+        || memaddr + length > info->buffer_vma + info->buffer_length) {
-         /* Out of bounds.  Use EIO because GDB uses it.  */
-         return EIO;
+     memset(s, 0, sizeof(*s));
+@@ -513,32 +264,6 @@ static void plugin_print_address(bfd_vma addr, struct disassemble_info *info)
+ }
+ 
+ 
+-#ifdef CONFIG_CAPSTONE
+-/* Disassemble a single instruction directly into plugin output */
+-static
+-bool cap_disas_plugin(disassemble_info *info, uint64_t pc, size_t size)
+-{
+-    uint8_t cap_buf[64];
+-    const uint8_t *cbuf = cap_buf;
+-    csh handle;
+-
+-    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
+-        return false;
+-    }
+-
+-    assert(size < sizeof(cap_buf));
+-    target_read_memory(pc, cap_buf, size, info);
+-
+-    if (cs_disasm_iter(handle, &cbuf, &size, &pc, cap_insn)) {
+-        GString *s = (GString *)info->stream;
+-        g_string_printf(s, "%s %s", cap_insn->mnemonic, cap_insn->op_str);
+-    }
+-
+-    cs_close(&handle);
+-    return true;
+-}
+-#endif
+-
+ /*
+  * We should only be dissembling one instruction at a time here. If
+  * there is left over it usually indicates the front end has read more
+diff --git a/disas/capstone.c b/disas/capstone.c
+new file mode 100644
+index 0000000000..b48f83958d
+--- /dev/null
++++ b/disas/capstone.c
+@@ -0,0 +1,286 @@
++/*
++ * Interface to the capstone disassembler.
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/bswap.h"
++#include "disas/dis-asm.h"
++#include "disas/capstone.h"
++
++
++/*
++ * Temporary storage for the capstone library.  This will be alloced via
++ * malloc with a size private to the library; thus there's no reason not
++ * to share this across calls and across host vs target disassembly.
++ */
++static __thread cs_insn *cap_insn;
++
++/*
++ * Initialize the Capstone library.
++ *
++ * ??? It would be nice to cache this.  We would need one handle for the
++ * host and one for the target.  For most targets we can reset specific
++ * parameters via cs_option(CS_OPT_MODE, new_mode), but we cannot change
++ * CS_ARCH_* in this way.  Thus we would need to be able to close and
++ * re-open the target handle with a different arch for the target in order
++ * to handle AArch64 vs AArch32 mode switching.
++ */
++static cs_err cap_disas_start(disassemble_info *info, csh *handle)
++{
++    cs_mode cap_mode = info->cap_mode;
++    cs_err err;
++
++    cap_mode += (info->endian == BFD_ENDIAN_BIG ? CS_MODE_BIG_ENDIAN
++                 : CS_MODE_LITTLE_ENDIAN);
++
++    err = cs_open(info->cap_arch, cap_mode, handle);
++    if (err != CS_ERR_OK) {
++        return err;
 +    }
-     memcpy (myaddr, info->buffer + (memaddr - info->buffer_vma), length);
-     return 0;
- }
- 
--/* Get LENGTH bytes from info's buffer, at target address memaddr.
--   Transfer them to myaddr.  */
--static int
--target_read_memory (bfd_vma memaddr,
--                    bfd_byte *myaddr,
--                    int length,
--                    struct disassemble_info *info)
-+/*
-+ * Get LENGTH bytes from info's buffer, at target address memaddr.
-+ * Transfer them to myaddr.
-+ */
-+static int target_read_memory(bfd_vma memaddr, bfd_byte *myaddr, int length,
-+                              struct disassemble_info *info)
- {
-     CPUDebug *s = container_of(info, CPUDebug, info);
--    int r;
--
--    r = cpu_memory_rw_debug(s->cpu, memaddr, myaddr, length, 0);
--
-+    int r = cpu_memory_rw_debug(s->cpu, memaddr, myaddr, length, 0);
-     return r ? EIO : 0;
- }
- 
- /* Print an error message.  We can assume that this is in response to
--   an error return from buffer_read_memory.  */
--void
--perror_memory (int status, bfd_vma memaddr, struct disassemble_info *info)
-+   an error return from {host,target}_read_memory.  */
-+static void perror_memory(int status, bfd_vma memaddr,
-+                          struct disassemble_info *info)
- {
--  if (status != EIO)
--    /* Can't happen.  */
--    (*info->fprintf_func) (info->stream, "Unknown error %d\n", status);
--  else
--    /* Actually, address between memaddr and memaddr + len was
--       out of bounds.  */
--    (*info->fprintf_func) (info->stream,
--			   "Address 0x%" PRIx64 " is out of bounds.\n", memaddr);
-+    if (status != EIO) {
-+        /* Can't happen.  */
-+        info->fprintf_func(info->stream, "Unknown error %d\n", status);
-+    } else {
-+        /* Address between memaddr and memaddr + len was out of bounds.  */
++
++    /* "Disassemble" unknown insns as ".byte W,X,Y,Z".  */
++    cs_option(*handle, CS_OPT_SKIPDATA, CS_OPT_ON);
++
++    if (info->cap_arch == CS_ARCH_X86) {
++        /*
++         * We don't care about errors (if for some reason the library
++         * is compiled without AT&T syntax); the user will just have
++         * to deal with the Intel syntax.
++         */
++        cs_option(*handle, CS_OPT_SYNTAX, CS_OPT_SYNTAX_ATT);
++    }
++
++    /* Allocate temp space for cs_disasm_iter.  */
++    if (cap_insn == NULL) {
++        cap_insn = cs_malloc(*handle);
++        if (cap_insn == NULL) {
++            cs_close(handle);
++            return CS_ERR_MEM;
++        }
++    }
++    return CS_ERR_OK;
++}
++
++static void cap_dump_insn_units(disassemble_info *info, cs_insn *insn,
++                                int i, int n)
++{
++    fprintf_function print = info->fprintf_func;
++    FILE *stream = info->stream;
++
++    switch (info->cap_insn_unit) {
++    case 4:
++        if (info->endian == BFD_ENDIAN_BIG) {
++            for (; i < n; i += 4) {
++                print(stream, " %08x", ldl_be_p(insn->bytes + i));
++
++            }
++        } else {
++            for (; i < n; i += 4) {
++                print(stream, " %08x", ldl_le_p(insn->bytes + i));
++            }
++        }
++        break;
++
++    case 2:
++        if (info->endian == BFD_ENDIAN_BIG) {
++            for (; i < n; i += 2) {
++                print(stream, " %04x", lduw_be_p(insn->bytes + i));
++            }
++        } else {
++            for (; i < n; i += 2) {
++                print(stream, " %04x", lduw_le_p(insn->bytes + i));
++            }
++        }
++        break;
++
++    default:
++        for (; i < n; i++) {
++            print(stream, " %02x", insn->bytes[i]);
++        }
++        break;
++    }
++}
++
++static void cap_dump_insn(disassemble_info *info, cs_insn *insn)
++{
++    fprintf_function print = info->fprintf_func;
++    FILE *stream = info->stream;
++    int i, n, split;
++
++    print(stream, "0x%08" PRIx64 ": ", insn->address);
++
++    n = insn->size;
++    split = info->cap_insn_split;
++
++    /* Dump the first SPLIT bytes of the instruction.  */
++    cap_dump_insn_units(info, insn, 0, MIN(n, split));
++
++    /* Add padding up to SPLIT so that mnemonics line up.  */
++    if (n < split) {
++        int width = (split - n) / info->cap_insn_unit;
++        width *= (2 * info->cap_insn_unit + 1);
++        print(stream, "%*s", width, "");
++    }
++
++    /* Print the actual instruction.  */
++    print(stream, "  %-8s %s\n", insn->mnemonic, insn->op_str);
++
++    /* Dump any remaining part of the insn on subsequent lines.  */
++    for (i = split; i < n; i += split) {
++        print(stream, "0x%08" PRIx64 ": ", insn->address + i);
++        cap_dump_insn_units(info, insn, i, MIN(n, i + split));
++        print(stream, "\n");
++    }
++}
++
++/* Disassemble SIZE bytes at PC for the target.  */
++bool cap_disas_target(disassemble_info *info, uint64_t pc, size_t size)
++{
++    uint8_t cap_buf[1024];
++    csh handle;
++    cs_insn *insn;
++    size_t csize = 0;
++
++    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
++        return false;
++    }
++    insn = cap_insn;
++
++    while (1) {
++        size_t tsize = MIN(sizeof(cap_buf) - csize, size);
++        const uint8_t *cbuf = cap_buf;
++
++        info->read_memory_func(pc + csize, cap_buf + csize, tsize, info);
++        csize += tsize;
++        size -= tsize;
++
++        while (cs_disasm_iter(handle, &cbuf, &csize, &pc, insn)) {
++            cap_dump_insn(info, insn);
++        }
++
++        /* If the target memory is not consumed, go back for more... */
++        if (size != 0) {
++            /*
++             * ... taking care to move any remaining fractional insn
++             * to the beginning of the buffer.
++             */
++            if (csize != 0) {
++                memmove(cap_buf, cbuf, csize);
++            }
++            continue;
++        }
++
++        /*
++         * Since the target memory is consumed, we should not have
++         * a remaining fractional insn.
++         */
++        if (csize != 0) {
++            info->fprintf_func(info->stream,
++                "Disassembler disagrees with translator "
++                "over instruction decoding\n"
++                "Please report this to qemu-devel@nongnu.org\n");
++        }
++        break;
++    }
++
++    cs_close(&handle);
++    return true;
++}
++
++/* Disassemble SIZE bytes at CODE for the host.  */
++bool cap_disas_host(disassemble_info *info, void *code, size_t size)
++{
++    csh handle;
++    const uint8_t *cbuf;
++    cs_insn *insn;
++    uint64_t pc;
++
++    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
++        return false;
++    }
++    insn = cap_insn;
++
++    cbuf = code;
++    pc = (uintptr_t)code;
++
++    while (cs_disasm_iter(handle, &cbuf, &size, &pc, insn)) {
++        cap_dump_insn(info, insn);
++    }
++    if (size != 0) {
 +        info->fprintf_func(info->stream,
-+			   "Address 0x%" PRIx64 " is out of bounds.\n",
-+                           memaddr);
++            "Disassembler disagrees with TCG over instruction encoding\n"
++            "Please report this to qemu-devel@nongnu.org\n");
 +    }
- }
- 
--/* This could be in a separate file, to save minuscule amounts of space
--   in statically linked executables.  */
--
--/* Just print the address is hex.  This is included for completeness even
--   though both GDB and objdump provide their own (to print symbolic
--   addresses).  */
--
--void
--generic_print_address (bfd_vma addr, struct disassemble_info *info)
-+/* Print address in hex. */
-+static void print_address(bfd_vma addr, struct disassemble_info *info)
- {
--    (*info->fprintf_func) (info->stream, "0x%" PRIx64, addr);
-+    info->fprintf_func(info->stream, "0x%" PRIx64, addr);
- }
- 
- /* Print address in hex, truncated to the width of a host virtual address. */
--static void
--generic_print_host_address(bfd_vma addr, struct disassemble_info *info)
-+static void host_print_address(bfd_vma addr, struct disassemble_info *info)
- {
--    uint64_t mask = ~0ULL >> (64 - (sizeof(void *) * 8));
--    generic_print_address(addr & mask, info);
-+    print_address((uintptr_t)addr, info);
- }
- 
--/* Just return the given address.  */
--
--int
--generic_symbol_at_address (bfd_vma addr, struct disassemble_info *info)
-+/* Stub prevents some fruitless earching in optabs disassemblers. */
-+static int symbol_at_address(bfd_vma addr, struct disassemble_info *info)
- {
--  return 1;
-+    return 1;
- }
- 
- bfd_vma bfd_getl64 (const bfd_byte *addr)
-@@ -423,36 +411,116 @@ static bool cap_disas_monitor(disassemble_info *info, uint64_t pc, int count)
- # define cap_disas_plugin(i, p, c) false
- #endif /* CONFIG_CAPSTONE */
- 
-+static void initialize_debug(CPUDebug *s)
-+{
-+    memset(s, 0, sizeof(*s));
-+    s->info.arch = bfd_arch_unknown;
-+    s->info.cap_arch = -1;
-+    s->info.cap_insn_unit = 4;
-+    s->info.cap_insn_split = 4;
-+    s->info.memory_error_func = perror_memory;
-+    s->info.symbol_at_address_func = symbol_at_address;
++
++    cs_close(&handle);
++    return true;
 +}
 +
-+static void initialize_debug_target(CPUDebug *s, CPUState *cpu)
++/* Disassemble COUNT insns at PC for the target.  */
++bool cap_disas_monitor(disassemble_info *info, uint64_t pc, int count)
 +{
-+    initialize_debug(s);
++    uint8_t cap_buf[32];
++    csh handle;
++    cs_insn *insn;
++    size_t csize = 0;
 +
-+    s->cpu = cpu;
-+    s->info.read_memory_func = target_read_memory;
-+    s->info.print_address_func = print_address;
-+#ifdef TARGET_WORDS_BIGENDIAN
-+    s->info.endian = BFD_ENDIAN_BIG;
-+#else
-+    s->info.endian = BFD_ENDIAN_LITTLE;
-+#endif
-+
-+    CPUClass *cc = CPU_GET_CLASS(cpu);
-+    if (cc->disas_set_info) {
-+        cc->disas_set_info(cpu, &s->info);
++    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
++        return false;
 +    }
++    insn = cap_insn;
++
++    while (1) {
++        /*
++         * We want to read memory for one insn, but generically we do not
++         * know how much memory that is.  We have a small buffer which is
++         * known to be sufficient for all supported targets.  Try to not
++         * read beyond the page, Just In Case.  For even more simplicity,
++         * ignore the actual target page size and use a 1k boundary.  If
++         * that turns out to be insufficient, we'll come back around the
++         * loop and read more.
++         */
++        uint64_t epc = QEMU_ALIGN_UP(pc + csize + 1, 1024);
++        size_t tsize = MIN(sizeof(cap_buf) - csize, epc - pc);
++        const uint8_t *cbuf = cap_buf;
++
++        /* Make certain that we can make progress.  */
++        assert(tsize != 0);
++        info->read_memory_func(pc, cap_buf + csize, tsize, info);
++        csize += tsize;
++
++        if (cs_disasm_iter(handle, &cbuf, &csize, &pc, insn)) {
++            cap_dump_insn(info, insn);
++            if (--count <= 0) {
++                break;
++            }
++        }
++        memmove(cap_buf, cbuf, csize);
++    }
++
++    cs_close(&handle);
++    return true;
 +}
 +
-+static void initialize_debug_host(CPUDebug *s)
++/* Disassemble a single instruction directly into plugin output */
++bool cap_disas_plugin(disassemble_info *info, uint64_t pc, size_t size)
 +{
-+    initialize_debug(s);
++    uint8_t cap_buf[32];
++    const uint8_t *cbuf = cap_buf;
++    csh handle;
 +
-+    s->info.read_memory_func = host_read_memory;
-+    s->info.print_address_func = host_print_address;
-+#ifdef HOST_WORDS_BIGENDIAN
-+    s->info.endian = BFD_ENDIAN_BIG;
-+#else
-+    s->info.endian = BFD_ENDIAN_LITTLE;
-+#endif
-+#if defined(CONFIG_TCG_INTERPRETER)
-+    s->info.print_insn = print_insn_tci;
-+#elif defined(__i386__)
-+    s->info.mach = bfd_mach_i386_i386;
-+    s->info.print_insn = print_insn_i386;
-+    s->info.cap_arch = CS_ARCH_X86;
-+    s->info.cap_mode = CS_MODE_32;
-+    s->info.cap_insn_unit = 1;
-+    s->info.cap_insn_split = 8;
-+#elif defined(__x86_64__)
-+    s->info.mach = bfd_mach_x86_64;
-+    s->info.print_insn = print_insn_i386;
-+    s->info.cap_arch = CS_ARCH_X86;
-+    s->info.cap_mode = CS_MODE_64;
-+    s->info.cap_insn_unit = 1;
-+    s->info.cap_insn_split = 8;
-+#elif defined(_ARCH_PPC)
-+    s->info.disassembler_options = (char *)"any";
-+    s->info.print_insn = print_insn_ppc;
-+    s->info.cap_arch = CS_ARCH_PPC;
-+# ifdef _ARCH_PPC64
-+    s->info.cap_mode = CS_MODE_64;
-+# endif
-+#elif defined(__riscv) && defined(CONFIG_RISCV_DIS)
-+#if defined(_ILP32) || (__riscv_xlen == 32)
-+    s->info.print_insn = print_insn_riscv32;
-+#elif defined(_LP64)
-+    s->info.print_insn = print_insn_riscv64;
-+#else
-+#error unsupported RISC-V ABI
-+#endif
-+#elif defined(__aarch64__) && defined(CONFIG_ARM_A64_DIS)
-+    s->info.print_insn = print_insn_arm_a64;
-+    s->info.cap_arch = CS_ARCH_ARM64;
-+#elif defined(__alpha__)
-+    s->info.print_insn = print_insn_alpha;
-+#elif defined(__sparc__)
-+    s->info.print_insn = print_insn_sparc;
-+    s->info.mach = bfd_mach_sparc_v9b;
-+#elif defined(__arm__)
-+    /* TCG only generates code for arm mode.  */
-+    s->info.print_insn = print_insn_arm;
-+    s->info.cap_arch = CS_ARCH_ARM;
-+#elif defined(__MIPSEB__)
-+    s->info.print_insn = print_insn_big_mips;
-+#elif defined(__MIPSEL__)
-+    s->info.print_insn = print_insn_little_mips;
-+#elif defined(__m68k__)
-+    s->info.print_insn = print_insn_m68k;
-+#elif defined(__s390__)
-+    s->info.print_insn = print_insn_s390;
-+#elif defined(__hppa__)
-+    s->info.print_insn = print_insn_hppa;
-+#endif
++    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
++        return false;
++    }
++
++    assert(size < sizeof(cap_buf));
++    info->read_memory_func(pc, cap_buf, size, info);
++
++    if (cs_disasm_iter(handle, &cbuf, &size, &pc, cap_insn)) {
++        info->fprintf_func(info->stream, "%s %s",
++                           cap_insn->mnemonic, cap_insn->op_str);
++    }
++
++    cs_close(&handle);
++    return true;
 +}
-+
- /* Disassemble this for me please... (debugging).  */
- void target_disas(FILE *out, CPUState *cpu, target_ulong code,
-                   target_ulong size)
- {
--    CPUClass *cc = CPU_GET_CLASS(cpu);
-     target_ulong pc;
-     int count;
-     CPUDebug s;
+diff --git a/disas/meson.build b/disas/meson.build
+index bde8280c73..09a852742e 100644
+--- a/disas/meson.build
++++ b/disas/meson.build
+@@ -21,5 +21,6 @@ common_ss.add(when: 'CONFIG_S390_DIS', if_true: files('s390.c'))
+ common_ss.add(when: 'CONFIG_SH4_DIS', if_true: files('sh4.c'))
+ common_ss.add(when: 'CONFIG_SPARC_DIS', if_true: files('sparc.c'))
+ common_ss.add(when: 'CONFIG_XTENSA_DIS', if_true: files('xtensa.c'))
++common_ss.add(when: capstone, if_true: files('capstone.c'))
  
--    INIT_DISASSEMBLE_INFO(s.info, out, fprintf);
--
--    s.cpu = cpu;
--    s.info.read_memory_func = target_read_memory;
-+    initialize_debug_target(&s, cpu);
-+    s.info.fprintf_func = fprintf;
-+    s.info.stream = out;
-     s.info.buffer_vma = code;
-     s.info.buffer_length = size;
--    s.info.print_address_func = generic_print_address;
--    s.info.cap_arch = -1;
--    s.info.cap_mode = 0;
--    s.info.cap_insn_unit = 4;
--    s.info.cap_insn_split = 4;
--
--#ifdef TARGET_WORDS_BIGENDIAN
--    s.info.endian = BFD_ENDIAN_BIG;
--#else
--    s.info.endian = BFD_ENDIAN_LITTLE;
--#endif
--
--    if (cc->disas_set_info) {
--        cc->disas_set_info(cpu, &s.info);
--    }
+ specific_ss.add(when: 'CONFIG_TCG_INTERPRETER', if_true: files('tci.c'))
+diff --git a/meson.build b/meson.build
+index 4c92b43fe5..e16a2b051d 100644
+--- a/meson.build
++++ b/meson.build
+@@ -965,6 +965,7 @@ common_ss.add(files('cpus-common.c'))
  
-     if (s.info.cap_arch >= 0 && cap_disas_target(&s.info, code, size)) {
-         return;
-@@ -540,34 +608,17 @@ bool cap_disas_plugin(disassemble_info *info, uint64_t pc, size_t size)
-  */
- char *plugin_disas(CPUState *cpu, uint64_t addr, size_t size)
- {
--    CPUClass *cc = CPU_GET_CLASS(cpu);
-     int count;
-     CPUDebug s;
-     GString *ds = g_string_set_size(&plugin_disas_output, 0);
+ subdir('softmmu')
  
-     g_assert(ds == &plugin_disas_output);
- 
--    INIT_DISASSEMBLE_INFO(s.info, NULL, plugin_printf);
--
--    s.cpu = cpu;
--    s.info.read_memory_func = target_read_memory;
-+    initialize_debug_target(&s, cpu);
-+    s.info.fprintf_func = plugin_printf;
-     s.info.buffer_vma = addr;
-     s.info.buffer_length = size;
-     s.info.print_address_func = plugin_print_address;
--    s.info.cap_arch = -1;
--    s.info.cap_mode = 0;
--    s.info.cap_insn_unit = 4;
--    s.info.cap_insn_split = 4;
--
--#ifdef TARGET_WORDS_BIGENDIAN
--    s.info.endian = BFD_ENDIAN_BIG;
--#else
--    s.info.endian = BFD_ENDIAN_LITTLE;
--#endif
--
--    if (cc->disas_set_info) {
--        cc->disas_set_info(cpu, &s.info);
--    }
- 
-     if (s.info.cap_arch >= 0 && cap_disas_plugin(&s.info, addr, size)) {
-         return g_strdup(ds->str);
-@@ -593,89 +644,24 @@ void disas(FILE *out, void *code, unsigned long size)
-     uintptr_t pc;
-     int count;
-     CPUDebug s;
--    int (*print_insn)(bfd_vma pc, disassemble_info *info) = NULL;
--
--    INIT_DISASSEMBLE_INFO(s.info, out, fprintf);
--    s.info.print_address_func = generic_print_host_address;
- 
-+    initialize_debug_host(&s);
-+    s.info.fprintf_func = fprintf;
-+    s.info.stream = out;
-     s.info.buffer = code;
-     s.info.buffer_vma = (uintptr_t)code;
-     s.info.buffer_length = size;
--    s.info.cap_arch = -1;
--    s.info.cap_mode = 0;
--    s.info.cap_insn_unit = 4;
--    s.info.cap_insn_split = 4;
--
--#ifdef HOST_WORDS_BIGENDIAN
--    s.info.endian = BFD_ENDIAN_BIG;
--#else
--    s.info.endian = BFD_ENDIAN_LITTLE;
--#endif
--#if defined(CONFIG_TCG_INTERPRETER)
--    print_insn = print_insn_tci;
--#elif defined(__i386__)
--    s.info.mach = bfd_mach_i386_i386;
--    print_insn = print_insn_i386;
--    s.info.cap_arch = CS_ARCH_X86;
--    s.info.cap_mode = CS_MODE_32;
--    s.info.cap_insn_unit = 1;
--    s.info.cap_insn_split = 8;
--#elif defined(__x86_64__)
--    s.info.mach = bfd_mach_x86_64;
--    print_insn = print_insn_i386;
--    s.info.cap_arch = CS_ARCH_X86;
--    s.info.cap_mode = CS_MODE_64;
--    s.info.cap_insn_unit = 1;
--    s.info.cap_insn_split = 8;
--#elif defined(_ARCH_PPC)
--    s.info.disassembler_options = (char *)"any";
--    print_insn = print_insn_ppc;
--    s.info.cap_arch = CS_ARCH_PPC;
--# ifdef _ARCH_PPC64
--    s.info.cap_mode = CS_MODE_64;
--# endif
--#elif defined(__riscv) && defined(CONFIG_RISCV_DIS)
--#if defined(_ILP32) || (__riscv_xlen == 32)
--    print_insn = print_insn_riscv32;
--#elif defined(_LP64)
--    print_insn = print_insn_riscv64;
--#else
--#error unsupported RISC-V ABI
--#endif
--#elif defined(__aarch64__) && defined(CONFIG_ARM_A64_DIS)
--    print_insn = print_insn_arm_a64;
--    s.info.cap_arch = CS_ARCH_ARM64;
--#elif defined(__alpha__)
--    print_insn = print_insn_alpha;
--#elif defined(__sparc__)
--    print_insn = print_insn_sparc;
--    s.info.mach = bfd_mach_sparc_v9b;
--#elif defined(__arm__)
--    print_insn = print_insn_arm;
--    s.info.cap_arch = CS_ARCH_ARM;
--    /* TCG only generates code for arm mode.  */
--#elif defined(__MIPSEB__)
--    print_insn = print_insn_big_mips;
--#elif defined(__MIPSEL__)
--    print_insn = print_insn_little_mips;
--#elif defined(__m68k__)
--    print_insn = print_insn_m68k;
--#elif defined(__s390__)
--    print_insn = print_insn_s390;
--#elif defined(__hppa__)
--    print_insn = print_insn_hppa;
--#endif
- 
-     if (s.info.cap_arch >= 0 && cap_disas_host(&s.info, code, size)) {
-         return;
-     }
- 
--    if (print_insn == NULL) {
--        print_insn = print_insn_od_host;
-+    if (s.info.print_insn == NULL) {
-+        s.info.print_insn = print_insn_od_host;
-     }
-     for (pc = (uintptr_t)code; size > 0; pc += count, size -= count) {
-         fprintf(out, "0x%08" PRIxPTR ":  ", pc);
--        count = print_insn(pc, &s.info);
-+        count = s.info.print_insn(pc, &s.info);
-         fprintf(out, "\n");
-         if (count < 0) {
-             break;
-@@ -720,31 +706,15 @@ physical_read_memory(bfd_vma memaddr, bfd_byte *myaddr, int length,
- void monitor_disas(Monitor *mon, CPUState *cpu,
-                    target_ulong pc, int nb_insn, int is_physical)
- {
--    CPUClass *cc = CPU_GET_CLASS(cpu);
-     int count, i;
-     CPUDebug s;
- 
--    INIT_DISASSEMBLE_INFO(s.info, NULL, qemu_fprintf);
--
--    s.cpu = cpu;
--    s.info.read_memory_func
--        = (is_physical ? physical_read_memory : target_read_memory);
--    s.info.print_address_func = generic_print_address;
--    s.info.buffer_vma = pc;
--    s.info.cap_arch = -1;
--    s.info.cap_mode = 0;
--    s.info.cap_insn_unit = 4;
--    s.info.cap_insn_split = 4;
--
--#ifdef TARGET_WORDS_BIGENDIAN
--    s.info.endian = BFD_ENDIAN_BIG;
--#else
--    s.info.endian = BFD_ENDIAN_LITTLE;
--#endif
--
--    if (cc->disas_set_info) {
--        cc->disas_set_info(cpu, &s.info);
-+    initialize_debug_target(&s, cpu);
-+    s.info.fprintf_func = qemu_fprintf;
-+    if (is_physical) {
-+        s.info.read_memory_func = physical_read_memory;
-     }
-+    s.info.buffer_vma = pc;
- 
-     if (s.info.cap_arch >= 0 && cap_disas_monitor(&s.info, pc, nb_insn)) {
-         return;
++common_ss.add(capstone)
+ specific_ss.add(files('disas.c', 'exec.c', 'gdbstub.c'), capstone, libpmem, libdaxctl)
+ specific_ss.add(files('exec-vary.c'))
+ specific_ss.add(when: 'CONFIG_TCG', if_true: files(
 -- 
 2.25.1
 
