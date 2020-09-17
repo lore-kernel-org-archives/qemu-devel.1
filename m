@@ -2,72 +2,62 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3642CC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:13:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D34CC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:14:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEF0F2075B
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:13:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEF0F2075B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9EB052075B
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:14:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EB052075B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIp3A-00016t-SF
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 04:13:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55086)
+	id 1kIp3v-00028V-QP
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 04:14:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51748)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kIowk-0000uc-Cj
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 04:07:14 -0400
-Resent-Date: Thu, 17 Sep 2020 04:07:14 -0400
-Resent-Message-Id: <E1kIowk-0000uc-Cj@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21722)
+ (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
+ id 1kIohh-0005C3-5f; Thu, 17 Sep 2020 03:51:41 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:4758 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kIowh-0007Ko-TP
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 04:07:13 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1600330001; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=buxGrlrOH2WaYp9TMoAyu2EbWW7NqyDcPbbCjEzKdqVOY64CqNwxYToPaYt0vEh5YDbRDRzBGH0Ze9yc88QQskBPkiRfV2JXw1cbC5hDoZESGQ30vl7n/SalXyz8UsTN4QoiOHCxyFOq7QeeLFibugFygKRn823pD1Vc2BSMuoc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1600330001;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=VyxmvDhQu60v1mejppi4ObQpPzRn+QAl0Ja0tVJjzlE=; 
- b=Lr7lfZic5Msx/GhcZ0SOLxvGTJ6sUTqekbG63mGpD6eISKzUR9m0zf0sgb67wNNSg4r7LVq6+URxgzcJPmFve573eIRzQ3XOpEiYluFo4rpG4GUpkuffSIAAYrNzq7dG91/+aUvIikbO6sa1NFqLdpyBkWHex73E4flwcch8+ko=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1600329999570500.97037922096024;
- Thu, 17 Sep 2020 01:06:39 -0700 (PDT)
-Subject: Re: [PATCH v6 00/12] i440fx/acpi: addition of feature and bug fixes.
-Message-ID: <160032999760.8478.8560819129012516657@66eaa9a8a123>
-In-Reply-To: <20200917074733.13612-1-ani@anisinha.ca>
+ (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
+ id 1kIohb-0005No-44; Thu, 17 Sep 2020 03:51:40 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 438AAC340460D82E3D51;
+ Thu, 17 Sep 2020 15:51:29 +0800 (CST)
+Received: from localhost (10.174.187.87) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
+ 15:51:22 +0800
+From: zhaolichang <zhaolichang@huawei.com>
+To: <qemu-trivial@nongnu.org>
+Subject: [PATCH V3 10/10] contrib/: fix some comment spelling errors
+Date: Thu, 17 Sep 2020 15:50:29 +0800
+Message-ID: <20200917075029.313-11-zhaolichang@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
+In-Reply-To: <20200917075029.313-1-zhaolichang@huawei.com>
+References: <20200917075029.313-1-zhaolichang@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: ani@anisinha.ca
-Date: Thu, 17 Sep 2020 01:06:39 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 04:07:10
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.187.87]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.191;
+ envelope-from=zhaolichang@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 03:37:07
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,21 +71,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, mst@redhat.com, jusual@redhat.com, f4bug@amsat.org,
- qemu-devel@nongnu.org, aleksandar.qemu.devel@gmail.com, imammedo@redhat.com,
- ani@anisinha.ca, pbonzini@redhat.com, aurelien@aurel32.net, rth@twiddle.net
+Cc: zhaolichang <zhaolichang@huawei.com>, Alex Bennee <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkxNzA3NDczMy4xMzYx
-Mi0xLWFuaUBhbmlzaW5oYS5jYS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
-bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
-bWF0aW9uOgoKTi9BLiBJbnRlcm5hbCBlcnJvciB3aGlsZSByZWFkaW5nIGxvZyBmaWxlCgoKClRo
-ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA5
-MTcwNzQ3MzMuMTM2MTItMS1hbmlAYW5pc2luaGEuY2EvdGVzdGluZy5jaGVja3BhdGNoLz90eXBl
-PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29t
+I found that there are many spelling errors in the comments of qemu,
+so I used the spellcheck tool to check the spelling errors
+and finally found some spelling errors in the contrib folder.
+
+Signed-off-by: zhaolichang <zhaolichang@huawei.com>
+Reviewed-by: Alex Bennee <alex.bennee@linaro.org>
+---
+ contrib/gitdm/filetypes.txt             | 6 +++---
+ contrib/ivshmem-client/ivshmem-client.h | 2 +-
+ contrib/libvhost-user/libvhost-user.c   | 4 ++--
+ contrib/libvhost-user/libvhost-user.h   | 2 +-
+ 4 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/contrib/gitdm/filetypes.txt b/contrib/gitdm/filetypes.txt
+index 9e9c505205..d2d6f6db8d 100644
+--- a/contrib/gitdm/filetypes.txt
++++ b/contrib/gitdm/filetypes.txt
+@@ -22,7 +22,7 @@
+ # in the gitdm sample-config directory.
+ #
+ # This file contains associations parameters regarding filetypes
+-# (documentation, develompent, multimedia, images...)
++# (documentation, development, multimedia, images...)
+ #
+ # format:
+ # filetype <type> <regex> [<comment>]
+@@ -59,8 +59,8 @@ filetype code \.s$	# Assembly
+ filetype code \.S$	# Assembly
+ filetype code \.asm$	# Assembly
+ filetype code \.awk$	# awk
+-filetype code ^common$  # script fragements
+-filetype code ^common.*$  # script fragements
++filetype code ^common$  # script fragments
++filetype code ^common.*$  # script fragments
+ filetype code (qom|qmp)-\w+$  # python script fragments
+ 
+ #
+diff --git a/contrib/ivshmem-client/ivshmem-client.h b/contrib/ivshmem-client/ivshmem-client.h
+index fe3cc4a03d..fc45a38060 100644
+--- a/contrib/ivshmem-client/ivshmem-client.h
++++ b/contrib/ivshmem-client/ivshmem-client.h
+@@ -174,7 +174,7 @@ int ivshmem_client_notify_all_vects(const IvshmemClient *client,
+                                     const IvshmemClientPeer *peer);
+ 
+ /**
+- * Broadcat a notification to all vectors of all peers
++ * Broadcast a notification to all vectors of all peers
+  *
+  * @client: The ivshmem client
+  *
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index 53f16bdf08..9d30ff2283 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -684,7 +684,7 @@ vu_add_mem_reg(VuDev *dev, VhostUserMsg *vmsg) {
+ 
+     /*
+      * If we are in postcopy mode and we receive a u64 payload with a 0 value
+-     * we know all the postcopy client bases have been recieved, and we
++     * we know all the postcopy client bases have been received, and we
+      * should start generating faults.
+      */
+     if (track_ramblocks &&
+@@ -973,7 +973,7 @@ vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vmsg)
+     for (i = 0; i < dev->max_queues; i++) {
+         if (dev->vq[i].vring.desc) {
+             if (map_ring(dev, &dev->vq[i])) {
+-                vu_panic(dev, "remaping queue %d during setmemtable", i);
++                vu_panic(dev, "remapping queue %d during setmemtable", i);
+             }
+         }
+     }
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
+index 844c37c648..287ac5fec7 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -424,7 +424,7 @@ typedef struct VuVirtqElement {
+  * @remove_watch: a remove_watch callback
+  * @iface: a VuDevIface structure with vhost-user device callbacks
+  *
+- * Intializes a VuDev vhost-user context.
++ * Initializes a VuDev vhost-user context.
+  *
+  * Returns: true on success, false on failure.
+  **/
+-- 
+2.26.2.windows.1
+
 
