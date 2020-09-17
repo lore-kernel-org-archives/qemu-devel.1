@@ -2,61 +2,60 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1493C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 01:19:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EB1CC43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 01:19:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CAE020715
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 01:19:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB05720715
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 01:19:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="f3kybrPl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CAE020715
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gPHw6j5e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB05720715
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIia2-0002lK-G5
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 21:19:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56022)
+	id 1kIia6-0002ss-Up
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 21:19:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56016)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kIiXg-0008TT-D1; Wed, 16 Sep 2020 21:16:56 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:49533 helo=ozlabs.org)
+ id 1kIiXf-0008Sm-Dd; Wed, 16 Sep 2020 21:16:55 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:53717 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kIiXc-0002Ru-En; Wed, 16 Sep 2020 21:16:56 -0400
+ id 1kIiXb-0002Rs-O8; Wed, 16 Sep 2020 21:16:55 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BsJvx1Z8Lz9sV6; Thu, 17 Sep 2020 11:16:44 +1000 (AEST)
+ id 4BsJvx5WL3z9sVM; Thu, 17 Sep 2020 11:16:45 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1600305405;
- bh=Wc3VykqGzaeb8hZEoDfWDPV9hCpyiAiimsRNX1MLfBg=;
+ bh=/ykHoG68zyxz4r8AP8iRd7NBsXrdAHAeBSMPe6NAEKc=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=f3kybrPlB0cTG9dg3TZHvuIJGMrxky/IYwj6ZPcVxV6AWqQf0n+GIxbbR7Q32p4Md
- p6GDcWTdqdI1D9yc9L6oBSIfTfhFlR9n3dXQsC/r1gdGgb1Q+inzIkVBofHGU8B3Mz
- XVhzBB+1Dd9/h37qEzgPbFKVZ9lb2J90wP3wuDTk=
-Date: Thu, 17 Sep 2020 10:44:34 +1000
+ b=gPHw6j5ei5+oKdHY/JW70ru27c9JAx/wzz52cpI6g9/7FfnYNyaliF+k0Jr7JkVjY
+ qqCIWsWHhr2Awfpn7/6EX7yM6Zs3//ytndUdDvUyrUelsSlWOwZLvkKhbtTjMtAYLM
+ izRr/nFCNVwHUfma2VdWvNTh472rCTRLRnE4zSV8=
+Date: Thu, 17 Sep 2020 11:08:52 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH 2/2] qom: Use DECLARE_INTERFACE_CHECKER macro
-Message-ID: <20200917004434.GF5258@yekko.fritz.box>
-References: <20200916223258.599367-1-ehabkost@redhat.com>
- <20200916223258.599367-3-ehabkost@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH 00/15] spapr: Error handling fixes and cleanups (round 2)
+Message-ID: <20200917010852.GH5258@yekko.fritz.box>
+References: <20200914123505.612812-1-groug@kaod.org>
+ <20200916024938.GD5258@yekko.fritz.box>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="NQTVMVnDVuULnIzU"
+ protocol="application/pgp-signature"; boundary="PW0Eas8rCkcu1VkF"
 Content-Disposition: inline
-In-Reply-To: <20200916223258.599367-3-ehabkost@redhat.com>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+In-Reply-To: <20200916024938.GD5258@yekko.fritz.box>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 21:16:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -17
 X-Spam_score: -1.8
 X-Spam_bar: -
@@ -75,434 +74,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. Berrange" <berrange@redhat.com>, Corey Minyard <minyard@acm.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org,
- Juan Quintela <quintela@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>,
- =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>,
- =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---NQTVMVnDVuULnIzU
-Content-Type: text/plain; charset=iso-8859-1
+--PW0Eas8rCkcu1VkF
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 16, 2020 at 06:32:58PM -0400, Eduardo Habkost wrote:
-> Mechanical search/replace to use the new
-> DECLARE_INTERFACE_CHECKER macro instead of manually defining
-> macros using INTERFACE_CHECK.
+On Wed, Sep 16, 2020 at 12:49:38PM +1000, David Gibson wrote:
+> On Mon, Sep 14, 2020 at 02:34:50PM +0200, Greg Kurz wrote:
+> > Yet another round of sanitizing the error handling in spapr. I've
+> > identified locations that needed fixing with the errp-guard.cocci
+> > coccinelle script. It turns out that a better result is achieved
+> > by fixing manually, especially by converting some void functions
+> > to indicate success/failure with a return value.
 >=20
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> 1..4 applied to ppc-for-5.2, I'll look at the rest in due course.
 
-ppc parts
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+5..13 now applied as well.
 
-> ---
-> This is an alternative to the patches submitted at
-> https://lore.kernel.org/qemu-devel/20200916193101.511600-3-ehabkost@redha=
-t.com/
-> https://lore.kernel.org/qemu-devel/20200916193101.511600-4-ehabkost@redha=
-t.com/
-> ---
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Corey Minyard <minyard@acm.org>
-> Cc: "C=E9dric Le Goater" <clg@kaod.org>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: "Herv=E9 Poussineau" <hpoussin@reactos.org>
-> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-> Cc: Juan Quintela <quintela@redhat.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: "Daniel P. Berrang=E9" <berrange@redhat.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Stefan Berger <stefanb@linux.ibm.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: qemu-devel@nongnu.org
-> Cc: qemu-ppc@nongnu.org
-> Cc: qemu-arm@nongnu.org
-> ---
->  include/hw/acpi/acpi_dev_interface.h |  5 ++---
->  include/hw/arm/linux-boot-if.h       |  4 ++--
->  include/hw/fw-path-provider.h        |  4 ++--
->  include/hw/hotplug.h                 |  4 ++--
->  include/hw/intc/intc.h               |  5 ++---
->  include/hw/ipmi/ipmi.h               |  4 ++--
->  include/hw/isa/isa.h                 |  4 ++--
->  include/hw/mem/memory-device.h       |  4 ++--
->  include/hw/nmi.h                     |  4 ++--
->  include/hw/ppc/pnv_xscom.h           |  4 ++--
->  include/hw/ppc/spapr_irq.h           |  4 ++--
->  include/hw/ppc/xics.h                |  4 ++--
->  include/hw/ppc/xive.h                | 12 ++++++------
->  include/hw/rdma/rdma.h               |  5 ++---
->  include/hw/rtc/m48t59.h              |  4 ++--
->  include/hw/stream.h                  |  4 ++--
->  include/hw/vmstate-if.h              |  4 ++--
->  include/qom/object_interfaces.h      |  5 ++---
->  include/sysemu/tpm.h                 |  4 ++--
->  target/arm/idau.h                    |  4 ++--
->  tests/check-qom-interface.c          |  4 ++--
->  21 files changed, 46 insertions(+), 50 deletions(-)
 >=20
-> diff --git a/include/hw/acpi/acpi_dev_interface.h b/include/hw/acpi/acpi_=
-dev_interface.h
-> index 9adf1e4706..96aa63919a 100644
-> --- a/include/hw/acpi/acpi_dev_interface.h
-> +++ b/include/hw/acpi/acpi_dev_interface.h
-> @@ -21,9 +21,8 @@ typedef enum {
->  typedef struct AcpiDeviceIfClass AcpiDeviceIfClass;
->  DECLARE_CLASS_CHECKERS(AcpiDeviceIfClass, ACPI_DEVICE_IF,
->                         TYPE_ACPI_DEVICE_IF)
-> -#define ACPI_DEVICE_IF(obj) \
-> -     INTERFACE_CHECK(AcpiDeviceIf, (obj), \
-> -                     TYPE_ACPI_DEVICE_IF)
-> +DECLARE_INTERFACE_CHECKER(AcpiDeviceIf, ACPI_DEVICE_IF,
-> +                          TYPE_ACPI_DEVICE_IF)
-> =20
->  typedef struct AcpiDeviceIf AcpiDeviceIf;
-> =20
-> diff --git a/include/hw/arm/linux-boot-if.h b/include/hw/arm/linux-boot-i=
-f.h
-> index c85f33b2c5..856d95831c 100644
-> --- a/include/hw/arm/linux-boot-if.h
-> +++ b/include/hw/arm/linux-boot-if.h
-> @@ -12,8 +12,8 @@
->  typedef struct ARMLinuxBootIfClass ARMLinuxBootIfClass;
->  DECLARE_CLASS_CHECKERS(ARMLinuxBootIfClass, ARM_LINUX_BOOT_IF,
->                         TYPE_ARM_LINUX_BOOT_IF)
-> -#define ARM_LINUX_BOOT_IF(obj) \
-> -    INTERFACE_CHECK(ARMLinuxBootIf, (obj), TYPE_ARM_LINUX_BOOT_IF)
-> +DECLARE_INTERFACE_CHECKER(ARMLinuxBootIf, ARM_LINUX_BOOT_IF,
-> +                          TYPE_ARM_LINUX_BOOT_IF)
-> =20
->  typedef struct ARMLinuxBootIf ARMLinuxBootIf;
-> =20
-> diff --git a/include/hw/fw-path-provider.h b/include/hw/fw-path-provider.h
-> index 8e1d45651c..93d5fdb6c3 100644
-> --- a/include/hw/fw-path-provider.h
-> +++ b/include/hw/fw-path-provider.h
-> @@ -25,8 +25,8 @@
->  typedef struct FWPathProviderClass FWPathProviderClass;
->  DECLARE_CLASS_CHECKERS(FWPathProviderClass, FW_PATH_PROVIDER,
->                         TYPE_FW_PATH_PROVIDER)
-> -#define FW_PATH_PROVIDER(obj) \
-> -     INTERFACE_CHECK(FWPathProvider, (obj), TYPE_FW_PATH_PROVIDER)
-> +DECLARE_INTERFACE_CHECKER(FWPathProvider, FW_PATH_PROVIDER,
-> +                          TYPE_FW_PATH_PROVIDER)
-> =20
->  typedef struct FWPathProvider FWPathProvider;
-> =20
-> diff --git a/include/hw/hotplug.h b/include/hw/hotplug.h
-> index e15f59c8b3..727c70ca9a 100644
-> --- a/include/hw/hotplug.h
-> +++ b/include/hw/hotplug.h
-> @@ -19,8 +19,8 @@
->  typedef struct HotplugHandlerClass HotplugHandlerClass;
->  DECLARE_CLASS_CHECKERS(HotplugHandlerClass, HOTPLUG_HANDLER,
->                         TYPE_HOTPLUG_HANDLER)
-> -#define HOTPLUG_HANDLER(obj) \
-> -     INTERFACE_CHECK(HotplugHandler, (obj), TYPE_HOTPLUG_HANDLER)
-> +DECLARE_INTERFACE_CHECKER(HotplugHandler, HOTPLUG_HANDLER,
-> +                          TYPE_HOTPLUG_HANDLER)
-> =20
->  typedef struct HotplugHandler HotplugHandler;
-> =20
-> diff --git a/include/hw/intc/intc.h b/include/hw/intc/intc.h
-> index 7018f608ca..9f36c9c14f 100644
-> --- a/include/hw/intc/intc.h
-> +++ b/include/hw/intc/intc.h
-> @@ -8,9 +8,8 @@
->  typedef struct InterruptStatsProviderClass InterruptStatsProviderClass;
->  DECLARE_CLASS_CHECKERS(InterruptStatsProviderClass, INTERRUPT_STATS_PROV=
-IDER,
->                         TYPE_INTERRUPT_STATS_PROVIDER)
-> -#define INTERRUPT_STATS_PROVIDER(obj) \
-> -    INTERFACE_CHECK(InterruptStatsProvider, (obj), \
-> -                    TYPE_INTERRUPT_STATS_PROVIDER)
-> +DECLARE_INTERFACE_CHECKER(InterruptStatsProvider, INTERRUPT_STATS_PROVID=
-ER,
-> +                          TYPE_INTERRUPT_STATS_PROVIDER)
-> =20
->  typedef struct InterruptStatsProvider InterruptStatsProvider;
-> =20
-> diff --git a/include/hw/ipmi/ipmi.h b/include/hw/ipmi/ipmi.h
-> index 3fa5a4abd0..25133264ff 100644
-> --- a/include/hw/ipmi/ipmi.h
-> +++ b/include/hw/ipmi/ipmi.h
-> @@ -109,8 +109,8 @@ uint32_t ipmi_next_uuid(void);
->   * and the BMC.
->   */
->  #define TYPE_IPMI_INTERFACE "ipmi-interface"
-> -#define IPMI_INTERFACE(obj) \
-> -     INTERFACE_CHECK(IPMIInterface, (obj), TYPE_IPMI_INTERFACE)
-> +DECLARE_INTERFACE_CHECKER(IPMIInterface, IPMI_INTERFACE,
-> +                          TYPE_IPMI_INTERFACE)
->  typedef struct IPMIInterfaceClass IPMIInterfaceClass;
->  DECLARE_CLASS_CHECKERS(IPMIInterfaceClass, IPMI_INTERFACE,
->                         TYPE_IPMI_INTERFACE)
-> diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
-> index ddb6a2d168..9e3e8aaaaa 100644
-> --- a/include/hw/isa/isa.h
-> +++ b/include/hw/isa/isa.h
-> @@ -38,8 +38,8 @@ static inline uint16_t applesmc_port(void)
->  typedef struct IsaDmaClass IsaDmaClass;
->  DECLARE_CLASS_CHECKERS(IsaDmaClass, ISADMA,
->                         TYPE_ISADMA)
-> -#define ISADMA(obj) \
-> -    INTERFACE_CHECK(IsaDma, (obj), TYPE_ISADMA)
-> +DECLARE_INTERFACE_CHECKER(IsaDma, ISADMA,
-> +                          TYPE_ISADMA)
-> =20
->  typedef enum {
->      ISADMA_TRANSFER_VERIFY,
-> diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-devic=
-e.h
-> index cde52e83c9..c5b32e2c6a 100644
-> --- a/include/hw/mem/memory-device.h
-> +++ b/include/hw/mem/memory-device.h
-> @@ -22,8 +22,8 @@
->  typedef struct MemoryDeviceClass MemoryDeviceClass;
->  DECLARE_CLASS_CHECKERS(MemoryDeviceClass, MEMORY_DEVICE,
->                         TYPE_MEMORY_DEVICE)
-> -#define MEMORY_DEVICE(obj) \
-> -     INTERFACE_CHECK(MemoryDeviceState, (obj), TYPE_MEMORY_DEVICE)
-> +DECLARE_INTERFACE_CHECKER(MemoryDeviceState, MEMORY_DEVICE,
-> +                          TYPE_MEMORY_DEVICE)
-> =20
->  typedef struct MemoryDeviceState MemoryDeviceState;
-> =20
-> diff --git a/include/hw/nmi.h b/include/hw/nmi.h
-> index fff41bebc6..b31082e969 100644
-> --- a/include/hw/nmi.h
-> +++ b/include/hw/nmi.h
-> @@ -29,8 +29,8 @@
->  typedef struct NMIClass NMIClass;
->  DECLARE_CLASS_CHECKERS(NMIClass, NMI,
->                         TYPE_NMI)
-> -#define NMI(obj) \
-> -     INTERFACE_CHECK(NMIState, (obj), TYPE_NMI)
-> +DECLARE_INTERFACE_CHECKER(NMIState, NMI,
-> +                          TYPE_NMI)
-> =20
->  typedef struct NMIState NMIState;
-> =20
-> diff --git a/include/hw/ppc/pnv_xscom.h b/include/hw/ppc/pnv_xscom.h
-> index 7e3b189c07..0d24a75827 100644
-> --- a/include/hw/ppc/pnv_xscom.h
-> +++ b/include/hw/ppc/pnv_xscom.h
-> @@ -25,8 +25,8 @@
->  typedef struct PnvXScomInterface PnvXScomInterface;
-> =20
->  #define TYPE_PNV_XSCOM_INTERFACE "pnv-xscom-interface"
-> -#define PNV_XSCOM_INTERFACE(obj) \
-> -    INTERFACE_CHECK(PnvXScomInterface, (obj), TYPE_PNV_XSCOM_INTERFACE)
-> +DECLARE_INTERFACE_CHECKER(PnvXScomInterface, PNV_XSCOM_INTERFACE,
-> +                          TYPE_PNV_XSCOM_INTERFACE)
->  typedef struct PnvXScomInterfaceClass PnvXScomInterfaceClass;
->  DECLARE_CLASS_CHECKERS(PnvXScomInterfaceClass, PNV_XSCOM_INTERFACE,
->                         TYPE_PNV_XSCOM_INTERFACE)
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index c22a72c9e2..105e1fb4e7 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -34,8 +34,8 @@ struct SpaprMachineState;
->  typedef struct SpaprInterruptController SpaprInterruptController;
-> =20
->  #define TYPE_SPAPR_INTC "spapr-interrupt-controller"
-> -#define SPAPR_INTC(obj)                                     \
-> -    INTERFACE_CHECK(SpaprInterruptController, (obj), TYPE_SPAPR_INTC)
-> +DECLARE_INTERFACE_CHECKER(SpaprInterruptController, SPAPR_INTC,
-> +                          TYPE_SPAPR_INTC)
->  typedef struct SpaprInterruptControllerClass SpaprInterruptControllerCla=
-ss;
->  DECLARE_CLASS_CHECKERS(SpaprInterruptControllerClass, SPAPR_INTC,
->                         TYPE_SPAPR_INTC)
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index c5a3cdcadc..eea6701371 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -137,8 +137,8 @@ struct ICSIRQState {
->  };
-> =20
->  #define TYPE_XICS_FABRIC "xics-fabric"
-> -#define XICS_FABRIC(obj)                                     \
-> -    INTERFACE_CHECK(XICSFabric, (obj), TYPE_XICS_FABRIC)
-> +DECLARE_INTERFACE_CHECKER(XICSFabric, XICS_FABRIC,
-> +                          TYPE_XICS_FABRIC)
->  typedef struct XICSFabricClass XICSFabricClass;
->  DECLARE_CLASS_CHECKERS(XICSFabricClass, XICS_FABRIC,
->                         TYPE_XICS_FABRIC)
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index 482fafccfd..3db9b4e5fd 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -152,8 +152,8 @@
->  typedef struct XiveNotifier XiveNotifier;
-> =20
->  #define TYPE_XIVE_NOTIFIER "xive-notifier"
-> -#define XIVE_NOTIFIER(obj)                                     \
-> -    INTERFACE_CHECK(XiveNotifier, (obj), TYPE_XIVE_NOTIFIER)
-> +DECLARE_INTERFACE_CHECKER(XiveNotifier, XIVE_NOTIFIER,
-> +                          TYPE_XIVE_NOTIFIER)
->  typedef struct XiveNotifierClass XiveNotifierClass;
->  DECLARE_CLASS_CHECKERS(XiveNotifierClass, XIVE_NOTIFIER,
->                         TYPE_XIVE_NOTIFIER)
-> @@ -389,8 +389,8 @@ typedef struct XiveTCTXMatch {
->  } XiveTCTXMatch;
-> =20
->  #define TYPE_XIVE_PRESENTER "xive-presenter"
-> -#define XIVE_PRESENTER(obj)                                     \
-> -    INTERFACE_CHECK(XivePresenter, (obj), TYPE_XIVE_PRESENTER)
-> +DECLARE_INTERFACE_CHECKER(XivePresenter, XIVE_PRESENTER,
-> +                          TYPE_XIVE_PRESENTER)
->  typedef struct XivePresenterClass XivePresenterClass;
->  DECLARE_CLASS_CHECKERS(XivePresenterClass, XIVE_PRESENTER,
->                         TYPE_XIVE_PRESENTER)
-> @@ -414,8 +414,8 @@ int xive_presenter_tctx_match(XivePresenter *xptr, Xi=
-veTCTX *tctx,
->   */
-> =20
->  #define TYPE_XIVE_FABRIC "xive-fabric"
-> -#define XIVE_FABRIC(obj)                                     \
-> -    INTERFACE_CHECK(XiveFabric, (obj), TYPE_XIVE_FABRIC)
-> +DECLARE_INTERFACE_CHECKER(XiveFabric, XIVE_FABRIC,
-> +                          TYPE_XIVE_FABRIC)
->  typedef struct XiveFabricClass XiveFabricClass;
->  DECLARE_CLASS_CHECKERS(XiveFabricClass, XIVE_FABRIC,
->                         TYPE_XIVE_FABRIC)
-> diff --git a/include/hw/rdma/rdma.h b/include/hw/rdma/rdma.h
-> index e77e43a170..ba520b64fe 100644
-> --- a/include/hw/rdma/rdma.h
-> +++ b/include/hw/rdma/rdma.h
-> @@ -22,9 +22,8 @@
->  typedef struct RdmaProviderClass RdmaProviderClass;
->  DECLARE_CLASS_CHECKERS(RdmaProviderClass, RDMA_PROVIDER,
->                         INTERFACE_RDMA_PROVIDER)
-> -#define RDMA_PROVIDER(obj) \
-> -    INTERFACE_CHECK(RdmaProvider, (obj), \
-> -                    INTERFACE_RDMA_PROVIDER)
-> +DECLARE_INTERFACE_CHECKER(RdmaProvider, RDMA_PROVIDER,
-> +                          INTERFACE_RDMA_PROVIDER)
-> =20
->  typedef struct RdmaProvider RdmaProvider;
-> =20
-> diff --git a/include/hw/rtc/m48t59.h b/include/hw/rtc/m48t59.h
-> index 04abedf3b2..0e61c6c2c4 100644
-> --- a/include/hw/rtc/m48t59.h
-> +++ b/include/hw/rtc/m48t59.h
-> @@ -34,8 +34,8 @@
->  typedef struct NvramClass NvramClass;
->  DECLARE_CLASS_CHECKERS(NvramClass, NVRAM,
->                         TYPE_NVRAM)
-> -#define NVRAM(obj) \
-> -    INTERFACE_CHECK(Nvram, (obj), TYPE_NVRAM)
-> +DECLARE_INTERFACE_CHECKER(Nvram, NVRAM,
-> +                          TYPE_NVRAM)
-> =20
->  typedef struct Nvram Nvram;
-> =20
-> diff --git a/include/hw/stream.h b/include/hw/stream.h
-> index e39d5a5b55..8662c4fcff 100644
-> --- a/include/hw/stream.h
-> +++ b/include/hw/stream.h
-> @@ -9,8 +9,8 @@
->  typedef struct StreamSlaveClass StreamSlaveClass;
->  DECLARE_CLASS_CHECKERS(StreamSlaveClass, STREAM_SLAVE,
->                         TYPE_STREAM_SLAVE)
-> -#define STREAM_SLAVE(obj) \
-> -     INTERFACE_CHECK(StreamSlave, (obj), TYPE_STREAM_SLAVE)
-> +DECLARE_INTERFACE_CHECKER(StreamSlave, STREAM_SLAVE,
-> +                          TYPE_STREAM_SLAVE)
-> =20
->  typedef struct StreamSlave StreamSlave;
-> =20
-> diff --git a/include/hw/vmstate-if.h b/include/hw/vmstate-if.h
-> index 52df571d17..9797cb4321 100644
-> --- a/include/hw/vmstate-if.h
-> +++ b/include/hw/vmstate-if.h
-> @@ -16,8 +16,8 @@
->  typedef struct VMStateIfClass VMStateIfClass;
->  DECLARE_CLASS_CHECKERS(VMStateIfClass, VMSTATE_IF,
->                         TYPE_VMSTATE_IF)
-> -#define VMSTATE_IF(obj)                             \
-> -    INTERFACE_CHECK(VMStateIf, (obj), TYPE_VMSTATE_IF)
-> +DECLARE_INTERFACE_CHECKER(VMStateIf, VMSTATE_IF,
-> +                          TYPE_VMSTATE_IF)
-> =20
->  typedef struct VMStateIf VMStateIf;
-> =20
-> diff --git a/include/qom/object_interfaces.h b/include/qom/object_interfa=
-ces.h
-> index f118fb516b..1e6a6ce811 100644
-> --- a/include/qom/object_interfaces.h
-> +++ b/include/qom/object_interfaces.h
-> @@ -9,9 +9,8 @@
->  typedef struct UserCreatableClass UserCreatableClass;
->  DECLARE_CLASS_CHECKERS(UserCreatableClass, USER_CREATABLE,
->                         TYPE_USER_CREATABLE)
-> -#define USER_CREATABLE(obj) \
-> -     INTERFACE_CHECK(UserCreatable, (obj), \
-> -                     TYPE_USER_CREATABLE)
-> +DECLARE_INTERFACE_CHECKER(UserCreatable, USER_CREATABLE,
-> +                          TYPE_USER_CREATABLE)
-> =20
->  typedef struct UserCreatable UserCreatable;
-> =20
-> diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
-> index 1a85564e47..5a7f13400d 100644
-> --- a/include/sysemu/tpm.h
-> +++ b/include/sysemu/tpm.h
-> @@ -29,8 +29,8 @@ typedef enum TPMVersion {
->  typedef struct TPMIfClass TPMIfClass;
->  DECLARE_CLASS_CHECKERS(TPMIfClass, TPM_IF,
->                         TYPE_TPM_IF)
-> -#define TPM_IF(obj)                             \
-> -    INTERFACE_CHECK(TPMIf, (obj), TYPE_TPM_IF)
-> +DECLARE_INTERFACE_CHECKER(TPMIf, TPM_IF,
-> +                          TYPE_TPM_IF)
-> =20
->  typedef struct TPMIf TPMIf;
-> =20
-> diff --git a/target/arm/idau.h b/target/arm/idau.h
-> index 0ef5251971..0d09ad0abd 100644
-> --- a/target/arm/idau.h
-> +++ b/target/arm/idau.h
-> @@ -31,8 +31,8 @@
->  #include "qom/object.h"
-> =20
->  #define TYPE_IDAU_INTERFACE "idau-interface"
-> -#define IDAU_INTERFACE(obj) \
-> -    INTERFACE_CHECK(IDAUInterface, (obj), TYPE_IDAU_INTERFACE)
-> +DECLARE_INTERFACE_CHECKER(IDAUInterface, IDAU_INTERFACE,
-> +                          TYPE_IDAU_INTERFACE)
->  typedef struct IDAUInterfaceClass IDAUInterfaceClass;
->  DECLARE_CLASS_CHECKERS(IDAUInterfaceClass, IDAU_INTERFACE,
->                         TYPE_IDAU_INTERFACE)
-> diff --git a/tests/check-qom-interface.c b/tests/check-qom-interface.c
-> index c99be97ed8..b0ca517510 100644
-> --- a/tests/check-qom-interface.c
-> +++ b/tests/check-qom-interface.c
-> @@ -19,8 +19,8 @@
->  typedef struct TestIfClass TestIfClass;
->  DECLARE_CLASS_CHECKERS(TestIfClass, TEST_IF,
->                         TYPE_TEST_IF)
-> -#define TEST_IF(obj) \
-> -     INTERFACE_CHECK(TestIf, (obj), TYPE_TEST_IF)
-> +DECLARE_INTERFACE_CHECKER(TestIf, TEST_IF,
-> +                          TYPE_TEST_IF)
-> =20
->  typedef struct TestIf TestIf;
-> =20
+> >=20
+> > Greg Kurz (15):
+> >   spapr: Fix error leak in spapr_realize_vcpu()
+> >   ppc: Add a return value to ppc_set_compat() and ppc_set_compat_all()
+> >   ppc: Fix return value in cpu_post_load() error path
+> >   spapr: Simplify error handling in callers of ppc_set_compat()
+> >   spapr: Get rid of cas_check_pvr() error reporting
+> >   spapr: Simplify error handling in do_client_architecture_support()
+> >   spapr: Simplify error handling in spapr_vio_busdev_realize()
+> >   spapr: Add a return value to spapr_drc_attach()
+> >   spapr: Simplify error handling in prop_get_fdt()
+> >   spapr: Add a return value to spapr_set_vcpu_id()
+> >   spapr: Simplify error handling in spapr_cpu_core_realize()
+> >   spapr: Add a return value to spapr_nvdimm_validate()
+> >   spapr: Add a return value to spapr_check_pagesize()
+> >   spapr: Simplify error handling in spapr_memory_plug()
+> >   spapr: Simplify error handling in spapr_memory_unplug_request()
+> >=20
+> >  include/hw/ppc/spapr.h        |  4 +-
+> >  include/hw/ppc/spapr_drc.h    |  2 +-
+> >  include/hw/ppc/spapr_nvdimm.h |  4 +-
+> >  target/ppc/cpu.h              |  4 +-
+> >  hw/ppc/spapr.c                | 76 ++++++++++++-----------------------
+> >  hw/ppc/spapr_caps.c           |  7 +++-
+> >  hw/ppc/spapr_cpu_core.c       | 24 +++++------
+> >  hw/ppc/spapr_drc.c            | 17 ++++----
+> >  hw/ppc/spapr_hcall.c          | 34 +++++++---------
+> >  hw/ppc/spapr_nvdimm.c         | 24 +++++------
+> >  hw/ppc/spapr_pci.c            |  5 +--
+> >  hw/ppc/spapr_vio.c            | 12 +++---
+> >  target/ppc/compat.c           | 26 +++++++-----
+> >  target/ppc/machine.c          |  9 +++--
+> >  14 files changed, 108 insertions(+), 140 deletions(-)
+> >=20
+>=20
+
+
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -510,25 +144,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---NQTVMVnDVuULnIzU
+--PW0Eas8rCkcu1VkF
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9isXEACgkQbDjKyiDZ
-s5Lz1xAA1GkhEgsf2LE8OUkI6N7ihpNAbU0XiYyezMOho9s4ARTjzk5mnlAm8OEL
-KBV34jmGHPOkbIx3zGhRR4OCgb3lJajKSEHfhBsOSISAPdqz7g2bxf+sfvE+31oq
-pw+m9VDpJmy5iYcYFeC9FmSWPWtXIlFaVtqiidnbUeWP0eW6hfPAMyuLgFEyvZGH
-tOfhkFYgTHPmhwRN0XiOF2L5F2NXxKW4n1SxPj92o/Qn80h+coCzsrSOBc3j9azu
-2E2DKVv6sMPSCMYcz9PmZwSaaa+QxCMAAAhiIF7ehQMFjuj5E19DnK4bp4opX+9M
-sYrYr/6mV0Cd/29ASYMIBqG1nZ3RfM91hgVM3qxhSlpV5QFVvAENZNMRevfw8KnR
-xpQ2B24+uPMnx6Vo+nyX51Dova4dze/OWHUWJ8j7UVHGLGF2Rh1EECiUIRG3/ivn
-oH2E/tNz9BDBU3vU9NvTjbns9ZBotTz5PylzipnG4Xb5WDbeZO6Ngc+HK9lg+mRm
-9/WIEJewTxpU8uIaJ5i4Ik+t1dqffgrl8EBgHBZHteGbRRxqWt2/8Ge0OgNgFYDa
-xQ2yNEETxwhkXUNsO1GPZAWTWsw7yJ4iz/NbOWLMAn900uR/M+ldIX48HMClPOxL
-bM/eqX4LkfAugV3JfU6OHUVUjEDj845G67oqlZqcZFL5zWVwN/4=
-=Si5n
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9ityQACgkQbDjKyiDZ
+s5J+SQ//Wjq/HTR0XlVJkKt6naCjZs90pgDrAI18iAzpI0JSByt7OmAbZV1pUjLN
+nsIU/WxBf4ihNbAuyUdoDPCp1K+Ib5JkjQym8KOo0wSySKVuhN6EinX8rnIweZnB
+3VxJml/M83qa+odL29K3vnHJfLeBYo3VhI0TYz9ljTbmeewiwq3RgWsC5Nq/T9kr
+CjrC2cAg9hCFxc5cd/I4UVPID5kR1Xd6VWVoXl1hdR/p8h1MOJ4XwOt5Hfp7r6i+
+Oe1nPMfKXKTQz6Lmzpw6gJcIy87tYld4mqhx0sSdoY2YsnpArxd8bdMNaSD0zrsD
+YuPslsRRuCy84qd4IWwY2JL/n+hPIAN454zRtPVivFMn0UGLQZ9AEa50ZKP0XhOL
+EpsozAFMd9Zi5/CC1KvTdpMSQf1qxoNK40ZUW+Hht9eOucs0qpJFya3O8ki1eyQX
+ScOIPLl7MadZg8b7Fvpl4fDU/iG57iaAAu2VdethmKeK6bANu2PHzSVxhMmOid62
+L9B5c7VIgGcWqHVUq7u/7xsEyLREQDHLkuJAenDVai5ZIoNyJ4EGgoPX5zagO4+q
+fDI7MKRTOp7uZuSAT/QylpNgtcwmxk/NcCRZdJ0hdkwRIdWJmApljd+j5hslY3hu
+BcrBGtKyVrbO+wvfdyHiIS3U8yXk1FmsxdR1zZPtCKz+5bQxrm8=
+=a8+I
 -----END PGP SIGNATURE-----
 
---NQTVMVnDVuULnIzU--
+--PW0Eas8rCkcu1VkF--
 
