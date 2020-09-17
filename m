@@ -2,87 +2,90 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 506FCC43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 15:49:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C6F8C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 15:51:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B6CE206B2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 15:49:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C979E206B2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 15:51:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bsdimp-com.20150623.gappssmtp.com header.i=@bsdimp-com.20150623.gappssmtp.com header.b="0TWvU31I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B6CE206B2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bsdimp.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B0w5fxvN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C979E206B2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIw9h-000535-HV
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 11:49:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38916)
+	id 1kIwC0-0006Tl-GZ
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 11:51:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39396)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <wlosh@bsdimp.com>) id 1kIw42-0000Zd-2g
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 11:43:14 -0400
-Received: from mail-qv1-xf36.google.com ([2607:f8b0:4864:20::f36]:45687)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <wlosh@bsdimp.com>) id 1kIw3p-0000nH-Fx
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 11:43:13 -0400
-Received: by mail-qv1-xf36.google.com with SMTP id cv8so1183364qvb.12
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 08:42:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bsdimp-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=/Ec+/ZqYOLzMujKOL24DTtJiUkdEM7E1+WvdEhWyP2s=;
- b=0TWvU31IEKTIcCZgQtVn9ge6nqELvg51QlBaDWcheZFrljS+OGOelcbRTUjD9Xc4BK
- /7ItAjXoenR2DnFlOl2QPCnOCdn5h5oPAdXAG9nLp9C7/bUowXeJzkpcz6C2neqfASBo
- g3BkNZy/2nDJa8XLq4jBKOiv02+5+YXUeH5VI/0ojunwMmQedYVTjhPeKullZeXr8Lkb
- FqgOuoSdQpnWE92+W3TMLSWO7jPHToPy21O2dhF502RSip9WfWFFfHDvvZ7/XP0QHRPz
- lsz7nyXQLhZ1cZG7wglMFQt+3n/E2NmMndN4OPBn8fSxorFFelmoV2d/sZc7ajHRv4B2
- inAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=/Ec+/ZqYOLzMujKOL24DTtJiUkdEM7E1+WvdEhWyP2s=;
- b=ilTHAkBKByXz5g9eojEyv3RUupfW1ahdiPEPEQjeWsEg4w0KlqeEueWGJmXkSwkCuR
- nkM5/x8gORlYxTv86aBqMM16AO+rx1LI3IrgV4n84I+Bvl5JpRoA9l0wC6KTxfZ/grIA
- k4mkbWFjen/I4Li2X0xCigGzNHMFqcntmYfC40Hgcc++UMdTrRrQR3ZdszunqL+zasIj
- Aj/50zIUAhUlTrmc2Yq2Q7AZuEmA50D0VR1L9V1LiudoFZQ0ddbCaNMrw4PbNC6i6itV
- YsaJ4Zf4x/FjRo+zqlEa8JDuWU1dRv30CkTfQKhyIXah0ywExH/6OJhZiR7VWBcOnbP8
- v2XQ==
-X-Gm-Message-State: AOAM531cBYW05ajLtUTF+UgF//riy8K47H1/OBEN/GI2RG2dzXlYtMCC
- OHhNlGMULpBe6JRRWyv2Zl15QPp7HEn38xHSkG+WRg==
-X-Google-Smtp-Source: ABdhPJxEiWbhStJmtL+p4PXSGrh7GZL5mKuNiYJEUrB45iU9cjFz07AVh3o81jJKLKog5O9Wf+0HGxAWR9g2paeWMSM=
-X-Received: by 2002:ad4:544a:: with SMTP id h10mr12954136qvt.35.1600357376716; 
- Thu, 17 Sep 2020 08:42:56 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kIw5C-0001f0-LO
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 11:44:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47475)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kIw5A-00015U-SN
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 11:44:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600357460;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Bpjk+WWlPDFoxx66cmH4yqyKkktF/kR7kgzF9vMSbrE=;
+ b=B0w5fxvNDMclxeJDzMYGwk+7eiUfEfj3VTgt1yux6TGLnbMkM89pMbiGF0+LCsjFYjgKFv
+ KmAJv2l4tXHMiT8T2q7eRFkOp7xuUVGWobDTpjPNLswBYzRaJ3TsHOsTMkpxsNd5ow+nEm
+ CcjmGhnedDgDecuRhH10yY7S38mJrPc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-106-1CNH0h5aM1K_uk33OwxCmA-1; Thu, 17 Sep 2020 11:44:18 -0400
+X-MC-Unique: 1CNH0h5aM1K_uk33OwxCmA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A9321084C84;
+ Thu, 17 Sep 2020 15:44:17 +0000 (UTC)
+Received: from localhost (ovpn-112-183.ams2.redhat.com [10.36.112.183])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 69D5310023A5;
+ Thu, 17 Sep 2020 15:44:16 +0000 (UTC)
+Date: Thu, 17 Sep 2020 16:44:15 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Zhenyu Ye <yezhenyu2@huawei.com>
+Subject: Re: [PATCH v1 0/2] Add timeout mechanism to qmp actions
+Message-ID: <20200917154415.GB839531@stefanha-x1.localdomain>
+References: <20200810145246.1049-1-yezhenyu2@huawei.com>
+ <20200810153811.GF14538@linux.fritz.box>
+ <c6d75e49-3e36-6a76-fdc8-cdf09e7c3393@huawei.com>
+ <20200914132738.GL579094@stefanha-x1.localdomain>
+ <7ad220bd-7ee5-1f66-b2e5-7dc57d72eb2e@huawei.com>
 MIME-Version: 1.0
-References: <875z8eupyp.fsf@dusky.pond.sub.org>
- <CAFEAcA8q8J1n2UqsNbHgNwEedA8pZ6fNA7obCR1REN-33nvmkg@mail.gmail.com>
- <d07189e2-0683-2eb9-44e0-a275688fa8b4@redhat.com>
- <9d4363e8-7bb8-8255-9914-6d9bc36cec79@redhat.com>
- <871rj0o1yk.fsf@dusky.pond.sub.org>
-In-Reply-To: <871rj0o1yk.fsf@dusky.pond.sub.org>
-From: Warner Losh <imp@bsdimp.com>
-Date: Thu, 17 Sep 2020 09:42:45 -0600
-Message-ID: <CANCZdfoML814K06BSg1C30pYve6qs2T-q8Z6scaGfO_LCtnacQ@mail.gmail.com>
-Subject: Re: Python 3.5 EOL; when can require 3.6?
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000f416c705af843c4d"
-Received-SPF: none client-ip=2607:f8b0:4864:20::f36;
- envelope-from=wlosh@bsdimp.com; helo=mail-qv1-xf36.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <7ad220bd-7ee5-1f66-b2e5-7dc57d72eb2e@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="kORqDWCi7qDJ0mEj"
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 20:51:18
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,103 +98,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, fam@euphon.net, qemu-block@nongnu.org,
+ armbru@redhat.com, xiexiangyou@huawei.com, qemu-devel@nongnu.org,
+ pbonzini@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000f416c705af843c4d
-Content-Type: text/plain; charset="UTF-8"
-
-On Thu, Sep 17, 2020 at 9:37 AM Markus Armbruster <armbru@redhat.com> wrote:
-
-> Thomas Huth <thuth@redhat.com> writes:
->
-> > On 16/09/2020 16.00, Thomas Huth wrote:
-> >> On 16/09/2020 14.30, Peter Maydell wrote:
-> >>> On Wed, 16 Sep 2020 at 08:43, Markus Armbruster <armbru@redhat.com>
-> wrote:
-> >>>> We require Python 3.5.  It will reach its "end of life" at the end of
-> >>>> September 2020[*].  Any reason not to require 3.6 for 5.2?
-> qemu-iotests
-> >>>> already does for its Python parts.
-> >> [...]
-> >>> The default should be
-> >>> "leave the version dependency where it is", not "bump the version
-> >>> dependency as soon as we can".
-> >>
-> >> OTOH, if none of our supported build systems uses python 3.5 by default
-> >> anymore, it also will not get tested anymore, so bugs might creep in,
-> >> which will of course end up in a bad experience for the users, too, that
-> >> still try to build with such an old version. So limiting the version to
-> >> the level that we also test is IMHO very reasonable.
-> >>
-> >> Let's have a look at the (older) systems that we support and the python
-> >> versions according to repology.org:
-> >> - FreeBSD Ports : >= 3.5.10 - but there is also 3.6 or newer
->
-
-FreeBSD Ports can specify, on a per-port basis, which version of Python to
-use:
-
-USES= python:3.6+
-
-So we're good there for all supported FreeBSD versions (11.x, 12.x and
--current).
-
-Warner
-
---000000000000f416c705af843c4d
-Content-Type: text/html; charset="UTF-8"
+--kORqDWCi7qDJ0mEj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Sep 17, 2020 at 9:37 AM Marku=
-s Armbruster &lt;<a href=3D"mailto:armbru@redhat.com">armbru@redhat.com</a>=
-&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px =
-0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Thom=
-as Huth &lt;<a href=3D"mailto:thuth@redhat.com" target=3D"_blank">thuth@red=
-hat.com</a>&gt; writes:<br>
-<br>
-&gt; On 16/09/2020 16.00, Thomas Huth wrote:<br>
-&gt;&gt; On 16/09/2020 14.30, Peter Maydell wrote:<br>
-&gt;&gt;&gt; On Wed, 16 Sep 2020 at 08:43, Markus Armbruster &lt;<a href=3D=
-"mailto:armbru@redhat.com" target=3D"_blank">armbru@redhat.com</a>&gt; wrot=
-e:<br>
-&gt;&gt;&gt;&gt; We require Python 3.5.=C2=A0 It will reach its &quot;end o=
-f life&quot; at the end of<br>
-&gt;&gt;&gt;&gt; September 2020[*].=C2=A0 Any reason not to require 3.6 for=
- 5.2?=C2=A0 qemu-iotests<br>
-&gt;&gt;&gt;&gt; already does for its Python parts.<br>
-&gt;&gt; [...]<br>
-&gt;&gt;&gt; The default should be<br>
-&gt;&gt;&gt; &quot;leave the version dependency where it is&quot;, not &quo=
-t;bump the version<br>
-&gt;&gt;&gt; dependency as soon as we can&quot;.<br>
-&gt;&gt; <br>
-&gt;&gt; OTOH, if none of our supported build systems uses python 3.5 by de=
-fault<br>
-&gt;&gt; anymore, it also will not get tested anymore, so bugs might creep =
-in,<br>
-&gt;&gt; which will of course end up in a bad experience for the users, too=
-, that<br>
-&gt;&gt; still try to build with such an old version. So limiting the versi=
-on to<br>
-&gt;&gt; the level that we also test is IMHO very reasonable.<br>
-&gt;&gt; <br>
-&gt;&gt; Let&#39;s have a look at the (older) systems that we support and t=
-he python<br>
-&gt;&gt; versions according to <a href=3D"http://repology.org" rel=3D"noref=
-errer" target=3D"_blank">repology.org</a>:<br>&gt;&gt; - FreeBSD Ports : &g=
-t;=3D 3.5.10 - but there is also 3.6 or newer<br></blockquote><div><br></di=
-v><div>FreeBSD Ports can specify, on a per-port basis, which version of Pyt=
-hon to use:</div><div><br></div><div>USES=3D python:3.6+</div><div><br></di=
-v><div>So we&#39;re good there for all supported FreeBSD versions (11.x, 12=
-.x and -current).</div><div><br></div><div>Warner</div></div></div>
+On Thu, Sep 17, 2020 at 03:36:57PM +0800, Zhenyu Ye wrote:
+> When the hang occurs, the QEMU is blocked at:
+>=20
+> =09#0  0x0000ffff95762b64 in ?? () from target:/usr/lib64/libpthread.so.0
+> =09#1  0x0000ffff9575bd88 in pthread_mutex_lock () from target:/usr/lib64=
+/libpthread.so.0
+> =09#2  0x0000aaaabb1f5948 in qemu_mutex_lock_impl (mutex=3D0xaaaacc8e1860=
+,
+> =09    file=3D0xaaaabb4e1bd0 "/Images/eillon/CODE/5-opensource/qemu/util/=
+async.c", line=3D605)
+> =09#3  0x0000aaaabb20acd4 in aio_context_acquire (ctx=3D0xaaaacc8e1800)
+> =09#4  0x0000aaaabb105e90 in bdrv_query_image_info (bs=3D0xaaaacc934620,
+> =09    p_info=3D0xaaaaccc41e18, errp=3D0xffffca669118)
+> =09#5  0x0000aaaabb105968 in bdrv_block_device_info (blk=3D0xaaaacdca19f0=
+, bs=3D0xaaaacc934620,
+> =09    flat=3Dfalse, errp=3D0xffffca6692b8)
+> =09#6  0x0000aaaabb1063dc in bdrv_query_info (blk=3D0xaaaacdca19f0, p_inf=
+o=3D0xaaaacd29c9a8,
+> =09    errp=3D0xffffca6692b8)
+> =09#7  0x0000aaaabb106c14 in qmp_query_block (errp=3D0x0)
+> =09#8  0x0000aaaabacb8e6c in hmp_info_block (mon=3D0xffffca6693d0, qdict=
+=3D0xaaaacd089790)
 
---000000000000f416c705af843c4d--
+Great, this shows that the main loop thread is stuck waiting for the
+AioContext lock.
+
+Please post backtraces from all QEMU threads ((gdb) thread apply all bt)
+so we can figure out which thread is holding up the main loop.
+
+Thanks,
+Stefan
+
+--kORqDWCi7qDJ0mEj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9jhE8ACgkQnKSrs4Gr
+c8hrxQf/TsDGZ8gWUynrHDZvPKbMfpDqWBuhJAoGiDAoUk18FYQYyZz4mnYBAGsr
+wRufv15uvsHt3eMAG4qDkdm6vFAfvFhpQR2DVlra25g5nJmlECIINoXH47XfqRe6
+Yh1X+2Wxo9ET3LVRMNY1ocI6n5/0pmhhO9ITOsxfRsAROk5XOIITEKTmTsTags/J
+gBR9rnkqAVq5sy4BbxMyAPCbYSpT/TgY0gN5Oyml+CjsaQHeVVgXYW2Xcb3iw0yu
+7UiIMva/h3EvuPYm10B3O5LUpzFVBj1YemDyIZEc69beCl/qTEv3xuLZ9jvlGMqT
+8HJN2v5DtBmeNenopCqG6HrXCIT+jg==
+=ASkc
+-----END PGP SIGNATURE-----
+
+--kORqDWCi7qDJ0mEj--
+
 
