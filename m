@@ -2,62 +2,72 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD5E6C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:13:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3642CC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:13:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 441B321D90
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:13:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 441B321D90
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id BEF0F2075B
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:13:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEF0F2075B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIp2M-0008Mj-EE
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 04:13:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51730)
+	id 1kIp3A-00016t-SF
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 04:13:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55086)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kIohd-00054X-W3; Thu, 17 Sep 2020 03:51:38 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:59008 helo=huawei.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kIowk-0000uc-Cj
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 04:07:14 -0400
+Resent-Date: Thu, 17 Sep 2020 04:07:14 -0400
+Resent-Message-Id: <E1kIowk-0000uc-Cj@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21722)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kIohb-0005Nu-Qd; Thu, 17 Sep 2020 03:51:37 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 7AF56218DDCCA84D3D18;
- Thu, 17 Sep 2020 15:51:31 +0800 (CST)
-Received: from localhost (10.174.187.87) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
- 15:51:20 +0800
-From: zhaolichang <zhaolichang@huawei.com>
-To: <qemu-trivial@nongnu.org>
-Subject: [PATCH V3 09/10] qapi/: fix some comment spelling errors
-Date: Thu, 17 Sep 2020 15:50:28 +0800
-Message-ID: <20200917075029.313-10-zhaolichang@huawei.com>
-X-Mailer: git-send-email 2.26.2.windows.1
-In-Reply-To: <20200917075029.313-1-zhaolichang@huawei.com>
-References: <20200917075029.313-1-zhaolichang@huawei.com>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kIowh-0007Ko-TP
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 04:07:13 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1600330001; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=buxGrlrOH2WaYp9TMoAyu2EbWW7NqyDcPbbCjEzKdqVOY64CqNwxYToPaYt0vEh5YDbRDRzBGH0Ze9yc88QQskBPkiRfV2JXw1cbC5hDoZESGQ30vl7n/SalXyz8UsTN4QoiOHCxyFOq7QeeLFibugFygKRn823pD1Vc2BSMuoc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1600330001;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=VyxmvDhQu60v1mejppi4ObQpPzRn+QAl0Ja0tVJjzlE=; 
+ b=Lr7lfZic5Msx/GhcZ0SOLxvGTJ6sUTqekbG63mGpD6eISKzUR9m0zf0sgb67wNNSg4r7LVq6+URxgzcJPmFve573eIRzQ3XOpEiYluFo4rpG4GUpkuffSIAAYrNzq7dG91/+aUvIikbO6sa1NFqLdpyBkWHex73E4flwcch8+ko=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1600329999570500.97037922096024;
+ Thu, 17 Sep 2020 01:06:39 -0700 (PDT)
+Subject: Re: [PATCH v6 00/12] i440fx/acpi: addition of feature and bug fixes.
+Message-ID: <160032999760.8478.8560819129012516657@66eaa9a8a123>
+In-Reply-To: <20200917074733.13612-1-ani@anisinha.ca>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.187.87]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35;
- envelope-from=zhaolichang@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 03:51:25
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: ani@anisinha.ca
+Date: Thu, 17 Sep 2020 01:06:39 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 04:07:10
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -71,68 +81,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhaolichang <zhaolichang@huawei.com>, qemu-devel@nongnu.org, Markus
- Armbruster <armbru@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, mst@redhat.com, jusual@redhat.com, f4bug@amsat.org,
+ qemu-devel@nongnu.org, aleksandar.qemu.devel@gmail.com, imammedo@redhat.com,
+ ani@anisinha.ca, pbonzini@redhat.com, aurelien@aurel32.net, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I found that there are many spelling errors in the comments of qemu,
-so I used the spellcheck tool to check the spelling errors
-and finally found some spelling errors in the qapi folder.
-
-Signed-off-by: zhaolichang <zhaolichang@huawei.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
----
- qapi/block-core.json | 4 ++--
- qapi/crypto.json     | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 2d94873ca0..3c16f1e11d 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1795,7 +1795,7 @@
- #
- # @block-backend: corresponds to BlockBackend
- #
--# @block-job: corresonds to BlockJob
-+# @block-job: corresponds to BlockJob
- #
- # @block-driver: corresponds to BlockDriverState
- #
-@@ -2067,7 +2067,7 @@
- # @target: name of the destination dirty bitmap
- #
- # @bitmaps: name(s) of the source dirty bitmap(s) at @node and/or fully
--#           specifed BlockDirtyBitmap elements. The latter are supported
-+#           specified BlockDirtyBitmap elements. The latter are supported
- #           since 4.1.
- #
- # Since: 4.0
-diff --git a/qapi/crypto.json b/qapi/crypto.json
-index bb7930d332..2aebe6fa20 100644
---- a/qapi/crypto.json
-+++ b/qapi/crypto.json
-@@ -336,7 +336,7 @@
- #                 written into added active keyslots
- #
- # @old-secret:    Optional (for deactivation only)
--#                 If given will deactive all keyslots that
-+#                 If given will deactivate all keyslots that
- #                 match password located in QCryptoSecret with this ID
- #
- # @iter-time:     Optional (for activation only)
-@@ -354,7 +354,7 @@
- #                 keyslot to deactivate
- #
- # @secret:        Optional. The ID of a QCryptoSecret object providing the
--#                 password to use to retrive current master key.
-+#                 password to use to retrieve current master key.
- #                 Defaults to the same secret that was used to open the image
- #
- #
--- 
-2.26.2.windows.1
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkxNzA3NDczMy4xMzYx
+Mi0xLWFuaUBhbmlzaW5oYS5jYS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
+bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
+bWF0aW9uOgoKTi9BLiBJbnRlcm5hbCBlcnJvciB3aGlsZSByZWFkaW5nIGxvZyBmaWxlCgoKClRo
+ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA5
+MTcwNzQ3MzMuMTM2MTItMS1hbmlAYW5pc2luaGEuY2EvdGVzdGluZy5jaGVja3BhdGNoLz90eXBl
+PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
+dy1kZXZlbEByZWRoYXQuY29t
 
