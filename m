@@ -4,95 +4,83 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 114FCC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:02:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D471FC2BBD1
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:02:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A2FC206A2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:02:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E61F206A2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:02:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hM/T/F69"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A2FC206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ez/sMK6M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E61F206A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIxJ0-0004XR-FZ
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 13:02:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58838)
+	id 1kIxJ5-0004iv-Ey
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 13:02:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59796)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kIxE6-0007hd-Cp; Thu, 17 Sep 2020 12:57:42 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40381)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kIxE3-0004ok-Ic; Thu, 17 Sep 2020 12:57:42 -0400
-Received: by mail-wm1-x342.google.com with SMTP id k18so2763811wmj.5;
- Thu, 17 Sep 2020 09:57:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=6QaMg1AvMw1pue6iNBZDZCiuxftSbFxqP2NNoQR16oU=;
- b=hM/T/F69PEgcWCYjroOjIIv7bfZwEtWdAfXh75vdxaA5lTCXR2DPwxKQAW96Ga0jkW
- XEn2HHqL3uzH433I9Mzod2BDcTfdpChn01KM+SUmP6ELOrDMJRtfl3qD/PFPtr40oaQg
- gJnF4IlmVu7+TSf3wBAxxlpB8OvPQ/dqQwfsj6PnAh7fayYGQbTyROi1G5C5xj+eYBS4
- QXTat0uM3CeNGww+trqHVwSe7gitmOfa+UklCInduE5lO8HM1FCq4LLDKBeoCXeCZrlx
- aLaREZQ+J5cqY5lPmY0l2ZoheT+y160345KZ5dojBOwYF9ajENagzFlw+3b3cIto/Bdt
- jW4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=6QaMg1AvMw1pue6iNBZDZCiuxftSbFxqP2NNoQR16oU=;
- b=qqyrfJYX6uvde0faaFBz6ld0SVKjr/uWmnP0QpATElLp+Kap+gNh2m0mFHoG1VnYQF
- ctMgxWTHAtMDos3wcCvzMzZIzwShD5zc16UB8KAOSPjdQVxaze3nmTUtAaOUKjlQUPHx
- ftHatruVyrv/DWisOIH2L2+hFaqU0ocxuQc+fSCbLIM13dFsT2qwnVPwu3InAsHMd50Q
- /WSUMTAcgOUjM1xsaNB8tj5T5rilC8XlBLRFm8gxsYC+WQ3rifpOCb8YSc/609CZdjqC
- su9CMfqQXj8Na871pTGJ1vIJkteKn86/1FPTnzIKsW3GoXvNgyMUXckQ0J9vIRCT0ukv
- XXvg==
-X-Gm-Message-State: AOAM5314uMV03dGefONuu6UJnYx8w201vhglSOULIaYH1dA16pgJCEsx
- vhoFRcI1gOWDIbZClLtcJJI=
-X-Google-Smtp-Source: ABdhPJyV1vhri3vaIpNnRnwVkKpUFg8xhQSJ/NHIO0jV0HpfYmBYkZtpAOMTcmpSdSJuU21PGqXd/w==
-X-Received: by 2002:a7b:c3da:: with SMTP id t26mr10470848wmj.23.1600361857453; 
- Thu, 17 Sep 2020 09:57:37 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id y6sm195832wrt.80.2020.09.17.09.57.36
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 17 Sep 2020 09:57:36 -0700 (PDT)
-Subject: Re: [PATCH] hw/arm/aspeed: Map the UART5 device unconditionally
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-devel@nongnu.org
-References: <20200905212415.760452-1-f4bug@amsat.org>
- <e640309b-b694-e815-d64d-40dd453e52ef@amsat.org>
- <5e27c1f9-6d11-fa62-ba71-0020ce9d595b@kaod.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <07b21d1d-fb5b-efb0-50f2-54a4b86df444@amsat.org>
-Date: Thu, 17 Sep 2020 18:57:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kIxHs-0003hz-0s
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 13:01:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31604)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kIxHp-0005Pp-DV
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 13:01:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600362092;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=AOcg7erdQiG6t1re3jBjRLL6u+BC9P88PDt8o+CU52k=;
+ b=ez/sMK6MBIRNC4TbsSwUqlbi9k4T8zFbfaYnGVqDVLMcH1JEsC1dC6XybtO0VZkjmJam54
+ qrQTYXCMy2Bq5nlxyMfzFunxe1i5JcWqWcU8cIK+MNULDfFUs/GW6HkcT7B/j09Dnm4+z5
+ k036HCaHAwE3XigljIQLjAPZjc8uRpk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-567-etVH8VP5NKa1lqdHXXr32w-1; Thu, 17 Sep 2020 13:01:30 -0400
+X-MC-Unique: etVH8VP5NKa1lqdHXXr32w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 618EF800467;
+ Thu, 17 Sep 2020 17:01:28 +0000 (UTC)
+Received: from work-vm (ovpn-114-108.ams2.redhat.com [10.36.114.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9306078803;
+ Thu, 17 Sep 2020 17:01:22 +0000 (UTC)
+Date: Thu, 17 Sep 2020 18:01:19 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH v3 4/5] sev/i386: Don't allow a system reset under an
+ SEV-ES guest
+Message-ID: <20200917170119.GR2793@work-vm>
+References: <cover.1600205384.git.thomas.lendacky@amd.com>
+ <058dcb33a9cc223e3180133d29e7a92bfdc40938.1600205384.git.thomas.lendacky@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <5e27c1f9-6d11-fa62-ba71-0020ce9d595b@kaod.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.248, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <058dcb33a9cc223e3180133d29e7a92bfdc40938.1600205384.git.thomas.lendacky@amd.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 02:01:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,96 +93,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>
+Cc: Brijesh Singh <brijesh.singh@amd.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Connor Kuehl <ckuehl@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Jiri Slaby <jslaby@suse.cz>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/16/20 7:51 AM, Cédric Le Goater wrote:
-> On 9/15/20 7:23 PM, Philippe Mathieu-Daudé wrote:
->> ping?
+* Tom Lendacky (thomas.lendacky@amd.com) wrote:
+> From: Tom Lendacky <thomas.lendacky@amd.com>
 > 
-> It's reviewed : 
+> An SEV-ES guest does not allow register state to be altered once it has
+> been measured. When a SEV-ES guest issues a reboot command, Qemu will
+> reset the vCPU state and resume the guest. This will cause failures under
+> SEV-ES, so prevent that from occurring.
 > 
->   http://patchwork.ozlabs.org/project/qemu-devel/patch/20200905212415.760452-1-f4bug@amsat.org/
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> ---
+>  accel/kvm/kvm-all.c       | 9 +++++++++
+>  include/sysemu/cpus.h     | 2 ++
+>  include/sysemu/hw_accel.h | 5 +++++
+>  include/sysemu/kvm.h      | 2 ++
+>  softmmu/cpus.c            | 5 +++++
+>  softmmu/vl.c              | 5 ++++-
+>  6 files changed, 27 insertions(+), 1 deletion(-)
 > 
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index 20725b0368..63153b6e53 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -2388,6 +2388,15 @@ void kvm_flush_coalesced_mmio_buffer(void)
+>      s->coalesced_flush_in_progress = false;
+>  }
+>  
+> +bool kvm_cpu_check_resettable(void)
+> +{
+> +    /*
+> +     * If we have a valid reset vector override, then SEV-ES is active
+> +     * and the CPU can't be reset.
+> +     */
+> +    return !kvm_state->reset_valid;
 
-Yes I know :) This is part of my routine to check if a
-patch hasn't been confirmed to be queued 1 week after the
-last review, to ping the maintainer (because some
-automatically flush patches older than 1month in their
-mailbox).
+This seems a bit weird since it's in generic rather than x86 specific
+code.
 
-> I will send a PR when I have more patches.
+Dave
 
-Ah OK. I didn't know you would keep merging the Aspeed
-patches. Since this was a single patch, I thought it would
-go via the usual qemu-arm queue from Peter.
-
-No rush, I just wanted to be sure the patch was not lost.
-Also, once a patch is queued, I understand it is the
-maintainer responsibility to keep rebasing the patch
-queued.
-
-Thanks!
-
-Phil.
-
+> +}
+> +
+>  static void do_kvm_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data arg)
+>  {
+>      if (!cpu->vcpu_dirty) {
+> diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
+> index 3c1da6a018..6d688c757f 100644
+> --- a/include/sysemu/cpus.h
+> +++ b/include/sysemu/cpus.h
+> @@ -24,6 +24,8 @@ void dump_drift_info(void);
+>  void qemu_cpu_kick_self(void);
+>  void qemu_timer_notify_cb(void *opaque, QEMUClockType type);
+>  
+> +bool cpu_is_resettable(void);
+> +
+>  void cpu_synchronize_all_states(void);
+>  void cpu_synchronize_all_post_reset(void);
+>  void cpu_synchronize_all_post_init(void);
+> diff --git a/include/sysemu/hw_accel.h b/include/sysemu/hw_accel.h
+> index e128f8b06b..8b4536e7ae 100644
+> --- a/include/sysemu/hw_accel.h
+> +++ b/include/sysemu/hw_accel.h
+> @@ -17,6 +17,11 @@
+>  #include "sysemu/hvf.h"
+>  #include "sysemu/whpx.h"
+>  
+> +static inline bool cpu_check_resettable(void)
+> +{
+> +    return kvm_enabled() ? kvm_cpu_check_resettable() : true;
+> +}
+> +
+>  static inline void cpu_synchronize_state(CPUState *cpu)
+>  {
+>      if (kvm_enabled()) {
+> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+> index f74cfa85ab..eb94bbbff9 100644
+> --- a/include/sysemu/kvm.h
+> +++ b/include/sysemu/kvm.h
+> @@ -494,6 +494,8 @@ int kvm_physical_memory_addr_from_host(KVMState *s, void *ram_addr,
+>  
+>  #endif /* NEED_CPU_H */
+>  
+> +bool kvm_cpu_check_resettable(void);
+> +
+>  void kvm_cpu_synchronize_state(CPUState *cpu);
+>  void kvm_cpu_synchronize_post_reset(CPUState *cpu);
+>  void kvm_cpu_synchronize_post_init(CPUState *cpu);
+> diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+> index a802e899ab..32f286643f 100644
+> --- a/softmmu/cpus.c
+> +++ b/softmmu/cpus.c
+> @@ -927,6 +927,11 @@ void hw_error(const char *fmt, ...)
+>      abort();
+>  }
+>  
+> +bool cpu_is_resettable(void)
+> +{
+> +    return cpu_check_resettable();
+> +}
+> +
+>  void cpu_synchronize_all_states(void)
+>  {
+>      CPUState *cpu;
+> diff --git a/softmmu/vl.c b/softmmu/vl.c
+> index 4eb9d1f7fd..422fbb1650 100644
+> --- a/softmmu/vl.c
+> +++ b/softmmu/vl.c
+> @@ -1475,7 +1475,10 @@ void qemu_system_guest_crashloaded(GuestPanicInformation *info)
+>  
+>  void qemu_system_reset_request(ShutdownCause reason)
+>  {
+> -    if (no_reboot && reason != SHUTDOWN_CAUSE_SUBSYSTEM_RESET) {
+> +    if (!cpu_is_resettable()) {
+> +        error_report("cpus are not resettable, terminating");
+> +        shutdown_requested = reason;
+> +    } else if (no_reboot && reason != SHUTDOWN_CAUSE_SUBSYSTEM_RESET) {
+>          shutdown_requested = reason;
+>      } else {
+>          reset_requested = reason;
+> -- 
+> 2.28.0
 > 
-> Thanks,
-> 
-> C. 
-> 
->> On 9/5/20 11:24 PM, Philippe Mathieu-Daudé wrote:
->>> The UART5 is present on the machine regardless there is a
->>> character device connected to it. Map it unconditionally.
->>>
->>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>> ---
->>>  hw/arm/aspeed_ast2600.c | 8 +++-----
->>>  hw/arm/aspeed_soc.c     | 8 +++-----
->>>  2 files changed, 6 insertions(+), 10 deletions(-)
->>>
->>> diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
->>> index 9d95e421435..1450bde7cf2 100644
->>> --- a/hw/arm/aspeed_ast2600.c
->>> +++ b/hw/arm/aspeed_ast2600.c
->>> @@ -325,11 +325,9 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
->>>      }
->>>  
->>>      /* UART - attach an 8250 to the IO space as our UART5 */
->>> -    if (serial_hd(0)) {
->>> -        qemu_irq uart5 = aspeed_soc_get_irq(s, ASPEED_DEV_UART5);
->>> -        serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
->>> -                       uart5, 38400, serial_hd(0), DEVICE_LITTLE_ENDIAN);
->>> -    }
->>> +    serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
->>> +                   aspeed_soc_get_irq(s, ASPEED_DEV_UART5),
->>> +                   38400, serial_hd(0), DEVICE_LITTLE_ENDIAN);
->>>  
->>>      /* I2C */
->>>      object_property_set_link(OBJECT(&s->i2c), "dram", OBJECT(s->dram_mr),
->>> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
->>> index 35be126db6f..7eefd54ac07 100644
->>> --- a/hw/arm/aspeed_soc.c
->>> +++ b/hw/arm/aspeed_soc.c
->>> @@ -283,11 +283,9 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
->>>      }
->>>  
->>>      /* UART - attach an 8250 to the IO space as our UART5 */
->>> -    if (serial_hd(0)) {
->>> -        qemu_irq uart5 = aspeed_soc_get_irq(s, ASPEED_DEV_UART5);
->>> -        serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
->>> -                       uart5, 38400, serial_hd(0), DEVICE_LITTLE_ENDIAN);
->>> -    }
->>> +    serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
->>> +                   aspeed_soc_get_irq(s, ASPEED_DEV_UART5), 38400,
->>> +                   serial_hd(0), DEVICE_LITTLE_ENDIAN);
->>>  
->>>      /* I2C */
->>>      object_property_set_link(OBJECT(&s->i2c), "dram", OBJECT(s->dram_mr),
->>>
-> 
-> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
