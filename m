@@ -2,88 +2,63 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D465FC2BBD1
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 07:59:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89479C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:00:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7110420665
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 07:59:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="TAObXpPF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7110420665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
+	by mail.kernel.org (Postfix) with ESMTPS id E731420665
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:00:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E731420665
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIopT-0006d6-Gm
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 03:59:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50876)
+	id 1kIoqB-0007zH-Pt
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 04:00:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51628)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIoei-0000C1-4S
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:48:36 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:44145)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIoef-0004rU-7v
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:48:35 -0400
-Received: by mail-pf1-x441.google.com with SMTP id o20so676884pfp.11
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 00:48:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=HieR0JUcIVqOsEn9fSMCcXQosTZo8bCqKBMgyay5mK4=;
- b=TAObXpPFi0IbC7+gDYSJVWjfMGIMmNXNClqA/lX3fIKNmZ7HKOE8KTuzCAm2NZ//K3
- D89mQYOYgxwR0SBgQ0GxpWeM/tNYbEoeBr+WeZ/1Z26A2+bV7DxaMyg69RYGRqMsYWJL
- sDKpFt3RS9hQvxl7PpQqnZ7wwwmPTrUmp0/u7tsV9QGVWRc+uhs76aij09FG4MJy3MmU
- w2jbutbxMbwGgIJChPpMG9J9eBq+atoVEk2Q4wu0EaEJBRbqICLbSOQzZgoLaEAOi1Rm
- Xj15w33WL24vdHl5riG6CAfE2LTqra/aduQlWwQIMtjxIo8S9BATa9N5m071xhOzb6Mh
- gbVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=HieR0JUcIVqOsEn9fSMCcXQosTZo8bCqKBMgyay5mK4=;
- b=PkPpXXdffPiJj663YKHScm6l1M4MU2i0RXbviTwkjqqwpJjvc07HIMf/R0HXwBpx6/
- WfI5qARI6LKFRXFQx25eGcKStAur5Ias7MDMgnkwarAF/ATRKxzXjSGMiJ3Re8Q2OD4s
- Nph6g9A7koz2HFpIgOVmmw17Lo1BOLRa7K8V4MX2v89GUa7sWO+wgvK0Wtwcd97bq8zU
- /V0CZsx4COu2jUbygPIrzb7Jy3AP/THsnoGiTUqve+DTYLoQt5eDvcQ4ng2CtUs5dtWb
- Ta3rkajeNaU+mOsBrM9epa8MLoCBlitLqs/RPAiYuCI8DPvK6yQr0jJTXQ/ZrFAG3Fd8
- tR/Q==
-X-Gm-Message-State: AOAM532FIKoH//wYKnOFIZ00F3zg4ikclNY+IEBB7/tBE4yjGOEsa7WI
- bsYzkDONiyXLA1zEO7Fl9U+fi0tMia279yqM
-X-Google-Smtp-Source: ABdhPJxdBwaByixGxlxksDY17U0FfdnipzFCYgeAmBiDMHOgAtM7qneM1dfSpjB27mYvqGppfG3dcw==
-X-Received: by 2002:a62:1648:0:b029:142:2501:39fb with SMTP id
- 69-20020a6216480000b0290142250139fbmr10246947pfw.74.1600328911466; 
- Thu, 17 Sep 2020 00:48:31 -0700 (PDT)
-Received: from localhost.localdomain ([115.96.122.113])
- by smtp.googlemail.com with ESMTPSA id y3sm20572516pfb.18.2020.09.17.00.48.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Sep 2020 00:48:30 -0700 (PDT)
-From: Ani Sinha <ani@anisinha.ca>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 09/12] piix4: don't reserve hw resources when hotplug is
- off globally
-Date: Thu, 17 Sep 2020 13:17:29 +0530
-Message-Id: <20200917074733.13612-10-ani@anisinha.ca>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200917074733.13612-1-ani@anisinha.ca>
-References: <20200917074733.13612-1-ani@anisinha.ca>
-Received-SPF: none client-ip=2607:f8b0:4864:20::441;
- envelope-from=ani@anisinha.ca; helo=mail-pf1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
+ id 1kIohN-0004kA-Qd; Thu, 17 Sep 2020 03:51:23 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:4753 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
+ id 1kIohJ-0005Lm-BZ; Thu, 17 Sep 2020 03:51:21 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 3AA8B569386E998D60E2;
+ Thu, 17 Sep 2020 15:51:13 +0800 (CST)
+Received: from localhost (10.174.187.87) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
+ 15:51:02 +0800
+From: zhaolichang <zhaolichang@huawei.com>
+To: <qemu-trivial@nongnu.org>
+Subject: [PATCH V3 02/10] migration/: fix some comment spelling errors
+Date: Thu, 17 Sep 2020 15:50:21 +0800
+Message-ID: <20200917075029.313-3-zhaolichang@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
+In-Reply-To: <20200917075029.313-1-zhaolichang@huawei.com>
+References: <20200917075029.313-1-zhaolichang@huawei.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.187.87]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.191;
+ envelope-from=zhaolichang@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 03:37:07
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,136 +71,225 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, jusual@redhat.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
- Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter
+ Maydell <peter.maydell@linaro.org>, zhaolichang <zhaolichang@huawei.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When acpi hotplug is turned off for both root pci bus as well as for pci
-bridges, we should not generate the related ACPI code for DSDT table or
-initialize related hw ports or reserve hw resources. This change makes
-sure all those operations are turned off in the case ACPI pci hotplug is
-off globally.
+I found that there are many spelling errors in the comments of qemu,
+so I used the spellcheck tool to check the spelling errors
+and finally found some spelling errors in the migration folder.
 
-In this change, we also make sure ACPI code for the PCNT method are only
-added when bsel is enabled for the corresponding pci bus or bridge hotplug
-is turned on.
-
-As q35 machines do not use bsel for it's pci buses at this point in time, this
-change affects DSDT acpi table for q35 machines as well. Therefore, we will
-also need to commit the updated golden master DSDT table acpi binary blobs as
-well. This is done in the following commit. Without the updated table blobs,
-the unit tests would fail with this patch.
-
-Signed-off-by: Ani Sinha <ani@anisinha.ca>
+Signed-off-by: zhaolichang <zhaolichang@huawei.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/acpi/piix4.c      |  6 ++++--
- hw/i386/acpi-build.c | 25 ++++++++++++++++++-------
- 2 files changed, 22 insertions(+), 9 deletions(-)
+ migration/colo-failover.c |  2 +-
+ migration/colo.c          |  2 +-
+ migration/multifd.c       |  4 ++--
+ migration/postcopy-ram.c  |  4 ++--
+ migration/postcopy-ram.h  |  2 +-
+ migration/ram.c           | 10 +++++-----
+ migration/rdma.c          |  8 ++++----
+ migration/savevm.c        |  4 ++--
+ 8 files changed, 18 insertions(+), 18 deletions(-)
 
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index e6163bb6ce..b70b1f98af 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -596,8 +596,10 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
-                           "acpi-gpe0", GPE_LEN);
-     memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
- 
--    acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
--                    s->use_acpi_hotplug_bridge);
-+    if (s->use_acpi_hotplug_bridge || s->use_acpi_root_pci_hotplug) {
-+        acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
-+                        s->use_acpi_hotplug_bridge);
-+    }
- 
-     s->cpu_hotplug_legacy = true;
-     object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index e079b686f5..e41bb0992b 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -95,6 +95,7 @@ typedef struct AcpiPmInfo {
-     bool s3_disabled;
-     bool s4_disabled;
-     bool pcihp_bridge_en;
-+    bool pcihp_root_en;
-     uint8_t s4_val;
-     AcpiFadtData fadt;
-     uint16_t cpu_hp_io_base;
-@@ -245,6 +246,9 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
-     pm->pcihp_bridge_en =
-         object_property_get_bool(obj, "acpi-pci-hotplug-with-bridge-support",
-                                  NULL);
-+    pm->pcihp_root_en =
-+        object_property_get_bool(obj, "acpi-root-pci-hotplug",
-+                                 NULL);
- }
- 
- static void acpi_get_misc_info(AcpiMiscInfo *info)
-@@ -450,10 +454,12 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+diff --git a/migration/colo-failover.c b/migration/colo-failover.c
+index e9ca0b4774..b717edc8e2 100644
+--- a/migration/colo-failover.c
++++ b/migration/colo-failover.c
+@@ -46,7 +46,7 @@ void failover_request_active(Error **errp)
+ {
+    if (failover_set_state(FAILOVER_STATUS_NONE,
+         FAILOVER_STATUS_REQUIRE) != FAILOVER_STATUS_NONE) {
+-        error_setg(errp, "COLO failover is already actived");
++        error_setg(errp, "COLO failover is already activated");
+         return;
      }
- 
-     /* Append PCNT method to notify about events on local and child buses.
--     * Add unconditionally for root since DSDT expects it.
-+     * Add this method for root bus only when hotplug is enabled since DSDT
-+     * expects it.
+     failover_bh = qemu_bh_new(colo_failover_bh, NULL);
+diff --git a/migration/colo.c b/migration/colo.c
+index ea7d1e9d4e..80788d46b5 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -632,7 +632,7 @@ out:
+     /*
+      * It is safe to unregister notifier after failover finished.
+      * Besides, colo_delay_timer and colo_checkpoint_sem can't be
+-     * released befor unregister notifier, or there will be use-after-free
++     * released before unregister notifier, or there will be use-after-free
+      * error.
       */
--    method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
--
-+    if (bsel || pcihp_bridge_en) {
-+        method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
-+    }
-     /* If bus supports hotplug select it and notify about local events */
-     if (bsel) {
-         uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
-@@ -479,7 +485,10 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-             aml_append(method, aml_name("^S%.02X.PCNT", devfn));
-         }
+     colo_compare_unregister_notifier(&packets_compare_notifier);
+diff --git a/migration/multifd.c b/migration/multifd.c
+index d0441202aa..ac84a61797 100644
+--- a/migration/multifd.c
++++ b/migration/multifd.c
+@@ -731,7 +731,7 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
+         qemu_sem_post(&p->sem_sync);
+         /*
+          * Although multifd_send_thread is not created, but main migration
+-         * thread neet to judge whether it is running, so we need to mark
++         * thread needs to judge whether it is running, so we need to mark
+          * its status.
+          */
+         p->quit = true;
+@@ -1042,7 +1042,7 @@ bool multifd_recv_all_channels_created(void)
+ 
+ /*
+  * Try to receive all multifd channels to get ready for the migration.
+- * - Return true and do not set @errp when correctly receving all channels;
++ * - Return true and do not set @errp when correctly receiving all channels;
+  * - Return false and do not set @errp when correctly receiving the current one;
+  * - Return false and set @errp when failing to receive the current channel.
+  */
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 1bb22f2b6c..baf094ba3a 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -237,7 +237,7 @@ release_ufd:
+  * request_ufd_features: this function should be called only once on a newly
+  * opened ufd, subsequent calls will lead to error.
+  *
+- * Returns: true on succes
++ * Returns: true on success
+  *
+  * @ufd: fd obtained from userfaultfd syscall
+  * @features: bit mask see UFFD_API_FEATURES
+@@ -807,7 +807,7 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
+ 
+     low_time_offset = get_low_time_offset(dc);
+     /* lookup cpu, to clear it,
+-     * that algorithm looks straighforward, but it's not
++     * that algorithm looks straightforward, but it's not
+      * optimal, more optimal algorithm is keeping tree or hash
+      * where key is address value is a list of  */
+     for (i = 0; i < smp_cpus; i++) {
+diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+index 9941feb63a..6d2b3cf124 100644
+--- a/migration/postcopy-ram.h
++++ b/migration/postcopy-ram.h
+@@ -161,7 +161,7 @@ struct PostCopyFD {
+  */
+ void postcopy_register_shared_ufd(struct PostCopyFD *pcfd);
+ void postcopy_unregister_shared_ufd(struct PostCopyFD *pcfd);
+-/* Call each of the shared 'waker's registerd telling them of
++/* Call each of the shared 'waker's registered telling them of
+  * availability of a block.
+  */
+ int postcopy_notify_shared_wake(RAMBlock *rb, uint64_t offset);
+diff --git a/migration/ram.c b/migration/ram.c
+index 76d4fee5d5..c5f36aeae5 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -256,7 +256,7 @@ int64_t ramblock_recv_bitmap_send(QEMUFile *file,
+     /*
+      * Always use little endian when sending the bitmap. This is
+      * required that when source and destination VMs are not using the
+-     * same endianess. (Note: big endian won't work.)
++     * same endianness. (Note: big endian won't work.)
+      */
+     bitmap_to_le(le_bitmap, block->receivedmap, nbits);
+ 
+@@ -275,7 +275,7 @@ int64_t ramblock_recv_bitmap_send(QEMUFile *file,
+     qemu_put_buffer(file, (const uint8_t *)le_bitmap, size);
+     /*
+      * Mark as an end, in case the middle part is screwed up due to
+-     * some "misterious" reason.
++     * some "mysterious" reason.
+      */
+     qemu_put_be64(file, RAMBLOCK_RECV_BITMAP_ENDING);
+     qemu_fflush(file);
+@@ -718,7 +718,7 @@ static int save_xbzrle_page(RAMState *rs, uint8_t **current_data,
+     /*
+      * Reaching here means the page has hit the xbzrle cache, no matter what
+      * encoding result it is (normal encoding, overflow or skipping the page),
+-     * count the page as encoded. This is used to caculate the encoding rate.
++     * count the page as encoded. This is used to calculate the encoding rate.
+      *
+      * Example: 2 pages (8KB) being encoded, first page encoding generates 2KB,
+      * 2nd page turns out to be skipped (i.e. no new bytes written to the
+@@ -3705,7 +3705,7 @@ int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *block)
+ 
+     /*
+      * Note: see comments in ramblock_recv_bitmap_send() on why we
+-     * need the endianess convertion, and the paddings.
++     * need the endianness conversion, and the paddings.
+      */
+     local_size = ROUND_UP(local_size, 8);
+ 
+@@ -3743,7 +3743,7 @@ int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *block)
      }
--    aml_append(parent_scope, method);
-+
-+    if (bsel || pcihp_bridge_en) {
-+        aml_append(parent_scope, method);
-+    }
-     qobject_unref(bsel);
- }
  
-@@ -1504,7 +1513,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         build_hpet_aml(dsdt);
-         build_piix4_isa_bridge(dsdt);
-         build_isa_devices_aml(dsdt);
--        build_piix4_pci_hotplug(dsdt);
-+        if (pm->pcihp_bridge_en || pm->pcihp_root_en) {
-+            build_piix4_pci_hotplug(dsdt);
-+        }
-         build_piix4_pci0_int(dsdt);
+     /*
+-     * Endianess convertion. We are during postcopy (though paused).
++     * Endianness conversion. We are during postcopy (though paused).
+      * The dirty bitmap won't change. We can directly modify it.
+      */
+     bitmap_from_le(block->bmap, le_bitmap, nbits);
+diff --git a/migration/rdma.c b/migration/rdma.c
+index 1dc563ec3f..8f43d69b06 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -1511,7 +1511,7 @@ static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
      } else {
-         sb_scope = aml_scope("_SB");
-@@ -1546,7 +1557,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-     {
-         aml_append(scope, aml_name_decl("_HID", aml_string("ACPI0006")));
+         /* This is the source side, we're in a separate thread
+          * or destination prior to migration_fd_process_incoming()
+-         * after postcopy, the destination also in a seprate thread.
++         * after postcopy, the destination also in a separate thread.
+          * we can't yield; so we have to poll the fd.
+          * But we need to be able to handle 'cancel' or an error
+          * without hanging forever.
+@@ -2268,7 +2268,7 @@ static inline int qemu_rdma_buffer_mergable(RDMAContext *rdma,
+  *    chunk, then start a new chunk and flush() the old chunk.
+  * 3. To keep the hardware busy, we also group chunks into batches
+  *    and only require that a batch gets acknowledged in the completion
+- *    qeueue instead of each individual chunk.
++ *    queue instead of each individual chunk.
+  */
+ static int qemu_rdma_write(QEMUFile *f, RDMAContext *rdma,
+                            uint64_t block_offset, uint64_t offset,
+@@ -3150,7 +3150,7 @@ static size_t qemu_rdma_save_page(QEMUFile *f, void *opaque,
+     if (size > 0) {
+         /*
+          * Add this page to the current 'chunk'. If the chunk
+-         * is full, or the page doen't belong to the current chunk,
++         * is full, or the page doesn't belong to the current chunk,
+          * an actual RDMA write will occur and a new chunk will be formed.
+          */
+         ret = qemu_rdma_write(f, rdma, block_offset, offset, size);
+@@ -4103,7 +4103,7 @@ void rdma_start_outgoing_migration(void *opaque,
+         goto err;
+     }
  
--        if (misc->is_piix4) {
-+        if (misc->is_piix4 && (pm->pcihp_bridge_en || pm->pcihp_root_en)) {
-             method = aml_method("_E01", 0, AML_NOTSERIALIZED);
-             aml_append(method,
-                 aml_acquire(aml_name("\\_SB.PCI0.BLCK"), 0xFFFF));
-@@ -1698,7 +1709,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-     crs_range_set_free(&crs_range_set);
+-    /* RDMA postcopy need a seprate queue pair for return path */
++    /* RDMA postcopy need a separate queue pair for return path */
+     if (migrate_postcopy()) {
+         rdma_return_path = qemu_rdma_data_init(host_port, errp);
  
-     /* reserve PCIHP resources */
--    if (pm->pcihp_io_len) {
-+    if (pm->pcihp_io_len && (pm->pcihp_bridge_en || pm->pcihp_root_en)) {
-         dev = aml_device("PHPR");
-         aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A06")));
-         aml_append(dev,
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 304d98ff78..ee21e981ba 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2795,7 +2795,7 @@ void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
+ 
+     if (!has_live) {
+         /* live default to true so old version of Xen tool stack can have a
+-         * successfull live migration */
++         * successful live migration */
+         live = true;
+     }
+ 
+@@ -2818,7 +2818,7 @@ void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
+          * "xen-save-devices-state" and in case of migration failure, libxl
+          * would call "cont".
+          * So call bdrv_inactivate_all (release locks) here to let the other
+-         * side of the migration take controle of the images.
++         * side of the migration take control of the images.
+          */
+         if (live && !saved_vm_running) {
+             ret = bdrv_inactivate_all();
 -- 
-2.17.1
+2.26.2.windows.1
 
 
