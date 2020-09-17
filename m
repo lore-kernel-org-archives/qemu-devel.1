@@ -2,48 +2,51 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DF29C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 03:57:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDD4CC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 03:57:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2E9E20770
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 03:57:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2E9E20770
+	by mail.kernel.org (Postfix) with ESMTPS id 6BDFB2074B
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 03:57:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BDFB2074B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIl2l-0004r1-0O
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 23:57:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54216)
+	id 1kIl2z-0005OW-IC
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 23:57:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54710)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kIl0R-0001Qp-GY; Wed, 16 Sep 2020 23:54:47 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:56258 helo=huawei.com)
+ id 1kIl1W-0003W5-Vu; Wed, 16 Sep 2020 23:55:55 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:57678 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kIl0O-0008BU-GA; Wed, 16 Sep 2020 23:54:46 -0400
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 61D9ACE20DFCA30A5655;
- Thu, 17 Sep 2020 11:54:24 +0800 (CST)
-Received: from localhost (10.174.187.87) by DGGEMS412-HUB.china.huawei.com
- (10.3.19.212) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
- 11:54:14 +0800
+ id 1kIl1U-0000AW-Kf; Wed, 16 Sep 2020 23:55:54 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id ADAECA68065EF64F2C6A;
+ Thu, 17 Sep 2020 11:55:48 +0800 (CST)
+Received: from localhost (10.174.187.87) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
+ 11:55:42 +0800
 From: zhaolichang <zhaolichang@huawei.com>
 To: <qemu-trivial@nongnu.org>
-Subject: [PATCH V2 00/10] fix some comment spelling errors
-Date: Thu, 17 Sep 2020 11:54:03 +0800
-Message-ID: <20200917035413.701-1-zhaolichang@huawei.com>
+Subject: [PATCH V2 05/10] util/: fix some comment spelling errors
+Date: Thu, 17 Sep 2020 11:54:08 +0800
+Message-ID: <20200917035413.701-6-zhaolichang@huawei.com>
 X-Mailer: git-send-email 2.26.2.windows.1
+In-Reply-To: <20200917035413.701-1-zhaolichang@huawei.com>
+References: <20200917035413.701-1-zhaolichang@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-Originating-IP: [10.174.187.87]
 X-CFilter-Loop: Reflected
 Received-SPF: pass client-ip=45.249.212.32;
@@ -68,103 +71,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhaolichang <zhaolichang@huawei.com>, qemu-devel@nongnu.org
+Cc: zhaolichang <zhaolichang@huawei.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I found that there are many spelling errors in the comments of qemu,=0D
-so I used the spellcheck tool to check the spelling errors, this series fix=
-ed this=0D
-spelling errors.=0D
-=0D
-v1 -> v2:=0D
-  address Peter Maydell's comments=0D
-  address Alex Benn=A8=A6e's comments=0D
-  add reviewed-by for patch 1,2,3,4,5,6,9,10
+I found that there are many spelling errors in the comments of qemu,
+so I used the spellcheck tool to check the spelling errors
+and finally found some spelling errors in the util folder.
 
-zhaolichang (10):
-  qemu/: fix some comment spelling errors
-  migration/: fix some comment spelling errors
-  docs/: fix some comment spelling errors
-  scripts/: fix some comment spelling errors
-  util/: fix some comment spelling errors
-  linux-user/: fix some comment spelling errors
-  block/: fix some comment spelling errors
-  disas/: fix some comment spelling errors
-  qapi/: fix some comment spelling errors
-  contrib/: fix some comment spelling errors
+Signed-off-by: zhaolichang <zhaolichang@huawei.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ util/osdep.c             | 2 +-
+ util/qemu-progress.c     | 2 +-
+ util/qemu-sockets.c      | 2 +-
+ util/qemu-thread-win32.c | 2 +-
+ util/qht.c               | 2 +-
+ util/trace-events        | 2 +-
+ 6 files changed, 6 insertions(+), 6 deletions(-)
 
- Changelog                                |  2 +-
- accel/tcg/user-exec.c                    |  2 +-
- audio/audio.c                            |  2 +-
- block.c                                  |  2 +-
- block/block-copy.c                       |  2 +-
- block/linux-aio.c                        |  2 +-
- block/mirror.c                           |  2 +-
- block/vhdx.c                             |  2 +-
- block/vhdx.h                             |  4 ++--
- configure                                |  2 +-
- contrib/gitdm/filetypes.txt              |  6 +++---
- contrib/ivshmem-client/ivshmem-client.h  |  2 +-
- contrib/libvhost-user/libvhost-user.c    |  4 ++--
- contrib/libvhost-user/libvhost-user.h    |  2 +-
- disas/hppa.c                             |  2 +-
- disas/m68k.c                             |  8 ++++----
- disas/ppc.c                              |  2 +-
- docs/COLO-FT.txt                         |  6 +++---
- docs/devel/blkdebug.txt                  |  2 +-
- docs/devel/migration.rst                 |  2 +-
- docs/devel/testing.rst                   |  2 +-
- docs/devel/tracing.txt                   |  2 +-
- docs/interop/bitmaps.rst                 |  2 +-
- docs/interop/dbus.rst                    |  4 ++--
- docs/interop/nbd.txt                     |  2 +-
- docs/interop/vhost-user-gpu.rst          |  2 +-
- docs/interop/vhost-user.rst              |  4 ++--
- docs/rdma.txt                            |  2 +-
- docs/specs/ppc-spapr-hotplug.txt         |  4 ++--
- docs/specs/ppc-spapr-xive.rst            |  4 ++--
- docs/system/arm/aspeed.rst               |  2 +-
- docs/system/deprecated.rst               |  8 ++++----
- docs/system/target-avr.rst               |  4 ++--
- docs/tools/virtiofsd.rst                 |  2 +-
- fsdev/virtfs-proxy-helper.c              |  2 +-
- hmp-commands.hx                          |  2 +-
- libdecnumber/decNumber.c                 |  2 +-
- linux-user/aarch64/signal.c              |  2 +-
- linux-user/cris/target_syscall.h         |  4 ++--
- linux-user/flat.h                        |  2 +-
- linux-user/flatload.c                    |  4 ++--
- linux-user/host/ppc64/safe-syscall.inc.S |  2 +-
- linux-user/syscall.c                     |  4 ++--
- migration/colo-failover.c                |  2 +-
- migration/colo.c                         |  2 +-
- migration/multifd.c                      |  4 ++--
- migration/postcopy-ram.c                 |  4 ++--
- migration/postcopy-ram.h                 |  2 +-
- migration/ram.c                          | 10 +++++-----
- migration/rdma.c                         |  8 ++++----
- migration/savevm.c                       |  4 ++--
- qapi/block-core.json                     |  4 ++--
- qapi/crypto.json                         |  4 ++--
- qemu-img.c                               |  2 +-
- qobject/qdict.c                          |  2 +-
- scripts/checkpatch.pl                    |  2 +-
- scripts/clean-header-guards.pl           |  2 +-
- scripts/decodetree.py                    |  6 +++---
- scripts/oss-fuzz/build.sh                |  2 +-
- scripts/tracetool/__init__.py            |  2 +-
- scsi/pr-manager-helper.c                 |  2 +-
- util/osdep.c                             |  2 +-
- util/qemu-progress.c                     |  2 +-
- util/qemu-sockets.c                      |  2 +-
- util/qemu-thread-win32.c                 |  2 +-
- util/qht.c                               |  2 +-
- util/trace-events                        |  2 +-
- 67 files changed, 101 insertions(+), 101 deletions(-)
-
---=20
+diff --git a/util/osdep.c b/util/osdep.c
+index 4829c07ff6..e50dc2214e 100644
+--- a/util/osdep.c
++++ b/util/osdep.c
+@@ -392,7 +392,7 @@ int qemu_unlink(const char *name)
+  * Set errno if fewer than `count' bytes are written.
+  *
+  * This function don't work with non-blocking fd's.
+- * Any of the possibilities with non-bloking fd's is bad:
++ * Any of the possibilities with non-blocking fd's is bad:
+  *   - return a short write (then name is wrong)
+  *   - busy wait adding (errno == EAGAIN) to the loop
+  */
+diff --git a/util/qemu-progress.c b/util/qemu-progress.c
+index 3c2223c1a2..20d51f8c12 100644
+--- a/util/qemu-progress.c
++++ b/util/qemu-progress.c
+@@ -131,7 +131,7 @@ void qemu_progress_end(void)
+ /*
+  * Report progress.
+  * @delta is how much progress we made.
+- * If @max is zero, @delta is an absolut value of the total job done.
++ * If @max is zero, @delta is an absolute value of the total job done.
+  * Else, @delta is a progress delta since the last call, as a fraction
+  * of @max.  I.e. the delta is @delta * @max / 100. This allows
+  * relative accounting of functions which may be a different fraction of
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index b37d288866..99ce2fd5e6 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -416,7 +416,7 @@ static struct addrinfo *inet_parse_connect_saddr(InetSocketAddress *saddr,
+ 
+     /* At least FreeBSD and OS-X 10.6 declare AI_V4MAPPED but
+      * then don't implement it in their getaddrinfo(). Detect
+-     * this and retry without the flag since that's preferrable
++     * this and retry without the flag since that's preferable
+      * to a fatal error
+      */
+     if (rc == EAI_BADFLAGS &&
+diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
+index 56a83333da..d207b0cb58 100644
+--- a/util/qemu-thread-win32.c
++++ b/util/qemu-thread-win32.c
+@@ -289,7 +289,7 @@ void qemu_event_wait(QemuEvent *ev)
+             ResetEvent(ev->event);
+ 
+             /* Tell qemu_event_set that there are waiters.  No need to retry
+-             * because there cannot be a concurent busy->free transition.
++             * because there cannot be a concurrent busy->free transition.
+              * After the CAS, the event will be either set or busy.
+              */
+             if (atomic_cmpxchg(&ev->value, EV_FREE, EV_BUSY) == EV_SET) {
+diff --git a/util/qht.c b/util/qht.c
+index 67e5d5b916..b2e020c398 100644
+--- a/util/qht.c
++++ b/util/qht.c
+@@ -49,7 +49,7 @@
+  * it anymore.
+  *
+  * Writers check for concurrent resizes by comparing ht->map before and after
+- * acquiring their bucket lock. If they don't match, a resize has occured
++ * acquiring their bucket lock. If they don't match, a resize has occurred
+  * while the bucket spinlock was being acquired.
+  *
+  * Related Work:
+diff --git a/util/trace-events b/util/trace-events
+index 4e894aa9c3..24c31803b0 100644
+--- a/util/trace-events
++++ b/util/trace-events
+@@ -28,7 +28,7 @@ qemu_file_monitor_add_watch(void *mon, const char *dirpath, const char *filename
+ qemu_file_monitor_remove_watch(void *mon, const char *dirpath, int64_t id) "File monitor %p remove watch dir='%s' id=%" PRId64
+ qemu_file_monitor_new(void *mon, int fd) "File monitor %p created fd=%d"
+ qemu_file_monitor_enable_watch(void *mon, const char *dirpath, int id) "File monitor %p enable watch dir='%s' id=%u"
+-qemu_file_monitor_disable_watch(void *mon, const char *dirpath, int id) "Fle monitor %p disable watch dir='%s' id=%u"
++qemu_file_monitor_disable_watch(void *mon, const char *dirpath, int id) "File monitor %p disable watch dir='%s' id=%u"
+ qemu_file_monitor_event(void *mon, const char *dirpath, const char *filename, int mask, unsigned int id) "File monitor %p event dir='%s' file='%s' mask=0x%x id=%u"
+ qemu_file_monitor_dispatch(void *mon, const char *dirpath, const char *filename, int ev, void *cb, void *opaque, int64_t id) "File monitor %p dispatch dir='%s' file='%s' ev=%d cb=%p opaque=%p id=%" PRId64
+ 
+-- 
 2.26.2.windows.1
 
 
