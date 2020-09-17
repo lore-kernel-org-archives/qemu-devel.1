@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B187C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:41:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C53EBC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:42:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8BAF22205
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:41:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8BAF22205
+	by mail.kernel.org (Postfix) with ESMTPS id 42619221EE
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:42:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42619221EE
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIyqG-0003Qh-Ss
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 14:41:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59652)
+	id 1kIyr2-0004Bu-5u
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 14:42:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59574)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kIyom-0002Ji-0k; Thu, 17 Sep 2020 14:39:40 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:58569)
+ id 1kIyoC-0001RQ-Rw; Thu, 17 Sep 2020 14:39:07 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:53899)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kIyoj-0002CO-UV; Thu, 17 Sep 2020 14:39:39 -0400
+ id 1kIyo9-00029f-M8; Thu, 17 Sep 2020 14:39:04 -0400
 Received: from [192.168.100.1] ([82.252.129.222]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N7iGi-1kVXsm0N6Y-014kpQ; Thu, 17 Sep 2020 20:39:30 +0200
-Subject: Re: [PATCH V3 06/10] linux-user/: fix some comment spelling errors
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1M4rD7-1kJFea03Oh-001yXx; Thu, 17 Sep 2020 20:38:55 +0200
+Subject: Re: [PATCH V3 05/10] util/: fix some comment spelling errors
 To: zhaolichang <zhaolichang@huawei.com>, qemu-trivial@nongnu.org
 References: <20200917075029.313-1-zhaolichang@huawei.com>
- <20200917075029.313-7-zhaolichang@huawei.com>
+ <20200917075029.313-6-zhaolichang@huawei.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -80,35 +80,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <2736342d-21a1-e611-f462-87a497e76a03@vivier.eu>
-Date: Thu, 17 Sep 2020 20:39:29 +0200
+Message-ID: <f2db53c5-1594-17f7-1b31-a140b1ab86d4@vivier.eu>
+Date: Thu, 17 Sep 2020 20:38:54 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200917075029.313-7-zhaolichang@huawei.com>
+In-Reply-To: <20200917075029.313-6-zhaolichang@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:OpUf0UlFlUhZQy+f9EfQMN3nBfPMtJTASoPK4dvSGlw4gbCrVSL
- gmDHiXxfUbx57Acb2QakI9FLfjCOW6ouHSXP+6KauftETgcIjPAdMRGRFJxzQpRmQQkBuPt
- Ph6rs+ETBZ3TdX4drojzIpsZO0dkJGEccVRQqizlJmcmf1e6ERtmuEe+LYriP1pLct26pw2
- N0KMhEbc71Hi15hhvHxnA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:BXRvxzLDuf8=:9oxbtn3rLRbzHPrKU6A5HT
- RewGldrMi0vMHEtJdmrXAOI2yHdzYlDZpAvF6YPCHtTZlUaEcJzZKdNUa1rs76AQFWPXSpheS
- ntMkK9fSQyaNqy1iGlpF2HHB5OvXXBvBQdtDZ4tm809IqkVCLJlrKWbdixVeX+nDF2uqpdqFF
- 4IrWmj5TivEMSlGCsMmTAW1c0WLmDnil4jla8CblfS58RdJgJ7MU0dnkG2rrwtdMcVfWlCIF8
- LePMynEVd2Uz2D7KY8dbmk1ikPM4xM9LQUWbxBtODJJsXi1wEY09TUZ5DEIM0I5+URieNCAeh
- eBgfC1S82mfCMLPsfd4xAEL5nCztAKrjqxMMAJl8s6HS0sZtkY3CxZNbb502qeMTb5vSr0mxC
- 4n95y3f9ojmCUzXOx95OnxEPJm+WCSBSzd8DoN+sD7W5Jzphnxg4PPB3EH6vYDHrVDgvN+o9A
- o+Q1QrGRg5P0Vcn2uSZkYkMTuiNLo4aBiXu9463z2zd2qe5fh7AvYcYqqioHx16mhdeUQXnCl
- 04FYuqKayenvvAmmPYjPBtfLPV0HPt7HP8OaIDt2EtcL31OAYhEeGL3KkW4g+4Q+74tTjP4DS
- eN5hmwLCe8u1XcYTk8mERWPgv6pV+FZ2B0e9f6az1BZjssn8QI0yo60vBJ49qVi2zVlIHcwSa
- W473RUvkL/P9vYhWUg/+j3DqtS22N6IOleJRIveJMvWHwLaF2RY99+d8BjMjf1pnCIzKmPnNO
- swRZm8bT1WclNSp7kZkc5hAuLeHdInZYWLQFR82/HnnYaHoiJ2igNJZKTuGXCcMYMUnPrrFIA
- keOev0vyxZ824gexj0NTybcDrrkji+Yl7wBjmqmiznWphXJnhGpqdQ9lrai00FWeGs9Ruz4
-Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:z5uqCskpwY6hKnfaqnTvhX+WY2OVcAJb0x1Ol8ajlN/kX5kvJBr
+ S2rNaVQpV7vk13hzr2m20dFpD4LxHqKsm1OkyJRyzITT79/BTfNSEdjqbuGgnqRVg/h6t2l
+ SFADfNgqCgICp2Eci2Wgg9RnHTh6AyOOnxPXhdjlNyXEPfdN82OFM1mp2pryrXMChlKBRfl
+ KhIieKeIwqQQ7dTuxl63A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:S3Yk10nr7DE=:IcQI2jLlPaC71tHowf6wz8
+ r/hcKBnZYzYU9pAYJjWhT8L7Cyjtb2/KDiwHnHyA51F6CKYihOHeyJTMBKsbWZKlMjWfB1YRh
+ 9TxMBLEfZH7I2fE+reLKH0JQDEd3udHR1OoG3Svt7fYqhbiuIY6BIXa2dauKVc9WLxNmhGL1F
+ DbkAPwB5AUDI3TZiMUlzWgqOCQllwgoUZboEFxwMqDqCld1lnO+oIfh91TjCDbGl7kYjcOVNP
+ kyKJ9YdIYYBNeLeb3f72gGddi5eBPxy7A4Ab0FH6rlBVUPJ8dZ58RV1S8hOamTOsNB00/6e1G
+ C7erZlNTEo+xi+8EzBKW2DUbq8N+j13cNjYBS10HP0uWEgWVqczspuKnffT8gL6ofka3Mw5Az
+ xdVlceG8pf72ayYD3Wf9xcbo+kmdBnG3tSOGOwHLITqWVWxTA3fKchOpu+zRHhQbHLC5m5qLv
+ YJxKLUHeIwh65Zixg5v5j538W1139xc7jfkaMXkWk+jfkdk7qW31m9WpSqU8TIxJkkrcp8tlP
+ daY20tNl8cgOgGJi76Q8wuzLfzEnLBOcavQEUm+s+SzWArp8xndWnq3nGXuQZTGqYI7nXfheG
+ EjpjJ4/6Y1nTgdR37zEwHd5QnknHB/Z4X8spUWLsQ1aoARZVGgSqSb5oqlLjJpox4vEX4lAh3
+ /d2Uh5+4BkPcbJjsKVDQHmw/jBZEZWnvjez5ca4OdwL8Yfuwfzf/yG7d/8CAT1Gd/JfRkFEQf
+ WCFrRWx4Qr11Q8R5pnRpvn9pemapV9s8WSm9wQ/dVDx1vKPXGZC7Ujpslu+SQ/suSJPmPK2u6
+ 11t4DVNjie5aA7FEajApPxjhRnxI0yAQF51jxJAZl5pDHx2XIUPRBKBn3HlZvzBetsvutls
+Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 14:39:36
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 14:37:31
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -136,123 +136,96 @@ Sender: "Qemu-devel"
 Le 17/09/2020 à 09:50, zhaolichang a écrit :
 > I found that there are many spelling errors in the comments of qemu,
 > so I used the spellcheck tool to check the spelling errors
-> and finally found some spelling errors in the linux-user folder.
+> and finally found some spelling errors in the util folder.
 > 
 > Signed-off-by: zhaolichang <zhaolichang@huawei.com>
 > Reviewed-by: Alex Bennee <alex.bennee@linaro.org>
 > ---
->  linux-user/aarch64/signal.c              | 2 +-
->  linux-user/cris/target_syscall.h         | 4 ++--
->  linux-user/flat.h                        | 2 +-
->  linux-user/flatload.c                    | 4 ++--
->  linux-user/host/ppc64/safe-syscall.inc.S | 2 +-
->  linux-user/syscall.c                     | 4 ++--
->  6 files changed, 9 insertions(+), 9 deletions(-)
+>  util/osdep.c             | 2 +-
+>  util/qemu-progress.c     | 2 +-
+>  util/qemu-sockets.c      | 2 +-
+>  util/qemu-thread-win32.c | 2 +-
+>  util/qht.c               | 2 +-
+>  util/trace-events        | 2 +-
+>  6 files changed, 6 insertions(+), 6 deletions(-)
 > 
-> diff --git a/linux-user/aarch64/signal.c b/linux-user/aarch64/signal.c
-> index cd521ee42d..d50c1ae583 100644
-> --- a/linux-user/aarch64/signal.c
-> +++ b/linux-user/aarch64/signal.c
-> @@ -78,7 +78,7 @@ struct target_sve_context {
->      struct target_aarch64_ctx head;
->      uint16_t vl;
->      uint16_t reserved[3];
-> -    /* The actual SVE data immediately follows.  It is layed out
-> +    /* The actual SVE data immediately follows.  It is laid out
->       * according to TARGET_SVE_SIG_{Z,P}REG_OFFSET, based off of
->       * the original struct pointer.
->       */
-> diff --git a/linux-user/cris/target_syscall.h b/linux-user/cris/target_syscall.h
-> index d109a6b42a..19e1281403 100644
-> --- a/linux-user/cris/target_syscall.h
-> +++ b/linux-user/cris/target_syscall.h
-> @@ -4,7 +4,7 @@
->  #define UNAME_MACHINE "cris"
->  #define UNAME_MINIMUM_RELEASE "2.6.32"
->  
-> -/* pt_regs not only specifices the format in the user-struct during
-> +/* pt_regs not only specifies the format in the user-struct during
->   * ptrace but is also the frame format used in the kernel prologue/epilogues
->   * themselves
+> diff --git a/util/osdep.c b/util/osdep.c
+> index 4829c07ff6..e50dc2214e 100644
+> --- a/util/osdep.c
+> +++ b/util/osdep.c
+> @@ -392,7 +392,7 @@ int qemu_unlink(const char *name)
+>   * Set errno if fewer than `count' bytes are written.
+>   *
+>   * This function don't work with non-blocking fd's.
+> - * Any of the possibilities with non-bloking fd's is bad:
+> + * Any of the possibilities with non-blocking fd's is bad:
+>   *   - return a short write (then name is wrong)
+>   *   - busy wait adding (errno == EAGAIN) to the loop
 >   */
-> @@ -32,7 +32,7 @@ struct target_pt_regs {
->          unsigned long spc;
->          unsigned long ccs;
->          unsigned long srp;
-> -        unsigned long erp; /* This is actually the debugged process' PC */
-> +        unsigned long erp; /* This is actually the debugged process's PC */
->          /* For debugging purposes; saved only when needed. */
->          unsigned long exs;
->          unsigned long eda;
-> diff --git a/linux-user/flat.h b/linux-user/flat.h
-> index 1e44b33443..ed518e2013 100644
-> --- a/linux-user/flat.h
-> +++ b/linux-user/flat.h
-> @@ -43,7 +43,7 @@ struct flat_hdr {
->  	abi_ulong reloc_count;  /* Number of relocation records */
->  	abi_ulong flags;
->  	abi_ulong build_date;   /* When the program/library was built */
-> -	abi_ulong filler[5];    /* Reservered, set to zero */
-> +	abi_ulong filler[5];    /* Reserved, set to zero */
->  };
+> diff --git a/util/qemu-progress.c b/util/qemu-progress.c
+> index 3c2223c1a2..20d51f8c12 100644
+> --- a/util/qemu-progress.c
+> +++ b/util/qemu-progress.c
+> @@ -131,7 +131,7 @@ void qemu_progress_end(void)
+>  /*
+>   * Report progress.
+>   * @delta is how much progress we made.
+> - * If @max is zero, @delta is an absolut value of the total job done.
+> + * If @max is zero, @delta is an absolute value of the total job done.
+>   * Else, @delta is a progress delta since the last call, as a fraction
+>   * of @max.  I.e. the delta is @delta * @max / 100. This allows
+>   * relative accounting of functions which may be a different fraction of
+> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+> index b37d288866..99ce2fd5e6 100644
+> --- a/util/qemu-sockets.c
+> +++ b/util/qemu-sockets.c
+> @@ -416,7 +416,7 @@ static struct addrinfo *inet_parse_connect_saddr(InetSocketAddress *saddr,
 >  
->  #define FLAT_FLAG_RAM    0x0001 /* load program entirely into RAM */
-> diff --git a/linux-user/flatload.c b/linux-user/flatload.c
-> index 8fb448f0bf..14d2999d15 100644
-> --- a/linux-user/flatload.c
-> +++ b/linux-user/flatload.c
-> @@ -442,7 +442,7 @@ static int load_flat_file(struct linux_binprm * bprm,
->      indx_len = (indx_len + 15) & ~(abi_ulong)15;
->  
->      /*
-> -     * Alloate the address space.
-> +     * Allocate the address space.
+>      /* At least FreeBSD and OS-X 10.6 declare AI_V4MAPPED but
+>       * then don't implement it in their getaddrinfo(). Detect
+> -     * this and retry without the flag since that's preferrable
+> +     * this and retry without the flag since that's preferable
+>       * to a fatal error
 >       */
->      probe_guest_base(bprm->filename, 0,
->                       text_len + data_len + extra + indx_len);
-> @@ -794,7 +794,7 @@ int load_flt_binary(struct linux_binprm *bprm, struct image_info *info)
->  #error here
->      for (i = MAX_SHARED_LIBS-1; i>0; i--) {
->              if (libinfo[i].loaded) {
-> -                    /* Push previos first to call address */
-> +                    /* Push previous first to call address */
->                      --sp;
->                      if (put_user_ual(start_addr, sp))
->                          return -EFAULT;
-> diff --git a/linux-user/host/ppc64/safe-syscall.inc.S b/linux-user/host/ppc64/safe-syscall.inc.S
-> index 8ed73a5b86..875133173b 100644
-> --- a/linux-user/host/ppc64/safe-syscall.inc.S
-> +++ b/linux-user/host/ppc64/safe-syscall.inc.S
-> @@ -84,7 +84,7 @@ safe_syscall_end:
+>      if (rc == EAI_BADFLAGS &&
+> diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
+> index 56a83333da..d207b0cb58 100644
+> --- a/util/qemu-thread-win32.c
+> +++ b/util/qemu-thread-win32.c
+> @@ -289,7 +289,7 @@ void qemu_event_wait(QemuEvent *ev)
+>              ResetEvent(ev->event);
 >  
->  	/* code path when we didn't execute the syscall */
->  0:	addi	3, 0, -TARGET_ERESTARTSYS
-> -	ld 14, 16(1) /* restore r14 to its orginal value */
-> +	ld 14, 16(1) /* restore r14 to its original value */
->  	blr
->  	.cfi_endproc
->  
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 55ac5c3208..897d20c076 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -481,7 +481,7 @@ _syscall4(int, sys_prlimit64, pid_t, pid, int, resource,
->  
->  
->  #if defined(TARGET_NR_timer_create)
-> -/* Maxiumum of 32 active POSIX timers allowed at any one time. */
-> +/* Maximum of 32 active POSIX timers allowed at any one time. */
->  static timer_t g_posix_timers[32] = { 0, } ;
->  
->  static inline int next_free_host_timer(void)
-> @@ -8180,7 +8180,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->      switch(num) {
->      case TARGET_NR_exit:
->          /* In old applications this may be used to implement _exit(2).
-> -           However in threaded applictions it is used for thread termination,
-> +           However in threaded applications it is used for thread termination,
->             and _exit_group is used for application termination.
->             Do thread termination if we have more then one thread.  */
+>              /* Tell qemu_event_set that there are waiters.  No need to retry
+> -             * because there cannot be a concurent busy->free transition.
+> +             * because there cannot be a concurrent busy->free transition.
+>               * After the CAS, the event will be either set or busy.
+>               */
+>              if (atomic_cmpxchg(&ev->value, EV_FREE, EV_BUSY) == EV_SET) {
+> diff --git a/util/qht.c b/util/qht.c
+> index 67e5d5b916..b2e020c398 100644
+> --- a/util/qht.c
+> +++ b/util/qht.c
+> @@ -49,7 +49,7 @@
+>   * it anymore.
+>   *
+>   * Writers check for concurrent resizes by comparing ht->map before and after
+> - * acquiring their bucket lock. If they don't match, a resize has occured
+> + * acquiring their bucket lock. If they don't match, a resize has occurred
+>   * while the bucket spinlock was being acquired.
+>   *
+>   * Related Work:
+> diff --git a/util/trace-events b/util/trace-events
+> index 4e894aa9c3..24c31803b0 100644
+> --- a/util/trace-events
+> +++ b/util/trace-events
+> @@ -28,7 +28,7 @@ qemu_file_monitor_add_watch(void *mon, const char *dirpath, const char *filename
+>  qemu_file_monitor_remove_watch(void *mon, const char *dirpath, int64_t id) "File monitor %p remove watch dir='%s' id=%" PRId64
+>  qemu_file_monitor_new(void *mon, int fd) "File monitor %p created fd=%d"
+>  qemu_file_monitor_enable_watch(void *mon, const char *dirpath, int id) "File monitor %p enable watch dir='%s' id=%u"
+> -qemu_file_monitor_disable_watch(void *mon, const char *dirpath, int id) "Fle monitor %p disable watch dir='%s' id=%u"
+> +qemu_file_monitor_disable_watch(void *mon, const char *dirpath, int id) "File monitor %p disable watch dir='%s' id=%u"
+>  qemu_file_monitor_event(void *mon, const char *dirpath, const char *filename, int mask, unsigned int id) "File monitor %p event dir='%s' file='%s' mask=0x%x id=%u"
+>  qemu_file_monitor_dispatch(void *mon, const char *dirpath, const char *filename, int ev, void *cb, void *opaque, int64_t id) "File monitor %p dispatch dir='%s' file='%s' ev=%d cb=%p opaque=%p id=%" PRId64
 >  
 > 
 
