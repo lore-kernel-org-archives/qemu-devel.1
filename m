@@ -2,101 +2,122 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3AF1C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 07:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 572B8C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 07:21:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 527B22072E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 07:19:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C14F92072E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 07:21:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WDYIlizJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 527B22072E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SydNvWff"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C14F92072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIoCG-0003Si-Dw
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 03:19:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44224)
+	id 1kIoDz-0005Cz-RV
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 03:20:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44388)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kIoBZ-0002wU-52
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:18:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29771)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIoCl-0004Ia-8F
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:19:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56183)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kIoBW-00017Z-4v
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:18:28 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIoCg-0001Di-GV
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:19:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600327104;
+ s=mimecast20190719; t=1600327177;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=J0mg7l8fSD8OC+hLvKntNqWk2rLwJkbIBms8Q2gkZY4=;
- b=WDYIlizJ3o+aTMY2X9GIq9VAMBz8X+pLY/TR7YGBx+b8TStKH1lWx3w34Pz87Uek0AJ/NM
- Dk/gcW1R/s15k+4qdNL1u80CxMDKuCrtcJ6PTv2up3yYeUT1QoBdYK85+gJmQ8lmUgdXuH
- YZDDr5leReeTpw663OGCY8fZ0Ar/brk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-LXN-QZ8uMkG4dhhswEVR2g-1; Thu, 17 Sep 2020 03:18:21 -0400
-X-MC-Unique: LXN-QZ8uMkG4dhhswEVR2g-1
-Received: by mail-wm1-f71.google.com with SMTP id u5so411374wme.3
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 00:18:21 -0700 (PDT)
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=qeSl6k6hauEbNZ6bSrEAPvGnE47CLrfVrhR41SsW1mA=;
+ b=SydNvWff6s8cm6FZoi2ySVPe/pbUk6+c3aE2P6AzU8FV4Vhmbjn7Mo++RYWVa/UVmnM5DV
+ JCXMV3wSnCQRlg6O27az8gBp70cmKYb4bBYoeDFUMWkdRZYVnaO6yrd4stPfIUGVsUa50J
+ VP4qXJfBYOQ0Q0nJg+weQ8sAYvlbvzk=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-270-Q-LjZeJiNM-PD9y1ujFvEw-1; Thu, 17 Sep 2020 03:19:36 -0400
+X-MC-Unique: Q-LjZeJiNM-PD9y1ujFvEw-1
+Received: by mail-wr1-f72.google.com with SMTP id r16so507930wrm.18
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 00:19:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=J0mg7l8fSD8OC+hLvKntNqWk2rLwJkbIBms8Q2gkZY4=;
- b=Q5h9dhdW/HNPm1snxKUAASpkBXL0rJOlhlKHW9CrA/Tss8jnTnu3U3S1SCzBnXaslH
- a797K5ZLY0q2u7Kizy9Up3uvfn/PNGXd5wMz9HMG4sm/77dWzmwZz66/JDxS3Mi7Nkml
- Pwa1cPEEG6YoJPzHx1p4qYsthCsIxrgnQIFOw7niAaWSODSq019vX/MjSdSDSh8NlDgm
- R8/VPM2dxPggqLXboAMdBeqxljrFMwp3NvY3IZ3BQsm5qjWjSiM0rwsm1CQqAm7xDTy7
- zlEh/5Jj1NajsTH0Ps5tTWGFmFi9CT90pHtMgbPu286WB05ZxMqzI/mUDjAtPtjo303c
- aD7g==
-X-Gm-Message-State: AOAM533iNc5koAiXjIQi3YSpkFAYGzx3durP6azDHHl34jBUwOQdjFyQ
- p6v0gzk9lSlbSkuZL3wZsIjqSiiqTtzlFKkurLS9X0vbITJsLlRoRAyYr14r6mp+4XKt0E2NcPd
- kSCcBThuR5CJv8Zw=
-X-Received: by 2002:a5d:4e8c:: with SMTP id e12mr32256888wru.180.1600327100025; 
- Thu, 17 Sep 2020 00:18:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy+PAeD59V/Ntd6yzkU+CSOJAv8ujM5iD5oyi3X7OZDLhDK9h96un3Fjbqcwrw77dQlGzIJhg==
-X-Received: by 2002:a5d:4e8c:: with SMTP id e12mr32256857wru.180.1600327099654; 
- Thu, 17 Sep 2020 00:18:19 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d003:b94f:6314:4839?
- ([2001:b07:6468:f312:d003:b94f:6314:4839])
- by smtp.gmail.com with ESMTPSA id y5sm9654084wmg.21.2020.09.17.00.18.18
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=qeSl6k6hauEbNZ6bSrEAPvGnE47CLrfVrhR41SsW1mA=;
+ b=jTgkK65u7zZFYFlLRf0H8c2/oM2SGblyjhXowb623Xk54NNwcLbIM2UIEtbPa4qRpV
+ ny0Ze89Pv1uLGznKF3qTfINFy08mNwEErhGW+u6ufy384Ne8x+R8BQdauQqRyUm1ziYT
+ kTsXiHAD1qySwNV7TwUCpbIy37U2Fy7Jwh1H/otNelK/8qDDgBo77O4E3Vfd9HWuNzd6
+ 3+2RFzDb6sXBhbXUIMVW+GasBn49RWSFRKTClRX4jnNrnAgbuv5IajK445zT+FOGlRw/
+ 5nhkLkclChrYUZLNF4P7/NxzFo0iKHy/z9SHUh9ROzAImI8wPXIogCVLlwxdh0cWg1sF
+ Wy1g==
+X-Gm-Message-State: AOAM532sKlNDbHdeHOz9znOVtgkN7ZJ7ohYjygCrT8zpc4hd7pXvDJ0z
+ ik+vEtqvsaTFAaYZbdXvQ3fvm0A23ZGZsujQhIGfvse8OEmXnSoTZ4tLUAgI6poufdEVx5hVNOq
+ EK0ExZjVyWh7OAUM=
+X-Received: by 2002:a05:600c:2252:: with SMTP id
+ a18mr9069739wmm.154.1600327171514; 
+ Thu, 17 Sep 2020 00:19:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyma22C0tJDb37dyRtes+F6vuDVtFZbxt3Yx/IEAnwhXWROSgyyfIuBeJg5dk//cvpnAIll+w==
+X-Received: by 2002:a05:600c:2252:: with SMTP id
+ a18mr9069711wmm.154.1600327171231; 
+ Thu, 17 Sep 2020 00:19:31 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id 2sm9233676wmf.25.2020.09.17.00.19.30
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 17 Sep 2020 00:18:19 -0700 (PDT)
-Subject: Re: [PATCH] migration: Silence compiler warning in
- global_state_store_running()
-To: Thomas Huth <thuth@redhat.com>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
-References: <20200916171913.148681-1-thuth@redhat.com>
- <93744d31-0f33-5bb1-fb76-42ca3a5fa401@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e44e5105-baba-3d0d-6477-37f24531d39f@redhat.com>
-Date: Thu, 17 Sep 2020 09:18:18 +0200
+ Thu, 17 Sep 2020 00:19:30 -0700 (PDT)
+Subject: Re: [PATCH 0/3] qom: Replace INTERFACE_CHECK with OBJECT_CHECK
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
+References: <20200916193101.511600-1-ehabkost@redhat.com>
+ <CAJ+F1CLo=mz6LhRTx0PTF-NiabiaCNwm-U=7VEhQXUmryQoqvw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <40730966-469a-de4d-29bd-03c7c409b3cf@redhat.com>
+Date: Thu, 17 Sep 2020 09:19:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <93744d31-0f33-5bb1-fb76-42ca3a5fa401@redhat.com>
+In-Reply-To: <CAJ+F1CLo=mz6LhRTx0PTF-NiabiaCNwm-U=7VEhQXUmryQoqvw@mail.gmail.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.003
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 20:51:18
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -120,60 +141,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/09/20 08:30, Thomas Huth wrote:
-> On 16/09/2020 19.19, Thomas Huth wrote:
->> GCC 9.3.0 on Ubuntu complains:
->>
->> In file included from /usr/include/string.h:495,
->>                  from /home/travis/build/huth/qemu/include/qemu/osdep.h:87,
->>                  from ../migration/global_state.c:13:
->> In function ‘strncpy’,
->>     inlined from ‘global_state_store_running’ at ../migration/global_state.c:47:5:
->> /usr/include/x86_64-linux-gnu/bits/string_fortified.h:106:10: error: ‘__builtin_strncpy’ specified bound 100 equals destination size [-Werror=stringop-truncation]
->>   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
->>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>
->> ... but we apparently really want to do the strncpy here. Silence the
->> warning with QEMU_NONSTRING.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  migration/global_state.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/migration/global_state.c b/migration/global_state.c
->> index 25311479a4..f1355d7d97 100644
->> --- a/migration/global_state.c
->> +++ b/migration/global_state.c
->> @@ -43,9 +43,9 @@ int global_state_store(void)
->>  void global_state_store_running(void)
->>  {
->>      const char *state = RunState_str(RUN_STATE_RUNNING);
->> +    QEMU_NONSTRING char *dest = (char *)global_state.runstate;
->>      assert(strlen(state) < sizeof(global_state.runstate));
->> -    strncpy((char *)global_state.runstate,
->> -           state, sizeof(global_state.runstate));
->> +    strncpy(dest, state, sizeof(global_state.runstate));
->>  }
+On 9/16/20 11:31 PM, Marc-André Lureau wrote:
+> Hi
 > 
-> Darn, I was sending too fast here, sorry, but seems like this does *not*
-> fix the issue with GCC 9.3:
+> On Wed, Sep 16, 2020 at 11:35 PM Eduardo Habkost <ehabkost@redhat.com
+> <mailto:ehabkost@redhat.com>> wrote:
 > 
->  https://travis-ci.com/github/huth/qemu/jobs/385871010#L2930
+>     This series replaces INTERFACE_CHECK with OBJECT_CHECK because
+>     both macros are exactly the same.
 > 
-> ... so maybe we should simply switch to strpadcpy() instead?
+>     The last patch is a new run of the OBJECT_CHECK ->
+>     DECLARE*_CHECKER* converter script that will convert the former
+>     INTERFACE_CHECK-based macros.
+> 
+> 
+> Well, at least having a different macro allows to tweak qom
+> implementation or replace it with something different more easily.
+> 
+> I have some wip branch somewhere where I actually made Interface a
+> different beast than Object (it was saving some fields, and avoiding
+> some potentially wrong casts iirc - I didn't bother to upstream that
+> yet). Also I have a different branch where I played with GObject to
+> replace qom. In both cases, your proposal would have, or would make, the
+> work more complicated.
 
-Yes, and probably do so everywhere that strncpy is used.
+Considering "wip branch not bothered to upstream" as "fork",
+your comment from [*] applies here...
 
-Paolo
+  You can't blame upstream from doing cleanups and modernization, or
+  stagnating. Forks are forks, with all the pain they carry. If they
+  want to avoid the maintenance cost, they have to do the extra effort
+  to get it upstream. This is also a "sneaky way" to remind them that
+  effort is better spent in this direction.
 
-
+[*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg720284.html
 
 
