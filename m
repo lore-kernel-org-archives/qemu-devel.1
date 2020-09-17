@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03BA7C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:56:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC231C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:56:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67EAE206DC
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:56:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F06B1206DC
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:56:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="dRLmMVT4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67EAE206DC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="Ex4d/vsN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F06B1206DC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIvKP-0003yJ-Gq
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 10:56:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50938)
+	id 1kIvKZ-0004DU-25
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 10:56:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50824)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1kIvCx-0005ff-I0; Thu, 17 Sep 2020 10:48:23 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:53406)
+ id 1kIvCR-00052I-Dj; Thu, 17 Sep 2020 10:47:51 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:52417)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1kIvCu-0007ST-1C; Thu, 17 Sep 2020 10:48:23 -0400
+ id 1kIvCO-0007R8-OV; Thu, 17 Sep 2020 10:47:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=TLU7wEwUlE3oAGvXm6DTimzdJH+HokxzKJcC6ULi77I=; 
- b=dRLmMVT46P3gqtHoH+sh2maMdJzHPhie+tZR+9zgr5igXFQC9HeMvIaL9fZnCgks3AVIt0FxZZqxhrIKTPRPmuAzH1QrWZ6z8JlCZzhiWUB7kBuz+g6pzOCck13Kf19aSheHHovK/tQN0RzQmBjgTyANw+/qyaqk9iqALBaE0j2x+mOPpXCzxVoppsPy1IfGZmdtXM14qvBTSRYOcr2lcwreT3gOD+yyoowdRfcKxID8VuQq6nAiNYal0E487g26OIyPrNoL2x0h1AMAnSuzwpVAmP88ux/8BrG41AY871h1KZIu8NktEX7Ehi9sQ0wdWm3tY2AGQ9GC2Qseh9kuzw==;
+ bh=MAbxPQhcB4q9/bAXd9UpPqfjnp4OiDoyrxWmg9eT538=; 
+ b=Ex4d/vsNPOMgx/ZyFclkot3fs4iPjihPF8pAqX3R6qrW93E6JoezMAKwmrIUGDmteA0LRApiB2sM2nL3pLHsq8/uN3sK3OTNxKjLvxfxxt0toA6VUevLfQ6xsV4tmQnSR7qOCt0gTMnRl7cJi64tIz36nGQzb5MIkyTuZycFpT1f05AMDb9SnkFNtYygENKU1C0lNWuI/9vbr+kE7oNW5UTx0N4y6beHe1nGz8KcJX2mMoN5MIaMRjf0sA6uA1Jswg3iuwOTq6uzRX6vgC/1QF+qRhjMYhEMrfKPwOpXCY+jLRUAd8Hl77ymg9vzz2AhLCkmcPbn/s0wUSny+SVeAA==;
 Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
  by fanzine.igalia.com with esmtps 
  (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1kIvCr-0000Wi-BR; Thu, 17 Sep 2020 16:48:17 +0200
+ id 1kIvCI-0000Rv-BY; Thu, 17 Sep 2020 16:47:42 +0200
 Received: from berto by mail.igalia.com with local (Exim)
- id 1kIvCr-0002Mf-2A; Thu, 17 Sep 2020 16:48:17 +0200
+ id 1kIvCI-0002JL-28; Thu, 17 Sep 2020 16:47:42 +0200
 From: Alberto Garcia <berto@igalia.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org
-Subject: Re: [PATCH 06/14] block/mirror: drop extra error propagation in
- commit_active_start()
-In-Reply-To: <20200909185930.26524-7-vsementsov@virtuozzo.com>
+Subject: Re: [PATCH 03/14] block: check return value of bdrv_open_child and
+ drop error propagation
+In-Reply-To: <20200909185930.26524-4-vsementsov@virtuozzo.com>
 References: <20200909185930.26524-1-vsementsov@virtuozzo.com>
- <20200909185930.26524-7-vsementsov@virtuozzo.com>
+ <20200909185930.26524-4-vsementsov@virtuozzo.com>
 User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
  (i586-pc-linux-gnu)
-Date: Thu, 17 Sep 2020 16:48:17 +0200
-Message-ID: <w51sgbgxxvy.fsf@maestria.local.igalia.com>
+Date: Thu, 17 Sep 2020 16:47:42 +0200
+Message-ID: <w51v9gcxxwx.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
@@ -86,11 +86,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed 09 Sep 2020 08:59:22 PM CEST, Vladimir Sementsov-Ogievskiy wrote:
-> Let's check return value of mirror_start_job to check for failure
-> instead of local_err.
+On Wed 09 Sep 2020 08:59:19 PM CEST, Vladimir Sementsov-Ogievskiy wrote:
+> This patch is generated by cocci script:
 >
-> Rename ret to job, as ret is usually integer variable.
+> @@
+> symbol bdrv_open_child, errp, local_err;
+> expression file;
+> @@
+>
+>   file = bdrv_open_child(...,
+> -                        &local_err
+> +                        errp
+>                         );
+> - if (local_err)
+> + if (!file)
+>   {
+>       ...
+> -     error_propagate(errp, local_err);
+>       ...
+>   }
+>
+> with command
+>
+> spatch --sp-file x.cocci --macro-file scripts/cocci-macro-file.h \
+> --in-place --no-show-diff --max-width 80 --use-gitgrep block
 >
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
