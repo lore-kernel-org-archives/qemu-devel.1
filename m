@@ -2,64 +2,87 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95D6DC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:39:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84AB0C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:39:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EC882087D
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:39:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EC882087D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id EAE1B2087D
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:39:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PydHCj7c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAE1B2087D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kItC0-0000u6-BV
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 08:39:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35108)
+	id 1kItC6-00016A-0D
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 08:39:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38628)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liangpeng10@huawei.com>)
- id 1kIsws-000096-90; Thu, 17 Sep 2020 08:23:38 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:51562 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liangpeng10@huawei.com>)
- id 1kIswq-0003R5-0j; Thu, 17 Sep 2020 08:23:37 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 591FB7FDB8DC9D2E3180;
- Thu, 17 Sep 2020 20:23:32 +0800 (CST)
-Received: from localhost.localdomain (10.175.104.175) by
- DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 17 Sep 2020 20:23:19 +0800
-From: Peng Liang <liangpeng10@huawei.com>
-To: <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>
-Subject: [RFC v2 08/10] target/arm: Introduce user_mask to indicate whether
- the feature is set explicitly
-Date: Thu, 17 Sep 2020 20:14:47 +0800
-Message-ID: <20200917121449.3442059-9-liangpeng10@huawei.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200917121449.3442059-1-liangpeng10@huawei.com>
-References: <20200917121449.3442059-1-liangpeng10@huawei.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kItAv-000855-DC
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 08:38:09 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:35229)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kItAr-0005L0-Ie
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 08:38:08 -0400
+Received: by mail-ed1-x544.google.com with SMTP id i1so2388596edv.2
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 05:38:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=/qXapW1V4fNhGT3dbUjlruU/kCQYzZed2g1ejpFVACs=;
+ b=PydHCj7cB9qHkY82VUEQN/JPW3nesu/2KB4XKegqlbcfsxY1YI1QuVRMxa9EY7UQnd
+ IU9BJTx8SpP6HOQqgia8Cs8BtLtlaR2LVLi11V7L/ZSrtAlXl0C9qNxaIIp9J9D98SD4
+ hZ7kYeD38xi6ZEl9BXJmX2bNxDTqj2D/ZGQPmO/my3z8D+L1TZ/7qCMc94nqPY2lR0XY
+ 0axwTERy4MLQfKkjey/h4K8Lcz4nF1rZTNErswyDpnY7c5bqaoa3xToiYudmBuenWOaT
+ xSoSkLxTc1zcYqzqxwatc+dL7sd7aX9PH+v1r4hez9b8Z+j2lygonBjRNtcis519RNk4
+ Mtdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=/qXapW1V4fNhGT3dbUjlruU/kCQYzZed2g1ejpFVACs=;
+ b=LwRn7BXv6XhfD46PD04pSIhhxf4Etu1MxJufMi0/+/1836CSl8iGxDcM579VlYmtUe
+ PJhDR4UySjs7/T50aRg2FgVP2G8HxZumdnkll3Hp7r9T6f0S58dkJ7qFuVtHI2ueGB0D
+ nGj8/Q930DnnzUIEVial3PhAfes6n2Hqqu1yS5DT6vabDckmd1e0Dl+coi7n/a487rJE
+ vxE7jybZhhJUH/Fqfn1C4vej9hLdBBPttw7vC2ZLeiUdfDGJiK4dh6wzBNN/BXAErE2r
+ v/On+wGRl2w17ry7DDmCES82hydckfZWQ6EfO/ikYcVKcyaHQ8eYZwqmW2zf4YlgBpDR
+ RGng==
+X-Gm-Message-State: AOAM531TWc/qnchDKniZgKUbFp2CvRoFfz24G2BMCWPWVLTnpoIVnnns
+ zD7iwbmqvZlIGBNSD4k0KchcT8dHmrxcNyHczhsH1w==
+X-Google-Smtp-Source: ABdhPJygSD3mHxeh3M2e+ih1Ytbjsayb81aT3udfGq+EXSj4DI9aPYYzaLGblVZ10FfuOvAg/ZTfDvSEmMevDmTx910=
+X-Received: by 2002:aa7:d58e:: with SMTP id r14mr15304405edq.52.1600346281605; 
+ Thu, 17 Sep 2020 05:38:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.175.104.175]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35;
- envelope-from=liangpeng10@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 08:23:09
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200916094705.2625331-1-berrange@redhat.com>
+In-Reply-To: <20200916094705.2625331-1-berrange@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 17 Sep 2020 13:37:50 +0100
+Message-ID: <CAFEAcA8=YdJdL09sVg7eKkZg35Wuzf1y=Vbo9v-hKMJ7T+LPwQ@mail.gmail.com>
+Subject: Re: [PULL 0/8] Block odirect patches
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x544.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -72,51 +95,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com,
- zhang.zhanghailiang@huawei.com, mst@redhat.com, cohuck@redhat.com,
- xiexiangyou@huawei.com, Peng Liang <liangpeng10@huawei.com>,
- pbonzini@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To add CPU feature dependencies, we need to known whether a CPU feature
-is set explicitly or automatically by dependencies mechanism.  Introduce
-user_mask to do that.
+On Wed, 16 Sep 2020 at 10:47, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
+>
+> The following changes since commit de39a045bd8d2b49e4f3d07976622c29d58e0b=
+ac:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/vga-20200915-pull-req=
+uest=3D
+> ' into staging (2020-09-15 14:25:05 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/berrange/qemu tags/block-odirect-pull-request
+>
+> for you to fetch changes up to b18a24a9f889bcf722754046130507d744a1b0b9:
+>
+>   block/file: switch to use qemu_open/qemu_create for improved errors (20=
+20-0=3D
+> 9-16 10:33:48 +0100)
+>
+> ----------------------------------------------------------------
+> block: improve error reporting for unsupported O_DIRECT
+>
+> ----------------------------------------------------------------
+>
+> Daniel P. Berrang=3DC3=3DA9 (8):
+>   monitor: simplify functions for getting a dup'd fdset entry
+>   util: split off a helper for dealing with O_CLOEXEC flag
+>   util: rename qemu_open() to qemu_open_old()
+>   util: refactor qemu_open_old to split off variadic args handling
+>   util: add Error object for qemu_open_internal error reporting
+>   util: introduce qemu_open and qemu_create with error reporting
+>   util: give a specific error message when O_DIRECT doesn't work
+>   block/file: switch to use qemu_open/qemu_create for improved errors
 
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Signed-off-by: Peng Liang <liangpeng10@huawei.com>
----
- target/arm/cpu.h | 1 +
- target/arm/cpu.c | 2 ++
- 2 files changed, 3 insertions(+)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index d93ad0f8f00e..c7513a5d393c 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -925,6 +925,7 @@ struct ARMCPU {
-      */
-     struct ARMISARegisters {
-         uint64_t regs[ID_MAX];
-+        uint64_t user_mask[ID_MAX];
-     } isar;
-     uint64_t midr;
-     uint32_t revidr;
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 10a52518dd14..36375807e19d 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1312,6 +1312,8 @@ static void arm_cpu_set_feature_prop(Object *obj, Visitor *v, const char *name,
-                                           feat->shift, feat->length,
-                                           feat->ni_value);
-     }
-+
-+    isar->user_mask[feat->reg] |= MAKE_64BIT_MASK(feat->shift, feat->length);
- }
- 
- static void arm_cpu_register_feature_props(ARMCPU *cpu)
--- 
-2.26.2
+Applied, thanks.
 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
+
+-- PMM
 
