@@ -2,118 +2,88 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34731C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 15:14:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DE35C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 15:18:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D7332222C
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 15:14:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E22E62220A
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 15:18:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mwyv1Ipj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D7332222C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="Uv2mj0YL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E22E62220A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIvcP-0003uW-7p
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 11:14:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55896)
+	id 1kIvgP-0007O4-UJ
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 11:18:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54666)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
- id 1kIvTC-00068j-97; Thu, 17 Sep 2020 11:05:10 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58134)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
- id 1kIvT9-0001Pw-S4; Thu, 17 Sep 2020 11:05:09 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 08HEu3GX168524; Thu, 17 Sep 2020 11:05:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=8NSebJ6ejs+2jYXFr8RVjNEJi+RFzmzRl7KZU3lBgxc=;
- b=mwyv1IpjmQWqtDNo1VcRCnyY12/NXNUx0jv/syMEY4kHUeRuKoEQdtiSvV6QNzsRSTed
- 40VJHEY3/s9MVFy3SN/On5HZj7qdhmn2IQBqV4ztL/4mmqTaiNQ8WnRi2juS8lXBCWdC
- S2KsMWdGqv9w41rDFDsVop0fiwQzvX+02U7eP9yT0tm+RE+fMlHE55u56hjmBQHNkmi7
- uW3kKIYErdvIEvlEmRC6Bk/7HMnI2Ar3ToFKvTc7o3lpR8m47LA+rHueNhgv2yqDGm5t
- z1Kvzt1/aJgu0fE5LtL6sYQKjketaE3QUJ9m4HupFk34sjTeAi9YqCIcwPrKSnwzQgHn 5Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33ma0er8en-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 17 Sep 2020 11:05:06 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08HF0GHu179710;
- Thu, 17 Sep 2020 11:05:05 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33ma0er8e5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 17 Sep 2020 11:05:05 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08HF2mcW012287;
- Thu, 17 Sep 2020 15:05:04 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com
- (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
- by ppma02dal.us.ibm.com with ESMTP id 33k5v9hhqd-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 17 Sep 2020 15:05:04 +0000
-Received: from b03ledav001.gho.boulder.ibm.com
- (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
- by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 08HF53Kj39715264
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 17 Sep 2020 15:05:03 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 161FE6E059;
- Thu, 17 Sep 2020 15:05:03 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id ADE216E054;
- Thu, 17 Sep 2020 15:05:01 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.163.85.51])
- by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
- Thu, 17 Sep 2020 15:05:01 +0000 (GMT)
-Subject: Re: [PATCH v4 0/5] s390x/pci: Accomodate vfio DMA limiting
-To: qemu-devel@nongnu.org, no-reply@patchew.org
-References: <160035396423.8478.4968781368528580151@66eaa9a8a123>
-From: Matthew Rosato <mjrosato@linux.ibm.com>
-Message-ID: <3855da1b-4cd8-a664-56b9-66dff4db9c26@linux.ibm.com>
-Date: Thu, 17 Sep 2020 11:05:01 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-MIME-Version: 1.0
-In-Reply-To: <160035396423.8478.4968781368528580151@66eaa9a8a123>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-09-17_10:2020-09-16,
- 2020-09-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- clxscore=1011 mlxscore=0 malwarescore=0 impostorscore=0 phishscore=0
- priorityscore=1501 suspectscore=0 bulkscore=0 mlxlogscore=999 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009170113
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=mjrosato@linux.ibm.com; helo=mx0b-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 10:21:03
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
-X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIvPv-0001q7-NY
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 11:01:47 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:39359)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIvPp-00012o-AE
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 11:01:47 -0400
+Received: by mail-pg1-x544.google.com with SMTP id d13so1515187pgl.6
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 08:01:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=Z7aNfB07N+MFsUa81RQnN73KV/KvOUxUEf7AXGwE9A4=;
+ b=Uv2mj0YLdpPdqY05fsBpc5Yj81CkLoJlK56sdxv9QPUGBxOiTUBiGk9hUCrYclWSk/
+ bUO9j+91P6QhpBS4MG5GslBS2aDqzK7ZEuPzPLBiOBotc3dCCEwqVuldP+2Yu8I/npQj
+ KpiVM90Qns7mp3as2EgcP72wP8oJj8JzFy7kjb0LozWDeoyBgke86pd6OXNYi6p1JJS5
+ GGUEKnxQktU/7Y0yc1L6Fjep+eAdjKNzdXvn5cdt/hU1WPe0/OPPsyB7nr5wF2YTKe9v
+ GUXujNvJrJX7fHe+eAwZiCtyxMwlcivO500uRi53HdPfvT2TErGVCQwuCxBLntbCn9n8
+ Bj7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=Z7aNfB07N+MFsUa81RQnN73KV/KvOUxUEf7AXGwE9A4=;
+ b=jHVxvnlyurPsjBwF0Ekq3OgIkxirBI3TGLkKtj1Heka5jxJuuha5AaaA3/8FtSvG+8
+ CN4Rzr0Pqymqw9trvJSXHu9t7nZzGosokrNJ6z8opyvw5vVVGZh4isFljV10IZfnqLfT
+ bWGk+vTT823UmBbJgcl8QN8KZfW7i6pdbay5QcxVKynAV3lSSsPXeEqNq25ZTOxWsOO9
+ iL6fJdAYqU4THz6rY6QpCqxkFGGgStctaXXT44DD+gBZ+f0p2N+zmCrX/PIXZgVcimJ2
+ G4dVV7abN95X6vpJTkgfyAOwlO0nLcPOlaa9SMtIv19H0b+MgNPXgTTvCmuBWiLBrjzh
+ KwYA==
+X-Gm-Message-State: AOAM533kE+uIhnmWe/M5pxKfo47JCwg7HGDx1y21W+Q7Mug/ON4vuveL
+ 94ojC3xlvQy6eNUjgbxRWBe33u4sIHeUNyia
+X-Google-Smtp-Source: ABdhPJykf3O0FrJ21ySjUd4VAXsyc48q0qBud/XDSkt360/UMo6kEYKNq3grDLS8XngJy/B+PCiD6w==
+X-Received: by 2002:aa7:8249:0:b029:142:2501:34db with SMTP id
+ e9-20020aa782490000b0290142250134dbmr11833603pfn.52.1600354895955; 
+ Thu, 17 Sep 2020 08:01:35 -0700 (PDT)
+Received: from localhost.localdomain ([115.96.151.231])
+ by smtp.googlemail.com with ESMTPSA id e10sm17674374pgb.45.2020.09.17.08.01.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 17 Sep 2020 08:01:35 -0700 (PDT)
+From: Ani Sinha <ani@anisinha.ca>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v8 09/12] piix4: don't reserve hw resources when hotplug is
+ off globally
+Date: Thu, 17 Sep 2020 20:30:41 +0530
+Message-Id: <20200917150044.23159-10-ani@anisinha.ca>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200917150044.23159-1-ani@anisinha.ca>
+References: <20200917150044.23159-1-ani@anisinha.ca>
+Received-SPF: none client-ip=2607:f8b0:4864:20::544;
+ envelope-from=ani@anisinha.ca; helo=mail-pg1-x544.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -126,45 +96,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, kvm@vger.kernel.org, pmorel@linux.ibm.com,
- david@redhat.com, cohuck@redhat.com, schnelle@linux.ibm.com,
- alex.williamson@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
- qemu-s390x@nongnu.org, mst@redhat.com, pbonzini@redhat.com, philmd@redhat.com,
- rth@twiddle.net
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ jusual@redhat.com, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
+ Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/17/20 10:46 AM, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/1600352445-21110-1-git-send-email-mjrosato@linux.ibm.com/
-> 
-> 
-> 
-> Hi,
-> 
-> This series failed the docker-quick@centos7 build test. Please find the testing commands and
-> their output below. If you have Docker installed, you can probably reproduce it
-> locally.
-> 
-> 
+When acpi hotplug is turned off for both root pci bus as well as for pci
+bridges, we should not generate the related ACPI code for DSDT table or
+initialize related hw ports or reserve hw resources. This change makes
+sure all those operations are turned off in the case ACPI pci hotplug is
+off globally.
 
-Errors seem to be of the flavor
+In this change, we also make sure ACPI code for the PCNT method are only
+added when bsel is enabled for the corresponding pci bus or bridge hotplug
+is turned on.
 
-'N/A. Internal error while reading log file'
-and
-'No space left on device'
+As q35 machines do not use bsel for it's pci buses at this point in time, this
+change affects DSDT acpi table for q35 machines as well. Therefore, we will
+also need to commit the updated golden master DSDT table acpi binary blobs as
+well. Follwoing is the list of blobs which needs updating:
 
-seems like a patchew disk issue rather than something with this patchset?
+ tests/data/acpi/q35/DSDT
+ tests/data/acpi/q35/DSDT.acpihmat
+ tests/data/acpi/q35/DSDT.bridge
+ tests/data/acpi/q35/DSDT.cphp
+ tests/data/acpi/q35/DSDT.dimmpxm
+ tests/data/acpi/q35/DSDT.ipmibt
+ tests/data/acpi/q35/DSDT.memhp
+ tests/data/acpi/q35/DSDT.mmio64
+ tests/data/acpi/q35/DSDT.numamem
+ tests/data/acpi/q35/DSDT.tis
 
-> 
-> 
-> 
-> 
-> The full log is available at
-> http://patchew.org/logs/1600352445-21110-1-git-send-email-mjrosato@linux.ibm.com/testing.docker-quick@centos7/?type=message.
-> ---
-> Email generated automatically by Patchew [https://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
-> 
+These tables are updated in the following commit. Without the updated table
+blobs, the unit tests would fail with this patch.
+
+Signed-off-by: Ani Sinha <ani@anisinha.ca>
+---
+ hw/acpi/piix4.c      |  6 ++++--
+ hw/i386/acpi-build.c | 25 ++++++++++++++++++-------
+ 2 files changed, 22 insertions(+), 9 deletions(-)
+
+diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+index e6163bb6ce..b70b1f98af 100644
+--- a/hw/acpi/piix4.c
++++ b/hw/acpi/piix4.c
+@@ -596,8 +596,10 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
+                           "acpi-gpe0", GPE_LEN);
+     memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
+ 
+-    acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
+-                    s->use_acpi_hotplug_bridge);
++    if (s->use_acpi_hotplug_bridge || s->use_acpi_root_pci_hotplug) {
++        acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
++                        s->use_acpi_hotplug_bridge);
++    }
+ 
+     s->cpu_hotplug_legacy = true;
+     object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index e079b686f5..e41bb0992b 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -95,6 +95,7 @@ typedef struct AcpiPmInfo {
+     bool s3_disabled;
+     bool s4_disabled;
+     bool pcihp_bridge_en;
++    bool pcihp_root_en;
+     uint8_t s4_val;
+     AcpiFadtData fadt;
+     uint16_t cpu_hp_io_base;
+@@ -245,6 +246,9 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
+     pm->pcihp_bridge_en =
+         object_property_get_bool(obj, "acpi-pci-hotplug-with-bridge-support",
+                                  NULL);
++    pm->pcihp_root_en =
++        object_property_get_bool(obj, "acpi-root-pci-hotplug",
++                                 NULL);
+ }
+ 
+ static void acpi_get_misc_info(AcpiMiscInfo *info)
+@@ -450,10 +454,12 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+     }
+ 
+     /* Append PCNT method to notify about events on local and child buses.
+-     * Add unconditionally for root since DSDT expects it.
++     * Add this method for root bus only when hotplug is enabled since DSDT
++     * expects it.
+      */
+-    method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
+-
++    if (bsel || pcihp_bridge_en) {
++        method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
++    }
+     /* If bus supports hotplug select it and notify about local events */
+     if (bsel) {
+         uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
+@@ -479,7 +485,10 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+             aml_append(method, aml_name("^S%.02X.PCNT", devfn));
+         }
+     }
+-    aml_append(parent_scope, method);
++
++    if (bsel || pcihp_bridge_en) {
++        aml_append(parent_scope, method);
++    }
+     qobject_unref(bsel);
+ }
+ 
+@@ -1504,7 +1513,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+         build_hpet_aml(dsdt);
+         build_piix4_isa_bridge(dsdt);
+         build_isa_devices_aml(dsdt);
+-        build_piix4_pci_hotplug(dsdt);
++        if (pm->pcihp_bridge_en || pm->pcihp_root_en) {
++            build_piix4_pci_hotplug(dsdt);
++        }
+         build_piix4_pci0_int(dsdt);
+     } else {
+         sb_scope = aml_scope("_SB");
+@@ -1546,7 +1557,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+     {
+         aml_append(scope, aml_name_decl("_HID", aml_string("ACPI0006")));
+ 
+-        if (misc->is_piix4) {
++        if (misc->is_piix4 && (pm->pcihp_bridge_en || pm->pcihp_root_en)) {
+             method = aml_method("_E01", 0, AML_NOTSERIALIZED);
+             aml_append(method,
+                 aml_acquire(aml_name("\\_SB.PCI0.BLCK"), 0xFFFF));
+@@ -1698,7 +1709,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+     crs_range_set_free(&crs_range_set);
+ 
+     /* reserve PCIHP resources */
+-    if (pm->pcihp_io_len) {
++    if (pm->pcihp_io_len && (pm->pcihp_bridge_en || pm->pcihp_root_en)) {
+         dev = aml_device("PHPR");
+         aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A06")));
+         aml_append(dev,
+-- 
+2.17.1
 
 
