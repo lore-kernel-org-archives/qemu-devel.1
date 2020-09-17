@@ -2,88 +2,103 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59FDFC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 16:34:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4F89C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 16:35:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8C9622211
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 16:34:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E9E1E206BE
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 16:35:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZlB9rXem"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8C9622211
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="er/2k1JF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9E1E206BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIws5-0003sd-0L
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 12:34:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53228)
+	id 1kIwsu-0004uT-4U
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 12:35:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52538)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kIwqo-0002US-6S
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 12:33:38 -0400
-Received: from mail-lj1-x22d.google.com ([2a00:1450:4864:20::22d]:38077)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kIwqm-0001DG-7L
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 12:33:37 -0400
-Received: by mail-lj1-x22d.google.com with SMTP id w3so2596806ljo.5
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 09:33:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=mQYVawQ0VFAISaJtKpdgpTqbQkmgDRGuUIri3CgmjiM=;
- b=ZlB9rXemFbA7y9pDrY8yQtOi+w/B1L6/pbNJN8baxXqRp8OnQMlwvKxoO++KDytSY8
- UX55EKmO9TSEt0qyIb8byC4gJCUWAB5W4LYChviCXGEzuYNgmjH/WLfyhod+2vrD96Q9
- p6YCeGoIWuk4SRQsnCcy2iTNWMNH9/tI5qL8GKOgEwOsj5O74l4LU4S+Rm2suV0x6ZRn
- jlsZwY4X6/w9lvNTwgw3RMus9YGcjPxqoyOuRyLdt+8k1e+UIy/kTptiUMMacq2GUM+u
- 16HcTc2EsGptSc6HxtZUaTA0fWQ3Bq11G/yaQJhPWXVTQ2z//X66GfQ9CGUYoxuitvK7
- Zgfw==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIwog-0000Zj-C9
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 12:31:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48034)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIwoe-0000w0-F8
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 12:31:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600360283;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZF+OqmqmstlUkr/dM0RnSgA94FV+mHcH3wKBsCU4Fw8=;
+ b=er/2k1JFAwfgKuKgKh0SFoyDO0lz8vUkjnNV6v9T+6bUBpO/dlFtz0vgGDQmH7sTWthgE/
+ hQz8gzByWIY3dsXoHGzXCvCmSUq2CNV5c/LqOghhAgWrsV2cIsRzEroYIdrG6q3gML9B/r
+ iPLmbfXheZl5GQc2Ny4pOIeSprcnJlw=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-74xmJuILPaO6uvovxDHoPw-1; Thu, 17 Sep 2020 12:31:19 -0400
+X-MC-Unique: 74xmJuILPaO6uvovxDHoPw-1
+Received: by mail-wr1-f69.google.com with SMTP id x15so1083632wrm.7
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 09:31:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=mQYVawQ0VFAISaJtKpdgpTqbQkmgDRGuUIri3CgmjiM=;
- b=UduuNsH1rBKG4K5yOkMEEb6C4ZX9M8fD25h1CkHbWSzuhCLepYqYUmb0QT/oLPkQd5
- qSGvMJvLzwhcoSPMCPGcp+kOZoFb0xLqZKGE1ninBuxYHpFBzlCZNbq+b5sG1nW80rXo
- f8liIlYgxbmHHyGFy0M35jr9IlLy8n1yi2Rh1s7MJUdgRNzxwHhuNl+PuK66yzHqRTTh
- CAlr8LK5SkUYuSsm/mhbIr1iT0igmu8GqPXivy2YxdR0eDhvb2fEJhUas1GjZTLbQFHL
- q7PJ2DqdDU/ouzWut52LfrKaJpG9qJIGnFlytOZhK/Zam6DMtVtYejAkj/i2AkujWG8a
- hlsQ==
-X-Gm-Message-State: AOAM533yNOCffV0kqyW7VgBHaHEualMLlXnn8gJqx/O9bHfguCtfT81m
- lP8DP0tbJ5fn3p2M40AeT4Y5QhaNuNvZIS/gwIw=
-X-Google-Smtp-Source: ABdhPJxv8hulfdBgYI7LADd+1B/VFJLRMhzqiAgHxQ05PXbBZzznpnWAVq8txHuzA0R6vFGXCGYQJHHAcykY7X1yKnY=
-X-Received: by 2002:a2e:854c:: with SMTP id u12mr10247988ljj.120.1600360413954; 
- Thu, 17 Sep 2020 09:33:33 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ZF+OqmqmstlUkr/dM0RnSgA94FV+mHcH3wKBsCU4Fw8=;
+ b=VLoZszw2vSoQanWERcQDtbPtv40vmrVfTeC8xMtpPPr67U7zBlbu2Em2lc+9JRYRw8
+ sFmxBHkP3Fg41SsRoL7CfRVUgKxZue5ZSyVorE0ehH5KvuMrP3y2JJXa4XcL0sgVuFbw
+ F7Io1gsxsujHPpWmcFAzLOSuBj6ZHGvCKxXgSGYXbI/sQFmGwLJ3Ik1TQtzVDjYr9nr5
+ 2xt6bwJC12bsbov3IOH1V2l2D1fMIhB0SsngyM7RNsyLZW8O61x+EzGy0s0agsK0hoJ8
+ Mp/cHYUVaK59zpo1rGaJAR4KHmugfxTZNNQuADskHwXTeyhPJ4YzhZzXam7GTPVqUYMb
+ TDTg==
+X-Gm-Message-State: AOAM530TGgLFewzChEqPYZHNm2NvU2Sote6LKJv9w9su6GFhQ5DQqjBc
+ WeOM/3MkQSfJZt7hhDTFSERZnVQN0RiwwbMBxK0ZQLaUyx3RCKvLaWZfrW3nsxoKoqTY8Oyo4dB
+ jceVaRfNE1i7hBl8=
+X-Received: by 2002:a5d:49d2:: with SMTP id t18mr31185233wrs.99.1600360278145; 
+ Thu, 17 Sep 2020 09:31:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxJk4OJfAAHKtjRC2q3Vdz8KiSyHcc881TPifcw7kwFeh6Gzk4LBfKN0go9mvWayUx4Ka9MpA==
+X-Received: by 2002:a5d:49d2:: with SMTP id t18mr31185212wrs.99.1600360277883; 
+ Thu, 17 Sep 2020 09:31:17 -0700 (PDT)
+Received: from x1w.redhat.com (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id i26sm75223wmb.17.2020.09.17.09.31.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 17 Sep 2020 09:31:17 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 2/4] qemu/bswap: add const_be16() and const_be32()
+Date: Thu, 17 Sep 2020 18:31:04 +0200
+Message-Id: <20200917163106.49351-3-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200917163106.49351-1-philmd@redhat.com>
+References: <20200917163106.49351-1-philmd@redhat.com>
 MIME-Version: 1.0
-References: <20200916114731.102080-1-thuth@redhat.com>
- <CAFEAcA8VyUYJnE3aji6zPQGPD-K+iVGwVNbygYypr+NpSzZBPw@mail.gmail.com>
- <7c21af54-342f-2a29-f700-3b1d3bbd5bc6@redhat.com>
-In-Reply-To: <7c21af54-342f-2a29-f700-3b1d3bbd5bc6@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Fri, 18 Sep 2020 00:33:16 +0800
-Message-ID: <CAE2XoE9xKJzfRUxQit+EFXii=q8XxUQUbcTMYJY-wkRUeZJkuQ@mail.gmail.com>
-Subject: Re: [PULL 00/24] qtests, unit tests and Cirrus-CI fixes / improvements
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000fc95da05af84f1e5"
-Received-SPF: pass client-ip=2a00:1450:4864:20::22d;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x22d.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 02:01:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,88 +111,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000fc95da05af84f1e5
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-On Thu, Sep 17, 2020 at 11:29 PM Thomas Huth <thuth@redhat.com> wrote:
->
-> On 17/09/2020 17.14, Peter Maydell wrote:
-> > On Wed, 16 Sep 2020 at 12:47, Thomas Huth <thuth@redhat.com> wrote:
-> >> ----------------------------------------------------------------
-> >> * Fix "readlink -f" problem in iotests on macOS (to fix the Cirrus-CI
-tests)
-> >> * Some minor qtest improvements
-> >> * Fix the unit tests to work on MSYS2, too
-> >> * Enable building and testing on MSYS2 in the Cirrus-CI
-> >> * Build FreeBSD with one task again in the Cirrus-CI
-> >> ----------------------------------------------------------------
-> >
-> > After merging this one I tried installing GNU sed on my local
-> > box so it could run the iotests, but they fail like this
-> > because they assume readarray, which doesn't exist in
-> > OSX bash
-> Ok, sounds like I should respin my patch here:
->
-> https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg04476.html
->
-> ... and could you install a newer version of bash via homebrew on your
-> system?
-What's the reason to exclude these list on win32? That's didn't optimize
-the time much, and indeed they can be
-compiled.
---target-list-exclude=3Di386-softmmu,arm-softmmu,ppc-softmmu,mips-softmmu"
+We already have the const_le() macros for little endian.
+Implement the big-endian equivalent.
 
->
->  Thomas
->
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ include/qemu/bswap.h | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
+diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
+index c3b4277342b..6885984e00c 100644
+--- a/include/qemu/bswap.h
++++ b/include/qemu/bswap.h
+@@ -83,7 +83,7 @@ static inline void bswap64s(uint64_t *s)
+ #endif
+ 
+ /*
+- * Same as cpu_to_le{16,32} described below, except that gcc will
++ * Same as cpu_to_{be,le}{16,32} described below, except that gcc will
+  * figure the result is a compile-time constant if you pass in a constant.
+  * So this can be used to initialize static variables.
+  */
+@@ -96,11 +96,20 @@ static inline void bswap64s(uint64_t *s)
+ # define const_le16(_x)                          \
+     ((((_x) & 0x00ff) << 8) |                    \
+      (((_x) & 0xff00) >> 8))
++# define const_be32(_x) (_x)
++# define const_be16(_x) (_x)
+ #else
+ # define const_le32(_x) (_x)
+ # define const_le16(_x) (_x)
++# define const_be32(_x)                          \
++    ((((_x) & 0x000000ffU) << 24) |              \
++     (((_x) & 0x0000ff00U) <<  8) |              \
++     (((_x) & 0x00ff0000U) >>  8) |              \
++     (((_x) & 0xff000000U) >> 24))
++# define const_be16(_x)                          \
++    ((((_x) & 0x00ff) << 8) |                    \
++     (((_x) & 0xff00) >> 8))
+ #endif
+-
+ /**
+  * Endianness conversion functions between host cpu and specified endianness.
+  * (We list the complete set of prototypes produced by the macros below
+-- 
+2.26.2
 
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---000000000000fc95da05af84f1e5
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><br><br>On Thu, Sep 17, 2020 at 11:29 PM Thomas Huth &lt;<=
-a href=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt; wrote:<br>&gt;<=
-br>&gt; On 17/09/2020 17.14, Peter Maydell wrote:<br>&gt; &gt; On Wed, 16 S=
-ep 2020 at 12:47, Thomas Huth &lt;<a href=3D"mailto:thuth@redhat.com">thuth=
-@redhat.com</a>&gt; wrote:<br>&gt; &gt;&gt; -------------------------------=
----------------------------------<br>&gt; &gt;&gt; * Fix &quot;readlink -f&=
-quot; problem in iotests on macOS (to fix the Cirrus-CI tests)<br>&gt; &gt;=
-&gt; * Some minor qtest improvements<br>&gt; &gt;&gt; * Fix the unit tests =
-to work on MSYS2, too<br>&gt; &gt;&gt; * Enable building and testing on MSY=
-S2 in the Cirrus-CI<br>&gt; &gt;&gt; * Build FreeBSD with one task again in=
- the Cirrus-CI<br>&gt; &gt;&gt; -------------------------------------------=
----------------------<br>&gt; &gt;<br>&gt; &gt; After merging this one I tr=
-ied installing GNU sed on my local<br>&gt; &gt; box so it could run the iot=
-ests, but they fail like this<br>&gt; &gt; because they assume readarray, w=
-hich doesn&#39;t exist in<br>&gt; &gt; OSX bash<br>&gt; Ok, sounds like I s=
-hould respin my patch here:<br>&gt;<br>&gt; <a href=3D"https://lists.gnu.or=
-g/archive/html/qemu-devel/2020-09/msg04476.html">https://lists.gnu.org/arch=
-ive/html/qemu-devel/2020-09/msg04476.html</a><br>&gt;<br>&gt; ... and could=
- you install a newer version of bash via homebrew on your<br>&gt; system?<d=
-iv>What&#39;s the reason to exclude these list on win32? That&#39;s didn&#3=
-9;t optimize the time much, and indeed they can be <br>compiled.<br>--targe=
-t-list-exclude=3Di386-softmmu,arm-softmmu,ppc-softmmu,mips-softmmu&quot;<br=
-><br>&gt;</div><div>&gt; =C2=A0Thomas<br>&gt;<br><br><br>--<br>=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=
-=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo</div></di=
-v>
-
---000000000000fc95da05af84f1e5--
 
