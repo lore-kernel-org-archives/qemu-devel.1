@@ -2,78 +2,77 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
+	HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07604C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 07:28:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27C73C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 07:29:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E4612083B
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 07:28:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 92D3B2072E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 07:29:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dgG/gEim"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E4612083B
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fwPndq6M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92D3B2072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIoL0-000142-Kh
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 03:28:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45634)
+	id 1kIoLy-0002F8-P3
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 03:29:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45832)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <scw@google.com>) id 1kIoIZ-00071r-Vf
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:25:44 -0400
-Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:39855)
+ (Exim 4.90_1) (envelope-from <scw@google.com>) id 1kIoJo-00085n-SP
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:27:00 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:34598)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <scw@google.com>) id 1kIoIY-0001w1-82
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:25:43 -0400
-Received: by mail-ej1-x641.google.com with SMTP id p9so1815425ejf.6
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 00:25:41 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <scw@google.com>) id 1kIoJm-00026C-Lc
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:27:00 -0400
+Received: by mail-ed1-x541.google.com with SMTP id k14so1461944edo.1
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 00:26:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=bb02cXXhgUnDaA1lDk/W8352Cq/b242vucM6Sv+/yVU=;
- b=dgG/gEim6nPGZKSuCh4yHgA9xwE0LO58BVGvhwF9+u/msO0mfHWObHH6qVV4jT5flQ
- r13LBYdt6LhwSfe/MLw5jEeZni4Laydj09KQkPVSQ3R/uUbyNjrlNUhQ8C1SRpIy//+q
- l4Ot2xAeykXEzw3259yfTgjSQ3Io8ryl1iMIQBRmVLK78Q5BvPbOhlIiLoAXXEvbSH5S
- pUPMZg9m46Z3SOUrTTDsWkwEVAQTM6aPNn1+Zr0gyIXDAR3ihqhfZ0peEBUmhJk6ifF3
- 5zBly6iIg5f0L2aKdzRK15KFG2194mtx4UUfEvbifPw5EdVyDgzkeju+oK6chWW/06tg
- rlFQ==
+ :cc; bh=GbM8qbPms0fd6ijq1GteDCY7MDClddMOoZTvyOWkR5E=;
+ b=fwPndq6MsEj/KhApi0pqYKyKiefQSpj17SOLUGwEnZB6dqHh+r5thFUVE2Vn1JlLBW
+ HmCGDarV3URjAkvZ/IRx5pzld+LOcGNHAG03eFhenwUza/K6Nab6YcDc3Vv3JrgfjuZL
+ p3oaPMGK+UEYP2Ci+GAJDqMWzIW+VuujKcOC/OVOv4ScGSVRlOvSCjxWS+1iCarwYyAK
+ ppy2xaAubraNW7lsaGCOR2tURZDCp77pL8v5kMIUqSxYtVj2/SAvi1elyoO0ZAtar0hs
+ lIS07lHZfDqe/onsG2XoMAjiSI9hYn92dWrplTxQ0OaanFKM9F/S4+HPHYpp1bHp7Juq
+ pFEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=bb02cXXhgUnDaA1lDk/W8352Cq/b242vucM6Sv+/yVU=;
- b=Ym+CBygiTCc//Un3Eporv/IehJjISDrINg5gnFRJx9Wa6mml/H/QxeSKl7McwfRiFF
- 96VDki0bDwVq1olDd3Z1PO1qW4Q0Rm3xpxFlAl0XAW02+54EMTpt0pOJDNfhTklRzPBh
- GQLyiAzSLPbsU50x5xNbZiUrITyHmPMGVhmuz1Vcbqw/4syuy2/67BcqBDUs6WeEkfCe
- TvdieKQC6zAFgODB301EN0wGqnGUucKL9Q+1Vk7biVNk+N8nB0OjOUIFfLGUxZOfZTBA
- elwhUaNiyLbvvlOvZuZXSIQjI6xlms7W9v0Dni3WA/hpFRjqAAyGBD7v/JMWOlvJxBZJ
- i0Wg==
-X-Gm-Message-State: AOAM532NzIpHUcegSRWTpDoEG+l8CK+CWPgPbEeD93DrazDnpKhUxD/G
- GBM+33rQQZjuL5uF+xJsmN57E52EhxMbvu+SzNSvZp8tjZk=
-X-Google-Smtp-Source: ABdhPJx6f8lvVS6sNKZUc/eQQzrDK9k7RlSLczqeopF0RME4aTMNRlmNNA6tT7HSc6zkojy7ncHBxoQP0awWH49fWw4=
-X-Received: by 2002:a17:906:119b:: with SMTP id
- n27mr29024584eja.124.1600327540416; 
- Thu, 17 Sep 2020 00:25:40 -0700 (PDT)
+ bh=GbM8qbPms0fd6ijq1GteDCY7MDClddMOoZTvyOWkR5E=;
+ b=ELv5N8Jun0ExSqJnNWkY2lev5IcO9XsVnf6PKDVoEvwftN/hU90NgjAllYkq2SzCet
+ REr2QAHbJihanZS0djga6iJsDKuC/WIR8BzUyaOTPn8BIQf/xEA54/G8jdqNzwg/ZJlN
+ mRcojk6p8/awFD6vkKAumwPGz+2+cwupnmHh3kXbvH3KWGbReQ4lcnI4/1rD05p78l+V
+ gguGb0jz5/WVLO6Bs92YiQfMjFP2uyG7z62p/mSN37kO3lp7cvLdwlOxAFC3qEgPdFaM
+ bvrS0zrTjEEtn6tHl2zrdZUAGITbbRg3OU4gOx9k55ygu/KTyUfy93Ah2sjlpcIZcN1y
+ 6P4g==
+X-Gm-Message-State: AOAM531NQbTg4grGcFmncpSxzvebJRE+hKme8QRK3nCO4j3ov0YWytog
+ 9DvheiPrC1Q+3Vt3W0AXkO1bpTjALI/OYsUnDRsuMrQmb+4=
+X-Google-Smtp-Source: ABdhPJztH9TTr/z5v1tyj28P05vdn6kcNYa2En2oJjyxzAaUHFD09d0g2afTOxrZ7EbL3DvD1SH45155a57xHpiM0fU=
+X-Received: by 2002:a50:d2d1:: with SMTP id q17mr31597131edg.167.1600327616696; 
+ Thu, 17 Sep 2020 00:26:56 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.1595463707.git.scw@google.com>
- <CAF3nBxin3tH_0bFGiV+=5pkU=uQdK8UAtWi808TPM9Rewq51OQ@mail.gmail.com>
-In-Reply-To: <CAF3nBxin3tH_0bFGiV+=5pkU=uQdK8UAtWi808TPM9Rewq51OQ@mail.gmail.com>
+References: <cover.1597129029.git.scw@google.com>
+ <7d61f792c22de8df3c6a9438eacc3906620e7c54.1597129029.git.scw@google.com>
+In-Reply-To: <7d61f792c22de8df3c6a9438eacc3906620e7c54.1597129029.git.scw@google.com>
 From: Shu-Chun Weng <scw@google.com>
-Date: Thu, 17 Sep 2020 00:25:29 -0700
-Message-ID: <CAF3nBxjtHbVpQC3vn6BzvxT2NECzmCKyW644UVNADs7hJaRVXA@mail.gmail.com>
-Subject: Re: [PATCH 0/2] Instruction set detection for clang.
-To: rth@twiddle.net
-Cc: qemu-devel@nongnu.org
+Date: Thu, 17 Sep 2020 00:26:45 -0700
+Message-ID: <CAF3nBxjs1+kyEMrSp=ag-CmEuT7T7W4cx63cqaCUyn8ruk_dug@mail.gmail.com>
+Subject: Re: [PATCH v2 4/8] linux-user: Add IPv6 options to do_print_sockopt()
+To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature";
- micalg=sha-256; boundary="00000000000098e77005af7d4ac2"
-Received-SPF: pass client-ip=2a00:1450:4864:20::641;
- envelope-from=scw@google.com; helo=mail-ej1-x641.google.com
+ micalg=sha-256; boundary="00000000000023e13205af7d4fc1"
+Received-SPF: pass client-ip=2a00:1450:4864:20::541;
+ envelope-from=scw@google.com; helo=mail-ed1-x541.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -175
@@ -100,81 +99,346 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000098e77005af7d4ac2
-Content-Type: multipart/alternative; boundary="000000000000928fc605af7d4a25"
+--00000000000023e13205af7d4fc1
+Content-Type: multipart/alternative; boundary="0000000000001e815005af7d4f40"
 
---000000000000928fc605af7d4a25
+--0000000000001e815005af7d4f40
 Content-Type: text/plain; charset="UTF-8"
 
-Ping.
+Ping -- this one was broken off into its own patch from v1 due to the
+amount of addition. Hence I did not add Review-by.
 
-On Wed, Aug 5, 2020 at 4:23 PM Shu-Chun Weng <scw@google.com> wrote:
+On Tue, Aug 11, 2020 at 12:10 AM Shu-Chun Weng <scw@google.com> wrote:
 
-> Ping: https://patchew.org/QEMU/cover.1595463707.git.scw@google.com/
+> Signed-off-by: Shu-Chun Weng <scw@google.com>
+> ---
+> v1 -> v2:
+>   New: Add all IPV6 options to do_print_sockopt(), including the newly
+> supported
+>   IPV6_ADDR_PREFERENCES.
 >
-> On Wed, Jul 22, 2020 at 5:27 PM Shu-Chun Weng <scw@google.com> wrote:
+>  linux-user/strace.c | 108 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 108 insertions(+)
 >
->> Currently when configuring QEMU with clang, AVX2, AVX512F, ATOMIC64, and
->> ATOMIC128 are all disabled because the detection code is GCC-only. With
->> these
->> two patches, I am able to configure, build, and run tests with clang with
->> all of
->> the above enabled.
->>
->> Shu-Chun Weng (2):
->>   configure: avx2 and avx512f detection for clang
->>   configure: atomic64/128 detection for clang
->>
->>  configure           | 34 +++++++++++++++++++++++-----------
->>  util/bufferiszero.c | 33 +++++++++++++++++++++++----------
->>  2 files changed, 46 insertions(+), 21 deletions(-)
->>
->> --
->> 2.28.0.rc0.105.gf9edc3c819-goog
->>
->>
+> diff --git a/linux-user/strace.c b/linux-user/strace.c
+> index 854b54a2ad..089fb3968e 100644
+> --- a/linux-user/strace.c
+> +++ b/linux-user/strace.c
+> @@ -6,6 +6,7 @@
+>  #include <sys/select.h>
+>  #include <sys/mount.h>
+>  #include <arpa/inet.h>
+> +#include <netinet/in.h>
+>  #include <netinet/tcp.h>
+>  #include <netinet/udp.h>
+>  #include <linux/if_packet.h>
+> @@ -2307,6 +2308,113 @@ print_optint:
+>              break;
+>          }
+>          break;
+> +    case SOL_IPV6:
+> +        qemu_log("SOL_IPV6,");
+> +        switch (optname) {
+> +        case IPV6_MTU_DISCOVER:
+> +            qemu_log("IPV6_MTU_DISCOVER,");
+> +            goto print_optint;
+> +        case IPV6_MTU:
+> +            qemu_log("IPV6_MTU,");
+> +            goto print_optint;
+> +        case IPV6_V6ONLY:
+> +            qemu_log("IPV6_V6ONLY,");
+> +            goto print_optint;
+> +        case IPV6_RECVPKTINFO:
+> +            qemu_log("IPV6_RECVPKTINFO,");
+> +            goto print_optint;
+> +        case IPV6_UNICAST_HOPS:
+> +            qemu_log("IPV6_UNICAST_HOPS,");
+> +            goto print_optint;
+> +        case IPV6_MULTICAST_HOPS:
+> +            qemu_log("IPV6_MULTICAST_HOPS,");
+> +            goto print_optint;
+> +        case IPV6_MULTICAST_LOOP:
+> +            qemu_log("IPV6_MULTICAST_LOOP,");
+> +            goto print_optint;
+> +        case IPV6_RECVERR:
+> +            qemu_log("IPV6_RECVERR,");
+> +            goto print_optint;
+> +        case IPV6_RECVHOPLIMIT:
+> +            qemu_log("IPV6_RECVHOPLIMIT,");
+> +            goto print_optint;
+> +        case IPV6_2292HOPLIMIT:
+> +            qemu_log("IPV6_2292HOPLIMIT,");
+> +            goto print_optint;
+> +        case IPV6_CHECKSUM:
+> +            qemu_log("IPV6_CHECKSUM,");
+> +            goto print_optint;
+> +        case IPV6_ADDRFORM:
+> +            qemu_log("IPV6_ADDRFORM,");
+> +            goto print_optint;
+> +        case IPV6_2292PKTINFO:
+> +            qemu_log("IPV6_2292PKTINFO,");
+> +            goto print_optint;
+> +        case IPV6_RECVTCLASS:
+> +            qemu_log("IPV6_RECVTCLASS,");
+> +            goto print_optint;
+> +        case IPV6_RECVRTHDR:
+> +            qemu_log("IPV6_RECVRTHDR,");
+> +            goto print_optint;
+> +        case IPV6_2292RTHDR:
+> +            qemu_log("IPV6_2292RTHDR,");
+> +            goto print_optint;
+> +        case IPV6_RECVHOPOPTS:
+> +            qemu_log("IPV6_RECVHOPOPTS,");
+> +            goto print_optint;
+> +        case IPV6_2292HOPOPTS:
+> +            qemu_log("IPV6_2292HOPOPTS,");
+> +            goto print_optint;
+> +        case IPV6_RECVDSTOPTS:
+> +            qemu_log("IPV6_RECVDSTOPTS,");
+> +            goto print_optint;
+> +        case IPV6_2292DSTOPTS:
+> +            qemu_log("IPV6_2292DSTOPTS,");
+> +            goto print_optint;
+> +        case IPV6_TCLASS:
+> +            qemu_log("IPV6_TCLASS,");
+> +            goto print_optint;
+> +        case IPV6_ADDR_PREFERENCES:
+> +            qemu_log("IPV6_ADDR_PREFERENCES,");
+> +            goto print_optint;
+> +#ifdef IPV6_RECVPATHMTU
+> +        case IPV6_RECVPATHMTU:
+> +            qemu_log("IPV6_RECVPATHMTU,");
+> +            goto print_optint;
+> +#endif
+> +#ifdef IPV6_TRANSPARENT
+> +        case IPV6_TRANSPARENT:
+> +            qemu_log("IPV6_TRANSPARENT,");
+> +            goto print_optint;
+> +#endif
+> +#ifdef IPV6_FREEBIND
+> +        case IPV6_FREEBIND:
+> +            qemu_log("IPV6_FREEBIND,");
+> +            goto print_optint;
+> +#endif
+> +#ifdef IPV6_RECVORIGDSTADDR
+> +        case IPV6_RECVORIGDSTADDR:
+> +            qemu_log("IPV6_RECVORIGDSTADDR,");
+> +            goto print_optint;
+> +#endif
+> +        case IPV6_PKTINFO:
+> +            qemu_log("IPV6_PKTINFO,");
+> +            print_pointer(optval, 0);
+> +            break;
+> +        case IPV6_ADD_MEMBERSHIP:
+> +            qemu_log("IPV6_ADD_MEMBERSHIP,");
+> +            print_pointer(optval, 0);
+> +            break;
+> +        case IPV6_DROP_MEMBERSHIP:
+> +            qemu_log("IPV6_DROP_MEMBERSHIP,");
+> +            print_pointer(optval, 0);
+> +            break;
+> +        default:
+> +            print_raw_param(TARGET_ABI_FMT_ld, optname, 0);
+> +            print_pointer(optval, 0);
+> +            break;
+> +        }
+> +        break;
+>      default:
+>          print_raw_param(TARGET_ABI_FMT_ld, level, 0);
+>          print_raw_param(TARGET_ABI_FMT_ld, optname, 0);
+> --
+> 2.28.0.220.ged08abb693-goog
+>
+>
 
---000000000000928fc605af7d4a25
+--0000000000001e815005af7d4f40
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr">Ping.</div><br><div class=3D"gmail_quote"><div dir=3D"ltr"=
- class=3D"gmail_attr">On Wed, Aug 5, 2020 at 4:23 PM Shu-Chun Weng &lt;<a h=
-ref=3D"mailto:scw@google.com">scw@google.com</a>&gt; wrote:<br></div><block=
-quote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1=
-px solid rgb(204,204,204);padding-left:1ex"><div dir=3D"ltr">Ping:=C2=A0<a =
-href=3D"https://patchew.org/QEMU/cover.1595463707.git.scw@google.com/" targ=
-et=3D"_blank">https://patchew.org/QEMU/cover.1595463707.git.scw@google.com/=
-</a></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_at=
-tr">On Wed, Jul 22, 2020 at 5:27 PM Shu-Chun Weng &lt;<a href=3D"mailto:scw=
-@google.com" target=3D"_blank">scw@google.com</a>&gt; wrote:<br></div><bloc=
-kquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:=
-1px solid rgb(204,204,204);padding-left:1ex">Currently when configuring QEM=
-U with clang, AVX2, AVX512F, ATOMIC64, and<br>
-ATOMIC128 are all disabled because the detection code is GCC-only. With the=
-se<br>
-two patches, I am able to configure, build, and run tests with clang with a=
-ll of<br>
-the above enabled.<br>
+<div dir=3D"ltr">Ping -- this one was broken off into its own patch from v1=
+ due to the amount of addition. Hence I did not add Review-by.</div><br><di=
+v class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Tue, Aug 1=
+1, 2020 at 12:10 AM Shu-Chun Weng &lt;<a href=3D"mailto:scw@google.com">scw=
+@google.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=
+=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
+-left:1ex">Signed-off-by: Shu-Chun Weng &lt;<a href=3D"mailto:scw@google.co=
+m" target=3D"_blank">scw@google.com</a>&gt;<br>
+---<br>
+v1 -&gt; v2:<br>
+=C2=A0 New: Add all IPV6 options to do_print_sockopt(), including the newly=
+ supported<br>
+=C2=A0 IPV6_ADDR_PREFERENCES.<br>
 <br>
-Shu-Chun Weng (2):<br>
-=C2=A0 configure: avx2 and avx512f detection for clang<br>
-=C2=A0 configure: atomic64/128 detection for clang<br>
+=C2=A0linux-user/strace.c | 108 +++++++++++++++++++++++++++++++++++++++++++=
++<br>
+=C2=A01 file changed, 108 insertions(+)<br>
 <br>
-=C2=A0configure=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 34 ++++++++++++++=
-+++++++++-----------<br>
-=C2=A0util/bufferiszero.c | 33 +++++++++++++++++++++++----------<br>
-=C2=A02 files changed, 46 insertions(+), 21 deletions(-)<br>
+diff --git a/linux-user/strace.c b/linux-user/strace.c<br>
+index 854b54a2ad..089fb3968e 100644<br>
+--- a/linux-user/strace.c<br>
++++ b/linux-user/strace.c<br>
+@@ -6,6 +6,7 @@<br>
+=C2=A0#include &lt;sys/select.h&gt;<br>
+=C2=A0#include &lt;sys/mount.h&gt;<br>
+=C2=A0#include &lt;arpa/inet.h&gt;<br>
++#include &lt;netinet/in.h&gt;<br>
+=C2=A0#include &lt;netinet/tcp.h&gt;<br>
+=C2=A0#include &lt;netinet/udp.h&gt;<br>
+=C2=A0#include &lt;linux/if_packet.h&gt;<br>
+@@ -2307,6 +2308,113 @@ print_optint:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
++=C2=A0 =C2=A0 case SOL_IPV6:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;SOL_IPV6,&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 switch (optname) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_MTU_DISCOVER:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_MTU_DISCOVER=
+,&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_MTU:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_MTU,&quot;);=
 <br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_V6ONLY:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_V6ONLY,&quot=
+;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_RECVPKTINFO:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_RECVPKTINFO,=
+&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_UNICAST_HOPS:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_UNICAST_HOPS=
+,&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_MULTICAST_HOPS:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_MULTICAST_HO=
+PS,&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_MULTICAST_LOOP:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_MULTICAST_LO=
+OP,&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_RECVERR:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_RECVERR,&quo=
+t;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_RECVHOPLIMIT:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_RECVHOPLIMIT=
+,&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_2292HOPLIMIT:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_2292HOPLIMIT=
+,&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_CHECKSUM:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_CHECKSUM,&qu=
+ot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_ADDRFORM:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_ADDRFORM,&qu=
+ot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_2292PKTINFO:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_2292PKTINFO,=
+&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_RECVTCLASS:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_RECVTCLASS,&=
+quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_RECVRTHDR:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_RECVRTHDR,&q=
+uot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_2292RTHDR:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_2292RTHDR,&q=
+uot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_RECVHOPOPTS:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_RECVHOPOPTS,=
+&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_2292HOPOPTS:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_2292HOPOPTS,=
+&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_RECVDSTOPTS:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_RECVDSTOPTS,=
+&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_2292DSTOPTS:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_2292DSTOPTS,=
+&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_TCLASS:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_TCLASS,&quot=
+;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_ADDR_PREFERENCES:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_ADDR_PREFERE=
+NCES,&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++#ifdef IPV6_RECVPATHMTU<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_RECVPATHMTU:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_RECVPATHMTU,=
+&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++#endif<br>
++#ifdef IPV6_TRANSPARENT<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_TRANSPARENT:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_TRANSPARENT,=
+&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++#endif<br>
++#ifdef IPV6_FREEBIND<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_FREEBIND:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_FREEBIND,&qu=
+ot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++#endif<br>
++#ifdef IPV6_RECVORIGDSTADDR<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_RECVORIGDSTADDR:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_RECVORIGDSTA=
+DDR,&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto print_optint;<br>
++#endif<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_PKTINFO:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_PKTINFO,&quo=
+t;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 print_pointer(optval, 0);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_ADD_MEMBERSHIP:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_ADD_MEMBERSH=
+IP,&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 print_pointer(optval, 0);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 case IPV6_DROP_MEMBERSHIP:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IPV6_DROP_MEMBERS=
+HIP,&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 print_pointer(optval, 0);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 default:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 print_raw_param(TARGET_ABI_FMT_l=
+d, optname, 0);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 print_pointer(optval, 0);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+=C2=A0 =C2=A0 =C2=A0default:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0print_raw_param(TARGET_ABI_FMT_ld, level,=
+ 0);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0print_raw_param(TARGET_ABI_FMT_ld, optnam=
+e, 0);<br>
 -- <br>
-2.28.0.rc0.105.gf9edc3c819-goog<br>
+2.28.0.220.ged08abb693-goog<br>
 <br>
 </blockquote></div>
-</blockquote></div>
 
---000000000000928fc605af7d4a25--
+--0000000000001e815005af7d4f40--
 
---00000000000098e77005af7d4ac2
+--00000000000023e13205af7d4fc1
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -241,14 +505,14 @@ fj6NEprNrkDFdegzTt/ptu3CS432kneuiLZXOyBWmhZkcdOHipuYjQ1nmuDk9ziWVtGUTl3XqE5B
 UoUMJm713ykBBikjH02oVRiJNqGk+emm2TLaroGhvyFsGFqqfub8CPbQyxd3e0Ch6LjZCosQjxT9
 LNTa43AxggJqMIICZgIBATBoMFQxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
 LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFzIFIzIFNNSU1FIENBIDIwMjACEAHy0XLDpZOC
-M1Wo/zUtMzMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPYZ9/mrAeC+Aq1gAENf
-Kl+/+kyRaGlfFtuIJNCXDQJYMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkF
-MQ8XDTIwMDkxNzA3MjU0MFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUD
+M1Wo/zUtMzMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIKOE2tUZvvbb5UcJpEL0
+2husbipXnFvip6BiFqhdxrXZMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkF
+MQ8XDTIwMDkxNzA3MjY1N1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUD
 BAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsG
-CWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQDVT7Dx3nJxU7LfPCtPPgj0e28pxC5X7a8lsD6h
-qWf3FUNoXll4hLzX1jX2jWSm4yK7HFdBLA5yxkUTU3td9idl/QlrjJcaubu1bWXjNMyldCABhT3Y
-sxHvDnDebqk5FJrtmVfjeVYoAizXGVt1jxLIUKrBTjWLtq0liFnck7Ij1S2DDaTiL6ukfuhzGf5R
-ZH4lHdYZ1G5txjFM6nEXFP4fdSos1Mo/HnQCgi9D3as09Fl+Nwe339IifPFE1UDMgslcxsgkbgba
-b+KL5qUWQkmRrUCHmzhl71DJZNxOuOrW27YV5NIz8GCwPobRn4rp64MVoxtCuc9ObSKODjRJB5Oe
---00000000000098e77005af7d4ac2--
+CWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQADRpkRtdTtzy4+m5Y91Lw25U5ocPxN6CUvjJMo
+s3JeOQXeTEgVoT/vhMNo7+q/KTxjyIlon+b7itNuBLVNmfEbqei7xSVULMVz+MTfIMHxbcxntE+z
+DHnNtINt9rmvyY7BI+jVYemrWohVK4+aETW9t7rfyH6DHKVGXP1mrhRlFf4rXwBJpU2PQWdPnN0d
+Lj8i0A0qCHJ01N0bLdbEQJ0Vs0krZ2DMysm+r2ZrqYMO2mePq9WOWBDWOxG7Yl/SqXOChnMlZ6Ul
+icPLJ0Fld6u96hwOiGyn7aYiWK9OtJYaaw5WTQDg2ii53Z4mNCH1ooomyx1A2+g0EqKd4JjpvtIF
+--00000000000023e13205af7d4fc1--
 
