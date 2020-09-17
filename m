@@ -2,94 +2,112 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A93FC43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 07:13:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3AF1C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 07:19:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A96BE2083B
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 07:13:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 527B22072E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 07:19:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R9qmBFWM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A96BE2083B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WDYIlizJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 527B22072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIo6t-0001ue-Er
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 03:13:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42466)
+	id 1kIoCG-0003Si-Dw
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 03:19:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44224)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kIo5u-00015F-6Y
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:12:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39474)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kIoBZ-0002wU-52
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:18:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29771)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kIo5s-0000Kn-49
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:12:37 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kIoBW-00017Z-4v
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:18:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600326754;
+ s=mimecast20190719; t=1600327104;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=selw2jGpffI4oV/xFqP3DX1AxW28g2mEP0haMSxkl1Q=;
- b=R9qmBFWMzztRTUp1LDDrmW+ke+Gx6lZjvjzXWAzKk+OVcSm39PHyPj+x19WkfelGK4jraY
- HjzuVwtwI434hibxxRB5m2MkPIWohPL8vD8dyV7hxpdRwztUvJR94RZkVJH19ud/y+9Ovp
- t62cV/jKhARCu0LTHrLhiZtIUTVODVw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-VjF66MiiPJyIahaC3N-qJw-1; Thu, 17 Sep 2020 03:12:33 -0400
-X-MC-Unique: VjF66MiiPJyIahaC3N-qJw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3315318B9EFA;
- Thu, 17 Sep 2020 07:12:31 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
- [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 14859100164C;
- Thu, 17 Sep 2020 07:12:26 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 72508113864A; Thu, 17 Sep 2020 09:12:25 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Ari Sundholm <ari@tuxera.com>
-Subject: Re: [PATCH 07/14] block/blklogwrites: drop error propagation
-References: <20200909185930.26524-1-vsementsov@virtuozzo.com>
- <20200909185930.26524-8-vsementsov@virtuozzo.com>
- <8856cf15-4092-55b7-6537-a6beb4ce8a18@tuxera.com>
- <87k0x0g2pu.fsf@dusky.pond.sub.org>
- <dd40693c-2dda-895d-f372-662b0071ee62@tuxera.com>
-Date: Thu, 17 Sep 2020 09:12:25 +0200
-In-Reply-To: <dd40693c-2dda-895d-f372-662b0071ee62@tuxera.com> (Ari Sundholm's
- message of "Wed, 16 Sep 2020 19:52:01 +0300")
-Message-ID: <87tuvwg9ly.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ bh=J0mg7l8fSD8OC+hLvKntNqWk2rLwJkbIBms8Q2gkZY4=;
+ b=WDYIlizJ3o+aTMY2X9GIq9VAMBz8X+pLY/TR7YGBx+b8TStKH1lWx3w34Pz87Uek0AJ/NM
+ Dk/gcW1R/s15k+4qdNL1u80CxMDKuCrtcJ6PTv2up3yYeUT1QoBdYK85+gJmQ8lmUgdXuH
+ YZDDr5leReeTpw663OGCY8fZ0Ar/brk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-174-LXN-QZ8uMkG4dhhswEVR2g-1; Thu, 17 Sep 2020 03:18:21 -0400
+X-MC-Unique: LXN-QZ8uMkG4dhhswEVR2g-1
+Received: by mail-wm1-f71.google.com with SMTP id u5so411374wme.3
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 00:18:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=J0mg7l8fSD8OC+hLvKntNqWk2rLwJkbIBms8Q2gkZY4=;
+ b=Q5h9dhdW/HNPm1snxKUAASpkBXL0rJOlhlKHW9CrA/Tss8jnTnu3U3S1SCzBnXaslH
+ a797K5ZLY0q2u7Kizy9Up3uvfn/PNGXd5wMz9HMG4sm/77dWzmwZz66/JDxS3Mi7Nkml
+ Pwa1cPEEG6YoJPzHx1p4qYsthCsIxrgnQIFOw7niAaWSODSq019vX/MjSdSDSh8NlDgm
+ R8/VPM2dxPggqLXboAMdBeqxljrFMwp3NvY3IZ3BQsm5qjWjSiM0rwsm1CQqAm7xDTy7
+ zlEh/5Jj1NajsTH0Ps5tTWGFmFi9CT90pHtMgbPu286WB05ZxMqzI/mUDjAtPtjo303c
+ aD7g==
+X-Gm-Message-State: AOAM533iNc5koAiXjIQi3YSpkFAYGzx3durP6azDHHl34jBUwOQdjFyQ
+ p6v0gzk9lSlbSkuZL3wZsIjqSiiqTtzlFKkurLS9X0vbITJsLlRoRAyYr14r6mp+4XKt0E2NcPd
+ kSCcBThuR5CJv8Zw=
+X-Received: by 2002:a5d:4e8c:: with SMTP id e12mr32256888wru.180.1600327100025; 
+ Thu, 17 Sep 2020 00:18:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy+PAeD59V/Ntd6yzkU+CSOJAv8ujM5iD5oyi3X7OZDLhDK9h96un3Fjbqcwrw77dQlGzIJhg==
+X-Received: by 2002:a5d:4e8c:: with SMTP id e12mr32256857wru.180.1600327099654; 
+ Thu, 17 Sep 2020 00:18:19 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d003:b94f:6314:4839?
+ ([2001:b07:6468:f312:d003:b94f:6314:4839])
+ by smtp.gmail.com with ESMTPSA id y5sm9654084wmg.21.2020.09.17.00.18.18
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 17 Sep 2020 00:18:19 -0700 (PDT)
+Subject: Re: [PATCH] migration: Silence compiler warning in
+ global_state_store_running()
+To: Thomas Huth <thuth@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+References: <20200916171913.148681-1-thuth@redhat.com>
+ <93744d31-0f33-5bb1-fb76-42ca3a5fa401@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e44e5105-baba-3d0d-6477-37f24531d39f@redhat.com>
+Date: Thu, 17 Sep 2020 09:18:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <93744d31-0f33-5bb1-fb76-42ca3a5fa401@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0.002
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.003
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 20:51:18
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
+X-Spam_score_int: -51
+X-Spam_score: -5.2
 X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
+X-Spam_report: (-5.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.062, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,186 +120,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- berto@igalia.com, pavel.dovgaluk@ispras.ru, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, groug@kaod.org,
- stefanha@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, jsnow@redhat.com
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ari Sundholm <ari@tuxera.com> writes:
+On 17/09/20 08:30, Thomas Huth wrote:
+> On 16/09/2020 19.19, Thomas Huth wrote:
+>> GCC 9.3.0 on Ubuntu complains:
+>>
+>> In file included from /usr/include/string.h:495,
+>>                  from /home/travis/build/huth/qemu/include/qemu/osdep.h:87,
+>>                  from ../migration/global_state.c:13:
+>> In function ‘strncpy’,
+>>     inlined from ‘global_state_store_running’ at ../migration/global_state.c:47:5:
+>> /usr/include/x86_64-linux-gnu/bits/string_fortified.h:106:10: error: ‘__builtin_strncpy’ specified bound 100 equals destination size [-Werror=stringop-truncation]
+>>   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
+>>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>
+>> ... but we apparently really want to do the strncpy here. Silence the
+>> warning with QEMU_NONSTRING.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  migration/global_state.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/migration/global_state.c b/migration/global_state.c
+>> index 25311479a4..f1355d7d97 100644
+>> --- a/migration/global_state.c
+>> +++ b/migration/global_state.c
+>> @@ -43,9 +43,9 @@ int global_state_store(void)
+>>  void global_state_store_running(void)
+>>  {
+>>      const char *state = RunState_str(RUN_STATE_RUNNING);
+>> +    QEMU_NONSTRING char *dest = (char *)global_state.runstate;
+>>      assert(strlen(state) < sizeof(global_state.runstate));
+>> -    strncpy((char *)global_state.runstate,
+>> -           state, sizeof(global_state.runstate));
+>> +    strncpy(dest, state, sizeof(global_state.runstate));
+>>  }
+> 
+> Darn, I was sending too fast here, sorry, but seems like this does *not*
+> fix the issue with GCC 9.3:
+> 
+>  https://travis-ci.com/github/huth/qemu/jobs/385871010#L2930
+> 
+> ... so maybe we should simply switch to strpadcpy() instead?
 
-> Hi,
->
-> On 9/11/20 11:03 AM, Markus Armbruster wrote:
->> Ari Sundholm <ari@tuxera.com> writes:
->>=20
->>> Hi Vladimir!
->>>
->>> Thank you for working on this. My comments below.
->>>
->>> On 9/9/20 9:59 PM, Vladimir Sementsov-Ogievskiy wrote:
->>>> It's simple to avoid error propagation in blk_log_writes_open(), we
->>>> just need to refactor blk_log_writes_find_cur_log_sector() a bit.
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy
->>>> <vsementsov@virtuozzo.com>
->>>> ---
->>>>    block/blklogwrites.c | 23 +++++++++++------------
->>>>    1 file changed, 11 insertions(+), 12 deletions(-)
->>>> diff --git a/block/blklogwrites.c b/block/blklogwrites.c
->>>> index 7ef046cee9..c7da507b2d 100644
->>>> --- a/block/blklogwrites.c
->>>> +++ b/block/blklogwrites.c
->>>> @@ -96,10 +96,10 @@ static inline bool blk_log_writes_sector_size_vali=
-d(uint32_t sector_size)
->>>>            sector_size < (1ull << 24);
->>>>    }
->>>>    -static uint64_t blk_log_writes_find_cur_log_sector(BdrvChild
->>>> *log,
->>>> -                                                   uint32_t sector_si=
-ze,
->>>> -                                                   uint64_t nr_entrie=
-s,
->>>> -                                                   Error **errp)
->>>> +static int64_t blk_log_writes_find_cur_log_sector(BdrvChild *log,
->>>
->>> I'd rather not change the return type for reasons detailed below.
->>>
->>>> +                                                  uint32_t sector_siz=
-e,
->>>> +                                                  uint64_t nr_entries=
-,
->>>> +                                                  Error **errp)
->>>>    {
->>>>        uint64_t cur_sector =3D 1;
->>>>        uint64_t cur_idx =3D 0;
->>>> @@ -112,13 +112,13 @@ static uint64_t blk_log_writes_find_cur_log_sect=
-or(BdrvChild *log,
->>>>            if (read_ret < 0) {
->>>>                error_setg_errno(errp, -read_ret,
->>>>                                 "Failed to read log entry %"PRIu64, cu=
-r_idx);
->>>> -            return (uint64_t)-1ull;
->>>> +            return read_ret;
->>>
->>> This is OK, provided the change in return type signedness is necessary
->>> in the first place.
->>>
->>>>            }
->>>>              if (cur_entry.flags & ~cpu_to_le64(LOG_FLAG_MASK)) {
->>>>                error_setg(errp, "Invalid flags 0x%"PRIx64" in log entr=
-y %"PRIu64,
->>>>                           le64_to_cpu(cur_entry.flags), cur_idx);
->>>> -            return (uint64_t)-1ull;
->>>> +            return -EINVAL;
->>>
->>> This is OK, provided the return type signedness change is necessary,
->>> although we already do have errp to indicate any errors.
->>>
->>>>            }
->>>>              /* Account for the sector of the entry itself */
->>>> @@ -143,7 +143,6 @@ static int blk_log_writes_open(BlockDriverState *b=
-s, QDict *options, int flags,
->>>>    {
->>>>        BDRVBlkLogWritesState *s =3D bs->opaque;
->>>>        QemuOpts *opts;
->>>> -    Error *local_err =3D NULL;
->>>>        int ret;
->>>>        uint64_t log_sector_size;
->>>>        bool log_append;
->>>> @@ -215,15 +214,15 @@ static int blk_log_writes_open(BlockDriverState =
-*bs, QDict *options, int flags,
->>>>            s->nr_entries =3D 0;
->>>>              if (blk_log_writes_sector_size_valid(log_sector_size)) {
->>>> -            s->cur_log_sector =3D
->>>> +            int64_t cur_log_sector =3D
->>>>                    blk_log_writes_find_cur_log_sector(s->log_file, log=
-_sector_size,
->>>> -                                    le64_to_cpu(log_sb.nr_entries), &=
-local_err);
->>>> -            if (local_err) {
->>>> -                ret =3D -EINVAL;
->>>> -                error_propagate(errp, local_err);
->>>> +                                    le64_to_cpu(log_sb.nr_entries), e=
-rrp);
->>>> +            if (cur_log_sector < 0) {
->>>> +                ret =3D cur_log_sector;
->>>
->>> This changes the semantics slightly. Changing the return type to int64
->>> may theoretically cause valid return values to be interpreted as
->>> errors. Since we already do have a dedicated out pointer for the error
->>> value (errp), why not use it?
->> Error.h's big comment:
->>   * Error reporting system loosely patterned after Glib's GError.
->>   *
->>   * =3D Rules =3D
->>   [...]
->>   * - Whenever practical, also return a value that indicates success /
->>   *   failure.  This can make the error checking more concise, and can
->>   *   avoid useless error object creation and destruction.  Note that
->>   *   we still have many functions returning void.  We recommend
->>   *   =E2=80=A2 bool-valued functions return true on success / false on =
-failure,
->>   *   =E2=80=A2 pointer-valued functions return non-null / null pointer,=
- and
->>   *   =E2=80=A2 integer-valued functions return non-negative / negative.
->> blk_log_writes_find_cur_log_sector() does return such an error value
->> before the patch: (uint64_t)-1.
->> The caller does not use it to check for errors.  It uses @err
->> instead.
->> Awkward, has to error_propagate().
->> Avoiding error_propagate() reduces the error handling boileplate.
->> It
->> also improves behavior when @errp is &error_abort: we get the abort
->> right where the error happens instead of where we propagate it.
->> Furthermore, caller has to make an error code (-EINVAL), because
->> returning (uint64_t)-1 throws it away.  Yes, a detailed error is stored
->> into @err, but you can't cleanly extract the error code.
->> Using a signed integer for returning "non-negative offset or
->> negative
->> errno code" is pervasive, starting with read() and write().  It hasn't
->> been a problem there, and it hasn't been a problem in the block layer.
->> 8 exbi-blocks should do for a while.  Should it become troublesome, we
->> won't solve the problem by going unsigned and adding one bit, we'll
->> double the width and add 64.
->>=20
->
-> I am in complete agreement with eliminating error propagation within
-> the blklogwrites driver. This was never a point of disagreement.
->
-> As error propagation is dropped in this patch, the awkwardness
-> referred to above will be no more, making that a moot point.
->
-> My main issue was that this patch does more than just the mechanical
-> transformation required. Changes that are not strictly necessary are=20
-> made, and they slightly change the semantics while duplicating the
-> error code and halving the range of the return type (instead of just
-> returning *some* value in the absence of a possibility to return
-> nothing, which will be thrown away by the caller anyway when an error
-> has occurred).
+Yes, and probably do so everywhere that strncpy is used.
 
-You have a point: the return type change should perhaps be a separate
-patch.  Up to the maintainer.
+Paolo
 
-> However, as the consensus seems to be that it is best to change the
-> return type to int64_t for consistency with the rest of the codebase,
-> I will not object any further regarding that point. Having conceded
-> that, this makes the difference between my preferred minimalistic
-> approach and this patch insignificant, and it is not my intention to
-> needlessly obstruct a perfectly fine patch series.
->
-> BTW, I do not think it would be difficult at all to extend the code in
-> error.h to make it convenient to extract errno and/or win32 error
-> values that have been explicitly provided, but this is a matter best
-> discussed separately and left for a later patch.
 
-Certainly feasible, but how would we deal with the fact that only some
-Error objects have an error code?
-
-> As for general matters regarding error handling and separation between
-> results and errors, I am open to discussing these off-list.
-
-Thanks!
 
 
