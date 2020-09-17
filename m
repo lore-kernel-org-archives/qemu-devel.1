@@ -2,92 +2,86 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F934C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 06:32:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD41CC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 06:41:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A00FF20707
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 06:32:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2EB5920707
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 06:41:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YS/qkI53"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A00FF20707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="ZffLjMMR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EB5920707
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kInSz-0005Dg-MF
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 02:32:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33226)
+	id 1kInbP-0007xW-2n
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 02:41:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35198)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kInR0-0004Ca-Ey
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 02:30:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41759
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kInQw-0003c1-Cc
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 02:30:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600324214;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=FkkO6yrGMMcRtoi4c7OWyS2swIvstU9Vv7XhdpFyz8k=;
- b=YS/qkI533Fq4Y+o11kvt9Ib/jqvodZ9DtxLg/UZ/C1jEt3eLDutj2iKGWvr6MXniCNe8fY
- s8QHOwWmAUp0sYCX6Qlw7cgcvpY1f5Kx3CTpuumyGTnxD4ZFd7dBcb/v62ACqCnoZLLSVu
- THOck/hXsAy4uIihZsDCVVh+NoVg1XM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-338-7pZ5WRkNMQannjDpQr4R-A-1; Thu, 17 Sep 2020 02:30:11 -0400
-X-MC-Unique: 7pZ5WRkNMQannjDpQr4R-A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CE661017DCD;
- Thu, 17 Sep 2020 06:30:10 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-113-38.ams2.redhat.com [10.36.113.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C33A9610F3;
- Thu, 17 Sep 2020 06:30:08 +0000 (UTC)
-Subject: Re: [PATCH] migration: Silence compiler warning in
- global_state_store_running()
-From: Thomas Huth <thuth@redhat.com>
-To: Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
-References: <20200916171913.148681-1-thuth@redhat.com>
-Message-ID: <93744d31-0f33-5bb1-fb76-42ca3a5fa401@redhat.com>
-Date: Thu, 17 Sep 2020 08:30:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kInaO-0007O5-5x
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 02:40:04 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33368)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kInaL-0004xg-6b
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 02:40:03 -0400
+Received: by mail-wr1-x443.google.com with SMTP id m6so756263wrn.0
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 23:39:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=y9UxicMhDGrk6TuwbYrhqv1rFLq0eZuODrY2Bj7I68U=;
+ b=ZffLjMMRG5bwoX0qyaHMvnaltML4t7C/i71wfCBb2N2JIk5m018gcqb7QXoM0f41xz
+ PElVAbool+zoOM0CllIxJUfTWsE4XO3k2R6IqrZ5vL+89u0og/DBKR1hPraUkp7V+xmB
+ Dum+R65TCHO2FKYhPR+vMAwKQSWTv74aLdG03NRTEPrlnzNUs+hyLKanu7xgpC4lQgGe
+ XH3Zwl/CObGStRGSwtfn51MBbo9GZjHhlDiqtqF6Di+kZjKst+5NMiq/XGFxaubnNOle
+ 83mCL2oXebw6Kxfa0CaDBXOZMX7OAydKslBNWGIYBLhKzI95/F1cp8gISwidklhq5I/X
+ 9wUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=y9UxicMhDGrk6TuwbYrhqv1rFLq0eZuODrY2Bj7I68U=;
+ b=Ncl2AcFAzEy7qlgpP0//7IMZjkMmb0Sji+lZukzQ3uHH2hzbO07N0x/lvx3up7qq3K
+ R37a+rKcIxAcwOrrSCAi0xVYLhoZV7USmYNBt8j6G/Y/2KENJMS6owuvavFtV8A5xSP6
+ fFJUGCC8gbfjRnvJhN6mfGY5fW/0M6JzcYy6W+B/wpgyBxBWpxzfmlTfeLyTi8P1L7zF
+ HEXamYbLeV2i7us7nn7xjQtDCwDSxTIPCFwu3tti9OkSTfKBlzSFB/I6gKvRAtkniDvL
+ LlJ3Ot1i1YtWnNJmftQe1SnWGQnF/x5nfDleBUgSrGrR2X59jEqXYBu2C01spLKdlobt
+ b8+A==
+X-Gm-Message-State: AOAM532/vvxApzpe6oiUTXo9QuFl/HCTixU0U7OOTf1Jgr4HhiKoY2+a
+ usqLk4GqVfzqJ1+Hy0udZIlA5j/YpswkOyF1aNthXg==
+X-Google-Smtp-Source: ABdhPJwW0DNJE6v7C6QyBqjIT7EurufRdp8adPLe8wzM9cqhycomfnadvW8m8RLaE3XLe8LR8CK/MQ6i7SGvAyChMNE=
+X-Received: by 2002:a5d:4f09:: with SMTP id c9mr29112789wru.427.1600324798055; 
+ Wed, 16 Sep 2020 23:39:58 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200916171913.148681-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.003
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 02:30:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -51
-X-Spam_score: -5.2
-X-Spam_bar: -----
-X-Spam_report: (-5.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.062, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+References: <20200916081910.977-1-ani@anisinha.ca>
+ <20200916081910.977-10-ani@anisinha.ca>
+ <20200917081602.7c2ff36f@redhat.com>
+In-Reply-To: <20200917081602.7c2ff36f@redhat.com>
+From: Ani Sinha <ani@anisinha.ca>
+Date: Thu, 17 Sep 2020 12:09:46 +0530
+Message-ID: <CAARzgwz3BQ2zZWmCLXnJsTkQz35OFE5OkR4j0eqFGTbdweHUTA@mail.gmail.com>
+Subject: Re: [PATCH v5 09/11] piix4: don't reserve hw resources when hotplug
+ is off globally
+To: Igor Mammedov <imammedo@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: none client-ip=2a00:1450:4864:20::443;
+ envelope-from=ani@anisinha.ca; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,56 +94,308 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Julia Suvorova <jusual@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16/09/2020 19.19, Thomas Huth wrote:
-> GCC 9.3.0 on Ubuntu complains:
-> 
-> In file included from /usr/include/string.h:495,
->                  from /home/travis/build/huth/qemu/include/qemu/osdep.h:87,
->                  from ../migration/global_state.c:13:
-> In function ‘strncpy’,
->     inlined from ‘global_state_store_running’ at ../migration/global_state.c:47:5:
-> /usr/include/x86_64-linux-gnu/bits/string_fortified.h:106:10: error: ‘__builtin_strncpy’ specified bound 100 equals destination size [-Werror=stringop-truncation]
->   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
->       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> ... but we apparently really want to do the strncpy here. Silence the
-> warning with QEMU_NONSTRING.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  migration/global_state.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/migration/global_state.c b/migration/global_state.c
-> index 25311479a4..f1355d7d97 100644
-> --- a/migration/global_state.c
-> +++ b/migration/global_state.c
-> @@ -43,9 +43,9 @@ int global_state_store(void)
->  void global_state_store_running(void)
->  {
->      const char *state = RunState_str(RUN_STATE_RUNNING);
-> +    QEMU_NONSTRING char *dest = (char *)global_state.runstate;
->      assert(strlen(state) < sizeof(global_state.runstate));
-> -    strncpy((char *)global_state.runstate,
-> -           state, sizeof(global_state.runstate));
-> +    strncpy(dest, state, sizeof(global_state.runstate));
->  }
+On Thu, Sep 17, 2020 at 11:46 AM Igor Mammedov <imammedo@redhat.com> wrote:
+>
+> On Wed, 16 Sep 2020 13:49:08 +0530
+> Ani Sinha <ani@anisinha.ca> wrote:
+>
+> > When acpi hotplug is turned off for both root pci bus as well as for pci
+> > bridges, we should not generate the related acpi code for DSDT table or
+> > initialize related hw ports or reserve hw resources. This change makes
+> > sure all those operations are turned off in the case acpi pci hotplug is
+> > off globally.
+> >
+> > In this change, we also make sure AMLs for the PCNT method are only added when
+> > bsel is enabled for the corresponding pci bus or bridge hotplug is turned on.
+> > As a result, when the hotplug for both the root pci device and bridge are
+> > disabled, this AML in the DSDT acpi table is turned off.
+> >
+> > As q35 machines do not use bsel for it's pci buses at this point in time, this
+> > change affects DSDT acpi table for q35 machines as well. Therefore, we also
+> > commit the updated golden master DSDT table acpi binary blobs as well.
+>
+> Please split binary blobs into separate patch, as described in process.
+> Otherwise the patch is very likely to become un-merge-able due to conflicts.
 
-Darn, I was sending too fast here, sorry, but seems like this does *not*
-fix the issue with GCC 9.3:
+I wanted to make sure that the changes in this patch and the blobs go
+together as a single atomic commit since the unit test will break if
+one has the patch but not the blobs.
 
- https://travis-ci.com/github/huth/qemu/jobs/385871010#L2930
-
-... so maybe we should simply switch to strpadcpy() instead?
-
- Thomas
-
+>
+> > Following is a typical diff between the q35 acpi DSDT table blobs:
+> >
+> > @@ -1,30 +1,30 @@
+> >  /*
+> >   * Intel ACPI Component Architecture
+> >   * AML/ASL+ Disassembler version 20180105 (64-bit version)
+> >   * Copyright (c) 2000 - 2018 Intel Corporation
+> >   *
+> >   * Disassembling to symbolic ASL+ operators
+> >   *
+> > - * Disassembly of tests/data/acpi/q35/DSDT, Tue Sep 15 18:52:47 2020
+> > + * Disassembly of /tmp/aml-3O0DR0, Tue Sep 15 18:52:47 2020
+> >   *
+> >   * Original Table Header:
+> >   *     Signature        "DSDT"
+> > - *     Length           0x00001DFE (7678)
+> > + *     Length           0x00001DF6 (7670)
+> >   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+> > - *     Checksum         0xAC
+> > + *     Checksum         0x17
+> >   *     OEM ID           "BOCHS "
+> >   *     OEM Table ID     "BXPCDSDT"
+> >   *     OEM Revision     0x00000001 (1)
+> >   *     Compiler ID      "BXPC"
+> >   *     Compiler Version 0x00000001 (1)
+> >   */
+> >  DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPCDSDT", 0x00000001)
+> >  {
+> >      Scope (\)
+> >      {
+> >          OperationRegion (DBG, SystemIO, 0x0402, One)
+> >          Field (DBG, ByteAcc, NoLock, Preserve)
+> >          {
+> >              DBGB,   8
+> >          }
+> >
+> > @@ -3113,24 +3113,20 @@
+> >                  Name (_ADR, 0x00010000)  // _ADR: Address
+> >                  Method (_S1D, 0, NotSerialized)  // _S1D: S1 Device State
+> >                  {
+> >                      Return (Zero)
+> >                  }
+> >
+> >                  Method (_S2D, 0, NotSerialized)  // _S2D: S2 Device State
+> >                  {
+> >                      Return (Zero)
+> >                  }
+> >
+> >                  Method (_S3D, 0, NotSerialized)  // _S3D: S3 Device State
+> >                  {
+> >                      Return (Zero)
+> >                  }
+> >              }
+> > -
+> > -            Method (PCNT, 0, NotSerialized)
+> > -            {
+> > -            }
+> >          }
+> >      }
+> >  }
+> >
+> > Signed-off-by: Ani Sinha <ani@anisinha.ca>
+> > ---
+> >  hw/acpi/piix4.c                   |   6 ++++--
+> >  hw/i386/acpi-build.c              |  25 ++++++++++++++++++-------
+> >  tests/data/acpi/q35/DSDT          | Bin 7678 -> 7670 bytes
+> >  tests/data/acpi/q35/DSDT.acpihmat | Bin 9002 -> 8994 bytes
+> >  tests/data/acpi/q35/DSDT.bridge   | Bin 7695 -> 7688 bytes
+> >  tests/data/acpi/q35/DSDT.cphp     | Bin 8141 -> 8133 bytes
+> >  tests/data/acpi/q35/DSDT.dimmpxm  | Bin 9331 -> 9323 bytes
+> >  tests/data/acpi/q35/DSDT.ipmibt   | Bin 7753 -> 7745 bytes
+> >  tests/data/acpi/q35/DSDT.memhp    | Bin 9037 -> 9029 bytes
+> >  tests/data/acpi/q35/DSDT.mmio64   | Bin 8808 -> 8801 bytes
+> >  tests/data/acpi/q35/DSDT.numamem  | Bin 7684 -> 7676 bytes
+> >  tests/data/acpi/q35/DSDT.tis      | Bin 8283 -> 8276 bytes
+> >  12 files changed, 22 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> > index e6163bb6ce..b70b1f98af 100644
+> > --- a/hw/acpi/piix4.c
+> > +++ b/hw/acpi/piix4.c
+> > @@ -596,8 +596,10 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
+> >                            "acpi-gpe0", GPE_LEN);
+> >      memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
+> >
+> > -    acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
+> > -                    s->use_acpi_hotplug_bridge);
+> > +    if (s->use_acpi_hotplug_bridge || s->use_acpi_root_pci_hotplug) {
+> > +        acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
+> > +                        s->use_acpi_hotplug_bridge);
+> > +    }
+> >
+> >      s->cpu_hotplug_legacy = true;
+> >      object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
+> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > index e079b686f5..e41bb0992b 100644
+> > --- a/hw/i386/acpi-build.c
+> > +++ b/hw/i386/acpi-build.c
+> > @@ -95,6 +95,7 @@ typedef struct AcpiPmInfo {
+> >      bool s3_disabled;
+> >      bool s4_disabled;
+> >      bool pcihp_bridge_en;
+> > +    bool pcihp_root_en;
+> >      uint8_t s4_val;
+> >      AcpiFadtData fadt;
+> >      uint16_t cpu_hp_io_base;
+> > @@ -245,6 +246,9 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
+> >      pm->pcihp_bridge_en =
+> >          object_property_get_bool(obj, "acpi-pci-hotplug-with-bridge-support",
+> >                                   NULL);
+> > +    pm->pcihp_root_en =
+> > +        object_property_get_bool(obj, "acpi-root-pci-hotplug",
+> > +                                 NULL);
+> >  }
+> >
+> >  static void acpi_get_misc_info(AcpiMiscInfo *info)
+> > @@ -450,10 +454,12 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+> >      }
+> >
+> >      /* Append PCNT method to notify about events on local and child buses.
+> > -     * Add unconditionally for root since DSDT expects it.
+> > +     * Add this method for root bus only when hotplug is enabled since DSDT
+> > +     * expects it.
+> >       */
+> > -    method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
+> > -
+> > +    if (bsel || pcihp_bridge_en) {
+> > +        method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
+> > +    }
+> >      /* If bus supports hotplug select it and notify about local events */
+> >      if (bsel) {
+> >          uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
+> > @@ -479,7 +485,10 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+> >              aml_append(method, aml_name("^S%.02X.PCNT", devfn));
+> >          }
+> >      }
+> > -    aml_append(parent_scope, method);
+> > +
+> > +    if (bsel || pcihp_bridge_en) {
+> > +        aml_append(parent_scope, method);
+> > +    }
+> >      qobject_unref(bsel);
+> >  }
+> >
+> > @@ -1504,7 +1513,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> >          build_hpet_aml(dsdt);
+> >          build_piix4_isa_bridge(dsdt);
+> >          build_isa_devices_aml(dsdt);
+> > -        build_piix4_pci_hotplug(dsdt);
+> > +        if (pm->pcihp_bridge_en || pm->pcihp_root_en) {
+> > +            build_piix4_pci_hotplug(dsdt);
+> > +        }
+> >          build_piix4_pci0_int(dsdt);
+> >      } else {
+> >          sb_scope = aml_scope("_SB");
+> > @@ -1546,7 +1557,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> >      {
+> >          aml_append(scope, aml_name_decl("_HID", aml_string("ACPI0006")));
+> >
+> > -        if (misc->is_piix4) {
+> > +        if (misc->is_piix4 && (pm->pcihp_bridge_en || pm->pcihp_root_en)) {
+> >              method = aml_method("_E01", 0, AML_NOTSERIALIZED);
+> >              aml_append(method,
+> >                  aml_acquire(aml_name("\\_SB.PCI0.BLCK"), 0xFFFF));
+> > @@ -1698,7 +1709,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> >      crs_range_set_free(&crs_range_set);
+> >
+> >      /* reserve PCIHP resources */
+> > -    if (pm->pcihp_io_len) {
+> > +    if (pm->pcihp_io_len && (pm->pcihp_bridge_en || pm->pcihp_root_en)) {
+> >          dev = aml_device("PHPR");
+> >          aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A06")));
+> >          aml_append(dev,
+> > diff --git a/tests/data/acpi/q35/DSDT b/tests/data/acpi/q35/DSDT
+> > index bba8884073a27427b88ac0d733c9c87330a59366..4fad91b72e279b744b0528fd687c862d3a3d5cfa 100644
+> > GIT binary patch
+> > delta 33
+> > pcmexo{mq)oCD<k8n=AtZqxeRyWwM-ZEHUxHPVoYElXuD50sy=Q3Pb<^
+> >
+> > delta 42
+> > ycmexn{m+`qCD<k8pDY6d<C=|J%VfFySYqOXo#F-DSSIh3wPhD!3vl)eVE_Owj0{Tv
+> >
+> > diff --git a/tests/data/acpi/q35/DSDT.acpihmat b/tests/data/acpi/q35/DSDT.acpihmat
+> > index 9cac92418b5fcc2767dc74603d599642b59623fe..e4df7d1ca89578dd81be3539c8f83f073bb8db25 100644
+> > GIT binary patch
+> > delta 33
+> > pcmZ4Gw#bdkCD<iINtuCx@ySN6OG=z>EHUxHPVoYElb<Qs0syHh3KIYT
+> >
+> > delta 42
+> > xcmZ4Fw#tpmCD<iIOPPUzv2r8VB_%FDmYDcpr+5K3mdQ_*Y}rNF0-XIq7y$jZ3mO0b
+> >
+> > diff --git a/tests/data/acpi/q35/DSDT.bridge b/tests/data/acpi/q35/DSDT.bridge
+> > index f08b7245f59aad491fcaa60e2bab1085c369ea1c..065399174575442201cc09ffa4939ddf90ac81b4 100644
+> > GIT binary patch
+> > delta 33
+> > ocmeCT>9FB)33dtLkYiwAT)&ZPnJlLVYfOBwQ@nt~<ejqq0G06xDgXcg
+> >
+> > delta 41
+> > wcmeCM>9^r>33dtLmt$aH^xnv|OqSE1H6}jTDPF*R@=jTQb`iD!XTJ~z0NaZSF#rGn
+> >
+> > diff --git a/tests/data/acpi/q35/DSDT.cphp b/tests/data/acpi/q35/DSDT.cphp
+> > index 57d859cef9fa16a8f125c4b338611c8472699f38..8d2395e3cb4383b30e3840caed0d09ccad0c7323 100644
+> > GIT binary patch
+> > delta 33
+> > ocmX?Wf7G7KCD<k8s5}D$<AjY|rShC^EHUxHPVoYElRM>Y0kO^r)&Kwi
+> >
+> > delta 42
+> > xcmX?Vf7YJMCD<k8tULn)qv}SkQh6>vmYDcpr+5K3mdPFRw(KHo0nUCQ3;+bB3f%wz
+> >
+> > diff --git a/tests/data/acpi/q35/DSDT.dimmpxm b/tests/data/acpi/q35/DSDT.dimmpxm
+> > index 9d5bd5744e2ba2e0f6126c3aba0bb36af865e499..df7422051c6feadeaa3b6733ad7efa67c339b49d 100644
+> > GIT binary patch
+> > delta 33
+> > ocmezD@!EsSCD<h-TZMsvF>)i9v<jyiOH6#QQ@nuPWPKG|0ILxQ{r~^~
+> >
+> > delta 42
+> > xcmaFu@!5mRCD<jTScQRs@!du)X%#L%mYDcpr+5K3mdSc5w(KHo0nUCQ3;+_P3k3iG
+> >
+> > diff --git a/tests/data/acpi/q35/DSDT.ipmibt b/tests/data/acpi/q35/DSDT.ipmibt
+> > index 5cd11de6a8fe47324e5f922823a22746882f19f5..c4ce5cc0ede822ea82656d078d7a8b7eee4a7516 100644
+> > GIT binary patch
+> > delta 33
+> > ocmX?UbI^v%CD<jzQI3Iu(Q6~uM_EocmYDcpr+5Lo$*gj=0Hl8i@&Et;
+> >
+> > delta 42
+> > xcmX?TbJB*(CD<jzQ;vaw@%~1xkFs2TEHUxHPVoY6ER$K}Y}rNF0-XIq7yt{`3i$v4
+> >
+> > diff --git a/tests/data/acpi/q35/DSDT.memhp b/tests/data/acpi/q35/DSDT.memhp
+> > index 05a7a73ec43130d5c3018bb462fd84981bfb151c..84614ffc1452358053b4c2be4b2edcb4d56a9ae6 100644
+> > GIT binary patch
+> > delta 33
+> > ocmX@>cGQi_CD<jzRhfZ-kz*s*S0zq2mYDcpr+5Lo$(+iz0Hk>c=Kufz
+> >
+> > delta 42
+> > xcmX@=cGiu{CD<jzSDAr<aqdR0uS#5gEHUxHPVoY6ER#8uZP`WG0-XIq7yt`p3hn>^
+> >
+> > diff --git a/tests/data/acpi/q35/DSDT.mmio64 b/tests/data/acpi/q35/DSDT.mmio64
+> > index efd3f1188f2b55da1514212d4be081a61c2a96e9..d8dd702b69cc24a6b58b8eaa79ea02439a2a7dd9 100644
+> > GIT binary patch
+> > delta 33
+> > ocmaFi^3a9LCD<h-QHg<paqmX1|B9R*tTFMyPVoW`lZBN00lUBo5&!@I
+> >
+> > delta 41
+> > wcmaFp^1_A7CD<h-Ly3WbF>)i<e??Az)|mKUr+5MP$wEs0>>_Ld&VC^b00^lI82|tP
+> >
+> > diff --git a/tests/data/acpi/q35/DSDT.numamem b/tests/data/acpi/q35/DSDT.numamem
+> > index 1978b55f1255402bf9bade0b91150b5cb49789a4..f36d22063a6eed4fb107ffd0e10477a2d6d7a983 100644
+> > GIT binary patch
+> > delta 33
+> > pcmZp%`D4xH66_N4N0xzs@!&?THL{#;EHUxHPVoYElMl$+0sy+k3XK2&
+> >
+> > delta 42
+> > xcmexk-D1P#66_MfBFDhM7`l;bjVzZROH6#QQ@ns1%jEsCw(KHo0nUCQ3;^@W3X}i<
+> >
+> > diff --git a/tests/data/acpi/q35/DSDT.tis b/tests/data/acpi/q35/DSDT.tis
+> > index 638de3872673d17b1958497d0e62c83653de1602..203030a61a92c204bb93c43fe79e546471ae2985 100644
+> > GIT binary patch
+> > delta 38
+> > ucmccZaK(YkCD<h-M1g^U@x?~2O|qOGnlbUgPVoW`laI>UZRU~-WC8&31`DbH
+> >
+> > delta 45
+> > zcmccOaNB{)CD<h-T7iLqv1KFICRt8@&6xOLr+5MP$wy`F*hJU@oc%&JGsy)p0RTF+
+> > B45<JB
+> >
+>
 
