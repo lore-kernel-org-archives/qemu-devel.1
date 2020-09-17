@@ -2,125 +2,88 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C32DAC43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:24:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12533C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:25:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58DA4206DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:24:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0116206DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:25:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fhOoSqcU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58DA4206DB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kin2/LuI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0116206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIpDX-0005Mz-Pe
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 04:24:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57974)
+	id 1kIpEG-0006iX-RR
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 04:25:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55110)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIp63-0004j9-Si
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 04:16:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52207
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1kIowp-000178-Oz
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 04:07:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28471)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kIp62-0000Zv-2S
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 04:16:51 -0400
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1kIown-0007LE-V5
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 04:07:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600330609;
+ s=mimecast20190719; t=1600330037;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:autocrypt:autocrypt;
- bh=AcQzhrvQjIT9KYC7r1LaDUKVkaB8DdrGls9ExoTd5MQ=;
- b=fhOoSqcUV7mMSAh8TTf1PHUScbxV0nN1B81M2DcmQ9SyGDgeyG2VayyO130zdr3n47yvBf
- 3od1OK604d28Jjr59IHwJI4EvgqLxX1PSLOLQh4+Ds+UsEhTNeDaP7VDV1C7PSow7GlVJe
- +KeO2+6XwXyUGFdJ0r7KR32OXycOZKU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-528-xiU_SeIyPh2UrU97WH1KtQ-1; Thu, 17 Sep 2020 04:16:45 -0400
-X-MC-Unique: xiU_SeIyPh2UrU97WH1KtQ-1
-Received: by mail-wr1-f70.google.com with SMTP id x15so573763wrm.7
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 01:16:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:to:cc:from:autocrypt:subject:message-id:date
- :user-agent:mime-version:content-language:content-transfer-encoding;
- bh=AcQzhrvQjIT9KYC7r1LaDUKVkaB8DdrGls9ExoTd5MQ=;
- b=fQPqoZdKW29dcJekgZ7c7Fr1RMKQQVISrFC6CuM+UXHCMORruZcqq6HPj1JX++TROP
- L6PgZ8aj0QYrj6uASddhHWm5/XzjoYuP6m22Si1KtNUJnU53Iiz3aQMUFQ5Xqqo1t562
- 7gVur2q+Q4i74IVViAjz7VHuCT4Dzn8cotbn8a0OyD+Fu5eIhZE2wh1I9H0fRtuj+cMz
- 7wIkKTAgGINQc75kKrK0NYpkYhKFRwAxmVKNzTtps2axl0JbYnAIhG3JdMf5Q347mW3B
- TTZNwJyPyYS6ApTZJa7WSRUuHVHowU8QmZdWAlTanTmipFYLhhEAyJ/3+to0rUbedSIG
- 2Q6g==
-X-Gm-Message-State: AOAM531OWiVaDCxVG6YkdzkaJMcIY4Yket7ywU89cvuciRqW8Hu+yPJ3
- qhJJ5I9i5r1crbtGXlauhG6Ju5+XOPQBEpK/s0fiVDl1c39a6FF55BPGNq6fZL8hUVLvQT7DZ4I
- MCtaDDJLI7S0zYAs=
-X-Received: by 2002:a7b:c210:: with SMTP id x16mr8381681wmi.76.1600330603887; 
- Thu, 17 Sep 2020 01:16:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyqAgwF1cT38noWuA66UUOk3ahDsrJJtMdsSdEvYubvflLhnegZkL2hnzf7NoUNPNURd/DABg==
-X-Received: by 2002:a7b:c210:: with SMTP id x16mr8381666wmi.76.1600330603688; 
- Thu, 17 Sep 2020 01:16:43 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id r14sm37773618wrn.56.2020.09.17.01.16.42
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 17 Sep 2020 01:16:43 -0700 (PDT)
-To: Paolo Bonzini <pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Subject: Use patchew to push successfully applied series to GitLab
-Message-ID: <22951108-74c2-a98b-9316-b17c4d8188e0@redhat.com>
-Date: Thu, 17 Sep 2020 10:16:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ in-reply-to:in-reply-to:references:references;
+ bh=SSTF4VUaJ6vpzBt/h1YAA1NBkaNiGyyr2cahE+V+bTk=;
+ b=Kin2/LuIoy0HHlW3GczuujrCfbHIZWvTunLDm/9sfo87+K+/84kTKudVTDt4qAS0YV5FAf
+ xZzWyAWOYhvmI3QzV4oWx/8GIjEzPNRN3480TRfWa3LJQmDjjVYPxqLaUqpLpQaMudVCBD
+ W9s3QSnWPX9e038dmLGCknYFIK6T080=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-112-R7MkopIBMTe80I7VfC8aZg-1; Thu, 17 Sep 2020 04:07:13 -0400
+X-MC-Unique: R7MkopIBMTe80I7VfC8aZg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 665DE100747A;
+ Thu, 17 Sep 2020 08:07:11 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4806E78814;
+ Thu, 17 Sep 2020 08:07:09 +0000 (UTC)
+Date: Thu, 17 Sep 2020 10:07:06 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Ying Fang <fangying1@huawei.com>
+Subject: Re: [RFC PATCH 03/12] target/arm/kvm32: make MPIDR consistent with
+ CPU Topology
+Message-ID: <20200917080706.s4edh2vd2gzjwg6y@kamzik.brq.redhat.com>
+References: <20200917032033.2020-1-fangying1@huawei.com>
+ <20200917032033.2020-4-fangying1@huawei.com>
 MIME-Version: 1.0
+In-Reply-To: <20200917032033.2020-4-fangying1@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 02:30:14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=drjones@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 20:51:18
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
 X-Spam_bar: -----
 X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,29 +96,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: patchew-devel@redhat.com, Thomas Huth <thuth@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com,
+ qemu-devel@nongnu.org, alex.chen@huawei.com, shannon.zhaosl@gmail.com,
+ qemu-arm@nongnu.org, alistair.francis@wdc.com, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+On Thu, Sep 17, 2020 at 11:20:24AM +0800, Ying Fang wrote:
+> MPIDR helps to provide an additional PE identification in a multiprocessor
+> system. This patch adds support for setting MPIDR from userspace, so that
+> MPIDR is consistent with CPU topology configured.
+> 
+> Signed-off-by: Ying Fang <fangying1@huawei.com>
+> ---
+>  target/arm/kvm32.c | 46 ++++++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 38 insertions(+), 8 deletions(-)
+> 
+> diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
+> index 0af46b41c8..85694dc8bf 100644
+> --- a/target/arm/kvm32.c
+> +++ b/target/arm/kvm32.c
 
-patchew is currently pushing successfully applied series
-(using the cover Message-ID as tag) to GitHub.
-This is very handy (no need to apply patches manually):
-https://github.com/patchew-project/qemu/tags
-
-Can we push the same that to an equivalent GitLab account?
-We could then have a script replying to the series if the
-series fails CI. Doing so would save reviewer/tester time
-(I'd rather have a series not failing on our CI tests before
-starting to review/test it).
-
-Thoughts?
+This file no longer exists in mainline. Please rebase the whole series.
 
 Thanks,
-
-Phil.
+drew
 
 
