@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA2DC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 13:56:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E08BC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 13:57:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC48420663
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 13:56:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D71220663
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 13:57:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OkIJ3yn0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC48420663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NnVOV7Zn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D71220663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIuOK-0002Yg-Ud
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 09:56:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34250)
+	id 1kIuPx-0005IC-TR
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 09:57:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34364)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIuM3-0008IO-VZ
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 09:53:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42796)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIuM7-0008On-BW
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 09:53:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25270)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIuLz-00082l-Sf
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 09:53:43 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIuM2-00083c-JT
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 09:53:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600350819;
+ s=mimecast20190719; t=1600350821;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ZLD+Sit25/qmgfx5038iz6MD+ijxOcduhMfIIhwKx9Y=;
- b=OkIJ3yn0rjiJhSlBtItZ56+Ij8Ov5wuB7MLuXsLleHezzNTG+Zd9emEUAQS9MUjD0N+KVp
- OUJJySVAnCenG41tzdFpl7jh3v2fJO1HbRyXwDkPyoQcKgDltz6buV2OfymuhxzMw69n5c
- xFZT2wwh3+1SX/hlQgMFP5Hex5T+MGA=
+ bh=qwyoKzUwKaOUmHybY8aN3Lg4BOl/jco1XTCKerjjwGg=;
+ b=NnVOV7ZncHRr9Z1jP4RapqCdWnvOQj4gyjhPOX6RvqFDfeqr8OjXbUfELLMHAHJ7NsRcVF
+ cMHYnIZj5u5ITvcNcWb8jTHt0hf65rN89HlghrwYB2VwoHAVIfOyl/LMdmhB7DxbN0vobz
+ zaDe042dN+rQ6A/PdoQgOk293+mht3s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-PU9re5w9NLy6BLSD8YvVGQ-1; Thu, 17 Sep 2020 09:53:35 -0400
-X-MC-Unique: PU9re5w9NLy6BLSD8YvVGQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-164-52qU0Hk9OXK2YE6fCBEshA-1; Thu, 17 Sep 2020 09:53:39 -0400
+X-MC-Unique: 52qU0Hk9OXK2YE6fCBEshA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F2CB80732A;
- Thu, 17 Sep 2020 13:53:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8821C64145;
+ Thu, 17 Sep 2020 13:53:38 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
  [10.36.112.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B12DE5DE51;
- Thu, 17 Sep 2020 13:53:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D9F0719D7C;
+ Thu, 17 Sep 2020 13:53:37 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 9F9DF9CBC; Thu, 17 Sep 2020 15:53:23 +0200 (CEST)
+ id 5DFE531F93; Thu, 17 Sep 2020 15:53:24 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/21] seabios: add microvm config, update build rules
-Date: Thu, 17 Sep 2020 15:53:04 +0200
-Message-Id: <20200917135323.18022-3-kraxel@redhat.com>
+Subject: [PULL 17/21] tests/acpi: allow microvm test data updates.
+Date: Thu, 17 Sep 2020 15:53:19 +0200
+Message-Id: <20200917135323.18022-18-kraxel@redhat.com>
 In-Reply-To: <20200917135323.18022-1-kraxel@redhat.com>
 References: <20200917135323.18022-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -107,65 +107,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Sergio Lopez <slp@redhat.com>
-Message-id: 20200915120909.20838-3-kraxel@redhat.com
----
- roms/Makefile               |  5 ++++-
- roms/config.seabios-microvm | 26 ++++++++++++++++++++++++++
- 2 files changed, 30 insertions(+), 1 deletion(-)
- create mode 100644 roms/config.seabios-microvm
+Also add empty test data files.
 
-diff --git a/roms/Makefile b/roms/Makefile
-index 1395a46695be..1489d47350f2 100644
---- a/roms/Makefile
-+++ b/roms/Makefile
-@@ -72,9 +72,12 @@ default help:
- 	@echo "  clean              -- delete the files generated by the previous" \
- 	                              "build targets"
- 
--bios: build-seabios-config-seabios-128k build-seabios-config-seabios-256k
-+bios: build-seabios-config-seabios-128k \
-+		build-seabios-config-seabios-256k \
-+		build-seabios-config-seabios-microvm
- 	cp seabios/builds/seabios-128k/bios.bin ../pc-bios/bios.bin
- 	cp seabios/builds/seabios-256k/bios.bin ../pc-bios/bios-256k.bin
-+	cp seabios/builds/seabios-microvm/bios.bin ../pc-bios/bios-microvm.bin
- 
- vgabios seavgabios: $(patsubst %,seavgabios-%,$(vgabios_variants))
- 
-diff --git a/roms/config.seabios-microvm b/roms/config.seabios-microvm
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 20200915120909.20838-18-kraxel@redhat.com
+---
+ tests/qtest/bios-tables-test-allowed-diff.h | 3 +++
+ tests/data/acpi/microvm/APIC                | 0
+ tests/data/acpi/microvm/DSDT                | 0
+ tests/data/acpi/microvm/FACP                | 0
+ 4 files changed, 3 insertions(+)
+ create mode 100644 tests/data/acpi/microvm/APIC
+ create mode 100644 tests/data/acpi/microvm/DSDT
+ create mode 100644 tests/data/acpi/microvm/FACP
+
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index dfb8523c8bf4..97c3fa621b7f 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1 +1,4 @@
+ /* List of comma-separated changed AML files to ignore */
++"tests/data/acpi/microvm/APIC",
++"tests/data/acpi/microvm/DSDT",
++"tests/data/acpi/microvm/FACP",
+diff --git a/tests/data/acpi/microvm/APIC b/tests/data/acpi/microvm/APIC
 new file mode 100644
-index 000000000000..a253e2edc6ec
---- /dev/null
-+++ b/roms/config.seabios-microvm
-@@ -0,0 +1,26 @@
-+CONFIG_QEMU=y
-+CONFIG_QEMU_HARDWARE=y
-+CONFIG_PERMIT_UNALIGNED_PCIROM=y
-+CONFIG_ROM_SIZE=128
-+CONFIG_XEN=n
-+CONFIG_BOOTSPLASH=n
-+CONFIG_ATA=n
-+CONFIG_AHCI=n
-+CONFIG_SDCARD=n
-+CONFIG_PVSCSI=n
-+CONFIG_ESP_SCSI=n
-+CONFIG_LSI_SCSI=n
-+CONFIG_MEGASAS=n
-+CONFIG_MPT_SCSI=n
-+CONFIG_FLOPPY=n
-+CONFIG_FLASH_FLOPPY=n
-+CONFIG_NVME=n
-+CONFIG_PS2PORT=n
-+CONFIG_USB=n
-+CONFIG_LPT=n
-+CONFIG_RTC_TIMER=n
-+CONFIG_USE_SMM=n
-+CONFIG_PMTIMER=n
-+CONFIG_TCGBIOS=n
-+CONFIG_HARDWARE_IRQ=n
-+CONFIG_ACPI_PARSE=y
+index 000000000000..e69de29bb2d1
+diff --git a/tests/data/acpi/microvm/DSDT b/tests/data/acpi/microvm/DSDT
+new file mode 100644
+index 000000000000..e69de29bb2d1
+diff --git a/tests/data/acpi/microvm/FACP b/tests/data/acpi/microvm/FACP
+new file mode 100644
+index 000000000000..e69de29bb2d1
 -- 
 2.27.0
 
