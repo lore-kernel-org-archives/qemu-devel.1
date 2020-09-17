@@ -7,51 +7,51 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B16A0C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 03:30:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1079EC43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 03:57:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 546B42065D
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 03:30:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 546B42065D
+	by mail.kernel.org (Postfix) with ESMTPS id 735902074B
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 03:57:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 735902074B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIkcw-0000p4-Ei
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 23:30:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47970)
+	id 1kIl2k-0004pq-HP
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 23:57:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54594)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1kIkUS-000579-78; Wed, 16 Sep 2020 23:21:44 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:45244 helo=huawei.com)
+ (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
+ id 1kIl1F-00036I-8s; Wed, 16 Sep 2020 23:55:37 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4704 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1kIkUM-0004Rp-L0; Wed, 16 Sep 2020 23:21:43 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 05F8EEB1067D628429A8;
- Thu, 17 Sep 2020 11:21:18 +0800 (CST)
-Received: from localhost (10.174.185.104) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
- 11:21:07 +0800
-From: Ying Fang <fangying1@huawei.com>
-To: <qemu-devel@nongnu.org>
-Subject: [RFC PATCH 12/12] hw/arm/virt-acpi-build: Enable CPU cache topology
-Date: Thu, 17 Sep 2020 11:20:33 +0800
-Message-ID: <20200917032033.2020-13-fangying1@huawei.com>
-X-Mailer: git-send-email 2.26.0.windows.1
-In-Reply-To: <20200917032033.2020-1-fangying1@huawei.com>
-References: <20200917032033.2020-1-fangying1@huawei.com>
+ (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
+ id 1kIl1C-0008U7-RJ; Wed, 16 Sep 2020 23:55:36 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 50279C795FD683112D79;
+ Thu, 17 Sep 2020 11:55:29 +0800 (CST)
+Received: from localhost (10.174.187.87) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
+ 11:55:22 +0800
+From: zhaolichang <zhaolichang@huawei.com>
+To: <qemu-trivial@nongnu.org>
+Subject: [PATCH V2 04/10] scripts/: fix some comment spelling errors
+Date: Thu, 17 Sep 2020 11:54:07 +0800
+Message-ID: <20200917035413.701-5-zhaolichang@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
+In-Reply-To: <20200917035413.701-1-zhaolichang@huawei.com>
+References: <20200917035413.701-1-zhaolichang@huawei.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [10.174.185.104]
+X-Originating-IP: [10.174.187.87]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32; envelope-from=fangying1@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 23:20:51
+Received-SPF: pass client-ip=45.249.212.190;
+ envelope-from=zhaolichang@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 23:20:53
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -71,195 +71,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com,
- zhang.zhanghailiang@huawei.com, Henglong Fan <fanhenglong@huawei.com>,
- alex.chen@huawei.com, shannon.zhaosl@gmail.com, qemu-arm@nongnu.org,
- alistair.francis@wdc.com, Ying Fang <fangying1@huawei.com>,
- imammedo@redhat.com
+Cc: Peter
+ Maydell <peter.maydell@linaro.org>, zhaolichang <zhaolichang@huawei.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A helper struct AcpiCacheOffset is introduced to describe the offset
-of three level caches. The cache hierarchy is built according to
-ACPI spec v6.3 5.2.29.2. Let's enable CPU cache topology now.
+I found that there are many spelling errors in the comments of qemu,
+so I used the spellcheck tool to check the spelling errors
+and finally found some spelling errors in the scripts folder.
 
-Signed-off-by: Ying Fang <fangying1@huawei.com>
-Signed-off-by: Henglong Fan <fanhenglong@huawei.com>
+Signed-off-by: zhaolichang <zhaolichang@huawei.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/acpi/aml-build.c         | 19 +++++++++-----
- hw/arm/virt-acpi-build.c    | 52 ++++++++++++++++++++++++++++++++-----
- include/hw/acpi/acpi-defs.h |  6 +++++
- include/hw/acpi/aml-build.h |  7 ++---
- 4 files changed, 68 insertions(+), 16 deletions(-)
+ scripts/checkpatch.pl          | 2 +-
+ scripts/clean-header-guards.pl | 2 +-
+ scripts/decodetree.py          | 6 +++---
+ scripts/oss-fuzz/build.sh      | 2 +-
+ scripts/tracetool/__init__.py  | 2 +-
+ 5 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-index 123eb032cd..f8d74f3f10 100644
---- a/hw/acpi/aml-build.c
-+++ b/hw/acpi/aml-build.c
-@@ -1783,27 +1783,32 @@ void build_cache_hierarchy(GArray *tbl,
- /*
-  * ACPI 6.3: 5.2.29.1 Processor hierarchy node structure (Type 0)
-  */
--void build_socket_hierarchy(GArray *tbl, uint32_t parent, uint32_t id)
-+void build_socket_hierarchy(GArray *tbl, uint32_t parent,
-+                            uint32_t offset, uint32_t id)
- {
-     build_append_byte(tbl, 0);          /* Type 0 - processor */
--    build_append_byte(tbl, 20);         /* Length, no private resources */
-+    build_append_byte(tbl, 24);         /* Length, no private resources */
-     build_append_int_noprefix(tbl, 0, 2);  /* Reserved */
-     build_append_int_noprefix(tbl, 1, 4);  /* Flags: Physical package */
-     build_append_int_noprefix(tbl, parent, 4);  /* Parent */
-     build_append_int_noprefix(tbl, id, 4);     /* ACPI processor ID */
--    build_append_int_noprefix(tbl, 0, 4);  /* Number of private resources */
-+    build_append_int_noprefix(tbl, 1, 4);  /*  Number of private resources */
-+    build_append_int_noprefix(tbl, offset, 4);  /* Private resources */
- }
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index bd3faa154c..50910899f2 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -1870,7 +1870,7 @@ sub process {
+ 			substr($s, 0, length($c), '');
  
--void build_processor_hierarchy(GArray *tbl, uint32_t flags,
--                               uint32_t parent, uint32_t id)
-+void build_processor_hierarchy(GArray *tbl, uint32_t flags, uint32_t parent,
-+                               AcpiCacheOffset offset, uint32_t id)
- {
-     build_append_byte(tbl, 0);          /* Type 0 - processor */
--    build_append_byte(tbl, 20);         /* Length, no private resources */
-+    build_append_byte(tbl, 32);         /* Length, no private resources */
-     build_append_int_noprefix(tbl, 0, 2);      /* Reserved */
-     build_append_int_noprefix(tbl, flags, 4);  /* Flags */
-     build_append_int_noprefix(tbl, parent, 4); /* Parent */
-     build_append_int_noprefix(tbl, id, 4);     /* ACPI processor ID */
--    build_append_int_noprefix(tbl, 0, 4);  /* Number of private resources */
-+    build_append_int_noprefix(tbl, 3, 4);  /* Number of private resources */
-+    build_append_int_noprefix(tbl, offset.l1d_offset, 4);/* Private resources */
-+    build_append_int_noprefix(tbl, offset.l1i_offset, 4);/* Private resources */
-+    build_append_int_noprefix(tbl, offset.l2_offset, 4); /* Private resources */
- }
+ 			# Make sure we remove the line prefixes as we have
+-			# none on the first line, and are going to readd them
++			# none on the first line, and are going to re-add them
+ 			# where necessary.
+ 			$s =~ s/\n./\n/gs;
  
- void build_smt_hierarchy(GArray *tbl, uint32_t parent, uint32_t id)
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index b5aa3d3c83..375fb9e24f 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -594,29 +594,69 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-                  "SRAT", table_data->len - srat_start, 3, NULL, NULL);
- }
+diff --git a/scripts/clean-header-guards.pl b/scripts/clean-header-guards.pl
+index f47d673ad5..a6680253b1 100755
+--- a/scripts/clean-header-guards.pl
++++ b/scripts/clean-header-guards.pl
+@@ -19,7 +19,7 @@
+ # Does the following:
+ # - Header files without a recognizable header guard are skipped.
+ # - Clean up any untidy header guards in-place.  Warn if the cleanup
+-#   renames guard symbols, and explain how to find occurences of these
++#   renames guard symbols, and explain how to find occurrences of these
+ #   symbols that may have to be updated manually.
+ # - Warn about duplicate header guard symbols.  To make full use of
+ #   this warning, you should clean up *all* headers in one run.
+diff --git a/scripts/decodetree.py b/scripts/decodetree.py
+index c02de9865b..60fd3b5e5f 100644
+--- a/scripts/decodetree.py
++++ b/scripts/decodetree.py
+@@ -94,7 +94,7 @@ def str_indent(c):
  
--static void build_pptt(GArray *table_data, BIOSLinker *linker, MachineState *ms)
-+static inline void arm_acpi_cache_info(CPUCacheInfo *cpu_cache,
-+                                       AcpiCacheInfo *acpi_cache)
- {
-+    acpi_cache->size = cpu_cache->size;
-+    acpi_cache->sets = cpu_cache->sets;
-+    acpi_cache->associativity = cpu_cache->associativity;
-+    acpi_cache->attributes = cpu_cache->attributes;
-+    acpi_cache->line_size = cpu_cache->line_size;
-+}
-+
-+static void build_pptt(GArray *table_data, BIOSLinker *linker,
-+                       VirtMachineState *vms)
-+{
-+    MachineState *ms = MACHINE(vms);
-     int pptt_start = table_data->len;
-     int uid = 0, cpus = 0, socket;
-     unsigned int smp_cores = ms->smp.cores;
-     unsigned int smp_threads = ms->smp.threads;
-+    AcpiCacheOffset offset;
-+    ARMCPU *cpu = ARM_CPU(qemu_get_cpu(cpus));
-+    AcpiCacheInfo cache_info;
  
-     acpi_data_push(table_data, sizeof(AcpiTableHeader));
+ def str_fields(fields):
+-    """Return a string uniquely identifing FIELDS"""
++    """Return a string uniquely identifying FIELDS"""
+     r = ''
+     for n in sorted(fields.keys()):
+         r += '_' + n
+@@ -814,7 +814,7 @@ def parse_generic(lineno, parent_pat, name, toks):
+     arg = None
+     fmt = None
+     for t in toks:
+-        # '&Foo' gives a format an explcit argument set.
++        # '&Foo' gives a format an explicit argument set.
+         if re.fullmatch(re_arg_ident, t):
+             tt = t[1:]
+             if arg:
+@@ -903,7 +903,7 @@ def parse_generic(lineno, parent_pat, name, toks):
+     elif not (is_format and width == 0) and width != insnwidth:
+         error(lineno, 'definition has {0} bits'.format(width))
  
-     for (socket = 0; cpus < ms->possible_cpus->len; socket++) {
--        uint32_t socket_offset = table_data->len - pptt_start;
-+        uint32_t l3_offset = table_data->len - pptt_start;
-+        uint32_t socket_offset;
-         int core;
+-    # Do not check for fields overlaping fields; one valid usage
++    # Do not check for fields overlapping fields; one valid usage
+     # is to be able to duplicate fields via import.
+     fieldmask = 0
+     for f in flds.values():
+diff --git a/scripts/oss-fuzz/build.sh b/scripts/oss-fuzz/build.sh
+index d16207eb67..0c3ca9e06f 100755
+--- a/scripts/oss-fuzz/build.sh
++++ b/scripts/oss-fuzz/build.sh
+@@ -69,7 +69,7 @@ mkdir -p "$DEST_DIR/lib/"  # Copy the shared libraries here
  
--        build_socket_hierarchy(table_data, 0, socket);
-+        /* L3 cache type structure */
-+        arm_acpi_cache_info(cpu->caches.l3_cache, &cache_info);
-+        build_cache_hierarchy(table_data, 0, &cache_info);
-+
-+        socket_offset = table_data->len - pptt_start;
-+        build_socket_hierarchy(table_data, 0, l3_offset, socket);
+ if ! make "-j$(nproc)" qemu-fuzz-i386; then
+     fatal "Build failed. Please specify a compiler with fuzzing support"\
+-          "using the \$CC and \$CXX environemnt variables"\
++          "using the \$CC and \$CXX environment variables"\
+           "\nFor example: CC=clang CXX=clang++ $0"
+ fi
  
-         for (core = 0; core < smp_cores; core++) {
-             uint32_t core_offset = table_data->len - pptt_start;
-             int thread;
+diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.py
+index 3ccfa1e116..3ee54be223 100644
+--- a/scripts/tracetool/__init__.py
++++ b/scripts/tracetool/__init__.py
+@@ -34,7 +34,7 @@ def error(*lines):
+ def out(*lines, **kwargs):
+     """Write a set of output lines.
  
-+            /* L2 cache tpe structure */
-+            offset.l2_offset = table_data->len - pptt_start;
-+            arm_acpi_cache_info(cpu->caches.l2_cache, &cache_info);
-+            build_cache_hierarchy(table_data, 0, &cache_info);
-+
-+            /* L1d cache type structure */
-+            offset.l1d_offset = table_data->len - pptt_start;
-+            arm_acpi_cache_info(cpu->caches.l1d_cache, &cache_info);
-+            build_cache_hierarchy(table_data, offset.l2_offset, &cache_info);
-+
-+            /* L1i cache type structure */
-+            offset.l1i_offset = table_data->len - pptt_start;
-+            arm_acpi_cache_info(cpu->caches.l1i_cache, &cache_info);
-+            build_cache_hierarchy(table_data, offset.l2_offset, &cache_info);
-+
-+            core_offset = table_data->len - pptt_start;
-             if (smp_threads <= 1) {
--                build_processor_hierarchy(table_data, 2, socket_offset, uid++);
-+                build_processor_hierarchy(table_data, 2, socket_offset,
-+                                          offset, uid++);
-              } else {
--                build_processor_hierarchy(table_data, 0, socket_offset, core);
-+
-+                build_processor_hierarchy(table_data, 0, socket_offset,
-+                                          offset, core);
-                 for (thread = 0; thread < smp_threads; thread++) {
-                     build_smt_hierarchy(table_data, core_offset, uid++);
-                 }
-@@ -892,7 +932,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
- 
-     if (cpu_topology_enabled) {
-         acpi_add_table(table_offsets, tables_blob);
--        build_pptt(tables_blob, tables->linker, ms);
-+        build_pptt(tables_blob, tables->linker, vms);
-     }
- 
-     acpi_add_table(table_offsets, tables_blob);
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index 3df38ab449..e48b7fa506 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -626,4 +626,10 @@ typedef struct AcpiCacheInfo {
-     uint16_t line_size;
- } AcpiCacheInfo;
- 
-+typedef struct AcpiCacheOffset {
-+    uint32_t l1d_offset;
-+    uint32_t l1i_offset;
-+    uint32_t l2_offset;
-+} AcpiCacheOffset;
-+
- #endif
-diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-index ced1ae6a83..984c5dec3b 100644
---- a/include/hw/acpi/aml-build.h
-+++ b/include/hw/acpi/aml-build.h
-@@ -438,10 +438,11 @@ void build_slit(GArray *table_data, BIOSLinker *linker, MachineState *ms);
- void build_cache_hierarchy(GArray *tbl,
-               uint32_t next_level, AcpiCacheInfo *cache_info);
- 
--void build_socket_hierarchy(GArray *tbl, uint32_t parent, uint32_t id);
-+void build_socket_hierarchy(GArray *tbl, uint32_t parent,
-+                            uint32_t offset, uint32_t id);
- 
--void build_processor_hierarchy(GArray *tbl, uint32_t flags,
--                               uint32_t parent, uint32_t id);
-+void build_processor_hierarchy(GArray *tbl, uint32_t flags, uint32_t parent,
-+                               AcpiCacheOffset offset, uint32_t id);
- 
- void build_smt_hierarchy(GArray *tbl, uint32_t parent, uint32_t id);
- 
+-    You can use kwargs as a shorthand for mapping variables when formating all
++    You can use kwargs as a shorthand for mapping variables when formatting all
+     the strings in lines.
+     """
+     lines = [ l % kwargs for l in lines ]
 -- 
-2.23.0
+2.26.2.windows.1
 
 
