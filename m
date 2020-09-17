@@ -2,94 +2,80 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4274FC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:06:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36632C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:07:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C918E21D24
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:06:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iw7d448i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C918E21D24
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B0E91214D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:07:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0E91214D8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIxMa-0008K5-Vi
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 13:06:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60196)
+	id 1kIxNW-0001D0-Mb
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 13:07:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60440)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <abologna@redhat.com>)
- id 1kIxJG-0005I7-KE
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 13:03:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47481
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <abologna@redhat.com>)
- id 1kIxJF-0005Zz-02
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 13:03:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600362179;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=2mo2MqNBsnSdUGZ4o89PbvBJNpPYbOLW5c0subifov0=;
- b=iw7d448iQXEG7IsFcQcrgD5Y+lxD+iewuQYcAuuvhoDWOBwLAvSpo+AgZydefPNUmkhscK
- ibkcAU/4rAbudqGZVKsVzMIj4RwAl6Vga+iCLNyxdhNwvo9HnXyr49A/CQBDyqDFqNIOmr
- 3YWq4+xuyUu/T/MWTIyi+yiDEN+zeNA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-265-rMzbCKlTPiitxwYeF3nyjg-1; Thu, 17 Sep 2020 13:02:42 -0400
-X-MC-Unique: rMzbCKlTPiitxwYeF3nyjg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C58B1107AD64;
- Thu, 17 Sep 2020 17:02:41 +0000 (UTC)
-Received: from harajuku.usersys.redhat.com (unknown [10.40.192.131])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 98EF719D6C;
- Thu, 17 Sep 2020 17:02:35 +0000 (UTC)
-Message-ID: <2a2f4c3504b5c00018907997f52df211b01d1f99.camel@redhat.com>
-Subject: Re: Python 3.5 EOL; when can require 3.6?
-From: Andrea Bolognani <abologna@redhat.com>
-To: "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>
-Date: Thu, 17 Sep 2020 19:02:32 +0200
-In-Reply-To: <20200917163545.GN1597829@redhat.com>
-References: <875z8eupyp.fsf@dusky.pond.sub.org>
- <CAFEAcA8q8J1n2UqsNbHgNwEedA8pZ6fNA7obCR1REN-33nvmkg@mail.gmail.com>
- <d07189e2-0683-2eb9-44e0-a275688fa8b4@redhat.com>
- <9d4363e8-7bb8-8255-9914-6d9bc36cec79@redhat.com>
- <871rj0o1yk.fsf@dusky.pond.sub.org>
- <b679e646f4dd8ebea753892c0cec27e54ba8f407.camel@redhat.com>
- <20200917163545.GN1597829@redhat.com>
-User-Agent: Evolution 3.36.5 (3.36.5-1.fc32)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kIxJy-0006Mh-0Y; Thu, 17 Sep 2020 13:03:46 -0400
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:48151)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kIxJw-0005ek-0C; Thu, 17 Sep 2020 13:03:45 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.108.16.64])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id ABBB762C261F;
+ Thu, 17 Sep 2020 19:03:39 +0200 (CEST)
+Received: from kaod.org (37.59.142.95) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 17 Sep
+ 2020 19:03:38 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-95G001e665840b-41c7-424d-a326-2d6e643fb57f,
+ FF1720B74B3888C93CA5040C1F5ACCC945AC33B8) smtp.auth=clg@kaod.org
+Subject: Re: [PATCH] hw/arm/aspeed: Map the UART5 device unconditionally
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ <qemu-devel@nongnu.org>
+References: <20200905212415.760452-1-f4bug@amsat.org>
+ <e640309b-b694-e815-d64d-40dd453e52ef@amsat.org>
+ <5e27c1f9-6d11-fa62-ba71-0020ce9d595b@kaod.org>
+ <07b21d1d-fb5b-efb0-50f2-54a4b86df444@amsat.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <4648c188-cacc-c532-857c-f0206f60e109@kaod.org>
+Date: Thu, 17 Sep 2020 19:03:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=abologna@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <07b21d1d-fb5b-efb0-50f2-54a4b86df444@amsat.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=abologna@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 02:16:16
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Originating-IP: [37.59.142.95]
+X-ClientProxiedBy: DAG5EX2.mxp5.local (172.16.2.42) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: 3561077f-3dce-4517-a17d-727132410fa7
+X-Ovh-Tracer-Id: 10874785728916392742
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrtdeggdduuddtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfhisehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepjeehtdeviefhgfeugfevjeeiveefvedtvdehhfejleduveejieefhfeffeetfeeunecuffhomhgrihhnpehoiihlrggsshdrohhrghenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehfgegsuhhgsegrmhhsrghtrdhorhhg
+Received-SPF: pass client-ip=79.137.123.220; envelope-from=clg@kaod.org;
+ helo=smtpout1.mo804.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 13:03:40
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -5
+X-Spam_score: -0.6
+X-Spam_bar: /
+X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ RCVD_IN_BL_SPAMCOP_NET=1.347, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,31 +88,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 2020-09-17 at 17:35 +0100, Daniel P. Berrangé wrote:
-> On Thu, Sep 17, 2020 at 06:07:00PM +0200, Andrea Bolognani wrote:
-> > It would be *fantastic* if we could keep the platform support policy
-> > used by QEMU and libvirt as aligned as reasonably possible.
+On 9/17/20 6:57 PM, Philippe Mathieu-Daudé wrote:
+> On 9/16/20 7:51 AM, Cédric Le Goater wrote:
+>> On 9/15/20 7:23 PM, Philippe Mathieu-Daudé wrote:
+>>> ping?
+>>
+>> It's reviewed : 
+>>
+>>   http://patchwork.ozlabs.org/project/qemu-devel/patch/20200905212415.760452-1-f4bug@amsat.org/
+>>
 > 
-> The current QEMU policy was a copy+paste of the same policy I wrote for
-> libvirt originally, just adding OpenBSD/NetBSD.
+> Yes I know :) This is part of my routine to check if a
+> patch hasn't been confirmed to be queued 1 week after the
+> last review, to ping the maintainer (because some
+> automatically flush patches older than 1month in their
+> mailbox).
+
+ooh. That's brutal.
+
+>> I will send a PR when I have more patches.
 > 
-> I've just posted an update for QEMU which matches the latest libvirt
-> policy, again just adding the extra BSDs.
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg06371.html
+> Ah OK. I didn't know you would keep merging the Aspeed
+> patches. Since this was a single patch, I thought it would
+> go via the usual qemu-arm queue from Peter.
 
-That's even better than I hoped for! Thank you so much :)
+sure. It could also. Fine with me. I have only three for the
+moment. 
 
--- 
-Andrea Bolognani / Red Hat / Virtualization
+> No rush, I just wanted to be sure the patch was not lost.
+> Also, once a patch is queued, I understand it is the
+> maintainer responsibility to keep rebasing the patch
+> queued.
 
+yes. I know. I have been taking care of Andrew's ADC patches 
+since 2017 ... cough cough :)
+
+Cheers,
+
+C.
 
