@@ -2,98 +2,63 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD7A3C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:06:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21B7EC35263
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:07:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13C0A2075B
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:06:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RZ3vWpcE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13C0A2075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id CB105221E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:07:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB105221E3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIow4-0007fk-3K
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 04:06:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52774)
+	id 1kIowY-00005C-Q2
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 04:07:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51678)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kIomo-0003Ew-Bp
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:57:02 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43028)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kIomm-0005uX-Lj
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:56:58 -0400
-Received: by mail-wr1-x443.google.com with SMTP id k15so948954wrn.10
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 00:56:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=HL3zRK0nuV3qNcHAHpU0fldw/pUl1Ru8nVonYr0YVZM=;
- b=RZ3vWpcEmpJ0UDZFie0YopmhFjEJZ8hNzMsKpUB8u/4EHsB8C8Zjv/RU+gnNELZhDP
- hF3pQMwRDM5TcL635z3hWV8m9o/Ru+noH0C9B1wptzdafcIbJDkHRMZszEeBOGoTwop6
- g23CJ/ps1ZRBIBhFQQhhahamqo+XbVtk7khMk9Bi4qka3zyDtAlZRD6H7EOsELBgQkLS
- fEYrKR/WE5dfzTYM1DtJ+KoDClj0K0q/jnODOYxV3OOIXwxn826wUtZwi+fT5H10xmYa
- pakBXzLtRIjvuARDgG/WveHOrlVL1eBsZ/QQqDJA/hSYoDAQGIap8/G7JI+4B132y0/9
- /Zbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=HL3zRK0nuV3qNcHAHpU0fldw/pUl1Ru8nVonYr0YVZM=;
- b=TBIV2CZYAglYryWOAKRT9ZqbVJnOJcKeqCc60ADKoMxHkFt0a1pl9I2u9F2QkOvy4D
- kz+t5vHKY15nD2tEZMHaru8MUAFIDLmN/sniBWH3gifIdM+w6l07xIZkprZ/CMF1fRmx
- bFU1Z3N64l6bTrTwVv0e6dFLdyRP9vWgNZTaY5+atwimcbzvg/HO5CowE3PW3agaw3r+
- u0GXY7UY3j6nYFMs4YvRN/GHAkTEgF68Ppx6SozJgraOhNvR8PpYWQmaUMQZKLDf9Tfb
- eSubl4WL1V2V2+5i/jPsvrng9vu/Xx0iowQs6WguSLXmPIoEOVa2mcJnOAL5olEmer/m
- obfA==
-X-Gm-Message-State: AOAM530TDxQcvOI0pseYm5DmvB0eNf9mWErOaGsS8aA3l784DK4z+ar8
- N9AMhN3zORobDRN8Oafemyo=
-X-Google-Smtp-Source: ABdhPJyJTJtOnQIBEp/YJxcUOSVMejGylzWkj3l4DmUs7xaaTJuc4WuL3hey1vA7e7wlnw9/OO8RUQ==
-X-Received: by 2002:adf:e488:: with SMTP id i8mr32670030wrm.116.1600329414267; 
- Thu, 17 Sep 2020 00:56:54 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id 63sm10910765wrc.63.2020.09.17.00.56.53
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 17 Sep 2020 00:56:53 -0700 (PDT)
-Subject: Re: [PATCH V9 0/6] mips: Add Loongson-3 machine support
-To: Huacai Chen <zltjiangshi@gmail.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-References: <1600222344-16808-1-git-send-email-chenhc@lemote.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7c38105a-831f-b306-9250-8d0c43fc4108@amsat.org>
-Date: Thu, 17 Sep 2020 09:56:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
+ id 1kIohW-0004mk-0J; Thu, 17 Sep 2020 03:51:30 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:4757 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
+ id 1kIohQ-0005Mg-P5; Thu, 17 Sep 2020 03:51:29 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 02BB2642F1F42872FD83;
+ Thu, 17 Sep 2020 15:51:21 +0800 (CST)
+Received: from localhost (10.174.187.87) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
+ 15:51:12 +0800
+From: zhaolichang <zhaolichang@huawei.com>
+To: <qemu-trivial@nongnu.org>
+Subject: [PATCH V3 05/10] util/: fix some comment spelling errors
+Date: Thu, 17 Sep 2020 15:50:24 +0800
+Message-ID: <20200917075029.313-6-zhaolichang@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
+In-Reply-To: <20200917075029.313-1-zhaolichang@huawei.com>
+References: <20200917075029.313-1-zhaolichang@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <1600222344-16808-1-git-send-email-chenhc@lemote.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -15
-X-Spam_score: -1.6
-X-Spam_bar: -
-X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.062,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.187.87]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.191;
+ envelope-from=zhaolichang@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 03:37:07
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,52 +71,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Huacai Chen <chenhuacai@gmail.com>, qemu-devel@nongnu.org,
- Jiaxun Yang <jiaxun.yang@flygoat.com>, Huacai Chen <chenhc@lemote.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: zhaolichang <zhaolichang@huawei.com>, Alex Bennee <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Huacai,
+I found that there are many spelling errors in the comments of qemu,
+so I used the spellcheck tool to check the spelling errors
+and finally found some spelling errors in the util folder.
 
-On 9/16/20 4:12 AM, Huacai Chen wrote:
-> Loongson-3 CPU family include Loongson-3A R1/R2/R3/R4 and Loongson-3B
-> R1/R2. Loongson-3A R1 is the oldest and its ISA is the smallest, while
-> Loongson-3A R4 is the newest and its ISA is almost the superset of all
-> others. To reduce complexity, in QEMU we just define two CPU types:
-> 
-> 1, "Loongson-3A1000" CPU which is corresponding to Loongson-3A R1. It is
->    suitable for TCG because Loongson-3A R1 has fewest ASE.
-> 2, "Loongson-3A4000" CPU which is corresponding to Loongson-3A R4. It is
->    suitable for KVM because Loongson-3A R4 has the VZ ASE.
-> 
-[...]
+Signed-off-by: zhaolichang <zhaolichang@huawei.com>
+Reviewed-by: Alex Bennee <alex.bennee@linaro.org>
+---
+ util/osdep.c             | 2 +-
+ util/qemu-progress.c     | 2 +-
+ util/qemu-sockets.c      | 2 +-
+ util/qemu-thread-win32.c | 2 +-
+ util/qht.c               | 2 +-
+ util/trace-events        | 2 +-
+ 6 files changed, 6 insertions(+), 6 deletions(-)
 
-> Of course the upstream kernel is also usable (though it is "unstable"
-> now):
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-> 
-> How to use QEMU/Loongson-3?
-> 1, Download kernel source from the above URL;
-> 2, Build a kernel with arch/mips/configs/loongson3_{def,hpc}config;
-> 3, Boot a Loongson-3A4000 host with this kernel (for KVM mode);
-> 4, Build QEMU-master with this patchset;
-> 5, modprobe kvm (only necessary for KVM mode);
-> 6, Use QEMU with TCG:
->        qemu-system-mips64el -M loongson3-virt,accel=tcg -cpu Loongson-3A1000 -kernel <path_to_kernel> -append ...
->    Use QEMU with KVM:
->        qemu-system-mips64el -M loongson3-virt,accel=kvm -cpu Loongson-3A4000 -kernel <path_to_kernel> -append ...
+diff --git a/util/osdep.c b/util/osdep.c
+index 4829c07ff6..e50dc2214e 100644
+--- a/util/osdep.c
++++ b/util/osdep.c
+@@ -392,7 +392,7 @@ int qemu_unlink(const char *name)
+  * Set errno if fewer than `count' bytes are written.
+  *
+  * This function don't work with non-blocking fd's.
+- * Any of the possibilities with non-bloking fd's is bad:
++ * Any of the possibilities with non-blocking fd's is bad:
+  *   - return a short write (then name is wrong)
+  *   - busy wait adding (errno == EAGAIN) to the loop
+  */
+diff --git a/util/qemu-progress.c b/util/qemu-progress.c
+index 3c2223c1a2..20d51f8c12 100644
+--- a/util/qemu-progress.c
++++ b/util/qemu-progress.c
+@@ -131,7 +131,7 @@ void qemu_progress_end(void)
+ /*
+  * Report progress.
+  * @delta is how much progress we made.
+- * If @max is zero, @delta is an absolut value of the total job done.
++ * If @max is zero, @delta is an absolute value of the total job done.
+  * Else, @delta is a progress delta since the last call, as a fraction
+  * of @max.  I.e. the delta is @delta * @max / 100. This allows
+  * relative accounting of functions which may be a different fraction of
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index b37d288866..99ce2fd5e6 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -416,7 +416,7 @@ static struct addrinfo *inet_parse_connect_saddr(InetSocketAddress *saddr,
+ 
+     /* At least FreeBSD and OS-X 10.6 declare AI_V4MAPPED but
+      * then don't implement it in their getaddrinfo(). Detect
+-     * this and retry without the flag since that's preferrable
++     * this and retry without the flag since that's preferable
+      * to a fatal error
+      */
+     if (rc == EAI_BADFLAGS &&
+diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
+index 56a83333da..d207b0cb58 100644
+--- a/util/qemu-thread-win32.c
++++ b/util/qemu-thread-win32.c
+@@ -289,7 +289,7 @@ void qemu_event_wait(QemuEvent *ev)
+             ResetEvent(ev->event);
+ 
+             /* Tell qemu_event_set that there are waiters.  No need to retry
+-             * because there cannot be a concurent busy->free transition.
++             * because there cannot be a concurrent busy->free transition.
+              * After the CAS, the event will be either set or busy.
+              */
+             if (atomic_cmpxchg(&ev->value, EV_FREE, EV_BUSY) == EV_SET) {
+diff --git a/util/qht.c b/util/qht.c
+index 67e5d5b916..b2e020c398 100644
+--- a/util/qht.c
++++ b/util/qht.c
+@@ -49,7 +49,7 @@
+  * it anymore.
+  *
+  * Writers check for concurrent resizes by comparing ht->map before and after
+- * acquiring their bucket lock. If they don't match, a resize has occured
++ * acquiring their bucket lock. If they don't match, a resize has occurred
+  * while the bucket spinlock was being acquired.
+  *
+  * Related Work:
+diff --git a/util/trace-events b/util/trace-events
+index 4e894aa9c3..24c31803b0 100644
+--- a/util/trace-events
++++ b/util/trace-events
+@@ -28,7 +28,7 @@ qemu_file_monitor_add_watch(void *mon, const char *dirpath, const char *filename
+ qemu_file_monitor_remove_watch(void *mon, const char *dirpath, int64_t id) "File monitor %p remove watch dir='%s' id=%" PRId64
+ qemu_file_monitor_new(void *mon, int fd) "File monitor %p created fd=%d"
+ qemu_file_monitor_enable_watch(void *mon, const char *dirpath, int id) "File monitor %p enable watch dir='%s' id=%u"
+-qemu_file_monitor_disable_watch(void *mon, const char *dirpath, int id) "Fle monitor %p disable watch dir='%s' id=%u"
++qemu_file_monitor_disable_watch(void *mon, const char *dirpath, int id) "File monitor %p disable watch dir='%s' id=%u"
+ qemu_file_monitor_event(void *mon, const char *dirpath, const char *filename, int mask, unsigned int id) "File monitor %p event dir='%s' file='%s' mask=0x%x id=%u"
+ qemu_file_monitor_dispatch(void *mon, const char *dirpath, const char *filename, int ev, void *cb, void *opaque, int64_t id) "File monitor %p dispatch dir='%s' file='%s' ev=%d cb=%p opaque=%p id=%" PRId64
+ 
+-- 
+2.26.2.windows.1
 
-Can you add a KVM-only build CI job?
-Simply building, not running test, as there is no MIPS CI.
-
-See for example commit 41e1f0e2256 (".travis.yml: Add a KVM-only
-s390x job"), but add it to GitLab instead.
-
-Thanks!
-
-Phil.
 
