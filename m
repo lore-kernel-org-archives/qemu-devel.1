@@ -2,88 +2,137 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85367C43465
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 20:59:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CD2CC43463
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 20:59:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA4952087D
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 20:59:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB0FF2087D
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 20:59:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fqL1fVEq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA4952087D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=panacorp.onmicrosoft.com header.i=@panacorp.onmicrosoft.com header.b="ucJgdHTc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB0FF2087D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=panasonic.aero
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJ10B-0002Xf-Oh
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 16:59:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53860)
+	id 1kJ10C-0002Yp-T0
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 16:59:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37202)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <shashi.mallela@linaro.org>)
- id 1kIyOs-00084D-74
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 14:12:54 -0400
-Received: from mail-qv1-xf41.google.com ([2607:f8b0:4864:20::f41]:43383)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <shashi.mallela@linaro.org>)
- id 1kIyOp-0007XY-Lm
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 14:12:53 -0400
-Received: by mail-qv1-xf41.google.com with SMTP id cr8so1451438qvb.10
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 11:12:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id;
- bh=vi2tBTnmk/vRLvVMLOo5DMMva4xANKkHA12Ad3xVztQ=;
- b=fqL1fVEqe7Zih+tQ3kLIVMMYFsGRcgpTgXYg/PZI0AIPYqXaM05W98UmkfFJKUNz6a
- g2cCKABTwR6p4a2T0zIPp1aeOR+UDkdh9Mfy47KCzOcx+KcR+7MwWAEaEIHF9pX2HB2j
- dNC75izYVS36DVZj6hFcCLO9rZ7CKdUwkoqwsXHGwIUVkx5TM7/ZAmyjDDlLJuhmlsQn
- 4YPj/X6Kpa36NujL4fSnzTO2QMWIjw4pmDr9vODvlIA1dRpRP4vlbmEhg9BcZ05xLjds
- /7+aEZZjmKY8j/4Fv4Ll1/2aNZ+ntaeonCN1dBYWG5Gw5GFs8oO0NOv+6jbB1Ka0JVly
- +o/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=vi2tBTnmk/vRLvVMLOo5DMMva4xANKkHA12Ad3xVztQ=;
- b=jhYnJeOrEriQ9mZxkzi4dlSPnE3upJtNC0yCogS7VRk2mxPmvQWx1S+CfSkpZB0zbz
- xfDnDRgYWUb0jzy+Y9B75BxQ745P77VWltlK+GP/HbXqPXu5AMVw13/sFgZIXZHDNg5r
- /ctKjZaXuwPXYSeiAdb8peqQPqgwbya+QPF5o17cLnpVxeUzwAmwk/d2/g8HlBtJvKuW
- 6Eb0TMBxKtIi4Xs6ftJ96Bno4Xe0mSZuP+T4OYYG2KsT9zTXTPQjtPJC5D0+eDNx0d1a
- P+VY5GA/LUK+szA5NC+82X0m3vqEEnqVzqQBl/SmQ2OHQbuLYI1WUSk5/sxpgSE5LD9v
- 8R2Q==
-X-Gm-Message-State: AOAM533T9SAmonOr5Q9ZkjhpF1addSsCEVq3eaTF0MTleLVuUKO24WLy
- nyBokEF+TSb6VjYpOuhHQlDOgQ==
-X-Google-Smtp-Source: ABdhPJzTUGLMhup8I8Ypbo47Gfw46PYjFeVJHjdCnMBzbpa33+QqQP1w+iHihZ9CojzuHSHSzZR80Q==
-X-Received: by 2002:a0c:eac5:: with SMTP id y5mr29960099qvp.2.1600366367952;
- Thu, 17 Sep 2020 11:12:47 -0700 (PDT)
-Received: from master.hitronhub.home ([2607:fea8:e2a0:e950::661])
- by smtp.googlemail.com with ESMTPSA id s192sm364556qke.50.2020.09.17.11.12.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Sep 2020 11:12:47 -0700 (PDT)
-From: Shashi Mallela <shashi.mallela@linaro.org>
-To: peter.maydell@linaro.org,
-	leif@nuviainc.com,
-	rad@semihalf.com
-Subject: [PATCH] hw/watchdog: Implement generic watchdog device model as per
- ARM BSAv0.9 hw/arm/sbsa-ref : Include SBSA watchdog device in sbsa-ref
- platform
-Date: Thu, 17 Sep 2020 14:12:45 -0400
-Message-Id: <20200917181245.132819-1-shashi.mallela@linaro.org>
-X-Mailer: git-send-email 2.18.4
-Received-SPF: pass client-ip=2607:f8b0:4864:20::f41;
- envelope-from=shashi.mallela@linaro.org; helo=mail-qv1-xf41.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1)
+ (envelope-from <prvs=35291cd0ec=david.aghaian@panasonic.aero>)
+ id 1kJ0Rx-0000i2-TY; Thu, 17 Sep 2020 16:24:13 -0400
+Received: from mail13.panasonic.aero ([199.21.163.153]:53202)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=35291cd0ec=david.aghaian@panasonic.aero>)
+ id 1kJ0Rv-00013u-Se; Thu, 17 Sep 2020 16:24:13 -0400
+Received: from pps.filterd (ppagent-sna03.mascorp.com [127.0.0.1])
+ by ppagent-sna03.mascorp.com (8.16.0.42/8.16.0.42) with SMTP id 08HKKZRg026079;
+ Thu, 17 Sep 2020 13:24:07 -0700
+Received: from mail-sna00a.mascorp.com ([10.139.50.244])
+ by ppagent-sna03.mascorp.com with ESMTP id 33k5rfhw18-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+ Thu, 17 Sep 2020 13:24:07 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.172)
+ by mail.panasonic.aero (10.139.50.26) with Microsoft SMTP Server (TLS) id
+ 14.3.487.0; Thu, 17 Sep 2020 13:24:06 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Px2hFT3/9+B6wb7+NNxLTy7bGbggn141+FT4bmZuwoIgQE4rd58+7yDZ5k4kf2oehKp7wzVqizCipU0bDNijSJR7utpLFxQFewItPyfU156BPWa+P4BD+XXwiRlRCYw42aHa1mxtfFdBDLTwdXEl9sltBa3IMlJX/eOyvUqapHGe4GnkbtH+aBdX8S804FU2ptBL2p1l7e44MrJSnnzKTdnw5GWLp+0iQwP17eNRFfpcTgZdAqFcb/6TS0G6Xb/ZdaJ0B8kEOeXfgfskm5sf8Y3drwVGelJHavPcH9qw5Obk6I+pftHzU3rTRODS7xWZ9NPR9D1kQ6CHuqfpHylkWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JebERAzjc3+XXTQ6KFpraIvIfunZKYH0EFcfROmDNSs=;
+ b=SLd/peWcBOdlW6CX74Hk95PnqXeJ/vur9+K/rV/rlVmg6xIO24PZ1im1SyU5n1wHgQ26UHy6i5Yp9vSgYH/di36dphHhxTkPcyOusmfmlZ1VG1SHnIxPJ1ZlGeJGhpIfIWWhEUmwYnzGpj/82L7krAvb3scuyTXMBs3Vc8HaXwdqHTeCCLro7zKikSPTm9JfzOO6RVjsix93TzC341KUEUtd1L14ZLPK3+Gda2aJkc8pClnm1BBzKwmWw85nTjpnYQjoOpTgZCOP4qHQ/QSebh64LqMDzefUU+QBtJT2wcn5hBVBu8s6oA8DdOaZQhOS8XwyN6HwcN5QNgWd7A2KiQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=panasonic.aero; dmarc=pass action=none
+ header.from=panasonic.aero; dkim=pass header.d=panasonic.aero; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=panacorp.onmicrosoft.com; s=selector1-panacorp-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JebERAzjc3+XXTQ6KFpraIvIfunZKYH0EFcfROmDNSs=;
+ b=ucJgdHTcujAhL2S/UwC4t2n5Sbwzm+7D2IRnUpKwQ7wa/02fyEfIb96rBb80dvPwBVtR36+hE9OKUmIFTlYf05aG+3SCHRYwzllkVL4ZonKJ4XKb89ATGVLMeZNuCK4KRwrIaj+VeIMg/qDYTnJmwJJd+IUn9t6G5apPFkafcP8=
+Received: from BY5PR10MB4193.namprd10.prod.outlook.com (2603:10b6:a03:202::22)
+ by BYAPR10MB2472.namprd10.prod.outlook.com (2603:10b6:a02:aa::18)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.15; Thu, 17 Sep
+ 2020 20:24:03 +0000
+Received: from BY5PR10MB4193.namprd10.prod.outlook.com
+ ([fe80::3c4e:c2d9:f8ed:d7e9]) by BY5PR10MB4193.namprd10.prod.outlook.com
+ ([fe80::3c4e:c2d9:f8ed:d7e9%5]) with mapi id 15.20.3391.015; Thu, 17 Sep 2020
+ 20:24:03 +0000
+From: David Aghaian <David.Aghaian@panasonic.aero>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [Qemu-arm] Assigning sd-card to specific SD-bus with Sabrelite
+ Machine
+Thread-Topic: [Qemu-arm] Assigning sd-card to specific SD-bus with Sabrelite
+ Machine
+Thread-Index: AQHWjR9QvoXsXm/RpUOqOKQnA64yXKltPk2A//+TE4A=
+Date: Thu, 17 Sep 2020 20:24:03 +0000
+Message-ID: <5C0C8776-3BDE-4E8D-9A4A-32B4EB6B46EE@panasonic.aero>
+References: <3FA3CCC0-72A3-42EB-A12B-7FA0A30E106F@panasonic.aero>
+ <CAFEAcA_PFGc2Ka-egqYqzMq0Nu_aRiNUPif0yntg4L56UTi7MQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA_PFGc2Ka-egqYqzMq0Nu_aRiNUPif0yntg4L56UTi7MQ@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: linaro.org; dkim=none (message not signed)
+ header.d=none;linaro.org; dmarc=none action=none header.from=panasonic.aero;
+x-originating-ip: [47.157.246.154]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 9c0203dc-7283-44f9-4089-08d85b479eb2
+x-ms-traffictypediagnostic: BYAPR10MB2472:
+x-microsoft-antispam-prvs: <BYAPR10MB247206285768E20F1075E60C923E0@BYAPR10MB2472.namprd10.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ZwKzSYY4kfTs5Yn67TEdbJZvT2XGspZCFMdH/jVBtx1iW6+9Y+P5E4tdOk9B7G5A3vGYJtkPjS+sS+u+OApaNFjHwSbgktQlR8KnfA3VD5ljzy5W7mRQIhjlolp1nN72mfio323qtUfCWWwXRKgHkI64FLBeqA7O7578UwZ7evdFUXblnFhs7bSTVMQgjx0kJR1KIMRcxvEwOyUEuuEl75jmfEkvTL+b/YBUpcNKgcmRZCDOGHWxBdfzvp3NpX2Db7dOu3dt0i2VLoQ7s81+2xciBUtsmTDj+HUQGFHNYPHFrMNdZaFvQv1Umf/beLcIn/jsD8fvXFnfPr6FFVTIVJE3C/R5Gre13mkGD3Q4/RMCTJE/kZu06jpk4FHczWiy
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:BY5PR10MB4193.namprd10.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(396003)(376002)(346002)(136003)(39850400004)(366004)(83380400001)(33656002)(71200400001)(66574015)(6916009)(132210200001)(4326008)(5660300002)(36756003)(86362001)(478600001)(2616005)(26005)(186003)(6512007)(2906002)(6506007)(316002)(66946007)(76116006)(8676002)(54906003)(66446008)(64756008)(66556008)(66476007)(6486002)(8936002);
+ DIR:OUT; SFP:1101; 
+x-ms-exchange-antispam-messagedata: dkHZiC+yub6PwG1RA2ingyU0nIzS8W+0FcyV0u21h/gKPN4RHMomML3aQEy6Hc9yhXJ3Bxb5B3RxEWM6WgwVnYaGSgJafjPEibR+M5IRqq9cwlOAwitWLEIjVlFbt3AMWNI7ppQpx7KVpOFnZlIJf5/zkAn9+PIMvLa3ytgbX1FBrkYpu+nQpKGRc2yC3THIHLmEkN36fHWPKbE4sAuSZuYPG2CQgUkAKm9fx3qbah87MEDaDQOcAg8Sys8isBw7qZkczr759X30WRWq5++7CH56EN2gHJdzNbHIKyRkWqRfNWOJ1igMI55iTTBECNkCOkrci7okRGxwkCW/njCZkuuYnaBlV5iNQWi2A4Q083z5U3NQ/nB315xuaqUk3EMiXwmg/QIdWvJfMyQPI33gyP6B3kIWjkJF2dKZBI0o2s0O6WTcj4KAcQ4VBtk00IdXAcmOM28sKCUn3fuIornm7wh5dKnHeFWwZzQEN8b1evm5a/K5sfaV930pxDasXgMS9fM+OxytjoPFkD5XIujLYR73fYRQckOAtXU5CIKHhUMutCyaUKITssCPtwAsQ0tr2xQvrAklQgzSZ1qx/IBhMwYLMAkhLZ51T69sdPiejkssLHfY2khfO6QIBLI1GeSN1cF296iTD7uUYlTuSa/wqw==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EE39C64EF90DAD4B8ED31E499DF4BDF5@namprd10.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR10MB4193.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9c0203dc-7283-44f9-4089-08d85b479eb2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Sep 2020 20:24:03.4440 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 10bbb247-08df-4ad3-a55e-47be7693b1d1
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: oUYeuzszBluUVeLVr3FNHnVtMOpKH0en5+Bwkt6pU8cI7zBzOozflZhV4K087v22lVCQVP1afD5A4KzRbOpHqxzjDbNgxyUA4/id62vqfQQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR10MB2472
+X-OriginatorOrg: panasonic.aero
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-17_17:2020-09-16,
+ 2020-09-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0
+ suspectscore=0 mlxscore=0 adultscore=0 malwarescore=0 phishscore=0
+ spamscore=0 mlxlogscore=999 impostorscore=0 clxscore=1011
+ priorityscore=1501 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2006250000 definitions=main-2009170149
+Received-SPF: pass client-ip=199.21.163.153;
+ envelope-from=prvs=35291cd0ec=david.aghaian@panasonic.aero;
+ helo=mail13.panasonic.aero
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 16:24:10
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-Mailman-Approved-At: Thu, 17 Sep 2020 16:57:34 -0400
@@ -98,550 +147,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Jean-Christophe DUBOIS <jcd@tribudubois.net>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Shashi Mallela <shashi.mallela@linaro.org>
----
- hw/arm/Kconfig                      |   1 +
- hw/arm/sbsa-ref.c                   |  23 ++
- hw/watchdog/Kconfig                 |   4 +
- hw/watchdog/meson.build             |   1 +
- hw/watchdog/wdt_sbsa_gwdt.c         | 343 ++++++++++++++++++++++++++++
- include/hw/watchdog/wdt_sbsa_gwdt.h |  68 ++++++
- 6 files changed, 440 insertions(+)
- create mode 100644 hw/watchdog/wdt_sbsa_gwdt.c
- create mode 100644 include/hw/watchdog/wdt_sbsa_gwdt.h
-
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index f303c6bead25..6b97e64595d3 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -210,6 +210,7 @@ config SBSA_REF
-     select PL031 # RTC
-     select PL061 # GPIO
-     select USB_EHCI_SYSBUS
-+    select WDT_SBSA_GWDT
- 
- config SABRELITE
-     bool
-diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
-index ac68b4640d0d..652079a12e37 100644
---- a/hw/arm/sbsa-ref.c
-+++ b/hw/arm/sbsa-ref.c
-@@ -40,6 +40,7 @@
- #include "hw/qdev-properties.h"
- #include "hw/usb.h"
- #include "hw/char/pl011.h"
-+#include "hw/watchdog/wdt_sbsa_gwdt.h"
- #include "net/net.h"
- #include "qom/object.h"
- 
-@@ -64,6 +65,9 @@ enum {
-     SBSA_GIC_DIST,
-     SBSA_GIC_REDIST,
-     SBSA_SECURE_EC,
-+    SBSA_GWDT,
-+    SBSA_GWDT_REFRESH,
-+    SBSA_GWDT_CONTROL,
-     SBSA_SMMU,
-     SBSA_UART,
-     SBSA_RTC,
-@@ -111,6 +115,8 @@ static const MemMapEntry sbsa_ref_memmap[] = {
-     [SBSA_GIC_DIST] =           { 0x40060000, 0x00010000 },
-     [SBSA_GIC_REDIST] =         { 0x40080000, 0x04000000 },
-     [SBSA_SECURE_EC] =          { 0x50000000, 0x00001000 },
-+    [SBSA_GWDT_REFRESH] =       { 0x50010000, 0x00001000 },
-+    [SBSA_GWDT_CONTROL] =       { 0x50011000, 0x00001000 },
-     [SBSA_UART] =               { 0x60000000, 0x00001000 },
-     [SBSA_RTC] =                { 0x60010000, 0x00001000 },
-     [SBSA_GPIO] =               { 0x60020000, 0x00001000 },
-@@ -140,6 +146,7 @@ static const int sbsa_ref_irqmap[] = {
-     [SBSA_SECURE_UART_MM] = 9,
-     [SBSA_AHCI] = 10,
-     [SBSA_EHCI] = 11,
-+    [SBSA_GWDT] = 12,
- };
- 
- static uint64_t sbsa_ref_cpu_mp_affinity(SBSAMachineState *sms, int idx)
-@@ -454,6 +461,20 @@ static void create_rtc(const SBSAMachineState *sms)
-     sysbus_create_simple("pl031", base, qdev_get_gpio_in(sms->gic, irq));
- }
- 
-+static void create_wdt(const SBSAMachineState *sms)
-+{
-+    hwaddr rbase = sbsa_ref_memmap[SBSA_GWDT_REFRESH].base;
-+    hwaddr cbase = sbsa_ref_memmap[SBSA_GWDT_CONTROL].base;
-+    DeviceState *dev = qdev_new(TYPE_WDT_SBSA_GWDT);
-+    SysBusDevice *s = SYS_BUS_DEVICE(dev);
-+    int irq = sbsa_ref_irqmap[SBSA_GWDT];
-+
-+    sysbus_realize_and_unref(s, &error_fatal);
-+    sysbus_mmio_map(s, 0, rbase);
-+    sysbus_mmio_map(s, 1, cbase);
-+    sysbus_connect_irq(s, 0, qdev_get_gpio_in(sms->gic, irq));
-+}
-+
- static DeviceState *gpio_key_dev;
- static void sbsa_ref_powerdown_req(Notifier *n, void *opaque)
- {
-@@ -737,6 +758,8 @@ static void sbsa_ref_init(MachineState *machine)
- 
-     create_rtc(sms);
- 
-+    create_wdt(sms);
-+
-     create_gpio(sms);
- 
-     create_ahci(sms);
-diff --git a/hw/watchdog/Kconfig b/hw/watchdog/Kconfig
-index 293209b291d6..94ac0d5b76b1 100644
---- a/hw/watchdog/Kconfig
-+++ b/hw/watchdog/Kconfig
-@@ -17,3 +17,7 @@ config WDT_DIAG288
- 
- config WDT_IMX2
-     bool
-+
-+config WDT_SBSA_GWDT
-+    bool
-+    default y if SBSA_REF
-\ No newline at end of file
-diff --git a/hw/watchdog/meson.build b/hw/watchdog/meson.build
-index 9b8725e64288..a9a23307acfe 100644
---- a/hw/watchdog/meson.build
-+++ b/hw/watchdog/meson.build
-@@ -5,3 +5,4 @@ softmmu_ss.add(when: 'CONFIG_WDT_IB700', if_true: files('wdt_ib700.c'))
- softmmu_ss.add(when: 'CONFIG_WDT_DIAG288', if_true: files('wdt_diag288.c'))
- softmmu_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('wdt_aspeed.c'))
- softmmu_ss.add(when: 'CONFIG_WDT_IMX2', if_true: files('wdt_imx2.c'))
-+softmmu_ss.add(when: 'CONFIG_WDT_SBSA_GWDT', if_true: files('wdt_sbsa_gwdt.c'))
-diff --git a/hw/watchdog/wdt_sbsa_gwdt.c b/hw/watchdog/wdt_sbsa_gwdt.c
-new file mode 100644
-index 000000000000..eb3be0862cf1
---- /dev/null
-+++ b/hw/watchdog/wdt_sbsa_gwdt.c
-@@ -0,0 +1,343 @@
-+/*
-+ * Generic watchdog device model for SBSA
-+ *
-+ * Copyright Linaro.org 2020
-+ *
-+ * Authors:
-+ *  Shashi Mallela <shashi.mallela@linaro.org>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at your
-+ * option) any later version.  See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "sysemu/reset.h"
-+#include "sysemu/watchdog.h"
-+#include "hw/watchdog/wdt_sbsa_gwdt.h"
-+#include "qemu/timer.h"
-+#include "migration/vmstate.h"
-+#include "qemu/log.h"
-+#include "qemu/module.h"
-+
-+static WatchdogTimerModel model = {
-+    .wdt_name = TYPE_WDT_SBSA_GWDT,
-+    .wdt_description = "sbsa_gwdt device for sbsa_ref platform",
-+};
-+
-+static const VMStateDescription vmstate_sbsa_gwdt = {
-+    .name = "vmstate_sbsa_gwdt",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_TIMER_PTR(timer, SBSA_GWDTState),
-+        VMSTATE_BOOL(enabled, SBSA_GWDTState),
-+        VMSTATE_BOOL(ws0, SBSA_GWDTState),
-+        VMSTATE_BOOL(ws1, SBSA_GWDTState),
-+        VMSTATE_UINT32(wrr, SBSA_GWDTState),
-+        VMSTATE_UINT32(wcs, SBSA_GWDTState),
-+        VMSTATE_UINT32(worl, SBSA_GWDTState),
-+        VMSTATE_UINT32(woru, SBSA_GWDTState),
-+        VMSTATE_UINT32(wcvl, SBSA_GWDTState),
-+        VMSTATE_UINT32(wcvu, SBSA_GWDTState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static uint64_t sbsa_gwdt_rread(void *opaque, hwaddr addr, unsigned int size)
-+{
-+    uint32_t ret;
-+
-+    if (addr == SBSA_GWDT_WRR) {
-+        /* watch refresh read has no effect and returns 0 */
-+        ret = 0;
-+    } else {
-+        fprintf(stderr, "bad address in refresh frame read : 0x%x\n",
-+                      (int)addr);
-+    }
-+    return ret;
-+}
-+
-+static uint64_t sbsa_gwdt_read(void *opaque, hwaddr addr, unsigned int size)
-+{
-+    SBSA_GWDTState *s = SBSA_GWDT(opaque);
-+    uint32_t ret = 0;
-+
-+    switch (addr) {
-+    case SBSA_GWDT_WCS:
-+        ret = s->wcs;
-+        break;
-+    case SBSA_GWDT_WOR:
-+        ret = s->worl;
-+        break;
-+    case SBSA_GWDT_WORU:
-+         ret = s->woru;
-+         break;
-+    case SBSA_GWDT_WCV:
-+        ret = s->wcvl;
-+        break;
-+    case SBSA_GWDT_WCVU:
-+        ret = s->wcvu;
-+        break;
-+    case SBSA_GWDT_W_IIDR:
-+        ret = s->id;
-+        break;
-+    default:
-+        fprintf(stderr, "bad address in control frame read : 0x%x\n",
-+                         (int)addr);
-+    }
-+    return ret;
-+}
-+
-+static void sbsa_gwdt_update_timer(SBSA_GWDTState *s, bool refresh,
-+                                   bool expired)
-+{
-+    uint64_t timeout = 0;
-+
-+    if (s->enabled) {
-+        if ((refresh) || (expired && !s->ws0)) {
-+            /*
-+             * Extract the upper 16 bits from woru & 32 bits from worl
-+             * registers to construct the 48 bit offset value
-+             */
-+            timeout = s->woru & SBSA_GWDT_WOR_MASK;
-+            timeout <<= 32;
-+            timeout |= s->worl;
-+            timeout += qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+
-+            /* store the current timeout value into compare registers */
-+            s->wcvu = timeout >> 32;
-+            s->wcvl = timeout;
-+        } else {
-+            timeout = s->wcvu;
-+            timeout <<= 32;
-+            timeout |= s->wcvl;
-+        }
-+
-+        if (!s->ws0) {
-+            timer_del(s->timer);
-+            timer_mod(s->ptimer,
-+                       timeout * NANOSECONDS_PER_SECOND);
-+        } else {
-+            timer_del(s->ptimer);
-+            timer_mod(s->timer,
-+                       timeout * NANOSECONDS_PER_SECOND);
-+        }
-+    } else {
-+        timer_del(s->ptimer);
-+        timer_del(s->timer);
-+    }
-+}
-+
-+static void sbsa_gwdt_rwrite(void *opaque, hwaddr offset, uint64_t data,
-+                             unsigned size) {
-+    SBSA_GWDTState *s = SBSA_GWDT(opaque);
-+
-+    if (offset == SBSA_GWDT_WRR) {
-+        s->wrr = data;
-+        s->wcs &= ~SBSA_GWDT_WCS_WS0;
-+        s->wcs &= ~SBSA_GWDT_WCS_WS1;
-+        s->ws0 = false;
-+        s->ws1 = false;
-+        sbsa_gwdt_update_timer(s, true , false);
-+    } else {
-+        fprintf(stderr, "bad address in refresh frame write : 0x%x\n",
-+                        (int)offset);
-+    }
-+}
-+
-+static void sbsa_gwdt_write(void *opaque, hwaddr offset, uint64_t data,
-+                             unsigned size) {
-+    SBSA_GWDTState *s = SBSA_GWDT(opaque);
-+    bool enable;
-+
-+    switch (offset) {
-+    case SBSA_GWDT_WCS:
-+        enable = data & SBSA_GWDT_WCS_EN;
-+        if (enable) {
-+            s->wcs |= SBSA_GWDT_WCS_EN;
-+            s->enabled = true;
-+        } else {
-+            s->wcs &= ~SBSA_GWDT_WCS_EN;
-+            s->enabled = false;
-+            s->ws0 = false;
-+            s->ws1 = false;
-+        }
-+        sbsa_gwdt_update_timer(s, false, false);
-+        break;
-+
-+    case SBSA_GWDT_WOR:
-+        s->worl = data;
-+        /*
-+         * TODO:- setting woru to 0 and triggering update timer(below) is a
-+         * temporary workaround to handle current linux driver which is
-+         * based on earlier version of BSA specification.Once the linux
-+         * driver is updated to BSA v0.9 will remove these next 2 lines.
-+         */
-+        s->woru = 0;
-+        sbsa_gwdt_update_timer(s, true , false);
-+        break;
-+
-+    case SBSA_GWDT_WORU:
-+        s->woru = data;
-+        sbsa_gwdt_update_timer(s, true , false);
-+        break;
-+
-+    case SBSA_GWDT_WCV:
-+        s->wcvl = data;
-+        break;
-+
-+    case SBSA_GWDT_WCVU:
-+        s->wcvu = data;
-+        break;
-+
-+    default:
-+        fprintf(stderr, "bad address in control frame write : 0x%x\n",
-+                (int)offset);
-+    }
-+    return;
-+}
-+
-+static void wdt_sbsa_gwdt_reset(DeviceState *dev)
-+{
-+    SBSA_GWDTState *s = SBSA_GWDT(dev);
-+
-+    timer_del(s->ptimer);
-+    timer_del(s->timer);
-+
-+    s->enabled = false;
-+    s->ws0 = false;
-+    s->ws1 = false;
-+    s->wcs &= ~SBSA_GWDT_WCS_EN;
-+    s->wcs &= ~SBSA_GWDT_WCS_WS0;
-+    s->wcs &= ~SBSA_GWDT_WCS_WS1;
-+    s->wcvl = 0;
-+    s->wcvu = 0;
-+    s->worl = 0;
-+    s->woru = 0;
-+    s->id = SBSA_GWDT_ID;
-+}
-+
-+static void sbsa_gwdt_reset(void *opaque)
-+{
-+    DeviceState *sbsa_gwdt = opaque;
-+
-+    wdt_sbsa_gwdt_reset(sbsa_gwdt);
-+}
-+
-+static void sbsa_gwdt_timer_sysinterrupt(void *opaque)
-+{
-+    SBSA_GWDTState *s = SBSA_GWDT(opaque);
-+
-+    s->wcs |= SBSA_GWDT_WCS_WS0;
-+    s->ws0 = true;
-+    qemu_set_irq(s->irq, 1);
-+    sbsa_gwdt_update_timer(s, false, true);
-+}
-+
-+static void sbsa_gwdt_timer_sysreset(void *dev)
-+{
-+    SBSA_GWDTState *s = SBSA_GWDT(dev);
-+    s->wcs |= SBSA_GWDT_WCS_WS1;
-+    s->ws1 = true;
-+    qemu_log_mask(CPU_LOG_RESET, "Watchdog timer expired.\n");
-+    /*
-+     * Reset the watchdog only if the guest gets notified about
-+     * expiry. watchdog_perform_action() may temporarily relinquish
-+     * the BQL; reset before triggering the action to avoid races with
-+     * sbsa_gwdt instructions.
-+     */
-+    switch (get_watchdog_action()) {
-+    case WATCHDOG_ACTION_DEBUG:
-+    case WATCHDOG_ACTION_NONE:
-+    case WATCHDOG_ACTION_PAUSE:
-+        break;
-+    default:
-+        wdt_sbsa_gwdt_reset(dev);
-+    }
-+    watchdog_perform_action();
-+}
-+
-+static const MemoryRegionOps sbsa_gwdt_rops = {
-+    .read = sbsa_gwdt_rread,
-+    .write = sbsa_gwdt_rwrite,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .valid.min_access_size = 4,
-+    .valid.max_access_size = 4,
-+    .valid.unaligned = false,
-+};
-+
-+static const MemoryRegionOps sbsa_gwdt_ops = {
-+    .read = sbsa_gwdt_read,
-+    .write = sbsa_gwdt_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .valid.min_access_size = 4,
-+    .valid.max_access_size = 4,
-+    .valid.unaligned = false,
-+};
-+
-+static void wdt_sbsa_gwdt_realize(DeviceState *dev, Error **errp)
-+{
-+    SBSA_GWDTState *s = SBSA_GWDT(dev);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-+
-+    memory_region_init_io(&s->rmmio, OBJECT(dev),
-+                          &sbsa_gwdt_rops, s,
-+                          "sbsa_gwdt.refresh",
-+                          SBSA_GWDT_RMMIO_SIZE);
-+
-+    memory_region_init_io(&s->cmmio, OBJECT(dev),
-+                          &sbsa_gwdt_ops, s,
-+                          "sbsa_gwdt.control",
-+                          SBSA_GWDT_CMMIO_SIZE);
-+
-+    sysbus_init_mmio(sbd, &s->rmmio);
-+    sysbus_init_mmio(sbd, &s->cmmio);
-+
-+    sysbus_init_irq(sbd, &s->irq);
-+
-+    qemu_register_reset(sbsa_gwdt_reset, s);
-+
-+    s->ptimer = timer_new_ns(QEMU_CLOCK_VIRTUAL, sbsa_gwdt_timer_sysinterrupt,
-+            dev);
-+    s->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, sbsa_gwdt_timer_sysreset,
-+                dev);
-+}
-+
-+static void wdt_sbsa_gwdt_unrealize(DeviceState *dev)
-+{
-+    SBSA_GWDTState *s = SBSA_GWDT(dev);
-+
-+    timer_del(s->ptimer);
-+    timer_free(s->ptimer);
-+
-+    timer_del(s->timer);
-+    timer_free(s->timer);
-+}
-+
-+static void wdt_sbsa_gwdt_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = wdt_sbsa_gwdt_realize;
-+    dc->unrealize = wdt_sbsa_gwdt_unrealize;
-+    dc->reset = wdt_sbsa_gwdt_reset;
-+    dc->hotpluggable = false;
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+    dc->vmsd = &vmstate_sbsa_gwdt;
-+}
-+
-+static const TypeInfo wdt_sbsa_gwdt_info = {
-+    .class_init = wdt_sbsa_gwdt_class_init,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .name  = TYPE_WDT_SBSA_GWDT,
-+    .instance_size  = sizeof(SBSA_GWDTState),
-+};
-+
-+static void wdt_sbsa_gwdt_register_types(void)
-+{
-+    watchdog_add_model(&model);
-+    type_register_static(&wdt_sbsa_gwdt_info);
-+}
-+
-+type_init(wdt_sbsa_gwdt_register_types)
-diff --git a/include/hw/watchdog/wdt_sbsa_gwdt.h b/include/hw/watchdog/wdt_sbsa_gwdt.h
-new file mode 100644
-index 000000000000..8044646fa62d
---- /dev/null
-+++ b/include/hw/watchdog/wdt_sbsa_gwdt.h
-@@ -0,0 +1,68 @@
-+#ifndef WDT_SBSA_GWDT_H
-+#define WDT_SBSA_GWDT_H
-+
-+#include "qemu/bitops.h"
-+#include "hw/sysbus.h"
-+#include "hw/irq.h"
-+
-+#define TYPE_WDT_SBSA_GWDT "sbsa_gwdt"
-+#define SBSA_GWDT(obj) \
-+    OBJECT_CHECK(SBSA_GWDTState, (obj), TYPE_WDT_SBSA_GWDT)
-+#define SBSA_GWDT_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(SBSA_GWDTClass, (klass), TYPE_WDT_SBSA_GWDT)
-+#define SBSA_GWDT_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(SBSA_GWDTClass, (obj), TYPE_WDT_SBSA_GWDT)
-+
-+/* SBSA Generic Watchdog register definitions */
-+/* refresh frame */
-+#define SBSA_GWDT_WRR       0x000
-+
-+/* control frame */
-+#define SBSA_GWDT_WCS       0x000
-+#define SBSA_GWDT_WOR       0x008
-+#define SBSA_GWDT_WORU      0x00C
-+#define SBSA_GWDT_WCV       0x010
-+#define SBSA_GWDT_WCVU      0x014
-+
-+/* Watchdog Interface Identification Register */
-+#define SBSA_GWDT_W_IIDR    0xFCC
-+
-+/* Watchdog Control and Status Register Bits */
-+#define SBSA_GWDT_WCS_EN    BIT(0)
-+#define SBSA_GWDT_WCS_WS0   BIT(1)
-+#define SBSA_GWDT_WCS_WS1   BIT(2)
-+
-+#define SBSA_GWDT_WOR_MASK  0x0000FFFF
-+
-+/* Watchdog Interface Identification Register definition*/
-+#define SBSA_GWDT_ID        0x1043B
-+
-+/* 2 Separate memory regions for each of refresh & control register frames */
-+#define SBSA_GWDT_RMMIO_SIZE 0x1000
-+#define SBSA_GWDT_CMMIO_SIZE 0x1000
-+
-+typedef struct SBSA_GWDTState {
-+    /* <private> */
-+    SysBusDevice parent_obj;
-+
-+    /*< public >*/
-+    MemoryRegion rmmio;
-+    MemoryRegion cmmio;
-+    qemu_irq irq;
-+
-+    QEMUTimer *ptimer, *timer;
-+
-+    uint32_t id;
-+    uint32_t wrr;
-+    uint32_t wcs;
-+    uint32_t worl;
-+    uint32_t woru;
-+    uint32_t wcvl;
-+    uint32_t wcvu;
-+    bool enabled;
-+    bool ws0, ws1;
-+
-+    /*< public >*/
-+} SBSA_GWDTState;
-+
-+#endif /* WDT_SBSA_GWDT_H */
--- 
-2.18.4
-
+RURJVDogUmVzZW5kaW5nIGFzIHJlcGx5LWFsbA0KDQpIZXkgUGV0ZXIsDQoNCg0KQXBwcmVjaWF0
+ZSB0aGUgcHJvbXB0IHJlc3BvbnNlLiBJcyB0aGVyZSBhIHBhcnRpY3VsYXIgcmVhc29uIHdoeSB5
+b3Ugd2VyZSBwcm9wb3NpbmcgdGhhdCB0aGUgbW9kaWZpY2F0aW9uIGJlIG1hZGUgdG8gdGhlIGZz
+bC1pbXgqIGZpbGVzIGFzIG9wcG9zZWQgdG8gdGhlICJzYWJyZWxpdGUuYyIgZmlsZT8gSSB3YXMg
+bG9va2luZyB2ZXJ5IGJyaWVmbHkgYXQgdGhlIGZpbGVzIHlvdSBtZW50aW9uZWQgYW5kIEkgYmVs
+aWV2ZSB0aGUgbGluZSB0aGF0IHdvdWxkIGhhdmUgdG8gYmUgYWRkZWQgKGJhc2luZyBpdCBvZmYg
+dGhlIHJlZmVyZW5jZSBzb3VyY2UgeW91IHByb3ZpZGVkKSB3b3VsZCBiZToNCg0KDQpJbnNpZGU6
+IGZzbC1pbXgyNS5jDQoNCi8qIEFsaWFzIGNvbnRyb2xsZXIgU0QgYnVzIHRvIHRoZSBTb0MgaXRz
+ZWxmICovDQpidXNfbmFtZSA9IGdfc3RyZHVwX3ByaW50Zigic2QtYnVzJWQiLCBpKTsNCm9iamVj
+dF9wcm9wZXJ0eV9hZGRfYWxpYXMoT0JKRUNUKCZzLT5lc2RoY1tpXSksIGJ1c19uYW1lLCBzZGhj
+aSwgInNkLWJ1cyIpOw0KZ19mcmVlKGJ1c19uYW1lKTsNCg0KdG8gYmUgYWRkZWQganVzdCB1bmRl
+ciBsaW5lIDI1MSAoZHVyaW5nIGluaXRpYWxpemF0aW9uIG9mIHRoZSBTREhDIGRldmljZXMpLiBJ
+IGRvIG5vdCBzZWUgdGhlIHNhbWUgaW5pdGlhbGl6YXRpb24gb2YgU0RIQyBkZXZpY2VzIGZvciB0
+aG9zZSBvbmUgb2YgdGhlIGZzbCBmaWxlcyB5b3UgbWVudGlvbmVkIChmc2wtaW14MzEpLg0KDQpC
+ZXN0LA0KRGF2aWQNCg0K77u/T24gOS8xNy8yMCwgMTI6NTQgUE0sICJQZXRlciBNYXlkZWxsIiA8
+cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnPiB3cm90ZToNCg0KICAgIEVYVEVSTkFMIEVNQUlMOiBU
+aGlzIGVtYWlsIG9yaWdpbmF0ZWQgZnJvbSBhIHNlbmRlciBvdXRzaWRlIG9mIHRoZSBvcmdhbml6
+YXRpb24uIFVzZSBjYXV0aW9uIHdoZW4gcmVzcG9uZGluZyB0byByZXF1ZXN0cywgY2xpY2tpbmcg
+bGlua3MsIG9yIG9wZW5pbmcgYXR0YWNobWVudHMuDQoNCiAgICAtLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQogICAg
+T24gVGh1LCAxNyBTZXAgMjAyMCBhdCAxOToyMSwgRGF2aWQgQWdoYWlhbg0KICAgIDxEYXZpZC5B
+Z2hhaWFuQHBhbmFzb25pYy5hZXJvPiB3cm90ZToNCiAgICA+IEhhdmluZyBhIHJlYWwgZGlmZmlj
+dWx0IHRpbWUgZGV0ZXJtaW5pbmcgd2hldGhlciBvciBub3QgSSBjYW4gdXNlIHFlbXUgKGFybSkg
+d2l0aCB0aGUgU2FicmVsaXRlIG1hY2hpbmUgdHlwZSB0byBiZSBhYmxlIHRvIGFzc2lnbiBhbiBz
+ZC1jYXJkIHRvIG9uZSBvZiB0aGUgNCBhdmFpbGFibGUgc2QtYnVzIHNsb3RzLiBDdXJyZW50bHks
+IG5vIG1hdHRlciB3aGF0IGNvbWJpbmF0aW9uIG9mIGFyZ3VtZW50cyBJIHByb3ZpZGUsIGl0IHdp
+bGwgYWx3YXlzIGZhbGwgb24gdGhlIGZpcnN0IGJ1cyAoc2VlIHNjcmVlbnNob3QpLg0KDQogICAg
+PiBJcyB0aGVyZSBhbnkgd2F5IHdpdGggUUVNVSB0byBhdHRhY2ggdGhlIGNhcmQgc3BlY2lmaWNh
+bGx5IHRvIHRoZSBsYXN0IHNkLWJ1cyBzbG90PyBJdCBzaG91bGQgYmUgbm90ZWQgSSB3YXMgYWJs
+ZSB0byBhY2hpZXZlIHRoZSBleHBlY3RlZCBiZWhhdmlvciBhZnRlciBwYXRjaGluZyBRRU1VIGl0
+c2VsZiB3aXRoIHRoZSBmb2xsb3dpbmcgY2hhbmdlIGJ1dCBJ4oCZZCBwcmVmZXIgdG8gbm90IGhh
+dmUgdG8gbW9kaWZ5IHRoZSB0b29sIGl0c2VsZi4NCg0KICAgIFRoaXMgb3VnaHQgdG8gd29yaywg
+YnV0IEkgdGhpbmsgdGhlcmUgaXMgYSBidWcgaW4gdGhlIFFFTVUgbW9kZWwNCiAgICBvZiB0aGlz
+IGJvYXJkIHdoaWNoIG1lYW5zIGl0IGRvZXMgbm90Lg0KDQogICAgPiBkaWZmIHFlbXUtNS4xLjAu
+b3JpZy9ody9zZC9zZGhjaS5jIHFlbXUtNS4xLjAvaHcvc2Qvc2RoY2kuYw0KICAgID4gMTMxMWEx
+MzEyLDEzMTQNCiAgICA+ID4gICAgIHN0YXRpYyBpbnQgaW5kZXg9MDsNCiAgICA+ID4gICAgIGNo
+YXIgbmFtZVs2NF07DQogICAgPiA+ICAgICBzcHJpbnRmKG5hbWUsICJzZC1idXMuJWQiLCBpbmRl
+eCsrKTsNCiAgICA+IDEzMTNjMTMxNg0KICAgID4gPCAgICAgICAgICAgICAgICAgICAgICAgICBU
+WVBFX1NESENJX0JVUywgREVWSUNFKHMpLCAic2QtYnVzIik7DQogICAgPiAtLS0NCiAgICA+ID4g
+ICAgICAgICAgICAgICAgICAgICAgICAgVFlQRV9TREhDSV9CVVMsIERFVklDRShzKSwgbmFtZSk7
+DQoNCiAgICBUaGFua3MgZm9yIHRoZSBzdWdnZXN0ZWQgcGF0Y2ggLS0gdGhpcyB3YXMgYSBiaWcg
+Y2x1ZSBhYm91dA0KICAgIHdoYXQgdGhlIHByb2JsZW0gd2FzLg0KDQogICAgc2RoY2kuYyBpc24n
+dCByZWFsbHkgdGhlIGJlc3QgcGxhY2UgZm9yIHRoaXMgdG8gYmUgZG9uZSAtLSB0aGlzIGlzDQog
+ICAgdGhlIG1vZGVsIG9mIHRoZSBkZXZpY2UgaXRzZWxmLCBhbmQgdGhlIG5hbWUgb2YgdGhlIGJ1
+cyBhcyBwYXJ0DQogICAgb2YgdGhlIGRldmljZSBzaG91bGQgYmUgJ3NkLWJ1cycuIFRoZSByaWdo
+dCBwbGFjZSB0byBmaXggdGhlDQogICAgYnVnLCBJIHRoaW5rLCBpcyBpbiB0aGUgaHcvYXJtL2Zz
+bC1pbXgqLmMgZmlsZXMsIHdoaWNoIGFyZSB0aGUNCiAgICBpbXBsZW1lbnRhdGlvbiBvZiB0aGUg
+U29DIG9iamVjdC4gVGhlcmUgd2Ugc2hvdWxkIGJlIGNyZWF0aW5nDQogICAgYWxpYXNlcyBvbiB0
+aGUgU29DIGZvciB0aGUgdmFyaW91cyBTRCBidXNlcyAodGhlcmUncyBhbiBleGFtcGxlDQogICAg
+b2YgdGhpcyBpbiBody9hcm0veGxueC16eW5xbXAuYyksIGFuZCB0aGUgYWxpYXNlcyBjYW4gYWxs
+IGhhdmUNCiAgICBkaWZmZXJlbnQgbmFtZXMgc28gdGhleSdyZSB1c2FibGUgZnJvbSB0aGUgY29t
+bWFuZCBsaW5lLg0KDQogICAgdGhhbmtzDQogICAgLS0gUE1NDQoNCg==
 
