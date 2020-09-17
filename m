@@ -2,45 +2,46 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55A6CC43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 03:25:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAA9FC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 03:26:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAA30206B5
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 03:25:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAA30206B5
+	by mail.kernel.org (Postfix) with ESMTPS id 7D517206C9
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 03:26:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D517206C9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIkY4-0002FS-Tm
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 23:25:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47890)
+	id 1kIkYp-0002ww-L5
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 23:26:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47940)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1kIkUP-0004zU-9w; Wed, 16 Sep 2020 23:21:41 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4748 helo=huawei.com)
+ id 1kIkUR-00054e-DZ; Wed, 16 Sep 2020 23:21:43 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:4747 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1kIkUM-0004RS-J7; Wed, 16 Sep 2020 23:21:40 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id F287774951387E5CE419;
- Thu, 17 Sep 2020 11:21:13 +0800 (CST)
-Received: from localhost (10.174.185.104) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
- 11:21:04 +0800
+ id 1kIkUM-0004RL-LY; Wed, 16 Sep 2020 23:21:43 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id D3C28BAC7ABDFF61A6C6;
+ Thu, 17 Sep 2020 11:21:08 +0800 (CST)
+Received: from localhost (10.174.185.104) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
+ 11:20:58 +0800
 From: Ying Fang <fangying1@huawei.com>
 To: <qemu-devel@nongnu.org>
-Subject: [RFC PATCH 09/12] target/arm/cpu: Add CPU cache description for arm
-Date: Thu, 17 Sep 2020 11:20:30 +0800
-Message-ID: <20200917032033.2020-10-fangying1@huawei.com>
+Subject: [RFC PATCH 06/12] hw/arm/virt-acpi-build: distinguish possible and
+ present cpus
+Date: Thu, 17 Sep 2020 11:20:27 +0800
+Message-ID: <20200917032033.2020-7-fangying1@huawei.com>
 X-Mailer: git-send-email 2.26.0.windows.1
 In-Reply-To: <20200917032033.2020-1-fangying1@huawei.com>
 References: <20200917032033.2020-1-fangying1@huawei.com>
@@ -79,128 +80,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add the CPUCacheInfo structure to hold CPU cache information for ARM cpus.
-A classic three level cache topology is used here. The default cache
-capacity is given and userspace can overwrite these values.
+When building ACPI tables regarding CPUs we should always build
+them for the number of possible CPUs, not the number of present
+CPUs. We then ensure only the present CPUs are enabled.
 
+Signed-off-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Ying Fang <fangying1@huawei.com>
 ---
- target/arm/cpu.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- target/arm/cpu.h | 27 +++++++++++++++++++++++++++
- 2 files changed, 69 insertions(+)
+ hw/arm/virt-acpi-build.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index c179e0752d..efa8e1974a 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -27,6 +27,7 @@
- #include "qapi/visitor.h"
- #include "cpu.h"
- #include "internals.h"
-+#include "qemu/units.h"
- #include "exec/exec-all.h"
- #include "hw/qdev-properties.h"
- #if !defined(CONFIG_USER_ONLY)
-@@ -998,6 +999,45 @@ uint64_t arm_cpu_mp_affinity(int idx, uint8_t clustersz)
-     return (Aff1 << ARM_AFF1_SHIFT) | Aff0;
- }
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 9efd7a3881..f1d574b5d3 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -56,14 +56,18 @@
  
-+static CPUCaches default_cache_info = {
-+    .l1d_cache = &(CPUCacheInfo) {
-+    .type = DATA_CACHE,
-+        .level = 1,
-+        .size = 64 * KiB,
-+        .line_size = 64,
-+        .associativity = 4,
-+        .sets = 256,
-+        .attributes = 0x02,
-+    },
-+    .l1i_cache = &(CPUCacheInfo) {
-+        .type = INSTRUCTION_CACHE,
-+        .level = 1,
-+        .size = 64 * KiB,
-+        .line_size = 64,
-+        .associativity = 4,
-+        .sets = 256,
-+        .attributes = 0x04,
-+    },
-+    .l2_cache = &(CPUCacheInfo) {
-+        .type = UNIFIED_CACHE,
-+        .level = 2,
-+        .size = 512 * KiB,
-+        .line_size = 64,
-+        .associativity = 8,
-+        .sets = 1024,
-+        .attributes = 0x0a,
-+    },
-+    .l3_cache = &(CPUCacheInfo) {
-+        .type = UNIFIED_CACHE,
-+        .level = 3,
-+        .size = 65536 * KiB,
-+        .line_size = 64,
-+        .associativity = 15,
-+        .sets = 2048,
-+        .attributes = 0x0a,
-+    },
-+};
-+
- static void cpreg_hashtable_data_destroy(gpointer data)
+ #define ARM_SPI_BASE 32
+ 
+-static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
++static void acpi_dsdt_add_cpus(Aml *scope, VirtMachineState *vms)
  {
-     /*
-@@ -1835,6 +1875,8 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-         }
+     uint16_t i;
++    CPUArchIdList *possible_cpus = MACHINE(vms)->possible_cpus;
+ 
+-    for (i = 0; i < smp_cpus; i++) {
++    for (i = 0; i < possible_cpus->len; i++) {
+         Aml *dev = aml_device("C%.03X", i);
+         aml_append(dev, aml_name_decl("_HID", aml_string("ACPI0007")));
+         aml_append(dev, aml_name_decl("_UID", aml_int(i)));
++        if (possible_cpus->cpus[i].cpu == NULL) {
++            aml_append(dev, aml_name_decl("_STA", aml_int(0)));
++        }
+         aml_append(scope, dev);
      }
+ }
+@@ -635,6 +639,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+     const int *irqmap = vms->irqmap;
+     AcpiMadtGenericDistributor *gicd;
+     AcpiMadtGenericMsiFrame *gic_msi;
++    int possible_cpus = MACHINE(vms)->possible_cpus->len;
+     int i;
  
-+    cpu->caches = default_cache_info;
-+
-     qemu_init_vcpu(cs);
-     cpu_reset(cs);
+     acpi_data_push(table_data, sizeof(AcpiMultipleApicTable));
+@@ -645,7 +650,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+     gicd->base_address = cpu_to_le64(memmap[VIRT_GIC_DIST].base);
+     gicd->version = vms->gic_version;
  
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index a1c7d8ebae..e9e3817e20 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -745,6 +745,30 @@ typedef enum ARMPSCIState {
+-    for (i = 0; i < vms->smp_cpus; i++) {
++    for (i = 0; i < possible_cpus; i++) {
+         AcpiMadtGenericCpuInterface *gicc = acpi_data_push(table_data,
+                                                            sizeof(*gicc));
+         ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(i));
+@@ -660,7 +665,9 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+         gicc->cpu_interface_number = cpu_to_le32(i);
+         gicc->arm_mpidr = cpu_to_le64(armcpu->mp_affinity);
+         gicc->uid = cpu_to_le32(i);
+-        gicc->flags = cpu_to_le32(ACPI_MADT_GICC_ENABLED);
++        if (i < vms->smp_cpus) {
++            gicc->flags = cpu_to_le32(ACPI_MADT_GICC_ENABLED);
++        }
  
- typedef struct ARMISARegisters ARMISARegisters;
- 
-+/* Cache information type */
-+enum CacheType {
-+    DATA_CACHE,
-+    INSTRUCTION_CACHE,
-+    UNIFIED_CACHE
-+};
-+
-+typedef struct CPUCacheInfo {
-+    enum CacheType type;      /* Cache Type*/
-+    uint8_t level;
-+    uint32_t size;            /* Size in bytes */
-+    uint16_t line_size;       /* Line size in bytes */
-+    uint8_t associativity;    /* Cache associativity */
-+    uint32_t sets;            /* Number of sets */
-+    uint8_t attributes;       /* Cache attributest  */
-+} CPUCacheInfo;
-+
-+typedef struct CPUCaches {
-+        CPUCacheInfo *l1d_cache;
-+        CPUCacheInfo *l1i_cache;
-+        CPUCacheInfo *l2_cache;
-+        CPUCacheInfo *l3_cache;
-+} CPUCaches;
-+
- /**
-  * ARMCPU:
-  * @env: #CPUARMState
-@@ -986,6 +1010,9 @@ struct ARMCPU {
- 
-     /* Generic timer counter frequency, in Hz */
-     uint64_t gt_cntfrq_hz;
-+
-+    /* CPU cache information */
-+    CPUCaches caches;
- };
- 
- unsigned int gt_cntfrq_period_ns(ARMCPU *cpu);
+         if (arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {
+             gicc->performance_interrupt = cpu_to_le32(PPI(VIRTUAL_PMU_IRQ));
+@@ -764,7 +771,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+      * the RTC ACPI device at all when using UEFI.
+      */
+     scope = aml_scope("\\_SB");
+-    acpi_dsdt_add_cpus(scope, vms->smp_cpus);
++    acpi_dsdt_add_cpus(scope, vms);
+     acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
+                        (irqmap[VIRT_UART] + ARM_SPI_BASE));
+     if (vmc->acpi_expose_flash) {
 -- 
 2.23.0
 
