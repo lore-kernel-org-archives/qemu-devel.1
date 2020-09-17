@@ -2,68 +2,90 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 092C2C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 09:23:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FCCCC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 09:24:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5734F206E6
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 09:23:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5734F206E6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id B37E2206E6
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 09:24:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hw+pqsG1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B37E2206E6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIq8B-0003CG-6Z
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 05:23:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47166)
+	id 1kIq9H-0004sg-Rc
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 05:24:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47376)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kIq7c-0002mI-Db
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 05:22:32 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4759 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kIq7Z-0005RI-Qb
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 05:22:32 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 36F5F96C5BEDAE2981C4;
- Thu, 17 Sep 2020 17:22:18 +0800 (CST)
-Received: from [10.174.186.4] (10.174.186.4) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0;
- Thu, 17 Sep 2020 17:22:11 +0800
-Subject: Re: [PATCH v10 00/12] *** A Method for evaluating dirty page rate ***
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <1600237327-33618-1-git-send-email-zhengchuan@huawei.com>
- <20200917091504.GD2793@work-vm>
-From: Zheng Chuan <zhengchuan@huawei.com>
-Message-ID: <2863327b-67ee-a440-1a2d-e439ecbbeb84@huawei.com>
-Date: Thu, 17 Sep 2020 17:22:10 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kIq8D-0003Ub-N5
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 05:23:09 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34952
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kIq8B-0005VW-Oh
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 05:23:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600334586;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3plUSpVzoWRWA19m4inJwQr2kZ0bdn8g1mlKRKIQMfU=;
+ b=Hw+pqsG1Wn7/dN8pIF8mLtX6fB9fh6YA2vIawnvdwme2zFpOt8fSCo9yR/bchAFV2CuMkH
+ QpwwyQchOdj1uTCrsWbPWP3cx6H30k41K5kbsFq5EpozpJwZ9qaj+3DNPoPNjZyDRKKCLq
+ egrux4saUpA9ZmMHXBx98eLSL6WlDMc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-584-azzIMahyNBOr-3ERQLZb6Q-1; Thu, 17 Sep 2020 05:23:04 -0400
+X-MC-Unique: azzIMahyNBOr-3ERQLZb6Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9B0A1019625;
+ Thu, 17 Sep 2020 09:23:03 +0000 (UTC)
+Received: from gondolin (ovpn-113-19.ams2.redhat.com [10.36.113.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 909F978810;
+ Thu, 17 Sep 2020 09:22:59 +0000 (UTC)
+Date: Thu, 17 Sep 2020 11:22:56 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Subject: Re: [PATCH v2] virtio: skip legacy support check on machine types
+ less than 5.1
+Message-ID: <20200917112256.796f620d.cohuck@redhat.com>
+In-Reply-To: <20200917084828.p7j3fc6p4almxbxw@steredhat>
+References: <20200915130514.80989-1-sgarzare@redhat.com>
+ <20200916110848.47395807.cohuck@redhat.com>
+ <20200917084828.p7j3fc6p4almxbxw@steredhat>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200917091504.GD2793@work-vm>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.186.4]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.191;
- envelope-from=zhengchuan@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 03:37:07
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -42
-X-Spam_score: -4.3
-X-Spam_bar: ----
-X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.062,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 02:23:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,145 +98,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, zhang.zhanghailiang@huawei.com, quintela@redhat.com,
- liq3ea@gmail.com, qemu-devel@nongnu.org, xiexiangyou@huawei.com,
- alex.chen@huawei.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, "Dr. David
+ Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, 17 Sep 2020 10:48:28 +0200
+Stefano Garzarella <sgarzare@redhat.com> wrote:
 
+> On Wed, Sep 16, 2020 at 11:08:48AM +0200, Cornelia Huck wrote:
+> > On Tue, 15 Sep 2020 15:05:14 +0200
+> > Stefano Garzarella <sgarzare@redhat.com> wrote:
+> >   
+> > > Commit 9b3a35ec82 ("virtio: verify that legacy support is not accidentally
+> > > on") added a check that returns an error if legacy support is on, but the
+> > > device is not legacy.
+> > > 
+> > > Unfortunately some devices were wrongly declared legacy even if they
+> > > were not (e.g vhost-vsock).
+> > > 
+> > > To avoid migration issues, we disable this error for machine types < 5.1,
+> > > but we print a warning.
+> > > 
+> > > Cc: qemu-stable@nongnu.org
+> > > Fixes: 9b3a35ec82 ("virtio: verify that legacy support is not accidentally on")
+> > > Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > Suggested-by: Cornelia Huck <cohuck@redhat.com>
+> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > ---
+> > > v2:
+> > >  - fixed Cornelia's e-mail address
+> > > ---
+> > >  include/hw/virtio/virtio.h |  1 +
+> > >  hw/core/machine.c          |  1 +
+> > >  hw/virtio/virtio.c         | 18 ++++++++++++++++--
+> > >  3 files changed, 18 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> > > index 807280451b..ed7cee348b 100644
+> > > --- a/include/hw/virtio/virtio.h
+> > > +++ b/include/hw/virtio/virtio.h
+> > > @@ -103,6 +103,7 @@ struct VirtIODevice
+> > >      bool use_started;
+> > >      bool started;
+> > >      bool start_on_kick; /* when virtio 1.0 feature has not been negotiated */
+> > > +    bool disable_legacy_check;
+> > >      VMChangeStateEntry *vmstate;
+> > >      char *bus_name;
+> > >      uint8_t device_endian;
+> > > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > > index ea26d61237..b686eab798 100644
+> > > --- a/hw/core/machine.c
+> > > +++ b/hw/core/machine.c
+> > > @@ -44,6 +44,7 @@ GlobalProperty hw_compat_5_0[] = {
+> > >      { "vmport", "x-signal-unsupported-cmd", "off" },
+> > >      { "vmport", "x-report-vmx-type", "off" },
+> > >      { "vmport", "x-cmds-v2", "off" },
+> > > +    { "virtio-device", "x-disable-legacy-check", "true" },  
+> > 
+> > Hm... not sure if we actually should add a new device property for
+> > that. Maybe we can use a flag in the base machine type instead?  
+> 
+> I am not very experienced with machine types.
+> I used the device property to easily access it from virtio devices.
+> 
+> Please, can you give me some suggestions where to look for the flags?
 
-On 2020/9/17 17:15, Dr. David Alan Gilbert wrote:
-> * Chuan Zheng (zhengchuan@huawei.com) wrote:
->> v9 -> v10:
->>     rename find_page_matched as find_block_matched
->>     fix wrong termination condition in find_block_matched
->>     add review-by for patches
->>
->> v8 -> v9:
->>     fix wrong index return of record_ramblock_hash_info
->>     optimize variable name according to review
->>     reset dirty_rate as -1
->>     change returns of compare_page_hash_info to bool
->>
->> v7 -> v8:
->>     add atomic_read for dirtyrate status
->>     add error_report if set dirtyrate state failed
->>     change returns of save_ramblock_hash and record_ramblock_hash_info to bool
->>     alloc ramblock dirtyinfo array at one time
->>     add review-by for patches
->>
->> v6 -> v7:
->>     fix minior comments and coding style by review
->>     add review-by for patches
->>
->> v5 -> v6:
->>     fix coding style according to review
->>     use TARGET_PAGE_SIZE and TARGET_PAGE_BITS instead of self-defined macros
->>     return start-time and calc-time by qmp command
->>
->> v4 -> v5:
->>     fix git apply failed due to meson-build
->>     add review-by for patches in v3
->>
->> v3 -> v4:
->>     use crc32 to get hash result instead of md5
->>     add DirtyRateStatus to denote calculation status
->>     add some trace_calls to make it easier to debug
->>     fix some comments accroding to review
->>
->> v2 -> v3:
->>     fix size_t compile warning
->>     fix codestyle checked by checkpatch.pl
->>
->> v1 -> v2:
->>     use g_rand_new() to generate rand_buf
->>     move RAMBLOCK_FOREACH_MIGRATABLE into migration/ram.h
->>     add skip_sample_ramblock to filter sampled ramblock
->>     fix multi-numa vm coredump when query dirtyrate
->>     rename qapi interface and rename some structures and functions
->>     succeed to compile by appling each patch
->>     add test for migrating vm
->>
->> Sometimes it is neccessary to evaluate dirty page rate before migration.
->> Users could decide whether to proceed migration based on the evaluation
->> in case of vm performance loss due to heavy workload.
->> Unlikey simulating dirtylog sync which could do harm on runnning vm,
->> we provide a sample-hash method to compare hash results for samping page.
->> In this way, it would have hardly no impact on vm performance.
->>
->> Evaluate the dirtypage rate both on running and migration vm.
->> The VM specifications for migration are as follows:
->> - VM use 4-K page;
->> - the number of VCPU is 32;
->> - the total memory is 32Gigabit;
->> - use 'mempress' tool to pressurize VM(mempress 4096 1024);
->> - migration bandwidth is 1GB/s
->>
->> +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->> |                      |  running  |                  migrating                           |
->> +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->> | no mempress          |   4MB/s   |          8MB/s      (migrated success)               |
->> -------------------------------------------------------------------------------------------
->> | mempress 4096 1024   |  1060MB/s |     456MB/s ~ 1142MB/s (cpu throttle triggered)      |
->> +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->> | mempress 4096 4096   |  4114MB/s |     688MB/s ~ 4132MB/s (cpu throttle triggered)      |
->> +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>
->> Test dirtyrate by qmp command like this:
->> 1.  virsh qemu-monitor-command [vmname] '{"execute":"calc-dirty-rate", "arguments": {"calc-time": [sleep-time]}}'; 
->> 2.  sleep specific time which is a bit larger than sleep-time
->> 3.  virsh qemu-monitor-command [vmname] '{"execute":"query-dirty-rate"}'
-> 
-> Thanks; it looks like we have a full set of reviews; I'll try and add
-> this for the next migration pull.
-> 
->> The qmp command returns like this:
->> {"return":{"status":"measured","dirty-rate":374,"start-time":3718293,"calc-time":1},"id":"libvirt-15"}
->>
->> Further test dirtyrate by libvirt api like this:
->> virsh getdirtyrate [vmname] [sleep-time]
-> 
-> So do you have some libvirt patches you're going to post?
-> 
-> Dave
-> 
+I was thinking about adding a new virtio_legacy_check flag into
+MachineClass to get a machine-wide config and avoid introducing a new
+config knob. The drawback is that every machine type supporting compat
+machines would need to take care about disabling the check in their
+5.1-or-older machines themselves.
 
-Hi, Dave.
+Not sure what the preferable solution is; I'm not really opposed to
+your approach, though.
 
-Yes, libvirt(including libvirt-python) interface will come after this qemu series patch:)
-
->> Chuan Zheng (12):
->>   migration/dirtyrate: setup up query-dirtyrate framwork
->>   migration/dirtyrate: add DirtyRateStatus to denote calculation status
->>   migration/dirtyrate: Add RamblockDirtyInfo to store sampled page info
->>   migration/dirtyrate: Add dirtyrate statistics series functions
->>   migration/dirtyrate: move RAMBLOCK_FOREACH_MIGRATABLE into ram.h
->>   migration/dirtyrate: Record hash results for each sampled page
->>   migration/dirtyrate: Compare page hash results for recorded sampled
->>     page
->>   migration/dirtyrate: skip sampling ramblock with size below
->>     MIN_RAMBLOCK_SIZE
->>   migration/dirtyrate: Implement set_sample_page_period() and
->>     is_sample_period_valid()
->>   migration/dirtyrate: Implement calculate_dirtyrate() function
->>   migration/dirtyrate: Implement
->>     qmp_cal_dirty_rate()/qmp_get_dirty_rate() function
->>   migration/dirtyrate: Add trace_calls to make it easier to debug
->>
->>  migration/dirtyrate.c  | 426 +++++++++++++++++++++++++++++++++++++++++++++++++
->>  migration/dirtyrate.h  |  70 ++++++++
->>  migration/meson.build  |   2 +-
->>  migration/ram.c        |  11 +-
->>  migration/ram.h        |  10 ++
->>  migration/trace-events |   8 +
->>  qapi/migration.json    |  67 ++++++++
->>  7 files changed, 583 insertions(+), 11 deletions(-)
->>  create mode 100644 migration/dirtyrate.c
->>  create mode 100644 migration/dirtyrate.h
->>
->> -- 
->> 1.8.3.1
->>
 
