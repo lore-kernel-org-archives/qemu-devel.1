@@ -6,65 +6,62 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AB75C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 04:28:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CCFAC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 04:28:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 025B82075E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 04:28:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 025B82075E
+	by mail.kernel.org (Postfix) with ESMTPS id 3AEB42075E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 04:28:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AEB42075E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIlXH-0001Gg-6O
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 00:28:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34206)
+	id 1kIlXJ-0001IA-Ch
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 00:28:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34208)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIlUZ-00073s-IY
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 00:25:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41268)
+ id 1kIlUb-00075G-Dx
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 00:25:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41364)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIlUT-0004a1-W2
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 00:25:55 -0400
+ id 1kIlUU-0004aK-4g
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 00:25:57 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kIlUR-0005h1-32
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 04:25:47 +0000
+ id 1kIlUS-0005fr-OV
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 04:25:48 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0ABB62E810A
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 04:25:47 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 929D82E8107
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 04:25:48 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 17 Sep 2020 04:17:18 -0000
-From: Launchpad Bug Tracker <1852781@bugs.launchpad.net>
+Date: Thu, 17 Sep 2020 04:17:20 -0000
+From: Launchpad Bug Tracker <1629483@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
  assignee=None; 
-X-Launchpad-Bug: product=ubuntu-z-systems; status=Expired; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: qemu-20.04 s390x
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: colin-king janitor paelzer th-huth
-X-Launchpad-Bug-Reporter: Colin Ian King (colin-king)
+X-Launchpad-Bug-Commenters: dkerr64 janitor kamath-ben th-huth
+X-Launchpad-Bug-Reporter: Benjamin Kamath (kamath-ben)
 X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <157384084797.7162.9983011521410421204.malonedeb@gac.canonical.com>
-Message-Id: <160031623880.27044.9493162054149325207.malone@loganberry.canonical.com>
-Subject: [Bug 1852781] Re: qemu s390x on focal - applications breaking
+References: <20160930224644.27765.63692.malonedeb@chaenomeles.canonical.com>
+Message-Id: <160031624013.27044.13973847429577215201.malone@loganberry.canonical.com>
+Subject: [Bug 1629483] Re: Build fails on optionrom
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: e4d6942578aed7d73a30e55edf7b567ca032672b
+X-Launchpad-Hash: 385e39f7c3d2cdd1795de94c03d25bc9373a0e5f
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 00:25:47
@@ -87,7 +84,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1852781 <1852781@bugs.launchpad.net>
+Reply-To: Bug 1629483 <1629483@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -101,55 +98,48 @@ Sender: "Qemu-devel"
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1852781
+https://bugs.launchpad.net/bugs/1629483
 
 Title:
-  qemu s390x on focal - applications breaking
+  Build fails on optionrom
 
 Status in QEMU:
   Expired
-Status in Ubuntu on IBM z Systems:
-  Expired
 
 Bug description:
-  Running qemu-system-s390x (1:4.0+dfsg-0ubuntu10) on an x86-64 Focal
-  host with an upgrade of a Eoan s390x VM to a Focal s390x is triggering
-  random breakage, for example:
+  Git pseudo-bisected (focused on optionrom commits) it to this commit.
 
-  sudo apt-get update && sudo apt-get dist-upgrade
+  commit cdbd727c20ad7aac7797dc8c95e485e1a4c6901b
+  Author: Richard Henderson <rth@twiddle.net>
+  Date:   Thu Jul 7 21:49:36 2016 -0700
 
-  ...
-  ...
+      build: Use $(AS) for optionrom explicitly
 
-  Unpacking debianutils (4.9) over (4.8.6.3) ...
-  Setting up debianutils (4.9) ...
-  Use of uninitialized value $ARGV[0] in string ne at /usr/sbin/update-mime=
- line 43.
-  (Reading database ... 83640 files and directories currently installed.)
-  Preparing to unpack .../bash_5.0-5ubuntu1_s390x.deb ...
-  Unpacking bash (5.0-5ubuntu1) over (5.0-4ubuntu1) ...
-  Setting up bash (5.0-5ubuntu1) ...
-  [12124.788618] User process fault: interruption code 0007 ilc:3 in bash[2=
-aa3d780000+149000]
-  dpkg: error processing package bash (--configure):
-   installed bash package post-installation script subprocess was killed by=
- signal (Floating point exception), core du
-  mped
-  Errors were encountered while processing:
-   bash
-  E: Sub-process /usr/bin/dpkg returned an error code (1)
+  =
 
-  And now bash is completely broken:
+  Build output (non-verbose):
 
-  cking@eoan-s390x:~$ bash
-  [12676.204389] User process fault: interruption code 0007 ilc:3 in bash[2=
-aa14780000+149000]
+    AS    optionrom/linuxboot.o
+  cpp: fatal error: '-c' is not a valid option to the preprocessor
+  compilation terminated.
+  cpp: fatal error: '-c' is not a valid option to the preprocessor
+  compilation terminated.
+    CC    optionrom/linuxboot_dma.o
+    CC    /home/bkamath/dev/workspace/block-2/mothra/output/sp0/targetqga/m=
+ain.o
+    AS    optionrom/kvmvapic.o
+  cpp: fatal error: '-c' is not a valid option to the preprocessor
+  compilation terminated.
 
-  Floating point exception (core dumped)
+  Steps to reproduce:
+  Using buildroot and overriding qemu version to 2.7.0
+  Fedora 24, cpp (GCC) 6.2.1 20160916 (Red Hat 6.2.1-2)
 
-  The upgrade works OK on a s390x, so I'm assuming it's something to do
-  with the qemu emulation.
+  I tried first just building without the -c option but it hangs
+  indefinitely. Reverting the above listed commit fixes the problem on
+  my platform. I didn't dive much further into this, because this seems
+  like a regression.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1852781/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1629483/+subscriptions
 
