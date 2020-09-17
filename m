@@ -2,63 +2,88 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3E89C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 07:58:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03463C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 07:58:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 744E520665
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 07:58:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 744E520665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8961D2083B
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 07:58:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="CnZW9gPa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8961D2083B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIooP-0005FD-F8
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 03:58:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51592)
+	id 1kIooX-0005Pm-DC
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 03:58:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50736)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kIohL-0004i7-0b; Thu, 17 Sep 2020 03:51:19 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:52174 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kIohH-0005LP-Da; Thu, 17 Sep 2020 03:51:18 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 36FBE719311A37E64844;
- Thu, 17 Sep 2020 15:51:09 +0800 (CST)
-Received: from localhost (10.174.187.87) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
- 15:50:58 +0800
-From: zhaolichang <zhaolichang@huawei.com>
-To: <qemu-trivial@nongnu.org>
-Subject: [PATCH V3 01/10] qemu/: fix some comment spelling errors
-Date: Thu, 17 Sep 2020 15:50:20 +0800
-Message-ID: <20200917075029.313-2-zhaolichang@huawei.com>
-X-Mailer: git-send-email 2.26.2.windows.1
-In-Reply-To: <20200917075029.313-1-zhaolichang@huawei.com>
-References: <20200917075029.313-1-zhaolichang@huawei.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.187.87]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32;
- envelope-from=zhaolichang@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 03:51:09
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIoeQ-0008HK-WC
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:48:19 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:38379)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kIoeP-0004pp-7c
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:48:18 -0400
+Received: by mail-pl1-x643.google.com with SMTP id c3so692858plz.5
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 00:48:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=V/i6UARRudUJoRdXtPW9d7XXfNZPRvXdDsElEekj7OA=;
+ b=CnZW9gPaandkGGDrH1VaeFv8EdTC1OZzBrUh7btE8LaPtNwkTgKqxUV4gfR9tZBpha
+ wwC+GB7mD3r34ZjuWkeLhomnherAljvwdbrEdGdZRMcM667t5CaOa0AgieVtaSqpkVBW
+ z/Fh2fh9y7S+NOzJnfOx+l8FpNPQci+TBbsBrMgtgojOo/I8mvV8WKBVBR5Jl60zRG3l
+ jy93znM85HZIPcH17L6hjdaI5wiGvXz6yy1/D9qqybegcOhPup2c/2H2nKME6DwEgY8e
+ gpkkBsLq2xI11JMc1kIvPL1a51TqUa5RaXyviLoYOsMvOesoE1Ib3k7izuSPYDi1v5s2
+ uXxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=V/i6UARRudUJoRdXtPW9d7XXfNZPRvXdDsElEekj7OA=;
+ b=gGiH6PF69u7wtULCl8cIUBJEJR13Q5wz91UiLUQBCLzgIH4xDW7orAlqWBJ9Fs0V+L
+ ZslTc8W9l+Pe1jGh8dI8qPyg74mtqUGgq12hUNBuSDz+4iZni7VgNCEs1O6mPMYeeqm1
+ Uzlx8eH/KOLtwwOEOvnIcUBZEbEKwRtJU7PK73/dMdU2faWIkFzKQJlSCXNHZo3/ijI6
+ DZ2NqU7CgD5+X8KRB6DGO9RTJFOKknxYMsqM6WVTli8vYnqVq6p9UZEITEx8B4LVnZn2
+ zxWlvi059dR7ZnsOxumZjob+X7SYkdTzfiG5OQUyEtumrMrkoxEPwRst4LqCsBhcLc9W
+ 27GA==
+X-Gm-Message-State: AOAM532S7CkqpnccCBCSCOBhjAlwVLzQOLBrvp9aX1SfhtRtvcI16by8
+ Fbjc/T3MWNcX9pK1oPTBzITdQ70yCGFFlEn9
+X-Google-Smtp-Source: ABdhPJxC+AmZ85kVK/Uy5septNaREyxM4oZ0GUBljgDH3oRsUF0OIVX5fUbALEIDDI+8evSvWTihug==
+X-Received: by 2002:a17:90a:d789:: with SMTP id
+ z9mr7472093pju.226.1600328895659; 
+ Thu, 17 Sep 2020 00:48:15 -0700 (PDT)
+Received: from localhost.localdomain ([115.96.122.113])
+ by smtp.googlemail.com with ESMTPSA id y3sm20572516pfb.18.2020.09.17.00.48.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 17 Sep 2020 00:48:14 -0700 (PDT)
+From: Ani Sinha <ani@anisinha.ca>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 06/12] tests/acpi: list added acpi table binary file for
+ pci bridge hotplug test
+Date: Thu, 17 Sep 2020 13:17:26 +0530
+Message-Id: <20200917074733.13612-7-ani@anisinha.ca>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200917074733.13612-1-ani@anisinha.ca>
+References: <20200917074733.13612-1-ani@anisinha.ca>
+Received-SPF: none client-ip=2607:f8b0:4864:20::643;
+ envelope-from=ani@anisinha.ca; helo=mail-pl1-x643.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,176 +96,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhaolichang <zhaolichang@huawei.com>, Alex Bennee <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, jusual@redhat.com,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
+ Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I found that there are many spelling errors in the comments of qemu,
-so I used the spellcheck tool to check the spelling errors
-and finally found some spelling errors in the folder.
+The file 'tests/data/acpi/pc/DSDT.hpbridge' is a newly added acpi table file
+for testing the pci bridge option 'acpi-pci-hotplug-with-bridge-support' under
+i440fx. This change documents this fact.
 
-Signed-off-by: zhaolichang <zhaolichang@huawei.com>
-Reviewed-by: Alex Bennee <alex.bennee@linaro.org>
+Signed-off-by: Ani Sinha <ani@anisinha.ca>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- Changelog                   | 2 +-
- accel/tcg/user-exec.c       | 2 +-
- audio/audio.c               | 2 +-
- block.c                     | 2 +-
- configure                   | 2 +-
- fsdev/virtfs-proxy-helper.c | 2 +-
- hmp-commands.hx             | 2 +-
- libdecnumber/decNumber.c    | 2 +-
- qemu-img.c                  | 2 +-
- qobject/qdict.c             | 2 +-
- scsi/pr-manager-helper.c    | 2 +-
- 11 files changed, 11 insertions(+), 11 deletions(-)
+ tests/qtest/bios-tables-test-allowed-diff.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/Changelog b/Changelog
-index 4a90bb9e8b..f7e178ccc0 100644
---- a/Changelog
-+++ b/Changelog
-@@ -241,7 +241,7 @@ version 0.8.0:
- version 0.7.2:
- 
-   - x86_64 fixes (Win2000 and Linux 2.6 boot in 32 bit)
--  - merge self modifying code handling in dirty ram page mecanism.
-+  - merge self modifying code handling in dirty ram page mechanism.
-   - MIPS fixes (Ralf Baechle)
-   - better user net performances
- 
-diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-index bb039eb32d..5c96819ded 100644
---- a/accel/tcg/user-exec.c
-+++ b/accel/tcg/user-exec.c
-@@ -88,7 +88,7 @@ static inline int handle_cpu_signal(uintptr_t pc, siginfo_t *info,
-          * use that value directly.  Within cpu_restore_state_from_tb, we
-          * assume PC comes from GETPC(), as used by the helper functions,
-          * so we adjust the address by -GETPC_ADJ to form an address that
--         * is within the call insn, so that the address does not accidentially
-+         * is within the call insn, so that the address does not accidentally
-          * match the beginning of the next guest insn.  However, when the
-          * pc comes from the signal frame it points to the actual faulting
-          * host memory insn and not the return from a call insn.
-diff --git a/audio/audio.c b/audio/audio.c
-index ce8c6dec5f..1a68cfaafb 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -1674,7 +1674,7 @@ static AudioState *audio_init(Audiodev *dev, const char *name)
-         head = audio_handle_legacy_opts();
-         /*
-          * In case of legacy initialization, all Audiodevs in the list will have
--         * the same configuration (except the driver), so it does't matter which
-+         * the same configuration (except the driver), so it doesn't matter which
-          * one we chose.  We need an Audiodev to set up AudioState before we can
-          * init a driver.  Also note that dev at this point is still in the
-          * list.
-diff --git a/block.c b/block.c
-index 9538af4884..11ab55f80b 100644
---- a/block.c
-+++ b/block.c
-@@ -2602,7 +2602,7 @@ static void bdrv_replace_child_noperm(BdrvChild *child,
- 
- /*
-  * Updates @child to change its reference to point to @new_bs, including
-- * checking and applying the necessary permisson updates both to the old node
-+ * checking and applying the necessary permission updates both to the old node
-  * and to @new_bs.
-  *
-  * NULL is passed as @new_bs for removing the reference before freeing @child.
-diff --git a/configure b/configure
-index ce27eafb0a..c74d79bfbc 100755
---- a/configure
-+++ b/configure
-@@ -3411,7 +3411,7 @@ EOF
-     xfs="yes"
-   else
-     if test "$xfs" = "yes" ; then
--      feature_not_found "xfs" "Instal xfsprogs/xfslibs devel"
-+      feature_not_found "xfs" "Install xfsprogs/xfslibs devel"
-     fi
-     xfs=no
-   fi
-diff --git a/fsdev/virtfs-proxy-helper.c b/fsdev/virtfs-proxy-helper.c
-index de061a8a0e..15c0e79b06 100644
---- a/fsdev/virtfs-proxy-helper.c
-+++ b/fsdev/virtfs-proxy-helper.c
-@@ -518,7 +518,7 @@ static void statfs_to_prstatfs(ProxyStatFS *pr_stfs, struct statfs *stfs)
- 
- /*
-  * Gets stat/statfs information and packs in out_iovec structure
-- * on success returns number of bytes packed in out_iovec struture
-+ * on success returns number of bytes packed in out_iovec structure
-  * otherwise returns -errno
-  */
- static int do_stat(int type, struct iovec *iovec, struct iovec *out_iovec)
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 60f395c276..27c4bbe0f2 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1267,7 +1267,7 @@ ERST
-     },
- SRST
- ``drive_backup``
--  Start a point-in-time copy of a block device to a specificed target.
-+  Start a point-in-time copy of a block device to a specified target.
- ERST
- 
-     {
-diff --git a/libdecnumber/decNumber.c b/libdecnumber/decNumber.c
-index 8c197023f4..1ffe458ad8 100644
---- a/libdecnumber/decNumber.c
-+++ b/libdecnumber/decNumber.c
-@@ -5626,7 +5626,7 @@ static const uShort LNnn[90] = {
- /*    would certainly save at least one if it were made ten times     */
- /*    bigger, too (for truncated fractions 0.100 through 0.999).      */
- /*    However, for most practical evaluations, at least four or five  */
--/*    iterations will be neede -- so this would only speed up by      */
-+/*    iterations will be needed -- so this would only speed up by      */
- /*    20-25% and that probably does not justify increasing the table  */
- /*    size.							      */
- /*								      */
-diff --git a/qemu-img.c b/qemu-img.c
-index 1d8c5cd778..3b7700c780 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -1188,7 +1188,7 @@ static int64_t find_nonzero(const uint8_t *buf, int64_t n)
-  * 'pnum' is set to the number of sectors (including and immediately following
-  * the first one) that are known to be in the same allocated/unallocated state.
-  * The function will try to align the end offset to alignment boundaries so
-- * that the request will at least end aligned and consequtive requests will
-+ * that the request will at least end aligned and consecutive requests will
-  * also start at an aligned offset.
-  */
- static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum,
-diff --git a/qobject/qdict.c b/qobject/qdict.c
-index 526de54ceb..1079bd3f6f 100644
---- a/qobject/qdict.c
-+++ b/qobject/qdict.c
-@@ -33,7 +33,7 @@ QDict *qdict_new(void)
- }
- 
- /**
-- * tdb_hash(): based on the hash agorithm from gdbm, via tdb
-+ * tdb_hash(): based on the hash algorithm from gdbm, via tdb
-  * (from module-init-tools)
-  */
- static unsigned int tdb_hash(const char *name)
-diff --git a/scsi/pr-manager-helper.c b/scsi/pr-manager-helper.c
-index d735b1e7f6..685ce7f92d 100644
---- a/scsi/pr-manager-helper.c
-+++ b/scsi/pr-manager-helper.c
-@@ -127,7 +127,7 @@ static int pr_manager_helper_initialize(PRManagerHelper *pr_mgr,
-     qio_channel_set_delay(QIO_CHANNEL(sioc), false);
-     pr_mgr->ioc = QIO_CHANNEL(sioc);
- 
--    /* A simple feature negotation protocol, even though there is
-+    /* A simple feature negotiation protocol, even though there is
-      * no optional feature right now.
-      */
-     r = pr_manager_helper_read(pr_mgr, &flags, sizeof(flags), errp);
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index dfb8523c8b..96a9237355 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1 +1,2 @@
+ /* List of comma-separated changed AML files to ignore */
++"tests/data/acpi/pc/DSDT.hpbridge",
 -- 
-2.26.2.windows.1
+2.17.1
 
 
