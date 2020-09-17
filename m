@@ -2,87 +2,128 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE422C2D0E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:52:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC1B0C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:53:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F571221E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:52:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 276662087D
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:53:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AvSl34Q9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F571221E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="BtH89zI1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 276662087D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIz10-0003LS-5m
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 14:52:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34516)
+	id 1kIz1v-0004Se-BL
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 14:53:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37200)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kIyza-0002QC-G1
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 14:50:51 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:41191)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kIyzY-0003sw-Bd
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 14:50:49 -0400
-Received: by mail-lj1-x243.google.com with SMTP id y4so2931914ljk.8
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 11:50:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=CAk6mV/9qvSg5WdVvPJL1WOIq9wZ6nb0JDNfKQourHk=;
- b=AvSl34Q9Upc6Q2t6aBJ+z3sK289YQjRQt5IPK27PazaZq8Z+775w3ksAsu3/PJ85CH
- ttHxybTs7qiBjDpLusXSVwEM5brYBEkzsl8wU0Sbg8ly3/JF1FTKvWqfotJktn80mVmV
- PMkIASwFnc9ZB0qOsdyUQEV4xBJWMwjT4FqVTlVNPEijOrXl+DhzLT6QOg1Z4uELKIi3
- eVcwhXPLA4QqAMfCyks4puVvVo5NrAePkIoncl8HO3bbNAGHXFbtGGKf5g0zw4f+Yuun
- 4G8mN8XgK65NAn/R1TjrU6lgz62g+tW6mYz2CJ0gv1bq32yabgnyB4I+aCn8Ul+XiN6S
- Hvww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=CAk6mV/9qvSg5WdVvPJL1WOIq9wZ6nb0JDNfKQourHk=;
- b=TcfGBbG9b2EKbHp4wDt3yrg6qMOXi1IDO7SZrsP0fB/cmrgjqwtz8dKT7YGJRDl535
- RJfl/4at9jO2w5FI2CwBnXAEpXWWfO5jCzW3gWKi11juAgcEKriTu054VTgec2ql0QsP
- xALu9Nr2B4jptN3RAiv5dvlzUCev6JkBVbfhzyp7BysELtiwCT0jEl7BC9p0ECJab6s/
- PuKjP0Hzt3um/ODbceKWUh3fCYkmgqk2bW56kdNqX/Hv69x8/x2dFaVx5LiL2mj+jviC
- Edv09bgr0C+XTLRfGOUT7nQouK8HSy7vNY8hG1ab2IRPHHnsmRD/Sx8n+QHXLdJVhQ+V
- z7RA==
-X-Gm-Message-State: AOAM532L47jDuG8pIsvGulhhRpGt7nQEasD493C9SS2jniOWDEiqzFTF
- Y/y/2S2LvJYwrjQS3RUy20zl/cdfMIGypTp8p58qbQ==
-X-Google-Smtp-Source: ABdhPJxQ8IhoJZu6TzX5w0ttUvQ+IbECBadY+m0iJ90F7and7V6FVMIbpxM6xX9dNiY+gJR9F7jOMUJwt5FJdbGL5mQ=
-X-Received: by 2002:a2e:9745:: with SMTP id f5mr11035508ljj.158.1600368645977; 
- Thu, 17 Sep 2020 11:50:45 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kIz1J-0003np-2H; Thu, 17 Sep 2020 14:52:37 -0400
+Received: from mail-eopbgr50138.outbound.protection.outlook.com
+ ([40.107.5.138]:54921 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kIz1F-0004U7-GY; Thu, 17 Sep 2020 14:52:36 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RXv7KXgLuEYXTBqR0Sp2xXCfW8CWsztbeafrCPiwbaGkHMJkAXwq/aRsHI3AKbAbsrzsU0/q7s0av9wqDLUqN7IhbYqIIkqReUNUCMKUCViLz94xADsVi0h4u0QiSjV6PPX7imX/sKmYKzgl4Jg9vEI0G+cVUY5PBlKgJLz0K2PpSCgI1F2xH5g2eoL92P2GqXDAhYx56uIFHDyUizqQdJlUPsgEPLenGRQX2X9oXXkAKJKcu6xb/cbef8TfDKSjG1JyXCheAeW8KiGb21QO/zhqXXJfUwQKru8i2HHlcBXnEGnObab0gx5saxw4p5s/ausPdOZg/3uORIVCK5/ELQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zRoBWnpk1UqHHpdeLbKh50d57sMB23zqVXWsTUjh/54=;
+ b=HLd5aCjSjhKo+HfOZHwDtlE1JFstNfWjB1XKUnuJhntfx8x0Q5Vqb7u10UfrqXCTuKgAMkC5qHFGV+8IWUPRqOUcIsn1GYX+4dyrgibu/AhSGuifzsLBf6oM/MmtCbPkvcs+DOsiqwgrABZE38ZW1dCPBVy9xA0aSPoobGs4KtHUjTmHorHDk8Tyb4LJqBGLa0zLEU0wj5cFZvyytk6Cpd0kxi+ae2QxTpd9/2E8EVtmhaxLFLElL0H+boqlm5LhP1wb6TOLSyDgjgV99HYPnNFRpEYDKm1XuxfkCPGWa76R/IQieg6dfDymmSEjCfYDdGjQvKmEU6E9n9UqOrwCOQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zRoBWnpk1UqHHpdeLbKh50d57sMB23zqVXWsTUjh/54=;
+ b=BtH89zI1hdH6DhAEr3XnjM5shOPSmax2rqYYqz8uH698ZYKW6U5+6KF+8aPiN2qeWGJ3mDJZcncDLqIrZM4vyfUQRNBEApYNhDCt3voG4s9L8d5wKPnPyAa1iUNLUd7rT31aWuCmVreeHF/+o9wBcaFttMatMd/xDz4JzvmuNmM=
+Authentication-Results: kaod.org; dkim=none (message not signed)
+ header.d=none;kaod.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB3718.eurprd08.prod.outlook.com (2603:10a6:20b:81::23)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Thu, 17 Sep
+ 2020 18:52:29 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692%8]) with mapi id 15.20.3370.019; Thu, 17 Sep 2020
+ 18:52:29 +0000
+Subject: Re: [PATCH 09/14] block/qcow2: qcow2_get_specific_info(): drop error
+ propagation
+To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, eblake@redhat.com,
+ jsnow@redhat.com, stefanha@redhat.com, pbonzini@redhat.com,
+ pavel.dovgaluk@ispras.ru, ari@tuxera.com, mreitz@redhat.com,
+ kwolf@redhat.com, groug@kaod.org
+References: <20200909185930.26524-1-vsementsov@virtuozzo.com>
+ <20200909185930.26524-10-vsementsov@virtuozzo.com>
+ <w51y2l85pon.fsf@maestria.local.igalia.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <d0d7bb04-d6a5-5b7b-17e6-6b659026054c@virtuozzo.com>
+Date: Thu, 17 Sep 2020 21:52:27 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
+In-Reply-To: <w51y2l85pon.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR10CA0032.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:20b:150::12) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-References: <20200917104441.31738-1-pbonzini@redhat.com>
- <faab2d69-4bd1-4878-d638-4c9414e56499@amsat.org>
- <87een0xs44.fsf@linaro.org>
- <CABgObfYby_HfevgJ2fP0EDemd4hXbWc24h3C7mZ4ar_N0mE7AQ@mail.gmail.com>
-In-Reply-To: <CABgObfYby_HfevgJ2fP0EDemd4hXbWc24h3C7mZ4ar_N0mE7AQ@mail.gmail.com>
-From: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Date: Thu, 17 Sep 2020 19:50:31 +0100
-Message-ID: <CAHDbmO3_iUbta7ZK6RecMk8zFeMNUngLOuoJoFbH08452-YMzg@mail.gmail.com>
-Subject: Re: [PATCH] docker.py: always use --rm
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000a7538005af86dc3d"
-Received-SPF: pass client-ip=2a00:1450:4864:20::243;
- envelope-from=alex.bennee@linaro.org; helo=mail-lj1-x243.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.75) by
+ AM0PR10CA0032.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:150::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.11 via Frontend
+ Transport; Thu, 17 Sep 2020 18:52:28 +0000
+X-Originating-IP: [185.215.60.75]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 43f4e09a-49f5-4918-6a56-08d85b3ad3c1
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3718:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB3718C79D0D5996FB5F8F8267C13E0@AM6PR08MB3718.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 7vrbnPa1yYjN5pgEIG2U2qCP8ifpSWJkkQo7ypSWM8PaV+z3EoJn93YElIUd95nGwxXQDGz2YQRmg8dywUkYAy6unCPwVEEqDTcdQCsHqZSyNERHi5ou1ls/CD4eObe5H0rP2X0NUj7IHtzHSA7MycsYa31PEe5OqLzeZSCkPlnWxRTqGTjUoOMTdjzbXAc0RiHIVC2Ju18N9M2qqFFQWxB6ikfU1bWBq+g+f6FgpqeAsz2NdgXcSdeh3nr+DGG2iPJzU8sYH9bdbYR1uq6o/G9eccg96k8WrmEUHuHRSNvS+BxDeOGH8a5T3CRbO6M3omWtF31nuFfPnSFKb/sIydch/sQ4VliCBUVzUO91g22GxprNJAm7WM8IRR2hz/XH
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(376002)(136003)(346002)(39840400004)(396003)(6486002)(19627235002)(316002)(26005)(478600001)(52116002)(5660300002)(8676002)(31686004)(36756003)(2616005)(956004)(2906002)(7416002)(8936002)(83380400001)(4326008)(16526019)(66946007)(86362001)(186003)(66556008)(16576012)(66476007)(31696002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: K5mT4J59UaqifaJanCSISbCems9lZxwKKHxPLvLdCRve3EMrk/LBM6LybxfDQdzV9CaVeT8UpTY78hAbhCR6LOa/yxHzvUQXiI1BuGCeaH8fC5ImTtLneeqyO5yEbaqwVYg72P3ykB5IDNF03PXM/t9eFsrE2azLX5sIHRYGdHdGpJFNJ5NpYLBmbC8mX4Nfvki9ogSZE0Q4qoI2UhxHZsIyxFExmnu9T7HZzVwTIAm78iLdoV8Gn3LvfS0JnOOPF0OirIke4fvOHctyePcdR8sB3mohQ1llmQTN62xE4olUXPiwb+/JhIerh3eOuV+T9YufyRwd7qqUccg17rYR9hcOZ5Y/BMVkQZLZSMJGmHkRMwQBi/rYZ9rtYUsZw9uFEB0ogt0V934FlwNGkAq5QwtlJh05gucw+QeiRope2pDvD+/BtBVogtX6WMK9qiOD6/sCxXYe93OHmlpFGHvdNm4NJ7cvypSNaxO8bArwuwDAS5LeKK4eWUQ/IG/xEwqhDx3V48GcsK+t8FBpnDVdRN3oZha0yI0fj7wcJ8MWGxx0OVNtpQ3Rgi6ch5MMkHjD7AohKLpmPeZlr+NMkVWSSRqPy2CFc3WS1Pcq/vyvRFJ4JCssRr2jG1yhaViJqbKX2fdd3b9+McblFaTFWSIDeQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 43f4e09a-49f5-4918-6a56-08d85b3ad3c1
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Sep 2020 18:52:29.2909 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: pdcu9j5bThP2LYYFhrzK0RzR0MLGZCYRN8d5dHQAnwET10yyg2zZZ1sNpL3uPoz3Bdr0Gx7utDAPdxj9H2GQtWsQ5+njljwujAeDGi7Y83U=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3718
+Received-SPF: pass client-ip=40.107.5.138;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR03-VE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 14:52:30
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,155 +137,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000a7538005af86dc3d
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+17.09.2020 19:32, Alberto Garcia wrote:
+> On Wed 09 Sep 2020 08:59:25 PM CEST, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
+> 
+>> + * On success return true with bm_list set (probably to NULL, if no bitmaps),
+> 
+> " probably " ? :-)
 
-Got it.
+I note this as "set to NULL" is not obvious thing (is it "unset" ? :).. And by "probably" I mean "may be", i.e. NULL is just one of possible cases. Probably I use "probably" in a wrong way?
 
-On Thu, 17 Sep 2020, 17:58 Paolo Bonzini, <pbonzini@redhat.com> wrote:
+> 
+>> + * on failure return false with errp set.
+>>    */
+>> -Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
+>> -                                                Error **errp)
+>> +bool qcow2_get_bitmap_info_list(BlockDriverState *bs,
+>> +                                Qcow2BitmapInfoList **info_list, Error **errp)
+>>   {
+>>       BDRVQcow2State *s = bs->opaque;
+>>       Qcow2BitmapList *bm_list;
+>>       Qcow2Bitmap *bm;
+>> -    Qcow2BitmapInfoList *list = NULL;
+>> -    Qcow2BitmapInfoList **plist = &list;
+> 
+> So here 'list' points at NULL and 'plist' at &list.
 
->
->
-> Il gio 17 set 2020, 18:53 Alex Benn=C3=A9e <alex.bennee@linaro.org> ha sc=
-ritto:
->
->>
->> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
->>
->> > On 9/17/20 12:44 PM, Paolo Bonzini wrote:
->> >> Avoid that containers pile up.
->> >>
->> >> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> >> ---
->> >>  tests/docker/Makefile.include | 1 -
->> >>  tests/docker/docker.py        | 4 ++--
->> >>  2 files changed, 2 insertions(+), 3 deletions(-)
->> >>
->> >> diff --git a/tests/docker/Makefile.include
->> b/tests/docker/Makefile.include
->> >> index 3daabaa2fd..75704268ff 100644
->> >> --- a/tests/docker/Makefile.include
->> >> +++ b/tests/docker/Makefile.include
->> >> @@ -243,7 +243,6 @@ docker-run: docker-qemu-src
->> >>              $(DOCKER_SCRIPT) run                                    =
-\
->> >>                      $(if $(NOUSER),,--run-as-current-user)          =
-\
->> >>                      --security-opt seccomp=3Dunconfined             =
-  \
->> >> -                    $(if $V,,--rm)                                  =
-\
->> >>                      $(if $(DEBUG),-ti,)                             =
-\
->> >
->> > Alternatively:
->> >
->> > -                       $(if $V,,--rm)
->> > -                       $(if $(DEBUG),-ti,)
->> > +                       $(if $(DEBUG),-ti,--rm)
->>
->> Surely that should b:
->>
->>   $(if $(DEBUG),-ti --rm,)
->>
->> I think being able to keep the container around is useful for debug, I
->> have no problem with changing the behaviour for V=3D1.
->>
->
-> You probably mean  $(if $(DEBUG),-ti,--rm) but that would not work becaus=
-e
-> the patch adds --rm unconditionally in docker.py. But $(DEBUG) gives you =
-a
-> shell to run the test from, so I don't think skipping --rm is useful even
-> in the $(DEBUG) case.
->
-> Paolo
->
->>
+Hmm, to be precise, list _is_ NULL (and points nowhere), and plist points to list.
 
---000000000000a7538005af86dc3d
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> 
+>> -        *plist = obj;
+>> -        plist = &obj->next;
+> 
+> In the original code 'plist' is updated when you add a new element, so
+> it always points at the end of the list. But 'list' is unchanged and it
+> still points at the first element.
+> 
+> So the caller receives a pointer to the first element.
+> 
+>> +        *info_list = obj;
+>> +        info_list = &obj->next;
+> 
+> But in the new code there is only one variable (passed by the caller),
+> which always points at the end of the list.
+> 
 
-<div dir=3D"auto">Got it.=C2=A0</div><br><div class=3D"gmail_quote"><div di=
-r=3D"ltr" class=3D"gmail_attr">On Thu, 17 Sep 2020, 17:58 Paolo Bonzini, &l=
-t;<a href=3D"mailto:pbonzini@redhat.com">pbonzini@redhat.com</a>&gt; wrote:=
-<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bord=
-er-left:1px #ccc solid;padding-left:1ex"><div dir=3D"auto"><div><br><br><di=
-v class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">Il gio 17 set=
- 2020, 18:53 Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.org"=
- target=3D"_blank" rel=3D"noreferrer">alex.bennee@linaro.org</a>&gt; ha scr=
-itto:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex=
-;border-left:1px #ccc solid;padding-left:1ex"><br>
-Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsat.org" rel=3D"n=
-oreferrer noreferrer" target=3D"_blank">f4bug@amsat.org</a>&gt; writes:<br>
-<br>
-&gt; On 9/17/20 12:44 PM, Paolo Bonzini wrote:<br>
-&gt;&gt; Avoid that containers pile up.<br>
-&gt;&gt; <br>
-&gt;&gt; Signed-off-by: Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat=
-.com" rel=3D"noreferrer noreferrer" target=3D"_blank">pbonzini@redhat.com</=
-a>&gt;<br>
-&gt;&gt; ---<br>
-&gt;&gt;=C2=A0 tests/docker/Makefile.include | 1 -<br>
-&gt;&gt;=C2=A0 tests/docker/docker.py=C2=A0 =C2=A0 =C2=A0 =C2=A0 | 4 ++--<b=
-r>
-&gt;&gt;=C2=A0 2 files changed, 2 insertions(+), 3 deletions(-)<br>
-&gt;&gt; <br>
-&gt;&gt; diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile=
-.include<br>
-&gt;&gt; index 3daabaa2fd..75704268ff 100644<br>
-&gt;&gt; --- a/tests/docker/Makefile.include<br>
-&gt;&gt; +++ b/tests/docker/Makefile.include<br>
-&gt;&gt; @@ -243,7 +243,6 @@ docker-run: docker-qemu-src<br>
-&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 $(DOCKER_SCRIPT) r=
-un=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
-&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 $(if $(NOUSER),,--run-as-current-user)=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 \<br>
-&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 --security-opt seccomp=3Dunconfined=C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
-&gt;&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 $(if $V,,--rm)=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
-&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 $(if $(DEBUG),-ti,)=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
-&gt;<br>
-&gt; Alternatively:<br>
-&gt;<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0$(if $V,,--rm)<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0$(if $(DEBUG),-ti,)<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0$(if $(DEBUG),-ti,--rm)<br>
-<br>
-Surely that should b:<br>
-<br>
-=C2=A0 $(if $(DEBUG),-ti --rm,)<br>
-<br>
-I think being able to keep the container around is useful for debug, I<br>
-have no problem with changing the behaviour for V=3D1.<br></blockquote></di=
-v></div><div dir=3D"auto"><br></div><div dir=3D"auto">You probably mean=C2=
-=A0 $(if $(DEBUG),-ti,--rm) but that would not work because the patch adds =
---rm unconditionally in docker.py. But $(DEBUG) gives you a shell to run th=
-e test from, so I don&#39;t think skipping --rm is useful even in the $(DEB=
-UG) case.</div><div dir=3D"auto"><br></div><div dir=3D"auto">Paolo</div><di=
-v dir=3D"auto"><div class=3D"gmail_quote"><blockquote class=3D"gmail_quote"=
- style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
-</blockquote></div></div></div>
-</blockquote></div>
+No: at first "*info_list = obj", we set the result which user will get, users pointer now points to the first object in the list.
+Then, at "info_list = &obj->next", we reassign info_list to another pointer: to "next" field of first list item. So, all further "*info_list = obj" are note visible to the caller.
 
---000000000000a7538005af86dc3d--
+Actually, the logic is not changed, just instead of plist we use info_list, and instead of list - a variable which should be defined in the caller. Look: in old code, first "*plist = obj" sets "list" variable, but all further "*plist = obj" don't change "list" variable.
+
+
+-- 
+Best regards,
+Vladimir
 
