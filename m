@@ -2,89 +2,74 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADD4CC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:24:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0411AC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:25:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E72C2075B
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:24:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 36CFD2075B
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:25:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dtm32XLK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E72C2075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="aCU77zBz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36CFD2075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIuq0-00083b-7r
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 10:24:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41772)
+	id 1kIuqP-0000Dv-3v
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 10:25:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37744)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kIujW-0006TT-RS
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 10:17:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59557)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kIujU-0002is-W5
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 10:17:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600352275;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=24jWfzjlkhKIxJSSL2cfwfuNqp054IGNzwVqyyudGDU=;
- b=dtm32XLKjJ25IuMjyDjFafsLsa1RGQF6a61yY6bta6E8gOL+100ymZTPDTMRN9De/13qz8
- V6+LlNcL9MTXzHkpOP3Ujv4bee+CGXaqcNHa/Fox3Dks8JJu2OIdX5OGcS+QSFjrX+De54
- ivJnAyL6fKvnhILx/tIgbvyik/FeHbU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-90-uv6sBA1LPgKMCWz0VKr2vA-1; Thu, 17 Sep 2020 10:17:53 -0400
-X-MC-Unique: uv6sBA1LPgKMCWz0VKr2vA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDBFF1074643;
- Thu, 17 Sep 2020 14:17:52 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
- [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AB5CC19D6C;
- Thu, 17 Sep 2020 14:17:52 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5E4A8113864A; Thu, 17 Sep 2020 16:17:51 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 11/37] qapi/common.py: Replace one-letter 'c' variable
-References: <20200915224027.2529813-1-jsnow@redhat.com>
- <20200915224027.2529813-12-jsnow@redhat.com>
-Date: Thu, 17 Sep 2020 16:17:51 +0200
-In-Reply-To: <20200915224027.2529813-12-jsnow@redhat.com> (John Snow's message
- of "Tue, 15 Sep 2020 18:40:01 -0400")
-Message-ID: <87mu1opjw0.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kIuWi-0005VC-9p
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 10:04:44 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:49599)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kIuWa-0000wH-3x
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 10:04:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=ZNiJsORcp4Qu2yaXOyJKbh2peAVLBuxy6it8UMI6dZ4=; b=aCU77zBzGr5EzYymatgQmhLxes
+ bEY2FoWNLsW/sw7lGZ46Is8BbZvQBz9Z+NmqiTwp39fzMSqq992/ptthKvWqzQpj+7tX1Kre6vjxK
+ Li+OgGM5KvELe3lqn0PmSwpGM0mAAwINBBP2jj6hgz2KcGxCDNOM+FkQfyqR4i2sn8wIzWEPNDIZh
+ NPgBA7wl3LtOIaPH8sWeZelDFw7u2q+SYaBK3HD5jHgwXVjLX7TrpITrVkB/Hhx2JmEFc3DAZEBJi
+ sz3qvhbA8PUdamvIXMTJ13KU+VTdg59nc6RPxDB1W6W27W4Dr172RKuC0aWIueQR8FE3ljjPwlLhS
+ Vd2hweqQ==;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Greg Kurz <groug@kaod.org>, Max Reitz <mreitz@redhat.com>,
+ Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Subject: Re: QEMU policy for real file tests
+Date: Thu, 17 Sep 2020 16:04:32 +0200
+Message-ID: <1957763.100GGpGQLh@silver>
+In-Reply-To: <CAFEAcA8yTpHE2WaBL3B8fbQtetqmH5uXgCudtfHXuYuA+LpavQ@mail.gmail.com>
+References: <1836935.RIYQIvKipu@silver>
+ <a60c566c-986c-2534-3e8e-6a3ff23b9d00@redhat.com>
+ <CAFEAcA8yTpHE2WaBL3B8fbQtetqmH5uXgCudtfHXuYuA+LpavQ@mail.gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 20:51:18
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 08:06:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,43 +82,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <crosa@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
+On Donnerstag, 17. September 2020 14:40:42 CEST Peter Maydell wrote:
+> (Ideally we'd put in some more consistent framework for temp files
+> used by tests to put them all in a single subdir or something, for
+> convenience in cleaning up afterwards.)
 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  scripts/qapi/common.py | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> index c665e67495..4c079755d3 100644
-> --- a/scripts/qapi/common.py
-> +++ b/scripts/qapi/common.py
-> @@ -30,14 +30,14 @@ def camel_to_upper(value):
->      new_name = ''
->      length = len(c_fun_str)
->      for i in range(length):
-> -        c = c_fun_str[i]
-> -        # When c is upper and no '_' appears before, do more checks
-> -        if c.isupper() and (i > 0) and c_fun_str[i - 1] != '_':
-> +        char = c_fun_str[i]
-> +        # When char is upper and no '_' appears before, do more checks
+Yes, a unified interface for creating and auto wiping these, as well as 
+communicating limits for them would be nice to allow test cases adapting to 
+low quota vs. generous environments automatically.
 
-Good opportunity to tweak the language: "When char is upper case".
+For now I take Thomas' advice of 4GB as very rough barrier to stay away from.
 
-> +        if char.isupper() and (i > 0) and c_fun_str[i - 1] != '_':
->              if i < length - 1 and c_fun_str[i + 1].islower():
->                  new_name += '_'
->              elif c_fun_str[i - 1].isdigit():
->                  new_name += '_'
-> -        new_name += c
-> +        new_name += char
->      return new_name.lstrip('_').upper()
+On Donnerstag, 17. September 2020 15:11:18 CEST Peter Maydell wrote:
+> On Thu, 17 Sep 2020 at 14:04, Thomas Huth <thuth@redhat.com> wrote:
+> > On 17/09/2020 14.06, Christian Schoenebeck wrote:
+> > [...]
+> > 
+> > > Final question: if at some later point one large file needs to be
+> > > created for some test case, is there some approximate size limit to
+> > > stay below for not causing issues with free CI cloud services?
+> > 
+> > FWIW, I know that 4G is already too big for some containers on Travis,
+> > see commit 178d383f10e15f5e5a7.
+> 
+> Yes. Also "it's sparse" doesn't always help -- eg on OSX there is
+> no sparse-file support so a 4GB file really does take 4GB even
+> if it's mostly zeroes...
+
+While I agree not using sparse files for test cases, as many environments 
+don't support them; as a side note though: macOS actually supports sparse 
+files for a long time, both on APFS and HPFS+ volumes. There is F_PUNCHHOLE 
+and F_PREALLOCATE for that purpose and st_size reflects the logical file size, 
+whereas st_blocks*S_BLKSIZE returns the actual allocated physical file size.
+
+Best regards,
+Christian Schoenebeck
+
 
 
