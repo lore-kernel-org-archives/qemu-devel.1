@@ -7,84 +7,81 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FE99C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 00:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11281C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 00:58:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC38F206C9
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 00:58:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D976C206B2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 00:58:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sfconservancy.org header.i=@sfconservancy.org header.b="YOI4Ozb+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC38F206C9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sfconservancy.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="ihJ6FeaM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D976C206B2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIiFV-0002D5-Mf
-	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 20:58:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50676)
+	id 1kIiGF-0002iM-RD
+	for qemu-devel@archiver.kernel.org; Wed, 16 Sep 2020 20:58:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50420)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bkuhn@sfconservancy.org>)
- id 1kIiE3-0001Gn-Sy
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 20:56:39 -0400
-Received: from pine.sfconservancy.org
- ([2001:4801:7822:103:be76:4eff:fe10:7c55]:47802)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bkuhn@sfconservancy.org>)
- id 1kIiDt-0007xu-0L
- for qemu-devel@nongnu.org; Wed, 16 Sep 2020 20:56:38 -0400
-Received: from localhost (unknown [216.161.86.19])
- (Authenticated sender: bkuhn)
- by pine.sfconservancy.org (Postfix) with ESMTPSA id 3FE47E833;
- Thu, 17 Sep 2020 00:56:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=sfconservancy.org;
- s=pine; t=1600304186;
- bh=FqiHtaCeMiUCXARQ/S2ALeC80mn1verlRPHJodx0xFY=;
- h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
- b=YOI4Ozb+aP1hiX1l9gtBjBaYqjoM8fPDcvI8Oudec7OfqoWzGktNlm/U0Ryci0DcK
- +kO+nrtNb1t8PsjodICppBpH00hYtpFlEjPS4ppDalHgs1QJ3WfBbwEvk4Ffj/tN3c
- t78vFfRPJAMR4dX+O7ghU4msXQkuzRKGnO98oQdLAPjEykDruRtb3dVU5Bk4bjRnoi
- gVvrHtWV6K/YXOgbo3kUFj0guROMrm9XG3AIFkjYUbQmvcQQhsh4QHgFxp8AODKOLe
- 5utObTfkGBZ+2SJKnI0t4EtvmBQiHpD1OCCUqUHPjjg2eETLS+vrF9UYgqbrBLqc0s
- HeRefbcNpXenA==
-From: "Bradley M. Kuhn" <bkuhn@sfconservancy.org>
-To: "qemu\@sfconservancy.org" <qemu@sfconservancy.org>
-Subject: Re: Should we apply for GitLab's open source program?
-Organization: Software Freedom Conservancy
-References: <878sdp4ks9.fsf@linaro.org>
- <20200908141701.GB7154@stefanha-x1.localdomain>
-Face: iVBORw0KGgoAAAANSUhEUgAAADAAAAAwBAMAAAClLOS0AAAABGdBTUEAALGPC/xhBQAAABVQ
- TFRFAAAAWjotvpiH/PHt27Sj7sq8lXFeBchlBgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsT
- AQCanBgAAAAHdElNRQfiCx4VFw6omMmeAAACAklEQVQ4y43UPZPbIBAGYGdu0puzQ51bI+qMdXId
- r0F1RoLrwfb+/5+QF307VVR4PDxiF14h7Xa7t3q8LJGjavj7a1euCYiZnaPnv9DF4FyMLKdXOPs4
- XM7KKzzKaF83gem+hUuF8QYUg7Fb4LEQAK1OG3hu4bbC3LpUC87+B9AMfQOg0yv0owEOK4x1+gnu
- M3yaV3jOMGxvKoXEKC9gAoabJtZYlXO8wJcb1hMHQClZgSj7cbzsY4a2vSqltIlz8nMpZnMkEmVw
- N4DtcYJo3AMPXFIMRMax/BjhOxZi2CpKKpWSZCd4C8aZ4CpzjR+Cint9WEp5H12IbbySEpHdaYVh
- OY9onf0Qq9//zDCFEW0MbFjUz7mHD1UdO4B3iErk9whdKdWVRuW5YLl5KnU2rjTBDyPmQImm5mec
- WQx7X3fBNwAzQ9kvBTKR0BwR3Bewhisn2mpkhea3BZwBcdorRlQk9QKecyZukRPeHTmuEL1FdjlJ
- tmTlvoAJPnRaMnKinNICn4QthNaKlNAlLae9sc5UODaelVh+l345u7ZMIY89GNdmWV8cIaTFlLGm
- QKLrzQykh/Aw02WsdoE2l1g7JIPdyWGFL6Hy1uJZsEjavLUXkVyeIdrbpPoXQHxDG0l68wEoW8vG
- BLI6qc2XoUEWCUI26aQfK1wypuwV7v6mtMhtgL8avOP/pBCiigAAAABJRU5ErkJggg==
-Date: Wed, 16 Sep 2020 16:39:55 -0700
-In-Reply-To: <20200908141701.GB7154@stefanha-x1.localdomain> (Stefan
- Hajnoczi's message of "Tue, 8 Sep 2020 15:17:01 +0100")
-Message-ID: <87zh5puw8k.fsf@ebb.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
+ id 1kIiD3-0000Xw-TJ
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 20:55:37 -0400
+Received: from mail-ed1-x532.google.com ([2a00:1450:4864:20::532]:40049)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
+ id 1kIiD1-0007kO-Lm
+ for qemu-devel@nongnu.org; Wed, 16 Sep 2020 20:55:37 -0400
+Received: by mail-ed1-x532.google.com with SMTP id t16so678118edw.7
+ for <qemu-devel@nongnu.org>; Wed, 16 Sep 2020 17:55:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=JUNRgWNjRaOkPBqAWqTQIpzjuW8eRI0JJxy57SS7DQs=;
+ b=ihJ6FeaMSIN9D1PcUPc5u2yrA9Doc0XOjgNa4J+1Ra9F2sBgoO7638e6q6jrPczGEd
+ r6W2kN7x3SVbTRy03wg4hYZeVzSopzAsgWpZw9zhc4L4K0eBR/DoDec0BoelWC6WqoYP
+ r9fTCanpUgzjuwXjnKc5sdIzbPIJt4Bjzy99k=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=JUNRgWNjRaOkPBqAWqTQIpzjuW8eRI0JJxy57SS7DQs=;
+ b=pHH9n/Op5blU+3bEPrUw2VwPZtdX7whMGGhPHMzBRpKiYBDMXcd1S9O7XFDMYDCtDS
+ SXDvI+KWj1cU/xzOC9skXpfumfdFzGK9J+Z7PtNScoUDaCmFCzs4WeJ1Mm6dmOJY05Jp
+ V4ZK50ZhMOkRG+iMxBdpCnzRAOWgW7At/jbwp+Qtr2S8Q0OEkUXT6GsJBbxqj38PhLOt
+ SlnHS63dm4fRWvG1YxnUWqfwX1794DIPwKEfa+xgIr/pjdiWZZ57lp0wR0CTFg8SOcXL
+ IL+XqsR1kawJE9aHkDVfsC8bGUVL8aSghh0JiYzLhWL9KwVDwxnPY32l4rwtzyr/M4ZC
+ kqsw==
+X-Gm-Message-State: AOAM530+j9BPyn/Er4rrwj6lHipnfYtl5oilwmCx477uPHlUGPFGwwZq
+ cL//prdtM5bHvrlvJ1/7G0xftcp/ZuyZS1BnJfw=
+X-Google-Smtp-Source: ABdhPJz/kGsmsiKIAFJu1pWARe9FIp85XZ3XhwQRdA8SQy/C3jAdUXuas0kXABn/vw6qJPoB13yO1JtDBWYaT59liFE=
+X-Received: by 2002:aa7:d959:: with SMTP id l25mr29834232eds.383.1600304133933; 
+ Wed, 16 Sep 2020 17:55:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <BY5PR02MB6772761F83EDC56737969C18CA210@BY5PR02MB6772.namprd02.prod.outlook.com>
+In-Reply-To: <BY5PR02MB6772761F83EDC56737969C18CA210@BY5PR02MB6772.namprd02.prod.outlook.com>
+From: Joel Stanley <joel@jms.id.au>
+Date: Thu, 17 Sep 2020 00:55:21 +0000
+Message-ID: <CACPK8XexXLYrwMenkyou0Xkc8Tx+p1SNi7jbFBj6aObAKHcBwQ@mail.gmail.com>
+Subject: Re: eMMC support
+To: Sai Pavan Boddu <saipava@xilinx.com>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2001:4801:7822:103:be76:4eff:fe10:7c55;
- envelope-from=bkuhn@sfconservancy.org; helo=pine.sfconservancy.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 20:56:26
-X-ACL-Warn: Detected OS   = ???
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::532;
+ envelope-from=joel.stan@gmail.com; helo=mail-ed1-x532.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,43 +94,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: , QEMU Developers <qemu-devel@nongnu.org>
+Cc: Edgar Iglesias <edgari@xilinx.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> On Fri, Sep 04, 2020 at 04:35:34PM +0100, Alex Benn=C3=A9e wrote:
->> Given our growing reliance on GitLab and the recent announcement about
->> free tier minutes:
->>=20
->>   https://about.gitlab.com/pricing/faq-consumption-cicd/
->>=20
->> is it time we officially apply for GitLab's Open Source Program:
->>=20
->>   https://about.gitlab.com/solutions/open-source/program/
+On Wed, 16 Sep 2020 at 18:35, Sai Pavan Boddu <saipava@xilinx.com> wrote:
+>
+> Hi Philippe,
+>
+>
+>
+> We are looking to add eMMC support, I searched the mailing list and found=
+ a series posted on eMMC by =E2=80=9CVincent Palatin=E2=80=9D
+>
+> https://lists.gnu.org/archive/html/qemu-devel/2011-07/msg02833.html
 
-Sorry for my late response on this thread.  Since GitLab is requiring that
-organizations be non-profits as part of this program, Conservancy will need
-to coordinate your application with you as we're the parent non-profit for
-this purpose.
+I would be interested in emmc support for the aspeed machines. Please
+cc me when you post patches.
 
-Given my late reply, you may already be coordinating with my colleague Brett
-about this, but I'll check in with him tomorrow to verify.
+> I would like to consider the above work and mix-up with more changes to s=
+tart adding support for eMMC. Do you have any suggestions on the approach f=
+ollowed in above patches ?
 
-One thing to note is that my understanding is that most of what you're
-getting access to through this program is proprietary software features that
-GitLab offers as add-ons.  I really encourage you as a project not enable
-such features, as ultimately you'll probably start to rely on them, and then
-you'll be effectively relying on proprietary software infrastructure to
-develop your project.
+The patches had minor review comments, but I assume the reason they
+didn't go anywhere is the author never followed up with further
+revisions. I would suggest applying them to the current tree, cleaning
+up any style changes that have happened since they were posted, and
+re-posting them for review.
 
-I'm also curious: is there something you need now from the GitLab software
-that self-hosting might improve?
---=20
-Bradley M. Kuhn - he/him
-Policy Fellow & Hacker-in-Residence at Software Freedom Conservancy
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-Become a Conservancy Supporter today: https://sfconservancy.org/supporter
+Cheers,
+
+Joel
+
+>
+>
+>
+> Note: Here is the existing support available in Xilinx fork, which might =
+require some work
+> https://github.com/Xilinx/qemu/blob/master/hw/sd/sd.c
+>
+>
+>
+> Regards,
+> Sai Pavan
 
