@@ -2,80 +2,77 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C3CDC43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 16:21:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD822C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 16:23:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B352206B2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 16:21:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33AE1206E6
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 16:23:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fl1GMi+U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B352206B2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q0VfxjCc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33AE1206E6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIwej-0000vd-Cf
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 12:21:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48546)
+	id 1kIwgd-0002o2-3u
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 12:23:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49816)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kIwZX-0005me-Kl
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 12:15:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22057)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kIwf0-0001ZL-Hg
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 12:21:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47645)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kIwZN-0007F7-UH
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 12:15:46 -0400
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kIwey-0007yw-Bo
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 12:21:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600359336;
+ s=mimecast20190719; t=1600359682;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=whKUzThs0csxZPNrQen/HPExnkGE5sVOjQqUGE0+2UU=;
- b=Fl1GMi+U/1CYPPgAMajxAJCvl8cAJWUpAHY/DEhIjSrexaQ1J/bVXRrbyY0uium448sVX7
- eOfGNmjvL7AgCy1rTxQcmerSFW2omGcEqJRwOxyedKXgAEQV8xLfdgY2L6DBsv3NzCxPHw
- R0oJOCj7naBDKE2q9KJo53dV1bg6oNI=
+ bh=rR19mB1//je4UeqVKYpHsOj4PHZcKtVg8Bje/zf7iiI=;
+ b=Q0VfxjCcJbl8p5JausTawW7iV/x2roa6HDJPjXn9Lf5FBAUt7IAikJGTeeIcWkcLJlnDQc
+ NH/+GDzzJk/hsqUJqwtaJ4EEMJ3IbCt66HWi+6CaucJKqgHDmHS79Ncu4NxTUVpWuz0q+w
+ XHEslt6Xgy0gtYXMc2uzOYcY0vtszZA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-241-Jfw43iEdO0OCnUXXM8Vinw-1; Thu, 17 Sep 2020 12:15:31 -0400
-X-MC-Unique: Jfw43iEdO0OCnUXXM8Vinw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-345-cG4daMOaOzOkMRfAX83pIg-1; Thu, 17 Sep 2020 12:19:25 -0400
+X-MC-Unique: cG4daMOaOzOkMRfAX83pIg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F14910BBED9;
- Thu, 17 Sep 2020 16:15:30 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-113-38.ams2.redhat.com [10.36.113.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A941F19930;
- Thu, 17 Sep 2020 16:15:22 +0000 (UTC)
-Subject: Re: [PATCH] docs: simplify and clarify the platform support rules
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200917155606.1623795-1-berrange@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b6a3673d-8767-ba44-7357-1297ff5c6f83@redhat.com>
-Date: Thu, 17 Sep 2020 18:15:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2D6D800C78;
+ Thu, 17 Sep 2020 16:19:23 +0000 (UTC)
+Received: from localhost (ovpn-119-217.rdu2.redhat.com [10.10.119.217])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 982991000320;
+ Thu, 17 Sep 2020 16:19:20 +0000 (UTC)
+Date: Thu, 17 Sep 2020 12:19:19 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: Python 3.5 EOL; when can require 3.6?
+Message-ID: <20200917161919.GO7594@habkost.net>
+References: <875z8eupyp.fsf@dusky.pond.sub.org>
+ <CAFEAcA8q8J1n2UqsNbHgNwEedA8pZ6fNA7obCR1REN-33nvmkg@mail.gmail.com>
+ <d07189e2-0683-2eb9-44e0-a275688fa8b4@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200917155606.1623795-1-berrange@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <d07189e2-0683-2eb9-44e0-a275688fa8b4@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 02:01:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -84,9 +81,8 @@ X-Spam_score: -5.1
 X-Spam_bar: -----
 X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,117 +96,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/09/2020 17.56, Daniel P. Berrangé wrote:
-> The distinction between short life and long life Linux distributions
-> turned out to be redundant. They can both be covered in a simple way
-> by noting support will target the current release, and the previous
-> release for a period of two years or until its EOL. This rule can also
-> apply to the other UNIX based distros, leaving only Windows needing a
-> different set of rules.
+On Wed, Sep 16, 2020 at 04:00:14PM +0200, Thomas Huth wrote:
+> On 16/09/2020 14.30, Peter Maydell wrote:
+> > On Wed, 16 Sep 2020 at 08:43, Markus Armbruster <armbru@redhat.com> wrote:
+> >> We require Python 3.5.  It will reach its "end of life" at the end of
+> >> September 2020[*].  Any reason not to require 3.6 for 5.2?  qemu-iotests
+> >> already does for its Python parts.
+> [...]
+> > The default should be
+> > "leave the version dependency where it is", not "bump the version
+> > dependency as soon as we can".
 > 
-> This also clarifies that Debian LTS is out of scope, because the LTS
-> support is provided by a separate group from the main Debian maintainer
-> team.
+> OTOH, if none of our supported build systems uses python 3.5 by default
+> anymore, it also will not get tested anymore, so bugs might creep in,
+> which will of course end up in a bad experience for the users, too, that
+> still try to build with such an old version. So limiting the version to
+> the level that we also test is IMHO very reasonable.
 > 
-> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-> ---
+> Let's have a look at the (older) systems that we support and the python
+> versions according to repology.org:
 > 
-> This is a spin off from the Python 3.5 thread
+> - RHEL7 / CentOS 7 : 3.6.8
+> - Ubuntu 18.04 (Bionic) : >= 3.6.5
+> - openSUSE Leap 15.0 : >= 3.6.5
+> - OpenBSD Ports : >= 3.7.9
+> - FreeBSD Ports : >= 3.5.10 - but there is also 3.6 or newer
+> - Homebrew : >= 3.7.9
 > 
-> https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg06358.html
-> 
->  docs/system/build-platforms.rst | 59 ++++++++++-----------------------
->  1 file changed, 18 insertions(+), 41 deletions(-)
-> 
-> diff --git a/docs/system/build-platforms.rst b/docs/system/build-platforms.rst
-> index 9734eba2f1..03d2fd217f 100644
-> --- a/docs/system/build-platforms.rst
-> +++ b/docs/system/build-platforms.rst
-> @@ -29,51 +29,28 @@ The Repology site https://repology.org is a useful resource to identify
->  currently shipped versions of software in various operating systems,
->  though it does not cover all distros listed below.
->  
-> -Linux OS
-> ---------
-> +Linux OS, macOS, FreeBSD, NetBSD, OpenBSD
-> +-----------------------------------------
->  
-> -For distributions with frequent, short-lifetime releases, the project
-> -will aim to support all versions that are not end of life by their
-> -respective vendors. For the purposes of identifying supported software
-> -versions, the project will look at Fedora, Ubuntu, and openSUSE distros.
-> -Other short- lifetime distros will be assumed to ship similar software
-> -versions.
-> +The project aims to support the most recent major version at all times. Support
-> +for the previous major version will be dropped 2 years after the new major
+> ... so I think it should be fine to retire 3.5 nowadays.
 
-I hope it is clear that for Ubuntu, major version means LTS and not each
-and every bi-annual release?
+Thank you very much for the summary.  I've added this info to
+https://wiki.qemu.org/Supported_Build_Platforms
 
-> +version is released or when the vendor itself drops support, whichever comes
-> +first. In this context, third-party efforts to extend the lifetime of a distro
-> +are not considered, even when they are endorsed by the vendor (eg. Debian LTS).
->  
-> -For distributions with long-lifetime releases, the project will aim to
-> -support the most recent major version at all times. Support for the
-> -previous major version will be dropped 2 years after the new major
-> -version is released, or when it reaches "end of life". For the purposes
-> -of identifying supported software versions, the project will look at
-> -RHEL, Debian, Ubuntu LTS, and SLES distros. Other long-lifetime distros
-> -will be assumed to ship similar software versions.
-> +For the purposes of identifying supported software versions available on Linux,
-> +the project will look at CentOS, Debian, Fedora, openSUSE, RHEL, SLES and
-> +Ubuntu LTS. Other distros will be assumed to ship similar software versions.
+Has anybody been able to find information om SLES Python
+versions?  I can't find this anywhere.
 
-Ok, here you explicitly state Ubuntu LTS, so I think it should be clear.
-
-> -Windows
-> --------
-> -
-> -The project supports building with current versions of the MinGW
-> -toolchain, hosted on Linux.
-> -
-> -macOS
-> ------
-> -
-> -The project supports building with the two most recent versions of
-> -macOS, with the current Homebrew package set available.
-> +For FreeBSD, decisions will be made based on the contents of the ports tree;
-> +for macOS, `HomeBrew`_ will be used, although `MacPorts`_ is expected to carry
-> +similar versions.
->  
-> -FreeBSD
-> +Windows
->  -------
->  
-> -The project aims to support all versions which are not end of
-> -life.
-> -
-> -NetBSD
-> -------
-> -
-> -The project aims to support the most recent major version at all times.
-> -Support for the previous major version will be dropped 2 years after the
-> -new major version is released.
-> -
-> -OpenBSD
-> --------
-> +The project supports building with current versions of the MinGW toolchain,
-> +hosted on Linux (Debian/Fedora).
->  
-> -The project aims to support all versions which are not end of
-> -life.
-> +The version of the Windows API that's currently targeted is Vista / Server
-> +2008.
-> 
-
-Sounds good to me.
-
-Acked-by: Thomas Huth <thuth@redhat.com>
+-- 
+Eduardo
 
 
