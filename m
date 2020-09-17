@@ -7,36 +7,37 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C53EBC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:42:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 824F3C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:43:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42619221EE
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:42:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42619221EE
+	by mail.kernel.org (Postfix) with ESMTPS id 0D8B8208E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:43:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D8B8208E4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIyr2-0004Bu-5u
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 14:42:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59574)
+	id 1kIyrz-0005aC-Tm
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 14:42:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59910)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kIyoC-0001RQ-Rw; Thu, 17 Sep 2020 14:39:07 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:53899)
+ id 1kIypu-0003Rp-Nv; Thu, 17 Sep 2020 14:40:50 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:59807)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kIyo9-00029f-M8; Thu, 17 Sep 2020 14:39:04 -0400
+ id 1kIyps-0002Tb-9Y; Thu, 17 Sep 2020 14:40:50 -0400
 Received: from [192.168.100.1] ([82.252.129.222]) by mrelayeu.kundenserver.de
- (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1M4rD7-1kJFea03Oh-001yXx; Thu, 17 Sep 2020 20:38:55 +0200
-Subject: Re: [PATCH V3 05/10] util/: fix some comment spelling errors
-To: zhaolichang <zhaolichang@huawei.com>, qemu-trivial@nongnu.org
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MjjKf-1kkZbl1hT1-00lBdi; Thu, 17 Sep 2020 20:40:42 +0200
+Subject: Re: [PATCH V3 08/10] disas/: fix some comment spelling errors
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ zhaolichang <zhaolichang@huawei.com>
 References: <20200917075029.313-1-zhaolichang@huawei.com>
- <20200917075029.313-6-zhaolichang@huawei.com>
+ <20200917075029.313-9-zhaolichang@huawei.com> <871rj0ztbc.fsf@linaro.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -80,35 +81,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <f2db53c5-1594-17f7-1b31-a140b1ab86d4@vivier.eu>
-Date: Thu, 17 Sep 2020 20:38:54 +0200
+Message-ID: <7bd9cc11-988f-47fc-ce08-2c159c763ea0@vivier.eu>
+Date: Thu, 17 Sep 2020 20:40:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200917075029.313-6-zhaolichang@huawei.com>
+In-Reply-To: <871rj0ztbc.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:z5uqCskpwY6hKnfaqnTvhX+WY2OVcAJb0x1Ol8ajlN/kX5kvJBr
- S2rNaVQpV7vk13hzr2m20dFpD4LxHqKsm1OkyJRyzITT79/BTfNSEdjqbuGgnqRVg/h6t2l
- SFADfNgqCgICp2Eci2Wgg9RnHTh6AyOOnxPXhdjlNyXEPfdN82OFM1mp2pryrXMChlKBRfl
- KhIieKeIwqQQ7dTuxl63A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:S3Yk10nr7DE=:IcQI2jLlPaC71tHowf6wz8
- r/hcKBnZYzYU9pAYJjWhT8L7Cyjtb2/KDiwHnHyA51F6CKYihOHeyJTMBKsbWZKlMjWfB1YRh
- 9TxMBLEfZH7I2fE+reLKH0JQDEd3udHR1OoG3Svt7fYqhbiuIY6BIXa2dauKVc9WLxNmhGL1F
- DbkAPwB5AUDI3TZiMUlzWgqOCQllwgoUZboEFxwMqDqCld1lnO+oIfh91TjCDbGl7kYjcOVNP
- kyKJ9YdIYYBNeLeb3f72gGddi5eBPxy7A4Ab0FH6rlBVUPJ8dZ58RV1S8hOamTOsNB00/6e1G
- C7erZlNTEo+xi+8EzBKW2DUbq8N+j13cNjYBS10HP0uWEgWVqczspuKnffT8gL6ofka3Mw5Az
- xdVlceG8pf72ayYD3Wf9xcbo+kmdBnG3tSOGOwHLITqWVWxTA3fKchOpu+zRHhQbHLC5m5qLv
- YJxKLUHeIwh65Zixg5v5j538W1139xc7jfkaMXkWk+jfkdk7qW31m9WpSqU8TIxJkkrcp8tlP
- daY20tNl8cgOgGJi76Q8wuzLfzEnLBOcavQEUm+s+SzWArp8xndWnq3nGXuQZTGqYI7nXfheG
- EjpjJ4/6Y1nTgdR37zEwHd5QnknHB/Z4X8spUWLsQ1aoARZVGgSqSb5oqlLjJpox4vEX4lAh3
- /d2Uh5+4BkPcbJjsKVDQHmw/jBZEZWnvjez5ca4OdwL8Yfuwfzf/yG7d/8CAT1Gd/JfRkFEQf
- WCFrRWx4Qr11Q8R5pnRpvn9pemapV9s8WSm9wQ/dVDx1vKPXGZC7Ujpslu+SQ/suSJPmPK2u6
- 11t4DVNjie5aA7FEajApPxjhRnxI0yAQF51jxJAZl5pDHx2XIUPRBKBn3HlZvzBetsvutls
-Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:cQ3VzOjwpEDPZH07QQT6CfH/PMMpTcrW109AXnccxdUpyDdUdVm
+ 9UicTcsUfU4j2ceTGUPYPO9R1QDeo5BMwGerpW6KJY8UCMAOuifLKJ0jVIgGi61fv/pa6HR
+ zIed5IJmvim33c1BHNHUp2RMU7ap73qwaoANpLk1+CjklXk2Jp3jAoeo1g3Lv+BTPGvN3L2
+ 5b9qm0HZDiNpkMy4IBIZw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:rbV0DlESwRA=:8/PNG0NBmprYoa0+D49MwG
+ ehqOUFBf9DnQDsD1Ahn7liJ0NMoqEQWpeAUxUeXPFcmTETbTlO1N1yb++xYL9rr7ktC7vEA7T
+ IvueN7kZlN7u5WMHXLBYvGhwg1T7WZfkRnBLdTOd4MWgvY/ftBKfVOaSElOE1peAxm/gBmf3O
+ 0u0S+MU9Xy9sYHdTfwbtpG6GOybMdqhmWJf/5bHPr+tspdmvZb/sj3dAR4zHYmW6Jy9i+reKt
+ sDrDX5e6ggKr/2cLP7y96u55RZ/KbFzWuShXaFx0qwIT9JTwEPr+yJc7Kg15VPjLEAsjwv80c
+ dgOe16qd8Q2Mz4z0SEGhEty4Y/s8KyHhktjL5QnrG1sqc9PHvhdT5hBicdvNhpIJ+mwHVisBJ
+ qoBBfXGLA9+SHyNTs8RYlwNt2ttvXXP+iZA+oXbHl/mnVWsI27xmvjotich5z9QIdu/Lt5J0h
+ /aKjKkG9Ttwnyn0SlZn23JgCYb3HUpcflMcaR+RhH3RqpflVi3ydz+72j7ErJv3dOHIDkgen5
+ uEsokrwAO55+ATO2ont5ibMCfyi2SuiAAIZc75t4nxH5tnWGJXtUC6KGJNudYHUiu5msTrGfI
+ qAlAQFua+0zjqMvEqEk3Vz5QTgyNTr3r+sdUCxEIo1iF4Rb+Lruoq2OTghnJQuI+ZjWp5Fb16
+ NW72lo+dkySbR5G1EOo8vqokNcjujJdTdvv5lf3QI/IecgT84wVDLmxP/jveTDCEvBEcmaBZE
+ LoWBwI9vBv7SqNf5aikp4vqK/tLWfHooH9yBRyNlskyEAuOc4kbM3e/ucmD4T692XTw/zjuRm
+ K/PJ3KJzh0UWat/BJo1QmvksAR+Un80Ry1az0c9vy9X8r0FtsJkP3zMlbnzmRwxY90G6hAo
+Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 14:37:31
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 14:36:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -128,110 +129,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex Bennee <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 17/09/2020 à 09:50, zhaolichang a écrit :
-> I found that there are many spelling errors in the comments of qemu,
-> so I used the spellcheck tool to check the spelling errors
-> and finally found some spelling errors in the util folder.
+Le 17/09/2020 à 10:44, Alex Bennée a écrit :
 > 
-> Signed-off-by: zhaolichang <zhaolichang@huawei.com>
-> Reviewed-by: Alex Bennee <alex.bennee@linaro.org>
-> ---
->  util/osdep.c             | 2 +-
->  util/qemu-progress.c     | 2 +-
->  util/qemu-sockets.c      | 2 +-
->  util/qemu-thread-win32.c | 2 +-
->  util/qht.c               | 2 +-
->  util/trace-events        | 2 +-
->  6 files changed, 6 insertions(+), 6 deletions(-)
+> zhaolichang <zhaolichang@huawei.com> writes:
 > 
-> diff --git a/util/osdep.c b/util/osdep.c
-> index 4829c07ff6..e50dc2214e 100644
-> --- a/util/osdep.c
-> +++ b/util/osdep.c
-> @@ -392,7 +392,7 @@ int qemu_unlink(const char *name)
->   * Set errno if fewer than `count' bytes are written.
->   *
->   * This function don't work with non-blocking fd's.
-> - * Any of the possibilities with non-bloking fd's is bad:
-> + * Any of the possibilities with non-blocking fd's is bad:
->   *   - return a short write (then name is wrong)
->   *   - busy wait adding (errno == EAGAIN) to the loop
->   */
-> diff --git a/util/qemu-progress.c b/util/qemu-progress.c
-> index 3c2223c1a2..20d51f8c12 100644
-> --- a/util/qemu-progress.c
-> +++ b/util/qemu-progress.c
-> @@ -131,7 +131,7 @@ void qemu_progress_end(void)
->  /*
->   * Report progress.
->   * @delta is how much progress we made.
-> - * If @max is zero, @delta is an absolut value of the total job done.
-> + * If @max is zero, @delta is an absolute value of the total job done.
->   * Else, @delta is a progress delta since the last call, as a fraction
->   * of @max.  I.e. the delta is @delta * @max / 100. This allows
->   * relative accounting of functions which may be a different fraction of
-> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-> index b37d288866..99ce2fd5e6 100644
-> --- a/util/qemu-sockets.c
-> +++ b/util/qemu-sockets.c
-> @@ -416,7 +416,7 @@ static struct addrinfo *inet_parse_connect_saddr(InetSocketAddress *saddr,
->  
->      /* At least FreeBSD and OS-X 10.6 declare AI_V4MAPPED but
->       * then don't implement it in their getaddrinfo(). Detect
-> -     * this and retry without the flag since that's preferrable
-> +     * this and retry without the flag since that's preferable
->       * to a fatal error
->       */
->      if (rc == EAI_BADFLAGS &&
-> diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
-> index 56a83333da..d207b0cb58 100644
-> --- a/util/qemu-thread-win32.c
-> +++ b/util/qemu-thread-win32.c
-> @@ -289,7 +289,7 @@ void qemu_event_wait(QemuEvent *ev)
->              ResetEvent(ev->event);
->  
->              /* Tell qemu_event_set that there are waiters.  No need to retry
-> -             * because there cannot be a concurent busy->free transition.
-> +             * because there cannot be a concurrent busy->free transition.
->               * After the CAS, the event will be either set or busy.
->               */
->              if (atomic_cmpxchg(&ev->value, EV_FREE, EV_BUSY) == EV_SET) {
-> diff --git a/util/qht.c b/util/qht.c
-> index 67e5d5b916..b2e020c398 100644
-> --- a/util/qht.c
-> +++ b/util/qht.c
-> @@ -49,7 +49,7 @@
->   * it anymore.
->   *
->   * Writers check for concurrent resizes by comparing ht->map before and after
-> - * acquiring their bucket lock. If they don't match, a resize has occured
-> + * acquiring their bucket lock. If they don't match, a resize has occurred
->   * while the bucket spinlock was being acquired.
->   *
->   * Related Work:
-> diff --git a/util/trace-events b/util/trace-events
-> index 4e894aa9c3..24c31803b0 100644
-> --- a/util/trace-events
-> +++ b/util/trace-events
-> @@ -28,7 +28,7 @@ qemu_file_monitor_add_watch(void *mon, const char *dirpath, const char *filename
->  qemu_file_monitor_remove_watch(void *mon, const char *dirpath, int64_t id) "File monitor %p remove watch dir='%s' id=%" PRId64
->  qemu_file_monitor_new(void *mon, int fd) "File monitor %p created fd=%d"
->  qemu_file_monitor_enable_watch(void *mon, const char *dirpath, int id) "File monitor %p enable watch dir='%s' id=%u"
-> -qemu_file_monitor_disable_watch(void *mon, const char *dirpath, int id) "Fle monitor %p disable watch dir='%s' id=%u"
-> +qemu_file_monitor_disable_watch(void *mon, const char *dirpath, int id) "File monitor %p disable watch dir='%s' id=%u"
->  qemu_file_monitor_event(void *mon, const char *dirpath, const char *filename, int mask, unsigned int id) "File monitor %p event dir='%s' file='%s' mask=0x%x id=%u"
->  qemu_file_monitor_dispatch(void *mon, const char *dirpath, const char *filename, int ev, void *cb, void *opaque, int64_t id) "File monitor %p dispatch dir='%s' file='%s' ev=%d cb=%p opaque=%p id=%" PRId64
->  
+>> I found that there are many spelling errors in the comments of qemu,
+>> so I used the spellcheck tool to check the spelling errors
+>> and finally found some spelling errors in the disas folder.
+>>
+>> Signed-off-by: zhaolichang <zhaolichang@huawei.com>
 > 
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+> 
+> I suggest on your next posting you CC qemu-trivial@nongnu.org so the
+> patches can get pulled in via the trivial tree.
+
+It was.
 
 Applied to my trivial-patches branch.
 
 Thanks,
 Laurent
+
+> 
+>> ---
+>>  disas/hppa.c | 2 +-
+>>  disas/m68k.c | 8 ++++----
+>>  disas/ppc.c  | 2 +-
+>>  3 files changed, 6 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/disas/hppa.c b/disas/hppa.c
+>> index 2dbd1fc445..dcf9a47f34 100644
+>> --- a/disas/hppa.c
+>> +++ b/disas/hppa.c
+>> @@ -2021,7 +2021,7 @@ print_insn_hppa (bfd_vma memaddr, disassemble_info *info)
+>>  			fput_fp_reg (GET_FIELD (insn, 6, 10), info);
+>>  		      break;
+>>  
+>> -		      /* 'fA' will not generate a space before the regsiter
+>> +		      /* 'fA' will not generate a space before the register
+>>  			 name.  Normally that is fine.  Except that it
+>>  			 causes problems with xmpyu which has no FP format
+>>  			 completer.  */
+>> diff --git a/disas/m68k.c b/disas/m68k.c
+>> index 863409c67c..aefaecfbd6 100644
+>> --- a/disas/m68k.c
+>> +++ b/disas/m68k.c
+>> @@ -70,7 +70,7 @@ struct floatformat
+>>    unsigned int exp_start;
+>>    unsigned int exp_len;
+>>    /* Bias added to a "true" exponent to form the biased exponent.  It
+>> -     is intentionally signed as, otherwize, -exp_bias can turn into a
+>> +     is intentionally signed as, otherwise, -exp_bias can turn into a
+>>       very large number (e.g., given the exp_bias of 0x3fff and a 64
+>>       bit long, the equation (long)(1 - exp_bias) evaluates to
+>>       4294950914) instead of -16382).  */
+>> @@ -479,7 +479,7 @@ struct m68k_opcode_alias
+>>        and remaining 3 bits of register shifted 9 bits in first word.
+>>        Indicate upper/lower in 1 bit shifted 7 bits in second word.
+>>        Use with `R' or `u' format.
+>> -   n  `m' withouth upper/lower indication. (For M[S]ACx; 4 bits split
+>> +   n  `m' without upper/lower indication. (For M[S]ACx; 4 bits split
+>>        with MSB shifted 6 bits in first word and remaining 3 bits of
+>>        register shifted 9 bits in first word.  No upper/lower
+>>        indication is done.)  Use with `R' or `u' format.
+>> @@ -854,7 +854,7 @@ fetch_arg (unsigned char *buffer,
+>>  
+>>  /* Check if an EA is valid for a particular code.  This is required
+>>     for the EMAC instructions since the type of source address determines
+>> -   if it is a EMAC-load instruciton if the EA is mode 2-5, otherwise it
+>> +   if it is a EMAC-load instruction if the EA is mode 2-5, otherwise it
+>>     is a non-load EMAC instruction and the bits mean register Ry.
+>>     A similar case exists for the movem instructions where the register
+>>     mask is interpreted differently for different EAs.  */
+>> @@ -1080,7 +1080,7 @@ print_indexed (int basereg,
+>>  
+>>  /* Returns number of bytes "eaten" by the operand, or
+>>     return -1 if an invalid operand was found, or -2 if
+>> -   an opcode tabe error was found.
+>> +   an opcode table error was found.
+>>     ADDR is the pc for this arg to be relative to.  */
+>>  
+>>  static int
+>> diff --git a/disas/ppc.c b/disas/ppc.c
+>> index 63e97cfe1d..02be878198 100644
+>> --- a/disas/ppc.c
+>> +++ b/disas/ppc.c
+>> @@ -5226,7 +5226,7 @@ operand_value_powerpc (const struct powerpc_operand *operand,
+>>        if ((operand->flags & PPC_OPERAND_SIGNED) != 0)
+>>  	{
+>>  	  /* BITM is always some number of zeros followed by some
+>> -	     number of ones, followed by some numer of zeros.  */
+>> +	     number of ones, followed by some number of zeros.  */
+>>  	  unsigned long top = operand->bitm;
+>>  	  /* top & -top gives the rightmost 1 bit, so this
+>>  	     fills in any trailing zeros.  */
+> 
+> 
 
 
