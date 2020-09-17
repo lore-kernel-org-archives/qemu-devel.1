@@ -2,91 +2,62 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E9D5C2D0E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:10:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70AEEC2BBD1
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:11:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2B142065D
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:10:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rjf7ax4q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2B142065D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 02E072075B
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 08:11:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02E072075B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIp0A-000585-Gl
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 04:10:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53100)
+	id 1kIp0h-0005oH-3l
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 04:11:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51710)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kIoon-00069w-Dj
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:59:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45816
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kIool-00067O-2T
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 03:59:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600329538;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=dod+uKaOMUpqOfy/MzGi8xyLP1hSuTYkmRsbrBo5570=;
- b=Rjf7ax4qn5RQPijT6nM+DrMmGKvUMArrZamLrkVRXP0/0cX36fg07OOyp+Dk1W2V/upbmO
- tiD+WbyYWnl5q02wzB3dT+RWVjePnMdwhYNlbEbzteK9JwWR8WBkka1S9XW4AWpGmnyonW
- WMhsLpr8/oC/vfYguxUPE4OSZ/IECiQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-311-aQ4JN2ndMsqHlp16Gdu1pg-1; Thu, 17 Sep 2020 03:58:46 -0400
-X-MC-Unique: aQ4JN2ndMsqHlp16Gdu1pg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EEC07102120C;
- Thu, 17 Sep 2020 07:58:44 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
- [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9635768865;
- Thu, 17 Sep 2020 07:58:44 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 21DE3113864A; Thu, 17 Sep 2020 09:58:43 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 07/37] qapi: add pylintrc
-References: <20200915224027.2529813-1-jsnow@redhat.com>
- <20200915224027.2529813-8-jsnow@redhat.com>
- <87k0wtoqes.fsf@dusky.pond.sub.org>
- <4da09c14-a768-73ee-3f91-62e7c60ac234@redhat.com>
-Date: Thu, 17 Sep 2020 09:58:43 +0200
-In-Reply-To: <4da09c14-a768-73ee-3f91-62e7c60ac234@redhat.com> (John Snow's
- message of "Wed, 16 Sep 2020 10:37:23 -0400")
-Message-ID: <875z8cg7gs.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
+ id 1kIohb-0004yh-OH; Thu, 17 Sep 2020 03:51:35 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:58852 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
+ id 1kIohZ-0005NL-AM; Thu, 17 Sep 2020 03:51:35 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id A1DABCCC06328E4FF938;
+ Thu, 17 Sep 2020 15:51:25 +0800 (CST)
+Received: from localhost (10.174.187.87) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
+ 15:51:18 +0800
+From: zhaolichang <zhaolichang@huawei.com>
+To: <qemu-trivial@nongnu.org>
+Subject: [PATCH V3 08/10] disas/: fix some comment spelling errors
+Date: Thu, 17 Sep 2020 15:50:27 +0800
+Message-ID: <20200917075029.313-9-zhaolichang@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
+In-Reply-To: <20200917075029.313-1-zhaolichang@huawei.com>
+References: <20200917075029.313-1-zhaolichang@huawei.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 02:16:16
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Originating-IP: [10.174.187.87]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35;
+ envelope-from=zhaolichang@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 03:51:25
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,181 +71,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: zhaolichang <zhaolichang@huawei.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
+I found that there are many spelling errors in the comments of qemu,
+so I used the spellcheck tool to check the spelling errors
+and finally found some spelling errors in the disas folder.
 
-> On 9/16/20 8:30 AM, Markus Armbruster wrote:
->> John Snow <jsnow@redhat.com> writes:
->> 
->>> Add a skeleton pylintrc file. Right now, it ignores quite a few things.
->>> Files will be removed from the known-bad list throughout this and
->>> following series as they are repaired.
->>>
->>> Note: Normally, pylintrc would go in the folder above the module, but as
->>> that folder is shared by many things, it is going inside the module
->>> folder now.
->>>
->>> Due to some bugs in different versions of pylint (2.5.x), pylint does
->>> not correctly recognize when it is being run from "inside" a module, and
->>> must be run *outside* of the module.
->>>
->>> Therefore, to run it, you must:
->>>
->>>   > cd :/qemu/scripts
->> -bash: cd: :/qemu/scripts: No such file or directory
->> ;-P
->> 
->>>   > pylint qapi/ --rcfile=qapi/pylintrc
->> Why not
->>     $ pylint scripts/qapi --rcfile=scripts/qapi/pylintrc
->> 
->
-> No reason I'm aware of, I have just been testing with CWD at the
-> scripts dir myself because of how python imports work.
->
-> If it works this way, enjoy!
+Signed-off-by: zhaolichang <zhaolichang@huawei.com>
+---
+ disas/hppa.c | 2 +-
+ disas/m68k.c | 8 ++++----
+ disas/ppc.c  | 2 +-
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
-It works, and it simplifies the commmit message.
-
->>> Signed-off-by: John Snow <jsnow@redhat.com>
->>> ---
->>>   scripts/qapi/pylintrc | 74 +++++++++++++++++++++++++++++++++++++++++++
->>>   1 file changed, 74 insertions(+)
->>>   create mode 100644 scripts/qapi/pylintrc
->>>
->>> diff --git a/scripts/qapi/pylintrc b/scripts/qapi/pylintrc
->>> new file mode 100644
->>> index 0000000000..c2bbb8e8e1
->>> --- /dev/null
->>> +++ b/scripts/qapi/pylintrc
->>> @@ -0,0 +1,74 @@
->>> +[MASTER]
->>> +
->>> +# Add files or directories matching the regex patterns to the blacklist. The
->>> +# regex matches against base names, not paths.
->>> +ignore-patterns=common.py,
->>> +                doc.py,
->>> +                error.py,
->>> +                expr.py,
->>> +                gen.py,
->>> +                parser.py,
->>> +                schema.py,
->>> +                source.py,
->>> +                types.py,
->>> +                visit.py,
->> Already not ignored:
->>      __init__.py
->>      commands.py
->>      common.py
->>      debug.py
->>      events.py
->>      introspect.py
->>      script.py
->> Okay.
->> 
->>> +
->>> +
->>> +[MESSAGES CONTROL]
->>> +
->>> +# Disable the message, report, category or checker with the given id(s). You
->>> +# can either give multiple identifiers separated by comma (,) or put this
->>> +# option multiple times (only on the command line, not in the configuration
->>> +# file where it should appear only once). You can also use "--disable=all" to
->>> +# disable everything first and then reenable specific checks. For example, if
->>> +# you want to run only the similarities checker, you can use "--disable=all
->>> +# --enable=similarities". If you want to run only the classes checker, but have
->>> +# no Warning level messages displayed, use "--disable=all --enable=classes
->>> +# --disable=W".
->>> +disable=fixme,
->>> +        missing-docstring,
->>> +        too-many-arguments,
->>> +        too-many-branches,
->>> +        too-many-statements,
->>> +        too-many-instance-attributes,
->> I'm fine with disabling these.
->> 
->
-> I'd like to enable missing-docstring eventually, but that's not for today.
-
-Understood.
-
->>> +
->>> +[REPORTS]
->>> +
->>> +[REFACTORING]
->>> +
->>> +[MISCELLANEOUS]
->>> +
->>> +[LOGGING]
->>> +
->>> +[BASIC]
->>> +
->>> +# Good variable names which should always be accepted, separated by a comma.
->>> +good-names=i,
->>> +           j,
->>> +           k,
->>> +           ex,
->>> +           Run,
->>> +           _
->> Isn't this the default?
->> 
->
-> Yes. I could omit it until I need to use good-names later on in the
-> series, but I thought it would look odd to add the defaults at that
-> point.
->
-> So it's a minor bit of prescience here.
-
-Matter of taste.  No objection.
-
->>> +
->>> +[VARIABLES]
->>> +
->>> +[STRING]
->>> +
->>> +[SPELLING]
->>> +
->>> +[FORMAT]
->>> +
->>> +[SIMILARITIES]
->>> +
->>> +# Ignore imports when computing similarities.
->>> +ignore-imports=yes
->> Why?
->> 
->
-> We don't care if import statements are similar to those in other
-> files. It's uninteresting entirely.
->
-> (It matches on from typing import ... that exceed four lines, which I
-> do regularly by the end of the series.)
-
-What about something like
-
-     # Ignore imports when computing similarities, because import
-     # statements being similar is uninteresting entirely
-
->>> +
->>> +[TYPECHECK]
->>> +
->>> +[CLASSES]
->>> +
->>> +[IMPORTS]
->>> +
->>> +[DESIGN]
->>> +
->>> +[EXCEPTIONS]
->> Looks like you started with output of --generate-rcfile,
->> 
->
-> I did,
-
-Let's mention that in the commit message.  Education opportunity :)
+diff --git a/disas/hppa.c b/disas/hppa.c
+index 2dbd1fc445..dcf9a47f34 100644
+--- a/disas/hppa.c
++++ b/disas/hppa.c
+@@ -2021,7 +2021,7 @@ print_insn_hppa (bfd_vma memaddr, disassemble_info *info)
+ 			fput_fp_reg (GET_FIELD (insn, 6, 10), info);
+ 		      break;
+ 
+-		      /* 'fA' will not generate a space before the regsiter
++		      /* 'fA' will not generate a space before the register
+ 			 name.  Normally that is fine.  Except that it
+ 			 causes problems with xmpyu which has no FP format
+ 			 completer.  */
+diff --git a/disas/m68k.c b/disas/m68k.c
+index 863409c67c..aefaecfbd6 100644
+--- a/disas/m68k.c
++++ b/disas/m68k.c
+@@ -70,7 +70,7 @@ struct floatformat
+   unsigned int exp_start;
+   unsigned int exp_len;
+   /* Bias added to a "true" exponent to form the biased exponent.  It
+-     is intentionally signed as, otherwize, -exp_bias can turn into a
++     is intentionally signed as, otherwise, -exp_bias can turn into a
+      very large number (e.g., given the exp_bias of 0x3fff and a 64
+      bit long, the equation (long)(1 - exp_bias) evaluates to
+      4294950914) instead of -16382).  */
+@@ -479,7 +479,7 @@ struct m68k_opcode_alias
+       and remaining 3 bits of register shifted 9 bits in first word.
+       Indicate upper/lower in 1 bit shifted 7 bits in second word.
+       Use with `R' or `u' format.
+-   n  `m' withouth upper/lower indication. (For M[S]ACx; 4 bits split
++   n  `m' without upper/lower indication. (For M[S]ACx; 4 bits split
+       with MSB shifted 6 bits in first word and remaining 3 bits of
+       register shifted 9 bits in first word.  No upper/lower
+       indication is done.)  Use with `R' or `u' format.
+@@ -854,7 +854,7 @@ fetch_arg (unsigned char *buffer,
+ 
+ /* Check if an EA is valid for a particular code.  This is required
+    for the EMAC instructions since the type of source address determines
+-   if it is a EMAC-load instruciton if the EA is mode 2-5, otherwise it
++   if it is a EMAC-load instruction if the EA is mode 2-5, otherwise it
+    is a non-load EMAC instruction and the bits mean register Ry.
+    A similar case exists for the movem instructions where the register
+    mask is interpreted differently for different EAs.  */
+@@ -1080,7 +1080,7 @@ print_indexed (int basereg,
+ 
+ /* Returns number of bytes "eaten" by the operand, or
+    return -1 if an invalid operand was found, or -2 if
+-   an opcode tabe error was found.
++   an opcode table error was found.
+    ADDR is the pc for this arg to be relative to.  */
+ 
+ static int
+diff --git a/disas/ppc.c b/disas/ppc.c
+index 63e97cfe1d..02be878198 100644
+--- a/disas/ppc.c
++++ b/disas/ppc.c
+@@ -5226,7 +5226,7 @@ operand_value_powerpc (const struct powerpc_operand *operand,
+       if ((operand->flags & PPC_OPERAND_SIGNED) != 0)
+ 	{
+ 	  /* BITM is always some number of zeros followed by some
+-	     number of ones, followed by some numer of zeros.  */
++	     number of ones, followed by some number of zeros.  */
+ 	  unsigned long top = operand->bitm;
+ 	  /* top & -top gives the rightmost 1 bit, so this
+ 	     fills in any trailing zeros.  */
+-- 
+2.26.2.windows.1
 
 
