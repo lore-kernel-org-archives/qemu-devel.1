@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE964C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:15:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FDD6C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:15:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 069AE20838
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:15:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C98A12064E
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:15:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="ZV8TkN0X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 069AE20838
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="MQG7fEic"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C98A12064E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIugw-000371-UF
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 10:15:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36226)
+	id 1kIuhT-0003SU-J8
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 10:15:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35472)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1kIuS2-0000CO-An; Thu, 17 Sep 2020 09:59:54 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:47368)
+ id 1kIuPG-00052D-1Y; Thu, 17 Sep 2020 09:57:02 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:42130)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1kIuRz-0000Mq-HC; Thu, 17 Sep 2020 09:59:54 -0400
+ id 1kIuPD-00007K-QL; Thu, 17 Sep 2020 09:57:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=7eAcOkCLr5DX+4Px0eNpmwZ7RuvS2v4xLNkJYY4PBjA=; 
- b=ZV8TkN0XU8rowzwpzkMiIXYmJzsQRlKqi2+4bIdeAL6SgtNiIHNZKRGC8PrNyo25u2UBew/ZhiDEFjEH0sxsuPEcBsBToKB0Fuztr2qor068zRhVfFwS4nOdfnMTwnyHUxie8n1S1jv6aeLPIc4H1D3wsW+4RSV+RbnTbllYrm9i8Tg6mj1EyI1aDF8YAZjevP5ZkMXdzAMM5oAeAt/pDo62e9YgmSk0adoP4m3qVct1YHrlL0mVZ311Qw2h5cHGKlAnJzPUK6JlFhPK+oG2tVqR3fXjlL6fmkzZ6O4gwT7gNLJsfKvgZONbBdvKcfb5UnWyREzuGCusNneWFGTcHQ==;
+ bh=TmK60EUFAI81conxG5UGAneBcLZvi3yffaIRT/v38IY=; 
+ b=MQG7fEic4kF6tgdBgMoS+z7N85oA2NuNz/VvwFeTXUkG3QxJjHzc91CBy5krU6wJjbHv7LdkhXd+GArKBHhvVEmafEwptKhWInwtwtyPn/FWAGSb1snIsnplalPM4MwEllhSN4QGJgkvd7RNXOC47ojc3liUmRwGGTg5tAi9LKktbsMzAyTaLaXpyWUZ1VEA701+AL7iz+xcZ0c8xSKjF94unW1AQCdKOrdB2ZzGsCr/VT/neYQfzFUtYH0uGrkcZhgGocTnO+6eTL+immzt4bVHH3iXOy0FBQaY/BCksh/7KdJH/N/izGK+YlG4/CjoAH2JsdQK2Zmnk/uH8tOLMA==;
 Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
  by fanzine.igalia.com with esmtps 
  (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1kIuRw-0002P5-0y; Thu, 17 Sep 2020 15:59:48 +0200
+ id 1kIuOp-0001yW-Ud; Thu, 17 Sep 2020 15:56:35 +0200
 Received: from berto by mail.igalia.com with local (Exim)
- id 1kIuRv-0006pY-NY; Thu, 17 Sep 2020 15:59:47 +0200
+ id 1kIuOp-0006XV-LW; Thu, 17 Sep 2020 15:56:35 +0200
 From: Alberto Garcia <berto@igalia.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org
-Subject: Re: [PATCH 02/14] block: use return status of bdrv_append()
-In-Reply-To: <20200909185930.26524-3-vsementsov@virtuozzo.com>
+Subject: Re: [PATCH 04/14] blockdev: fix drive_backup_prepare() missed error
+In-Reply-To: <20200909185930.26524-5-vsementsov@virtuozzo.com>
 References: <20200909185930.26524-1-vsementsov@virtuozzo.com>
- <20200909185930.26524-3-vsementsov@virtuozzo.com>
+ <20200909185930.26524-5-vsementsov@virtuozzo.com>
 User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
  (i586-pc-linux-gnu)
-Date: Thu, 17 Sep 2020 15:59:47 +0200
-Message-ID: <w515z8czep8.fsf@maestria.local.igalia.com>
+Date: Thu, 17 Sep 2020 15:56:35 +0200
+Message-ID: <w51bli4zeuk.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
@@ -85,9 +85,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed 09 Sep 2020 08:59:18 PM CEST, Vladimir Sementsov-Ogievskiy wrote:
-> Now bdrv_append returns status and we can drop all the local_err things
-> around it.
+On Wed 09 Sep 2020 08:59:20 PM CEST, Vladimir Sementsov-Ogievskiy wrote:
+> We leak local_err and don't report failure to the caller. It's
+> definitely wrong, let's fix.
 >
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
