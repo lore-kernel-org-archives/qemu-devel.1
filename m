@@ -2,80 +2,96 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16A37C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 04:30:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EB25C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 06:02:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0CB52075E
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 04:30:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0CB52075E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id DEF18208DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 06:02:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IFgH5PXC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEF18208DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIlZN-0002nM-Sc
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 00:30:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35208)
+	id 1kIn06-0004qU-VK
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 02:02:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56334)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIlYB-0002JB-EW
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 00:29:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41542)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kIlY9-0004xa-Ez
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 00:29:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kIlY8-00062w-0c
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 04:29:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E9D2A2E80EE
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 04:29:35 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kImzI-0004Nx-7z
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 02:01:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23732)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kImzF-0000RW-Nt
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 02:01:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600322500;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fCGL/nEcce+Yr1hqYuzW4S4LCUePOkKzZ40ZIBLWADc=;
+ b=IFgH5PXCM4wLJBzCCjJRbosENB43Nwyrz31ZIDgzJcPf4gykSaLxD3pHxyM7gU8awCKMiT
+ cd5DNlGasz1Zj1wBiRVTVq1d8qqNkfTPfHmP50ush5kRXWPxyQBoF49A8MTwh9rnGMLHuq
+ 5m9+mEFZsgqx4D6jMjvXaJ43AI2R5yw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-473-fq5R9nY8NuO12Hx5xatxSQ-1; Thu, 17 Sep 2020 02:01:36 -0400
+X-MC-Unique: fq5R9nY8NuO12Hx5xatxSQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 677E310082E8;
+ Thu, 17 Sep 2020 06:01:35 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3CDA776E16;
+ Thu, 17 Sep 2020 06:01:25 +0000 (UTC)
+Date: Thu, 17 Sep 2020 08:01:23 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Julia Suvorova <jusual@redhat.com>
+Subject: Re: [RFC PATCH v2 3/4] hw/i386/acpi-build: Turn off support of PCIe
+ native hot-plug and SHPC in _OSC
+Message-ID: <20200917080123.29b7e838@redhat.com>
+In-Reply-To: <CAMDeoFW+KC69j7GW_-w5n1iJashYmZ2i_f-nEsPOs3DQkzog7g@mail.gmail.com>
+References: <20200818215227.181654-1-jusual@redhat.com>
+ <20200818215227.181654-4-jusual@redhat.com>
+ <20200821141339.00f2076c@redhat.com>
+ <CAMDeoFU4nHJZ6FNtTKjnpA8h12AmLpycSEKGkUO85CNy643WyQ@mail.gmail.com>
+ <CAMDeoFW+KC69j7GW_-w5n1iJashYmZ2i_f-nEsPOs3DQkzog7g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 17 Sep 2020 04:17:19 -0000
-From: Launchpad Bug Tracker <1603970@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 7-mair-g janitor th-huth
-X-Launchpad-Bug-Reporter: Kilian Ries (7-mair-g)
-X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <20160718121144.22648.14707.malonedeb@chaenomeles.canonical.com>
-Message-Id: <160031623948.27044.1191177869704517423.malone@loganberry.canonical.com>
-Subject: [Bug 1603970] Re: KVM freezes after live migration (AMD 4184 -> 4234)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: c03f651711e894b76cd277d349ec0239585a14c6
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 00:25:47
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 02:01:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,93 +100,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1603970 <1603970@bugs.launchpad.net>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+On Wed, 16 Sep 2020 21:14:36 +0200
+Julia Suvorova <jusual@redhat.com> wrote:
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+> On Wed, Sep 16, 2020 at 8:03 PM Julia Suvorova <jusual@redhat.com> wrote:
+> >
+> > On Fri, Aug 21, 2020 at 2:13 PM Igor Mammedov <imammedo@redhat.com> wrote:  
+> > >
+> > > On Tue, 18 Aug 2020 23:52:26 +0200
+> > > Julia Suvorova <jusual@redhat.com> wrote:
+> > >  
+> > > > Other methods may be used if the system is capable of this and the _OSC bit
+> > > > is set. Disable them explicitly to force ACPI PCI hot-plug use. The older
+> > > > versions will still use PCIe native.
+> > > >
+> > > > Signed-off-by: Julia Suvorova <jusual@redhat.com>
+> > > > ---
+> > > >  hw/i386/acpi-build.h | 11 +++++++++++
+> > > >  hw/i386/acpi-build.c | 21 +++++++++++++++------
+> > > >  2 files changed, 26 insertions(+), 6 deletions(-)
+> > > >
+> > > > diff --git a/hw/i386/acpi-build.h b/hw/i386/acpi-build.h
+> > > > index 74df5fc612..6f94312c39 100644
+> > > > --- a/hw/i386/acpi-build.h
+> > > > +++ b/hw/i386/acpi-build.h
+> > > > @@ -5,6 +5,17 @@
+> > > >
+> > > >  extern const struct AcpiGenericAddress x86_nvdimm_acpi_dsmio;
+> > > >
+> > > > +/* PCI Firmware Specification 3.2, Table 4-5 */
+> > > > +typedef enum {
+> > > > +    ACPI_OSC_NATIVE_HP_EN = 0,
+> > > > +    ACPI_OSC_SHPC_EN = 1,
+> > > > +    ACPI_OSC_PME_EN = 2,
+> > > > +    ACPI_OSC_AER_EN = 3,
+> > > > +    ACPI_OSC_PCIE_CAP_EN = 4,
+> > > > +    ACPI_OSC_LTR_EN = 5,
+> > > > +    ACPI_OSC_ALLONES_INVALID = 6,
+> > > > +} AcpiOSCField;
+> > > > +
+> > > >  void acpi_setup(void);
+> > > >
+> > > >  #endif
+> > > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > > > index f3cd52bd06..c5f4802b8c 100644
+> > > > --- a/hw/i386/acpi-build.c
+> > > > +++ b/hw/i386/acpi-build.c
+> > > > @@ -1411,7 +1411,7 @@ static void build_i386_pci_hotplug(Aml *table, uint64_t pcihp_addr)
+> > > >      aml_append(table, scope);
+> > > >  }
+> > > >
+> > > > -static Aml *build_q35_osc_method(void)
+> > > > +static Aml *build_q35_osc_method(AcpiPmInfo *pm)
+> > > >  {
+> > > >      Aml *if_ctx;
+> > > >      Aml *if_ctx2;
+> > > > @@ -1419,6 +1419,7 @@ static Aml *build_q35_osc_method(void)
+> > > >      Aml *method;
+> > > >      Aml *a_cwd1 = aml_name("CDW1");
+> > > >      Aml *a_ctrl = aml_local(0);
+> > > > +    unsigned osc_ctrl;
+> > > >
+> > > >      method = aml_method("_OSC", 4, AML_NOTSERIALIZED);
+> > > >      aml_append(method, aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
+> > > > @@ -1430,11 +1431,19 @@ static Aml *build_q35_osc_method(void)
+> > > >
+> > > >      aml_append(if_ctx, aml_store(aml_name("CDW3"), a_ctrl));
+> > > >
+> > > > +    /* Always allow native PME, AER (depend on PCIE Capability Control) */
+> > > > +    osc_ctrl = BIT(ACPI_OSC_PME_EN) | BIT(ACPI_OSC_AER_EN) |
+> > > > +               BIT(ACPI_OSC_PCIE_CAP_EN);
+> > > > +
+> > > >      /*
+> > > > -     * Always allow native PME, AER (no dependencies)
+> > > > -     * Allow SHPC (PCI bridges can have SHPC controller)
+> > > > +     * Guests seem to generally prefer native hot-plug control.
+> > > > +     * Enable it only when we do not use ACPI hot-plug.
+> > > >       */
+> > > > -    aml_append(if_ctx, aml_and(a_ctrl, aml_int(0x1F), a_ctrl));
+> > > > +    if (!pm->pcihp_bridge_en) {
+> > > > +        osc_ctrl |= BIT(ACPI_OSC_NATIVE_HP_EN) | BIT(ACPI_OSC_SHPC_EN);
+> > > > +    }  
+> > >
+> > > ACPI hotplug works only for coldplugged bridges, and native one is used
+> > > on hotplugged ones.
+> > > Wouldn't that break SHPC/Native hotplug on hotplugged PCI/PCI-E bridge?  
+> 
+> Wait, what configuration are you talking about exactly?
+Currently on piix4, we have ACPI and native hotplug working simultaneously
+the former works on cold-plugged bridges and if you hotplug another bridge,
+that one will use native method.
+With above hunk it probably will break.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1603970
+> 
+> > > > +    aml_append(if_ctx, aml_and(a_ctrl, aml_int(osc_ctrl), a_ctrl));
+> > > >
+> > > >      if_ctx2 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(1))));
+> > > >      /* Unknown revision */
+> > > > @@ -1514,7 +1523,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> > > >          aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
+> > > >          aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+> > > >          aml_append(dev, aml_name_decl("_UID", aml_int(1)));
+> > > > -        aml_append(dev, build_q35_osc_method());
+> > > > +        aml_append(dev, build_q35_osc_method(pm));
+> > > >          aml_append(sb_scope, dev);
+> > > >          aml_append(dsdt, sb_scope);
+> > > >
+> > > > @@ -1590,7 +1599,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> > > >              if (pci_bus_is_express(bus)) {
+> > > >                  aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A08")));
+> > > >                  aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
+> > > > -                aml_append(dev, build_q35_osc_method());
+> > > > +                aml_append(dev, build_q35_osc_method(pm));
+> > > >              } else {
+> > > >                  aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A03")));
+> > > >              }  
+> > >  
+> 
 
-Title:
-  KVM freezes after live migration (AMD 4184 -> 4234)
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  Hi,
-
-  i have two host systems with different CPU types:
-
-  Host A:
-  AMD Opteron(tm) Processor 4234
-
-  Host B:
-  AMD Opteron(tm) Processor 4184
-
-  Live migration from B -> A works as expected, migration from A -> B
-  always ends in a freezed KVM. If the KVM is frozen, VNC output is
-  still present, however, you can't type anything. CPU usage is always
-  at 100% for one core (so if i set two cores, one is at 100% the other
-  one at 0% usage).
-
-  My command to launch the KVM is the following:
-
-  /usr/bin/kvm -id 104 -chardev socket,id=3Dqmp,path=3D/var/run/qemu-
-  server/104.qmp,server,nowait -mon chardev=3Dqmp,mode=3Dcontrol -pidfile
-  /var/run/qemu-server/104.pid -daemonize -smbios
-  type=3D1,uuid=3D26dd83a9-b9bd-4641-8016-c55f255f1bdf -name kilian-test
-  -smp 1,sockets=3D1,cores=3D1,maxcpus=3D1 -nodefaults -boot menu=3Don,stri=
-ct=3Don
-  ,reboot-timeout=3D1000 -vga cirrus -vnc unix:/var/run/qemu-
-  server/104.vnc,x509,password -cpu
-  kvm64,+lahf_lm,+sep,+kvm_pv_unhalt,+kvm_pv_eoi,enforce -m 512 -object
-  memory-backend-ram,id=3Dram-node0,size=3D512M -numa
-  node,nodeid=3D0,cpus=3D0,memdev=3Dram-node0 -k de -device pci-
-  bridge,id=3Dpci.2,chassis_nr=3D2,bus=3Dpci.0,addr=3D0x1f -device pci-
-  bridge,id=3Dpci.1,chassis_nr=3D1,bus=3Dpci.0,addr=3D0x1e -device piix3-us=
-b-
-  uhci,id=3Duhci,bus=3Dpci.0,addr=3D0x1.0x2 -device usb-
-  tablet,id=3Dtablet,bus=3Duhci.0,port=3D1 -device virtio-balloon-
-  pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x3 -iscsi initiator-
-  name=3Diqn.1993-08.org.debian:01:5ca1e9d334b2 -drive
-  file=3D/mnt/pve/nfs_synology/images/104/vm-104-disk-2.qcow2,if=3Dnone,id
-  =3Ddrive-virtio0,format=3Dqcow2,cache=3Dnone,aio=3Dnative,detect-zeroes=
-=3Don
-  -device virtio-blk-pci,drive=3Ddrive-
-  virtio0,id=3Dvirtio0,bus=3Dpci.0,addr=3D0xa,bootindex=3D100 -netdev
-  type=3Dtap,id=3Dnet0,ifname=3Dtap104i0,script=3D/var/lib/qemu-server/pve-
-  bridge,downscript=3D/var/lib/qemu-server/pve-bridgedown,vhost=3Don -device
-  virtio-net-
-  pci,mac=3D66:33:31:36:35:36,netdev=3Dnet0,bus=3Dpci.0,addr=3D0x12,id=3Dne=
-t0,bootindex=3D300
-
-  =
-
-  KVM / QEMU version: QEMU emulator version 2.5.1.1
-
-  I have tried to set different CPU types, but no one works (qemu64,
-  vm64, Opteron_G1, ...).
-
-  =
-
-  I have found an email from 2014 where another user reports exactly the sa=
-me problem:
-
-  http://lists.gnu.org/archive/html/qemu-discuss/2014-02/msg00002.html
-
-  Greets
-  Kilian
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1603970/+subscriptions
 
