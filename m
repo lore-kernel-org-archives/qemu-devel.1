@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BCD1C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:10:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 016DBC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:11:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BADB9206B6
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:10:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 72A87206CA
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:11:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gny0fN0S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BADB9206B6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FGo6ChnH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72A87206CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIubv-00040S-MH
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 10:10:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34676)
+	id 1kIudM-0005Cz-DV
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 10:11:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34566)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIuMV-0000PV-FJ
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 09:54:11 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38853
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIuMP-00008R-MR
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 09:54:05 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58034
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIuMI-00086q-7r
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 09:54:11 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kIuM6-00085S-MH
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 09:54:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600350831;
+ s=mimecast20190719; t=1600350825;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6dXo9mEeo5X1ztcjNyLshZ6Dr/bA7itz3qp8Aev5p5M=;
- b=Gny0fN0S4qPid+kv1gWbME1R8muAyww/P5YvIp4qPj9r4t9mPXebVvkTvdgqscvCTxDGT6
- KgBlhRpUho2KHzuDqedlIaofowOQmt2nrSlFlrHxshl6FIdGC7AJ1ZGqGA9b2RA4lR06aA
- SSr0zYPEJJhythITkFB/SBc3weNb9Go=
+ bh=oEcSaQ5hQpGZ/LSYwjiqxuRmgK+CFde8gH6ebQuIY0g=;
+ b=FGo6ChnHyfKQNGEaJLyInklBphsNxDazQ4/OlyIUJPR+UdVKpdDGctVopIi84ZRvd5x7Wr
+ P1YGEUojzyXzxLvtc6OYKNp/KpEnRi0OYF7HsnYjXB9pS8KLpTWPEDFpy4cxzP3VDI/M+w
+ jQ6pwHIuLn3hwNqTSBBy9zfuOu/Hjsc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-437-sWTB2SoYOJuaPBlGneOPVg-1; Thu, 17 Sep 2020 09:53:49 -0400
-X-MC-Unique: sWTB2SoYOJuaPBlGneOPVg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-331-9bT2kc0DNqmkcxbkNyfx7w-1; Thu, 17 Sep 2020 09:53:43 -0400
+X-MC-Unique: 9bT2kc0DNqmkcxbkNyfx7w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58D361084D74;
- Thu, 17 Sep 2020 13:53:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D6D91084CB5;
+ Thu, 17 Sep 2020 13:53:42 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
  [10.36.112.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B6EF061100;
- Thu, 17 Sep 2020 13:53:38 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B399F5DE51;
+ Thu, 17 Sep 2020 13:53:35 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 6702831F96; Thu, 17 Sep 2020 15:53:24 +0200 (CEST)
+ id 1328731E60; Thu, 17 Sep 2020 15:53:24 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 18/21] tests/acpi: allow override blkdev
-Date: Thu, 17 Sep 2020 15:53:20 +0200
-Message-Id: <20200917135323.18022-19-kraxel@redhat.com>
+Subject: [PULL 11/21] microvm/acpi: use seabios with acpi=on
+Date: Thu, 17 Sep 2020 15:53:13 +0200
+Message-Id: <20200917135323.18022-12-kraxel@redhat.com>
 In-Reply-To: <20200917135323.18022-1-kraxel@redhat.com>
 References: <20200917135323.18022-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -84,7 +84,7 @@ X-Spam_bar: -----
 X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,41 +108,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-microvm needs virtio-blk instead of ide.
+With acpi=off continue to use qboot.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Sergio Lopez <slp@redhat.com>
-Message-id: 20200915120909.20838-19-kraxel@redhat.com
+Message-id: 20200915120909.20838-12-kraxel@redhat.com
 ---
- tests/qtest/bios-tables-test.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ hw/i386/microvm.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-index 504b810af583..1779af1cc889 100644
---- a/tests/qtest/bios-tables-test.c
-+++ b/tests/qtest/bios-tables-test.c
-@@ -72,6 +72,7 @@ typedef struct {
-     const char *variant;
-     const char *uefi_fl1;
-     const char *uefi_fl2;
-+    const char *blkdev;
-     const char *cd;
-     const uint64_t ram_start;
-     const uint64_t scan_len;
-@@ -666,9 +667,10 @@ static void test_acpi_one(const char *params, test_data *data)
-         args = g_strdup_printf("-machine %s,kernel-irqchip=off %s -accel tcg "
-             "-net none -display none %s "
-             "-drive id=hd0,if=none,file=%s,format=raw "
--            "-device ide-hd,drive=hd0 ",
-+            "-device %s,drive=hd0 ",
-              data->machine, data->tcg_only ? "" : "-accel kvm",
--             params ? params : "", disk);
-+             params ? params : "", disk,
-+             data->blkdev ?: "ide-hd");
+diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
+index ca0c9983f137..54510a03f754 100644
+--- a/hw/i386/microvm.c
++++ b/hw/i386/microvm.c
+@@ -52,6 +52,7 @@
+ #include "hw/xen/start_info.h"
+ 
+ #define MICROVM_QBOOT_FILENAME "qboot.rom"
++#define MICROVM_BIOS_FILENAME  "bios-microvm.bin"
+ 
+ static void microvm_set_rtc(MicrovmMachineState *mms, ISADevice *s)
+ {
+@@ -174,7 +175,9 @@ static void microvm_devices_init(MicrovmMachineState *mms)
      }
  
-     data->qts = qtest_init(args);
+     if (bios_name == NULL) {
+-        bios_name = MICROVM_QBOOT_FILENAME;
++        bios_name = x86_machine_is_acpi_enabled(x86ms)
++            ? MICROVM_BIOS_FILENAME
++            : MICROVM_QBOOT_FILENAME;
+     }
+     x86_bios_rom_init(get_system_memory(), true);
+ }
 -- 
 2.27.0
 
