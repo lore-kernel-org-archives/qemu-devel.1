@@ -2,91 +2,97 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D56FC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:00:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 114FCC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:02:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5A59206CA
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:00:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A2FC206A2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 17:02:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dJKLAnaz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5A59206CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hM/T/F69"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A2FC206A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIxHA-0002pn-VV
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 13:00:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58184)
+	id 1kIxJ0-0004XR-FZ
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 13:02:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58838)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kIxAb-0004sn-PY
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 12:54:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52441)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kIxAa-0004LZ-48
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 12:54:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600361643;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=00HYtV2QlwKx47gpHKmX1FeTYm6fuoHkb0WZGRSxpEk=;
- b=dJKLAnaz54L5qmZgYAqtyD1YlbaGD/qqQ39aB6hzfWXV0Ouu3JjBZ3p4M2hYK0MzPg74WU
- D0LbMJBBvQ0olRSJM2cPIeMFsWkR1HswGAcFaos1zHpzlkKNWj/uA9RwLOhMo9oQntoONz
- XK70D5v/WyIJ/GRrcdwp/x+DESB+nOQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-439-o4R1HY5VOyWvODtLmAPwAQ-1; Thu, 17 Sep 2020 12:54:01 -0400
-X-MC-Unique: o4R1HY5VOyWvODtLmAPwAQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21E958BE3DD;
- Thu, 17 Sep 2020 16:54:00 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-113-38.ams2.redhat.com [10.36.113.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E9DB518EDE;
- Thu, 17 Sep 2020 16:53:46 +0000 (UTC)
-Subject: Re: [PATCH] tests/acceptance: Disable tests dependent of unreliable
- apt.armbian.com
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200917163954.50514-1-philmd@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <308aaf63-a9a4-256e-a29f-9d0bd1c53532@redhat.com>
-Date: Thu, 17 Sep 2020 18:53:43 +0200
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kIxE6-0007hd-Cp; Thu, 17 Sep 2020 12:57:42 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40381)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kIxE3-0004ok-Ic; Thu, 17 Sep 2020 12:57:42 -0400
+Received: by mail-wm1-x342.google.com with SMTP id k18so2763811wmj.5;
+ Thu, 17 Sep 2020 09:57:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=6QaMg1AvMw1pue6iNBZDZCiuxftSbFxqP2NNoQR16oU=;
+ b=hM/T/F69PEgcWCYjroOjIIv7bfZwEtWdAfXh75vdxaA5lTCXR2DPwxKQAW96Ga0jkW
+ XEn2HHqL3uzH433I9Mzod2BDcTfdpChn01KM+SUmP6ELOrDMJRtfl3qD/PFPtr40oaQg
+ gJnF4IlmVu7+TSf3wBAxxlpB8OvPQ/dqQwfsj6PnAh7fayYGQbTyROi1G5C5xj+eYBS4
+ QXTat0uM3CeNGww+trqHVwSe7gitmOfa+UklCInduE5lO8HM1FCq4LLDKBeoCXeCZrlx
+ aLaREZQ+J5cqY5lPmY0l2ZoheT+y160345KZ5dojBOwYF9ajENagzFlw+3b3cIto/Bdt
+ jW4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=6QaMg1AvMw1pue6iNBZDZCiuxftSbFxqP2NNoQR16oU=;
+ b=qqyrfJYX6uvde0faaFBz6ld0SVKjr/uWmnP0QpATElLp+Kap+gNh2m0mFHoG1VnYQF
+ ctMgxWTHAtMDos3wcCvzMzZIzwShD5zc16UB8KAOSPjdQVxaze3nmTUtAaOUKjlQUPHx
+ ftHatruVyrv/DWisOIH2L2+hFaqU0ocxuQc+fSCbLIM13dFsT2qwnVPwu3InAsHMd50Q
+ /WSUMTAcgOUjM1xsaNB8tj5T5rilC8XlBLRFm8gxsYC+WQ3rifpOCb8YSc/609CZdjqC
+ su9CMfqQXj8Na871pTGJ1vIJkteKn86/1FPTnzIKsW3GoXvNgyMUXckQ0J9vIRCT0ukv
+ XXvg==
+X-Gm-Message-State: AOAM5314uMV03dGefONuu6UJnYx8w201vhglSOULIaYH1dA16pgJCEsx
+ vhoFRcI1gOWDIbZClLtcJJI=
+X-Google-Smtp-Source: ABdhPJyV1vhri3vaIpNnRnwVkKpUFg8xhQSJ/NHIO0jV0HpfYmBYkZtpAOMTcmpSdSJuU21PGqXd/w==
+X-Received: by 2002:a7b:c3da:: with SMTP id t26mr10470848wmj.23.1600361857453; 
+ Thu, 17 Sep 2020 09:57:37 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id y6sm195832wrt.80.2020.09.17.09.57.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 17 Sep 2020 09:57:36 -0700 (PDT)
+Subject: Re: [PATCH] hw/arm/aspeed: Map the UART5 device unconditionally
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-devel@nongnu.org
+References: <20200905212415.760452-1-f4bug@amsat.org>
+ <e640309b-b694-e815-d64d-40dd453e52ef@amsat.org>
+ <5e27c1f9-6d11-fa62-ba71-0020ce9d595b@kaod.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <07b21d1d-fb5b-efb0-50f2-54a4b86df444@amsat.org>
+Date: Thu, 17 Sep 2020 18:57:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200917163954.50514-1-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <5e27c1f9-6d11-fa62-ba71-0020ce9d595b@kaod.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 02:01:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.248, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,30 +105,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/09/2020 18.39, Philippe Mathieu-Daudé wrote:
-> Armbian servers are not very reliable and confused the GitLab CI
-> users a few times this month (path updated, archives moved, and
-> now the SSL: CERTIFICATE_VERIFY_FAILED "certificate has expired"
-> error). Time to disable these tests.
-> Users can still use the artifacts from the cache (or manually add
-> them to the cache).
+On 9/16/20 7:51 AM, Cédric Le Goater wrote:
+> On 9/15/20 7:23 PM, Philippe Mathieu-Daudé wrote:
+>> ping?
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  tests/acceptance/boot_linux_console.py | 10 ++++++++++
->  tests/acceptance/replay_kernel.py      |  2 ++
->  2 files changed, 12 insertions(+)
+> It's reviewed : 
+> 
+>   http://patchwork.ozlabs.org/project/qemu-devel/patch/20200905212415.760452-1-f4bug@amsat.org/
+> 
 
-These failures in the Gitlab-CI are quite annoying, indeed.
+Yes I know :) This is part of my routine to check if a
+patch hasn't been confirmed to be queued 1 week after the
+last review, to ping the maintainer (because some
+automatically flush patches older than 1month in their
+mailbox).
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+> I will send a PR when I have more patches.
 
+Ah OK. I didn't know you would keep merging the Aspeed
+patches. Since this was a single patch, I thought it would
+go via the usual qemu-arm queue from Peter.
+
+No rush, I just wanted to be sure the patch was not lost.
+Also, once a patch is queued, I understand it is the
+maintainer responsibility to keep rebasing the patch
+queued.
+
+Thanks!
+
+Phil.
+
+> 
+> Thanks,
+> 
+> C. 
+> 
+>> On 9/5/20 11:24 PM, Philippe Mathieu-Daudé wrote:
+>>> The UART5 is present on the machine regardless there is a
+>>> character device connected to it. Map it unconditionally.
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> ---
+>>>  hw/arm/aspeed_ast2600.c | 8 +++-----
+>>>  hw/arm/aspeed_soc.c     | 8 +++-----
+>>>  2 files changed, 6 insertions(+), 10 deletions(-)
+>>>
+>>> diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
+>>> index 9d95e421435..1450bde7cf2 100644
+>>> --- a/hw/arm/aspeed_ast2600.c
+>>> +++ b/hw/arm/aspeed_ast2600.c
+>>> @@ -325,11 +325,9 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
+>>>      }
+>>>  
+>>>      /* UART - attach an 8250 to the IO space as our UART5 */
+>>> -    if (serial_hd(0)) {
+>>> -        qemu_irq uart5 = aspeed_soc_get_irq(s, ASPEED_DEV_UART5);
+>>> -        serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
+>>> -                       uart5, 38400, serial_hd(0), DEVICE_LITTLE_ENDIAN);
+>>> -    }
+>>> +    serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
+>>> +                   aspeed_soc_get_irq(s, ASPEED_DEV_UART5),
+>>> +                   38400, serial_hd(0), DEVICE_LITTLE_ENDIAN);
+>>>  
+>>>      /* I2C */
+>>>      object_property_set_link(OBJECT(&s->i2c), "dram", OBJECT(s->dram_mr),
+>>> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+>>> index 35be126db6f..7eefd54ac07 100644
+>>> --- a/hw/arm/aspeed_soc.c
+>>> +++ b/hw/arm/aspeed_soc.c
+>>> @@ -283,11 +283,9 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+>>>      }
+>>>  
+>>>      /* UART - attach an 8250 to the IO space as our UART5 */
+>>> -    if (serial_hd(0)) {
+>>> -        qemu_irq uart5 = aspeed_soc_get_irq(s, ASPEED_DEV_UART5);
+>>> -        serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
+>>> -                       uart5, 38400, serial_hd(0), DEVICE_LITTLE_ENDIAN);
+>>> -    }
+>>> +    serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
+>>> +                   aspeed_soc_get_irq(s, ASPEED_DEV_UART5), 38400,
+>>> +                   serial_hd(0), DEVICE_LITTLE_ENDIAN);
+>>>  
+>>>      /* I2C */
+>>>      object_property_set_link(OBJECT(&s->i2c), "dram", OBJECT(s->dram_mr),
+>>>
+> 
+> 
 
