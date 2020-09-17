@@ -2,116 +2,89 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7C91C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:27:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7185CC43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:29:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22C0520684
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:27:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E41CA2075B
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:28:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="O1HJA8Dq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22C0520684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LoBj+wMq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E41CA2075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIusY-0003dM-1r
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 10:27:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42710)
+	id 1kIuuA-0005u5-Qc
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 10:28:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39220)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
- id 1kIuma-0002zG-Ly; Thu, 17 Sep 2020 10:21:09 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62016)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
- id 1kIumX-0003Db-EA; Thu, 17 Sep 2020 10:21:08 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 08HE2ZFU069209; Thu, 17 Sep 2020 10:21:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=1gi5s1Tx693BWL7xgcm3etVQVG7BMtLGNWjUnVDwD3o=;
- b=O1HJA8DqrhVIqXDjLtDS1hsaS0WzuyUUUxkxuvMmYmQ+Swrm/4ZNbpNuWLR0STmyiH/8
- vrtBG1pY5dusGnDLZr29vMrYTLuWMBlxGea8R26GelOtj0skMGLNaeEc9V5pXFddMq+G
- YKWIQYuJ3edsE/V4NTKbiq1U+tJRhTsXmWqOvrBLLzj42y/t4NqkUVGP/TSMDt7kZ6iO
- 5UOgcmGGYpkm/33zoUSnPZxQqVSfKZEayV/zzEc992jeKcb9+NkHqu1mPp2cU9Sw0OBb
- wqw29C0YqaoSmmvLH3Q9YzUQUthJo9hgY2UCrJNSwe3nq1k8tzC/b0PudoQZkyCNDoNc 8g== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33m95arprt-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 17 Sep 2020 10:21:03 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08HE3N8x074254;
- Thu, 17 Sep 2020 10:21:03 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33m95arprg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 17 Sep 2020 10:21:03 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08HEILAF017892;
- Thu, 17 Sep 2020 14:21:02 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
- [9.57.198.24]) by ppma01dal.us.ibm.com with ESMTP id 33k6591uwf-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 17 Sep 2020 14:21:02 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
- [9.57.199.111])
- by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 08HEL1sD46268810
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 17 Sep 2020 14:21:01 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6AB01AC05E;
- Thu, 17 Sep 2020 14:21:01 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 3EC7EAC059;
- Thu, 17 Sep 2020 14:20:57 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.163.85.51])
- by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
- Thu, 17 Sep 2020 14:20:57 +0000 (GMT)
-From: Matthew Rosato <mjrosato@linux.ibm.com>
-To: alex.williamson@redhat.com, cohuck@redhat.com
-Subject: [PATCH v4 2/5] vfio: Create shared routine for scanning info
- capabilities
-Date: Thu, 17 Sep 2020 10:20:42 -0400
-Message-Id: <1600352445-21110-3-git-send-email-mjrosato@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1600352445-21110-1-git-send-email-mjrosato@linux.ibm.com>
-References: <1600352445-21110-1-git-send-email-mjrosato@linux.ibm.com>
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kIubS-0003Iz-7C
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 10:09:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41329)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kIubQ-0001Vi-2N
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 10:09:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600351775;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=tyOll9kipGJhNL6A4guWijhalDMqR2rHpL11BxfV3i0=;
+ b=LoBj+wMq4OmJbhKHy/ZE81o7n4K0tvOg1cfC+I1NfObTvGaHPyU1cMGGzZD9UMlzNLhOPc
+ TDwLX4d4t6SuGuRNsa9mua+zkWpHWJh11Lkd6piawlB5Hpo0Q4tN9qDZ+95Fi3zfAI7SSo
+ /YOf0Grup6cWdA81qSEFTRYiPuy+UNc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-353-lM8Bn5q3NNifI0UmoLrUrg-1; Thu, 17 Sep 2020 10:09:33 -0400
+X-MC-Unique: lM8Bn5q3NNifI0UmoLrUrg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EEC2510BBED5;
+ Thu, 17 Sep 2020 14:09:31 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 99E975DA30;
+ Thu, 17 Sep 2020 14:09:23 +0000 (UTC)
+Date: Thu, 17 Sep 2020 16:09:22 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Ani Sinha <ani@anisinha.ca>
+Subject: Re: [PATCH v7 09/12] piix4: don't reserve hw resources when hotplug
+ is off globally
+Message-ID: <20200917160922.2b0f5f58@redhat.com>
+In-Reply-To: <20200917100947.21106-10-ani@anisinha.ca>
+References: <20200917100947.21106-1-ani@anisinha.ca>
+ <20200917100947.21106-10-ani@anisinha.ca>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-09-17_09:2020-09-16,
- 2020-09-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0
- lowpriorityscore=0 suspectscore=0 phishscore=0 impostorscore=0 mlxscore=0
- malwarescore=0 clxscore=1015 mlxlogscore=999 priorityscore=1501
- bulkscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009170104
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=mjrosato@linux.ibm.com; helo=mx0b-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 10:21:03
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
-X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 02:01:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -124,67 +97,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, kvm@vger.kernel.org, pmorel@linux.ibm.com,
- david@redhat.com, schnelle@linux.ibm.com, qemu-devel@nongnu.org,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
- mst@redhat.com, pbonzini@redhat.com, philmd@redhat.com, rth@twiddle.net
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S.
+ Tsirkin" <mst@redhat.com>, jusual@redhat.com, qemu-devel@nongnu.org,
+ Philippe =?UTF-8?B?TWF0aGll?= =?UTF-8?B?dS1EYXVkw6k=?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rather than duplicating the same loop in multiple locations,
-create a static function to do the work.
+On Thu, 17 Sep 2020 15:39:44 +0530
+Ani Sinha <ani@anisinha.ca> wrote:
 
-Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
----
- hw/vfio/common.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+> When acpi hotplug is turned off for both root pci bus as well as for pci
+> bridges, we should not generate the related ACPI code for DSDT table or
+> initialize related hw ports or reserve hw resources. This change makes
+> sure all those operations are turned off in the case ACPI pci hotplug is
+> off globally.
+> 
+> In this change, we also make sure ACPI code for the PCNT method are only
+> added when bsel is enabled for the corresponding pci bus or bridge hotplug
+> is turned on.
+> 
+> As q35 machines do not use bsel for it's pci buses at this point in time, this
+> change affects DSDT acpi table for q35 machines as well. Therefore, we will
+> also need to commit the updated golden master DSDT table acpi binary blobs as
+> well. This is done in the following commit. Without the updated table blobs,
+> the unit tests would fail with this patch.
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 13471ae..e47a4d7 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -825,17 +825,12 @@ static void vfio_listener_release(VFIOContainer *container)
-     }
- }
- 
--struct vfio_info_cap_header *
--vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id)
-+static struct vfio_info_cap_header *
-+vfio_get_cap(void *ptr, uint32_t cap_offset, uint16_t id)
- {
-     struct vfio_info_cap_header *hdr;
--    void *ptr = info;
--
--    if (!(info->flags & VFIO_REGION_INFO_FLAG_CAPS)) {
--        return NULL;
--    }
- 
--    for (hdr = ptr + info->cap_offset; hdr != ptr; hdr = ptr + hdr->next) {
-+    for (hdr = ptr + cap_offset; hdr != ptr; hdr = ptr + hdr->next) {
-         if (hdr->id == id) {
-             return hdr;
-         }
-@@ -844,6 +839,16 @@ vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id)
-     return NULL;
- }
- 
-+struct vfio_info_cap_header *
-+vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id)
-+{
-+    if (!(info->flags & VFIO_REGION_INFO_FLAG_CAPS)) {
-+        return NULL;
-+    }
-+
-+    return vfio_get_cap((void *)info, info->cap_offset, id);
-+}
-+
- static int vfio_setup_region_sparse_mmaps(VFIORegion *region,
-                                           struct vfio_region_info *info)
- {
--- 
-1.8.3.1
+this breaks bisection,
+tables updated by 10/12 should be marked a being changed,
+like it's done with other test cases ex: [1/12]
+
+
+> 
+> Signed-off-by: Ani Sinha <ani@anisinha.ca>
+> ---
+>  hw/acpi/piix4.c      |  6 ++++--
+>  hw/i386/acpi-build.c | 25 ++++++++++++++++++-------
+>  2 files changed, 22 insertions(+), 9 deletions(-)
+> 
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index e6163bb6ce..b70b1f98af 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -596,8 +596,10 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
+>                            "acpi-gpe0", GPE_LEN);
+>      memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
+>  
+> -    acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
+> -                    s->use_acpi_hotplug_bridge);
+> +    if (s->use_acpi_hotplug_bridge || s->use_acpi_root_pci_hotplug) {
+> +        acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
+> +                        s->use_acpi_hotplug_bridge);
+> +    }
+>  
+>      s->cpu_hotplug_legacy = true;
+>      object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index e079b686f5..e41bb0992b 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -95,6 +95,7 @@ typedef struct AcpiPmInfo {
+>      bool s3_disabled;
+>      bool s4_disabled;
+>      bool pcihp_bridge_en;
+> +    bool pcihp_root_en;
+>      uint8_t s4_val;
+>      AcpiFadtData fadt;
+>      uint16_t cpu_hp_io_base;
+> @@ -245,6 +246,9 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
+>      pm->pcihp_bridge_en =
+>          object_property_get_bool(obj, "acpi-pci-hotplug-with-bridge-support",
+>                                   NULL);
+> +    pm->pcihp_root_en =
+> +        object_property_get_bool(obj, "acpi-root-pci-hotplug",
+> +                                 NULL);
+>  }
+>  
+>  static void acpi_get_misc_info(AcpiMiscInfo *info)
+> @@ -450,10 +454,12 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+>      }
+>  
+>      /* Append PCNT method to notify about events on local and child buses.
+> -     * Add unconditionally for root since DSDT expects it.
+> +     * Add this method for root bus only when hotplug is enabled since DSDT
+> +     * expects it.
+>       */
+> -    method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
+> -
+> +    if (bsel || pcihp_bridge_en) {
+> +        method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
+> +    }
+>      /* If bus supports hotplug select it and notify about local events */
+>      if (bsel) {
+>          uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
+> @@ -479,7 +485,10 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+>              aml_append(method, aml_name("^S%.02X.PCNT", devfn));
+>          }
+>      }
+> -    aml_append(parent_scope, method);
+> +
+> +    if (bsel || pcihp_bridge_en) {
+> +        aml_append(parent_scope, method);
+> +    }
+>      qobject_unref(bsel);
+>  }
+>  
+> @@ -1504,7 +1513,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>          build_hpet_aml(dsdt);
+>          build_piix4_isa_bridge(dsdt);
+>          build_isa_devices_aml(dsdt);
+> -        build_piix4_pci_hotplug(dsdt);
+> +        if (pm->pcihp_bridge_en || pm->pcihp_root_en) {
+> +            build_piix4_pci_hotplug(dsdt);
+> +        }
+>          build_piix4_pci0_int(dsdt);
+>      } else {
+>          sb_scope = aml_scope("_SB");
+> @@ -1546,7 +1557,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>      {
+>          aml_append(scope, aml_name_decl("_HID", aml_string("ACPI0006")));
+>  
+> -        if (misc->is_piix4) {
+> +        if (misc->is_piix4 && (pm->pcihp_bridge_en || pm->pcihp_root_en)) {
+>              method = aml_method("_E01", 0, AML_NOTSERIALIZED);
+>              aml_append(method,
+>                  aml_acquire(aml_name("\\_SB.PCI0.BLCK"), 0xFFFF));
+> @@ -1698,7 +1709,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>      crs_range_set_free(&crs_range_set);
+>  
+>      /* reserve PCIHP resources */
+> -    if (pm->pcihp_io_len) {
+> +    if (pm->pcihp_io_len && (pm->pcihp_bridge_en || pm->pcihp_root_en)) {
+>          dev = aml_device("PHPR");
+>          aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A06")));
+>          aml_append(dev,
 
 
