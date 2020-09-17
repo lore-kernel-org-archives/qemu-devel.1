@@ -2,92 +2,63 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 902C6C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:33:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BD7AC43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:33:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 084682087D
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:33:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=blade-group.com header.i=@blade-group.com header.b="lGkbGv7W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 084682087D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=blade-group.com
+	by mail.kernel.org (Postfix) with ESMTPS id EC825208E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:33:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC825208E4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIt62-0001G1-22
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 08:33:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35754)
+	id 1kIt6c-00028C-31
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 08:33:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35162)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <antoine.damhet@blade-group.com>)
- id 1kIszG-0002Rv-Eb
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 08:26:06 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55445)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <antoine.damhet@blade-group.com>)
- id 1kIszD-0003qF-WA
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 08:26:05 -0400
-Received: by mail-wm1-x341.google.com with SMTP id d4so1769142wmd.5
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 05:26:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=blade-group.com; s=google;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=hxuORB+uFMLaG5rwi1PH2mmObmRrvK5jQMFiamDZXzE=;
- b=lGkbGv7W8PHsY6SQoxMJoMXdqV4/0QCwpidTssYXPbKCPXmM9H2uumQ6TSXtUhDaoe
- YECrK+Z7uN5mLUOm8WXEJ0ygPKVuSdIVzTc2wQgM56IiM6HqP7IBiIollffTmpGAK2/p
- ad2da2e9exknrD3Pb2d8A4GHkfqL9l1LX4qBZGPeQP0ndYLZ/oAEWrTBwqjBuJzyDgOS
- Qb9soXOSJ9U1ccdd8iFIxfRLAxlcjnH5ecNXE48NekX5+ePudjPGoT42ExpPjQDFyqxc
- qFbO6nkOlih+pOFqlj77AL6O4KlVLsKMmIu4bCWMoZvO1ByDJxjsqgXzM44Cx+z3h2H8
- AV7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=hxuORB+uFMLaG5rwi1PH2mmObmRrvK5jQMFiamDZXzE=;
- b=RACKtKPjg2MF04awfwgDWBfyzUqlbsFSjx0qFq5YHqnqJ7JxEwjTodthMvXxw943es
- bGlXwLLcuUxC2mQuHRUT2F54kE2S/VIkkLvi5lS+cgptuDNp6tZ+dmcUyfR9MKt7U5T3
- crf5ZYVPQqLKocKlEtncJ9xLbLWaLfQlf68ibVDyTdUN5ddapZZFwQk1ErCe/3w1HbLh
- hnyhk3UqJoGMimgxVozNjeudbXWmM0ccQOqT1TzJ+iNMrG9/3XkeKpDWGFShKNx9bntD
- P4hKXcm06BWCW8izogXzQEaT+X1rzB/L6/ySlOZhy//pJ3F976f4JbfZ9U/63s+5lfoo
- JmIQ==
-X-Gm-Message-State: AOAM530mbCpAnqi9/hK4nbP/ae29eKCfC2ekGo0ACscLUN994OCCw9nJ
- utPxnZBgJMY+BIyXXm+RLMyCxA==
-X-Google-Smtp-Source: ABdhPJz2yC/mTYzUvINbOg0NNDiAc8aQOaPyb4uEp8wHsiKMAsUoGBgC2Qk5XWVZsCkYWd9/YJGSKA==
-X-Received: by 2002:a1c:4b13:: with SMTP id y19mr9555726wma.75.1600345561795; 
- Thu, 17 Sep 2020 05:26:01 -0700 (PDT)
-Received: from localhost ([2a01:e34:ec16:8a90:4e1d:96ff:fe49:7109])
- by smtp.gmail.com with ESMTPSA id n4sm38207470wrp.61.2020.09.17.05.26.00
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Sep 2020 05:26:00 -0700 (PDT)
-Date: Thu, 17 Sep 2020 14:25:59 +0200
-From: Antoine Damhet <antoine.damhet@blade-group.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH] target/i386: always create kvmclock device
-Message-ID: <20200917122559.e7i5o64k7rw7urdh@tartarus>
-References: <20200917111306.819263-1-vkuznets@redhat.com>
+ (Exim 4.90_1) (envelope-from <liangpeng10@huawei.com>)
+ id 1kIsww-0000Kc-6K; Thu, 17 Sep 2020 08:23:42 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:51596 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <liangpeng10@huawei.com>)
+ id 1kIswr-0003R8-FK; Thu, 17 Sep 2020 08:23:41 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 5FACB1A9EBC2C0236BA8;
+ Thu, 17 Sep 2020 20:23:32 +0800 (CST)
+Received: from localhost.localdomain (10.175.104.175) by
+ DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
+ 14.3.487.0; Thu, 17 Sep 2020 20:23:21 +0800
+From: Peng Liang <liangpeng10@huawei.com>
+To: <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>
+Subject: [RFC v2 09/10] target/arm: introduce CPU feature dependency mechanism
+Date: Thu, 17 Sep 2020 20:14:48 +0800
+Message-ID: <20200917121449.3442059-10-liangpeng10@huawei.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200917121449.3442059-1-liangpeng10@huawei.com>
+References: <20200917121449.3442059-1-liangpeng10@huawei.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="vikpe6obnxeko6wi"
-Content-Disposition: inline
-In-Reply-To: <20200917111306.819263-1-vkuznets@redhat.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=antoine.damhet@blade-group.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_INVALID=0.1,
- DKIM_SIGNED=0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.104.175]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35;
+ envelope-from=liangpeng10@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 08:23:09
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,114 +71,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: peter.maydell@linaro.org, drjones@redhat.com,
+ zhang.zhanghailiang@huawei.com, mst@redhat.com, cohuck@redhat.com,
+ xiexiangyou@huawei.com, Peng Liang <liangpeng10@huawei.com>,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Some CPU features are dependent on other CPU features.  For example,
+ID_AA64PFR0_EL1.FP field and ID_AA64PFR0_EL1.AdvSIMD must have the same
+value, which means FP and ADVSIMD are dependent on each other, FPHP and
+ADVSIMDHP are dependent on each other.
 
---vikpe6obnxeko6wi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This commit introduces a mechanism for CPU feature dependency in
+AArch64.  We build a directed graph from the CPU feature dependency
+relationship, each edge from->to means the `to` CPU feature is dependent
+on the `from` CPU feature.  And we will automatically enable/disable CPU
+feature according to the directed graph.
 
-On Thu, Sep 17, 2020 at 01:13:06PM +0200, Vitaly Kuznetsov wrote:
-> QEMU's kvmclock device is only created when KVM PV feature bits for
-> kvmclock (KVM_FEATURE_CLOCKSOURCE/KVM_FEATURE_CLOCKSOURCE2) are
-> exposed to the guest. With 'kvm=3Doff' cpu flag the device is not
-> created and we don't call KVM_GET_CLOCK/KVM_SET_CLOCK upon migration.
-> It was reported that without these call at least Hyper-V TSC page
-> clocksouce (which can be enabled independently) gets broken after
-> migration.
->=20
-> Switch to creating kvmclock QEMU device unconditionally, it seems
-> to always make sense to call KVM_GET_CLOCK/KVM_SET_CLOCK on migration.
-> Use KVM_CAP_ADJUST_CLOCK check instead of CPUID feature bits.
->=20
-> Reported-by: Antoine Damhet <antoine.damhet@blade-group.com>
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  hw/i386/kvm/clock.c    | 6 +-----
->  target/i386/kvm.c      | 5 +++++
->  target/i386/kvm_i386.h | 1 +
->  3 files changed, 7 insertions(+), 5 deletions(-)
->=20
-> diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
-> index 64283358f91d..526c9ea5172b 100644
-> --- a/hw/i386/kvm/clock.c
-> +++ b/hw/i386/kvm/clock.c
-> @@ -330,11 +330,7 @@ static const TypeInfo kvmclock_info =3D {
->  /* Note: Must be called after VCPU initialization. */
->  void kvmclock_create(void)
->  {
-> -    X86CPU *cpu =3D X86_CPU(first_cpu);
-> -
-> -    if (kvm_enabled() &&
-> -        cpu->env.features[FEAT_KVM] & ((1ULL << KVM_FEATURE_CLOCKSOURCE)=
- |
-> -                                       (1ULL << KVM_FEATURE_CLOCKSOURCE2=
-))) {
-> +    if (kvm_enabled() && kvm_has_adjust_clock()) {
+For example, a and b CPU features are in relationship a->b, which means
+b is dependent on a.  If b is enabled by user, then a is enabled
+automatically.  And if a is disabled by user, then b is disabled
+automatically.
 
-Shouldn't the old check used when machine type <=3D 5.1 in order to avoid
-migration incompatibility ?
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Signed-off-by: Peng Liang <liangpeng10@huawei.com>
+---
+ target/arm/cpu.c | 134 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 134 insertions(+)
 
->          sysbus_create_simple(TYPE_KVM_CLOCK, -1, NULL);
->      }
->  }
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 4a8b3a41c1bc..20b31b65307b 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -143,6 +143,11 @@ bool kvm_has_adjust_clock_stable(void)
->      return (ret =3D=3D KVM_CLOCK_TSC_STABLE);
->  }
-> =20
-> +bool kvm_has_adjust_clock(void)
-> +{
-> +    return kvm_check_extension(kvm_state, KVM_CAP_ADJUST_CLOCK);
-> +}
-> +
->  bool kvm_has_exception_payload(void)
->  {
->      return has_exception_payload;
-> diff --git a/target/i386/kvm_i386.h b/target/i386/kvm_i386.h
-> index 064b8798a26c..0fce4e51d2d6 100644
-> --- a/target/i386/kvm_i386.h
-> +++ b/target/i386/kvm_i386.h
-> @@ -34,6 +34,7 @@
-> =20
->  bool kvm_allows_irq0_override(void);
->  bool kvm_has_smm(void);
-> +bool kvm_has_adjust_clock(void);
->  bool kvm_has_adjust_clock_stable(void);
->  bool kvm_has_exception_payload(void);
->  void kvm_synchronize_all_tsc(void);
-> --=20
-> 2.25.4
->=20
->=20
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 36375807e19d..4bb8587e9c53 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1257,6 +1257,107 @@ static struct CPUFeatureInfo cpu_features[] = {
+     },
+ };
+ 
++typedef struct CPUFeatureDep {
++    CPUFeatureInfo from, to;
++} CPUFeatureDep;
++
++static const CPUFeatureDep feature_dependencies[] = {
++    {
++        .from = FIELD_INFO("fp", ID_AA64PFR0, FP, true, 0, 0xf, false),
++        .to = FIELD_INFO("asimd", ID_AA64PFR0, ADVSIMD, true, 0, 0xf, false),
++    },
++    {
++        .from = FIELD_INFO("asimd", ID_AA64PFR0, ADVSIMD, true, 0, 0xf, false),
++        .to = FIELD_INFO("fp", ID_AA64PFR0, FP, true, 0, 0xf, false),
++    },
++    {
++        .from = {
++            .reg = ID_AA64PFR0, .length = R_ID_AA64PFR0_FP_LENGTH,
++            .shift = R_ID_AA64PFR0_FP_SHIFT, .sign = true, .min_value = 1,
++            .ni_value = 0, .name = "fphp", .is_32bit = false,
++        },
++        .to = {
++            .reg = ID_AA64PFR0, .length = R_ID_AA64PFR0_ADVSIMD_LENGTH,
++            .shift = R_ID_AA64PFR0_ADVSIMD_SHIFT, .sign = true, .min_value = 1,
++            .ni_value = 0, .name = "asimdhp", .is_32bit = false,
++        },
++    },
++    {
++        .from = {
++            .reg = ID_AA64PFR0, .length = R_ID_AA64PFR0_ADVSIMD_LENGTH,
++            .shift = R_ID_AA64PFR0_ADVSIMD_SHIFT, .sign = true, .min_value = 1,
++            .ni_value = 0, .name = "asimdhp", .is_32bit = false,
++        },
++        .to = {
++            .reg = ID_AA64PFR0, .length = R_ID_AA64PFR0_FP_LENGTH,
++            .shift = R_ID_AA64PFR0_FP_SHIFT, .sign = true, .min_value = 1,
++            .ni_value = 0, .name = "fphp", .is_32bit = false,
++        },
++    },
++    {
++
++        .from = FIELD_INFO("aes", ID_AA64ISAR0, AES, false, 1, 0, false),
++        .to = {
++            .reg = ID_AA64ISAR0, .length = R_ID_AA64ISAR0_AES_LENGTH,
++            .shift = R_ID_AA64ISAR0_AES_SHIFT, .sign = false, .min_value = 2,
++            .ni_value = 1, .name = "pmull", .is_32bit = false,
++        },
++    },
++    {
++
++        .from = FIELD_INFO("sha2", ID_AA64ISAR0, SHA2, false, 1, 0, false),
++        .to = {
++            .reg = ID_AA64ISAR0, .length = R_ID_AA64ISAR0_SHA2_LENGTH,
++            .shift = R_ID_AA64ISAR0_SHA2_SHIFT, .sign = false, .min_value = 2,
++            .ni_value = 1, .name = "sha512", .is_32bit = false,
++        },
++    },
++    {
++        .from = FIELD_INFO("lrcpc", ID_AA64ISAR1, LRCPC, false, 1, 0, false),
++        .to = {
++            .reg = ID_AA64ISAR1, .length = R_ID_AA64ISAR1_LRCPC_LENGTH,
++            .shift = R_ID_AA64ISAR1_LRCPC_SHIFT, .sign = false, .min_value = 2,
++            .ni_value = 1, .name = "ilrcpc", .is_32bit = false,
++        },
++    },
++    {
++        .from = FIELD_INFO("sm3", ID_AA64ISAR0, SM3, false, 1, 0, false),
++        .to = FIELD_INFO("sm4", ID_AA64ISAR0, SM4, false, 1, 0, false),
++    },
++    {
++        .from = FIELD_INFO("sm4", ID_AA64ISAR0, SM4, false, 1, 0, false),
++        .to = FIELD_INFO("sm3", ID_AA64ISAR0, SM3, false, 1, 0, false),
++    },
++    {
++        .from = FIELD_INFO("sha1", ID_AA64ISAR0, SHA1, false, 1, 0, false),
++        .to = FIELD_INFO("sha2", ID_AA64ISAR0, SHA2, false, 1, 0, false),
++    },
++    {
++        .from = FIELD_INFO("sha2", ID_AA64ISAR0, SHA2, false, 1, 0, false),
++        .to = FIELD_INFO("sha1", ID_AA64ISAR0, SHA1, false, 1, 0, false),
++    },
++    {
++        .from = FIELD_INFO("sha1", ID_AA64ISAR0, SHA1, false, 1, 0, false),
++        .to = FIELD_INFO("sha3", ID_AA64ISAR0, SHA3, false, 1, 0, false),
++    },
++    {
++        .from = FIELD_INFO("sha3", ID_AA64ISAR0, SHA3, false, 1, 0, false),
++        .to = {
++            .reg = ID_AA64ISAR0, .length = R_ID_AA64ISAR0_SHA2_LENGTH,
++            .shift = R_ID_AA64ISAR0_SHA2_SHIFT, .sign = false, .min_value = 2,
++            .ni_value = 1, .name = "sha512", .is_32bit = false,
++        },
++    },
++    {
++        .from = {
++            .reg = ID_AA64ISAR0, .length = R_ID_AA64ISAR0_SHA2_LENGTH,
++            .shift = R_ID_AA64ISAR0_SHA2_SHIFT, .sign = false, .min_value = 2,
++            .ni_value = 1, .name = "sha512", .is_32bit = false,
++        },
++        .to = FIELD_INFO("sha3", ID_AA64ISAR0, SHA3, false, 1, 0, false),
++    },
++};
++
+ static void arm_cpu_get_feature_prop(Object *obj, Visitor *v, const char *name,
+                                      void *opaque, Error **errp)
+ {
+@@ -1491,6 +1592,8 @@ static void arm_cpu_finalizefn(Object *obj)
+ 
+ void arm_cpu_finalize_features(ARMCPU *cpu, Error **errp)
+ {
++    int i;
++    ARMISARegisters *isar = &cpu->isar;
+     Error *local_err = NULL;
+ 
+     if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
+@@ -1500,6 +1603,37 @@ void arm_cpu_finalize_features(ARMCPU *cpu, Error **errp)
+             return;
+         }
+     }
++
++    if (!kvm_enabled() || !kvm_arm_cpu_feature_supported()) {
++        return;
++    }
++
++    for (i = 0; i < ARRAY_SIZE(feature_dependencies); ++i) {
++        const CPUFeatureDep *d = &feature_dependencies[i];
++        bool from_explicit = !!(isar->user_mask[d->from.reg] &
++                                MAKE_64BIT_MASK(d->from.shift, d->from.length));
++        bool to_explicit = !!(isar->user_mask[d->to.reg] &
++                              MAKE_64BIT_MASK(d->to.shift, d->to.length));
++        bool from_enabled = object_property_get_bool(OBJECT(cpu), d->from.name,
++                                                     &error_abort);
++        bool to_enabled = object_property_get_bool(OBJECT(cpu), d->to.name,
++                                                   &error_abort);
++
++        if (!from_enabled && to_enabled) {
++            if (from_explicit && to_explicit) {
++                error_setg(errp, "The CPU feature '%s' dependes on CPU feature "
++                           "'%s' that is disabled explicitly",
++                           d->to.name, d->from.name);
++                return;
++            } else if (from_explicit) {
++                isar->regs[d->to.reg] = deposit64(isar->regs[d->to.reg],
++                        d->to.shift, d->to.length, d->to.ni_value);
++            } else if (to_explicit) {
++                isar->regs[d->from.reg] = deposit64(isar->regs[d->from.reg],
++                        d->from.shift, d->from.length, d->from.min_value);
++            }
++        }
++    }
+ }
+ 
+ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+-- 
+2.26.2
 
---=20
-Antoine 'xdbob' Damhet
-
---vikpe6obnxeko6wi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEArm1WbQx2GmOsfF83AmjLzzljz4FAl9jVdUACgkQ3AmjLzzl
-jz41ZggAgr4IGvlzgt8XS4LjT1qYjt+vr7IFjoceBn6d/Cou21MgV/fBGylABPfy
-KJBdJMO4tQ5FCQSlV30sAyFzsoMrKz8B6o4N8i2KVCPPNslH2eQBxaCSutoZWZUO
-xGtapD0xAMHwKqd6gjdyTO5YrEq/PdPH79mDiOn38ZDE422WnWiCEts1yMUX51Hk
-4bCC89fV3w7oDj/lzrJs+kfQpybP/qH67OMv0FqJE5guhkiE27zxbMz+O0n47D0n
-E8UfXTEzXS/9ev1lP8vcuv+IJhm7tT44lEP2TMfl+UdBdMMCPpLKqoeummQ4HlB0
-siWUMcmlB8Lmb+BYnPPF6gbM0rk4wQ==
-=Vqhs
------END PGP SIGNATURE-----
-
---vikpe6obnxeko6wi--
 
