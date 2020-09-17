@@ -2,129 +2,91 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC1B0C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:53:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA76C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:54:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 276662087D
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:53:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFCB22087D
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:54:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="BtH89zI1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 276662087D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SM49Nc90"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFCB22087D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIz1v-0004Se-BL
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 14:53:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37200)
+	id 1kIz3T-0005QW-Sx
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 14:54:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37578)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kIz1J-0003np-2H; Thu, 17 Sep 2020 14:52:37 -0400
-Received: from mail-eopbgr50138.outbound.protection.outlook.com
- ([40.107.5.138]:54921 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kIz1F-0004U7-GY; Thu, 17 Sep 2020 14:52:36 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RXv7KXgLuEYXTBqR0Sp2xXCfW8CWsztbeafrCPiwbaGkHMJkAXwq/aRsHI3AKbAbsrzsU0/q7s0av9wqDLUqN7IhbYqIIkqReUNUCMKUCViLz94xADsVi0h4u0QiSjV6PPX7imX/sKmYKzgl4Jg9vEI0G+cVUY5PBlKgJLz0K2PpSCgI1F2xH5g2eoL92P2GqXDAhYx56uIFHDyUizqQdJlUPsgEPLenGRQX2X9oXXkAKJKcu6xb/cbef8TfDKSjG1JyXCheAeW8KiGb21QO/zhqXXJfUwQKru8i2HHlcBXnEGnObab0gx5saxw4p5s/ausPdOZg/3uORIVCK5/ELQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zRoBWnpk1UqHHpdeLbKh50d57sMB23zqVXWsTUjh/54=;
- b=HLd5aCjSjhKo+HfOZHwDtlE1JFstNfWjB1XKUnuJhntfx8x0Q5Vqb7u10UfrqXCTuKgAMkC5qHFGV+8IWUPRqOUcIsn1GYX+4dyrgibu/AhSGuifzsLBf6oM/MmtCbPkvcs+DOsiqwgrABZE38ZW1dCPBVy9xA0aSPoobGs4KtHUjTmHorHDk8Tyb4LJqBGLa0zLEU0wj5cFZvyytk6Cpd0kxi+ae2QxTpd9/2E8EVtmhaxLFLElL0H+boqlm5LhP1wb6TOLSyDgjgV99HYPnNFRpEYDKm1XuxfkCPGWa76R/IQieg6dfDymmSEjCfYDdGjQvKmEU6E9n9UqOrwCOQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zRoBWnpk1UqHHpdeLbKh50d57sMB23zqVXWsTUjh/54=;
- b=BtH89zI1hdH6DhAEr3XnjM5shOPSmax2rqYYqz8uH698ZYKW6U5+6KF+8aPiN2qeWGJ3mDJZcncDLqIrZM4vyfUQRNBEApYNhDCt3voG4s9L8d5wKPnPyAa1iUNLUd7rT31aWuCmVreeHF/+o9wBcaFttMatMd/xDz4JzvmuNmM=
-Authentication-Results: kaod.org; dkim=none (message not signed)
- header.d=none;kaod.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB3718.eurprd08.prod.outlook.com (2603:10a6:20b:81::23)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Thu, 17 Sep
- 2020 18:52:29 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::b179:9641:7589:d692%8]) with mapi id 15.20.3370.019; Thu, 17 Sep 2020
- 18:52:29 +0000
-Subject: Re: [PATCH 09/14] block/qcow2: qcow2_get_specific_info(): drop error
- propagation
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, eblake@redhat.com,
- jsnow@redhat.com, stefanha@redhat.com, pbonzini@redhat.com,
- pavel.dovgaluk@ispras.ru, ari@tuxera.com, mreitz@redhat.com,
- kwolf@redhat.com, groug@kaod.org
-References: <20200909185930.26524-1-vsementsov@virtuozzo.com>
- <20200909185930.26524-10-vsementsov@virtuozzo.com>
- <w51y2l85pon.fsf@maestria.local.igalia.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <d0d7bb04-d6a5-5b7b-17e6-6b659026054c@virtuozzo.com>
-Date: Thu, 17 Sep 2020 21:52:27 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
-In-Reply-To: <w51y2l85pon.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR10CA0032.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:20b:150::12) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kIz2D-0004kB-FR
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 14:53:33 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52776
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kIz2A-0004fk-L0
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 14:53:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600368809;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fs56+6Sy+oLVIRfBTYUZtfP6eFuZvoJ9qx+3LPNX2Lc=;
+ b=SM49Nc90WGIodyVxjpNm4Ys8giu74hw8v/RrojXDG84YCD+oQ0v3VR/ycgFBw+kMEo7+0g
+ TPYjRLAQMiRw2Te/k8ao22CJlTrcNPQdVlUHzt8Ovg7IsDdIs/LlXSr6o7X1tOrzRvx+Pq
+ fPhjz0/orPjzqBdxUC6kWk/0xnaNO2I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-531-hImQGLMnOtuYvHAgy1fWBw-1; Thu, 17 Sep 2020 14:53:25 -0400
+X-MC-Unique: hImQGLMnOtuYvHAgy1fWBw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D75B80734F;
+ Thu, 17 Sep 2020 18:53:24 +0000 (UTC)
+Received: from [10.10.119.140] (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ED61877D85;
+ Thu, 17 Sep 2020 18:53:22 +0000 (UTC)
+Subject: Re: [PATCH 15/37] qapi/common.py: split build_params into new file
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200915224027.2529813-1-jsnow@redhat.com>
+ <20200915224027.2529813-16-jsnow@redhat.com>
+ <877dsspiqd.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <9cd429a9-246b-167b-b75e-8ce3164ff39f@redhat.com>
+Date: Thu, 17 Sep 2020 14:53:22 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.5] (185.215.60.75) by
- AM0PR10CA0032.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:150::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.11 via Frontend
- Transport; Thu, 17 Sep 2020 18:52:28 +0000
-X-Originating-IP: [185.215.60.75]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 43f4e09a-49f5-4918-6a56-08d85b3ad3c1
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3718:
-X-Microsoft-Antispam-PRVS: <AM6PR08MB3718C79D0D5996FB5F8F8267C13E0@AM6PR08MB3718.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7vrbnPa1yYjN5pgEIG2U2qCP8ifpSWJkkQo7ypSWM8PaV+z3EoJn93YElIUd95nGwxXQDGz2YQRmg8dywUkYAy6unCPwVEEqDTcdQCsHqZSyNERHi5ou1ls/CD4eObe5H0rP2X0NUj7IHtzHSA7MycsYa31PEe5OqLzeZSCkPlnWxRTqGTjUoOMTdjzbXAc0RiHIVC2Ju18N9M2qqFFQWxB6ikfU1bWBq+g+f6FgpqeAsz2NdgXcSdeh3nr+DGG2iPJzU8sYH9bdbYR1uq6o/G9eccg96k8WrmEUHuHRSNvS+BxDeOGH8a5T3CRbO6M3omWtF31nuFfPnSFKb/sIydch/sQ4VliCBUVzUO91g22GxprNJAm7WM8IRR2hz/XH
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(376002)(136003)(346002)(39840400004)(396003)(6486002)(19627235002)(316002)(26005)(478600001)(52116002)(5660300002)(8676002)(31686004)(36756003)(2616005)(956004)(2906002)(7416002)(8936002)(83380400001)(4326008)(16526019)(66946007)(86362001)(186003)(66556008)(16576012)(66476007)(31696002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: K5mT4J59UaqifaJanCSISbCems9lZxwKKHxPLvLdCRve3EMrk/LBM6LybxfDQdzV9CaVeT8UpTY78hAbhCR6LOa/yxHzvUQXiI1BuGCeaH8fC5ImTtLneeqyO5yEbaqwVYg72P3ykB5IDNF03PXM/t9eFsrE2azLX5sIHRYGdHdGpJFNJ5NpYLBmbC8mX4Nfvki9ogSZE0Q4qoI2UhxHZsIyxFExmnu9T7HZzVwTIAm78iLdoV8Gn3LvfS0JnOOPF0OirIke4fvOHctyePcdR8sB3mohQ1llmQTN62xE4olUXPiwb+/JhIerh3eOuV+T9YufyRwd7qqUccg17rYR9hcOZ5Y/BMVkQZLZSMJGmHkRMwQBi/rYZ9rtYUsZw9uFEB0ogt0V934FlwNGkAq5QwtlJh05gucw+QeiRope2pDvD+/BtBVogtX6WMK9qiOD6/sCxXYe93OHmlpFGHvdNm4NJ7cvypSNaxO8bArwuwDAS5LeKK4eWUQ/IG/xEwqhDx3V48GcsK+t8FBpnDVdRN3oZha0yI0fj7wcJ8MWGxx0OVNtpQ3Rgi6ch5MMkHjD7AohKLpmPeZlr+NMkVWSSRqPy2CFc3WS1Pcq/vyvRFJ4JCssRr2jG1yhaViJqbKX2fdd3b9+McblFaTFWSIDeQ==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 43f4e09a-49f5-4918-6a56-08d85b3ad3c1
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Sep 2020 18:52:29.2909 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pdcu9j5bThP2LYYFhrzK0RzR0MLGZCYRN8d5dHQAnwET10yyg2zZZ1sNpL3uPoz3Bdr0Gx7utDAPdxj9H2GQtWsQ5+njljwujAeDGi7Y83U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3718
-Received-SPF: pass client-ip=40.107.5.138;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR03-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 14:52:30
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <877dsspiqd.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 02:16:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -137,61 +99,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-17.09.2020 19:32, Alberto Garcia wrote:
-> On Wed 09 Sep 2020 08:59:25 PM CEST, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
+On 9/17/20 10:42 AM, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
 > 
->> + * On success return true with bm_list set (probably to NULL, if no bitmaps),
+>> Including it in common.py creates a circular import dependency, because
+>> schema relies on common.py. To type build_params properly, it needs to
+>> be moved outside of the chain.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>   scripts/qapi/commands.py |  2 +-
+>>   scripts/qapi/common.py   | 23 -----------------------
+>>   scripts/qapi/events.py   |  2 +-
+>>   scripts/qapi/params.py   | 40 ++++++++++++++++++++++++++++++++++++++++
+>>   4 files changed, 42 insertions(+), 25 deletions(-)
+>>   create mode 100644 scripts/qapi/params.py
 > 
-> " probably " ? :-)
-
-I note this as "set to NULL" is not obvious thing (is it "unset" ? :).. And by "probably" I mean "may be", i.e. NULL is just one of possible cases. Probably I use "probably" in a wrong way?
-
+> Ugh.
 > 
->> + * on failure return false with errp set.
->>    */
->> -Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
->> -                                                Error **errp)
->> +bool qcow2_get_bitmap_info_list(BlockDriverState *bs,
->> +                                Qcow2BitmapInfoList **info_list, Error **errp)
->>   {
->>       BDRVQcow2State *s = bs->opaque;
->>       Qcow2BitmapList *bm_list;
->>       Qcow2Bitmap *bm;
->> -    Qcow2BitmapInfoList *list = NULL;
->> -    Qcow2BitmapInfoList **plist = &list;
-> 
-> So here 'list' points at NULL and 'plist' at &list.
-
-Hmm, to be precise, list _is_ NULL (and points nowhere), and plist points to list.
-
-> 
->> -        *plist = obj;
->> -        plist = &obj->next;
-> 
-> In the original code 'plist' is updated when you add a new element, so
-> it always points at the end of the list. But 'list' is unchanged and it
-> still points at the first element.
-> 
-> So the caller receives a pointer to the first element.
-> 
->> +        *info_list = obj;
->> +        info_list = &obj->next;
-> 
-> But in the new code there is only one variable (passed by the caller),
-> which always points at the end of the list.
+> Would moving it gen.py work?
 > 
 
-No: at first "*info_list = obj", we set the result which user will get, users pointer now points to the first object in the list.
-Then, at "info_list = &obj->next", we reassign info_list to another pointer: to "next" field of first list item. So, all further "*info_list = obj" are note visible to the caller.
+Actually, yes.
 
-Actually, the logic is not changed, just instead of plist we use info_list, and instead of list - a variable which should be defined in the caller. Look: in old code, first "*plist = obj" sets "list" variable, but all further "*plist = obj" don't change "list" variable.
+I have an experimental patch way, way later in the series that does this:
+
+1. Leaves common.py with *just* functions and constants used by 
+schema.py: c_name, POINTER_SUFFIX, and transitively EATSPACE.
+
+2. Splits gen_c.py out of gen.py, putting all of the C-specific 
+generator classes in there.
+
+3. Adds params.py and the C-specific bits of common.py into gen_c.py.
 
 
--- 
-Best regards,
-Vladimir
+In effect, you get gen_c.py with all of the C-specific bits in it, all 
+of the other code-generation modules import from gen_c (marking them 
+obviously as C code generators), and schema.py and other parsing friends 
+import only the tiny common.py for c_name().
+
+
+I'll adjust this patch to stash this in gen.py for now. It's too 
+disruptive to shift the other refactor around in my stack.
+
+--js
+
 
