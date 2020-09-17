@@ -2,73 +2,100 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AD77C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 11:19:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 779BDC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 11:42:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5D3820838
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 11:19:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5D3820838
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id E1E0921D7F
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 11:42:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R3Xq28nO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1E0921D7F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIrwk-00063o-If
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 07:19:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47378)
+	id 1kIsJF-0002vb-MF
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 07:42:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52670)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kIrwA-0005ed-BQ
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 07:18:50 -0400
-Resent-Date: Thu, 17 Sep 2020 07:18:50 -0400
-Resent-Message-Id: <E1kIrwA-0005ed-BQ@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21737)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kIrw7-0003Wu-W8
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 07:18:50 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1600341518; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=OLry8nIVunfV6KlbkvjnPXzdC+GQJHbFYbpvbcsNLthsBnMQD4foixVH6uDie71DXLxZJnYV52yxjGhjchp7IQXzwfzEF8fbL9SmAoA6IDlH7HUM33+CzIwXsgTyF8isITNbaK9KveLibtHk4uV7mdYn2QufpgVqetkX84cCUPg=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1600341518;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=ZcfeHBuEFhJOQ03vZDNsNJ4wR3Dhn+6zQnNUkXNW9Ok=; 
- b=Dxs8RTPJA/Gq5wPRxHN+a/QmfG64reXfLZ7w8TME7FUqoFUIQGWn0JQzReNXW4I6qlmsYFIZXHMushY4UQbaz2y+zgDnkHhj/ChGhZYOCR4FFJjhj3sp3G6PYNzhfXi0UZsjc3zcLoL8qss5MDEMqiwdPGw1LU8JCPhjVNOF4TA=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1600341518260253.39924761160808;
- Thu, 17 Sep 2020 04:18:38 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
+ id 1kIsIK-0002UG-AQ
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 07:41:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22666)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
+ id 1kIsIG-0006el-Vw
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 07:41:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600342898;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=M2vCKio4W2BuVGJinba+V4eiJMAq0dLJcbf4HxLk9Jo=;
+ b=R3Xq28nOopNbU/5iI5QZ5M8rlu9czhlMwe2uXx7jtBPsxYzTnVVW26TZGwbIpQXau58Yo3
+ i/xDmmR7HZNMK+YyMV0j/JXYTgNec0DUmstaHMxdQs2oRihUsDbAY31U+Jrm1oEdOOm070
+ KzPlrOC4avmykvpDNrZtA5aoZiWjQYU=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-236-q-FOfCemNGG3Yq9iIcRlXQ-1; Thu, 17 Sep 2020 07:41:33 -0400
+X-MC-Unique: q-FOfCemNGG3Yq9iIcRlXQ-1
+Received: by mail-wr1-f69.google.com with SMTP id n15so762880wrv.23
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 04:41:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+ :message-id:mime-version;
+ bh=M2vCKio4W2BuVGJinba+V4eiJMAq0dLJcbf4HxLk9Jo=;
+ b=RMiestVOHTM516mNZHGDIs9wtVtLc0Jujx5eep/l6fbZYNqDigvq8uJSou/ZCh2lNk
+ aDzDZBrIAAWa0ipsn9Xx45YRxereHE/MJpOVztS45v/RzYLGIAPYyOYz/6+usIVln6iV
+ a5vATU9cu1JISBMcFzig5ie9TCcmlv47AFfxkrkT3mqOVE3nfAQmA+V2QUuyEh0i6UmF
+ +Q4cKZBVVf5bV38kY24dFFj9WWtXqTZkB/CTIImM8JDL7Em9DDwddU7ypszb8HQ7rHbv
+ +0wH31sZG8HjEjjwVl8OsNCHhXaFWIcJ3eQ1yFQazI9ew09rtZ90PTLHqk7k6rngma/F
+ ktDw==
+X-Gm-Message-State: AOAM531tz/VAzELXRNfZe86dVGu1zUFXB9OF32+dMW0hMHq05VKTZACv
+ rgZ4/pawHYkAESCHOQFH5i94Eoleb8qz78fsUavWavoHkF12Mvy67d+8jZk5fyBJ77BVHmt06lG
+ bDZkKvYZvv/6pnAs=
+X-Received: by 2002:adf:d4c7:: with SMTP id w7mr32315499wrk.263.1600342892207; 
+ Thu, 17 Sep 2020 04:41:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwGLIbIm4oeOmzB25QjRiv+2KDBF4My/GXHNglablUWSbiUbE20iO57KYCaS8bP8bffHTxRVQ==
+X-Received: by 2002:adf:d4c7:: with SMTP id w7mr32315481wrk.263.1600342892015; 
+ Thu, 17 Sep 2020 04:41:32 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+ by smtp.gmail.com with ESMTPSA id a11sm10586864wmm.18.2020.09.17.04.41.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 17 Sep 2020 04:41:31 -0700 (PDT)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: qemu-devel@nongnu.org,
 Subject: Re: [PATCH] target/i386: always create kvmclock device
-Message-ID: <160034151689.8478.18235018336121752129@66eaa9a8a123>
-In-Reply-To: <20200917111306.819263-1-vkuznets@redhat.com>
+In-Reply-To: <160034151689.8478.18235018336121752129@66eaa9a8a123>
+References: <160034151689.8478.18235018336121752129@66eaa9a8a123>
+Date: Thu, 17 Sep 2020 13:41:30 +0200
+Message-ID: <87imcchbpx.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: vkuznets@redhat.com
-Date: Thu, 17 Sep 2020 04:18:38 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 04:07:10
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vkuznets@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=vkuznets@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/16 20:51:18
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,20 +108,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
- dgilbert@redhat.com, antoine.damhet@blade-group.com, pbonzini@redhat.com
+Cc: antoine.damhet@blade-group.com, pbonzini@redhat.com, mtosatti@redhat.com,
+ ehabkost@redhat.com, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkxNzExMTMwNi44MTky
-NjMtMS12a3V6bmV0c0ByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
-dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
-aW5mb3JtYXRpb246CgpOL0EuIEludGVybmFsIGVycm9yIHdoaWxlIHJlYWRpbmcgbG9nIGZpbGUK
-CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8y
-MDIwMDkxNzExMTMwNi44MTkyNjMtMS12a3V6bmV0c0ByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2tw
-YXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
-UGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
-IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+no-reply@patchew.org writes:
+
+> Patchew URL: https://patchew.org/QEMU/20200917111306.819263-1-vkuznets@redhat.com/
+>
+>
+>
+> Hi,
+>
+> This series seems to have some coding style problems. See output below for
+> more information:
+>
+> N/A. Internal error while reading log file
+
+error: copy-fd: write returned No space left on device
+fatal: failed to copy file to '/var/tmp/patchew-tester-tmp-h4pn40by/src/.git/objects/pack/pack-614a2d933aa3d31ccd9f7bddf2f28bf8fae5e07c.pack': No space left on device
+fatal: The remote end hung up unexpectedly
+
+does not look like something I can fix. No idea why 'no space left' is
+called a 'coding style problem' btw :-)
+
+-- 
+Vitaly
+
 
