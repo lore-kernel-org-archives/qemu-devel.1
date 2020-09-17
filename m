@@ -2,86 +2,87 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B705C2BBD1
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:44:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88CF8C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:45:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1EED21582
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:44:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 076C320678
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 12:45:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rJCwUVoR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1EED21582
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j8gofYlJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 076C320678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kItHN-0007VE-LA
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 08:44:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39884)
+	id 1kItIP-0008Aa-Of
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 08:45:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39602)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1kItEN-0003rV-MX
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 08:41:44 -0400
-Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:38334)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kItDd-0002qX-En
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 08:40:57 -0400
+Received: from mail-ej1-x634.google.com ([2a00:1450:4864:20::634]:39660)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1kItEK-0005wi-DW
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 08:41:43 -0400
-Received: by mail-pf1-x431.google.com with SMTP id l126so1141404pfd.5
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 05:41:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kItDb-0005py-IX
+ for qemu-devel@nongnu.org; Thu, 17 Sep 2020 08:40:56 -0400
+Received: by mail-ej1-x634.google.com with SMTP id p9so3056239ejf.6
+ for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 05:40:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2OdJQRLcdOum/QgVtr/P1Vx3YmopOHbavwZGRPWAftY=;
- b=rJCwUVoRuLNCbzr1KEP5QVECzw9BVWCXL8ciUkI1TBd/7M/c2bPHHtkmHZy3lXXs46
- XCew32pMks8tUIcL71VxE/28Zz0Z1n79ACsS2WASSylHiFcGHvxQRq9c1Pb98bHMsMEs
- abEcg1j0Wtpa/vMI1T45ssA9Kg5frBeGg61/3TX+n0XFByV2DQjF/HUhlVlDQaGzvTWS
- 2nRcjIJW45xJf+/dXjx74KWv20LcCtPqltSgcgXyCDTeGnUUiC2ncQ1EmJOS+SV5Dua0
- rIfwlHKcr+SjuPj23vYU1gKvIIDBJXXsO1w9ilBOV3kkUKI/SoWc77Gd1ypSwzjFwV6P
- rrWw==
+ :cc:content-transfer-encoding;
+ bh=Jx9bQR3SOzEdG3/ANboftMpqjSRIpZ0h4XkgmtrzA/0=;
+ b=j8gofYlJY04w/lTHwauT09Tzoxn39Hsg2LxIul/PO3FqF4pwgtGiaGfOkH7FoUIzuG
+ 3u5IvdJIehdMil6yhxoQKoq2GbXjqSksbRKTvhmxQgoKv3s+2sJMWIGgfpbIV0BA3kfA
+ WXG17xNAkOB0fmlUpsBfSl7zI034WCsOcCzkJAZEpqYW0UVgOq0gcS//odI8AKMOt8E4
+ 9M8ggNLCQUg4O5DL9Olq9LxcHF6pfKdGBQiYmlyL/pY6toNQEuggaK01PliYRgCNVFNJ
+ EPOg2rhf+3or8cu6W8QoSgek4paCdHXF4kHvaxDSZVZmr7nxshVLxddRmZQHvkR33dMg
+ Pd/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=2OdJQRLcdOum/QgVtr/P1Vx3YmopOHbavwZGRPWAftY=;
- b=XYBpjzWncthM18EdQ/2c6qQcT6W+s3gEQo+sXQEjy2KcJ2HEc4cdBbgDTuPsGfxWVf
- jI9mdew/VU3jy8qsTi3SPCc1kwDZuXeEXWVTQvGnGVkf96v+ien/vsSsh9Hi/wkxVeOj
- pZxQYnzKOVY+FOJiI2aeceXxeRd8jQbbSrvohl7CO3gJy4NgwheKTNL/IMh4IjJGMjui
- SEC/twAV0W0cLvZzws/wqcNelvFxPids2UZDKkmsnRj5A8W3CCob3e/4zGbHMeWHoeGC
- f0rkywMOat/T5kSPF9GI6vLge3ARhgUIF25cANbANa+K2ekn76HZDKmgMT3nITkgBLTK
- za9Q==
-X-Gm-Message-State: AOAM532Og3w9vDJz8s0qHVn0Ghyatz8nGbhoECm0sf2q1wB+tgnXOkvc
- OiBos+PKEIZutwfUqwSB6zzJr2sSFBXn4vL2jsB0P5l+qt8=
-X-Google-Smtp-Source: ABdhPJwxTnBu5K2lZGsDWA49dRqz3zdX1eLtixQmO5zEnRPDQAEqItICqQoSnbjSwet1O2AWlsBYTVVBlx9VgcGaoGA=
-X-Received: by 2002:a63:6346:: with SMTP id x67mr22721848pgb.121.1600346497434; 
- Thu, 17 Sep 2020 05:41:37 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Jx9bQR3SOzEdG3/ANboftMpqjSRIpZ0h4XkgmtrzA/0=;
+ b=AeFGF3/hrzTYXzuAz7VqCXGwTvpYDt2fIli3SCG3ulqfkqMuczInbiBXfM7yObem4g
+ DaGBq4/HAY2XzK818odDf2UCGZ32zDG7ogU5BIZWA7Phok1oy5yvcNWuJ/+QZS3Pyaj8
+ 4gTURv+BsycsERtCn6aJ+lZJQmVsLZwaPLdYj83+6XvJ7Oj6HJbikuRhb1ABUcAPjY+h
+ JMkyzybLrjHY1r1NGKLJ5ParKqqVxw4YUBsyfckIAVM3B3vE+Qw3QI50swvpJwxpynaq
+ mF6io8F4iBP5Aqo30amqCQAC+qQ64eUQEHACffITallaj3JVG0SAQniQbLrvfjGaVudh
+ sA/g==
+X-Gm-Message-State: AOAM531w6jZjsWo56nQ08tPxb62GNPM+JipQ7+kgmoPIW+OI62TjNlb0
+ q/a3z0DZ/0P4pEJggwJY/rQ8me6OEWm7vaRyWk1J7Q==
+X-Google-Smtp-Source: ABdhPJzJZzZzwNS7cnRtajEYck2mc8ljTWEG44SnEgEIWYMfRIuajb2vcoizvTF3fZUQn7JiJfpMP/57P84TsZdHjrk=
+X-Received: by 2002:a17:907:20d9:: with SMTP id
+ qq25mr29133573ejb.382.1600346453688; 
+ Thu, 17 Sep 2020 05:40:53 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200824134431.GA35623@stefanha-x1.localdomain>
- <CAJSP0QW3xniHzHS=_Ok1D-NuAViHUShCxYs38YDo-YjUxC_+ZA@mail.gmail.com>
- <709da6a3-d158-270b-fb63-43ef65dfe668@virtuozzo.com>
- <dd5d6d0f-cc52-d3d5-0bbc-c57dcfef6842@virtuozzo.com>
-In-Reply-To: <dd5d6d0f-cc52-d3d5-0bbc-c57dcfef6842@virtuozzo.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Thu, 17 Sep 2020 13:41:26 +0100
-Message-ID: <CAJSP0QVRMzw5AAJEPpOChyFK4hUuEe1VE909QvYb6HQGOV_8XA@mail.gmail.com>
-Subject: Re: QEMU 5.0 virtio-blk performance regression with high queue depths
-To: "Denis V. Lunev" <den@virtuozzo.com>
+References: <1836935.RIYQIvKipu@silver> <20200917093756.GC1568038@redhat.com>
+ <8e3f59a3-925e-d89f-2073-6c9654bff75f@redhat.com>
+ <2029663.ApTj1TM13Z@silver> <20200917122445.GB1597829@redhat.com>
+In-Reply-To: <20200917122445.GB1597829@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 17 Sep 2020 13:40:42 +0100
+Message-ID: <CAFEAcA8JVV79RbDGfTwA=UFYWnj_SW8aGFHuUw=UJ0jVM8+e2A@mail.gmail.com>
+Subject: Re: QEMU policy for real file tests
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::431;
- envelope-from=stefanha@gmail.com; helo=mail-pf1-x431.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::634;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x634.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -96,50 +97,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Christian Schoenebeck <qemu_oss@crudebyte.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>,
+ Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 16, 2020 at 5:43 PM Denis V. Lunev <den@virtuozzo.com> wrote:
-> On 9/16/20 5:07 PM, Denis V. Lunev wrote:
-> > I will make a check today.
-> >
-> > Talking about our performance measurements, we have not
-> > seen ANY performance degradation, especially 30-40%.
-> > This looking quite strange to me.
-> >
-> > Though there is quite important difference. We are always
-> > using O_DIRECT and 'native' AIO engine.
-> >
-> > Den
->
-> I have put my hands into this and it looks like you are right. There is
-> a difference. It is not as significant for me as in your case, but I observe
-> stable around 10% difference with 128 vs 256 queue size.
->
-> I have checked with:
-> - QEMU 5.1
-> - Fedora 31 in guest
-> - qcow2 (64k, 1Mb) and raw image on host
-> - nocache and both threaded/native IO modes
->
-> The test was run on Thinkpad Carbon X1 gen 6 laptop.
->
-> For the reference, I have seen 330k IOPS for read
-> at max which is looking awesome for native and 220k
-> IOPS for threads.
+On Thu, 17 Sep 2020 at 13:24, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
+> If creating in /tmp then stay below 100 MB, as it can be surprisingly
+> space constrained in some cases.
 
-Thanks for confirming! Reverting the commit is unattractive since it
-does improve performance in some cases.
+Also if creating in /tmp/ it's nice to use an obviously qemu-testing
+related filename. If a 'make check' run falls over partway through it
+is prone to leaving files un-cleaned-up in /tmp/ and it's much easier
+to know you can just delete them if they're named 'qtest*' rather
+than just 'tmp*'...
 
-It would be good to understand the root cause so the regression can be
-fixed without reducing queue-size again.
+(Ideally we'd put in some more consistent framework for temp files
+used by tests to put them all in a single subdir or something, for
+convenience in cleaning up afterwards.)
 
-Do you have time to investigate?
-
-Thanks,
-Stefan
+thanks
+-- PMM
 
