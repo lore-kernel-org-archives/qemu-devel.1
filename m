@@ -2,73 +2,110 @@ Return-Path: <SRS0=BocF=C2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0411AC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:25:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AFF8C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:25:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36CFD2075B
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:25:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D16F52075B
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 14:25:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="aCU77zBz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36CFD2075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="IlMQ03Lt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D16F52075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIuqP-0000Dv-3v
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 10:25:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37744)
+	id 1kIurB-0001GD-Mr
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 10:25:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42722)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kIuWi-0005VC-9p
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 10:04:44 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:49599)
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kIumd-00032l-U7; Thu, 17 Sep 2020 10:21:11 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42178)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kIuWa-0000wH-3x
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 10:04:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=ZNiJsORcp4Qu2yaXOyJKbh2peAVLBuxy6it8UMI6dZ4=; b=aCU77zBzGr5EzYymatgQmhLxes
- bEY2FoWNLsW/sw7lGZ46Is8BbZvQBz9Z+NmqiTwp39fzMSqq992/ptthKvWqzQpj+7tX1Kre6vjxK
- Li+OgGM5KvELe3lqn0PmSwpGM0mAAwINBBP2jj6hgz2KcGxCDNOM+FkQfyqR4i2sn8wIzWEPNDIZh
- NPgBA7wl3LtOIaPH8sWeZelDFw7u2q+SYaBK3HD5jHgwXVjLX7TrpITrVkB/Hhx2JmEFc3DAZEBJi
- sz3qvhbA8PUdamvIXMTJ13KU+VTdg59nc6RPxDB1W6W27W4Dr172RKuC0aWIueQR8FE3ljjPwlLhS
- Vd2hweqQ==;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Greg Kurz <groug@kaod.org>, Max Reitz <mreitz@redhat.com>,
- Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Subject: Re: QEMU policy for real file tests
-Date: Thu, 17 Sep 2020 16:04:32 +0200
-Message-ID: <1957763.100GGpGQLh@silver>
-In-Reply-To: <CAFEAcA8yTpHE2WaBL3B8fbQtetqmH5uXgCudtfHXuYuA+LpavQ@mail.gmail.com>
-References: <1836935.RIYQIvKipu@silver>
- <a60c566c-986c-2534-3e8e-6a3ff23b9d00@redhat.com>
- <CAFEAcA8yTpHE2WaBL3B8fbQtetqmH5uXgCudtfHXuYuA+LpavQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 08:06:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kIumb-0003E0-Mm; Thu, 17 Sep 2020 10:21:11 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 08HEKWrQ089509; Thu, 17 Sep 2020 10:21:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject
+ : date : message-id : in-reply-to : references; s=pp1;
+ bh=HrOG73Xu/7JUcc3vBp0EmxzkDtGg1qQbREzhmSBIwoc=;
+ b=IlMQ03Lt5NFVED8y0zkQO0cs97XC92IPZEq0mgcPP7AD3qbZAQpy9yvGqCReS/NbJNJf
+ NZM6N8GvQE34zaYTgb399dGvI95FA1SQM8W623yrfr3ObI/Gw1EdqwxkBJ086xVk2YtK
+ 0EUtCya5tjYU/e8xIRJYtAb+dVRR4hsgHQEm53gFfMy61tUrEI6buCgcEDB9wGTtITbh
+ PKCB13PeUrH5Y4YJBAXMxLt4T5pLhHmLZaMRZeYWaXZZkekN3gtYuWjp35YNgROfP5HS
+ mSTKUtWokwKfJd/cdyeGLsW1zCKCsmxGFzFRkGptclw6ZfECShNmFSkxLhoUyfRMD2iU KA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33m9fmr0fq-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 17 Sep 2020 10:21:08 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08HEL1aw092477;
+ Thu, 17 Sep 2020 10:21:07 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.26])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33m9fmr0f6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 17 Sep 2020 10:21:07 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+ by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08HEHqFC008209;
+ Thu, 17 Sep 2020 14:21:06 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com
+ [9.57.198.28]) by ppma04wdc.us.ibm.com with ESMTP id 33k6hecudh-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 17 Sep 2020 14:21:06 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
+ [9.57.199.111])
+ by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 08HEL5TC40829212
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 17 Sep 2020 14:21:05 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id BEA0DAC059;
+ Thu, 17 Sep 2020 14:21:05 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A65B3AC05B;
+ Thu, 17 Sep 2020 14:21:01 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.163.85.51])
+ by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+ Thu, 17 Sep 2020 14:21:01 +0000 (GMT)
+From: Matthew Rosato <mjrosato@linux.ibm.com>
+To: alex.williamson@redhat.com, cohuck@redhat.com
+Subject: [PATCH v4 3/5] vfio: Find DMA available capability
+Date: Thu, 17 Sep 2020 10:20:43 -0400
+Message-Id: <1600352445-21110-4-git-send-email-mjrosato@linux.ibm.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1600352445-21110-1-git-send-email-mjrosato@linux.ibm.com>
+References: <1600352445-21110-1-git-send-email-mjrosato@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-17_09:2020-09-16,
+ 2020-09-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 mlxscore=0
+ malwarescore=0 suspectscore=0 priorityscore=1501 clxscore=1015
+ impostorscore=0 lowpriorityscore=0 adultscore=0 mlxlogscore=868
+ spamscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009170104
+Received-SPF: pass client-ip=148.163.156.1;
+ envelope-from=mjrosato@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 10:20:55
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,45 +119,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: thuth@redhat.com, kvm@vger.kernel.org, pmorel@linux.ibm.com,
+ david@redhat.com, schnelle@linux.ibm.com, qemu-devel@nongnu.org,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
+ mst@redhat.com, pbonzini@redhat.com, philmd@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Donnerstag, 17. September 2020 14:40:42 CEST Peter Maydell wrote:
-> (Ideally we'd put in some more consistent framework for temp files
-> used by tests to put them all in a single subdir or something, for
-> convenience in cleaning up afterwards.)
+The underlying host may be limiting the number of outstanding DMA
+requests for type 1 IOMMU.  Add helper functions to check for the
+DMA available capability and retrieve the current number of DMA
+mappings allowed.
 
-Yes, a unified interface for creating and auto wiping these, as well as 
-communicating limits for them would be nice to allow test cases adapting to 
-low quota vs. generous environments automatically.
+Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+---
+ hw/vfio/common.c              | 31 +++++++++++++++++++++++++++++++
+ include/hw/vfio/vfio-common.h |  2 ++
+ 2 files changed, 33 insertions(+)
 
-For now I take Thomas' advice of 4GB as very rough barrier to stay away from.
-
-On Donnerstag, 17. September 2020 15:11:18 CEST Peter Maydell wrote:
-> On Thu, 17 Sep 2020 at 14:04, Thomas Huth <thuth@redhat.com> wrote:
-> > On 17/09/2020 14.06, Christian Schoenebeck wrote:
-> > [...]
-> > 
-> > > Final question: if at some later point one large file needs to be
-> > > created for some test case, is there some approximate size limit to
-> > > stay below for not causing issues with free CI cloud services?
-> > 
-> > FWIW, I know that 4G is already too big for some containers on Travis,
-> > see commit 178d383f10e15f5e5a7.
-> 
-> Yes. Also "it's sparse" doesn't always help -- eg on OSX there is
-> no sparse-file support so a 4GB file really does take 4GB even
-> if it's mostly zeroes...
-
-While I agree not using sparse files for test cases, as many environments 
-don't support them; as a side note though: macOS actually supports sparse 
-files for a long time, both on APFS and HPFS+ volumes. There is F_PUNCHHOLE 
-and F_PREALLOCATE for that purpose and st_size reflects the logical file size, 
-whereas st_blocks*S_BLKSIZE returns the actual allocated physical file size.
-
-Best regards,
-Christian Schoenebeck
-
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index e47a4d7..20914bf 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -849,6 +849,37 @@ vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id)
+     return vfio_get_cap((void *)info, info->cap_offset, id);
+ }
+ 
++static struct vfio_info_cap_header *
++vfio_get_iommu_type1_info_cap(struct vfio_iommu_type1_info *info, uint16_t id)
++{
++    if (!(info->flags & VFIO_IOMMU_INFO_CAPS)) {
++        return NULL;
++    }
++
++    return vfio_get_cap((void *)info, info->cap_offset, id);
++}
++
++bool vfio_get_info_dma_avail(struct vfio_iommu_type1_info *info,
++                             unsigned int *avail)
++{
++    struct vfio_info_cap_header *hdr;
++    struct vfio_iommu_type1_info_dma_avail *cap;
++
++    /* If the capability cannot be found, assume no DMA limiting */
++    hdr = vfio_get_iommu_type1_info_cap(info,
++                                        VFIO_IOMMU_TYPE1_INFO_DMA_AVAIL);
++    if (hdr == NULL) {
++        return false;
++    }
++
++    if (avail != NULL) {
++        cap = (void *) hdr;
++        *avail = cap->avail;
++    }
++
++    return true;
++}
++
+ static int vfio_setup_region_sparse_mmaps(VFIORegion *region,
+                                           struct vfio_region_info *info)
+ {
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index c78f3ff..661a380 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -178,6 +178,8 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp);
+ void vfio_put_group(VFIOGroup *group);
+ int vfio_get_device(VFIOGroup *group, const char *name,
+                     VFIODevice *vbasedev, Error **errp);
++bool vfio_get_info_dma_avail(struct vfio_iommu_type1_info *info,
++                             unsigned int *avail);
+ 
+ extern const MemoryRegionOps vfio_region_ops;
+ typedef QLIST_HEAD(VFIOGroupList, VFIOGroup) VFIOGroupList;
+-- 
+1.8.3.1
 
 
