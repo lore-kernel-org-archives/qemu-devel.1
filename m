@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00E9BC43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:39:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B187C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:41:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62EB8221EE
-	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:39:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62EB8221EE
+	by mail.kernel.org (Postfix) with ESMTPS id D8BAF22205
+	for <qemu-devel@archiver.kernel.org>; Thu, 17 Sep 2020 18:41:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8BAF22205
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kIyog-0001i8-E3
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 14:39:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59460)
+	id 1kIyqG-0003Qh-Ss
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 14:41:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59652)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kIynV-0000Q9-RD; Thu, 17 Sep 2020 14:38:21 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:35407)
+ id 1kIyom-0002Ji-0k; Thu, 17 Sep 2020 14:39:40 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:58569)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kIynT-00026n-H1; Thu, 17 Sep 2020 14:38:21 -0400
+ id 1kIyoj-0002CO-UV; Thu, 17 Sep 2020 14:39:39 -0400
 Received: from [192.168.100.1] ([82.252.129.222]) by mrelayeu.kundenserver.de
  (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1M6ltQ-1kQ8Ss2WJK-008IV6; Thu, 17 Sep 2020 20:38:08 +0200
-Subject: Re: [PATCH V3 04/10] scripts/: fix some comment spelling errors
+ 1N7iGi-1kVXsm0N6Y-014kpQ; Thu, 17 Sep 2020 20:39:30 +0200
+Subject: Re: [PATCH V3 06/10] linux-user/: fix some comment spelling errors
 To: zhaolichang <zhaolichang@huawei.com>, qemu-trivial@nongnu.org
 References: <20200917075029.313-1-zhaolichang@huawei.com>
- <20200917075029.313-5-zhaolichang@huawei.com>
+ <20200917075029.313-7-zhaolichang@huawei.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -80,35 +80,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <8aff0726-da41-1af1-cfc0-bb8337bf51f1@vivier.eu>
-Date: Thu, 17 Sep 2020 20:38:06 +0200
+Message-ID: <2736342d-21a1-e611-f462-87a497e76a03@vivier.eu>
+Date: Thu, 17 Sep 2020 20:39:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200917075029.313-5-zhaolichang@huawei.com>
+In-Reply-To: <20200917075029.313-7-zhaolichang@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Eee1YnGsFN1q1+mq6B5Tngc4S1lmTRb3hl2ouolIoNWCTw1UhWx
- zvvy76+k4QxFNhxnExhSWBmfbNk8QyRlsKDhrVWXTK4OpaA/kHNKF3pFBQOxtYQ7w+WxuTb
- Qurt2u8Srq9TvP4QsIdx7rJ3Gt2VbDUIWBM3zaBSWSR5xeoG7quzohMjHGGTLbWDyeGSdbu
- fzVZFcOtq8zBbAq63QJdg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:EbLzqQwD/lA=:SJUlqMgXTQ8atkaG6Elutb
- RIDUr3K1eYVtOOQ2bJ+aXXrky8brtJqyWB4FFbRn/bVPLUloQvL16t1Q2gNzmr0kqB5sZkgYS
- 6AzrggDdh3S44V10Ar3s1vCwnnNN0m5vfIW/LEoLdNO5X1hCpWAdnveA2ehdTKoyIqLRDPpji
- HxDED9gxayjnHB4I8Dkua5Y47QFgMjesTa/JCX3BgFLMNJy/3ZokrFLnjsmJSiQSoeQHUSOij
- iJcg7ZESGZjaCrT8Ew2HTgJJZKzJ0KDS7ZnhNfbjvBq17tN6lphwHDEPNqxobtDl8bg5zdjvs
- PCoIL7SWP6UHhS+yF40j6IL36++Ghclt43YC0qlbQG0wZFCWu+1E+ngybfpJj0rBOX3UvZihc
- pJK/M40Z65rl58E9VaQXkhTaglBLXU9ZbC/5bRAlu7tQKkisfxgicso8tX0jrT3f/CZTTA7Iu
- 8OWCmBU1gYyGy4cDAXaSghfsQepEtIRSSesj0mrKZZEbOF+7xdVFsrBeuQlJd8m3wkHs9c7kR
- TCvygQDDVXwh2mLyLXte8oSjp2y29KexNQwIjVJVHnFjDN3kw61ZzFd4uxjU3FFMUyZb6Eb6l
- ko9erwR0WdwAj066AjxpQJ8K7CuA+qsQQdjIQG2TQ/yaPMsYGmMmRIAu6aC+LF6oDwqBIFdD4
- 45K6IONasm/cZYyQpQAMLc6CcUtCM9LNhajuDf8MiAF182Gvs3RqbF+CRq067fMgEvnOFxTgQ
- 4XEbbmIQig10oyGaoBEoCAdjahzd02r2j7X2dPRKHJDzImfgsRmbCNTkIt+7S+o9LXXVyA4Hn
- 7nvAdbMmfBcpepx1J1mX0PQT19OL1t4zJurVZUyuGalIw/GntacIHJ7V/q4xP5RTcQvH83h
-Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:OpUf0UlFlUhZQy+f9EfQMN3nBfPMtJTASoPK4dvSGlw4gbCrVSL
+ gmDHiXxfUbx57Acb2QakI9FLfjCOW6ouHSXP+6KauftETgcIjPAdMRGRFJxzQpRmQQkBuPt
+ Ph6rs+ETBZ3TdX4drojzIpsZO0dkJGEccVRQqizlJmcmf1e6ERtmuEe+LYriP1pLct26pw2
+ N0KMhEbc71Hi15hhvHxnA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:BXRvxzLDuf8=:9oxbtn3rLRbzHPrKU6A5HT
+ RewGldrMi0vMHEtJdmrXAOI2yHdzYlDZpAvF6YPCHtTZlUaEcJzZKdNUa1rs76AQFWPXSpheS
+ ntMkK9fSQyaNqy1iGlpF2HHB5OvXXBvBQdtDZ4tm809IqkVCLJlrKWbdixVeX+nDF2uqpdqFF
+ 4IrWmj5TivEMSlGCsMmTAW1c0WLmDnil4jla8CblfS58RdJgJ7MU0dnkG2rrwtdMcVfWlCIF8
+ LePMynEVd2Uz2D7KY8dbmk1ikPM4xM9LQUWbxBtODJJsXi1wEY09TUZ5DEIM0I5+URieNCAeh
+ eBgfC1S82mfCMLPsfd4xAEL5nCztAKrjqxMMAJl8s6HS0sZtkY3CxZNbb502qeMTb5vSr0mxC
+ 4n95y3f9ojmCUzXOx95OnxEPJm+WCSBSzd8DoN+sD7W5Jzphnxg4PPB3EH6vYDHrVDgvN+o9A
+ o+Q1QrGRg5P0Vcn2uSZkYkMTuiNLo4aBiXu9463z2zd2qe5fh7AvYcYqqioHx16mhdeUQXnCl
+ 04FYuqKayenvvAmmPYjPBtfLPV0HPt7HP8OaIDt2EtcL31OAYhEeGL3KkW4g+4Q+74tTjP4DS
+ eN5hmwLCe8u1XcYTk8mERWPgv6pV+FZ2B0e9f6az1BZjssn8QI0yo60vBJ49qVi2zVlIHcwSa
+ W473RUvkL/P9vYhWUg/+j3DqtS22N6IOleJRIveJMvWHwLaF2RY99+d8BjMjf1pnCIzKmPnNO
+ swRZm8bT1WclNSp7kZkc5hAuLeHdInZYWLQFR82/HnnYaHoiJ2igNJZKTuGXCcMYMUnPrrFIA
+ keOev0vyxZ824gexj0NTybcDrrkji+Yl7wBjmqmiznWphXJnhGpqdQ9lrai00FWeGs9Ruz4
+Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 14:38:18
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 14:39:36
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -128,7 +128,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Alex Bennee <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -136,101 +136,124 @@ Sender: "Qemu-devel"
 Le 17/09/2020 à 09:50, zhaolichang a écrit :
 > I found that there are many spelling errors in the comments of qemu,
 > so I used the spellcheck tool to check the spelling errors
-> and finally found some spelling errors in the scripts folder.
+> and finally found some spelling errors in the linux-user folder.
 > 
 > Signed-off-by: zhaolichang <zhaolichang@huawei.com>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Alex Bennee <alex.bennee@linaro.org>
 > ---
->  scripts/checkpatch.pl          | 2 +-
->  scripts/clean-header-guards.pl | 2 +-
->  scripts/decodetree.py          | 6 +++---
->  scripts/oss-fuzz/build.sh      | 2 +-
->  scripts/tracetool/__init__.py  | 2 +-
->  5 files changed, 7 insertions(+), 7 deletions(-)
+>  linux-user/aarch64/signal.c              | 2 +-
+>  linux-user/cris/target_syscall.h         | 4 ++--
+>  linux-user/flat.h                        | 2 +-
+>  linux-user/flatload.c                    | 4 ++--
+>  linux-user/host/ppc64/safe-syscall.inc.S | 2 +-
+>  linux-user/syscall.c                     | 4 ++--
+>  6 files changed, 9 insertions(+), 9 deletions(-)
 > 
-> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-> index bd3faa154c..50910899f2 100755
-> --- a/scripts/checkpatch.pl
-> +++ b/scripts/checkpatch.pl
-> @@ -1870,7 +1870,7 @@ sub process {
->  			substr($s, 0, length($c), '');
+> diff --git a/linux-user/aarch64/signal.c b/linux-user/aarch64/signal.c
+> index cd521ee42d..d50c1ae583 100644
+> --- a/linux-user/aarch64/signal.c
+> +++ b/linux-user/aarch64/signal.c
+> @@ -78,7 +78,7 @@ struct target_sve_context {
+>      struct target_aarch64_ctx head;
+>      uint16_t vl;
+>      uint16_t reserved[3];
+> -    /* The actual SVE data immediately follows.  It is layed out
+> +    /* The actual SVE data immediately follows.  It is laid out
+>       * according to TARGET_SVE_SIG_{Z,P}REG_OFFSET, based off of
+>       * the original struct pointer.
+>       */
+> diff --git a/linux-user/cris/target_syscall.h b/linux-user/cris/target_syscall.h
+> index d109a6b42a..19e1281403 100644
+> --- a/linux-user/cris/target_syscall.h
+> +++ b/linux-user/cris/target_syscall.h
+> @@ -4,7 +4,7 @@
+>  #define UNAME_MACHINE "cris"
+>  #define UNAME_MINIMUM_RELEASE "2.6.32"
 >  
->  			# Make sure we remove the line prefixes as we have
-> -			# none on the first line, and are going to readd them
-> +			# none on the first line, and are going to re-add them
->  			# where necessary.
->  			$s =~ s/\n./\n/gs;
+> -/* pt_regs not only specifices the format in the user-struct during
+> +/* pt_regs not only specifies the format in the user-struct during
+>   * ptrace but is also the frame format used in the kernel prologue/epilogues
+>   * themselves
+>   */
+> @@ -32,7 +32,7 @@ struct target_pt_regs {
+>          unsigned long spc;
+>          unsigned long ccs;
+>          unsigned long srp;
+> -        unsigned long erp; /* This is actually the debugged process' PC */
+> +        unsigned long erp; /* This is actually the debugged process's PC */
+>          /* For debugging purposes; saved only when needed. */
+>          unsigned long exs;
+>          unsigned long eda;
+> diff --git a/linux-user/flat.h b/linux-user/flat.h
+> index 1e44b33443..ed518e2013 100644
+> --- a/linux-user/flat.h
+> +++ b/linux-user/flat.h
+> @@ -43,7 +43,7 @@ struct flat_hdr {
+>  	abi_ulong reloc_count;  /* Number of relocation records */
+>  	abi_ulong flags;
+>  	abi_ulong build_date;   /* When the program/library was built */
+> -	abi_ulong filler[5];    /* Reservered, set to zero */
+> +	abi_ulong filler[5];    /* Reserved, set to zero */
+>  };
 >  
-> diff --git a/scripts/clean-header-guards.pl b/scripts/clean-header-guards.pl
-> index f47d673ad5..a6680253b1 100755
-> --- a/scripts/clean-header-guards.pl
-> +++ b/scripts/clean-header-guards.pl
-> @@ -19,7 +19,7 @@
->  # Does the following:
->  # - Header files without a recognizable header guard are skipped.
->  # - Clean up any untidy header guards in-place.  Warn if the cleanup
-> -#   renames guard symbols, and explain how to find occurences of these
-> +#   renames guard symbols, and explain how to find occurrences of these
->  #   symbols that may have to be updated manually.
->  # - Warn about duplicate header guard symbols.  To make full use of
->  #   this warning, you should clean up *all* headers in one run.
-> diff --git a/scripts/decodetree.py b/scripts/decodetree.py
-> index c02de9865b..60fd3b5e5f 100644
-> --- a/scripts/decodetree.py
-> +++ b/scripts/decodetree.py
-> @@ -94,7 +94,7 @@ def str_indent(c):
+>  #define FLAT_FLAG_RAM    0x0001 /* load program entirely into RAM */
+> diff --git a/linux-user/flatload.c b/linux-user/flatload.c
+> index 8fb448f0bf..14d2999d15 100644
+> --- a/linux-user/flatload.c
+> +++ b/linux-user/flatload.c
+> @@ -442,7 +442,7 @@ static int load_flat_file(struct linux_binprm * bprm,
+>      indx_len = (indx_len + 15) & ~(abi_ulong)15;
+>  
+>      /*
+> -     * Alloate the address space.
+> +     * Allocate the address space.
+>       */
+>      probe_guest_base(bprm->filename, 0,
+>                       text_len + data_len + extra + indx_len);
+> @@ -794,7 +794,7 @@ int load_flt_binary(struct linux_binprm *bprm, struct image_info *info)
+>  #error here
+>      for (i = MAX_SHARED_LIBS-1; i>0; i--) {
+>              if (libinfo[i].loaded) {
+> -                    /* Push previos first to call address */
+> +                    /* Push previous first to call address */
+>                      --sp;
+>                      if (put_user_ual(start_addr, sp))
+>                          return -EFAULT;
+> diff --git a/linux-user/host/ppc64/safe-syscall.inc.S b/linux-user/host/ppc64/safe-syscall.inc.S
+> index 8ed73a5b86..875133173b 100644
+> --- a/linux-user/host/ppc64/safe-syscall.inc.S
+> +++ b/linux-user/host/ppc64/safe-syscall.inc.S
+> @@ -84,7 +84,7 @@ safe_syscall_end:
+>  
+>  	/* code path when we didn't execute the syscall */
+>  0:	addi	3, 0, -TARGET_ERESTARTSYS
+> -	ld 14, 16(1) /* restore r14 to its orginal value */
+> +	ld 14, 16(1) /* restore r14 to its original value */
+>  	blr
+>  	.cfi_endproc
+>  
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 55ac5c3208..897d20c076 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -481,7 +481,7 @@ _syscall4(int, sys_prlimit64, pid_t, pid, int, resource,
 >  
 >  
->  def str_fields(fields):
-> -    """Return a string uniquely identifing FIELDS"""
-> +    """Return a string uniquely identifying FIELDS"""
->      r = ''
->      for n in sorted(fields.keys()):
->          r += '_' + n
-> @@ -814,7 +814,7 @@ def parse_generic(lineno, parent_pat, name, toks):
->      arg = None
->      fmt = None
->      for t in toks:
-> -        # '&Foo' gives a format an explcit argument set.
-> +        # '&Foo' gives a format an explicit argument set.
->          if re.fullmatch(re_arg_ident, t):
->              tt = t[1:]
->              if arg:
-> @@ -903,7 +903,7 @@ def parse_generic(lineno, parent_pat, name, toks):
->      elif not (is_format and width == 0) and width != insnwidth:
->          error(lineno, 'definition has {0} bits'.format(width))
+>  #if defined(TARGET_NR_timer_create)
+> -/* Maxiumum of 32 active POSIX timers allowed at any one time. */
+> +/* Maximum of 32 active POSIX timers allowed at any one time. */
+>  static timer_t g_posix_timers[32] = { 0, } ;
 >  
-> -    # Do not check for fields overlaping fields; one valid usage
-> +    # Do not check for fields overlapping fields; one valid usage
->      # is to be able to duplicate fields via import.
->      fieldmask = 0
->      for f in flds.values():
-> diff --git a/scripts/oss-fuzz/build.sh b/scripts/oss-fuzz/build.sh
-> index d16207eb67..0c3ca9e06f 100755
-> --- a/scripts/oss-fuzz/build.sh
-> +++ b/scripts/oss-fuzz/build.sh
-> @@ -69,7 +69,7 @@ mkdir -p "$DEST_DIR/lib/"  # Copy the shared libraries here
+>  static inline int next_free_host_timer(void)
+> @@ -8180,7 +8180,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+>      switch(num) {
+>      case TARGET_NR_exit:
+>          /* In old applications this may be used to implement _exit(2).
+> -           However in threaded applictions it is used for thread termination,
+> +           However in threaded applications it is used for thread termination,
+>             and _exit_group is used for application termination.
+>             Do thread termination if we have more then one thread.  */
 >  
->  if ! make "-j$(nproc)" qemu-fuzz-i386; then
->      fatal "Build failed. Please specify a compiler with fuzzing support"\
-> -          "using the \$CC and \$CXX environemnt variables"\
-> +          "using the \$CC and \$CXX environment variables"\
->            "\nFor example: CC=clang CXX=clang++ $0"
->  fi
->  
-> diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.py
-> index 3ccfa1e116..3ee54be223 100644
-> --- a/scripts/tracetool/__init__.py
-> +++ b/scripts/tracetool/__init__.py
-> @@ -34,7 +34,7 @@ def error(*lines):
->  def out(*lines, **kwargs):
->      """Write a set of output lines.
->  
-> -    You can use kwargs as a shorthand for mapping variables when formating all
-> +    You can use kwargs as a shorthand for mapping variables when formatting all
->      the strings in lines.
->      """
->      lines = [ l % kwargs for l in lines ]
 > 
 
 Applied to my trivial-patches branch.
