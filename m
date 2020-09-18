@@ -2,105 +2,93 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E7EC43467
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 15:34:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 443DBC43463
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 15:34:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1C3221481
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 15:34:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C77D8208DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 15:34:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PFxYTrnD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1C3221481
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RQaMGSc+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C77D8208DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJIOi-0003IJ-Nr
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 11:34:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51826)
+	id 1kJIPX-0004P4-LM
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 11:34:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kJIDa-0000CH-Pe
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 11:22:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58473
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kJIG0-0003G8-2A
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 11:25:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28526
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kJIDY-0003UF-LD
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 11:22:34 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kJIFx-0003m7-QC
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 11:25:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600442551;
+ s=mimecast20190719; t=1600442700;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=SsJ9T03FLpo5/oRUzIMD8dt9gfahzYwEoPIInb5/pLg=;
- b=PFxYTrnDd9wJSzrM5vS/MoZyEMIhf9fv0MLZtwmgES7CHkF26IezVkCArvXHMuq5L1IZfF
- TSahKpPSlCNF74a3pVaL8x8r7Dz9SlT432y08LUeE/ugVNjYXY+qtlI7CBo8tpzzG1L0iu
- agS2uxuFtfWUUinUt1MH1RwL6P3gJ7g=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-348-Z1kPAjUcNHuolcjZrtbbQw-1; Fri, 18 Sep 2020 11:22:16 -0400
-X-MC-Unique: Z1kPAjUcNHuolcjZrtbbQw-1
-Received: by mail-wm1-f72.google.com with SMTP id l26so1571457wmg.7
- for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 08:22:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=SsJ9T03FLpo5/oRUzIMD8dt9gfahzYwEoPIInb5/pLg=;
- b=sxxlZOSVpy063UEJloSBYnoFLk5w7M7BORMPVzoxim5UjUh+ngfphLBJnPv33+dJWN
- LAyWay4nqzwDzjXzH8XGZHZ3II3HCDyI6DYUIacyFjsIJltQQMVDvhaQyedeg+Jvy1Pg
- x4VYwBgP4OlkhgjhwoEMslQK1tu4sTjaPm/BDATlEQ1EELXbYsUn6n2tnF4twkfrAOma
- FMq0xpTnZmrvrS2lFdYgm4d6yrQBY+Zp6xoAIuvVf29jYDvbqNtkjIqpOXKS3usBX7GD
- U6qz9dNthGQowd5imXf+UMjYpVcnKOwCRK+fDI5vc0jpFN2zP5fRYY/n97mTX1d+rShY
- if9g==
-X-Gm-Message-State: AOAM533ek31h7OYc4F/SKYQLVbXFjvVKdxU932+c8jRMqjRxbdPAn0kT
- BVh18bIwYbPdmQBhhnk+YWKV9/Fn1Qjwyoiuiqj0GQDC56O4Itps1yWXRPpLbTr836CLDNACZrp
- TEdqe7i07Eo8qbKY=
-X-Received: by 2002:adf:81c6:: with SMTP id 64mr37031754wra.176.1600442534507; 
- Fri, 18 Sep 2020 08:22:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwDdirnvEKJHUZ9rncgN/VlrCM7/4hHmSrWx3Ho8whcY8/EY3xim+zmQ/JE5JLx+rtteJWLzw==
-X-Received: by 2002:adf:81c6:: with SMTP id 64mr37031742wra.176.1600442534330; 
- Fri, 18 Sep 2020 08:22:14 -0700 (PDT)
-Received: from x1w.redhat.com (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id l19sm5440401wmi.8.2020.09.18.08.22.13
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Sep 2020 08:22:13 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 1/1] hw/nvram/fw_cfg: fix FWCfgDataGeneratorClass::get_data()
- consumption
-Date: Fri, 18 Sep 2020 17:22:07 +0200
-Message-Id: <20200918152207.157589-2-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200918152207.157589-1-philmd@redhat.com>
-References: <20200918152207.157589-1-philmd@redhat.com>
+ bh=bLUecCaLw2HZ72DUBlLdDtdA7bOogv0RkTLAIIiOX70=;
+ b=RQaMGSc+0+O7xRO2a0kTEI48DPNc7vB7d2MeFirF8cjrlr+Auc0ejsRuWCFj70ysTAG1lC
+ yrBQU8f25Ie1qCN1X8taOf9H74eYLGM9uiYxf4QZYzF28lZHKgbIGoWol1Q22fKnnfz7eT
+ Y+23I2Q9sRiYhNsd3OPLprBAeL8HlwI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-173-h2K5M5C2NPmCWk5RND9Jqw-1; Fri, 18 Sep 2020 11:24:58 -0400
+X-MC-Unique: h2K5M5C2NPmCWk5RND9Jqw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 84F378712FE;
+ Fri, 18 Sep 2020 15:24:57 +0000 (UTC)
+Received: from [10.10.119.140] (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AABAA60FC2;
+ Fri, 18 Sep 2020 15:24:56 +0000 (UTC)
+Subject: Re: [PATCH 13/37] qapi/common.py: add notational type hints
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200915224027.2529813-1-jsnow@redhat.com>
+ <20200915224027.2529813-14-jsnow@redhat.com>
+ <87h7rwpj8d.fsf@dusky.pond.sub.org>
+ <d1f725b3-c23c-d619-5cd2-ead63e3faa9a@redhat.com>
+ <87r1qzibgg.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <8eef6c71-45f4-9abc-77a6-de559f884a27@redhat.com>
+Date: Fri, 18 Sep 2020 11:24:56 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
+In-Reply-To: <87r1qzibgg.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 08:09:31
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 03:47:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
+X-Spam_score_int: -69
+X-Spam_score: -7.0
+X-Spam_bar: -------
+X-Spam_report: (-7.0 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-1.869, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -113,70 +101,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Laszlo Ersek <lersek@redhat.com>
+On 9/18/20 7:14 AM, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
+> 
+>> On 9/17/20 10:32 AM, Markus Armbruster wrote:
+>>> Question on the subject line: what makes a type hint notational?
+>>>
+>>
+>> My cover letter explains that every time I use this phrase, I mean to
+>> state that "This patch adds exclusively type notations and makes no
+>> functional changes to the runtime operation whatsoever."
+>>
+>> i.e. notations-only.
+> 
+> By the time I get to PATCH 13, details explained in the cover letter
+> have been flushed from my memory.  Moreover, the cover letter won't make
+> it into Git.  Best to repeat them right in the commit message.  Perhaps:
+> 
+>      qapi/common; Add type hints
+> 
+>      Type hints do not change behavior.
+> 
 
-The documentation on g_byte_array_free()
-<https://developer.gnome.org/glib/stable/glib-Byte-Arrays.html#g-byte-array-free>
-says:
+ACK, done.
 
-> Returns
->
-> the element data if free_segment is FALSE, otherwise NULL. The element
-> data should be freed using g_free().
+>>> John Snow <jsnow@redhat.com> writes:
+>>>
+>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>> ---
+>>>>    scripts/qapi/common.py | 27 ++++++++++++++++-----------
+>>>>    1 file changed, 16 insertions(+), 11 deletions(-)
+>>>>
+>>>> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+>>>> index 4c079755d3..af01348b35 100644
+>>>> --- a/scripts/qapi/common.py
+>>>> +++ b/scripts/qapi/common.py
+>>>> @@ -12,6 +12,7 @@
+>>>>    # See the COPYING file in the top-level directory.
+>>>>      import re
+>>>> +from typing import Optional, Union, Sequence
+>>>>      
+>>>>    EATSPACE = '\033EATSPACE.'
+>>>> @@ -22,7 +23,7 @@
+>>>>    # ENUMName -> ENUM_NAME, EnumName1 -> ENUM_NAME1
+>>>>    # ENUM_NAME -> ENUM_NAME, ENUM_NAME1 -> ENUM_NAME1, ENUM_Name2 -> ENUM_NAME2
+>>>>    # ENUM24_Name -> ENUM24_NAME
+>>>> -def camel_to_upper(value):
+>>>> +def camel_to_upper(value: str) -> str:
+>>>>        c_fun_str = c_name(value, False)
+>>>>        if value.isupper():
+>>>>            return c_fun_str
+>>>> @@ -41,7 +42,9 @@ def camel_to_upper(value):
+>>>>        return new_name.lstrip('_').upper()
+>>>>      
+>>>> -def c_enum_const(type_name, const_name, prefix=None):
+>>>> +def c_enum_const(type_name: str,
+>>>> +                 const_name: str,
+>>>> +                 prefix: Optional[str] = None) -> str:
+>>>>        if prefix is not None:
+>>>>            type_name = prefix
+>>>>        return camel_to_upper(type_name) + '_' + c_name(const_name, False).upper()
+>>>> @@ -56,7 +59,7 @@ def c_enum_const(type_name, const_name, prefix=None):
+>>>>    # into substrings of a generated C function name.
+>>>>    # '__a.b_c' -> '__a_b_c', 'x-foo' -> 'x_foo'
+>>>>    # protect=True: 'int' -> 'q_int'; protect=False: 'int' -> 'int'
+>>>> -def c_name(name, protect=True):
+>>>> +def c_name(name: str, protect: bool = True) -> str:
+>>>>        # ANSI X3J11/88-090, 3.1.1
+>>>>        c89_words = set(['auto', 'break', 'case', 'char', 'const', 'continue',
+>>>>                         'default', 'do', 'double', 'else', 'enum', 'extern',
+>>>> @@ -134,24 +137,24 @@ def pop(self, amount: int = 4) -> int:
+>>>>      # Generate @code with @kwds interpolated.
+>>>>    # Obey INDENT level, and strip EATSPACE.
+>>>> -def cgen(code, **kwds):
+>>>> +def cgen(code: str, **kwds: Union[str, int]) -> str:
+>>> Hmm.
+>>> The @kwds values can be anything, provided they match the conversion
+>>> specifiers in @code:
+>>>
+>>>>        raw = code % kwds
+>>> Your type hint adds a restriction that wasn't there before.
+>>> Is there a better way?
+>>>
+>>
+>> Maybe there are format-like type annotation tricks you can do to
+>> enforce this, but I did not research them. I tried to resist
+>> "improving" our usage of the old % formatter prematurely. I may do a
+>> wholesale f-string conversion at some point, but not now, it's not
+>> important.
+>>
+>> In practice, we pass strings and integers. This typing *is*
+>> artificially restrictive, though. We can declare the type to be "Any"
+>> and allow the function to fail or succeed at runtime if you'd prefer.
+>>
 
-Because we currently call g_byte_array_free() with free_segment=TRUE, we
-end up passing data=NULL to fw_cfg_add_file().
+I went with the 'object' type in new revisions.
 
-On the plus side, fw_cfg_data_read() and fw_cfg_dma_transfer() both deal
-with NULL data gracefully: QEMU does not crash when the guest reads such
-an item, the guest just gets a properly sized, but zero-filled blob.
-
-However, the bug breaks UEFI HTTPS boot, as the IANA_TLS_CIPHER array,
-generated otherwise correctly by the "tls-cipher-suites" object, is in
-effect replaced with a zero blob.
-
-Fix the issue by passing free_segment=FALSE to g_byte_array_free():
-
-- the caller (fw_cfg_add_from_generator()) temporarily assumes ownership
-  of the generated byte array,
-
-- then ownership of the byte array is transfered to fw_cfg, as
-  fw_cfg_add_file() links (not copies) "data" into fw_cfg.
-
-Cc: "Daniel P. Berrangé" <berrange@redhat.com>
-Cc: "Philippe Mathieu-Daudé" <philmd@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Fixes: 3203148917d035b09f71986ac2eaa19a352d6d9d
-Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200916151510.22767-1-lersek@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- hw/nvram/fw_cfg.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index f3a4728288e..0e95d057fd5 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -1056,7 +1056,7 @@ bool fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
-         return false;
-     }
-     size = array->len;
--    fw_cfg_add_file(s, filename, g_byte_array_free(array, TRUE), size);
-+    fw_cfg_add_file(s, filename, g_byte_array_free(array, FALSE), size);
- 
-     return true;
- }
--- 
-2.26.2
+>>>>        if INDENT:
+>>>>            raw, _ = re.subn(r'^(?!(#|$))', str(INDENT), raw, flags=re.MULTILINE)
+>>>>        return re.sub(re.escape(EATSPACE) + r' *', '', raw)
+>>>>      
+>>>> -def mcgen(code, **kwds):
+>>>> +def mcgen(code: str, **kwds: Union[str, int]) -> str:
+>>> Likewise.
+>>>
+>>
+>> Unresearched idea: It's possible that we can subclass the
+>> string.Formatter class and extend it to perform our special variable
+>> replacements (chomping EATSPACE, etc.)
+>>
+>> And *maybe* because it inherits from the standard formatter, we would
+>> benefit from any analysis Mypy performs on such things.
+>>
+>> Basically, replace mcgen/cgen with class CFormatter(string.Formatter).
+>>
+>> (maybe. assume that none of what I just said will work or is feasible.)
+> 
+> Sounds worth exploring.  No need to do it now, of course.
+> 
 
 
