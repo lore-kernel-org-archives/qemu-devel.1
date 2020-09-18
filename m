@@ -2,94 +2,132 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C96A8C43464
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 17:52:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D4D2C43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 17:53:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3148121734
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 17:52:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69B0B21734
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 17:53:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kc8vt670"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3148121734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fknk4ZYg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69B0B21734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJKYJ-0002Ep-8T
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 13:52:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36198)
+	id 1kJKZd-0003Dr-3H
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 13:53:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36838)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kJKNz-0002oK-5H; Fri, 18 Sep 2020 13:41:31 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34374)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kJKNx-0000Gb-S1; Fri, 18 Sep 2020 13:41:26 -0400
-Received: by mail-wm1-x343.google.com with SMTP id l15so7162673wmh.1;
- Fri, 18 Sep 2020 10:41:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=9qL0PD5p90+XPqlO1VLzLa4jpbVXhICHWwCAyjStqAk=;
- b=kc8vt670RThIdeLyqUfZB8/x40+sNMqw/aWLn9hZe9RgTgt8uquese1vzigY6nk2rn
- cYtHls0KTtwC9eQCBFkxYrB6TqqNDSQaMYOQPUYfVbw113+SMPiQi8CxBFu0002BYsmS
- hSzSMSgEtsQn2S7NxBnOK6baIajMlAscgVdVeb9+hybNmgcGwGsnPI4zmFoH4Trs3FxQ
- lLNHK4/av0wiZNRYpR46sv/h3R0B5EPX05DPuc5JxHfykItIobn1YAeuzlTEnAHATh0s
- SDFJJoxrqVmp7QKj+B+KSOPFMcYBNru+qN7WMzYMtF0aaaHORgWAKG3BJX6zploNCZNg
- UnGg==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kJKSB-0005mf-Lk
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 13:45:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41801)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kJKS9-0000iS-Po
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 13:45:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600451141;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=cG66onCmMKAIuqaehP1vC/HZdG67yAneAVrfd42wUM0=;
+ b=Fknk4ZYg/gFlZx9td6TOz/8z2Zs65qc3Pip4LukQWzZpTl3n8DdZpca7YP30rAZvlnxV5G
+ iF6nvHvXUfuo9rhXeORuhiSF76/wTrU/PhkLnWe/BPia3nwMY7Hr6nGFW5CjCE/390bLVh
+ wpLNOCkZCC1ngLBvw12Mq/Kdd1PGKpo=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-202-kLqtTJ6hOlOjO9hQgxlU8g-1; Fri, 18 Sep 2020 13:45:36 -0400
+X-MC-Unique: kLqtTJ6hOlOjO9hQgxlU8g-1
+Received: by mail-wr1-f70.google.com with SMTP id 33so2389831wrk.12
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 10:45:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=9qL0PD5p90+XPqlO1VLzLa4jpbVXhICHWwCAyjStqAk=;
- b=WajeOC8j/pq4ofD21B+jnzSlad6obY0s0bP21vAC+8gU86zb9OYEZ1xAA/x5VlfFj0
- VRSe/tQKxn93GLsR/LK4duY1jc9ZA/itAxFzWcggH9tz7SyKI8PRYIGY3OqcrVkbKPNr
- arfsdG210s/Z7y4nwsUiY9ECuSEIkVU7KqtC5Gigp2jstmfuvYhaQu4VixWef3aFkpUS
- 48l7/Zdgs4rQgBpmqUn1olgqWFYM9IXU+apKh53X2xNh3dxf9i/ozrEFU471ygvW/1/Q
- gvNdB4ZRzsZKINHs+nEDcKJ4IHDMxs5ztxX64PAEuWPG7MxcfMpcivOYNADLSaneRB8j
- weBg==
-X-Gm-Message-State: AOAM533QtkFEZ7vcDjLp/dle0d0bYVBQNOYUM6h9vujNQQDuty6pVqGd
- S4T/ymG/ClTIplLEC6aZgJEeI6HX8t0=
-X-Google-Smtp-Source: ABdhPJxhSHxBRUHQMt9KdRkjOhKY6YC4yv2/MaFbOc1nmsMQh+gPeo0sncyIECuXISgziq6IjriccQ==
-X-Received: by 2002:a05:600c:2cc1:: with SMTP id
- l1mr16314746wmc.78.1600450883801; 
- Fri, 18 Sep 2020 10:41:23 -0700 (PDT)
-Received: from x1w.redhat.com (65.red-83-57-170.dynamicip.rima-tde.net.
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=cG66onCmMKAIuqaehP1vC/HZdG67yAneAVrfd42wUM0=;
+ b=Rl9SyQZdArp2+mi0C3Au8cpNvsorzE+Gxdx4A4Txm0dOQKn9UEMfPSJifUEdTvybO+
+ +h0a+NIXJW7GVsXwWeiJAmu11bu2+7zXiCky/0Li39fF9QyvUzE2+zxk+JqphcQd0Uz+
+ 4s5ZpIyX/51KT+TrO8bkbSlspHNHFNNjMVC2bBuruFeAc1fLz08iLE7ZMA/ML53FSg5V
+ MpXAmMwpVaLQWgf9DStBUFMtOa4Mw4/CzgW0FYDi08+ABSN/QFnkOFHgDE1OPNkTzCzX
+ IkvjXzEmsGJbg6yEhNyYfChqXSSL6XNZE9lrJ9XsJou9dxtzD7OwSpGBoGf+pjl1ZADf
+ R8Fg==
+X-Gm-Message-State: AOAM530zCv7kP7J86nPaEmay1OHn/aqdoJFZgt3tytAo0EgQ0RVjNFQz
+ z73Dh67H1eZl/3EimvVaSfI0Pno4LFRilO38X0lVMplzssn8qqE9R6LTvedikMogLxOu7tEaH16
+ /8tN2X8VGHurFo7A=
+X-Received: by 2002:a1c:9cd3:: with SMTP id
+ f202mr16668042wme.148.1600451134565; 
+ Fri, 18 Sep 2020 10:45:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwD6N/Pjd0kqIwnxNPBEmFo4WDUpSHgO62Gk8ek5MERfoelxjraJzbm+PXgFpEsa74uOs5ULw==
+X-Received: by 2002:a1c:9cd3:: with SMTP id
+ f202mr16668020wme.148.1600451134380; 
+ Fri, 18 Sep 2020 10:45:34 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id a81sm6356179wmf.32.2020.09.18.10.41.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Sep 2020 10:41:23 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ by smtp.gmail.com with ESMTPSA id i3sm6308259wrs.4.2020.09.18.10.45.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 18 Sep 2020 10:45:33 -0700 (PDT)
+Subject: Re: [PATCH] tests/acceptance: Disable tests dependent of unreliable
+ apt.armbian.com
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 4/6] hw/sd/sdcard: Reset both start/end addresses on error
-Date: Fri, 18 Sep 2020 19:41:15 +0200
-Message-Id: <20200918174117.180057-5-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200918174117.180057-1-f4bug@amsat.org>
-References: <20200918174117.180057-1-f4bug@amsat.org>
+References: <20200917163954.50514-1-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <9a337e8e-a864-dd09-e44d-fcbfd6edc08e@redhat.com>
+Date: Fri, 18 Sep 2020 19:45:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200917163954.50514-1-philmd@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Language: en-US
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 00:20:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -69
+X-Spam_score: -7.0
+X-Spam_bar: -------
+X-Spam_report: (-7.0 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-1.869, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,47 +140,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-block@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From the Spec "4.3.5 Erase":
+On 9/17/20 6:39 PM, Philippe Mathieu-Daudé wrote:
+> Armbian servers are not very reliable and confused the GitLab CI
+> users a few times this month (path updated, archives moved, and
+> now the SSL: CERTIFICATE_VERIFY_FAILED "certificate has expired"
+> error). Time to disable these tests.
+> Users can still use the artifacts from the cache (or manually add
+> them to the cache).
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  tests/acceptance/boot_linux_console.py | 10 ++++++++++
+>  tests/acceptance/replay_kernel.py      |  2 ++
+>  2 files changed, 12 insertions(+)
 
-  The host should adhere to the following command
-  sequence: ERASE_WR_BLK_START, ERASE_WR_BLK_END and
-  ERASE (CMD38).
-
-  If an erase (CMD38) or address setting (CMD32, 33)
-  command is received out of sequence, the card shall
-  set the ERASE_SEQ_ERROR bit in the status register
-  and reset the whole sequence.
-
-Reset both addresses if the ERASE command occured
-out of sequence (one of the start/end address is
-not set).
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/sd/sd.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 4c05152f189..ee7b64023aa 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -755,6 +755,8 @@ static void sd_erase(SDState *sd)
-     if (sd->erase_start == INVALID_ADDRESS
-             || sd->erase_end == INVALID_ADDRESS) {
-         sd->card_status |= ERASE_SEQ_ERROR;
-+        sd->erase_start = INVALID_ADDRESS;
-+        sd->erase_end = INVALID_ADDRESS;
-         return;
-     }
- 
--- 
-2.26.2
+Thanks, applied to my acceptance-testing tree.
 
 
