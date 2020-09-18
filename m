@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEDC8C43463
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 21:05:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C5B3C43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 21:07:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 607C2208B8
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 21:05:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 607C2208B8
+	by mail.kernel.org (Postfix) with ESMTPS id 85E79221EC
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 21:06:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85E79221EC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJNZg-0004jD-8l
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 17:05:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46340)
+	id 1kJNar-00066C-UV
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 17:06:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46646)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kJN7T-0004l8-A1; Fri, 18 Sep 2020 16:36:35 -0400
-Received: from new1-smtp.messagingengine.com ([66.111.4.221]:59807)
+ id 1kJN86-0005LB-RT; Fri, 18 Sep 2020 16:37:14 -0400
+Received: from new1-smtp.messagingengine.com ([66.111.4.221]:35547)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kJN7O-0004wr-IP; Fri, 18 Sep 2020 16:36:35 -0400
+ id 1kJN85-000508-0o; Fri, 18 Sep 2020 16:37:14 -0400
 Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
- by mailnew.nyi.internal (Postfix) with ESMTP id C7D505801FA;
- Fri, 18 Sep 2020 16:36:29 -0400 (EDT)
+ by mailnew.nyi.internal (Postfix) with ESMTP id A6A0358023A;
+ Fri, 18 Sep 2020 16:36:51 -0400 (EDT)
 Received: from mailfrontend2 ([10.202.2.163])
- by compute7.internal (MEProxy); Fri, 18 Sep 2020 16:36:29 -0400
+ by compute7.internal (MEProxy); Fri, 18 Sep 2020 16:36:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding; s=fm1; bh=YQq9ReT8TygTf
- QFcmsLpt9EB9MP2HFQSLFimCa1SxpY=; b=enON9D9hubuJPCvIADxleQZX0pDMV
- YiQhzThNr1AeU3dhsAIfPjUiSwL5pFXdV6sQO6tHLXmj8ey88W202qOIe95kU+HK
- gDcND78FXt/eYdXOp2cIcYW8bv7gBNWPRw08Bctnr4rsdOQgMcXKynzuO4/XwTPu
- slCZqti/VUf+h1cpQr9fQlFuQ1gv8VQ7NJIGhB/OjSPSw+bM/s+KDRwJ860UIY9Y
- 2K64/CKT06ZaSmh0wPTDn9qd7LnBiluGFlnkhLDlbsgUZOQjs+06f6U6OLIpPIMW
- y7JuFGZk6a+etSBwzuy4LsbbhKpFU3tNs9t47GR8c2HfG1FTSDdH0O2Cw==
+ :mime-version:content-transfer-encoding; s=fm1; bh=AycJYZl/NgLxN
+ PWjandj//+b8/Mw6mQIDrxQg7FfP2U=; b=hRcoK0DrUc++MUPzRpJB5CB6vcDne
+ VEweo8ubAnyiC9l1OF744KmW/OETPFcQUBiLmrqQ0rop7g1YYuc7BsH3QWFDk9dZ
+ ILcf57JURGMBZCQBzQf/qeFlyUqWcFHBLtCLIjqlipoQ/11QkF7F2ukmpHwXcd//
+ OswjAwmjeOx2ouMu01C7ShW3uPwpURlODOJ3cvIVoK832Hv0Ve+MNHU7g8u0cvs9
+ PY9Tw5mFUyh9GCPGXYTiwHJmALxl/70hlV93dnOuUeh6G6ovJ/KiWIRleTemt+KM
+ /5HrExxuo290PZzIv8zWNY81b8GhpyBK+xWp+b2CEFdqTqkoRKRZ4QXyw==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
  messagingengine.com; h=cc:content-transfer-encoding:date:from
  :in-reply-to:message-id:mime-version:references:subject:to
  :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
- fm3; bh=YQq9ReT8TygTfQFcmsLpt9EB9MP2HFQSLFimCa1SxpY=; b=FdzNT7vC
- ccktF/aEP7t5kZo4PBnKkOiLbzQW3bazZh0c3BpOeMROtg0NGt48sxiurRoOY7Li
- UjJ10OoTfBpfDkohXmsRdwk4rSctpoXoT/gc9gee9b6tnMT01kkAltzpw18lSUi9
- mxKR1K3U4wpFCEPGTilm2nEHbQ3Rrvnv5EqUpx/FMJfsChBwYdb+1VxHXPq04jiP
- IZbyeHCcbXlZxHOzOPXATI7UrGj3x/nCEFkzj2SQ4e/wHvCGH9bE4dbDsPdej8kO
- Gsd7TIHQZLEwxkVonFWDwZ7z+JctRUtbTK7PK0Ij7rMmN9GPXMq3DAvZeNlBV25g
- 5ckksD6wqj0loA==
-X-ME-Sender: <xms:TRplX_1U4881KOabC5deTLQtVV1A4NIE3LbjT2uvLCjxMAeRgRw3cQ>
- <xme:TRplX-GZWMl440MARvjkEb0mNbgIArczw9CdHI7AvLZW1e_fha1pJTURZWT9D0Y0v
- iqNtn4Cw422KUZW-hc>
+ fm3; bh=AycJYZl/NgLxNPWjandj//+b8/Mw6mQIDrxQg7FfP2U=; b=QuwFjkQr
+ QPAUGkxEN3UfTl7y2jOMnr5VR0+shrMh6VJ0R/eYsUMn8NskgsL99Laj0SBNqbn+
+ ib+0RnRMnfnzCQDpPXrxAxZUCBszqMmUSUcb8xxza2CJISkCNT2trtXecxBIjyIj
+ 1mBqSc4PEL8wCsGHaj2qWovbJFSf6cb+et2Hcs0LIt7y/D3p+cvS1czZo9THV+GP
+ FPd8I4sECNVZU3lTlvOEfWVSB9wEHYmTKTG8Xz5RN6BTUIzCjH8RwBcXsOpLwhCe
+ odPUm92qxp/gf0M4SMqn/YOI0dU+3dRuhoJsOTt1+Hph8YebKwDeMbGkb08D+M7O
+ wbu855ZRN/9hOQ==
+X-ME-Sender: <xms:YxplX7uilNP2l0Ov8AL5Eo9BK3wM2XdFZHJr-QNCEEPHroc4r_pqxw>
+ <xme:YxplX8dn1xa90XXDgdAszhlJWAq9VMbY4VCy7us8Be0OV8XkfZYQcKKuocyMYSnSQ
+ 1DQp-zuvWFk4jVncv0>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrtdeigdduhedvucetufdoteggodetrfdotf
  fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
  uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
  cujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpefmlhgruhhs
  ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
  gvrhhnpeeuleetgeeiuefhgfekfefgveejiefgteekiedtgfdtieefhfdthfefueffvefg
- keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtne
+ keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpeekne
  curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
-X-ME-Proxy: <xmx:TRplX_4CxkU25ZfJpIGVTeW_zodOquGwMGwj0PqUdDDc-g3fAiwUwg>
- <xmx:TRplX03mCufY6X2K1votjxta2NJq3wVZWCfSOfysEldbWHbBXBhntw>
- <xmx:TRplXyEBzXuNXGVKrz9B3LBxYOCXe5O33VxLGwWfYyb1JwewLkNOag>
- <xmx:TRplXwanExY-khER6yZ5djqRSa61Axq5qH-YwG0m1HHC817zs1iUz6kq1Ak>
+X-ME-Proxy: <xmx:YxplX-xRyHV8bQc7xJm7sdDQkRzi0wZRWgS871Gm7_r_XATrKk3HZQ>
+ <xmx:YxplX6NVWJLzX1aURIcbHJGy7J1kMrymp5AyFQtcyZh-DW6dpjKArQ>
+ <xmx:YxplX7-sFDXzOkm4KuPEwLWgmWfCSf5eEyXMGgurg1LWsQNnNImw7Q>
+ <xmx:YxplX3SNH09mcwIWFn30Q5tqboIOlj5h6fQ1hK7YMTMP53WcKaRML8UI_mM>
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id B02A33064683;
- Fri, 18 Sep 2020 16:36:27 -0400 (EDT)
+ by mail.messagingengine.com (Postfix) with ESMTPA id B0A713064610;
+ Fri, 18 Sep 2020 16:36:49 -0400 (EDT)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 03/17] hw/block/nvme: handle dma errors
-Date: Fri, 18 Sep 2020 22:36:07 +0200
-Message-Id: <20200918203621.602915-4-its@irrelevant.dk>
+Subject: [PATCH v2 17/17] hw/block/nvme: change controller pci id
+Date: Fri, 18 Sep 2020 22:36:21 +0200
+Message-Id: <20200918203621.602915-18-its@irrelevant.dk>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200918203621.602915-1-its@irrelevant.dk>
 References: <20200918203621.602915-1-its@irrelevant.dk>
@@ -118,144 +118,104 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Handling DMA errors gracefully is required for the device to pass the
-block/011 test ("disable PCI device while doing I/O") in the blktests
-suite.
+There are two reasons for changing this:
 
-With this patch the device passes the test by retrying "critical"
-transfers (posting of completion entries and processing of submission
-queue entries).
+  1. The nvme device currently uses an internal Intel device id.
 
-If DMA errors occur at any other point in the execution of the command
-(say, while mapping the PRPs), the command is aborted with a Data
-Transfer Error status code.
+  2. Since commits "nvme: fix write zeroes offset and count" and "nvme:
+     support multiple namespaces" the controller device no longer has
+     the quirks that the Linux kernel think it has.
+
+     As the quirks are applied based on pci vendor and device id, change
+     them to get rid of the quirks.
+
+To keep backward compatibility, add a new 'use-intel-id' parameter to
+the nvme device to force use of the Intel vendor and device id. This is
+off by default but add a compat property to set this for 5.1 machines
+and older. If a 5.1 machine is booted (or the use-intel-id parameter is
+explicitly set to true), the Linux kernel will just apply these
+unnecessary quirks:
+
+  1. NVME_QUIRK_IDENTIFY_CNS which says that the device does not support
+     anything else than values 0x0 and 0x1 for CNS (Identify Namespace
+     and Identify Namespace). With multiple namespace support, this just
+     means that the kernel will "scan" namespaces instead of using
+     "Active Namespace ID list" (CNS 0x2).
+
+  2. NVME_QUIRK_DISABLE_WRITE_ZEROES. The nvme device started out with a
+     broken Write Zeroes implementation which has since been fixed in
+     commit 9d6459d21a6e ("nvme: fix write zeroes offset and count").
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-Acked-by: Keith Busch <kbusch@kernel.org>
+Reviewed-by: Keith Busch <kbusch@kernel.org>
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- hw/block/nvme.c       | 41 +++++++++++++++++++++++++++++++----------
- hw/block/trace-events |  2 ++
- 2 files changed, 33 insertions(+), 10 deletions(-)
+ hw/block/nvme.h   |  1 +
+ hw/block/nvme.c   | 12 ++++++++++--
+ hw/core/machine.c |  1 +
+ 3 files changed, 12 insertions(+), 2 deletions(-)
 
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index a8b98a1c1ea9..ccf52ac7bb82 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -15,6 +15,7 @@ typedef struct NvmeParams {
+     uint8_t  aerl;
+     uint32_t aer_max_queued;
+     uint8_t  mdts;
++    bool     use_intel_id;
+ } NvmeParams;
+ 
+ typedef struct NvmeAsyncEvent {
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 63078f600920..8ffe407ef658 100644
+index 3e733a2b1321..c00e78b85f51 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -140,14 +140,14 @@ static inline void *nvme_addr_to_cmb(NvmeCtrl *n, hwaddr addr)
-     return &n->cmbuf[addr - n->ctrl_mem.addr];
- }
+@@ -2681,6 +2681,15 @@ static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev, Error **errp)
  
--static void nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
-+static int nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
- {
-     if (n->bar.cmbsz && nvme_addr_is_cmb(n, addr)) {
-         memcpy(buf, nvme_addr_to_cmb(n, addr), size);
--        return;
-+        return 0;
-     }
+     pci_conf[PCI_INTERRUPT_PIN] = 1;
+     pci_config_set_prog_interface(pci_conf, 0x2);
++
++    if (n->params.use_intel_id) {
++        pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_INTEL);
++        pci_config_set_device_id(pci_conf, 0x5845);
++    } else {
++        pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_REDHAT);
++        pci_config_set_device_id(pci_conf, PCI_DEVICE_ID_REDHAT_NVME);
++    }
++
+     pci_config_set_class(pci_conf, PCI_CLASS_STORAGE_EXPRESS);
+     pcie_endpoint_cap_init(pci_dev, 0x80);
  
--    pci_dma_read(&n->parent_obj, addr, buf, size);
-+    return pci_dma_read(&n->parent_obj, addr, buf, size);
- }
+@@ -2834,6 +2843,7 @@ static Property nvme_props[] = {
+     DEFINE_PROP_UINT8("aerl", NvmeCtrl, params.aerl, 3),
+     DEFINE_PROP_UINT32("aer_max_queued", NvmeCtrl, params.aer_max_queued, 64),
+     DEFINE_PROP_UINT8("mdts", NvmeCtrl, params.mdts, 7),
++    DEFINE_PROP_BOOL("use-intel-id", NvmeCtrl, params.use_intel_id, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
- static int nvme_check_sqid(NvmeCtrl *n, uint16_t sqid)
-@@ -307,6 +307,7 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, uint64_t prp1, uint64_t prp2,
-     int num_prps = (len >> n->page_bits) + 1;
-     uint16_t status;
-     bool prp_list_in_cmb = false;
-+    int ret;
+@@ -2850,8 +2860,6 @@ static void nvme_class_init(ObjectClass *oc, void *data)
+     pc->realize = nvme_realize;
+     pc->exit = nvme_exit;
+     pc->class_id = PCI_CLASS_STORAGE_EXPRESS;
+-    pc->vendor_id = PCI_VENDOR_ID_INTEL;
+-    pc->device_id = 0x5845;
+     pc->revision = 2;
  
-     QEMUSGList *qsg = &req->qsg;
-     QEMUIOVector *iov = &req->iov;
-@@ -347,7 +348,11 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, uint64_t prp1, uint64_t prp2,
+     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index ea26d612374d..944120cf19c8 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -34,6 +34,7 @@ GlobalProperty hw_compat_5_1[] = {
+     { "vhost-user-scsi", "num_queues", "1"},
+     { "virtio-blk-device", "num-queues", "1"},
+     { "virtio-scsi-device", "num_queues", "1"},
++    { "nvme", "use-intel-id", "on"},
+ };
+ const size_t hw_compat_5_1_len = G_N_ELEMENTS(hw_compat_5_1);
  
-             nents = (len + n->page_size - 1) >> n->page_bits;
-             prp_trans = MIN(n->max_prp_ents, nents) * sizeof(uint64_t);
--            nvme_addr_read(n, prp2, (void *)prp_list, prp_trans);
-+            ret = nvme_addr_read(n, prp2, (void *)prp_list, prp_trans);
-+            if (ret) {
-+                trace_pci_nvme_err_addr_read(prp2);
-+                return NVME_DATA_TRAS_ERROR;
-+            }
-             while (len != 0) {
-                 uint64_t prp_ent = le64_to_cpu(prp_list[i]);
- 
-@@ -364,8 +369,12 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, uint64_t prp1, uint64_t prp2,
-                     i = 0;
-                     nents = (len + n->page_size - 1) >> n->page_bits;
-                     prp_trans = MIN(n->max_prp_ents, nents) * sizeof(uint64_t);
--                    nvme_addr_read(n, prp_ent, (void *)prp_list,
--                        prp_trans);
-+                    ret = nvme_addr_read(n, prp_ent, (void *)prp_list,
-+                                         prp_trans);
-+                    if (ret) {
-+                        trace_pci_nvme_err_addr_read(prp_ent);
-+                        return NVME_DATA_TRAS_ERROR;
-+                    }
-                     prp_ent = le64_to_cpu(prp_list[i]);
-                 }
- 
-@@ -457,6 +466,7 @@ static void nvme_post_cqes(void *opaque)
-     NvmeCQueue *cq = opaque;
-     NvmeCtrl *n = cq->ctrl;
-     NvmeRequest *req, *next;
-+    int ret;
- 
-     QTAILQ_FOREACH_SAFE(req, &cq->req_list, entry, next) {
-         NvmeSQueue *sq;
-@@ -466,15 +476,21 @@ static void nvme_post_cqes(void *opaque)
-             break;
-         }
- 
--        QTAILQ_REMOVE(&cq->req_list, req, entry);
-         sq = req->sq;
-         req->cqe.status = cpu_to_le16((req->status << 1) | cq->phase);
-         req->cqe.sq_id = cpu_to_le16(sq->sqid);
-         req->cqe.sq_head = cpu_to_le16(sq->head);
-         addr = cq->dma_addr + cq->tail * n->cqe_size;
-+        ret = pci_dma_write(&n->parent_obj, addr, (void *)&req->cqe,
-+                            sizeof(req->cqe));
-+        if (ret) {
-+            trace_pci_nvme_err_addr_write(addr);
-+            timer_mod(cq->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-+                      500 * SCALE_MS);
-+            break;
-+        }
-+        QTAILQ_REMOVE(&cq->req_list, req, entry);
-         nvme_inc_cq_tail(cq);
--        pci_dma_write(&n->parent_obj, addr, (void *)&req->cqe,
--            sizeof(req->cqe));
-         nvme_req_exit(req);
-         QTAILQ_INSERT_TAIL(&sq->req_list, req, entry);
-     }
-@@ -1611,7 +1627,12 @@ static void nvme_process_sq(void *opaque)
- 
-     while (!(nvme_sq_empty(sq) || QTAILQ_EMPTY(&sq->req_list))) {
-         addr = sq->dma_addr + sq->head * n->sqe_size;
--        nvme_addr_read(n, addr, (void *)&cmd, sizeof(cmd));
-+        if (nvme_addr_read(n, addr, (void *)&cmd, sizeof(cmd))) {
-+            trace_pci_nvme_err_addr_read(addr);
-+            timer_mod(sq->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-+                      500 * SCALE_MS);
-+            break;
-+        }
-         nvme_inc_sq_head(sq);
- 
-         req = QTAILQ_FIRST(&sq->req_list);
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index 8ff4cbc4932c..c506ae8b69ef 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -86,6 +86,8 @@ pci_nvme_mmio_shutdown_cleared(void) "shutdown bit cleared"
- 
- # nvme traces for error conditions
- pci_nvme_err_mdts(uint16_t cid, size_t len) "cid %"PRIu16" len %zu"
-+pci_nvme_err_addr_read(uint64_t addr) "addr 0x%"PRIx64""
-+pci_nvme_err_addr_write(uint64_t addr) "addr 0x%"PRIx64""
- pci_nvme_err_invalid_dma(void) "PRP/SGL is too small for transfer size"
- pci_nvme_err_invalid_prplist_ent(uint64_t prplist) "PRP list entry is null or not page aligned: 0x%"PRIx64""
- pci_nvme_err_invalid_prp2_align(uint64_t prp2) "PRP2 is not page aligned: 0x%"PRIx64""
 -- 
 2.28.0
 
