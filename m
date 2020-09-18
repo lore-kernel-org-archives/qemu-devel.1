@@ -2,96 +2,81 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFF2FC43464
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 16:08:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86FFEC43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 16:11:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63AC7206A4
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 16:08:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q4zQlAPv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63AC7206A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id B2FCC206A4
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 16:11:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2FCC206A4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJIwP-0007vI-Ec
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 12:08:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35322)
+	id 1kJIyV-0002QC-QA
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 12:11:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kJIr2-0001Og-2O; Fri, 18 Sep 2020 12:03:21 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:45154)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kJIog-0006zt-IU
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 12:00:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60414)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kJIr0-00020t-BZ; Fri, 18 Sep 2020 12:03:19 -0400
-Received: by mail-pg1-x542.google.com with SMTP id 67so3712978pgd.12;
- Fri, 18 Sep 2020 09:03:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=fONA64XSdMINk4Pb3HJvl02BkTmqUfaoSQk6W/tx2aE=;
- b=q4zQlAPvzmnCy/j+JfpvVec+NkCSjngziD1domsA2YXZ9C2mPSHG9wcbGMRxm5EZ95
- 6LFlQ2MrD3rqE/Noaw7Zmr1Ffp1aLc4Ii50rNOnV07Bf/E2115OY3jmgdiOn7igwV8V3
- mZvbDbvebf/btejF+vqx6Mlvy5RI2NlgoA6DYxWUtIatb1U2vYLhoDWBbjL3r0fBBByY
- Gl0Iaozkwx7pfhrhxKD01SBQIg3EaKv9iPMKomh50iNpAEHDV9TmFFqOWH/v5KMm+AEI
- mj5mVMjCwdYJDltvaj5zHb9AcV1uMMq7hCqavf2w6eApCj8Ha4OxhrUrpyxMMALDO6kv
- 8akA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=fONA64XSdMINk4Pb3HJvl02BkTmqUfaoSQk6W/tx2aE=;
- b=K2sOTOM9jQ7Je5Gu2OV53PZfyS7KCurM34JmMml07ZxpSscGPDqmC0IqXw+6kv3MsM
- VBJf8fjZvn2DU0MkK2SVHCoZE9caaJo9KuJDGZocwTKtsSncDkk2dBdlVnRKjXE8jmzP
- QjWG++3XwdQNaRxl0C+MpMZ9Hl0w7qFKrq7Pa2Z+RtFd3pRoKNIM/bbVjryDgg7GYVFI
- aN+ypDEKmZkb61SOCaBv2EYQ5bmAHX6CSbuALXFGkruG85ZX62nROL8O3+VbNMrCv4of
- JFBSJGXEiGsreFNERBjs5SsQy2iyABcB0c0KwPqdI14fPFTLullGMFxL6g7HMJgMj6j0
- kJHA==
-X-Gm-Message-State: AOAM530Ia5HgCOaKhRJtGjggru6ILjQTClFql9P8OznvUhoXT/wrqH2C
- +WABHXEjzzYuWFHJl200J5LsVvD87J4gOA==
-X-Google-Smtp-Source: ABdhPJy65ZplwHo5cDKNDYnSxr/Z8n3sQzglvcDGc3rS8cXHlVeRAXYvUN5fSg2GE34W/gz4kdUi/A==
-X-Received: by 2002:aa7:96eb:0:b029:142:2501:397b with SMTP id
- i11-20020aa796eb0000b02901422501397bmr16971433pfq.64.1600444996165; 
- Fri, 18 Sep 2020 09:03:16 -0700 (PDT)
-Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id z22sm16889012pjq.2.2020.09.18.09.03.13
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Sep 2020 09:03:15 -0700 (PDT)
-From: Yonggang Luo <luoyonggang@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v5 2/4] curses: Fixes curses compiling errors.
-Date: Sat, 19 Sep 2020 00:02:48 +0800
-Message-Id: <20200918160250.1141-3-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.28.0.windows.1
-In-Reply-To: <20200918160250.1141-1-luoyonggang@gmail.com>
-References: <20200918160250.1141-1-luoyonggang@gmail.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kJIod-0001Uj-SE
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 12:00:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kJIob-0002qx-Oe
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 16:00:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id B98EC2E80E9
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 16:00:49 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x542.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 18 Sep 2020 15:46:20 -0000
+From: Daniel Berrange <1896096@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange bonzini fredb74 laurent-vivier
+X-Launchpad-Bug-Reporter: Frederic Bezies (fredb74)
+X-Launchpad-Bug-Modifier: Daniel Berrange (berrange)
+References: <160036517624.17887.51064102046414127.malonedeb@soybean.canonical.com>
+Message-Id: <160044398098.17362.7107786975882044211.malone@soybean.canonical.com>
+Subject: [Bug 1896096] Re: Git version: Build process is broken in
+ block_curl.c.o
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: d9bca02db86f685ec3cea7fe103097dd0b9e1c52
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 05:01:27
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -100,65 +85,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- QEMU Trivial <qemu-trivial@nongnu.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, Yonggang Luo <luoyonggang@gmail.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Reply-To: Bug 1896096 <1896096@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is the compiling error:
-../ui/curses.c: In function 'curses_refresh':
-../ui/curses.c:256:5: error: 'next_maybe_keycode' may be used uninitialized in this function [-Werror=maybe-uninitialized]
-  256 |     curses2foo(_curses2keycode, _curseskey2keycode, chr, maybe_keycode)
-      |     ^~~~~~~~~~
-../ui/curses.c:302:32: note: 'next_maybe_keycode' was declared here
-  302 |             enum maybe_keycode next_maybe_keycode;
-      |                                ^~~~~~~~~~~~~~~~~~
-../ui/curses.c:256:5: error: 'maybe_keycode' may be used uninitialized in this function [-Werror=maybe-uninitialized]
-  256 |     curses2foo(_curses2keycode, _curseskey2keycode, chr, maybe_keycode)
-      |     ^~~~~~~~~~
-../ui/curses.c:265:24: note: 'maybe_keycode' was declared here
-  265 |     enum maybe_keycode maybe_keycode;
-      |                        ^~~~~~~~~~~~~
-cc1.exe: all warnings being treated as errors
+FYI, QEMU automatically enables PIC/PIE as needed, so there's no need to
+set it via these flags.
 
-gcc version 10.2.0 (Rev1, Built by MSYS2 project)
+In fact everything in your $CFLAGS is already set by QEMU out of the box
+too.
 
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
----
- ui/curses.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+For LDFLAGS you can cull the -g and -pie
 
-diff --git a/ui/curses.c b/ui/curses.c
-index 12bc682cf9..e4f9588c3e 100644
---- a/ui/curses.c
-+++ b/ui/curses.c
-@@ -262,7 +262,7 @@ static int curses2foo(const int _curses2foo[], const int _curseskey2foo[],
- static void curses_refresh(DisplayChangeListener *dcl)
- {
-     int chr, keysym, keycode, keycode_alt;
--    enum maybe_keycode maybe_keycode;
-+    enum maybe_keycode maybe_keycode = CURSES_KEYCODE;
- 
-     curses_winch_check();
- 
-@@ -299,7 +299,7 @@ static void curses_refresh(DisplayChangeListener *dcl)
- 
-         /* alt or esc key */
-         if (keycode == 1) {
--            enum maybe_keycode next_maybe_keycode;
-+            enum maybe_keycode next_maybe_keycode = CURSES_KEYCODE;
-             int nextchr = console_getch(&next_maybe_keycode);
- 
-             if (nextchr != -1) {
--- 
-2.28.0.windows.1
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1896096
+
+Title:
+  Git version: Build process is broken in block_curl.c.o
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  Gcc version: 10.2.0
+  Glusterfs: 8.1
+  Libguestfs: 1.42
+
+  Configure options used:
+
+  configure \
+      --prefix=3D/usr \
+      --sysconfdir=3D/etc \
+      --localstatedir=3D/var \
+      --libexecdir=3D/usr/lib/qemu \
+      --extra-ldflags=3D"$LDFLAGS" \
+      --smbd=3D/usr/bin/smbd \
+      --enable-modules \
+      --enable-sdl \
+      --disable-werror \
+      --enable-slirp=3Dsystem \
+      --enable-xfsctl \
+      --audio-drv-list=3D"pa alsa sdl"
+      =
+
+  Error log attached. Here is the beginning:
+
+  /usr/bin/ld: /usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../lib/Scrt=
+1.o: in function `_start':
+  (.text+0x24): undefined reference to `main'
+  /usr/bin/ld: libblock-curl.a(block_curl.c.o): in function `curl_block_ini=
+t':
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1896096/+subscriptions
 
