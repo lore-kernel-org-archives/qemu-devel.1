@@ -2,74 +2,77 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0906BC43464
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 13:31:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5A5EC43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 13:31:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49F49206DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 13:31:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28E2321734
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 13:31:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fbw9PILW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49F49206DB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bngdDT/C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28E2321734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJGTi-0000M1-6m
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 09:31:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46306)
+	id 1kJGTk-0000Pm-Qh
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 09:31:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46324)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kJGRy-0007Vj-7v
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 09:29:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52843)
+ id 1kJGS0-0007Wy-Ki
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 09:29:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31945)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kJGRw-0002T3-0d
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 09:29:17 -0400
+ id 1kJGRy-0002TL-6M
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 09:29:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600435754;
+ s=mimecast20190719; t=1600435757;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=5oY1TSqrhj+xNpCsSQCX2lw9c3fJEw8Euk2PUnluTqM=;
- b=fbw9PILWEs7N/fQhkQzPpKQuJLJYWYfz2S9/tSOpzeiSbox+TCO+ribTwQxR/VkA77Bu13
- 9X1IorZbtwqFSoGABLaHFkaKd5InT3t80/uvc2lA8uUeNy1RhBPGZDdGwrKNeQxB7cUt53
- DIGCv4VJs8VR9uT3RT+zbGK0Z0XYp/U=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Z+d61B3dqHmc7ZfZm9cSPj/X1aJ3cLn0k1+yDMTMLxQ=;
+ b=bngdDT/CI6YcbjqR7B+c3GRHhM15BgPOjRvLfFr1y848dTes/bWXM43hq3VNFzmEEPWLPK
+ +WJDtgzotyQnYU5VAR5UTNBtP0aWKbaHVa8fpQho9p3uwZdaLdXkGs2DjQeMuijAA5zVIc
+ 4SQlhuc5mp3jFRE5GGMcebcWOvbSU6w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-173-SRxV9SD2OOCbbnPaJym3bQ-1; Fri, 18 Sep 2020 09:29:10 -0400
-X-MC-Unique: SRxV9SD2OOCbbnPaJym3bQ-1
+ us-mta-75-s67b24rrMG6ma3o3MizHtA-1; Fri, 18 Sep 2020 09:29:12 -0400
+X-MC-Unique: s67b24rrMG6ma3o3MizHtA-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7488D1966324;
- Fri, 18 Sep 2020 13:29:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83C49AFD63;
+ Fri, 18 Sep 2020 13:29:11 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-114-199.ams2.redhat.com
  [10.36.114.199])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A667878806;
- Fri, 18 Sep 2020 13:29:04 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D27849CBA;
+ Fri, 18 Sep 2020 13:29:09 +0000 (UTC)
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/3] gitlab: add jobs for checking paches
-Date: Fri, 18 Sep 2020 14:29:00 +0100
-Message-Id: <20200918132903.1848939-1-berrange@redhat.com>
+Subject: [PATCH 1/3] gitlab: add a CI job for running checkpatch.pl
+Date: Fri, 18 Sep 2020 14:29:01 +0100
+Message-Id: <20200918132903.1848939-2-berrange@redhat.com>
+In-Reply-To: <20200918132903.1848939-1-berrange@redhat.com>
+References: <20200918132903.1848939-1-berrange@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 01:32:10
@@ -102,57 +105,92 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This introduces two new jobs to GitLab. The first runs "checkpatch.pl"=0D
-across all patches, while the second is a dedicated DCO signoff check.=0D
-=0D
-While checkpatch.pl does validate DCO signoff, it is sub-optimal as we=0D
-need to allow the checkpatch.pl job to fail as there are always patches=0D
-which intentionally violate some rules, and we've no mechanism for marking=
-=0D
-permitted exceptions in code. Thus the checkpatch.pl jobs needs to be=0D
-non-fatal allowing failure.=0D
-=0D
-By having a separate DCO job, we can make that particular job mandatory.=0D
-=0D
-Checking patches themselves in GitLab CI is a little difficult, as the=0D
-CI job receives no indication of what the base ancestor was for the=0D
-branch being tested. To work around this, we add the master QEMU git=0D
-repo as a new remote and ask git to find the common ancestor vs the=0D
-branch being tested.=0D
-=0D
-An example pipeline showing failure of these two jobs is here:=0D
-=0D
-  https://gitlab.com/berrange/qemu/-/pipelines/191219666=0D
-=0D
-The checkpatch.pl job failure output:=0D
-=0D
-  https://gitlab.com/berrange/qemu/-/jobs/743439455=0D
-=0D
-And the DCO signoff job failure output:=0D
-=0D
-  https://gitlab.com/berrange/qemu/-/jobs/743439456=0D
-=0D
-I think the latter shows the benefit of having a dedicated DCO signoff=0D
-job checker, as the info presented to the user is much clearer about=0D
-what they did wrong and how & why they must address it.=0D
-=0D
-_+#          base:  master=0D
-=0D
-Daniel P. Berrang=C3=A9 (3):=0D
-  gitlab: add a CI job for running checkpatch.pl=0D
-  gitlab: add a CI job to validate the DCO sign off=0D
-  gitlab: assign python helper files to GitLab maintainers section=0D
-=0D
- .gitlab-ci.d/check-dco.py   | 94 +++++++++++++++++++++++++++++++++++++=0D
- .gitlab-ci.d/check-patch.py | 48 +++++++++++++++++++=0D
- .gitlab-ci.yml              | 22 +++++++++=0D
- MAINTAINERS                 |  1 +=0D
- 4 files changed, 165 insertions(+)=0D
- create mode 100755 .gitlab-ci.d/check-dco.py=0D
- create mode 100755 .gitlab-ci.d/check-patch.py=0D
-=0D
---=20=0D
-2.26.2=0D
-=0D
+This job is advisory since it is expected that certain patches will fail
+the style checks and checkpatch.pl provides no way to mark exceptions to
+the rules.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ .gitlab-ci.d/check-patch.py | 48 +++++++++++++++++++++++++++++++++++++
+ .gitlab-ci.yml              | 12 ++++++++++
+ 2 files changed, 60 insertions(+)
+ create mode 100755 .gitlab-ci.d/check-patch.py
+
+diff --git a/.gitlab-ci.d/check-patch.py b/.gitlab-ci.d/check-patch.py
+new file mode 100755
+index 0000000000..5a14a25b13
+--- /dev/null
++++ b/.gitlab-ci.d/check-patch.py
+@@ -0,0 +1,48 @@
++#!/usr/bin/env python3
++#
++# check-patch.py: run checkpatch.pl across all commits in a branch
++#
++# Copyright (C) 2020 Red Hat, Inc.
++#
++# SPDX-License-Identifier: GPL-2.0-or-later
++
++import os
++import os.path
++import sys
++import subprocess
++
++namespace = "qemu-project"
++if len(sys.argv) >= 2:
++    namespace = sys.argv[1]
++
++cwd = os.getcwd()
++reponame = os.path.basename(cwd)
++repourl = "https://gitlab.com/%s/%s.git" % (namespace, reponame)
++
++# GitLab CI environment does not give us any direct info about the
++# base for the user's branch. We thus need to figure out a common
++# ancestor between the user's branch and current git master.
++subprocess.check_call(["git", "remote", "add", "check-patch", repourl])
++subprocess.check_call(["git", "fetch", "check-patch", "master"],
++                      stdout=subprocess.DEVNULL,
++                      stderr=subprocess.DEVNULL)
++
++ancestor = subprocess.check_output(["git", "merge-base",
++                                    "check-patch/master", "HEAD"],
++                                   universal_newlines=True)
++
++ancestor = ancestor.strip()
++
++subprocess.check_call(["git", "remote", "rm", "check-patch"])
++
++errors = False
++
++print("\nChecking all commits since %s...\n" % ancestor)
++
++ret = subprocess.run(["scripts/checkpatch.pl", ancestor + "..."])
++
++if ret.returncode != 0:
++    print("    ❌ FAIL one or more commits failed scripts/checkpatch.pl")
++    sys.exit(1)
++
++sys.exit(0)
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index a18e18b57e..3ed724c720 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -369,3 +369,15 @@ check-crypto-only-gnutls:
+   variables:
+     IMAGE: centos7
+     MAKE_CHECK_ARGS: check
++
++
++check-patch:
++  stage: test
++  image: $CI_REGISTRY_IMAGE/qemu/centos8:latest
++  script: .gitlab-ci.d/check-patch.py
++  except:
++    variables:
++      - $CI_PROJECT_NAMESPACE == 'qemu-project' && $CI_COMMIT_BRANCH == 'master'
++  variables:
++    GIT_DEPTH: 1000
++  allow_failure: true
+-- 
+2.26.2
 
 
