@@ -2,90 +2,71 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38A50C43463
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 00:07:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5066DC43463
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 00:11:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 858E520771
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 00:07:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SadJVhws"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 858E520771
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8A427206C9
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 00:11:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A427206C9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJ3vs-0005iZ-OT
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 20:07:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37892)
+	id 1kJ3zd-00071i-KM
+	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 20:11:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38780)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kJ3th-00044a-Ue
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 20:05:05 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:51278)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kJ3tf-0007X3-FF
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 20:05:05 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id a9so2171714pjg.1
- for <qemu-devel@nongnu.org>; Thu, 17 Sep 2020 17:05:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=lciLN6lb6WIm6k4jr55Hk/ny6QmXaUdY5X1z2Junh6Q=;
- b=SadJVhwsJHHm25L5x3dRYuXFdujuIYOMHAOIlgpgCwZtxrqYF/es6KCigWxzWZAvfA
- QbjxZ5a3nL4r7x+RpgM8a7tvPMbWW7vjaHfPxPV3CaXZRF/vtYX63vWnjQ1Y3kSsXgKm
- SKWc43XmNuk86rADXzlg53HceXMF9wnP6kNLddNzjohmJRyDOgX0KZeF/HkobUqVxNGz
- Ghl2iSoaiMZC/O+tWd0MhFQAgBKbM7QKsnJW8u1DNRLbOhWeN5/EGyQMLOoFOndneVcf
- xub1gUT6bpAAC+I4IbqqAJX+rMICy3NE0SvdUVZQmuW//How0nlCDkKWEwjBfiyST8Ai
- nkJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=lciLN6lb6WIm6k4jr55Hk/ny6QmXaUdY5X1z2Junh6Q=;
- b=LAjWMupCHEQWZc3FbIHjzxam69jqlvUePzeRWeMiSL19cQJdCrah1USG7YrkqMy686
- elicy1J6R5bOTlOMNTrZmrZr+EPMvmxs8rNCWsYoQm5Haa51rJhYMaCdNGpllz1ez8y2
- ztVb9ElQhZFaX16tO1Zzyrkg3Bm27N0RK+BNi/rul0CNViuL8K4yeYBXZMIqnedJ38pv
- +OTce63XyC6Z2uTIVcTe41jZ4JpM3ZUEEFVnGESTLeD33P4zWi7ytmIZWPUxdSpNwWvv
- 4ToF3RJ0KvAhQcV4OFbFW2MXkZGx5BrTe4KhOe5rvthuecoww7HQYx6F1KZJ6ebe8ts1
- e76Q==
-X-Gm-Message-State: AOAM5339XB0Ukv68EwNvJT3sh3kTtiVzIq2vTDG4RRGNyqGX8ALO3Q94
- odJH8O/NhuB/hILwF3JO0syoVhfMRTfrwQ==
-X-Google-Smtp-Source: ABdhPJzqy6psp31OM+XFuxi3EoUpqwNGaiTKOwZqGGb15YrwUAZfd4ZFb0Qv1Lqt0G84hYmGfeCL2w==
-X-Received: by 2002:a17:902:7d8e:b029:d1:f2df:ad4 with SMTP id
- a14-20020a1709027d8eb02900d1f2df0ad4mr8615094plm.44.1600387501770; 
- Thu, 17 Sep 2020 17:05:01 -0700 (PDT)
-Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id i2sm785589pfq.89.2020.09.17.17.05.00
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Sep 2020 17:05:01 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] target/arm: Fix SVE splice
-Date: Thu, 17 Sep 2020 17:05:00 -0700
-Message-Id: <20200918000500.2690937-1-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kJ3yo-0006OH-CL; Thu, 17 Sep 2020 20:10:22 -0400
+Resent-Date: Thu, 17 Sep 2020 20:10:22 -0400
+Resent-Message-Id: <E1kJ3yo-0006OH-CL@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21373)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kJ3yl-00085O-Jj; Thu, 17 Sep 2020 20:10:21 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1600387813; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=Df/JmMnm2qzaDoJyE+CZk2HedBpU56svCFwKKbx0l5Pu6G5DqaBVrChKIm6tOx2Pvqn9QWvJJ/mRU+DURpeUah3sURfh0E/fUmS+Buj9dNGUHfYmn51XpH6D4ZDNUh0LGW0y8Sy+O9v15jCp0nLWXUsvAKQDmfUJ4qntnaSRo1w=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1600387813;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=9CY5yCOPRa9gnumi+sYom/2GvRJo2ojT1k3yoayRiv0=; 
+ b=hxp50l+LK/BEzDojjypLmB3KytweMhmOhtuClfSyIXEPrsAGDlOMags2heLdaet1lC7DnSQQCSwnFDAWtszANf1bkY6jiavks0wk9/CIdMf3MNinbu7zm05bzwy5mh8HU1+qmnJT6T6wxkyOtLutC7gX6NE4hz7T+K/9/zFq9qg=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1600387812749456.5704245919708;
+ Thu, 17 Sep 2020 17:10:12 -0700 (PDT)
+Subject: Re: [PATCH] target/arm: Fix SVE splice
+Message-ID: <160038781140.8478.12061062067317454042@66eaa9a8a123>
+In-Reply-To: <20200918000500.2690937-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: richard.henderson@linaro.org
+Date: Thu, 17 Sep 2020 17:10:12 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 20:10:16
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,35 +79,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-stable@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-While converting to gen_gvec_ool_zzzp, we lost passing
-a->esz as the data argument to the function.
-
-Fixes: 36cbb7a8e71
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/translate-sve.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 8233295391..b9f9e6f4ae 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -3182,7 +3182,7 @@ static bool trans_SPLICE(DisasContext *s, arg_rprr_esz *a)
- {
-     if (sve_access_check(s)) {
-         gen_gvec_ool_zzzp(s, gen_helper_sve_splice,
--                          a->rd, a->rn, a->rm, a->pg, 0);
-+                          a->rd, a->rn, a->rm, a->pg, a->esz);
-     }
-     return true;
- }
--- 
-2.25.1
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkxODAwMDUwMC4yNjkw
+OTM3LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBm
+YWlsZWQgYnVpbGQgdGVzdCBvbiBGcmVlQlNEIGhvc3QuIFBsZWFzZSBmaW5kIHRoZSBkZXRhaWxz
+IGJlbG93LgoKCgoKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3
+Lm9yZy9sb2dzLzIwMjAwOTE4MDAwNTAwLjI2OTA5MzctMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5h
+cm8ub3JnL3Rlc3RpbmcuRnJlZUJTRC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVk
+IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
+c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
