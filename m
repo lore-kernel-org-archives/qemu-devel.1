@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C93FC43463
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 21:14:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ED4AC43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 21:16:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8D5B221EC
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 21:14:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1EB1722208
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 21:16:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aHcRYOR9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8D5B221EC
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RhbrSi4v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EB1722208
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJNho-00067G-TH
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 17:14:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48510)
+	id 1kJNkT-0000RO-3X
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 17:16:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kJNIM-0002mG-BV
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 16:47:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51066)
+ id 1kJNIN-0002nk-J5
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 16:47:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52745)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kJNID-0006KT-UK
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 16:47:50 -0400
+ id 1kJNIJ-0006LE-3d
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 16:47:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600462058;
+ s=mimecast20190719; t=1600462066;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=yBGYeKJNAcB0YAjhwXsZVV1nEOhIkCekg/Yt7YL+nbw=;
- b=aHcRYOR9f1167u83WkUtmNmqE2CEDDQ6P2zVTVhtLgg4klMIovdVXdZc3WLIGtN0j3pqfd
- /VpL+1TZj2FLsuvJKpDFgIzCRrmRhrdt0xbEO8sPg8/sbBptk494h1ikI+gsYc4+5oAJep
- siSRP3dT4u/33RoXfd2scUcPU8feCq4=
+ bh=PKJL4oTrE7z0Mpieiwxl18ICPhqKcwdVBP7xcKeiZXg=;
+ b=RhbrSi4vlJRXCXBYHOCy1kME4cmqgN1SPreV3EvePbr/1B3bbvjKfnL1e6pQGObHs7cr5h
+ wBXa8Oq3HlsTRsTQKK6DokO7JYA9K/997kM8DzPvZjZsuF7w2zEU9GGtzuE4VFnLsEPPE/
+ cQzbbS9t/EPOyulBBQffiWdgBPtC/GA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-390-7CvtlxzuP4ip8PHGSyqE6w-1; Fri, 18 Sep 2020 16:47:34 -0400
-X-MC-Unique: 7CvtlxzuP4ip8PHGSyqE6w-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-590-HMAelNe7MlqGpwnZWgoKDg-1; Fri, 18 Sep 2020 16:47:30 -0400
+X-MC-Unique: HMAelNe7MlqGpwnZWgoKDg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 773B464147;
- Fri, 18 Sep 2020 20:47:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4A881891EA7;
+ Fri, 18 Sep 2020 20:47:29 +0000 (UTC)
 Received: from localhost (unknown [10.10.67.5])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E464A10013C1;
- Fri, 18 Sep 2020 20:47:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 17C8778824;
+ Fri, 18 Sep 2020 20:47:28 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL 16/17] Use OBJECT_DECLARE_TYPE when possible
-Date: Fri, 18 Sep 2020 16:47:13 -0400
-Message-Id: <20200918204714.27276-17-ehabkost@redhat.com>
+Subject: [PULL 13/17] scripts/codeconverter: Update to latest version
+Date: Fri, 18 Sep 2020 16:47:10 -0400
+Message-Id: <20200918204714.27276-14-ehabkost@redhat.com>
 In-Reply-To: <20200918204714.27276-1-ehabkost@redhat.com>
 References: <20200918204714.27276-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
@@ -97,1357 +97,1806 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Paul Durrant <paul@xen.org>
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This converts existing DECLARE_OBJ_CHECKERS usage to
-OBJECT_DECLARE_TYPE when possible.
-
- $ ./scripts/codeconverter/converter.py -i \
-   --pattern=AddObjectDeclareType $(git grep -l '' -- '*.[ch]')
+I'm not documenting every single change in the codeconverter
+script because most of that code will be deleted once we finish
+the QOM code conversion.  This patch updates the script to the
+latest version that was used to perform changes in the QOM code.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Acked-by: Paul Durrant <paul@xen.org>
-Message-Id: <20200916182519.415636-5-ehabkost@redhat.com>
+Message-Id: <20200916182519.415636-2-ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/ppc/e500.h                         | 5 +----
- hw/s390x/ccw-device.h                 | 4 +---
- hw/s390x/virtio-ccw.h                 | 5 +----
- hw/usb/ccid.h                         | 5 +----
- hw/usb/hcd-dwc2.h                     | 3 +--
- hw/usb/hcd-ehci.h                     | 5 +----
- hw/virtio/virtio-pci.h                | 5 +----
- include/chardev/char.h                | 4 +---
- include/hw/arm/aspeed_soc.h           | 5 +----
- include/hw/arm/bcm2836.h              | 5 +----
- include/hw/arm/smmu-common.h          | 5 +----
- include/hw/arm/smmuv3.h               | 5 +----
- include/hw/arm/virt.h                 | 5 +----
- include/hw/boards.h                   | 3 +--
- include/hw/display/macfb.h            | 5 +----
- include/hw/gpio/aspeed_gpio.h         | 5 +----
- include/hw/i2c/aspeed_i2c.h           | 5 +----
- include/hw/i386/ioapic_internal.h     | 5 +----
- include/hw/i386/microvm.h             | 5 +----
- include/hw/i386/pc.h                  | 4 +---
- include/hw/i386/x86-iommu.h           | 5 +----
- include/hw/i386/x86.h                 | 5 +----
- include/hw/ide/internal.h             | 4 +---
- include/hw/input/adb.h                | 4 +---
- include/hw/isa/i8259_internal.h       | 5 +----
- include/hw/isa/isa.h                  | 4 +---
- include/hw/mem/nvdimm.h               | 5 +----
- include/hw/misc/aspeed_scu.h          | 5 +----
- include/hw/misc/aspeed_sdmc.h         | 5 +----
- include/hw/misc/imx_ccm.h             | 5 +----
- include/hw/misc/mos6522.h             | 5 +----
- include/hw/pci-host/pnv_phb4.h        | 5 +----
- include/hw/pci/pci.h                  | 4 +---
- include/hw/pci/pci_host.h             | 4 +---
- include/hw/pcmcia.h                   | 5 +----
- include/hw/ppc/spapr.h                | 5 +----
- include/hw/qdev-core.h                | 4 +---
- include/hw/rtc/allwinner-rtc.h        | 5 +----
- include/hw/s390x/3270-ccw.h           | 5 +----
- include/hw/s390x/s390-virtio-ccw.h    | 5 +----
- include/hw/s390x/storage-attributes.h | 5 +----
- include/hw/s390x/storage-keys.h       | 5 +----
- include/hw/s390x/tod.h                | 5 +----
- include/hw/scsi/scsi.h                | 4 +---
- include/hw/sd/allwinner-sdhost.h      | 5 +----
- include/hw/sd/sd.h                    | 5 +----
- include/hw/ssi/aspeed_smc.h           | 5 +----
- include/hw/ssi/xilinx_spips.h         | 4 +---
- include/hw/timer/aspeed_timer.h       | 5 +----
- include/hw/timer/i8254.h              | 5 +----
- include/hw/usb.h                      | 4 +---
- include/hw/virtio/virtio.h            | 4 +---
- include/hw/watchdog/wdt_aspeed.h      | 5 +----
- include/hw/xen/xen-block.h            | 4 +---
- include/hw/xen/xen-bus.h              | 4 +---
- include/net/can_host.h                | 5 +----
- include/net/filter.h                  | 4 +---
- include/ui/console.h                  | 4 +---
- hw/arm/mps2-tz.c                      | 5 +----
- hw/arm/mps2.c                         | 5 +----
- hw/arm/musca.c                        | 5 +----
- hw/arm/spitz.c                        | 5 +----
- hw/arm/vexpress.c                     | 5 +----
- hw/block/m25p80.c                     | 5 +----
- hw/input/adb-kbd.c                    | 5 +----
- hw/input/adb-mouse.c                  | 5 +----
- hw/misc/tmp421.c                      | 5 +----
- hw/scsi/scsi-disk.c                   | 5 +----
- hw/scsi/vmw_pvscsi.c                  | 5 +----
- 69 files changed, 69 insertions(+), 255 deletions(-)
+ .../codeconverter/codeconverter/patching.py   | 193 +++--
+ .../codeconverter/codeconverter/qom_macros.py | 327 ++++++--
+ .../codeconverter/qom_type_info.py            | 741 +++++++++++++++---
+ .../codeconverter/test_patching.py            |   3 +-
+ .../codeconverter/test_regexps.py             |  26 +-
+ scripts/codeconverter/converter.py            |  12 +-
+ 6 files changed, 1057 insertions(+), 245 deletions(-)
 
-diff --git a/hw/ppc/e500.h b/hw/ppc/e500.h
-index 63870751ff..1e5853b032 100644
---- a/hw/ppc/e500.h
-+++ b/hw/ppc/e500.h
-@@ -14,7 +14,6 @@ struct PPCE500MachineState {
-      */
-     PlatformBusDevice *pbus_dev;
- };
--typedef struct PPCE500MachineState PPCE500MachineState;
- 
- struct PPCE500MachineClass {
-     /*< private >*/
-@@ -39,14 +38,12 @@ struct PPCE500MachineClass {
-     hwaddr pci_mmio_bus_base;
-     hwaddr spin_base;
- };
--typedef struct PPCE500MachineClass PPCE500MachineClass;
- 
- void ppce500_init(MachineState *machine);
- 
- hwaddr booke206_page_size_to_tlb(uint64_t size);
- 
- #define TYPE_PPCE500_MACHINE      "ppce500-base-machine"
--DECLARE_OBJ_CHECKERS(PPCE500MachineState, PPCE500MachineClass,
--                     PPCE500_MACHINE, TYPE_PPCE500_MACHINE)
-+OBJECT_DECLARE_TYPE(PPCE500MachineState, PPCE500MachineClass, PPCE500_MACHINE)
- 
- #endif
-diff --git a/hw/s390x/ccw-device.h b/hw/s390x/ccw-device.h
-index cf7d492084..832c78cd42 100644
---- a/hw/s390x/ccw-device.h
-+++ b/hw/s390x/ccw-device.h
-@@ -38,7 +38,6 @@ struct CCWDeviceClass {
-     void (*realize)(CcwDevice *, Error **);
-     void (*refill_ids)(CcwDevice *);
- };
--typedef struct CCWDeviceClass CCWDeviceClass;
- 
- static inline CcwDevice *to_ccw_dev_fast(DeviceState *d)
- {
-@@ -47,7 +46,6 @@ static inline CcwDevice *to_ccw_dev_fast(DeviceState *d)
- 
- #define TYPE_CCW_DEVICE "ccw-device"
- 
--DECLARE_OBJ_CHECKERS(CcwDevice, CCWDeviceClass,
--                     CCW_DEVICE, TYPE_CCW_DEVICE)
-+OBJECT_DECLARE_TYPE(CcwDevice, CCWDeviceClass, CCW_DEVICE)
- 
- #endif
-diff --git a/hw/s390x/virtio-ccw.h b/hw/s390x/virtio-ccw.h
-index cea259685d..21790608b4 100644
---- a/hw/s390x/virtio-ccw.h
-+++ b/hw/s390x/virtio-ccw.h
-@@ -54,10 +54,7 @@
- #define CCW_CMD_SET_VIRTIO_REV 0x83
- 
- #define TYPE_VIRTIO_CCW_DEVICE "virtio-ccw-device"
--typedef struct VirtIOCCWDeviceClass VirtIOCCWDeviceClass;
--typedef struct VirtioCcwDevice VirtioCcwDevice;
--DECLARE_OBJ_CHECKERS(VirtioCcwDevice, VirtIOCCWDeviceClass,
--                     VIRTIO_CCW_DEVICE, TYPE_VIRTIO_CCW_DEVICE)
-+OBJECT_DECLARE_TYPE(VirtioCcwDevice, VirtIOCCWDeviceClass, VIRTIO_CCW_DEVICE)
- 
- typedef struct VirtioBusState VirtioCcwBusState;
- typedef struct VirtioBusClass VirtioCcwBusClass;
-diff --git a/hw/usb/ccid.h b/hw/usb/ccid.h
-index ef2bb3462d..6b82a55bd4 100644
---- a/hw/usb/ccid.h
-+++ b/hw/usb/ccid.h
-@@ -13,13 +13,10 @@
- #include "hw/qdev-core.h"
- #include "qom/object.h"
- 
--typedef struct CCIDCardState CCIDCardState;
- typedef struct CCIDCardInfo CCIDCardInfo;
- 
- #define TYPE_CCID_CARD "ccid-card"
--typedef struct CCIDCardClass CCIDCardClass;
--DECLARE_OBJ_CHECKERS(CCIDCardState, CCIDCardClass,
--                     CCID_CARD, TYPE_CCID_CARD)
-+OBJECT_DECLARE_TYPE(CCIDCardState, CCIDCardClass, CCID_CARD)
- 
- /*
-  * callbacks to be used by the CCID device (hw/usb-ccid.c) to call
-diff --git a/hw/usb/hcd-dwc2.h b/hw/usb/hcd-dwc2.h
-index 919e3e43b1..6998b04706 100644
---- a/hw/usb/hcd-dwc2.h
-+++ b/hw/usb/hcd-dwc2.h
-@@ -181,7 +181,6 @@ struct DWC2Class {
- };
- 
- #define TYPE_DWC2_USB   "dwc2-usb"
--DECLARE_OBJ_CHECKERS(DWC2State, DWC2Class,
--                     DWC2_USB, TYPE_DWC2_USB)
-+OBJECT_DECLARE_TYPE(DWC2State, DWC2Class, DWC2_USB)
- 
- #endif
-diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
-index 1301ce0be7..199913bca5 100644
---- a/hw/usb/hcd-ehci.h
-+++ b/hw/usb/hcd-ehci.h
-@@ -350,10 +350,7 @@ struct EHCIPCIState {
- #define TYPE_PPC4xx_EHCI "ppc4xx-ehci-usb"
- #define TYPE_FUSBH200_EHCI "fusbh200-ehci-usb"
- 
--typedef struct EHCISysBusState EHCISysBusState;
--typedef struct SysBusEHCIClass SysBusEHCIClass;
--DECLARE_OBJ_CHECKERS(EHCISysBusState, SysBusEHCIClass,
--                     SYS_BUS_EHCI, TYPE_SYS_BUS_EHCI)
-+OBJECT_DECLARE_TYPE(EHCISysBusState, SysBusEHCIClass, SYS_BUS_EHCI)
- 
- struct EHCISysBusState {
-     /*< private >*/
-diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-index 47b6bb4e26..06e2af12de 100644
---- a/hw/virtio/virtio-pci.h
-+++ b/hw/virtio/virtio-pci.h
-@@ -19,7 +19,6 @@
- #include "hw/virtio/virtio-bus.h"
- #include "qom/object.h"
- 
--typedef struct VirtIOPCIProxy VirtIOPCIProxy;
- 
- /* virtio-pci-bus */
- 
-@@ -91,9 +90,7 @@ typedef struct {
-  * virtio-pci: This is the PCIDevice which has a virtio-pci-bus.
-  */
- #define TYPE_VIRTIO_PCI "virtio-pci"
--typedef struct VirtioPCIClass VirtioPCIClass;
--DECLARE_OBJ_CHECKERS(VirtIOPCIProxy, VirtioPCIClass,
--                     VIRTIO_PCI, TYPE_VIRTIO_PCI)
-+OBJECT_DECLARE_TYPE(VirtIOPCIProxy, VirtioPCIClass, VIRTIO_PCI)
- 
- struct VirtioPCIClass {
-     PCIDeviceClass parent_class;
-diff --git a/include/chardev/char.h b/include/chardev/char.h
-index 5874de57ea..db42f0a8c6 100644
---- a/include/chardev/char.h
-+++ b/include/chardev/char.h
-@@ -226,9 +226,7 @@ int qemu_chr_write(Chardev *s, const uint8_t *buf, int len, bool write_all);
- int qemu_chr_wait_connected(Chardev *chr, Error **errp);
- 
- #define TYPE_CHARDEV "chardev"
--typedef struct ChardevClass ChardevClass;
--DECLARE_OBJ_CHECKERS(Chardev, ChardevClass,
--                     CHARDEV, TYPE_CHARDEV)
-+OBJECT_DECLARE_TYPE(Chardev, ChardevClass, CHARDEV)
- 
- #define TYPE_CHARDEV_NULL "chardev-null"
- #define TYPE_CHARDEV_MUX "chardev-mux"
-diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
-index 05c7d53df3..11cfe6e358 100644
---- a/include/hw/arm/aspeed_soc.h
-+++ b/include/hw/arm/aspeed_soc.h
-@@ -62,12 +62,9 @@ struct AspeedSoCState {
-     AspeedSDHCIState sdhci;
-     AspeedSDHCIState emmc;
- };
--typedef struct AspeedSoCState AspeedSoCState;
- 
- #define TYPE_ASPEED_SOC "aspeed-soc"
--typedef struct AspeedSoCClass AspeedSoCClass;
--DECLARE_OBJ_CHECKERS(AspeedSoCState, AspeedSoCClass,
--                     ASPEED_SOC, TYPE_ASPEED_SOC)
-+OBJECT_DECLARE_TYPE(AspeedSoCState, AspeedSoCClass, ASPEED_SOC)
- 
- struct AspeedSoCClass {
-     DeviceClass parent_class;
-diff --git a/include/hw/arm/bcm2836.h b/include/hw/arm/bcm2836.h
-index 181d9563d0..428c15d316 100644
---- a/include/hw/arm/bcm2836.h
-+++ b/include/hw/arm/bcm2836.h
-@@ -18,10 +18,7 @@
- #include "qom/object.h"
- 
- #define TYPE_BCM283X "bcm283x"
--typedef struct BCM283XClass BCM283XClass;
--typedef struct BCM283XState BCM283XState;
--DECLARE_OBJ_CHECKERS(BCM283XState, BCM283XClass,
--                     BCM283X, TYPE_BCM283X)
-+OBJECT_DECLARE_TYPE(BCM283XState, BCM283XClass, BCM283X)
- 
- #define BCM283X_NCPUS 4
- 
-diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
-index 54d0872fd8..706be3c6d0 100644
---- a/include/hw/arm/smmu-common.h
-+++ b/include/hw/arm/smmu-common.h
-@@ -118,7 +118,6 @@ struct SMMUState {
-     uint8_t bus_num;
-     PCIBus *primary_bus;
- };
--typedef struct SMMUState SMMUState;
- 
- struct SMMUBaseClass {
-     /* <private> */
-@@ -129,11 +128,9 @@ struct SMMUBaseClass {
-     DeviceRealize parent_realize;
- 
- };
--typedef struct SMMUBaseClass SMMUBaseClass;
- 
- #define TYPE_ARM_SMMU "arm-smmu"
--DECLARE_OBJ_CHECKERS(SMMUState, SMMUBaseClass,
--                     ARM_SMMU, TYPE_ARM_SMMU)
-+OBJECT_DECLARE_TYPE(SMMUState, SMMUBaseClass, ARM_SMMU)
- 
- /* Return the SMMUPciBus handle associated to a PCI bus number */
- SMMUPciBus *smmu_find_smmu_pcibus(SMMUState *s, uint8_t bus_num);
-diff --git a/include/hw/arm/smmuv3.h b/include/hw/arm/smmuv3.h
-index 2a3f6dd197..c641e60735 100644
---- a/include/hw/arm/smmuv3.h
-+++ b/include/hw/arm/smmuv3.h
-@@ -63,7 +63,6 @@ struct SMMUv3State {
-     qemu_irq     irq[4];
-     QemuMutex mutex;
- };
--typedef struct SMMUv3State SMMUv3State;
- 
- typedef enum {
-     SMMU_IRQ_EVTQ,
-@@ -80,10 +79,8 @@ struct SMMUv3Class {
-     DeviceRealize parent_realize;
-     DeviceReset   parent_reset;
- };
--typedef struct SMMUv3Class SMMUv3Class;
- 
- #define TYPE_ARM_SMMUV3   "arm-smmuv3"
--DECLARE_OBJ_CHECKERS(SMMUv3State, SMMUv3Class,
--                     ARM_SMMUV3, TYPE_ARM_SMMUV3)
-+OBJECT_DECLARE_TYPE(SMMUv3State, SMMUv3Class, ARM_SMMUV3)
- 
- #endif
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 392b0bd571..d018a4f297 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -128,7 +128,6 @@ struct VirtMachineClass {
-     bool kvm_no_adjvtime;
-     bool acpi_expose_flash;
- };
--typedef struct VirtMachineClass VirtMachineClass;
- 
- struct VirtMachineState {
-     MachineState parent;
-@@ -165,13 +164,11 @@ struct VirtMachineState {
-     DeviceState *acpi_dev;
-     Notifier powerdown_notifier;
- };
--typedef struct VirtMachineState VirtMachineState;
- 
- #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
- 
- #define TYPE_VIRT_MACHINE   MACHINE_TYPE_NAME("virt")
--DECLARE_OBJ_CHECKERS(VirtMachineState, VirtMachineClass,
--                     VIRT_MACHINE, TYPE_VIRT_MACHINE)
-+OBJECT_DECLARE_TYPE(VirtMachineState, VirtMachineClass, VIRT_MACHINE)
- 
- void virt_acpi_setup(VirtMachineState *vms);
- bool virt_is_acpi_enabled(VirtMachineState *vms);
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 795910d01b..56aa1ca335 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -21,8 +21,7 @@
- 
- #define TYPE_MACHINE "machine"
- #undef MACHINE  /* BSD defines it and QEMU does not use it */
--DECLARE_OBJ_CHECKERS(MachineState, MachineClass,
--                     MACHINE, TYPE_MACHINE)
-+OBJECT_DECLARE_TYPE(MachineState, MachineClass, MACHINE)
- 
- extern MachineState *current_machine;
- 
-diff --git a/include/hw/display/macfb.h b/include/hw/display/macfb.h
-index 0960480b75..4adfaa725a 100644
---- a/include/hw/display/macfb.h
-+++ b/include/hw/display/macfb.h
-@@ -43,10 +43,7 @@ struct MacfbSysBusState {
- };
- 
- #define TYPE_NUBUS_MACFB "nubus-macfb"
--typedef struct MacfbNubusDeviceClass MacfbNubusDeviceClass;
--typedef struct MacfbNubusState MacfbNubusState;
--DECLARE_OBJ_CHECKERS(MacfbNubusState, MacfbNubusDeviceClass,
--                     NUBUS_MACFB, TYPE_NUBUS_MACFB)
-+OBJECT_DECLARE_TYPE(MacfbNubusState, MacfbNubusDeviceClass, NUBUS_MACFB)
- 
- struct MacfbNubusDeviceClass {
-     DeviceClass parent_class;
-diff --git a/include/hw/gpio/aspeed_gpio.h b/include/hw/gpio/aspeed_gpio.h
-index 2582e6e0dc..e1636ce7fe 100644
---- a/include/hw/gpio/aspeed_gpio.h
-+++ b/include/hw/gpio/aspeed_gpio.h
-@@ -14,10 +14,7 @@
- #include "qom/object.h"
- 
- #define TYPE_ASPEED_GPIO "aspeed.gpio"
--typedef struct AspeedGPIOClass AspeedGPIOClass;
--typedef struct AspeedGPIOState AspeedGPIOState;
--DECLARE_OBJ_CHECKERS(AspeedGPIOState, AspeedGPIOClass,
--                     ASPEED_GPIO, TYPE_ASPEED_GPIO)
-+OBJECT_DECLARE_TYPE(AspeedGPIOState, AspeedGPIOClass, ASPEED_GPIO)
- 
- #define ASPEED_GPIO_MAX_NR_SETS 8
- #define ASPEED_REGS_PER_BANK 14
-diff --git a/include/hw/i2c/aspeed_i2c.h b/include/hw/i2c/aspeed_i2c.h
-index 695e1c0928..565f833066 100644
---- a/include/hw/i2c/aspeed_i2c.h
-+++ b/include/hw/i2c/aspeed_i2c.h
-@@ -29,10 +29,7 @@
- #define TYPE_ASPEED_2400_I2C TYPE_ASPEED_I2C "-ast2400"
- #define TYPE_ASPEED_2500_I2C TYPE_ASPEED_I2C "-ast2500"
- #define TYPE_ASPEED_2600_I2C TYPE_ASPEED_I2C "-ast2600"
--typedef struct AspeedI2CClass AspeedI2CClass;
--typedef struct AspeedI2CState AspeedI2CState;
--DECLARE_OBJ_CHECKERS(AspeedI2CState, AspeedI2CClass,
--                     ASPEED_I2C, TYPE_ASPEED_I2C)
-+OBJECT_DECLARE_TYPE(AspeedI2CState, AspeedI2CClass, ASPEED_I2C)
- 
- #define ASPEED_I2C_NR_BUSSES 16
- #define ASPEED_I2C_MAX_POOL_SIZE 0x800
-diff --git a/include/hw/i386/ioapic_internal.h b/include/hw/i386/ioapic_internal.h
-index e9cc2eaf54..0ac9e2400d 100644
---- a/include/hw/i386/ioapic_internal.h
-+++ b/include/hw/i386/ioapic_internal.h
-@@ -82,12 +82,9 @@
- 
- #define IOAPIC_VER_ENTRIES_SHIFT        16
- 
--typedef struct IOAPICCommonState IOAPICCommonState;
- 
- #define TYPE_IOAPIC_COMMON "ioapic-common"
--typedef struct IOAPICCommonClass IOAPICCommonClass;
--DECLARE_OBJ_CHECKERS(IOAPICCommonState, IOAPICCommonClass,
--                     IOAPIC_COMMON, TYPE_IOAPIC_COMMON)
-+OBJECT_DECLARE_TYPE(IOAPICCommonState, IOAPICCommonClass, IOAPIC_COMMON)
- 
- struct IOAPICCommonClass {
-     SysBusDeviceClass parent_class;
-diff --git a/include/hw/i386/microvm.h b/include/hw/i386/microvm.h
-index be2d95af4d..3b9fd4ff17 100644
---- a/include/hw/i386/microvm.h
-+++ b/include/hw/i386/microvm.h
-@@ -50,7 +50,6 @@ struct MicrovmMachineClass {
-     HotplugHandler *(*orig_hotplug_handler)(MachineState *machine,
-                                            DeviceState *dev);
- };
--typedef struct MicrovmMachineClass MicrovmMachineClass;
- 
- struct MicrovmMachineState {
-     X86MachineState parent;
-@@ -69,10 +68,8 @@ struct MicrovmMachineState {
-     Notifier machine_done;
-     Notifier powerdown_req;
- };
--typedef struct MicrovmMachineState MicrovmMachineState;
- 
- #define TYPE_MICROVM_MACHINE   MACHINE_TYPE_NAME("microvm")
--DECLARE_OBJ_CHECKERS(MicrovmMachineState, MicrovmMachineClass,
--                     MICROVM_MACHINE, TYPE_MICROVM_MACHINE)
-+OBJECT_DECLARE_TYPE(MicrovmMachineState, MicrovmMachineClass, MICROVM_MACHINE)
- 
- #endif
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index c14e14dfe0..b2da2c8d2b 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -119,11 +119,9 @@ struct PCMachineClass {
-     /* use PVH to load kernels that support this feature */
-     bool pvh_enabled;
- };
--typedef struct PCMachineClass PCMachineClass;
- 
- #define TYPE_PC_MACHINE "generic-pc-machine"
--DECLARE_OBJ_CHECKERS(PCMachineState, PCMachineClass,
--                     PC_MACHINE, TYPE_PC_MACHINE)
-+OBJECT_DECLARE_TYPE(PCMachineState, PCMachineClass, PC_MACHINE)
- 
- /* ioapic.c */
- 
-diff --git a/include/hw/i386/x86-iommu.h b/include/hw/i386/x86-iommu.h
-index bbfaf44e79..9de92d33a1 100644
---- a/include/hw/i386/x86-iommu.h
-+++ b/include/hw/i386/x86-iommu.h
-@@ -26,10 +26,7 @@
- #include "qom/object.h"
- 
- #define  TYPE_X86_IOMMU_DEVICE  ("x86-iommu")
--typedef struct X86IOMMUClass X86IOMMUClass;
--typedef struct X86IOMMUState X86IOMMUState;
--DECLARE_OBJ_CHECKERS(X86IOMMUState, X86IOMMUClass,
--                     X86_IOMMU_DEVICE, TYPE_X86_IOMMU_DEVICE)
-+OBJECT_DECLARE_TYPE(X86IOMMUState, X86IOMMUClass, X86_IOMMU_DEVICE)
- 
- #define X86_IOMMU_SID_INVALID             (0xffff)
- 
-diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
-index 0eef9fb0c0..d5dcf7a07f 100644
---- a/include/hw/i386/x86.h
-+++ b/include/hw/i386/x86.h
-@@ -39,7 +39,6 @@ struct X86MachineClass {
-     /* Enables contiguous-apic-ID mode */
-     bool compat_apic_id_mode;
- };
--typedef struct X86MachineClass X86MachineClass;
- 
- struct X86MachineState {
-     /*< private >*/
-@@ -72,14 +71,12 @@ struct X86MachineState {
-      */
-     AddressSpace *ioapic_as;
- };
--typedef struct X86MachineState X86MachineState;
- 
- #define X86_MACHINE_SMM              "smm"
- #define X86_MACHINE_ACPI             "acpi"
- 
- #define TYPE_X86_MACHINE   MACHINE_TYPE_NAME("x86")
--DECLARE_OBJ_CHECKERS(X86MachineState, X86MachineClass,
--                     X86_MACHINE, TYPE_X86_MACHINE)
-+OBJECT_DECLARE_TYPE(X86MachineState, X86MachineClass, X86_MACHINE)
- 
- void init_topo_info(X86CPUTopoInfo *topo_info, const X86MachineState *x86ms);
- 
-diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
-index eb9eb4e0ae..77c9372c27 100644
---- a/include/hw/ide/internal.h
-+++ b/include/hw/ide/internal.h
-@@ -488,9 +488,7 @@ struct IDEBus {
- };
- 
- #define TYPE_IDE_DEVICE "ide-device"
--typedef struct IDEDeviceClass IDEDeviceClass;
--DECLARE_OBJ_CHECKERS(IDEDevice, IDEDeviceClass,
--                     IDE_DEVICE, TYPE_IDE_DEVICE)
-+OBJECT_DECLARE_TYPE(IDEDevice, IDEDeviceClass, IDE_DEVICE)
- 
- struct IDEDeviceClass {
-     DeviceClass parent_class;
-diff --git a/include/hw/input/adb.h b/include/hw/input/adb.h
-index 285f70db55..3d1c2f4b10 100644
---- a/include/hw/input/adb.h
-+++ b/include/hw/input/adb.h
-@@ -43,9 +43,7 @@ typedef int ADBDeviceRequest(ADBDevice *d, uint8_t *buf_out,
- typedef bool ADBDeviceHasData(ADBDevice *d);
- 
- #define TYPE_ADB_DEVICE "adb-device"
--typedef struct ADBDeviceClass ADBDeviceClass;
--DECLARE_OBJ_CHECKERS(ADBDevice, ADBDeviceClass,
--                     ADB_DEVICE, TYPE_ADB_DEVICE)
-+OBJECT_DECLARE_TYPE(ADBDevice, ADBDeviceClass, ADB_DEVICE)
- 
- struct ADBDevice {
-     /*< private >*/
-diff --git a/include/hw/isa/i8259_internal.h b/include/hw/isa/i8259_internal.h
-index cd050bb9f2..a6ae8a583f 100644
---- a/include/hw/isa/i8259_internal.h
-+++ b/include/hw/isa/i8259_internal.h
-@@ -30,12 +30,9 @@
- #include "hw/intc/i8259.h"
- #include "qom/object.h"
- 
--typedef struct PICCommonState PICCommonState;
- 
- #define TYPE_PIC_COMMON "pic-common"
--typedef struct PICCommonClass PICCommonClass;
--DECLARE_OBJ_CHECKERS(PICCommonState, PICCommonClass,
--                     PIC_COMMON, TYPE_PIC_COMMON)
-+OBJECT_DECLARE_TYPE(PICCommonState, PICCommonClass, PIC_COMMON)
- 
- struct PICCommonClass {
-     ISADeviceClass parent_class;
-diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
-index ddb6a2d168..5f7943fa67 100644
---- a/include/hw/isa/isa.h
-+++ b/include/hw/isa/isa.h
-@@ -11,9 +11,7 @@
- #define ISA_NUM_IRQS 16
- 
- #define TYPE_ISA_DEVICE "isa-device"
--typedef struct ISADeviceClass ISADeviceClass;
--DECLARE_OBJ_CHECKERS(ISADevice, ISADeviceClass,
--                     ISA_DEVICE, TYPE_ISA_DEVICE)
-+OBJECT_DECLARE_TYPE(ISADevice, ISADeviceClass, ISA_DEVICE)
- 
- #define TYPE_ISA_BUS "ISA"
- DECLARE_INSTANCE_CHECKER(ISABus, ISA_BUS,
-diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
-index 19e3d3092d..c699842dd0 100644
---- a/include/hw/mem/nvdimm.h
-+++ b/include/hw/mem/nvdimm.h
-@@ -46,10 +46,7 @@
- #define MIN_NAMESPACE_LABEL_SIZE      (128UL << 10)
- 
- #define TYPE_NVDIMM      "nvdimm"
--typedef struct NVDIMMClass NVDIMMClass;
--typedef struct NVDIMMDevice NVDIMMDevice;
--DECLARE_OBJ_CHECKERS(NVDIMMDevice, NVDIMMClass,
--                     NVDIMM, TYPE_NVDIMM)
-+OBJECT_DECLARE_TYPE(NVDIMMDevice, NVDIMMClass, NVDIMM)
- 
- #define NVDIMM_LABEL_SIZE_PROP "label-size"
- #define NVDIMM_UUID_PROP       "uuid"
-diff --git a/include/hw/misc/aspeed_scu.h b/include/hw/misc/aspeed_scu.h
-index 8d3b14acd4..d49bfb02fb 100644
---- a/include/hw/misc/aspeed_scu.h
-+++ b/include/hw/misc/aspeed_scu.h
-@@ -15,10 +15,7 @@
- #include "qom/object.h"
- 
- #define TYPE_ASPEED_SCU "aspeed.scu"
--typedef struct AspeedSCUClass AspeedSCUClass;
--typedef struct AspeedSCUState AspeedSCUState;
--DECLARE_OBJ_CHECKERS(AspeedSCUState, AspeedSCUClass,
--                     ASPEED_SCU, TYPE_ASPEED_SCU)
-+OBJECT_DECLARE_TYPE(AspeedSCUState, AspeedSCUClass, ASPEED_SCU)
- #define TYPE_ASPEED_2400_SCU TYPE_ASPEED_SCU "-ast2400"
- #define TYPE_ASPEED_2500_SCU TYPE_ASPEED_SCU "-ast2500"
- #define TYPE_ASPEED_2600_SCU TYPE_ASPEED_SCU "-ast2600"
-diff --git a/include/hw/misc/aspeed_sdmc.h b/include/hw/misc/aspeed_sdmc.h
-index 3375afc89b..ec2d59a14f 100644
---- a/include/hw/misc/aspeed_sdmc.h
-+++ b/include/hw/misc/aspeed_sdmc.h
-@@ -13,10 +13,7 @@
- #include "qom/object.h"
- 
- #define TYPE_ASPEED_SDMC "aspeed.sdmc"
--typedef struct AspeedSDMCClass AspeedSDMCClass;
--typedef struct AspeedSDMCState AspeedSDMCState;
--DECLARE_OBJ_CHECKERS(AspeedSDMCState, AspeedSDMCClass,
--                     ASPEED_SDMC, TYPE_ASPEED_SDMC)
-+OBJECT_DECLARE_TYPE(AspeedSDMCState, AspeedSDMCClass, ASPEED_SDMC)
- #define TYPE_ASPEED_2400_SDMC TYPE_ASPEED_SDMC "-ast2400"
- #define TYPE_ASPEED_2500_SDMC TYPE_ASPEED_SDMC "-ast2500"
- #define TYPE_ASPEED_2600_SDMC TYPE_ASPEED_SDMC "-ast2600"
-diff --git a/include/hw/misc/imx_ccm.h b/include/hw/misc/imx_ccm.h
-index e9d82a2a50..7e5678e972 100644
---- a/include/hw/misc/imx_ccm.h
-+++ b/include/hw/misc/imx_ccm.h
-@@ -28,10 +28,7 @@
- #define PLL_MFN(x)              (((x) & 0x3ff) << 0)
- 
- #define TYPE_IMX_CCM "imx.ccm"
--typedef struct IMXCCMClass IMXCCMClass;
--typedef struct IMXCCMState IMXCCMState;
--DECLARE_OBJ_CHECKERS(IMXCCMState, IMXCCMClass,
--                     IMX_CCM, TYPE_IMX_CCM)
-+OBJECT_DECLARE_TYPE(IMXCCMState, IMXCCMClass, IMX_CCM)
- 
- struct IMXCCMState {
-     /* <private> */
-diff --git a/include/hw/misc/mos6522.h b/include/hw/misc/mos6522.h
-index f73271ba67..fc95d22b0f 100644
---- a/include/hw/misc/mos6522.h
-+++ b/include/hw/misc/mos6522.h
-@@ -122,12 +122,9 @@ struct MOS6522State {
- 
-     qemu_irq irq;
- };
--typedef struct MOS6522State MOS6522State;
- 
- #define TYPE_MOS6522 "mos6522"
--typedef struct MOS6522DeviceClass MOS6522DeviceClass;
--DECLARE_OBJ_CHECKERS(MOS6522State, MOS6522DeviceClass,
--                     MOS6522, TYPE_MOS6522)
-+OBJECT_DECLARE_TYPE(MOS6522State, MOS6522DeviceClass, MOS6522)
- 
- struct MOS6522DeviceClass {
-     DeviceClass parent_class;
-diff --git a/include/hw/pci-host/pnv_phb4.h b/include/hw/pci-host/pnv_phb4.h
-index 15a4633178..05efb4e6b9 100644
---- a/include/hw/pci-host/pnv_phb4.h
-+++ b/include/hw/pci-host/pnv_phb4.h
-@@ -15,7 +15,6 @@
- #include "hw/ppc/xive.h"
- #include "qom/object.h"
- 
--typedef struct PnvPhb4PecState PnvPhb4PecState;
- typedef struct PnvPhb4PecStack PnvPhb4PecStack;
- typedef struct PnvPHB4 PnvPHB4;
- typedef struct PnvChip PnvChip;
-@@ -142,9 +141,7 @@ extern const MemoryRegionOps pnv_phb4_xscom_ops;
-  * PHB4 PEC (PCI Express Controller)
-  */
- #define TYPE_PNV_PHB4_PEC "pnv-phb4-pec"
--typedef struct PnvPhb4PecClass PnvPhb4PecClass;
--DECLARE_OBJ_CHECKERS(PnvPhb4PecState, PnvPhb4PecClass,
--                     PNV_PHB4_PEC, TYPE_PNV_PHB4_PEC)
-+OBJECT_DECLARE_TYPE(PnvPhb4PecState, PnvPhb4PecClass, PNV_PHB4_PEC)
- 
- #define TYPE_PNV_PHB4_PEC_STACK "pnv-phb4-pec-stack"
- DECLARE_INSTANCE_CHECKER(PnvPhb4PecStack, PNV_PHB4_PEC_STACK,
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index c13ae1f858..0a59a06b14 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -394,9 +394,7 @@ typedef int (*pci_map_irq_fn)(PCIDevice *pci_dev, int irq_num);
- typedef PCIINTxRoute (*pci_route_irq_fn)(void *opaque, int pin);
- 
- #define TYPE_PCI_BUS "PCI"
--typedef struct PCIBusClass PCIBusClass;
--DECLARE_OBJ_CHECKERS(PCIBus, PCIBusClass,
--                     PCI_BUS, TYPE_PCI_BUS)
-+OBJECT_DECLARE_TYPE(PCIBus, PCIBusClass, PCI_BUS)
- #define TYPE_PCIE_BUS "PCIE"
- 
- bool pci_bus_is_express(PCIBus *bus);
-diff --git a/include/hw/pci/pci_host.h b/include/hw/pci/pci_host.h
-index d1fc1c3604..52e038c019 100644
---- a/include/hw/pci/pci_host.h
-+++ b/include/hw/pci/pci_host.h
-@@ -32,9 +32,7 @@
- #include "qom/object.h"
- 
- #define TYPE_PCI_HOST_BRIDGE "pci-host-bridge"
--typedef struct PCIHostBridgeClass PCIHostBridgeClass;
--DECLARE_OBJ_CHECKERS(PCIHostState, PCIHostBridgeClass,
--                     PCI_HOST_BRIDGE, TYPE_PCI_HOST_BRIDGE)
-+OBJECT_DECLARE_TYPE(PCIHostState, PCIHostBridgeClass, PCI_HOST_BRIDGE)
- 
- struct PCIHostState {
-     SysBusDevice busdev;
-diff --git a/include/hw/pcmcia.h b/include/hw/pcmcia.h
-index fb40ae7e09..e3ba44e0bf 100644
---- a/include/hw/pcmcia.h
-+++ b/include/hw/pcmcia.h
-@@ -12,10 +12,7 @@ typedef struct PCMCIASocket {
- } PCMCIASocket;
- 
- #define TYPE_PCMCIA_CARD "pcmcia-card"
--typedef struct PCMCIACardClass PCMCIACardClass;
--typedef struct PCMCIACardState PCMCIACardState;
--DECLARE_OBJ_CHECKERS(PCMCIACardState, PCMCIACardClass,
--                     PCMCIA_CARD, TYPE_PCMCIA_CARD)
-+OBJECT_DECLARE_TYPE(PCMCIACardState, PCMCIACardClass, PCMCIA_CARD)
- 
- struct PCMCIACardState {
-     /*< private >*/
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index c8cd63bc06..eea7ac8624 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -39,12 +39,9 @@ struct SpaprRtcState {
- };
- 
- typedef struct SpaprDimmState SpaprDimmState;
--typedef struct SpaprMachineClass SpaprMachineClass;
- 
- #define TYPE_SPAPR_MACHINE      "spapr-machine"
--typedef struct SpaprMachineState SpaprMachineState;
--DECLARE_OBJ_CHECKERS(SpaprMachineState, SpaprMachineClass,
--                     SPAPR_MACHINE, TYPE_SPAPR_MACHINE)
-+OBJECT_DECLARE_TYPE(SpaprMachineState, SpaprMachineClass, SPAPR_MACHINE)
- 
- typedef enum {
-     SPAPR_RESIZE_HPT_DEFAULT = 0,
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index e025ba9653..72064f4dd4 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -12,9 +12,7 @@ enum {
- };
- 
- #define TYPE_DEVICE "device"
--typedef struct DeviceClass DeviceClass;
--DECLARE_OBJ_CHECKERS(DeviceState, DeviceClass,
--                     DEVICE, TYPE_DEVICE)
-+OBJECT_DECLARE_TYPE(DeviceState, DeviceClass, DEVICE)
- 
- typedef enum DeviceCategory {
-     DEVICE_CATEGORY_BRIDGE,
-diff --git a/include/hw/rtc/allwinner-rtc.h b/include/hw/rtc/allwinner-rtc.h
-index 5a6e9fff32..bf415431cd 100644
---- a/include/hw/rtc/allwinner-rtc.h
-+++ b/include/hw/rtc/allwinner-rtc.h
-@@ -60,10 +60,7 @@
-  * @{
-  */
- 
--typedef struct AwRtcClass AwRtcClass;
--typedef struct AwRtcState AwRtcState;
--DECLARE_OBJ_CHECKERS(AwRtcState, AwRtcClass,
--                     AW_RTC, TYPE_AW_RTC)
-+OBJECT_DECLARE_TYPE(AwRtcState, AwRtcClass, AW_RTC)
- 
- /** @} */
- 
-diff --git a/include/hw/s390x/3270-ccw.h b/include/hw/s390x/3270-ccw.h
-index 9a11093192..1439882294 100644
---- a/include/hw/s390x/3270-ccw.h
-+++ b/include/hw/s390x/3270-ccw.h
-@@ -31,10 +31,7 @@
- #define TC_EWRITEA 0x0d         /* Erase write alternate */
- #define TC_WRITESF 0x11         /* Write structured field */
- 
--typedef struct EmulatedCcw3270Class EmulatedCcw3270Class;
--typedef struct EmulatedCcw3270Device EmulatedCcw3270Device;
--DECLARE_OBJ_CHECKERS(EmulatedCcw3270Device, EmulatedCcw3270Class,
--                     EMULATED_CCW_3270, TYPE_EMULATED_CCW_3270)
-+OBJECT_DECLARE_TYPE(EmulatedCcw3270Device, EmulatedCcw3270Class, EMULATED_CCW_3270)
- 
- struct EmulatedCcw3270Device {
-     CcwDevice parent_obj;
-diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
-index 54d14da0a6..3331990e02 100644
---- a/include/hw/s390x/s390-virtio-ccw.h
-+++ b/include/hw/s390x/s390-virtio-ccw.h
-@@ -16,10 +16,7 @@
- 
- #define TYPE_S390_CCW_MACHINE               "s390-ccw-machine"
- 
--typedef struct S390CcwMachineClass S390CcwMachineClass;
--typedef struct S390CcwMachineState S390CcwMachineState;
--DECLARE_OBJ_CHECKERS(S390CcwMachineState, S390CcwMachineClass,
--                     S390_CCW_MACHINE, TYPE_S390_CCW_MACHINE)
-+OBJECT_DECLARE_TYPE(S390CcwMachineState, S390CcwMachineClass, S390_CCW_MACHINE)
- 
- 
- struct S390CcwMachineState {
-diff --git a/include/hw/s390x/storage-attributes.h b/include/hw/s390x/storage-attributes.h
-index efb28c48be..5239eb538c 100644
---- a/include/hw/s390x/storage-attributes.h
-+++ b/include/hw/s390x/storage-attributes.h
-@@ -20,10 +20,7 @@
- #define TYPE_QEMU_S390_STATTRIB "s390-storage_attributes-qemu"
- #define TYPE_KVM_S390_STATTRIB "s390-storage_attributes-kvm"
- 
--typedef struct S390StAttribClass S390StAttribClass;
--typedef struct S390StAttribState S390StAttribState;
--DECLARE_OBJ_CHECKERS(S390StAttribState, S390StAttribClass,
--                     S390_STATTRIB, TYPE_S390_STATTRIB)
-+OBJECT_DECLARE_TYPE(S390StAttribState, S390StAttribClass, S390_STATTRIB)
- 
- struct S390StAttribState {
-     DeviceState parent_obj;
-diff --git a/include/hw/s390x/storage-keys.h b/include/hw/s390x/storage-keys.h
-index 40f042f54e..2888d42d0b 100644
---- a/include/hw/s390x/storage-keys.h
-+++ b/include/hw/s390x/storage-keys.h
-@@ -17,10 +17,7 @@
- #include "qom/object.h"
- 
- #define TYPE_S390_SKEYS "s390-skeys"
--typedef struct S390SKeysClass S390SKeysClass;
--typedef struct S390SKeysState S390SKeysState;
--DECLARE_OBJ_CHECKERS(S390SKeysState, S390SKeysClass,
--                     S390_SKEYS, TYPE_S390_SKEYS)
-+OBJECT_DECLARE_TYPE(S390SKeysState, S390SKeysClass, S390_SKEYS)
- 
- struct S390SKeysState {
-     DeviceState parent_obj;
-diff --git a/include/hw/s390x/tod.h b/include/hw/s390x/tod.h
-index c02498f65e..ff3195a4bf 100644
---- a/include/hw/s390x/tod.h
-+++ b/include/hw/s390x/tod.h
-@@ -21,10 +21,7 @@ typedef struct S390TOD {
- } S390TOD;
- 
- #define TYPE_S390_TOD "s390-tod"
--typedef struct S390TODClass S390TODClass;
--typedef struct S390TODState S390TODState;
--DECLARE_OBJ_CHECKERS(S390TODState, S390TODClass,
--                     S390_TOD, TYPE_S390_TOD)
-+OBJECT_DECLARE_TYPE(S390TODState, S390TODClass, S390_TOD)
- #define TYPE_KVM_S390_TOD TYPE_S390_TOD "-kvm"
- #define TYPE_QEMU_S390_TOD TYPE_S390_TOD "-qemu"
- 
-diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
-index 3818e3fa46..b1e2ed7c35 100644
---- a/include/hw/scsi/scsi.h
-+++ b/include/hw/scsi/scsi.h
-@@ -50,9 +50,7 @@ struct SCSIRequest {
- };
- 
- #define TYPE_SCSI_DEVICE "scsi-device"
--typedef struct SCSIDeviceClass SCSIDeviceClass;
--DECLARE_OBJ_CHECKERS(SCSIDevice, SCSIDeviceClass,
--                     SCSI_DEVICE, TYPE_SCSI_DEVICE)
-+OBJECT_DECLARE_TYPE(SCSIDevice, SCSIDeviceClass, SCSI_DEVICE)
- 
- struct SCSIDeviceClass {
-     DeviceClass parent_class;
-diff --git a/include/hw/sd/allwinner-sdhost.h b/include/hw/sd/allwinner-sdhost.h
-index 7bccc06d1c..bfe08ff4ef 100644
---- a/include/hw/sd/allwinner-sdhost.h
-+++ b/include/hw/sd/allwinner-sdhost.h
-@@ -45,10 +45,7 @@
-  * @{
-  */
- 
--typedef struct AwSdHostClass AwSdHostClass;
--typedef struct AwSdHostState AwSdHostState;
--DECLARE_OBJ_CHECKERS(AwSdHostState, AwSdHostClass,
--                     AW_SDHOST, TYPE_AW_SDHOST)
-+OBJECT_DECLARE_TYPE(AwSdHostState, AwSdHostClass, AW_SDHOST)
- 
- /** @} */
- 
-diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
-index 8dd4c363f5..59d108d453 100644
---- a/include/hw/sd/sd.h
-+++ b/include/hw/sd/sd.h
-@@ -89,12 +89,9 @@ typedef struct {
-     uint8_t crc;
- } SDRequest;
- 
--typedef struct SDState SDState;
- 
- #define TYPE_SD_CARD "sd-card"
--typedef struct SDCardClass SDCardClass;
--DECLARE_OBJ_CHECKERS(SDState, SDCardClass,
--                     SD_CARD, TYPE_SD_CARD)
-+OBJECT_DECLARE_TYPE(SDState, SDCardClass, SD_CARD)
- 
- struct SDCardClass {
-     /*< private >*/
-diff --git a/include/hw/ssi/aspeed_smc.h b/include/hw/ssi/aspeed_smc.h
-index 8e023d8ff6..3dd354b52e 100644
---- a/include/hw/ssi/aspeed_smc.h
-+++ b/include/hw/ssi/aspeed_smc.h
-@@ -68,10 +68,7 @@ typedef struct AspeedSMCFlash {
- } AspeedSMCFlash;
- 
- #define TYPE_ASPEED_SMC "aspeed.smc"
--typedef struct AspeedSMCClass AspeedSMCClass;
--typedef struct AspeedSMCState AspeedSMCState;
--DECLARE_OBJ_CHECKERS(AspeedSMCState, AspeedSMCClass,
--                     ASPEED_SMC, TYPE_ASPEED_SMC)
-+OBJECT_DECLARE_TYPE(AspeedSMCState, AspeedSMCClass, ASPEED_SMC)
- 
- struct AspeedSMCClass {
-     SysBusDevice parent_obj;
-diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
-index b1ab347617..a2bf2cf3c7 100644
---- a/include/hw/ssi/xilinx_spips.h
-+++ b/include/hw/ssi/xilinx_spips.h
-@@ -130,14 +130,12 @@ struct XilinxSPIPSClass {
-     uint32_t rx_fifo_size;
-     uint32_t tx_fifo_size;
- };
--typedef struct XilinxSPIPSClass XilinxSPIPSClass;
- 
- #define TYPE_XILINX_SPIPS "xlnx.ps7-spi"
- #define TYPE_XILINX_QSPIPS "xlnx.ps7-qspi"
- #define TYPE_XLNX_ZYNQMP_QSPIPS "xlnx.usmp-gqspi"
- 
--DECLARE_OBJ_CHECKERS(XilinxSPIPS, XilinxSPIPSClass,
--                     XILINX_SPIPS, TYPE_XILINX_SPIPS)
-+OBJECT_DECLARE_TYPE(XilinxSPIPS, XilinxSPIPSClass, XILINX_SPIPS)
- 
- DECLARE_INSTANCE_CHECKER(XilinxQSPIPS, XILINX_QSPIPS,
-                          TYPE_XILINX_QSPIPS)
-diff --git a/include/hw/timer/aspeed_timer.h b/include/hw/timer/aspeed_timer.h
-index 4c76f955c9..d36034a10c 100644
---- a/include/hw/timer/aspeed_timer.h
-+++ b/include/hw/timer/aspeed_timer.h
-@@ -27,10 +27,7 @@
- #include "qom/object.h"
- 
- #define TYPE_ASPEED_TIMER "aspeed.timer"
--typedef struct AspeedTimerClass AspeedTimerClass;
--typedef struct AspeedTimerCtrlState AspeedTimerCtrlState;
--DECLARE_OBJ_CHECKERS(AspeedTimerCtrlState, AspeedTimerClass,
--                     ASPEED_TIMER, TYPE_ASPEED_TIMER)
-+OBJECT_DECLARE_TYPE(AspeedTimerCtrlState, AspeedTimerClass, ASPEED_TIMER)
- #define TYPE_ASPEED_2400_TIMER TYPE_ASPEED_TIMER "-ast2400"
- #define TYPE_ASPEED_2500_TIMER TYPE_ASPEED_TIMER "-ast2500"
- #define TYPE_ASPEED_2600_TIMER TYPE_ASPEED_TIMER "-ast2600"
-diff --git a/include/hw/timer/i8254.h b/include/hw/timer/i8254.h
-index 1a522a2457..3e569f42b6 100644
---- a/include/hw/timer/i8254.h
-+++ b/include/hw/timer/i8254.h
-@@ -40,10 +40,7 @@ typedef struct PITChannelInfo {
- } PITChannelInfo;
- 
- #define TYPE_PIT_COMMON "pit-common"
--typedef struct PITCommonState PITCommonState;
--typedef struct PITCommonClass PITCommonClass;
--DECLARE_OBJ_CHECKERS(PITCommonState, PITCommonClass,
--                     PIT_COMMON, TYPE_PIT_COMMON)
-+OBJECT_DECLARE_TYPE(PITCommonState, PITCommonClass, PIT_COMMON)
- 
- #define TYPE_I8254 "isa-pit"
- #define TYPE_KVM_I8254 "kvm-pit"
-diff --git a/include/hw/usb.h b/include/hw/usb.h
-index 5783635491..355745c23a 100644
---- a/include/hw/usb.h
-+++ b/include/hw/usb.h
-@@ -265,9 +265,7 @@ struct USBDevice {
- };
- 
- #define TYPE_USB_DEVICE "usb-device"
--typedef struct USBDeviceClass USBDeviceClass;
--DECLARE_OBJ_CHECKERS(USBDevice, USBDeviceClass,
--                     USB_DEVICE, TYPE_USB_DEVICE)
-+OBJECT_DECLARE_TYPE(USBDevice, USBDeviceClass, USB_DEVICE)
- 
- typedef void (*USBDeviceRealize)(USBDevice *dev, Error **errp);
- typedef void (*USBDeviceUnrealize)(USBDevice *dev);
-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-index 807280451b..28cf3b9120 100644
---- a/include/hw/virtio/virtio.h
-+++ b/include/hw/virtio/virtio.h
-@@ -68,9 +68,7 @@ typedef struct VirtQueueElement
- #define VIRTIO_NO_VECTOR 0xffff
- 
- #define TYPE_VIRTIO_DEVICE "virtio-device"
--typedef struct VirtioDeviceClass VirtioDeviceClass;
--DECLARE_OBJ_CHECKERS(VirtIODevice, VirtioDeviceClass,
--                     VIRTIO_DEVICE, TYPE_VIRTIO_DEVICE)
-+OBJECT_DECLARE_TYPE(VirtIODevice, VirtioDeviceClass, VIRTIO_DEVICE)
- 
- enum virtio_device_endian {
-     VIRTIO_DEVICE_ENDIAN_UNKNOWN,
-diff --git a/include/hw/watchdog/wdt_aspeed.h b/include/hw/watchdog/wdt_aspeed.h
-index 2ca1eb5432..80b03661e3 100644
---- a/include/hw/watchdog/wdt_aspeed.h
-+++ b/include/hw/watchdog/wdt_aspeed.h
-@@ -15,10 +15,7 @@
- #include "qom/object.h"
- 
- #define TYPE_ASPEED_WDT "aspeed.wdt"
--typedef struct AspeedWDTClass AspeedWDTClass;
--typedef struct AspeedWDTState AspeedWDTState;
--DECLARE_OBJ_CHECKERS(AspeedWDTState, AspeedWDTClass,
--                     ASPEED_WDT, TYPE_ASPEED_WDT)
-+OBJECT_DECLARE_TYPE(AspeedWDTState, AspeedWDTClass, ASPEED_WDT)
- #define TYPE_ASPEED_2400_WDT TYPE_ASPEED_WDT "-ast2400"
- #define TYPE_ASPEED_2500_WDT TYPE_ASPEED_WDT "-ast2500"
- #define TYPE_ASPEED_2600_WDT TYPE_ASPEED_WDT "-ast2600"
-diff --git a/include/hw/xen/xen-block.h b/include/hw/xen/xen-block.h
-index 8ff5421dc3..a74fd9384f 100644
---- a/include/hw/xen/xen-block.h
-+++ b/include/hw/xen/xen-block.h
-@@ -68,11 +68,9 @@ struct XenBlockDeviceClass {
-     XenBlockDeviceRealize realize;
-     XenBlockDeviceUnrealize unrealize;
- };
--typedef struct XenBlockDeviceClass XenBlockDeviceClass;
- 
- #define TYPE_XEN_BLOCK_DEVICE  "xen-block"
--DECLARE_OBJ_CHECKERS(XenBlockDevice, XenBlockDeviceClass,
--                     XEN_BLOCK_DEVICE, TYPE_XEN_BLOCK_DEVICE)
-+OBJECT_DECLARE_TYPE(XenBlockDevice, XenBlockDeviceClass, XEN_BLOCK_DEVICE)
- 
- struct XenDiskDevice {
-     XenBlockDevice blockdev;
-diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index 1924d93c6c..3df696136f 100644
---- a/include/hw/xen/xen-bus.h
-+++ b/include/hw/xen/xen-bus.h
-@@ -57,11 +57,9 @@ struct XenDeviceClass {
-     XenDeviceFrontendChanged frontend_changed;
-     XenDeviceUnrealize unrealize;
- };
--typedef struct XenDeviceClass XenDeviceClass;
- 
- #define TYPE_XEN_DEVICE "xen-device"
--DECLARE_OBJ_CHECKERS(XenDevice, XenDeviceClass,
--                     XEN_DEVICE, TYPE_XEN_DEVICE)
-+OBJECT_DECLARE_TYPE(XenDevice, XenDeviceClass, XEN_DEVICE)
- 
- struct XenBus {
-     BusState qbus;
-diff --git a/include/net/can_host.h b/include/net/can_host.h
-index 18979c2e2d..4e3ce3f954 100644
---- a/include/net/can_host.h
-+++ b/include/net/can_host.h
-@@ -32,10 +32,7 @@
- #include "qom/object.h"
- 
- #define TYPE_CAN_HOST "can-host"
--typedef struct CanHostClass CanHostClass;
--typedef struct CanHostState CanHostState;
--DECLARE_OBJ_CHECKERS(CanHostState, CanHostClass,
--                     CAN_HOST, TYPE_CAN_HOST)
-+OBJECT_DECLARE_TYPE(CanHostState, CanHostClass, CAN_HOST)
- 
- struct CanHostState {
-     ObjectClass oc;
-diff --git a/include/net/filter.h b/include/net/filter.h
-index e7e593128a..27ffc630df 100644
---- a/include/net/filter.h
-+++ b/include/net/filter.h
-@@ -15,9 +15,7 @@
- #include "net/queue.h"
- 
- #define TYPE_NETFILTER "netfilter"
--typedef struct NetFilterClass NetFilterClass;
--DECLARE_OBJ_CHECKERS(NetFilterState, NetFilterClass,
--                     NETFILTER, TYPE_NETFILTER)
-+OBJECT_DECLARE_TYPE(NetFilterState, NetFilterClass, NETFILTER)
- 
- typedef void (FilterSetup) (NetFilterState *nf, Error **errp);
- typedef void (FilterCleanup) (NetFilterState *nf);
-diff --git a/include/ui/console.h b/include/ui/console.h
-index 8602203523..d091c2e1e2 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -106,9 +106,7 @@ void kbd_put_keysym(int keysym);
- /* consoles */
- 
- #define TYPE_QEMU_CONSOLE "qemu-console"
--typedef struct QemuConsoleClass QemuConsoleClass;
--DECLARE_OBJ_CHECKERS(QemuConsole, QemuConsoleClass,
--                     QEMU_CONSOLE, TYPE_QEMU_CONSOLE)
-+OBJECT_DECLARE_TYPE(QemuConsole, QemuConsoleClass, QEMU_CONSOLE)
- 
- 
- struct QemuConsoleClass {
-diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
-index dbf7d63dc8..3707876d6d 100644
---- a/hw/arm/mps2-tz.c
-+++ b/hw/arm/mps2-tz.c
-@@ -77,7 +77,6 @@ struct MPS2TZMachineClass {
-     uint32_t scc_id;
-     const char *armsse_type;
- };
--typedef struct MPS2TZMachineClass MPS2TZMachineClass;
- 
- struct MPS2TZMachineState {
-     MachineState parent;
-@@ -102,14 +101,12 @@ struct MPS2TZMachineState {
-     DeviceState *lan9118;
-     SplitIRQ cpu_irq_splitter[MPS2TZ_NUMIRQ];
- };
--typedef struct MPS2TZMachineState MPS2TZMachineState;
- 
- #define TYPE_MPS2TZ_MACHINE "mps2tz"
- #define TYPE_MPS2TZ_AN505_MACHINE MACHINE_TYPE_NAME("mps2-an505")
- #define TYPE_MPS2TZ_AN521_MACHINE MACHINE_TYPE_NAME("mps2-an521")
- 
--DECLARE_OBJ_CHECKERS(MPS2TZMachineState, MPS2TZMachineClass,
--                     MPS2TZ_MACHINE, TYPE_MPS2TZ_MACHINE)
-+OBJECT_DECLARE_TYPE(MPS2TZMachineState, MPS2TZMachineClass, MPS2TZ_MACHINE)
- 
- /* Main SYSCLK frequency in Hz */
- #define SYSCLK_FRQ 20000000
-diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
-index 5d47160850..9a8b23c64c 100644
---- a/hw/arm/mps2.c
-+++ b/hw/arm/mps2.c
-@@ -63,7 +63,6 @@ struct MPS2MachineClass {
-     hwaddr ethernet_base;
-     hwaddr psram_base;
- };
--typedef struct MPS2MachineClass MPS2MachineClass;
- 
- struct MPS2MachineState {
-     MachineState parent;
-@@ -85,7 +84,6 @@ struct MPS2MachineState {
-     CMSDKAPBDualTimer dualtimer;
-     CMSDKAPBWatchdog watchdog;
- };
--typedef struct MPS2MachineState MPS2MachineState;
- 
- #define TYPE_MPS2_MACHINE "mps2"
- #define TYPE_MPS2_AN385_MACHINE MACHINE_TYPE_NAME("mps2-an385")
-@@ -93,8 +91,7 @@ typedef struct MPS2MachineState MPS2MachineState;
- #define TYPE_MPS2_AN500_MACHINE MACHINE_TYPE_NAME("mps2-an500")
- #define TYPE_MPS2_AN511_MACHINE MACHINE_TYPE_NAME("mps2-an511")
- 
--DECLARE_OBJ_CHECKERS(MPS2MachineState, MPS2MachineClass,
--                     MPS2_MACHINE, TYPE_MPS2_MACHINE)
-+OBJECT_DECLARE_TYPE(MPS2MachineState, MPS2MachineClass, MPS2_MACHINE)
- 
- /* Main SYSCLK frequency in Hz */
- #define SYSCLK_FRQ 25000000
-diff --git a/hw/arm/musca.c b/hw/arm/musca.c
-index 16015255c8..b50157f63a 100644
---- a/hw/arm/musca.c
-+++ b/hw/arm/musca.c
-@@ -55,7 +55,6 @@ struct MuscaMachineClass {
-     const MPCInfo *mpc_info;
-     int num_mpcs;
- };
--typedef struct MuscaMachineClass MuscaMachineClass;
- 
- struct MuscaMachineState {
-     MachineState parent;
-@@ -84,14 +83,12 @@ struct MuscaMachineState {
-     UnimplementedDeviceState gpio;
-     UnimplementedDeviceState cryptoisland;
- };
--typedef struct MuscaMachineState MuscaMachineState;
- 
- #define TYPE_MUSCA_MACHINE "musca"
- #define TYPE_MUSCA_A_MACHINE MACHINE_TYPE_NAME("musca-a")
- #define TYPE_MUSCA_B1_MACHINE MACHINE_TYPE_NAME("musca-b1")
- 
--DECLARE_OBJ_CHECKERS(MuscaMachineState, MuscaMachineClass,
--                     MUSCA_MACHINE, TYPE_MUSCA_MACHINE)
-+OBJECT_DECLARE_TYPE(MuscaMachineState, MuscaMachineClass, MUSCA_MACHINE)
- 
- /*
-  * Main SYSCLK frequency in Hz
-diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
-index a7ad667f06..b5b867e6ed 100644
---- a/hw/arm/spitz.c
-+++ b/hw/arm/spitz.c
-@@ -43,7 +43,6 @@ struct SpitzMachineClass {
-     enum spitz_model_e model;
-     int arm_id;
- };
--typedef struct SpitzMachineClass SpitzMachineClass;
- 
- struct SpitzMachineState {
-     MachineState parent;
-@@ -56,11 +55,9 @@ struct SpitzMachineState {
-     DeviceState *scp1;
-     DeviceState *misc_gpio;
- };
--typedef struct SpitzMachineState SpitzMachineState;
- 
- #define TYPE_SPITZ_MACHINE "spitz-common"
--DECLARE_OBJ_CHECKERS(SpitzMachineState, SpitzMachineClass,
--                     SPITZ_MACHINE, TYPE_SPITZ_MACHINE)
-+OBJECT_DECLARE_TYPE(SpitzMachineState, SpitzMachineClass, SPITZ_MACHINE)
- 
- #define zaurus_printf(format, ...)                              \
-     fprintf(stderr, "%s: " format, __func__, ##__VA_ARGS__)
-diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-index 01bb4bba1e..94ff094ab3 100644
---- a/hw/arm/vexpress.c
-+++ b/hw/arm/vexpress.c
-@@ -171,20 +171,17 @@ struct VexpressMachineClass {
-     MachineClass parent;
-     VEDBoardInfo *daughterboard;
- };
--typedef struct VexpressMachineClass VexpressMachineClass;
- 
- struct VexpressMachineState {
-     MachineState parent;
-     bool secure;
-     bool virt;
- };
--typedef struct VexpressMachineState VexpressMachineState;
- 
- #define TYPE_VEXPRESS_MACHINE   "vexpress"
- #define TYPE_VEXPRESS_A9_MACHINE   MACHINE_TYPE_NAME("vexpress-a9")
- #define TYPE_VEXPRESS_A15_MACHINE   MACHINE_TYPE_NAME("vexpress-a15")
--DECLARE_OBJ_CHECKERS(VexpressMachineState, VexpressMachineClass,
--                     VEXPRESS_MACHINE, TYPE_VEXPRESS_MACHINE)
-+OBJECT_DECLARE_TYPE(VexpressMachineState, VexpressMachineClass, VEXPRESS_MACHINE)
- 
- typedef void DBoardInitFn(const VexpressMachineState *machine,
-                           ram_addr_t ram_size,
-diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-index 8dae779c76..483925f57a 100644
---- a/hw/block/m25p80.c
-+++ b/hw/block/m25p80.c
-@@ -456,17 +456,14 @@ struct Flash {
-     const FlashPartInfo *pi;
- 
- };
--typedef struct Flash Flash;
- 
- struct M25P80Class {
-     SSISlaveClass parent_class;
-     FlashPartInfo *pi;
- };
--typedef struct M25P80Class M25P80Class;
- 
- #define TYPE_M25P80 "m25p80-generic"
--DECLARE_OBJ_CHECKERS(Flash, M25P80Class,
--                     M25P80, TYPE_M25P80)
-+OBJECT_DECLARE_TYPE(Flash, M25P80Class, M25P80)
- 
- static inline Manufacturer get_man(Flash *s)
- {
-diff --git a/hw/input/adb-kbd.c b/hw/input/adb-kbd.c
-index fe0c363d64..a9088c910c 100644
---- a/hw/input/adb-kbd.c
-+++ b/hw/input/adb-kbd.c
-@@ -32,10 +32,7 @@
- #include "trace.h"
- #include "qom/object.h"
- 
--typedef struct ADBKeyboardClass ADBKeyboardClass;
--typedef struct KBDState KBDState;
--DECLARE_OBJ_CHECKERS(KBDState, ADBKeyboardClass,
--                     ADB_KEYBOARD, TYPE_ADB_KEYBOARD)
-+OBJECT_DECLARE_TYPE(KBDState, ADBKeyboardClass, ADB_KEYBOARD)
- 
- struct KBDState {
-     /*< private >*/
-diff --git a/hw/input/adb-mouse.c b/hw/input/adb-mouse.c
-index f5750909b4..e6b341f028 100644
---- a/hw/input/adb-mouse.c
-+++ b/hw/input/adb-mouse.c
-@@ -31,10 +31,7 @@
- #include "trace.h"
- #include "qom/object.h"
- 
--typedef struct ADBMouseClass ADBMouseClass;
--typedef struct MouseState MouseState;
--DECLARE_OBJ_CHECKERS(MouseState, ADBMouseClass,
--                     ADB_MOUSE, TYPE_ADB_MOUSE)
-+OBJECT_DECLARE_TYPE(MouseState, ADBMouseClass, ADB_MOUSE)
- 
- struct MouseState {
-     /*< public >*/
-diff --git a/hw/misc/tmp421.c b/hw/misc/tmp421.c
-index 212d6e0e83..ef3c682e32 100644
---- a/hw/misc/tmp421.c
-+++ b/hw/misc/tmp421.c
-@@ -65,17 +65,14 @@ struct TMP421State {
-     uint8_t pointer;
- 
- };
--typedef struct TMP421State TMP421State;
- 
- struct TMP421Class {
-     I2CSlaveClass parent_class;
-     DeviceInfo *dev;
- };
--typedef struct TMP421Class TMP421Class;
- 
- #define TYPE_TMP421 "tmp421-generic"
--DECLARE_OBJ_CHECKERS(TMP421State, TMP421Class,
--                     TMP421, TYPE_TMP421)
-+OBJECT_DECLARE_TYPE(TMP421State, TMP421Class, TMP421)
- 
- 
- /* the TMP421 registers */
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 1f0388a755..e859534eaf 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -55,10 +55,7 @@
- 
- #define TYPE_SCSI_DISK_BASE         "scsi-disk-base"
- 
--typedef struct SCSIDiskClass SCSIDiskClass;
--typedef struct SCSIDiskState SCSIDiskState;
--DECLARE_OBJ_CHECKERS(SCSIDiskState, SCSIDiskClass,
--                     SCSI_DISK_BASE, TYPE_SCSI_DISK_BASE)
-+OBJECT_DECLARE_TYPE(SCSIDiskState, SCSIDiskClass, SCSI_DISK_BASE)
- 
- struct SCSIDiskClass {
-     SCSIDeviceClass parent_class;
-diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
-index 40095bed09..a63d25de48 100644
---- a/hw/scsi/vmw_pvscsi.c
-+++ b/hw/scsi/vmw_pvscsi.c
-@@ -61,12 +61,9 @@ struct PVSCSIClass {
-     PCIDeviceClass parent_class;
-     DeviceRealize parent_dc_realize;
- };
--typedef struct PVSCSIClass PVSCSIClass;
- 
- #define TYPE_PVSCSI "pvscsi"
--typedef struct PVSCSIState PVSCSIState;
--DECLARE_OBJ_CHECKERS(PVSCSIState, PVSCSIClass,
--                     PVSCSI, TYPE_PVSCSI)
-+OBJECT_DECLARE_TYPE(PVSCSIState, PVSCSIClass, PVSCSI)
- 
- 
- /* Compatibility flags for migration */
+diff --git a/scripts/codeconverter/codeconverter/patching.py b/scripts/codeconverter/codeconverter/patching.py
+index 627a1a1b04..9e92505d39 100644
+--- a/scripts/codeconverter/codeconverter/patching.py
++++ b/scripts/codeconverter/codeconverter/patching.py
+@@ -5,7 +5,7 @@
+ #
+ # This work is licensed under the terms of the GNU GPL, version 2.  See
+ # the COPYING file in the top-level directory.
+-from typing import IO, Match, NamedTuple, Optional, Literal, Iterable, Type, Dict, List, Any, TypeVar, NewType, Tuple
++from typing import IO, Match, NamedTuple, Optional, Literal, Iterable, Type, Dict, List, Any, TypeVar, NewType, Tuple, Union
+ from pathlib import Path
+ from itertools import chain
+ from tempfile import NamedTemporaryFile
+@@ -47,7 +47,7 @@ class FileMatch:
+ 
+     def __init__(self, f: 'FileInfo', m: Match) -> None:
+         self.file: 'FileInfo' = f
+-        self.match: Match = m
++        self.match: Match[str] = m
+ 
+     @property
+     def name(self) -> str:
+@@ -68,8 +68,13 @@ class FileMatch:
+     def line_col(self) -> LineAndColumn:
+         return self.file.line_col(self.start())
+ 
+-    def group(self, *args):
+-        return self.match.group(*args)
++    def group(self, group: Union[int, str]) -> str:
++        return self.match.group(group)
++
++    def getgroup(self, group: str) -> Optional[str]:
++        if group not in self.match.groupdict():
++            return None
++        return self.match.group(group)
+ 
+     def log(self, level, fmt, *args) -> None:
+         pos = self.line_col()
+@@ -163,18 +168,51 @@ class FileMatch:
+         raise NotImplementedError()
+ 
+     @classmethod
+-    def find_matches(klass, content: str) -> Iterable[Match]:
+-        """Generate match objects for class
++    def finditer(klass, content: str, pos=0, endpos=-1) -> Iterable[Match]:
++        """Helper for re.finditer()"""
++        if endpos >= 0:
++            content = content[:endpos]
++        return klass.compiled_re().finditer(content, pos)
+ 
+-        Might be reimplemented by subclasses if they
+-        intend to look for matches using a different method.
+-        """
+-        return klass.compiled_re().finditer(content)
++    @classmethod
++    def domatch(klass, content: str, pos=0, endpos=-1) -> Optional[Match]:
++        """Helper for re.match()"""
++        if endpos >= 0:
++            content = content[:endpos]
++        return klass.compiled_re().match(content, pos)
++
++    def group_finditer(self, klass: Type['FileMatch'], group: Union[str, int]) -> Iterable['FileMatch']:
++        assert self.file.original_content
++        return (klass(self.file, m)
++                for m in klass.finditer(self.file.original_content,
++                                        self.match.start(group),
++                                        self.match.end(group)))
++
++    def try_group_match(self, klass: Type['FileMatch'], group: Union[str, int]) -> Optional['FileMatch']:
++        assert self.file.original_content
++        m = klass.domatch(self.file.original_content,
++                          self.match.start(group),
++                          self.match.end(group))
++        if not m:
++            return None
++        else:
++            return klass(self.file, m)
++
++    def group_match(self, group: Union[str, int]) -> 'FileMatch':
++        m = self.try_group_match(FullMatch, group)
++        assert m
++        return m
+ 
+     @property
+     def allfiles(self) -> 'FileList':
+         return self.file.allfiles
+ 
++class FullMatch(FileMatch):
++    """Regexp that will match all contents of string
++    Useful when used with group_match()
++    """
++    regexp = r'(?s).*' # (?s) is re.DOTALL
++
+ def all_subclasses(c: Type[FileMatch]) -> Iterable[Type[FileMatch]]:
+     for sc in c.__subclasses__():
+         yield sc
+@@ -201,7 +239,15 @@ def apply_patches(s: str, patches: Iterable[Patch]) -> str:
+     """
+     r = StringIO()
+     last = 0
+-    for p in sorted(patches):
++    def patch_sort_key(item: Tuple[int, Patch]) -> Tuple[int, int, int]:
++        """Patches are sorted by byte position,
++        patches at the same byte position are applied in the order
++        they were generated.
++        """
++        i,p = item
++        return (p.start, p.end, i)
++
++    for i,p in sorted(enumerate(patches), key=patch_sort_key):
+         DBG("Applying patch at position %d (%s) - %d (%s): %r",
+             p.start, line_col(s, p.start),
+             p.end, line_col(s, p.end),
+@@ -220,26 +266,35 @@ class RegexpScanner:
+         self.match_index: Dict[Type[Any], List[FileMatch]] = {}
+         self.match_name_index: Dict[Tuple[Type[Any], str, str], Optional[FileMatch]] = {}
+ 
+-    def _find_matches(self, klass: Type[Any]) -> Iterable[FileMatch]:
++    def _matches_of_type(self, klass: Type[Any]) -> Iterable[FileMatch]:
+         raise NotImplementedError()
+ 
+     def matches_of_type(self, t: Type[T]) -> List[T]:
+         if t not in self.match_index:
+-            self.match_index[t] = list(self._find_matches(t))
+-        return  self.match_index[t] # type: ignore
++            self.match_index[t] = list(self._matches_of_type(t))
++        return self.match_index[t] # type: ignore
+ 
+-    def find_match(self, t: Type[T], name: str, group: str='name') -> Optional[T]:
++    def find_matches(self, t: Type[T], name: str, group: str='name') -> List[T]:
+         indexkey = (t, name, group)
+         if indexkey in self.match_name_index:
+             return self.match_name_index[indexkey] # type: ignore
+-        r: Optional[T] = None
++        r: List[T] = []
+         for m in self.matches_of_type(t):
+             assert isinstance(m, FileMatch)
+-            if m.group(group) == name:
+-                r = m # type: ignore
++            if m.getgroup(group) == name:
++                r.append(m) # type: ignore
+         self.match_name_index[indexkey] = r # type: ignore
+         return r
+ 
++    def find_match(self, t: Type[T], name: str, group: str='name') -> Optional[T]:
++        l = self.find_matches(t, name, group)
++        if not l:
++            return None
++        if len(l) > 1:
++            logger.warn("multiple matches found for %r (%s=%r)", t, group, name)
++            return None
++        return l[0]
++
+     def reset_index(self) -> None:
+         self.match_index.clear()
+         self.match_name_index.clear()
+@@ -258,18 +313,22 @@ class FileInfo(RegexpScanner):
+     def __repr__(self) -> str:
+         return f'<FileInfo {repr(self.filename)}>'
+ 
++    def filename_matches(self, name: str) -> bool:
++        nameparts = Path(name).parts
++        return self.filename.parts[-len(nameparts):] == nameparts
++
+     def line_col(self, start: int) -> LineAndColumn:
+         """Return line and column for a match object inside original_content"""
+         return line_col(self.original_content, start)
+ 
+-    def _find_matches(self, klass: Type[Any]) -> List[FileMatch]:
++    def _matches_of_type(self, klass: Type[Any]) -> List[FileMatch]:
+         """Build FileMatch objects for each match of regexp"""
+         if not hasattr(klass, 'regexp') or klass.regexp is None:
+             return []
+         assert hasattr(klass, 'regexp')
+         DBG("%s: scanning for %s", self.filename, klass.__name__)
+         DBG("regexp: %s", klass.regexp)
+-        matches = [klass(self, m) for m in klass.find_matches(self.original_content)]
++        matches = [klass(self, m) for m in klass.finditer(self.original_content)]
+         DBG('%s: %d matches found for %s: %s', self.filename, len(matches),
+             klass.__name__,' '.join(names(matches)))
+         return matches
+@@ -277,7 +336,7 @@ class FileInfo(RegexpScanner):
+     def find_match(self, t: Type[T], name: str, group: str='name') -> Optional[T]:
+         for m in self.matches_of_type(t):
+             assert isinstance(m, FileMatch)
+-            if m.group(group) == name:
++            if m.getgroup(group) == name:
+                 return m # type: ignore
+         return None
+ 
+@@ -299,7 +358,16 @@ class FileInfo(RegexpScanner):
+         return (m for l in lists
+                   for m in l)
+ 
+-    def scan_for_matches(self, class_names: Optional[List[str]]=None) -> None:
++    def gen_patches(self, matches: List[FileMatch]) -> None:
++        for m in matches:
++            DBG("Generating patches for %r", m)
++            for i,p in enumerate(m.gen_patches()):
++                DBG("patch %d generated by %r:", i, m)
++                DBG("replace contents at %s-%s with %r",
++                    self.line_col(p.start), self.line_col(p.end), p.replacement)
++                self.patches.append(p)
++
++    def scan_for_matches(self, class_names: Optional[List[str]]=None) -> Iterable[FileMatch]:
+         DBG("class names: %r", class_names)
+         class_dict = match_class_dict()
+         if class_names is None:
+@@ -309,40 +377,9 @@ class FileInfo(RegexpScanner):
+         DBG("class_names: %r", class_names)
+         for cn in class_names:
+             matches = self.matches_of_type(class_dict[cn])
+-            if len(matches) > 0:
+-                DBG('%s: %d matches found for %s: %s', self.filename,
+-                     len(matches), cn, ' '.join(names(matches)))
+-
+-    def gen_patches(self) -> None:
+-        for m in self.all_matches:
+-            for i,p in enumerate(m.gen_patches()):
+-                DBG("patch %d generated by %r:", i, m)
+-                DBG("replace contents at %s-%s with %r",
+-                    self.line_col(p.start), self.line_col(p.end), p.replacement)
+-                self.patches.append(p)
+-
+-    def patch_content(self, max_passes=0, class_names: Optional[List[str]]=None) -> None:
+-        """Multi-pass content patching loop
+-
+-        We run multiple passes because there are rules that will
+-        delete init functions once they become empty.
+-        """
+-        passes = 0
+-        total_patches  = 0
+-        DBG("max_passes: %r", max_passes)
+-        while not max_passes or max_passes <= 0 or passes < max_passes:
+-            passes += 1
+-            self.scan_for_matches(class_names)
+-            self.gen_patches()
+-            DBG("patch content: pass %d: %d patches generated", passes, len(self.patches))
+-            total_patches += len(self.patches)
+-            if not self.patches:
+-                break
+-            try:
+-                self.apply_patches()
+-            except PatchingError:
+-                logger.exception("%s: failed to patch file", self.filename)
+-        DBG("%s: %d patches applied total in %d passes", self.filename, total_patches, passes)
++            DBG('%d matches found for %s: %s',
++                    len(matches), cn, ' '.join(names(matches)))
++            yield from matches
+ 
+     def apply_patches(self) -> None:
+         """Replace self.original_content after applying patches from self.patches"""
+@@ -384,14 +421,46 @@ class FileList(RegexpScanner):
+     def __iter__(self):
+         return iter(self.files)
+ 
+-    def _find_matches(self, klass: Type[Any]) -> Iterable[FileMatch]:
+-        return chain(*(f._find_matches(klass) for f in self.files))
++    def _matches_of_type(self, klass: Type[Any]) -> Iterable[FileMatch]:
++        return chain(*(f._matches_of_type(klass) for f in self.files))
+ 
+-    def find_file(self, name) -> Optional[FileInfo]:
++    def find_file(self, name: str) -> Optional[FileInfo]:
+         """Get file with path ending with @name"""
+-        nameparts = Path(name).parts
+         for f in self.files:
+-            if f.filename.parts[:len(nameparts)] == nameparts:
++            if f.filename_matches(name):
+                 return f
+         else:
+-            return None
+\ No newline at end of file
++            return None
++
++    def one_pass(self, class_names: List[str]) -> int:
++        total_patches = 0
++        for f in self.files:
++            INFO("Scanning file %s", f.filename)
++            matches = list(f.scan_for_matches(class_names))
++            INFO("Generating patches for file %s", f.filename)
++            f.gen_patches(matches)
++            total_patches += len(f.patches)
++        if total_patches:
++            for f in self.files:
++                try:
++                    f.apply_patches()
++                except PatchingError:
++                    logger.exception("%s: failed to patch file", f.filename)
++        return total_patches
++
++    def patch_content(self, max_passes, class_names: List[str]) -> None:
++        """Multi-pass content patching loop
++
++        We run multiple passes because there are rules that will
++        delete init functions once they become empty.
++        """
++        passes = 0
++        total_patches  = 0
++        DBG("max_passes: %r", max_passes)
++        while not max_passes or max_passes <= 0 or passes < max_passes:
++            passes += 1
++            INFO("Running pass: %d", passes)
++            count = self.one_pass(class_names)
++            DBG("patch content: pass %d: %d patches generated", passes, count)
++            total_patches += count
++        DBG("%d patches applied total in %d passes", total_patches, passes)
+diff --git a/scripts/codeconverter/codeconverter/qom_macros.py b/scripts/codeconverter/codeconverter/qom_macros.py
+index 68a33d5c6f..2d2f2055a3 100644
+--- a/scripts/codeconverter/codeconverter/qom_macros.py
++++ b/scripts/codeconverter/codeconverter/qom_macros.py
+@@ -23,16 +23,24 @@ WARN = logger.warning
+ 
+ RE_CONSTANT = OR(RE_STRING, RE_NUMBER)
+ 
+-class ConstantDefine(FileMatch):
+-    """Simple #define preprocessor directive for a constant"""
+-    # if the macro contents are very simple, it might be included
+-    # in the match group 'value'
++class DefineDirective(FileMatch):
++    """Match any #define directive"""
++    regexp = S(r'^[ \t]*#[ \t]*define', CPP_SPACE, NAMED('name', RE_IDENTIFIER), r'\b')
++
++class ExpressionDefine(FileMatch):
++    """Simple #define preprocessor directive for an expression"""
+     regexp = S(r'^[ \t]*#[ \t]*define', CPP_SPACE, NAMED('name', RE_IDENTIFIER),
+-               CPP_SPACE, NAMED('value', RE_CONSTANT), r'[ \t]*\n')
++               CPP_SPACE, NAMED('value', RE_EXPRESSION), r'[ \t]*\n')
+ 
+     def provided_identifiers(self) -> Iterable[RequiredIdentifier]:
+         yield RequiredIdentifier('constant', self.group('name'))
+ 
++class ConstantDefine(ExpressionDefine):
++    """Simple #define preprocessor directive for a number or string constant"""
++    regexp = S(r'^[ \t]*#[ \t]*define', CPP_SPACE, NAMED('name', RE_IDENTIFIER),
++               CPP_SPACE, NAMED('value', RE_CONSTANT), r'[ \t]*\n')
++
++
+ class TypeIdentifiers(NamedTuple):
+     """Type names found in type declarations"""
+     # TYPE_MYDEVICE
+@@ -236,13 +244,12 @@ class TypeCheckMacro(FileMatch):
+     """OBJECT_CHECK/OBJECT_CLASS_CHECK/OBJECT_GET_CLASS macro definitions
+     Will be replaced by DECLARE_*_CHECKERS macro
+     """
+-    #TODO: handle and convert INTERFACE_CHECK macros
+     regexp = RE_CHECK_MACRO
+ 
+     @property
+     def checker(self) -> CheckerMacroName:
+         """Name of checker macro being used"""
+-        return self.group('checker')
++        return self.group('checker') # type: ignore
+ 
+     @property
+     def typedefname(self) -> Optional[str]:
+@@ -330,6 +337,8 @@ class TypeCheckMacro(FileMatch):
+                                instancetype=instancetype, uppercase=uppercase)
+ 
+     def gen_patches(self) -> Iterable[Patch]:
++        # the implementation is a bit tricky because we need to group
++        # macros dealing with the same type into a single declaration
+         if self.type_identifiers is None:
+             self.warn("couldn't extract type information from macro %s", self.name)
+             return
+@@ -426,10 +435,61 @@ class TypeCheckMacro(FileMatch):
+             yield self.prepend("/* FIXME: %s */\n" % (issue))
+         yield self.append(new_decl)
+ 
+-class DeclareInstanceChecker(FileMatch):
+-    """DECLARE_INSTANCE_CHECKER use
+-    Will be replaced with DECLARE_OBJ_CHECKERS if possible
++class InterfaceCheckMacro(FileMatch):
++    """Type checking macro using INTERFACE_CHECK
++    Will be replaced by DECLARE_INTERFACE_CHECKER
+     """
++    regexp = S(RE_MACRO_DEFINE,
++               'INTERFACE_CHECK',
++               r'\s*\(\s*', OR(NAMED('instancetype', RE_IDENTIFIER), RE_TYPE, name='c_type'),
++               r'\s*,', CPP_SPACE,
++               OPTIONAL_PARS(RE_IDENTIFIER), r',', CPP_SPACE,
++               NAMED('qom_typename', RE_IDENTIFIER), r'\s*\)\n')
++
++    def required_identifiers(self) -> Iterable[RequiredIdentifier]:
++        yield RequiredIdentifier('include', '"qom/object.h"')
++        yield RequiredIdentifier('type', self.group('instancetype'))
++        yield RequiredIdentifier('constant', self.group('qom_typename'))
++
++    def gen_patches(self) -> Iterable[Patch]:
++        if self.file.filename_matches('qom/object.h'):
++            self.debug("skipping object.h")
++            return
++
++        typename = self.group('qom_typename')
++        uppercase = self.name
++        instancetype = self.group('instancetype')
++        c = f"DECLARE_INTERFACE_CHECKER({instancetype}, {uppercase},\n"+\
++            f"                          {typename})\n"
++        yield self.make_patch(c)
++
++
++class TypeDeclaration(FileMatch):
++    """Parent class to all type declarations"""
++    @property
++    def instancetype(self) -> Optional[str]:
++        return self.getgroup('instancetype')
++
++    @property
++    def classtype(self) -> Optional[str]:
++        return self.getgroup('classtype')
++
++    @property
++    def typename(self) -> Optional[str]:
++        return self.getgroup('typename')
++
++class TypeCheckerDeclaration(TypeDeclaration):
++    """Parent class to all type checker declarations"""
++    @property
++    def typename(self) -> str:
++        return self.group('typename')
++
++    @property
++    def uppercase(self) -> str:
++        return self.group('uppercase')
++
++class DeclareInstanceChecker(TypeCheckerDeclaration):
++    """DECLARE_INSTANCE_CHECKER use"""
+     #TODO: replace lonely DECLARE_INSTANCE_CHECKER with DECLARE_OBJ_CHECKERS
+     #      if all types are found.
+     #      This will require looking up the correct class type in the TypeInfo
+@@ -445,8 +505,45 @@ class DeclareInstanceChecker(FileMatch):
+         yield RequiredIdentifier('constant', self.group('typename'))
+         yield RequiredIdentifier('type', self.group('instancetype'))
+ 
+-class DeclareClassCheckers(FileMatch):
+-    """DECLARE_INSTANCE_CHECKER use"""
++class DeclareInterfaceChecker(TypeCheckerDeclaration):
++    """DECLARE_INTERFACE_CHECKER use"""
++    regexp = S(r'^[ \t]*DECLARE_INTERFACE_CHECKER\s*\(\s*',
++               NAMED('instancetype', RE_TYPE), r'\s*,\s*',
++               NAMED('uppercase', RE_IDENTIFIER), r'\s*,\s*',
++               OR(RE_IDENTIFIER, RE_STRING, RE_MACRO_CONCAT, RE_FUN_CALL, name='typename'), SP,
++               r'\)[ \t]*;?[ \t]*\n')
++
++    def required_identifiers(self) -> Iterable[RequiredIdentifier]:
++        yield RequiredIdentifier('include', '"qom/object.h"')
++        yield RequiredIdentifier('constant', self.group('typename'))
++        yield RequiredIdentifier('type', self.group('instancetype'))
++
++class DeclareInstanceType(TypeDeclaration):
++    """DECLARE_INSTANCE_TYPE use"""
++    regexp = S(r'^[ \t]*DECLARE_INSTANCE_TYPE\s*\(\s*',
++               NAMED('uppercase', RE_IDENTIFIER), r'\s*,\s*',
++               NAMED('instancetype', RE_TYPE), SP,
++               r'\)[ \t]*;?[ \t]*\n')
++
++    def required_identifiers(self) -> Iterable[RequiredIdentifier]:
++        yield RequiredIdentifier('include', '"qom/object.h"')
++        yield RequiredIdentifier('type', self.group('instancetype'))
++
++class DeclareClassType(TypeDeclaration):
++    """DECLARE_CLASS_TYPE use"""
++    regexp = S(r'^[ \t]*DECLARE_CLASS_TYPE\s*\(\s*',
++               NAMED('uppercase', RE_IDENTIFIER), r'\s*,\s*',
++               NAMED('classtype', RE_TYPE), SP,
++               r'\)[ \t]*;?[ \t]*\n')
++
++    def required_identifiers(self) -> Iterable[RequiredIdentifier]:
++        yield RequiredIdentifier('include', '"qom/object.h"')
++        yield RequiredIdentifier('type', self.group('classtype'))
++
++
++
++class DeclareClassCheckers(TypeCheckerDeclaration):
++    """DECLARE_CLASS_CHECKER use"""
+     regexp = S(r'^[ \t]*DECLARE_CLASS_CHECKERS\s*\(\s*',
+                NAMED('classtype', RE_TYPE), r'\s*,\s*',
+                NAMED('uppercase', RE_IDENTIFIER), r'\s*,\s*',
+@@ -458,10 +555,8 @@ class DeclareClassCheckers(FileMatch):
+         yield RequiredIdentifier('constant', self.group('typename'))
+         yield RequiredIdentifier('type', self.group('classtype'))
+ 
+-class DeclareObjCheckers(FileMatch):
+-    """DECLARE_OBJ_CHECKERS use
+-    Will be replaced with OBJECT_DECLARE_TYPE if possible
+-    """
++class DeclareObjCheckers(TypeCheckerDeclaration):
++    """DECLARE_OBJ_CHECKERS use"""
+     #TODO: detect when OBJECT_DECLARE_SIMPLE_TYPE can be used
+     regexp = S(r'^[ \t]*DECLARE_OBJ_CHECKERS\s*\(\s*',
+                NAMED('instancetype', RE_TYPE), r'\s*,\s*',
+@@ -476,44 +571,121 @@ class DeclareObjCheckers(FileMatch):
+         yield RequiredIdentifier('type', self.group('classtype'))
+         yield RequiredIdentifier('type', self.group('instancetype'))
+ 
+-    def gen_patches(self):
+-        ids = TypeIdentifiers(uppercase=self.group('uppercase'),
+-                              typename=self.group('typename'),
+-                              classtype=self.group('classtype'),
+-                              instancetype=self.group('instancetype'))
+-        issues = ids.check_consistency()
+-        if issues:
+-            for i in issues:
+-                self.warn("inconsistent identifiers: %s", i)
++class TypeDeclarationFixup(FileMatch):
++    """Common base class for code that will look at a set of type declarations"""
++    regexp = RE_FILE_BEGIN
++    def gen_patches(self) -> Iterable[Patch]:
++        if self.file.filename_matches('qom/object.h'):
++            self.debug("skipping object.h")
+             return
+ 
+-        if self.group('typename') != 'TYPE_'+self.group('uppercase'):
+-            self.warn("type %s mismatch with uppercase name %s", ids.typename, ids.uppercase)
+-            return
++        # group checkers by uppercase name:
++        decl_types: List[Type[TypeDeclaration]] = [DeclareInstanceChecker, DeclareInstanceType,
++                                                   DeclareClassCheckers, DeclareClassType,
++                                                   DeclareObjCheckers]
++        checker_dict: Dict[str, List[TypeDeclaration]] = {}
++        for t in decl_types:
++            for m in self.file.matches_of_type(t):
++                checker_dict.setdefault(m.group('uppercase'), []).append(m)
++        self.debug("checker_dict: %r", checker_dict)
++        for uppercase,checkers in checker_dict.items():
++            fields = ('instancetype', 'classtype', 'uppercase', 'typename')
++            fvalues = dict((field, set(getattr(m, field) for m in checkers
++                                       if getattr(m, field, None) is not None))
++                            for field in fields)
++            for field,values in fvalues.items():
++                if len(values) > 1:
++                    for c in checkers:
++                        c.warn("%s mismatch (%s)", field, ' '.join(values))
++                    return
+ 
+-        typedefs = [(t,self.file.find_match(SimpleTypedefMatch, t))
+-                    for t in (ids.instancetype, ids.classtype)]
+-        for t,td in typedefs:
+-            if td is None:
+-                self.warn("typedef %s not found", t)
+-                break
+-            if td.start() > self.start():
+-                self.warn("typedef %s needs to be move earlier in the file", t)
+-                break
+-            #HACK: check if typedef is used between its definition and the macro
+-            #TODO: check if the only match is inside the "struct { ... }" declaration
+-            if re.search(r'\b'+t+r'\b', self.file.original_content[td.end():self.start()]):
+-                self.warn("typedef %s can't be moved, it is used before the macro", t)
+-                break
+-        else:
+-            for t,td in typedefs:
+-                yield td.make_removal_patch()
++            field_dict = dict((f, v.pop() if v else None) for f,v in fvalues.items())
++            yield from self.gen_patches_for_type(uppercase, checkers, field_dict)
++
++    def find_conflicts(self, uppercase: str, checkers: List[TypeDeclaration]) -> bool:
++        """Look for conflicting declarations that would make it unsafe to add new ones"""
++        conflicting: List[FileMatch] = []
++        # conflicts in the same file:
++        conflicting.extend(chain(self.file.find_matches(DefineDirective, uppercase),
++                                 self.file.find_matches(DeclareInterfaceChecker, uppercase, 'uppercase'),
++                                 self.file.find_matches(DeclareClassType, uppercase, 'uppercase'),
++                                 self.file.find_matches(DeclareInstanceType, uppercase, 'uppercase')))
++
++        # conflicts in another file:
++        conflicting.extend(o for o in chain(self.allfiles.find_matches(DeclareInstanceChecker, uppercase, 'uppercase'),
++                                            self.allfiles.find_matches(DeclareClassCheckers, uppercase, 'uppercase'),
++                                            self.allfiles.find_matches(DeclareInterfaceChecker, uppercase, 'uppercase'),
++                                            self.allfiles.find_matches(DefineDirective, uppercase))
++                           if o is not None and o.file != self.file
++                               # if both are .c files, there's no conflict at all:
++                               and not (o.file.filename.suffix == '.c' and
++                                       self.file.filename.suffix == '.c'))
++
++        if conflicting:
++            for c in checkers:
++                c.warn("skipping due to conflicting %s macro", uppercase)
++            for o in conflicting:
++                if o is None:
++                    continue
++                o.warn("conflicting %s macro is here", uppercase)
++            return True
+ 
+-            lowercase = ids.uppercase.lower()
+-            # all is OK, we can replace the macro!
+-            c = (f'OBJECT_DECLARE_TYPE({ids.instancetype}, {ids.classtype},\n'
+-                 f'                    {lowercase}, {ids.uppercase})\n')
+-            yield self.make_patch(c)
++        return False
++
++    def gen_patches_for_type(self, uppercase: str,
++                             checkers: List[TypeDeclaration],
++                             fields: Dict[str, Optional[str]]) -> Iterable[Patch]:
++        """Should be reimplemented by subclasses"""
++        return
++        yield
++
++class DeclareVoidTypes(TypeDeclarationFixup):
++    """Add DECLARE_*_TYPE(..., void) when there's no declared type"""
++    regexp = RE_FILE_BEGIN
++    def gen_patches_for_type(self, uppercase: str,
++                             checkers: List[TypeDeclaration],
++                             fields: Dict[str, Optional[str]]) -> Iterable[Patch]:
++        if self.find_conflicts(uppercase, checkers):
++            return
++
++        #_,last_checker = max((m.start(), m) for m in checkers)
++        _,first_checker = min((m.start(), m) for m in checkers)
++
++        if not any(m.instancetype for m in checkers):
++            yield first_checker.prepend(f'DECLARE_INSTANCE_TYPE({uppercase}, void)\n')
++        if not any(m.classtype for m in checkers):
++            yield first_checker.prepend(f'DECLARE_CLASS_TYPE({uppercase}, void)\n')
++
++        #if not all(len(v) == 1 for v in fvalues.values()):
++        #    return
++        #
++        #final_values = dict((field, values.pop())
++        #                    for field,values in fvalues.items())
++        #s = (f"DECLARE_OBJ_CHECKERS({final_values['instancetype']}, {final_values['classtype']},\n"+
++        #        f"                     {final_values['uppercase']}, {final_values['typename']})\n")
++        #for c in checkers:
++        #    yield c.make_removal_patch()
++        #yield last_checker.append(s)
++
++
++class AddDeclareTypeName(TypeDeclarationFixup):
++    """Add DECLARE_TYPE_NAME declarations if necessary"""
++    def gen_patches_for_type(self, uppercase: str,
++                             checkers: List[TypeDeclaration],
++                             fields: Dict[str, Optional[str]]) -> Iterable[Patch]:
++        typename = fields.get('typename')
++        if typename is None:
++            self.warn("typename unavailable")
++            return
++        if typename == f'TYPE_{uppercase}':
++            self.info("already using TYPE_%s as type name", uppercase)
++            return
++        if self.file.find_match(DeclareTypeName, uppercase, 'uppercase'):
++            self.info("type name for %s already declared", uppercase)
++            return
++        _,first_checker = min((m.start(), m) for m in checkers)
++        s = f'DECLARE_TYPE_NAME({uppercase}, {typename})\n'
++        yield first_checker.prepend(s)
+ 
+ class TrivialClassStruct(FileMatch):
+     """Trivial class struct"""
+@@ -527,14 +699,13 @@ class DeclareTypeName(FileMatch):
+                OR(RE_IDENTIFIER, RE_STRING, RE_MACRO_CONCAT, RE_FUN_CALL, name='typename'),
+                r'\s*\);?[ \t]*\n')
+ 
+-class ObjectDeclareType(FileMatch):
++class ObjectDeclareType(TypeCheckerDeclaration):
+     """OBJECT_DECLARE_TYPE usage
+     Will be replaced with OBJECT_DECLARE_SIMPLE_TYPE if possible
+     """
+     regexp = S(r'^[ \t]*OBJECT_DECLARE_TYPE\s*\(',
+                NAMED('instancetype', RE_TYPE), r'\s*,\s*',
+                NAMED('classtype', RE_TYPE), r'\s*,\s*',
+-               NAMED('lowercase', RE_IDENTIFIER), r'\s*,\s*',
+                NAMED('uppercase', RE_IDENTIFIER), SP,
+                r'\)[ \t]*;?[ \t]*\n')
+ 
+@@ -549,14 +720,42 @@ class ObjectDeclareType(FileMatch):
+                  "                           %(uppercase)s, %(parent_struct)s)\n" % d)
+             yield self.make_patch(c)
+ 
+-def find_type_declaration(files: FileList, typename: str) -> Optional[FileMatch]:
+-    """Find usage of DECLARE*CHECKER macro"""
+-    for c in (DeclareInstanceChecker, DeclareClassCheckers, DeclareObjCheckers, DeclareTypeName):
+-        d = files.find_match(c, name=typename, group='typename')
+-        if d:
+-            return d
++class ObjectDeclareSimpleType(TypeCheckerDeclaration):
++    """OBJECT_DECLARE_SIMPLE_TYPE usage"""
++    regexp = S(r'^[ \t]*OBJECT_DECLARE_SIMPLE_TYPE\s*\(',
++               NAMED('instancetype', RE_TYPE), r'\s*,\s*',
++               NAMED('uppercase', RE_IDENTIFIER), SP,
++               r'\)[ \t]*;?[ \t]*\n')
++
++class OldStyleObjectDeclareSimpleType(TypeCheckerDeclaration):
++    """OBJECT_DECLARE_SIMPLE_TYPE usage (old API)"""
++    regexp = S(r'^[ \t]*OBJECT_DECLARE_SIMPLE_TYPE\s*\(',
++               NAMED('instancetype', RE_TYPE), r'\s*,\s*',
++               NAMED('lowercase', RE_IDENTIFIER), r'\s*,\s*',
++               NAMED('uppercase', RE_IDENTIFIER), r'\s*,\s*',
++               NAMED('parent_classtype', RE_TYPE), SP,
++               r'\)[ \t]*;?[ \t]*\n')
++
++    @property
++    def classtype(self) -> Optional[str]:
++        instancetype = self.instancetype
++        assert instancetype
++        return f"{instancetype}Class"
++
++def find_typename_uppercase(files: FileList, typename: str) -> Optional[str]:
++    """Try to find what's the right MODULE_OBJ_NAME for a given type name"""
++    decl = files.find_match(DeclareTypeName, name=typename, group='typename')
++    if decl:
++        return decl.group('uppercase')
++    if typename.startswith('TYPE_'):
++        return typename[len('TYPE_'):]
+     return None
+ 
++def find_type_checkers(files:FileList, name:str, group:str='uppercase') -> Iterable[TypeCheckerDeclaration]:
++    """Find usage of DECLARE*CHECKER macro"""
++    c: Type[TypeCheckerDeclaration]
++    for c in (DeclareInstanceChecker, DeclareClassCheckers, DeclareObjCheckers, ObjectDeclareType, ObjectDeclareSimpleType):
++        yield from files.find_matches(c, name=name, group=group)
+ 
+ class Include(FileMatch):
+     """#include directive"""
+@@ -586,9 +785,13 @@ class MoveSymbols(FileMatch):
+     regexp = RE_FILE_BEGIN
+ 
+     def gen_patches(self) -> Iterator[Patch]:
++        if self.file.filename_matches('qom/object.h'):
++            self.debug("skipping object.h")
++            return
++
+         index: Dict[RequiredIdentifier, SymbolUserList] = {}
+         definition_classes = [SimpleTypedefMatch, FullStructTypedefMatch, ConstantDefine, Include]
+-        user_classes = [TypeCheckMacro, DeclareObjCheckers, DeclareInstanceChecker, DeclareClassCheckers]
++        user_classes = [TypeCheckMacro, DeclareObjCheckers, DeclareInstanceChecker, DeclareClassCheckers, InterfaceCheckMacro]
+ 
+         # first we scan for all symbol definitions and usage:
+         for dc in definition_classes:
+@@ -650,3 +853,9 @@ class MoveSymbols(FileMatch):
+                 definition.warn("definition of %s %s needs to be moved earlier in the file", i.type, i.name)
+                 earliest.warn("definition of %s %s is used here", i.type, i.name)
+ 
++
++class EmptyPreprocessorConditional(FileMatch):
++    """Delete empty preprocessor conditionals"""
++    regexp = r'^[ \t]*#(if|ifdef)[ \t].*\n+[ \t]*#endif[ \t]*\n'
++    def gen_patches(self) -> Iterable[Patch]:
++        yield self.make_removal_patch()
+diff --git a/scripts/codeconverter/codeconverter/qom_type_info.py b/scripts/codeconverter/codeconverter/qom_type_info.py
+index fc02058739..255cb59923 100644
+--- a/scripts/codeconverter/codeconverter/qom_type_info.py
++++ b/scripts/codeconverter/codeconverter/qom_type_info.py
+@@ -24,11 +24,6 @@ RE_TI_FIELDS = M(RE_TI_FIELD_INIT)
+ 
+ RE_TYPEINFO_START = S(r'^[ \t]*', M(r'(static|const)\s+', name='modifiers'), r'TypeInfo\s+',
+                       NAMED('name', RE_IDENTIFIER), r'\s*=\s*{[ \t]*\n')
+-RE_TYPEINFO_DEF = S(RE_TYPEINFO_START,
+-                    M(NAMED('fields', RE_TI_FIELDS),
+-                      SP, NAMED('endcomments', RE_COMMENTS),
+-                      r'};?\n',
+-                      n='?', name='fullspec'))
+ 
+ ParsedArray = List[str]
+ ParsedInitializerValue = Union[str, ParsedArray]
+@@ -36,26 +31,55 @@ class InitializerValue(NamedTuple):
+     raw: str
+     parsed: Optional[ParsedInitializerValue]
+     match: Optional[Match]
+-TypeInfoInitializers = Dict[str, InitializerValue]
+-
+-def parse_array(m: Match) -> ParsedArray:
+-    #DBG('parse_array: %r', m.group(0))
+-    return [m.group('arrayitem') for m in re.finditer(RE_ARRAY_ITEM, m.group('arrayitems'))]
+-
+-def parse_initializer_value(m: Match, s: str) -> InitializerValue:
+-    parsed: Optional[ParsedInitializerValue] = None
+-    #DBG("parse_initializer_value: %r", s)
+-    array = re.match(RE_ARRAY, s)
+-    if array:
+-        parsed = parse_array(array)
+-    return InitializerValue(s, parsed, m)
+-
+-class TypeInfoVar(FileMatch):
+-    """TypeInfo variable declaration with initializer
+-    Will be replaced by OBJECT_DEFINE_TYPE_EXTENDED macro
+-    (not implemented yet)
++
++class ArrayItem(FileMatch):
++    regexp = RE_ARRAY_ITEM
++
++class ArrayInitializer(FileMatch):
++    regexp = RE_ARRAY
++
++    def parsed(self) -> ParsedArray:
++        #DBG('parse_array: %r', m.group(0))
++        return [m.group('arrayitem') for m in self.group_finditer(ArrayItem, 'arrayitems')]
++
++class FieldInitializer(FileMatch):
++    regexp = RE_TI_FIELD_INIT
++
++    @property
++    def raw(self) -> str:
++        return self.group('value')
++
++    @property
++    def parsed(self) -> ParsedInitializerValue:
++        parsed: ParsedInitializerValue = self.raw
++        #DBG("parse_initializer_value: %r", s)
++        array = self.try_group_match(ArrayInitializer, 'value')
++        if array:
++            assert isinstance(array, ArrayInitializer)
++            return array.parsed()
++        return parsed
++
++TypeInfoInitializers = Dict[str, FieldInitializer]
++
++class TypeDefinition(FileMatch):
++    """
++    Common base class for type definitions (TypeInfo variables or OBJECT_DEFINE* macros)
+     """
+-    regexp = RE_TYPEINFO_DEF
++    @property
++    def instancetype(self) -> Optional[str]:
++        return self.group('instancetype')
++
++    @property
++    def classtype(self) -> Optional[str]:
++        return self.group('classtype')
++
++    @property
++    def uppercase(self) -> Optional[str]:
++        return self.group('uppercase')
++
++    @property
++    def parent_uppercase(self) -> str:
++        return self.group('parent_uppercase')
+ 
+     @property
+     def initializers(self) -> Optional[TypeInfoInitializers]:
+@@ -65,14 +89,26 @@ class TypeInfoVar(FileMatch):
+         fields = self.group('fields')
+         if fields is None:
+             return None
+-        d = dict((fm.group('field'), parse_initializer_value(fm, fm.group('value')))
+-                  for fm in re.finditer(RE_TI_FIELD_INIT, fields))
+-        self._initializers = d
+-        return d
++        d = dict((fm.group('field'), fm)
++                  for fm in self.group_finditer(FieldInitializer, 'fields'))
++        self._initializers = d # type: ignore
++        return self._initializers
++
++
++class TypeInfoVar(TypeDefinition):
++    """TypeInfo variable declaration with initializer"""
++    regexp = S(NAMED('begin', RE_TYPEINFO_START),
++               M(NAMED('fields', RE_TI_FIELDS),
++                 NAMED('endcomments', SP, RE_COMMENTS),
++                 NAMED('end', r'};?\n'),
++                 n='?', name='fullspec'))
+ 
+     def is_static(self) -> bool:
+         return 'static' in self.group('modifiers')
+ 
++    def is_const(self) -> bool:
++        return 'const' in self.group('modifiers')
++
+     def is_full(self) -> bool:
+         return bool(self.group('fullspec'))
+ 
+@@ -82,8 +118,46 @@ class TypeInfoVar(FileMatch):
+             return {}
+         return self.initializers
+ 
+-    def get_initializer_value(self, field: str) -> InitializerValue:
+-        return self.get_initializers().get(field, InitializerValue('', '', None))
++    def get_raw_initializer_value(self, field: str, default: str = '') -> str:
++        initializers = self.get_initializers()
++        if field in initializers:
++            return initializers[field].raw
++        else:
++            return default
++
++    @property
++    def typename(self) -> Optional[str]:
++        return self.get_raw_initializer_value('name')
++
++    @property
++    def uppercase(self) -> Optional[str]:
++        typename = self.typename
++        if not typename:
++            return None
++        if not typename.startswith('TYPE_'):
++            return None
++        return typename[len('TYPE_'):]
++
++    @property
++    def classtype(self) -> Optional[str]:
++        class_size = self.get_raw_initializer_value('class_size')
++        if not class_size:
++            return None
++        m = re.fullmatch(RE_SIZEOF, class_size)
++        if not m:
++            return None
++        return m.group('sizeoftype')
++
++    @property
++    def instancetype(self) -> Optional[str]:
++        instance_size = self.get_raw_initializer_value('instance_size')
++        if not instance_size:
++            return None
++        m = re.fullmatch(RE_SIZEOF, instance_size)
++        if not m:
++            return None
++        return m.group('sizeoftype')
++
+ 
+     #def extract_identifiers(self) -> Optional[TypeIdentifiers]:
+     #    """Try to extract identifiers from names being used"""
+@@ -116,32 +190,105 @@ class TypeInfoVar(FileMatch):
+         #                       uppercase=uppercase, lowercase=lowercase,
+         #                       instancetype=instancetype, classtype=classtype)
+ 
+-    def append_field(self, field, value) -> Patch:
++    def append_field(self, field: str, value: str) -> Patch:
+         """Generate patch appending a field initializer"""
+         content = f'    .{field} = {value},\n'
+-        return Patch(self.match.end('fields'), self.match.end('fields'),
+-                     content)
++        fm = self.group_match('fields')
++        assert fm
++        return fm.append(content)
+ 
+     def patch_field(self, field: str, replacement: str) -> Patch:
+         """Generate patch replacing a field initializer"""
+-        values = self.initializers
+-        assert values
+-        value = values.get(field)
++        initializers = self.initializers
++        assert initializers
++        value = initializers.get(field)
+         assert value
+-        fm = value.match
+-        assert fm
+-        fstart = self.match.start('fields') + fm.start()
+-        fend = self.match.start('fields') + fm.end()
+-        return Patch(fstart, fend, replacement)
++        return value.make_patch(replacement)
++
++    def remove_field(self, field: str) -> Iterable[Patch]:
++        initializers = self.initializers
++        assert initializers
++        if field in initializers:
++            yield self.patch_field(field, '')
++
++    def remove_fields(self, *fields: str) -> Iterable[Patch]:
++        for f in fields:
++            yield from self.remove_field(f)
++
++    def patch_field_value(self, field: str, replacement: str) -> Patch:
++        """Replace just the value of a field initializer"""
++        initializers = self.initializers
++        assert initializers
++        value = initializers.get(field)
++        assert value
++        vm = value.group_match('value')
++        assert vm
++        return vm.make_patch(replacement)
++
++
++class RemoveRedundantClassSize(TypeInfoVar):
++    """Remove class_size when using OBJECT_DECLARE_SIMPLE_TYPE"""
++    def gen_patches(self) -> Iterable[Patch]:
++        initializers = self.initializers
++        if initializers is None:
++            return
++        if 'class_size' not in initializers:
++            return
++
++        self.debug("Handling %s", self.name)
++        m = re.fullmatch(RE_SIZEOF, initializers['class_size'].raw)
++        if not m:
++            self.warn("%s class_size is not sizeof?", self.name)
++            return
++        classtype = m.group('sizeoftype')
++        if not classtype.endswith('Class'):
++            self.warn("%s class size type (%s) is not *Class?", self.name, classtype)
++            return
++        self.debug("classtype is %s", classtype)
++        instancetype = classtype[:-len('Class')]
++        self.debug("intanceypte is %s", instancetype)
++        self.debug("searching for simpletype declaration using %s as InstanceType", instancetype)
++        decl = self.allfiles.find_match(OldStyleObjectDeclareSimpleType,
++                                        instancetype, 'instancetype')
++        if not decl:
++            self.debug("No simpletype declaration found for %s", instancetype)
++            return
++        self.debug("Found simple type declaration")
++        decl.debug("declaration is here")
++        yield from self.remove_field('class_size')
+ 
++class RemoveDeclareSimpleTypeArg(OldStyleObjectDeclareSimpleType):
++    """Remove class_size when using OBJECT_DECLARE_SIMPLE_TYPE"""
+     def gen_patches(self) -> Iterable[Patch]:
++        c = (f'OBJECT_DECLARE_SIMPLE_TYPE({self.group("instancetype")}, {self.group("lowercase")},\n'
++             f'                           {self.group("uppercase")})\n')
++        yield self.make_patch(c)
++
++class UseDeclareTypeExtended(TypeInfoVar):
++    """Replace TypeInfo variable with OBJECT_DEFINE_TYPE_EXTENDED"""
++    def gen_patches(self) -> Iterable[Patch]:
++        # this will just ensure the caches for find_match() and matches_for_type()
++        # will be loaded in advance:
++        find_type_checkers(self.allfiles, 'xxxxxxxxxxxxxxxxx')
++
++        if not self.is_static():
++            self.info("Skipping non-static TypeInfo variable")
++            return
++
++        type_info_macro = self.file.find_match(TypeInfoMacro, self.name)
++        if not type_info_macro:
++            self.warn("TYPE_INFO(%s) line not found", self.name)
++            return
++
+         values = self.initializers
+         if values is None:
+             return
+         if 'name' not in values:
+             self.warn("name not set in TypeInfo variable %s", self.name)
+             return
++
+         typename = values['name'].raw
++
+         if 'parent' not in values:
+             self.warn("parent not set in TypeInfo variable %s", self.name)
+             return
+@@ -167,49 +314,403 @@ class TypeInfoVar(FileMatch):
+                 self.warn("class_size is set to: %r", values['class_size'].raw)
+                 return
+ 
+-        #NOTE: this will NOT work after declarations are converted
+-        #      to OBJECT_DECLARE*
++        #for t in (typename, parent_typename):
++        #    if not re.fullmatch(RE_IDENTIFIER, t):
++        #        self.info("type name is not a macro/constant")
++        #        if instancetype or classtype:
++        #            self.warn("macro/constant type name is required for instance/class type")
++        #        if not self.file.force:
++        #            return
+ 
+         # Now, the challenge is to find out the right MODULE_OBJ_NAME for the
+         # type and for the parent type
+-        instance_decl = find_type_declaration(self.allfiles, typename)
+-        parent_decl = find_type_declaration(self.allfiles, parent_typename)
+-
+         self.info("TypeInfo variable for %s is here", typename)
+-        if instance_decl:
+-            instance_decl.info("instance type declaration (%s) is here", instance_decl.match.group('uppercase'))
+-        if parent_decl:
+-            parent_decl.info("parent type declaration (%s) is here", parent_decl.match.group('uppercase'))
++        uppercase = find_typename_uppercase(self.allfiles, typename)
++        if not uppercase:
++            self.info("Can't find right uppercase name for %s", typename)
++            if instancetype or classtype:
++                self.warn("Can't find right uppercase name for %s", typename)
++                self.warn("This will make type validation difficult in the future")
++            return
+ 
+-        ok = True
+-        if (instance_decl is None and (instancetype or classtype)):
+-            self.warn("Can't find where type checkers for %s are declared.  We need them to validate sizes of %s", typename, self.name)
+-            ok = False
+-
+-        if (instance_decl is not None
+-            and 'instancetype' in instance_decl.match.groupdict()
+-            and instancetype != instance_decl.group('instancetype')):
+-            self.warn("type at instance_size is %r.  Should instance_size be set to sizeof(%s) ?",
+-                      instancetype, instance_decl.group('instancetype'))
+-            instance_decl.warn("Type checker declaration for %s is here", typename)
+-            ok = False
+-        if (instance_decl is not None
+-            and 'classtype' in instance_decl.match.groupdict()
+-            and classtype != instance_decl.group('classtype')):
+-            self.warn("type at class_size is %r.  Should class_size be set to sizeof(%s) ?",
+-                      classtype, instance_decl.group('classtype'))
+-            instance_decl.warn("Type checker declaration for %s is here", typename)
+-            ok = False
+-
+-        if not ok:
++        parent_uppercase = find_typename_uppercase(self.allfiles, parent_typename)
++        if not parent_uppercase:
++            self.info("Can't find right uppercase name for parent type (%s)", parent_typename)
++            if instancetype or classtype:
++                self.warn("Can't find right uppercase name for parent type (%s)", parent_typename)
++                self.warn("This will make type validation difficult in the future")
+             return
+ 
++        ok = True
++
++        #checkers: List[TypeCheckerDeclaration] = list(find_type_checkers(self.allfiles, uppercase))
++        #for c in checkers:
++        #    c.info("instance type checker declaration (%s) is here", c.group('uppercase'))
++        #if not checkers:
++        #    self.info("No type checkers declared for %s", uppercase)
++        #    if instancetype or classtype:
++        #        self.warn("Can't find where type checkers for %s (%s) are declared.  We will need them to validate sizes of %s",
++        #                  typename, uppercase, self.name)
++
++        if not instancetype:
++            instancetype = 'void'
++        if not classtype:
++            classtype = 'void'
++
++        #checker_instancetypes = set(c.instancetype for c in checkers
++        #                            if c.instancetype is not None)
++        #if len(checker_instancetypes) > 1:
++        #    self.warn("ambiguous set of type checkers")
++        #    for c in checkers:
++        #        c.warn("instancetype is %s here", c.instancetype)
++        #    ok = False
++        #elif len(checker_instancetypes) == 1:
++        #    checker_instancetype = checker_instancetypes.pop()
++        #    DBG("checker instance type: %r", checker_instancetype)
++        #    if instancetype != checker_instancetype:
++        #        self.warn("type at instance_size is %r.  Should instance_size be set to sizeof(%s) ?",
++        #                instancetype, checker_instancetype)
++        #        ok = False
++        #else:
++        #    if instancetype != 'void':
++        #        self.warn("instance type checker for %s (%s) not found", typename, instancetype)
++        #        ok = False
++
++        #checker_classtypes = set(c.classtype for c in checkers
++        #                         if c.classtype is not None)
++        #if len(checker_classtypes) > 1:
++        #    self.warn("ambiguous set of type checkers")
++        #    for c in checkers:
++        #        c.warn("classtype is %s here", c.classtype)
++        #    ok = False
++        #elif len(checker_classtypes) == 1:
++        #    checker_classtype = checker_classtypes.pop()
++        #    DBG("checker class type: %r", checker_classtype)
++        #    if classtype != checker_classtype:
++        #        self.warn("type at class_size is %r.  Should class_size be set to sizeof(%s) ?",
++        #                classtype, checker_classtype)
++        #        ok = False
++        #else:
++        #    if classtype != 'void':
++        #        self.warn("class type checker for %s (%s) not found", typename, classtype)
++        #        ok = False
++
++        #if not ok:
++        #    for c in checkers:
++        #        c.warn("Type checker declaration for %s (%s) is here",
++        #                           typename, type(c).__name__)
++        #    return
++
+         #if parent_decl is None:
+         #    self.warn("Can't find where parent type %s is declared", parent_typename)
+ 
++        #yield self.prepend(f'DECLARE_TYPE_NAME({uppercase}, {typename})\n')
++        #if not instancetype:
++        #    yield self.prepend(f'DECLARE_INSTANCE_TYPE({uppercase}, void)\n')
++        #if not classtype:
++        #    yield self.prepend(f'DECLARE_CLASS_TYPE({uppercase}, void)\n')
+         self.info("%s can be patched!", self.name)
+-        return
+-        yield
++        replaced_fields = ['name', 'parent', 'instance_size', 'class_size']
++        begin = self.group_match('begin')
++        newbegin =  f'OBJECT_DEFINE_TYPE_EXTENDED({self.name},\n'
++        newbegin += f'                            {instancetype}, {classtype},\n'
++        newbegin += f'                            {uppercase}, {parent_uppercase}'
++        if set(values.keys()) - set(replaced_fields):
++            newbegin += ',\n'
++        yield begin.make_patch(newbegin)
++        yield from self.remove_fields(*replaced_fields)
++        end = self.group_match('end')
++        yield end.make_patch(')\n')
++        yield type_info_macro.make_removal_patch()
++
++class ObjectDefineTypeExtended(TypeDefinition):
++    """OBJECT_DEFINE_TYPE_EXTENDED usage"""
++    regexp = S(r'^[ \t]*OBJECT_DEFINE_TYPE_EXTENDED\s*\(\s*',
++               NAMED('name', RE_IDENTIFIER), r'\s*,\s*',
++               NAMED('instancetype', RE_IDENTIFIER), r'\s*,\s*',
++               NAMED('classtype', RE_IDENTIFIER), r'\s*,\s*',
++               NAMED('uppercase', RE_IDENTIFIER), r'\s*,\s*',
++               NAMED('parent_uppercase', RE_IDENTIFIER),
++               M(r',\s*\n',
++                 NAMED('fields', RE_TI_FIELDS),
++                 n='?'),
++               r'\s*\);?\n?')
++
++class ObjectDefineType(TypeDefinition):
++    """OBJECT_DEFINE_TYPE usage"""
++    regexp = S(r'^[ \t]*OBJECT_DEFINE_TYPE\s*\(\s*',
++               NAMED('lowercase', RE_IDENTIFIER), r'\s*,\s*',
++               NAMED('uppercase', RE_IDENTIFIER), r'\s*,\s*',
++               NAMED('parent_uppercase', RE_IDENTIFIER),
++               M(r',\s*\n',
++                 NAMED('fields', RE_TI_FIELDS),
++                 n='?'),
++               r'\s*\);?\n?')
++
++def find_type_definitions(files: FileList, uppercase: str) -> Iterable[TypeDefinition]:
++    types: List[Type[TypeDefinition]] = [TypeInfoVar, ObjectDefineType, ObjectDefineTypeExtended]
++    for t in types:
++        for m in files.matches_of_type(t):
++            m.debug("uppercase: %s", m.uppercase)
++    yield from (m for t in types
++                  for m in files.matches_of_type(t)
++                if m.uppercase == uppercase)
++
++class AddDeclareVoidClassType(TypeDeclarationFixup):
++    """Will add DECLARE_CLASS_TYPE(..., void) if possible"""
++    def gen_patches_for_type(self, uppercase: str,
++                             checkers: List[TypeDeclaration],
++                             fields: Dict[str, Optional[str]]) -> Iterable[Patch]:
++        defs = list(find_type_definitions(self.allfiles, uppercase))
++        if len(defs) > 1:
++            self.warn("multiple definitions for %s", uppercase)
++            for d in defs:
++                d.warn("definition found here")
++            return
++        elif len(defs) == 0:
++            self.warn("type definition for %s not found", uppercase)
++            return
++        d = defs[0]
++        if d.classtype is None:
++            d.info("definition for %s has classtype, skipping", uppercase)
++            return
++        class_type_checkers = [c for c in checkers
++                               if c.classtype is not None]
++        if class_type_checkers:
++            for c in class_type_checkers:
++                c.warn("class type checker for %s is present here", uppercase)
++            return
++
++        _,last_checker = max((m.start(), m) for m in checkers)
++        s = f'DECLARE_CLASS_TYPE({uppercase}, void)\n'
++        yield last_checker.append(s)
++
++class AddDeclareVoidInstanceType(FileMatch):
++    """Will add DECLARE_INSTANCE_TYPE(..., void) if possible"""
++    regexp = S(r'^[ \t]*#[ \t]*define', CPP_SPACE,
++               NAMED('name', r'TYPE_[a-zA-Z0-9_]+\b'),
++               CPP_SPACE, r'.*\n')
++
++    def gen_patches(self) -> Iterable[Patch]:
++        assert self.name.startswith('TYPE_')
++        uppercase = self.name[len('TYPE_'):]
++        defs = list(find_type_definitions(self.allfiles, uppercase))
++        if len(defs) > 1:
++            self.warn("multiple definitions for %s", uppercase)
++            for d in defs:
++                d.warn("definition found here")
++            return
++        elif len(defs) == 0:
++            self.warn("type definition for %s not found", uppercase)
++            return
++        d = defs[0]
++        instancetype = d.instancetype
++        if instancetype is not None and instancetype != 'void':
++            return
++
++        instance_checkers = [c for c in find_type_checkers(self.allfiles, uppercase)
++                             if c.instancetype]
++        if instance_checkers:
++            d.warn("instance type checker for %s already declared", uppercase)
++            for c in instance_checkers:
++                c.warn("instance checker for %s is here", uppercase)
++            return
++
++        s = f'DECLARE_INSTANCE_TYPE({uppercase}, void)\n'
++        yield self.append(s)
++
++class AddObjectDeclareType(DeclareObjCheckers):
++    """Will add OBJECT_DECLARE_TYPE(...) if possible"""
++    def gen_patches(self) -> Iterable[Patch]:
++        uppercase = self.uppercase
++        typename = self.group('typename')
++        instancetype = self.group('instancetype')
++        classtype = self.group('classtype')
++
++        if typename != f'TYPE_{uppercase}':
++            self.warn("type name mismatch: %s vs %s", typename, uppercase)
++            return
++
++        typedefs = [(t,self.allfiles.find_matches(SimpleTypedefMatch, t))
++                    for t in (instancetype, classtype)]
++        for t,tds in typedefs:
++            if not tds:
++                self.warn("typedef %s not found", t)
++                return
++            for td in tds:
++                td_type = td.group('typedef_type')
++                if td_type != f'struct {t}':
++                    self.warn("typedef mismatch: %s is defined as %s", t, td_type)
++                    td.warn("typedef is here")
++                    return
++
++        # look for reuse of same struct type
++        other_instance_checkers = [c for c in find_type_checkers(self.allfiles, instancetype, 'instancetype')
++                                if c.uppercase != uppercase]
++        if other_instance_checkers:
++            self.warn("typedef %s is being reused", instancetype)
++            for ic in other_instance_checkers:
++                ic.warn("%s is reused here", instancetype)
++            if not self.file.force:
++                return
++
++        decl_types: List[Type[TypeDeclaration]] = [DeclareClassCheckers, DeclareObjCheckers]
++        class_decls = [m for t in decl_types
++                       for m in self.allfiles.find_matches(t, uppercase, 'uppercase')]
++
++        defs = list(find_type_definitions(self.allfiles, uppercase))
++        if len(defs) > 1:
++            self.warn("multiple definitions for %s", uppercase)
++            for d in defs:
++                d.warn("definition found here")
++            if not self.file.force:
++                return
++        elif len(defs) == 0:
++            self.warn("type definition for %s not found", uppercase)
++            if not self.file.force:
++                return
++        else:
++            d = defs[0]
++            if d.instancetype != instancetype:
++                self.warn("mismatching instance type for %s (%s)", uppercase, instancetype)
++                d.warn("instance type declared here (%s)", d.instancetype)
++                if not self.file.force:
++                    return
++            if d.classtype != classtype:
++                self.warn("mismatching class type for %s (%s)", uppercase, classtype)
++                d.warn("class type declared here (%s)", d.classtype)
++                if not self.file.force:
++                    return
++
++        assert self.file.original_content
++        for t,tds in typedefs:
++            assert tds
++            for td in tds:
++                if td.file is not self.file:
++                    continue
++
++                # delete typedefs that are truly redundant:
++                # 1) defined after DECLARE_OBJ_CHECKERS
++                if td.start() > self.start():
++                    yield td.make_removal_patch()
++                # 2) defined before DECLARE_OBJ_CHECKERS, but unused
++                elif not re.search(r'\b'+t+r'\b', self.file.original_content[td.end():self.start()]):
++                    yield td.make_removal_patch()
++
++        c = (f'OBJECT_DECLARE_TYPE({instancetype}, {classtype}, {uppercase})\n')
++        yield self.make_patch(c)
++
++class AddObjectDeclareSimpleType(DeclareInstanceChecker):
++    """Will add OBJECT_DECLARE_SIMPLE_TYPE(...) if possible"""
++    def gen_patches(self) -> Iterable[Patch]:
++        uppercase = self.uppercase
++        typename = self.group('typename')
++        instancetype = self.group('instancetype')
++
++        if typename != f'TYPE_{uppercase}':
++            self.warn("type name mismatch: %s vs %s", typename, uppercase)
++            return
++
++        typedefs = [(t,self.allfiles.find_matches(SimpleTypedefMatch, t))
++                    for t in (instancetype,)]
++        for t,tds in typedefs:
++            if not tds:
++                self.warn("typedef %s not found", t)
++                return
++            for td in tds:
++                td_type = td.group('typedef_type')
++                if td_type != f'struct {t}':
++                    self.warn("typedef mismatch: %s is defined as %s", t, td_type)
++                    td.warn("typedef is here")
++                    return
++
++        # look for reuse of same struct type
++        other_instance_checkers = [c for c in find_type_checkers(self.allfiles, instancetype, 'instancetype')
++                                if c.uppercase != uppercase]
++        if other_instance_checkers:
++            self.warn("typedef %s is being reused", instancetype)
++            for ic in other_instance_checkers:
++                ic.warn("%s is reused here", instancetype)
++            if not self.file.force:
++                return
++
++        decl_types: List[Type[TypeDeclaration]] = [DeclareClassCheckers, DeclareObjCheckers]
++        class_decls = [m for t in decl_types
++                       for m in self.allfiles.find_matches(t, uppercase, 'uppercase')]
++        if class_decls:
++            self.warn("class type declared for %s", uppercase)
++            for cd in class_decls:
++                cd.warn("class declaration found here")
++            return
++
++        defs = list(find_type_definitions(self.allfiles, uppercase))
++        if len(defs) > 1:
++            self.warn("multiple definitions for %s", uppercase)
++            for d in defs:
++                d.warn("definition found here")
++            if not self.file.force:
++                return
++        elif len(defs) == 0:
++            self.warn("type definition for %s not found", uppercase)
++            if not self.file.force:
++                return
++        else:
++            d = defs[0]
++            if d.instancetype != instancetype:
++                self.warn("mismatching instance type for %s (%s)", uppercase, instancetype)
++                d.warn("instance type declared here (%s)", d.instancetype)
++                if not self.file.force:
++                    return
++            if d.classtype:
++                self.warn("class type set for %s", uppercase)
++                d.warn("class type declared here")
++                if not self.file.force:
++                    return
++
++        assert self.file.original_content
++        for t,tds in typedefs:
++            assert tds
++            for td in tds:
++                if td.file is not self.file:
++                    continue
++
++                # delete typedefs that are truly redundant:
++                # 1) defined after DECLARE_OBJ_CHECKERS
++                if td.start() > self.start():
++                    yield td.make_removal_patch()
++                # 2) defined before DECLARE_OBJ_CHECKERS, but unused
++                elif not re.search(r'\b'+t+r'\b', self.file.original_content[td.end():self.start()]):
++                    yield td.make_removal_patch()
++
++        c = (f'OBJECT_DECLARE_SIMPLE_TYPE({instancetype}, {uppercase})\n')
++        yield self.make_patch(c)
++
++
++class TypeInfoStringName(TypeInfoVar):
++    """Replace hardcoded type names with TYPE_ constant"""
++    def gen_patches(self) -> Iterable[Patch]:
++        values = self.initializers
++        if values is None:
++            return
++        if 'name' not in values:
++            self.warn("name not set in TypeInfo variable %s", self.name)
++            return
++        typename = values['name'].raw
++        if re.fullmatch(RE_IDENTIFIER, typename):
++            return
++
++        self.warn("name %s is not an identifier", typename)
++        #all_defines = [m for m in self.allfiles.matches_of_type(ExpressionDefine)]
++        #self.debug("all_defines: %r", all_defines)
++        constants = [m for m in self.allfiles.matches_of_type(ExpressionDefine)
++                     if m.group('value').strip() == typename.strip()]
++        if not constants:
++            self.warn("No macro for %s found", typename)
++            return
++        if len(constants) > 1:
++            self.warn("I don't know which macro to use: %r", constants)
++            return
++        yield self.patch_field_value('name', constants[0].name)
+ 
+ class RedundantTypeSizes(TypeInfoVar):
+     """Remove redundant instance_size/class_size from TypeInfo vars"""
+@@ -230,8 +731,8 @@ class RedundantTypeSizes(TypeInfoVar):
+             self.debug("no need to validate %s", self.name)
+             return
+ 
+-        instance_decl = find_type_declaration(self.allfiles, typename)
+-        if instance_decl:
++        instance_decls = find_type_checkers(self.allfiles, typename)
++        if instance_decls:
+             self.debug("won't touch TypeInfo var that has type checkers")
+             return
+ 
+@@ -240,12 +741,12 @@ class RedundantTypeSizes(TypeInfoVar):
+             self.warn("Can't find TypeInfo for %s", parent_typename)
+             return
+ 
+-        if 'instance_size' in values and parent.get_initializer_value('instance_size').raw != values['instance_size'].raw:
++        if 'instance_size' in values and parent.get_raw_initializer_value('instance_size') != values['instance_size'].raw:
+             self.info("instance_size mismatch")
+             parent.info("parent type declared here")
+             return
+ 
+-        if 'class_size' in values and parent.get_initializer_value('class_size').raw != values['class_size'].raw:
++        if 'class_size' in values and parent.get_raw_initializer_value('class_size') != values['class_size'].raw:
+             self.info("class_size mismatch")
+             parent.info("parent type declared here")
+             return
+@@ -303,10 +804,11 @@ class RedundantTypeSizes(TypeInfoVar):
+ #                yield self.append_field('class_init', ids.lowercase+'_class_init')
+ 
+ class TypeInitMacro(FileMatch):
+-    """type_init(...) macro use
+-    Will be deleted if function is empty
+-    """
++    """Use of type_init(...) macro"""
+     regexp = S(r'^[ \t]*type_init\s*\(\s*', NAMED('name', RE_IDENTIFIER), r'\s*\);?[ \t]*\n')
++
++class DeleteEmptyTypeInitFunc(TypeInitMacro):
++    """Delete empty function declared using type_init(...)"""
+     def gen_patches(self) -> Iterable[Patch]:
+         fn = self.file.find_match(StaticVoidFunction, self.name)
+         DBG("function for %s: %s", self.name, fn)
+@@ -331,7 +833,7 @@ class StaticVoidFunction(FileMatch):
+                         r'#[^\n]*\n',
+                         r'\n',
+                         repeat='*')),
+-               r'}\n')
++               r'};?\n')
+ 
+     @property
+     def body(self) -> str:
+@@ -340,34 +842,40 @@ class StaticVoidFunction(FileMatch):
+     def has_preprocessor_directive(self) -> bool:
+         return bool(re.search(r'^[ \t]*#', self.body, re.MULTILINE))
+ 
+-class TypeRegisterCall(FileMatch):
++def find_containing_func(m: FileMatch) -> Optional['StaticVoidFunction']:
++    """Return function containing this match"""
++    for fn in m.file.matches_of_type(StaticVoidFunction):
++        if fn.contains(m):
++            return fn
++    return None
++
++class TypeRegisterStaticCall(FileMatch):
+     """type_register_static() call
+     Will be replaced by TYPE_INFO() macro
+     """
+-    regexp = S(r'^[ \t]*type_register_static\s*\(&\s*', NAMED('name', RE_IDENTIFIER), r'\s*\);[ \t]*\n')
+-
+-    def function(self) -> Optional['StaticVoidFunction']:
+-        """Return function containing this call"""
+-        for m in self.file.matches_of_type(StaticVoidFunction):
+-            if m.contains(self):
+-                return m
+-        return None
++    regexp = S(r'^[ \t]*', NAMED('func_name', 'type_register_static'),
++               r'\s*\(&\s*', NAMED('name', RE_IDENTIFIER), r'\s*\);[ \t]*\n')
+ 
++class UseTypeInfo(TypeRegisterStaticCall):
++    """Replace type_register_static() call with TYPE_INFO declaration"""
+     def gen_patches(self) -> Iterable[Patch]:
+-        fn = self.function()
+-        if fn is None:
+-            self.warn("can't find function where type_register_static(&%s) is called", self.name)
+-            return
++        fn = find_containing_func(self)
++        if fn:
++            DBG("%r is inside %r", self, fn)
++            type_init = self.file.find_match(TypeInitMacro, fn.name)
++            if type_init is None:
++                self.warn("can't find type_init(%s) line", fn.name)
++                if not self.file.force:
++                    return
++        else:
++            self.warn("can't identify the function where type_register_static(&%s) is called", self.name)
++            if not self.file.force:
++                return
+ 
+         #if fn.has_preprocessor_directive() and not self.file.force:
+         #    self.warn("function %s has preprocessor directives, this requires --force", fn.name)
+         #    return
+ 
+-        type_init = self.file.find_match(TypeInitMacro, fn.name)
+-        if type_init is None:
+-            self.warn("can't find type_init(%s) line", fn.name)
+-            return
+-
+         var = self.file.find_match(TypeInfoVar, self.name)
+         if var is None:
+             self.warn("can't find TypeInfo var declaration for %s", self.name)
+@@ -375,24 +883,51 @@ class TypeRegisterCall(FileMatch):
+ 
+         if not var.is_full():
+             self.warn("variable declaration %s wasn't parsed fully", var.name)
+-            return
++            if not self.file.force:
++                return
+ 
+-        if fn.contains(var):
++        if fn and fn.contains(var):
+             self.warn("TypeInfo %s variable is inside a function", self.name)
+-            return
++            if not self.file.force:
++                return
+ 
+         # delete type_register_static() call:
+         yield self.make_patch('')
+         # append TYPE_REGISTER(...) after variable declaration:
+         yield var.append(f'TYPE_INFO({self.name})\n')
+ 
++class TypeRegisterCall(FileMatch):
++    """type_register_static() call"""
++    regexp = S(r'^[ \t]*', NAMED('func_name', 'type_register'),
++               r'\s*\(&\s*', NAMED('name', RE_IDENTIFIER), r'\s*\);[ \t]*\n')
++
++class MakeTypeRegisterStatic(TypeRegisterCall):
++    """Make type_register() call static if variable is static const"""
++    def gen_patches(self):
++        var = self.file.find_match(TypeInfoVar, self.name)
++        if var is None:
++            self.warn("can't find TypeInfo var declaration for %s", self.name)
++            return
++        if var.is_static() and var.is_const():
++            yield self.group_match('func_name').make_patch('type_register_static')
++
++class MakeTypeRegisterNotStatic(TypeRegisterStaticCall):
++    """Make type_register() call static if variable is static const"""
++    def gen_patches(self):
++        var = self.file.find_match(TypeInfoVar, self.name)
++        if var is None:
++            self.warn("can't find TypeInfo var declaration for %s", self.name)
++            return
++        if not var.is_static() or not var.is_const():
++            yield self.group_match('func_name').make_patch('type_register')
++
+ class TypeInfoMacro(FileMatch):
+     """TYPE_INFO macro usage"""
+     regexp = S(r'^[ \t]*TYPE_INFO\s*\(\s*', NAMED('name', RE_IDENTIFIER), r'\s*\)[ \t]*;?[ \t]*\n')
+ 
+ def find_type_info(files: RegexpScanner, name: str) -> Optional[TypeInfoVar]:
+     ti = [ti for ti in files.matches_of_type(TypeInfoVar)
+-            if ti.get_initializer_value('name').raw == name]
++            if ti.get_raw_initializer_value('name') == name]
+     DBG("type info vars: %r", ti)
+     if len(ti) > 1:
+         DBG("multiple TypeInfo vars found for %s", name)
+diff --git a/scripts/codeconverter/codeconverter/test_patching.py b/scripts/codeconverter/codeconverter/test_patching.py
+index 5998af81c9..71dfbd47e1 100644
+--- a/scripts/codeconverter/codeconverter/test_patching.py
++++ b/scripts/codeconverter/codeconverter/test_patching.py
+@@ -31,7 +31,6 @@ def test_pattern_patching():
+     files = FileList()
+     f = FileInfo(files, of.name)
+     f.load()
+-    f.scan_for_matches()
+     matches = f.matches_of_type(BasicPattern)
+     assert len(matches) == 2
+     p2 = matches[1]
+@@ -40,7 +39,7 @@ def test_pattern_patching():
+     f.patches.append(p2.append('XXX'))
+ 
+     # apply all patches:
+-    f.gen_patches()
++    f.gen_patches(matches)
+     patched = f.get_patched_content()
+     assert patched == ('one line\n'+
+                        'this pattern will be patched: defBBBBBhij\n'+
+diff --git a/scripts/codeconverter/codeconverter/test_regexps.py b/scripts/codeconverter/codeconverter/test_regexps.py
+index 9b84d689a6..a445634d88 100644
+--- a/scripts/codeconverter/codeconverter/test_regexps.py
++++ b/scripts/codeconverter/codeconverter/test_regexps.py
+@@ -9,7 +9,7 @@ from .regexps import *
+ from .qom_macros import *
+ from .qom_type_info import *
+ 
+-def test_res():
++def test_res() -> None:
+     def fullmatch(regexp, s):
+         return re.fullmatch(regexp, s, re.MULTILINE)
+ 
+@@ -113,10 +113,10 @@ static const TypeInfo char_file_type_info = {
+              * need to set up reset or vmstate, and has no realize method.
+              */''')
+ 
+-    print(RE_TYPEINFO_DEF)
++    print(TypeInfoVar.regexp)
+     test_empty = 'static const TypeInfo x86_base_cpu_type_info = {\n'+\
+                  '};\n';
+-    assert fullmatch(RE_TYPEINFO_DEF, test_empty)
++    assert fullmatch(TypeInfoVar.regexp, test_empty)
+ 
+     test_simple = r'''
+     static const TypeInfo x86_base_cpu_type_info = {
+@@ -125,7 +125,7 @@ static const TypeInfo char_file_type_info = {
+         .class_init = x86_cpu_base_class_init,
+     };
+     '''
+-    assert re.search(RE_TYPEINFO_DEF, test_simple, re.MULTILINE)
++    assert re.search(TypeInfoVar.regexp, test_simple, re.MULTILINE)
+ 
+     test_interfaces = r'''
+     static const TypeInfo acpi_ged_info = {
+@@ -141,7 +141,7 @@ static const TypeInfo char_file_type_info = {
+         }
+     };
+     '''
+-    assert re.search(RE_TYPEINFO_DEF, test_interfaces, re.MULTILINE)
++    assert re.search(TypeInfoVar.regexp, test_interfaces, re.MULTILINE)
+ 
+     test_comments = r'''
+     static const TypeInfo palm_misc_gpio_info = {
+@@ -155,7 +155,7 @@ static const TypeInfo char_file_type_info = {
+          */
+     };
+     '''
+-    assert re.search(RE_TYPEINFO_DEF, test_comments, re.MULTILINE)
++    assert re.search(TypeInfoVar.regexp, test_comments, re.MULTILINE)
+ 
+     test_comments = r'''
+     static const TypeInfo tpm_crb_info = {
+@@ -170,7 +170,7 @@ static const TypeInfo char_file_type_info = {
+         }
+     };
+     '''
+-    assert re.search(RE_TYPEINFO_DEF, test_comments, re.MULTILINE)
++    assert re.search(TypeInfoVar.regexp, test_comments, re.MULTILINE)
+ 
+ def test_struct_re():
+     print('---')
+@@ -232,8 +232,8 @@ def test_initial_includes():
+ 
+ /* pflash_cfi01.c */
+ '''
+-    print(repr(list(m.groupdict() for m in re.finditer(InitialIncludes.regexp, c, re.MULTILINE))))
+-    m = re.match(InitialIncludes.regexp, c, re.MULTILINE)
++    print(repr(list(m.groupdict() for m in InitialIncludes.finditer(c))))
++    m = InitialIncludes.domatch(c)
+     assert m
+     print(repr(m.group(0)))
+     assert m.group(0).endswith('#include "exec/hwaddr.h"\n')
+@@ -247,8 +247,8 @@ def test_initial_includes():
+ 
+ 
+ '''
+-    print(repr(list(m.groupdict() for m in re.finditer(InitialIncludes.regexp, c, re.MULTILINE))))
+-    m = re.match(InitialIncludes.regexp, c, re.MULTILINE)
++    print(repr(list(m.groupdict() for m in InitialIncludes.finditer(c))))
++    m = InitialIncludes.domatch(c)
+     assert m
+     print(repr(m.group(0)))
+     assert m.group(0).endswith('#include "9p.h"\n')
+@@ -274,8 +274,8 @@ def test_initial_includes():
+ /* Missing stuff:
+    SCTRL_P[12](END|ST)INC
+ '''
+-    print(repr(list(m.groupdict() for m in re.finditer(InitialIncludes.regexp, c, re.MULTILINE))))
+-    m = re.match(InitialIncludes.regexp, c, re.MULTILINE)
++    print(repr(list(m.groupdict() for m in InitialIncludes.finditer(c))))
++    m = InitialIncludes.domatch(c)
+     assert m
+     print(repr(m.group(0)))
+     assert m.group(0).endswith('#include "sysemu/dma.h"\n')
+diff --git a/scripts/codeconverter/converter.py b/scripts/codeconverter/converter.py
+index ebaf9b57ce..75cb515d93 100755
+--- a/scripts/codeconverter/converter.py
++++ b/scripts/codeconverter/converter.py
+@@ -42,7 +42,7 @@ def process_all_files(parser: argparse.ArgumentParser, args: argparse.Namespace)
+             for t in f.matches_of_type(TypeInfoVar):
+                 assert isinstance(t, TypeInfoVar)
+                 values = [f.filename, t.name] + \
+-                         [t.get_initializer_value(f).raw
++                         [t.get_raw_initializer_value(f)
+                           for f in TI_FIELDS]
+                 DBG('values: %r', values)
+                 assert all('\t' not in v for v in values)
+@@ -55,18 +55,18 @@ def process_all_files(parser: argparse.ArgumentParser, args: argparse.Namespace)
+         parser.error("--pattern is required")
+ 
+     classes = [p for arg in args.patterns
+-                for p in re.split(r'[\s,]', arg)]
++               for p in re.split(r'[\s,]', arg)
++               if p.strip()]
+     for c in classes:
+-        if c not in match_classes:
++        if c not in match_classes \
++           or not match_classes[c].regexp:
+             print("Invalid pattern name: %s" % (c), file=sys.stderr)
+             print("Valid patterns:", file=sys.stderr)
+             print(PATTERN_HELP, file=sys.stderr)
+             sys.exit(1)
+ 
+     DBG("classes: %r", classes)
+-    for f in files:
+-        DBG("patching contents of %s", f.filename)
+-        f.patch_content(max_passes=args.passes, class_names=classes)
++    files.patch_content(max_passes=args.passes, class_names=classes)
+ 
+     for f in files:
+         #alltypes.extend(f.type_infos)
 -- 
 2.26.2
 
