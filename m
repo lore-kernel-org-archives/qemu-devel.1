@@ -2,108 +2,83 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40F38C43463
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 08:40:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E8DC43465
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 08:43:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93AB320C56
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 08:40:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5FED42176B
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 08:43:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D0HFOo25"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93AB320C56
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="ObvCt7Gv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FED42176B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJBw2-0008Iz-7m
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 04:40:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36102)
+	id 1kJByy-00030T-CD
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 04:43:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36828)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJBuc-0007Wl-BZ
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 04:38:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21080)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJBua-0007Eq-NG
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 04:38:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600418311;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jKtY+pRlucL0q3uuq9pIy/9rTnLjOr3sHbFXDHxPOF4=;
- b=D0HFOo25jNrueuTg4tnOFFurw7fuDoiFtHVc5JrBPFXR0k2bhFMtSxMFBsfTa1757xo8k4
- Pn645eOhSwqrtjPqEnzMbhI6GD68azge62m0r3sbikzVUzRjNH9PIfq5H1ys5mPhEaCyvs
- 0V/WaCLJpZgQXbXIebJOdFB9BtvZuhc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-539-3Z1kRkLyNc2U6r_pE0Auew-1; Fri, 18 Sep 2020 04:38:30 -0400
-X-MC-Unique: 3Z1kRkLyNc2U6r_pE0Auew-1
-Received: by mail-wm1-f70.google.com with SMTP id y18so1219575wma.4
- for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 01:38:29 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kJBxN-0001Fo-DA
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 04:41:25 -0400
+Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:43496)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kJBxK-0007n3-Py
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 04:41:25 -0400
+Received: by mail-pf1-x431.google.com with SMTP id f18so2990757pfa.10
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 01:41:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id;
+ bh=GdgweBFiZYARuCVoz1uNH+aYHDiFtvCUWBa8dNRXSzk=;
+ b=ObvCt7GvTbWP8WiCl0okf1dYdh7WBq5xFXfDLw1cJ6imVBfRdTzQBTDraFb4VpFEd8
+ UiLJl+RCXBND2LqcGfE2+ZVvVeLfEr2P8mNLNCE8ywq9Mt6X1yyS54aGmZgqhmffms2g
+ AI23xwMGMsYLOP++cvqN6ZN12mrU7pWVWw1llHnse7wImXWHxM0lNkWr5aA2LL4O1Mdp
+ xsMgyzVqVzM8Pn3NyvCPq0e0E7OfCYc8RL+GB5o5nfV4ST4YgFBi9TCt6X7dibvfy18T
+ g5JYw8s4usU6Z8EC/xUh39R+MtC7O1hDQsYyvGyapE3ptFuxCiz4UuhzHeW59XGik7Ag
+ E+WA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=jKtY+pRlucL0q3uuq9pIy/9rTnLjOr3sHbFXDHxPOF4=;
- b=aJTCgboVOXAqMf88hZa2o27jR6YIq+6tjPa7aSDZc4sWuHkjLvuqbX2ehJPEHBv1dU
- Dfamlm/xnF4Re5mqgMZp80hXkq+/mQK9zzUZraaBfyxxXs9f0qVJOc3ekdA7giEQ2BR6
- wdP9iVS//3abZMEsRAyo4wrbyMSYFXXMCWv8cfOQ2HcvMScfd6Iga87dE7Z8EMKV2qFe
- XhaBMdje3GzLHApK/nmc858+ARczFsK5Dg7JQQap1zUvSacBfbxc5SsCYcyhbGMvyxcM
- gMEOexwttxInoqiq87WzClZEQGLBHUkJJeaJkAerdgzx5VzBXqJ/Mc7D4CWvkDFghoZb
- Y5Xw==
-X-Gm-Message-State: AOAM533y7acZHjiOoS84lw3cL7OvijUkfqErtQL77RodT3EeK0gRo+Bp
- PihrvZKGq0Hbp6BTjPMT2IJUKrLonRBW/+eq0jIjNGc3wjmmliq6lOCk4MOWsCnNfvnJlm8aXj3
- 1bVzrKShHZ0OefP4=
-X-Received: by 2002:adf:f6cd:: with SMTP id y13mr35898419wrp.161.1600418308553; 
- Fri, 18 Sep 2020 01:38:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxBgZJv4k7YOw5Vd1InQhxbs2WD5xa8tnX5DRzcCPcvO8Y+XtOL4o79V9Za/orVPGiUJmAiMw==
-X-Received: by 2002:adf:f6cd:: with SMTP id y13mr35898401wrp.161.1600418308320; 
- Fri, 18 Sep 2020 01:38:28 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:69b4:4715:609f:385f?
- ([2001:b07:6468:f312:69b4:4715:609f:385f])
- by smtp.gmail.com with ESMTPSA id s80sm3702185wme.41.2020.09.18.01.38.27
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 18 Sep 2020 01:38:27 -0700 (PDT)
-Subject: Re: [PATCH] target/i386: always create kvmclock device
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, qemu-devel@nongnu.org
-References: <20200917111306.819263-1-vkuznets@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8783874f-8d6d-b1b6-20c3-9910c267779b@redhat.com>
-Date: Fri, 18 Sep 2020 10:38:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-MIME-Version: 1.0
-In-Reply-To: <20200917111306.819263-1-vkuznets@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 01:32:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=GdgweBFiZYARuCVoz1uNH+aYHDiFtvCUWBa8dNRXSzk=;
+ b=MncFPObQIIL3Lgx8ueUERHLv6CUv8KJjJnugtRreTzusgPPIvKkmDnoECNozU3Jtvg
+ KAKSJ6rtRPHcg71BY0uApZXeTEX/qLg7JmZsnAjvw3pNLvAOFTLd7d8RfXeH9iMwi4uo
+ BU6NFSEEzbbTbkR9+okeo0HtakmuGuK2UJzeaOHXYVo6muKoo5BX5hcGZEjtrb2ql5yH
+ bPUKbcVSmtzCufDrfq/lRSnKV+R+1GxlsuuX2daIo6W2W0zKpaBX6PJJ7orRzFxAY6bV
+ g+B74t9oE3n82V+8JW5y7QUC4gyu/Y33qaz/SDZGH7UuCctyzadV68vHKokmSpWd9RUv
+ VdKA==
+X-Gm-Message-State: AOAM533LZSjk+k0K3DpeVP8fZvvL2etmA4G+ITEdKLByQPCdrA9Z89i1
+ W8OsXB2RdCsuDtJhQlrW76+dmA==
+X-Google-Smtp-Source: ABdhPJyQqMxBTUq86BT9AskTLlGpTvspHIoO7eWy4p0+vNpvCzazscyp9Ece1t+97hhQDrqF6TULSg==
+X-Received: by 2002:a63:7018:: with SMTP id l24mr25085668pgc.55.1600418481078; 
+ Fri, 18 Sep 2020 01:41:21 -0700 (PDT)
+Received: from localhost.localdomain ([115.96.124.157])
+ by smtp.googlemail.com with ESMTPSA id gi20sm2120603pjb.28.2020.09.18.01.41.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 18 Sep 2020 01:41:19 -0700 (PDT)
+From: Ani Sinha <ani@anisinha.ca>
+To: mst@redhat.com,
+	qemu-devel@nongnu.org
+Subject: [PATCH v10 00/13]  i440fx/acpi: addition of feature and bug fixes.
+Date: Fri, 18 Sep 2020 14:10:58 +0530
+Message-Id: <20200918084111.15339-1-ani@anisinha.ca>
+X-Mailer: git-send-email 2.17.1
+Received-SPF: none client-ip=2607:f8b0:4864:20::431;
+ envelope-from=ani@anisinha.ca; helo=mail-pf1-x431.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -116,84 +91,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Antoine Damhet <antoine.damhet@blade-group.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, jusual@redhat.com,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
+ Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/09/20 13:13, Vitaly Kuznetsov wrote:
-> QEMU's kvmclock device is only created when KVM PV feature bits for
-> kvmclock (KVM_FEATURE_CLOCKSOURCE/KVM_FEATURE_CLOCKSOURCE2) are
-> exposed to the guest. With 'kvm=off' cpu flag the device is not
-> created and we don't call KVM_GET_CLOCK/KVM_SET_CLOCK upon migration.
-> It was reported that without these call at least Hyper-V TSC page
-> clocksouce (which can be enabled independently) gets broken after
-> migration.
-> 
-> Switch to creating kvmclock QEMU device unconditionally, it seems
-> to always make sense to call KVM_GET_CLOCK/KVM_SET_CLOCK on migration.
-> Use KVM_CAP_ADJUST_CLOCK check instead of CPUID feature bits.
-> 
-> Reported-by: Antoine Damhet <antoine.damhet@blade-group.com>
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  hw/i386/kvm/clock.c    | 6 +-----
->  target/i386/kvm.c      | 5 +++++
->  target/i386/kvm_i386.h | 1 +
->  3 files changed, 7 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
-> index 64283358f91d..526c9ea5172b 100644
-> --- a/hw/i386/kvm/clock.c
-> +++ b/hw/i386/kvm/clock.c
-> @@ -330,11 +330,7 @@ static const TypeInfo kvmclock_info = {
->  /* Note: Must be called after VCPU initialization. */
->  void kvmclock_create(void)
->  {
-> -    X86CPU *cpu = X86_CPU(first_cpu);
-> -
-> -    if (kvm_enabled() &&
-> -        cpu->env.features[FEAT_KVM] & ((1ULL << KVM_FEATURE_CLOCKSOURCE) |
-> -                                       (1ULL << KVM_FEATURE_CLOCKSOURCE2))) {
-> +    if (kvm_enabled() && kvm_has_adjust_clock()) {
->          sysbus_create_simple(TYPE_KVM_CLOCK, -1, NULL);
->      }
->  }
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 4a8b3a41c1bc..20b31b65307b 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -143,6 +143,11 @@ bool kvm_has_adjust_clock_stable(void)
->      return (ret == KVM_CLOCK_TSC_STABLE);
->  }
->  
-> +bool kvm_has_adjust_clock(void)
-> +{
-> +    return kvm_check_extension(kvm_state, KVM_CAP_ADJUST_CLOCK);
-> +}
-> +
->  bool kvm_has_exception_payload(void)
->  {
->      return has_exception_payload;
-> diff --git a/target/i386/kvm_i386.h b/target/i386/kvm_i386.h
-> index 064b8798a26c..0fce4e51d2d6 100644
-> --- a/target/i386/kvm_i386.h
-> +++ b/target/i386/kvm_i386.h
-> @@ -34,6 +34,7 @@
->  
->  bool kvm_allows_irq0_override(void);
->  bool kvm_has_smm(void);
-> +bool kvm_has_adjust_clock(void);
->  bool kvm_has_adjust_clock_stable(void);
->  bool kvm_has_exception_payload(void);
->  void kvm_synchronize_all_tsc(void);
-> 
+Final patch series with all the patches reviewed or ack'd and marked as such.
+Thanks Julia and Igor for the reviews. Hope this series gets pulled in soon.
 
-Queued, thanks.
+--Ani
 
-Paolo
+Ani Sinha (13):
+  tests/acpi: mark addition of table DSDT.roothp for unit testing root
+    pci hotplug
+  tests/acpi: add new unit test to test hotplug off/on feature on the
+    root pci bus
+  tests/acpi: add a new ACPI table in order to test root pci hotplug
+    on/off
+  Fix a gap where acpi_pcihp_find_hotplug_bus() returns a
+    non-hotpluggable bus
+  i440fx/acpi: do not add hotplug related amls for cold plugged bridges
+  tests/acpi: list added acpi table binary file for pci bridge hotplug
+    test
+  tests/acpi: unit test for 'acpi-pci-hotplug-with-bridge-support'
+    bridge flag
+  tests/acpi: add newly added acpi DSDT table blob for pci bridge
+    hotplug flag
+  Add ACPI DSDT tables for q35 that are being updated by the next patch
+  piix4: don't reserve hw resources when hotplug is off globally
+  tests/acpi: update golden master DSDT binary table blobs for q35
+  tests/acpi: unit test exercising global pci hotplug off for i440fx
+  tests/acpi: add DSDT.hpbrroot DSDT table blob to test global i440fx
+    hotplug
+
+ hw/acpi/pcihp.c                   |  15 +++++++++
+ hw/acpi/piix4.c                   |   6 ++--
+ hw/i386/acpi-build.c              |  37 ++++++++++++++--------
+ tests/data/acpi/pc/DSDT.hpbridge  | Bin 0 -> 4895 bytes
+ tests/data/acpi/pc/DSDT.hpbrroot  | Bin 0 -> 2953 bytes
+ tests/data/acpi/pc/DSDT.roothp    | Bin 0 -> 5130 bytes
+ tests/data/acpi/q35/DSDT          | Bin 7678 -> 7670 bytes
+ tests/data/acpi/q35/DSDT.acpihmat | Bin 9002 -> 8994 bytes
+ tests/data/acpi/q35/DSDT.bridge   | Bin 7695 -> 7688 bytes
+ tests/data/acpi/q35/DSDT.cphp     | Bin 8141 -> 8133 bytes
+ tests/data/acpi/q35/DSDT.dimmpxm  | Bin 9331 -> 9323 bytes
+ tests/data/acpi/q35/DSDT.ipmibt   | Bin 7753 -> 7745 bytes
+ tests/data/acpi/q35/DSDT.memhp    | Bin 9037 -> 9029 bytes
+ tests/data/acpi/q35/DSDT.mmio64   | Bin 8808 -> 8801 bytes
+ tests/data/acpi/q35/DSDT.numamem  | Bin 7684 -> 7676 bytes
+ tests/data/acpi/q35/DSDT.tis      | Bin 8283 -> 8276 bytes
+ tests/qtest/bios-tables-test.c    |  49 ++++++++++++++++++++++++++++++
+ 17 files changed, 92 insertions(+), 15 deletions(-)
+ create mode 100644 tests/data/acpi/pc/DSDT.hpbridge
+ create mode 100644 tests/data/acpi/pc/DSDT.hpbrroot
+ create mode 100644 tests/data/acpi/pc/DSDT.roothp
+
+-- 
+2.17.1
 
 
