@@ -2,87 +2,92 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 335C9C43463
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 10:54:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D27F0C43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 10:57:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76BCB21973
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 10:54:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 480B720789
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 10:57:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RhUBZd+f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76BCB21973
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eWqOYFPv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 480B720789
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJE1g-0003Xu-Ct
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 06:54:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38876)
+	id 1kJE4c-0006Cv-82
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 06:57:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39710)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kJE0f-0002ok-Ch; Fri, 18 Sep 2020 06:52:57 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35806)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kJE0d-0007p6-AN; Fri, 18 Sep 2020 06:52:57 -0400
-Received: by mail-ot1-x344.google.com with SMTP id o6so4988524ota.2;
- Fri, 18 Sep 2020 03:52:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=oocQ5mlAt6HnjaWdLqPOvslz8XKIQac7kdibgx2EP+w=;
- b=RhUBZd+f6FwQfe73c2PvweYO01M6U5rNvWwEfcIErVi5QLopbsqDz0wO2R7UbMCZwH
- 7/Lkjch9GDLq3kHrJDsI4NsWXXFSNUQwMYZITRS9y8p0TfQk96c69oRAqhsOgUS4FP/B
- womZ5gPI1GbOCousp8OqAUHvjcPQc6DvLiS9kPV87Wpm7e85mz4n7G0PdDOiV2D98rrP
- Xuzki1FOoRQ6FsxX99xiMKjfNPum1XycU4tsDX9De3CvavPxYMfESw0ajwy3hkK316g/
- Tw9T6uD1R9kabQKQjkL+4gI8+6Lav07Ok0cKyamxGF6o2FS+t39tmC5JLQuNXRF0htNp
- h/tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=oocQ5mlAt6HnjaWdLqPOvslz8XKIQac7kdibgx2EP+w=;
- b=ABgdYEwRh4nLKvJGzXoVDrDc+Y/Bxwj86xFZifLEv3hnN47XWX33Su/DV9JKKxY3s7
- 6rjhFJn+oohV8ZVtV6kdxh8ldgaVDbc83ts2dbMAEO3hcTbbv78530zVZmEMANKuatEo
- s4WPbUOO4s4RWI3gUBLN2Ti6R/8fSopmXvAHy9rAbQ7a3W6uGt5yYBNsAMj5dQjMZGvl
- 9/ylIbzn9zheEJP4tyx9oaxW43ILrSFnjZrPdRUO1g3nMXxxMCCIxExSS9xn/ijR5UHn
- l+hzkV0qd5btv/FS2bFaxlbTNuqVX0hKFpp4eXSODAZHugYRtnijukSFynNin9+Cvmuf
- znHA==
-X-Gm-Message-State: AOAM533leOqWhTQKX5J2icYSeisnah0ipC1a3jHFaUPgI0M3Sl/L8kNR
- vjd5CzxIR2d123McswZcMVxpNgOwoU5wXXboeus=
-X-Google-Smtp-Source: ABdhPJw3eKrth2ebMddwmuAVqo5WeGSyWs/wDImnr7sPSkCR9wZmIRUwEufznJLpBkPjx0Y7rsgtIcV3ayykJSP8Wfs=
-X-Received: by 2002:a05:6830:2302:: with SMTP id
- u2mr21376323ote.181.1600426373807; 
- Fri, 18 Sep 2020 03:52:53 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kJE3l-0005h0-CU
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 06:56:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51141)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kJE3f-0008Vi-P6
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 06:56:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600426562;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=SUaEPiZPN1YdbwhOwBH8+jPtqZAGgo0xZtWUVcE87/0=;
+ b=eWqOYFPvfDN/REb/1yYyOQHcJIVwqYDnOK2ImAIfb36TLJFcJ8g2bXigVO/O5UwTEkqHJI
+ 7DvWHz8wc8dCSxsBRX8YmLQkuiMDM5DOHRZTjq1MYFnfr3qUErg2sAH2pLycwXuKjYEd4F
+ kelWhvGK22HmHWep+vsQvrxLIdrTO2s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-281-i7E1-2_2MCSB5zfELRVz6Q-1; Fri, 18 Sep 2020 06:56:00 -0400
+X-MC-Unique: i7E1-2_2MCSB5zfELRVz6Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5EFB364092;
+ Fri, 18 Sep 2020 10:55:59 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
+ [10.36.114.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2DE9C5C641;
+ Fri, 18 Sep 2020 10:55:59 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id B8C0A113864A; Fri, 18 Sep 2020 12:55:57 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH 09/37] qapi/common.py: Add indent manager
+References: <20200915224027.2529813-1-jsnow@redhat.com>
+ <20200915224027.2529813-10-jsnow@redhat.com>
+ <87k0wtiwlb.fsf@dusky.pond.sub.org>
+ <37ea889c-746e-bea9-a719-6bee9e86f1a8@redhat.com>
+ <87v9gcesh8.fsf@dusky.pond.sub.org>
+ <301fb683-9b57-d355-3b08-776ab4869975@redhat.com>
+Date: Fri, 18 Sep 2020 12:55:57 +0200
+In-Reply-To: <301fb683-9b57-d355-3b08-776ab4869975@redhat.com> (John Snow's
+ message of "Thu, 17 Sep 2020 13:18:15 -0400")
+Message-ID: <87363fjqv6.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-References: <20200827113806.1850687-1-ppandit@redhat.com>
-In-Reply-To: <20200827113806.1850687-1-ppandit@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Fri, 18 Sep 2020 18:52:18 +0800
-Message-ID: <CAKXe6SK2MQS-ntCpo2-TkAh57PcuGRaCBRMur91sxiB1Z-k62g@mail.gmail.com>
-Subject: Re: [PATCH] fdc: check null block pointer before blk_pwrite
-To: P J P <ppandit@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=liq3ea@gmail.com; helo=mail-ot1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 01:32:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,79 +100,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ruhr-University <bugs-syssec@rub.de>, John Snow <jsnow@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org,
- Prasad J Pandit <pjp@fedoraproject.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <crosa@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-P J P <ppandit@redhat.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8827=E6=97=A5=E5=
-=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=887:41=E5=86=99=E9=81=93=EF=BC=9A
->
-> From: Prasad J Pandit <pjp@fedoraproject.org>
->
-> While transferring data via fdctrl_write_data(), check that
-> current drive does not have a null block pointer. Avoid
-> null pointer dereference.
->
->  -> https://ruhr-uni-bochum.sciebo.de/s/NNWP2GfwzYKeKwE?path=3D%2Ffdc_nul=
-lptr1
->     =3D=3D1658854=3D=3DHint: address points to the zero page.
->     #0 blk_inc_in_flight block/block-backend.c:1327
->     #1 blk_prw block/block-backend.c:1299
->     #2 blk_pwrite block/block-backend.c:1464
->     #3 fdctrl_write_data hw/block/fdc.c:2418
->     #4 fdctrl_write hw/block/fdc.c:962
->     #5 portio_write ioport.c:205
->     #6 memory_region_write_accessor memory.c:483
->     #7 access_with_adjusted_size memory.c:544
->     #8 memory_region_dispatch_write memory.c:1476
->
-> Reported-by: Ruhr-University <bugs-syssec@rub.de>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> ---
->  hw/block/fdc.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-> index e9ed3eef45..dedadac68a 100644
-> --- a/hw/block/fdc.c
-> +++ b/hw/block/fdc.c
-> @@ -2419,7 +2419,8 @@ static void fdctrl_write_data(FDCtrl *fdctrl, uint3=
-2_t value)
->          if (pos =3D=3D FD_SECTOR_LEN - 1 ||
->              fdctrl->data_pos =3D=3D fdctrl->data_len) {
->              cur_drv =3D get_cur_drv(fdctrl);
-> -            if (blk_pwrite(cur_drv->blk, fd_offset(cur_drv), fdctrl->fif=
-o,
-> +            if (cur_drv->blk
-> +                && blk_pwrite(cur_drv->blk, fd_offset(cur_drv), fdctrl->=
-fifo,
->                             BDRV_SECTOR_SIZE, 0) < 0) {
->                  FLOPPY_DPRINTF("error writing sector %d\n",
->                                 fd_sector(cur_drv));
-> --
+John Snow <jsnow@redhat.com> writes:
 
-Hello Prasad,
-
-There are several pattern to address this NULL check in fdc.c.
-I think it is better to consider this as an error. Just like the check
-in 'fdctrl_format_sector':
-
-if (cur_drv->blk =3D=3D NULL ||
-    blk_pwrite(cur_drv->blk, fd_offset(cur_drv), fdctrl->fifo,
-    BDRV_SECTOR_SIZE, 0) < 0) {
-    FLOPPY_DPRINTF("error formatting sector %d\n", fd_sector(cur_drv));
-    fdctrl_stop_transfer(fdctrl, FD_SR0_ABNTERM | FD_SR0_SEEK, 0x00, 0x00);
-} else {
-
-Also there seems exists the same issue in  'fdctrl_read_data'
-
-Thanks,
-Li Qiang
-
-> 2.26.2
+> On 9/17/20 4:07 AM, Markus Armbruster wrote:
+>> John Snow <jsnow@redhat.com> writes:
+>> 
+>>> On 9/16/20 11:13 AM, Markus Armbruster wrote:
+>>>> John Snow <jsnow@redhat.com> writes:
+>>>>
 >
 >
+>>>> Let's replace "the indent" by "the indentation" globally.
+>>>>
+>>>
+>>> They're both cromulent as nouns and one is shorter.
+>>>
+>>> I'll switch in good faith; do you prefer "Indentation" as a noun?
+>> Use of "indent" as a noun was new to me, but what do I know; you're
+>> the
+>> native speaker.  Use your judgement.  Applies to the class name, too.
+>> 
+>
+> I made the change; see gitlab commits or wait for v2 to see if it
+> reads better to you.
+>
+>>>>> +        return self._level
+>>>>>    +    def __repr__(self) -> str:
+>>>>> +        return "{}({:d})".format(type(self).__name__, self._level)
+>>>> Is __repr__ needed?
+>>>>
+>>>
+>>> Yes; it's used in the underflow exception , and it is nice when using
+>>> the python shell interactively.
+>>>
+>>> repr(Indent(4)) == "Indent(4)"
+>> Meh.  There's another three dozen classes for you to put lipstick on
+>> :)
+>> 
+>
+> We'll get to them in due time. For now, please admire the lipstick.
+
+If I take off my glasses and step six feet back, I just might be able to
+overlook it.
+
+>>>>> +    def pop(self, amount: int = 4) -> int:
+>>>>> +        """Pop `amount` spaces off of the indent, default four."""
+>>>>> +        if self._level < amount:
+>>>>> +            raise ArithmeticError(
+>>>>> +                "Can't pop {:d} spaces from {:s}".format(amount, repr(self)))
+>> I think assert(amount <= self._level) would do just fine.
+>> 
+>
+> Secretly, asserts can be disabled in Python just like they can in C code.
+
+There are compilers that let you switch off array bounds checking.
+Would you advocate manual bounds checking to protect people from their
+own folly?
+
+> My habit: if it's something that should already be true given the
+> nature of how the code is laid out, use an assertion. If I am
+> preventing an erroneous state (Especially from callers in other
+> modules), explicitly raise an exception.
+
+I check function preconditions ruthlessly with assert.  There's no sane
+way to recover anyway.
+
+Without a way to recover, the only benefit is crashing more prettily.
+If the error is six levels deep in a some fancy-pants framework, then
+prettier crashes might actually help someone finding the error slightly
+faster.  But it ain't.
+
+My final argument is local consistency: use of assertions to check
+preconditions is pervasive in scripts/qapi/.
+
+> (See the gitlab branch for the updated version of this patch, which
+> has changed the code slightly.)
+
+[...]
+
 
