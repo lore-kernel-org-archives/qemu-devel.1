@@ -7,71 +7,70 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9554C43463
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 17:44:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E491C43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 17:46:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D44C21707
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 17:44:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1489E21707
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 17:46:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iDjqhXrQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D44C21707
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZhZGCoBs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1489E21707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJKRD-0004dM-BE
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 13:44:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36162)
+	id 1kJKSu-00067I-2b
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 13:46:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36220)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kJKNw-0002nA-50; Fri, 18 Sep 2020 13:41:24 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51654)
+ id 1kJKO0-0002oR-C0; Fri, 18 Sep 2020 13:41:32 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36859)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kJKNu-0000FL-IT; Fri, 18 Sep 2020 13:41:23 -0400
-Received: by mail-wm1-x343.google.com with SMTP id w2so6083905wmi.1;
- Fri, 18 Sep 2020 10:41:21 -0700 (PDT)
+ id 1kJKNy-0000Gs-Qc; Fri, 18 Sep 2020 13:41:28 -0400
+Received: by mail-wr1-x441.google.com with SMTP id z1so6461840wrt.3;
+ Fri, 18 Sep 2020 10:41:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=mHMBZwFybrG3Wb5VMsP3egLDE4ZsHJicDRun+ytDKB4=;
- b=iDjqhXrQBlXTZoroY32efXfJq2RtOCHrjqnSmbeDF/n0kpABMlZfcq+VaLeYzJgCrr
- W3YwbCVHvvj4kmI8qUxc9UZWNwbMf9TXN9rmX5nNGDAjXxako0LMrrKGrSSZyl/mqMYS
- kJ1P1NPL7k72jTlK5YRmMl8xgncf8Qnbl7zVjw82Z7HoSxYBpu55WMl8R18pQ1Sc0QiO
- ATFT9dulauKeQGFWCKaNZD9DGBow4vpjLKwthnggrKtJRDPsvYiYp4PNjJbWmYr72989
- lELbLgt2BaxG3XdDB29Ab31tBmyxxjHnnF7hbEUe9LiL9WelEwu6243XHMn5JCeUjP+1
- a4fQ==
+ bh=UJjk8ZR/erxbnrLQ53sw18LTpiI4+fnfSdMDknbc4K0=;
+ b=ZhZGCoBsfn+UONcYcwvkGlZcMK6BlUdKqbm+mhCYd58+/Eh4d9YE4vY92e8ZuFUA9p
+ PiVzVankmaErjjOayyHAsMXkeNXysviLJKTv8r3Ge9wxeHJfToT+LqV1yNxlWlWa8I2N
+ 53zr5EhFIURU4kyDSn6hDMLLENamBoZBJzgdsq+JGm1BZBhcCcRKrlBVu9kJxlpYV+kp
+ JK6Gd7hzv/+ZAniAekN4lr78Blr1y4vkYCIDZqG5pDHHhQUwpMnB2sqTI7tLeAc9Yg+H
+ D25ug9cmDG7wlP+NUIqRvJ+wzjqUui5gdJW7uozVEprFL0/06YRSmb9/YwaC0YGjRjBE
+ /2Qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=mHMBZwFybrG3Wb5VMsP3egLDE4ZsHJicDRun+ytDKB4=;
- b=Gbon1O1FB04x8L6aPJts2/C/g8AsUu3maMx0+paiSfwEv6esuOR11O4yCWYJr4JIUv
- R6thNbN81V7ikx8leg3qqjdes2J1nEURGMINAqpLcLksR+PMQOQQfn0j6gIBwQjZmwOl
- IdBVyR7oY6Y6ssxKc+s6ukSB8kGP44Ug6XDr7YcktcJu0I1rPlPBBYXvVbX/T6fTtFrd
- NVz9xJfJOzhjwqVPC71dJyWioowecVbUZvLFhjWwtQ6QAjHAS8I2b2TJJ8vT6+qxL5qO
- 9xdlV/LRBgUUSOY7L9SWgMnwXC4gkuMOSdI/m1CsITWnsiQ9g9eHpt6mMR3lPXQXTo74
- y2MA==
-X-Gm-Message-State: AOAM533bbJDs+pXBX99O4C2lhqzV3eIXnRZfN31d62hQ8XmlpqtJsaqW
- rRCjeKyV0DbJrL52S2LSPkJyTJSzouY=
-X-Google-Smtp-Source: ABdhPJwHDsIzpBjkWdnd7DvWVfxyk62dE3wOvgXi/8eskd5mdSlb9HoSpi5Sq0rl3Rp41AHWjOzBeg==
-X-Received: by 2002:a05:600c:2182:: with SMTP id
- e2mr17103210wme.102.1600450880358; 
- Fri, 18 Sep 2020 10:41:20 -0700 (PDT)
+ bh=UJjk8ZR/erxbnrLQ53sw18LTpiI4+fnfSdMDknbc4K0=;
+ b=W1MWrTUegr23Em4m6jC35AIvEdLoudmHeeQQAoagh/2OpqTXOC/igymIZ3DiBgbFzK
+ GV5fxllz6fswCGe3Lx7Bnwlwr0/4ToKDAqXgjel7YJOGWRfaA1EoTJFocMloz/HjHkC/
+ BERKHNilJTQaPPNrP5mc4hABZibS+rVtYQWn+uONp8gl5qL8Oekphake+cg5ZksScS/E
+ 3zaQ2+5VjPLfLWHLZB8tf6WuCHTSqtB/Z58A3ebaGOu4bkUUNVLKNPf8jupqBn7N7bKi
+ ty/AhEW/9yKF3BNIFu6G53Qaf6KWaVA5L3zgLvuYTopzle4qbXyQ4S4PN9xg8QKOuELd
+ LEpQ==
+X-Gm-Message-State: AOAM5330ARiP37TCcqVOEuQN6metJ1ntlENfyVuP56buivLESwrITwnT
+ V0u4Lr6I8S2VLP/rw/RB4P6MfzromY8=
+X-Google-Smtp-Source: ABdhPJznczTLAPC3R3Zkc7v6W/nZf8C8+osE5w7JYxVujdOV4cbj4HewTfP2XU27rIGGvsfaITRueQ==
+X-Received: by 2002:adf:a18c:: with SMTP id u12mr40631017wru.90.1600450885109; 
+ Fri, 18 Sep 2020 10:41:25 -0700 (PDT)
 Received: from x1w.redhat.com (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id a81sm6356179wmf.32.2020.09.18.10.41.19
+ by smtp.gmail.com with ESMTPSA id a81sm6356179wmf.32.2020.09.18.10.41.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Sep 2020 10:41:19 -0700 (PDT)
+ Fri, 18 Sep 2020 10:41:24 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 1/6] hw/sd/sdcard: Add trace event for ERASE command
- (CMD38)
-Date: Fri, 18 Sep 2020 19:41:12 +0200
-Message-Id: <20200918174117.180057-2-f4bug@amsat.org>
+Subject: [RFC PATCH 5/6] hw/sd/sdcard: Do not attempt to erase out of range
+ addresses
+Date: Fri, 18 Sep 2020 19:41:16 +0200
+Message-Id: <20200918174117.180057-6-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200918174117.180057-1-f4bug@amsat.org>
 References: <20200918174117.180057-1-f4bug@amsat.org>
@@ -79,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -110,40 +109,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Trace addresses provided to the ERASE command.
+While the Spec v3 is not very clear, v6 states:
 
+  If the host provides an out of range address as an argument
+  to CMD32 or CMD33, the card shall indicate OUT_OF_RANGE error
+  in R1 (ERX) for CMD38.
+
+If an address is out of range, do not attempt to erase it:
+return R1 with the error bit set.
+
+Buglink: https://bugs.launchpad.net/bugs/1895310
+Reported-by: Alexander Bulekov <alxndr@bu.edu>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/sd.c         | 2 +-
- hw/sd/trace-events | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ hw/sd/sd.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 00128822224..2606b969e34 100644
+index ee7b64023aa..4454d168e2f 100644
 --- a/hw/sd/sd.c
 +++ b/hw/sd/sd.c
-@@ -749,7 +749,7 @@ static void sd_erase(SDState *sd)
-     uint64_t erase_start = sd->erase_start;
-     uint64_t erase_end = sd->erase_end;
+@@ -766,6 +766,13 @@ static void sd_erase(SDState *sd)
+         erase_end *= 512;
+     }
  
--    trace_sdcard_erase();
-+    trace_sdcard_erase(sd->erase_start, sd->erase_end);
-     if (!sd->erase_start || !sd->erase_end) {
-         sd->card_status |= ERASE_SEQ_ERROR;
-         return;
-diff --git a/hw/sd/trace-events b/hw/sd/trace-events
-index a87d7355fb8..96c7ea5e52f 100644
---- a/hw/sd/trace-events
-+++ b/hw/sd/trace-events
-@@ -46,7 +46,7 @@ sdcard_reset(void) ""
- sdcard_set_blocklen(uint16_t length) "0x%03x"
- sdcard_inserted(bool readonly) "read_only: %u"
- sdcard_ejected(void) ""
--sdcard_erase(void) ""
-+sdcard_erase(uint32_t first, uint32_t last) "addr first 0x%" PRIx32" last 0x%" PRIx32
- sdcard_lock(void) ""
- sdcard_unlock(void) ""
- sdcard_read_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
++    if (sd->erase_start > sd->size || sd->erase_end > sd->size) {
++        sd->card_status |= OUT_OF_RANGE;
++        sd->erase_start = INVALID_ADDRESS;
++        sd->erase_end = INVALID_ADDRESS;
++        return;
++    }
++
+     erase_start = sd_addr_to_wpnum(erase_start);
+     erase_end = sd_addr_to_wpnum(erase_end);
+     sd->erase_start = INVALID_ADDRESS;
 -- 
 2.26.2
 
