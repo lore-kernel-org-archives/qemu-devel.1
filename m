@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2505C43464
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 08:49:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A0C0C43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 08:50:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57799208B8
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 08:49:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 93D5D208B8
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 08:50:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="V52/wwul"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57799208B8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="iFmNOd6l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93D5D208B8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJC54-00014m-CK
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 04:49:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37330)
+	id 1kJC5f-0001tJ-FY
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 04:49:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36934)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kJByS-00030c-7E
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 04:42:32 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35155)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kJBxc-0001n2-2T
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 04:41:40 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:40567)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kJByM-0007xJ-G0
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 04:42:31 -0400
-Received: by mail-pg1-x543.google.com with SMTP id g29so3079678pgl.2
- for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 01:42:26 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kJBxZ-0007ob-AV
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 04:41:39 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id gf14so2647086pjb.5
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 01:41:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=PZ0t5l0h/1dEpMOLrSPH28d48Nu+Fe9SZlr/r+Ye7Vw=;
- b=V52/wwul9s8DedAR5ouvf561AUTmNU26zuIzCZygkxDsTHNsYFyqYnWxqzQjblA4QF
- vYJb9T2zdd5KV93kPPhhR4+3O67aorRQ587Xrsz7WuIYJKvR6/V9QuwiZYIbYmPRc72N
- gg8IZUYSmoJQlvZzVyGYs8ZD95GFHsE9KZJQ6IrqrZJwZyhoKZ2NlXdcx5cdG4vIL85W
- 4y1qIwiETNjWR5cQ5cUsvbZpuCWNU+YmUzRsz6eiwbWyszFifNIm9rpOghTqALCIIHpV
- PhIb3JAP6BinCaiZqTyQGHFJr0R7mxqtuvpayN4aze90LyN4U80J5k9gafKgbdo+vzB5
- 7bNA==
+ bh=f5ra6UODN1AUn8bh55WFoMqTw5asQpeyZp8NnbOMP2Y=;
+ b=iFmNOd6lchL+Vj4LNvJ8Llti2wrmSKDpYEA/chk9YMhS2czEUDlOk/AnjklIW72sn5
+ Vzs8rVXZRNI2ATE/ET47HVN3vWidUNFgvquy1WKsLrTgyWuOu36wLWYmH6kX51Y+iVaV
+ 7zg1iB3Adh3OdDmWG7xRYiROg2X5UL7Bmh8+RHTYhio1pE83HwRkfKRpcwhh36dNIxf1
+ rzqKQNj4o8WM6B2/sy6AWVd4eXkSCfwuBHXBWUYqg8r/0BV5hj5SbTHVJ6uPGxZ6OZaT
+ 1cJBqFGdA/yZSMA0pq6BuW5dA4UjXbNDQl+BPRTBEo86OFM78FeAyp0Cd5kV8urCIQnF
+ 3xgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=PZ0t5l0h/1dEpMOLrSPH28d48Nu+Fe9SZlr/r+Ye7Vw=;
- b=PtcpgBOLyhYwQrAvHKXJLDE5qa8qjX6Y4d6NxaLuyEbi1/BBUg/8Kkv1VMpus/l4LX
- jqk70WohJ24Ue1FeTWD86jq5ua9b094rEQIRE9xMlk/oSPFfueQ1c4ngAlbqgPSCk1i2
- FfCPrOeW+XY3i0Tbw9RKRQIq29aUB8a1evTvFwXIEZjrqsrY/g+lntqZ4LQGardvGmO/
- 8CXJpufcUXjnO6WhxyYHZfr0uLgLn4K76Ea5b0ePQHGLxDuNHnxy+c+K+9QOgDD0tS93
- fmMUCm617Q/nENkusm9cAKbQiBnlnCQLpotnil4oCTVmyOreH3EXN3cSKhQORbOcUvzM
- jFZw==
-X-Gm-Message-State: AOAM531Z84iwj5cowYt52/aEABoPO5C+NMTov+/Mie3RfHNRAJ9yJ2si
- cTCTOO/tYLHlgy74bVldud1Feg==
-X-Google-Smtp-Source: ABdhPJybscssd5cy/TUiUtK4KTDQWxE0pC92Oer/JqYDebgAxByIHDLNhE5ol/3wdbqhx/8xjNfrGw==
-X-Received: by 2002:aa7:9182:0:b029:142:2501:3977 with SMTP id
- x2-20020aa791820000b029014225013977mr14816879pfa.60.1600418545120; 
- Fri, 18 Sep 2020 01:42:25 -0700 (PDT)
+ bh=f5ra6UODN1AUn8bh55WFoMqTw5asQpeyZp8NnbOMP2Y=;
+ b=IO92M8J9q/X75MqkUB9hUhX71PUypyqUdwAuGJzusICsuSrl7uqd8coy+GZDAl5OMr
+ iFWzsGqdU03IYOs/I5f0orzDNi8cHPJK0QuYgDb15ttRPF96TAAOSoAiUe8e8y1CwOQP
+ 1nx6E6hsQqfe0Z4yGeO8KttHLByhWMUtJ2qnV0P+R5L4tXGXif+tQqJZuV5HpKflaQXp
+ aTflqeuF/M+ZHtBu0r/qlrEVn2lCWcBLpC6AKw4wOQuGtcu1hNBn5+gR5HNiTHW1Rtqv
+ fxHyZrjoNUx7Cf+irxYHVjQ0Q6+ciYi4RUfZH0s+Sqa/kei8fAD4bZAMnwTYb8Gvq4wi
+ ztLg==
+X-Gm-Message-State: AOAM532GABcKEQwU7hUmxbA99k5HkOm1UWktWz1Cuyg0aie1+BJ7hb37
+ JRqFyrUANhbaxpk0AcZ1c1c6tw==
+X-Google-Smtp-Source: ABdhPJzDExbOU5jidnm0e+bL+KUTkUEzpA0XO5+RuDvRWRh7CiJMf4eB5qVctANYxPDh6p6DIQ3teQ==
+X-Received: by 2002:a17:90b:1b52:: with SMTP id
+ nv18mr12409857pjb.149.1600418495959; 
+ Fri, 18 Sep 2020 01:41:35 -0700 (PDT)
 Received: from localhost.localdomain ([115.96.124.157])
- by smtp.googlemail.com with ESMTPSA id gi20sm2120603pjb.28.2020.09.18.01.42.20
+ by smtp.googlemail.com with ESMTPSA id gi20sm2120603pjb.28.2020.09.18.01.41.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Sep 2020 01:42:24 -0700 (PDT)
+ Fri, 18 Sep 2020 01:41:35 -0700 (PDT)
 From: Ani Sinha <ani@anisinha.ca>
 To: mst@redhat.com,
 	qemu-devel@nongnu.org
-Subject: [PATCH v10 13/13] tests/acpi: add DSDT.hpbrroot DSDT table blob to
- test global i440fx hotplug
-Date: Fri, 18 Sep 2020 14:11:11 +0530
-Message-Id: <20200918084111.15339-14-ani@anisinha.ca>
+Subject: [PATCH v10 03/13] tests/acpi: add a new ACPI table in order to test
+ root pci hotplug on/off
+Date: Fri, 18 Sep 2020 14:11:01 +0530
+Message-Id: <20200918084111.15339-4-ani@anisinha.ca>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200918084111.15339-1-ani@anisinha.ca>
 References: <20200918084111.15339-1-ani@anisinha.ca>
-Received-SPF: none client-ip=2607:f8b0:4864:20::543;
- envelope-from=ani@anisinha.ca; helo=mail-pg1-x543.google.com
+Received-SPF: none client-ip=2607:f8b0:4864:20::1044;
+ envelope-from=ani@anisinha.ca; helo=mail-pj1-x1044.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -18
@@ -84,7 +84,7 @@ X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ SPF_NONE=0.001, T_FILL_THIS_FORM_SHORT=0.01 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,12 +107,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This change adds a new DSDT golden master table blob to test disabling
-hotplug on both pci root bus and pci bridges. Also reverts the change
-in file bios-tables-test-allowed-diff.h to make sure its now empty so that
-future modifications to acpi tables can be caught.
-
-The following is the disassembled diff between DSDT.hpbridge and DSDT.hpbrroot:
+A new binary ACPI table tests/data/acpi/pc/DSDT.roothp is added in order
+to unit test hotplug on/off capability on the root pci bus for i440fx.
+The diff between the table DSDT.bridge and DSDT.roothp is listed below:
 
 @@ -1,30 +1,30 @@
  /*
@@ -122,16 +119,16 @@ The following is the disassembled diff between DSDT.hpbridge and DSDT.hpbrroot:
   *
   * Disassembling to symbolic ASL+ operators
   *
-- * Disassembly of tests/data/acpi/pc/DSDT.hpbridge, Wed Sep 16 09:45:56 2020
-+ * Disassembly of /tmp/aml-ECV9Q0, Wed Sep 16 09:45:56 2020
+- * Disassembly of tests/data/acpi/pc/DSDT.bridge, Fri Sep 11 22:51:04 2020
++ * Disassembly of /tmp/aml-UGIHQ0, Fri Sep 11 22:51:04 2020
   *
   * Original Table Header:
   *     Signature        "DSDT"
-- *     Length           0x0000131F (4895)
-+ *     Length           0x00000B89 (2953)
+- *     Length           0x00001A89 (6793)
++ *     Length           0x0000140A (5130)
   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
-- *     Checksum         0xF9
-+ *     Checksum         0xA2
+- *     Checksum         0x09
++ *     Checksum         0xE6
   *     OEM ID           "BOCHS "
   *     OEM Table ID     "BXPCDSDT"
   *     OEM Revision     0x00000001 (1)
@@ -148,160 +145,7 @@ The following is the disassembled diff between DSDT.hpbridge and DSDT.hpbrroot:
              DBGB,   8
          }
 
-@@ -234,64 +234,32 @@
-         {
-             Name (_HID, EisaId ("PNP0B00") /* AT Real-Time Clock */)  // _HID: Hardware ID
-             Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
-             {
-                 IO (Decode16,
-                     0x0070,             // Range Minimum
-                     0x0070,             // Range Maximum
-                     0x01,               // Alignment
-                     0x08,               // Length
-                     )
-                 IRQNoFlags ()
-                     {8}
-             })
-         }
-     }
-
--    Scope (_SB.PCI0)
--    {
--        OperationRegion (PCST, SystemIO, 0xAE00, 0x08)
--        Field (PCST, DWordAcc, NoLock, WriteAsZeros)
--        {
--            PCIU,   32,
--            PCID,   32
--        }
--
--        OperationRegion (SEJ, SystemIO, 0xAE08, 0x04)
--        Field (SEJ, DWordAcc, NoLock, WriteAsZeros)
--        {
--            B0EJ,   32
--        }
--
--        OperationRegion (BNMR, SystemIO, 0xAE10, 0x04)
--        Field (BNMR, DWordAcc, NoLock, WriteAsZeros)
--        {
--            BNUM,   32
--        }
--
--        Mutex (BLCK, 0x00)
--        Method (PCEJ, 2, NotSerialized)
--        {
--            Acquire (BLCK, 0xFFFF)
--            BNUM = Arg0
--            B0EJ = (One << Arg1)
--            Release (BLCK)
--            Return (Zero)
--        }
--    }
--
-     Scope (_SB)
-     {
-         Scope (PCI0)
-         {
-             Method (_PRT, 0, NotSerialized)  // _PRT: PCI Routing Table
-             {
-                 Local0 = Package (0x80){}
-                 Local1 = Zero
-                 While ((Local1 < 0x80))
-                 {
-                     Local2 = (Local1 >> 0x02)
-                     Local3 = ((Local1 + Local2) & 0x03)
-                     If ((Local3 == Zero))
-                     {
-                         Local4 = Package (0x04)
-                             {
-@@ -690,38 +658,32 @@
-                 Method (_OST, 3, Serialized)  // _OST: OSPM Status Indication
-                 {
-                     COST (Zero, Arg0, Arg1, Arg2)
-                 }
-             }
-         }
-     }
-
-     Method (\_GPE._E02, 0, NotSerialized)  // _Exx: Edge-Triggered GPE
-     {
-         \_SB.CPUS.CSCN ()
-     }
-
-     Scope (_GPE)
-     {
-         Name (_HID, "ACPI0006" /* GPE Block Device */)  // _HID: Hardware ID
--        Method (_E01, 0, NotSerialized)  // _Exx: Edge-Triggered GPE
--        {
--            Acquire (\_SB.PCI0.BLCK, 0xFFFF)
--            \_SB.PCI0.PCNT ()
--            Release (\_SB.PCI0.BLCK)
--        }
-     }
-
-     Scope (\_SB.PCI0)
-     {
-         Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
-         {
-             WordBusNumber (ResourceProducer, MinFixed, MaxFixed, PosDecode,
-                 0x0000,             // Granularity
-                 0x0000,             // Range Minimum
-                 0x00FF,             // Range Maximum
-                 0x0000,             // Translation Offset
-                 0x0100,             // Length
-                 ,, )
-             IO (Decode16,
-                 0x0CF8,             // Range Minimum
-                 0x0CF8,             // Range Maximum
-@@ -766,48 +728,32 @@
-         })
-         Device (GPE0)
-         {
-             Name (_HID, "PNP0A06" /* Generic Container Device */)  // _HID: Hardware ID
-             Name (_UID, "GPE0 resources")  // _UID: Unique ID
-             Name (_STA, 0x0B)  // _STA: Status
-             Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
-             {
-                 IO (Decode16,
-                     0xAFE0,             // Range Minimum
-                     0xAFE0,             // Range Maximum
-                     0x01,               // Alignment
-                     0x04,               // Length
-                     )
-             })
-         }
--
--        Device (PHPR)
--        {
--            Name (_HID, "PNP0A06" /* Generic Container Device */)  // _HID: Hardware ID
--            Name (_UID, "PCI Hotplug resources")  // _UID: Unique ID
--            Name (_STA, 0x0B)  // _STA: Status
--            Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
--            {
--                IO (Decode16,
--                    0xAE00,             // Range Minimum
--                    0xAE00,             // Range Maximum
--                    0x01,               // Alignment
--                    0x14,               // Length
--                    )
--            })
--        }
-     }
-
-     Scope (\)
-     {
-         Name (_S3, Package (0x04)  // _S3_: S3 System State
-         {
-             One,
-             One,
-             Zero,
-             Zero
-         })
-         Name (_S4, Package (0x04)  // _S4_: S4 System State
-         {
-             0x02,
-             0x02,
-             Zero,
-@@ -831,479 +777,48 @@
+@@ -831,61 +831,60 @@
              Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
              {
                  IO (Decode16,
@@ -346,8 +190,48 @@ The following is the disassembled diff between DSDT.hpbridge and DSDT.hpbrroot:
              Device (S18)
              {
                  Name (_ADR, 0x00030000)  // _ADR: Address
+-                Name (BSEL, One)
++                Name (BSEL, Zero)
+                 Device (S00)
+                 {
+                     Name (_SUN, Zero)  // _SUN: Slot User Number
+                     Name (_ADR, Zero)  // _ADR: Address
+                     Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+                     {
+                         PCEJ (BSEL, _SUN)
+                     }
+                 }
+
+                 Device (S08)
+                 {
+                     Name (_SUN, One)  // _SUN: Slot User Number
+                     Name (_ADR, 0x00010000)  // _ADR: Address
+                     Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+                     {
+@@ -1345,456 +1344,30 @@
+                         Notify (SE8, Arg1)
+                     }
+
+                     If ((Arg0 & 0x40000000))
+                     {
+                         Notify (SF0, Arg1)
+                     }
+
+                     If ((Arg0 & 0x80000000))
+                     {
+                         Notify (SF8, Arg1)
+                     }
+                 }
+
+                 Method (PCNT, 0, NotSerialized)
+                 {
+-                    BNUM = One
++                    BNUM = Zero
+                     DVNT (PCIU, One)
+                     DVNT (PCID, 0x03)
+                 }
              }
--
+
 -            Device (S20)
 -            {
 -                Name (_SUN, 0x04)  // _SUN: Slot User Number
@@ -771,12 +655,13 @@ The following is the disassembled diff between DSDT.hpbridge and DSDT.hpbrroot:
 -                }
 -            }
 -
--            Method (PCNT, 0, NotSerialized)
--            {
+             Method (PCNT, 0, NotSerialized)
+             {
 -                BNUM = Zero
 -                DVNT (PCIU, One)
 -                DVNT (PCID, 0x03)
--            }
+                 ^S18.PCNT ()
+             }
          }
      }
  }
@@ -784,57 +669,69 @@ The following is the disassembled diff between DSDT.hpbridge and DSDT.hpbrroot:
 Signed-off-by: Ani Sinha <ani@anisinha.ca>
 Acked-by: Igor Mammedov <imammedo@redhat.com>
 ---
- tests/data/acpi/pc/DSDT.hpbrroot            | Bin 0 -> 2953 bytes
+ tests/data/acpi/pc/DSDT.roothp              | Bin 0 -> 5130 bytes
  tests/qtest/bios-tables-test-allowed-diff.h |   1 -
  2 files changed, 1 deletion(-)
- create mode 100644 tests/data/acpi/pc/DSDT.hpbrroot
+ create mode 100644 tests/data/acpi/pc/DSDT.roothp
 
-diff --git a/tests/data/acpi/pc/DSDT.hpbrroot b/tests/data/acpi/pc/DSDT.hpbrroot
+diff --git a/tests/data/acpi/pc/DSDT.roothp b/tests/data/acpi/pc/DSDT.roothp
 new file mode 100644
-index 0000000000000000000000000000000000000000..14518bb843059a0db1d216543f632d5a00c1a695
+index 0000000000000000000000000000000000000000..886a5e6952f6f034bdd80d44d43de5975a1a4b0f
 GIT binary patch
-literal 2953
-zcmb7GUvJY^6hAk1igTSbPV23RzC;B!4JL3BhLH9`Vy8*gBz5DIZE__$ZO{Tj!U8Js
-zM`&q~pzww=rakN-RC(`5*ggUufqez0L7&LZv71oRR02zJ?mhS1^ZT7Y_xc!?QGY4}
-zu$|npUbK?ApG@6A83O<s)4x&@*T8NYxq`#wkjU&U*&pL8C#l~Wxzz&uqvihYx_6$q
-ztl`1>j`Cu?;XT@R*MXEa*FDZ@pe#66&apf5re4w{r&uzg*;ibUoUBm;$yqHKpj4zl
-zCodJve0`|IP>Gi9cG0X?APVs6y$qtgrO<r#O1^3&&6?pP)r*c*&w@u1*CSEmzRMN2
-z7k%D!q3g<nK_7b4&$|uytr3NP{tNe^&*PG#*Q`W>Pd|>J$7mcxfP0{Pb&l8&UAuFl
-zWMv(nE5b9RVqVbn5O=w#ROikMLq*cEI~SI61}X<G3dkN=4PlP+FAB^B7Z@wBCN%MX
-zA%tjl=Tv2Rb+ju!`_V3mhZjI0t*o?Y=%e@@!^jc&d49aW-Ux355DV;`@J;}>a2d{s
-zzTwnj*~|{(yl9kWk_zxJU*;O)yFA2C<8Ow~^8vrX-|{$@BxljcC+4_H6>#tg;l%Ew
-z%Vs?_bWaR&$3CK~@K}M}748a>w9xiBr1j;>XipfmF`*Oo><N1UNDGR;=X9;Ej{+j^
-zd+M9^zyl^N0K+U*G3hx+S>lu^)!>d<tAjTaYP%jZc5;yy4c_+dH+Trvy$81%>%axr
-z=qcR|REl7t%he?Vn!Quq4c1F^8(bWTEoi=sjb>R?N_01PXe7z)ON5a`ho<-N-a1zR
-zOAWT00N#TJ;%zq>c+G9M0h^7!Yj2%8FA!U*7OEp=)>bqLUnzQ}>6MYx+0u$tXT8V+
-z-fm%;M*3V<FP2vHS_BnpT4I{ZPp2T_=ja|hBN-3lyVR3kw9w}kjr%0FJLO~OCe}bu
-zl2I&qI#3eE%1V66XP-_(L<nPYIsWiQ!0@Ya|19;11kqCyj#0AUA&q(4m&B>`05$ZQ
-zKc91~n#G>A0v34wY9*5IqvyuZG5ep4o;rY@^3hYs?;v_gos6EcI~DR>A4BJ%&wx)K
-zfKU7I=`r~95%B4Kcw-zMFNII`K63y*<HKjh;4??SXY9_hh~8V{@L~WzEFrr0Fy)aT
-z<ydD^ezH|Lh%r$`5oK2?`^U}h=zQ(NwP)7yBM3g_7gtO-SChq?cf1>$za(#6y?t}@
-z*2dM_U^Cq;FYTY@80Q5ByRgfmc(q|sVZF<+%cJ(zNt$FKshjyK(@Ry0>9xugrssdq
-z7>K%FF(i9yhLi-|%9oR<X=Lk3HR_bACCLL4qVs3h{5u@E1pH!I-7INZN+Slr7bvVI
-z^!nn@p&swH;IXc0+BLN}r6YR8KDl;Y9A53@BXJ)Lyw<oF!8~w#C%WSc#NOj^*Z%s@
-zN_na8s+BN#^m#yR+!R`vXkRT(>y}=Xj&g&!J6XBwGNkUoxKWI7uOJ?B$j=0ZYg`?J
-z&%8s-P}^hf%O$Z_JZ#F(=VVh{IBW~m(bi-~D-nI!sz;A<bYi{^kwuTaYZLtPcxYTo
-zs@KPb7=nrH>_?ZVs_=;6g9VC}CH1Mkum&sHdP3$BNYqr|>a>G?$m9&Pu3cB>v3v_=
-z-pOleOpxDYP$^SZ6_r-}bG={G+C@+b@u1*?9*a7I%bfqY9fJ_IE%*%Rg^kBvbT7&z
-zl(VQnqIbBw7ah%G`1Jz#_sJYUuuflw!GOLD^n}1)8FmNKVDQ)bVCC<(&(40>6Uazy
-zFc|zgR1c)krhn>abP*j1I+~bSHMJ}{5?mo9KX7*hEruL)JpSGBdiV7%6R`>SW(~Jk
-z8E0lnWQc>~3(kxrVq=3X3(mfy6#`Vg{}3R%b8hiReKCmPO1`p+SxS>Oc54Swl&}(}
-z8%imL*Zf}NayV!TWlPh7rV!mYW2N>d7|Rf-XeVVr-yfuhgA5JqPTWde3O1sy0RICI
-C_`Dwg
+literal 5130
+zcmb7IQEwZ^5uPQF@^O!pj?&q3tT-lQyJ?cbCMj8Q&=-++6iG{@&OFL(aYFAXDJT^L
+z$iaz=C`wS80Tjn?f$E|UeP9eeTR)-w3Hb@>OMgI$#(D}nbH}A<iU%YFc-ooy?wgt2
+z+1V8h%V=;7fc>Yish6#E;rFI)ppF3mjp?sik+#8Z8-<d?l!(Oa$BIA3M?uzpV-&VZ
+z?C&l2Z?5~vS1xOMu=8Afw$t>!eB$l^fgbI6oYO#EbgY77cNR>&l98Qq#Yp78<5Ahk
+z8+DMKt%?C^RSqykxoj320>ltRX1iTB8&yaEeD{+AlKogEdG0~6W~9x!;iR<{$7<xk
+zBaQ2ks`;7ARkxe?=GcW}SLyeA(4GF~xCwu4Cg9)yi}j$#XJkjOTd5SEK8j<;NDdOf
+z0jR&aMbS{WcIQgP$~%6n=$>IH=5j`laF<JJZT@yt010Jxme&ggf`b&J7(GTM++5}t
+zOUwlq7%Q<o*u%ez5%gwvZd5n7hHuTxz4DgKV~d~?Dle}Y`f&a(;LK6*3;c44{Sf^j
+z3Q~!^jJ}KlTU>>=C7(FEwqfSQJg*s**|Z8g#y5F}@e>~5H}N~m7kHn4$baNBT$Y_R
+zqnMiK8dbpPCxU|A$!(a8tVmA^){earuF8`o_G$Ffs4OqG{TOokW_9>Z4AHot6W%$E
+zo<>1lRQ-2u)*Je8LX<(KKD7rPFnJLeu2NY(Tc)<DTMeeb3oc`Ikf7u8ZKd&Hr0up<
+zyoXgRzu;Iq3JH24Q@n?ULakb7iW(S5&<nM#YT9On4SgN7o2Fj87qPFC)bD#OGI|GW
+zALw=aO;Yzjtzq>Q9Ce*j#b^e1%z6X7*+|><p!vKIf7aw}@3SV4z>atLu(<;~3cFqP
+zco#u&thkNZx&eFL8^^n>n>ucCX{fef@7v^1$|ERsyvrj)O<|yk4mCRLd0!mta22rT
+z;mIC=ci2RKPxcsidr#aZJZkn_`|*w2QHqwzmI|7g_4^qaA6a_j=&>YgbCvrztKIk^
+zZ?|y2#Cu%PRx0=PdK>}uOlq1dUr#~YFO~y%N;)3HXQit=YhlhU8uv(TcQ!6ynplj%
+z-bmoyqn$0|Tv@40eD3RMh(}{sWgNc>eh)yK@i%pkf}rrUlw(vZ_=3i~?Q3Re4*(+c
+zx-ZW=R^4JxTR{}q2<jEm54;z~yki;uZ133-?^)k_7ULWBp4BFM&)S_T<*tu;=aFCF
+zJ~!e%=ey61xzB~T&kfug<L<FL{p{?QM%*v??w7{gFNL^YvOAj+W^awVmjd^qgs1`I
+zlE;H3$2yzx7h6+;Ii^riMXRfB_}k6y=zROE|C;sU&;_6Jiz}&{Tj}ygpLicW`cwMh
+z`yYSw=;7}BAA`+wb7OtbRFa&R7@WWfOJI-1qVl`Q2~XIMual66v~Ct_Os~`|rq`<v
+z7&e3q14-Ab2DX}60!4MJxRFMrk#D56gj1<iWDiJ*$-lGhcPWe|h%cGf%}OSd%}@lv
+zQ5e%wdSmSmkuE=O!I7THWcIc46!x%u+`hhjTM}ms<w&tpCmL6yGY{PEmE&;(Mep$$
+z*M9SyWn;bPYSkEJ^vfKvaVlh($gh>BbxW_wVQDb;d0sho8HVn`I4RC>w<MiQ$X^MZ
+zu5ma{KJ(5+hG>tu->ysD@_8zMJttG~=y@)LBiH0at8snPY9zuEow#1-g2jxz{Rw$_
+zJTk5&=m+CUoPvqb*<aqJs=_UXA1qL;EV)PZg*8~sH&P0hL8jXcTBjY%L!o4#wf}*(
+zfaO~<i%v0<!v*rMJ5<WFs_LdhCVyiOsyed*+Ixu20!_s5augh&BMMWm`H{YYP<1WX
+zD|9dgx0_YY|M4UV5xjcgr%w;OJe?*^6HG=uOGHWa63wTHp`65n58%IF%>x8>I#l|7
+zI#lQr0pB8SIC8)L&z}OzzkYoB&e=PGj$r+M|1Sa_XrWDi=~kvoI0eD2ENRxvOdh8o
+z=su($X*<C+NeS}u+s^kV-=8pvNbX5y*{lZ>`6>xc#e^1io(o>U3#Q?v=&fyZZ!I~q
+zQxe0NalGuz$`W4m@Ct|09kNjH>Tk~`+wR<2`<=cP1aQAt-NItY5gKo=qY<kyHAan6
+zt$e=iUwQJM(^}ab#mZ!YOEPBjwv`<SxGoXUkSA+E&mZK(V2K9U9{+4*?*?xo7;k_D
+zY-Fgv5fEBiH4KCPPtax^YP@tGBZz|*yYp)+LoeePk8(sI1)Gd~D~Jh^bnFID3~drA
+zLI<RS|55zFLZCUylvwdN3s|Kv)|_CC31}<~x+GZfAPZQhLZO27f`DEKgDwkJyyge2
+zawt@=#sxGU2E8L#xq$Les9?pK3Ib5VpeuqkA)tv+s9;SBXfh1?u3()O(CJX9V8x4S
+z5bI1B^sZo41yl`%3f7c>roy1_3D#KwoehNwR{Ym7h;=Runis6ND+8z&3Kgsu1@vMV
+zv>;e73FxIzs9>EJ(D^W^E?6%M=;ctTV0}$MUkig8g7u1kUI~Q?)&&7w2!j>{>+1sg
+zdMH$|UKP-*VbC?f`i6kM5egNo*97$1B&b%qYCNblB3<RM#o&m#?0z?K*uv8Rg}Vbm
+zLIHbtV3A1>78M2Td4VNOg0QTjfPE{lv`HXK^01{~Pd>7+`3xlTv^=ztD{LVH8~M63
+zw2?Dx1Opp+TN&EO9d74=jr_e!wwc40e+ZzA+fvAQ^r3ua#{=-l!VM<uc=tj1%&wA*
+zTSeH@zI<k1B^ire*xSB*X7@A3@)dSG1&=I!#7<dbAr9@7w=rU;%(0|~_B6>O_EnUz
+qIEMB%$!OQE(aj2fBcUHEXrb|V-eQA+!J``fG=la&-l7$y;r{_Geabxm
 
 literal 0
 HcmV?d00001
 
 diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
-index dea61d94f1..dfb8523c8b 100644
+index ac864fc982..dfb8523c8b 100644
 --- a/tests/qtest/bios-tables-test-allowed-diff.h
 +++ b/tests/qtest/bios-tables-test-allowed-diff.h
 @@ -1,2 +1 @@
  /* List of comma-separated changed AML files to ignore */
--"tests/data/acpi/pc/DSDT.hpbrroot",
+-"tests/data/acpi/pc/DSDT.roothp",
 -- 
 2.17.1
 
