@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C48BC43463
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 19:19:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 299D3C43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 19:21:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17EEE21D7F
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 19:19:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9AD8821D7F
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 19:21:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H1kjFfGu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17EEE21D7F
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VYS1pFZD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AD8821D7F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJLuP-0000L9-59
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 15:19:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48322)
+	id 1kJLwx-00037j-G7
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 15:21:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kJLHU-0000a5-Fg
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:38:48 -0400
-Received: from mail-pl1-x633.google.com ([2607:f8b0:4864:20::633]:40200)
+ id 1kJLHq-0000oT-Gd
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:39:15 -0400
+Received: from mail-pf1-x42b.google.com ([2607:f8b0:4864:20::42b]:37881)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kJLHO-0007AP-Ne
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:38:48 -0400
-Received: by mail-pl1-x633.google.com with SMTP id bd2so3427354plb.7
- for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 11:38:42 -0700 (PDT)
+ id 1kJLHj-0007Cg-D5
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:39:10 -0400
+Received: by mail-pf1-x42b.google.com with SMTP id w7so3995290pfi.4
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 11:38:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Ub2ynCDHLnvijoSLHJW2aWQL1n7R5p9vDIqMXp4ZHSk=;
- b=H1kjFfGuGUJLJrC45gAqwwG/PcE0N6UjVVW2N2+/vvCQxm0zAyoJ/YlV+albivg06L
- iP3W+NuQgagIcy6ZbztBaM4822HM6deWhiNN8PkEuiugj34z/Pc2PxfBBtJHUVwXlVOq
- 0CS4W5E3aENok62PDVcEpJpRupoelM0nPlA/IX6Y4han93v4xCGvplhK+r+zVtYBUiNr
- I/ahWDx/bUEq8f5TpfovpdzPIC1aWPrK1zsezUWgoneWaCdwmbfB7/iQOhiDIXi0XN/O
- 1dmB0EZK3mT3Ooo2SXKFJPt0XZhgUIPzz6iqKXlhkBWHCXsbnZqHcuTd5Yb6rkOjcdRV
- Y9Zg==
+ bh=F9WZxYtN1t58DJuwcxgcE7EyJ0JsU31eFbA5w0cg3Y0=;
+ b=VYS1pFZDx12BJTVstF/LJ4p8Mleko9uRxS3mzWWmag0XVEXWtHOMLepVt3148bNZsP
+ m/OtHBQzgd5cl9i6p1e01yFLOUfPRbkEhLEpQ1RjrXn5dzobvvmOevf2hEz/1wVfmj4E
+ SrfbgxgoXZNO/S5OphKUsB9Vyh1Svh4dmMy2JoH+IdWAykKII7UsOVN0VP5zEyknFqJq
+ CHdfrHy709E5A00vIfCdNzl3aWVrWBX89ycch8Xcs/ltOecuYbsZOUg2giaIHbsQ7H4n
+ 0jdBWaBWfgH1YH0g9sbQt/G6oqffJ3R/fVlWygvV1sBOky9QBZbk4+WsLZ5w58MMF0x4
+ wD8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Ub2ynCDHLnvijoSLHJW2aWQL1n7R5p9vDIqMXp4ZHSk=;
- b=eKy8wsVn+Ny6XOrufChCnp6GtRCxvZpiyBjKC9m2L5NoP88KCdHxq9oq6Hi/OeqQjN
- XsCW1+ntSVc4rYwzbHvTnjHWD+FCfXOYSJuewTo/MqFE1XeWO0c3rYlrGiit6l2kfXBX
- kx3nNb6M/Xnhx+5EKZteCR7D6ivj76CiRSGrvhWvYbhe9XiciFNOZeoowG/gkT3n5k4d
- 8qk+N9stCK3DDwepp7eNMTyQkV1GHoAhan7Hg1+EgMhJ8uBryUUsXMMu0dMqOUVIDMho
- 1duaXL3wnj3h2c6695ccZWBrCD330HTGjVN04XVL1sUy6GOUKK5WW4mm8Elw2FKpKv59
- 450w==
-X-Gm-Message-State: AOAM531NCBbN/5snx2yB6BOwsOePb4/DHyBWG7Cz9RTCdOLhCd7yiARI
- AecGCjQjA6XjPsWFPF1IPc3n1jhTPwSPtg==
-X-Google-Smtp-Source: ABdhPJxo/bnRKZ8bRUsIZBPMSMacNidfGSf7kAM9DSd2X+Fx8taWyXqRpAT9ucVcENSGG87q05Nbcw==
-X-Received: by 2002:a17:90b:20d1:: with SMTP id
- ju17mr13299274pjb.134.1600454320765; 
- Fri, 18 Sep 2020 11:38:40 -0700 (PDT)
+ bh=F9WZxYtN1t58DJuwcxgcE7EyJ0JsU31eFbA5w0cg3Y0=;
+ b=AwMW7uiZkor/IQe9Q7wjHAKq+gajDFAL5mH3RPMBnr3qX7zquPpKAXFNcqH0hoshnK
+ e1e4QlRgjuP08O2oePjjk3jVOFYM8UugE4jV6D6kHZcxcHQ5Aq7FyW7QUSJNXs7Wk/Ks
+ UF1HQi6U5Qh9jYsLX5buDP30i3HIIPd0zfCqXgHwHU1uBXwILN1dB2WjJG2xga1bOTey
+ ch2dnCzXngzltw9K+x1gvux9I4r2PtcwLRl8yw+vl7he6VGeiXtIwxYUGUu4HXHV4IaA
+ GGVWgoIrkebsLj58Mqfhp72h6fC4MF37oEk/iLm88oCPM0uYdd0DsYD2N47cPeYkGcKq
+ SDJw==
+X-Gm-Message-State: AOAM5336KZjuTOetOncaL2hJ7QjeIKwNTZB/EHHx/iDSk5XAtTqeT4qa
+ X0xB88qOrLMA9AgJii3r8ZGMqn12xCeYVA==
+X-Google-Smtp-Source: ABdhPJyGMQ0spxS3OXzCQR3X4lF/WMlJgFZfvjfJOdCPXxEVCa2KXUqhN9Q6jsEWzYFGxGfGL9alXg==
+X-Received: by 2002:a62:406:0:b029:142:2501:3978 with SMTP id
+ 6-20020a6204060000b029014225013978mr16388530pfe.61.1600454337103; 
+ Fri, 18 Sep 2020 11:38:57 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id f4sm3680723pfj.147.2020.09.18.11.38.39
+ by smtp.gmail.com with ESMTPSA id f4sm3680723pfj.147.2020.09.18.11.38.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Sep 2020 11:38:39 -0700 (PDT)
+ Fri, 18 Sep 2020 11:38:56 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 36/81] target/arm: Implement SVE2 MATCH, NMATCH
-Date: Fri, 18 Sep 2020 11:37:06 -0700
-Message-Id: <20200918183751.2787647-37-richard.henderson@linaro.org>
+Subject: [PATCH v3 49/81] target/arm: Implement SVE2 FMMLA
+Date: Fri, 18 Sep 2020 11:37:19 -0700
+Message-Id: <20200918183751.2787647-50-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200918183751.2787647-1-richard.henderson@linaro.org>
 References: <20200918183751.2787647-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::633;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x633.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::42b;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x42b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -108,161 +108,191 @@ Sender: "Qemu-devel"
 
 From: Stephen Long <steplong@quicinc.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Stephen Long <steplong@quicinc.com>
-Message-Id: <20200415145915.2859-1-steplong@quicinc.com>
-[rth: Expanded comment for do_match2]
+Message-Id: <20200422165503.13511-1-steplong@quicinc.com>
+[rth: Fix indexing in helpers, expand macro to straight functions.]
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v2: Apply esz_mask to input pg to fix output flags.
----
- target/arm/helper-sve.h    | 10 ++++++
- target/arm/sve.decode      |  5 +++
- target/arm/sve_helper.c    | 64 ++++++++++++++++++++++++++++++++++++++
- target/arm/translate-sve.c | 22 +++++++++++++
- 4 files changed, 101 insertions(+)
+ target/arm/cpu.h           | 10 ++++++
+ target/arm/helper-sve.h    |  3 ++
+ target/arm/sve.decode      |  4 +++
+ target/arm/sve_helper.c    | 74 ++++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 34 ++++++++++++++++++
+ 5 files changed, 125 insertions(+)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 5ed2f2c65b..aaefbf0167 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3917,6 +3917,16 @@ static inline bool isar_feature_aa64_sve2_bitperm(const ARMISARegisters *id)
+     return FIELD_EX64(id->id_aa64zfr0, ID_AA64ZFR0, BITPERM) != 0;
+ }
+ 
++static inline bool isar_feature_aa64_sve2_f32mm(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->id_aa64zfr0, ID_AA64ZFR0, F32MM) != 0;
++}
++
++static inline bool isar_feature_aa64_sve2_f64mm(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->id_aa64zfr0, ID_AA64ZFR0, F64MM) != 0;
++}
++
+ /*
+  * Feature tests for "does this exist in either 32-bit or 64-bit?"
+  */
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 923911ca21..7f53287f0d 100644
+index d472fc009d..2c6d3431ec 100644
 --- a/target/arm/helper-sve.h
 +++ b/target/arm/helper-sve.h
-@@ -2509,6 +2509,16 @@ DEF_HELPER_FLAGS_3(sve2_uqrshrnt_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
- DEF_HELPER_FLAGS_3(sve2_uqrshrnt_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
- DEF_HELPER_FLAGS_3(sve2_uqrshrnt_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
- 
-+DEF_HELPER_FLAGS_5(sve2_match_ppzz_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve2_match_ppzz_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
+@@ -2662,3 +2662,6 @@ DEF_HELPER_FLAGS_5(sve2_sqrdcmlah_zzzz_s, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(sve2_sqrdcmlah_zzzz_d, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_5(sve2_nmatch_ppzz_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve2_nmatch_ppzz_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+
- DEF_HELPER_FLAGS_6(sve2_faddp_zpzz_h, TCG_CALL_NO_RWG,
-                    void, ptr, ptr, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_6(sve2_faddp_zpzz_s, TCG_CALL_NO_RWG,
++DEF_HELPER_FLAGS_6(fmmla_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(fmmla_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, ptr, i32)
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index a50afd40c2..2207693d28 100644
+index 1b5bd2d193..11e724d3a2 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -1320,6 +1320,11 @@ UQSHRNT         01000101 .. 1 ..... 00 1101 ..... .....  @rd_rn_tszimm_shr
- UQRSHRNB        01000101 .. 1 ..... 00 1110 ..... .....  @rd_rn_tszimm_shr
- UQRSHRNT        01000101 .. 1 ..... 00 1111 ..... .....  @rd_rn_tszimm_shr
+@@ -1389,6 +1389,10 @@ UMLSLT_zzzw     01000100 .. 0 ..... 010 111 ..... .....  @rda_rn_rm
+ CMLA_zzzz       01000100 esz:2 0 rm:5 0010 rot:2 rn:5 rd:5  ra=%reg_movprfx
+ SQRDCMLAH_zzzz  01000100 esz:2 0 rm:5 0011 rot:2 rn:5 rd:5  ra=%reg_movprfx
  
-+### SVE2 Character Match
++### SVE2 floating point matrix multiply accumulate
 +
-+MATCH           01000101 .. 1 ..... 100 ... ..... 0 .... @pd_pg_rn_rm
-+NMATCH          01000101 .. 1 ..... 100 ... ..... 1 .... @pd_pg_rn_rm
++FMMLA           01100100 .. 1 ..... 111001 ..... .....  @rda_rn_rm
 +
- ## SVE2 floating-point pairwise operations
+ ### SVE2 Memory Gather Load Group
  
- FADDP           01100100 .. 010 00 0 100 ... ..... ..... @rdn_pg_rm
+ # SVE2 64-bit gather non-temporal load
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index aa7ff94812..139dea423f 100644
+index e0bd0fbe78..aaf336118b 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -6875,3 +6875,67 @@ void HELPER(sve2_nbsl)(void *vd, void *vn, void *vm, void *vk, uint32_t desc)
-         d[i] = ~((n[i] & k[i]) | (m[i] & ~k[i]));
+@@ -7258,3 +7258,77 @@ void HELPER(sve2_xar_s)(void *vd, void *vn, void *vm, uint32_t desc)
+         d[i] = ror32(n[i] ^ m[i], shr);
      }
  }
 +
-+/*
-+ * Returns true if m0 or m1 contains the low uint8_t/uint16_t in n.
-+ * See hasless(v,1) from
-+ *   https://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord
-+ */
-+static inline bool do_match2(uint64_t n, uint64_t m0, uint64_t m1, int esz)
++void HELPER(fmmla_s)(void *vd, void *vn, void *vm, void *va,
++                     void *status, uint32_t desc)
 +{
-+    int bits = 8 << esz;
-+    uint64_t ones = dup_const(esz, 1);
-+    uint64_t signs = ones << (bits - 1);
-+    uint64_t cmp0, cmp1;
++    intptr_t s, opr_sz = simd_oprsz(desc) / (sizeof(float32) * 4);
 +
-+    cmp1 = dup_const(esz, n);
-+    cmp0 = cmp1 ^ m0;
-+    cmp1 = cmp1 ^ m1;
-+    cmp0 = (cmp0 - ones) & ~cmp0;
-+    cmp1 = (cmp1 - ones) & ~cmp1;
-+    return (cmp0 | cmp1) & signs;
-+}
++    for (s = 0; s < opr_sz; ++s) {
++        float32 *n = vn + s * sizeof(float32) * 4;
++        float32 *m = vm + s * sizeof(float32) * 4;
++        float32 *a = va + s * sizeof(float32) * 4;
++        float32 *d = vd + s * sizeof(float32) * 4;
++        float32 n00 = n[H4(0)], n01 = n[H4(1)];
++        float32 n10 = n[H4(2)], n11 = n[H4(3)];
++        float32 m00 = m[H4(0)], m01 = m[H4(1)];
++        float32 m10 = m[H4(2)], m11 = m[H4(3)];
++        float32 p0, p1;
 +
-+static inline uint32_t do_match(void *vd, void *vn, void *vm, void *vg,
-+                                uint32_t desc, int esz, bool nmatch)
-+{
-+    uint16_t esz_mask = pred_esz_masks[esz];
-+    intptr_t opr_sz = simd_oprsz(desc);
-+    uint32_t flags = PREDTEST_INIT;
-+    intptr_t i, j, k;
++        /* i = 0, j = 0 */
++        p0 = float32_mul(n00, m00, status);
++        p1 = float32_mul(n01, m01, status);
++        d[H4(0)] = float32_add(a[H4(0)], float32_add(p0, p1, status), status);
 +
-+    for (i = 0; i < opr_sz; i += 16) {
-+        uint64_t m0 = *(uint64_t *)(vm + i);
-+        uint64_t m1 = *(uint64_t *)(vm + i + 8);
-+        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3)) & esz_mask;
-+        uint16_t out = 0;
++        /* i = 0, j = 1 */
++        p0 = float32_mul(n00, m10, status);
++        p1 = float32_mul(n01, m11, status);
++        d[H4(1)] = float32_add(a[H4(1)], float32_add(p0, p1, status), status);
 +
-+        for (j = 0; j < 16; j += 8) {
-+            uint64_t n = *(uint64_t *)(vn + i + j);
++        /* i = 1, j = 0 */
++        p0 = float32_mul(n10, m00, status);
++        p1 = float32_mul(n11, m01, status);
++        d[H4(2)] = float32_add(a[H4(2)], float32_add(p0, p1, status), status);
 +
-+            for (k = 0; k < 8; k += 1 << esz) {
-+                if (pg & (1 << (j + k))) {
-+                    bool o = do_match2(n >> (k * 8), m0, m1, esz);
-+                    out |= (o ^ nmatch) << (j + k);
-+                }
-+            }
-+        }
-+        *(uint16_t *)(vd + H1_2(i >> 3)) = out;
-+        flags = iter_predtest_fwd(out, pg, flags);
++        /* i = 1, j = 1 */
++        p0 = float32_mul(n10, m10, status);
++        p1 = float32_mul(n11, m11, status);
++        d[H4(3)] = float32_add(a[H4(3)], float32_add(p0, p1, status), status);
 +    }
-+    return flags;
 +}
 +
-+#define DO_PPZZ_MATCH(NAME, ESZ, INV)                                         \
-+uint32_t HELPER(NAME)(void *vd, void *vn, void *vm, void *vg, uint32_t desc)  \
-+{                                                                             \
-+    return do_match(vd, vn, vm, vg, desc, ESZ, INV);                          \
++void HELPER(fmmla_d)(void *vd, void *vn, void *vm, void *va,
++                     void *status, uint32_t desc)
++{
++    intptr_t s, opr_sz = simd_oprsz(desc) / (sizeof(float64) * 4);
++
++    for (s = 0; s < opr_sz; ++s) {
++        float64 *n = vn + s * sizeof(float64) * 4;
++        float64 *m = vm + s * sizeof(float64) * 4;
++        float64 *a = va + s * sizeof(float64) * 4;
++        float64 *d = vd + s * sizeof(float64) * 4;
++        float64 n00 = n[0], n01 = n[1], n10 = n[2], n11 = n[3];
++        float64 m00 = m[0], m01 = m[1], m10 = m[2], m11 = m[3];
++        float64 p0, p1;
++
++        /* i = 0, j = 0 */
++        p0 = float64_mul(n00, m00, status);
++        p1 = float64_mul(n01, m01, status);
++        d[0] = float64_add(a[0], float64_add(p0, p1, status), status);
++
++        /* i = 0, j = 1 */
++        p0 = float64_mul(n00, m10, status);
++        p1 = float64_mul(n01, m11, status);
++        d[1] = float64_add(a[1], float64_add(p0, p1, status), status);
++
++        /* i = 1, j = 0 */
++        p0 = float64_mul(n10, m00, status);
++        p1 = float64_mul(n11, m01, status);
++        d[2] = float64_add(a[2], float64_add(p0, p1, status), status);
++
++        /* i = 1, j = 1 */
++        p0 = float64_mul(n10, m10, status);
++        p1 = float64_mul(n11, m11, status);
++        d[3] = float64_add(a[3], float64_add(p0, p1, status), status);
++    }
 +}
-+
-+DO_PPZZ_MATCH(sve2_match_ppzz_b, MO_8, false)
-+DO_PPZZ_MATCH(sve2_match_ppzz_h, MO_16, false)
-+
-+DO_PPZZ_MATCH(sve2_nmatch_ppzz_b, MO_8, true)
-+DO_PPZZ_MATCH(sve2_nmatch_ppzz_h, MO_16, true)
-+
-+#undef DO_PPZZ_MATCH
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 540e926c18..ffb7f5c8a0 100644
+index 0cb10ac3e2..63acb25921 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -7467,6 +7467,28 @@ static bool trans_UQRSHRNT(DisasContext *s, arg_rri_esz *a)
-     return do_sve2_shr_narrow(s, a, ops);
- }
+@@ -7677,6 +7677,40 @@ DO_SVE2_ZPZZ_FP(FMINP, fminp)
+  * SVE Integer Multiply-Add (unpredicated)
+  */
  
-+static bool do_sve2_ppzz_flags(DisasContext *s, arg_rprr_esz *a,
-+                               gen_helper_gvec_flags_4 *fn)
++static bool trans_FMMLA(DisasContext *s, arg_rrrr_esz *a)
 +{
-+    if (!dc_isar_feature(aa64_sve2, s)) {
++    gen_helper_gvec_4_ptr *fn;
++
++    switch (a->esz) {
++    case MO_32:
++        if (!dc_isar_feature(aa64_sve2_f32mm, s)) {
++            return false;
++        }
++        fn = gen_helper_fmmla_s;
++        break;
++    case MO_64:
++        if (!dc_isar_feature(aa64_sve2_f64mm, s)) {
++            return false;
++        }
++        fn = gen_helper_fmmla_d;
++        break;
++    default:
 +        return false;
 +    }
-+    return do_ppzz_flags(s, a, fn);
++
++    if (sve_access_check(s)) {
++        unsigned vsz = vec_full_reg_size(s);
++        TCGv_ptr status = fpstatus_ptr(a->esz == MO_16 ? FPST_FPCR_F16 : FPST_FPCR);
++        tcg_gen_gvec_4_ptr(vec_full_reg_offset(s, a->rd),
++                           vec_full_reg_offset(s, a->rn),
++                           vec_full_reg_offset(s, a->rm),
++                           vec_full_reg_offset(s, a->ra),
++                           status, vsz, vsz, 0, fn);
++        tcg_temp_free_ptr(status);
++    }
++    return true;
 +}
 +
-+#define DO_SVE2_PPZZ_MATCH(NAME, name)                                      \
-+static bool trans_##NAME(DisasContext *s, arg_rprr_esz *a)                  \
-+{                                                                           \
-+    static gen_helper_gvec_flags_4 * const fns[4] = {                       \
-+        gen_helper_sve2_##name##_ppzz_b, gen_helper_sve2_##name##_ppzz_h,   \
-+        NULL,                            NULL                               \
-+    };                                                                      \
-+    return do_sve2_ppzz_flags(s, a, fns[a->esz]);                           \
-+}
-+
-+DO_SVE2_PPZZ_MATCH(MATCH, match)
-+DO_SVE2_PPZZ_MATCH(NMATCH, nmatch)
-+
- static bool do_sve2_zpzz_fp(DisasContext *s, arg_rprr_esz *a,
-                             gen_helper_gvec_4_ptr *fn)
+ static bool do_sqdmlal_zzzw(DisasContext *s, arg_rrrr_esz *a,
+                             bool sel1, bool sel2)
  {
 -- 
 2.25.1
