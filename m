@@ -2,78 +2,120 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A32AC43464
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 08:36:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAABBC43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 08:37:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C6972075B
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 08:36:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5FFE62075B
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 08:37:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QR3kfcoI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C6972075B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dx8P+qlW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FFE62075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJBs7-0005hR-TU
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 04:35:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34064)
+	id 1kJBtN-0006oL-2J
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 04:37:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35014)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kJBoF-0002hD-BP
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 04:32:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24130)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kJBr6-0005iW-4A
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 04:34:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59119)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kJBoC-0006El-0v
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 04:31:59 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kJBr0-0006bW-Tp
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 04:34:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600417914;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=Kf3CPqBjknClbjakj9GXz1ZtGhF+Agkx3vzQld74qtE=;
- b=QR3kfcoIchL/NTf8sGSsX4ppMU+bW62CpopiXKmxLEw5K/woPxrdsQS1kf67zVP7qAuLcv
- P4N0xg/yOMgPJTB1oRmuqr72ssoBdl+vs3t/xVzLFc98RyivTKma/DOczuTzELxS3SqwIO
- 0W9pz8kO8qbWc/TebBsYwtD7r+b+OVQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-510-cp0cOaA0OdytICIkis6CCg-1; Fri, 18 Sep 2020 04:31:42 -0400
-X-MC-Unique: cp0cOaA0OdytICIkis6CCg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B1B064093;
- Fri, 18 Sep 2020 08:31:40 +0000 (UTC)
-Received: from redhat.com (ovpn-113-161.ams2.redhat.com [10.36.113.161])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AA8AE610F3;
- Fri, 18 Sep 2020 08:31:35 +0000 (UTC)
-Date: Fri, 18 Sep 2020 09:31:32 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Erich Mcmillan <erich.mcmillan@hp.com>
-Subject: Re: [PATCH 2/2] add maximum combined fw size as machine
- configuration option
-Message-ID: <20200918083132.GC1628512@redhat.com>
-References: <20200918042339.3477-1-erich.mcmillan@hp.com>
+ s=mimecast20190719; t=1600418090;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=5Ohz6PjOoI50Exshc4hPi6gBeM+WUI1S9YyZuqkUE2Q=;
+ b=Dx8P+qlWHtdXQECNYC7HVLlmQJcrI7vBvuEhhnoZy5sPa3CVtIAhoSfOoz9qfdBuxUor54
+ v+nMDTH15q9Qdn2apRWvsA0cW3a93+jhh/bBVyhp+M/WGBkf4jKFWdjZ+dWLK7J5eglp7I
+ 2bSg/l4EhDgzN7HmR7sCvT7sw7J8XgM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-264-TzVXzcatMwecTzfiHYHhsQ-1; Fri, 18 Sep 2020 04:34:45 -0400
+X-MC-Unique: TzVXzcatMwecTzfiHYHhsQ-1
+Received: by mail-wm1-f72.google.com with SMTP id y18so1216252wma.4
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 01:34:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=5Ohz6PjOoI50Exshc4hPi6gBeM+WUI1S9YyZuqkUE2Q=;
+ b=l6im3ngXfBcSwfFb9QVInoJLY5vDkulyk70Sq0Htq9uQ/pRYRO41lgWW+nLaZaP9dS
+ Au3n/HGF3bENP1l/+qn3ra+anTFV7KdSCv5hZc6ZzAnBTAGSBgx9TfAOT9abbrugVW+m
+ QpjEqoq75fEVwoNX9Fq00EbTLKNRvqKbxC6iiE+h4I1XaIfzl06XyflerVq76FcbxtiV
+ TyRgleJ2RIRd35pGcObTjYf3DfqsdG4n1gefQV0b2lTcXEBl7BhTEIYGDRMq+7I4hQah
+ cRQPHq3e3n1ObGOATaWlDXPaYaVrh9swUjS2TIhq/Q6elnAKx2x836wuS95pf7X85nIi
+ ZdGg==
+X-Gm-Message-State: AOAM533krEYxFlw9ab6rHKLfCQjlkjI6s2G3XEBCb+6mL17jXdT6Wfr7
+ DyO9dgVlRysNrpitB4SLUT6avZWJ5gr+gEsRqk5HIrF01EkkvSArjEvylayAzb3Z8GkKXj4ybqD
+ XqREct3YjX/jE+wY=
+X-Received: by 2002:adf:df81:: with SMTP id z1mr38336954wrl.9.1600418084664;
+ Fri, 18 Sep 2020 01:34:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw7S6oWL/lHiRn9pY6JkyPp3B9ohE0KRcv0gS+SgcWeIUtwRNz8ZC5849BBoikX1fA0Mhwt6g==
+X-Received: by 2002:adf:df81:: with SMTP id z1mr38336938wrl.9.1600418084463;
+ Fri, 18 Sep 2020 01:34:44 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id d6sm3707809wrq.67.2020.09.18.01.34.43
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 18 Sep 2020 01:34:43 -0700 (PDT)
+Subject: Re: [PATCH] hw/nvram/fw_cfg: fix FWCfgDataGeneratorClass::get_data()
+ consumption
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+References: <20200916151510.22767-1-lersek@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <b12385c9-3a81-8d82-08ba-f46e3d14a468@redhat.com>
+Date: Fri, 18 Sep 2020 10:34:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200918042339.3477-1-erich.mcmillan@hp.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200916151510.22767-1-lersek@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 00:20:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -82,8 +124,9 @@ X-Spam_score: -5.1
 X-Spam_bar: -----
 X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,179 +139,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: mst@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
- imammedo@redhat.com, lersek@redhat.com
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 18, 2020 at 04:23:39AM +0000, Erich Mcmillan wrote:
-> From: Erich McMillan <erich.mcmillan@hp.com>
+On 9/16/20 5:15 PM, Laszlo Ersek wrote:
+> The documentation on g_byte_array_free()
+> <https://developer.gnome.org/glib/stable/glib-Byte-Arrays.html#g-byte-array-free>
+> says:
 > 
-> Signed-off-by: Erich McMillan <erich.mcmillan@hp.com>
+>> Returns
+>>
+>> the element data if free_segment is FALSE, otherwise NULL. The element
+>> data should be freed using g_free().
+> 
+> Because we currently call g_byte_array_free() with free_segment=TRUE, we
+> end up passing data=NULL to fw_cfg_add_file().
+> 
+> On the plus side, fw_cfg_data_read() and fw_cfg_dma_transfer() both deal
+> with NULL data gracefully: QEMU does not crash when the guest reads such
+> an item, the guest just gets a properly sized, but zero-filled blob.
+> 
+> However, the bug breaks UEFI HTTPS boot, as the IANA_TLS_CIPHER array,
+> generated otherwise correctly by the "tls-cipher-suites" object, is in
+> effect replaced with a zero blob.
+> 
+> Fix the issue by passing free_segment=FALSE to g_byte_array_free():
+> 
+> - the caller (fw_cfg_add_from_generator()) temporarily assumes ownership
+>   of the generated byte array,
+> 
+> - then ownership of the byte array is transfered to fw_cfg, as
+>   fw_cfg_add_file() links (not copies) "data" into fw_cfg.
+> 
+> Cc: "Daniel P. Berrangé" <berrange@redhat.com>
+> Cc: "Philippe Mathieu-Daudé" <philmd@redhat.com>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Fixes: 3203148917d035b09f71986ac2eaa19a352d6d9d
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
 > ---
->  hw/i386/pc.c         | 40 ++++++++++++++++++++++++++++++++++++++++
->  hw/i386/pc_sysfw.c   | 13 ++-----------
->  include/hw/i386/pc.h | 22 ++++++++++++----------
->  3 files changed, 54 insertions(+), 21 deletions(-)
+>  hw/nvram/fw_cfg.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index d11daac..b304988 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1869,6 +1869,39 @@ static void pc_machine_set_max_ram_below_4g(Object *obj, Visitor *v,
->      pcms->max_ram_below_4g = value;
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index f3a4728288eb..0e95d057fd51 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -1056,7 +1056,7 @@ bool fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
+>          return false;
+>      }
+>      size = array->len;
+> -    fw_cfg_add_file(s, filename, g_byte_array_free(array, TRUE), size);
+> +    fw_cfg_add_file(s, filename, g_byte_array_free(array, FALSE), size);
+>  
+>      return true;
 >  }
->  
-> +static void pc_machine_get_max_fw_size(Object *obj, Visitor *v,
-> +                                             const char *name, void *opaque,
-> +                                             Error **errp)
-> +{
-> +    PCMachineState *pcms = PC_MACHINE(obj);
-> +    uint64_t value = pcms->max_fw_size;
-> +
-> +    visit_type_size(v, name, &value, errp);
-> +}
-> +
-> +static void pc_machine_set_max_fw_size(Object *obj, Visitor *v,
-> +                                             const char *name, void *opaque,
-> +                                             Error **errp)
-> +{
-> +    PCMachineState *pcms = PC_MACHINE(obj);
-> +    Error *error = NULL;
-> +    uint64_t value;
-> +
-> +    visit_type_size(v, name, &value, &error);
-> +    if (error) {
-> +        error_propagate(errp, error);
-> +        return;
-> +    }
-> +
+> 
 
-Just here we should have a comment explaining why we pick this max limit.
-The comment you removed later can be transplanted to here...
-
-> +    if (value > 16 * MiB) {
-> +        warn_report("User specifed max allowed firmware size %" PRIu64 " is greater than 16MiB,"
-> +                    "if combined firwmare size exceeds 16MiB system may not boot,"
-> +                    "or experience intermittent stability issues.", value);
-> +    }
-> +
-> +    pcms->max_fw_size = value;
-> +}
-> +
->  static void pc_machine_initfn(Object *obj)
->  {
->      PCMachineState *pcms = PC_MACHINE(obj);
-> @@ -1884,6 +1917,7 @@ static void pc_machine_initfn(Object *obj)
->      pcms->smbus_enabled = true;
->      pcms->sata_enabled = true;
->      pcms->pit_enabled = true;
-> +    pcms->max_fw_size = 8 * MiB;
->  
->      pc_system_flash_create(pcms);
->      pcms->pcspk = isa_new(TYPE_PC_SPEAKER);
-> @@ -2004,6 +2038,12 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
->  
->      object_class_property_add_bool(oc, PC_MACHINE_PIT,
->          pc_machine_get_pit, pc_machine_set_pit);
-> +
-> +    object_class_property_add(oc, PC_MACHINE_MAX_FW_SIZE, "size",
-> +        pc_machine_get_max_fw_size, pc_machine_set_max_fw_size,
-> +        NULL, NULL);
-> +    object_class_property_set_description(oc, PC_MACHINE_MAX_FW_SIZE,
-> +        "Maximum combined firmware size");
->  }
->  
->  static const TypeInfo pc_machine_info = {
-> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-> index b6c0822..22450ba 100644
-> --- a/hw/i386/pc_sysfw.c
-> +++ b/hw/i386/pc_sysfw.c
-> @@ -39,15 +39,6 @@
->  #include "hw/block/flash.h"
->  #include "sysemu/kvm.h"
->  
-> -/*
-> - * We don't have a theoretically justifiable exact lower bound on the base
-> - * address of any flash mapping. In practice, the IO-APIC MMIO range is
-> - * [0xFEE00000..0xFEE01000] -- see IO_APIC_DEFAULT_ADDRESS --, leaving free
-> - * only 18MB-4KB below 4G. For now, restrict the cumulative mapping to 8MB in
-> - * size.
-> - */
-
-....this comment should be transplanted above^^
-
-> -#define FLASH_SIZE_LIMIT (8 * MiB)
-> -
->  #define FLASH_SECTOR_SIZE 4096
->  
->  static void pc_isa_bios_init(MemoryRegion *rom_memory,
-> @@ -182,10 +173,10 @@ static void pc_system_flash_map(PCMachineState *pcms,
->          }
->          if ((hwaddr)size != size
->              || total_size > HWADDR_MAX - size
-> -            || total_size + size > FLASH_SIZE_LIMIT) {
-> +            || total_size + size > pcms->max_fw_size) {
->              error_report("combined size of system firmware exceeds "
->                           "%" PRIu64 " bytes",
-> -                         FLASH_SIZE_LIMIT);
-> +                         pcms->max_fw_size);
->              exit(1);
->          }
->  
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index fe52e16..cae213d 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -39,10 +39,11 @@ struct PCMachineState {
->      uint64_t max_ram_below_4g;
->      OnOffAuto vmport;
->  
-> -    bool acpi_build_enabled;
-> -    bool smbus_enabled;
-> -    bool sata_enabled;
-> -    bool pit_enabled;
-> +    bool     acpi_build_enabled;
-> +    bool     smbus_enabled;
-> +    bool     sata_enabled;
-> +    bool     pit_enabled;
-> +    uint64_t max_fw_size;
-
-Don't change whitespace in the existing fields - trying to
-horizontally align fields has no benefit and needlessly
-creates bigger diffs.
-
->  
->      /* NUMA information: */
->      uint64_t numa_nodes;
-> @@ -52,13 +53,14 @@ struct PCMachineState {
->      hwaddr memhp_io_base;
->  };
->  
-> -#define PC_MACHINE_ACPI_DEVICE_PROP "acpi-device"
-> -#define PC_MACHINE_MAX_RAM_BELOW_4G "max-ram-below-4g"
-> +#define PC_MACHINE_ACPI_DEVICE_PROP   "acpi-device"
-> +#define PC_MACHINE_MAX_RAM_BELOW_4G   "max-ram-below-4g"
->  #define PC_MACHINE_DEVMEM_REGION_SIZE "device-memory-region-size"
-> -#define PC_MACHINE_VMPORT           "vmport"
-> -#define PC_MACHINE_SMBUS            "smbus"
-> -#define PC_MACHINE_SATA             "sata"
-> -#define PC_MACHINE_PIT              "pit"
-> +#define PC_MACHINE_VMPORT             "vmport"
-> +#define PC_MACHINE_SMBUS              "smbus"
-> +#define PC_MACHINE_SATA               "sata"
-> +#define PC_MACHINE_PIT                "pit"
-> +#define PC_MACHINE_MAX_FW_SIZE        "max-fw-size"
-
-Same here, just don't change whitespace alignment please.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Thanks, applied to my fw_cfg tree.
 
 
