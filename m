@@ -2,70 +2,67 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA3A2C43463
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 06:26:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC5A0C43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 06:32:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBA422100A
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 06:26:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3985820DD4
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 06:32:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jTwNoYIc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBA422100A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EGLydwHM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3985820DD4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJ9qP-0000eP-58
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 02:26:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49276)
+	id 1kJ9wo-000486-4i
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 02:32:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50568)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kJ9p8-0000Bi-8d
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 02:24:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47196)
+ id 1kJ9vd-0003dT-HY
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 02:31:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49702)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kJ9p2-0003f6-5n
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 02:24:45 -0400
+ id 1kJ9vb-000515-Et
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 02:31:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600410278;
+ s=mimecast20190719; t=1600410686;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=32cwReohcqNY3CPE939sO3L6V4oQznrYvlCJbPPXjIY=;
- b=jTwNoYIcO8xSSLksj77igaFnhiwEAcBbfROL2y2ICnLbK2jF6M2GCPuefiuLwvClJTXxaW
- DAW4rI+rvuChTcnnCUqYYSJKVfkKD2QGQ5ScpsUFhQvItRvhA4oMKs9zceIXH1Tb6pjHng
- 4pmFCGd/2/Gmhz8tHo8BcekW7GvfFfg=
+ bh=ZtYqTTpjT3//RiYRUEB9geR/tdVvR9e9nZweq7q5ySc=;
+ b=EGLydwHM6grww1Wz0rEbQq/4x5XwPQHHKI1H2eCq55UT66b4v/basT1CWCmsChv4Bj40vy
+ Z4k1NnxpDBOYjUTGjU0gmxQuqy1NYcMwbj0AEI6qgHHvHWikpHzSx/zYSzgH1XFlI5SPhd
+ PuiUdP146uASPQ6Suq5g+fFw1bE+mg8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-210-6F0xJOEiO-G5UJr7VMykvg-1; Fri, 18 Sep 2020 02:24:36 -0400
-X-MC-Unique: 6F0xJOEiO-G5UJr7VMykvg-1
+ us-mta-543-bWHeYcH8O1KXojqB-FocJw-1; Fri, 18 Sep 2020 02:31:24 -0400
+X-MC-Unique: bWHeYcH8O1KXojqB-FocJw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F4845708B;
- Fri, 18 Sep 2020 06:24:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AA0A56BFA;
+ Fri, 18 Sep 2020 06:31:23 +0000 (UTC)
 Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 51A101972A;
- Fri, 18 Sep 2020 06:24:25 +0000 (UTC)
-Date: Fri, 18 Sep 2020 08:24:23 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C03601972A;
+ Fri, 18 Sep 2020 06:31:12 +0000 (UTC)
+Date: Fri, 18 Sep 2020 08:31:11 +0200
 From: Igor Mammedov <imammedo@redhat.com>
 To: Ani Sinha <ani@anisinha.ca>
-Subject: Re: [PATCH v8 09/12] piix4: don't reserve hw resources when hotplug
- is off globally
-Message-ID: <20200918082423.644c3a08@redhat.com>
-In-Reply-To: <20200917150044.23159-10-ani@anisinha.ca>
+Subject: Re: [PATCH v8 00/12] i440fx/acpi: addition of feature and bug fixes.
+Message-ID: <20200918083111.357cd3e9@redhat.com>
+In-Reply-To: <20200917150044.23159-1-ani@anisinha.ca>
 References: <20200917150044.23159-1-ani@anisinha.ca>
- <20200917150044.23159-10-ani@anisinha.ca>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
@@ -74,9 +71,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=imammedo@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=imammedo@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 00:20:40
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 01:32:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
@@ -98,158 +95,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- jusual@redhat.com, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org, Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Richard Henderson <rth@twiddle.net>
+ "Michael S. Tsirkin" <mst@redhat.com>, jusual@redhat.com,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 17 Sep 2020 20:30:41 +0530
+On Thu, 17 Sep 2020 20:30:32 +0530
 Ani Sinha <ani@anisinha.ca> wrote:
 
-> When acpi hotplug is turned off for both root pci bus as well as for pci
-> bridges, we should not generate the related ACPI code for DSDT table or
-> initialize related hw ports or reserve hw resources. This change makes
-> sure all those operations are turned off in the case ACPI pci hotplug is
-> off globally.
-> 
-> In this change, we also make sure ACPI code for the PCNT method are only
-> added when bsel is enabled for the corresponding pci bus or bridge hotplug
-> is turned on.
-> 
-> As q35 machines do not use bsel for it's pci buses at this point in time, this
-> change affects DSDT acpi table for q35 machines as well. Therefore, we will
-> also need to commit the updated golden master DSDT table acpi binary blobs as
-> well. Follwoing is the list of blobs which needs updating:
-> 
->  tests/data/acpi/q35/DSDT
->  tests/data/acpi/q35/DSDT.acpihmat
->  tests/data/acpi/q35/DSDT.bridge
->  tests/data/acpi/q35/DSDT.cphp
->  tests/data/acpi/q35/DSDT.dimmpxm
->  tests/data/acpi/q35/DSDT.ipmibt
->  tests/data/acpi/q35/DSDT.memhp
->  tests/data/acpi/q35/DSDT.mmio64
->  tests/data/acpi/q35/DSDT.numamem
->  tests/data/acpi/q35/DSDT.tis
-> 
-> These tables are updated in the following commit. Without the updated table
-> blobs, the unit tests would fail with this patch.
+> In v8, I have updated the commit log for patch #9 mentioning the tables that
+> are being updated with patch #10.
 
-adding this to commit description doesn't help,
-'make check' still fails if we apply patches till this point.
-which leads to broken bisection.
+FYI,
+nothing formal but we usually keep whole change log here in form
+Changelog:
+   vN+1:
+       - ...
+       - ...
+        entries are basically a copy from per patch chagelogs
+   vN:
+       - ...
+   ...
+   v2:
+       - ...
+    
+this way reader can see what has changed without need to
+look for all previous versions.
 
-I'm curious, what is not clear in process description at
-the start of tests/qtest/bios-tables-test.c.
-You did that for new tests, but so some reason you are avoiding
-to  follow the same rules with this patch.
-
-
-> Signed-off-by: Ani Sinha <ani@anisinha.ca>
-> ---
->  hw/acpi/piix4.c      |  6 ++++--
->  hw/i386/acpi-build.c | 25 ++++++++++++++++++-------
->  2 files changed, 22 insertions(+), 9 deletions(-)
 > 
-> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> index e6163bb6ce..b70b1f98af 100644
-> --- a/hw/acpi/piix4.c
-> +++ b/hw/acpi/piix4.c
-> @@ -596,8 +596,10 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
->                            "acpi-gpe0", GPE_LEN);
->      memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
->  
-> -    acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
-> -                    s->use_acpi_hotplug_bridge);
-> +    if (s->use_acpi_hotplug_bridge || s->use_acpi_root_pci_hotplug) {
-> +        acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
-> +                        s->use_acpi_hotplug_bridge);
-> +    }
->  
->      s->cpu_hotplug_legacy = true;
->      object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index e079b686f5..e41bb0992b 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -95,6 +95,7 @@ typedef struct AcpiPmInfo {
->      bool s3_disabled;
->      bool s4_disabled;
->      bool pcihp_bridge_en;
-> +    bool pcihp_root_en;
->      uint8_t s4_val;
->      AcpiFadtData fadt;
->      uint16_t cpu_hp_io_base;
-> @@ -245,6 +246,9 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
->      pm->pcihp_bridge_en =
->          object_property_get_bool(obj, "acpi-pci-hotplug-with-bridge-support",
->                                   NULL);
-> +    pm->pcihp_root_en =
-> +        object_property_get_bool(obj, "acpi-root-pci-hotplug",
-> +                                 NULL);
->  }
->  
->  static void acpi_get_misc_info(AcpiMiscInfo *info)
-> @@ -450,10 +454,12 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
->      }
->  
->      /* Append PCNT method to notify about events on local and child buses.
-> -     * Add unconditionally for root since DSDT expects it.
-> +     * Add this method for root bus only when hotplug is enabled since DSDT
-> +     * expects it.
->       */
-> -    method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
-> -
-> +    if (bsel || pcihp_bridge_en) {
-> +        method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
-> +    }
->      /* If bus supports hotplug select it and notify about local events */
->      if (bsel) {
->          uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
-> @@ -479,7 +485,10 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
->              aml_append(method, aml_name("^S%.02X.PCNT", devfn));
->          }
->      }
-> -    aml_append(parent_scope, method);
-> +
-> +    if (bsel || pcihp_bridge_en) {
-> +        aml_append(parent_scope, method);
-> +    }
->      qobject_unref(bsel);
->  }
->  
-> @@ -1504,7 +1513,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->          build_hpet_aml(dsdt);
->          build_piix4_isa_bridge(dsdt);
->          build_isa_devices_aml(dsdt);
-> -        build_piix4_pci_hotplug(dsdt);
-> +        if (pm->pcihp_bridge_en || pm->pcihp_root_en) {
-> +            build_piix4_pci_hotplug(dsdt);
-> +        }
->          build_piix4_pci0_int(dsdt);
->      } else {
->          sb_scope = aml_scope("_SB");
-> @@ -1546,7 +1557,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->      {
->          aml_append(scope, aml_name_decl("_HID", aml_string("ACPI0006")));
->  
-> -        if (misc->is_piix4) {
-> +        if (misc->is_piix4 && (pm->pcihp_bridge_en || pm->pcihp_root_en)) {
->              method = aml_method("_E01", 0, AML_NOTSERIALIZED);
->              aml_append(method,
->                  aml_acquire(aml_name("\\_SB.PCI0.BLCK"), 0xFFFF));
-> @@ -1698,7 +1709,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->      crs_range_set_free(&crs_range_set);
->  
->      /* reserve PCIHP resources */
-> -    if (pm->pcihp_io_len) {
-> +    if (pm->pcihp_io_len && (pm->pcihp_bridge_en || pm->pcihp_root_en)) {
->          dev = aml_device("PHPR");
->          aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A06")));
->          aml_append(dev,
+> Ani Sinha (12):
+>   tests/acpi: mark addition of table DSDT.roothp for unit testing root
+>     pci hotplug
+>   tests/acpi: add new unit test to test hotplug off/on feature on the
+>     root pci bus
+>   tests/acpi: add a new ACPI table in order to test root pci hotplug
+>     on/off
+>   Fix a gap where acpi_pcihp_find_hotplug_bus() returns a
+>     non-hotpluggable bus
+>   i440fx/acpi: do not add hotplug related amls for cold plugged bridges
+>   tests/acpi: list added acpi table binary file for pci bridge hotplug
+>     test
+>   tests/acpi: unit test for 'acpi-pci-hotplug-with-bridge-support'
+>     bridge flag
+>   tests/acpi: add newly added acpi DSDT table blob for pci bridge
+>     hotplug flag
+>   piix4: don't reserve hw resources when hotplug is off globally
+>   tests/acpi: update golden master DSDT binary table blobs for q35
+>   tests/acpi: unit test exercising global pci hotplug off for i440fx
+>   tests/acpi: add DSDT.hpbrroot DSDT table blob to test global i440fx
+>     hotplug
+> 
+>  hw/acpi/pcihp.c                   |  15 +++++++++
+>  hw/acpi/piix4.c                   |   6 ++--
+>  hw/i386/acpi-build.c              |  37 ++++++++++++++--------
+>  tests/data/acpi/pc/DSDT.hpbridge  | Bin 0 -> 4895 bytes
+>  tests/data/acpi/pc/DSDT.hpbrroot  | Bin 0 -> 2953 bytes
+>  tests/data/acpi/pc/DSDT.roothp    | Bin 0 -> 5130 bytes
+>  tests/data/acpi/q35/DSDT          | Bin 7678 -> 7670 bytes
+>  tests/data/acpi/q35/DSDT.acpihmat | Bin 9002 -> 8994 bytes
+>  tests/data/acpi/q35/DSDT.bridge   | Bin 7695 -> 7688 bytes
+>  tests/data/acpi/q35/DSDT.cphp     | Bin 8141 -> 8133 bytes
+>  tests/data/acpi/q35/DSDT.dimmpxm  | Bin 9331 -> 9323 bytes
+>  tests/data/acpi/q35/DSDT.ipmibt   | Bin 7753 -> 7745 bytes
+>  tests/data/acpi/q35/DSDT.memhp    | Bin 9037 -> 9029 bytes
+>  tests/data/acpi/q35/DSDT.mmio64   | Bin 8808 -> 8801 bytes
+>  tests/data/acpi/q35/DSDT.numamem  | Bin 7684 -> 7676 bytes
+>  tests/data/acpi/q35/DSDT.tis      | Bin 8283 -> 8276 bytes
+>  tests/qtest/bios-tables-test.c    |  49 ++++++++++++++++++++++++++++++
+>  17 files changed, 92 insertions(+), 15 deletions(-)
+>  create mode 100644 tests/data/acpi/pc/DSDT.hpbridge
+>  create mode 100644 tests/data/acpi/pc/DSDT.hpbrroot
+>  create mode 100644 tests/data/acpi/pc/DSDT.roothp
+> 
 
 
