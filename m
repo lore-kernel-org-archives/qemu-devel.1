@@ -7,78 +7,80 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3242FC43465
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 20:51:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 472D7C43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 20:56:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AA612311A
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 20:51:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AA612311A
+	by mail.kernel.org (Postfix) with ESMTPS id B41B021741
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 20:56:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B41B021741
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJNLw-0003YS-CO
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 16:51:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46378)
+	id 1kJNQo-0006cf-G5
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 16:56:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46554)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kJN7V-0004nj-Ok; Fri, 18 Sep 2020 16:36:37 -0400
-Received: from new1-smtp.messagingengine.com ([66.111.4.221]:38209)
+ id 1kJN80-0005Ct-15; Fri, 18 Sep 2020 16:37:08 -0400
+Received: from new1-smtp.messagingengine.com ([66.111.4.221]:46485)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kJN7S-0004xc-SR; Fri, 18 Sep 2020 16:36:37 -0400
+ id 1kJN7y-0004zZ-7l; Fri, 18 Sep 2020 16:37:07 -0400
 Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
- by mailnew.nyi.internal (Postfix) with ESMTP id 1B659580215;
- Fri, 18 Sep 2020 16:36:34 -0400 (EDT)
+ by mailnew.nyi.internal (Postfix) with ESMTP id 1CF85580231;
+ Fri, 18 Sep 2020 16:36:45 -0400 (EDT)
 Received: from mailfrontend2 ([10.202.2.163])
- by compute7.internal (MEProxy); Fri, 18 Sep 2020 16:36:34 -0400
+ by compute7.internal (MEProxy); Fri, 18 Sep 2020 16:36:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding; s=fm1; bh=OilfjDLIZZFgT
- 1MKes1rgGsHvhKPCbnciYBLgxXw6SY=; b=kGKFFFUBJaNqOXeuKcNK9n3fvOGoj
- +aDcAkarUYLo4bA2OPU8iCU+zw93KdUq8PxKGIL5isNx2ID5n2YhDwwvo+xwatUL
- pK10bvQSdF30gCgOIfFUgXwJQWzM+mOnvstVvFypOO2a1T15bcPNrXxHv5Sz0zQp
- jC0M3W15lyjyCY1y0FJ18fXUYHeoqz2o4n1tUVtiMGzZYQxc8xn5waJTLOfxSOlH
- IzS34CbFmOWwqUJ1Cam3gub14m8Jl/G60hOSL4wh6q9shN827bQm/7YofMnbRVZq
- KKxUqzXtZXcISE3GH5R4UmPEdY/u5ZYL1siEZ71mdhQGnFSdhLQyz90kw==
+ :mime-version:content-transfer-encoding; s=fm1; bh=UBQI++ulJhmJW
+ +K8ao6+lIoIrU0hGd0x4qsrZp9HNlI=; b=tIeA7SBdD49SXc8OtVK9PC5BrOpEH
+ 38Cy2M/EDWq4uTp3Xq56qBUzPjv4UWQcQNqLaflSquMz+e7+EiAgkqZc5kvRhnal
+ 0+NWKFz58BlkhPKMLhcgl+kDSbLBWcxy5+X6RArUA+t8Pmxs0D0L+fo3qhBnxiuI
+ /vBrjQMaXrq+YzVWsMqmwjUzwncrbC398x2wV/PK3O9PpIi1WCkJv7RCyCiXCjdy
+ XTb4/rbaFNncz8c/Z6MOQ0/IMoRTVhoyBr9dN8KDUhIfagsEGujvQ4zI3IJ2tEhA
+ l/adCc5uS+VRExCGwzPi5CMShwv3N/DVD1XPD+RR3lC8drAIbil94rrgQ==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
  messagingengine.com; h=cc:content-transfer-encoding:date:from
  :in-reply-to:message-id:mime-version:references:subject:to
  :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
- fm3; bh=OilfjDLIZZFgT1MKes1rgGsHvhKPCbnciYBLgxXw6SY=; b=Z0h3CBIa
- 48bungS1PXU9n5TH2ZKTo6otqfnjDN1PnOKOMV2rut0eYX+hyP1UI0kmYXFidF7w
- WDwV7oJRpf3NOB9IBU8QlHz2X3j8W5S1m/lq/Yx6GjHvUifaPKure3bYlNViDbx+
- I0sENWDkR1VnDeZwHePNqaogDBxt1hQCri0oxOzD38Cnqcckico4y9MnoGS4HOz4
- Fl0WYEAmj1SwisXWuzzdq6Xlsq+J1GPlOTKODkbFSqsnkk1qvSBkFtjGoukblfHG
- TkkdRg2Nny3THNV01TgJQA8xtV+p8WV45gcMFU0mfVZ4MVCN3UkQ1WZwJrApRxpJ
- +9IUMDZBKPocKQ==
-X-ME-Sender: <xms:URplX_JL1uRD6Ju-eZV5u5O69Us56gYlxWpxuQgI0pj7SkWyvFDr1A>
- <xme:URplXzLehx5zGRte7nybmWXLRcQ98DalmyZCMKnqz_oS4eCqjMMksVSz-T8tmLdN8
- 4XhbY9Q--RBYRdcL9A>
+ fm3; bh=UBQI++ulJhmJW+K8ao6+lIoIrU0hGd0x4qsrZp9HNlI=; b=NUhqfzOf
+ 6dIT1gAJrB68EHLUydB9geP2+CkBKAbMtXhkj8g16rwKMgWxzwp4plHLdT2ndx+P
+ yvPG6gePUI1mXNYRX481Jd1LehOVfPVIKE4PZOyIAKmfHKYczm49HkBfZ2Deb41m
+ fU+jrSNWWlLEphuXBDd+ivpbhW5/ktkka6hCJxW9rmE2gW5QooHHLYWq1ru63Sqb
+ uPjEPhywL+v1APpF6T1sgltGxa1TEDw7ZySHx/yflEV1g1Bb74lJyIuug+HKqGg8
+ AWtvtQuxtJlLMAWV2dU0GOn2KzwMiY+SIeVGX6UmV1BkXRCfV4jiVI6BSajibegP
+ VdzjVxL59ScvSw==
+X-ME-Sender: <xms:XBplX9q4K_kIumcp01tOfyekeVbPIncOHDhw2gsV5TqrFLUFKPWpmA>
+ <xme:XBplX_qsnxwUnUHT1bJMy_h-7cDHrAJVGLHr0UqN_fG7VWe9zqR9YbV1YiHMXTHs9
+ S6EItob9BgwvpWNINk>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrtdeigdduhedvucetufdoteggodetrfdotf
  fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
  uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
  cujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpefmlhgruhhs
  ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
- gvrhhnpeeuleetgeeiuefhgfekfefgveejiefgteekiedtgfdtieefhfdthfefueffvefg
- keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedvne
- curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
-X-ME-Proxy: <xmx:URplX3vf8jrwsHjjZVUkq-2P0GLZ40QJAMv2pBxVwxleIGZJSeIBjg>
- <xmx:URplX4YVeUKhKGe7gDGO50svtPkw4iY5720RzAnN5Z-F2R1fb1YgkQ>
- <xmx:URplX2ZSsF7-R1tgkrTKmRWdXGjMYNx605wVYBo6IhdRWH42j3sEDA>
- <xmx:URplX-5YTTFSfPo5N6h7ORgOyaeEe0Fnpb1b9ty0CFtgtCz7EHZGLw>
+ gvrhhnpeeltdetfeegkefguedvtdduffejiedvjeejudejieelveekhfekvdefleeludev
+ ffenucffohhmrghinhepvddtudelqddtkedrohhrghenucfkphepkedtrdduieejrdelke
+ drudeltdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhm
+ pehithhssehirhhrvghlvghvrghnthdrughk
+X-ME-Proxy: <xmx:XBplX6OaPd8-Rcai3SHKOKgSomDrtH5LbystWEieopwrs74Ko4xDIA>
+ <xmx:XBplX461UJNlb8XYvAOJQf2gpbNCbVLW4kiglYTPhu_UbQhZN0Qaxw>
+ <xmx:XBplX86lpvvkkyNtlxQqbYOOK9QXj4lGZLO6S-JogkE7jSPZqAbOHA>
+ <xmx:XBplX-txZJNx8VjSfP2gcH8MvzCv8Ci1kUDdozN34K0IGbUkMEbi-YFc7bw>
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id 5C32B3064610;
- Fri, 18 Sep 2020 16:36:32 -0400 (EDT)
+ by mail.messagingengine.com (Postfix) with ESMTPA id 27E553064682;
+ Fri, 18 Sep 2020 16:36:43 -0400 (EDT)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 06/17] hw/block/nvme: add a lba to bytes helper
-Date: Fri, 18 Sep 2020 22:36:10 +0200
-Message-Id: <20200918203621.602915-7-its@irrelevant.dk>
+Subject: [PATCH v2 13/17] hw/block/nvme: add support for sgl bit bucket
+ descriptor
+Date: Fri, 18 Sep 2020 22:36:17 +0200
+Message-Id: <20200918203621.602915-14-its@irrelevant.dk>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200918203621.602915-1-its@irrelevant.dk>
 References: <20200918203621.602915-1-its@irrelevant.dk>
@@ -109,72 +111,120 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
  qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Klaus Jensen <k.jensen@samsung.com>, Max Reitz <mreitz@redhat.com>,
+ Klaus Jensen <k.jensen@samsung.com>,
+ Gollu Appalanaidu <anaidu.gollu@samsung.com>, Max Reitz <mreitz@redhat.com>,
  Klaus Jensen <its@irrelevant.dk>, Keith Busch <kbusch@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Klaus Jensen <k.jensen@samsung.com>
+From: Gollu Appalanaidu <anaidu.gollu@samsung.com>
 
-Add the nvme_l2b helper and use it for converting NLB and SLBA to byte
-counts and offsets.
+This adds support for SGL descriptor type 0x1 (bit bucket descriptor).
+See the NVM Express v1.3d specification, Section 4.4 ("Scatter Gather
+List (SGL)").
 
+Signed-off-by: Gollu Appalanaidu <anaidu.gollu@samsung.com>
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 ---
- hw/block/nvme.h |  6 ++++++
- hw/block/nvme.c | 12 ++++--------
- 2 files changed, 10 insertions(+), 8 deletions(-)
+ hw/block/nvme.c | 33 +++++++++++++++++++++++++++------
+ 1 file changed, 27 insertions(+), 6 deletions(-)
 
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index 52ba794f2e9a..1675c1e0755c 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -77,6 +77,12 @@ static inline uint8_t nvme_ns_lbads(NvmeNamespace *ns)
-     return nvme_ns_lbaf(ns)->ds;
- }
- 
-+/* convert an LBA to the equivalent in bytes */
-+static inline size_t nvme_l2b(NvmeNamespace *ns, uint64_t lba)
-+{
-+    return lba << nvme_ns_lbads(ns);
-+}
-+
- #define TYPE_NVME "nvme"
- #define NVME(obj) \
-         OBJECT_CHECK(NvmeCtrl, (obj), TYPE_NVME)
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 10568cbf8761..62db87460413 100644
+index e01b4b22882e..d2e211c7cbc2 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -644,12 +644,10 @@ static uint16_t nvme_write_zeroes(NvmeCtrl *n, NvmeRequest *req)
- {
-     NvmeRwCmd *rw = (NvmeRwCmd *)&req->cmd;
-     NvmeNamespace *ns = req->ns;
--    const uint8_t lba_index = NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas);
--    const uint8_t data_shift = ns->id_ns.lbaf[lba_index].ds;
-     uint64_t slba = le64_to_cpu(rw->slba);
-     uint32_t nlb  = le16_to_cpu(rw->nlb) + 1;
--    uint64_t offset = slba << data_shift;
--    uint32_t count = nlb << data_shift;
-+    uint64_t offset = nvme_l2b(ns, slba);
-+    uint32_t count = nvme_l2b(ns, nlb);
-     uint16_t status;
+@@ -430,6 +430,10 @@ static uint16_t nvme_map_sgl_data(NvmeCtrl *n, QEMUSGList *qsg,
+         uint8_t type = NVME_SGL_TYPE(segment[i].type);
  
-     trace_pci_nvme_write_zeroes(nvme_cid(req), slba, nlb);
-@@ -674,10 +672,8 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeRequest *req)
-     uint32_t nlb  = le32_to_cpu(rw->nlb) + 1;
-     uint64_t slba = le64_to_cpu(rw->slba);
+         switch (type) {
++        case NVME_SGL_DESCR_TYPE_BIT_BUCKET:
++            if (req->cmd.opcode == NVME_CMD_WRITE) {
++                continue;
++            }
+         case NVME_SGL_DESCR_TYPE_DATA_BLOCK:
+             break;
+         case NVME_SGL_DESCR_TYPE_SEGMENT:
+@@ -440,6 +444,7 @@ static uint16_t nvme_map_sgl_data(NvmeCtrl *n, QEMUSGList *qsg,
+         }
  
--    uint8_t lba_index  = NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas);
--    uint8_t data_shift = ns->id_ns.lbaf[lba_index].ds;
--    uint64_t data_size = (uint64_t)nlb << data_shift;
--    uint64_t data_offset = slba << data_shift;
-+    uint64_t data_size = nvme_l2b(ns, nlb);
-+    uint64_t data_offset = nvme_l2b(ns, slba);
-     int is_write = rw->opcode == NVME_CMD_WRITE ? 1 : 0;
-     enum BlockAcctType acct = is_write ? BLOCK_ACCT_WRITE : BLOCK_ACCT_READ;
-     uint16_t status;
+         dlen = le32_to_cpu(segment[i].len);
++
+         if (!dlen) {
+             continue;
+         }
+@@ -460,6 +465,11 @@ static uint16_t nvme_map_sgl_data(NvmeCtrl *n, QEMUSGList *qsg,
+         }
+ 
+         trans_len = MIN(*len, dlen);
++
++        if (type == NVME_SGL_DESCR_TYPE_BIT_BUCKET) {
++            goto next;
++        }
++
+         addr = le64_to_cpu(segment[i].addr);
+ 
+         if (UINT64_MAX - addr < dlen) {
+@@ -471,6 +481,7 @@ static uint16_t nvme_map_sgl_data(NvmeCtrl *n, QEMUSGList *qsg,
+             return status;
+         }
+ 
++next:
+         *len -= trans_len;
+     }
+ 
+@@ -540,7 +551,8 @@ static uint16_t nvme_map_sgl(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
+         seg_len = le32_to_cpu(sgld->len);
+ 
+         /* check the length of the (Last) Segment descriptor */
+-        if (!seg_len || seg_len & 0xf) {
++        if ((!seg_len || seg_len & 0xf) &&
++            (NVME_SGL_TYPE(sgld->type) != NVME_SGL_DESCR_TYPE_BIT_BUCKET)) {
+             return NVME_INVALID_SGL_SEG_DESCR | NVME_DNR;
+         }
+ 
+@@ -577,19 +589,27 @@ static uint16_t nvme_map_sgl(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
+ 
+         last_sgld = &segment[nsgld - 1];
+ 
+-        /* if the segment ends with a Data Block, then we are done */
+-        if (NVME_SGL_TYPE(last_sgld->type) == NVME_SGL_DESCR_TYPE_DATA_BLOCK) {
++        /*
++         * If the segment ends with a Data Block or Bit Bucket Descriptor Type,
++         * then we are done.
++         */
++        switch (NVME_SGL_TYPE(last_sgld->type)) {
++        case NVME_SGL_DESCR_TYPE_DATA_BLOCK:
++        case NVME_SGL_DESCR_TYPE_BIT_BUCKET:
+             status = nvme_map_sgl_data(n, qsg, iov, segment, nsgld, &len, req);
+             if (status) {
+                 goto unmap;
+             }
+ 
+             goto out;
++
++        default:
++            break;
+         }
+ 
+         /*
+-         * If the last descriptor was not a Data Block, then the current
+-         * segment must not be a Last Segment.
++         * If the last descriptor was not a Data Block or Bit Bucket, then the
++         * current segment must not be a Last Segment.
+          */
+         if (NVME_SGL_TYPE(sgld->type) == NVME_SGL_DESCR_TYPE_LAST_SEGMENT) {
+             status = NVME_INVALID_SGL_SEG_DESCR | NVME_DNR;
+@@ -2654,7 +2674,8 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
+     id->nn = cpu_to_le32(n->num_namespaces);
+     id->oncs = cpu_to_le16(NVME_ONCS_WRITE_ZEROES | NVME_ONCS_TIMESTAMP |
+                            NVME_ONCS_FEATURES);
+-    id->sgls = cpu_to_le32(NVME_CTRL_SGLS_SUPPORT_NO_ALIGN);
++    id->sgls = cpu_to_le32(NVME_CTRL_SGLS_SUPPORT_NO_ALIGN |
++                           NVME_CTRL_SGLS_BITBUCKET);
+ 
+     subnqn = g_strdup_printf("nqn.2019-08.org.qemu:%s", n->params.serial);
+     strpadcpy((char *)id->subnqn, sizeof(id->subnqn), subnqn, '\0');
 -- 
 2.28.0
 
