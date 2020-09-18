@@ -2,124 +2,91 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AEBBC43464
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B66DC43465
 	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 18:39:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A922121534
+	by mail.kernel.org (Postfix) with ESMTPS id CC61E21D7F
 	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 18:39:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="CsC+P/wR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A922121534
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X6yp7BoK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC61E21D7F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJLIb-0000jc-KA
+	id 1kJLIb-0000k8-PT
 	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 14:39:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44456)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47740)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kJL0K-0007ei-CD; Fri, 18 Sep 2020 14:21:06 -0400
-Received: from mail-eopbgr40094.outbound.protection.outlook.com
- ([40.107.4.94]:32391 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kJL0G-0004dZ-8y; Fri, 18 Sep 2020 14:21:03 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EK5eR27YHOnXGlAvBcG1fMueiI0Ge0kMoNd+GNPHkRMpXOykI0LE0+DvyL/XPIkxvha6ImBBQgoFrCO594qulQ/yLG2jrnreAbPObKArlQyL4Dgf4efq1IcIKlKvsF2ruFP+RiNamh0OmunAxEAvVeAVIjMaBUjUXSo1nPTe7aCIZVNW71nuwmyJgyFj92GqLmOw4gE37u2shCnyuxveCK/2zXvep49SM5gHbEZqkJ5ng6QhVJwiu1/4jx7gSyhEip3N4DPqFCbanlH83KYLNNJhOiWx6/xa6VG5OsaKF+qjKhOJ+NWoZn1F2LNhziZWp+tVDZWUHuMvxrMugmpX5A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MaA6RrRANpRcdov7Gw6qp3pWulzXEsVWc/PNy6xwrbg=;
- b=aFaYU18MSRfCQ8eQSSoZXJHZF0toODHMFDXtTceHRw7wqN4VdJk+ZrLuFYBU8Ahyn+5UuKQgftX3W4Bg6e9sQkCmiBatufBtillOid0g4CiVLEnMzWJ2cwu6Yj36MdbjT5/Udw+Oxt7xPR/+A8vBeAkChSBjJo+4cNIbx8L1j1Yxcgtw3k28SRYgQL5KOyx9McTPGVleSyJgkVAg+yrGRu0nJxjYVSqY7EEHi+PbvjqAkUTGmZqr4OywnssWBmWPGR3HUGXmOVQAhFM8Sgc6jj0kaJhm6hM5MqKEkvNgzSL7LRj46SL+enqBEBHkAAvxdZoGjLxmVNlwQFhbK9vJYw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MaA6RrRANpRcdov7Gw6qp3pWulzXEsVWc/PNy6xwrbg=;
- b=CsC+P/wRNw7bgHjUvpvv+7ASzZZfJAmZ+RCPfpnj7IwkDAaXC+gD3yQoyMevkp0dcpH3KGNSrhFdch3nzk5auY8ACQ64n2KTquw5T0phLP7f436+UKLVNstRvlIEKzDkiNkTmaJCE4aPeqTHDZ3M1M/1nMQ2fvkGBVXp16+8kEU=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM5PR0801MB1905.eurprd08.prod.outlook.com (2603:10a6:203:43::8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.14; Fri, 18 Sep
- 2020 18:20:18 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::b179:9641:7589:d692%8]) with mapi id 15.20.3370.019; Fri, 18 Sep 2020
- 18:20:18 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, vsementsov@virtuozzo.com, armbru@redhat.com,
- eblake@redhat.com, fam@euphon.net, stefanha@redhat.com, mreitz@redhat.com,
- kwolf@redhat.com, den@openvz.org
-Subject: [PATCH v6 14/15] scripts/simplebench: improve ascii table: add
- difference line
-Date: Fri, 18 Sep 2020 21:19:50 +0300
-Message-Id: <20200918181951.21752-15-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200918181951.21752-1-vsementsov@virtuozzo.com>
-References: <20200918181951.21752-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM4PR05CA0019.eurprd05.prod.outlook.com (2603:10a6:205::32)
- To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kJLGj-0007MR-ND
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:38:01 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:36617)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kJLGi-00072k-0b
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:38:01 -0400
+Received: by mail-pl1-x644.google.com with SMTP id k13so3442041plk.3
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 11:37:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=rRP60tIXgXyDjfRHhOpTpwQ4z3K7JPkhoQFnyY4gDHg=;
+ b=X6yp7BoK7Iom3GOnwch1Rsj7fljWGvc7tch+klKdqPu+sghEKLxq9lpGz5UZ/QGgYs
+ GTfJM2ep0u1ug5zvIOckbot0H+KaYy3slynYwkFLSXSqwmcm4zNVRUc2fIjGtWQYPfbv
+ ublJxte5uRQTPQXyKaCfrvemQaqigbjjRWGhgtR0B7nhZOKJ+IT5pBnFGMS3/h5I7Ydw
+ OysE6L3FcFZEk8/HONnq6dslgGGEuC0/WEhWrzvsO07aMhQ4JWEfZ5GSGIsXpEMtr6zh
+ JotPkHhbrBm66stBwchsaJg+4xk0NwVAjkF3jkrKVIgn7iBr1Ke0aSEnOdtncGz0vyfH
+ spVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=rRP60tIXgXyDjfRHhOpTpwQ4z3K7JPkhoQFnyY4gDHg=;
+ b=N3ISMWd8b8RbFtvKy+5qJpHnk4E+e86mRf6Cge7FD0wdBDUHXoVsVWsatew/WVZBJW
+ qun5nFdMofTNrR0ZzIXDFKk6iBJI7do0HpOzsLHNL2WTy28razLiW9y9GFFXerKlT0Bw
+ BQnZb1z18lD9RuCrCgGVNIA1fINTJxtEf0A4LRpayCQ8FGDQxeK8o3kAyWo3rZjc1fgb
+ MGikALuKpJY1R1xB2Uq5bRG8bWx1fKb6B+JIsSEHBj2QZjEg2DYX1koYvWz3ZlXCgyEy
+ FvQK/QZU0IQk9CHBYH8wS4fnvLNzCGCFgG/tth6WVWEpIieEKI1ZBxrvCCtnlRvBc+Qz
+ SuQQ==
+X-Gm-Message-State: AOAM533KRBYD6ADZE3QEdE7zbv1HTbHdLQuRu8siyPNBUaS8Ol6X1EVr
+ VXbEHK85xA4SQ4uJdxl7ZoOGYFh8Nrd9Jw==
+X-Google-Smtp-Source: ABdhPJxR1oYdOEKRTmfHQkUrJTsYp4jSTQ58ckutG0XGsOoz/Nld3I3RLOoxvJIz/axJRNkMk7sGOA==
+X-Received: by 2002:a17:90b:f83:: with SMTP id
+ ft3mr14069235pjb.234.1600454276540; 
+ Fri, 18 Sep 2020 11:37:56 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id f4sm3680723pfj.147.2020.09.18.11.37.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 18 Sep 2020 11:37:55 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 02/81] target/arm: Fix sve_zip_p vs odd vector lengths
+Date: Fri, 18 Sep 2020 11:36:32 -0700
+Message-Id: <20200918183751.2787647-3-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200918183751.2787647-1-richard.henderson@linaro.org>
+References: <20200918183751.2787647-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.sw.ru (185.215.60.106) by
- AM4PR05CA0019.eurprd05.prod.outlook.com (2603:10a6:205::32) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3391.13 via Frontend Transport; Fri, 18 Sep 2020 18:20:18 +0000
-X-Mailer: git-send-email 2.21.3
-X-Originating-IP: [185.215.60.106]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 806d1ce3-8609-4895-6060-08d85bff7f78
-X-MS-TrafficTypeDiagnostic: AM5PR0801MB1905:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM5PR0801MB1905348C1E5B757305DF9BDAC13F0@AM5PR0801MB1905.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3044;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: eaWir+/zNKHHVettEO9Pa+yTpQAH7nJRb5pCYcVPBChrlZBdbIaqrtiKc1iGoDOILd4R3/qi/rhmIBWb903G0pLD+u0oRsc7A3gy2cq5Bfl0HN2p0KWCGd3JyctUTqYWvz3CYGy8Be6QyQ/fLdwyUidLWVQXJEPSKRpPr//pSHFgxEz+vIX1CvQEcQUlrI/ULg5Btq4QFO7bdGXo2TewzntaHx6YjgeiolHDJ/+EaeKpU0+SqQXB/ZReKTMP36DSttAVhh+5X60YiKXJb3WRBHSmn+YIxF244hF53BOHPp54xt+Wr4ujNrpIspN6WNqKPIWv4yeOG0CvE1ML9QcoqQbUpB6IzKFWwvvfFyWouoyeNs7mBHA+AU80rJWqAVsK
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(39840400004)(396003)(376002)(366004)(136003)(346002)(66556008)(8936002)(66946007)(66476007)(107886003)(6506007)(2616005)(5660300002)(2906002)(83380400001)(6486002)(956004)(6666004)(1076003)(186003)(8676002)(52116002)(4326008)(316002)(86362001)(6916009)(478600001)(26005)(36756003)(16526019)(6512007);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: jLCKStDn2IsgR2I4AILRzfZoWZNEZl3j83CbuAxr1VhATm20CKXM/t9Gvx2PtQEak8zRJ1k43snXk4sS8Il1NVu7Xoi7rUTKbQxk2Im+GzYUYcj84XuZHvZuUFQewFtXHGLzqr09kGVjmPgN/lQ6PCN+TrVGXZ0qV1AgZsUkP8ME2HD4uhgwLXDMyBw7tamonKAHvw9Kt4Zjecuc6qq5fDkZZhyWLeWcJBYLZCk2kN5xzfRP/3dcBlan3dZ8ZO4s2wVZSHTJEzl3AunOTzjlRDRVuaooOqPbB87F/UKlNOjPysW+vvZkqBNo63y1neqejTxLwqm9amxt0bn0ghdgd11N3K4R6in+GYFVkRY0D4w9LecS+PAlHM+wIqBtn4ANGw6qmUFIzXy5wPliUctr83kBSQc3YNdUNjORqJytmEZly867/vcTn/oAk72Ywf7APmhf88ayMOyDXPYaef9xTrC5a2NcRaairNCX+ybqRhkMaDOjz7Ld2t3JeCEiPZ7HmLK0+hFKp2t6SsvC6H6OAP+tVXgilhuEwym8jDul+hLvRdsePJUj0fAHZskR0ssF4LeRime5hYnJFaLSQo5q4+NyvAW8TZJ7OYJYOzP/UFzq7xcgJ6iWTSnjXRXm+NQvb88MQ8WN9svinWkJOPNAJw==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 806d1ce3-8609-4895-6060-08d85bff7f78
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2020 18:20:18.8389 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MTryrD1aM50JFt3i+mcxNquZD44oO0JDwfikQo02grhUaVWF1/4SuREAEFgVyQw3lYjA/sP63nEPp/Qsxbn3BEosoL1BJWz5TbaMsWoLFno=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0801MB1905
-Received-SPF: pass client-ip=40.107.4.94;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR03-DB5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 14:20:14
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -133,85 +100,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Laurent Desnogues <laurent.desnogues@gmail.com>, peter.maydell@linaro.org,
+ alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Performance improvements / degradations are usually discussed in
-percentage. Let's make the script calculate it for us.
+Wrote too much with low-half zip (zip1) with vl % 512 != 0.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Adjust all of the x + (y << s) to x | (y << s) as a style fix.
+
+We only ever have exact overlap between D, M, and N.  Therefore
+we only need a single temporary, and we do not need to check for
+partial overlap.
+
+Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- scripts/simplebench/simplebench.py | 46 +++++++++++++++++++++++++++---
- 1 file changed, 42 insertions(+), 4 deletions(-)
+ target/arm/sve_helper.c | 25 ++++++++++++++-----------
+ 1 file changed, 14 insertions(+), 11 deletions(-)
 
-diff --git a/scripts/simplebench/simplebench.py b/scripts/simplebench/simplebench.py
-index 56d3a91ea2..0ff05a38b8 100644
---- a/scripts/simplebench/simplebench.py
-+++ b/scripts/simplebench/simplebench.py
-@@ -153,14 +153,22 @@ def bench(test_func, test_envs, test_cases, *args, **vargs):
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index fcb46f150f..b8651ae173 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -1870,6 +1870,7 @@ void HELPER(sve_zip_p)(void *vd, void *vn, void *vm, uint32_t pred_desc)
+     intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
+     int esz = extract32(pred_desc, SIMD_DATA_SHIFT, 2);
+     intptr_t high = extract32(pred_desc, SIMD_DATA_SHIFT + 2, 1);
++    int esize = 1 << esz;
+     uint64_t *d = vd;
+     intptr_t i;
  
- def ascii(results):
-     """Return ASCII representation of bench() returned dict."""
--    from tabulate import tabulate
-+    import tabulate
-+
-+    # We want leading whitespace for difference row cells (see below)
-+    tabulate.PRESERVE_WHITESPACE = True
+@@ -1882,33 +1883,35 @@ void HELPER(sve_zip_p)(void *vd, void *vn, void *vm, uint32_t pred_desc)
+         mm = extract64(mm, high * half, half);
+         nn = expand_bits(nn, esz);
+         mm = expand_bits(mm, esz);
+-        d[0] = nn + (mm << (1 << esz));
++        d[0] = nn | (mm << esize);
+     } else {
+-        ARMPredicateReg tmp_n, tmp_m;
++        ARMPredicateReg tmp;
  
-     dim = None
--    tab = [[""] + [c['id'] for c in results['envs']]]
-+    tab = [
-+        # Environment columns are named A, B, ...
-+        [""] + [chr(ord('A') + i) for i in range(len(results['envs']))],
-+        [""] + [c['id'] for c in results['envs']]
-+    ]
-     for case in results['cases']:
-         row = [case['id']]
-+        case_results = results['tab'][case['id']]
-         for env in results['envs']:
--            res = results['tab'][case['id']][env['id']]
-+            res = case_results[env['id']]
-             if dim is None:
-                 dim = res['dimension']
-             else:
-@@ -168,4 +176,34 @@ def ascii(results):
-             row.append(ascii_one(res))
-         tab.append(row)
+         /* We produce output faster than we consume input.
+            Therefore we must be mindful of possible overlap.  */
+-        if ((vn - vd) < (uintptr_t)oprsz) {
+-            vn = memcpy(&tmp_n, vn, oprsz);
+-        }
+-        if ((vm - vd) < (uintptr_t)oprsz) {
+-            vm = memcpy(&tmp_m, vm, oprsz);
++        if (vd == vn) {
++            vn = memcpy(&tmp, vn, oprsz);
++            if (vd == vm) {
++                vm = vn;
++            }
++        } else if (vd == vm) {
++            vm = memcpy(&tmp, vm, oprsz);
+         }
+         if (high) {
+             high = oprsz >> 1;
+         }
  
--    return f'All results are in {dim}\n\n' + tabulate(tab)
-+        # Add row of difference between column. For each column starting from
-+        # B we calculate difference with all previous columns.
-+        row = ['', '']  # case name and first column
-+        for i in range(1, len(results['envs'])):
-+            cell = ''
-+            env = results['envs'][i]
-+            res = case_results[env['id']]
-+
-+            if 'average' not in res:
-+                # Failed result
-+                row.append(cell)
-+                continue
-+
-+            for j in range(0, i):
-+                env_j = results['envs'][j]
-+                res_j = case_results[env_j['id']]
-+
-+                if 'average' not in res_j:
-+                    # Failed result
-+                    cell += ' --'
-+                    continue
-+
-+                col_j = chr(ord('A') + j)
-+                avg_j = res_j['average']
-+                delta = (res['average'] - avg_j) / avg_j * 100
-+                delta_delta = (res['delta'] + res_j['delta']) / avg_j * 100
-+                cell += f' {col_j}{round(delta):+}±{round(delta_delta)}%'
-+            row.append(cell)
-+        tab.append(row)
-+
-+    return f'All results are in {dim}\n\n' + tabulate.tabulate(tab)
+-        if ((high & 3) == 0) {
++        if ((oprsz & 7) == 0) {
+             uint32_t *n = vn, *m = vm;
+             high >>= 2;
+ 
+-            for (i = 0; i < DIV_ROUND_UP(oprsz, 8); i++) {
++            for (i = 0; i < oprsz / 8; i++) {
+                 uint64_t nn = n[H4(high + i)];
+                 uint64_t mm = m[H4(high + i)];
+ 
+                 nn = expand_bits(nn, esz);
+                 mm = expand_bits(mm, esz);
+-                d[i] = nn + (mm << (1 << esz));
++                d[i] = nn | (mm << esize);
+             }
+         } else {
+             uint8_t *n = vn, *m = vm;
+@@ -1920,7 +1923,7 @@ void HELPER(sve_zip_p)(void *vd, void *vn, void *vm, uint32_t pred_desc)
+ 
+                 nn = expand_bits(nn, esz);
+                 mm = expand_bits(mm, esz);
+-                d16[H2(i)] = nn + (mm << (1 << esz));
++                d16[H2(i)] = nn | (mm << esize);
+             }
+         }
+     }
 -- 
-2.21.3
+2.25.1
 
 
