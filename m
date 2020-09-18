@@ -7,70 +7,75 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D91EEC43463
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 10:36:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F01E3C43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 10:38:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 394C821534
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 10:36:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A02521D24
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 10:38:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HNFmSaKj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 394C821534
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ii6A64mS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A02521D24
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJDkd-0003tc-Gb
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 06:36:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34130)
+	id 1kJDmQ-0005cx-GU
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 06:38:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34190)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kJDj0-0001wC-7v
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 06:34:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31832)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kJDj7-00025i-Rf
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 06:34:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34064)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kJDiy-0005BG-8v
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 06:34:41 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kJDj5-0005CI-07
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 06:34:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600425279;
+ s=mimecast20190719; t=1600425286;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=qT6Li75uvxZeJ8KC7IVApxYxhxtkik0Szgg6LPg9L4A=;
- b=HNFmSaKj+faIZpsC3UoZHA9SKaCXC1cEpEF7LIW60ESvLjb6eqgsIwQUkRRH4DV1Pz27CP
- /cbCSTcItjilYeV7unDCPMPLBG9d4eGdq69lTzeDE6TkzJ78FEtRTdfV7MIqzgTvXa0lVd
- CPC5uVjgLzqmhxvoL+g/PcmDS17gVBc=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=XVUCVNO4APeMaNsoKSKvJekSTv+7JAP5Fuqg/doiR1U=;
+ b=ii6A64mS/fC7hSSxmfWfIl1++n8D82K1OLIQsukUPbmeC0SwNiYWYz4HlVnoKR6TimmYxm
+ IPaLUeCu593waY0rcQTP0S0RHl2Bf22KH43DvaozDdGH34ug5Mxjp8iSAsVyslOn3+fQRC
+ 1lh12QUktKI2CMGHD42j3VcMCCd7GUA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-JRRKplsUMRy2fU4C1uR4_Q-1; Fri, 18 Sep 2020 06:34:37 -0400
-X-MC-Unique: JRRKplsUMRy2fU4C1uR4_Q-1
+ us-mta-450-R7NwxjSuPSiaN-K5fa1uZw-1; Fri, 18 Sep 2020 06:34:44 -0400
+X-MC-Unique: R7NwxjSuPSiaN-K5fa1uZw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41A45188C12D;
- Fri, 18 Sep 2020 10:34:36 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B8F9188C12D;
+ Fri, 18 Sep 2020 10:34:43 +0000 (UTC)
 Received: from thuth.com (ovpn-112-53.ams2.redhat.com [10.36.112.53])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 835BE60BEC;
- Fri, 18 Sep 2020 10:34:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C23166198C;
+ Fri, 18 Sep 2020 10:34:41 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
-Subject: [PATCH 1/6] meson: move libudev test
-Date: Fri, 18 Sep 2020 12:34:25 +0200
-Message-Id: <20200918103430.297167-2-thuth@redhat.com>
+Subject: [PATCH 3/6] migration: Silence compiler warning in
+ global_state_store_running()
+Date: Fri, 18 Sep 2020 12:34:27 +0200
+Message-Id: <20200918103430.297167-4-thuth@redhat.com>
 In-Reply-To: <20200918103430.297167-1-thuth@redhat.com>
 References: <20200918103430.297167-1-thuth@redhat.com>
+MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 01:32:10
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 00:20:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
@@ -96,87 +101,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+GCC 9.3.0 on Ubuntu complains:
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20200916162621.100141-2-pbonzini@redhat.com>
+In file included from /usr/include/string.h:495,
+                 from /home/travis/build/huth/qemu/include/qemu/osdep.h:87,
+                 from ../migration/global_state.c:13:
+In function ‘strncpy’,
+    inlined from ‘global_state_store_running’ at ../migration/global_state.c:47:5:
+/usr/include/x86_64-linux-gnu/bits/string_fortified.h:106:10: error:
+ ‘__builtin_strncpy’ specified bound 100 equals destination size [-Werror=stringop-truncation]
+  106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+... but we apparently really want to do a strncpy here - the size is already
+checked with the assert() statement right in front of it. To silence the
+warning, simply replace it with our strpadcpy() function.
+
+Suggested-by: Philippe Mathieu-Daudé <philmd@redhat.com> (two years ago)
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- configure   | 14 --------------
- meson.build |  7 ++++---
- 2 files changed, 4 insertions(+), 17 deletions(-)
+ migration/global_state.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/configure b/configure
-index 7564479008..d8bd6829b3 100755
---- a/configure
-+++ b/configure
-@@ -908,7 +908,6 @@ Linux)
-   linux_user="yes"
-   kvm="yes"
-   QEMU_INCLUDES="-isystem ${source_path}/linux-headers -Ilinux-headers $QEMU_INCLUDES"
--  libudev="yes"
- ;;
- esac
+diff --git a/migration/global_state.c b/migration/global_state.c
+index 25311479a4..a33947ca32 100644
+--- a/migration/global_state.c
++++ b/migration/global_state.c
+@@ -44,8 +44,8 @@ void global_state_store_running(void)
+ {
+     const char *state = RunState_str(RUN_STATE_RUNNING);
+     assert(strlen(state) < sizeof(global_state.runstate));
+-    strncpy((char *)global_state.runstate,
+-           state, sizeof(global_state.runstate));
++    strpadcpy((char *)global_state.runstate, sizeof(global_state.runstate),
++              state, '\0');
+ }
  
-@@ -6283,15 +6282,6 @@ if test "$libnfs" != "no" ; then
- fi
- 
- ##########################################
--# Do we have libudev
--if test "$libudev" != "no" ; then
--  if $pkg_config libudev && test "$static" != "yes"; then
--    libudev="yes"
--    libudev_libs=$($pkg_config --libs libudev)
--  else
--    libudev="no"
--  fi
--fi
- 
- # Exclude --warn-common with TSan to suppress warnings from the TSan libraries.
- if test "$solaris" = "no" && test "$tsan" = "no"; then
-@@ -7460,10 +7450,6 @@ if test "$gcov" = "yes" ; then
-   echo "CONFIG_GCOV=y" >> $config_host_mak
- fi
- 
--if test "$libudev" != "no"; then
--    echo "CONFIG_LIBUDEV=y" >> $config_host_mak
--    echo "LIBUDEV_LIBS=$libudev_libs" >> $config_host_mak
--fi
- if test "$fuzzing" != "no"; then
-     echo "CONFIG_FUZZ=y" >> $config_host_mak
- fi
-diff --git a/meson.build b/meson.build
-index f4d1ab1096..4872498897 100644
---- a/meson.build
-+++ b/meson.build
-@@ -252,8 +252,8 @@ if 'CONFIG_CURL' in config_host
-                             link_args: config_host['CURL_LIBS'].split())
- endif
- libudev = not_found
--if 'CONFIG_LIBUDEV' in config_host
--  libudev = declare_dependency(link_args: config_host['LIBUDEV_LIBS'].split())
-+if target_os == 'linux'
-+  libudev = dependency('libudev', static: enable_static)
- endif
- brlapi = not_found
- if 'CONFIG_BRLAPI' in config_host
-@@ -435,6 +435,7 @@ has_gettid = cc.has_function('gettid')
- 
- # Create config-host.h
- 
-+config_host_data.set('CONFIG_LIBUDEV', libudev.found())
- config_host_data.set('CONFIG_SDL', sdl.found())
- config_host_data.set('CONFIG_SDL_IMAGE', sdl_image.found())
- config_host_data.set('CONFIG_VNC', vnc.found())
-@@ -1515,7 +1516,7 @@ summary_info += {'sheepdog support':  config_host.has_key('CONFIG_SHEEPDOG')}
- summary_info += {'capstone':          config_host.has_key('CONFIG_CAPSTONE')}
- summary_info += {'libpmem support':   config_host.has_key('CONFIG_LIBPMEM')}
- summary_info += {'libdaxctl support': config_host.has_key('CONFIG_LIBDAXCTL')}
--summary_info += {'libudev':           config_host.has_key('CONFIG_LIBUDEV')}
-+summary_info += {'libudev':           libudev.found()}
- summary_info += {'default devices':   config_host['CONFIG_MINIKCONF_MODE'] == '--defconfig'}
- summary_info += {'plugin support':    config_host.has_key('CONFIG_PLUGIN')}
- summary_info += {'fuzzing support':   config_host.has_key('CONFIG_FUZZ')}
+ bool global_state_received(void)
 -- 
 2.18.2
 
