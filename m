@@ -2,104 +2,96 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78201C43464
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 16:49:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9F08C43463
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 16:52:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAEB020848
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 16:49:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C7B32078B
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 16:52:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OrLZX9Ze"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAEB020848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jXJDwQcf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C7B32078B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJJZD-0005tm-Rw
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 12:48:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40444)
+	id 1kJJcq-00083Q-5M
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 12:52:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41430)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kJJ7d-000577-FK
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 12:20:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23065
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kJJ7b-0005ht-7U
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 12:20:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600446025;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=gyuuZ4Sz8ayGeGEwQkqastteCZWQE5SL9GYanhN/cu8=;
- b=OrLZX9ZeotS65ZTVm4bFsdaK+NmbiOxQvMyNvP8pygqchqgJwb98CFW659V5TEPUnhktoF
- iPgywb8J/qg7jdWCKICnsdwygXmtiTQ+rRB/vj269rxxj7LelcYpE+3uEqYS1ZNWx9m6fy
- gvXfu6j0wa3CQwLI1AnTVizYnUo4Zg4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-557-xz13OE5bPjOvSq9Gfkg1EA-1; Fri, 18 Sep 2020 12:20:23 -0400
-X-MC-Unique: xz13OE5bPjOvSq9Gfkg1EA-1
-Received: by mail-wm1-f69.google.com with SMTP id w3so2242905wmg.4
- for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 09:20:23 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1kJJBU-0000hf-0M
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 12:24:28 -0400
+Received: from mail-vs1-xe41.google.com ([2607:f8b0:4864:20::e41]:34689)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1kJJBQ-00068k-ME
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 12:24:27 -0400
+Received: by mail-vs1-xe41.google.com with SMTP id y190so3943157vsy.1
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 09:24:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=sM/DvbAmUefzPfv9k6dUc54IMv/ZOAiE5sKS7mi8c/Q=;
+ b=jXJDwQcfQDa7yQ2b2J8VWXTOJ1ZoyVUVHZ0/EcT4dwdIs6+11pebKJxLYbQGxJAYsx
+ W6qTSQL+KTBTCmc2Gq0AAVN6YN/9IurgKV1WWCtukCrU/56bLgOwEqRJslkzysmWg3n7
+ 8xYx+bUhw+UkJRt6jvC87m8yKnGDf/URZHFjd9XAQHjosKDRNFw+GKSWG7soZebNCMdI
+ r04GgnFIOwOHzMevmoVjc2L4cXxe+9ssshaBikGAZkucBxUgdZXlVGqe+JGKO3DQ4vJC
+ J1KIzqkhHChb7YkrYHkhLTkzeVUUUcZCxsY9U5UPPCaw6UsqQWo/sfX4BM1kFVg0BGJ2
+ QjJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=gyuuZ4Sz8ayGeGEwQkqastteCZWQE5SL9GYanhN/cu8=;
- b=slJoRpNEduXK+JkdngMcHdX1e5bacWu91IhFKECBhNmJl/65H9kBes9APE3E+OH2yM
- DrXFDVIVyr6g/CFu2k8PSa7zubF3iY9J5ZPcFcrrFdaJdyj8O/mxqW/E9Wi0W8/Lh4us
- DPH8e8i00JbCeWp9W7Qg0MSGJXJFJao8/ryceHSpKI3UyH7q6AoJ4hpcECQeIZLUOLgF
- T7xifK4jESM7D1ftxFqrsKIwReMFb7utOTjlvJ+ibxKqyB9WaWTdiW9U0VjAW35AB/Te
- NRw70zoFxXZivEjBK0NYqFIE4PX/PpzYzGQ0y6z3ibHGg7JNTeCSb7LHb4LGASpLUikc
- 4GTQ==
-X-Gm-Message-State: AOAM530gkYSpk3pcz+rfUWfFRd24jXvMw1s9Km2t5TGwjtqX9eti+vLR
- UOOpTaorAdqsXmKcfGckrCCVR6bLa0E0b2FoqA37KU8wbep/+nGHtRym0iNoE5793x6ar9jRy+Z
- yrK9E5JplLJiyPY8=
-X-Received: by 2002:a1c:96:: with SMTP id 144mr16465888wma.84.1600446022151;
- Fri, 18 Sep 2020 09:20:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzCnd1cPN5DzXVivE9FUlCePK5vrajlZZl8i/znXLCpZyPK+3qNcJZgb27qyKuMBuQH/S85+Q==
-X-Received: by 2002:a1c:96:: with SMTP id 144mr16465862wma.84.1600446021864;
- Fri, 18 Sep 2020 09:20:21 -0700 (PDT)
-Received: from redhat.com (bzq-109-65-116-225.red.bezeqint.net.
- [109.65.116.225])
- by smtp.gmail.com with ESMTPSA id o15sm5604768wmh.29.2020.09.18.09.20.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Sep 2020 09:20:21 -0700 (PDT)
-Date: Fri, 18 Sep 2020 12:20:19 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 08/15] tests/qtest/vhost-user-test: prepare the tests for
- adding new dev class
-Message-ID: <20200918161836.318893-9-mst@redhat.com>
-References: <20200918161836.318893-1-mst@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=sM/DvbAmUefzPfv9k6dUc54IMv/ZOAiE5sKS7mi8c/Q=;
+ b=W7RezSZJ4EzcC6VvaC7i5H+2gwJ2duANZMZAcpaoYt1Tpz9dOUzJq1IDpIvlg4XV5K
+ ivlUkXahcy1r94Fo2ThMsFQO2eN/X6g6Lu+L2tc/V/DXrB8aN8b3G39GRJF6sDPHWONK
+ Y6TRj+P6+1WYQ8V/zp7XYjsg8+6J09UwWQ6reGJo+UjwTX8VxomrHOsZkpLJ1cRzM2bx
+ tUok+t70EgzRzm/nVgKdBjhNSzvOUJINeLbvTfxJn7sq/YjkrpthMrEtmwEsJp3dBzH+
+ BizcVvAc2mYDYF2f1bCCseILHC0kOaGNahDCeRne4kgCCF56d/I3/aS+85RYsSKmhKeD
+ lzjw==
+X-Gm-Message-State: AOAM530jETQ7DOC8XulFUpjZbyB4b+CPGEE0Gt42L30pDGDHME/jVgi/
+ 9Bgzdc9NjHukFRRro14GCCa878Bnlzr1shJ7vg/nzw==
+X-Google-Smtp-Source: ABdhPJyW42Z/EtCvWvAqOcKXStP+QhmnNb44gPLa64hvQVUbjwuWzr483zUP62onWEWW/4ucHNtga6YhwwZecHyRR9g=
+X-Received: by 2002:a05:6102:379:: with SMTP id
+ f25mr12705732vsa.47.1600446262954; 
+ Fri, 18 Sep 2020 09:24:22 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200918161836.318893-1-mst@redhat.com>
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 03:47:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
+References: <20200914140641.21369-1-peter.maydell@linaro.org>
+ <20200914140641.21369-33-peter.maydell@linaro.org>
+ <CAP+75-XNAKE8n7MffAsSJFO1EVzAmTZsv4COyZoFWKEOELOO5A@mail.gmail.com>
+ <CAP+75-VmpCCnqLi_uX+GPc=-SF07WXMRZ1BDrNpuEzVOJpvy_A@mail.gmail.com>
+In-Reply-To: <CAP+75-VmpCCnqLi_uX+GPc=-SF07WXMRZ1BDrNpuEzVOJpvy_A@mail.gmail.com>
+From: Havard Skinnemoen <hskinnemoen@google.com>
+Date: Fri, 18 Sep 2020 09:24:11 -0700
+Message-ID: <CAFQmdRZLRDxtQBMj2fQwjwNP3Pp1DZ==Pb+jcfz4E7ivJ7eYGQ@mail.gmail.com>
+Subject: Re: [PULL 32/36] tests/acceptance: console boot tests for quanta-gsj
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Cleber Rosa Junior <crosa@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, 
+ Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::e41;
+ envelope-from=hskinnemoen@google.com; helo=mail-vs1-xe41.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -175
+X-Spam_score: -17.6
+X-Spam_bar: -----------------
+X-Spam_report: (-17.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,272 +104,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Dima Stepanov <dimastep@yandex-team.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Dima Stepanov <dimastep@yandex-team.ru>
+On Fri, Sep 18, 2020 at 6:57 AM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> On Fri, Sep 18, 2020 at 3:52 PM Philippe Mathieu-Daud=C3=A9
+> <philmd@redhat.com> wrote:
+> >
+> > Hi Havard,
+> >
+> > On Mon, Sep 14, 2020 at 5:47 PM Peter Maydell <peter.maydell@linaro.org=
+> wrote:
+> > >
+> > > From: Havard Skinnemoen <hskinnemoen@google.com>
+> > >
+> > > This adds two acceptance tests for the quanta-gsj machine.
+> > >
+> > > One test downloads a lightly patched openbmc flash image from github =
+and
+> > > verifies that it boots all the way to the login prompt.
+> > >
+> > > The other test downloads a kernel, initrd and dtb built from the same
+> > > openbmc source and verifies that the kernel detects all CPUs and boot=
+s
+> > > to the point where it can't find the root filesystem (because we have=
+ no
+> > > flash image in this case).
+> > >
+> > > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > > Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > > Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+> > > Message-id: 20200911052101.2602693-15-hskinnemoen@google.com
+> > > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> > > ---
+> > [...]
+> > > +    def test_arm_quanta_gsj_initrd(self):
+> > > +        """
+> > > +        :avocado: tags=3Darch:arm
+> > > +        :avocado: tags=3Dmachine:quanta-gsj
+> > > +        """
+> > > +        initrd_url =3D (
+> > > +                'https://github.com/hskinnemoen/openbmc/releases/dow=
+nload/'
+> > > +                '20200711-gsj-qemu-0/obmc-phosphor-initramfs-gsj.cpi=
+o.xz')
+> > > +        initrd_hash =3D '98fefe5d7e56727b1eb17d5c00311b1b5c945300'
+> > > +        initrd_path =3D self.fetch_asset(initrd_url, asset_hash=3Din=
+itrd_hash)
+> > > +        kernel_url =3D (
+> > > +                'https://github.com/hskinnemoen/openbmc/releases/dow=
+nload/'
+> > > +                '20200711-gsj-qemu-0/uImage-gsj.bin')
+> > > +        kernel_hash =3D 'fa67b2f141d56d39b3c54305c0e8a899c99eb2c7'
+> > > +        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dke=
+rnel_hash)
+> > > +        dtb_url =3D (
+> > > +                'https://github.com/hskinnemoen/openbmc/releases/dow=
+nload/'
+> > > +                '20200711-gsj-qemu-0/nuvoton-npcm730-gsj.dtb')
+> > > +        dtb_hash =3D '18315f7006d7b688d8312d5c727eecd819aa36a4'
+> > > +        dtb_path =3D self.fetch_asset(dtb_url, asset_hash=3Ddtb_hash=
+)
+> > > +
+> > > +        self.vm.set_console()
+> > > +        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
+> > > +                               'console=3DttyS0,115200n8 '
+> > > +                               'earlycon=3Duart8250,mmio32,0xf000100=
+0')
+> > > +        self.vm.add_args('-kernel', kernel_path,
+> > > +                         '-initrd', initrd_path,
+> > > +                         '-dtb', dtb_path,
+> > > +                         '-append', kernel_command_line)
+> > > +        self.vm.launch()
+> > > +
+> > > +        self.wait_for_console_pattern('Booting Linux on physical CPU=
+ 0x0')
+> > > +        self.wait_for_console_pattern('CPU1: thread -1, cpu 1, socke=
+t 0')
+> > > +        self.wait_for_console_pattern(
+> > > +                'Give root password for system maintenance')
+> >
+> > This test is failing (timeout) on our CI:
+>
+> Oops I meant to keep the other one: test_arm_quanta_gsj
+> (not test_arm_quanta_gsj_initrd).
+>
+> > https://gitlab.com/philmd/qemu/-/jobs/745483978#L857
 
-For now only vhost-user-net device is supported by the test. Other
-vhost-user devices are not tested. As a first step make source code
-refactoring so new devices can reuse the same test routines. To make
-this provide a new vhost_user_ops structure with the methods to
-initialize device, its command line or make a proper vhost-user
-responses.
+Sorry about that. It only takes 60-ish seconds on my (admittedly beefy) mac=
+hine.
 
-Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
-Reviewed-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
-Message-Id: <a48b60fb96fef230b75fff72a2d77040dcb5ef7c.1599813294.git.dimastep@yandex-team.ru>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- tests/qtest/vhost-user-test.c | 105 ++++++++++++++++++++++++----------
- 1 file changed, 76 insertions(+), 29 deletions(-)
-
-diff --git a/tests/qtest/vhost-user-test.c b/tests/qtest/vhost-user-test.c
-index 9ee0f1e4fd..3df5322614 100644
---- a/tests/qtest/vhost-user-test.c
-+++ b/tests/qtest/vhost-user-test.c
-@@ -135,6 +135,10 @@ enum {
-     TEST_FLAGS_END,
- };
- 
-+enum {
-+    VHOST_USER_NET,
-+};
-+
- typedef struct TestServer {
-     gchar *socket_path;
-     gchar *mig_path;
-@@ -154,10 +158,25 @@ typedef struct TestServer {
-     bool test_fail;
-     int test_flags;
-     int queues;
-+    struct vhost_user_ops *vu_ops;
- } TestServer;
- 
-+struct vhost_user_ops {
-+    /* Device types. */
-+    int type;
-+    void (*append_opts)(TestServer *s, GString *cmd_line,
-+            const char *chr_opts);
-+
-+    /* VHOST-USER commands. */
-+    void (*set_features)(TestServer *s, CharBackend *chr,
-+            VhostUserMsg *msg);
-+    void (*get_protocol_features)(TestServer *s,
-+            CharBackend *chr, VhostUserMsg *msg);
-+};
-+
- static const char *init_hugepagefs(void);
--static TestServer *test_server_new(const gchar *name);
-+static TestServer *test_server_new(const gchar *name,
-+        struct vhost_user_ops *ops);
- static void test_server_free(TestServer *server);
- static void test_server_listen(TestServer *server);
- 
-@@ -167,7 +186,7 @@ enum test_memfd {
-     TEST_MEMFD_NO,
- };
- 
--static void append_vhost_opts(TestServer *s, GString *cmd_line,
-+static void append_vhost_net_opts(TestServer *s, GString *cmd_line,
-                              const char *chr_opts)
- {
-     g_string_append_printf(cmd_line, QEMU_CMD_CHR QEMU_CMD_NETDEV,
-@@ -332,25 +351,15 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
-         break;
- 
-     case VHOST_USER_SET_FEATURES:
--        g_assert_cmpint(msg.payload.u64 & (0x1ULL << VHOST_USER_F_PROTOCOL_FEATURES),
--                        !=, 0ULL);
--        if (s->test_flags == TEST_FLAGS_DISCONNECT) {
--            qemu_chr_fe_disconnect(chr);
--            s->test_flags = TEST_FLAGS_BAD;
-+        if (s->vu_ops->set_features) {
-+            s->vu_ops->set_features(s, chr, &msg);
-         }
-         break;
- 
-     case VHOST_USER_GET_PROTOCOL_FEATURES:
--        /* send back features to qemu */
--        msg.flags |= VHOST_USER_REPLY_MASK;
--        msg.size = sizeof(m.payload.u64);
--        msg.payload.u64 = 1 << VHOST_USER_PROTOCOL_F_LOG_SHMFD;
--        msg.payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_CROSS_ENDIAN;
--        if (s->queues > 1) {
--            msg.payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_MQ;
-+        if (s->vu_ops->get_protocol_features) {
-+            s->vu_ops->get_protocol_features(s, chr, &msg);
-         }
--        p = (uint8_t *) &msg;
--        qemu_chr_fe_write_all(chr, p, VHOST_USER_HDR_SIZE + msg.size);
-         break;
- 
-     case VHOST_USER_GET_VRING_BASE:
-@@ -467,7 +476,8 @@ static const char *init_hugepagefs(void)
- #endif
- }
- 
--static TestServer *test_server_new(const gchar *name)
-+static TestServer *test_server_new(const gchar *name,
-+        struct vhost_user_ops *ops)
- {
-     TestServer *server = g_new0(TestServer, 1);
-     char template[] = "/tmp/vhost-test-XXXXXX";
-@@ -495,6 +505,7 @@ static TestServer *test_server_new(const gchar *name)
- 
-     server->log_fd = -1;
-     server->queues = 1;
-+    server->vu_ops = ops;
- 
-     return server;
- }
-@@ -669,11 +680,11 @@ static void vhost_user_test_cleanup(void *s)
- 
- static void *vhost_user_test_setup(GString *cmd_line, void *arg)
- {
--    TestServer *server = test_server_new("vhost-user-test");
-+    TestServer *server = test_server_new("vhost-user-test", arg);
-     test_server_listen(server);
- 
-     append_mem_opts(server, cmd_line, 256, TEST_MEMFD_AUTO);
--    append_vhost_opts(server, cmd_line, "");
-+    server->vu_ops->append_opts(server, cmd_line, "");
- 
-     g_test_queue_destroy(vhost_user_test_cleanup, server);
- 
-@@ -682,11 +693,11 @@ static void *vhost_user_test_setup(GString *cmd_line, void *arg)
- 
- static void *vhost_user_test_setup_memfd(GString *cmd_line, void *arg)
- {
--    TestServer *server = test_server_new("vhost-user-test");
-+    TestServer *server = test_server_new("vhost-user-test", arg);
-     test_server_listen(server);
- 
-     append_mem_opts(server, cmd_line, 256, TEST_MEMFD_YES);
--    append_vhost_opts(server, cmd_line, "");
-+    server->vu_ops->append_opts(server, cmd_line, "");
- 
-     g_test_queue_destroy(vhost_user_test_cleanup, server);
- 
-@@ -720,7 +731,7 @@ static void test_migrate(void *obj, void *arg, QGuestAllocator *alloc)
-         return;
-     }
- 
--    dest = test_server_new("dest");
-+    dest = test_server_new("dest", s->vu_ops);
-     dest_cmdline = g_string_new(qos_get_current_command_line());
-     uri = g_strdup_printf("%s%s", "unix:", dest->mig_path);
- 
-@@ -730,7 +741,7 @@ static void test_migrate(void *obj, void *arg, QGuestAllocator *alloc)
-     test_server_listen(dest);
-     g_string_append_printf(dest_cmdline, " -incoming %s", uri);
-     append_mem_opts(dest, dest_cmdline, 256, TEST_MEMFD_AUTO);
--    append_vhost_opts(dest, dest_cmdline, "");
-+    dest->vu_ops->append_opts(dest, dest_cmdline, "");
-     to = qtest_init(dest_cmdline->str);
- 
-     /* This would be where you call qos_allocate_objects(to, NULL), if you want
-@@ -831,11 +842,11 @@ connect_thread(gpointer data)
- 
- static void *vhost_user_test_setup_reconnect(GString *cmd_line, void *arg)
- {
--    TestServer *s = test_server_new("reconnect");
-+    TestServer *s = test_server_new("reconnect", arg);
- 
-     g_thread_new("connect", connect_thread, s);
-     append_mem_opts(s, cmd_line, 256, TEST_MEMFD_AUTO);
--    append_vhost_opts(s, cmd_line, ",server");
-+    s->vu_ops->append_opts(s, cmd_line, ",server");
- 
-     g_test_queue_destroy(vhost_user_test_cleanup, s);
- 
-@@ -866,13 +877,13 @@ static void test_reconnect(void *obj, void *arg, QGuestAllocator *alloc)
- 
- static void *vhost_user_test_setup_connect_fail(GString *cmd_line, void *arg)
- {
--    TestServer *s = test_server_new("connect-fail");
-+    TestServer *s = test_server_new("connect-fail", arg);
- 
-     s->test_fail = true;
- 
-     g_thread_new("connect", connect_thread, s);
-     append_mem_opts(s, cmd_line, 256, TEST_MEMFD_AUTO);
--    append_vhost_opts(s, cmd_line, ",server");
-+    s->vu_ops->append_opts(s, cmd_line, ",server");
- 
-     g_test_queue_destroy(vhost_user_test_cleanup, s);
- 
-@@ -881,13 +892,13 @@ static void *vhost_user_test_setup_connect_fail(GString *cmd_line, void *arg)
- 
- static void *vhost_user_test_setup_flags_mismatch(GString *cmd_line, void *arg)
- {
--    TestServer *s = test_server_new("flags-mismatch");
-+    TestServer *s = test_server_new("flags-mismatch", arg);
- 
-     s->test_flags = TEST_FLAGS_DISCONNECT;
- 
-     g_thread_new("connect", connect_thread, s);
-     append_mem_opts(s, cmd_line, 256, TEST_MEMFD_AUTO);
--    append_vhost_opts(s, cmd_line, ",server");
-+    s->vu_ops->append_opts(s, cmd_line, ",server");
- 
-     g_test_queue_destroy(vhost_user_test_cleanup, s);
- 
-@@ -924,11 +935,47 @@ static void test_multiqueue(void *obj, void *arg, QGuestAllocator *alloc)
-     wait_for_rings_started(s, s->queues * 2);
- }
- 
-+static void vu_net_set_features(TestServer *s, CharBackend *chr,
-+        VhostUserMsg *msg)
-+{
-+    g_assert_cmpint(msg->payload.u64 &
-+            (0x1ULL << VHOST_USER_F_PROTOCOL_FEATURES), !=, 0ULL);
-+    if (s->test_flags == TEST_FLAGS_DISCONNECT) {
-+        qemu_chr_fe_disconnect(chr);
-+        s->test_flags = TEST_FLAGS_BAD;
-+    }
-+}
-+
-+static void vu_net_get_protocol_features(TestServer *s, CharBackend *chr,
-+        VhostUserMsg *msg)
-+{
-+    /* send back features to qemu */
-+    msg->flags |= VHOST_USER_REPLY_MASK;
-+    msg->size = sizeof(m.payload.u64);
-+    msg->payload.u64 = 1 << VHOST_USER_PROTOCOL_F_LOG_SHMFD;
-+    msg->payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_CROSS_ENDIAN;
-+    if (s->queues > 1) {
-+        msg->payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_MQ;
-+    }
-+    qemu_chr_fe_write_all(chr, (uint8_t *)msg, VHOST_USER_HDR_SIZE + msg->size);
-+}
-+
-+/* Each VHOST-USER device should have its ops structure defined. */
-+static struct vhost_user_ops g_vu_net_ops = {
-+    .type = VHOST_USER_NET,
-+
-+    .append_opts = append_vhost_net_opts,
-+
-+    .set_features = vu_net_set_features,
-+    .get_protocol_features = vu_net_get_protocol_features,
-+};
-+
- static void register_vhost_user_test(void)
- {
-     QOSGraphTestOptions opts = {
-         .before = vhost_user_test_setup,
-         .subprocess = true,
-+        .arg = &g_vu_net_ops,
-     };
- 
-     qemu_add_opts(&qemu_chardev_opts);
--- 
-MST
-
+Havard
 
