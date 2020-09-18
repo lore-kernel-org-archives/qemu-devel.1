@@ -2,86 +2,91 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43098C43463
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 18:39:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0C88C43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 18:39:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77B7A21534
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 18:39:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 55D9E21534
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 18:39:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PbzzfgZh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77B7A21534
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AiDSs/6X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55D9E21534
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJLIF-0000Xp-EL
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 14:39:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45498)
+	id 1kJLIO-0000dG-2H
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 14:39:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kJL5m-0004oy-Sw
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:26:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40340)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kJL5k-0005bs-Rb
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:26:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600453599;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Qg3mFIVJK9vZUN57gdYuod+m/oyOWe0a1QGYp/cL1iM=;
- b=PbzzfgZhNs3V0+GVDMwxDdu5BZEaJeEEj1Lw0MQas/Pn70jH3+VmT9cZNGEamQzi1HciMI
- CbYJzzGpY2jAH7eWRQMmAB1Cg8YxPYY8+/NK2Gq3Cfgmzng0uT92bhDHdo/HMXBA3rPeCv
- kvJq5uHU1BoiCBpw8/zdx8Y8cLVnyHI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-239-CnAT-qZxN8KfcKEVk6V5ow-1; Fri, 18 Sep 2020 14:26:35 -0400
-X-MC-Unique: CnAT-qZxN8KfcKEVk6V5ow-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8468E1019625;
- Fri, 18 Sep 2020 18:26:34 +0000 (UTC)
-Received: from localhost (ovpn-119-217.rdu2.redhat.com [10.10.119.217])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6B62268875;
- Fri, 18 Sep 2020 18:26:31 +0000 (UTC)
-Date: Fri, 18 Sep 2020 14:26:29 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH v7 0/2] Remove EPYC mode apicid decode and use generic
- decode
-Message-ID: <20200918182629.GF7594@habkost.net>
-References: <159897580089.30750.12581669374705391794.stgit@naples-babu.amd.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kJLGh-0007HG-E0
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:37:59 -0400
+Received: from mail-pj1-x102e.google.com ([2607:f8b0:4864:20::102e]:50841)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kJLGe-00072S-Gb
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:37:58 -0400
+Received: by mail-pj1-x102e.google.com with SMTP id fa1so3630623pjb.0
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 11:37:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=TabxK5GcsIsrrKGcXqH3X6F6TiDqhMqLODq3mwGAI3c=;
+ b=AiDSs/6XYZxya0vWpwJc0fvIn9io3MQLOWZUwM5xixG9rkTC62H9HZoXQY9gHikqfO
+ AA1GliKS1ON3ynieEtYsA4p1DRra1yH/VvSfLoDjSH2GIqop8JY3tOwPC4+smXSE8I7s
+ nKusQtjzk8iuAleqSR3N/MSbEiz/r3U1V16Bf56NEGmoJ6AOQZbPfzm1BogtU0qvrLD3
+ RNyUXh6OnzgFrvK8b6GhYHb+k0n/3U2UZMcYUklQi6IxPkyXX0yax0ngmwChox/1EX8r
+ bFjCLOcaMZx2b56LAw6brMQLk3ZLE0nmXrr9RmnbV8zSOcFbNKiWb54eEDq8JwjNqfeX
+ YPWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=TabxK5GcsIsrrKGcXqH3X6F6TiDqhMqLODq3mwGAI3c=;
+ b=HEDVvrIN5IY7sKa7HYD6SygyvZvwjE2eSM+wo0N06uDr0n24DRJTldQkAeRLsVJ/un
+ 3NNOUT9B+x9Zxdzgu8gHMpr6oY4Ff8XwZAk+kRI9yMNIFAe6cM3PTgJTnU3pFD7GIkMs
+ WUW6kcuOe5obLyTm4FiIcNC0gFn+neY/+hpeRK+yvBXJCtai9OpFEqn9tPjyIjhtH8sd
+ PKtM3WS2wdyxIWkoiCi50Lvi//g/6qTpzlqX19ACTqsUVcBXXoNQF6f2SPU2kJG9Ydxg
+ uVCmWVC7lTLNu9yYo7QLYyntACxd4IJ4Fx5LWKS/dae7XANIcE6RcgOpcCLEFXboroSh
+ 4LAw==
+X-Gm-Message-State: AOAM530qKuDLxkM8PpE4wjuFYIQevtH2FI2QtPrwRWV2CmqhN66lxuTl
+ 7JobsiBP3iT6ZfWz69CH/AyZEemJwUrAow==
+X-Google-Smtp-Source: ABdhPJzr1qM2pRoqHNfL2nKAgTMMpdMy2PKnvj9JFgsBLJv/hMjfKt24lJnwV6RP3zHY4kRyLvSeMg==
+X-Received: by 2002:a17:90a:f83:: with SMTP id
+ 3mr13567625pjz.132.1600454273822; 
+ Fri, 18 Sep 2020 11:37:53 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id f4sm3680723pfj.147.2020.09.18.11.37.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 18 Sep 2020 11:37:53 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 00/81] target/arm: Implement SVE2
+Date: Fri, 18 Sep 2020 11:36:30 -0700
+Message-Id: <20200918183751.2787647-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <159897580089.30750.12581669374705391794.stgit@naples-babu.amd.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 01:32:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::102e;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x102e.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,30 +99,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mst@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com,
- pbonzini@redhat.com, rth@twiddle.net
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 01, 2020 at 10:57:20AM -0500, Babu Moger wrote:
-> To support some of the complex topology, we introduced EPYC mode apicid decode.
-> But, EPYC mode decode is running into problems. Also it can become quite a
-> maintenance problem in the future. So, it was decided to remove that code and
-> use the generic decode which works for majority of the topology. Most of the
-> SPECed configuration would work just fine. With some non-SPECed user inputs,
-> it will create some sub-optimal configuration.
-> 
-> Here is the discussion thread.
-> https://lore.kernel.org/qemu-devel/c0bcc1a6-1d84-a6e7-e468-d5b437c1b254@amd.com/
-> https://lore.kernel.org/qemu-devel/20200826143849.59f6970b@redhat.com/
-> 
-> This series removes all the EPYC mode specific apicid changes and use the generic
-> apicid decode.
+This is the first revision that has been fully tested vs ArmIE,
+although only with 128-bit vectors.
 
-Queued, thanks!
+Since ArmIE does not produce an SVE signal frame, I have a small
+hack in RISU to pull the vector data from the FP frame.  I may try
+an assembly wrapper to capture the larger vector data before it
+gets clobbered by AdvSIMD usage within libc (especially memset),
+but it wasn't especially urgent.
+
+
+r~
+
+
+Richard Henderson (63):
+  target/arm: Fix sve_uzp_p vs odd vector lengths
+  target/arm: Fix sve_zip_p vs odd vector lengths
+  target/arm: Fix sve_punpk_p vs odd vector lengths
+  target/arm: Add ID_AA64ZFR0 fields and isar_feature_aa64_sve2
+  target/arm: Implement SVE2 Integer Multiply - Unpredicated
+  target/arm: Implement SVE2 integer pairwise add and accumulate long
+  target/arm: Implement SVE2 integer unary operations (predicated)
+  target/arm: Split out saturating/rounding shifts from neon
+  target/arm: Implement SVE2 saturating/rounding bitwise shift left
+    (predicated)
+  target/arm: Implement SVE2 integer halving add/subtract (predicated)
+  target/arm: Implement SVE2 integer pairwise arithmetic
+  target/arm: Implement SVE2 saturating add/subtract (predicated)
+  target/arm: Implement SVE2 integer add/subtract long
+  target/arm: Implement SVE2 integer add/subtract interleaved long
+  target/arm: Implement SVE2 integer add/subtract wide
+  target/arm: Implement SVE2 integer multiply long
+  target/arm: Implement PMULLB and PMULLT
+  target/arm: Implement SVE2 bitwise shift left long
+  target/arm: Implement SVE2 bitwise exclusive-or interleaved
+  target/arm: Implement SVE2 bitwise permute
+  target/arm: Implement SVE2 complex integer add
+  target/arm: Implement SVE2 integer absolute difference and accumulate
+    long
+  target/arm: Implement SVE2 integer add/subtract long with carry
+  target/arm: Implement SVE2 bitwise shift right and accumulate
+  target/arm: Implement SVE2 bitwise shift and insert
+  target/arm: Implement SVE2 integer absolute difference and accumulate
+  target/arm: Implement SVE2 saturating extract narrow
+  target/arm: Implement SVE2 SHRN, RSHRN
+  target/arm: Implement SVE2 SQSHRUN, SQRSHRUN
+  target/arm: Implement SVE2 UQSHRN, UQRSHRN
+  target/arm: Implement SVE2 SQSHRN, SQRSHRN
+  target/arm: Implement SVE2 WHILEGT, WHILEGE, WHILEHI, WHILEHS
+  target/arm: Implement SVE2 WHILERW, WHILEWR
+  target/arm: Implement SVE2 bitwise ternary operations
+  target/arm: Implement SVE2 saturating multiply-add long
+  target/arm: Implement SVE2 saturating multiply-add high
+  target/arm: Implement SVE2 integer multiply-add long
+  target/arm: Implement SVE2 complex integer multiply-add
+  target/arm: Implement SVE2 XAR
+  target/arm: Pass separate addend to {U,S}DOT helpers
+  target/arm: Pass separate addend to FCMLA helpers
+  target/arm: Split out formats for 2 vectors + 1 index
+  target/arm: Split out formats for 3 vectors + 1 index
+  target/arm: Implement SVE2 integer multiply (indexed)
+  target/arm: Implement SVE2 integer multiply-add (indexed)
+  target/arm: Implement SVE2 saturating multiply-add high (indexed)
+  target/arm: Implement SVE2 saturating multiply-add (indexed)
+  target/arm: Implement SVE2 integer multiply long (indexed)
+  target/arm: Implement SVE2 saturating multiply (indexed)
+  target/arm: Implement SVE2 signed saturating doubling multiply high
+  target/arm: Implement SVE2 saturating multiply high (indexed)
+  target/arm: Implement SVE2 multiply-add long (indexed)
+  target/arm: Implement SVE2 complex integer multiply-add (indexed)
+  target/arm: Implement SVE mixed sign dot product (indexed)
+  target/arm: Implement SVE mixed sign dot product
+  target/arm: Implement SVE2 crypto unary operations
+  target/arm: Implement SVE2 crypto destructive binary operations
+  target/arm: Implement SVE2 crypto constructive binary operations
+  target/arm: Share table of sve load functions
+  target/arm: Implement SVE2 LD1RO
+  target/arm: Implement 128-bit ZIP, UZP, TRN
+  target/arm: Implement SVE2 complex integer dot product
+  target/arm: Enable SVE2 and some extensions
+
+Stephen Long (18):
+  target/arm: Implement SVE2 floating-point pairwise
+  target/arm: Implement SVE2 MATCH, NMATCH
+  target/arm: Implement SVE2 ADDHNB, ADDHNT
+  target/arm: Implement SVE2 RADDHNB, RADDHNT
+  target/arm: Implement SVE2 SUBHNB, SUBHNT
+  target/arm: Implement SVE2 RSUBHNB, RSUBHNT
+  target/arm: Implement SVE2 HISTCNT, HISTSEG
+  target/arm: Implement SVE2 scatter store insns
+  target/arm: Implement SVE2 gather load insns
+  target/arm: Implement SVE2 FMMLA
+  target/arm: Implement SVE2 SPLICE, EXT
+  target/arm: Implement SVE2 TBL, TBX
+  target/arm: Implement SVE2 FCVTNT
+  target/arm: Implement SVE2 FCVTLT
+  target/arm: Implement SVE2 FCVTXNT, FCVTX
+  target/arm: Implement SVE2 FLOGB
+  target/arm: Implement SVE2 bitwise shift immediate
+  target/arm: Implement SVE2 fp multiply-add long
+
+ target/arm/cpu.h                |   56 +
+ target/arm/helper-sve.h         |  722 ++++++-
+ target/arm/helper.h             |  104 +-
+ target/arm/translate-a64.h      |    3 +
+ target/arm/vec_internal.h       |  143 ++
+ target/arm/sve.decode           |  568 +++++-
+ target/arm/cpu64.c              |   11 +
+ target/arm/helper.c             |    3 +-
+ target/arm/kvm64.c              |   11 +
+ target/arm/neon_helper.c        |  507 +----
+ target/arm/sve_helper.c         | 2175 +++++++++++++++++++--
+ target/arm/translate-a64.c      |   67 +-
+ target/arm/translate-sve.c      | 3152 +++++++++++++++++++++++++++++--
+ target/arm/vec_helper.c         |  767 +++++++-
+ target/arm/translate-neon.c.inc |   20 +-
+ 15 files changed, 7443 insertions(+), 866 deletions(-)
 
 -- 
-Eduardo
+2.25.1
 
 
