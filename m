@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8E6FC43464
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 17:13:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4954EC43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 17:17:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57B1821534
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 17:13:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57B1821534
+	by mail.kernel.org (Postfix) with ESMTPS id 7D22E21707
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 17:17:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D22E21707
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJJwm-0001bt-BE
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 13:13:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54904)
+	id 1kJK1D-0004DT-FK
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 13:17:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56716)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kJJuI-000850-MR
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 13:10:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41892)
+ id 1kJJzI-0002wS-5I
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 13:15:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42266)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kJJuF-0004Qs-BA
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 13:10:46 -0400
+ id 1kJJzC-0005Bz-0Z
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 13:15:54 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kJJuD-0002Ol-GU
- for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 17:10:41 +0000
+ id 1kJJz0-0002cj-4s
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 17:15:38 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 4E42C2E80EA
- for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 17:10:41 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 216382E80E7
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 17:15:38 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 18 Sep 2020 17:03:36 -0000
-From: Frederic Bezies <1896096@bugs.launchpad.net>
+Date: Fri, 18 Sep 2020 17:07:00 -0000
+From: Paolo Bonzini <1895703@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
- assignee=None; 
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: buildsys tcg
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange bonzini fredb74 laurent-vivier
-X-Launchpad-Bug-Reporter: Frederic Bezies (fredb74)
-X-Launchpad-Bug-Modifier: Frederic Bezies (fredb74)
-References: <160036517624.17887.51064102046414127.malonedeb@soybean.canonical.com>
-Message-Id: <160044861662.1200.17744030833932475220.malone@chaenomeles.canonical.com>
-Subject: [Bug 1896096] Re: Git version: Build process is broken in
- block_curl.c.o
+X-Launchpad-Bug-Commenters: ahmedkrmn bonzini philmd pmaydell
+X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: Paolo Bonzini (bonzini)
+References: <160018860889.17103.9156462398304890013.malonedeb@soybean.canonical.com>
+Message-Id: <160044882008.14375.11166427943474351123.malone@gac.canonical.com>
+Subject: [Bug 1895703] Re: performance degradation in tcg since Meson switch
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: e3802b01386bcd78b6e88cdc388e7bd79daf3456
+X-Launchpad-Hash: 9aa0c197e956160d29e18b5f066cc4fc6ee41eec
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 05:01:27
@@ -85,71 +85,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1896096 <1896096@bugs.launchpad.net>
+Reply-To: Bug 1895703 <1895703@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Configure line: configure \
-    --prefix=3D/usr \
-    --sysconfdir=3D/etc \
-    --localstatedir=3D/var \
-    --libexecdir=3D/usr/lib/qemu \
-    --smbd=3D/usr/bin/smbd \
-    --extra-ldflags=3D"-Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now" \
-    --enable-modules \
-    --enable-sdl \
-    --disable-werror \
-    --enable-slirp=3Dsystem \
-    --enable-xfsctl \
-    --audio-drv-list=3D"pa alsa sdl"
-
-** Attachment added: "config.log"
-   https://bugs.launchpad.net/qemu/+bug/1896096/+attachment/5412259/+files/=
-config.log
+Uff, of course...
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1896096
+https://bugs.launchpad.net/bugs/1895703
 
 Title:
-  Git version: Build process is broken in block_curl.c.o
+  performance degradation in tcg since Meson switch
 
 Status in QEMU:
-  Invalid
+  New
 
 Bug description:
-  Gcc version: 10.2.0
-  Glusterfs: 8.1
-  Libguestfs: 1.42
+  The buildsys conversion to Meson (1d806cef0e3..7fd51e68c34)
+  introduced a degradation in performance in some TCG targets:
 
-  Configure options used:
+  --------------------------------------------------------
+  Test Program: matmult_double
+  --------------------------------------------------------
+  Target              Instructions     Previous    Latest
+                                       1d806cef   7fd51e68
+  ----------  --------------------  ----------  ----------
+  alpha              3 233 957 639       -----     +7.472%
+  m68k               3 919 110 506       -----    +18.433%
+  --------------------------------------------------------
 
-  configure \
-      --prefix=3D/usr \
-      --sysconfdir=3D/etc \
-      --localstatedir=3D/var \
-      --libexecdir=3D/usr/lib/qemu \
-      --extra-ldflags=3D"$LDFLAGS" \
-      --smbd=3D/usr/bin/smbd \
-      --enable-modules \
-      --enable-sdl \
-      --disable-werror \
-      --enable-slirp=3Dsystem \
-      --enable-xfsctl \
-      --audio-drv-list=3D"pa alsa sdl"
-      =
-
-  Error log attached. Here is the beginning:
-
-  /usr/bin/ld: /usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../lib/Scrt=
-1.o: in function `_start':
-  (.text+0x24): undefined reference to `main'
-  /usr/bin/ld: libblock-curl.a(block_curl.c.o): in function `curl_block_ini=
-t':
+  Original report from Ahmed Karaman with further testing done
+  by Aleksandar Markovic:
+  https://www.mail-archive.com/qemu-devel@nongnu.org/msg740279.html
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1896096/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1895703/+subscriptions
 
