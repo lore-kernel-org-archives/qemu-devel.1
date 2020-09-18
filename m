@@ -2,100 +2,75 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61681C43463
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 17:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF6AAC43463
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 17:02:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAC1D208DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 17:02:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EG7xfLJo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAC1D208DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 549E2208DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 17:02:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 549E2208DB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJJlw-0007vK-N5
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 13:02:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44036)
+	id 1kJJmO-0000QK-7r
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 13:02:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50648)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kJJMU-0001vC-JH
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 12:35:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34226)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kJJMR-0007iK-9w
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 12:35:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600446946;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=wZDOMOo+4KTzwsFlpiGnldWqFJ5sfaKidwjKy4A9jnI=;
- b=EG7xfLJoeAc424/KsM1A2pfW0c+sB26LuJgKlysO3uWiMGOsYvISKbirHDNN4g/I3//QG0
- VOXai7YcQQ677tzZd3lNtzf7Go24BUJrA2+tmb9x3Xhd+Sh1Ei5ME5HKCNCGvuMDANwVE/
- 5awkd+KW23F6qlDtIhfQxZpdq06qP/E=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-225-hOmY4HbZOT-_3wbmAyx9gQ-1; Fri, 18 Sep 2020 12:35:39 -0400
-X-MC-Unique: hOmY4HbZOT-_3wbmAyx9gQ-1
-Received: by mail-wr1-f72.google.com with SMTP id 33so2349633wre.0
- for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 09:35:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=wZDOMOo+4KTzwsFlpiGnldWqFJ5sfaKidwjKy4A9jnI=;
- b=sM8xFqATir3K8ing0Ol7baluY1kj3DZKRsygE6QXcqfFZqCxuZgFZTpS8eLG+JEbG3
- Cnppsk0gPq8xGLEoq840/rtZoLgP4P0eT4+yXqqzyoeGsKbnjNOpwMWpBoArqJKB8Noc
- wUUIEOTY3t59qfUHYRt5cvGpZd7/OKqHEHl6U+tBYsLf2rliV/vW2tnzPIQcr71uGaZ/
- xeJSGvSviD9PiHfnhSb9bpz/wUzvNbGrtjkGXmTc1rXuS0BNpwVwiVC5scpBuQ2l769t
- VpjcYuJ+cTb2RsJJ1aVaQ47UTtOmsqinmoTQZK/fyeRw/Eekg9KeAPv8dC9nognMHI4s
- +bJw==
-X-Gm-Message-State: AOAM5305BXe4xKTPi9QqQkKNP/99/vmA7jy963bkzOvwMFoekvHJ0g6t
- DQgwBVE0BKKyKumRFZ4sKB5y23laKwRd957qMNWMKYyyLZ9kpCy8FzZcNjpPipdcR394nkmJJp+
- 6RjRgHv6YX4Swkkk=
-X-Received: by 2002:a5d:4151:: with SMTP id c17mr41519608wrq.302.1600446937705; 
- Fri, 18 Sep 2020 09:35:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwEPBr0A7zA5gQGiyFyeAlczpHto2H9ku02wNUzK6pTNtJwlLz3CXh7lJ36IhaCuhoT8eiqrQ==
-X-Received: by 2002:a5d:4151:: with SMTP id c17mr41519583wrq.302.1600446937454; 
- Fri, 18 Sep 2020 09:35:37 -0700 (PDT)
-Received: from redhat.com (bzq-109-65-116-225.red.bezeqint.net.
- [109.65.116.225])
- by smtp.gmail.com with ESMTPSA id u66sm20557957wme.1.2020.09.18.09.35.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Sep 2020 09:35:36 -0700 (PDT)
-Date: Fri, 18 Sep 2020 12:35:34 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PULL v2 00/15] virtio,pc,acpi: fixes, tests
-Message-ID: <20200918123517-mutt-send-email-mst@kernel.org>
-References: <20200918161836.318893-1-mst@redhat.com>
+ (Exim 4.90_1) (envelope-from <salil.mehta@huawei.com>)
+ id 1kJJiy-0006v5-QR; Fri, 18 Sep 2020 12:59:04 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2545 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <salil.mehta@huawei.com>)
+ id 1kJJiv-0002aB-27; Fri, 18 Sep 2020 12:59:04 -0400
+Received: from nkgeml709-chm.china.huawei.com (unknown [172.30.72.54])
+ by Forcepoint Email with ESMTP id 77DE2540EBD2317782A9;
+ Sat, 19 Sep 2020 00:58:52 +0800 (CST)
+Received: from lhreml703-chm.china.huawei.com (10.201.108.52) by
+ nkgeml709-chm.china.huawei.com (10.98.57.40) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.1913.5; Sat, 19 Sep 2020 00:58:49 +0800
+Received: from lhreml703-chm.china.huawei.com ([10.201.68.198]) by
+ lhreml703-chm.china.huawei.com ([10.201.68.198]) with mapi id 15.01.1913.007; 
+ Fri, 18 Sep 2020 17:58:46 +0100
+From: Salil Mehta <salil.mehta@huawei.com>
+To: Andrew Jones <drjones@redhat.com>
+Subject: RE: [RFC PATCH 04/12] device_tree: add qemu_fdt_add_path
+Thread-Topic: [RFC PATCH 04/12] device_tree: add qemu_fdt_add_path
+Thread-Index: AQHWjKHH5zES4p0+/UadBbZsJn/3JalsapaAgAEMekCAAGKzgIAAxAJQ
+Date: Fri, 18 Sep 2020 16:58:46 +0000
+Message-ID: <4147233067d04928a7255ce3f806a8a4@huawei.com>
+References: <20200917032033.2020-1-fangying1@huawei.com>
+ <20200917032033.2020-5-fangying1@huawei.com>
+ <20200917081239.bdfhkofodqvhg3i6@kamzik.brq.redhat.com>
+ <a0ef33da132a411a8da14a8b05f78c1d@huawei.com>
+ <20200918060649.oi5cdgouuopf45us@kamzik.brq.redhat.com>
+In-Reply-To: <20200918060649.oi5cdgouuopf45us@kamzik.brq.redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.65.147]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20200918161836.318893-1-mst@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 01:32:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.189;
+ envelope-from=salil.mehta@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 12:58:53
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,122 +83,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ Zhanghailiang <zhang.zhanghailiang@huawei.com>, Alexander Graf <agraf@suse.de>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "Chenzhendong \(alex\)" <alex.chen@huawei.com>,
+ "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "alistair.francis@wdc.com" <alistair.francis@wdc.com>,
+ fangying <fangying1@huawei.com>, "imammedo@redhat.com" <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-found a problem on some build systems. sorry.
-will post v3.
+> From: Andrew Jones [mailto:drjones@redhat.com]
+> Sent: Friday, September 18, 2020 7:07 AM
+>=20
+> On Fri, Sep 18, 2020 at 12:25:19AM +0000, Salil Mehta wrote:
+> >
+> > > From: Qemu-arm
+> [mailto:qemu-arm-bounces+salil.mehta=3Dhuawei.com@nongnu.org]
+> > > On Behalf Of Andrew Jones
+> > > Sent: Thursday, September 17, 2020 9:13 AM
+> > > To: fangying <fangying1@huawei.com>
+> > > Cc: peter.maydell@linaro.org; Zhanghailiang
+> <zhang.zhanghailiang@huawei.com>;
+> > > Alexander Graf <agraf@suse.de>; qemu-devel@nongnu.org; Chenzhendong (=
+alex)
+> > > <alex.chen@huawei.com>; shannon.zhaosl@gmail.com; qemu-arm@nongnu.org=
+;
+> > > alistair.francis@wdc.com; imammedo@redhat.com
+> > > Subject: Re: [RFC PATCH 04/12] device_tree: add qemu_fdt_add_path
+> > >
+> > > On Thu, Sep 17, 2020 at 11:20:25AM +0800, Ying Fang wrote:
+> > > > From: Andrew Jones <drjones@redhat.com>
+> > > >
+> > > > qemu_fdt_add_path works like qemu_fdt_add_subnode, except it
+> > > > also recursively adds any missing parent nodes.
+> > > >
+> > > > Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+> > > > Cc: Alexander Graf <agraf@suse.de>
+> > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > > > ---
+> > > >  device_tree.c                | 24 ++++++++++++++++++++++++
+> > > >  include/sysemu/device_tree.h |  1 +
+> > > >  2 files changed, 25 insertions(+)
+> > > >
+> > > > diff --git a/device_tree.c b/device_tree.c
+> > > > index b335dae707..1854be3a02 100644
+> > > > --- a/device_tree.c
+> > > > +++ b/device_tree.c
+> > > > @@ -524,6 +524,30 @@ int qemu_fdt_add_subnode(void *fdt, const char=
+ *name)
+> > > >      return retval;
+> > > >  }
+> > > >
+> > > > +int qemu_fdt_add_path(void *fdt, const char *path)
+> > > > +{
+> > > > +    char *parent;
+> > > > +    int offset;
+> > > > +
+> > > > +    offset =3D fdt_path_offset(fdt, path);
+> > > > +    if (offset < 0 && offset !=3D -FDT_ERR_NOTFOUND) {
+> > > > +        error_report("%s Couldn't find node %s: %s", __func__, pat=
+h,
+> > > > +                     fdt_strerror(offset));
+> > > > +        exit(1);
+> > > > +    }
+> > > > +
+> > > > +    if (offset !=3D -FDT_ERR_NOTFOUND) {
+> > > > +        return offset;
+> > > > +    }
+> > > > +
+> > > > +    parent =3D g_strdup(path);
+> > > > +    strrchr(parent, '/')[0] =3D '\0';
+> > > > +    qemu_fdt_add_path(fdt, parent);
+> > > > +    g_free(parent);
+> > > > +
+> > > > +    return qemu_fdt_add_subnode(fdt, path);
+> > > > +}
+> > >
+> > > Igor didn't like the recursion when I posted this before so I changed
+> > > it when doing the refresh[*] that I gave to Salil Mehta. Salil also
+> > > works for Huawei, are you guys not working together?
+> > >
+> > > [*] https://github.com/rhdrjones/qemu/commits/virt-cpu-topology-refre=
+sh
+> > >
+> >
+> >
+> > I was not aware of this work going on. I am based at Cambridge and Fang=
+ying
+> > in Hangzhou and work for different teams.
+> >
+> > Yes, I have it and have integrated it with the Virtual CPU hotplug bran=
+ch
+> > and I am testing them.
+> >
+> > I have also rebased virtual cpu hotplug patches and integrated the PMU
+> > related changes recently been discussed in other mail-chain. Plus, I am
+> > also dealing with the MPIDR/affinity part from the Kernel which has bee=
+n
+> > discussed earlier with the Marc Zyngier.
+> >
+> > It looks some of the changes are common here like ability to set MPIDR
+> > of the vcpus at the time of their creation inside KVM. And the PPTT
+> > table changes which were present in your refresh branch as well. Change=
+s
+> > related to the possible and present vcpus might need a sync as well.
+> >
+> > @Andrew, should I take out the part which is common and affects the
+> > virtual cpu hotplug and push them separately. This way I can have part
+> > of the changes related to the vcpu hotplug done which will also cover
+> > this patch-set requirements as well?
+>=20
+> Whatever works best for you and Ying Fang. It looks like this series
+> only focuses on topology. It's not considering present and possible
+> cpus, but it probably should. It also adds the cache hierarchy stuff,
+> but I'm not sure it's approaching that in the right way. I think it
+> may make sense to put this series on hold and take another look at
+> your hotplug series when it's reposted before deciding what to do.
 
-On Fri, Sep 18, 2020 at 12:19:59PM -0400, Michael S. Tsirkin wrote:
-> changes from v1:
->     rebased on master
->     pick a fixed patch version - noticed by Raphael
-> 
-> The following changes since commit e883b492c221241d28aaa322c61536436090538a:
-> 
->   Merge remote-tracking branch 'remotes/legoater/tags/pull-aspeed-20200918' into staging (2020-09-18 13:36:42 +0100)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-> 
-> for you to fetch changes up to b98061bc65dae34cfabcfe2c123a5b14347c6135:
-> 
->   virtio-iommu-pci: force virtio version 1 (2020-09-18 12:18:05 -0400)
-> 
-> ----------------------------------------------------------------
-> virtio,pc,acpi: fixes, tests
-> 
-> Fixes and tests all over the place.
-> Batch iommu updates for vdpa.
-> Removal of deprecated cpu hotplug commands.
-> 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> 
-> ----------------------------------------------------------------
-> David Hildenbrand (1):
->       pc: fix auto_enable_numa_with_memhp/auto_enable_numa_with_memdev for the 5.0 machine
-> 
-> Dima Stepanov (7):
->       vhost: recheck dev state in the vhost_migration_log routine
->       vhost: check queue state in the vhost_dev_set_log routine
->       tests/qtest/vhost-user-test: prepare the tests for adding new dev class
->       tests/qtest/libqos/virtio-blk: add support for vhost-user-blk
->       tests/qtest/vhost-user-test: add support for the vhost-user-blk device
->       tests/qtest/vhost-user-test: add migrate_reconnect test
->       tests/qtest/vhost-user-test: enable the reconnect tests
-> 
-> Eric Auger (2):
->       virtio-iommu: Check gtrees are non null before destroying them
->       virtio-iommu-pci: force virtio version 1
-> 
-> Igor Mammedov (1):
->       cphp: remove deprecated cpu-add command(s)
-> 
-> Jason Wang (3):
->       linux headers: sync to 5.9-rc4
->       vhost: switch to use IOTLB v2 format
->       vhost-vdpa: batch updating IOTLB mappings
-> 
-> Li Qiang (1):
->       virtio-mem: detach the element from the virtqueue when error occurs
-> 
->  qapi/machine.json                                  |  24 --
->  include/hw/boards.h                                |   1 -
->  include/hw/i386/pc.h                               |   1 -
->  include/hw/virtio/vhost-backend.h                  |   2 +
->  include/hw/virtio/vhost-user-blk.h                 |  10 +
->  include/hw/virtio/vhost-vdpa.h                     |   1 +
->  include/hw/virtio/vhost.h                          |   1 +
->  include/monitor/hmp.h                              |   1 -
->  include/standard-headers/drm/drm_fourcc.h          | 140 ++++++++++
->  include/standard-headers/linux/ethtool.h           |  87 +++++++
->  include/standard-headers/linux/input-event-codes.h |   3 +-
->  include/standard-headers/linux/vhost_types.h       |  11 +
->  include/standard-headers/linux/virtio_9p.h         |   4 +-
->  include/standard-headers/linux/virtio_blk.h        |  26 +-
->  include/standard-headers/linux/virtio_config.h     |   8 +-
->  include/standard-headers/linux/virtio_console.h    |   8 +-
->  include/standard-headers/linux/virtio_net.h        |   6 +-
->  include/standard-headers/linux/virtio_scsi.h       |  20 +-
->  linux-headers/asm-generic/unistd.h                 |   6 +-
->  linux-headers/asm-mips/unistd_n32.h                |   1 +
->  linux-headers/asm-mips/unistd_n64.h                |   1 +
->  linux-headers/asm-mips/unistd_o32.h                |   1 +
->  linux-headers/asm-powerpc/kvm.h                    |   5 +
->  linux-headers/asm-powerpc/unistd_32.h              |   1 +
->  linux-headers/asm-powerpc/unistd_64.h              |   1 +
->  linux-headers/asm-s390/kvm.h                       |   7 +-
->  linux-headers/asm-s390/unistd_32.h                 |   1 +
->  linux-headers/asm-s390/unistd_64.h                 |   1 +
->  linux-headers/asm-x86/unistd_32.h                  |   1 +
->  linux-headers/asm-x86/unistd_64.h                  |   1 +
->  linux-headers/asm-x86/unistd_x32.h                 |   1 +
->  linux-headers/linux/kvm.h                          |   4 +
->  linux-headers/linux/vfio.h                         |   2 +-
->  linux-headers/linux/vhost.h                        |   2 +
->  hw/block/vhost-user-blk.c                          |  19 +-
->  hw/core/machine-hmp-cmds.c                         |  12 -
->  hw/core/machine-qmp-cmds.c                         |  12 -
->  hw/i386/pc.c                                       |  27 --
->  hw/i386/pc_piix.c                                  |   1 -
->  hw/i386/pc_q35.c                                   |   2 +-
->  hw/s390x/s390-virtio-ccw.c                         |  12 -
->  hw/virtio/vhost-backend.c                          |  88 +++++--
->  hw/virtio/vhost-vdpa.c                             |  66 +++++
->  hw/virtio/vhost.c                                  |  49 +++-
->  hw/virtio/virtio-iommu-pci.c                       |   2 +-
->  hw/virtio/virtio-iommu.c                           |   8 +-
->  hw/virtio/virtio-mem.c                             |   3 +
->  tests/qtest/cpu-plug-test.c                        | 100 +------
->  tests/qtest/libqos/virtio-blk.c                    |  14 +-
->  tests/qtest/test-hmp.c                             |   1 -
->  tests/qtest/vhost-user-test.c                      | 290 ++++++++++++++++++---
->  docs/system/deprecated.rst                         |  25 +-
->  hmp-commands.hx                                    |  15 --
->  53 files changed, 813 insertions(+), 323 deletions(-)
-> 
+
+Ok fine. Let me collaborate with him internally first. Either of us
+will have to rebase our patches on others code.
+
+
+thanks
+
+
+>=20
+> Thanks,
+> drew
+>=20
+> >
+> > @Fangying, will this work for you?
+> >
+> >
+> > Salil.
+> >
+> >
 
 
