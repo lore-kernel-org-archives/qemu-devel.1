@@ -2,88 +2,100 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NORMAL_HTTP_TO_IP,NUMERIC_HTTP_ADDR,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 937C9C43465
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 21:20:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E86DC43463
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 21:22:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 115C822208
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 21:20:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BV+FDtsu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 115C822208
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C6B2D22208
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 21:22:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6B2D22208
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJNnY-0003Ih-3L
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 17:20:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48814)
+	id 1kJNq3-0003oJ-B7
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 17:22:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46562)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kJNJ5-0003BD-JK
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 16:48:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46411)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kJNJ3-0006TF-87
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 16:48:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600462111;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Rg1vUGg+NQh0UsEWhYotEM8dC8ClGTsLqERdGE5uJ44=;
- b=BV+FDtsuzKQ9i8hEUAwU/nIZVVeeEkOnuwuzQGheAdBoGUJynlSS3go8NO92ZovwURacS6
- phL1vrrI8HjZGKu0vRMT/tmce6cOc7jzHTekEPgTKINgGmAhCl642HXFw1+sG7pHUUhvcG
- zncN1Tf+nOupb0BWt3SBt/8MffI8n2A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-576-Men7KVHGPbOIGiijL_DFUw-1; Fri, 18 Sep 2020 16:48:27 -0400
-X-MC-Unique: Men7KVHGPbOIGiijL_DFUw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4AC618BA288;
- Fri, 18 Sep 2020 20:48:26 +0000 (UTC)
-Received: from localhost (unknown [10.36.110.14])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BE17510013C1;
- Fri, 18 Sep 2020 20:48:22 +0000 (UTC)
-From: marcandre.lureau@redhat.com
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kJN80-0005Dn-Nf; Fri, 18 Sep 2020 16:37:08 -0400
+Received: from new1-smtp.messagingengine.com ([66.111.4.221]:43811)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kJN7x-0004zV-VD; Fri, 18 Sep 2020 16:37:08 -0400
+Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
+ by mailnew.nyi.internal (Postfix) with ESMTP id 5A32D580230;
+ Fri, 18 Sep 2020 16:36:44 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+ by compute7.internal (MEProxy); Fri, 18 Sep 2020 16:36:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding; s=fm1; bh=V1J4f90bwo+Ef
+ ZC3f/9mH/YsIrZrtwXG618pPmin5v0=; b=gEnKZsEz7M70LOuQdI4rdvRWS8Cfn
+ ui7C7GP9KECfFMHlkMdWt/9Y8qwyibAfVZYhbzJ0p4LOPbxnlhkuxeWtDeK7mi8p
+ YXgspgUQnKPZY3K7DFBKmICdv0tkEKcZf6CDTf0/dXckRqk1zSalQM5gRlnII4jK
+ lu7+tomFgoCu+KERXIuK+A/7FN1GXYFachjR8Ygo4tsmgCcgqXbtRxulU0vxLPka
+ Tpl+HvKsOTZSo4DToento5Re2MNiOIBhClfNL2QkUxQapC+BOhHrvbGBoIj735+N
+ e53SiBrHVNVCWmaUcoax5L7obT0+p7H8Wpr6xh6LylPcOv4PurWRWu4MQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-transfer-encoding:date:from
+ :in-reply-to:message-id:mime-version:references:subject:to
+ :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+ fm3; bh=V1J4f90bwo+EfZC3f/9mH/YsIrZrtwXG618pPmin5v0=; b=bKZZljSA
+ wyK+3X6vK8hxv8BTFLMzz/7v37AdbYbNiyFnQeO8x7ljFHA2L0dordzl9DATDJNa
+ +zSQ0OXROk2JTHHpR73WIm2aj8g/agv0pKtWOENwr/3fqpyxcwMRZQfMs0y8JBfD
+ BpQOd0ODsLhY06n1XVBcJ3Q1/wvuSuuDQRs9QQQLM26ddP1KdJVt3+P8FWC5ghAn
+ rjrcJvO67ZgYJLvgR/MGLn7DN5h2vM/8bV/LBpmgGVUhViaZORNnH+6ouAQU//Ob
+ HSF/De8MCSn2QnWUSISWKBWlSGwnyqqYdt7eR9QW2fsjYw7euL1W5qrZDDdeMUeq
+ l80l3ZCODBSlKw==
+X-ME-Sender: <xms:WhplX6WldmXSpIb5drdv1zZMt4nmKAydPtDq2UDmGTKvIudUS7dJsw>
+ <xme:WhplX2nhaN5ox82syTEReYLlIwHldnaxLbvDLmRVuRRjZPttdOz7qdZyMQlLm0eGA
+ Hnwd57ScxkRTmqtdMA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrtdeigdduhedvucetufdoteggodetrfdotf
+ fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+ uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+ cujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpefmlhgruhhs
+ ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
+ gvrhhnpeeltdetfeegkefguedvtdduffejiedvjeejudejieelveekhfekvdefleeludev
+ ffenucffohhmrghinhepvddtudelqddtkedrohhrghenucfkphepkedtrdduieejrdelke
+ drudeltdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhm
+ pehithhssehirhhrvghlvghvrghnthdrughk
+X-ME-Proxy: <xmx:WxplX-anWL9EuNDsD-02A68TRWcqpz2thFbS4yxMxloSnXbMipVgWg>
+ <xmx:WxplXxWNg6D2JEqZG8yHG-ODzH_Kjtr0dmA4vUNVEA6_8QAeWhVUGA>
+ <xmx:WxplX0m0Ywp1NNtNfAw1C7jSsnTj1wrzS9t_3qUmg9XfTpZ8-S-Iqw>
+ <xmx:WxplX-5VudKHcLD8BociKyX1bBlsRP1e7OU3Wnudvpglz57INd8oELo6688>
+Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by mail.messagingengine.com (Postfix) with ESMTPA id 741A73064610;
+ Fri, 18 Sep 2020 16:36:41 -0400 (EDT)
+From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 3/6] meson: convert pc-bios/optionrom
-Date: Sat, 19 Sep 2020 00:47:56 +0400
-Message-Id: <20200918204759.225810-4-marcandre.lureau@redhat.com>
-In-Reply-To: <20200918204759.225810-1-marcandre.lureau@redhat.com>
-References: <20200918204759.225810-1-marcandre.lureau@redhat.com>
+Subject: [PATCH v2 12/17] hw/block/nvme: add support for scatter gather lists
+Date: Fri, 18 Sep 2020 22:36:16 +0200
+Message-Id: <20200918203621.602915-13-its@irrelevant.dk>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20200918203621.602915-1-its@irrelevant.dk>
+References: <20200918203621.602915-1-its@irrelevant.dk>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124;
- envelope-from=marcandre.lureau@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 00:20:40
+Received-SPF: pass client-ip=66.111.4.221; envelope-from=its@irrelevant.dk;
+ helo=new1-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 16:36:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.999,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,254 +108,537 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-s390x@nongnu.org,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Klaus Jensen <k.jensen@samsung.com>, Max Reitz <mreitz@redhat.com>,
+ Klaus Jensen <its@irrelevant.dk>, Keith Busch <kbusch@kernel.org>,
+ Klaus Jensen <klaus.jensen@cnexlabs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+From: Klaus Jensen <k.jensen@samsung.com>
 
-Checking for linker emulation is a bit tricky with meson, since it
-actually tries to compile a file with a main().
+For now, support the Data Block, Segment and Last Segment descriptor
+types.
 
-I didn't bother to port the Darwin or SunOS check, as they are
-quite old, and not very specific to the compiler version/issue, so they
-might be outdated.
+See NVM Express 1.3d, Section 4.4 ("Scatter Gather List (SGL)").
 
-Use a subproject: this is a simple workaround to avoid the incompatible
-flags (such as gprof) that are set globally for the rest of QEMU.
-
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+Acked-by: Keith Busch <kbusch@kernel.org>
 ---
- configure                     | 16 --------
- pc-bios/meson.build           |  4 ++
- pc-bios/optionrom/Makefile    | 73 -----------------------------------
- pc-bios/optionrom/meson.build | 73 +++++++++++++++++++++++++++++++++++
- subprojects/optionrom         |  1 +
- 5 files changed, 78 insertions(+), 89 deletions(-)
- delete mode 100644 pc-bios/optionrom/Makefile
- create mode 100644 pc-bios/optionrom/meson.build
- create mode 120000 subprojects/optionrom
+ include/block/nvme.h  |   6 +-
+ hw/block/nvme.c       | 329 ++++++++++++++++++++++++++++++++++--------
+ hw/block/trace-events |   4 +
+ 3 files changed, 279 insertions(+), 60 deletions(-)
 
-diff --git a/configure b/configure
-index 3a8733c9be..4e56edc70c 100755
---- a/configure
-+++ b/configure
-@@ -6441,22 +6441,7 @@ if test "$guest_agent_msi" = "yes"; then
-   esac
- fi
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index 65e68a82c897..58647bcdad0b 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -412,9 +412,9 @@ typedef union NvmeCmdDptr {
+ } NvmeCmdDptr;
  
--# Mac OS X ships with a broken assembler
- roms=
--if { test "$cpu" = "i386" || test "$cpu" = "x86_64"; } && \
--        test "$targetos" != "Darwin" && test "$targetos" != "SunOS" && \
--        test "$softmmu" = yes ; then
--    # Different host OS linkers have different ideas about the name of the ELF
--    # emulation. Linux and OpenBSD/amd64 use 'elf_i386'; FreeBSD uses the _fbsd
--    # variant; OpenBSD/i386 uses the _obsd variant; and Windows uses i386pe.
--    for emu in elf_i386 elf_i386_fbsd elf_i386_obsd i386pe; do
--        if "$ld" -verbose 2>&1 | grep -q "^[[:space:]]*$emu[[:space:]]*$"; then
--            ld_i386_emulation="$emu"
--            roms="optionrom"
--            break
--        fi
--    done
--fi
+ enum NvmePsdt {
+-    PSDT_PRP                 = 0x0,
+-    PSDT_SGL_MPTR_CONTIGUOUS = 0x1,
+-    PSDT_SGL_MPTR_SGL        = 0x2,
++    NVME_PSDT_PRP                 = 0x0,
++    NVME_PSDT_SGL_MPTR_CONTIGUOUS = 0x1,
++    NVME_PSDT_SGL_MPTR_SGL        = 0x2,
+ };
  
- # Only build s390-ccw bios if we're on s390x and the compiler has -march=z900
- if test "$cpu" = "s390x" ; then
-@@ -7861,7 +7846,6 @@ DIRS="$DIRS contrib/plugins/"
- LINKS="Makefile"
- LINKS="$LINKS tests/tcg/lm32/Makefile"
- LINKS="$LINKS tests/tcg/Makefile.target"
--LINKS="$LINKS pc-bios/optionrom/Makefile"
- LINKS="$LINKS roms/seabios/Makefile"
- LINKS="$LINKS pc-bios/qemu-icon.bmp"
- LINKS="$LINKS .gdbinit scripts" # scripts needed by relative path in .gdbinit
-diff --git a/pc-bios/meson.build b/pc-bios/meson.build
-index e5139b3ef5..d25585ca97 100644
---- a/pc-bios/meson.build
-+++ b/pc-bios/meson.build
-@@ -92,6 +92,10 @@ endif
- subdir('descriptors')
- subdir('keymaps')
+ typedef struct QEMU_PACKED NvmeCmd {
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index a440f6617f70..e01b4b22882e 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -413,13 +413,262 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, uint64_t prp1, uint64_t prp2,
+     return NVME_SUCCESS;
+ }
  
-+if host_machine.cpu_family() in ['x86', 'x86_64']
-+  subproject('optionrom')
-+endif
+-static uint16_t nvme_dma_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
+-                             uint64_t prp1, uint64_t prp2, DMADirection dir,
++/*
++ * Map 'nsgld' data descriptors from 'segment'. The function will subtract the
++ * number of bytes mapped in len.
++ */
++static uint16_t nvme_map_sgl_data(NvmeCtrl *n, QEMUSGList *qsg,
++                                  QEMUIOVector *iov,
++                                  NvmeSglDescriptor *segment, uint64_t nsgld,
++                                  size_t *len, NvmeRequest *req)
++{
++    dma_addr_t addr, trans_len;
++    uint32_t dlen;
++    uint16_t status;
 +
- if host_machine.cpu_family() == 's390x' and cc.has_argument('-march=z900')
-   subproject('s390-ccw')
- endif
-diff --git a/pc-bios/optionrom/Makefile b/pc-bios/optionrom/Makefile
-deleted file mode 100644
-index 084fc10f05..0000000000
---- a/pc-bios/optionrom/Makefile
-+++ /dev/null
-@@ -1,73 +0,0 @@
--CURRENT_MAKEFILE := $(realpath $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
--SRC_DIR := $(dir $(CURRENT_MAKEFILE))
--TOPSRC_DIR := $(SRC_DIR)/../..
--VPATH = $(SRC_DIR)
--
--all: multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin pvh.bin
--# Dummy command so that make thinks it has done something
--	@true
--
--include ../../config-host.mak
--CFLAGS = -O2 -g
--
--quiet-command = $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 && $1, @$1))
--cc-option = $(if $(shell $(CC) $1 -c -o /dev/null -xc /dev/null >/dev/null 2>&1 && echo OK), $1, $2)
--
--override CFLAGS += -march=i486 -Wall
--
--# Flags for dependency generation
--override CPPFLAGS += -MMD -MP -MT $@ -MF $(@D)/$(*F).d
--
--override CFLAGS += $(filter -W%, $(QEMU_CFLAGS))
--override CFLAGS += $(CFLAGS_NOPIE) -ffreestanding -I$(TOPSRC_DIR)/include
--override CFLAGS += $(call cc-option, -fno-stack-protector)
--override CFLAGS += $(call cc-option, -m16)
--
--ifeq ($(filter -m16, $(CFLAGS)),)
--# Attempt to work around compilers that lack -m16 (GCC <= 4.8, clang <= ??)
--# On GCC we add -fno-toplevel-reorder to keep the order of asm blocks with
--# respect to the rest of the code.  clang does not have -fno-toplevel-reorder,
--# but it places all asm blocks at the beginning and we're relying on it for
--# the option ROM header.  So just force clang not to use the integrated
--# assembler, which doesn't support .code16gcc.
--override CFLAGS += $(call cc-option, -fno-toplevel-reorder)
--override CFLAGS += $(call cc-option, -no-integrated-as)
--override CFLAGS += -m32 -include $(SRC_DIR)/code16gcc.h
--endif
--
--Wa = -Wa,
--override ASFLAGS += -32
--override CFLAGS += $(call cc-option, $(Wa)-32)
--
--LD_I386_EMULATION ?= elf_i386
--override LDFLAGS = -m $(LD_I386_EMULATION) -T $(SRC_DIR)/flat.lds
--override LDFLAGS += $(LDFLAGS_NOPIE)
--
--all: multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin pvh.bin
--
--pvh.img: pvh.o pvh_main.o
--
--%.o: %.S
--	$(call quiet-command,$(CPP) $(CPPFLAGS) -c -o - $< | $(AS) $(ASFLAGS) -o $@,"AS","$@")
--
--%.o: %.c
--	$(call quiet-command,$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@,"CC","$@")
--
--%.img: %.o
--	$(call quiet-command,$(LD) $(LDFLAGS) -s -o $@ $^,"BUILD","$@")
--
--%.raw: %.img
--	$(call quiet-command,$(OBJCOPY) -O binary -j .text $< $@,"BUILD","$@")
--
--%.bin: %.raw
--	$(call quiet-command,$(PYTHON) $(TOPSRC_DIR)/scripts/signrom.py $< $@,"SIGN","$@")
--
--include $(wildcard *.d)
--
--clean:
--	rm -f *.o *.d *.raw *.img *.bin *~
--
--# suppress auto-removal of intermediate files
--.SECONDARY:
--
--.PHONY: all clean
-diff --git a/pc-bios/optionrom/meson.build b/pc-bios/optionrom/meson.build
-new file mode 100644
-index 0000000000..7d5314cd80
---- /dev/null
-+++ b/pc-bios/optionrom/meson.build
-@@ -0,0 +1,73 @@
-+project('optionrom')
++    for (int i = 0; i < nsgld; i++) {
++        uint8_t type = NVME_SGL_TYPE(segment[i].type);
 +
-+cc = meson.get_compiler('c')
-+objcopy = find_program('objcopy')
-+signrom = find_program(meson.current_source_dir() / '../../scripts/signrom.py')
++        switch (type) {
++        case NVME_SGL_DESCR_TYPE_DATA_BLOCK:
++            break;
++        case NVME_SGL_DESCR_TYPE_SEGMENT:
++        case NVME_SGL_DESCR_TYPE_LAST_SEGMENT:
++            return NVME_INVALID_NUM_SGL_DESCRS | NVME_DNR;
++        default:
++            return NVME_SGL_DESCR_TYPE_INVALID | NVME_DNR;
++        }
 +
-+emu = ''
-+foreach e: ['elf_i386', 'elf_i386_fbsd', 'elf_i386_obsd', 'i386pe']
-+  if cc.has_multi_link_arguments('-nostdlib', '-Wl,-emain', '-m32', '-Wl,-m' + e)
-+    emu = e
-+    break
-+  endif
-+endforeach
++        dlen = le32_to_cpu(segment[i].len);
++        if (!dlen) {
++            continue;
++        }
 +
-+if emu == ''
-+  message('No suitable compiler/linker found to build optionrom')
-+  subdir_done()
-+endif
++        if (*len == 0) {
++            /*
++             * All data has been mapped, but the SGL contains additional
++             * segments and/or descriptors. The controller might accept
++             * ignoring the rest of the SGL.
++             */
++            uint16_t sgls = le16_to_cpu(n->id_ctrl.sgls);
++            if (sgls & NVME_CTRL_SGLS_EXCESS_LENGTH) {
++                break;
++            }
 +
-+link_args = ['-nostdlib', '-m32', '-Wl,-m' + e]
-+link_args += cc.get_supported_link_arguments('-Wl,--build-id=none')
-+if cc.has_multi_link_arguments('-fno-pie', '-no-pie')
-+  link_args += ['-no-pie']
-+endif
++            trace_pci_nvme_err_invalid_sgl_excess_length(nvme_cid(req));
++            return NVME_DATA_SGL_LEN_INVALID | NVME_DNR;
++        }
 +
-+link_args += '-Wl,-T' + meson.current_source_dir() / 'flat.lds'
++        trans_len = MIN(*len, dlen);
++        addr = le64_to_cpu(segment[i].addr);
 +
-+c_args = ['-O2', '-ffreestanding', '-march=i486']
-+c_args += cc.get_supported_arguments('-fno-pie', '-fno-stack-protector', '-Wa,-32')
-+if cc.has_argument('-m16')
-+  c_args += '-m16'
-+else
-+  # Attempt to work around compilers that lack -m16 (GCC <= 4.8, clang <= ??)
-+  # On GCC we add -fno-toplevel-reorder to keep the order of asm blocks with
-+  # respect to the rest of the code.  clang does not have -fno-toplevel-reorder,
-+  # but it places all asm blocks at the beginning and we're relying on it for
-+  # the option ROM header.  So just force clang not to use the integrated
-+  # assembler, which doesn't support .code16gcc.
-+  c_args += cc.get_supported_arguments('-fno-toplevel-reorder', '-no-integrated-as')
-+  c_args += ['-m32', '-include', meson.current_source_dir() / 'code16gcc.h']
-+endif
++        if (UINT64_MAX - addr < dlen) {
++            return NVME_DATA_SGL_LEN_INVALID | NVME_DNR;
++        }
 +
-+foreach target, src: {
-+  'multiboot': ['multiboot.S'],
-+  'linuxboot_dma': ['linuxboot_dma.c'],
-+  'linuxboot': ['linuxboot.S'],
-+  'kvmvapic': ['kvmvapic.S'],
-+  'pvh': ['pvh.S', 'pvh_main.c'],
-+ }
-+  img = executable(
-+    target + '.img',
-+    src,
-+    c_args: c_args,
-+    include_directories: include_directories('../../include'),
-+    link_args: link_args,
-+    override_options: ['b_coverage=false'],
-+  )
++        status = nvme_map_addr(n, qsg, iov, addr, trans_len);
++        if (status) {
++            return status;
++        }
 +
-+  raw = custom_target(
-+    target + '.raw',
-+    output: target + '.raw',
-+    input: img,
-+    command: [objcopy, '-O', 'binary', '-j', '.text', '@INPUT@', '@OUTPUT@'],
-+  )
++        *len -= trans_len;
++    }
 +
-+  bin = custom_target(
-+    target + '.bin',
-+    output: target + '.bin',
-+    input: raw,
-+    command: [signrom, '@INPUT@', '@OUTPUT@'],
-+    build_by_default: true,
-+  )
-+endforeach
-diff --git a/subprojects/optionrom b/subprojects/optionrom
-new file mode 120000
-index 0000000000..0bd7ed1798
---- /dev/null
-+++ b/subprojects/optionrom
-@@ -0,0 +1 @@
-+../pc-bios/optionrom
-\ No newline at end of file
++    return NVME_SUCCESS;
++}
++
++static uint16_t nvme_map_sgl(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
++                             NvmeSglDescriptor sgl, size_t len,
+                              NvmeRequest *req)
++{
++    /*
++     * Read the segment in chunks of 256 descriptors (one 4k page) to avoid
++     * dynamically allocating a potentially huge SGL. The spec allows the SGL
++     * to be larger (as in number of bytes required to describe the SGL
++     * descriptors and segment chain) than the command transfer size, so it is
++     * not bounded by MDTS.
++     */
++    const int SEG_CHUNK_SIZE = 256;
++
++    NvmeSglDescriptor segment[SEG_CHUNK_SIZE], *sgld, *last_sgld;
++    uint64_t nsgld;
++    uint32_t seg_len;
++    uint16_t status;
++    bool sgl_in_cmb = false;
++    hwaddr addr;
++    int ret;
++
++    sgld = &sgl;
++    addr = le64_to_cpu(sgl.addr);
++
++    trace_pci_nvme_map_sgl(nvme_cid(req), NVME_SGL_TYPE(sgl.type), len);
++
++    /*
++     * If the entire transfer can be described with a single data block it can
++     * be mapped directly.
++     */
++    if (NVME_SGL_TYPE(sgl.type) == NVME_SGL_DESCR_TYPE_DATA_BLOCK) {
++        status = nvme_map_sgl_data(n, qsg, iov, sgld, 1, &len, req);
++        if (status) {
++            goto unmap;
++        }
++
++        goto out;
++    }
++
++    /*
++     * If the segment is located in the CMB, the submission queue of the
++     * request must also reside there.
++     */
++    if (nvme_addr_is_cmb(n, addr)) {
++        if (!nvme_addr_is_cmb(n, req->sq->dma_addr)) {
++            return NVME_INVALID_USE_OF_CMB | NVME_DNR;
++        }
++
++        sgl_in_cmb = true;
++    }
++
++    for (;;) {
++        switch (NVME_SGL_TYPE(sgld->type)) {
++        case NVME_SGL_DESCR_TYPE_SEGMENT:
++        case NVME_SGL_DESCR_TYPE_LAST_SEGMENT:
++            break;
++        default:
++            return NVME_INVALID_SGL_SEG_DESCR | NVME_DNR;
++        }
++
++        seg_len = le32_to_cpu(sgld->len);
++
++        /* check the length of the (Last) Segment descriptor */
++        if (!seg_len || seg_len & 0xf) {
++            return NVME_INVALID_SGL_SEG_DESCR | NVME_DNR;
++        }
++
++        if (UINT64_MAX - addr < seg_len) {
++            return NVME_DATA_SGL_LEN_INVALID | NVME_DNR;
++        }
++
++        nsgld = seg_len / sizeof(NvmeSglDescriptor);
++
++        while (nsgld > SEG_CHUNK_SIZE) {
++            if (nvme_addr_read(n, addr, segment, sizeof(segment))) {
++                trace_pci_nvme_err_addr_read(addr);
++                status = NVME_DATA_TRAS_ERROR;
++                goto unmap;
++            }
++
++            status = nvme_map_sgl_data(n, qsg, iov, segment, SEG_CHUNK_SIZE,
++                                       &len, req);
++            if (status) {
++                goto unmap;
++            }
++
++            nsgld -= SEG_CHUNK_SIZE;
++            addr += SEG_CHUNK_SIZE * sizeof(NvmeSglDescriptor);
++        }
++
++        ret = nvme_addr_read(n, addr, segment, nsgld *
++                             sizeof(NvmeSglDescriptor));
++        if (ret) {
++            trace_pci_nvme_err_addr_read(addr);
++            status = NVME_DATA_TRAS_ERROR;
++            goto unmap;
++        }
++
++        last_sgld = &segment[nsgld - 1];
++
++        /* if the segment ends with a Data Block, then we are done */
++        if (NVME_SGL_TYPE(last_sgld->type) == NVME_SGL_DESCR_TYPE_DATA_BLOCK) {
++            status = nvme_map_sgl_data(n, qsg, iov, segment, nsgld, &len, req);
++            if (status) {
++                goto unmap;
++            }
++
++            goto out;
++        }
++
++        /*
++         * If the last descriptor was not a Data Block, then the current
++         * segment must not be a Last Segment.
++         */
++        if (NVME_SGL_TYPE(sgld->type) == NVME_SGL_DESCR_TYPE_LAST_SEGMENT) {
++            status = NVME_INVALID_SGL_SEG_DESCR | NVME_DNR;
++            goto unmap;
++        }
++
++        sgld = last_sgld;
++        addr = le64_to_cpu(sgld->addr);
++
++        /*
++         * Do not map the last descriptor; it will be a Segment or Last Segment
++         * descriptor and is handled by the next iteration.
++         */
++        status = nvme_map_sgl_data(n, qsg, iov, segment, nsgld - 1, &len, req);
++        if (status) {
++            goto unmap;
++        }
++
++        /*
++         * If the next segment is in the CMB, make sure that the sgl was
++         * already located there.
++         */
++        if (sgl_in_cmb != nvme_addr_is_cmb(n, addr)) {
++            status = NVME_INVALID_USE_OF_CMB | NVME_DNR;
++            goto unmap;
++        }
++    }
++
++out:
++    /* if there is any residual left in len, the SGL was too short */
++    if (len) {
++        status = NVME_DATA_SGL_LEN_INVALID | NVME_DNR;
++        goto unmap;
++    }
++
++    return NVME_SUCCESS;
++
++unmap:
++    if (iov->iov) {
++        qemu_iovec_destroy(iov);
++    }
++
++    if (qsg->sg) {
++        qemu_sglist_destroy(qsg);
++    }
++
++    return status;
++}
++
++static uint16_t nvme_map_dptr(NvmeCtrl *n, size_t len, NvmeRequest *req)
++{
++    uint64_t prp1, prp2;
++
++    switch (NVME_CMD_FLAGS_PSDT(req->cmd.flags)) {
++    case NVME_PSDT_PRP:
++        prp1 = le64_to_cpu(req->cmd.dptr.prp1);
++        prp2 = le64_to_cpu(req->cmd.dptr.prp2);
++
++        return nvme_map_prp(n, prp1, prp2, len, req);
++    case NVME_PSDT_SGL_MPTR_CONTIGUOUS:
++    case NVME_PSDT_SGL_MPTR_SGL:
++        /* SGLs shall not be used for Admin commands in NVMe over PCIe */
++        if (!req->sq->sqid) {
++            return NVME_INVALID_FIELD | NVME_DNR;
++        }
++
++        return nvme_map_sgl(n, &req->qsg, &req->iov, req->cmd.dptr.sgl, len,
++                            req);
++    default:
++        return NVME_INVALID_FIELD;
++    }
++}
++
++static uint16_t nvme_dma(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
++                         DMADirection dir, NvmeRequest *req)
+ {
+     uint16_t status = NVME_SUCCESS;
+ 
+-    status = nvme_map_prp(n, prp1, prp2, len, req);
++    status = nvme_map_dptr(n, len, req);
+     if (status) {
+         return status;
+     }
+@@ -458,15 +707,6 @@ static uint16_t nvme_dma_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
+     return status;
+ }
+ 
+-static uint16_t nvme_map_dptr(NvmeCtrl *n, size_t len, NvmeRequest *req)
+-{
+-    NvmeCmd *cmd = &req->cmd;
+-    uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
+-    uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
+-
+-    return nvme_map_prp(n, prp1, prp2, len, req);
+-}
+-
+ static void nvme_post_cqes(void *opaque)
+ {
+     NvmeCQueue *cq = opaque;
+@@ -927,10 +1167,7 @@ static uint16_t nvme_create_sq(NvmeCtrl *n, NvmeRequest *req)
+ static uint16_t nvme_smart_info(NvmeCtrl *n, uint8_t rae, uint32_t buf_len,
+                                 uint64_t off, NvmeRequest *req)
+ {
+-    NvmeCmd *cmd = &req->cmd;
+-    uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
+-    uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
+-    uint32_t nsid = le32_to_cpu(cmd->nsid);
++    uint32_t nsid = le32_to_cpu(req->cmd.nsid);
+ 
+     uint32_t trans_len;
+     time_t current_ms;
+@@ -979,17 +1216,14 @@ static uint16_t nvme_smart_info(NvmeCtrl *n, uint8_t rae, uint32_t buf_len,
+         nvme_clear_events(n, NVME_AER_TYPE_SMART);
+     }
+ 
+-    return nvme_dma_prp(n, (uint8_t *) &smart + off, trans_len, prp1, prp2,
+-                        DMA_DIRECTION_FROM_DEVICE, req);
++    return nvme_dma(n, (uint8_t *) &smart + off, trans_len,
++                    DMA_DIRECTION_FROM_DEVICE, req);
+ }
+ 
+ static uint16_t nvme_fw_log_info(NvmeCtrl *n, uint32_t buf_len, uint64_t off,
+                                  NvmeRequest *req)
+ {
+     uint32_t trans_len;
+-    NvmeCmd *cmd = &req->cmd;
+-    uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
+-    uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
+     NvmeFwSlotInfoLog fw_log = {
+         .afi = 0x1,
+     };
+@@ -1002,17 +1236,14 @@ static uint16_t nvme_fw_log_info(NvmeCtrl *n, uint32_t buf_len, uint64_t off,
+ 
+     trans_len = MIN(sizeof(fw_log) - off, buf_len);
+ 
+-    return nvme_dma_prp(n, (uint8_t *) &fw_log + off, trans_len, prp1, prp2,
+-                        DMA_DIRECTION_FROM_DEVICE, req);
++    return nvme_dma(n, (uint8_t *) &fw_log + off, trans_len,
++                    DMA_DIRECTION_FROM_DEVICE, req);
+ }
+ 
+ static uint16_t nvme_error_info(NvmeCtrl *n, uint8_t rae, uint32_t buf_len,
+                                 uint64_t off, NvmeRequest *req)
+ {
+     uint32_t trans_len;
+-    NvmeCmd *cmd = &req->cmd;
+-    uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
+-    uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
+     NvmeErrorLog errlog;
+ 
+     if (!rae) {
+@@ -1027,8 +1258,8 @@ static uint16_t nvme_error_info(NvmeCtrl *n, uint8_t rae, uint32_t buf_len,
+ 
+     trans_len = MIN(sizeof(errlog) - off, buf_len);
+ 
+-    return nvme_dma_prp(n, (uint8_t *)&errlog, trans_len, prp1, prp2,
+-                        DMA_DIRECTION_FROM_DEVICE, req);
++    return nvme_dma(n, (uint8_t *)&errlog, trans_len,
++                    DMA_DIRECTION_FROM_DEVICE, req);
+ }
+ 
+ static uint16_t nvme_get_log(NvmeCtrl *n, NvmeRequest *req)
+@@ -1188,14 +1419,10 @@ static uint16_t nvme_create_cq(NvmeCtrl *n, NvmeRequest *req)
+ 
+ static uint16_t nvme_identify_ctrl(NvmeCtrl *n, NvmeRequest *req)
+ {
+-    NvmeIdentify *c = (NvmeIdentify *)&req->cmd;
+-    uint64_t prp1 = le64_to_cpu(c->prp1);
+-    uint64_t prp2 = le64_to_cpu(c->prp2);
+-
+     trace_pci_nvme_identify_ctrl();
+ 
+-    return nvme_dma_prp(n, (uint8_t *)&n->id_ctrl, sizeof(n->id_ctrl), prp1,
+-                        prp2, DMA_DIRECTION_FROM_DEVICE, req);
++    return nvme_dma(n, (uint8_t *)&n->id_ctrl, sizeof(n->id_ctrl),
++                    DMA_DIRECTION_FROM_DEVICE, req);
+ }
+ 
+ static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeRequest *req)
+@@ -1203,8 +1430,6 @@ static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeRequest *req)
+     NvmeNamespace *ns;
+     NvmeIdentify *c = (NvmeIdentify *)&req->cmd;
+     uint32_t nsid = le32_to_cpu(c->nsid);
+-    uint64_t prp1 = le64_to_cpu(c->prp1);
+-    uint64_t prp2 = le64_to_cpu(c->prp2);
+ 
+     trace_pci_nvme_identify_ns(nsid);
+ 
+@@ -1215,8 +1440,8 @@ static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeRequest *req)
+ 
+     ns = &n->namespaces[nsid - 1];
+ 
+-    return nvme_dma_prp(n, (uint8_t *)&ns->id_ns, sizeof(ns->id_ns), prp1,
+-                        prp2, DMA_DIRECTION_FROM_DEVICE, req);
++    return nvme_dma(n, (uint8_t *)&ns->id_ns, sizeof(ns->id_ns),
++                    DMA_DIRECTION_FROM_DEVICE, req);
+ }
+ 
+ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeRequest *req)
+@@ -1224,8 +1449,6 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeRequest *req)
+     NvmeIdentify *c = (NvmeIdentify *)&req->cmd;
+     static const int data_len = NVME_IDENTIFY_DATA_SIZE;
+     uint32_t min_nsid = le32_to_cpu(c->nsid);
+-    uint64_t prp1 = le64_to_cpu(c->prp1);
+-    uint64_t prp2 = le64_to_cpu(c->prp2);
+     uint32_t *list;
+     uint16_t ret;
+     int i, j = 0;
+@@ -1252,8 +1475,8 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeRequest *req)
+             break;
+         }
+     }
+-    ret = nvme_dma_prp(n, (uint8_t *)list, data_len, prp1, prp2,
+-                       DMA_DIRECTION_FROM_DEVICE, req);
++    ret = nvme_dma(n, (uint8_t *)list, data_len, DMA_DIRECTION_FROM_DEVICE,
++                   req);
+     g_free(list);
+     return ret;
+ }
+@@ -1262,8 +1485,6 @@ static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeRequest *req)
+ {
+     NvmeIdentify *c = (NvmeIdentify *)&req->cmd;
+     uint32_t nsid = le32_to_cpu(c->nsid);
+-    uint64_t prp1 = le64_to_cpu(c->prp1);
+-    uint64_t prp2 = le64_to_cpu(c->prp2);
+ 
+     uint8_t list[NVME_IDENTIFY_DATA_SIZE];
+ 
+@@ -1295,8 +1516,8 @@ static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeRequest *req)
+     ns_descrs->uuid.hdr.nidl = NVME_NIDT_UUID_LEN;
+     stl_be_p(&ns_descrs->uuid.v, nsid);
+ 
+-    return nvme_dma_prp(n, list, NVME_IDENTIFY_DATA_SIZE, prp1, prp2,
+-                        DMA_DIRECTION_FROM_DEVICE, req);
++    return nvme_dma(n, list, NVME_IDENTIFY_DATA_SIZE,
++                    DMA_DIRECTION_FROM_DEVICE, req);
+ }
+ 
+ static uint16_t nvme_identify(NvmeCtrl *n, NvmeRequest *req)
+@@ -1372,14 +1593,10 @@ static inline uint64_t nvme_get_timestamp(const NvmeCtrl *n)
+ 
+ static uint16_t nvme_get_feature_timestamp(NvmeCtrl *n, NvmeRequest *req)
+ {
+-    NvmeCmd *cmd = &req->cmd;
+-    uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
+-    uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
+-
+     uint64_t timestamp = nvme_get_timestamp(n);
+ 
+-    return nvme_dma_prp(n, (uint8_t *)&timestamp, sizeof(timestamp), prp1,
+-                        prp2, DMA_DIRECTION_FROM_DEVICE, req);
++    return nvme_dma(n, (uint8_t *)&timestamp, sizeof(timestamp),
++                    DMA_DIRECTION_FROM_DEVICE, req);
+ }
+ 
+ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeRequest *req)
+@@ -1508,12 +1725,9 @@ static uint16_t nvme_set_feature_timestamp(NvmeCtrl *n, NvmeRequest *req)
+ {
+     uint16_t ret;
+     uint64_t timestamp;
+-    NvmeCmd *cmd = &req->cmd;
+-    uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
+-    uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
+ 
+-    ret = nvme_dma_prp(n, (uint8_t *)&timestamp, sizeof(timestamp), prp1,
+-                       prp2, DMA_DIRECTION_TO_DEVICE, req);
++    ret = nvme_dma(n, (uint8_t *)&timestamp, sizeof(timestamp),
++                   DMA_DIRECTION_TO_DEVICE, req);
+     if (ret != NVME_SUCCESS) {
+         return ret;
+     }
+@@ -2440,6 +2654,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
+     id->nn = cpu_to_le32(n->num_namespaces);
+     id->oncs = cpu_to_le16(NVME_ONCS_WRITE_ZEROES | NVME_ONCS_TIMESTAMP |
+                            NVME_ONCS_FEATURES);
++    id->sgls = cpu_to_le32(NVME_CTRL_SGLS_SUPPORT_NO_ALIGN);
+ 
+     subnqn = g_strdup_printf("nqn.2019-08.org.qemu:%s", n->params.serial);
+     strpadcpy((char *)id->subnqn, sizeof(id->subnqn), subnqn, '\0');
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 04a700c73f7d..b780993c3da5 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -36,6 +36,7 @@ pci_nvme_dma_read(uint64_t prp1, uint64_t prp2) "DMA read, prp1=0x%"PRIx64" prp2
+ pci_nvme_map_addr(uint64_t addr, uint64_t len) "addr 0x%"PRIx64" len %"PRIu64""
+ pci_nvme_map_addr_cmb(uint64_t addr, uint64_t len) "addr 0x%"PRIx64" len %"PRIu64""
+ pci_nvme_map_prp(uint64_t trans_len, uint32_t len, uint64_t prp1, uint64_t prp2, int num_prps) "trans_len %"PRIu64" len %"PRIu32" prp1 0x%"PRIx64" prp2 0x%"PRIx64" num_prps %d"
++pci_nvme_map_sgl(uint16_t cid, uint8_t typ, uint64_t len) "cid %"PRIu16" type 0x%"PRIx8" len %"PRIu64""
+ pci_nvme_io_cmd(uint16_t cid, uint32_t nsid, uint16_t sqid, uint8_t opcode, const char *opname) "cid %"PRIu16" nsid %"PRIu32" sqid %"PRIu16" opc 0x%"PRIx8" opname '%s'"
+ pci_nvme_admin_cmd(uint16_t cid, uint16_t sqid, uint8_t opcode, const char *opname) "cid %"PRIu16" sqid %"PRIu16" opc 0x%"PRIx8" opname '%s'"
+ pci_nvme_rw(uint16_t cid, const char *verb, uint32_t nlb, uint64_t count, uint64_t lba) "cid %"PRIu16" '%s' nlb %"PRIu32" count %"PRIu64" lba 0x%"PRIx64""
+@@ -90,6 +91,9 @@ pci_nvme_err_mdts(uint16_t cid, size_t len) "cid %"PRIu16" len %zu"
+ pci_nvme_err_addr_read(uint64_t addr) "addr 0x%"PRIx64""
+ pci_nvme_err_addr_write(uint64_t addr) "addr 0x%"PRIx64""
+ pci_nvme_err_aio(uint16_t cid, const char *errname, uint16_t status) "cid %"PRIu16" err '%s' status 0x%"PRIx16""
++pci_nvme_err_invalid_sgld(uint16_t cid, uint8_t typ) "cid %"PRIu16" type 0x%"PRIx8""
++pci_nvme_err_invalid_num_sgld(uint16_t cid, uint8_t typ) "cid %"PRIu16" type 0x%"PRIx8""
++pci_nvme_err_invalid_sgl_excess_length(uint16_t cid) "cid %"PRIu16""
+ pci_nvme_err_invalid_dma(void) "PRP/SGL is too small for transfer size"
+ pci_nvme_err_invalid_prplist_ent(uint64_t prplist) "PRP list entry is null or not page aligned: 0x%"PRIx64""
+ pci_nvme_err_invalid_prp2_align(uint64_t prp2) "PRP2 is not page aligned: 0x%"PRIx64""
 -- 
-2.26.2
+2.28.0
 
 
