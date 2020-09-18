@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D17D4C43463
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 19:26:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35D4CC43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 19:26:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46156208DB
+	by mail.kernel.org (Postfix) with ESMTPS id C069522208
 	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 19:26:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ql8amN+x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46156208DB
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rZuYZr4P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C069522208
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJM23-0001ZK-Ce
+	id 1kJM23-0001a5-VI
 	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 15:26:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48766)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48200)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kJLI7-0000uI-9o
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:39:27 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:33132)
+ id 1kJLHK-0000LM-0e
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:38:38 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:36451)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kJLHo-0007DQ-7J
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:39:23 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id md22so4604441pjb.0
- for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 11:39:05 -0700 (PDT)
+ id 1kJLHG-000793-On
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:38:37 -0400
+Received: by mail-pg1-x542.google.com with SMTP id f2so3990380pgd.3
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 11:38:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=tpgwU+O2Pyt/u4rQ1PaoM0R+miZyXm0Qzr3tAtW7L6c=;
- b=Ql8amN+xWtuJhkPjoOXWPeOMnsejcjZJtsBpVEVjwfAGbata+yob1JQv16IaGld45x
- Qb3de2irou0ZZL+WR7e/y6mrs/9/VwKoeW4rePjalii5bEgApG7sIiLK3d6rD1fpMGRU
- dWiC1kT5KcbdyVihov9fo2l2HKMMWZW7OzcK76mAhV0zV1yrqMYHRSp0wxCxOTs+5G+w
- EKtui3HcZX3aT6mo4CzFkleFL7DesUWAtfTnnx1BPgbXZIlHfSoIw//v6bAc5TQqdxK1
- uBWudgFEHTpSKxKvKfeViiXqa3yygeFxIS1erD95qjcN2Hxt7eBxLKNq4Oq/tL6Y/bT1
- u0pg==
+ bh=sw3fn0l1rQhTFIrGVphb8kkMpbmZh0rgVNt+StOMsvU=;
+ b=rZuYZr4PtyjCIVZnT5OT69edQLdxT/ZuDmKUvVuLOGM+IjeJatHK1Y2FuBhOryXG2O
+ a6n5fbqarRCtusN5AXthxZpXG89+abgHYaf3kKKWVPJRZGcG/WmeMiep8r2XSPJmW1XF
+ XpZqETfgmNFPS1v/k5U5oWAWPOE8lurINxTvwb96kIl8AHxXximmhn2bCCEtXNeDvX+m
+ AB49Ht4+x5tHjSqAzSMElS1PbQPr5Ruw0B2vSFxx0y7iT0r+iAiUblmbJDKIWm9cngoi
+ idU4fk3tX/Vn/+SeaUyjWitqZ7abtxDp2+GkGGtPU/XvpNiMV3FLxHoPno6qXtR4q9Si
+ yK9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=tpgwU+O2Pyt/u4rQ1PaoM0R+miZyXm0Qzr3tAtW7L6c=;
- b=bKpP+Kxr+PFYTQmiIOXjLx7caQNyYDPbisqyycaIe3T5xmZHV6wdsSwD4AopZBIgBp
- 86q3t4ZUzGiGuaw5N3Oqw+Ia6qUB9BQJfZaDaWjB7fEzuESO6ERb43Bfipu0sdqtvp7K
- O0ivORgVu7E3Oz+hDwq1WJiNfCE63bzfMe9vVDZxMFQSmATggk90VGcmbcJ/rWYfAC4u
- 9Xw+rejLDM5VT4Wit1VvHeeY8+/MRDJWBtHUk4QnL5kZWG/riaP5FmBk2m9AlRSJ9kRQ
- mGJHvTC9rpFF//d8axfVqipnha8QezPYR7MmpP/qanLZZoMA1BRDAyXzYVg8bT5xrHnO
- KkKA==
-X-Gm-Message-State: AOAM530l9Mjem5qLkv2smb32fb0HCvvfeenOUyyeHzdovUtsQ7tl9db9
- sphlMcOmkg8ODHNBvxQr3ge8qkgrduNeDw==
-X-Google-Smtp-Source: ABdhPJwaagueNwgQmf5LdgaXYAVZBEN80kU4itwiVW8562wFKNB+4GAo+E7B57evy8cSBrUSlxBV6g==
-X-Received: by 2002:a17:90a:ea09:: with SMTP id
- w9mr13600298pjy.203.1600454344420; 
- Fri, 18 Sep 2020 11:39:04 -0700 (PDT)
+ bh=sw3fn0l1rQhTFIrGVphb8kkMpbmZh0rgVNt+StOMsvU=;
+ b=Nui3Ot9i3/t1VNmc7yYggOqtOJsD8zAa0EROF6+YcqaivP8kwVnAoPVRH/8Rq2F/+U
+ Zd68NKUvztVw3DXTFo3NQL0WDID5Icf5P2IoobguNiFaKhJiNkvHckKv+SV414sJg/fB
+ CkgJ5so8YWyQk+7H0mv2ohkAnPFDQUYVaAS8UkTcF1BfW4wELvErxpyPM2Xk5w1LOmvX
+ cKzcXUZGi4IrLrgMMAw0wr07D9oO4MI+jAkXGevgybn/ILSrt534srGuWFbhMHn2Y8zQ
+ qCF0jhujDWhpfShZPk3cMESyBDco+EBq/Wi6tIkxSOVD4I1zThzPgaqZDVkocNTPgoho
+ 1hMg==
+X-Gm-Message-State: AOAM532tkfSnP9AIMNAm2nr58T+U3uCWdLTrx6wYswOhdkEpozkBD4HB
+ XrMvgFBpFN3mnVAMlktpSAZo6z6M0XIY8Q==
+X-Google-Smtp-Source: ABdhPJyrBEKXnUhxc2JJOKfaP5y1AX21Gb+BkZdVybR/ovZP0jBTR3vCSe9dfcR4eS4jnzfAXxjnSA==
+X-Received: by 2002:aa7:99c2:0:b029:142:440b:fa28 with SMTP id
+ v2-20020aa799c20000b0290142440bfa28mr14540611pfi.30.1600454313028; 
+ Fri, 18 Sep 2020 11:38:33 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id f4sm3680723pfj.147.2020.09.18.11.39.02
+ by smtp.gmail.com with ESMTPSA id f4sm3680723pfj.147.2020.09.18.11.38.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Sep 2020 11:39:03 -0700 (PDT)
+ Fri, 18 Sep 2020 11:38:32 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 54/81] target/arm: Split out formats for 3 vectors + 1 index
-Date: Fri, 18 Sep 2020 11:37:24 -0700
-Message-Id: <20200918183751.2787647-55-richard.henderson@linaro.org>
+Subject: [PATCH v3 30/81] target/arm: Implement SVE2 SQSHRUN, SQRSHRUN
+Date: Fri, 18 Sep 2020 11:37:00 -0700
+Message-Id: <20200918183751.2787647-31-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200918183751.2787647-1-richard.henderson@linaro.org>
 References: <20200918183751.2787647-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1044.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,150 +105,218 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Used by FMLA and DOT, but will shortly be used more.
-Split FMLA from FMLS to avoid an extra sub field;
-similarly for SDOT from UDOT.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/sve.decode      | 29 +++++++++++++++++++----------
- target/arm/translate-sve.c | 38 ++++++++++++++++++++++++++++----------
- 2 files changed, 47 insertions(+), 20 deletions(-)
+ target/arm/helper-sve.h    | 16 +++++++
+ target/arm/sve.decode      |  4 ++
+ target/arm/sve_helper.c    | 35 ++++++++++++++
+ target/arm/translate-sve.c | 98 ++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 153 insertions(+)
 
+diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
+index f4bf3f9a40..8ca99b5c3c 100644
+--- a/target/arm/helper-sve.h
++++ b/target/arm/helper-sve.h
+@@ -2460,6 +2460,22 @@ DEF_HELPER_FLAGS_3(sve2_rshrnt_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_3(sve2_rshrnt_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_3(sve2_rshrnt_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+ 
++DEF_HELPER_FLAGS_3(sve2_sqshrunb_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve2_sqshrunb_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve2_sqshrunb_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_3(sve2_sqshrunt_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve2_sqshrunt_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve2_sqshrunt_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_3(sve2_sqrshrunb_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve2_sqrshrunb_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve2_sqrshrunb_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_3(sve2_sqrshrunt_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve2_sqrshrunt_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve2_sqrshrunt_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++
+ DEF_HELPER_FLAGS_6(sve2_faddp_zpzz_h, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_6(sve2_faddp_zpzz_s, TCG_CALL_NO_RWG,
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index a121e55f07..ea6ec5f198 100644
+index 7cc4b6cc43..cade628cfd 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -73,6 +73,7 @@
- &rprr_s         rd pg rn rm s
- &rprr_esz       rd pg rn rm esz
- &rrrr_esz       rd ra rn rm esz
-+&rrxr_esz       rd rn rm ra index esz
- &rprrr_esz      rd pg rn rm ra esz
- &rpri_esz       rd pg rn imm esz
- &ptrue          rd esz pat s
-@@ -254,6 +255,14 @@
- @rrx_d          ........ 11 . index:1 rm:4 ...... rn:5 rd:5 \
-                 &rrx_esz esz=3
+@@ -1288,6 +1288,10 @@ SQXTUNT         01000101 .. 1 ..... 010 101 ..... .....  @rd_rn_tszimm_shl
+ ## SVE2 bitwise shift right narrow
  
-+# Three registers and a scalar by index
-+@rrxr_h         ........ 0. . ..      rm:3 ...... rn:5 rd:5 \
-+                &rrxr_esz ra=%reg_movprfx index=%index3_22_19 esz=1
-+@rrxr_s         ........ 10 . index:2 rm:3 ...... rn:5 rd:5 \
-+                &rrxr_esz ra=%reg_movprfx esz=2
-+@rrxr_d         ........ 11 . index:1 rm:4 ...... rn:5 rd:5 \
-+                &rrxr_esz ra=%reg_movprfx esz=3
+ # Bit 23 == 0 is handled by esz > 0 in the translator.
++SQSHRUNB        01000101 .. 1 ..... 00 0000 ..... .....  @rd_rn_tszimm_shr
++SQSHRUNT        01000101 .. 1 ..... 00 0001 ..... .....  @rd_rn_tszimm_shr
++SQRSHRUNB       01000101 .. 1 ..... 00 0010 ..... .....  @rd_rn_tszimm_shr
++SQRSHRUNT       01000101 .. 1 ..... 00 0011 ..... .....  @rd_rn_tszimm_shr
+ SHRNB           01000101 .. 1 ..... 00 0100 ..... .....  @rd_rn_tszimm_shr
+ SHRNT           01000101 .. 1 ..... 00 0101 ..... .....  @rd_rn_tszimm_shr
+ RSHRNB          01000101 .. 1 ..... 00 0110 ..... .....  @rd_rn_tszimm_shr
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index 27907ed1a5..df324f0498 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -1873,6 +1873,16 @@ static inline uint64_t do_urshr(uint64_t x, unsigned sh)
+     }
+ }
+ 
++static inline int64_t do_srshr(int64_t x, unsigned sh)
++{
++    if (likely(sh < 64)) {
++        return (x >> sh) + ((x >> (sh - 1)) & 1);
++    } else {
++        /* Rounding the sign bit always produces 0. */
++        return 0;
++    }
++}
 +
- ###########################################################################
- # Instruction patterns.  Grouped according to the SVE encodingindex.xhtml.
+ DO_ZPZI(sve_asr_zpzi_b, int8_t, H1, DO_SHR)
+ DO_ZPZI(sve_asr_zpzi_h, int16_t, H1_2, DO_SHR)
+ DO_ZPZI(sve_asr_zpzi_s, int32_t, H1_4, DO_SHR)
+@@ -1935,6 +1945,31 @@ DO_SHRNT(sve2_rshrnt_h, uint16_t, uint8_t, H1_2, H1, do_urshr)
+ DO_SHRNT(sve2_rshrnt_s, uint32_t, uint16_t, H1_4, H1_2, do_urshr)
+ DO_SHRNT(sve2_rshrnt_d, uint64_t, uint32_t,     , H1_4, do_urshr)
  
-@@ -769,10 +778,10 @@ DOT_zzzz        01000100 1 sz:1 0 rm:5 00000 u:1 rn:5 rd:5 \
-                 ra=%reg_movprfx
- 
- # SVE integer dot product (indexed)
--DOT_zzxw        01000100 101 index:2 rm:3 00000 u:1 rn:5 rd:5 \
--                sz=0 ra=%reg_movprfx
--DOT_zzxw        01000100 111 index:1 rm:4 00000 u:1 rn:5 rd:5 \
--                sz=1 ra=%reg_movprfx
-+SDOT_zzxw_s     01000100 .. 1 ..... 000000 ..... .....          @rrxr_s
-+SDOT_zzxw_d     01000100 .. 1 ..... 000000 ..... .....          @rrxr_d
-+UDOT_zzxw_s     01000100 .. 1 ..... 000001 ..... .....          @rrxr_s
-+UDOT_zzxw_d     01000100 .. 1 ..... 000001 ..... .....          @rrxr_d
- 
- # SVE floating-point complex add (predicated)
- FCADD           01100100 esz:2 00000 rot:1 100 pg:3 rm:5 rd:5 \
-@@ -791,12 +800,12 @@ FCMLA_zzxz      01100100 11 1 index:1 rm:4 0001 rot:2 rn:5 rd:5 \
- ### SVE FP Multiply-Add Indexed Group
- 
- # SVE floating-point multiply-add (indexed)
--FMLA_zzxz       01100100 0.1 .. rm:3 00000 sub:1 rn:5 rd:5 \
--                ra=%reg_movprfx index=%index3_22_19 esz=1
--FMLA_zzxz       01100100 101 index:2 rm:3 00000 sub:1 rn:5 rd:5 \
--                ra=%reg_movprfx esz=2
--FMLA_zzxz       01100100 111 index:1 rm:4 00000 sub:1 rn:5 rd:5 \
--                ra=%reg_movprfx esz=3
-+FMLA_zzxz       01100100 .. 1 ..... 000000 ..... .....  @rrxr_h
-+FMLA_zzxz       01100100 .. 1 ..... 000000 ..... .....  @rrxr_s
-+FMLA_zzxz       01100100 .. 1 ..... 000000 ..... .....  @rrxr_d
-+FMLS_zzxz       01100100 .. 1 ..... 000001 ..... .....  @rrxr_h
-+FMLS_zzxz       01100100 .. 1 ..... 000001 ..... .....  @rrxr_s
-+FMLS_zzxz       01100100 .. 1 ..... 000001 ..... .....  @rrxr_d
- 
- ### SVE FP Multiply Indexed Group
++#define DO_SQSHRUN_H(x, sh) do_sat_bhs((int64_t)(x) >> sh, 0, UINT8_MAX)
++#define DO_SQSHRUN_S(x, sh) do_sat_bhs((int64_t)(x) >> sh, 0, UINT16_MAX)
++#define DO_SQSHRUN_D(x, sh) \
++    do_sat_bhs((int64_t)(x) >> (sh < 64 ? sh : 63), 0, UINT32_MAX)
++
++DO_SHRNB(sve2_sqshrunb_h, int16_t, uint8_t, DO_SQSHRUN_H)
++DO_SHRNB(sve2_sqshrunb_s, int32_t, uint16_t, DO_SQSHRUN_S)
++DO_SHRNB(sve2_sqshrunb_d, int64_t, uint32_t, DO_SQSHRUN_D)
++
++DO_SHRNT(sve2_sqshrunt_h, int16_t, uint8_t, H1_2, H1, DO_SQSHRUN_H)
++DO_SHRNT(sve2_sqshrunt_s, int32_t, uint16_t, H1_4, H1_2, DO_SQSHRUN_S)
++DO_SHRNT(sve2_sqshrunt_d, int64_t, uint32_t,     , H1_4, DO_SQSHRUN_D)
++
++#define DO_SQRSHRUN_H(x, sh) do_sat_bhs(do_srshr(x, sh), 0, UINT8_MAX)
++#define DO_SQRSHRUN_S(x, sh) do_sat_bhs(do_srshr(x, sh), 0, UINT16_MAX)
++#define DO_SQRSHRUN_D(x, sh) do_sat_bhs(do_srshr(x, sh), 0, UINT32_MAX)
++
++DO_SHRNB(sve2_sqrshrunb_h, int16_t, uint8_t, DO_SQRSHRUN_H)
++DO_SHRNB(sve2_sqrshrunb_s, int32_t, uint16_t, DO_SQRSHRUN_S)
++DO_SHRNB(sve2_sqrshrunb_d, int64_t, uint32_t, DO_SQRSHRUN_D)
++
++DO_SHRNT(sve2_sqrshrunt_h, int16_t, uint8_t, H1_2, H1, DO_SQRSHRUN_H)
++DO_SHRNT(sve2_sqrshrunt_s, int32_t, uint16_t, H1_4, H1_2, DO_SQRSHRUN_S)
++DO_SHRNT(sve2_sqrshrunt_d, int64_t, uint32_t,     , H1_4, DO_SQRSHRUN_D)
++
+ #undef DO_SHRNB
+ #undef DO_SHRNT
  
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 10200f0207..7c50298302 100644
+index ad31066296..3751544e95 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -3817,26 +3817,34 @@ static bool trans_DOT_zzzz(DisasContext *s, arg_DOT_zzzz *a)
-     return true;
+@@ -6868,6 +6868,104 @@ static bool trans_RSHRNT(DisasContext *s, arg_rri_esz *a)
+     return do_sve2_shr_narrow(s, a, ops);
  }
  
--static bool trans_DOT_zzxw(DisasContext *s, arg_DOT_zzxw *a)
-+static bool do_zzxz_ool(DisasContext *s, arg_rrxr_esz *a,
-+                        gen_helper_gvec_4 *fn)
- {
--    static gen_helper_gvec_4 * const fns[2][2] = {
--        { gen_helper_gvec_sdot_idx_b, gen_helper_gvec_sdot_idx_h },
--        { gen_helper_gvec_udot_idx_b, gen_helper_gvec_udot_idx_h }
--    };
--
-+    if (fn == NULL) {
-+        return false;
-+    }
-     if (sve_access_check(s)) {
--        gen_gvec_ool_zzzz(s, fns[a->u][a->sz], a->rd, a->rn, a->rm,
--                          a->ra, a->index);
-+        gen_gvec_ool_zzzz(s, fn, a->rd, a->rn, a->rm, a->ra, a->index);
-     }
-     return true;
- }
- 
-+#define DO_RRXR(NAME, FUNC) \
-+    static bool NAME(DisasContext *s, arg_rrxr_esz *a)  \
-+    { return do_zzxz_ool(s, a, FUNC); }
-+
-+DO_RRXR(trans_SDOT_zzxw_s, gen_helper_gvec_sdot_idx_b)
-+DO_RRXR(trans_SDOT_zzxw_d, gen_helper_gvec_sdot_idx_h)
-+DO_RRXR(trans_UDOT_zzxw_s, gen_helper_gvec_udot_idx_b)
-+DO_RRXR(trans_UDOT_zzxw_d, gen_helper_gvec_udot_idx_h)
-+
-+#undef DO_RRXR
- 
- /*
-  *** SVE Floating Point Multiply-Add Indexed Group
-  */
- 
--static bool trans_FMLA_zzxz(DisasContext *s, arg_FMLA_zzxz *a)
-+static bool do_FMLA_zzxz(DisasContext *s, arg_rrxr_esz *a, bool sub)
- {
-     static gen_helper_gvec_4_ptr * const fns[3] = {
-         gen_helper_gvec_fmla_idx_h,
-@@ -3851,13 +3859,23 @@ static bool trans_FMLA_zzxz(DisasContext *s, arg_FMLA_zzxz *a)
-                            vec_full_reg_offset(s, a->rn),
-                            vec_full_reg_offset(s, a->rm),
-                            vec_full_reg_offset(s, a->ra),
--                           status, vsz, vsz, (a->index << 1) | a->sub,
-+                           status, vsz, vsz, (a->index << 1) | sub,
-                            fns[a->esz - 1]);
-         tcg_temp_free_ptr(status);
-     }
-     return true;
- }
- 
-+static bool trans_FMLA_zzxz(DisasContext *s, arg_FMLA_zzxz *a)
++static void gen_sqshrunb_vec(unsigned vece, TCGv_vec d,
++                             TCGv_vec n, int64_t shr)
 +{
-+    return do_FMLA_zzxz(s, a, false);
++    TCGv_vec t = tcg_temp_new_vec_matching(d);
++    int halfbits = 4 << vece;
++
++    tcg_gen_sari_vec(vece, n, n, shr);
++    tcg_gen_dupi_vec(vece, t, 0);
++    tcg_gen_smax_vec(vece, n, n, t);
++    tcg_gen_dupi_vec(vece, t, MAKE_64BIT_MASK(0, halfbits));
++    tcg_gen_umin_vec(vece, d, n, t);
++    tcg_temp_free_vec(t);
 +}
 +
-+static bool trans_FMLS_zzxz(DisasContext *s, arg_FMLA_zzxz *a)
++static bool trans_SQSHRUNB(DisasContext *s, arg_rri_esz *a)
 +{
-+    return do_FMLA_zzxz(s, a, true);
++    static const TCGOpcode vec_list[] = {
++        INDEX_op_sari_vec, INDEX_op_smax_vec, INDEX_op_umin_vec, 0
++    };
++    static const GVecGen2i ops[3] = {
++        { .fniv = gen_sqshrunb_vec,
++          .opt_opc = vec_list,
++          .fno = gen_helper_sve2_sqshrunb_h,
++          .vece = MO_16 },
++        { .fniv = gen_sqshrunb_vec,
++          .opt_opc = vec_list,
++          .fno = gen_helper_sve2_sqshrunb_s,
++          .vece = MO_32 },
++        { .fniv = gen_sqshrunb_vec,
++          .opt_opc = vec_list,
++          .fno = gen_helper_sve2_sqshrunb_d,
++          .vece = MO_64 },
++    };
++    return do_sve2_shr_narrow(s, a, ops);
 +}
 +
- /*
-  *** SVE Floating Point Multiply Indexed Group
-  */
++static void gen_sqshrunt_vec(unsigned vece, TCGv_vec d,
++                             TCGv_vec n, int64_t shr)
++{
++    TCGv_vec t = tcg_temp_new_vec_matching(d);
++    int halfbits = 4 << vece;
++
++    tcg_gen_sari_vec(vece, n, n, shr);
++    tcg_gen_dupi_vec(vece, t, 0);
++    tcg_gen_smax_vec(vece, n, n, t);
++    tcg_gen_dupi_vec(vece, t, MAKE_64BIT_MASK(0, halfbits));
++    tcg_gen_umin_vec(vece, n, n, t);
++    tcg_gen_shli_vec(vece, n, n, halfbits);
++    tcg_gen_bitsel_vec(vece, d, t, d, n);
++    tcg_temp_free_vec(t);
++}
++
++static bool trans_SQSHRUNT(DisasContext *s, arg_rri_esz *a)
++{
++    static const TCGOpcode vec_list[] = {
++        INDEX_op_shli_vec, INDEX_op_sari_vec,
++        INDEX_op_smax_vec, INDEX_op_umin_vec, 0
++    };
++    static const GVecGen2i ops[3] = {
++        { .fniv = gen_sqshrunt_vec,
++          .opt_opc = vec_list,
++          .load_dest = true,
++          .fno = gen_helper_sve2_sqshrunt_h,
++          .vece = MO_16 },
++        { .fniv = gen_sqshrunt_vec,
++          .opt_opc = vec_list,
++          .load_dest = true,
++          .fno = gen_helper_sve2_sqshrunt_s,
++          .vece = MO_32 },
++        { .fniv = gen_sqshrunt_vec,
++          .opt_opc = vec_list,
++          .load_dest = true,
++          .fno = gen_helper_sve2_sqshrunt_d,
++          .vece = MO_64 },
++    };
++    return do_sve2_shr_narrow(s, a, ops);
++}
++
++static bool trans_SQRSHRUNB(DisasContext *s, arg_rri_esz *a)
++{
++    static const GVecGen2i ops[3] = {
++        { .fno = gen_helper_sve2_sqrshrunb_h },
++        { .fno = gen_helper_sve2_sqrshrunb_s },
++        { .fno = gen_helper_sve2_sqrshrunb_d },
++    };
++    return do_sve2_shr_narrow(s, a, ops);
++}
++
++static bool trans_SQRSHRUNT(DisasContext *s, arg_rri_esz *a)
++{
++    static const GVecGen2i ops[3] = {
++        { .fno = gen_helper_sve2_sqrshrunt_h },
++        { .fno = gen_helper_sve2_sqrshrunt_s },
++        { .fno = gen_helper_sve2_sqrshrunt_d },
++    };
++    return do_sve2_shr_narrow(s, a, ops);
++}
++
+ static bool do_sve2_zpzz_fp(DisasContext *s, arg_rprr_esz *a,
+                             gen_helper_gvec_4_ptr *fn)
+ {
 -- 
 2.25.1
 
