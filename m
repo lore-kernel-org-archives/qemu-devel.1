@@ -2,81 +2,80 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EB4CC43463
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 15:13:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5747C43463
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 15:13:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B881E2388B
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 15:13:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 36DA52388B
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 15:13:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UQIiQBY4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B881E2388B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EzC0eOtK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36DA52388B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJI4w-0005tl-Fn
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 11:13:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47326)
+	id 1kJI55-0006Ap-1H
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 11:13:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47606)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kJHxo-0006V4-US
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 11:06:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50180)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kJHyR-0006x6-Ai
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 11:06:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24508)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kJHxl-0000Xs-Ay
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 11:06:16 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kJHyP-0000dP-DP
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 11:06:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600441568;
+ s=mimecast20190719; t=1600441612;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=XM7OAmXTOk6Dn4Gfks418JOy4EEvHfub5qqdEwcobzE=;
- b=UQIiQBY4LSGWsR3Sm8O6xKLWsweA+sKYwgK8K7Hdi7+JL2kDpagP/hoquxJs6bb/Y2PiUd
- QSrigaMukSus2CpieYkaC8gvW2YbPHhQAXYm6H6DMaZ7Q/ETSmJgnU6ikQUWJmSRQdmSIw
- 72krfuboQ+uYjyFMA0+8Upo6Sh11vI8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-213-ysKByWEkM4GkSNGHuGr5Bg-1; Fri, 18 Sep 2020 11:06:06 -0400
-X-MC-Unique: ysKByWEkM4GkSNGHuGr5Bg-1
-Received: by mail-wr1-f70.google.com with SMTP id v12so2240930wrm.9
- for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 08:06:06 -0700 (PDT)
+ bh=GXFOFA+oBpG8V2C34lkq5FMQCHgmci5cClagY+iuF1U=;
+ b=EzC0eOtK0emP6KjIi+Ji41am71NNu2xK/sM9Ox0NljoV+t4cyF+/a3q8o8//sjyzQW0EjE
+ altX+1twg7bLbmQLlV/EvWKgZiugXnkqfJCmsFJo5BUxRZJQs1XlCcRCn/1qccEz2/Eaa8
+ 8ECjFKECyI3SwN+TijP7DL4rMsb9pbQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-315-RMMAhg7aMZOvbmL5MBXrAw-1; Fri, 18 Sep 2020 11:06:50 -0400
+X-MC-Unique: RMMAhg7aMZOvbmL5MBXrAw-1
+Received: by mail-wr1-f72.google.com with SMTP id j7so2245336wro.14
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 08:06:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=XM7OAmXTOk6Dn4Gfks418JOy4EEvHfub5qqdEwcobzE=;
- b=LuGVXhhAX8fXXOk3PNsxF0Xrlhy/5DuUX/EBZlREIYL0tTj7bCfm2yDLxvvYKqS0M5
- 1MvYnbVu64wXp8XYfLlntWo2tazKpj1AwFVzjzMpfUK+fJ3q6B0NR5j5YznfqjLE3uIl
- QXd+BkEd8W7wiVenrjc7h1ddxh4G+EiMpze/z+KoxqEwY/TQLhER9TLfNR33OM+5Ujyr
- gPqSLmP2PmqsZwIHZT7W4bA8g2c0AQ7LOgZrc8Y+m0NzpiwKWcRKf2tpxWFBbIoXljvP
- m7tRV/bboTVdrzZNAbVT+CKIB/GHdMzn3JXLhQ1t9PU6m3+/UA/wGNBdgEkSP4O8EDw3
- n+Bw==
-X-Gm-Message-State: AOAM530xWPOVvA1PUnjBopZ7ifUUkl0T0DqGhiZxfHV5i4B0FGGYtmaC
- mqDTE2QE+3/0906HujsJQ+y2+RvwXzThwfIvW/m/lJvIvPSPb5cCGGtKFkvoW2RWU4jVd9BBUQ7
- jMKK/zFBB4KZfOCg=
-X-Received: by 2002:a1c:3b09:: with SMTP id i9mr15605302wma.43.1600441564895; 
- Fri, 18 Sep 2020 08:06:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzarNa7A1XKUaJ941x5tw5No7cgXMhPmdDp3XgFKqUe7eiisf9aKzOIc+0+Q8yPlGLmqEvlww==
-X-Received: by 2002:a1c:3b09:: with SMTP id i9mr15605274wma.43.1600441564683; 
- Fri, 18 Sep 2020 08:06:04 -0700 (PDT)
+ bh=GXFOFA+oBpG8V2C34lkq5FMQCHgmci5cClagY+iuF1U=;
+ b=N3khXPbmOJ+oIwoBRxKZCoT8HQ2mfe2Tejf+/ypjKRDkASwClJdIrSHNPEMgzkW+oM
+ u0kLcQKnOvvdAkKFhAu7OlrQK63mqIAjc3o3zp7PKRuRDp6hAzDqAE+3etIOscfP3H0e
+ pfoSytM2pzwQJRZ7X46JrmK19nChS1CIL0NY5s+SHjS0Hba8q8ljanu+BatHi+tywr5h
+ u3Tymp0V/OUcQS1QOgOt7IepBk4N/6s45jIULVW/c+60Fg7v1XzGGLzlckfqrAdaC1TK
+ AfXJdc9W/UeoDIE6Cthhqxn5xM7/avel6EjEXRWL/Gyn/FIvGJ7DOsYm682cbVD9cAza
+ uUiw==
+X-Gm-Message-State: AOAM530O7TqiQVFEw1y+Mhm0rq12CncKyDXqhoXdwet2/xpA06l1ccB6
+ w3o+OdVfdjCt5VBeeoosim/ozxho97qQ+g9Fadt/PAQMzVe3ELO1H1iJUTcYZ5HTq2NrCY6Q2wW
+ dUgsYzYcbmA3Cy9Q=
+X-Received: by 2002:a1c:2cc4:: with SMTP id s187mr15743475wms.36.1600441609289; 
+ Fri, 18 Sep 2020 08:06:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyobroxkjxSyRPfY0xq3dAz97S1DxoqD5CcSCMwxo9YoUx6unIWVd0Vw9ep1uhi81SKIgF3Bg==
+X-Received: by 2002:a1c:2cc4:: with SMTP id s187mr15743453wms.36.1600441609086; 
+ Fri, 18 Sep 2020 08:06:49 -0700 (PDT)
 Received: from redhat.com (bzq-109-65-116-225.red.bezeqint.net.
  [109.65.116.225])
- by smtp.gmail.com with ESMTPSA id d83sm5668107wmf.23.2020.09.18.08.06.02
+ by smtp.gmail.com with ESMTPSA id 92sm5978638wra.19.2020.09.18.08.06.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Sep 2020 08:06:04 -0700 (PDT)
-Date: Fri, 18 Sep 2020 11:06:02 -0400
+ Fri, 18 Sep 2020 08:06:48 -0700 (PDT)
+Date: Fri, 18 Sep 2020 11:06:47 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/15] pc: fix
- auto_enable_numa_with_memhp/auto_enable_numa_with_memdev for the 5.0 machine
-Message-ID: <20200918150506.286890-6-mst@redhat.com>
+Subject: [PULL 03/15] vhost-vdpa: batch updating IOTLB mappings
+Message-ID: <20200918150506.286890-4-mst@redhat.com>
 References: <20200918150506.286890-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200918150506.286890-1-mst@redhat.com>
@@ -111,50 +110,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>,
- qemu-stable@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200918150647.boSYrJ3UuQnOZLQVEtRd5UNASEPsIdC1thwH9BRxVro@z>
 
-From: David Hildenbrand <david@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
 
-Unfortunately, a typo sneeked in: we want to set
-auto_enable_numa_with_memdev to false, not auto_enable_numa_with_memhp.
+To speed up the memory mapping updating between vhost-vDPA and vDPA
+device driver, this patch passes the IOTLB batching flags via IOTLB
+API. Two new flags was introduced, VHOST_IOTLB_BATCH_BEGIN is a hint
+that a bathced IOTLB updating may be initiated from the
+userspace. VHOST_IOTLB_BATCH_END is a hint that userspace has finished
+the updating:
 
-Cc: qemu-stable@nongnu.org # v5.1
-Fixes: 195784a0cfad (numa: Auto-enable NUMA when any memory devices are possible)
-Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20200820094828.30348-1-david@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+VHOST_IOTLB_BATCH_BEGIN
+VHOST_IOTLB_UPDATE/VHOST_IOTLB_INVALIDATE
+...
+VHOST_IOTLB_BATCH_END
+
+Vhost-vDPA can then know that all mappings has been set and can do
+optimization like passing all the mappings to the vDPA device driver.
+
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+Message-Id: <20200907104903.31551-4-jasowang@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/pc_q35.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/hw/virtio/vhost-vdpa.h |  1 +
+ hw/virtio/vhost-vdpa.c         | 66 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 67 insertions(+)
 
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 0cb9c18cd4..b95759df60 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -382,7 +382,7 @@ static void pc_q35_5_0_machine_options(MachineClass *m)
-     m->numa_mem_supported = true;
-     compat_props_add(m->compat_props, hw_compat_5_0, hw_compat_5_0_len);
-     compat_props_add(m->compat_props, pc_compat_5_0, pc_compat_5_0_len);
--    m->auto_enable_numa_with_memhp = false;
-+    m->auto_enable_numa_with_memdev = false;
+diff --git a/include/hw/virtio/vhost-vdpa.h b/include/hw/virtio/vhost-vdpa.h
+index 6455663388..9b81a409da 100644
+--- a/include/hw/virtio/vhost-vdpa.h
++++ b/include/hw/virtio/vhost-vdpa.h
+@@ -18,6 +18,7 @@ typedef struct vhost_vdpa {
+     int device_fd;
+     uint32_t msg_type;
+     MemoryListener listener;
++    struct vhost_dev *dev;
+ } VhostVDPA;
+ 
+ extern AddressSpace address_space_memory;
+diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
+index 4580f3efd8..ba1ae3ea44 100644
+--- a/hw/virtio/vhost-vdpa.c
++++ b/hw/virtio/vhost-vdpa.c
+@@ -78,6 +78,46 @@ static int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, hwaddr iova,
+     return ret;
  }
  
- DEFINE_Q35_MACHINE(v5_0, "pc-q35-5.0", NULL,
++static void vhost_vdpa_listener_begin(MemoryListener *listener)
++{
++    struct vhost_vdpa *v = container_of(listener, struct vhost_vdpa, listener);
++    struct vhost_dev *dev = v->dev;
++    struct vhost_msg_v2 msg;
++    int fd = v->device_fd;
++
++    if (!(dev->backend_cap & (0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH))) {
++        return;
++    }
++
++    msg.type = v->msg_type;
++    msg.iotlb.type = VHOST_IOTLB_BATCH_BEGIN;
++
++    if (write(fd, &msg, sizeof(msg)) != sizeof(msg)) {
++        error_report("failed to write, fd=%d, errno=%d (%s)",
++                     fd, errno, strerror(errno));
++    }
++}
++
++static void vhost_vdpa_listener_commit(MemoryListener *listener)
++{
++    struct vhost_vdpa *v = container_of(listener, struct vhost_vdpa, listener);
++    struct vhost_dev *dev = v->dev;
++    struct vhost_msg_v2 msg;
++    int fd = v->device_fd;
++
++    if (!(dev->backend_cap & (0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH))) {
++        return;
++    }
++
++    msg.type = v->msg_type;
++    msg.iotlb.type = VHOST_IOTLB_BATCH_END;
++
++    if (write(fd, &msg, sizeof(msg)) != sizeof(msg)) {
++        error_report("failed to write, fd=%d, errno=%d (%s)",
++                     fd, errno, strerror(errno));
++    }
++}
++
+ static void vhost_vdpa_listener_region_add(MemoryListener *listener,
+                                            MemoryRegionSection *section)
+ {
+@@ -191,6 +231,8 @@ static void vhost_vdpa_listener_region_del(MemoryListener *listener,
+  * depends on the addnop().
+  */
+ static const MemoryListener vhost_vdpa_memory_listener = {
++    .begin = vhost_vdpa_listener_begin,
++    .commit = vhost_vdpa_listener_commit,
+     .region_add = vhost_vdpa_listener_region_add,
+     .region_del = vhost_vdpa_listener_region_del,
+ };
+@@ -226,6 +268,7 @@ static int vhost_vdpa_init(struct vhost_dev *dev, void *opaque)
+     assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_VDPA);
+ 
+     v = opaque;
++    v->dev = dev;
+     dev->opaque =  opaque ;
+     vhost_vdpa_call(dev, VHOST_GET_FEATURES, &features);
+     dev->backend_features = features;
+@@ -280,6 +323,28 @@ static int vhost_vdpa_set_features(struct vhost_dev *dev,
+     return !(status & VIRTIO_CONFIG_S_FEATURES_OK);
+ }
+ 
++static int vhost_vdpa_set_backend_cap(struct vhost_dev *dev)
++{
++    uint64_t features;
++    uint64_t f = 0x1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2 |
++        0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH;
++    int r;
++
++    if (vhost_vdpa_call(dev, VHOST_GET_BACKEND_FEATURES, &features)) {
++        return 0;
++    }
++
++    features &= f;
++    r = vhost_vdpa_call(dev, VHOST_SET_BACKEND_FEATURES, &features);
++    if (r) {
++        return 0;
++    }
++
++    dev->backend_cap = features;
++
++    return 0;
++}
++
+ int vhost_vdpa_get_device_id(struct vhost_dev *dev,
+                                    uint32_t *device_id)
+ {
+@@ -452,6 +517,7 @@ const VhostOps vdpa_ops = {
+         .vhost_set_vring_kick = vhost_vdpa_set_vring_kick,
+         .vhost_set_vring_call = vhost_vdpa_set_vring_call,
+         .vhost_get_features = vhost_vdpa_get_features,
++        .vhost_set_backend_cap = vhost_vdpa_set_backend_cap,
+         .vhost_set_owner = vhost_vdpa_set_owner,
+         .vhost_set_vring_endian = NULL,
+         .vhost_backend_memslots_limit = vhost_vdpa_memslots_limit,
 -- 
 MST
 
