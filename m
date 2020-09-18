@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7DE7C43464
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 20:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E477C43463
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 20:51:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB8DF221EC
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 20:49:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB8DF221EC
+	by mail.kernel.org (Postfix) with ESMTPS id 8A26A206A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 20:51:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A26A206A2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJNJl-0002dJ-PW
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 16:49:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46522)
+	id 1kJNLf-0003NV-Ev
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 16:51:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46382)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kJN7w-000596-Gb; Fri, 18 Sep 2020 16:37:04 -0400
-Received: from new1-smtp.messagingengine.com ([66.111.4.221]:48301)
+ id 1kJN7W-0004oE-1Z; Fri, 18 Sep 2020 16:36:38 -0400
+Received: from new1-smtp.messagingengine.com ([66.111.4.221]:50117)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kJN7u-0004zC-Uz; Fri, 18 Sep 2020 16:37:04 -0400
+ id 1kJN7U-0004xv-B7; Fri, 18 Sep 2020 16:36:37 -0400
 Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
- by mailnew.nyi.internal (Postfix) with ESMTP id A0F19580228;
- Fri, 18 Sep 2020 16:36:41 -0400 (EDT)
+ by mailnew.nyi.internal (Postfix) with ESMTP id 83BF1580219;
+ Fri, 18 Sep 2020 16:36:35 -0400 (EDT)
 Received: from mailfrontend2 ([10.202.2.163])
- by compute7.internal (MEProxy); Fri, 18 Sep 2020 16:36:41 -0400
+ by compute7.internal (MEProxy); Fri, 18 Sep 2020 16:36:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding; s=fm1; bh=NU3i7wZQJ1iMp
- 0eJQz5wKZXs58UpNvmKz/fJmjx6HEY=; b=T6Fyv5on5zjJi49aDrYZtXdlD3v48
- wJg3gWDuK/pDdU662Ei4vtgYBLduAiF9UvaqZRWbwI2misf5xLnz+CUSoyXpqxNw
- KZJIgD2cTrIcpdtkVDtZUfJTMjSejBPcbzXpjzWVUDwa9f6qZanfGbQtm+bQ1mb6
- fFsBu64bly2Os9QZb2/6+DiqU2walHjhQB2WA7YTJ8l7DhwkcradbVPjpAYHvqAb
- 9u1yMw3anV8SQk/O27TgyWx9Wh1iY2i8upRdOuZFrf26o2SyWrSC2HR8APmJ+rXu
- nbd09mrsXxI2g4mjt7sxwcCMK8YjE5brtjXvZaBN40zAPapesw0aCppAw==
+ :mime-version:content-transfer-encoding; s=fm1; bh=7wv89baT9qHbL
+ /ezIoIGzPoYiVwB/5EWHsOfYIG7Gjo=; b=Vp9qvyY4GeEMPoBQTlkgEGXpZV1aF
+ hYdpa3gZ3T4xGqFDVebcJt/1VU9vsf4IFwvQdeNdOnBnsiZLUcjDHu8E1DkJdY8t
+ ctOZL2fVmd+gyIZtuGWVaYUqByfULGvshlbAn5XuVZY3zw1Km7V4tSbHwlvh8ZJt
+ dVk3Fk9GhJ/zX9L601+E56pukTYwDkSwRF7fdFRwuoDc/0lLZ+m9VGRu0zhQ4poB
+ 72HdCBSpZUGg9MOkpn/+jPoXMXYW+NHFZb5ZkMQTERfvHy9qPNUPTxAwi546eoT8
+ /muTSc6NvQswtgQgT2gZIuMXBB43+GBxShnDEeLb4rcrIW1U1dT0x3Q2g==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
  messagingengine.com; h=cc:content-transfer-encoding:date:from
  :in-reply-to:message-id:mime-version:references:subject:to
  :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
- fm3; bh=NU3i7wZQJ1iMp0eJQz5wKZXs58UpNvmKz/fJmjx6HEY=; b=nLN+GYnt
- vNZzBOUCrHp/1t0XaR2s8H/PF/suBtaowSlhMW4VlEJuSWyZIOuXlG618tag6pmF
- MtmBdHqnIzGULVe5fiHix2B8g2NFewLwLKT5TloRhnrmvtE0xWxf4jmnQc8Wxtgc
- R9SGUfJAHPXID2l65WzhaBpXJ1bgyWMxdGDj/RP4c6VHKgwhU+KRz8ruGVTmp/hN
- RnXzEOmvou3PC6JuJQX0KQnf6rRaM4LdUx8MiPCW9FWSZ12ATZtR0p1vpbFQssYZ
- 5nkyDdwWU0/+LEtD0+vEUrJSpun0HKo/WUZmcUjtmPJtgWr7t+6kYL+7O9bcwdsQ
- PNXEp0ksf4AKmA==
-X-ME-Sender: <xms:WRplX3UvqTXclcUJ9FRqkzpIye0GG50cfBE0t-qovjGY1jCXqav-yQ>
- <xme:WRplX_luflcpESTos_BPPAtobrM677mj_kzH5O2YkiV1d3eSKC4HExyeGrgQjdB7b
- faBhcGv0hixDv5CYbM>
+ fm3; bh=7wv89baT9qHbL/ezIoIGzPoYiVwB/5EWHsOfYIG7Gjo=; b=ljGKo7bd
+ a+G42ihXC9FI96pjpKRKoNqaGODNTKRxUSjDjOSkeKSMaZ2Bl7n+WELd/YLMEqNu
+ CjbyITj367vbf581QBuGeybhf3pbRbZFhaH1yEgk3iQmvxEF3hDKt+JJrh6xBQis
+ 6Ir/1pmIUhdH4fn/IoYwxDWEchkpChJt3FbMFk3LmiPwk977N38eWGISqYxg/YLx
+ 6oWewpCZpU8NyJ8fgfvxWmd4sWPa3kSvaEqRwCq3iiS1YJMehH3QII4Vi6Gg3nfn
+ bKDRrnZSybq8ym5T96RVF7AOUXSmBY1sNrcGgFapWb8TkMKqdN3GPodxZ22yZN18
+ o114SVpyjzSE2w==
+X-ME-Sender: <xms:UxplX-L9HJU-nY10rtYBb4ozpwIsv90TZ-EjpeRROHXemJ_b8F-knQ>
+ <xme:UxplX2JBv9l0Tgdm4TJX4HipQGvWnMN9ZuiBWoc9N3y8jWctrByin_wcKkgMlYj8o
+ EsfS0z1Fpbp09y12tI>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrtdeigdduhedvucetufdoteggodetrfdotf
  fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
  uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
  cujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpefmlhgruhhs
  ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
  gvrhhnpeeuleetgeeiuefhgfekfefgveejiefgteekiedtgfdtieefhfdthfefueffvefg
- keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpeehne
+ keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedvne
  curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
-X-ME-Proxy: <xmx:WRplXzZOdQsaAh_yZsDUirUcRy2fLx35iazY5Boh7Q2xg3y-iKtsuw>
- <xmx:WRplXyU94nd1-3LyZGBdry68kpOb9Fwx6nYDzJVOqy3Fr8yIdxtUgw>
- <xmx:WRplXxkLo_6pwv7SWi2jhIjCoy5zh205Ksqu9y0FQhR7EchtJTLlzg>
- <xmx:WRplX3WpNc_qyFgt1rMihL8E-A0PebOdpjOY4EAO7ByKVbcKAguiNQ>
+X-ME-Proxy: <xmx:UxplX-s65cSH18969ZE0RJmAO5HUdE47N2MVeH9wxmD_vSgy-Q-7LQ>
+ <xmx:UxplXzakECiNhJ6S94un0C1sMMFJhhVrcjZU8uc40-5DeaPghj2eZw>
+ <xmx:UxplX1YzqnTkL2MPtI0vaQFgKGL44fSbKMnqcD2-LZ5duQ7EK-auKQ>
+ <xmx:UxplXx7o4xrFqdafUvwpwb5xmxIQZAcYmQoC5_eqZmHgyzTRtkZSxw>
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id F0A6E3064683;
- Fri, 18 Sep 2020 16:36:39 -0400 (EDT)
+ by mail.messagingengine.com (Postfix) with ESMTPA id D0665306467E;
+ Fri, 18 Sep 2020 16:36:33 -0400 (EDT)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 11/17] hw/block/nvme: harden cmb access
-Date: Fri, 18 Sep 2020 22:36:15 +0200
-Message-Id: <20200918203621.602915-12-its@irrelevant.dk>
+Subject: [PATCH v2 07/17] hw/block/nvme: fix endian conversion
+Date: Fri, 18 Sep 2020 22:36:11 +0200
+Message-Id: <20200918203621.602915-8-its@irrelevant.dk>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200918203621.602915-1-its@irrelevant.dk>
 References: <20200918203621.602915-1-its@irrelevant.dk>
@@ -117,36 +117,37 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Since the controller has only supported PRPs so far it has not been
-required to check the ending address (addr + len - 1) of the CMB access
-for validity since it has been guaranteed to be in range of the CMB.
-
-This changes when the controller adds support for SGLs (next patch), so
-add that check.
+The raw NLB field is a 16 bit value, so use le16_to_cpu instead of
+le32_to_cpu and cast to uint32_t before incrementing the value to not
+wrap around.
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 ---
- hw/block/nvme.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ hw/block/nvme.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 7e6cbd3f1058..a440f6617f70 100644
+index 62db87460413..32267a3e4782 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -142,7 +142,12 @@ static inline void *nvme_addr_to_cmb(NvmeCtrl *n, hwaddr addr)
- 
- static int nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
+@@ -645,7 +645,7 @@ static uint16_t nvme_write_zeroes(NvmeCtrl *n, NvmeRequest *req)
+     NvmeRwCmd *rw = (NvmeRwCmd *)&req->cmd;
+     NvmeNamespace *ns = req->ns;
+     uint64_t slba = le64_to_cpu(rw->slba);
+-    uint32_t nlb  = le16_to_cpu(rw->nlb) + 1;
++    uint32_t nlb = (uint32_t)le16_to_cpu(rw->nlb) + 1;
+     uint64_t offset = nvme_l2b(ns, slba);
+     uint32_t count = nvme_l2b(ns, nlb);
+     uint16_t status;
+@@ -669,7 +669,7 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeRequest *req)
  {
--    if (n->bar.cmbsz && nvme_addr_is_cmb(n, addr)) {
-+    hwaddr hi = addr + size - 1;
-+    if (hi < addr) {
-+        return 1;
-+    }
-+
-+    if (n->bar.cmbsz && nvme_addr_is_cmb(n, addr) && nvme_addr_is_cmb(n, hi)) {
-         memcpy(buf, nvme_addr_to_cmb(n, addr), size);
-         return 0;
-     }
+     NvmeRwCmd *rw = (NvmeRwCmd *)&req->cmd;
+     NvmeNamespace *ns = req->ns;
+-    uint32_t nlb  = le32_to_cpu(rw->nlb) + 1;
++    uint32_t nlb = (uint32_t)le16_to_cpu(rw->nlb) + 1;
+     uint64_t slba = le64_to_cpu(rw->slba);
+ 
+     uint64_t data_size = nvme_l2b(ns, nlb);
 -- 
 2.28.0
 
