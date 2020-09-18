@@ -2,73 +2,93 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-22.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09096C43464
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 15:40:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17C71C43463
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 15:40:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 862B1208DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 15:40:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 862B1208DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8FE0320789
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 15:40:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fb06HV1u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FE0320789
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJIUR-0001oC-Js
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 11:39:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53310)
+	id 1kJIV4-0002C3-0R
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 11:40:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53676)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kJIIj-0005rQ-9g
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 11:27:53 -0400
-Resent-Date: Fri, 18 Sep 2020 11:27:53 -0400
-Resent-Message-Id: <E1kJIIj-0005rQ-9g@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21330)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kJIIf-0004JF-5z
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 11:27:52 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1600442859; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=UrxSjM1Bzgz9fG+4RxVzhP3nEh0BFL/bKyS8mt/QPF0cEjZ3XiL+xwobPAy4KeE+pfZrTuxdN+n3JoEbHJccseGBS50UpwHmIJyOoz5kcIf4f5prGY/kY4tYgNonOBxZhtE1y6ViEfDseKeloZCxU9sOKk2m3e/vdokd9Qksde8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1600442859;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=428ECmJdM91YVat7N2jC23M3OsK94qHLvlPxAWnl4KE=; 
- b=djiNB4SA0xtL8P3DzW5+rrfLfFAkBkVy4lmfr4MsP37Lh7TXkBD41PKysPHTZIPZWxpSQlxjVPe+H7x61n2SKSM2EuwnuyVHi/MdJV4pzvN696DejNm5KmcwN929Kt99OhzuWaKO+TR8DORz9zn28yIYYfQriBF7z1yIk/bS79o=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1600442858088780.7340363327984;
- Fri, 18 Sep 2020 08:27:38 -0700 (PDT)
-Subject: Re: [PULL 0/1] fw-cfg patches for 2020-09-18
-Message-ID: <160044285685.8478.2376245900770489@66eaa9a8a123>
-In-Reply-To: <20200918152207.157589-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1kJIKG-0007vO-Ip
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 11:29:30 -0400
+Received: from mail-ua1-x943.google.com ([2607:f8b0:4864:20::943]:43585)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1kJIKE-0004X9-7V
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 11:29:28 -0400
+Received: by mail-ua1-x943.google.com with SMTP id v5so1984913uau.10
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 08:29:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=sFJHbyUj6uuBk8ba6cqOJ304O4LOCReKl4ZHNukt8IY=;
+ b=Fb06HV1uVXs2vE2Fx5IxJDQu8FLrSWl9wM1lhp/gYXFkOL3pf4z+wRx+FR23prZZVm
+ NTjbMpF8zo5/3MC5nqLANiKSk8Ur/4aZq9VmUTjAGH1QK0vvKhzlMrZAjJuuAfj3wZg5
+ A0FgCblPL8/WlFeh/RodWsEI1oieeSPVwMfMxe59tK2p6t2p8NMEIyBeEwub5Tn+bDun
+ soLKjmS+9Ecn2ibFw7dwzwpR0utabw+zaPaVI70YA2BCijmoWVoioJ3veDsnKhRonU/4
+ YOi3L9MKdDbFlvEhb9MJvpC5nqUqBz1Fz/uC4Fav+pW0IW1o9o1TpqvqAl+As/f41Q7/
+ QOjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=sFJHbyUj6uuBk8ba6cqOJ304O4LOCReKl4ZHNukt8IY=;
+ b=efdGnOAAPDx91rLONq1pSXonI6O6St1cyyq17XkL0WP95Mc42w8UGD2cHHhIwpnsgh
+ xulS9mirG7U31uTBysdqYSjWBF1njJvc9psYAmGxjBF+BWbBJyKB+CtFtjZiRoEOYDo7
+ HpQQDJO7FomAe0lCpjM1EudB0d7j4SKNTPdBdI+f9yAYcrTAlLlX+aqyipewxMb2SLBL
+ P3/Kj13D884rGkEEOowJKagK/DBjVeZlgRRBGEKQv0bd2/BD5x35ok7A9uSAcEVhIsBV
+ 5M2ET++FqcNprFSeOn1856mPpXJ6n1wm6q17zM1iwNtEq0A8w1lWQwBkfcDTNf2cCxB/
+ P4JA==
+X-Gm-Message-State: AOAM531GKwBLRa9l3+rPBmZLtLcq3s6Nk5QEzZ/5dZqxOr0svPcYXNCp
+ zDA5bOCz40e4BFUtgbPgpjuSJXA8tuWkTzx1D8Q4wg==
+X-Google-Smtp-Source: ABdhPJyCqhik262ehepGLVVREzw0oimXj+8PGEwamh2z1f5ab7syLeoutEXqCYkwvA985v5rhEgVUrBDb/F1uDSi3hc=
+X-Received: by 2002:ab0:2904:: with SMTP id v4mr18637006uap.15.1600442960499; 
+ Fri, 18 Sep 2020 08:29:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: philmd@redhat.com
-Date: Fri, 18 Sep 2020 08:27:38 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 09:13:24
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200918142344.150749-1-f4bug@amsat.org>
+ <55648bee-46e6-4055-104d-0c82e8fcfe64@amsat.org>
+In-Reply-To: <55648bee-46e6-4055-104d-0c82e8fcfe64@amsat.org>
+From: Havard Skinnemoen <hskinnemoen@google.com>
+Date: Fri, 18 Sep 2020 08:29:09 -0700
+Message-ID: <CAFQmdRZxuHimdZtqwq=Vzoy7iwg2SiNgGTDQwH9oPXGheH6+EA@mail.gmail.com>
+Subject: Re: [PATCH] tests/acceptance: Reduce quanta-gsj U-boot+Linux test time
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>, 
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::943;
+ envelope-from=hskinnemoen@google.com; helo=mail-ua1-x943.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -175
+X-Spam_score: -17.6
+X-Spam_bar: -----------------
+X-Spam_report: (-17.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,20 +101,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: philmd@redhat.com, lersek@redhat.com, qemu-devel@nongnu.org,
- kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkxODE1MjIwNy4xNTc1
-ODktMS1waGlsbWRAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKTi9BLiBJbnRlcm5hbCBlcnJvciB3aGlsZSByZWFkaW5nIGxvZyBmaWxlCgoK
-ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAy
-MDA5MTgxNTIyMDcuMTU3NTg5LTEtcGhpbG1kQHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNo
-Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
-aGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
-cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Fri, Sep 18, 2020 at 7:27 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+>
+> On 9/18/20 4:23 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> > The 'arm_quanta_gsj_initrd' test is timeouting on GitLab CI:
+> > https://gitlab.com/philmd/qemu/-/jobs/745483978#L846
+> >
+> > Use the same trick from the 'arm_quanta_gsj' test to reduce the
+> > systemd services started and get quicker to the shell prompt.
+> >
+> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > ---
+> >  tests/acceptance/boot_linux_console.py | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >
+> > diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/=
+boot_linux_console.py
+> > index 4a366ce93e4..7748febbf54 100644
+> > --- a/tests/acceptance/boot_linux_console.py
+> > +++ b/tests/acceptance/boot_linux_console.py
+> > @@ -638,6 +638,9 @@ def test_arm_quanta_gsj_initrd(self):
+> >
+> >          self.vm.set_console()
+> >          kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
+> > +                               'initcall_blacklist=3Dnpcm_i2c_bus_driv=
+er_init '
+> > +                               'systemd.mask=3Dsystemd-random-seed.ser=
+vice '
+> > +                               'systemd.mask=3Ddropbearkey.service '
+> >                                 'console=3DttyS0,115200n8 '
+> >                                 'earlycon=3Duart8250,mmio32,0xf0001000'=
+)
+> >          self.vm.add_args('-kernel', kernel_path,
+> >
+>
+> Bah unfortunately this is still not enough :(
+
+Right, this patch modifies the initrd test, but that's not the one
+that timed out.
+
+(10/40) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_qu=
+anta_gsj:
+ INTERRUPTED: Test interrupted by SIGTERM\nRunner error occurred:
+Timeout reached\nOriginal status: ERROR\n{'name':
+'10-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_quanta=
+_gsj',
+'logdir': '/builds/philmd/qemu/build/tests/results/job-2020-09-18T13.41-b9.=
+..
+(90.81 s)
+ (11/40) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_q=
+uanta_gsj_initrd:
+ PASS (27.00 s)
+
+Havard
 
