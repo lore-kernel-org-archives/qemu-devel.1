@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1091C43463
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 15:44:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21E23C43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 15:47:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8602F208DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 15:44:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8602F208DB
+	by mail.kernel.org (Postfix) with ESMTPS id 8764B23787
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 15:47:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8764B23787
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJIYu-0007Oz-HO
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 11:44:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57106)
+	id 1kJIbg-0000Oi-GR
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 11:47:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55306)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kJIVO-00032n-8a
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 11:40:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56686)
+ id 1kJIQU-0005n1-Km
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 11:35:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56054)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kJIVJ-0006aL-52
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 11:40:58 -0400
+ id 1kJIQ9-0005TU-AI
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 11:35:51 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kJIVE-0000oT-3f
- for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 15:40:48 +0000
+ id 1kJIQ6-00087x-77
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 15:35:30 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id F3C642E8023
- for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 15:40:47 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 303192E80EA
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 15:35:30 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 18 Sep 2020 15:30:52 -0000
-From: Daniel Berrange <1896096@bugs.launchpad.net>
+Date: Fri, 18 Sep 2020 15:26:34 -0000
+From: Frederic Bezies <1896096@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
@@ -51,9 +51,9 @@ X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: berrange bonzini fredb74 laurent-vivier
 X-Launchpad-Bug-Reporter: Frederic Bezies (fredb74)
-X-Launchpad-Bug-Modifier: Daniel Berrange (berrange)
+X-Launchpad-Bug-Modifier: Frederic Bezies (fredb74)
 References: <160036517624.17887.51064102046414127.malonedeb@soybean.canonical.com>
-Message-Id: <160044305210.15219.17563659409781558416.malone@gac.canonical.com>
+Message-Id: <160044279495.21789.3430978283169159201.malone@wampee.canonical.com>
 Subject: [Bug 1896096] Re: Git version: Build process is broken in
  block_curl.c.o
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -61,7 +61,7 @@ X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: 1bc6bc283b5e44c1ff714db3510bb26fbc7e7388
+X-Launchpad-Hash: f7ea673e63c72e8878e016d0f357ad21902f3474
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 05:01:27
@@ -89,16 +89,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The problem is caused by the extra flags you're forcing on the compiler:
-
-Using 'CFLAGS' from environment with value: '-O2 -g -fPIE -DPIE -std=3Dgnu9=
-9 -Wall'
-Using 'LDFLAGS' from environment with value: '-g -pie -Wl,-O1,--sort-common=
-,--as-needed,-z,relro,-z,now'
-Using 'CPPFLAGS' from environment with value: '-D_FORTIFY_SOURCE=3D2'
-
-Most particularly the "-pie" in LDFLAGS.  This is only valid for
-executables, not shared libraries, and thus it breaks the build.
+** Attachment added: "config-host.mak asked for"
+   https://bugs.launchpad.net/qemu/+bug/1896096/+attachment/5412211/+files/=
+config-host.mak
 
 -- =
 
