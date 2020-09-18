@@ -8,74 +8,74 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 665DCC43463
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 14:45:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91BB0C43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 14:46:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 990BF21973
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 14:45:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 248AE21973
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 14:46:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ebbki7VR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 990BF21973
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jlqDCbs7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 248AE21973
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJHdU-0007Ks-FW
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 10:45:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37046)
+	id 1kJHes-0008Ra-5u
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 10:46:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kJHch-0006lX-1g; Fri, 18 Sep 2020 10:44:27 -0400
-Received: from mail-pl1-x62f.google.com ([2607:f8b0:4864:20::62f]:35183)
+ id 1kJHdo-0007eh-Bo; Fri, 18 Sep 2020 10:45:38 -0400
+Received: from mail-pj1-x102e.google.com ([2607:f8b0:4864:20::102e]:37524)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kJHcf-0003vo-D2; Fri, 18 Sep 2020 10:44:26 -0400
-Received: by mail-pl1-x62f.google.com with SMTP id bg9so3105446plb.2;
- Fri, 18 Sep 2020 07:44:24 -0700 (PDT)
+ id 1kJHdm-00048c-1x; Fri, 18 Sep 2020 10:45:36 -0400
+Received: by mail-pj1-x102e.google.com with SMTP id kk9so3138469pjb.2;
+ Fri, 18 Sep 2020 07:45:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=RxOe7eEUW06SH+dJ3JUnUQCKxr91q5VdFDVbXqBq6zw=;
- b=ebbki7VRy0c9NgvBe1q7Y3nj71y2cm6eWIMU5JrQ19XScyTovTU9p4qadKGan0GssW
- JECB4+SE/epkt5taPqogJbGV2RmwlEgNHSzS4zVsnEDp8yz+2rF3BWBz5Ee6TKHSLmKD
- OdFWB2jFN2YKz4aB5kBZQ0roTE/d0nX5ikG82alFnd3yHlCVFRQnNfmEWIzLPSwIuqew
- kPmuvJW9dtho5unJDYktbuqepWKOwz9jjRp6JqIXS35rJHnR7khRUyzvW0d/xmszAnt2
- p0Px0j+GRH5jEFlxfDovcqlqHXjomA6CNB7ZHvTIrExUnlM26af5OrgJVebqfMkapi9h
- hFtw==
+ bh=KI9wi8wtXI4j9WWUYsI3+T64+fj4Vp22um09VqfofOU=;
+ b=jlqDCbs7YH68PQj7GDzsfbzfrrMEwItV4Njj9aV0ZxIRfkZ0j4wGTgTffqu5GfKNea
+ w8QIqGLxX5oMr4ExPg4vnss34aDmg72r+14YEc4AJVtlZcrbs7H1mh5oqtFFXsisElAP
+ eMd6z5tQkwmVnb/T2IyN3iWD7SnOxnroXbHrH21poBWDDsxfW9MOctE8ZGy1upda2g06
+ uWjdJ6DSLnwab4ax56ET69+rmWmwuAQfuVLKGOnSt7WYJ1BWflIAbpnXi0WA12Et5uV8
+ zI3gKLZ+BnndJ31BE64fTcciLgk0vbl6z7uhNlAO18nBQzGFuuQASqzKupEoJ562VA75
+ puyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=RxOe7eEUW06SH+dJ3JUnUQCKxr91q5VdFDVbXqBq6zw=;
- b=n4BXVXDCQ/iqUBoZZwLHakDOGxwDOtzO9FfavCfRPk2gLazz8Y4aJQUtiaR7VBSSfL
- c7mRJZUsxLSHwXVre9Rxo8MO3ElU+sJ1DCg44jZB4AkEI4t4c3IqEzJV60Tnff/Z2syc
- GGgC88HwribtZCkxD3C+7Ak/gZpsJ7eBFXGp41llyF+mOKNaURBfsI9MiPoo4TeSdW+F
- x96FC1NabPi4P/nw41BJQBhGrERMjUZ65w5QyGsu8BmtWYh9YroEXZHmEy3giiyS4NV3
- mwOH99AEIcUameE1Ei9h/DpZ9P+fc4RmJE/SNPovPfiGchzqSwIxTzY//O5GeTUlAdzZ
- ggdA==
-X-Gm-Message-State: AOAM530uyBZBbH2cc1Ap0zrul2D+wIprUdOzZagd+t5cHzbepp9eGEiM
- IYpQC+h/PJZkUKItm1RZ6YcEc0zr0mBrDg==
-X-Google-Smtp-Source: ABdhPJxH+DVU+bmeQXWoHdiII6V+W0T4IccwTOsieVJ0u/QP1EpVo0uqGYIFdhSrNUyR0DssxULzjw==
-X-Received: by 2002:a17:90b:1916:: with SMTP id
- mp22mr12521523pjb.132.1600440263025; 
- Fri, 18 Sep 2020 07:44:23 -0700 (PDT)
+ bh=KI9wi8wtXI4j9WWUYsI3+T64+fj4Vp22um09VqfofOU=;
+ b=PI5AvYCDuFHCRJWuwaVC7B9tk0er0zWXKypzhMqA5xd0P1apzmbkLIibSts8SQ7zbH
+ xO2Mo1K+Do77siQQBqvcOJz7JkZbG/BCRhK4O99QjoA121flrIV4/yZ8s8jqAXY+Z+w9
+ 12XeFS0fS67AtVFKJNHm5rLSubBsR538IYCn3ZZW9uh0lCcDmWws+g6BIEl75gk3qo4Z
+ KWPWcG6a6V+BfZ88mWRe+uzlyrk8tOLzuZODYrMXGnvOJ1EkciUW95cWAq4WDUukVIig
+ URMANJC00UKvV+7HsX7KckvPVyDB3uFcyQldrMbQcWQ5hu3yH0P/CUz2JXFCSDLOLQQq
+ mYoA==
+X-Gm-Message-State: AOAM532j6tnznuMFB0uZDYm9eCOegajQFe4dcI9Mss+ZMFH0ivk9jCub
+ fIDyLDV9QKdD7DCUtUjfc3jlsiOMEX0UCg==
+X-Google-Smtp-Source: ABdhPJwTbPOLOeghdZEKNWD260eCzY0Ps0gkVH7XQ6jQ+aNff+qDhJh5WIQ1gAepugQEJLJqcfgpRw==
+X-Received: by 2002:a17:90a:c28e:: with SMTP id
+ f14mr13152584pjt.83.1600440331498; 
+ Fri, 18 Sep 2020 07:45:31 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id q15sm3097603pje.29.2020.09.18.07.44.20
+ by smtp.googlemail.com with ESMTPSA id k7sm3178184pjs.9.2020.09.18.07.45.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Sep 2020 07:44:22 -0700 (PDT)
+ Fri, 18 Sep 2020 07:45:30 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
 Subject: [PATCH] configure: fixes indent of $meson setup
-Date: Fri, 18 Sep 2020 22:44:03 +0800
-Message-Id: <20200918144403.521-1-luoyonggang@gmail.com>
+Date: Fri, 18 Sep 2020 22:45:12 +0800
+Message-Id: <20200918144512.978-1-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::62f;
- envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x62f.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::102e;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x102e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -114,7 +114,7 @@ Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/configure b/configure
-index 3757e48b17..6acd13a436 100755
+index 3757e48b17..422b1ef2a3 100755
 --- a/configure
 +++ b/configure
 @@ -7850,10 +7850,10 @@ NINJA=${ninja:-$PWD/ninjatool} $meson setup \
@@ -128,7 +128,7 @@ index 3757e48b17..6acd13a436 100755
 +        -Dmalloc=$malloc -Dmalloc_trim=$malloc_trim \
 +        -Dcocoa=$cocoa -Dmpath=$mpath -Dsdl=$sdl -Dsdl_image=$sdl_image \
 +        -Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
-+        -Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f\
++        -Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f \
          $cross_arg \
          "$PWD" "$source_path"
  
