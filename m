@@ -2,119 +2,83 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39E0BC43465
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 10:20:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B346CC43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 10:25:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B29772075E
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 10:20:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 305EC208C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 10:25:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E0IspoQ8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B29772075E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a1jweCur"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 305EC208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJDUm-00027U-R5
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 06:20:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58712)
+	id 1kJDZz-0004Jh-UP
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 06:25:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59886)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kJDUC-0001ib-3k
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 06:19:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32979)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1kJDYs-0003rQ-N2
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 06:24:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58239)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kJDU9-0002yY-Rh
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 06:19:23 -0400
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1kJDYq-0003dO-Nc
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 06:24:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600424360;
+ s=mimecast20190719; t=1600424651;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=xEOvW7v2NehhQ6VtJbjhy9K3C1408Q2hmc7RFbP+nhI=;
- b=E0IspoQ8A34Mp4N3ztyl/OCSHuW1zYRe7FqsE8iHLasWxUnWTFd7ZzQWa27V1omIcar93L
- VaOl7wWSXZ7vbsvlLgRRrzZdh879NcJGlc18R1BXJ8vQcGElysU1KyXj4t9RWQDj+XC+mn
- xYjO2nCUKcYB+8+/BIBDzFijs1pD5VE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-Jd2LJLXIPB6_CxOjTW0qHA-1; Fri, 18 Sep 2020 06:19:19 -0400
-X-MC-Unique: Jd2LJLXIPB6_CxOjTW0qHA-1
-Received: by mail-wm1-f70.google.com with SMTP id m25so1890230wmi.0
- for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 03:19:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=xEOvW7v2NehhQ6VtJbjhy9K3C1408Q2hmc7RFbP+nhI=;
- b=C/hq7r6BE0077S9KhqEz/eS0NKKnh7MzvyuEx1Ra4qMSby4CSQ3i31S97mmTenEvzR
- kXkpEBykqm7rVpG6j4/4HV9aDe0bDMvLQAJtFC7M7pbTXBURjUTXyd76pOtNmuuSurHm
- nax+oYz4ebvJcNelIJA6JJBHKlX7HmWzApH8w5+1DsOsmrD1nB+qub53epKKw7BQxHcl
- 3L4Rlluq/80xOomLd97BCf2co0E4aRnr5/WXhsQlRo+Qgft7fu5Tja6bF+OimqH1J0AD
- J3HJHgntzxTCEyoYaNnz/2/Cp6y917DaasozJZ2sbfQQM+JZYhinukreJ6/EWYWwrIXC
- QbNg==
-X-Gm-Message-State: AOAM532hlYQMGSTOkwH+VItka0cXmngW9TESgzRefLyHcKYz8rYF9LRF
- ai8qKZja677zRv1s5ou9Pt+spFfWlvhkYpxPjdCwUw0rxObPyN52jhM/aLzyofNX8ghYMdbWU+R
- CIqZNcvh1uZ2X0cI=
-X-Received: by 2002:adf:f44d:: with SMTP id f13mr36631092wrp.224.1600424358159; 
- Fri, 18 Sep 2020 03:19:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx/MloDD5kXRRwTCfHAjizS3qJXgouk3JANTqFBsMG0xsUTCnzirX6nWpODN6myegMlCZGEIg==
-X-Received: by 2002:adf:f44d:: with SMTP id f13mr36631068wrp.224.1600424357928; 
- Fri, 18 Sep 2020 03:19:17 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id l18sm4367493wrp.84.2020.09.18.03.19.16
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 18 Sep 2020 03:19:17 -0700 (PDT)
-Subject: Re: [PATCH] spice: remove obsolete callback
-To: marcandre.lureau@redhat.com, qemu-devel@nongnu.org
-References: <20200918100737.91646-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <68a6a805-fe82-05e2-fbb3-ab86a1117394@redhat.com>
-Date: Fri, 18 Sep 2020 12:19:16 +0200
+ in-reply-to:in-reply-to:references:references;
+ bh=LAMPedh2AIlCfVsWCPHe0HLPSIMznpNqhOhqrkFIpmA=;
+ b=a1jweCur5mX+/jWsYusRP1cncnZgbM203yYCtxyMjdTGe6pOnx/PMYVQy4vB2UnF12oEx1
+ cUB3a/CWoQiOgjHN4b4wwV8CV8qlODqZgeE3G5IOM5SSN9B3NujEFetHvp7xk/MZ4p1Ewe
+ bsWheqdeFHaVozxYM1jNobyMotULe4s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-399-8hnWeCvPMqCi1_JTHjI2Ig-1; Fri, 18 Sep 2020 06:24:10 -0400
+X-MC-Unique: 8hnWeCvPMqCi1_JTHjI2Ig-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 819F3801AAB;
+ Fri, 18 Sep 2020 10:24:08 +0000 (UTC)
+Received: from [10.36.112.29] (ovpn-112-29.ams2.redhat.com [10.36.112.29])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 522F45DEBE;
+ Fri, 18 Sep 2020 10:24:04 +0000 (UTC)
+Subject: Re: [PATCH v2 2/2] virtio-iommu-pci: force virtio version 1
+To: Cornelia Huck <cohuck@redhat.com>
+References: <20200908193309.20569-1-eric.auger@redhat.com>
+ <20200908193309.20569-3-eric.auger@redhat.com>
+ <20200918112909.5f797bf4.cohuck@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <72eea96c-8ad0-90b0-aaa7-dabad1f118d8@redhat.com>
+Date: Fri, 18 Sep 2020 12:24:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200918100737.91646-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20200918112909.5f797bf4.cohuck@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
+Received-SPF: pass client-ip=216.205.24.124;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 01:32:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
@@ -137,103 +101,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kraxel@redhat.com, fziglio@redhat.com
+Cc: jean-philippe@linaro.org, thuth@redhat.com, mst@redhat.com,
+ qemu-devel@nongnu.org, qemu-stable@nongnu.org, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/18/20 12:07 PM, marcandre.lureau@redhat.com wrote:
-> From: Marc-André Lureau <marcandre.lureau@redhat.com>
-> 
-> The "attach_worker" callbacks aren't doing anything in QEMU, but they
-> were mandatory until Spice server commit
-> 6aa1a17c69dc3cc02f338a78b3266e4c00ea1c1a ("spice-qxl: Remove QXLWorker
-> definition").
-> 
-> Furthermore, the old spelling is deprecated since commit
-> 974692bda1e77af92b71ed43b022439448492cb9 ("spice-qxl: Fix typo in
-> callback name and remove obsolete parameter")
-> 
-> Compile that code out if Spice server version is recent enough.
-> 
-> Fix compiler deprecation warnings with Spice > 0.14.3 (not released
-> yet). We may want to wait until newer version is actually released to
-> apply the patch.
-> 
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> ---
->  hw/display/qxl.c   | 4 ++++
->  ui/spice-display.c | 4 ++++
->  2 files changed, 8 insertions(+)
-> 
-> diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-> index 11871340e7..a02072dee0 100644
-> --- a/hw/display/qxl.c
-> +++ b/hw/display/qxl.c
-> @@ -518,12 +518,14 @@ static int qxl_track_command(PCIQXLDevice *qxl, struct QXLCommandExt *ext)
->  
->  /* spice display interface callbacks */
->  
+Hi Connie,
 
-What about adding in include/ui/spice-display.h:
+On 9/18/20 11:29 AM, Cornelia Huck wrote:
+> On Tue,  8 Sep 2020 21:33:09 +0200
+> Eric Auger <eric.auger@redhat.com> wrote:
+> 
+>> Commit 9b3a35ec82 ("virtio: verify that legacy support is not
+>> accidentally on") added a safety check that requires to set
+>> 'disable-legacy=on' on virtio-iommu-pci:
+>>
+>> qemu-system-aarch64: -device virtio-iommu-pci: device is modern-only,
+>> use disable-legacy=on
+>>
+>> virtio-iommu was introduced after the release of VIRTIO 1.0
+>> specifications, so it should be 'modern-only'.
+>>
+>> This patch forces virtio version 1 and removes the 'transitional_name'
+>> property removing the need to specify 'disable-legacy=on' on
+>> virtio-iommu-pci device.
+> 
+> Not sure whether this patch has been queued already, and how much we
+> care about migration compatibility for virtio-iommu, but would it make
+> sense to force modern on 5.1+ compat machines only? (see
+> https://lore.kernel.org/qemu-devel/20200918074710.27810-1-sgarzare@redhat.com/)
 
-#if SPICE_SERVER_VERSION < 0x000e04 /* release 0.14.4 */
-#define SPACE_ATTACH_WORKER_MANDATORY
-#endif
+I don't think it was pulled yet.
+> 
+>>
+>> Cc: qemu-stable@nongnu.org
 
-Then use #ifdef SPACE_ATTACH_WORKER_MANDATORY in the source files?
+The virtio-iommu-pci device only is usable on ARM in dt mode so I don't
+think it has production users at the moment.
 
-Regardless:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Thanks
 
-> +#if SPICE_SERVER_VERSION < 0x000e04 /* release 0.14.4 */
->  static void interface_attach_worker(QXLInstance *sin, QXLWorker *qxl_worker)
->  {
->      PCIQXLDevice *qxl = container_of(sin, PCIQXLDevice, ssd.qxl);
->  
->      trace_qxl_interface_attach_worker(qxl->id);
->  }
-> +#endif
->  
->  static void interface_set_compression_level(QXLInstance *sin, int level)
->  {
-> @@ -1156,7 +1158,9 @@ static const QXLInterface qxl_interface = {
->      .base.major_version      = SPICE_INTERFACE_QXL_MAJOR,
->      .base.minor_version      = SPICE_INTERFACE_QXL_MINOR,
->  
-> +#if SPICE_SERVER_VERSION < 0x000e04 /* release 0.14.4 */
->      .attache_worker          = interface_attach_worker,
-> +#endif
->      .set_compression_level   = interface_set_compression_level,
->  #if SPICE_NEEDS_SET_MM_TIME
->      .set_mm_time             = interface_set_mm_time,
-> diff --git a/ui/spice-display.c b/ui/spice-display.c
-> index 19632fdf6c..811936ff7f 100644
-> --- a/ui/spice-display.c
-> +++ b/ui/spice-display.c
-> @@ -500,10 +500,12 @@ void qemu_spice_display_refresh(SimpleSpiceDisplay *ssd)
->  
->  /* spice display interface callbacks */
->  
-> +#if SPICE_SERVER_VERSION < 0x000e04 /* release 0.14.4 */
->  static void interface_attach_worker(QXLInstance *sin, QXLWorker *qxl_worker)
->  {
->      /* nothing to do */
->  }
-> +#endif
->  
->  static void interface_set_compression_level(QXLInstance *sin, int level)
->  {
-> @@ -709,7 +711,9 @@ static const QXLInterface dpy_interface = {
->      .base.major_version      = SPICE_INTERFACE_QXL_MAJOR,
->      .base.minor_version      = SPICE_INTERFACE_QXL_MINOR,
->  
-> +#if SPICE_SERVER_VERSION < 0x000e04 /* release 0.14.4 */
->      .attache_worker          = interface_attach_worker,
-> +#endif
->      .set_compression_level   = interface_set_compression_level,
->  #if SPICE_NEEDS_SET_MM_TIME
->      .set_mm_time             = interface_set_mm_time,
+Eric
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>>
+>> ---
+>> v1 -> v2:
+>> - Added Connie's R-b
+>> ---
+>>  hw/virtio/virtio-iommu-pci.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/hw/virtio/virtio-iommu-pci.c b/hw/virtio/virtio-iommu-pci.c
+>> index ba62d60a0a..3b6f7a11c6 100644
+>> --- a/hw/virtio/virtio-iommu-pci.c
+>> +++ b/hw/virtio/virtio-iommu-pci.c
+>> @@ -68,6 +68,7 @@ static void virtio_iommu_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+>>      object_property_set_link(OBJECT(dev), "primary-bus",
+>>                               OBJECT(pci_get_bus(&vpci_dev->pci_dev)),
+>>                               &error_abort);
+>> +    virtio_pci_force_virtio_1(vpci_dev);
+>>      qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
+>>  }
+>>  
+>> @@ -97,7 +98,6 @@ static void virtio_iommu_pci_instance_init(Object *obj)
+>>  static const VirtioPCIDeviceTypeInfo virtio_iommu_pci_info = {
+>>      .base_name             = TYPE_VIRTIO_IOMMU_PCI,
+>>      .generic_name          = "virtio-iommu-pci",
+>> -    .transitional_name     = "virtio-iommu-pci-transitional",
+>>      .non_transitional_name = "virtio-iommu-pci-non-transitional",
+>>      .instance_size = sizeof(VirtIOIOMMUPCI),
+>>      .instance_init = virtio_iommu_pci_instance_init,
+> 
 > 
 
 
