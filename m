@@ -2,91 +2,98 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05B9BC43464
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 20:04:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 145E8C43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 20:07:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E11322208
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 20:04:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5328A206D4
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 20:07:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y4e12Sbu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E11322208
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NacBqVJj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5328A206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJMcp-0004JJ-VA
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 16:04:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49138)
+	id 1kJMfX-0007ol-6N
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 16:07:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53116)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kJLIU-0001QW-Rn
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:39:56 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:37368)
+ id 1kJLcg-0006yI-Gg
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 15:00:43 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:33279)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kJLIO-0007K6-H1
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:39:50 -0400
-Received: by mail-pf1-x442.google.com with SMTP id w7so3996317pfi.4
- for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 11:39:41 -0700 (PDT)
+ id 1kJLcZ-0001XK-VQ
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 15:00:41 -0400
+Received: by mail-pl1-x644.google.com with SMTP id d19so3477194pld.0
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 12:00:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=dgqa26KZVdKCtc03FsTaVbtOnIm76ZLnoLwFdbk/1bU=;
- b=Y4e12SbuIi8Jn/JBd/8XyYpSJ6yTFkJO6choFAuLQ7uC8u9NtV5ySFs2S1nDwZ3wSV
- nqv2Y49zRlWKmn9hCYol1ehE+KWS7z3QbgArJXM6F4blO36wMKQMlFr6OLMEUkpnXr4O
- HV5pBggmVtk1baLSPHONBQ+SCKJgYmSfScoHjZvbS8HWt5G56byqtcfMYO0aa/y5zCP/
- 4wv0iZ+bYZ+MiyfOXVoRVNgsWgju+t5wZqNSq3FaGeYmN7mL4XaIcgzPBDoIhaiFbi4j
- 1ygQEiOZTg6RM3voYigPB31tcsxysIxZ/Wn12cZ7c6WNFzGo1RUHr3zO8xh3dWoaezb9
- 9qvg==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=fqh6VGf/wM6lICUERuOk8wcgmre+kvtwDANu+VLducw=;
+ b=NacBqVJj7rTj0Ydpuj4EohxLdDl9CdZ6HS8OLqZpHD8wwzKOeDYQ/HKe4em712xPQL
+ w4dfgyqyk3TqamIyhV5yaCT8nCNL/+Cr0lCkvC8m6C3ZHCIy9BhbSNSrUv6EdChdfRal
+ +mxZqqQYEF5aae6EgXtrvSTtXlR1FwfdwYa6W6pJ7R3kCwegmmHRuKGyHhnxuuU+1FHf
+ lHH9oWFEKGFxoLIIUD6gsAe4PRkq7PPscmirwBRvf+eRRxxhjTQPntpLKnHZuigyUnoK
+ qJHBpxr3KSAqS2VXP7AtITnVAS0BQ2svTncrU3YtVW7e/V0MyOGOMrNNaoUmKhfRJqIY
+ 1Ngw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=dgqa26KZVdKCtc03FsTaVbtOnIm76ZLnoLwFdbk/1bU=;
- b=qv+qqmDxc/bguw43c7FFi0QUaDyqRFqGEe78RmmNAvOJCmGlnCZWt+gwEkCJlyqJyf
- 8LVUSbcNDFQmPmCx30zJUyX9d6fhxwqKb9qnd3CMwQRD0u/rfKmkGXCv9ag/gFWQEAVy
- a4TTBauiM59k5rw/836Fg20iGtsh6/J8O7dMf5tUMPU+gUcGO+4+RTiVdqqtpjAfzvLO
- SFS+CaT0v2+Qf61XNLIe51M1edsZsVcc4HD0sWyztwVB/jk5LjcQYAO0bfv3m0nWAsKW
- P2/0nUpjCL33wavZskOKIhX8qPjqiiEVca5rFasAT1pd081rYEqq6EoD+ld7QdObCA88
- IUPQ==
-X-Gm-Message-State: AOAM532QeHc3+3hZ2ezOr73dCLOjQfOdXst4xzpOXQTyo80qNyWp8vur
- AlohhpQkppzuaYw+XKmOqAdlo185hNDjGw==
-X-Google-Smtp-Source: ABdhPJyR7zPMTurcuPHoZLWYvSlnVkKPjXV/Q8wT+AEUsxD24crWalceBiYTe9sO2cG6lKeoAltvcg==
-X-Received: by 2002:a62:503:0:b029:13e:d13d:a0f9 with SMTP id
- 3-20020a6205030000b029013ed13da0f9mr32930391pff.21.1600454379946; 
- Fri, 18 Sep 2020 11:39:39 -0700 (PDT)
-Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id f4sm3680723pfj.147.2020.09.18.11.39.38
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Sep 2020 11:39:39 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=fqh6VGf/wM6lICUERuOk8wcgmre+kvtwDANu+VLducw=;
+ b=oXr+FjxsBuLDGE7xddDuPRC/rYV8vElzpKbBWlnZwQUGSmLd75S9B1De7lNpDqnly2
+ 1INeQVzCfg46MtizP0L4+1vJfqbwg0EhSFnyqU872O576uC4Sz/kwpFMruqXWwlGu3Ao
+ RQwVcLs5wLB4o6SPWR1UU509GA+H81QztAKCfSfi7Svo51gpZHUDHLAF6urC+wInu47d
+ Ce5wMbsKi02U6zaWtuntJ7zZ41w2BN0w35i0D8tYRsae76kx2gysW8PP96kTATxgiIh1
+ VPYc0vddbKvoOK95/DSPrv/uA0S8mRewB4jtAH/rm6NrK0EoVLNhfSWmX5K28YTR/nw4
+ pGGw==
+X-Gm-Message-State: AOAM532NaIa2ZOV+FvREqsUJKpnE4TgKrBP+ViO7P2L6vvroZSJNjhBt
+ aWiYXdOh+pWHftTWWb3W8pNANw==
+X-Google-Smtp-Source: ABdhPJw9g2unZzLz96cTgmJSmmpKQ5F8FaUO4mcE81dZt2XH1KDGx6mmo4J6GfR/YVPu3EYquu9O4A==
+X-Received: by 2002:a17:90a:1425:: with SMTP id
+ j34mr13959364pja.106.1600455634303; 
+ Fri, 18 Sep 2020 12:00:34 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id i1sm4099685pfk.21.2020.09.18.12.00.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 18 Sep 2020 12:00:33 -0700 (PDT)
+Subject: Re: [PATCH v8 00/17] QEMU cpus.c refactoring part2
+To: Claudio Fontana <cfontana@suse.de>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>
+References: <20200916142004.27429-1-cfontana@suse.de>
 From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 80/81] target/arm: Implement SVE2 complex integer dot
- product
-Date: Fri, 18 Sep 2020 11:37:50 -0700
-Message-Id: <20200918183751.2787647-81-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200918183751.2787647-1-richard.henderson@linaro.org>
-References: <20200918183751.2787647-1-richard.henderson@linaro.org>
+Message-ID: <d0bb4af9-55a1-b332-af6f-7601dfb10db7@linaro.org>
+Date: Fri, 18 Sep 2020 12:00:31 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
+In-Reply-To: <20200916142004.27429-1-cfontana@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_score_int: -39
+X-Spam_score: -4.0
+X-Spam_bar: ----
+X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-1.869,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -101,210 +108,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Alberto Garcia <berto@igalia.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
+ Colin Xu <colin.xu@intel.com>, haxm-team@intel.com,
+ Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Wenchao Wang <wenchao.wang@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/helper-sve.h    | 10 ++++
- target/arm/sve.decode      |  9 ++++
- target/arm/sve_helper.c    | 99 ++++++++++++++++++++++++++++++++++++++
- target/arm/translate-sve.c | 17 +++++++
- 4 files changed, 135 insertions(+)
+On 9/16/20 7:19 AM, Claudio Fontana wrote:
+> Motivation and higher level steps:
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg04628.html
+> 
+> Current state is mostly all reviewed, but I include here a few resolutions
+> of rebasing conflicts and a new patch to use current_machine instead of
+> qdev_get_machine in softmmu context.
+> 
+> It's minor, but if additional reviewing is necessary, here is the whole series again.
+> 
+> CI is all green, and also available at https://github.com/hw-claudio/qemu.git "cpus-refactoring"
+> 
+> The following changes since commit 5a77bbb53b087f95dbba7ce30b02ac2d7b147a3a:
+> 
+>   iotests: Work around failing readlink -f (2020-09-15 18:19:26 +0200)
+> 
+> are available in the Git repository at:
+> 
+>   https://github.com/hw-claudio/qemu.git 
+> 
+> for you to fetch changes up to f9ec667595537400a6bc0aaf094a5ca6bbaacf44:
+> 
+>   accel/tcg: use current_machine as it is always set for softmmu (2020-09-15 18:19:27 +0200)
 
-diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 9542f01c42..4af5e1a5ce 100644
---- a/target/arm/helper-sve.h
-+++ b/target/arm/helper-sve.h
-@@ -2784,3 +2784,13 @@ DEF_HELPER_FLAGS_5(sve2_fcvtlt_sd, TCG_CALL_NO_RWG,
- DEF_HELPER_FLAGS_5(flogb_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_5(flogb_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_5(flogb_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve2_cdot_zzzz_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve2_cdot_zzzz_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve2_cdot_idx_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve2_cdot_idx_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 6708c048e0..84232ff9e5 100644
---- a/target/arm/sve.decode
-+++ b/target/arm/sve.decode
-@@ -811,6 +811,9 @@ MUL_zzi         00100101 .. 110 000 110 ........ .....          @rdn_i8s
- DOT_zzzz        01000100 1 sz:1 0 rm:5 00000 u:1 rn:5 rd:5 \
-                 ra=%reg_movprfx
- 
-+# SVE2 complex dot product (vectors)
-+CDOT_zzzz       01000100 esz:2 0 rm:5 0001 rot:2 rn:5 rd:5  ra=%reg_movprfx
-+
- #### SVE Multiply - Indexed
- 
- # SVE integer dot product (indexed)
-@@ -849,6 +852,12 @@ SQDMLSLB_zzxw_d 01000100 .. 1 ..... 0011.0 ..... .....          @rrxw_d
- SQDMLSLT_zzxw_s 01000100 .. 1 ..... 0011.1 ..... .....          @rrxw_s
- SQDMLSLT_zzxw_d 01000100 .. 1 ..... 0011.1 ..... .....          @rrxw_d
- 
-+# SVE2 complex integer dot product (indexed)
-+CDOT_zzxw_s     01000100 10 1 index:2 rm:3 0100 rot:2 rn:5 rd:5 \
-+                ra=%reg_movprfx
-+CDOT_zzxw_d     01000100 11 1 index:1 rm:4 0100 rot:2 rn:5 rd:5 \
-+                ra=%reg_movprfx
-+
- # SVE2 complex integer multiply-add (indexed)
- CMLA_zzxz_h     01000100 10 1 index:2 rm:3 0110 rot:2 rn:5 rd:5 \
-                 ra=%reg_movprfx
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index ef04a0f95a..0ff5e0baf8 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -1592,6 +1592,105 @@ void HELPER(sve2_sqrdcmlah_idx_s)(void *vd, void *vn, void *vm,
-     do_cmla_idx_s(vd, vn, vm, va, desc, do_sqrdcmlah_s);
- }
- 
-+/* Note N and M are 4 elements bundled into one unit. */
-+static int32_t do_cdot_s(uint32_t n, uint32_t m, int32_t a,
-+                         int sel_a, int sel_b, int sub_i)
-+{
-+    for (int i = 0; i <= 1; i++) {
-+        int32_t elt1_r = (int8_t)(n >> (16 * i));
-+        int32_t elt1_i = (int8_t)(n >> (16 * i + 8));
-+        int32_t elt2_a = (int8_t)(m >> (16 * i + 8 * sel_a));
-+        int32_t elt2_b = (int8_t)(m >> (16 * i + 8 * sel_b));
-+
-+        a += elt1_r * elt2_a + elt1_i * elt2_b * sub_i;
-+    }
-+    return a;
-+}
-+
-+static int64_t do_cdot_d(uint64_t n, uint64_t m, int64_t a,
-+                         int sel_a, int sel_b, int sub_i)
-+{
-+    for (int i = 0; i <= 1; i++) {
-+        int64_t elt1_r = (int16_t)(n >> (32 * i + 0));
-+        int64_t elt1_i = (int16_t)(n >> (32 * i + 16));
-+        int64_t elt2_a = (int16_t)(m >> (32 * i + 16 * sel_a));
-+        int64_t elt2_b = (int16_t)(m >> (32 * i + 16 * sel_b));
-+
-+        a += elt1_r * elt2_a + elt1_i * elt2_b * sub_i;
-+    }
-+    return a;
-+}
-+
-+void HELPER(sve2_cdot_zzzz_s)(void *vd, void *vn, void *vm,
-+                              void *va, uint32_t desc)
-+{
-+    int opr_sz = simd_oprsz(desc);
-+    int rot = simd_data(desc);
-+    int sel_a = rot & 1;
-+    int sel_b = sel_a ^ 1;
-+    int sub_i = (rot == 0 || rot == 3 ? -1 : 1);
-+    uint32_t *d = vd, *n = vn, *m = vm, *a = va;
-+
-+    for (int e = 0; e < opr_sz / 4; e++) {
-+        d[e] = do_cdot_s(n[e], m[e], a[e], sel_a, sel_b, sub_i);
-+    }
-+}
-+
-+void HELPER(sve2_cdot_zzzz_d)(void *vd, void *vn, void *vm,
-+                              void *va, uint32_t desc)
-+{
-+    int opr_sz = simd_oprsz(desc);
-+    int rot = simd_data(desc);
-+    int sel_a = rot & 1;
-+    int sel_b = sel_a ^ 1;
-+    int sub_i = (rot == 0 || rot == 3 ? -1 : 1);
-+    uint64_t *d = vd, *n = vn, *m = vm, *a = va;
-+
-+    for (int e = 0; e < opr_sz / 8; e++) {
-+        d[e] = do_cdot_d(n[e], m[e], a[e], sel_a, sel_b, sub_i);
-+    }
-+}
-+
-+void HELPER(sve2_cdot_idx_s)(void *vd, void *vn, void *vm,
-+                             void *va, uint32_t desc)
-+{
-+    int opr_sz = simd_oprsz(desc);
-+    int rot = extract32(desc, SIMD_DATA_SHIFT, 2);
-+    int idx = H4(extract32(desc, SIMD_DATA_SHIFT + 2, 2));
-+    int sel_a = rot & 1;
-+    int sel_b = sel_a ^ 1;
-+    int sub_i = (rot == 0 || rot == 3 ? -1 : 1);
-+    uint32_t *d = vd, *n = vn, *m = vm, *a = va;
-+
-+    for (int seg = 0; seg < opr_sz / 4; seg += 4) {
-+        uint32_t seg_m = m[seg + idx];
-+        for (int e = 0; e < 4; e++) {
-+            d[seg + e] = do_cdot_s(n[seg + e], seg_m, a[seg + e],
-+                                   sel_a, sel_b, sub_i);
-+        }
-+    }
-+}
-+
-+void HELPER(sve2_cdot_idx_d)(void *vd, void *vn, void *vm,
-+                             void *va, uint32_t desc)
-+{
-+    int seg, opr_sz = simd_oprsz(desc);
-+    int rot = extract32(desc, SIMD_DATA_SHIFT, 2);
-+    int idx = extract32(desc, SIMD_DATA_SHIFT + 2, 2);
-+    int sel_a = rot & 1;
-+    int sel_b = sel_a ^ 1;
-+    int sub_i = (rot == 0 || rot == 3 ? -1 : 1);
-+    uint64_t *d = vd, *n = vn, *m = vm, *a = va;
-+
-+    for (seg = 0; seg < opr_sz / 8; seg += 2) {
-+        uint64_t seg_m = m[seg + idx];
-+        for (int e = 0; e < 2; e++) {
-+            d[seg + e] = do_cdot_d(n[seg + e], seg_m, a[seg + e],
-+                                   sel_a, sel_b, sub_i);
-+        }
-+    }
-+}
-+
- #define DO_ZZXZ(NAME, TYPE, H, OP) \
- void HELPER(NAME)(void *vd, void *vn, void *vm, void *va, uint32_t desc) \
- {                                                                       \
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 92d1297a5c..4893968cdb 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -4151,6 +4151,9 @@ DO_SVE2_RRXR_ROT(CMLA_zzxz_s, gen_helper_sve2_cmla_idx_s)
- DO_SVE2_RRXR_ROT(SQRDCMLAH_zzxz_h, gen_helper_sve2_sqrdcmlah_idx_h)
- DO_SVE2_RRXR_ROT(SQRDCMLAH_zzxz_s, gen_helper_sve2_sqrdcmlah_idx_s)
- 
-+DO_SVE2_RRXR_ROT(CDOT_zzxw_s, gen_helper_sve2_cdot_idx_s)
-+DO_SVE2_RRXR_ROT(CDOT_zzxw_d, gen_helper_sve2_cdot_idx_d)
-+
- #undef DO_SVE2_RRXR_ROT
- 
- /*
-@@ -8355,6 +8358,20 @@ static bool trans_CMLA_zzzz(DisasContext *s, arg_CMLA_zzzz *a)
-     return true;
- }
- 
-+static bool trans_CDOT_zzzz(DisasContext *s, arg_CMLA_zzzz *a)
-+{
-+    if (!dc_isar_feature(aa64_sve2, s) || a->esz < MO_32) {
-+        return false;
-+    }
-+    if (sve_access_check(s)) {
-+        gen_helper_gvec_4 *fn = (a->esz == MO_32
-+                                 ? gen_helper_sve2_cdot_zzzz_s
-+                                 : gen_helper_sve2_cdot_zzzz_d);
-+        gen_gvec_ool_zzzz(s, fn, a->rd, a->rn, a->rm, a->ra, a->rot);
-+    }
-+    return true;
-+}
-+
- static bool trans_SQRDCMLAH_zzzz(DisasContext *s, arg_SQRDCMLAH_zzzz *a)
- {
-     static gen_helper_gvec_4 * const fns[] = {
--- 
-2.25.1
+Queuing this to tcg-next, with Phil's suggested change to current_machine in
+the final patch.
 
+
+r~
 
