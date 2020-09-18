@@ -2,80 +2,89 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74BBFC43464
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 09:03:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE023C43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 09:07:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76AF921D42
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 09:03:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76AF921D42
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 595BD208DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 09:07:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RfKmOwX+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 595BD208DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJCIg-0006zb-IR
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 05:03:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41178)
+	id 1kJCMT-0001Z8-6o
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 05:07:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42524)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kJCGq-0005Wq-UO
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 05:01:33 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33508)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kJCGo-0001nC-0T
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 05:01:32 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kJCGi-0006LF-RC
- for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 09:01:25 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id CCAED2E8141
- for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 09:01:22 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 18 Sep 2020 08:49:16 -0000
-From: Daniel Berrange <1896096@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kJCLb-0000uq-G0
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 05:06:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28503)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kJCLY-0002Ow-W6
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 05:06:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600419982;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=VrJ9MH7sCjHHK4bdsm1eUbET4NsCywypUj4ioRHWGv8=;
+ b=RfKmOwX+kswJcxBEZBcHMWFTfq7KVqN3MYGZf/g+3Rm15DXOEwHhcorvGhB50CoPAln3NP
+ ZPh61qtxHu3aKKzFWlA25eCFax8BYaM/jY4FYx8HI1iubmgTG0w8PtM1fqpfD9YB+ffwMR
+ 7V+f1G4Dr4VCQJkAH1ctCI5CqRgD9Bk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-360-JSBB41iFOTef1ihqapUsiQ-1; Fri, 18 Sep 2020 05:06:07 -0400
+X-MC-Unique: JSBB41iFOTef1ihqapUsiQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 22A0E1891E85;
+ Fri, 18 Sep 2020 09:06:06 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-113-161.ams2.redhat.com
+ [10.36.113.161])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7196E73675;
+ Fri, 18 Sep 2020 09:06:04 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange fredb74
-X-Launchpad-Bug-Reporter: Frederic Bezies (fredb74)
-X-Launchpad-Bug-Modifier: Daniel Berrange (berrange)
-References: <160036517624.17887.51064102046414127.malonedeb@soybean.canonical.com>
-Message-Id: <160041895707.21075.15899392148330575017.malone@wampee.canonical.com>
-Subject: [Bug 1896096] Re: Git version: Build process is broken in
- block_curl.c.o
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: 8af475381be5b95c14ca5686fff0a22f31c2c42e
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 05:01:27
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.248, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Subject: [PATCH v2] docs: simplify and clarify the platform support rules
+Date: Fri, 18 Sep 2020 10:06:03 +0100
+Message-Id: <20200918090603.1640224-1-berrange@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 00:20:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,60 +93,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1896096 <1896096@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Please give more info on your host OS build environment, and most
-importantly confirm that you have tried doing a build from a
-*completely* clean git checkout. Recent build system changes introduced
-risk of problems if you have not done a full clean. "git clean -f -x -d"
-will delete every file in your git checkout that is not committed,
-ensuring you are starting from a pristine checkout.
+The distinction between short life and long life Linux distributions
+turned out to be redundant. They can both be covered in a simple way
+by noting support will target the current release, and the previous
+release for a period of two years or until its EOL. This rule can also
+apply to the other UNIX based distros, leaving only Windows needing a
+different set of rules.
 
--- =
+This also clarifies that Debian LTS is out of scope, because the LTS
+support is provided by a separate group from the main Debian maintainer
+team.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1896096
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ docs/system/build-platforms.rst | 59 +++++++++++----------------------
+ 1 file changed, 19 insertions(+), 40 deletions(-)
 
-Title:
-  Git version: Build process is broken in block_curl.c.o
+diff --git a/docs/system/build-platforms.rst b/docs/system/build-platforms.rst
+index 9734eba2f1..1cdff44abf 100644
+--- a/docs/system/build-platforms.rst
++++ b/docs/system/build-platforms.rst
+@@ -29,51 +29,30 @@ The Repology site https://repology.org is a useful resource to identify
+ currently shipped versions of software in various operating systems,
+ though it does not cover all distros listed below.
+ 
+-Linux OS
+---------
++Linux OS, macOS, FreeBSD, NetBSD, OpenBSD
++-----------------------------------------
+ 
+-For distributions with frequent, short-lifetime releases, the project
+-will aim to support all versions that are not end of life by their
+-respective vendors. For the purposes of identifying supported software
+-versions, the project will look at Fedora, Ubuntu, and openSUSE distros.
+-Other short- lifetime distros will be assumed to ship similar software
+-versions.
++The project aims to support the most recent major version at all times. Support
++for the previous major version will be dropped 2 years after the new major
++version is released or when the vendor itself drops support, whichever comes
++first. In this context, third-party efforts to extend the lifetime of a distro
++are not considered, even when they are endorsed by the vendor (eg. Debian LTS).
+ 
+-For distributions with long-lifetime releases, the project will aim to
+-support the most recent major version at all times. Support for the
+-previous major version will be dropped 2 years after the new major
+-version is released, or when it reaches "end of life". For the purposes
+-of identifying supported software versions, the project will look at
+-RHEL, Debian, Ubuntu LTS, and SLES distros. Other long-lifetime distros
+-will be assumed to ship similar software versions.
++For the purposes of identifying supported software versions available on Linux,
++the project will look at CentOS, Debian, Fedora, openSUSE, RHEL, SLES and
++Ubuntu LTS. Other distros will be assumed to ship similar software versions.
+ 
+-Windows
+--------
+-
+-The project supports building with current versions of the MinGW
+-toolchain, hosted on Linux.
++For FreeBSD and OpenBSD, decisions will be made based on the contents of the
++respective ports repository, while NetBSD will use the pkgsrc repository.
+ 
+-macOS
+------
++For macOS, `HomeBrew`_ will be used, although `MacPorts`_ is expected to carry
++similar versions.
+ 
+-The project supports building with the two most recent versions of
+-macOS, with the current Homebrew package set available.
+-
+-FreeBSD
++Windows
+ -------
+ 
+-The project aims to support all versions which are not end of
+-life.
+-
+-NetBSD
+-------
+-
+-The project aims to support the most recent major version at all times.
+-Support for the previous major version will be dropped 2 years after the
+-new major version is released.
+-
+-OpenBSD
+--------
++The project supports building with current versions of the MinGW toolchain,
++hosted on Linux (Debian/Fedora).
+ 
+-The project aims to support all versions which are not end of
+-life.
++The version of the Windows API that's currently targeted is Vista / Server
++2008.
+-- 
+2.26.2
 
-Status in QEMU:
-  New
-
-Bug description:
-  Gcc version: 10.2.0
-  Glusterfs: 8.1
-  Libguestfs: 1.42
-
-  Configure options used:
-
-  configure \
-      --prefix=3D/usr \
-      --sysconfdir=3D/etc \
-      --localstatedir=3D/var \
-      --libexecdir=3D/usr/lib/qemu \
-      --extra-ldflags=3D"$LDFLAGS" \
-      --smbd=3D/usr/bin/smbd \
-      --enable-modules \
-      --enable-sdl \
-      --disable-werror \
-      --enable-slirp=3Dsystem \
-      --enable-xfsctl \
-      --audio-drv-list=3D"pa alsa sdl"
-      =
-
-  Error log attached. Here is the beginning:
-
-  /usr/bin/ld: /usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../lib/Scrt=
-1.o: in function `_start':
-  (.text+0x24): undefined reference to `main'
-  /usr/bin/ld: libblock-curl.a(block_curl.c.o): in function `curl_block_ini=
-t':
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1896096/+subscriptions
 
