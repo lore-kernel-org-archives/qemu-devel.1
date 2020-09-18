@@ -2,129 +2,104 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB6F6C43465
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 10:01:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16881C43463
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 10:03:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2394020878
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 10:01:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5DADC208B8
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 10:03:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="B5YRrHCV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2394020878
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AffKamhk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DADC208B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJDCh-0005ZQ-8d
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 06:01:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54458)
+	id 1kJDF3-0007Xm-8F
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 06:03:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54820)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <den@virtuozzo.com>) id 1kJDAc-0004cd-82
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 05:59:11 -0400
-Received: from mail-eopbgr30119.outbound.protection.outlook.com
- ([40.107.3.119]:57388 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <den@virtuozzo.com>) id 1kJDAZ-0000ZQ-AK
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 05:59:09 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iJKVHKUD2CPhM5FvfbSRwUmzjgPQDqT0IjLRwMnrXX8+oTHJQ2TRyxInYlfu1iP5ASSdl340YJcWlJGPVa//OKkLP0OAWyJTJMycMZdtSCgeNalKdH0hgoUXmbPM+UGZOnZqlK6N+zvwNXiipTKe2cdV0lKHLjB7LvV5yKD5BUozaHo/09TOk3CYMw4LJxykgj0MNhjlHHz1heS2KWi8ZBZeA5VJakTMH6cIKLUgneoXrRhiIc1a6Pw7bT/+juvggYhp9kzniffMxxe/MM93ceoODmkN/vjFOJ+48Q0c3sMRRKgu9hygSCQd//SvRGdA+K3LVIpXBQwwOLrxmMEJOA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6oTt8ft9QMgryTJVDWknBUfEElRgJ83wpbtSKjHquPo=;
- b=Vsc5ENNg2jhcmyn4lFrvc5MbmtH7rdlEFqI9ALMiEzUhuQpg1uB2WQbOo9jTtygb+5hxfweFXg5uguS5A8EFudEP3R5Kq1B/qwmcIc4t3IUWxtv9L8VxBQK/lEKYzgaVM415lHQHFt9IdHi2U7S218NeTRjRyAZuAfKBgDHklI/Y8aOkbA7gcAXi7XR4AkmuBfu1zDqijlXYQ2YBLoAB3r72c1e0a/GyvJ9DbF252hwYZs46swiR53bYanmRvG0M/bilbj2KULGGw5R33fUr+sQwGS9BhyhOVgeDaIvdJT77z2evMp4XMeUM+3DAPskfYeebIbWALr8rvNaDhKWtoQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6oTt8ft9QMgryTJVDWknBUfEElRgJ83wpbtSKjHquPo=;
- b=B5YRrHCVKJx/8PaVH8SDBXEe3BorX4IK5ZNzJYz/oc6DZk1wgB2KvEgfmnqo1czlhUMWMnSjOGWtV28JRj6gK7KgkiOPSdXpQdzgEqNcD+uREuZjWq3HmmsyzRbVMWSi0SC6bcu5u7ZKQSfuZ5tPIz+H4iY1eK9lavnMNJWrDnE=
-Authentication-Results: virtuozzo.com; dkim=none (message not signed)
- header.d=none;virtuozzo.com; dmarc=none action=none
- header.from=virtuozzo.com;
-Received: from AM6PR08MB4214.eurprd08.prod.outlook.com (2603:10a6:20b:8d::30)
- by AM6PR08MB3285.eurprd08.prod.outlook.com (2603:10a6:209:4b::22)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.19; Fri, 18 Sep
- 2020 09:59:04 +0000
-Received: from AM6PR08MB4214.eurprd08.prod.outlook.com
- ([fe80::948a:2e3c:f9f:66f7]) by AM6PR08MB4214.eurprd08.prod.outlook.com
- ([fe80::948a:2e3c:f9f:66f7%4]) with mapi id 15.20.3391.017; Fri, 18 Sep 2020
- 09:59:04 +0000
-Subject: Re: QEMU 5.0 virtio-blk performance regression with high queue depths
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>,
- qemu-devel <qemu-devel@nongnu.org>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20200824134431.GA35623@stefanha-x1.localdomain>
- <CAJSP0QW3xniHzHS=_Ok1D-NuAViHUShCxYs38YDo-YjUxC_+ZA@mail.gmail.com>
- <709da6a3-d158-270b-fb63-43ef65dfe668@virtuozzo.com>
- <dd5d6d0f-cc52-d3d5-0bbc-c57dcfef6842@virtuozzo.com>
- <CAJSP0QVRMzw5AAJEPpOChyFK4hUuEe1VE909QvYb6HQGOV_8XA@mail.gmail.com>
-From: "Denis V. Lunev" <den@virtuozzo.com>
-Message-ID: <ec0e4c0b-9570-de7c-66fd-5cb4085ab075@virtuozzo.com>
-Date: Fri, 18 Sep 2020 12:59:02 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <CAJSP0QVRMzw5AAJEPpOChyFK4hUuEe1VE909QvYb6HQGOV_8XA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-ClientProxiedBy: AM0PR07CA0009.eurprd07.prod.outlook.com
- (2603:10a6:208:ac::22) To AM6PR08MB4214.eurprd08.prod.outlook.com
- (2603:10a6:20b:8d::30)
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1kJDCI-0005Wy-Nu
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 06:00:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45933)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1kJDCE-0000mg-M0
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 06:00:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600423248;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=waR5iF6dKU3BVwiJqn4s5OkzIxa9MbiNXFv1q9V644A=;
+ b=AffKamhkjywUamOF/IrVM9xP1/GJUIBkulzBE+aPRlt17TBlCcdMNINYBQiS3rvHBwa7EB
+ u1f3J0UaPA4aWH8mhtqTQDSO6KReHuy2Se4yUfEsJFPYywWQASgBn/2RXZgBhUgUdrkKM6
+ /bgvWj/9U/RMAGJOddG8+cpl6RRUq8M=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-176-ixQM0J3MOvGlDKQ6Tll0vQ-1; Fri, 18 Sep 2020 06:00:47 -0400
+X-MC-Unique: ixQM0J3MOvGlDKQ6Tll0vQ-1
+Received: by mail-wm1-f70.google.com with SMTP id y18so1293363wma.4
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 03:00:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=waR5iF6dKU3BVwiJqn4s5OkzIxa9MbiNXFv1q9V644A=;
+ b=CS7VqfXASYL+Nmko+tdA/60l92vd73RVorgT+vCy+UZOfaSwKsNKF4YwkJwFxEuClZ
+ hPXdq0+aJWSvk2EEkb7bZm0NdpnZ5ZXpKKJyWiaGNr6EdjGyIVdqVjRAxLCHfCAOXWuK
+ Fgv0dqEst7QxvIB/3nHOans7Y/1aEm4lLxNJgQaNSyUvrfJWd93FaxYcRHJdyPHilAgF
+ TSj6ZXjx897FEpmIClvPESXdaoZIN8PLwT+bWeZA17gJ9ILydnI2jkqHvkkeRNHotZOS
+ pPeEK+zl5B58hjFIw3987KsekdYx7Xrl8cKDoGgcN4sF4FwVOqLlYs10cwp2fA0r7Dxt
+ Ecpw==
+X-Gm-Message-State: AOAM531wXVe64SlY/koPJIewxlmovQzH/r3F09rVPe1ko8yAghm0Uqhp
+ ScWueupOnCTz+WyRs2tAMPkO77AsolIYoZ89Ry6P7FWT2goPW7uEIdBGAoUy4nfnYbgDZWGSfSg
+ KkV/yoZ4JrvZ2VF4=
+X-Received: by 2002:a1c:2cc4:: with SMTP id s187mr14411587wms.36.1600423245668; 
+ Fri, 18 Sep 2020 03:00:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzilFvYJxYRlaN8YMont27nqhZfFbDzjCjv6ELjLeoqDfwcWpY7v1qXVRIPwDLYnJxWLw5x7A==
+X-Received: by 2002:a1c:2cc4:: with SMTP id s187mr14411542wms.36.1600423245303; 
+ Fri, 18 Sep 2020 03:00:45 -0700 (PDT)
+Received: from steredhat (host-79-51-197-141.retail.telecomitalia.it.
+ [79.51.197.141])
+ by smtp.gmail.com with ESMTPSA id 92sm4484143wra.19.2020.09.18.03.00.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 18 Sep 2020 03:00:44 -0700 (PDT)
+Date: Fri, 18 Sep 2020 12:00:42 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v3 2/4] vhost-vsock-pci: force virtio version 1
+Message-ID: <20200918100042.5rlp6jovqct62bso@steredhat>
+References: <20200918074710.27810-1-sgarzare@redhat.com>
+ <20200918074710.27810-3-sgarzare@redhat.com>
+ <20200918111901.7b8862b3.cohuck@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.1.27] (31.148.204.195) by
- AM0PR07CA0009.eurprd07.prod.outlook.com (2603:10a6:208:ac::22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3412.7 via Frontend Transport; Fri, 18 Sep 2020 09:59:03 +0000
-X-Originating-IP: [31.148.204.195]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: be35cb68-c90b-4969-af5e-08d85bb97983
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3285:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB3285B90B2A50B63AB4C0664AB63F0@AM6PR08MB3285.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: xRc8vL27soasfLuz06eK1ScUEP8IFMtJVCebmQ3hH7uBE8I/zAHcq/ka0EUqNukDzFYBJo0Lf1U/+HLF0mdcaah9UL+sWZ8ENem4B//fN6kRaBsDvRZnsSRG8MpvYHKJBxRasy4BuUyw+YYbtftYcouUiem3chiGPnhSk1KkcCvsWBxaveXqq2BSyI7YB1WE6PAgJXYKZarXJzxMGFKcU79UxT+A5b4D2owTj67BRbbEaP8pXKvVTZqZ8Gw5sKPC5NG4iuOv5TN18j/Ad13H4qN+v2Wam/RR4k+kS5COfhlsvT8MNIsf7QAnYzD7f2dkO5PphNaTxZc8ioCpN0Uvb/ZbjzYe6LbBHcGdhyVSwsjH98nUpQ5eWe/BS8YjAQAT
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR08MB4214.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(346002)(136003)(396003)(39840400004)(376002)(366004)(66476007)(66556008)(107886003)(86362001)(4326008)(6916009)(66946007)(5660300002)(6486002)(2906002)(956004)(2616005)(83380400001)(8676002)(52116002)(16576012)(31696002)(26005)(53546011)(316002)(36756003)(31686004)(54906003)(16526019)(8936002)(478600001)(186003)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 8r8/ogG4WzC7oYnSuQ8uUbWjRIm36C9NLZDHGcy0rV1/0YuWjfjkTvSekmn3a98iqWd5tzQ1D5N/w6uKs+BMfdlOgMU1l25GE3QEWT34dtB5YFD8eBrzjICX4BwO+FYrply5Sfm0bcw7Mzdas2kpahn1WS/+aIan6wK7+yhMCL6aq4QsOY5m+0jEaA+nCs4u6sY7GvQRzHtrr04HamfJCFCa5ktlo/7+Aa/aqOieR/ctbVo3uoQnAGGAxWe/BA3QczQ1leKWTWGQRCeYMZUuBRpBUFecQ3metqbI14fx8Mfn1euKmBbtO76WNnP4FPnZuoyFi6tiALPxtFAMSoacPMN4qsE69wcoBzAGor1t3E2sw6MfAjpAXeNO3gf9FxpkUkwFx+7DRzvAObimqM+X4jyiZoPeVYJmXInf/CFRzvJQkCBZgB4RGpoKCvgZjH4I2ASU+Qxjat/0LZuJabak0UwkKd/l1/flZIZqzop5+29GFQWdAH34PhqMV1ID1IUJ0Gg5+zdZ/6OuhpQ1okaBFJiiR+0P7BMIH+V2PhEi7XyySPQ9IIOcbvCJxuAhFPv1wRWQ2j/eCOjgNAEg15/EUK/AASyk/7QRnQNpKl06HHAPjr4rkWDJVtQkvLnDn8jDKis8bsh+3EX9wWPjIcAUSQ==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: be35cb68-c90b-4969-af5e-08d85bb97983
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4214.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2020 09:59:04.0124 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jkMh5brgWg4X2T7FtC0vJHhjOGka1wkElu7FZLYQ8oG60lAZPFPKFw/U1KbTy/tjG4LqKI2MZr5bwAXmUQfSSA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3285
-Received-SPF: pass client-ip=40.107.3.119; envelope-from=den@virtuozzo.com;
- helo=EUR03-AM5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 05:59:04
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200918111901.7b8862b3.cohuck@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=sgarzare@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=sgarzare@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 00:20:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -137,46 +112,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Thomas Huth <thuth@redhat.com>, Qinghua Cheng <qcheng@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-stable@nongnu.org, David Hildenbrand <david@redhat.com>,
+ qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>, Qian Cai <caiqian@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/17/20 3:41 PM, Stefan Hajnoczi wrote:
-> On Wed, Sep 16, 2020 at 5:43 PM Denis V. Lunev <den@virtuozzo.com> wrote:
->> On 9/16/20 5:07 PM, Denis V. Lunev wrote:
->>> I will make a check today.
->>>
->>> Talking about our performance measurements, we have not
->>> seen ANY performance degradation, especially 30-40%.
->>> This looking quite strange to me.
->>>
->>> Though there is quite important difference. We are always
->>> using O_DIRECT and 'native' AIO engine.
->>>
->>> Den
->> I have put my hands into this and it looks like you are right. There is
->> a difference. It is not as significant for me as in your case, but I observe
->> stable around 10% difference with 128 vs 256 queue size.
->>
->> I have checked with:
->> - QEMU 5.1
->> - Fedora 31 in guest
->> - qcow2 (64k, 1Mb) and raw image on host
->> - nocache and both threaded/native IO modes
->>
->> The test was run on Thinkpad Carbon X1 gen 6 laptop.
->>
->> For the reference, I have seen 330k IOPS for read
->> at max which is looking awesome for native and 220k
->> IOPS for threads.
-> Thanks for confirming! Reverting the commit is unattractive since it
-> does improve performance in some cases.
->
-> It would be good to understand the root cause so the regression can be
-> fixed without reducing queue-size again.
->
-> Do you have time to investigate?
-I will make a try next week.
+On Fri, Sep 18, 2020 at 11:19:01AM +0200, Cornelia Huck wrote:
+> On Fri, 18 Sep 2020 09:47:08 +0200
+> Stefano Garzarella <sgarzare@redhat.com> wrote:
+> 
+> > Commit 9b3a35ec82 ("virtio: verify that legacy support is not
+> > accidentally on") added a safety check that requires to set
+> > 'disable-legacy=on' on vhost-vsock-pci device:
+> > 
+> >     $ ./qemu-system-x86_64 ... -device vhost-vsock-pci,guest-cid=5
+> >         qemu-system-x86_64: -device vhost-vsock-pci,guest-cid=5:
+> >         device is modern-only, use disable-legacy=on
+> > 
+> > virtio-vsock was introduced after the release of VIRTIO 1.0
+> > specifications, so it should be 'modern-only'.
+> > In addition Cornelia verified that forcing a legacy mode on
+> > vhost-vsock-pci device using x86-64 host and s390x guest, so with
+> > different endianness, produces strange behaviours.
+> > 
+> > This patch forces virtio version 1 and removes the 'transitional_name'
+> > property removing the need to specify 'disable-legacy=on' on
+> > vhost-vsock-pci device.
+> > 
+> > To avoid migration issues, we force virtio version 1 only when
+> > legacy check is enabled in the new machine types (>= 5.1).
+> > 
+> > Cc: qemu-stable@nongnu.org
+> > Reported-by: Qian Cai <caiqian@redhat.com>
+> > Reported-by: Qinghua Cheng <qcheng@redhat.com>
+> > Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1868449
+> > Suggested-by: Cornelia Huck <cohuck@redhat.com>
+> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > ---
+> > v3:
+> >  - forced virtio version 1 only with new machine types
+> > v2:
+> >  - fixed commit message [Cornelia]
+> > ---
+> >  hw/virtio/vhost-vsock-pci.c | 10 +++++++++-
+> >  1 file changed, 9 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/virtio/vhost-vsock-pci.c b/hw/virtio/vhost-vsock-pci.c
+> > index e56067b427..205da8d1f5 100644
+> > --- a/hw/virtio/vhost-vsock-pci.c
+> > +++ b/hw/virtio/vhost-vsock-pci.c
+> > @@ -44,6 +44,15 @@ static void vhost_vsock_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+> >  {
+> >      VHostVSockPCI *dev = VHOST_VSOCK_PCI(vpci_dev);
+> >      DeviceState *vdev = DEVICE(&dev->vdev);
+> > +    VirtIODevice *virtio_dev = VIRTIO_DEVICE(vdev);
+> > +
+> > +    /*
+> > +     * To avoid migration issues, we force virtio version 1 only when
+> > +     * legacy check is enabled in the new machine types (>= 5.1).
+> > +     */
+> > +    if (!virtio_legacy_check_disabled(virtio_dev)) {
+> > +        virtio_pci_force_virtio_1(vpci_dev);
+> > +    }
+> >  
+> >      qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
+> >  }
+> > @@ -73,7 +82,6 @@ static void vhost_vsock_pci_instance_init(Object *obj)
+> >  static const VirtioPCIDeviceTypeInfo vhost_vsock_pci_info = {
+> >      .base_name             = TYPE_VHOST_VSOCK_PCI,
+> >      .generic_name          = "vhost-vsock-pci",
+> > -    .transitional_name     = "vhost-vsock-pci-transitional",
+> 
+> Hm... this means that vhost-vsock-pci-transitional won't work on compat
+> machines, which could also lead to migration compatibility issues (I
+> think?)
+> 
 
-Den
+Yes, I think you are right.
+
+> Is this way of specifying the device sufficiently uncommon so that we
+> can ignore that?
+
+I think it's really uncommon and we can safetly eliminate it, since it
+has never been really transitional.  But if we want to leave it for
+migration compatibility, that's fine with me.
+
+Thanks,
+Stefano
+
 
