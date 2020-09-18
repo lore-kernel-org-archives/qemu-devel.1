@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21F13C43464
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 19:46:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AECFC43463
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 19:47:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEBFF21D42
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 19:46:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B81521D42
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 19:47:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wdp5jhjC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEBFF21D42
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bxr3bq6e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B81521D42
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJMLM-0005hd-QL
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 15:46:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49024)
+	id 1kJMM5-0006Bk-Or
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 15:47:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48820)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kJLIJ-0001Lr-2H
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:39:44 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:34579)
+ id 1kJLI9-00010O-Qi
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:39:29 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:42447)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kJLIG-0007JK-Rc
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:39:38 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id s14so4600544pju.1
- for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 11:39:36 -0700 (PDT)
+ id 1kJLHy-0007EV-3Q
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 14:39:29 -0400
+Received: by mail-pg1-x544.google.com with SMTP id k14so3973227pgi.9
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 11:39:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=uqRFNthjY19DaXy+bhh6PHCChxy0wtOZHHVokv5xS8o=;
- b=wdp5jhjCLrTN4ISPLKg1ygpdiU76waF5AzzDL1phmVGLfKCdjSE6N/g2G6D36dkzCl
- Yu3KUTRkwCl1UxdBv6K6Pq1H0NjARd58U0pzdqS79cMiwJWZk9ubU8o4bgvl3CCUv+Od
- LMMsc9Z+6VTk1saLWIQugLfwpTIXEYR2aK8AU9qRO8cTmjCIHSOeoiJnwRfrIG9PshhB
- F4Jj2/vZggRu9LTM6M/HQYwUzS596jgdlw6mL8nU4wPI4OzZ7m00bEFB0DQ70aYKPRJ9
- tkfSeoUDP7Pc/7+N15oYWKDn2KJayVAQlejKTHCIXGH1B3Zh7jOSKvEJ7dJ1bodo8zd1
- vMbg==
+ bh=lFJ8kTFmIiX5tpGTknCea588jF44LhIYKzuEd0gTcfs=;
+ b=bxr3bq6eWIPh4qOlnsTf0jmJiEbtbfjt6recMWPnZUBh4K9EA853OJrZJEqhf4zeOi
+ sDSRSV4oqn/TSbdSkXBlEzInCS0C6kzH2p6h/l6AJ+itGIv18Mt9A6u8KTSieiHa/HLI
+ wpxSMACTKKDVdcDtPaB17Gy6B73TNHiuxS87yJvuSVwUcerTIBknaGMSGTha/XWHZdTM
+ +vjjL+1Df/0LMrqvJ/rlBb8Fng6wsQ4D+jA2UD/sN3KiackpPU7/2YhuTX2YvxV264Z+
+ Togcg142LDEcRWCFWu9u8G6BZlTzY1Jklw2iRixtY4i8Aq7dSs/eZ16et2dCOYcOjCwu
+ ulXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=uqRFNthjY19DaXy+bhh6PHCChxy0wtOZHHVokv5xS8o=;
- b=BwgeP41DrIObDDTc1U8c6UZ2P4u8F//5PV/0fuoLcWI+o9+hQ59qwVVKAeaSWErHVN
- BhSExNiQ+ux2UQZ6ixfJmvwMZe6uqz+lwfcaeoDZrSoTuucmW4ZOcd++TD55iRLexsK8
- cGcse11lUvAQFKDysPQ55e+DKeb4CG1jioy5yw0CRlfA1hQwy9NRK7VIoXjEqlYANi76
- 7RZimSqRqo44Y397ra09XJCOLW++iNOweycBfSvWqy4AXyqv62XNzW9OqbMoaeM9KisS
- j5S6dQb0kCIGOu395oILqCtxIahH3p7K/TKwZgmgJWbsJL4A68Hxr2kWZhmJu6t9sokU
- 1frQ==
-X-Gm-Message-State: AOAM533oH+C3hHaDAhd6oyexYDUXi/1KOhev4MVrboLMbuJCMQOiORyF
- G9b1Yya/T/e+BvdgDH2NQUpYrq0vjZOJIw==
-X-Google-Smtp-Source: ABdhPJwaYIoOCMIW8iUwZxHVqyed0x4+amtwrD+9b/pVq6K3m10v+O09cHsd/cAmxlCblBmT/z4uxA==
-X-Received: by 2002:a17:902:a50b:b029:d1:e5e7:bdd2 with SMTP id
- s11-20020a170902a50bb02900d1e5e7bdd2mr16865535plq.50.1600454374937; 
- Fri, 18 Sep 2020 11:39:34 -0700 (PDT)
+ bh=lFJ8kTFmIiX5tpGTknCea588jF44LhIYKzuEd0gTcfs=;
+ b=NlyaUBFFZif5G6xyfGFJNhLD6RxjJLo820nxO7PJlKaZN+tosvI6vxA8J/3rU/3qEZ
+ VMVKlRhFIPd577wD/apMrJeuB+A89yzc6cWritNeo+T+DKE9vQy/FfwYQuX6wpj6ueLn
+ caKiq2yBcPpKXSrwsjJ1bgWv7/+xseoOwIQJTgevtNK7XiV8qaiN2+ny7daDhwyb8TWF
+ z2ZBKVJpl+CWgLvQLvmYIv5v4WczrlLIwoQECaJmxJfqy0oAayzM0sgU3QMECkr3AFBs
+ EI9KALk4C2TMOf4hKdGk88osraos7TLC34kfCa1UFr3fzVs9Md31rV+hGMMQ1htZCva9
+ th1A==
+X-Gm-Message-State: AOAM533WGJ40HSmQWl9XCKD28eG9MPEvm99r+841C1hAtXBTrsrjUfnJ
+ nZvVcTOJisoFHWrvQdK0dYx3C4yeaCRTjg==
+X-Google-Smtp-Source: ABdhPJyh2iVlx8kkZdmvYawNnls3IM2hIllweNMd41N2eaf91iQQ8rxyhwvlfKHKX0iwQo4yRt+46w==
+X-Received: by 2002:a63:4b63:: with SMTP id k35mr29021279pgl.235.1600454354815; 
+ Fri, 18 Sep 2020 11:39:14 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id f4sm3680723pfj.147.2020.09.18.11.39.33
+ by smtp.gmail.com with ESMTPSA id f4sm3680723pfj.147.2020.09.18.11.39.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Sep 2020 11:39:34 -0700 (PDT)
+ Fri, 18 Sep 2020 11:39:14 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 76/81] target/arm: Implement SVE2 LD1RO
-Date: Fri, 18 Sep 2020 11:37:46 -0700
-Message-Id: <20200918183751.2787647-77-richard.henderson@linaro.org>
+Subject: [PATCH v3 61/81] target/arm: Implement SVE2 signed saturating
+ doubling multiply high
+Date: Fri, 18 Sep 2020 11:37:31 -0700
+Message-Id: <20200918183751.2787647-62-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200918183751.2787647-1-richard.henderson@linaro.org>
 References: <20200918183751.2787647-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,138 +107,193 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
+ target/arm/helper.h        | 10 +++++
  target/arm/sve.decode      |  4 ++
- target/arm/translate-sve.c | 97 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 101 insertions(+)
+ target/arm/translate-sve.c | 18 ++++++++
+ target/arm/vec_helper.c    | 84 ++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 116 insertions(+)
 
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 8b3dc9b4e3..fa7b2b7dd7 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -944,6 +944,16 @@ DEF_HELPER_FLAGS_5(neon_sqrdmulh_h, TCG_CALL_NO_RWG,
+ DEF_HELPER_FLAGS_5(neon_sqrdmulh_s, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
+ 
++DEF_HELPER_FLAGS_4(sve2_sqdmulh_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve2_sqdmulh_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve2_sqdmulh_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve2_sqdmulh_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_4(sve2_sqrdmulh_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve2_sqrdmulh_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve2_sqrdmulh_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve2_sqrdmulh_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++
+ DEF_HELPER_FLAGS_4(gvec_xar_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ 
+ #ifdef TARGET_AARCH64
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 6808ff4194..e0d093c5d7 100644
+index 400940a18d..6879870cc1 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -1119,11 +1119,15 @@ LD_zpri         1010010 .. nreg:2 0.... 111 ... ..... .....     @rpri_load_msz
- # SVE load and broadcast quadword (scalar plus scalar)
- LD1RQ_zprr      1010010 .. 00 ..... 000 ... ..... ..... \
-                 @rprr_load_msz nreg=0
-+LD1RO_zprr      1010010 .. 01 ..... 000 ... ..... ..... \
-+                @rprr_load_msz nreg=0
+@@ -1214,6 +1214,10 @@ SMULH_zzz       00000100 .. 1 ..... 0110 10 ..... .....  @rd_rn_rm
+ UMULH_zzz       00000100 .. 1 ..... 0110 11 ..... .....  @rd_rn_rm
+ PMUL_zzz        00000100 00 1 ..... 0110 01 ..... .....  @rd_rn_rm_e0
  
- # SVE load and broadcast quadword (scalar plus immediate)
- # LD1RQB, LD1RQH, LD1RQS, LD1RQD
- LD1RQ_zpri      1010010 .. 00 0.... 001 ... ..... ..... \
-                 @rpri_load_msz nreg=0
-+LD1RO_zpri      1010010 .. 01 0.... 001 ... ..... ..... \
-+                @rpri_load_msz nreg=0
++# SVE2 signed saturating doubling multiply high (unpredicated)
++SQDMULH_zzz     00000100 .. 1 ..... 0111 00 ..... .....  @rd_rn_rm
++SQRDMULH_zzz    00000100 .. 1 ..... 0111 01 ..... .....  @rd_rn_rm
++
+ ### SVE2 Integer - Predicated
  
- # SVE 32-bit gather prefetch (scalar plus 32-bit scaled offsets)
- PRF             1000010 00 -1 ----- 0-- --- ----- 0 ----
+ SADALP_zpzz     01000100 .. 000 100 101 ... ..... .....  @rdm_pg_rn
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 79af31f12e..7c6a6a3bda 100644
+index c30aed211f..298c328ce0 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -5641,6 +5641,103 @@ static bool trans_LD1RQ_zpri(DisasContext *s, arg_rpri_load *a)
-     return true;
+@@ -6434,6 +6434,24 @@ static bool trans_PMUL_zzz(DisasContext *s, arg_rrr_esz *a)
+     return do_sve2_zzz_ool(s, a, gen_helper_gvec_pmul_b);
  }
  
-+static void do_ldro(DisasContext *s, int zt, int pg, TCGv_i64 addr, int dtype)
++static bool trans_SQDMULH_zzz(DisasContext *s, arg_rrr_esz *a)
 +{
-+    unsigned vsz = vec_full_reg_size(s);
-+    unsigned vsz_r32;
-+    TCGv_ptr t_pg;
-+    TCGv_i32 t_desc;
-+    int desc, poff, doff;
++    static gen_helper_gvec_3 * const fns[4] = {
++        gen_helper_sve2_sqdmulh_b, gen_helper_sve2_sqdmulh_h,
++        gen_helper_sve2_sqdmulh_s, gen_helper_sve2_sqdmulh_d,
++    };
++    return do_sve2_zzz_ool(s, a, fns[a->esz]);
++}
 +
-+    if (vsz < 32) {
-+        /*
-+         * Note that this UNDEFINED check comes after CheckSVEEnabled()
-+         * in the ARM pseudocode, which is the sve_access_check() done
-+         * in our caller.  We should not now return false from the caller.
-+         */
-+        unallocated_encoding(s);
-+        return;
-+    }
++static bool trans_SQRDMULH_zzz(DisasContext *s, arg_rrr_esz *a)
++{
++    static gen_helper_gvec_3 * const fns[4] = {
++        gen_helper_sve2_sqrdmulh_b, gen_helper_sve2_sqrdmulh_h,
++        gen_helper_sve2_sqrdmulh_s, gen_helper_sve2_sqrdmulh_d,
++    };
++    return do_sve2_zzz_ool(s, a, fns[a->esz]);
++}
 +
-+    /* Load the first octaword using the normal predicated load helpers.  */
+ /*
+  * SVE2 Integer - Predicated
+  */
+diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
+index 82e12b51c1..f3a19821cd 100644
+--- a/target/arm/vec_helper.c
++++ b/target/arm/vec_helper.c
+@@ -81,6 +81,26 @@ void HELPER(sve2_sqrdmlsh_b)(void *vd, void *vn, void *vm,
+     }
+ }
+ 
++void HELPER(sve2_sqdmulh_b)(void *vd, void *vn, void *vm, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc);
++    int8_t *d = vd, *n = vn, *m = vm;
 +
-+    poff = pred_full_reg_offset(s, pg);
-+    if (vsz > 32) {
-+        /*
-+         * Zero-extend the first 32 bits of the predicate into a temporary.
-+         * This avoids triggering an assert making sure we don't have bits
-+         * set within a predicate beyond VQ, but we have lowered VQ to 2
-+         * for this load operation.
-+         */
-+        TCGv_i64 tmp = tcg_temp_new_i64();
-+#ifdef HOST_WORDS_BIGENDIAN
-+        poff += 4;
-+#endif
-+        tcg_gen_ld32u_i64(tmp, cpu_env, poff);
-+
-+        poff = offsetof(CPUARMState, vfp.preg_tmp);
-+        tcg_gen_st_i64(tmp, cpu_env, poff);
-+        tcg_temp_free_i64(tmp);
-+    }
-+
-+    t_pg = tcg_temp_new_ptr();
-+    tcg_gen_addi_ptr(t_pg, cpu_env, poff);
-+
-+    desc = simd_desc(32, 32, zt);
-+    t_desc = tcg_const_i32(desc);
-+
-+    gen_helper_gvec_mem *fn
-+        = ldr_fns[s->mte_active[0]][s->be_data == MO_BE][dtype][0];
-+    fn(cpu_env, t_pg, addr, t_desc);
-+
-+    tcg_temp_free_ptr(t_pg);
-+    tcg_temp_free_i32(t_desc);
-+
-+    /*
-+     * Replicate that first octaword.
-+     * The replication happens in units of 32; if the full vector size
-+     * is not a multiple of 32, the final bits are zeroed.
-+     */
-+    doff = vec_full_reg_offset(s, zt);
-+    vsz_r32 = QEMU_ALIGN_DOWN(vsz, 32);
-+    if (vsz >= 64) {
-+        tcg_gen_gvec_dup_mem(5, doff + 32, doff, vsz_r32 - 32, vsz - 32);
-+    } else if (vsz > vsz_r32) {
-+        /* Nop move, with side effect of clearing the tail. */
-+        tcg_gen_gvec_mov(MO_64, doff, doff, vsz_r32, vsz);
++    for (i = 0; i < opr_sz; ++i) {
++        d[i] = do_sqrdmlah_b(n[i], m[i], 0, false, false);
 +    }
 +}
 +
-+static bool trans_LD1RO_zprr(DisasContext *s, arg_rprr_load *a)
++void HELPER(sve2_sqrdmulh_b)(void *vd, void *vn, void *vm, uint32_t desc)
 +{
-+    if (!dc_isar_feature(aa64_sve2_f64mm, s)) {
-+        return false;
++    intptr_t i, opr_sz = simd_oprsz(desc);
++    int8_t *d = vd, *n = vn, *m = vm;
++
++    for (i = 0; i < opr_sz; ++i) {
++        d[i] = do_sqrdmlah_b(n[i], m[i], 0, false, true);
 +    }
-+    if (a->rm == 31) {
-+        return false;
-+    }
-+    if (sve_access_check(s)) {
-+        TCGv_i64 addr = new_tmp_a64(s);
-+        tcg_gen_shli_i64(addr, cpu_reg(s, a->rm), dtype_msz(a->dtype));
-+        tcg_gen_add_i64(addr, addr, cpu_reg_sp(s, a->rn));
-+        do_ldro(s, a->rd, a->pg, addr, a->dtype);
-+    }
-+    return true;
 +}
 +
-+static bool trans_LD1RO_zpri(DisasContext *s, arg_rpri_load *a)
+ /* Signed saturating rounding doubling multiply-accumulate high half, 16-bit */
+ int16_t do_sqrdmlah_h(int16_t src1, int16_t src2, int16_t src3,
+                       bool neg, bool round, uint32_t *sat)
+@@ -198,6 +218,28 @@ void HELPER(sve2_sqrdmlsh_h)(void *vd, void *vn, void *vm,
+     }
+ }
+ 
++void HELPER(sve2_sqdmulh_h)(void *vd, void *vn, void *vm, uint32_t desc)
 +{
-+    if (!dc_isar_feature(aa64_sve2_f64mm, s)) {
-+        return false;
++    intptr_t i, opr_sz = simd_oprsz(desc);
++    int16_t *d = vd, *n = vn, *m = vm;
++    uint32_t discard;
++
++    for (i = 0; i < opr_sz / 2; ++i) {
++        d[i] = do_sqrdmlah_h(n[i], m[i], 0, false, false, &discard);
 +    }
-+    if (sve_access_check(s)) {
-+        TCGv_i64 addr = new_tmp_a64(s);
-+        tcg_gen_addi_i64(addr, cpu_reg_sp(s, a->rn), a->imm * 32);
-+        do_ldro(s, a->rd, a->pg, addr, a->dtype);
-+    }
-+    return true;
 +}
 +
- /* Load and broadcast element.  */
- static bool trans_LD1R_zpri(DisasContext *s, arg_rpri_load *a)
++void HELPER(sve2_sqrdmulh_h)(void *vd, void *vn, void *vm, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc);
++    int16_t *d = vd, *n = vn, *m = vm;
++    uint32_t discard;
++
++    for (i = 0; i < opr_sz / 2; ++i) {
++        d[i] = do_sqrdmlah_h(n[i], m[i], 0, false, true, &discard);
++    }
++}
++
+ /* Signed saturating rounding doubling multiply-accumulate high half, 32-bit */
+ int32_t do_sqrdmlah_s(int32_t src1, int32_t src2, int32_t src3,
+                       bool neg, bool round, uint32_t *sat)
+@@ -309,6 +351,28 @@ void HELPER(sve2_sqrdmlsh_s)(void *vd, void *vn, void *vm,
+     }
+ }
+ 
++void HELPER(sve2_sqdmulh_s)(void *vd, void *vn, void *vm, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc);
++    int32_t *d = vd, *n = vn, *m = vm;
++    uint32_t discard;
++
++    for (i = 0; i < opr_sz / 4; ++i) {
++        d[i] = do_sqrdmlah_s(n[i], m[i], 0, false, false, &discard);
++    }
++}
++
++void HELPER(sve2_sqrdmulh_s)(void *vd, void *vn, void *vm, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc);
++    int32_t *d = vd, *n = vn, *m = vm;
++    uint32_t discard;
++
++    for (i = 0; i < opr_sz / 4; ++i) {
++        d[i] = do_sqrdmlah_s(n[i], m[i], 0, false, true, &discard);
++    }
++}
++
+ /* Signed saturating rounding doubling multiply-accumulate high half, 64-bit */
+ static int64_t do_sat128_d(Int128 r)
  {
+@@ -368,6 +432,26 @@ void HELPER(sve2_sqrdmlsh_d)(void *vd, void *vn, void *vm,
+     }
+ }
+ 
++void HELPER(sve2_sqdmulh_d)(void *vd, void *vn, void *vm, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc);
++    int64_t *d = vd, *n = vn, *m = vm;
++
++    for (i = 0; i < opr_sz / 8; ++i) {
++        d[i] = do_sqrdmlah_d(n[i], m[i], 0, false, false);
++    }
++}
++
++void HELPER(sve2_sqrdmulh_d)(void *vd, void *vn, void *vm, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc);
++    int64_t *d = vd, *n = vn, *m = vm;
++
++    for (i = 0; i < opr_sz / 8; ++i) {
++        d[i] = do_sqrdmlah_d(n[i], m[i], 0, false, true);
++    }
++}
++
+ /* Integer 8 and 16-bit dot-product.
+  *
+  * Note that for the loops herein, host endianness does not matter
 -- 
 2.25.1
 
