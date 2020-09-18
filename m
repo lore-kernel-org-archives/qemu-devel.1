@@ -2,81 +2,81 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61372C43463
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 16:26:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F04AAC43463
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 16:26:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDC9821D24
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 16:26:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 484A621D24
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 16:26:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AG363yWk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDC9821D24
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I5QHkSZa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 484A621D24
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJJDR-000231-0m
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 12:26:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40472)
+	id 1kJJDn-0002RT-9s
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 12:26:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40318)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kJJ7i-0005FQ-SS
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 12:20:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34871)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kJJ7V-000529-Jv
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 12:20:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45034)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kJJ7g-0005lI-7M
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 12:20:34 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kJJ7P-0005ZG-Oc
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 12:20:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600446031;
+ s=mimecast20190719; t=1600446014;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=cQLHX1DoJKJj5W3DVopK1pVavkbFhdLI78v3G2Q4YW4=;
- b=AG363yWk6/nA7gHEOKwnxL6COvMa2KcucqDfpgVp2QBiq2WLMzyJsf1qKsqT42Qi+fNFS8
- BIW2NATISeNWupryZGiuUIL0yeUHT82dPBIY/KBEvE2UsddvF5XReoLSYBWMZ7Dw+8kbfm
- Sd/PQOial2+f7hCAihfCKGRv8Z/IEUI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-MbAGSbzGPzG7EKCEP4E0gA-1; Fri, 18 Sep 2020 12:20:26 -0400
-X-MC-Unique: MbAGSbzGPzG7EKCEP4E0gA-1
-Received: by mail-wr1-f72.google.com with SMTP id h4so2331205wrb.4
- for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 09:20:26 -0700 (PDT)
+ bh=Msq8goiUIrREy947KknDtEH1ZqD2k0E/AfsZQGv/SGY=;
+ b=I5QHkSZaHlKk+/2sSP77MqnXyWO7yTsOMnpAQrMVfQuGua3fPzneWNLkdkK7C4/n9ZAbNh
+ XXk6P9Y/OmbUPYCmoA0QTxrRzDGM3+pa5kF/UhtZhrOyVv1LzhwFlnrpZDFw5ju5UkA+hT
+ WYKlz3gfysa5fEAOhvbnJuDmNhse5no=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-146-AnfN_2rcMBuAKsYqbB7ITg-1; Fri, 18 Sep 2020 12:20:11 -0400
+X-MC-Unique: AnfN_2rcMBuAKsYqbB7ITg-1
+Received: by mail-wm1-f69.google.com with SMTP id a7so2245111wmc.2
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 09:20:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=cQLHX1DoJKJj5W3DVopK1pVavkbFhdLI78v3G2Q4YW4=;
- b=FJpS7GPBHpzgxXHAK93b6HJs3bHhGSiZQ5N7xKfOadO4XL5zpfKrZT2RGqpb+hlnwD
- 4II/oSCKxcKgoQqt8fcq0W76cmmAJGTfozV0YnsFe5GwWI391E5L6rELZMeo3rH7O3zV
- EnyF+ynjKE3fLk5Ed5d98vqkTfdWox4qVbmXoHhUnuyXivOGTzymH0qgppWgudmpWotf
- zSNSH006sdsgAtdUHAJFJUmOSxSGn41NaJxdJ2cY/pAj4CQath7v6rjaH+3HoKGi6Rdh
- 6v0EldVjF+/DgK5n1vO3FhKPoP7npMapKhOYt4/gY9GpuWDcpaRkiPq8F/0F/A4VeNdu
- znHw==
-X-Gm-Message-State: AOAM532AH9Y5aDb5v8yE5ouVyMdvOabR5hxe3Eg8vcsUAbcP4jOH2hPE
- WcVdDB9zPtbm6OaPRnIJUZ+2e1RYWlZtpcH72Qx2iARpseOOAgZTQ482uT7ZBrzJj+0myj3DvhY
- wFN8XSeWqyG5D5wg=
-X-Received: by 2002:a5d:43cf:: with SMTP id v15mr39531344wrr.269.1600446025041; 
- Fri, 18 Sep 2020 09:20:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxbkL3nYp1jsxgLayp4DGAN/gpY7D4KM3CDnNmJ+cr4f+xKKfaogLgWL2DJp3EZFfDPdt+htA==
-X-Received: by 2002:a5d:43cf:: with SMTP id v15mr39531317wrr.269.1600446024822; 
- Fri, 18 Sep 2020 09:20:24 -0700 (PDT)
+ bh=Msq8goiUIrREy947KknDtEH1ZqD2k0E/AfsZQGv/SGY=;
+ b=Jevpug76S7co2rQlXwxl/g2OCPcmHrj26UiRRKapj+D2PKpNyXrRCVkJrN5dkLh0xe
+ SAfPhxX1lfl7Hi2UIAchvAMLetiQE2fEf52KA5MFEDp0Rz8H0o651tyfRjG/hQ9c6Hp2
+ HFPd2sRUKpd62fEgs4hEI279dp/PpGURvjD8C62HSj9cTJJM00S4+zXPx2fayUkw1ZKR
+ +dFU1KRNiXRWCnR9y1tFDD1CFUowcWYvR3yNroqC6i8zDB3viHx2FLOcTRZEA68eZkr0
+ GcENE84rfyPolCWxq4Op5rj30jDlvo3ggvEN1E+EnnYUj1IVdurtdFWt5w31e3I5sv6w
+ fHZg==
+X-Gm-Message-State: AOAM532DddzKed9kh1BH6DqoCDJPCVSKJzLRCHC3m4BHDfG9gDC11wXQ
+ n9ZV2NlN+2CuCYwRZetlgFRCHYFEblb4Y+7VB4l8ZTZcbYdWBrIni37rWPjlCBTQXteR2fiGs4N
+ 5YbqDUmMd7h1bcFY=
+X-Received: by 2002:a1c:f208:: with SMTP id s8mr16979335wmc.85.1600446009655; 
+ Fri, 18 Sep 2020 09:20:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJymlaLUhEcBc2Kkg7rrEvpgtXS1Urt7OPkfWifR+13AjZ97NNKcWZHs+CGELURdy1kMd5MovA==
+X-Received: by 2002:a1c:f208:: with SMTP id s8mr16979322wmc.85.1600446009489; 
+ Fri, 18 Sep 2020 09:20:09 -0700 (PDT)
 Received: from redhat.com (bzq-109-65-116-225.red.bezeqint.net.
  [109.65.116.225])
- by smtp.gmail.com with ESMTPSA id f6sm6142752wro.5.2020.09.18.09.20.23
+ by smtp.gmail.com with ESMTPSA id z127sm6019969wmc.2.2020.09.18.09.20.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Sep 2020 09:20:24 -0700 (PDT)
-Date: Fri, 18 Sep 2020 12:20:22 -0400
+ Fri, 18 Sep 2020 09:20:08 -0700 (PDT)
+Date: Fri, 18 Sep 2020 12:20:07 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 09/15] tests/qtest/libqos/virtio-blk: add support for
- vhost-user-blk
-Message-ID: <20200918161836.318893-10-mst@redhat.com>
+Subject: [PULL v2 04/15] virtio-mem: detach the element from the virtqueue
+ when error occurs
+Message-ID: <20200918161836.318893-5-mst@redhat.com>
 References: <20200918161836.318893-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200918161836.318893-1-mst@redhat.com>
@@ -111,61 +111,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Dima Stepanov <dimastep@yandex-team.ru>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Li Qiang <liq3ea@163.com>,
+ David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Dima Stepanov <dimastep@yandex-team.ru>
+From: Li Qiang <liq3ea@163.com>
 
-Add support for the vhost-user-blk-pci device. This node can be used by
-the vhost-user-blk tests. Tests for the vhost-user-blk device are added
-in the following patches.
+If error occurs while processing the virtio request we should call
+'virtqueue_detach_element' to detach the element from the virtqueue
+before free the elem.
 
-Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
-Message-Id: <4d3e683a87557bcef520826c54aa3e5ab7c64111.1599813294.git.dimastep@yandex-team.ru>
-Reviewed-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
+Signed-off-by: Li Qiang <liq3ea@163.com>
+Message-Id: <20200816142245.17556-1-liq3ea@163.com>
+Fixes: 910b25766b ("virtio-mem: Paravirtualized memory hot(un)plug")
+Acked-by: David Hildenbrand <david@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- tests/qtest/libqos/virtio-blk.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ hw/virtio/virtio-mem.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/tests/qtest/libqos/virtio-blk.c b/tests/qtest/libqos/virtio-blk.c
-index 5da02591bc..c0fd9d24e3 100644
---- a/tests/qtest/libqos/virtio-blk.c
-+++ b/tests/qtest/libqos/virtio-blk.c
-@@ -30,7 +30,8 @@
- static void *qvirtio_blk_get_driver(QVirtioBlk *v_blk,
-                                     const char *interface)
- {
--    if (!g_strcmp0(interface, "virtio-blk")) {
-+    if (!g_strcmp0(interface, "virtio-blk") ||
-+            !g_strcmp0(interface, "vhost-user-blk")) {
-         return v_blk;
-     }
-     if (!g_strcmp0(interface, "virtio")) {
-@@ -120,6 +121,17 @@ static void virtio_blk_register_nodes(void)
-     qos_node_produces("virtio-blk-pci", "virtio-blk");
- 
-     g_free(arg);
-+
-+    /* vhost-user-blk-pci */
-+    arg = g_strdup_printf("id=drv0,chardev=chdev0,addr=%x.%x",
-+                                PCI_SLOT, PCI_FN);
-+    opts.extra_device_opts = arg;
-+    add_qpci_address(&opts, &addr);
-+    qos_node_create_driver("vhost-user-blk-pci", virtio_blk_pci_create);
-+    qos_node_consumes("vhost-user-blk-pci", "pci-bus", &opts);
-+    qos_node_produces("vhost-user-blk-pci", "vhost-user-blk");
-+
-+    g_free(arg);
- }
- 
- libqos_init(virtio_blk_register_nodes);
+diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
+index 8fbec77ccc..7c8ca9f28b 100644
+--- a/hw/virtio/virtio-mem.c
++++ b/hw/virtio/virtio-mem.c
+@@ -318,6 +318,7 @@ static void virtio_mem_handle_request(VirtIODevice *vdev, VirtQueue *vq)
+         if (iov_to_buf(elem->out_sg, elem->out_num, 0, &req, len) < len) {
+             virtio_error(vdev, "virtio-mem protocol violation: invalid request"
+                          " size: %d", len);
++            virtqueue_detach_element(vq, elem, 0);
+             g_free(elem);
+             return;
+         }
+@@ -327,6 +328,7 @@ static void virtio_mem_handle_request(VirtIODevice *vdev, VirtQueue *vq)
+             virtio_error(vdev, "virtio-mem protocol violation: not enough space"
+                          " for response: %zu",
+                          iov_size(elem->in_sg, elem->in_num));
++            virtqueue_detach_element(vq, elem, 0);
+             g_free(elem);
+             return;
+         }
+@@ -348,6 +350,7 @@ static void virtio_mem_handle_request(VirtIODevice *vdev, VirtQueue *vq)
+         default:
+             virtio_error(vdev, "virtio-mem protocol violation: unknown request"
+                          " type: %d", type);
++            virtqueue_detach_element(vq, elem, 0);
+             g_free(elem);
+             return;
+         }
 -- 
 MST
 
