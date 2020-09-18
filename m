@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-14.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5A5EC43464
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 13:31:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2046C43463
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 13:32:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28E2321734
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 13:31:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D356206DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 13:32:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bngdDT/C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28E2321734
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BNYqi7ZF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D356206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJGTk-0000Pm-Qh
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 09:31:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46324)
+	id 1kJGUr-0001pE-GC
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 09:32:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46360)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kJGS0-0007Wy-Ki
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 09:29:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31945)
+ id 1kJGS2-0007YI-Pt
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 09:29:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49323)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kJGRy-0002TL-6M
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 09:29:20 -0400
+ id 1kJGRz-0002TW-MH
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 09:29:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600435757;
+ s=mimecast20190719; t=1600435758;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Z+d61B3dqHmc7ZfZm9cSPj/X1aJ3cLn0k1+yDMTMLxQ=;
- b=bngdDT/CI6YcbjqR7B+c3GRHhM15BgPOjRvLfFr1y848dTes/bWXM43hq3VNFzmEEPWLPK
- +WJDtgzotyQnYU5VAR5UTNBtP0aWKbaHVa8fpQho9p3uwZdaLdXkGs2DjQeMuijAA5zVIc
- 4SQlhuc5mp3jFRE5GGMcebcWOvbSU6w=
+ bh=PNk3faC8kc7Le9bXtWKm3igpLtEky47pmixLCfruOtA=;
+ b=BNYqi7ZFtobfBAaie+Y0Hll68LVtYSFF9spUg021qJYXkx7e2uQdm7Ee/GEa4z/blcVsTy
+ lr8Sni6+oyjkF2FH8DpAyVFyCVBGBrNgpbCN/5IKt8ZR1YaUmSLQHRf7rZ6gZR71TdCYQq
+ x+bd99SPiY67ukcD4NYTp2BHhJbx0lo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-75-s67b24rrMG6ma3o3MizHtA-1; Fri, 18 Sep 2020 09:29:12 -0400
-X-MC-Unique: s67b24rrMG6ma3o3MizHtA-1
+ us-mta-496-_caV-DlRPWKdSJ4C-B9zPA-1; Fri, 18 Sep 2020 09:29:14 -0400
+X-MC-Unique: _caV-DlRPWKdSJ4C-B9zPA-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83C49AFD63;
- Fri, 18 Sep 2020 13:29:11 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA92C1966324;
+ Fri, 18 Sep 2020 13:29:13 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-114-199.ams2.redhat.com
  [10.36.114.199])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D27849CBA;
- Fri, 18 Sep 2020 13:29:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 01F8F9CBA;
+ Fri, 18 Sep 2020 13:29:11 +0000 (UTC)
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/3] gitlab: add a CI job for running checkpatch.pl
-Date: Fri, 18 Sep 2020 14:29:01 +0100
-Message-Id: <20200918132903.1848939-2-berrange@redhat.com>
+Subject: [PATCH 2/3] gitlab: add a CI job to validate the DCO sign off
+Date: Fri, 18 Sep 2020 14:29:02 +0100
+Message-Id: <20200918132903.1848939-3-berrange@redhat.com>
 In-Reply-To: <20200918132903.1848939-1-berrange@redhat.com>
 References: <20200918132903.1848939-1-berrange@redhat.com>
 MIME-Version: 1.0
@@ -73,9 +73,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 01:32:10
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 00:20:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
@@ -105,26 +105,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This job is advisory since it is expected that certain patches will fail
-the style checks and checkpatch.pl provides no way to mark exceptions to
-the rules.
+While checkpatch.pl can validate DCO sign off that job must always be
+advisory only since it is expected that certain patches will fail some
+code style rules.
+
+We require the DCO sign off to be mandatory for all commits though, so
+it benefits from being validated in a standalone job.
 
 Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- .gitlab-ci.d/check-patch.py | 48 +++++++++++++++++++++++++++++++++++++
- .gitlab-ci.yml              | 12 ++++++++++
- 2 files changed, 60 insertions(+)
- create mode 100755 .gitlab-ci.d/check-patch.py
+ .gitlab-ci.d/check-dco.py | 94 +++++++++++++++++++++++++++++++++++++++
+ .gitlab-ci.yml            | 10 +++++
+ 2 files changed, 104 insertions(+)
+ create mode 100755 .gitlab-ci.d/check-dco.py
 
-diff --git a/.gitlab-ci.d/check-patch.py b/.gitlab-ci.d/check-patch.py
+diff --git a/.gitlab-ci.d/check-dco.py b/.gitlab-ci.d/check-dco.py
 new file mode 100755
-index 0000000000..5a14a25b13
+index 0000000000..632c8bcce8
 --- /dev/null
-+++ b/.gitlab-ci.d/check-patch.py
-@@ -0,0 +1,48 @@
++++ b/.gitlab-ci.d/check-dco.py
+@@ -0,0 +1,94 @@
 +#!/usr/bin/env python3
 +#
-+# check-patch.py: run checkpatch.pl across all commits in a branch
++# check-dco.py: validate all commits are signed off
 +#
 +# Copyright (C) 2020 Red Hat, Inc.
 +#
@@ -143,53 +146,97 @@ index 0000000000..5a14a25b13
 +reponame = os.path.basename(cwd)
 +repourl = "https://gitlab.com/%s/%s.git" % (namespace, reponame)
 +
-+# GitLab CI environment does not give us any direct info about the
-+# base for the user's branch. We thus need to figure out a common
-+# ancestor between the user's branch and current git master.
-+subprocess.check_call(["git", "remote", "add", "check-patch", repourl])
-+subprocess.check_call(["git", "fetch", "check-patch", "master"],
++subprocess.check_call(["git", "remote", "add", "check-dco", repourl])
++subprocess.check_call(["git", "fetch", "check-dco", "master"],
 +                      stdout=subprocess.DEVNULL,
 +                      stderr=subprocess.DEVNULL)
 +
 +ancestor = subprocess.check_output(["git", "merge-base",
-+                                    "check-patch/master", "HEAD"],
++                                    "check-dco/master", "HEAD"],
 +                                   universal_newlines=True)
 +
 +ancestor = ancestor.strip()
 +
-+subprocess.check_call(["git", "remote", "rm", "check-patch"])
++subprocess.check_call(["git", "remote", "rm", "check-dco"])
 +
 +errors = False
 +
-+print("\nChecking all commits since %s...\n" % ancestor)
++print("\nChecking for 'Signed-off-by: NAME <EMAIL>' " +
++      "on all commits since %s...\n" % ancestor)
 +
-+ret = subprocess.run(["scripts/checkpatch.pl", ancestor + "..."])
++log = subprocess.check_output(["git", "log", "--format=%H %s",
++                               ancestor + "..."],
++                              universal_newlines=True)
 +
-+if ret.returncode != 0:
-+    print("    ❌ FAIL one or more commits failed scripts/checkpatch.pl")
++if log == "":
++    commits = []
++else:
++    commits = [[c[0:40], c[41:]] for c in log.strip().split("\n")]
++
++for sha, subject in commits:
++
++    msg = subprocess.check_output(["git", "show", "-s", sha],
++                                  universal_newlines=True)
++    lines = msg.strip().split("\n")
++
++    print("🔍 %s %s" % (sha, subject))
++    sob = False
++    for line in lines:
++        if "Signed-off-by:" in line:
++            sob = True
++            if "localhost" in line:
++                print("    ❌ FAIL: bad email in %s" % line)
++                errors = True
++
++    if not sob:
++        print("    ❌ FAIL missing Signed-off-by tag")
++        errors = True
++
++if errors:
++    print("""
++
++❌ ERROR: One or more commits are missing a valid Signed-off-By tag.
++
++
++This project requires all contributors to assert that their contributions
++are provided in compliance with the terms of the Developer's Certificate
++of Origin 1.1 (DCO):
++
++  https://developercertificate.org/
++
++To indicate acceptance of the DCO every commit must have a tag
++
++  Signed-off-by: REAL NAME <EMAIL>
++
++This can be achieved by passing the "-s" flag to the "git commit" command.
++
++To bulk update all commits on current branch "git rebase" can be used:
++
++  git rebase -i master -x 'git commit --amend --no-edit -s'
++
++""")
++
 +    sys.exit(1)
 +
 +sys.exit(0)
 diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index a18e18b57e..3ed724c720 100644
+index 3ed724c720..b672f4ff23 100644
 --- a/.gitlab-ci.yml
 +++ b/.gitlab-ci.yml
-@@ -369,3 +369,15 @@ check-crypto-only-gnutls:
+@@ -381,3 +381,13 @@ check-patch:
    variables:
-     IMAGE: centos7
-     MAKE_CHECK_ARGS: check
+     GIT_DEPTH: 1000
+   allow_failure: true
 +
-+
-+check-patch:
++check-dco:
 +  stage: test
 +  image: $CI_REGISTRY_IMAGE/qemu/centos8:latest
-+  script: .gitlab-ci.d/check-patch.py
++  script: .gitlab-ci.d/check-dco.py
 +  except:
 +    variables:
 +      - $CI_PROJECT_NAMESPACE == 'qemu-project' && $CI_COMMIT_BRANCH == 'master'
 +  variables:
 +    GIT_DEPTH: 1000
-+  allow_failure: true
 -- 
 2.26.2
 
