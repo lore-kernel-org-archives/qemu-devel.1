@@ -2,72 +2,88 @@ Return-Path: <SRS0=nn+c=C3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91F4EC43464
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 03:41:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD9C9C43464
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 04:21:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2959A21973
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 03:41:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2959A21973
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 05FB82073A
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 04:21:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fnnX4Etk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05FB82073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJ7H2-00017y-0O
-	for qemu-devel@archiver.kernel.org; Thu, 17 Sep 2020 23:41:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46088)
+	id 1kJ7tq-0003K1-TX
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 00:21:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54038)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sean.j.christopherson@intel.com>)
- id 1kJ7GB-0000ba-Vo
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 23:40:31 -0400
-Received: from mga11.intel.com ([192.55.52.93]:1108)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sean.j.christopherson@intel.com>)
- id 1kJ7G8-000844-Tz
- for qemu-devel@nongnu.org; Thu, 17 Sep 2020 23:40:31 -0400
-IronPort-SDR: lDNohdsWlWVIgKLOHqinCd9lYyTCCbqwXbrp99CtwCf+IZB66w4MgAWckkaf/tRy2E1EYwuynG
- TzSrN5A/9Pcw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9747"; a="157244561"
-X-IronPort-AV: E=Sophos;i="5.77,273,1596524400"; d="scan'208";a="157244561"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
- by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 17 Sep 2020 20:40:21 -0700
-IronPort-SDR: CbVNzFAOMR3PkY/2fc34QHgHGNTt+SunCQniElVPuifxlEm7+YvAweuzuX5pmbt79qQIA06lOR
- JVOyXFusBiQQ==
-X-IronPort-AV: E=Sophos;i="5.77,273,1596524400"; d="scan'208";a="339662430"
-Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
- by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 17 Sep 2020 20:40:20 -0700
-Date: Thu, 17 Sep 2020 20:40:19 -0700
-From: Sean Christopherson <sean.j.christopherson@intel.com>
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v3 0/5] Qemu SEV-ES guest support
-Message-ID: <20200918034015.GD14678@sjchrist-ice>
-References: <cover.1600205384.git.thomas.lendacky@amd.com>
- <20200917172802.GS2793@work-vm>
- <de0e9c27-8954-3a77-21db-cad84f334277@amd.com>
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kJ7t7-0002sn-6h
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 00:20:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39087)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kJ7t5-0004mG-3Y
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 00:20:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600402840;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=roqUm4xBZX0M5YwTRsi43dswJPMSQ77v3XjDGfFpg1M=;
+ b=fnnX4Etka2R9FmXQLOqh37P9EeyR6vex06DzskbGwd9K8dBwSGS+6m9py7xioZOZzhMyIe
+ Zs1MdHBn2Nut+pt7WvEm3DNjZVRwNHq4Sn7qEpGFM2VKu7kQ+YG810qZpLKwhbt3FobObX
+ bfNwM/92xUN932qPaVs3JWYMuQVRvDw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-162-lQ34FwMQOgOYvMB0ux3j2g-1; Fri, 18 Sep 2020 00:20:39 -0400
+X-MC-Unique: lQ34FwMQOgOYvMB0ux3j2g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD02B81F02E;
+ Fri, 18 Sep 2020 04:20:37 +0000 (UTC)
+Received: from localhost (ovpn-119-217.rdu2.redhat.com [10.10.119.217])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 191EC10013C1;
+ Fri, 18 Sep 2020 04:20:36 +0000 (UTC)
+Date: Fri, 18 Sep 2020 00:20:36 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Robert Hoo <robert.hu@linux.intel.com>
+Subject: Re: [PATCH v3 2/2] Mark Icelake-Client CPU models deprecated
+Message-ID: <20200918042036.GY7594@habkost.net>
+References: <1600245434-63021-1-git-send-email-robert.hu@linux.intel.com>
+ <1600245434-63021-2-git-send-email-robert.hu@linux.intel.com>
+ <20200917180158.GT7594@habkost.net>
+ <de6e39509242483607525f9e27aeff92e510a5dc.camel@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <de6e39509242483607525f9e27aeff92e510a5dc.camel@linux.intel.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <de0e9c27-8954-3a77-21db-cad84f334277@amd.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: pass client-ip=192.55.52.93;
- envelope-from=sean.j.christopherson@intel.com; helo=mga11.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/17 23:40:22
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 00:20:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,113 +97,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Brijesh Singh <brijesh.singh@amd.com>,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Connor Kuehl <ckuehl@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Jiri Slaby <jslaby@suse.cz>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, robert.hu@intel.com,
+ pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 17, 2020 at 01:56:21PM -0500, Tom Lendacky wrote:
-> On 9/17/20 12:28 PM, Dr. David Alan Gilbert wrote:
-> > * Tom Lendacky (thomas.lendacky@amd.com) wrote:
-> > > From: Tom Lendacky <thomas.lendacky@amd.com>
+On Fri, Sep 18, 2020 at 10:18:56AM +0800, Robert Hoo wrote:
+> On Thu, 2020-09-17 at 14:01 -0400, Eduardo Habkost wrote:
+> > On Wed, Sep 16, 2020 at 04:37:14PM +0800, Robert Hoo wrote:
+> > > Going to obsolete Icelake-Client CPU models in the future.
 > > > 
-> > > This patch series provides support for launching an SEV-ES guest.
+> > > Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+> > > ---
+> > > Change log
+> > > v3:
+> > > Obsolete in v5.2 --> v5.3.
 > > > 
-> > > Secure Encrypted Virtualization - Encrypted State (SEV-ES) expands on the
-> > > SEV support to protect the guest register state from the hypervisor. See
-> > > "AMD64 Architecture Programmer's Manual Volume 2: System Programming",
-> > > section "15.35 Encrypted State (SEV-ES)" [1].
+> > >  target/i386/cpu.c | 10 +++++++++-
+> > >  1 file changed, 9 insertions(+), 1 deletion(-)
 > > > 
-> > > In order to allow a hypervisor to perform functions on behalf of a guest,
-> > > there is architectural support for notifying a guest's operating system
-> > > when certain types of VMEXITs are about to occur. This allows the guest to
-> > > selectively share information with the hypervisor to satisfy the requested
-> > > function. The notification is performed using a new exception, the VMM
-> > > Communication exception (#VC). The information is shared through the
-> > > Guest-Hypervisor Communication Block (GHCB) using the VMGEXIT instruction.
-> > > The GHCB format and the protocol for using it is documented in "SEV-ES
-> > > Guest-Hypervisor Communication Block Standardization" [2].
-> > > 
-> > > The main areas of the Qemu code that are updated to support SEV-ES are
-> > > around the SEV guest launch process and AP booting in order to support
-> > > booting multiple vCPUs.
-> > > 
-> > > There are no new command line switches required. Instead, the desire for
-> > > SEV-ES is presented using the SEV policy object. Bit 2 of the SEV policy
-> > > object indicates that SEV-ES is required.
-> > > 
-> > > The SEV launch process is updated in two ways. The first is that a the
-> > > KVM_SEV_ES_INIT ioctl is used to initialize the guest instead of the
-> > > standard KVM_SEV_INIT ioctl. The second is that before the SEV launch
-> > > measurement is calculated, the LAUNCH_UPDATE_VMSA SEV API is invoked for
-> > > each vCPU that Qemu has created. Once the LAUNCH_UPDATE_VMSA API has been
-> > > invoked, no direct changes to the guest register state can be made.
-> > > 
-> > > AP booting poses some interesting challenges. The INIT-SIPI-SIPI sequence
-> > > is typically used to boot the APs. However, the hypervisor is not allowed
-> > > to update the guest registers. For the APs, the reset vector must be known
-> > > in advance. An OVMF method to provide a known reset vector address exists
-> > > by providing an SEV information block, identified by UUID, near the end of
-> > > the firmware [3]. OVMF will program the jump to the actual reset vector in
-> > > this area of memory. Since the memory location is known in advance, an AP
-> > > can be created with the known reset vector address as its starting CS:IP.
-> > > The GHCB document [2] talks about how SMP booting under SEV-ES is
-> > > performed. SEV-ES also requires the use of the in-kernel irqchip support
-> > > in order to minimize the changes required to Qemu to support AP booting.
+> > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > > index 9cb82b7..15c1c00 100644
+> > > --- a/target/i386/cpu.c
+> > > +++ b/target/i386/cpu.c
+> > > @@ -3467,7 +3467,12 @@ static X86CPUDefinition builtin_x86_defs[] =
+> > > {
+> > >          .xlevel = 0x80000008,
+> > >          .model_id = "Intel Core Processor (Icelake)",
+> > >          .versions = (X86CPUVersionDefinition[]) {
+> > > -            { .version = 1 },
+> > > +            {
+> > > +                .version = 1,
+> > > +                .deprecated = true,
+> > > +                .note = "Deprecated. Will be obsoleted in v5.3.
+> > > Please use "
+> > > +                        "'Icelake-Server-v1' CPU model",
 > > 
-> > Some random thoughts:
-> >    a) Is there something that explicitly disallows SMM?
+> > What's the difference between "deprecated" and "obsoleted"?
+> > 
+> Forgive my non-native understanding on English word:-D
+
+No problem!  I'm not a native speaker either.  :-)
+
+> Here is my understanding:
+> 'Deprecate' is to express strong disapproval on the usage; but, can
+> still be used if user insists.
+> 'Obsolete' means not usable anymore.
 > 
-> There isn't currently. Is there a way to know early on that SMM is enabled?
-> Could I just call x86_machine_is_smm_enabled() to check that?
+> You can feel free to reword the note words.
+> Perhaps substitute 'removed' for 'obsolete' will be better.
 
-KVM_CAP_X86_SMM is currently checked as a KVM-wide capability.  One option
-is to change that to use a per-VM ioctl() and then have KVM return 0 for
-SEV-ES VMs.
+"Removed" would be clearer, yes.  It's probably better to not
+mention the exact version, and just say it will be removed in
+the future.
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 416c82048a..4d7f84ed1b 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -145,7 +145,7 @@ int kvm_has_pit_state2(void)
+Or maybe just make the message shorter and set deprecation_note
+to "Please use Icelake-Server instead".  The details can be
+documented in docs/system/deprecated.rst.
 
- bool kvm_has_smm(void)
- {
--    return kvm_check_extension(kvm_state, KVM_CAP_X86_SMM);
-+    return kvm_vm_check_extension(kvm_state, KVM_CAP_X86_SMM);
- }
+-- 
+Eduardo
 
- bool kvm_has_adjust_clock_stable(void)
-
-> >    b) I think all the interfaces you're using are already defined in
-> > Linux header files - even if the code to implement them isn't actually
-> > upstream in the kernel yet (the launch_update in particular) - we
-> > normally wait for the kernel interface to be accepted before taking the
-> > QEMU patches, but if the constants are in the headers already I'm not
-> > sure what the rule is.
-> 
-> Correct, everything was already present from a Linux header perspective.
-> 
-> >    c) What happens if QEMU reads the register values from the state if
-> > the guest is paused - does it just see junk?  I'm just wondering if you
-> > need to add checks in places it might try to.
-> 
-> I thought about what to do about calls to read the registers once the guest
-> state has become encrypted. I think it would take a lot of changes to make
-> Qemu "protected state aware" for what I see as little gain. Qemu is likely
-> to see a lot of zeroes or actual register values from the GHCB protocol for
-> previous VMGEXITs that took place.
-
-Yeah, we more or less came to the same conclusion for TDX.  It's easy enough
-to throw an error if QEMU attempts to read protected state, but without
-other invasive changes, it's too easy to unintentionally kill the VM.  MSRs
-are a bit of a special case, but for REGS, SREGS, and whatever other state
-is read out, simply letting KVM return zeros/garbage seems like the lesser
-of all evils.
 
