@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 153C3C43463
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 11:06:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A95C43463
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 11:17:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3944320874
-	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 11:06:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D24E21D42
+	for <qemu-devel@archiver.kernel.org>; Fri, 18 Sep 2020 11:17:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K0oGFSQx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3944320874
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KmU9fBSd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D24E21D42
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJEDs-0001Gc-7J
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 07:06:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41244)
+	id 1kJEO9-0003kH-Ac
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 07:17:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43356)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kJEBP-0008QQ-8W
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 07:04:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38213)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kJENF-0003Gx-Br
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 07:16:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24825)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kJEBM-0000wL-Td
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 07:04:02 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kJELI-00024g-AN
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 07:16:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600427039;
+ s=mimecast20190719; t=1600427654;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=OshyfBJP2APoMnPtMHzpxPWlqGUQCcLYJOgcgY+6JOE=;
- b=K0oGFSQxAr7grGkTw8FHrNLW7iBYpJvbOUFoug+nuOAEMHUVSBH4TcTjOA5dpz1ldMeANY
- MiC122qIQNOwzVmGNtEXhWScRtC7W8WtdXLg/pFtNzMQndwmucCb0QG2jZ8ynMTDVvuyjw
- 3WrxUTYZSkPJL6LfhKQ06fFUTPYYRiY=
+ bh=HEHSYGV1lSq3WMxbVmGAvpLzkVKnYNN/UzjnIX/TR/U=;
+ b=KmU9fBSd50MlF44KXkgixW2RNquPmO2cBMnSbs0wjXI8LDYbXJF/mYobRigBvqwgFCmwpK
+ pTGYJq2wtxYEnPwF2XXJvdku1c94wfXEbcsyKFXU/TiThm83xZMbw84JP/g6XgP8tCSpzv
+ gJrE0srRQoW/Pc6zBSxkqz53tGveTaI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-494-sQLWMeHyMmy8ekpmvauKHA-1; Fri, 18 Sep 2020 07:03:55 -0400
-X-MC-Unique: sQLWMeHyMmy8ekpmvauKHA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-404-3OTAZtmZMzafDp5t8ulb-g-1; Fri, 18 Sep 2020 07:14:10 -0400
+X-MC-Unique: 3OTAZtmZMzafDp5t8ulb-g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C93B9186843C;
- Fri, 18 Sep 2020 11:03:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA21110082EB;
+ Fri, 18 Sep 2020 11:14:09 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
  [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9695173664;
- Fri, 18 Sep 2020 11:03:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6AF5710013C1;
+ Fri, 18 Sep 2020 11:14:09 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 2B5BD113864A; Fri, 18 Sep 2020 13:03:53 +0200 (CEST)
+ id EEB76113864A; Fri, 18 Sep 2020 13:14:07 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 10/37] qapi/common.py: delint with pylint
+Subject: Re: [PATCH 13/37] qapi/common.py: add notational type hints
 References: <20200915224027.2529813-1-jsnow@redhat.com>
- <20200915224027.2529813-11-jsnow@redhat.com>
- <87r1r0pjza.fsf@dusky.pond.sub.org>
- <eba468c3-91c3-10cb-9ef6-662468e676f7@redhat.com>
-Date: Fri, 18 Sep 2020 13:03:53 +0200
-In-Reply-To: <eba468c3-91c3-10cb-9ef6-662468e676f7@redhat.com> (John Snow's
- message of "Thu, 17 Sep 2020 13:48:18 -0400")
-Message-ID: <87y2l7ibxi.fsf@dusky.pond.sub.org>
+ <20200915224027.2529813-14-jsnow@redhat.com>
+ <87h7rwpj8d.fsf@dusky.pond.sub.org>
+ <d1f725b3-c23c-d619-5cd2-ead63e3faa9a@redhat.com>
+Date: Fri, 18 Sep 2020 13:14:07 +0200
+In-Reply-To: <d1f725b3-c23c-d619-5cd2-ead63e3faa9a@redhat.com> (John Snow's
+ message of "Thu, 17 Sep 2020 14:18:02 -0400")
+Message-ID: <87r1qzibgg.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -80,14 +80,6 @@ Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/18 00:20:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.997,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
-X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,106 +101,113 @@ Sender: "Qemu-devel"
 
 John Snow <jsnow@redhat.com> writes:
 
-> On 9/17/20 10:15 AM, Markus Armbruster wrote:
+> On 9/17/20 10:32 AM, Markus Armbruster wrote:
+>> Question on the subject line: what makes a type hint notational?
+>> 
+>
+> My cover letter explains that every time I use this phrase, I mean to
+> state that "This patch adds exclusively type notations and makes no 
+> functional changes to the runtime operation whatsoever."
+>
+> i.e. notations-only.
+
+By the time I get to PATCH 13, details explained in the cover letter
+have been flushed from my memory.  Moreover, the cover letter won't make
+it into Git.  Best to repeat them right in the commit message.  Perhaps:
+
+    qapi/common; Add type hints
+
+    Type hints do not change behavior.
+
 >> John Snow <jsnow@redhat.com> writes:
 >> 
 >>> Signed-off-by: John Snow <jsnow@redhat.com>
 >>> ---
->>>   scripts/qapi/common.py | 16 +++++++---------
->>>   scripts/qapi/schema.py | 14 +++++++-------
->>>   2 files changed, 14 insertions(+), 16 deletions(-)
+>>>   scripts/qapi/common.py | 27 ++++++++++++++++-----------
+>>>   1 file changed, 16 insertions(+), 11 deletions(-)
 >>>
 >>> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
->>> index 87d87b95e5..c665e67495 100644
+>>> index 4c079755d3..af01348b35 100644
 >>> --- a/scripts/qapi/common.py
 >>> +++ b/scripts/qapi/common.py
->>> @@ -14,6 +14,11 @@
->>>   import re
+>>> @@ -12,6 +12,7 @@
+>>>   # See the COPYING file in the top-level directory.
+>>>     import re
+>>> +from typing import Optional, Union, Sequence
 >>>     
->>> +EATSPACE = '\033EATSPACE.'
->>> +POINTER_SUFFIX = ' *' + EATSPACE
->>> +c_name_trans = str.maketrans('.-', '__')
->>> +
->>> +
->> You rename and move.  pylint gripes about the names, but it doesn't
->> actually ask for the move, as far as I can tell.  Can you explain why
->> you move?
->> 
->
-> Preference. I like constants and globals at the top so you can audit
-> any code that runs at import time in one place.
-
-I can buy this argument.
-
->                                                 Since they are
-> externally visible objects, having them near other "header" style
-> information makes sense to me.
-
-This one I find unconvincing.  Functions and classes are just as
-visible.
-
-Mention the move in the commit message, along with the (convincing part
-of the) rationale.
-
-Aside: EATSPACE and c_name_trans are actually local to common.py.
-EATSPACE sort of leaks out only via the contract of mcgen().  The
-contract could be rephrased in terms of POINTER_SUFFIX.  Not sure it's
-worthwhile.
-
+>>>   EATSPACE = '\033EATSPACE.'
+>>> @@ -22,7 +23,7 @@
 >>>   # ENUMName -> ENUM_NAME, EnumName1 -> ENUM_NAME1
 >>>   # ENUM_NAME -> ENUM_NAME, ENUM_NAME1 -> ENUM_NAME1, ENUM_Name2 -> ENUM_NAME2
 >>>   # ENUM24_Name -> ENUM24_NAME
->>> @@ -42,9 +47,6 @@ def c_enum_const(type_name, const_name, prefix=None):
+>>> -def camel_to_upper(value):
+>>> +def camel_to_upper(value: str) -> str:
+>>>       c_fun_str = c_name(value, False)
+>>>       if value.isupper():
+>>>           return c_fun_str
+>>> @@ -41,7 +42,9 @@ def camel_to_upper(value):
+>>>       return new_name.lstrip('_').upper()
+>>>     
+>>> -def c_enum_const(type_name, const_name, prefix=None):
+>>> +def c_enum_const(type_name: str,
+>>> +                 const_name: str,
+>>> +                 prefix: Optional[str] = None) -> str:
+>>>       if prefix is not None:
+>>>           type_name = prefix
 >>>       return camel_to_upper(type_name) + '_' + c_name(const_name, False).upper()
->>>     
->>> -c_name_trans = str.maketrans('.-', '__')
->
-> (This one winds up being a constant, so I renamed it in my v2.)
->
->>> -
->>> -
->>>   # Map @name to a valid C identifier.
->>>   # If @protect, avoid returning certain ticklish identifiers (like
->>>   # C keywords) by prepending 'q_'.
->>> @@ -89,10 +91,6 @@ def c_name(name, protect=True):
->>>       return name
->>>     
->>> -eatspace = '\033EATSPACE.'
->>> -pointer_suffix = ' *' + eatspace
->>> -
->>> -
->>>   class Indent:
->>>       """
->>>       Indent-level management.
->>> @@ -135,12 +133,12 @@ def pop(self, amount: int = 4) -> int:
->>>     
->>>   # Generate @code with @kwds interpolated.
->>> -# Obey indent_level, and strip eatspace.
->>> +# Obey INDENT level, and strip EATSPACE.
->> Is the change to INDENT intentional?
+>>> @@ -56,7 +59,7 @@ def c_enum_const(type_name, const_name, prefix=None):
+>>>   # into substrings of a generated C function name.
+>>>   # '__a.b_c' -> '__a_b_c', 'x-foo' -> 'x_foo'
+>>>   # protect=True: 'int' -> 'q_int'; protect=False: 'int' -> 'int'
+>>> -def c_name(name, protect=True):
+>>> +def c_name(name: str, protect: bool = True) -> str:
+>>>       # ANSI X3J11/88-090, 3.1.1
+>>>       c89_words = set(['auto', 'break', 'case', 'char', 'const', 'continue',
+>>>                        'default', 'do', 'double', 'else', 'enum', 'extern',
+>>> @@ -134,24 +137,24 @@ def pop(self, amount: int = 4) -> int:
+>>>     # Generate @code with @kwds interpolated.
+>>>   # Obey INDENT level, and strip EATSPACE.
+>>> -def cgen(code, **kwds):
+>>> +def cgen(code: str, **kwds: Union[str, int]) -> str:
+>> Hmm.
+>> The @kwds values can be anything, provided they match the conversion
+>> specifiers in @code:
+>> 
+>>>       raw = code % kwds
+>> Your type hint adds a restriction that wasn't there before.
+>> Is there a better way?
 >> 
 >
-> Kind of, but it's either late (should have been with the indent
-> manager patch) or early (Should be with the patch that moves comments
-> into docstrings.)
+> Maybe there are format-like type annotation tricks you can do to
+> enforce this, but I did not research them. I tried to resist
+> "improving" our usage of the old % formatter prematurely. I may do a
+> wholesale f-string conversion at some point, but not now, it's not
+> important.
 >
-> When this comment becomes a docstring, I use `INDENT` to indicate it
-> as a proper object. This in and of itself is prescient, as we are not
-> using sphinx/apidoc to generate any documentation about the QAPI
-> package yet.
+> In practice, we pass strings and integers. This typing *is*
+> artificially restrictive, though. We can declare the type to be "Any"
+> and allow the function to fail or succeed at runtime if you'd prefer.
 >
-> (The pending v2 uses `indent` after you pointed out that it was not a
-> constant.)
->
->>>   def cgen(code, **kwds):
->>>       raw = code % kwds
 >>>       if INDENT:
 >>>           raw, _ = re.subn(r'^(?!(#|$))', str(INDENT), raw, flags=re.MULTILINE)
->>> -    return re.sub(re.escape(eatspace) + r' *', '', raw)
->>> +    return re.sub(re.escape(EATSPACE) + r' *', '', raw)
+>>>       return re.sub(re.escape(EATSPACE) + r' *', '', raw)
 >>>     
->>>   def mcgen(code, **kwds):
->> [...]
+>>> -def mcgen(code, **kwds):
+>>> +def mcgen(code: str, **kwds: Union[str, int]) -> str:
+>> Likewise.
 >> 
+>
+> Unresearched idea: It's possible that we can subclass the
+> string.Formatter class and extend it to perform our special variable 
+> replacements (chomping EATSPACE, etc.)
+>
+> And *maybe* because it inherits from the standard formatter, we would
+> benefit from any analysis Mypy performs on such things.
+>
+> Basically, replace mcgen/cgen with class CFormatter(string.Formatter).
+>
+> (maybe. assume that none of what I just said will work or is feasible.)
+
+Sounds worth exploring.  No need to do it now, of course.
 
 
