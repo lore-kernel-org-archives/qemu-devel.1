@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30904C43463
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:30:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8FFAC43464
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:31:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0585208DB
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:30:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30336208DB
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:31:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RT4tlojr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0585208DB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JQBe5siI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30336208DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJfkY-0001cn-Vo
-	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 12:30:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51768)
+	id 1kJflV-0002PZ-7k
+	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 12:31:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51538)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJfHb-0005ju-Ks
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36852
- helo=us-smtp-1.mimecast.com)
+ id 1kJfHO-0005UZ-R3
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44352)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJfHO-0007TB-Gv
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:15 -0400
+ id 1kJfHA-0007Pd-2k
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600531201;
+ s=mimecast20190719; t=1600531186;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DOrt7kYjcH5WRwo6OurObM2v4qeJaIsh0cYuRRkHd0E=;
- b=RT4tlojrH6x5XTM4WTl/6jvCLVOTRn//gCaSPZNw3xWch+7SlzXK/BHBBbwq28P8KWdW0N
- gGj0Q7gEp3SQnClr+J4GdjC7x4qUgcF2adyyXiBmStXwuQypW28zX2iGFNvOGuTiAA3mAD
- VbFhNOj6fT8VHw3nbM2/nJD6/H1BSxQ=
+ bh=Tkn5x3SmRtENeyRythGpocLhfNHWHtH02D7imFP+YWY=;
+ b=JQBe5siIUV9taLHZAY9OX2TEjRreKLnTHqSrv8JDJm5DWehGt0hjmaJqOkOYvqesPwY+5p
+ dCmbQGBCfzm4v3mRTS0Zo5pimEfBepnFDKeY/6tACBVdTwZtBiv1VFqmBuIH2WfbBmjpxE
+ 8oNevzacmAa5MvU9gcUZUv1nMi7Kvu8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-68-zZqa0JnjPuiGi1g2bFCk-Q-1; Sat, 19 Sep 2020 11:59:59 -0400
-X-MC-Unique: zZqa0JnjPuiGi1g2bFCk-Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-481-5Ovo-FEANNaOD3yxUOM4AA-1; Sat, 19 Sep 2020 11:59:41 -0400
+X-MC-Unique: 5Ovo-FEANNaOD3yxUOM4AA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 867DE1074654
- for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 15:59:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 934DC1074644;
+ Sat, 19 Sep 2020 15:59:40 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 25A261002D42;
- Sat, 19 Sep 2020 15:59:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 336DD60C47;
+ Sat, 19 Sep 2020 15:59:40 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 56/57] checkpatch: avoid error on cover letter files
-Date: Sat, 19 Sep 2020 11:59:15 -0400
-Message-Id: <20200919155916.1046398-57-pbonzini@redhat.com>
+Subject: [PULL 29/57] hw: megasas: consider 'iov_count=0' is an error in
+ megasas_map_sgl
+Date: Sat, 19 Sep 2020 11:58:48 -0400
+Message-Id: <20200919155916.1046398-30-pbonzini@redhat.com>
 In-Reply-To: <20200919155916.1046398-1-pbonzini@redhat.com>
 References: <20200919155916.1046398-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 11:59:21
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 06:41:51
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
 X-Spam_bar: -----
 X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.996,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,48 +97,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: Alexander Bulekov <alxndr@bu.edu>, Li Qiang <liq3ea@163.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+From: Li Qiang <liq3ea@163.com>
 
-Running checkpatch on a directory that contains a cover letter reports
-this error:
+Currently in 'megasas_map_sgl' when 'iov_count=0' will just return
+success however the 'cmd' doens't contain any iov. This will cause
+the assert in 'scsi_dma_complete' failed. This is because in
+'dma_blk_cb' the 'dbs->sg_cur_index == dbs->sg->nsg' will be true
+and just call 'dma_complete'. However now there is no aiocb returned.
 
-    Checking /tmp/tmpbnngauy3/0000-cover-letter.patch...
-    ERROR: Does not appear to be a unified-diff format patch
+This fixes the LP#1878263:
 
-    total: 1 errors, 0 warnings, 0 lines checked
+-->https://bugs.launchpad.net/qemu/+bug/1878263
 
-Let's skip cover letter as it is already done in the Linux kernel
-commits 06330fc40e3f ("checkpatch: avoid NOT_UNIFIED_DIFF errors
-on cover-letter.patch files") and a08ffbef4ab7 ("checkpatch: fix
-ignoring cover-letter logic").
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Message-Id: <20200917170212.92672-1-sgarzare@redhat.com>
+Reported-by: Alexander Bulekov <alxndr@bu.edu>
+Signed-off-by: Li Qiang <liq3ea@163.com>
+Message-Id: <20200815141940.44025-3-liq3ea@163.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scripts/checkpatch.pl | 2 +-
+ hw/scsi/megasas.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index bd3faa154c..3c898f878a 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -3005,7 +3005,7 @@ sub process {
- 		return 1;
- 	}
+diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+index 4cc709d2c6..e24c12d7ee 100644
+--- a/hw/scsi/megasas.c
++++ b/hw/scsi/megasas.c
+@@ -277,7 +277,7 @@ static int megasas_map_sgl(MegasasState *s, MegasasCmd *cmd, union mfi_sgl *sgl)
  
--	if (!$is_patch) {
-+	if (!$is_patch && $filename !~ /cover-letter\.patch$/) {
- 		ERROR("Does not appear to be a unified-diff format patch\n");
- 	}
- 
+     cmd->flags = le16_to_cpu(cmd->frame->header.flags);
+     iov_count = cmd->frame->header.sge_count;
+-    if (iov_count > MEGASAS_MAX_SGE) {
++    if (!iov_count || iov_count > MEGASAS_MAX_SGE) {
+         trace_megasas_iovec_sgl_overflow(cmd->index, iov_count,
+                                          MEGASAS_MAX_SGE);
+         return -1;
 -- 
 2.26.2
 
