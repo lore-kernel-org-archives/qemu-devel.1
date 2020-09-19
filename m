@@ -2,79 +2,103 @@ Return-Path: <SRS0=MBD3=C4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4017CC43464
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 13:37:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A266AC43464
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 14:00:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 891E120878
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 13:37:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F19EB2100A
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 14:00:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SnBtwgwq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 891E120878
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AG14vLvA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F19EB2100A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJd3n-0001dl-F3
-	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 09:37:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51166)
+	id 1kJdPM-0005nQ-7R
+	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 10:00:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55492)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kJd2l-0001Di-2N
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 09:36:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41090)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kJd2i-000598-Gn
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 09:36:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600522603;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type;
- bh=U9ubkd3O7+YWeUZ8RN0ix03ulsPZPWBQJNmS6a7M/ow=;
- b=SnBtwgwqmQ9c74vV58GevE/P1Hhjb2E9JA12imt13vwZlE3tRihbXqDmHwznaSWLJJje+1
- XQAeWCDRFJ73emET4FQR1v30nljfcX3FHsh8XKXhQpD51HQovIlSvWWg72PX7ILO32h9XE
- YfgXDU4VaagMy7f0W2z/AZSWk0BYRPo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-443-PojkqYCxO6WaFs54D65m2A-1; Sat, 19 Sep 2020 09:36:40 -0400
-X-MC-Unique: PojkqYCxO6WaFs54D65m2A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9A5C10A7AE2;
- Sat, 19 Sep 2020 13:36:39 +0000 (UTC)
-Received: from thuth.com (ovpn-112-71.ams2.redhat.com [10.36.112.71])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1B19A68D62;
- Sat, 19 Sep 2020 13:36:38 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] Remove superfluous .gitignore files
-Date: Sat, 19 Sep 2020 15:36:37 +0200
-Message-Id: <20200919133637.72744-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 06:41:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.996,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kJdOb-0005N4-4F
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 09:59:21 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45992)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kJdOZ-0007Xr-DX
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 09:59:20 -0400
+Received: by mail-wr1-x443.google.com with SMTP id x14so8300543wrl.12
+ for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 06:59:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=7l7WKLfzd38Lyzh4hVQq9PFrc/tNLxDpYsxlXHCfn1g=;
+ b=AG14vLvAHLBK2IJ8IflzWm8plYVeJCE/AMyPziLfm2ZKzU7WXkbwkgvMEQRApB1BNl
+ j+na5zMlB26NyPdpF2ojna+GEp7mgzElXkMq4zzqlU/Sc+H5VxQzkGt+lUXQPI66cco+
+ x40+Fz9btpivtcT+o2Obn/Sk2qOaRt2pwkJG5uIvj0DcFE/7NOAhc/BnFSbgvlJqWIef
+ ++4U8qT+SwAhQSKtiVelY18UCa2I2L2XP3rYcSxIt7JMscCOk/5btOgjxDCmVF6Hu2bw
+ G62C7s9JikUlRV5v6E01D5+kXvSOmhNTQZo127W8OtLBjtb07uKoSqHh1GcYAfGOz44u
+ dQdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=7l7WKLfzd38Lyzh4hVQq9PFrc/tNLxDpYsxlXHCfn1g=;
+ b=A3sTWWpEbIXG4hEyEj8eQPPOQA/Ib7xm+elUABGNProNl7LEmpclHuAyNfpoc7Qrca
+ HMyrATHDZafSSmDMz2K53/hXN+J4V67ddQFPoRI5tRLxXkPAi6um1cUfq0fBfVTwU3M8
+ +IL1srkCaNVmBWdSs14MjBGk2w1O43/WEs8a14Eh4ZYRreBDxG4mkYGLQ/UuooLmfDbw
+ dymGDW/EMjmpE9gSlWWDoDS1CzfViOllY0mbjynvl1EzoEqzTGsDgOX+WFHh7jCq/Yww
+ meYUiVSSSatu4sxD9PcTMMVD0g0yrvOjk82UYKMq1b+eJviQ6xJjQKRuHN+CY01imbGE
+ LaUw==
+X-Gm-Message-State: AOAM533QNfHWIfD0HCeUTZ+MB77cHHMMYQ/0ZagcYfABWZeWS+U0uJ0c
+ dOKSYe3m9KRrEXQPbpBwrNg=
+X-Google-Smtp-Source: ABdhPJzrpje11fIUwgSpfOc0kU0/DSixgZTUrT8+oz1JImbuyzT170NSimOvU4KizTB0Tb9+W2PhUQ==
+X-Received: by 2002:adf:dd44:: with SMTP id u4mr41377533wrm.22.1600523957610; 
+ Sat, 19 Sep 2020 06:59:17 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id y6sm10957981wrs.7.2020.09.19.06.59.16
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 19 Sep 2020 06:59:16 -0700 (PDT)
+Subject: Re: [PATCH V9 6/6] hw/mips: Add Loongson-3 machine support
+To: Huacai Chen <chenhuacai@gmail.com>
+References: <1600222344-16808-1-git-send-email-chenhc@lemote.com>
+ <1600222344-16808-7-git-send-email-chenhc@lemote.com>
+ <c3804617-7c65-4082-de76-81e718f6d139@amsat.org>
+ <CAAhV-H5OysVNvGzD066eVqA+-k2+GJDjwSGR0hJT0VUh3Ld83A@mail.gmail.com>
+ <63a89ba1-a920-c2b9-bd4f-7f523fdda895@amsat.org>
+ <31d4f14f-bba5-a5a5-d024-668558416083@amsat.org>
+ <CAAhV-H71RPoqf046-BJWEHkSumNM5mohxhwShSD9PyELTEzEtw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <ff3c4df0-6c11-ef9c-a26e-0397e13fc628@amsat.org>
+Date: Sat, 19 Sep 2020 15:59:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+MIME-Version: 1.0
+In-Reply-To: <CAAhV-H71RPoqf046-BJWEHkSumNM5mohxhwShSD9PyELTEzEtw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.248, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -87,150 +111,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org
+Cc: Huacai Chen <zltjiangshi@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since we are now always doing out-of-tree builds, these gitignore
-files should not be necessary anymore.
+On 9/19/20 3:00 AM, Huacai Chen wrote:
+> Hi, Philippe,
+> 
+> On Thu, Sep 17, 2020 at 3:53 PM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>
+>> On 9/16/20 12:47 PM, Philippe Mathieu-Daudé wrote:
+>>> On 9/16/20 11:49 AM, Huacai Chen wrote:
+>>>> On Wed, Sep 16, 2020 at 3:56 PM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>>>> On 9/16/20 4:12 AM, Huacai Chen wrote:
+>>> [...]
+>>>>>> +static void mips_loongson3_virt_init(MachineState *machine)
+>>>>>> +{
+>>>>>> +    int i;
+>>>>>> +    long bios_size;
+>>>>>> +    MIPSCPU *cpu;
+>>>>>> +    CPUMIPSState *env;
+>>>>>> +    DeviceState *liointc;
+>>>>>> +    char *filename;
+>>>>>> +    const char *kernel_cmdline = machine->kernel_cmdline;
+>>>>>> +    const char *kernel_filename = machine->kernel_filename;
+>>>>>> +    const char *initrd_filename = machine->initrd_filename;
+>>>>>> +    ram_addr_t ram_size = machine->ram_size;
+>>>>>> +    MemoryRegion *address_space_mem = get_system_memory();
+>>>>>> +    MemoryRegion *ram = g_new(MemoryRegion, 1);
+>>>>>> +    MemoryRegion *bios = g_new(MemoryRegion, 1);
+>>>>>> +    MemoryRegion *iomem = g_new(MemoryRegion, 1);
+>>>>>> +
+>>>>>> +    /* TODO: TCG will support all CPU types */
+>>>>>> +    if (!kvm_enabled()) {
+>>>>>> +        if (!machine->cpu_type) {
+>>>>>> +            machine->cpu_type = MIPS_CPU_TYPE_NAME("Loongson-3A1000");
+>>>>>> +        }
+>>>>>> +        if (!strstr(machine->cpu_type, "Loongson-3A1000")) {
+>>>>>> +            error_report("Loongson-3/TCG need cpu type Loongson-3A1000");
+>>>>>> +            exit(1);
+>>>>>> +        }
+>>>>>> +    } else {
+>>>>>> +        if (!machine->cpu_type) {
+>>>>>> +            machine->cpu_type = MIPS_CPU_TYPE_NAME("Loongson-3A4000");
+>>>>>> +        }
+>>>>>> +        if (!strstr(machine->cpu_type, "Loongson-3A4000")) {
+>>>>>> +            error_report("Loongson-3/KVM need cpu type Loongson-3A4000");
+>>>>>> +            exit(1);
+>>>>>> +        }
+>>>>>> +    }
+>>>>>> +
+>>>>>> +    if (ram_size < 512 * MiB) {
+>>>>>> +        error_report("Loongson-3 need at least 512MB memory");
+>>>>>
+>>>>> Typo "needs", but why?
+>>>> Though you told me "QEMU shouldn't assume anything about the guest",
+>>>> but Loongson-3 machine really need at least 512M memory. And as you
+>>>> said, this can simplify the memsize/highmemsize process (always larger
+>>>> than 256).
+>>>
+>>> OK, that's fine.
+>>>
+>>>>
+>>>>>
+>>>>>> +        exit(1);
+>>>>>> +    }
+>>>>>> +
+>>>>>> +    /*
+>>>>>> +     * The whole MMIO range among configure registers doesn't generate
+>>>>>> +     * exception when accessing invalid memory. Create an empty slot to
+>>>>>> +     * emulate this feature.
+>>>>>> +     */
+>>>>>> +    empty_slot_init("fallback", 0, 0x80000000);
+>>>>>
+>>>>> Again, this doesn't look correct (no comment in my previous review).
+>>>> This is written by Jiaxun because this is only needed by TCG, and he
+>>>> said that malta also uses empty_slot_init() here.
+>>>
+>>> IIRC for Malta this is a GT64120 specific hole.
+>>>
+>>> In this case I'd like to know the justification first.
+>>> Maybe you want to add this hole in the LOONGSON_LIOINTC device...
+>>
+>> Which makes me also wonder why are you splitting out 256MB of the RAM?
+>>
+>> This was a physical restriction of the GT64120 on 32-bit targets.
+>> Your hardware is virtual and 64-bit...
+> The physical memory address layout of Loongson-3:
+> 0-0x40000000  Low RAM (256MB)
+> 0x40000000-0x80000000 Hole for several MMIO registers (256MB)
+> 0x80000000-TopOfMemory High RAM
+> 
+> Thogh this is a virtual platform, but the kernel link address is in
+> CKSEG0, so "Low RAM" should exist. Though MMIO is different from real
+> hardware, but put it in the same hole can make life easy.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/keymaps/.gitignore       |  1 -
- plugins/.gitignore               |  2 --
- tests/.gitignore                 | 32 --------------------------------
- tests/fp/.gitignore              |  2 --
- tests/migration/.gitignore       |  2 --
- tests/multiboot/.gitignore       |  3 ---
- tests/qemu-iotests/.gitignore    |  9 ---------
- tests/tcg/.gitignore             |  5 -----
- tests/uefi-test-tools/.gitignore |  3 ---
- 9 files changed, 59 deletions(-)
- delete mode 100644 pc-bios/keymaps/.gitignore
- delete mode 100644 plugins/.gitignore
- delete mode 100644 tests/.gitignore
- delete mode 100644 tests/fp/.gitignore
- delete mode 100644 tests/migration/.gitignore
- delete mode 100644 tests/multiboot/.gitignore
- delete mode 100644 tests/qemu-iotests/.gitignore
- delete mode 100644 tests/tcg/.gitignore
- delete mode 100644 tests/uefi-test-tools/.gitignore
+OK...
 
-diff --git a/pc-bios/keymaps/.gitignore b/pc-bios/keymaps/.gitignore
-deleted file mode 100644
-index f90738f4dc..0000000000
---- a/pc-bios/keymaps/.gitignore
-+++ /dev/null
-@@ -1 +0,0 @@
--/*.stamp
-diff --git a/plugins/.gitignore b/plugins/.gitignore
-deleted file mode 100644
-index 7b8aaa1f10..0000000000
---- a/plugins/.gitignore
-+++ /dev/null
-@@ -1,2 +0,0 @@
--qemu-plugins-ld.symbols
--qemu-plugins-ld64.symbols
-diff --git a/tests/.gitignore b/tests/.gitignore
-deleted file mode 100644
-index d03c037d77..0000000000
---- a/tests/.gitignore
-+++ /dev/null
-@@ -1,32 +0,0 @@
--atomic_add-bench
--benchmark-crypto-cipher
--benchmark-crypto-hash
--benchmark-crypto-hmac
--check-*
--!check-*.c
--!check-*.sh
--fp/*.out
--qht-bench
--rcutorture
--test-*
--!test-*.c
--!test-*.py
--!docker/test-*
--test-qapi-commands.[ch]
--test-qapi-init-commands.[ch]
--include/test-qapi-commands-sub-module.[ch]
--test-qapi-commands-sub-sub-module.[ch]
--test-qapi-emit-events.[ch]
--test-qapi-events.[ch]
--include/test-qapi-events-sub-module.[ch]
--test-qapi-events-sub-sub-module.[ch]
--test-qapi-types.[ch]
--include/test-qapi-types-sub-module.[ch]
--test-qapi-types-sub-sub-module.[ch]
--test-qapi-visit.[ch]
--include/test-qapi-visit-sub-module.[ch]
--test-qapi-visit-sub-sub-module.[ch]
--test-qapi-introspect.[ch]
--*-test
--qapi-schema/*.test.*
--vm/*.img
-diff --git a/tests/fp/.gitignore b/tests/fp/.gitignore
-deleted file mode 100644
-index 704fd42992..0000000000
---- a/tests/fp/.gitignore
-+++ /dev/null
-@@ -1,2 +0,0 @@
--fp-test
--fp-bench
-diff --git a/tests/migration/.gitignore b/tests/migration/.gitignore
-deleted file mode 100644
-index 84f37552e4..0000000000
---- a/tests/migration/.gitignore
-+++ /dev/null
-@@ -1,2 +0,0 @@
--initrd-stress.img
--stress
-diff --git a/tests/multiboot/.gitignore b/tests/multiboot/.gitignore
-deleted file mode 100644
-index 93ef99800b..0000000000
---- a/tests/multiboot/.gitignore
-+++ /dev/null
-@@ -1,3 +0,0 @@
--*.bin
--*.elf
--test.out
-diff --git a/tests/qemu-iotests/.gitignore b/tests/qemu-iotests/.gitignore
-deleted file mode 100644
-index da62054000..0000000000
---- a/tests/qemu-iotests/.gitignore
-+++ /dev/null
-@@ -1,9 +0,0 @@
--check.log
--check.time*
--common.env
--*.out.bad
--*.notrun
--socket_scm_helper
--
--# ignore everything in the scratch directory
--scratch/
-diff --git a/tests/tcg/.gitignore b/tests/tcg/.gitignore
-deleted file mode 100644
-index 84d7541b28..0000000000
---- a/tests/tcg/.gitignore
-+++ /dev/null
-@@ -1,5 +0,0 @@
--# These are build artefacts which only appear when you are doing
--# builds directly in the source tree.
--config-*.mak
--*-softmmu/
--*-linux-user/
-diff --git a/tests/uefi-test-tools/.gitignore b/tests/uefi-test-tools/.gitignore
-deleted file mode 100644
-index 9f246701de..0000000000
---- a/tests/uefi-test-tools/.gitignore
-+++ /dev/null
-@@ -1,3 +0,0 @@
--Build
--Conf
--log
--- 
-2.18.2
+> 
+> Then it seems there is really a mistake of empty_slot_init() but has
+> nothing to do with liointc, and the right one should be
+> empty_slot_init("fallback", 0x40000000, 0x40000000);
 
+The EMPTY_SLOT models physical slot for busses that don't
+generate bus error when the slot is accessed and there is
+nothing there.
+
+If the 256MiB region starting at 0x40000000 is reserved for
+MMIO registers, you certainly want to get a bus error if the
+CPU tries to address an unmapped/illegal address.
+
+If you know some area belong to a device that might be accessed
+by firmware/kernel but it isn't important to model it, then you
+can create an UNIMP_DEVICE with create_unimplemented_device(),
+which behaves as RAZ/WI accesses on the bus.
+
+Regards,
+
+Phil.
+
+> 
+> Huacai
+> 
 
