@@ -7,83 +7,84 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CBC2C43464
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:30:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30904C43463
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:30:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8399208DB
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:30:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0585208DB
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:30:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OP9uhb7C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8399208DB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RT4tlojr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0585208DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJfkV-0001ZR-MM
-	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 12:30:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51762)
+	id 1kJfkY-0001cn-Vo
+	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 12:30:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51768)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJfHb-0005jc-Bg
+ id 1kJfHb-0005ju-Ks
  for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36050)
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36852
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJfHM-0007S5-Kr
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:14 -0400
+ id 1kJfHO-0007TB-Gv
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600531194;
+ s=mimecast20190719; t=1600531201;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KWrmc5Ev93CzvFANEfLqvjroURewAAlVIo8XZm51r/g=;
- b=OP9uhb7CMUe2sXDRkxEo8UtvpZIuiFxEQZF0hIredwpXs20V8/G0yfkwnKeOv1gWcwIfmp
- a76aLCQdee1GcUJg8Z9X16BsipboFM/2FUt0pKrJxfIyhonWXI1o7CrbP+OQdEy/5kQS/r
- P4PzJBYeUG53mlhi+u1+ZSrTvjQjppk=
+ bh=DOrt7kYjcH5WRwo6OurObM2v4qeJaIsh0cYuRRkHd0E=;
+ b=RT4tlojrH6x5XTM4WTl/6jvCLVOTRn//gCaSPZNw3xWch+7SlzXK/BHBBbwq28P8KWdW0N
+ gGj0Q7gEp3SQnClr+J4GdjC7x4qUgcF2adyyXiBmStXwuQypW28zX2iGFNvOGuTiAA3mAD
+ VbFhNOj6fT8VHw3nbM2/nJD6/H1BSxQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-369-_R2gSqWTPZK461l1oLqj8A-1; Sat, 19 Sep 2020 11:59:50 -0400
-X-MC-Unique: _R2gSqWTPZK461l1oLqj8A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-68-zZqa0JnjPuiGi1g2bFCk-Q-1; Sat, 19 Sep 2020 11:59:59 -0400
+X-MC-Unique: zZqa0JnjPuiGi1g2bFCk-Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C39A56BE3;
- Sat, 19 Sep 2020 15:59:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 867DE1074654
+ for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 15:59:58 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2BCC95576A;
- Sat, 19 Sep 2020 15:59:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 25A261002D42;
+ Sat, 19 Sep 2020 15:59:58 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 42/57] fuzz: use qemu_get_exec_dir
-Date: Sat, 19 Sep 2020 11:59:01 -0400
-Message-Id: <20200919155916.1046398-43-pbonzini@redhat.com>
+Subject: [PULL 56/57] checkpatch: avoid error on cover letter files
+Date: Sat, 19 Sep 2020 11:59:15 -0400
+Message-Id: <20200919155916.1046398-57-pbonzini@redhat.com>
 In-Reply-To: <20200919155916.1046398-1-pbonzini@redhat.com>
 References: <20200919155916.1046398-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 06:41:51
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 11:59:21
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
 X-Spam_bar: -----
 X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.996,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,43 +97,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>, Thomas Huth <thuth@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make things consistent with how softmmu/vl.c uses os_find_datadir.
-Initializing the path to the executables will also be needed for
-get_relocatable_path to work.
+From: Stefano Garzarella <sgarzare@redhat.com>
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Alexander Bulekov <alxndr@bu.edu>
+Running checkpatch on a directory that contains a cover letter reports
+this error:
+
+    Checking /tmp/tmpbnngauy3/0000-cover-letter.patch...
+    ERROR: Does not appear to be a unified-diff format patch
+
+    total: 1 errors, 0 warnings, 0 lines checked
+
+Let's skip cover letter as it is already done in the Linux kernel
+commits 06330fc40e3f ("checkpatch: avoid NOT_UNIFIED_DIFF errors
+on cover-letter.patch files") and a08ffbef4ab7 ("checkpatch: fix
+ignoring cover-letter logic").
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Message-Id: <20200917170212.92672-1-sgarzare@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/qtest/fuzz/fuzz.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ scripts/checkpatch.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
-index e906ef9efa..1811cb1d88 100644
---- a/tests/qtest/fuzz/fuzz.c
-+++ b/tests/qtest/fuzz/fuzz.c
-@@ -153,6 +153,7 @@ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
-     module_call_init(MODULE_INIT_QOM);
-     module_call_init(MODULE_INIT_LIBQOS);
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index bd3faa154c..3c898f878a 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -3005,7 +3005,7 @@ sub process {
+ 		return 1;
+ 	}
  
-+    qemu_init_exec_dir(**argv);
-     target_name = strstr(**argv, "-target-");
-     if (target_name) {        /* The binary name specifies the target */
-         target_name += strlen("-target-");
-@@ -165,7 +166,7 @@ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
-          * location of the executable. Using this we add exec_dir/pc-bios to
-          * the datadirs.
-          */
--        bindir = g_path_get_dirname(**argv);
-+        bindir = qemu_get_exec_dir();
-         datadir = g_build_filename(bindir, "pc-bios", NULL);
-         if (g_file_test(datadir, G_FILE_TEST_IS_DIR)) {
-             qemu_add_data_dir(datadir);
+-	if (!$is_patch) {
++	if (!$is_patch && $filename !~ /cover-letter\.patch$/) {
+ 		ERROR("Does not appear to be a unified-diff format patch\n");
+ 	}
+ 
 -- 
 2.26.2
 
