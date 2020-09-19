@@ -7,74 +7,78 @@ X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 998A6C43464
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 00:46:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99AE4C43464
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 01:02:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE59D21D20
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 00:46:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB4E621D43
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 01:02:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jUdj6Lz9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE59D21D20
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NxZ8w4aw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB4E621D43
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJR1Z-0006gl-0x
-	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 20:46:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34862)
+	id 1kJRGa-0000Ua-25
+	for qemu-devel@archiver.kernel.org; Fri, 18 Sep 2020 21:02:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1kJQzY-0005U0-NS
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 20:44:42 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:36159)
+ id 1kJRF3-0008UC-LH
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 21:00:42 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:33147)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1kJQzW-0001Ch-6e
- for qemu-devel@nongnu.org; Fri, 18 Sep 2020 20:44:40 -0400
-Received: by mail-io1-xd44.google.com with SMTP id d190so9014971iof.3
- for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 17:44:36 -0700 (PDT)
+ id 1kJRF1-00038J-3E
+ for qemu-devel@nongnu.org; Fri, 18 Sep 2020 21:00:41 -0400
+Received: by mail-io1-xd43.google.com with SMTP id r25so9052644ioj.0
+ for <qemu-devel@nongnu.org>; Fri, 18 Sep 2020 18:00:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=O8xsVXnMB9n3UYN0HRcrAh4xExkf0s2jhjzx80O73V4=;
- b=jUdj6Lz9C1fcPSyqIsaTdGgxlsTQ4Xms5boxMZDSBe98K74hUCeIEVlHke353vTOqE
- 37tzJdr1S62SxduLP1cMHbph8fHQMNQVK2rbxqxLixmxFiAM99rU25HkXEJZDIoCxxRs
- 8NxHnb0zlgFemaJ5uHDJJwxyV5DQnxik0I3UHV9p6yFkllGjb5xstyqjv1HI2pLigyty
- 0au04eqMQ9oSed6CsSkkc/W+11pZKhV1qjNJqVtodeyHHo5PSis5U+HzCB9JjnlChzx1
- bW3tjYUOJAUlXz4EKnC7sTP2XiKUqY6oNmK7hNhxUn5OPUWJ0TGye27kABJgpO3K/8+u
- Z8Eg==
+ :cc:content-transfer-encoding;
+ bh=R1YHF3NxcNs53+6IjRGYPBYBLOmRZ3gwW3qtyuskw28=;
+ b=NxZ8w4awu9pp5LoU5ALOgz1e7Wpt8zP95Abr6g4AOOS6DdeukMSSP/C9rqhagQy9LR
+ 7RzPVLeVbow7b95g7vYo95+MH4XR59BSVgnhwhwJ/mabG73Db2vHX7wRfiqwzFzlBZbS
+ NB+d3h9aCpZNDsNa1n4tIs778dVsrw/9fujiK+fJITQHeg8uSvVWCuSwK45K94fjpjTu
+ oDviu7mpcgw6utg/JpSHlMwQCil5FgZwY0LgcLH/xMGjhAzQhxhXORUxLSbRsPu8mdsM
+ okkuMmltrP0bpJvk7GdHXsOiw0p8/tlaEbjWgswPmdXKtQHFDosCJlT80Z67PFKtCSvz
+ zWTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=O8xsVXnMB9n3UYN0HRcrAh4xExkf0s2jhjzx80O73V4=;
- b=a7WC2q8WJswPDCYBzaWDbkPF7OyAcSEsP1JqctKD9jM6eGdrbPKum6QLzuH5d6Cgyn
- qNO6swEw3NJuQP8kBnoQ45iQNV/D+Ialcr2+AHu8LHltbiQtzl+KuVI4fIuESgmyTi8h
- 8rkbMFEkCl3Thd3gmGVhTqhjalPhBQEwZ9Hse1k7mJaY4+/xGtqEKDRyhqeIYsDvtJap
- siRCenO0PEbmlzipvYHzcSdlAOQ/+pVuWrXlhOuttS5o58VvjG/3IyfAV3lGYmKn9GSn
- zzxto5zilsRsN44mtQW79tdK2+SFAGbtWWQq06/xxbi8pc1SN7APTpWmzeuMQEw1vYYf
- cCyA==
-X-Gm-Message-State: AOAM533nBx0O/4s80sRTN+xv2euXocfmuUJwAMXkbqiaZMmi+kseXVCv
- uEhgDposL88ZUREjfdtCBpKQ3xgn4LCH8mqrGQI=
-X-Google-Smtp-Source: ABdhPJw6LLB1Wth0SWIRXqw1IOxSmaSV39FKg9s0if2vxcmkccnpDlrQn+o48AxMxDL3ozwxMvUkQC1V0d3u6IJxFAw=
-X-Received: by 2002:a5d:9483:: with SMTP id v3mr1001139ioj.84.1600476276146;
- Fri, 18 Sep 2020 17:44:36 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=R1YHF3NxcNs53+6IjRGYPBYBLOmRZ3gwW3qtyuskw28=;
+ b=CE9vzMyy1HB3odqSrXQPjitMNDin6EhPoVeoi3bPE2H8Kvo/iBfuE8Ar6f32sncZVb
+ sZ80sOtVJGfqqWV1NtkazVw+qlpXkYSGFkWfVW0Vgn143f5VZwspR2BL0fXKC2OFkjak
+ 3eH4i3aePhMBFZW0eeBcssrP6GKbeDYxZIsYSBjyE67NHCKq6JoTJJpcb8GOjR8JE9cj
+ H4U1+YyW4ig/j2b+sAgFOiMeOWiHTxpFRRkjHSXv0fKK7I4KBW0flB7+kCtSxwTrBmg2
+ fJhiHuZ8Rzi/izXuc9OsIOdwx4IPxemmUTyVvhrsVcFXomOQe5Eg2M5Ro0VVPx0nARTy
+ O54w==
+X-Gm-Message-State: AOAM532P4Lk38/RRRRKMY/vU4HrpDJGuUQ3Nw5HGgvjY5vY5LLT6nqEb
+ hLKt598wF9ko3AyMzfYQ0bm2RceiCrpPrm7iibE=
+X-Google-Smtp-Source: ABdhPJykqkVVSgg7UAKWsJzumlHjjxXsDYjsQsvshXL8PfpUzEuec0wwf0xd9IFCd2mIbyfIQyVDPt7BNCpxfGGA4q8=
+X-Received: by 2002:a02:a498:: with SMTP id d24mr33134809jam.137.1600477237968; 
+ Fri, 18 Sep 2020 18:00:37 -0700 (PDT)
 MIME-Version: 1.0
 References: <1600222344-16808-1-git-send-email-chenhc@lemote.com>
- <1600222344-16808-4-git-send-email-chenhc@lemote.com>
- <1c19dd56-7d76-3dc8-c881-f0631e5e5352@linaro.org>
-In-Reply-To: <1c19dd56-7d76-3dc8-c881-f0631e5e5352@linaro.org>
+ <1600222344-16808-7-git-send-email-chenhc@lemote.com>
+ <c3804617-7c65-4082-de76-81e718f6d139@amsat.org>
+ <CAAhV-H5OysVNvGzD066eVqA+-k2+GJDjwSGR0hJT0VUh3Ld83A@mail.gmail.com>
+ <63a89ba1-a920-c2b9-bd4f-7f523fdda895@amsat.org>
+ <31d4f14f-bba5-a5a5-d024-668558416083@amsat.org>
+In-Reply-To: <31d4f14f-bba5-a5a5-d024-668558416083@amsat.org>
 From: Huacai Chen <chenhuacai@gmail.com>
-Date: Sat, 19 Sep 2020 08:44:23 +0800
-Message-ID: <CAAhV-H57HH9EjP9+VDZx_6p-bA6Lkh+w05JPfo1RmeptRw7eJA@mail.gmail.com>
-Subject: Re: [PATCH V9 3/6] target/mips: Add loongson-ext lswc2 group of
- instructions (Part 1)
-To: Richard Henderson <richard.henderson@linaro.org>
+Date: Sat, 19 Sep 2020 09:00:26 +0800
+Message-ID: <CAAhV-H71RPoqf046-BJWEHkSumNM5mohxhwShSD9PyELTEzEtw@mail.gmail.com>
+Subject: Re: [PATCH V9 6/6] hw/mips: Add Loongson-3 machine support
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
- envelope-from=chenhuacai@gmail.com; helo=mail-io1-xd44.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
+ envelope-from=chenhuacai@gmail.com; helo=mail-io1-xd43.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -98,7 +102,6 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Huacai Chen <zltjiangshi@gmail.com>,
  Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
  QEMU Developers <qemu-devel@nongnu.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  Aurelien Jarno <aurelien@aurel32.net>
@@ -106,29 +109,107 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, Richard,
+Hi, Philippe,
 
-On Wed, Sep 16, 2020 at 11:15 PM Richard Henderson
-<richard.henderson@linaro.org> wrote:
+On Thu, Sep 17, 2020 at 3:53 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
 >
-> On 9/15/20 7:12 PM, Huacai Chen wrote:
-> > +    case OPC_GSLQ:
-> > +        gen_base_offset_addr(ctx, t0, rs, lsq_offset);
-> > +        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEQ |
-> > +                            ctx->default_tcg_memop_mask);
-> > +        gen_store_gpr(t0, rt);
-> > +        gen_base_offset_addr(ctx, t0, rs, lsq_offset + 8);
-> > +        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEQ |
-> > +                            ctx->default_tcg_memop_mask);
-> > +        gen_store_gpr(t0, lsq_rt1);
+> On 9/16/20 12:47 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> > On 9/16/20 11:49 AM, Huacai Chen wrote:
+> >> On Wed, Sep 16, 2020 at 3:56 PM Philippe Mathieu-Daud=C3=A9 <f4bug@ams=
+at.org> wrote:
+> >>> On 9/16/20 4:12 AM, Huacai Chen wrote:
+> > [...]
+> >>>> +static void mips_loongson3_virt_init(MachineState *machine)
+> >>>> +{
+> >>>> +    int i;
+> >>>> +    long bios_size;
+> >>>> +    MIPSCPU *cpu;
+> >>>> +    CPUMIPSState *env;
+> >>>> +    DeviceState *liointc;
+> >>>> +    char *filename;
+> >>>> +    const char *kernel_cmdline =3D machine->kernel_cmdline;
+> >>>> +    const char *kernel_filename =3D machine->kernel_filename;
+> >>>> +    const char *initrd_filename =3D machine->initrd_filename;
+> >>>> +    ram_addr_t ram_size =3D machine->ram_size;
+> >>>> +    MemoryRegion *address_space_mem =3D get_system_memory();
+> >>>> +    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+> >>>> +    MemoryRegion *bios =3D g_new(MemoryRegion, 1);
+> >>>> +    MemoryRegion *iomem =3D g_new(MemoryRegion, 1);
+> >>>> +
+> >>>> +    /* TODO: TCG will support all CPU types */
+> >>>> +    if (!kvm_enabled()) {
+> >>>> +        if (!machine->cpu_type) {
+> >>>> +            machine->cpu_type =3D MIPS_CPU_TYPE_NAME("Loongson-3A10=
+00");
+> >>>> +        }
+> >>>> +        if (!strstr(machine->cpu_type, "Loongson-3A1000")) {
+> >>>> +            error_report("Loongson-3/TCG need cpu type Loongson-3A1=
+000");
+> >>>> +            exit(1);
+> >>>> +        }
+> >>>> +    } else {
+> >>>> +        if (!machine->cpu_type) {
+> >>>> +            machine->cpu_type =3D MIPS_CPU_TYPE_NAME("Loongson-3A40=
+00");
+> >>>> +        }
+> >>>> +        if (!strstr(machine->cpu_type, "Loongson-3A4000")) {
+> >>>> +            error_report("Loongson-3/KVM need cpu type Loongson-3A4=
+000");
+> >>>> +            exit(1);
+> >>>> +        }
+> >>>> +    }
+> >>>> +
+> >>>> +    if (ram_size < 512 * MiB) {
+> >>>> +        error_report("Loongson-3 need at least 512MB memory");
+> >>>
+> >>> Typo "needs", but why?
+> >> Though you told me "QEMU shouldn't assume anything about the guest",
+> >> but Loongson-3 machine really need at least 512M memory. And as you
+> >> said, this can simplify the memsize/highmemsize process (always larger
+> >> than 256).
+> >
+> > OK, that's fine.
+> >
+> >>
+> >>>
+> >>>> +        exit(1);
+> >>>> +    }
+> >>>> +
+> >>>> +    /*
+> >>>> +     * The whole MMIO range among configure registers doesn't gener=
+ate
+> >>>> +     * exception when accessing invalid memory. Create an empty slo=
+t to
+> >>>> +     * emulate this feature.
+> >>>> +     */
+> >>>> +    empty_slot_init("fallback", 0, 0x80000000);
+> >>>
+> >>> Again, this doesn't look correct (no comment in my previous review).
+> >> This is written by Jiaxun because this is only needed by TCG, and he
+> >> said that malta also uses empty_slot_init() here.
+> >
+> > IIRC for Malta this is a GT64120 specific hole.
+> >
+> > In this case I'd like to know the justification first.
+> > Maybe you want to add this hole in the LOONGSON_LIOINTC device...
 >
-> If rs == rt, this will compute the wrong address for the second load.
+> Which makes me also wonder why are you splitting out 256MB of the RAM?
 >
-> Either avoid storing t0 back to rt until both loads are complete, or retain the
-> address temporary and simply add 8 between the two loads.
-OK, this will be improved in V10.
+> This was a physical restriction of the GT64120 on 32-bit targets.
+> Your hardware is virtual and 64-bit...
+The physical memory address layout of Loongson-3:
+0-0x40000000  Low RAM (256MB)
+0x40000000-0x80000000 Hole for several MMIO registers (256MB)
+0x80000000-TopOfMemory High RAM
 
->
->
-> r~
+Thogh this is a virtual platform, but the kernel link address is in
+CKSEG0, so "Low RAM" should exist. Though MMIO is different from real
+hardware, but put it in the same hole can make life easy.
+
+Then it seems there is really a mistake of empty_slot_init() but has
+nothing to do with liointc, and the right one should be
+empty_slot_init("fallback", 0x40000000, 0x40000000);
+
+Huacai
 
