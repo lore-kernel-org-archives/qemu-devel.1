@@ -2,75 +2,82 @@ Return-Path: <SRS0=MBD3=C4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFB37C43464
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 08:28:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C590C43463
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 09:21:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 315F421481
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 08:28:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="N8VbCIMO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 315F421481
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
+	by mail.kernel.org (Postfix) with ESMTPS id 548502100A
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 09:21:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 548502100A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJYEZ-0002Xc-4I
-	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 04:28:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34326)
+	id 1kJZ3f-0003fA-2l
+	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 05:21:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41448)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@163.com>) id 1kJYDc-000288-FL
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 04:27:40 -0400
-Received: from mail-m971.mail.163.com ([123.126.97.1]:49914)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liq3ea@163.com>) id 1kJYDV-0005jH-Id
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 04:27:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
- s=s110527; h=From:Subject:Date:Message-Id; bh=mv9vAiivvmxvCEJBs8
- S/qaz6r9HO4URel5Bho94yIyo=; b=N8VbCIMO8fvcDKCUK4wd1sNAWYjXI0R36B
- 3UvIF3vFE6+q5o2KR2+UZBewPZAuMhp1O/zPuqIaURtC4UFW0QS798najU5eqYKT
- ZUZg3dcZg+K8m7EGohIHSRSUAHLrN0FSJb5yGW/2UczIF9ERaroFonjgpxU7L/N0
- IShCetFKo=
-Received: from localhost.localdomain (unknown [183.159.201.198])
- by smtp1 (Coremail) with SMTP id GdxpCgBXCGDgwGVfmgOqBw--.284S4;
- Sat, 19 Sep 2020 16:27:14 +0800 (CST)
-From: Li Qiang <liq3ea@163.com>
-To: pbonzini@redhat.com,
-	mst@redhat.com
-Subject: [PATCH] virtio: update MemoryRegionCaches when guest set bad features
-Date: Sat, 19 Sep 2020 01:27:06 -0700
-Message-Id: <20200919082706.6703-1-liq3ea@163.com>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID: GdxpCgBXCGDgwGVfmgOqBw--.284S4
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Ar1kXr13GF45Zr4DCF17ZFb_yoW8Ar4Dp3
- 4xAFyYvFW2qrnxAan5tF4kWr4rArykGw429w1j9w12k3W8Xr13A34IkrZ2qFZrZ340vF48
- CFW0gryjvrnrZaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
- 9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UOXoxUUUUU=
-X-Originating-IP: [183.159.201.198]
-X-CM-SenderInfo: 5oltjvrd6rljoofrz/1tbiTwOkbVsGV5aDWwAAsB
-Received-SPF: pass client-ip=123.126.97.1; envelope-from=liq3ea@163.com;
- helo=mail-m971.mail.163.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 04:27:18
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kJZ2w-0003GL-Nn
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 05:20:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38256)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kJZ2t-0002uz-W3
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 05:20:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kJZ2s-0000Iq-Ca
+ for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 09:20:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5A0E22E804E
+ for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 09:20:38 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 19 Sep 2020 09:11:29 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1896317@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: i386
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: philmd
+X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+Message-Id: <160050668992.17815.17282420990273568963.malonedeb@soybean.canonical.com>
+Subject: [Bug 1896317] [NEW] ioapic: UndefinedBehaviorSanitizer starting
+ qemu-system-i386
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: 985ba02fd3027ccb2bf788a5871a5037dfbb8a6f
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 05:00:50
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,56 +86,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Qiang <liq3ea@163.com>, qemu-devel@nongnu.org
+Reply-To: Bug 1896317 <1896317@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Current the 'virtio_set_features' only update the 'MemorRegionCaches'
-when the 'virtio_set_features_nocheck' return '0' which means it is
-not bad features. However the guest can still trigger the access of the
-used vring after set bad features. In this situation it will cause assert
-failure in 'ADDRESS_SPACE_ST_CACHED'.
+Public bug reported:
 
-Buglink: https://bugs.launchpad.net/qemu/+bug/1890333
-Fixes: db812c4073c7 ("virtio: update MemoryRegionCaches when guest negotiates features")
-Reported-by: Alexander Bulekov <alxndr@bu.edu>
-Signed-off-by: Li Qiang <liq3ea@163.com>
----
- hw/virtio/virtio.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+As of commit 053a4177817:
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index e983025217..4441ae5ed4 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -2963,17 +2963,16 @@ int virtio_set_features(VirtIODevice *vdev, uint64_t val)
-         return -EINVAL;
-     }
-     ret = virtio_set_features_nocheck(vdev, val);
--    if (!ret) {
--        if (virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX)) {
--            /* VIRTIO_RING_F_EVENT_IDX changes the size of the caches.  */
--            int i;
--            for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
--                if (vdev->vq[i].vring.num != 0) {
--                    virtio_init_region_cache(vdev, i);
--                }
-+    if (virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX)) {
-+        /* VIRTIO_RING_F_EVENT_IDX changes the size of the caches.  */
-+        int i;
-+        for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
-+            if (vdev->vq[i].vring.num != 0) {
-+                virtio_init_region_cache(vdev, i);
-             }
-         }
--
-+    }
-+    if (!ret) {
-         if (!virtio_device_started(vdev, vdev->status) &&
-             !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
-             vdev->start_on_kick = true;
--- 
-2.17.1
+$ ./configure --enable-sanitizers --disable-kvm
 
+$ make qemu-system-i386
+
+$ ./build/i386-softmmu/qemu-system-i386
+include/exec/memory.h:688:12: runtime error: member access within null poin=
+ter of type 'AddressSpace' (aka 'struct AddressSpace')
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior include/exec/memory=
+.h:688:12 in =
+
+AddressSanitizer:DEADLYSIGNAL
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+=3D=3D249513=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x000000=
+000020 (pc 0x55955d7f8c4f bp 0x7fff10f3cff0 sp 0x7fff10f3cf20 T0)
+=3D=3D249513=3D=3DThe signal is caused by a READ memory access.
+=3D=3D249513=3D=3DHint: address points to the zero page.
+    #0 0x55955d7f8c4f in address_space_to_flatview include/exec/memory.h:68=
+8:12
+    #1 0x55955d8003d2 in address_space_translate include/exec/memory.h:2286=
+:31
+    #2 0x55955d8315f3 in address_space_stl_internal memory_ldst.c.inc:312:10
+    #3 0x55955d831cd1 in address_space_stl_le memory_ldst.c.inc:353:5
+    #4 0x55955d7ef2e1 in stl_le_phys include/exec/memory_ldst_phys.h.inc:10=
+3:5
+    #5 0x55955d7ed299 in ioapic_service hw/intc/ioapic.c:138:17
+    #6 0x55955d7f0e30 in ioapic_set_irq hw/intc/ioapic.c:186:17
+    #7 0x55955e34b825 in qemu_set_irq hw/core/irq.c:45:5
+    #8 0x55955d0409e6 in gsi_handler hw/i386/x86.c:583:5
+    #9 0x55955e34b825 in qemu_set_irq hw/core/irq.c:45:5
+    #10 0x55955ca539c9 in hpet_handle_legacy_irq hw/timer/hpet.c:724:13
+    #11 0x55955e34b825 in qemu_set_irq hw/core/irq.c:45:5
+    #12 0x55955ce7a695 in pit_irq_timer_update hw/timer/i8254.c:264:5
+    #13 0x55955ce7a1d8 in pit_irq_control hw/timer/i8254.c:306:9
+    #14 0x55955e34b825 in qemu_set_irq hw/core/irq.c:45:5
+    #15 0x55955ca52276 in hpet_reset hw/timer/hpet.c:707:5
+    #16 0x55955e342e91 in device_transitional_reset hw/core/qdev.c:1114:9
+    #17 0x55955e345cfc in resettable_phase_hold hw/core/resettable.c:182:13
+    #18 0x55955e31c1e5 in bus_reset_child_foreach hw/core/bus.c:94:9
+    #19 0x55955e348a58 in resettable_child_foreach hw/core/resettable.c:96:9
+    #20 0x55955e34596f in resettable_phase_hold hw/core/resettable.c:173:5
+    #21 0x55955e344a72 in resettable_assert_reset hw/core/resettable.c:60:5
+    #22 0x55955e344919 in resettable_reset hw/core/resettable.c:45:5
+    #23 0x55955e3473e9 in resettable_cold_reset_fn hw/core/resettable.c:269=
+:5
+    #24 0x55955e344898 in qemu_devices_reset hw/core/reset.c:69:9
+    #25 0x55955d05c5b0 in pc_machine_reset hw/i386/pc.c:1632:5
+    #26 0x55955d55ab84 in qemu_system_reset softmmu/vl.c:1403:9
+    #27 0x55955d56816d in qemu_init softmmu/vl.c:4458:5
+    #28 0x55955bc13609 in main softmmu/main.c:49:5
+    #29 0x7f3baad20041 in __libc_start_main (/lib64/libc.so.6+0x27041)
+    #30 0x55955bb398ed in _start (build-sanitizer/qemu-system-i386+0x1b3d8e=
+d)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV include/exec/memory.h:688:12 in address_spa=
+ce_to_flatview
+
+Comment and stl_le_phys() added in commit cb135f59b80:
+    /* No matter whether IR is enabled, we translate
+     * the IOAPIC message into a MSI one, and its
+     * address space will decide whether we need a
+     * translation. */
+    stl_le_phys(ioapic_as, info.addr, info.data);
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: i386
+
+** Tags added: i386
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1896317
+
+Title:
+  ioapic: UndefinedBehaviorSanitizer starting qemu-system-i386
+
+Status in QEMU:
+  New
+
+Bug description:
+  As of commit 053a4177817:
+
+  $ ./configure --enable-sanitizers --disable-kvm
+
+  $ make qemu-system-i386
+
+  $ ./build/i386-softmmu/qemu-system-i386
+  include/exec/memory.h:688:12: runtime error: member access within null po=
+inter of type 'AddressSpace' (aka 'struct AddressSpace')
+  SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior include/exec/memo=
+ry.h:688:12 in =
+
+  AddressSanitizer:DEADLYSIGNAL
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  =3D=3D249513=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x0000=
+00000020 (pc 0x55955d7f8c4f bp 0x7fff10f3cff0 sp 0x7fff10f3cf20 T0)
+  =3D=3D249513=3D=3DThe signal is caused by a READ memory access.
+  =3D=3D249513=3D=3DHint: address points to the zero page.
+      #0 0x55955d7f8c4f in address_space_to_flatview include/exec/memory.h:=
+688:12
+      #1 0x55955d8003d2 in address_space_translate include/exec/memory.h:22=
+86:31
+      #2 0x55955d8315f3 in address_space_stl_internal memory_ldst.c.inc:312=
+:10
+      #3 0x55955d831cd1 in address_space_stl_le memory_ldst.c.inc:353:5
+      #4 0x55955d7ef2e1 in stl_le_phys include/exec/memory_ldst_phys.h.inc:=
+103:5
+      #5 0x55955d7ed299 in ioapic_service hw/intc/ioapic.c:138:17
+      #6 0x55955d7f0e30 in ioapic_set_irq hw/intc/ioapic.c:186:17
+      #7 0x55955e34b825 in qemu_set_irq hw/core/irq.c:45:5
+      #8 0x55955d0409e6 in gsi_handler hw/i386/x86.c:583:5
+      #9 0x55955e34b825 in qemu_set_irq hw/core/irq.c:45:5
+      #10 0x55955ca539c9 in hpet_handle_legacy_irq hw/timer/hpet.c:724:13
+      #11 0x55955e34b825 in qemu_set_irq hw/core/irq.c:45:5
+      #12 0x55955ce7a695 in pit_irq_timer_update hw/timer/i8254.c:264:5
+      #13 0x55955ce7a1d8 in pit_irq_control hw/timer/i8254.c:306:9
+      #14 0x55955e34b825 in qemu_set_irq hw/core/irq.c:45:5
+      #15 0x55955ca52276 in hpet_reset hw/timer/hpet.c:707:5
+      #16 0x55955e342e91 in device_transitional_reset hw/core/qdev.c:1114:9
+      #17 0x55955e345cfc in resettable_phase_hold hw/core/resettable.c:182:=
+13
+      #18 0x55955e31c1e5 in bus_reset_child_foreach hw/core/bus.c:94:9
+      #19 0x55955e348a58 in resettable_child_foreach hw/core/resettable.c:9=
+6:9
+      #20 0x55955e34596f in resettable_phase_hold hw/core/resettable.c:173:5
+      #21 0x55955e344a72 in resettable_assert_reset hw/core/resettable.c:60=
+:5
+      #22 0x55955e344919 in resettable_reset hw/core/resettable.c:45:5
+      #23 0x55955e3473e9 in resettable_cold_reset_fn hw/core/resettable.c:2=
+69:5
+      #24 0x55955e344898 in qemu_devices_reset hw/core/reset.c:69:9
+      #25 0x55955d05c5b0 in pc_machine_reset hw/i386/pc.c:1632:5
+      #26 0x55955d55ab84 in qemu_system_reset softmmu/vl.c:1403:9
+      #27 0x55955d56816d in qemu_init softmmu/vl.c:4458:5
+      #28 0x55955bc13609 in main softmmu/main.c:49:5
+      #29 0x7f3baad20041 in __libc_start_main (/lib64/libc.so.6+0x27041)
+      #30 0x55955bb398ed in _start (build-sanitizer/qemu-system-i386+0x1b3d=
+8ed)
+
+  AddressSanitizer can not provide additional info.
+  SUMMARY: AddressSanitizer: SEGV include/exec/memory.h:688:12 in address_s=
+pace_to_flatview
+
+  Comment and stl_le_phys() added in commit cb135f59b80:
+      /* No matter whether IR is enabled, we translate
+       * the IOAPIC message into a MSI one, and its
+       * address space will decide whether we need a
+       * translation. */
+      stl_le_phys(ioapic_as, info.addr, info.data);
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1896317/+subscriptions
 
