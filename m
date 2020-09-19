@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B214AC43464
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:21:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED6D2C43463
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:21:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42D86208C7
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:21:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4242B208C7
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:21:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y0tWeJvl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42D86208C7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LFL6QpnJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4242B208C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJfbh-0005Pp-Bz
-	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 12:21:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51464)
+	id 1kJfcA-0006Ue-E6
+	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 12:21:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51370)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJfHK-0005S5-33
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 11:59:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41038)
+ id 1kJfHA-0005Qh-BU
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 11:59:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20843)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJfH4-0007OU-SW
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 11:59:55 -0400
+ id 1kJfGy-0007NZ-OL
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 11:59:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600531182;
+ s=mimecast20190719; t=1600531176;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RuSmsrXTg886tOScpTNGMVUO2FnOpFcuZm7f1zc8rLg=;
- b=Y0tWeJvli5h5wDa/I7KfaTB4uIMCgiATm5YWlwoUWMuTm7jiOvJFWd3LmSuT7NU3uTd9GV
- LxPLG1YdwpWQOAQl/q4UgH65y6327G24EsAHQvW/YhyTi6BJUd7L3jPV9ahPUQ79n17KEI
- trbCQoSRPv+BTdoqPrkDLMHTfCjssjU=
+ bh=79tytawcwJw9LHpxLHI/O73wCTA0ATdaC7xziuc35VA=;
+ b=LFL6QpnJnqnq26guHkKRP5MQgtYnVjxWMX2WB6GZAd1t/APm8yvP3QddewUaGUUhe3pVSw
+ TmGNp+eKWisCrAkgNLbZIWwPpSmUbOg+V3YGbAgufCnchmK6fO7ldnk2FYOuHwvERnw0IM
+ NAxQHIDTXbjF6mTRZofcOt5AmGUs/9Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-SrxRJO0sMN6P8ddK5xmnYg-1; Sat, 19 Sep 2020 11:59:39 -0400
-X-MC-Unique: SrxRJO0sMN6P8ddK5xmnYg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-90-rteOSMfHPQK27UzAEImxFg-1; Sat, 19 Sep 2020 11:59:33 -0400
+X-MC-Unique: rteOSMfHPQK27UzAEImxFg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B68D910066FE;
- Sat, 19 Sep 2020 15:59:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A910C56BF2;
+ Sat, 19 Sep 2020 15:59:32 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 65C5460C47;
- Sat, 19 Sep 2020 15:59:38 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 45FEC1975E;
+ Sat, 19 Sep 2020 15:59:32 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 25/57] hw/char/serial: Make 'wakeup' property boolean
-Date: Sat, 19 Sep 2020 11:58:44 -0400
-Message-Id: <20200919155916.1046398-26-pbonzini@redhat.com>
+Subject: [PULL 18/57] hw/mips/mipssim: Use MMIO serial device on fake ISA I/O
+Date: Sat, 19 Sep 2020 11:58:37 -0400
+Message-Id: <20200919155916.1046398-19-pbonzini@redhat.com>
 In-Reply-To: <20200919155916.1046398-1-pbonzini@redhat.com>
 References: <20200919155916.1046398-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -96,68 +96,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Make the "wakeup" property introduced in commit 9826fd597df
-("suspend: make serial ports wakeup the guest") a boolean.
+The 'mipssim' is not a real hardware, it is a simulator.
 
-As we want to reuse the generic serial properties in the
-ISA model (next commit), expose this property.
+There is an ISA MMIO space mapped at 0x1fd00000, however
+this is not a real ISA bus (no ISA IRQ). So can not use
+the TYPE_ISA_SERIAL device...
+Instead we have been using a plain MMIO device, but named
+it IO.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+TYPE_SERIAL_IO is a subset of TYPE_SERIAL_MM, using
+regshift=0 and endianness=DEVICE_LITTLE_ENDIAN.
+
+Directly use the TYPE_SERIAL_MM device, enforcing the
+regshift/endianness values. 'regshift' default is already
+'0'. 'endianness' is meaningless for 8-bit accesses.
+
+This change breaks migration back compatibility, but
+this is not an issue for the mipssim machine.
+
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200907015535.827885-6-f4bug@amsat.org>
+Message-Id: <20200907011538.818996-2-philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/char/serial-isa.c     | 2 +-
- hw/char/serial.c         | 1 +
- include/hw/char/serial.h | 2 +-
- 3 files changed, 3 insertions(+), 2 deletions(-)
+ hw/mips/mipssim.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/hw/char/serial-isa.c b/hw/char/serial-isa.c
-index d4aad81a85..7e1b36c3f6 100644
---- a/hw/char/serial-isa.c
-+++ b/hw/char/serial-isa.c
-@@ -119,7 +119,7 @@ static Property serial_isa_properties[] = {
-     DEFINE_PROP_UINT32("iobase",  ISASerialState, iobase,  -1),
-     DEFINE_PROP_UINT32("irq",    ISASerialState, isairq,  -1),
-     DEFINE_PROP_CHR("chardev",   ISASerialState, state.chr),
--    DEFINE_PROP_UINT32("wakeup", ISASerialState, state.wakeup, 0),
-+    DEFINE_PROP_BOOL("wakeup",   ISASerialState, state.wakeup, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
+diff --git a/hw/mips/mipssim.c b/hw/mips/mipssim.c
+index 1b3b762203..5d4ad74828 100644
+--- a/hw/mips/mipssim.c
++++ b/hw/mips/mipssim.c
+@@ -216,10 +216,11 @@ mips_mipssim_init(MachineState *machine)
+      * MIPS CPU INT2, which is interrupt 4.
+      */
+     if (serial_hd(0)) {
+-        DeviceState *dev = qdev_new(TYPE_SERIAL_IO);
++        DeviceState *dev = qdev_new(TYPE_SERIAL_MM);
  
-diff --git a/hw/char/serial.c b/hw/char/serial.c
-index 7b5ef872bd..4386adabd4 100644
---- a/hw/char/serial.c
-+++ b/hw/char/serial.c
-@@ -975,6 +975,7 @@ const MemoryRegionOps serial_io_ops = {
- static Property serial_properties[] = {
-     DEFINE_PROP_CHR("chardev", SerialState, chr),
-     DEFINE_PROP_UINT32("baudbase", SerialState, baudbase, 115200),
-+    DEFINE_PROP_BOOL("wakeup", SerialState, wakeup, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
-index 51397a8a18..83fa08e4e7 100644
---- a/include/hw/char/serial.h
-+++ b/include/hw/char/serial.h
-@@ -61,7 +61,7 @@ struct SerialState {
-     uint32_t baudbase;
-     uint32_t tsr_retry;
-     guint watch_tag;
--    uint32_t wakeup;
-+    bool wakeup;
- 
-     /* Time when the last byte was successfully sent out of the tsr */
-     uint64_t last_xmit_ts;
+         qdev_prop_set_chr(dev, "chardev", serial_hd(0));
+-        qdev_set_legacy_instance_id(dev, 0x3f8, 2);
++        qdev_prop_set_uint8(dev, "regshift", 0);
++        qdev_prop_set_uint8(dev, "endianness", DEVICE_LITTLE_ENDIAN);
+         sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+         sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, env->irq[4]);
+         sysbus_add_io(SYS_BUS_DEVICE(dev), 0x3f8,
 -- 
 2.26.2
 
