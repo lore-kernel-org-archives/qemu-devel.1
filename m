@@ -4,66 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BC2EC43464
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:11:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C44FC43464
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:12:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04456208DB
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:11:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF976208DB
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:12:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bzeFPvP2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04456208DB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sn717IIl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF976208DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJfSC-0001uL-2I
-	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 12:11:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51292)
+	id 1kJfTK-0003TQ-Pf
+	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 12:12:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51324)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJfH6-0005Jp-9C
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 11:59:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49810
- helo=us-smtp-1.mimecast.com)
+ id 1kJfH8-0005NL-7R
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 11:59:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39281)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJfGx-0007N6-KU
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 11:59:43 -0400
+ id 1kJfH3-0007Nw-AD
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 11:59:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600531174;
+ s=mimecast20190719; t=1600531179;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nvq4tCUVHx8qouuAoWhRcs5PTv3JFM540York1YwLMs=;
- b=bzeFPvP24uJnitdD9Gff4g3L7g5ZXU5SV+p3ka8hH/PBi3o57jis9jk6t/DuBxcfiASGFj
- lLO2t153K0jkspUe9YT2n2CboCS5cWOsb3YkZ7Qb5JOW9vof6TQ2RP70X7TesJ+8K7QDZM
- KBq2ZOv2wz9umbe3/MXQo6CWwqOtrX8=
+ bh=HyDKceypEWz+8riJI6yGqoX39X+g88wTAYURoyNIUmU=;
+ b=Sn717IIlAaDD1DbDIU5tsgAVikqY79NhhTH13jbeBO2QgmnAVFWkOXMHqNyo7Buh3G5Ett
+ dGcWb6kyZWWXomlhpDxKdZMTt3HoSa6RkFP40Vx2pwWjTMhPbLMrwNXWoaI7NVw6xzYysL
+ VxyiYsdYh0oxCcMeXX1Sovj2UEdDcFs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-guJWS8ZiP1SEDfHw-hce0g-1; Sat, 19 Sep 2020 11:59:32 -0400
-X-MC-Unique: guJWS8ZiP1SEDfHw-hce0g-1
+ us-mta-136-IApZVA_KM0Wa51fUAshrfw-1; Sat, 19 Sep 2020 11:59:34 -0400
+X-MC-Unique: IApZVA_KM0Wa51fUAshrfw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0897C1074654;
- Sat, 19 Sep 2020 15:59:31 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F10910066FC;
+ Sat, 19 Sep 2020 15:59:33 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A9C261975E;
- Sat, 19 Sep 2020 15:59:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C3377196F3;
+ Sat, 19 Sep 2020 15:59:32 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/57] acpi: i386: Move VMBus DSDT entry to SB
-Date: Sat, 19 Sep 2020 11:58:33 -0400
-Message-Id: <20200919155916.1046398-15-pbonzini@redhat.com>
+Subject: [PULL 19/57] hw/char/serial: Remove TYPE_SERIAL_IO
+Date: Sat, 19 Sep 2020 11:58:38 -0400
+Message-Id: <20200919155916.1046398-20-pbonzini@redhat.com>
 In-Reply-To: <20200919155916.1046398-1-pbonzini@redhat.com>
 References: <20200919155916.1046398-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -72,19 +71,19 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 11:59:26
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 11:03:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
 X-Spam_bar: -----
 X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.996,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,65 +96,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, Jon Doron <arilou@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jon Doron <arilou@gmail.com>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <20200715084326.678715-2-arilou@gmail.com>
+TYPE_SERIAL_IO is a subset of TYPE_SERIAL_MM, and it is
+not used anymore. Remove it.
+
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200907011538.818996-3-philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/i386/acpi-build.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ hw/char/serial.c         | 41 ----------------------------------------
+ include/hw/char/serial.h | 11 -----------
+ 2 files changed, 52 deletions(-)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 7a5a8b3521..975db68c6d 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -975,7 +975,6 @@ static Aml *build_vmbus_device_aml(VMBusBridge *vmbus_bridge)
+diff --git a/hw/char/serial.c b/hw/char/serial.c
+index 2386479492..fd80ae5592 100644
+--- a/hw/char/serial.c
++++ b/hw/char/serial.c
+@@ -985,46 +985,6 @@ const MemoryRegionOps serial_io_ops = {
+     .endianness = DEVICE_LITTLE_ENDIAN,
+ };
  
- static void build_isa_devices_aml(Aml *table)
- {
--    VMBusBridge *vmbus_bridge = vmbus_bridge_find();
-     bool ambiguous;
-     Object *obj = object_resolve_path_type("", TYPE_ISA_BUS, &ambiguous);
-     Aml *scope;
-@@ -986,10 +985,6 @@ static void build_isa_devices_aml(Aml *table)
-     build_acpi_ipmi_devices(scope, BUS(obj), "\\_SB.PCI0.ISA");
-     isa_build_aml(ISA_BUS(obj), scope);
- 
--    if (vmbus_bridge) {
--        aml_append(scope, build_vmbus_device_aml(vmbus_bridge));
+-static void serial_io_realize(DeviceState *dev, Error **errp)
+-{
+-    SerialIO *sio = SERIAL_IO(dev);
+-    SerialState *s = &sio->serial;
+-
+-    if (!qdev_realize(DEVICE(s), NULL, errp)) {
+-        return;
 -    }
 -
-     aml_append(table, scope);
+-    memory_region_init_io(&s->io, OBJECT(dev), &serial_io_ops, s, "serial", 8);
+-    sysbus_init_mmio(SYS_BUS_DEVICE(sio), &s->io);
+-    sysbus_init_irq(SYS_BUS_DEVICE(sio), &s->irq);
+-}
+-
+-static void serial_io_class_init(ObjectClass *klass, void* data)
+-{
+-    DeviceClass *dc = DEVICE_CLASS(klass);
+-
+-    dc->realize = serial_io_realize;
+-    /* No dc->vmsd: class has no migratable state */
+-}
+-
+-static void serial_io_instance_init(Object *o)
+-{
+-    SerialIO *sio = SERIAL_IO(o);
+-
+-    object_initialize_child(o, "serial", &sio->serial, TYPE_SERIAL);
+-
+-    qdev_alias_all_properties(DEVICE(&sio->serial), o);
+-}
+-
+-
+-static const TypeInfo serial_io_info = {
+-    .name = TYPE_SERIAL_IO,
+-    .parent = TYPE_SYS_BUS_DEVICE,
+-    .instance_size = sizeof(SerialIO),
+-    .instance_init = serial_io_instance_init,
+-    .class_init = serial_io_class_init,
+-};
+-
+ static Property serial_properties[] = {
+     DEFINE_PROP_CHR("chardev", SerialState, chr),
+     DEFINE_PROP_UINT32("baudbase", SerialState, baudbase, 115200),
+@@ -1178,7 +1138,6 @@ static const TypeInfo serial_mm_info = {
+ static void serial_register_types(void)
+ {
+     type_register_static(&serial_info);
+-    type_register_static(&serial_io_info);
+     type_register_static(&serial_mm_info);
  }
  
-@@ -1485,6 +1480,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-     PCIBus *bus = NULL;
-     TPMIf *tpm = tpm_find();
-     int i;
-+    VMBusBridge *vmbus_bridge = vmbus_bridge_find();
+diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
+index 264f529a7f..51397a8a18 100644
+--- a/include/hw/char/serial.h
++++ b/include/hw/char/serial.h
+@@ -91,13 +91,6 @@ struct SerialMM {
+ };
+ typedef struct SerialMM SerialMM;
  
-     dsdt = init_aml_allocator();
+-struct SerialIO {
+-    SysBusDevice parent;
+-
+-    SerialState serial;
+-};
+-typedef struct SerialIO SerialIO;
+-
+ extern const VMStateDescription vmstate_serial;
+ extern const MemoryRegionOps serial_io_ops;
  
-@@ -1526,6 +1522,12 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         }
-     }
+@@ -111,10 +104,6 @@ DECLARE_INSTANCE_CHECKER(SerialState, SERIAL,
+ DECLARE_INSTANCE_CHECKER(SerialMM, SERIAL_MM,
+                          TYPE_SERIAL_MM)
  
-+    if (vmbus_bridge) {
-+        sb_scope = aml_scope("_SB");
-+        aml_append(sb_scope, build_vmbus_device_aml(vmbus_bridge));
-+        aml_append(dsdt, sb_scope);
-+    }
-+
-     if (pcmc->legacy_cpu_hotplug) {
-         build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
-     } else {
+-#define TYPE_SERIAL_IO "serial-io"
+-DECLARE_INSTANCE_CHECKER(SerialIO, SERIAL_IO,
+-                         TYPE_SERIAL_IO)
+-
+ SerialMM *serial_mm_init(MemoryRegion *address_space,
+                          hwaddr base, int regshift,
+                          qemu_irq irq, int baudbase,
 -- 
 2.26.2
 
