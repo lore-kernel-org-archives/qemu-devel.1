@@ -2,110 +2,113 @@ Return-Path: <SRS0=MBD3=C4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61ECDC43464
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 15:27:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF1CBC43463
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 15:36:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A04DC2100A
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 15:27:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5D05F20866
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 15:36:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Umu+bkX4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A04DC2100A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="R2aBgqnV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D05F20866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJem0-00059S-O9
-	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 11:27:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44374)
+	id 1kJeun-0000ZN-5a
+	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 11:36:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46076)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJelR-0004b9-KI
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 11:27:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27284)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJelP-0002b7-Lv
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 11:27:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600529218;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jb+tUWECdJh1+GTTUYVQtihtN2OTKBKDhiwssIKHfUI=;
- b=Umu+bkX4PnsEtl1BP7Q8xQIbENuOQeWTNEb5/H/pm0NgPzT6EXoBkWzBl4TKDYX1JPlCDO
- B/+CZw+8ZSSvzbJAwEQK47IlFgl3AvkUq5iEJoc6RGsbDD2e43NI+L13nmTn/OpM84l0rE
- zghz+w+Cztpmtb3u8RVsl7Vojx5XdF4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-578-WkZbDli8N6uwd9BO6L4cBA-1; Sat, 19 Sep 2020 11:26:54 -0400
-X-MC-Unique: WkZbDli8N6uwd9BO6L4cBA-1
-Received: by mail-wr1-f72.google.com with SMTP id r16so3541141wrm.18
- for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 08:26:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=jb+tUWECdJh1+GTTUYVQtihtN2OTKBKDhiwssIKHfUI=;
- b=ks/HeLizMC4FL0S+YXaayQ9WfVn/PJ9xRwlthq46uQHqgcV/jHcAbzyQsbmBGm3sJa
- OJIImAUK8C2XIj4klh902hNqB/bBbv7wCkBSXQhCjegN0/f6uvAfMaAKH4cwgB7ZKQit
- hC8j2PoLG1zwBi/kApgq8FIHVjcupHqf3QYOGDEkuiZyXbeOpvACyfmVeKjISqd42ePH
- C0A2yP7ZceYvA3fbz8TadgyTDE8xAfl2DkgbFs93GyGztH0+FExrKae5SQvZ9xsT9/VE
- hc4HTzhBY/tQUaZOqCWhdDjpe6VOwusZO8EvgMn62jHeWT9Bge9+5j/uFnFW2GW3BFYs
- K0hg==
-X-Gm-Message-State: AOAM533ZLQPFG3Z+eVjxsZa/g/LJX3JapPY+uforhaCUdKC/VLU6XCTG
- k7mBJcwK0hgRygOp6HnkTkCOAd41vP4bvpI4KMtqOfYsvOUxZ5kgauyLq2k+TEqdw5rlmEjnAd6
- DFOmPqiklhwXQrI8=
-X-Received: by 2002:a7b:cd93:: with SMTP id y19mr19978216wmj.112.1600529213205; 
- Sat, 19 Sep 2020 08:26:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxWwsvDOcik7LdKnZUv1CZMuDlIUZzGOIoe+o0NQ2DoyYtnBM5pRgbYxknIlqq5dLhwYKkBmA==
-X-Received: by 2002:a7b:cd93:: with SMTP id y19mr19978203wmj.112.1600529212959; 
- Sat, 19 Sep 2020 08:26:52 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:b20a:b600:521c:512d?
- ([2001:b07:6468:f312:b20a:b600:521c:512d])
- by smtp.gmail.com with ESMTPSA id o4sm11413702wrv.86.2020.09.19.08.26.52
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 19 Sep 2020 08:26:52 -0700 (PDT)
-Subject: Re: [PATCH 0/6] Convert pc-bios Makefiles to meson
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-References: <20200918204759.225810-1-marcandre.lureau@redhat.com>
- <0e14e115-797d-b91b-dec5-7a2a26836d92@redhat.com>
- <CAJ+F1C+NDS=M+JDbAyU9itvHkBKvjCS3gtn2P1T2nvYbnn+8JA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <02cb4105-8729-3b5b-fa45-b465d4324095@redhat.com>
-Date: Sat, 19 Sep 2020 17:26:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-MIME-Version: 1.0
-In-Reply-To: <CAJ+F1C+NDS=M+JDbAyU9itvHkBKvjCS3gtn2P1T2nvYbnn+8JA@mail.gmail.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 11:03:07
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.996,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kJesx-0007Ko-73; Sat, 19 Sep 2020 11:34:47 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:25710
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kJest-0003n0-PR; Sat, 19 Sep 2020 11:34:46 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 08JFWRA7122404; Sat, 19 Sep 2020 11:34:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject
+ : date : message-id : in-reply-to : references; s=pp1;
+ bh=WK8gF4N9HS62KlaG4AFwexv7peq6mKBPRGLNCAZO4F8=;
+ b=R2aBgqnVt267CHCjv/FEf0ulu5/0+RwnESwFaZS2sRJGKiPB1gWsf55ptElzltwM0tDF
+ GSu2s6MGxNCsMKZ87EcwCwu3ifNfe6ze6ZYNi/6/8WN9E1Ml1PnP7ZXavsoHi2VkNhCw
+ e40GrkdoIB/j66cs5FJNsUGIb2j8ktA7nyFEcC2LwkJ/atlJ3ZWyt9n8F/b9J8bW5B+5
+ SLQw9b320g1e+ypJ0n1IpaBkhSD12ds9Pgrez2HpXFee9dePCieirurBo1CHgR2LcMmJ
+ 99tkzV5zEK0AvAFqH9/+FsTzB/wrJbJALoKGUuyzOcdO60vFxFv6dtDTv1gEViQr6k5U 4g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33ng7h4t6q-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Sat, 19 Sep 2020 11:34:41 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08JFYftW128544;
+ Sat, 19 Sep 2020 11:34:41 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
+ [169.55.91.170])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33ng7h4t6e-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Sat, 19 Sep 2020 11:34:41 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+ by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08JFQaBP019138;
+ Sat, 19 Sep 2020 15:34:40 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com
+ (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+ by ppma02wdc.us.ibm.com with ESMTP id 33n9m8b7hu-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Sat, 19 Sep 2020 15:34:40 +0000
+Received: from b03ledav004.gho.boulder.ibm.com
+ (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+ by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 08JFYXuD49414546
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Sat, 19 Sep 2020 15:34:33 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0ABEE7805F;
+ Sat, 19 Sep 2020 15:34:39 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B7F7D7805C;
+ Sat, 19 Sep 2020 15:34:37 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.211.74.107])
+ by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Sat, 19 Sep 2020 15:34:37 +0000 (GMT)
+From: Matthew Rosato <mjrosato@linux.ibm.com>
+To: cohuck@redhat.com, thuth@redhat.com
+Subject: [PATCH 1/7] update-linux-headers: Add vfio_zdev.h
+Date: Sat, 19 Sep 2020 11:34:26 -0400
+Message-Id: <1600529672-10243-2-git-send-email-mjrosato@linux.ibm.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1600529672-10243-1-git-send-email-mjrosato@linux.ibm.com>
+References: <1600529672-10243-1-git-send-email-mjrosato@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-19_05:2020-09-16,
+ 2020-09-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 phishscore=0
+ mlxlogscore=999 mlxscore=0 clxscore=1015 lowpriorityscore=0 spamscore=0
+ priorityscore=1501 suspectscore=0 impostorscore=0 adultscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009190131
+Received-SPF: pass client-ip=148.163.158.5;
+ envelope-from=mjrosato@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 11:34:41
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
+X-Spam_bar: --
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,31 +121,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Qemu-s390x list <qemu-s390x@nongnu.org>,
- QEMU <qemu-devel@nongnu.org>
+Cc: kvm@vger.kernel.org, pmorel@linux.ibm.com, david@redhat.com,
+ schnelle@linux.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, alex.williamson@redhat.com,
+ mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19/09/20 17:15, Marc-André Lureau wrote:
-> 
-> 
->     I don't know, the way pc-bios/ works seems just wrong to me.  pc-bios
->     should IMO be its own build system with support for docker-based cross
->     compilers similar to tests/tcg.
-> 
-> 
-> It could still use meson to build the binaries though (like we did for
-> qboot). It's more about setting up the environment for the build to
-> compile for the target.
+vfio_zdev.h is used by s390x zPCI support to pass device-specific
+CLP information between host and userspace.
 
-Yes, essentially it would set up the cross file.  However, to some
-extent whether or not Meson is used would be of relative importance.
+Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+---
+ scripts/update-linux-headers.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Step 1 would probably be to find a place for the common docker
-infrastructure, moving the common parts of tests/docker and tests/tcg to
-scripts/docker and de-Make-izing them.
-
-Paolo
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index 29c27f4..9efbaf2 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -141,7 +141,7 @@ done
+ 
+ rm -rf "$output/linux-headers/linux"
+ mkdir -p "$output/linux-headers/linux"
+-for header in kvm.h vfio.h vfio_ccw.h vhost.h \
++for header in kvm.h vfio.h vfio_ccw.h vfio_zdev.h vhost.h \
+               psci.h psp-sev.h userfaultfd.h mman.h; do
+     cp "$tmpdir/include/linux/$header" "$output/linux-headers/linux"
+ done
+-- 
+1.8.3.1
 
 
