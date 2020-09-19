@@ -7,83 +7,84 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF6BC43464
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:43:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6E45C43463
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:44:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F830208DB
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:43:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1FD36208DB
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:44:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CLSNtHBf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F830208DB
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZnukCOnH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FD36208DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJfxq-0003M7-5s
-	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 12:43:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51678)
+	id 1kJfyQ-00045B-8d
+	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 12:44:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51778)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJfHX-0005dH-Sk
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56517)
+ id 1kJfHb-0005kW-Ua
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36314
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJfHH-0007RV-0Y
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:11 -0400
+ id 1kJfHM-0007R2-KQ
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600531191;
+ s=mimecast20190719; t=1600531190;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=v6hVuzLmxdNrVWHNupW2COauxg+G/6js/hEZ0vqHLRU=;
- b=CLSNtHBf8xwyoVgugDOyj5xNyrmf5yMy147PHCPEImO7s2Yj2iVRDri3/EoK32czakqsW5
- b0Mi4LvFDVckmR6APvTFDX6MWqtoclSvBnkPI77+mFzR7LyT8V2YJPrWLsR50EEAVkPia8
- euXCYE64Q6O3OYNKI44GKLYnPsbZxvU=
+ bh=e2sJKZqKafTOzd1p5yXwll+9kazSOrzlw8kQ0zp2kLk=;
+ b=ZnukCOnHP8foRx5You4kXVpKurnMV7AORTCKRKsVP0jR5XyGGRkL0z5uRu3RYU0EnSF/4U
+ Il6+q/DdDz4ruuaJ6xNNYdY3uwGFaEyIiOnAeDRRBl/T2Krya3oYV0dWP+LaC/7zT5L3S4
+ 5LGewgyaaqMWmk+lqTllHHHFItE1HG8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-5_E2L-mbN8idU5PL7mzwPQ-1; Sat, 19 Sep 2020 11:59:49 -0400
-X-MC-Unique: 5_E2L-mbN8idU5PL7mzwPQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-432-7ZdZ8lw3M2aOvYjGT9OaxQ-1; Sat, 19 Sep 2020 11:59:48 -0400
+X-MC-Unique: 7ZdZ8lw3M2aOvYjGT9OaxQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1181D10066FE
- for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 15:59:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BBC7E186DD4B
+ for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 15:59:47 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D3EBE5576A
- for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 15:59:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 794B310016DA;
+ Sat, 19 Sep 2020 15:59:47 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 41/57] oslib: do not call g_strdup from qemu_get_exec_dir
-Date: Sat, 19 Sep 2020 11:59:00 -0400
-Message-Id: <20200919155916.1046398-42-pbonzini@redhat.com>
+Subject: [PULL 38/57] meson: qtest: set "depends" correctly
+Date: Sat, 19 Sep 2020 11:58:57 -0400
+Message-Id: <20200919155916.1046398-39-pbonzini@redhat.com>
 In-Reply-To: <20200919155916.1046398-1-pbonzini@redhat.com>
 References: <20200919155916.1046398-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 11:03:07
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 11:59:21
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
 X-Spam_bar: -----
 X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.996,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,203 +97,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Just return the directory without requiring the caller to free it.
-This also removes a bogus check for NULL in os_find_datadir and
-module_load_one; g_strdup of a static variable cannot return NULL.
+This does not have any effect on Meson's behavior itself, since "meson test"
+always rebuilds everything (that is one reason why we are not using it...).
+However, mtest2make can use this information to do a selective rebuild
+for the requested suite.
 
+Cc: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qemu/osdep.h    |  8 ++------
- os-posix.c              |  6 +-----
- os-win32.c              |  2 +-
- tests/qtest/fuzz/fuzz.c |  4 ++--
- util/module.c           |  7 +------
- util/oslib-posix.c      |  8 +++++---
- util/oslib-win32.c      | 12 ++++++++----
- 7 files changed, 20 insertions(+), 27 deletions(-)
+ meson.build             | 7 ++++---
+ tests/qtest/meson.build | 2 ++
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 412962d91a..db2cfffaff 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -590,12 +590,8 @@ char *qemu_get_local_state_pathname(const char *relative_pathname);
-  * Try OS specific API first, if not working, parse from argv0. */
- void qemu_init_exec_dir(const char *argv0);
+diff --git a/meson.build b/meson.build
+index 848223778d..f5c9c04e40 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1094,7 +1094,7 @@ common_all = static_library('common',
  
--/* Get the saved exec dir.
-- *
-- * The caller is responsible for releasing the value returned with g_free()
-- * after use.
-- */
--char *qemu_get_exec_dir(void);
-+/* Get the saved exec dir.  */
-+const char *qemu_get_exec_dir(void);
+ feature_to_c = find_program('scripts/feature_to_c.sh')
  
- /**
-  * qemu_getauxval:
-diff --git a/os-posix.c b/os-posix.c
-index bf98508b6d..8d8e7fc15c 100644
---- a/os-posix.c
-+++ b/os-posix.c
-@@ -90,13 +90,9 @@ void os_setup_signal_handling(void)
-  */
- char *os_find_datadir(void)
- {
--    g_autofree char *exec_dir = NULL;
-     g_autofree char *dir = NULL;
- 
--    exec_dir = qemu_get_exec_dir();
--    g_return_val_if_fail(exec_dir != NULL, NULL);
--
--    dir = g_build_filename(exec_dir, "pc-bios", NULL);
-+    dir = g_build_filename(qemu_get_exec_dir(), "pc-bios", NULL);
-     if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {
-         return g_steal_pointer(&dir);
-     }
-diff --git a/os-win32.c b/os-win32.c
-index c9c3afe648..eb8501b9e5 100644
---- a/os-win32.c
-+++ b/os-win32.c
-@@ -65,7 +65,7 @@ void os_setup_early_signal_handling(void)
-  */
- char *os_find_datadir(void)
- {
--    return qemu_get_exec_dir();
-+    return g_strdup(qemu_get_exec_dir());
- }
- 
- void os_set_line_buffering(void)
-diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
-index 1ceea84702..e906ef9efa 100644
---- a/tests/qtest/fuzz/fuzz.c
-+++ b/tests/qtest/fuzz/fuzz.c
-@@ -143,7 +143,8 @@ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
- {
- 
-     char *target_name;
--    char *bindir, *datadir;
-+    const char *bindir;
-+    char *datadir;
-     bool serialize = false;
- 
-     /* Initialize qgraph and modules */
-@@ -166,7 +167,6 @@ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
-          */
-         bindir = g_path_get_dirname(**argv);
-         datadir = g_build_filename(bindir, "pc-bios", NULL);
--        g_free(bindir);
-         if (g_file_test(datadir, G_FILE_TEST_IS_DIR)) {
-             qemu_add_data_dir(datadir);
-         }
-diff --git a/util/module.c b/util/module.c
-index 34772e7d87..9ffe83bb32 100644
---- a/util/module.c
-+++ b/util/module.c
-@@ -172,7 +172,6 @@ bool module_load_one(const char *prefix, const char *lib_name)
- 
- #ifdef CONFIG_MODULES
-     char *fname = NULL;
--    char *exec_dir;
- #ifdef CONFIG_MODULE_UPGRADES
-     char *version_dir;
- #endif
-@@ -199,13 +198,12 @@ bool module_load_one(const char *prefix, const char *lib_name)
-         return true;
-     }
- 
--    exec_dir = qemu_get_exec_dir();
-     search_dir = getenv("QEMU_MODULE_DIR");
-     if (search_dir != NULL) {
-         dirs[n_dirs++] = g_strdup_printf("%s", search_dir);
-     }
-     dirs[n_dirs++] = g_strdup_printf("%s", CONFIG_QEMU_MODDIR);
--    dirs[n_dirs++] = g_strdup_printf("%s", exec_dir ? : "");
-+    dirs[n_dirs++] = g_strdup(qemu_get_exec_dir());
- 
- #ifdef CONFIG_MODULE_UPGRADES
-     version_dir = g_strcanon(g_strdup(QEMU_PKGVERSION),
-@@ -216,9 +214,6 @@ bool module_load_one(const char *prefix, const char *lib_name)
- 
-     assert(n_dirs <= ARRAY_SIZE(dirs));
- 
--    g_free(exec_dir);
--    exec_dir = NULL;
--
-     for (i = 0; i < n_dirs; i++) {
-         fname = g_strdup_printf("%s/%s%s",
-                 dirs[i], module_name, CONFIG_HOST_DSOSUF);
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index ad8001a4ad..0dd8d24076 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -366,7 +366,9 @@ void qemu_init_exec_dir(const char *argv0)
-     char *p = NULL;
-     char buf[PATH_MAX];
- 
--    assert(!exec_dir[0]);
-+    if (exec_dir[0]) {
-+        return;
+-emulators = []
++emulators = {}
+ foreach target : target_dirs
+   config_target = config_target_mak[target]
+   target_name = config_target['TARGET_NAME']
+@@ -1213,7 +1213,8 @@ foreach target : target_dirs
+     }]
+   endif
+   foreach exe: execs
+-    emulators += executable(exe['name'], exe['sources'],
++    emulators += {exe['name']:
++         executable(exe['name'], exe['sources'],
+                install: true,
+                c_args: c_args,
+                dependencies: arch_deps + deps + exe['dependencies'],
+@@ -1222,6 +1223,7 @@ foreach target : target_dirs
+                link_depends: [block_syms, qemu_syms] + exe.get('link_depends', []),
+                link_args: link_args,
+                gui_app: exe['gui'])
 +    }
  
- #if defined(__linux__)
-     {
-@@ -439,9 +441,9 @@ void qemu_init_exec_dir(const char *argv0)
-     g_free(dir);
- }
+     if 'CONFIG_TRACE_SYSTEMTAP' in config_host
+       foreach stp: [
+@@ -1267,7 +1269,6 @@ if xkbcommon.found()
+                            dependencies: [qemuutil, xkbcommon], install: have_tools)
+ endif
  
--char *qemu_get_exec_dir(void)
-+const char *qemu_get_exec_dir(void)
- {
--    return g_strdup(exec_dir);
-+    return exec_dir;
- }
+-qemu_block_tools = []
+ if have_tools
+   qemu_img = executable('qemu-img', [files('qemu-img.c'), hxdep],
+              dependencies: [authz, block, crypto, io, qom, qemuutil], install: true)
+diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
+index 874b5be62b..359a6cde64 100644
+--- a/tests/qtest/meson.build
++++ b/tests/qtest/meson.build
+@@ -228,6 +228,7 @@ foreach dir : target_dirs
+   endif
  
- static void sigbus_handler(int signal)
-diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-index c654dafd93..1a33912944 100644
---- a/util/oslib-win32.c
-+++ b/util/oslib-win32.c
-@@ -315,7 +315,7 @@ void qemu_set_tty_echo(int fd, bool echo)
-     }
- }
+   target_base = dir.split('-')[0]
++  qtest_emulator = emulators['qemu-system-' + target_base]
+   qtests = get_variable('qtests_' + target_base, []) + qtests_generic
  
--static char exec_dir[PATH_MAX];
-+static char *exec_dir;
- 
- void qemu_init_exec_dir(const char *argv0)
- {
-@@ -324,6 +324,10 @@ void qemu_init_exec_dir(const char *argv0)
-     char buf[MAX_PATH];
-     DWORD len;
- 
-+    if (exec_dir) {
-+        return;
-+    }
-+
-     len = GetModuleFileName(NULL, buf, sizeof(buf) - 1);
-     if (len == 0) {
-         return;
-@@ -336,13 +340,13 @@ void qemu_init_exec_dir(const char *argv0)
-     }
-     *p = 0;
-     if (access(buf, R_OK) == 0) {
--        pstrcpy(exec_dir, sizeof(exec_dir), buf);
-+        exec_dir = g_strdup(buf);
-     }
- }
- 
--char *qemu_get_exec_dir(void)
-+const char *qemu_get_exec_dir(void)
- {
--    return g_strdup(exec_dir);
-+    return exec_dir;
- }
- 
- #if !GLIB_CHECK_VERSION(2, 50, 0)
+   qtest_env = environment()
+@@ -248,6 +249,7 @@ foreach dir : target_dirs
+     # FIXME: missing dependency on the emulator binary and qemu-img
+     test('qtest-@0@: @1@'.format(target_base, test),
+          qtest_executables[test],
++         depends: [qemu_img, qtest_emulator],
+          env: qtest_env,
+          args: ['--tap', '-k'],
+          protocol: 'tap',
 -- 
 2.26.2
 
