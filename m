@@ -7,71 +7,74 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FD84C43463
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 19:12:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B22C9C43464
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 19:12:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0DF42158C
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 19:12:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0DF42158C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id BFBD42158C
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 19:12:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFBD42158C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJiHB-0002I0-6S
-	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 15:12:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55778)
+	id 1kJiHM-0002ZH-T7
+	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 15:12:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55822)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kJiFm-0001O5-5H; Sat, 19 Sep 2020 15:10:34 -0400
-Resent-Date: Sat, 19 Sep 2020 15:10:34 -0400
-Resent-Message-Id: <E1kJiFm-0001O5-5H@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21386)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kJiFi-0004HL-Fh; Sat, 19 Sep 2020 15:10:33 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1600542621; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=RRddUYZJcgqKQi3Sn/gf5ITNFLrzZ8sVN/HhcnikRhwPvmmMYpwRp/MU1c2ohQEDBqzIPqlPouKn6yJg7y0Poyns/7PabBkUV9Cuz6fgoLguLcoiQU1uettFqHC/o5S62SQj8fTazWD/Ofs9HhF8FuqBpRzIiptci4YP9I6z1OI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1600542621;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=peqzZRwttEOGwaTDV4VoxIpPWrLwPyxxckmPVc6pJVc=; 
- b=jVJ6Y8vyX/UsTcg77Tgths+76goXKRLutuzcvlv57peGJ4CuIDiZ0g8B1LvAYi4/ER3prZlVB9IIM90V5YIB/J1a7arjteUN/pa+8uqNySMqFvfpccX6jKCDts24+1kjO/AlPjyWT/67PhvAz+tLESm/b/lRf2vZB11BxfBxAeo=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 160054262009866.3671603385875;
- Sat, 19 Sep 2020 12:10:20 -0700 (PDT)
-Subject: Re: [PULL 00/17] Trivial branch for 5.2 patches
-Message-ID: <160054261844.23907.17023808703122114683@66eaa9a8a123>
-In-Reply-To: <20200919184451.2129349-1-laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kJiFz-0001eL-Ex
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 15:10:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38520)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kJiFw-0004KL-9y
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 15:10:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kJiFt-0002bj-G8
+ for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 19:10:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 714FD2E80DB
+ for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 19:10:41 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: laurent@vivier.eu
-Date: Sat, 19 Sep 2020 12:10:20 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 15:10:25
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 19 Sep 2020 19:01:09 -0000
+From: Benjamin David Lunt <1896342@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: fysnet
+X-Launchpad-Bug-Reporter: Benjamin David Lunt (fysnet)
+X-Launchpad-Bug-Modifier: Benjamin David Lunt (fysnet)
+Message-Id: <160054207000.14948.11107647546582134186.malonedeb@gac.canonical.com>
+Subject: [Bug 1896342] [NEW] IDE ATA IDENTIFY WORD 106
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: 5b485e0fbc0191f13271cbc56535093e2f901f77
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 15:10:41
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.248, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,114 +83,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, mjt@tls.msk.ru, qemu-devel@nongnu.org,
- laurent@vivier.eu
+Reply-To: Bug 1896342 <1896342@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkxOTE4NDQ1MS4yMTI5
-MzQ5LTEtbGF1cmVudEB2aXZpZXIuZXUvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
-ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
-bmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMDkxOTE4NDQ1MS4yMTI5
-MzQ5LTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVjdDogW1BVTEwgMDAvMTddIFRyaXZpYWwgYnJh
-bmNoIGZvciA1LjIgcGF0Y2hlcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBU
-cnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRz
-L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
-CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFn
-XSAgICAgICAgIHBhdGNoZXcvMjAyMDA5MTkxODQ0NTEuMjEyOTM0OS0xLWxhdXJlbnRAdml2aWVy
-LmV1IC0+IHBhdGNoZXcvMjAyMDA5MTkxODQ0NTEuMjEyOTM0OS0xLWxhdXJlbnRAdml2aWVyLmV1
-ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNmY5OTUxYSBjb250cmliLzogZml4IHNv
-bWUgY29tbWVudCBzcGVsbGluZyBlcnJvcnMKNWQzZDVhMSBxYXBpLzogZml4IHNvbWUgY29tbWVu
-dCBzcGVsbGluZyBlcnJvcnMKMWFkMzFmMiBkaXNhcy86IGZpeCBzb21lIGNvbW1lbnQgc3BlbGxp
-bmcgZXJyb3JzCmM1OTgwYWMgbGludXgtdXNlci86IGZpeCBzb21lIGNvbW1lbnQgc3BlbGxpbmcg
-ZXJyb3JzCjU3NzlmMjQgdXRpbC86IGZpeCBzb21lIGNvbW1lbnQgc3BlbGxpbmcgZXJyb3JzCjQx
-OGNiOWQgc2NyaXB0cy86IGZpeCBzb21lIGNvbW1lbnQgc3BlbGxpbmcgZXJyb3JzCjFhYjk1NTUg
-ZG9jcy86IGZpeCBzb21lIGNvbW1lbnQgc3BlbGxpbmcgZXJyb3JzCmNmN2YyZjUgbWlncmF0aW9u
-LzogZml4IHNvbWUgY29tbWVudCBzcGVsbGluZyBlcnJvcnMKMGI4YWEzNyBxZW11LzogZml4IHNv
-bWUgY29tbWVudCBzcGVsbGluZyBlcnJvcnMKOTRmNDkwOCBzY3JpcHRzL2dpdC5vcmRlcmZpbGU6
-IERpc3BsYXkgbWVzb24gZmlsZXMgYWxvbmcgd2l0aCBidWlsZHN5cyBvbmVzCjg0NjU5YTcgaHcv
-dGltZXIvaHBldDogRml4IGRlYnVnIGZvcm1hdCBzdHJpbmdzCmY1OTFkNDEgaHcvdGltZXIvaHBl
-dDogUmVtb3ZlIHVudXNlZCBmdW5jdGlvbnMgaHBldF9yYW1fcmVhZGIsIGhwZXRfcmFtX3JlYWR3
-CjBlYzc0NDIgbWFudWFsOiBlc2NhcGUgYmFja3NsYXNoZXMgaW4gInBhcnNlZC1saXRlcmFsIiBi
-bG9ja3MKYzBiZTM5NSB1aS9zcGljZS1pbnB1dDogUmVtb3ZlIHN1cGVyZmx1b3VzIGZvcndhcmQg
-ZGVjbGFyYXRpb24KNDA2NjE2NiBody9wcGMvcHBjNHh4X3BjaTogUmVwbGFjZSBtYWdpYyB2YWx1
-ZSBieSB0aGUgUENJX05VTV9QSU5TIGRlZmluaXRpb24KYTVmMzUxNSBody9ncGlvL21heDczMTA6
-IFJlbW92ZSBpbXBvc3NpYmxlIGNoZWNrCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzE2IENoZWNr
-aW5nIGNvbW1pdCBhNWYzNTE1ZTkxODcgKGh3L2dwaW8vbWF4NzMxMDogUmVtb3ZlIGltcG9zc2li
-bGUgY2hlY2spCjIvMTYgQ2hlY2tpbmcgY29tbWl0IDQwNjYxNjY0YjAyNyAoaHcvcHBjL3BwYzR4
-eF9wY2k6IFJlcGxhY2UgbWFnaWMgdmFsdWUgYnkgdGhlIFBDSV9OVU1fUElOUyBkZWZpbml0aW9u
-KQozLzE2IENoZWNraW5nIGNvbW1pdCBjMGJlMzk1MWU1MjggKHVpL3NwaWNlLWlucHV0OiBSZW1v
-dmUgc3VwZXJmbHVvdXMgZm9yd2FyZCBkZWNsYXJhdGlvbikKNC8xNiBDaGVja2luZyBjb21taXQg
-MGVjNzQ0MmNhNjU1IChtYW51YWw6IGVzY2FwZSBiYWNrc2xhc2hlcyBpbiAicGFyc2VkLWxpdGVy
-YWwiIGJsb2NrcykKNS8xNiBDaGVja2luZyBjb21taXQgZjU5MWQ0MTQ1ODMwIChody90aW1lci9o
-cGV0OiBSZW1vdmUgdW51c2VkIGZ1bmN0aW9ucyBocGV0X3JhbV9yZWFkYiwgaHBldF9yYW1fcmVh
-ZHcpCjYvMTYgQ2hlY2tpbmcgY29tbWl0IDg0NjU5YTc0MTMyMCAoaHcvdGltZXIvaHBldDogRml4
-IGRlYnVnIGZvcm1hdCBzdHJpbmdzKQo3LzE2IENoZWNraW5nIGNvbW1pdCA5NGY0OTA4M2E1N2Mg
-KHNjcmlwdHMvZ2l0Lm9yZGVyZmlsZTogRGlzcGxheSBtZXNvbiBmaWxlcyBhbG9uZyB3aXRoIGJ1
-aWxkc3lzIG9uZXMpCjgvMTYgQ2hlY2tpbmcgY29tbWl0IDBiOGFhMzcxYjlmZCAocWVtdS86IGZp
-eCBzb21lIGNvbW1lbnQgc3BlbGxpbmcgZXJyb3JzKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
-cmFjdGVycwojNTI6IEZJTEU6IGF1ZGlvL2F1ZGlvLmM6MTY3NzoKKyAgICAgICAgICogdGhlIHNh
-bWUgY29uZmlndXJhdGlvbiAoZXhjZXB0IHRoZSBkcml2ZXIpLCBzbyBpdCBkb2Vzbid0IG1hdHRl
-ciB3aGljaAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNl
-cGFyYXRlIGxpbmUKIzE1NjogRklMRTogc2NzaS9wci1tYW5hZ2VyLWhlbHBlci5jOjEzMDoKKyAg
-ICAvKiBBIHNpbXBsZSBmZWF0dXJlIG5lZ290aWF0aW9uIHByb3RvY29sLCBldmVuIHRob3VnaCB0
-aGVyZSBpcwoKdG90YWw6IDAgZXJyb3JzLCAyIHdhcm5pbmdzLCA4OCBsaW5lcyBjaGVja2VkCgpQ
-YXRjaCA4LzE2IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjkvMTYgQ2hlY2tpbmcgY29tbWl0
-IGNmN2YyZjUxOTE1NiAobWlncmF0aW9uLzogZml4IHNvbWUgY29tbWVudCBzcGVsbGluZyBlcnJv
-cnMpCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0
-ZSBsaW5lCiM5NjogRklMRTogbWlncmF0aW9uL3Bvc3Rjb3B5LXJhbS5oOjE2NDoKKy8qIENhbGwg
-ZWFjaCBvZiB0aGUgc2hhcmVkICd3YWtlcidzIHJlZ2lzdGVyZWQgdGVsbGluZyB0aGVtIG9mCgpX
-QVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSB0cmFpbGluZyAqLyBvbiBhIHNlcGFyYXRlIGxp
-bmUKIzE5ODogRklMRTogbWlncmF0aW9uL3NhdmV2bS5jOjI3OTg6CisgICAgICAgICAqIHN1Y2Nl
-c3NmdWwgbGl2ZSBtaWdyYXRpb24gKi8KCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMTQ0
-IGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTAv
-MTYgQ2hlY2tpbmcgY29tbWl0IDFhYjk1NTVhMGJhZCAoZG9jcy86IGZpeCBzb21lIGNvbW1lbnQg
-c3BlbGxpbmcgZXJyb3JzKQoxMS8xNiBDaGVja2luZyBjb21taXQgNDE4Y2I5ZDc4MDUwIChzY3Jp
-cHRzLzogZml4IHNvbWUgY29tbWVudCBzcGVsbGluZyBlcnJvcnMpCjEyLzE2IENoZWNraW5nIGNv
-bW1pdCA1Nzc5ZjI0YTljMjUgKHV0aWwvOiBmaXggc29tZSBjb21tZW50IHNwZWxsaW5nIGVycm9y
-cykKMTMvMTYgQ2hlY2tpbmcgY29tbWl0IGM1OTgwYWNhZWI4YiAobGludXgtdXNlci86IGZpeCBz
-b21lIGNvbW1lbnQgc3BlbGxpbmcgZXJyb3JzKQpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2Ug
-YSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMjY6IEZJTEU6IGxpbnV4LXVzZXIvYWFy
-Y2g2NC9zaWduYWwuYzo4MToKKyAgICAvKiBUaGUgYWN0dWFsIFNWRSBkYXRhIGltbWVkaWF0ZWx5
-IGZvbGxvd3MuICBJdCBpcyBsYWlkIG91dAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEg
-bGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzM5OiBGSUxFOiBsaW51eC11c2VyL2NyaXMv
-dGFyZ2V0X3N5c2NhbGwuaDo3OgorLyogcHRfcmVncyBub3Qgb25seSBzcGVjaWZpZXMgdGhlIGZv
-cm1hdCBpbiB0aGUgdXNlci1zdHJ1Y3QgZHVyaW5nCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
-IG5ldmVyIHVzZSB0YWJzCiM2MTogRklMRTogbGludXgtdXNlci9mbGF0Lmg6NDY6CiteSWFiaV91
-bG9uZyBmaWxsZXJbNV07ICAgIC8qIFJlc2VydmVkLCBzZXQgdG8gemVybyAqLyQKCnRvdGFsOiAx
-IGVycm9ycywgMiB3YXJuaW5ncywgNzIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTMvMTYgaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KCjE0LzE2IENoZWNraW5nIGNvbW1pdCAxYWQzMWYyYWYyNmYg
-KGRpc2FzLzogZml4IHNvbWUgY29tbWVudCBzcGVsbGluZyBlcnJvcnMpCkVSUk9SOiBjb2RlIGlu
-ZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzI2OiBGSUxFOiBkaXNhcy9ocHBhLmM6MjAyNDoK
-K15JXkkgICAgICAvKiAnZkEnIHdpbGwgbm90IGdlbmVyYXRlIGEgc3BhY2UgYmVmb3JlIHRoZSBy
-ZWdpc3RlciQKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBz
-ZXBhcmF0ZSBsaW5lCiMyNjogRklMRTogZGlzYXMvaHBwYS5jOjIwMjQ6CisgICAgICAgICAgICAg
-ICAgICAgICAvKiAnZkEnIHdpbGwgbm90IGdlbmVyYXRlIGEgc3BhY2UgYmVmb3JlIHRoZSByZWdp
-c3RlcgoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNzk6IEZJTEU6
-IGRpc2FzL3BwYy5jOjUyMjk6CiteSSAgICAgbnVtYmVyIG9mIG9uZXMsIGZvbGxvd2VkIGJ5IHNv
-bWUgbnVtYmVyIG9mIHplcm9zLiAgKi8kCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSB0
-cmFpbGluZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzc5OiBGSUxFOiBkaXNhcy9wcGMuYzo1MjI5
-OgorICAgICAgICAgICAgbnVtYmVyIG9mIG9uZXMsIGZvbGxvd2VkIGJ5IHNvbWUgbnVtYmVyIG9m
-IHplcm9zLiAgKi8KCnRvdGFsOiAyIGVycm9ycywgMiB3YXJuaW5ncywgNDggbGluZXMgY2hlY2tl
-ZAoKUGF0Y2ggMTQvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjE1LzE2IENoZWNraW5n
-IGNvbW1pdCA1ZDNkNWExOTU2MmQgKHFhcGkvOiBmaXggc29tZSBjb21tZW50IHNwZWxsaW5nIGVy
-cm9ycykKMTYvMTYgQ2hlY2tpbmcgY29tbWl0IDZmOTk1MWEwYzc1YyAoY29udHJpYi86IGZpeCBz
-b21lIGNvbW1lbnQgc3BlbGxpbmcgZXJyb3JzKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
-bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApo
-dHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDkxOTE4NDQ1MS4yMTI5MzQ5LTEtbGF1cmVudEB2
-aXZpZXIuZXUvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5l
-cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBs
-ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Public bug reported:
+
+The code at line 202 in hw/ide/core.c
+ (https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/ide/core.c;#l201)
+hard codes bit 13 set.  However, get_physical_block_exp() can and may retur=
+n 0, which is a valid response. If get_physical_block_exp() does return zer=
+o, bit 13 should not be set.
+
+ATAPI8 states (Section 7.17.7.73):
+ "Bit 13 of word 106 shall be set to one to indicate that the device has mo=
+re than one logical sector per physical sector"
+
+and gives the examples:
+  Bits (3:0): 0 =3D 2^0 =3D 1 logical sector per physical sector
+  Bits (3:0): 1 =3D 2^1 =3D 2 logical sector per physical sector
+  Bits (3:0): 2 =3D 2^2 =3D 4 logical sector per physical sector
+  Bits (3:0): 3 =3D 2^3 =3D 8 logical sector per physical sector
+
+Therefore, if bit 13 is set, bits 3:0 must be greater than zero.
+
+If get_physical_block_exp() returns zero then there is a 1:1 ratio and
+bit 13 must be 0.
+
+Just my opinion.
+
+Thanks,
+Ben
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1896342
+
+Title:
+  IDE ATA IDENTIFY WORD 106
+
+Status in QEMU:
+  New
+
+Bug description:
+  The code at line 202 in hw/ide/core.c
+   (https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/ide/core.c;#l201)
+  hard codes bit 13 set.  However, get_physical_block_exp() can and may ret=
+urn 0, which is a valid response. If get_physical_block_exp() does return z=
+ero, bit 13 should not be set.
+
+  ATAPI8 states (Section 7.17.7.73):
+   "Bit 13 of word 106 shall be set to one to indicate that the device has =
+more than one logical sector per physical sector"
+
+  and gives the examples:
+    Bits (3:0): 0 =3D 2^0 =3D 1 logical sector per physical sector
+    Bits (3:0): 1 =3D 2^1 =3D 2 logical sector per physical sector
+    Bits (3:0): 2 =3D 2^2 =3D 4 logical sector per physical sector
+    Bits (3:0): 3 =3D 2^3 =3D 8 logical sector per physical sector
+
+  Therefore, if bit 13 is set, bits 3:0 must be greater than zero.
+
+  If get_physical_block_exp() returns zero then there is a 1:1 ratio and
+  bit 13 must be 0.
+
+  Just my opinion.
+
+  Thanks,
+  Ben
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1896342/+subscriptions
 
