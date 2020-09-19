@@ -2,88 +2,97 @@ Return-Path: <SRS0=MBD3=C4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 443F3C43463
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:40:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6163EC43464
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:41:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9535D208DB
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:40:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC318206A4
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:41:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OFy+Zy/x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9535D208DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e5iqCmCo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC318206A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJfuI-0006o9-Kj
-	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 12:40:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51714)
+	id 1kJfvO-0008Cb-56
+	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 12:41:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52460)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJfHZ-0005gU-FH
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53951)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJfHL-0007SZ-Dm
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600531196;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=a0HGQw1MXerVeCfVWbsho895pJdZfvez29NetutVjys=;
- b=OFy+Zy/xSNW3L7pfgt+SQI668BFKpnFeIwNn0BxMmUwKxHEsTsOIUajfAiWtb7N/Hgft+a
- jH4lsUyoVeDk2T/gCy71PUIjrk5Lr40yejmADT0+AzvCJ6IlKeY5xPWUvc0PaZybQUgkTQ
- LcrPz58pNUH9nTer6cGU1UvdEp8rC00=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-443-FNT7KjeaMsmbd6E40XgpDQ-1; Sat, 19 Sep 2020 11:59:54 -0400
-X-MC-Unique: FNT7KjeaMsmbd6E40XgpDQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 592941074644
- for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 15:59:53 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0721910016DA;
- Sat, 19 Sep 2020 15:59:52 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 52/57] ui: relocate paths to icons and translations
-Date: Sat, 19 Sep 2020 11:59:11 -0400
-Message-Id: <20200919155916.1046398-53-pbonzini@redhat.com>
-In-Reply-To: <20200919155916.1046398-1-pbonzini@redhat.com>
-References: <20200919155916.1046398-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kJfK5-0008N8-E0
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:02:49 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:34398)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kJfK3-0007tD-G0
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:02:49 -0400
+Received: by mail-wm1-x342.google.com with SMTP id l15so8696683wmh.1
+ for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 09:02:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=FSDTJJm0AiY1cJL804Ya2N20+pLbHfwZZl1522+7sqM=;
+ b=e5iqCmCoSDIx81UStpCXLYgMzT3btCrLhxtfTHaqhIF46jZ47TSbGwyj3uahNo/fmk
+ 8G0tomDwD4hLZp3ir/4NZbkKZTRT3qFvn8aGtcnsayAEbSKSSpazEqEtCeij/YXr7ZWY
+ FUz/45qxUfNMiaFet7Cpg60QGVntAEw3V2/WueJ1L6H0HaUVoOxbwnNRbRz0GUVLePIP
+ UbbvWLeS9OZ4HgYNtNGYCtQkPA0Y374RK7HWwaPK0kTrkBo3R2eDkMq1CvaU67vIHp1n
+ AaNNth6MRYUEu/H1GAYRw7GNPzj0Ix1O2vNlyA9KnujskwydxNtpvnRQKwiOCQb9GvRk
+ Y4PQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=FSDTJJm0AiY1cJL804Ya2N20+pLbHfwZZl1522+7sqM=;
+ b=Na329aZFit3e8OCbRSLcND3NYn4JQ4ExJH+Bav1sLaLGK2F189sQkgGDrlZIhTVrlQ
+ umZHt+aNe5LdCT4Rq3NnoTAk/EKHHjRTLivyAokqSjiHTIPMTSwxcZiY8cySy3lmgMza
+ puxISfznQMnl6kQQUYSIz6sDsVt8Y9thUkP6KHBr4Fdp7WueOXhRGyTEcf4uoKGXEp++
+ Duq6vrWU11sGBbHQqrsQkI2r0NKSBWxvG/8IXTQ4E957SbSwfbavrSJq8EOdhEHI6yAX
+ RmOrMfwPORWGqCC3PtbJ4VWRuUgrGCu4RsPZD1Q+dFJBMqiAClmJAf1RhclrIddCEadq
+ YRhw==
+X-Gm-Message-State: AOAM530s1R6W+RzXHO3lB8rEHLJSlBXv5iE1jN+gvpEdsTVuY3VIJISG
+ EiSfhUEvg9PUR5b7YZ6qavM=
+X-Google-Smtp-Source: ABdhPJy2pBs8k6Url+zAMul3o2snoC2P+ywFJNDLodCXkaqY+m7mhGMyZsG7zspurYp0C1CN2vINZw==
+X-Received: by 2002:a1c:7c17:: with SMTP id x23mr22077798wmc.165.1600531365721; 
+ Sat, 19 Sep 2020 09:02:45 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id h8sm11885623wrw.68.2020.09.19.09.02.44
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 19 Sep 2020 09:02:45 -0700 (PDT)
+Subject: Re: [PATCH] configure: fix performance regression due to PIC objects
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20200919155639.1045857-1-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <2ae0f4d8-a80e-e682-0752-4051c703046b@amsat.org>
+Date: Sat, 19 Sep 2020 18:02:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 06:41:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.996,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200919155639.1045857-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.248, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,103 +105,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Ahmed Karaman <ahmedkrmn@outlook.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- ui/gtk.c  | 10 ++++++++--
- ui/sdl2.c |  9 +++++++--
- 2 files changed, 15 insertions(+), 4 deletions(-)
+Cc'ing Aleksandar as Ahmed is away.
 
-diff --git a/ui/gtk.c b/ui/gtk.c
-index 1c59de2af4..b11594d817 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -51,6 +51,7 @@
- #include <math.h>
- 
- #include "trace.h"
-+#include "qemu/cutils.h"
- #include "ui/input.h"
- #include "sysemu/runstate.h"
- #include "sysemu/sysemu.h"
-@@ -2202,6 +2203,7 @@ static void gtk_display_init(DisplayState *ds, DisplayOptions *opts)
-     GtkDisplayState *s = g_malloc0(sizeof(*s));
-     GdkDisplay *window_display;
-     GtkIconTheme *theme;
-+    char *dir;
- 
-     if (!gtkinit) {
-         fprintf(stderr, "gtk initialization failed\n");
-@@ -2211,7 +2213,9 @@ static void gtk_display_init(DisplayState *ds, DisplayOptions *opts)
-     s->opts = opts;
- 
-     theme = gtk_icon_theme_get_default();
--    gtk_icon_theme_prepend_search_path(theme, CONFIG_QEMU_ICONDIR);
-+    dir = get_relocated_path(CONFIG_QEMU_ICONDIR);
-+    gtk_icon_theme_prepend_search_path(theme, dir);
-+    g_free(dir);
-     g_set_prgname("qemu");
- 
-     s->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-@@ -2227,7 +2231,9 @@ static void gtk_display_init(DisplayState *ds, DisplayOptions *opts)
-      * sure that we don't accidentally break implicit assumptions.  */
-     setlocale(LC_MESSAGES, "");
-     setlocale(LC_CTYPE, "C.UTF-8");
--    bindtextdomain("qemu", CONFIG_QEMU_LOCALEDIR);
-+    dir = get_relocated_path(CONFIG_QEMU_LOCALEDIR);
-+    bindtextdomain("qemu", dir);
-+    g_free(dir);
-     bind_textdomain_codeset("qemu", "UTF-8");
-     textdomain("qemu");
- 
-diff --git a/ui/sdl2.c b/ui/sdl2.c
-index b23a8f0a8e..abad7f981e 100644
---- a/ui/sdl2.c
-+++ b/ui/sdl2.c
-@@ -25,6 +25,7 @@
- 
- #include "qemu/osdep.h"
- #include "qemu/module.h"
-+#include "qemu/cutils.h"
- #include "ui/console.h"
- #include "ui/input.h"
- #include "ui/sdl2.h"
-@@ -795,6 +796,7 @@ static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
-     int i;
-     SDL_SysWMinfo info;
-     SDL_Surface *icon = NULL;
-+    char *dir;
- 
-     assert(o->type == DISPLAY_TYPE_SDL);
- 
-@@ -868,15 +870,18 @@ static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
-     }
- 
- #ifdef CONFIG_SDL_IMAGE
--    icon = IMG_Load(CONFIG_QEMU_ICONDIR "/hicolor/128x128/apps/qemu.png");
-+    dir = get_relocated_path(CONFIG_QEMU_ICONDIR "/hicolor/128x128/apps/qemu.png");
-+    icon = IMG_Load(dir);
- #else
-     /* Load a 32x32x4 image. White pixels are transparent. */
--    icon = SDL_LoadBMP(CONFIG_QEMU_ICONDIR "/hicolor/32x32/apps/qemu.bmp");
-+    dir = get_relocated_path(CONFIG_QEMU_ICONDIR "/hicolor/32x32/apps/qemu.bmp");
-+    icon = SDL_LoadBMP(dir);
-     if (icon) {
-         uint32_t colorkey = SDL_MapRGB(icon->format, 255, 255, 255);
-         SDL_SetColorKey(icon, SDL_TRUE, colorkey);
-     }
- #endif
-+    g_free(dir);
-     if (icon) {
-         SDL_SetWindowIcon(sdl2_console[0].real_window, icon);
-     }
--- 
-2.26.2
-
+On 9/19/20 5:56 PM, Paolo Bonzini wrote:
+> Because most files in QEMU are grouped into static libraries, Meson conservatively
+> compiles them with -fPIC.  This is overkill and produces slowdowns up to 20% on
+> some TCG tests.
+> 
+> As a stopgap measure, use the b_staticpic option to limit the slowdown to
+> --enable-pie.  https://github.com/mesonbuild/meson/pull/7760 will allow
+> us to use b_staticpic=false and let Meson do the right thing.
+> 
+> Reported-by: Ahmed Karaman <ahmedkrmn@outlook.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  configure | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/configure b/configure
+> index 0004c46525..0786144043 100755
+> --- a/configure
+> +++ b/configure
+> @@ -7414,6 +7414,7 @@ NINJA=${ninja:-$PWD/ninjatool} $meson setup \
+>          -Dwerror=$(if test "$werror" = yes; then echo true; else echo false; fi) \
+>          -Dstrip=$(if test "$strip_opt" = yes; then echo true; else echo false; fi) \
+>          -Db_pie=$(if test "$pie" = yes; then echo true; else echo false; fi) \
+> +        -Db_staticpic=$(if test "$pie" = yes; then echo true; else echo false; fi) \
+>          -Db_coverage=$(if test "$gcov" = yes; then echo true; else echo false; fi) \
+>  	-Dmalloc=$malloc -Dmalloc_trim=$malloc_trim -Dsparse=$sparse \
+>  	-Dkvm=$kvm -Dhax=$hax -Dwhpx=$whpx -Dhvf=$hvf \
+> 
 
 
