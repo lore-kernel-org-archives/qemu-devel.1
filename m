@@ -7,84 +7,83 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1B9EC43464
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:28:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D1EBC43463
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:28:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44A38208DB
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:28:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 66EB2208DB
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:28:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z3sl4pGE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44A38208DB
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y9Dfw06K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66EB2208DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJfik-0006eo-82
-	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 12:28:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51756)
+	id 1kJfjJ-0007Qs-IY
+	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 12:28:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51514)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJfHa-0005iv-VC
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:14 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49124
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1kJfHM-0005Tr-UL
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21667)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJfHM-0007S7-KX
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:14 -0400
+ id 1kJfH8-0007PI-8d
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600531194;
+ s=mimecast20190719; t=1600531185;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=LKpXgE0G2/xjvgtHLt5F4BDe7adqBuUzUuGwhoZs0lc=;
- b=Z3sl4pGEuUA0BC4PoZfecLEnz4xbH864njVv0a6xUR3hqgZKQMuTS7qRHIOQ9uDp+6Y4ZP
- 5fv2k+Kk6HkBGiX/4im2oYx0R6Tt+KFWesTp+A1MT51dJXiI+3FcHVSYD0Q8OKefYK6ug+
- 3nn6aO6swGzwb+dyMVO1A1CUFkH1eyY=
+ bh=Ff/sHlpb/v/HqEwa96UtAVZ7ovOEkkfSWz1CFz4RXDU=;
+ b=Y9Dfw06KSDd49RUKPf+TRfHxrsUnDEuZoZ/sp5BHLk7g9O3UjQmEMg4rPB6dPQ/cdRlQyK
+ AfBE3cRTyvZxKAkmwEcMkMMau4uosAWlZ8PAMLqd+Yq/I6/w2PxRyGCezoKrLJksxxK0+h
+ OdAH68qKTIF3hpP6Q37DWTSrBNfVl/g=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-520-P1dCTm7BMSi1n-b9OV8kpg-1; Sat, 19 Sep 2020 11:59:52 -0400
-X-MC-Unique: P1dCTm7BMSi1n-b9OV8kpg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-430-WUaj7XVjPRO_-vj4rE2axg-1; Sat, 19 Sep 2020 11:59:43 -0400
+X-MC-Unique: WUaj7XVjPRO_-vj4rE2axg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A4D088EF00
- for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 15:59:51 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 780B81074654
+ for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 15:59:42 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 47E935576A
- for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 15:59:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 42B2D10016DA
+ for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 15:59:42 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 48/57] vl: relocate paths to data directories
-Date: Sat, 19 Sep 2020 11:59:07 -0400
-Message-Id: <20200919155916.1046398-49-pbonzini@redhat.com>
+Subject: [PULL 32/57] meson: move libmpathpersist test
+Date: Sat, 19 Sep 2020 11:58:51 -0400
+Message-Id: <20200919155916.1046398-33-pbonzini@redhat.com>
 In-Reply-To: <20200919155916.1046398-1-pbonzini@redhat.com>
 References: <20200919155916.1046398-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 06:12:10
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 11:03:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
 X-Spam_bar: -----
 X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.996,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,205 +100,298 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As an additional advantage, the logic is now unified between
-POSIX and Win32 systems.
+This is the first compiler/linker test that has been moved to Meson.
+Add more section headings to keep things clearer.
+
+This also fixes static linking to libmpathpersist, which has a
+dependency on libmultipath but no pkg-config file to describe it.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qemu-common.h   |  1 -
- include/sysemu/sysemu.h |  2 +-
- os-posix.c              | 20 --------------------
- os-win32.c              | 11 -----------
- softmmu/vl.c            | 40 ++++++++++++++++++++++++++++------------
- tests/qtest/fuzz/fuzz.c |  5 +++--
- 6 files changed, 32 insertions(+), 47 deletions(-)
+ configure         | 77 +++----------------------------------------
+ meson.build       | 83 ++++++++++++++++++++++++++++++++++++++++++-----
+ meson_options.txt |  2 ++
+ 3 files changed, 81 insertions(+), 81 deletions(-)
 
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index 9cfd62669b..a9b11f59c4 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -131,7 +131,6 @@ char *qemu_find_file(int type, const char *name);
+diff --git a/configure b/configure
+index 4a7f577f49..7e8c31cafa 100755
+--- a/configure
++++ b/configure
+@@ -394,7 +394,7 @@ netmap="no"
+ sdl="auto"
+ sdl_image="auto"
+ virtfs=""
+-mpath=""
++mpath="auto"
+ vnc="enabled"
+ sparse="no"
+ vde=""
+@@ -1109,9 +1109,9 @@ for opt do
+   ;;
+   --enable-virtfs) virtfs="yes"
+   ;;
+-  --disable-mpath) mpath="no"
++  --disable-mpath) mpath="disabled"
+   ;;
+-  --enable-mpath) mpath="yes"
++  --enable-mpath) mpath="enabled"
+   ;;
+   --disable-vnc) vnc="disabled"
+   ;;
+@@ -3847,57 +3847,6 @@ if test "$modules" = yes; then
+     fi
+ fi
  
- /* OS specific functions */
- void os_setup_early_signal_handling(void);
--char *os_find_datadir(void);
- int os_parse_cmd_args(int index, const char *optarg);
- 
- /*
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 4b6a5c459c..817ff4cf75 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -14,7 +14,7 @@ extern const char *qemu_name;
- extern QemuUUID qemu_uuid;
- extern bool qemu_uuid_set;
- 
--void qemu_add_data_dir(const char *path);
-+void qemu_add_data_dir(char *path);
- 
- void qemu_add_exit_notifier(Notifier *notify);
- void qemu_remove_exit_notifier(Notifier *notify);
-diff --git a/os-posix.c b/os-posix.c
-index 8d8e7fc15c..af91089c01 100644
---- a/os-posix.c
-+++ b/os-posix.c
-@@ -80,26 +80,6 @@ void os_setup_signal_handling(void)
-     sigaction(SIGTERM, &act, NULL);
- }
- 
--/*
-- * Find a likely location for support files using the location of the binary.
-- * When running from the build tree this will be "$bindir/pc-bios".
-- * Otherwise, this is CONFIG_QEMU_DATADIR.
-- *
-- * The caller must use g_free() to free the returned data when it is
-- * no longer required.
-- */
--char *os_find_datadir(void)
--{
--    g_autofree char *dir = NULL;
+-##########################################
+-# libmpathpersist probe
 -
--    dir = g_build_filename(qemu_get_exec_dir(), "pc-bios", NULL);
--    if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {
--        return g_steal_pointer(&dir);
--    }
+-if test "$mpath" != "no" ; then
+-  # probe for the new API
+-  cat > $TMPC <<EOF
+-#include <libudev.h>
+-#include <mpath_persist.h>
+-unsigned mpath_mx_alloc_len = 1024;
+-int logsink;
+-static struct config *multipath_conf;
+-extern struct udev *udev;
+-extern struct config *get_multipath_config(void);
+-extern void put_multipath_config(struct config *conf);
+-struct udev *udev;
+-struct config *get_multipath_config(void) { return multipath_conf; }
+-void put_multipath_config(struct config *conf) { }
 -
--    return g_strdup(CONFIG_QEMU_DATADIR);
+-int main(void) {
+-    udev = udev_new();
+-    multipath_conf = mpath_lib_init();
+-    return 0;
 -}
--
- void os_set_proc_name(const char *s)
- {
- #if defined(PR_SET_NAME)
-diff --git a/os-win32.c b/os-win32.c
-index eb8501b9e5..fd1137bab1 100644
---- a/os-win32.c
-+++ b/os-win32.c
-@@ -57,17 +57,6 @@ void os_setup_early_signal_handling(void)
-     atexit(os_undo_timer_resolution);
- }
- 
--/*
-- * Look for support files in the same directory as the executable.
-- *
-- * The caller must use g_free() to free the returned data when it is
-- * no longer required.
-- */
--char *os_find_datadir(void)
--{
--    return g_strdup(qemu_get_exec_dir());
+-EOF
+-  if compile_prog "" "-ludev -lmultipath -lmpathpersist" ; then
+-    mpathpersist=yes
+-    mpathpersist_new_api=yes
+-  else
+-    # probe for the old API
+-    cat > $TMPC <<EOF
+-#include <libudev.h>
+-#include <mpath_persist.h>
+-unsigned mpath_mx_alloc_len = 1024;
+-int logsink;
+-int main(void) {
+-    struct udev *udev = udev_new();
+-    mpath_lib_init(udev);
+-    return 0;
 -}
+-EOF
+-    if compile_prog "" "-ludev -lmultipath -lmpathpersist" ; then
+-      mpathpersist=yes
+-      mpathpersist_new_api=no
+-    else
+-      mpathpersist=no
+-    fi
+-  fi
+-else
+-  mpathpersist=no
+-fi
 -
- void os_set_line_buffering(void)
- {
-     setbuf(stdout, NULL);
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index f7b103467c..c872657e60 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -2005,7 +2005,7 @@ char *qemu_find_file(int type, const char *name)
-     return NULL;
- }
+ ##########################################
+ # pthread probe
+ PTHREADLIBS_LIST="-pthread -lpthread -lpthreadGC2"
+@@ -6339,23 +6288,11 @@ if test "$softmmu" = yes ; then
+       fi
+       virtfs=no
+     fi
+-    if test "$mpath" != no && test "$mpathpersist" = yes ; then
+-      mpath=yes
+-    else
+-      if test "$mpath" = yes; then
+-        error_exit "Multipath requires libmpathpersist devel"
+-      fi
+-      mpath=no
+-    fi
+   else
+     if test "$virtfs" = yes; then
+       error_exit "VirtFS is supported only on Linux"
+     fi
+     virtfs=no
+-    if test "$mpath" = yes; then
+-      error_exit "Multipath is supported only on Linux"
+-    fi
+-    mpath=no
+   fi
+ fi
  
--void qemu_add_data_dir(const char *path)
-+void qemu_add_data_dir(char *path)
- {
-     int i;
+@@ -6896,12 +6833,6 @@ fi
+ if test "$virtfs" = "yes" ; then
+   echo "CONFIG_VIRTFS=y" >> $config_host_mak
+ fi
+-if test "$mpath" = "yes" ; then
+-  echo "CONFIG_MPATH=y" >> $config_host_mak
+-  if test "$mpathpersist_new_api" = "yes"; then
+-    echo "CONFIG_MPATH_NEW_API=y" >> $config_host_mak
+-  fi
+-fi
+ if test "$vhost_scsi" = "yes" ; then
+   echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
+ fi
+@@ -7992,7 +7923,7 @@ NINJA=${ninja:-$PWD/ninjatool} $meson setup \
+         -Dstrip=$(if test "$strip_opt" = yes; then echo true; else echo false; fi) \
+         -Db_pie=$(if test "$pie" = yes; then echo true; else echo false; fi) \
+         -Db_coverage=$(if test "$gcov" = yes; then echo true; else echo false; fi) \
+-	-Dsdl=$sdl -Dsdl_image=$sdl_image \
++	-Dmpath=$mpath -Dsdl=$sdl -Dsdl_image=$sdl_image \
+ 	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
+ 	-Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f\
+         $cross_arg \
+diff --git a/meson.build b/meson.build
+index 11213b6e8b..4d617d7561 100644
+--- a/meson.build
++++ b/meson.build
+@@ -86,6 +86,14 @@ if 'SPARSE_CFLAGS' in config_host
+                        'compile_commands.json'])
+ endif
  
-@@ -2017,10 +2017,11 @@ void qemu_add_data_dir(const char *path)
-     }
-     for (i = 0; i < data_dir_idx; i++) {
-         if (strcmp(data_dir[i], path) == 0) {
--            return; /* duplicate */
-+            g_free(path); /* duplicate */
-+            return;
-         }
-     }
--    data_dir[data_dir_idx++] = g_strdup(path);
-+    data_dir[data_dir_idx++] = path;
- }
- 
- static inline bool nonempty_str(const char *str)
-@@ -2829,6 +2830,26 @@ static void create_default_memdev(MachineState *ms, const char *path)
-                             &error_fatal);
- }
- 
-+/*
-+ * Find a likely location for support files using the location of the binary.
-+ * When running from the build tree this will be "$bindir/pc-bios".
-+ * Otherwise, this is CONFIG_QEMU_DATADIR (possibly relocated).
-+ *
-+ * The caller must use g_free() to free the returned data when it is
-+ * no longer required.
-+ */
-+static char *find_datadir(void)
-+{
-+    g_autofree char *dir = NULL;
++###########################################
++# Target-specific checks and dependencies #
++###########################################
 +
-+    dir = g_build_filename(qemu_get_exec_dir(), "pc-bios", NULL);
-+    if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {
-+        return g_steal_pointer(&dir);
-+    }
++if targetos != 'linux' and get_option('mpath').enabled()
++  error('Multipath is supported only on Linux')
++endif
 +
-+    return get_relocated_path(CONFIG_QEMU_DATADIR);
-+}
+ m = cc.find_library('m', required: false)
+ util = cc.find_library('util', required: false)
+ winmm = []
+@@ -117,6 +125,11 @@ elif targetos == 'haiku'
+             cc.find_library('network'),
+             cc.find_library('bsd')]
+ endif
 +
- void qemu_init(int argc, char **argv, char **envp)
- {
-     int i;
-@@ -2862,7 +2883,7 @@ void qemu_init(int argc, char **argv, char **envp)
-     Error *main_loop_err = NULL;
-     Error *err = NULL;
-     bool list_data_dirs = false;
--    char *dir, **dirs;
-+    char **dirs;
-     const char *mem_path = NULL;
-     bool have_custom_ram_size;
-     BlockdevOptionsQueue bdo_queue = QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
-@@ -3195,7 +3216,7 @@ void qemu_init(int argc, char **argv, char **envp)
-                 if (is_help_option(optarg)) {
-                     list_data_dirs = true;
-                 } else {
--                    qemu_add_data_dir(optarg);
-+                    qemu_add_data_dir(g_strdup(optarg));
-                 }
-                 break;
-             case QEMU_OPTION_bios:
-@@ -3927,17 +3948,12 @@ void qemu_init(int argc, char **argv, char **envp)
-     /* add configured firmware directories */
-     dirs = g_strsplit(CONFIG_QEMU_FIRMWAREPATH, G_SEARCHPATH_SEPARATOR_S, 0);
-     for (i = 0; dirs[i] != NULL; i++) {
--        qemu_add_data_dir(dirs[i]);
-+        qemu_add_data_dir(get_relocated_path(dirs[i]));
-     }
-     g_strfreev(dirs);
++################
++# Dependencies #
++################
++
+ # The path to glib.h is added to all compilation commands.  This was
+ # grandfathered in from the QEMU Makefiles.
+ add_project_arguments(config_host['GLIB_CFLAGS'].split(),
+@@ -223,10 +236,6 @@ if 'CONFIG_SPICE' in config_host
+                              link_args: config_host['SPICE_LIBS'].split())
+ endif
+ rt = cc.find_library('rt', required: false)
+-libmpathpersist = not_found
+-if config_host.has_key('CONFIG_MPATH')
+-  libmpathpersist = cc.find_library('mpathpersist')
+-endif
+ libdl = not_found
+ if 'CONFIG_PLUGIN' in config_host
+   libdl = cc.find_library('dl', required: true)
+@@ -257,9 +266,65 @@ if 'CONFIG_CURL' in config_host
+                             link_args: config_host['CURL_LIBS'].split())
+ endif
+ libudev = not_found
+-if target_os == 'linux'
+-  libudev = dependency('libudev', static: enable_static)
++if targetos == 'linux'
++  libudev = dependency('libudev',
++                       required: get_option('mpath').enabled(),
++                       static: enable_static)
++endif
++
++mpathpersist = not_found
++mpathpersist_new_api = false
++if targetos == 'linux' and not get_option('mpath').disabled()
++  mpath_test_source_new = '''
++    #include <libudev.h>
++    #include <mpath_persist.h>
++    unsigned mpath_mx_alloc_len = 1024;
++    int logsink;
++    static struct config *multipath_conf;
++    extern struct udev *udev;
++    extern struct config *get_multipath_config(void);
++    extern void put_multipath_config(struct config *conf);
++    struct udev *udev;
++    struct config *get_multipath_config(void) { return multipath_conf; }
++    void put_multipath_config(struct config *conf) { }
++    int main(void) {
++        udev = udev_new();
++        multipath_conf = mpath_lib_init();
++        return 0;
++    }'''
++  mpath_test_source_old = '''
++      #include <libudev.h>
++      #include <mpath_persist.h>
++      unsigned mpath_mx_alloc_len = 1024;
++      int logsink;
++      int main(void) {
++          struct udev *udev = udev_new();
++          mpath_lib_init(udev);
++          return 0;
++      }'''
++  libmultipath = cc.find_library('multipath',
++                                 required: get_option('mpath'),
++                                 static: enable_static)
++  libmpathpersist = cc.find_library('mpathpersist',
++                                    required: get_option('mpath'),
++                                    static: enable_static)
++  if libmultipath.found() and libmpathpersist.found() and libudev.found()
++    mpathlibs = [libmultipath, libmpathpersist, libudev]
++    if cc.links(mpath_test_source_new, dependencies: mpathlibs)
++      mpathpersist = declare_dependency(dependencies: mpathlibs)
++      mpathpersist_new_api = true
++    elif cc.links(mpath_test_source_old, dependencies: mpathlibs)
++      mpathpersist = declare_dependency(dependencies: mpathlibs)
++    else
++      if get_option('mpath').enabled()
++        error('Cannot detect libmpathpersist API')
++      else
++        warning('Cannot detect libmpathpersist API, disabling')
++      endif
++    endif
++  endif
+ endif
++
+ brlapi = not_found
+ if 'CONFIG_BRLAPI' in config_host
+   brlapi = declare_dependency(link_args: config_host['BRLAPI_LIBS'].split())
+@@ -447,6 +512,8 @@ has_gettid = cc.has_function('gettid')
+ # Create config-host.h
  
-     /* try to find datadir relative to the executable path */
--    dir = os_find_datadir();
--    qemu_add_data_dir(dir);
--    g_free(dir);
--
--    /* add the datadir specified when building */
--    qemu_add_data_dir(CONFIG_QEMU_DATADIR);
-+    qemu_add_data_dir(find_datadir());
+ config_host_data.set('CONFIG_LIBUDEV', libudev.found())
++config_host_data.set('CONFIG_MPATH', mpathpersist.found())
++config_host_data.set('CONFIG_MPATH_NEW_API', mpathpersist_new_api)
+ config_host_data.set('CONFIG_SDL', sdl.found())
+ config_host_data.set('CONFIG_SDL_IMAGE', sdl_image.found())
+ config_host_data.set('CONFIG_VNC', vnc.found())
+@@ -1196,7 +1263,7 @@ if have_tools
  
-     /* -L help lists the data directories and exits. */
-     if (list_data_dirs) {
-diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
-index 1811cb1d88..d9ef4b3e1e 100644
---- a/tests/qtest/fuzz/fuzz.c
-+++ b/tests/qtest/fuzz/fuzz.c
-@@ -170,8 +170,9 @@ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
-         datadir = g_build_filename(bindir, "pc-bios", NULL);
-         if (g_file_test(datadir, G_FILE_TEST_IS_DIR)) {
-             qemu_add_data_dir(datadir);
--        }
--        g_free(datadir);
-+        } else {
-+            g_free(datadir);
-+	}
-     } else if (*argc > 1) {  /* The target is specified as an argument */
-         target_name = (*argv)[1];
-         if (!strstr(target_name, "--fuzz-target=")) {
+     executable('qemu-pr-helper', files('scsi/qemu-pr-helper.c', 'scsi/utils.c'),
+                dependencies: [authz, crypto, io, qom, qemuutil,
+-                              libcap_ng, libudev, libmpathpersist],
++                              libcap_ng, mpathpersist],
+                install: true)
+   endif
+ 
+@@ -1418,7 +1485,7 @@ summary_info += {'Audio drivers':     config_host['CONFIG_AUDIO_DRIVERS']}
+ summary_info += {'Block whitelist (rw)': config_host['CONFIG_BDRV_RW_WHITELIST']}
+ summary_info += {'Block whitelist (ro)': config_host['CONFIG_BDRV_RO_WHITELIST']}
+ summary_info += {'VirtFS support':    config_host.has_key('CONFIG_VIRTFS')}
+-summary_info += {'Multipath support': config_host.has_key('CONFIG_MPATH')}
++summary_info += {'Multipath support': mpathpersist.found()}
+ summary_info += {'VNC support':       vnc.found()}
+ if vnc.found()
+   summary_info += {'VNC SASL support':  sasl.found()}
+diff --git a/meson_options.txt b/meson_options.txt
+index 543cf70043..b38a6ae92a 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -6,6 +6,8 @@ option('docdir', type : 'string', value : 'doc',
+ option('gettext', type : 'boolean', value : true,
+        description: 'Localization of the GTK+ user interface')
+ 
++option('mpath', type : 'feature', value : 'auto',
++       description: 'Multipath persistent reservation passthrough')
+ option('sdl', type : 'feature', value : 'auto',
+        description: 'SDL user interface')
+ option('sdl_image', type : 'feature', value : 'auto',
 -- 
 2.26.2
 
