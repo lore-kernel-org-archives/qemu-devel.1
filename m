@@ -2,68 +2,68 @@ Return-Path: <SRS0=MBD3=C4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6E45C43463
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:44:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBB43C43464
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:45:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FD36208DB
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:44:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6BC20208DB
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:45:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZnukCOnH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FD36208DB
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YVQqh7Bs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BC20208DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJfyQ-00045B-8d
-	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 12:44:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51778)
+	id 1kJfzo-00061y-I7
+	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 12:45:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51686)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJfHb-0005kW-Ua
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36314
- helo=us-smtp-1.mimecast.com)
+ id 1kJfHY-0005dr-7E
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:12 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31277
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJfHM-0007R2-KQ
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:15 -0400
+ id 1kJfHK-0007SR-Kr
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 12:00:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600531190;
+ s=mimecast20190719; t=1600531195;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=e2sJKZqKafTOzd1p5yXwll+9kazSOrzlw8kQ0zp2kLk=;
- b=ZnukCOnHP8foRx5You4kXVpKurnMV7AORTCKRKsVP0jR5XyGGRkL0z5uRu3RYU0EnSF/4U
- Il6+q/DdDz4ruuaJ6xNNYdY3uwGFaEyIiOnAeDRRBl/T2Krya3oYV0dWP+LaC/7zT5L3S4
- 5LGewgyaaqMWmk+lqTllHHHFItE1HG8=
+ bh=pq35pprjY9O0C9/iJtey6JbSoVcKHmRAr2UADQ5C67Q=;
+ b=YVQqh7BsFM1Fle25dl4WeHkkDNzD/o3HUv9HWmWQu5r7VyM4MyOHSvhQXjyhu8Tp61y8t/
+ C+u9IYLRtshcZoESY8kZzb0oMTh5c1Tivg426bffPUWDJ8Dy0QDk0gSJgWy0jXMKBlI1tf
+ ETup+lk7H/Sa8yGN+42uPnBglmIhZnE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-432-7ZdZ8lw3M2aOvYjGT9OaxQ-1; Sat, 19 Sep 2020 11:59:48 -0400
-X-MC-Unique: 7ZdZ8lw3M2aOvYjGT9OaxQ-1
+ us-mta-524-0jT_B4GxOjeqWfdiaKB4HQ-1; Sat, 19 Sep 2020 11:59:53 -0400
+X-MC-Unique: 0jT_B4GxOjeqWfdiaKB4HQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BBC7E186DD4B
- for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 15:59:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9A23186DD4C
+ for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 15:59:52 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 794B310016DA;
- Sat, 19 Sep 2020 15:59:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9F53F10016DA
+ for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 15:59:52 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 38/57] meson: qtest: set "depends" correctly
-Date: Sat, 19 Sep 2020 11:58:57 -0400
-Message-Id: <20200919155916.1046398-39-pbonzini@redhat.com>
+Subject: [PULL 51/57] qga: relocate path to default configuration and hook
+Date: Sat, 19 Sep 2020 11:59:10 -0400
+Message-Id: <20200919155916.1046398-52-pbonzini@redhat.com>
 In-Reply-To: <20200919155916.1046398-1-pbonzini@redhat.com>
 References: <20200919155916.1046398-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -74,9 +74,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 11:59:21
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 06:12:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
@@ -97,82 +97,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This does not have any effect on Meson's behavior itself, since "meson test"
-always rebuilds everything (that is one reason why we are not using it...).
-However, mtest2make can use this information to do a selective rebuild
-for the requested suite.
-
-Cc: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- meson.build             | 7 ++++---
- tests/qtest/meson.build | 2 ++
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ qga/main.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/meson.build b/meson.build
-index 848223778d..f5c9c04e40 100644
---- a/meson.build
-+++ b/meson.build
-@@ -1094,7 +1094,7 @@ common_all = static_library('common',
+diff --git a/qga/main.c b/qga/main.c
+index 3febf3b0fd..740f5f7303 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -29,6 +29,7 @@
+ #include "qapi/error.h"
+ #include "channel.h"
+ #include "qemu/bswap.h"
++#include "qemu/cutils.h"
+ #include "qemu/help_option.h"
+ #include "qemu/sockets.h"
+ #include "qemu/systemd.h"
+@@ -968,7 +969,7 @@ static void config_load(GAConfig *config)
+ {
+     GError *gerr = NULL;
+     GKeyFile *keyfile;
+-    const char *conf = g_getenv("QGA_CONF") ?: QGA_CONF_DEFAULT;
++    g_autofree char *conf = g_strdup(g_getenv("QGA_CONF")) ?: get_relocated_path(QGA_CONF_DEFAULT);
  
- feature_to_c = find_program('scripts/feature_to_c.sh')
+     /* read system config */
+     keyfile = g_key_file_new();
+@@ -1027,7 +1028,7 @@ end:
+     if (gerr &&
+         !(gerr->domain == G_FILE_ERROR && gerr->code == G_FILE_ERROR_NOENT)) {
+         g_critical("error loading configuration from path: %s, %s",
+-                   QGA_CONF_DEFAULT, gerr->message);
++                   conf, gerr->message);
+         exit(EXIT_FAILURE);
+     }
+     g_clear_error(&gerr);
+@@ -1141,7 +1142,7 @@ static void config_parse(GAConfig *config, int argc, char **argv)
+ #ifdef CONFIG_FSFREEZE
+         case 'F':
+             g_free(config->fsfreeze_hook);
+-            config->fsfreeze_hook = g_strdup(optarg ?: QGA_FSFREEZE_HOOK_DEFAULT);
++            config->fsfreeze_hook = optarg ? g_strdup(optarg) : get_relocated_path(QGA_FSFREEZE_HOOK_DEFAULT);
+             break;
+ #endif
+         case 't':
+@@ -1463,6 +1464,7 @@ int main(int argc, char **argv)
  
--emulators = []
-+emulators = {}
- foreach target : target_dirs
-   config_target = config_target_mak[target]
-   target_name = config_target['TARGET_NAME']
-@@ -1213,7 +1213,8 @@ foreach target : target_dirs
-     }]
-   endif
-   foreach exe: execs
--    emulators += executable(exe['name'], exe['sources'],
-+    emulators += {exe['name']:
-+         executable(exe['name'], exe['sources'],
-                install: true,
-                c_args: c_args,
-                dependencies: arch_deps + deps + exe['dependencies'],
-@@ -1222,6 +1223,7 @@ foreach target : target_dirs
-                link_depends: [block_syms, qemu_syms] + exe.get('link_depends', []),
-                link_args: link_args,
-                gui_app: exe['gui'])
-+    }
+     config->log_level = G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL;
  
-     if 'CONFIG_TRACE_SYSTEMTAP' in config_host
-       foreach stp: [
-@@ -1267,7 +1269,6 @@ if xkbcommon.found()
-                            dependencies: [qemuutil, xkbcommon], install: have_tools)
- endif
++    qemu_init_exec_dir(argv[0]);
+     qga_qmp_init_marshal(&ga_commands);
  
--qemu_block_tools = []
- if have_tools
-   qemu_img = executable('qemu-img', [files('qemu-img.c'), hxdep],
-              dependencies: [authz, block, crypto, io, qom, qemuutil], install: true)
-diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
-index 874b5be62b..359a6cde64 100644
---- a/tests/qtest/meson.build
-+++ b/tests/qtest/meson.build
-@@ -228,6 +228,7 @@ foreach dir : target_dirs
-   endif
- 
-   target_base = dir.split('-')[0]
-+  qtest_emulator = emulators['qemu-system-' + target_base]
-   qtests = get_variable('qtests_' + target_base, []) + qtests_generic
- 
-   qtest_env = environment()
-@@ -248,6 +249,7 @@ foreach dir : target_dirs
-     # FIXME: missing dependency on the emulator binary and qemu-img
-     test('qtest-@0@: @1@'.format(target_base, test),
-          qtest_executables[test],
-+         depends: [qemu_img, qtest_emulator],
-          env: qtest_env,
-          args: ['--tap', '-k'],
-          protocol: 'tap',
+     init_dfl_pathnames();
 -- 
 2.26.2
 
