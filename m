@@ -2,80 +2,82 @@ Return-Path: <SRS0=MBD3=C4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C38F7C43463
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 20:42:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FEC3C433DB
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 20:50:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBE3A21D42
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 20:42:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBE3A21D42
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 656102075A
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 20:50:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=poolhem.se header.i=@poolhem.se header.b="AVOjWivo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 656102075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=poolhem.se
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJjge-0004OX-Qs
-	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 16:42:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41660)
+	id 1kJjoa-0006m0-Ab
+	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 16:50:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42942)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kJjf8-0003qA-RA
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 16:40:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44342)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kJjf6-00065o-Lp
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 16:40:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kJjf4-0000k9-O5
- for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 20:40:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 790112E80E9
- for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 20:40:46 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 19 Sep 2020 20:35:22 -0000
-From: Paul Zimmerman <1892604@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: brendandg pauldzim petunia2000 pmaydell
-X-Launchpad-Bug-Reporter: Brendan Dolan-Gavitt (brendandg)
-X-Launchpad-Bug-Modifier: Paul Zimmerman (pauldzim)
-References: <159814309088.988.14645850566795174578.malonedeb@wampee.canonical.com>
-Message-Id: <160054772262.22139.16709127799849267316.malone@wampee.canonical.com>
-Subject: [Bug 1892604] Re: qemu-system-arm: ../hw/usb/hcd-dwc2.c:666:
- dwc2_glbreg_read: Assertion `addr <= GINTSTS2' failed.
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: 829568ad59380eefd2610e9bf52b0405bd3115f2
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 15:10:41
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.248, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <hc94@poolhem.se>) id 1kJgxc-0004dC-F5
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 13:47:44 -0400
+Received: from mailout12.inleed.net ([2a0b:dc80:cafe:112::1]:37034
+ helo=ns12.inleed.net)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <hc94@poolhem.se>) id 1kJgxZ-0003Rd-6K
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 13:47:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=poolhem.se; 
+ s=x;
+ h=Content-Transfer-Encoding:Content-Type:Mime-Version:References:
+ In-Reply-To:Message-Id:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+ Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+ :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+ List-Post:List-Owner:List-Archive;
+ bh=u198mhXbRjsFn2ZOgJPDFzjsb+fgVNw2/BEFi6zEDA4=; b=AVOjWivofzaAAcjgGFCVEYuXV0
+ qAKgXoLFrlW7FZUom5KUuh05Q3Cec0Ge9Y8zIlLTWQ4VpdOs7MQxmggmeegi96p63p681oZy4mhio
+ VsBEMVvNm35c9EmzcHeRkVX3GAle8fIXYgoe9zxZ8oLgYbKkUu1LpjcujYl+1IMDNyyDgDOW32NAL
+ /X9KMBfegLmGcNLJuLGOIzgqdFHUZWTySFp1zc3elrId5mL0j0aFbdjB7X8eJYYF5q0v64u1hlYSO
+ KvUM3RI5UDwKm6byKmZizPonyL/7uBunvt9xw8RpyosAxfxDjPKDcdclBZnhdtZZGn3kLIlTWxi4i
+ nrjP/74w==;
+Received: from [213.115.245.47] (helo=balrog.lkp.se)
+ by ns12.inleed.net with esmtpa (Exim 4.93.0.4)
+ (envelope-from <hc94@poolhem.se>)
+ id 1kJgxW-004z9E-W1; Sat, 19 Sep 2020 19:47:39 +0200
+Date: Sat, 19 Sep 2020 19:47:12 +0200
+From: Henrik Carlqvist <hc94@poolhem.se>
+To: Henrik Carlqvist <hc981@poolhem.se>
+Subject: Ping2: [PATCH v2] Emulate dip switch language layout settings on
+ SUN keyboard
+Message-Id: <20200919194712.1ddd62cf.hc94@poolhem.se>
+In-Reply-To: <20200803222049.2967aeda.hc981@poolhem.se>
+References: <20200803222049.2967aeda.hc981@poolhem.se>
+X-Mailer: Sylpheed version 0.9.7 (GTK+ 1.2.10; i686-pc-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Id: henrik@poolhem.se
+Received-SPF: none client-ip=2a0b:dc80:cafe:112::1;
+ envelope-from=hc94@poolhem.se; helo=ns12.inleed.net
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -13
+X-Spam_score: -1.4
+X-Spam_bar: -
+X-Spam_report: (-1.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ SPF_HELO_SOFTFAIL=0.732, SPF_NONE=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
+X-Mailman-Approved-At: Sat, 19 Sep 2020 16:48:42 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,81 +86,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1892604 <1892604@bugs.launchpad.net>
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, atar4qemu@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I also tried
-http://downloads.raspberrypi.org/raspbian/images/raspbian-2016-09-28/2016-0=
-9-23
--raspbian-jessie.zip, which is the next Raspbian release after the
-cursed one, and it works OK too. So I assume any release after that will
-also work OK. Just in case anyone wants to use the older releases
-because they are smaller than the later ones.
+Just wanted to check that my patch hasn't been forgotten... I was hoping that
+it would make it into some branch in git.
 
--- =
+Do you want me to do any more changes to the patch or the description?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1892604
+Best regards Henrik
 
-Title:
-  qemu-system-arm: ../hw/usb/hcd-dwc2.c:666: dwc2_glbreg_read: Assertion
-  `addr <=3D GINTSTS2' failed.
+On Mon, 3 Aug 2020 22:20:49 +0200
+Henrik Carlqvist <hc981@poolhem.se> wrote:
 
-Status in QEMU:
-  New
-
-Bug description:
-  When trying to run the 2016-05-27 Raspbian image on the emulated
-  raspi2 platform, the system boots but shortly after the login prompt
-  QEMU (master; commit ID ca489cd037e4d50dc6c40570a167504ad7e5a521) dies
-  with:
-
-  qemu-system-arm: ../hw/usb/hcd-dwc2.c:666: dwc2_glbreg_read: Assertion
-  `addr <=3D GINTSTS2' failed.
-
-  Steps to reproduce:
-
-  1. Get the image: wget
-  http://downloads.raspberrypi.org/raspbian/images/raspbian-2016-05-31/2016=
--05-27
-  -raspbian-jessie.zip
-
-  2. Extract the kernel image and DTB:
-
-  sudo losetup -f --show -P 2016-05-27-raspbian-jessie.img
-  sudo mkdir /mnt/rpi
-  sudo mount /dev/loop11p1 /mnt/rpi/
-  cp /mnt/rpi/kernel7.img .                                                =
-                                                                           =
-                                                                           =
-                                                                   =
-
-  cp /mnt/rpi/bcm2709-rpi-2-b.dtb .                                        =
-                                                                           =
-                                                                           =
-                                                                   =
-
-  sudo umount /mnt/rpi =
-
-  sudo losetup -d /dev/loop11 =
-
-
-  3. Run QEMU:
-  qemu-system-arm -M raspi2 -m 1G -dtb bcm2709-rpi-2-b.dtb -kernel kernel7.=
-img -append "rw earlyprintk loglevel=3D8 console=3DttyAMA0,115200 dwc_otg.l=
-pm_enable=3D0 root=3D/dev/mmcblk0p2" -sd 2016-05-27-raspbian-jessie.img -sm=
-p 4 -serial stdio -display none
-
-  A few seconds after the login prompt is displayed, QEMU will exit with
-  the assertion failure.
-
-  I also tried changing all of the asserts to if statements that (for
-  MMIO reads) returned 0 and (for writes) just returned, but this
-  resulted in a non-responsive system.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1892604/+subscriptions
+> This is my second attempt to contribute a patch which makes the -k switch
+> useful for sparc emulation as its value is used to emulate the dip switch
+> in a SUN keyboard for language layout setting.
+> 
+> Unfortunately my glib version is too old to compile later versions of qemu
+> so even though this patch is made from latest git I have only been able to
+> test it myself with qemu version 4.1.1. I think and hope that this patch
+> will compile and work also with the latest version of git as it only affects
+> one file and there hasn't been much changes to that file since tested
+> version 4.1.1.
+> 
+> Best regards Henrik
+> 
+> From e302b02dec32c28297ed20d852c5fba2c1682f5a Mon Sep 17 00:00:00 2001
+> From: Henrik Carlqvist <hc1245@poolhem.se>
+> Date: Mon, 3 Aug 2020 22:11:55 +0200
+> Subject: [PATCH] Emulating sun keyboard language layout dip switches, taking
+>  the value for the dip switches from the "-k" option to qemu.
+> 
+> SUN Type 4, 5 and 5c keyboards have dip switches to choose the language
+> layout of the keyboard. Solaris makes an ioctl to query the value of the
+> dipswitches and uses that value to select keyboard layout. Also the SUN
+> bios like the one in the file ss5.bin uses this value to support at least
+> some keyboard layouts. However, the OpenBIOS provided with qemu is
+> hardcoded to always use an US keyboard layout.
+> 
+> Before this patch, qemu allways gave dip switch value 0x21 (US keyboard),
+> this patch uses the command line switch "-k" (keyboard layout) to select
+> dip switch value. A table is used to lookup values from arguments like:
+> 
+> -k fr
+> -k es
+> 
+> But the patch also accepts numeric dip switch values directly to the -k
+> switch:
+> 
+> -k 0x2b
+> -k 43
+> 
+> Both values above are the same and select swedish keyboard as explained in
+> table 3-15 at
+> https://docs.oracle.com/cd/E19683-01/806-6642/new-43/index.html
+> 
+> Unless you want to do a full Solaris installation but happen to have
+> access to a bios file, the easiest way to test that the patch works is to:
+> 
+> qemu-system-sparc -k sv -bios /path/to/ss5.bin
+> 
+> If you already happen to have a Solaris installation in a qemu disk image
+> file you can easily try different keyboard layouts after this patch is
+> applied.
+> 
+> Signed-off-by: Henrik Carlqvist <hc1245@poolhem.se>
+> ---
+>  hw/char/escc.c | 74
+> +++++++++++++++++++++++++++++++++++++++++++++++++++++++++- 1 file changed,
+> 73 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/char/escc.c b/hw/char/escc.c
+> index 7d16ee8688..7287056b5f 100644
+> --- a/hw/char/escc.c
+> +++ b/hw/char/escc.c
+> @@ -30,6 +30,8 @@
+>  #include "qemu/module.h"
+>  #include "hw/char/escc.h"
+>  #include "ui/console.h"
+> +#include "sysemu/sysemu.h"
+> +#include "qemu/cutils.h"
+>  #include "trace.h"
+>  
+>  /*
+> @@ -175,6 +177,7 @@
+>  #define R_MISC1I 14
+>  #define R_EXTINT 15
+>  
+> +static unsigned char sun_keyboard_layout_dip_switch(void);
+>  static void handle_kbd_command(ESCCChannelState *s, int val);
+>  static int serial_can_receive(void *opaque);
+>  static void serial_receive_byte(ESCCChannelState *s, int ch);
+> @@ -730,6 +733,75 @@ static QemuInputHandler sunkbd_handler = {
+>      .event = sunkbd_handle_event,
+>  };
+>  
+> +static unsigned char sun_keyboard_layout_dip_switch(void)
+> +{
+> +    /* Return the value of the dip-switches in a SUN Type 5 keyboard */
+> +    static unsigned char ret = 0xff;
+> +
+> +    if ((ret == 0xff) && keyboard_layout) {
+> +        int i;
+> +        struct layout_values {
+> +            const char *lang;
+> +            unsigned char dip;
+> +        } languages[] =
+> +    /* Dip values from table 3-16 Layouts for Type 4, 5, and 5c Keyboards
+> */+            {
+> +                {"en-us", 0x21}, /* U.S.A. (US5.kt) */
+> +                                 /* 0x22 is some other US (US_UNIX5.kt)*/
+> +                {"fr",    0x23}, /* France (France5.kt) */
+> +                {"da",    0x24}, /* Denmark (Denmark5.kt) */
+> +                {"de",    0x25}, /* Germany (Germany5.kt) */
+> +                {"it",    0x26}, /* Italy (Italy5.kt) */
+> +                {"nl",    0x27}, /* The Netherlands (Netherland5.kt) */
+> +                {"no",    0x28}, /* Norway (Norway.kt) */
+> +                {"pt",    0x29}, /* Portugal (Portugal5.kt) */
+> +                {"es",    0x2a}, /* Spain (Spain5.kt) */
+> +                {"sv",    0x2b}, /* Sweden (Sweden5.kt) */
+> +                {"fr-ch", 0x2c}, /* Switzerland/French (Switzer_Fr5.kt) */
+> +                {"de-ch", 0x2d}, /* Switzerland/German (Switzer_Ge5.kt) */
+> +                {"en-gb", 0x2e}, /* Great Britain (UK5.kt) */
+> +                {"ko",    0x2f}, /* Korea (Korea5.kt) */
+> +                {"tw",    0x30}, /* Taiwan (Taiwan5.kt) */
+> +                {"ja",    0x31}, /* Japan (Japan5.kt) */
+> +                {"fr-ca", 0x32}, /* Canada/French (Canada_Fr5.kt) */
+> +                {"hu",    0x33}, /* Hungary (Hungary5.kt) */
+> +                {"pl",    0x34}, /* Poland (Poland5.kt) */
+> +                {"cz",    0x35}, /* Czech (Czech5.kt) */
+> +                {"ru",    0x36}, /* Russia (Russia5.kt) */
+> +                {"lv",    0x37}, /* Latvia (Latvia5.kt) */
+> +                {"tr",    0x38}, /* Turkey-Q5 (TurkeyQ5.kt) */
+> +                {"gr",    0x39}, /* Greece (Greece5.kt) */
+> +                {"ar",    0x3a}, /* Arabic (Arabic5.kt) */
+> +                {"lt",    0x3b}, /* Lithuania (Lithuania5.kt) */
+> +                {"nl-be", 0x3c}, /* Belgium (Belgian5.kt) */
+> +                {"be",    0x3c}, /* Belgium (Belgian5.kt) */
+> +            };
+> +
+> +        for (i = 0;
+> +             i < sizeof(languages) / sizeof(struct layout_values);
+> +             i++) {
+> +            if (!strcmp(keyboard_layout, languages[i].lang)) {
+> +                ret = languages[i].dip;
+> +                return ret;
+> +            }
+> +        }
+> +        /* Found no known language code */
+> +
+> +        if ((keyboard_layout[0] >= '0') && (keyboard_layout[0] <= '9')) {
+> +            unsigned int tmp;
+> +            /* As a fallback we also accept numeric dip switch value */
+> +            if (!qemu_strtoui(keyboard_layout, NULL, 0, &tmp)) {
+> +                ret = (unsigned char)tmp;
+> +            }
+> +        }
+> +    }
+> +    if (ret == 0xff) {
+> +        /* Final fallback if keyboard_layout was not set or recognized */
+> +        ret = 0x21; /* en-us layout */
+> +    }
+> +    return ret;
+> +}
+> +
+>  static void handle_kbd_command(ESCCChannelState *s, int val)
+>  {
+>      trace_escc_kbd_command(val);
+> @@ -751,7 +823,7 @@ static void handle_kbd_command(ESCCChannelState *s, int
+> val)     case 0xf:
+>          clear_queue(s);
+>          put_queue(s, 0xfe);
+> -        put_queue(s, 0x21); /*  en-us layout */
+> +        put_queue(s, sun_keyboard_layout_dip_switch());
+>          break;
+>      default:
+>          break;
+> -- 
+> 2.14.5
 
