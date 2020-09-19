@@ -4,78 +4,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC19EC43463
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:13:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80C17C43463
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:15:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4850D208DB
-	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:13:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E9CDC208DB
+	for <qemu-devel@archiver.kernel.org>; Sat, 19 Sep 2020 16:15:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YSwiL3W+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4850D208DB
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DIwDOjE9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9CDC208DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJfUT-0005Kr-Sz
-	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 12:13:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51466)
+	id 1kJfW9-0006uT-Sp
+	for qemu-devel@archiver.kernel.org; Sat, 19 Sep 2020 12:15:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51348)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJfHK-0005Sl-TL
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 11:59:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59012)
+ id 1kJfH9-0005PZ-Mc
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 11:59:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55035)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJfH6-0007Or-AG
- for qemu-devel@nongnu.org; Sat, 19 Sep 2020 11:59:56 -0400
+ id 1kJfGx-0007NH-MM
+ for qemu-devel@nongnu.org; Sat, 19 Sep 2020 11:59:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600531183;
+ s=mimecast20190719; t=1600531175;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=od6JXIY1fcP2j39Qow/9a/can0bTK6XDiYgmSrU6a9s=;
- b=YSwiL3W+KP9ZTNNibW5bt1IzX49r1cxHWzOIbSOfKOZ4Fv8hdJDO1qHahSYezy+LnGHbD5
- fwmKEWXlvP77Xu5Fr5O4SIymlZu04efYrwRscf4hkiV3Qd2xe6v4GFl7hx2bBJPaU9c+J5
- HtH1bzI7oOE7DaVizBFS86fBtuuUvAs=
+ bh=qPGBDRWzNPEJeb+ZkX8dUDQ6P3CC5kzoM+bMM7X804o=;
+ b=DIwDOjE9usP4eqAEPWXXRhs/YECOQmsojM78mqHYex/4x8r5w5KzrN59qHcnUIq1hWlBfG
+ y1rDjK8GQQCgI0xfYqEBeTAk9FflIJ5oG3ESfSbBHdYet+vaBDC9jz4CUKa/FtYx1gz6u5
+ 9dxFjTUq9ayiNsqjirNhu56w9njm7Hc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-snbhLkm-P-Kc3lJ5hbZ6dg-1; Sat, 19 Sep 2020 11:59:40 -0400
-X-MC-Unique: snbhLkm-P-Kc3lJ5hbZ6dg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-567-HLDMZhmpMGa7noKdF0JzFw-1; Sat, 19 Sep 2020 11:59:33 -0400
+X-MC-Unique: HLDMZhmpMGa7noKdF0JzFw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B20331074651;
- Sat, 19 Sep 2020 15:59:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B3741074644
+ for <qemu-devel@nongnu.org>; Sat, 19 Sep 2020 15:59:32 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4512B60C47;
- Sat, 19 Sep 2020 15:59:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DD9A2196F3;
+ Sat, 19 Sep 2020 15:59:31 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 27/57] scsi-generic: Fix HM-zoned device scan
-Date: Sat, 19 Sep 2020 11:58:46 -0400
-Message-Id: <20200919155916.1046398-28-pbonzini@redhat.com>
+Subject: [PULL 17/57] numa: remove fixup numa_state->num_nodes to MAX_NODES
+Date: Sat, 19 Sep 2020 11:58:36 -0400
+Message-Id: <20200919155916.1046398-18-pbonzini@redhat.com>
 In-Reply-To: <20200919155916.1046398-1-pbonzini@redhat.com>
 References: <20200919155916.1046398-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 11:03:07
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/19 06:41:51
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
@@ -96,87 +96,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Dmitry Fomichev <dmitry.fomichev@wdc.com>,
- Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-Several important steps during device scan depend on SCSI type of the
-device. For example, max_transfer property is only determined and
-assigned if the device has the type of TYPE_DISK.
+current code permits only nodeids in [0..MAX_NODES) range
+due to nodeid check in
 
-Host-managed ZBC disks retain most of the properties of regular SCSI
-drives, but they have their own SCSI device type, 0x14. This prevents
-the proper assignment of max_transfer property for HM-zoned devices in
-scsi-generic driver leading to I/O errors if the maximum i/o size
-calculated at the guest exceeds the host value.
+  parse_numa_node()
+      if (nodenr >= MAX_NODES) {
+          error_setg(errp, "Max number of NUMA nodes reached: %"
 
-To fix this, define TYPE_ZBC to have the standard value from SCSI ZBC
-standard spec. Several scan steps that were previously done only for
-TYPE_DISK devices, are now performed for the SCSI devices having
-TYPE_ZBC too.
+so subj fixup is not reachable, drop it.
 
-Reported-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Message-Id: <20200811225122.17342-3-dmitry.fomichev@wdc.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <20200911084410.788171-4-imammedo@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/scsi-generic.c   | 10 ++++++----
- include/scsi/constants.h |  1 +
- 2 files changed, 7 insertions(+), 4 deletions(-)
+ hw/core/numa.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
-index 86ed0a3822..2cb23ca891 100644
---- a/hw/scsi/scsi-generic.c
-+++ b/hw/scsi/scsi-generic.c
-@@ -162,7 +162,8 @@ static void scsi_handle_inquiry_reply(SCSIGenericReq *r, SCSIDevice *s)
-         }
-     }
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 706c1e84c6..7d5d413001 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -677,10 +677,6 @@ void numa_complete_configuration(MachineState *ms)
+     if (ms->numa_state->num_nodes > 0) {
+         uint64_t numa_total;
  
--    if (s->type == TYPE_DISK && (r->req.cmd.buf[1] & 0x01)) {
-+    if ((s->type == TYPE_DISK || s->type == TYPE_ZBC) &&
-+        (r->req.cmd.buf[1] & 0x01)) {
-         page = r->req.cmd.buf[2];
-         if (page == 0xb0) {
-             uint32_t max_transfer =
-@@ -299,10 +300,11 @@ static void scsi_read_complete(void * opaque, int ret)
-     }
-     blk_set_guest_block_size(s->conf.blk, s->blocksize);
- 
--    /* Patch MODE SENSE device specific parameters if the BDS is opened
-+    /*
-+     * Patch MODE SENSE device specific parameters if the BDS is opened
-      * readonly.
-      */
--    if ((s->type == TYPE_DISK || s->type == TYPE_TAPE) &&
-+    if ((s->type == TYPE_DISK || s->type == TYPE_TAPE || s->type == TYPE_ZBC) &&
-         blk_is_read_only(s->conf.blk) &&
-         (r->req.cmd.buf[0] == MODE_SENSE ||
-          r->req.cmd.buf[0] == MODE_SENSE_10) &&
-@@ -617,7 +619,7 @@ static void scsi_generic_read_device_identification(SCSIDevice *s)
- void scsi_generic_read_device_inquiry(SCSIDevice *s)
- {
-     scsi_generic_read_device_identification(s);
--    if (s->type == TYPE_DISK) {
-+    if (s->type == TYPE_DISK || s->type == TYPE_ZBC) {
-         scsi_generic_set_vpd_bl_emulation(s);
-     } else {
-         s->needs_vpd_bl_emulation = false;
-diff --git a/include/scsi/constants.h b/include/scsi/constants.h
-index 874176019e..2a32c08b5e 100644
---- a/include/scsi/constants.h
-+++ b/include/scsi/constants.h
-@@ -218,6 +218,7 @@
- #define TYPE_ENCLOSURE      0x0d    /* Enclosure Services Device */
- #define TYPE_RBC            0x0e    /* Simplified Direct-Access Device */
- #define TYPE_OSD            0x11    /* Object-storage Device */
-+#define TYPE_ZBC            0x14    /* Host-managed Zoned SCSI Device */
- #define TYPE_WLUN           0x1e    /* Well known LUN */
- #define TYPE_NOT_PRESENT    0x1f
- #define TYPE_INACTIVE       0x20
+-        if (ms->numa_state->num_nodes > MAX_NODES) {
+-            ms->numa_state->num_nodes = MAX_NODES;
+-        }
+-
+         numa_total = 0;
+         for (i = 0; i < ms->numa_state->num_nodes; i++) {
+             numa_total += numa_info[i].node_mem;
 -- 
 2.26.2
 
