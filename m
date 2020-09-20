@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0A48C43466
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 17:19:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B992C43465
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 17:19:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E4FF207BB
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 17:19:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E4FF207BB
+	by mail.kernel.org (Postfix) with ESMTPS id 12C43207BB
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 17:19:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12C43207BB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=t-online.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kK305-0005dy-Bi
-	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 13:19:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44214)
+	id 1kK307-0005ja-49
+	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 13:19:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44264)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <volker.ruemelin@t-online.de>)
- id 1kK2y3-00040u-Eq
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 13:17:39 -0400
-Received: from mailout08.t-online.de ([194.25.134.20]:56150)
+ id 1kK2yF-00042T-IC
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 13:17:57 -0400
+Received: from mailout05.t-online.de ([194.25.134.82]:46070)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <volker.ruemelin@t-online.de>)
- id 1kK2y1-0006Fd-Nd
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 13:17:39 -0400
-Received: from fwd20.aul.t-online.de (fwd20.aul.t-online.de [172.20.26.140])
- by mailout08.t-online.de (Postfix) with SMTP id 07E2941E61DF;
- Sun, 20 Sep 2020 19:17:36 +0200 (CEST)
+ id 1kK2yD-0006GB-28
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 13:17:51 -0400
+Received: from fwd11.aul.t-online.de (fwd11.aul.t-online.de [172.20.27.152])
+ by mailout05.t-online.de (Postfix) with SMTP id 412E5422766C;
+ Sun, 20 Sep 2020 19:17:44 +0200 (CEST)
 Received: from linpower.localnet
- (G54emqZHYhtqxL8jXYmVtop8pYMDyAFBZ-bbdLrqWFyzWCBFxEoBEQcOotHyBf6wlm@[93.236.144.216])
- by fwd20.t-online.de
+ (r3XF58ZbQhz2tJ9f9JYa4a1q22e+raSO+9GK-nG26E+C34IPSb9Xw1IIkuYlbsXwjj@[93.236.144.216])
+ by fwd11.t-online.de
  with (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384 encrypted)
- esmtp id 1kK2xz-0t19hA0; Sun, 20 Sep 2020 19:17:35 +0200
+ esmtp id 1kK2y4-2q0ftA0; Sun, 20 Sep 2020 19:17:40 +0200
 Received: by linpower.localnet (Postfix, from userid 1000)
- id EF210335504; Sun, 20 Sep 2020 19:17:29 +0200 (CEST)
+ id F332A335507; Sun, 20 Sep 2020 19:17:29 +0200 (CEST)
 From: =?UTF-8?q?Volker=20R=C3=BCmelin?= <vr_qemu@t-online.de>
 To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: [PATCH 3/9] audio/spiceaudio: always rate limit playback stream
-Date: Sun, 20 Sep 2020 19:17:23 +0200
-Message-Id: <20200920171729.15861-3-vr_qemu@t-online.de>
+Subject: [PATCH 5/9] audio: remove unnecessary calls to put_buffer_in
+Date: Sun, 20 Sep 2020 19:17:25 +0200
+Message-Id: <20200920171729.15861-5-vr_qemu@t-online.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <84f1c61a-8399-c75e-96c2-febfc2dd5fab@t-online.de>
 References: <84f1c61a-8399-c75e-96c2-febfc2dd5fab@t-online.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ID: G54emqZHYhtqxL8jXYmVtop8pYMDyAFBZ-bbdLrqWFyzWCBFxEoBEQcOotHyBf6wlm
-X-TOI-EXPURGATEID: 150726::1600622255-000053CC-410D1DA5/0/0 CLEAN NORMAL
-X-TOI-MSGID: c27bc480-7caa-410e-a3f0-2339759c4744
-Received-SPF: none client-ip=194.25.134.20;
- envelope-from=volker.ruemelin@t-online.de; helo=mailout08.t-online.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/20 13:17:36
+X-ID: r3XF58ZbQhz2tJ9f9JYa4a1q22e+raSO+9GK-nG26E+C34IPSb9Xw1IIkuYlbsXwjj
+X-TOI-EXPURGATEID: 150726::1600622260-000007DF-948D9F3E/0/0 CLEAN NORMAL
+X-TOI-MSGID: 20318a5f-6668-46f2-9fea-077be0374dfa
+Received-SPF: none client-ip=194.25.134.82;
+ envelope-from=volker.ruemelin@t-online.de; helo=mailout05.t-online.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/20 13:17:44
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -84,54 +84,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The playback rate with the spiceaudio backend is currently too
-fast if there's no spice client connected or the spice client
-can't play audio. Rate limit the audio playback stream in all
-cases. To calculate the rate correctly the limiter has to know
-the maximum buffer size.
+This patch removes unnecessary calls to the pcm_ops function
+put_buffer_in(). No audio backend needs this call if the
+returned length of pcm_ops function get_buffer_in() is zero.
 
-Fixes: 8c198ff065 ("spiceaudio: port to the new audio backend api")
+For the DirectSound backend this prevents a call to
+dsound_unlock_in() without a preceding call to dsound_lock_in().
+While Windows doesn't complain it seems wrong anyway.
+
 Signed-off-by: Volker Rümelin <vr_qemu@t-online.de>
 ---
- audio/audio.c      |  3 ++-
- audio/spiceaudio.c | 10 ++++------
- 2 files changed, 6 insertions(+), 7 deletions(-)
+ audio/audio.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/audio/audio.c b/audio/audio.c
-index ad3f57b4c4..ba52259050 100644
+index f1f0d72389..75107a12d0 100644
 --- a/audio/audio.c
 +++ b/audio/audio.c
-@@ -1089,7 +1089,8 @@ static size_t audio_pcm_hw_run_out(HWVoiceOut *hw, size_t live)
-     size_t clipped = 0;
+@@ -1261,7 +1261,6 @@ static size_t audio_pcm_hw_run_in(HWVoiceIn *hw, size_t samples)
  
-     while (live) {
--        size_t size, decr, proc;
-+        size_t size = live * hw->info.bytes_per_frame;
-+        size_t decr, proc;
-         void *buf = hw->pcm_ops->get_buffer_out(hw, &size);
- 
+         assert(size % hw->info.bytes_per_frame == 0);
          if (size == 0) {
-diff --git a/audio/spiceaudio.c b/audio/spiceaudio.c
-index c8d81ba442..c062742622 100644
---- a/audio/spiceaudio.c
-+++ b/audio/spiceaudio.c
-@@ -130,13 +130,11 @@ static void *line_out_get_buffer(HWVoiceOut *hw, size_t *size)
-     }
+-            hw->pcm_ops->put_buffer_in(hw, buf, size);
+             break;
+         }
  
-     if (out->frame) {
--        *size = audio_rate_get_bytes(
--            &hw->info, &out->rate,
--            (out->fsize - out->fpos) * hw->info.bytes_per_frame);
--    } else {
--        audio_rate_start(&out->rate);
--        *size = LINE_OUT_SAMPLES << 2;
-+        *size = MIN((out->fsize - out->fpos) << 2, *size);
-     }
-+
-+    *size = audio_rate_get_bytes(&hw->info, &out->rate, *size);
-+
-     return out->frame + out->fpos;
- }
+@@ -1502,7 +1501,6 @@ size_t audio_generic_read(HWVoiceIn *hw, void *buf, size_t size)
+         void *src = hw->pcm_ops->get_buffer_in(hw, &src_size);
+ 
+         if (src_size == 0) {
+-            hw->pcm_ops->put_buffer_in(hw, src, src_size);
+             break;
+         }
  
 -- 
 2.26.2
