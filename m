@@ -7,83 +7,83 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11F15C43465
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 23:02:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A068C43463
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 23:11:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 682D620809
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 23:02:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8683D20809
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 23:11:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="s+h/KB70"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 682D620809
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FI5MJbBA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8683D20809
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kK8LO-0006Kp-Ay
-	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 19:02:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43670)
+	id 1kK8Um-0008Cq-8p
+	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 19:11:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44984)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kK8Jo-0005o1-1n
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 19:00:29 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:51583)
+ id 1kK8Tv-0007ks-Mw
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 19:10:55 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:35346)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kK8Jh-0004Lw-07
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 19:00:24 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id a9so6355370pjg.1
- for <qemu-devel@nongnu.org>; Sun, 20 Sep 2020 16:00:20 -0700 (PDT)
+ id 1kK8To-0005Pe-Et
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 19:10:51 -0400
+Received: by mail-pg1-x542.google.com with SMTP id g29so7268534pgl.2
+ for <qemu-devel@nongnu.org>; Sun, 20 Sep 2020 16:10:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:references:from:message-id:date:user-agent:mime-version
  :in-reply-to:content-language:content-transfer-encoding;
- bh=DZYp+jqXCnl9LSLKD0zG8bv96mYfBaZD2cIqmRkuiQc=;
- b=s+h/KB70dvcVLUNekkDBMYfcTojf96x3vrt+EZUJmSFp9IgtUuTPTQhNn5scvXw6vM
- dbl6n6wZ8oPxz3D8BRXfkdfCFpKD+eCakn9OQh3nBOL6R82HUraH44E627coYWdA3x8S
- uZNxGTtHvcsqTWmmtkrlhsWIaxcfH9XRXKQ20FHgUA+n8e3OC5dOsEE2dLN1T8vNhFHy
- dWs0KGp8LSvXHnmIP0owlbIYyoooUrmMMXuq18X0reAwp6WeMNHxz920y+I3ySYg8ZKd
- UGJ1yWdgxPvg5YHrMg7fHAgryVoq/u3XIeBbhQrYC1GAyoRL4p7hOmktB6WmRnWFHQze
- ZeyQ==
+ bh=mBbIriOKfWb6KBm1bCtu2UG9ugzVsEFTnnciII7Q9T4=;
+ b=FI5MJbBAq9v4ot/1Ln6ym4hfPxdBldGOhcDCrC8BRWoqqro+GE8BTJo6uDgfTeamlg
+ r2XgiPrVcb9PSGTcmqoN4Pj0ksFaukKw9O1mEcBOccs1zyKrFdK+pyV8aCDtPnqlAkHQ
+ WY0vQBzdebcn3K9P1A2fco8w6PhN08bz/PxEOOIQPUeuIY7pJYwyJGpjRB0pigx/bsk4
+ BxSq4TSqOV3xd4sIqJ7HZUMqYkYcpyrB3eZt36AT0EUTqALkNpd2QL7s0WV1CkfFdq6F
+ SmRPUlCS3BBtpv90RBbX27FcZiIjKg5oFC6BTIYBAAjqpgMagKQrq4OGOUelE5wzSUE5
+ 6vWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=DZYp+jqXCnl9LSLKD0zG8bv96mYfBaZD2cIqmRkuiQc=;
- b=DNclDIMf05edsIavaG8O6E9LBOOWz9Rz0vbFbymoXsW+yaI176JvxFj74Ft0NEkrn9
- MzDa3/LRYcrGSJF35Ox/A4t+tANoMyyUQCSUGMJI949RnkR70pkxZFanVMt4NoaREe3A
- 9uiVcEBkswm3aQik0IrWnLqHp0mCNwaBPXA43473mc08T61oSUwjFdsrPIpHCIl4TJG7
- J9XFzMvr7UTlXpNJDAmkXHxFBFkaKoZ/F/F0i8BwgQBtOzm7j7UhTKEbU3qHy+OgEp/i
- C2BEJXUq8nntyPIziQNSjpfRNrHhBSkUIWb/EuIJGWCnsdlssRXSG5lB306kPfI5kImV
- eGeA==
-X-Gm-Message-State: AOAM53371XNSvWCRvE6FiVYw4ToSpwe1grnTZye/irh7z+n2U49SEUQx
- gt9HxqboFmNzclpmfts7F46pw70oGtJ5xw==
-X-Google-Smtp-Source: ABdhPJzJT8cFakIlfpg1XplePmLeyb+iuw+RyGnUAWNrBpRVfjy0vwLm0k/BimltP7fdMFXBHJoMxQ==
-X-Received: by 2002:a17:90a:d813:: with SMTP id
- a19mr21219711pjv.115.1600642819327; 
- Sun, 20 Sep 2020 16:00:19 -0700 (PDT)
+ bh=mBbIriOKfWb6KBm1bCtu2UG9ugzVsEFTnnciII7Q9T4=;
+ b=kbkz5hQxw/GcuXJTdFuQfMvd1zVmnnJQPlMdmgXXvKkBBLi7AU0gB6dab/bMmpaXeh
+ 0T6bu92Z47294HyBCP0VK7di7hJUo5YNgSFggsvOpRFZF0ZSVGQ/zPn+ERA4GprOyNpK
+ e+eCWtUg+C+mXBYWAtMdoXfBXP8/ecIw93M2HQiQwq9qdNKrkizk4XaDRtKq/q2WAM4O
+ Z3LIVu8rzmpgGy1Jhfk6X/1VRabhrG+91XkiWWYjY1ZOD4bwhnfV1Ypxvqr/u/bnLlJw
+ Eibe+AktzvWSOml2DJt268MQOxOR131IZIx3M6gX2OYUZXME908zDpsWIaCIw7C0MuVL
+ Snkg==
+X-Gm-Message-State: AOAM530Tdr0to591QcVrP1A+WCcdfhU6Re7HNTkOlgwLhmthAamN9FW5
+ Gd7jpWQWTlCA/zX0NjDlaDUfKznTA3hHFQ==
+X-Google-Smtp-Source: ABdhPJy9iK1Xf6O+0PueS0c0Ngz6Ed+5aPJAeTmrqZRJaWaO6Ty8+XjZ4NIfEqMM7wFm9AJwp9l6fw==
+X-Received: by 2002:aa7:8ad8:0:b029:150:7d36:cddf with SMTP id
+ b24-20020aa78ad80000b02901507d36cddfmr3708500pfd.55.1600643446105; 
+ Sun, 20 Sep 2020 16:10:46 -0700 (PDT)
 Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id v204sm10011726pfc.10.2020.09.20.16.00.18
+ by smtp.gmail.com with ESMTPSA id bb6sm8546312pjb.15.2020.09.20.16.10.45
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 20 Sep 2020 16:00:18 -0700 (PDT)
-Subject: Re: [PATCH 1/4] configure: cleanup invocation of submodule Make
+ Sun, 20 Sep 2020 16:10:45 -0700 (PDT)
+Subject: Re: [PATCH 2/4] configure: cleanup CFLAGS and LDFLAGS for submodules
 To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 References: <20200920093016.1150346-1-pbonzini@redhat.com>
- <20200920093016.1150346-2-pbonzini@redhat.com>
+ <20200920093016.1150346-3-pbonzini@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <5d1929df-d3c9-9053-0894-48445a75ebab@linaro.org>
-Date: Sun, 20 Sep 2020 16:00:16 -0700
+Message-ID: <7c31f7fc-c4e5-7f81-e4db-8b5562073e20@linaro.org>
+Date: Sun, 20 Sep 2020 16:10:43 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200920093016.1150346-2-pbonzini@redhat.com>
+In-Reply-To: <20200920093016.1150346-3-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1044.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -110,16 +110,22 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/20/20 2:30 AM, Paolo Bonzini wrote:
-> Move common command line options to SUBDIR_MAKEFLAGS, thus simplifying
-> the rules themselves.
+> The -g and -O2 flags that configure adds to CFLAGS are only used by submodules,
+> so do not put anymore the confusing CFLAGS variable in config-host.mak and
+> replace it with more explicit SUBMODULE_CFLAGS variable.
+> 
+> There was also no equivalent SUBMODULE_LDFLAGS variable, add it.  This would
+> theoretically help with LTO if we want -g and -O2 options on the command line.
+> I say "theoretically" because submodules should not be linking anything; but
+> since we were passing an "LD" variable we might as well get its flags right.
+> 
+> CFLAGS are now synthesized in the configuration summary as a quick way to present
+> --enable-debug and --enable-debug-info.
 > 
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  Makefile | 24 +++++++++++++++---------
->  1 file changed, 15 insertions(+), 9 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 r~
-
 
