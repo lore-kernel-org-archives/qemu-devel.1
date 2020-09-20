@@ -4,44 +4,44 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B3BCC43463
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 13:26:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB288C43463
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 13:26:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EABE21531
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 13:26:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EABE21531
+	by mail.kernel.org (Postfix) with ESMTPS id 2EB4420EDD
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 13:26:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EB4420EDD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJzMb-0005ej-Cl
-	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 09:26:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34614)
+	id 1kJzMf-0005q5-77
+	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 09:26:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34628)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mail@maciej.szmigiero.name>)
- id 1kJzLl-0004D1-Vs
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 09:25:54 -0400
-Received: from vps-vb.mhejs.net ([37.28.154.113]:44348)
+ id 1kJzLp-0004HV-AG
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 09:25:57 -0400
+Received: from vps-vb.mhejs.net ([37.28.154.113]:44372)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mail@maciej.szmigiero.name>)
- id 1kJzLj-0003Do-BJ
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 09:25:53 -0400
+ id 1kJzLm-0003G1-Sc
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 09:25:56 -0400
 Received: from MUA
  by vps-vb.mhejs.net with esmtps (TLS1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
  (Exim 4.93.0.4) (envelope-from <mail@maciej.szmigiero.name>)
- id 1kJzLX-00087Z-3U; Sun, 20 Sep 2020 15:25:39 +0200
+ id 1kJzLc-00087d-DZ; Sun, 20 Sep 2020 15:25:44 +0200
 From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
  Eduardo Habkost <ehabkost@redhat.com>
-Subject: [PATCH 1/3] haprot: add a device for memory hot-add protocols
-Date: Sun, 20 Sep 2020 15:25:20 +0200
-Message-Id: <711ff6f2a973293a2ae8933094b3b0207f135aa0.1600556526.git.maciej.szmigiero@oracle.com>
+Subject: [PATCH 2/3] Add Hyper-V Dynamic Memory Protocol definitions
+Date: Sun, 20 Sep 2020 15:25:21 +0200
+Message-Id: <cb27fc9df2b5118a15bf132a2c7ebee5ad6b1ef4.1600556526.git.maciej.szmigiero@oracle.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <cover.1600556526.git.maciej.szmigiero@oracle.com>
 References: <cover.1600556526.git.maciej.szmigiero@oracle.com>
@@ -78,472 +78,445 @@ Sender: "Qemu-devel"
 
 From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
-This device works like a virtual DIMM stick: it allows inserting extra RAM
-into the guest at run time.
-
-The main differences from the ACPI-based PC DIMM hotplug are:
-* Notifying the guest about the new memory range is not done via ACPI but
-via a protocol handler that registers with the haprot framework.
-This means that the ACPI DIMM slot limit does not apply.
-
-* A protocol handler can prevent removal of a haprot device when it is
-still in use by setting its "busy" field.
-
-* A protocol handler can also register an "unplug" callback so it gets
-notified when an user decides to remove the haprot device.
-This way the protocol handler can inform the guest about this fact and / or
-do its own cleanup.
+This commit adds Hyper-V Dynamic Memory Protocol definitions, taken
+from hv_balloon Linux kernel driver, adapted to the QEMU coding style and
+definitions.
 
 Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 ---
- hw/i386/Kconfig         |   2 +
- hw/i386/pc.c            |  18 ++-
- hw/mem/Kconfig          |   4 +
- hw/mem/haprot.c         | 263 ++++++++++++++++++++++++++++++++++++++++
- hw/mem/meson.build      |   1 +
- include/hw/mem/haprot.h |  72 +++++++++++
- 6 files changed, 359 insertions(+), 1 deletion(-)
- create mode 100644 hw/mem/haprot.c
- create mode 100644 include/hw/mem/haprot.h
+ include/hw/hyperv/dynmem-proto.h | 425 +++++++++++++++++++++++++++++++
+ 1 file changed, 425 insertions(+)
+ create mode 100644 include/hw/hyperv/dynmem-proto.h
 
-diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
-index d0bd8b537d55..ca143e568de2 100644
---- a/hw/i386/Kconfig
-+++ b/hw/i386/Kconfig
-@@ -58,6 +58,7 @@ config I440FX
-     imply E1000_PCI
-     imply VMPORT
-     imply VMMOUSE
-+    imply HAPROT
-     select PC_PCI
-     select PC_ACPI
-     select ACPI_SMBUS
-@@ -85,6 +86,7 @@ config Q35
-     imply E1000E_PCI_EXPRESS
-     imply VMPORT
-     imply VMMOUSE
-+    imply HAPROT
-     select PC_PCI
-     select PC_ACPI
-     select PCI_EXPRESS_Q35
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index b55369357e5d..b7a0e4ee3ea2 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -77,6 +77,7 @@
- #include "hw/acpi/cpu_hotplug.h"
- #include "hw/boards.h"
- #include "acpi-build.h"
-+#include "hw/mem/haprot.h"
- #include "hw/mem/pc-dimm.h"
- #include "hw/mem/nvdimm.h"
- #include "qapi/error.h"
-@@ -1416,6 +1417,18 @@ static void pc_virtio_md_pci_unplug_request(HotplugHandler *hotplug_dev,
-     error_setg(errp, "virtio based memory devices cannot be unplugged.");
- }
- 
-+static void pc_haprot_unplug_request(DeviceState *dev, Error **errp)
-+{
-+    HAProtDevice *haprot = HAPROT(dev);
-+
-+    if (haprot->busy) {
-+        error_setg(errp, "the memory is still busy, cannot unplug");
-+        return;
-+    }
-+
-+    object_unparent(OBJECT(dev));
-+}
-+
- static void pc_virtio_md_pci_unplug(HotplugHandler *hotplug_dev,
-                                     DeviceState *dev, Error **errp)
- {
-@@ -1458,6 +1471,8 @@ static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
-                object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
-         pc_virtio_md_pci_unplug_request(hotplug_dev, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_HAPROT)) {
-+        pc_haprot_unplug_request(dev, errp);
-     } else {
-         error_setg(errp, "acpi: device unplug request for not supported device"
-                    " type: %s", object_get_typename(OBJECT(dev)));
-@@ -1486,7 +1501,8 @@ static HotplugHandler *pc_get_hotplug_handler(MachineState *machine,
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) ||
-         object_dynamic_cast(OBJECT(dev), TYPE_CPU) ||
-         object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
--        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
-+        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI) ||
-+        object_dynamic_cast(OBJECT(dev), TYPE_HAPROT)) {
-         return HOTPLUG_HANDLER(machine);
-     }
- 
-diff --git a/hw/mem/Kconfig b/hw/mem/Kconfig
-index a0ef2cf648e1..a5d8c8851d1b 100644
---- a/hw/mem/Kconfig
-+++ b/hw/mem/Kconfig
-@@ -10,3 +10,7 @@ config NVDIMM
-     default y
-     depends on (PC || PSERIES || ARM_VIRT)
-     select MEM_DEVICE
-+
-+config HAPROT
-+    bool
-+    select MEM_DEVICE
-diff --git a/hw/mem/haprot.c b/hw/mem/haprot.c
+diff --git a/include/hw/hyperv/dynmem-proto.h b/include/hw/hyperv/dynmem-proto.h
 new file mode 100644
-index 000000000000..38373351b55c
+index 000000000000..407cc54b00a8
 --- /dev/null
-+++ b/hw/mem/haprot.c
-@@ -0,0 +1,263 @@
++++ b/include/hw/hyperv/dynmem-proto.h
+@@ -0,0 +1,425 @@
++#ifndef HW_HYPERV_DYNMEM_PROTO_H
++#define HW_HYPERV_DYNMEM_PROTO_H
++
 +/*
-+ * A device for memory hot-add protocols
++ * Hyper-V Dynamic Memory Protocol definitions
 + *
 + * Copyright (C) 2020 Oracle and/or its affiliates.
 + *
 + * Author: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 + *
-+ * Heavily based on pc-dimm.c:
-+ * Copyright ProfitBricks GmbH 2012
-+ * Copyright (C) 2014 Red Hat Inc
++ * Based on drivers/hv/hv_balloon.c from Linux kernel:
++ * Copyright (c) 2012, Microsoft Corporation.
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * Author: K. Y. Srinivasan <kys@microsoft.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.
 + * See the COPYING file in the top-level directory.
 + */
 +
-+#include "qemu/osdep.h"
-+
-+#include "hw/boards.h"
-+#include "hw/mem/haprot.h"
-+#include "hw/mem/memory-device.h"
-+#include "hw/qdev-properties.h"
-+#include "migration/vmstate.h"
-+#include "qapi/error.h"
-+#include "qapi/visitor.h"
-+#include "qemu/module.h"
-+#include "sysemu/hostmem.h"
-+#include "trace.h"
-+
-+static Property haprot_properties[] = {
-+    DEFINE_PROP_UINT64(HAPROT_ADDR_PROP, HAProtDevice, addr, 0),
-+    DEFINE_PROP_UINT32(HAPROT_NODE_PROP, HAProtDevice, node, 0),
-+    DEFINE_PROP_LINK(HAPROT_MEMDEV_PROP, HAProtDevice, hostmem,
-+                     TYPE_MEMORY_BACKEND, HostMemoryBackend *),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void haprot_get_size(Object *obj, Visitor *v, const char *name,
-+                            void *opaque, Error **errp)
-+{
-+    Error *local_err = NULL;
-+    uint64_t value;
-+
-+    value = memory_device_get_region_size(MEMORY_DEVICE(obj), &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    visit_type_uint64(v, name, &value, errp);
-+}
-+
-+static void haprot_init(Object *obj)
-+{
-+    object_property_add(obj, HAPROT_SIZE_PROP, "uint64", haprot_get_size,
-+                        NULL, NULL, NULL);
-+}
-+
-+static void haprot_realize(DeviceState *dev, Error **errp)
-+{
-+    HAProtDevice *haprot = HAPROT(dev);
-+    HAProtDeviceClass *hc = HAPROT_GET_CLASS(haprot);
-+    uint64_t align;
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    Error *local_err = NULL;
-+    int nb_numa_nodes = ms->numa_state->num_nodes;
-+
-+    if (!hc->plug_notify_cb) {
-+        error_setg(errp, "no mem hot add protocol registered");
-+        return;
-+    }
-+
-+    if (hc->get_align_cb) {
-+        align = hc->get_align_cb(hc->notify_cb_ctx, haprot);
-+    } else {
-+        align = 0;
-+    }
-+
-+    memory_device_pre_plug(MEMORY_DEVICE(haprot), ms,
-+                           align ? &align : NULL,
-+                           &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    if (!haprot->hostmem) {
-+        error_setg(errp, "'" HAPROT_MEMDEV_PROP "' property is not set");
-+        return;
-+    } else if (host_memory_backend_is_mapped(haprot->hostmem)) {
-+        const char *path;
-+
-+        path = object_get_canonical_path_component(OBJECT(haprot->hostmem));
-+        error_setg(errp, "can't use already busy memdev: %s", path);
-+        return;
-+    }
-+    if (((nb_numa_nodes > 0) && (haprot->node >= nb_numa_nodes)) ||
-+        (!nb_numa_nodes && haprot->node)) {
-+        error_setg(errp,
-+                   "Node property value %"PRIu32" exceeds the number of numa nodes %d",
-+                   haprot->node, nb_numa_nodes ? nb_numa_nodes : 1);
-+        return;
-+    }
-+
-+    host_memory_backend_set_mapped(haprot->hostmem, true);
-+
-+    memory_device_plug(MEMORY_DEVICE(haprot), ms);
-+    vmstate_register_ram(host_memory_backend_get_memory(haprot->hostmem),
-+                         dev);
-+
-+    hc->plug_notify_cb(hc->notify_cb_ctx, haprot, &local_err);
-+    if (local_err) {
-+        memory_device_unplug(MEMORY_DEVICE(haprot), ms);
-+        vmstate_unregister_ram(host_memory_backend_get_memory(haprot->hostmem),
-+                               dev);
-+        host_memory_backend_set_mapped(haprot->hostmem, false);
-+
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+}
-+
-+static void haprot_unrealize(DeviceState *dev)
-+{
-+    HAProtDevice *haprot = HAPROT(dev);
-+    HAProtDeviceClass *hc = HAPROT_GET_CLASS(haprot);
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+
-+    if (hc->unplug_notify_cb) {
-+        hc->unplug_notify_cb(hc->notify_cb_ctx, haprot);
-+    }
-+
-+    memory_device_unplug(MEMORY_DEVICE(haprot), ms);
-+    vmstate_unregister_ram(host_memory_backend_get_memory(haprot->hostmem),
-+                           dev);
-+
-+    host_memory_backend_set_mapped(haprot->hostmem, false);
-+}
-+
-+static uint64_t haprot_md_get_addr(const MemoryDeviceState *md)
-+{
-+    return object_property_get_uint(OBJECT(md), HAPROT_ADDR_PROP,
-+                                    &error_abort);
-+}
-+
-+static void haprot_md_set_addr(MemoryDeviceState *md, uint64_t addr,
-+                               Error **errp)
-+{
-+    object_property_set_uint(OBJECT(md), HAPROT_ADDR_PROP, addr, errp);
-+}
-+
-+static MemoryRegion *haprot_md_get_memory_region(MemoryDeviceState *md,
-+                                                 Error **errp)
-+{
-+    HAProtDevice *haprot = HAPROT(md);
-+
-+    if (!haprot->hostmem) {
-+        error_setg(errp, "'" HAPROT_MEMDEV_PROP "' property must be set");
-+        return NULL;
-+    }
-+
-+    return host_memory_backend_get_memory(haprot->hostmem);
-+}
-+
-+static void haprot_md_fill_device_info(const MemoryDeviceState *md,
-+                                       MemoryDeviceInfo *info)
-+{
-+    PCDIMMDeviceInfo *di = g_new0(PCDIMMDeviceInfo, 1);
-+    const DeviceClass *dc = DEVICE_GET_CLASS(md);
-+    const HAProtDevice *haprot = HAPROT(md);
-+    const DeviceState *dev = DEVICE(md);
-+
-+    if (dev->id) {
-+        di->has_id = true;
-+        di->id = g_strdup(dev->id);
-+    }
-+    di->hotplugged = dev->hotplugged;
-+    di->hotpluggable = dc->hotpluggable;
-+    di->addr = haprot->addr;
-+    di->slot = -1;
-+    di->node = haprot->node;
-+    di->size = object_property_get_uint(OBJECT(haprot), HAPROT_SIZE_PROP,
-+                                        NULL);
-+    di->memdev = object_get_canonical_path(OBJECT(haprot->hostmem));
-+
-+    info->u.dimm.data = di;
-+    info->type = MEMORY_DEVICE_INFO_KIND_DIMM;
-+}
-+
-+static void haprot_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    MemoryDeviceClass *mdc = MEMORY_DEVICE_CLASS(oc);
-+
-+    dc->realize = haprot_realize;
-+    dc->unrealize = haprot_unrealize;
-+    device_class_set_props(dc, haprot_properties);
-+    dc->desc = "Memory for a hot add protocol";
-+
-+    mdc->get_addr = haprot_md_get_addr;
-+    mdc->set_addr = haprot_md_set_addr;
-+    mdc->get_plugged_size = memory_device_get_region_size;
-+    mdc->get_memory_region = haprot_md_get_memory_region;
-+    mdc->fill_device_info = haprot_md_fill_device_info;
-+}
-+
-+void haprot_register_protocol(HAProtocolGetAlign get_align_cb,
-+                              HAProtocolPlugNotify plug_notify_cb,
-+                              HAProtocolUnplugNotify unplug_notify_cb,
-+                              void *notify_ctx, Error **errp)
-+{
-+    HAProtDeviceClass *hc = HAPROT_CLASS(object_class_by_name(TYPE_HAPROT));
-+
-+    if (hc->plug_notify_cb) {
-+        error_setg(errp, "a mem hot add protocol was already registered");
-+        return;
-+    }
-+
-+    hc->get_align_cb = get_align_cb;
-+    hc->plug_notify_cb = plug_notify_cb;
-+    hc->unplug_notify_cb = unplug_notify_cb;
-+    hc->notify_cb_ctx = notify_ctx;
-+}
-+
-+void haprot_unregister_protocol(HAProtocolPlugNotify plug_notify_cb,
-+                                Error **errp)
-+{
-+    HAProtDeviceClass *hc = HAPROT_CLASS(object_class_by_name(TYPE_HAPROT));
-+
-+    if (!hc->plug_notify_cb) {
-+        error_setg(errp, "no mem hot add protocol was registered");
-+        return;
-+    }
-+
-+    if (hc->plug_notify_cb != plug_notify_cb) {
-+        error_setg(errp, "different mem hot add protocol was registered");
-+        return;
-+    }
-+
-+    hc->get_align_cb = NULL;
-+    hc->plug_notify_cb = NULL;
-+    hc->unplug_notify_cb = NULL;
-+    hc->notify_cb_ctx = NULL;
-+}
-+
-+static TypeInfo haprot_info = {
-+    .name          = TYPE_HAPROT,
-+    .parent        = TYPE_DEVICE,
-+    .instance_size = sizeof(HAProtDevice),
-+    .instance_init = haprot_init,
-+    .class_init    = haprot_class_init,
-+    .class_size    = sizeof(HAProtDeviceClass),
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_MEMORY_DEVICE },
-+        { }
-+    },
-+};
-+
-+static void haprot_register_types(void)
-+{
-+    type_register_static(&haprot_info);
-+}
-+
-+type_init(haprot_register_types)
-diff --git a/hw/mem/meson.build b/hw/mem/meson.build
-index 0d22f2b5727e..764062077dca 100644
---- a/hw/mem/meson.build
-+++ b/hw/mem/meson.build
-@@ -3,5 +3,6 @@ mem_ss.add(files('memory-device.c'))
- mem_ss.add(when: 'CONFIG_DIMM', if_true: files('pc-dimm.c'))
- mem_ss.add(when: 'CONFIG_NPCM7XX', if_true: files('npcm7xx_mc.c'))
- mem_ss.add(when: 'CONFIG_NVDIMM', if_true: files('nvdimm.c'))
-+mem_ss.add(when: 'CONFIG_HAPROT', if_true: files('haprot.c'))
- 
- softmmu_ss.add_all(when: 'CONFIG_MEM_DEVICE', if_true: mem_ss)
-diff --git a/include/hw/mem/haprot.h b/include/hw/mem/haprot.h
-new file mode 100644
-index 000000000000..9d44007b4945
---- /dev/null
-+++ b/include/hw/mem/haprot.h
-@@ -0,0 +1,72 @@
 +/*
-+ * A device for memory hot-add protocols
++ * Protocol versions. The low word is the minor version, the high word the major
++ * version.
 + *
-+ * Copyright (C) 2020 Oracle and/or its affiliates.
++ * History:
++ * Initial version 1.0
++ * Changed to 0.1 on 2009/03/25
++ * Changes to 0.2 on 2009/05/14
++ * Changes to 0.3 on 2009/12/03
++ * Changed to 1.0 on 2011/04/05
++ * Changed to 2.0 on 2019/12/10
++ */
++
++#define DYNMEM_MAKE_VERSION(Major, Minor) ((uint32_t)(((Major) << 16) | (Minor)))
++#define DYNMEM_MAJOR_VERSION(Version) ((uint32_t)(Version) >> 16)
++#define DYNMEM_MINOR_VERSION(Version) ((uint32_t)(Version) & 0xff)
++
++enum {
++    DYNMEM_PROTOCOL_VERSION_1 = DYNMEM_MAKE_VERSION(0, 3),
++    DYNMEM_PROTOCOL_VERSION_2 = DYNMEM_MAKE_VERSION(1, 0),
++    DYNMEM_PROTOCOL_VERSION_3 = DYNMEM_MAKE_VERSION(2, 0),
++
++    DYNMEM_PROTOCOL_VERSION_WIN7 = DYNMEM_PROTOCOL_VERSION_1,
++    DYNMEM_PROTOCOL_VERSION_WIN8 = DYNMEM_PROTOCOL_VERSION_2,
++    DYNMEM_PROTOCOL_VERSION_WIN10 = DYNMEM_PROTOCOL_VERSION_3,
++
++    DYNMEM_PROTOCOL_VERSION_CURRENT = DYNMEM_PROTOCOL_VERSION_WIN10
++};
++
++
++
++/*
++ * Message Types
++ */
++
++enum dm_message_type {
++    /*
++     * Version 0.3
++     */
++    DM_ERROR = 0,
++    DM_VERSION_REQUEST = 1,
++    DM_VERSION_RESPONSE = 2,
++    DM_CAPABILITIES_REPORT = 3,
++    DM_CAPABILITIES_RESPONSE = 4,
++    DM_STATUS_REPORT = 5,
++    DM_BALLOON_REQUEST = 6,
++    DM_BALLOON_RESPONSE = 7,
++    DM_UNBALLOON_REQUEST = 8,
++    DM_UNBALLOON_RESPONSE = 9,
++    DM_MEM_HOT_ADD_REQUEST = 10,
++    DM_MEM_HOT_ADD_RESPONSE = 11,
++    DM_VERSION_03_MAX = 11,
++    /*
++     * Version 1.0.
++     */
++    DM_INFO_MESSAGE = 12,
++    DM_VERSION_1_MAX = 12,
++
++    /*
++     * Version 2.0
++     */
++    DM_MEM_HOT_REMOVE_REQUEST = 13,
++    DM_MEM_HOT_REMOVE_RESPONSE = 14
++};
++
++
++/*
++ * Structures defining the dynamic memory management
++ * protocol.
++ */
++
++union dm_version {
++    struct {
++        uint16_t minor_version;
++        uint16_t major_version;
++    };
++    uint32_t version;
++} QEMU_PACKED;
++
++
++union dm_caps {
++    struct {
++        uint64_t balloon:1;
++        uint64_t hot_add:1;
++        /*
++         * To support guests that may have alignment
++         * limitations on hot-add, the guest can specify
++         * its alignment requirements; a value of n
++         * represents an alignment of 2^n in mega bytes.
++         */
++        uint64_t hot_add_alignment:4;
++        uint64_t hot_remove:1;
++        uint64_t reservedz:57;
++    } cap_bits;
++    uint64_t caps;
++} QEMU_PACKED;
++
++union dm_mem_page_range {
++    struct  {
++        /*
++         * The PFN number of the first page in the range.
++         * 40 bits is the architectural limit of a PFN
++         * number for AMD64.
++         */
++        uint64_t start_page:40;
++        /*
++         * The number of pages in the range.
++         */
++        uint64_t page_cnt:24;
++    } finfo;
++    uint64_t  page_range;
++} QEMU_PACKED;
++
++
++
++/*
++ * The header for all dynamic memory messages:
 + *
-+ * Author: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
++ * type: Type of the message.
++ * size: Size of the message in bytes; including the header.
++ * trans_id: The guest is responsible for manufacturing this ID.
++ */
++
++struct dm_header {
++    uint16_t type;
++    uint16_t size;
++    uint32_t trans_id;
++} QEMU_PACKED;
++
++/*
++ * A generic message format for dynamic memory.
++ * Specific message formats are defined later in the file.
++ */
++
++struct dm_message {
++    struct dm_header hdr;
++    uint8_t data[]; /* enclosed message */
++} QEMU_PACKED;
++
++
++/*
++ * Specific message types supporting the dynamic memory protocol.
++ */
++
++/*
++ * Version negotiation message. Sent from the guest to the host.
++ * The guest is free to try different versions until the host
++ * accepts the version.
 + *
-+ * Heavily based on pc-dimm.h:
-+ * Copyright ProfitBricks GmbH 2012
-+ * Copyright (C) 2013-2014 Red Hat Inc
++ * dm_version: The protocol version requested.
++ * is_last_attempt: If TRUE, this is the last version guest will request.
++ * reservedz: Reserved field, set to zero.
++ */
++
++struct dm_version_request {
++    struct dm_header hdr;
++    union dm_version version;
++    uint32_t is_last_attempt:1;
++    uint32_t reservedz:31;
++} QEMU_PACKED;
++
++/*
++ * Version response message; Host to Guest and indicates
++ * if the host has accepted the version sent by the guest.
 + *
-+ * Authors:
-+ *  Vasilis Liaskovitis <vasilis.liaskovitis@profitbricks.com>
-+ *  Igor Mammedov <imammedo@redhat.com>
++ * is_accepted: If TRUE, host has accepted the version and the guest
++ * should proceed to the next stage of the protocol. FALSE indicates that
++ * guest should re-try with a different version.
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
++ * reservedz: Reserved field, set to zero.
++ */
++
++struct dm_version_response {
++    struct dm_header hdr;
++    uint64_t is_accepted:1;
++    uint64_t reservedz:63;
++} QEMU_PACKED;
++
++/*
++ * Message reporting capabilities. This is sent from the guest to the
++ * host.
++ */
++
++struct dm_capabilities {
++    struct dm_header hdr;
++    union dm_caps caps;
++    uint64_t min_page_cnt;
++    uint64_t max_page_number;
++} QEMU_PACKED;
++
++/*
++ * Response to the capabilities message. This is sent from the host to the
++ * guest. This message notifies if the host has accepted the guest's
++ * capabilities. If the host has not accepted, the guest must shutdown
++ * the service.
++ *
++ * is_accepted: Indicates if the host has accepted guest's capabilities.
++ * reservedz: Must be 0.
++ */
++
++struct dm_capabilities_resp_msg {
++    struct dm_header hdr;
++    uint64_t is_accepted:1;
++    uint64_t hot_remove:1;
++    uint64_t suppress_pressure_reports:1;
++    uint64_t reservedz:61;
++} QEMU_PACKED;
++
++/*
++ * This message is used to report memory pressure from the guest.
++ * This message is not part of any transaction and there is no
++ * response to this message.
++ *
++ * num_avail: Available memory in pages.
++ * num_committed: Committed memory in pages.
++ * page_file_size: The accumulated size of all page files
++ *                 in the system in pages.
++ * zero_free: The nunber of zero and free pages.
++ * page_file_writes: The writes to the page file in pages.
++ * io_diff: An indicator of file cache efficiency or page file activity,
++ *          calculated as File Cache Page Fault Count - Page Read Count.
++ *          This value is in pages.
++ *
++ * Some of these metrics are Windows specific and fortunately
++ * the algorithm on the host side that computes the guest memory
++ * pressure only uses num_committed value.
++ */
++
++struct dm_status {
++    struct dm_header hdr;
++    uint64_t num_avail;
++    uint64_t num_committed;
++    uint64_t page_file_size;
++    uint64_t zero_free;
++    uint32_t page_file_writes;
++    uint32_t io_diff;
++} QEMU_PACKED;
++
++
++/*
++ * Message to ask the guest to allocate memory - balloon up message.
++ * This message is sent from the host to the guest. The guest may not be
++ * able to allocate as much memory as requested.
++ *
++ * num_pages: number of pages to allocate.
++ */
++
++struct dm_balloon {
++    struct dm_header hdr;
++    uint32_t num_pages;
++    uint32_t reservedz;
++} QEMU_PACKED;
++
++
++/*
++ * Balloon response message; this message is sent from the guest
++ * to the host in response to the balloon message.
++ *
++ * reservedz: Reserved; must be set to zero.
++ * more_pages: If FALSE, this is the last message of the transaction.
++ * if TRUE there will atleast one more message from the guest.
++ *
++ * range_count: The number of ranges in the range array.
++ *
++ * range_array: An array of page ranges returned to the host.
 + *
 + */
 +
-+#ifndef QEMU_HAPROT_H
-+#define QEMU_HAPROT_H
++struct dm_balloon_response {
++    struct dm_header hdr;
++    uint32_t reservedz;
++    uint32_t more_pages:1;
++    uint32_t range_count:31;
++    union dm_mem_page_range range_array[];
++} QEMU_PACKED;
 +
-+#include "exec/memory.h"
-+#include "hw/qdev-core.h"
++/*
++ * Un-balloon message; this message is sent from the host
++ * to the guest to give guest more memory.
++ *
++ * more_pages: If FALSE, this is the last message of the transaction.
++ * if TRUE there will atleast one more message from the guest.
++ *
++ * reservedz: Reserved; must be set to zero.
++ *
++ * range_count: The number of ranges in the range array.
++ *
++ * range_array: An array of page ranges returned to the host.
++ *
++ */
 +
-+#define TYPE_HAPROT "mem-haprot"
-+#define HAPROT(obj) \
-+    OBJECT_CHECK(HAProtDevice, (obj), TYPE_HAPROT)
-+#define HAPROT_CLASS(oc) \
-+    OBJECT_CLASS_CHECK(HAProtDeviceClass, (oc), TYPE_HAPROT)
-+#define HAPROT_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(HAProtDeviceClass, (obj), TYPE_HAPROT)
++struct dm_unballoon_request {
++    struct dm_header hdr;
++    uint32_t more_pages:1;
++    uint32_t reservedz:31;
++    uint32_t range_count;
++    union dm_mem_page_range range_array[];
++} QEMU_PACKED;
 +
-+#define HAPROT_ADDR_PROP "addr"
-+#define HAPROT_NODE_PROP "node"
-+#define HAPROT_SIZE_PROP "size"
-+#define HAPROT_MEMDEV_PROP "memdev"
++/*
++ * Un-balloon response message; this message is sent from the guest
++ * to the host in response to an unballoon request.
++ *
++ */
 +
-+typedef struct HAProtDevice {
-+    /* private */
-+    DeviceState parent_obj;
++struct dm_unballoon_response {
++    struct dm_header hdr;
++} QEMU_PACKED;
 +
-+    /* public */
-+    uint64_t addr;
-+    uint32_t node;
-+    HostMemoryBackend *hostmem;
-+    bool busy;
-+} HAProtDevice;
 +
-+typedef uint64_t (*HAProtocolGetAlign)(void *ctx, HAProtDevice *haprot);
-+typedef void (*HAProtocolPlugNotify)(void *ctx, HAProtDevice *haprot,
-+                                     Error **errp);
-+typedef void (*HAProtocolUnplugNotify)(void *ctx, HAProtDevice *haprot);
++/*
++ * Hot add request message. Message sent from the host to the guest.
++ *
++ * mem_range: Memory range to hot add.
++ *
++ */
 +
-+typedef struct HAProtDeviceClass {
-+    /* private */
-+    DeviceClass parent_class;
-+    HAProtocolGetAlign get_align_cb;
-+    HAProtocolPlugNotify plug_notify_cb;
-+    HAProtocolUnplugNotify unplug_notify_cb;
-+    void *notify_cb_ctx;
-+} HAProtDeviceClass;
++struct dm_hot_add {
++    struct dm_header hdr;
++    union dm_mem_page_range range;
++} QEMU_PACKED;
 +
-+void haprot_register_protocol(HAProtocolGetAlign get_align_cb,
-+                              HAProtocolPlugNotify plug_notify_cb,
-+                              HAProtocolUnplugNotify unplug_notify_cb,
-+                              void *notify_ctx, Error **errp);
-+void haprot_unregister_protocol(HAProtocolPlugNotify plug_notify_cb,
-+                                Error **errp);
++/*
++ * Hot add response message.
++ * This message is sent by the guest to report the status of a hot add request.
++ * If page_count is less than the requested page count, then the host should
++ * assume all further hot add requests will fail, since this indicates that
++ * the guest has hit an upper physical memory barrier.
++ *
++ * Hot adds may also fail due to low resources; in this case, the guest must
++ * not complete this message until the hot add can succeed, and the host must
++ * not send a new hot add request until the response is sent.
++ * If VSC fails to hot add memory DYNMEM_NUMBER_OF_UNSUCCESSFUL_HOTADD_ATTEMPTS
++ * times it fails the request.
++ *
++ *
++ * page_count: number of pages that were successfully hot added.
++ *
++ * result: result of the operation 1: success, 0: failure.
++ *
++ */
++
++struct dm_hot_add_response {
++    struct dm_header hdr;
++    uint32_t page_count;
++    uint32_t result;
++} QEMU_PACKED;
++
++struct dm_hot_remove {
++    struct dm_header hdr;
++    uint32_t virtual_node;
++    uint32_t page_count;
++    uint32_t qos_flags;
++    uint32_t reservedZ;
++} QEMU_PACKED;
++
++struct dm_hot_remove_response {
++    struct dm_header hdr;
++    uint32_t result;
++    uint32_t range_count;
++    uint64_t more_pages:1;
++    uint64_t reservedz:63;
++    union dm_mem_page_range range_array[];
++} QEMU_PACKED;
++
++#define DM_REMOVE_QOS_LARGE (1 << 0)
++#define DM_REMOVE_QOS_LOCAL (1 << 1)
++#define DM_REMOVE_QOS_MASK (0x3)
++
++/*
++ * Types of information sent from host to the guest.
++ */
++
++enum dm_info_type {
++    INFO_TYPE_MAX_PAGE_CNT = 0,
++    MAX_INFO_TYPE
++};
++
++
++/*
++ * Header for the information message.
++ */
++
++struct dm_info_header {
++    enum dm_info_type type;
++    uint32_t data_size;
++    uint8_t  data[];
++} QEMU_PACKED;
++
++/*
++ * This message is sent from the host to the guest to pass
++ * some relevant information (win8 addition).
++ *
++ * reserved: no used.
++ * info_size: size of the information blob.
++ * info: information blob.
++ */
++
++struct dm_info_msg {
++    struct dm_header hdr;
++    uint32_t reserved;
++    uint32_t info_size;
++    uint8_t  info[];
++};
 +
 +#endif
 
