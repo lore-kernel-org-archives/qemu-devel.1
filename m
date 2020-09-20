@@ -2,67 +2,89 @@ Return-Path: <SRS0=9ZvH=C5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12F9DC43466
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 08:25:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADCC7C43466
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 09:31:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD8B620809
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 08:25:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD8B620809
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 2D2FA20EDD
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 09:31:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eU2XX0kf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D2FA20EDD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJuee-00017e-Q2
-	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 04:25:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46086)
+	id 1kJvhL-0000Ei-5S
+	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 05:31:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55778)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kJuag-0003ch-2d; Sun, 20 Sep 2020 04:20:58 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:56566
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kJuae-0003uy-5x; Sun, 20 Sep 2020 04:20:57 -0400
-Received: from host81-154-161-117.range81-154.btcentralplus.com
- ([81.154.161.117] helo=kentang.home)
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kJubA-0006Dn-Kp; Sun, 20 Sep 2020 09:21:33 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-To: armbru@redhat.com, david@gibson.dropbear.id.au, atar4qemu@gmail.com,
- qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Date: Sun, 20 Sep 2020 09:20:17 +0100
-Message-Id: <20200920082018.16135-6-mark.cave-ayland@ilande.co.uk>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200920082018.16135-1-mark.cave-ayland@ilande.co.uk>
-References: <20200920082018.16135-1-mark.cave-ayland@ilande.co.uk>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kJvfs-00070F-6K
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 05:30:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22790)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kJvfq-0002kJ-Ad
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 05:30:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600594221;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8V7m33mR/GkT/611spi62ViYrq3aOu5Qz1vILJEmu9Q=;
+ b=eU2XX0kfjy0sNlNSvoUAM3URxLo0w5BMTsyP1bB1ENID5Y41IucZuyqa13j0BSETxO2EEB
+ MWU5tgzbdNwOCgRjVO0wcaDW5Tb4rxYNPjv+tDlpBfgaPAPQpH5QjIDgQGHFdstyEjfJYm
+ 6j4Z7oVCNfbgPLIOIEYZbC+QWCSGyfo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-303-EZpDRzCtMBmvkifmFQEZKA-1; Sun, 20 Sep 2020 05:30:19 -0400
+X-MC-Unique: EZpDRzCtMBmvkifmFQEZKA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46E491074644
+ for <qemu-devel@nongnu.org>; Sun, 20 Sep 2020 09:30:18 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com
+ (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 150DF10027AA
+ for <qemu-devel@nongnu.org>; Sun, 20 Sep 2020 09:30:18 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 3/4] configure: do not clobber environment
+ CFLAGS/CXXFLAGS/LDFLAGS
+Date: Sun, 20 Sep 2020 05:30:15 -0400
+Message-Id: <20200920093016.1150346-4-pbonzini@redhat.com>
+In-Reply-To: <20200920093016.1150346-1-pbonzini@redhat.com>
+References: <20200920093016.1150346-1-pbonzini@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 81.154.161.117
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH 5/6] macio: don't reference serial_hd() directly within the
- device
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/20 03:58:12
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -50
+X-Spam_score: -5.1
+X-Spam_bar: -----
+X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-2.996,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,91 +101,126 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instead use qdev_prop_set_chr() to configure the ESCC serial chardevs at the
-Mac Old World and New World machine level.
+If the CFLAGS, CXXFLAGS or LDFLAGS variables are present in the environment,
+any modification made within the configure script is passed down to Meson.
+This is particularly undesirable for the "-pie" option, since it overrides
+"-shared" and thus messes up the linker flags for shared modules.
 
-Also remove the now obsolete comment referring to the use of serial_hd() and
-change user_createable to true accordingly.
+Using a separate variable therefore fixes the bug, while clarifying that
+the scope of these CFLAGS is just the configure script.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reported-by: Frederic Bezies
+Analyzed-by: Toolybird
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/misc/macio/macio.c | 5 +----
- hw/ppc/mac_newworld.c | 6 ++++++
- hw/ppc/mac_oldworld.c | 6 ++++++
- 3 files changed, 13 insertions(+), 4 deletions(-)
+ configure | 30 +++++++++++++++++-------------
+ 1 file changed, 17 insertions(+), 13 deletions(-)
 
-diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-index 679722628e..ce641d41fd 100644
---- a/hw/misc/macio/macio.c
-+++ b/hw/misc/macio/macio.c
-@@ -109,8 +109,6 @@ static void macio_common_realize(PCIDevice *d, Error **errp)
-     qdev_prop_set_uint32(DEVICE(&s->escc), "disabled", 0);
-     qdev_prop_set_uint32(DEVICE(&s->escc), "frequency", ESCC_CLOCK);
-     qdev_prop_set_uint32(DEVICE(&s->escc), "it_shift", 4);
--    qdev_prop_set_chr(DEVICE(&s->escc), "chrA", serial_hd(0));
--    qdev_prop_set_chr(DEVICE(&s->escc), "chrB", serial_hd(1));
-     qdev_prop_set_uint32(DEVICE(&s->escc), "chnBtype", escc_serial);
-     qdev_prop_set_uint32(DEVICE(&s->escc), "chnAtype", escc_serial);
-     if (!qdev_realize(DEVICE(&s->escc), BUS(&s->macio_bus), errp)) {
-@@ -458,8 +456,7 @@ static void macio_class_init(ObjectClass *klass, void *data)
-     k->class_id = PCI_CLASS_OTHERS << 8;
-     device_class_set_props(dc, macio_properties);
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
--    /* Reason: Uses serial_hds in macio_instance_init */
--    dc->user_creatable = false;
-+    dc->user_creatable = true;
+diff --git a/configure b/configure
+index 5fabc77fb3..9a0bbd2a69 100755
+--- a/configure
++++ b/configure
+@@ -155,7 +155,7 @@ update_cxxflags() {
+     # options which some versions of GCC's C++ compiler complain about
+     # because they only make sense for C programs.
+     QEMU_CXXFLAGS="$QEMU_CXXFLAGS -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS"
+-    CXXFLAGS=$(echo "$CFLAGS" | sed s/-std=gnu99/-std=gnu++11/)
++    CONFIGURE_CXXFLAGS=$(echo "$CONFIGURE_CFLAGS" | sed s/-std=gnu99/-std=gnu++11/)
+     for arg in $QEMU_CFLAGS; do
+         case $arg in
+             -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-externs|\
+@@ -170,13 +170,14 @@ update_cxxflags() {
+ 
+ compile_object() {
+   local_cflags="$1"
+-  do_cc $CFLAGS $QEMU_CFLAGS $local_cflags -c -o $TMPO $TMPC
++  do_cc $CFLAGS $CONFIGURE_CFLAGS $QEMU_CFLAGS $local_cflags -c -o $TMPO $TMPC
  }
  
- static const TypeInfo macio_bus_info = {
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index e42bd7a626..e59b30e0a7 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -123,6 +123,7 @@ static void ppc_core99_init(MachineState *machine)
-     UNINHostState *uninorth_pci;
-     PCIBus *pci_bus;
-     PCIDevice *macio;
-+    ESCCState *escc;
-     bool has_pmu, has_adb;
-     MACIOIDEState *macio_ide;
-     BusState *adb_bus;
-@@ -382,6 +383,11 @@ static void ppc_core99_init(MachineState *machine)
-     qdev_prop_set_bit(dev, "has-adb", has_adb);
-     object_property_set_link(OBJECT(macio), "pic", OBJECT(pic_dev),
-                              &error_abort);
-+
-+    escc = ESCC(object_resolve_path_component(OBJECT(macio), "escc"));
-+    qdev_prop_set_chr(DEVICE(escc), "chrA", serial_hd(0));
-+    qdev_prop_set_chr(DEVICE(escc), "chrB", serial_hd(1));
-+
-     pci_realize_and_unref(macio, pci_bus, &error_fatal);
+ compile_prog() {
+   local_cflags="$1"
+   local_ldflags="$2"
+-  do_cc $CFLAGS $QEMU_CFLAGS $local_cflags -o $TMPE $TMPC $LDFLAGS $QEMU_LDFLAGS $local_ldflags
++  do_cc $CFLAGS $CONFIGURE_CFLAGS $QEMU_CFLAGS $local_cflags -o $TMPE $TMPC \
++      $LDFLAGS $CONFIGURE_LDFLAGS $QEMU_LDFLAGS $local_ldflags
+ }
  
-     /* We only emulate 2 out of 3 IDE controllers for now */
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index 7aba040f1b..25ade63ba3 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -96,6 +96,7 @@ static void ppc_heathrow_init(MachineState *machine)
-     PCIBus *pci_bus;
-     PCIDevice *macio;
-     MACIOIDEState *macio_ide;
-+    ESCCState *escc;
-     SysBusDevice *s;
-     DeviceState *dev, *pic_dev;
-     BusState *adb_bus;
-@@ -283,6 +284,11 @@ static void ppc_heathrow_init(MachineState *machine)
-     qdev_prop_set_uint64(dev, "frequency", tbfreq);
-     object_property_set_link(OBJECT(macio), "pic", OBJECT(pic_dev),
-                              &error_abort);
+ # symbolically link $1 to $2.  Portable version of "ln -sf".
+@@ -632,7 +633,10 @@ QEMU_CFLAGS="-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
+ QEMU_CFLAGS="-D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE $QEMU_CFLAGS"
+ QEMU_INCLUDES="-iquote . -iquote ${source_path} -iquote ${source_path}/accel/tcg -iquote ${source_path}/include"
+ QEMU_INCLUDES="$QEMU_INCLUDES -iquote ${source_path}/disas/libvixl"
+-CFLAGS="-std=gnu99 -Wall"
 +
-+    escc = ESCC(object_resolve_path_component(OBJECT(macio), "escc"));
-+    qdev_prop_set_chr(DEVICE(escc), "chrA", serial_hd(0));
-+    qdev_prop_set_chr(DEVICE(escc), "chrB", serial_hd(1));
-+
-     pci_realize_and_unref(macio, pci_bus, &error_fatal);
++# Flags that are needed during configure but later taken care of by Meson
++CONFIGURE_CFLAGS="-std=gnu99 -Wall"
++CONFIGURE_LDFLAGS=
  
-     macio_ide = MACIO_IDE(object_resolve_path_component(OBJECT(macio),
+ 
+ check_define() {
+@@ -960,7 +964,7 @@ if test "$mingw32" = "yes" ; then
+   EXESUF=".exe"
+   HOST_DSOSUF=".dll"
+   # MinGW needs -mthreads for TLS and macro _MT.
+-  CFLAGS="-mthreads $CFLAGS"
++  CONFIGURE_CFLAGS="-mthreads $CONFIGURE_CFLAGS"
+   write_c_skeleton;
+   prefix="/qemu"
+   qemu_suffix=""
+@@ -2230,7 +2234,7 @@ fi
+ 
+ if test "$static" = "yes"; then
+   if test "$pie" != "no" && compile_prog "-Werror -fPIE -DPIE" "-static-pie"; then
+-    CFLAGS="-fPIE -DPIE $CFLAGS"
++    CONFIGURE_CFLAGS="-fPIE -DPIE $CONFIGURE_CFLAGS"
+     QEMU_LDFLAGS="-static-pie $QEMU_LDFLAGS"
+     pie="yes"
+   elif test "$pie" = "yes"; then
+@@ -2240,11 +2244,11 @@ if test "$static" = "yes"; then
+     pie="no"
+   fi
+ elif test "$pie" = "no"; then
+-  CFLAGS="$CFLAGS_NOPIE $CFLAGS"
+-  LDFLAGS="$LDFLAGS_NOPIE $LDFLAGS"
++  CONFIGURE_CFLAGS="$CFLAGS_NOPIE $CONFIGURE_CFLAGS"
++  CONFIGURE_LDFLAGS="$LDFLAGS_NOPIE $CONFIGURE_LDFLAGS"
+ elif compile_prog "-Werror -fPIE -DPIE" "-pie"; then
+-  CFLAGS="-fPIE -DPIE $CFLAGS"
+-  LDFLAGS="-pie $LDFLAGS"
++  CONFIGURE_CFLAGS="-fPIE -DPIE $CONFIGURE_CFLAGS"
++  CONFIGURE_LDFLAGS="-pie $CONFIGURE_LDFLAGS"
+   pie="yes"
+ elif test "$pie" = "yes"; then
+   error_exit "PIE not available due to missing toolchain support"
+@@ -3808,7 +3812,7 @@ EOF
+ if ! compile_prog "$glib_cflags -Werror" "$glib_libs" ; then
+     if cc_has_warning_flag "-Wno-unknown-attributes"; then
+         glib_cflags="-Wno-unknown-attributes $glib_cflags"
+-        CFLAGS="-Wno-unknown-attributes $CFLAGS"
++        CONFIGURE_CFLAGS="-Wno-unknown-attributes $CONFIGURE_CFLAGS"
+     fi
+ fi
+ 
+@@ -3828,7 +3832,7 @@ EOF
+ if ! compile_prog "$glib_cflags -Werror" "$glib_libs" ; then
+     if cc_has_warning_flag "-Wno-unused-function"; then
+         glib_cflags="$glib_cflags -Wno-unused-function"
+-        CFLAGS="$CFLAGS -Wno-unused-function"
++        CONFIGURE_CFLAGS="$CONFIGURE_CFLAGS -Wno-unused-function"
+     fi
+ fi
+ 
+@@ -6359,7 +6363,7 @@ EOF
+ 
+     update_cxxflags
+ 
+-    if do_cxx $CXXFLAGS $QEMU_CXXFLAGS -o $TMPE $TMPCXX $TMPO $QEMU_LDFLAGS; then
++    if do_cxx $CONFIGURE_CXXFLAGS $QEMU_CXXFLAGS -o $TMPE $TMPCXX $TMPO $QEMU_LDFLAGS; then
+         # C++ compiler $cxx works ok with C compiler $cc
+         :
+     else
 -- 
-2.20.1
+2.26.2
+
 
 
