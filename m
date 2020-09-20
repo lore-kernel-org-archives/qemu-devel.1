@@ -2,90 +2,88 @@ Return-Path: <SRS0=9ZvH=C5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70235C43465
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 07:58:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 460FBC43465
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 07:59:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9B0920708
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 07:58:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D627520708
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 07:59:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Khjbq2EF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9B0920708
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J4Lq2TzD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D627520708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJuEk-0006pa-RP
-	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 03:58:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42662)
+	id 1kJuFg-0007hK-VA
+	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 03:59:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42738)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJuDT-00067A-Ay
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 03:56:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37177)
+ id 1kJuEk-0006yg-Dm
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 03:58:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40726)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kJuDR-0001Pn-8w
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 03:56:59 -0400
+ id 1kJuEh-0001WN-BV
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 03:58:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600588616;
+ s=mimecast20190719; t=1600588692;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ipTvR/BnUwqSV2bZqkU7boM1FnL1aMFHwITwd7O+KBc=;
- b=Khjbq2EFZKkGjSF8cNtHlbdQcAoVPcCLbA+Jc5GXQzmOcr5P9/wU4zlRglI17IM5fiCnnX
- nK4VZLmD66CTkKCoiirQrmoNih3EJqdId4Anxt9YhjrEjxweun6KfUUzHlFvil567rb+XY
- ca0NNRIpzAJ50Shs+INadpgQhbK+ruo=
+ bh=5GB5/zu05Cq7nBrtEwXVxtUbbylCF5Lq338WruWDUeo=;
+ b=J4Lq2TzDiuv5yw1RbKZX86vWlPExi9BzyvB8WWckaVj3MX3xAhX4QZytV3OXiSLaGmF/xD
+ l9FOfDlonA/80fIg5zM+vn64waQBbO9sAdvmUTCX+VMMxqgKEH4EZQQaNyiTadxuVaxoJe
+ Zv4tKnmKMyCduQ1WBuC7aDNCHpe8WuU=
 Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
  [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-8oXeuuEVNvqYA1CGHKtvoQ-1; Sun, 20 Sep 2020 03:56:52 -0400
-X-MC-Unique: 8oXeuuEVNvqYA1CGHKtvoQ-1
-Received: by mail-wr1-f69.google.com with SMTP id y3so4330382wrl.21
- for <qemu-devel@nongnu.org>; Sun, 20 Sep 2020 00:56:52 -0700 (PDT)
+ us-mta-153-gZNbgJBvOSi1p2sNrn-D0w-1; Sun, 20 Sep 2020 03:58:09 -0400
+X-MC-Unique: gZNbgJBvOSi1p2sNrn-D0w-1
+Received: by mail-wr1-f69.google.com with SMTP id f18so4334812wrv.19
+ for <qemu-devel@nongnu.org>; Sun, 20 Sep 2020 00:58:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=ipTvR/BnUwqSV2bZqkU7boM1FnL1aMFHwITwd7O+KBc=;
- b=PQQhOcLh8d4ZnifqXaUM4R1my24iMYXFv2ESOo+mNrjRlyTu2zR54UAwjaomeCUBjj
- MGkZeQk+uQWjfRjTFNM7MZruOsmlgJ5AR84AUL8szOPrSKeZNTf27dQzF0Hi5XVrHi0N
- TmlxrkhQhD9MLuqsOATJEsM84dUgNXvZRYR4No2oT6ucHehK/w3KOrqIMwLlC6mECyhN
- U5ebBYaQTQebEUW1lse+Vw+Q98A80XDFyvVDW6BY3XFV4lIjGI/GOs5QbANHyoJLwCoe
- y7gHtoUA4RDRfGbLI8iD/UHfAI1f7wdOrpLj5w+6O8TQpxTjEulPwPq4cjE4P0qdMLaM
- HDWA==
-X-Gm-Message-State: AOAM5314ceU6GBDd4Ri+Dsa0gZkogMESZOy2j64kdanbQHcv5RhcZblF
- 8+uP066CViBFojSSf5tvbdhoSI9K2m+3rgoGXnOoSEcaSEmSinmSlKktUZvoW0TX/Ri1q7hZ+rm
- xW2UQDPV6v3+8QVw=
-X-Received: by 2002:a1c:9a57:: with SMTP id c84mr23818513wme.136.1600588611524; 
- Sun, 20 Sep 2020 00:56:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwLCGPF3lAHIwyS5eQFe1utFZ172ZdfekyGd+7M0RRL7bO9ImUfj8yUxsvF1uzdPtJ+RHuX/A==
-X-Received: by 2002:a1c:9a57:: with SMTP id c84mr23818488wme.136.1600588611333; 
- Sun, 20 Sep 2020 00:56:51 -0700 (PDT)
+ bh=5GB5/zu05Cq7nBrtEwXVxtUbbylCF5Lq338WruWDUeo=;
+ b=jSXEFzOGTSS1b8P8QYzx4XO+iJXkRsSzsIyTa66IfIaa6QI0vgpiGwsfQJKISPuzMN
+ 7V2iwtH9ecTX3tp16iIEjnqv0XWwhfo5A5BONJp4kwALOQV9vrUgLqfBXTx/GHAJWdtC
+ 1KqUZIb6fQ5sr5MTnytsfbvCy53kycNh6lRPSJ5WGDw4GEd4tDvEbGd6CMOSqX/18gUv
+ +BS+LvtZZ7ePJK/MdkjBeAnytvT8sCDwpg8oGSBtGckz7rD30Efq/sn/ot7y6XnZloR6
+ y4U0YsUs2dl9xDTUYz4l3ZJ9SGLoueevgtO7cLvb6nQXaNCyDhsPHCLwoTQyvg5Y/Bu8
+ WCDw==
+X-Gm-Message-State: AOAM531mSR6VApqmWQ9Jui0K+wmKWc187k9yi7/CTtxHQFhGQSFwYucx
+ qgHVarhr/Rd0hWbqRx9r+lLM4Z/nMkdg/sMuqWRhSBbSffiSofkvNDi392mTba+TqSsFAViDLw9
+ ljr5ymrxs/k1L6BI=
+X-Received: by 2002:adf:fc0a:: with SMTP id i10mr45991269wrr.111.1600588688334; 
+ Sun, 20 Sep 2020 00:58:08 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxDxGahU3R6/Z2VUh+0jodGp0ohMCA0Ur7q0HohUgMTpaFvOFXU98CG202z/SO7G9NVFd7mZw==
+X-Received: by 2002:adf:fc0a:: with SMTP id i10mr45991247wrr.111.1600588688117; 
+ Sun, 20 Sep 2020 00:58:08 -0700 (PDT)
 Received: from [192.168.10.150] ([93.56.170.5])
- by smtp.gmail.com with ESMTPSA id f14sm15456840wrt.53.2020.09.20.00.56.50
+ by smtp.gmail.com with ESMTPSA id v17sm15609962wrc.23.2020.09.20.00.58.06
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 20 Sep 2020 00:56:50 -0700 (PDT)
-Subject: Re: [RFC 0/4] Add a 'in_mmio' device flag to avoid the DMA to MMIO
-To: Li Qiang <liq3ea@163.com>, dmitry.fleytman@gmail.com,
- jasowang@redhat.com, kraxel@redhat.com, berrange@redhat.com,
- ehabkost@redhat.com, alxndr@bu.edu, peter.maydell@linaro.org, f4bug@amsat.org
-References: <20200908164157.47108-1-liq3ea@163.com>
+ Sun, 20 Sep 2020 00:58:07 -0700 (PDT)
+Subject: Re: [PATCH v4 00/15] Reverse debugging
+To: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>, qemu-devel@nongnu.org
+References: <160006358590.31457.16757371597343007847.stgit@pasha-ThinkPad-X280>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2ea35f00-3388-22b3-6961-169d2b8a55b7@redhat.com>
-Date: Sun, 20 Sep 2020 09:56:50 +0200
+Message-ID: <ad338011-6abf-7833-6553-cf724b4fb23d@redhat.com>
+Date: Sun, 20 Sep 2020 09:58:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200908164157.47108-1-liq3ea@163.com>
+In-Reply-To: <160006358590.31457.16757371597343007847.stgit@pasha-ThinkPad-X280>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -93,9 +91,9 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/20 02:12:36
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/20 03:58:12
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -50
 X-Spam_score: -5.1
@@ -117,38 +115,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liq3ea@gmail.com, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, wrampazz@redhat.com, ehabkost@redhat.com,
+ alex.bennee@linaro.org, mtosatti@redhat.com, armbru@redhat.com,
+ mreitz@redhat.com, stefanha@redhat.com, crosa@redhat.com, philmd@redhat.com,
+ zhiwei_liu@c-sky.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/09/20 18:41, Li Qiang wrote:
-> Currently the qemu device fuzzer find some DMA to MMIO issue. If the
-> device handling MMIO currently trigger a DMA which the address is MMIO,
-> this will reenter the device MMIO handler. As some of the device doesn't
-> consider this it will sometimes crash the qemu.
+On 14/09/20 08:06, Pavel Dovgalyuk wrote:
+> GDB remote protocol supports reverse debugging of the targets.
+> It includes 'reverse step' and 'reverse continue' operations.
+> The first one finds the previous step of the execution,
+> and the second one is intended to stop at the last breakpoint that
+> would happen when the program is executed normally.
 > 
-> This patch tries to solve this by adding a per-device flag 'in_mmio'.
-> When the memory core dispatch MMIO it will check/set this flag and when
-> it leaves it will clean this flag.
-> 
-> 
-> Li Qiang (4):
->   memory: add memory_region_init_io_with_dev interface
->   memory: avoid reenter the device's MMIO handler while processing MMIO
->   e1000e: use the new memory_region_init_io_with_dev interface
->   hcd-xhci: use the new memory_region_init_io_with_dev interface
-> 
->  hw/net/e1000e.c        |  8 ++++----
->  hw/usb/hcd-xhci.c      | 25 ++++++++++++++---------
->  include/exec/memory.h  |  9 +++++++++
->  include/hw/qdev-core.h |  1 +
->  softmmu/memory.c       | 46 +++++++++++++++++++++++++++++++++++++++---
->  5 files changed, 72 insertions(+), 17 deletions(-)
-> 
+> Reverse debugging is possible in the replay mode, when at least
+> one snapshot was created at the record or replay phase.
+> QEMU can use these snapshots for travelling back in time with GDB.
 
-I don't think this is a good solution.  These are device bugs and they
-need to be fixed.
+I had queued this, it is a very nice patch series.  Unfortunately, the
+tests failed on gitlab:
+
+https://gitlab.com/bonzini/qemu/-/jobs/745795080
 
 Paolo
 
