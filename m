@@ -6,63 +6,62 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F1DAC43466
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 06:41:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A334FC43466
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 06:47:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B08C2085B
-	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 06:41:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B08C2085B
+	by mail.kernel.org (Postfix) with ESMTPS id EABAB2085B
+	for <qemu-devel@archiver.kernel.org>; Sun, 20 Sep 2020 06:47:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EABAB2085B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kJt2j-0002RS-UZ
-	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 02:41:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60418)
+	id 1kJt7u-0003bu-31
+	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 02:47:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kJt1q-00022W-4H
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 02:40:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42696)
+ id 1kJt6R-0003AF-CV
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 02:45:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42750)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kJt1n-0002MT-DR
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 02:40:53 -0400
+ id 1kJt6P-0002n3-Kp
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 02:45:39 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kJt1k-0005Wv-VX
- for <qemu-devel@nongnu.org>; Sun, 20 Sep 2020 06:40:48 +0000
+ id 1kJt6O-0005qc-5J
+ for <qemu-devel@nongnu.org>; Sun, 20 Sep 2020 06:45:36 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id AB9712E80E9
- for <qemu-devel@nongnu.org>; Sun, 20 Sep 2020 06:40:48 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 0C89C2E80E9
+ for <qemu-devel@nongnu.org>; Sun, 20 Sep 2020 06:45:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 20 Sep 2020 06:35:40 -0000
-From: Paul Zimmerman <1892604@bugs.launchpad.net>
+Date: Sun, 20 Sep 2020 06:37:54 -0000
+From: A van Schie <1875139@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: brendandg pauldzim petunia2000 pmaydell
-X-Launchpad-Bug-Reporter: Brendan Dolan-Gavitt (brendandg)
-X-Launchpad-Bug-Modifier: Paul Zimmerman (pauldzim)
-References: <159814309088.988.14645850566795174578.malonedeb@wampee.canonical.com>
-Message-Id: <160058374016.13871.5073456430396266746.malone@gac.canonical.com>
-Subject: [Bug 1892604] Re: qemu-system-arm: ../hw/usb/hcd-dwc2.c:666:
- dwc2_glbreg_read: Assertion `addr <= GINTSTS2' failed.
+X-Launchpad-Bug-Commenters: avschie berrange pkrempa
+X-Launchpad-Bug-Reporter: A van Schie (avschie)
+X-Launchpad-Bug-Modifier: A van Schie (avschie)
+References: <158788589324.18152.6333525201430073299.malonedeb@wampee.canonical.com>
+Message-Id: <160058387459.21789.18024304044431067196.malone@wampee.canonical.com>
+Subject: [Bug 1875139] Re: Domain fails to start when 'readonly' device not
+ writable
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: 1f18f808a1fa2276c39eec8078f56968d0b57860
+X-Launchpad-Hash: 8e21788245f132451b61dc911e72c2081d15bab4
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/20 02:00:54
@@ -85,90 +84,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1892604 <1892604@bugs.launchpad.net>
+Reply-To: Bug 1875139 <1875139@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-So I dug into this a little more, and it looks like this issue has
-nothing to do with hcd-dwc2, other than it served as a canary because of
-the assert that fired. With hcd-dwc2 removed from the build, the
-2016-05-27 Raspbian image still doesn't work, it hangs shortly after the
-login prompt appears on the console, before the GUI starts.
+I saw that that the related issue was implemented in 5.1.0.
 
-I tested with Qemu 4.0.0 and 4.2.1 and they are fine. The issue started
-with Qemu 5.0.0. hcd-dwc2 wasn't introduced until 5.1.0, so it can't be
-the root cause.
+So after I updated my QEMU to version 5.1.0. My VM(s) with a LVM read-
+only volume started again.
 
-Since the issue doesn't seem to appear with any Raspbian distro since
-2016-05-27, I don't know if anyone will be motivated to look into this
-any further. Should we just close this bug?
-
-** Changed in: qemu
-       Status: New =3D> Confirmed
+Thanks for getting this issue solved.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1892604
+https://bugs.launchpad.net/bugs/1875139
 
 Title:
-  qemu-system-arm: ../hw/usb/hcd-dwc2.c:666: dwc2_glbreg_read: Assertion
-  `addr <=3D GINTSTS2' failed.
+  Domain fails to start when 'readonly' device not writable
 
 Status in QEMU:
-  Confirmed
+  New
 
 Bug description:
-  When trying to run the 2016-05-27 Raspbian image on the emulated
-  raspi2 platform, the system boots but shortly after the login prompt
-  QEMU (master; commit ID ca489cd037e4d50dc6c40570a167504ad7e5a521) dies
-  with:
+  This issue is introduced in QEMU 4.2.0 (4.1.0 is working fine)
 
-  qemu-system-arm: ../hw/usb/hcd-dwc2.c:666: dwc2_glbreg_read: Assertion
-  `addr <=3D GINTSTS2' failed.
+  My root disk is a LVM2 volume thin snapshot that is marked as read-only
+  But when I try to start the domain (using virt-manager) I get the followi=
+ng error:
 
-  Steps to reproduce:
+  Error starting domain: internal error: process exited while connecting
+  to monitor: 2020-04-26T06:55:06.342700Z qemu-system-x86_64: -blockdev
+  {"driver":"host_device","filename":"/dev/vg/vmroot-20200425","aio":"native
+  ","node-name":"libvirt-3-storage","cache":{"direct":true,"no-
+  flush":false},"auto-read-only":true,"discard":"unmap"} The device is
+  not writable: Permission denied
 
-  1. Get the image: wget
-  http://downloads.raspberrypi.org/raspbian/images/raspbian-2016-05-31/2016=
--05-27
-  -raspbian-jessie.zip
+  Changing the lvm snapshot to writeable allows me to start the domain.
+  (Making it changes possible during domain is running)
 
-  2. Extract the kernel image and DTB:
+  I don't think QEMU should fail when it can't open a (block) device when t=
+he read-only option is set.
+  (why is write access needed?)
 
-  sudo losetup -f --show -P 2016-05-27-raspbian-jessie.img
-  sudo mkdir /mnt/rpi
-  sudo mount /dev/loop11p1 /mnt/rpi/
-  cp /mnt/rpi/kernel7.img .                                                =
-                                                                           =
-                                                                           =
-                                                                   =
-
-  cp /mnt/rpi/bcm2709-rpi-2-b.dtb .                                        =
-                                                                           =
-                                                                           =
-                                                                   =
-
-  sudo umount /mnt/rpi =
-
-  sudo losetup -d /dev/loop11 =
-
-
-  3. Run QEMU:
-  qemu-system-arm -M raspi2 -m 1G -dtb bcm2709-rpi-2-b.dtb -kernel kernel7.=
-img -append "rw earlyprintk loglevel=3D8 console=3DttyAMA0,115200 dwc_otg.l=
-pm_enable=3D0 root=3D/dev/mmcblk0p2" -sd 2016-05-27-raspbian-jessie.img -sm=
-p 4 -serial stdio -display none
-
-  A few seconds after the login prompt is displayed, QEMU will exit with
-  the assertion failure.
-
-  I also tried changing all of the asserts to if statements that (for
-  MMIO reads) returned 0 and (for writes) just returned, but this
-  resulted in a non-responsive system.
+  Reproduce steps:
+  * Create LVM read-only volume (I don't think any data is needed)
+  * Create domain with read-only volume as block device
+  * Try to start the domain
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1892604/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1875139/+subscriptions
 
