@@ -7,69 +7,68 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C34CDC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 18:10:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3D6FC4363C
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 18:10:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44369207BC
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 18:10:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 48600207BC
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 18:10:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jHduOQHs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44369207BC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ayYa1xjB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48600207BC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKQGl-000475-9e
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 14:10:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51974)
+	id 1kKQH8-0004lA-Uk
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 14:10:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52616)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kKQCV-0000pI-Kz
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 14:06:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20108)
+ id 1kKQEz-0002w3-0I
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 14:08:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53999)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kKQCT-0003OV-Nl
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 14:06:07 -0400
+ id 1kKQEr-0003ZV-7D
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 14:08:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600711565;
+ s=mimecast20190719; t=1600711703;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iW3QHzbX8W0Yc7R0BjPkkZ/gXL0wTQFyAlxL92NNsKI=;
- b=jHduOQHsfNUNHDDR7UfpvMjA0x5wmiEcDt0qy7kg4xSN6AiSeJqQWF0kZBja0In4iOlJsK
- GIwUrqBCX0c5rbMLlppxELzD1wLuSWJAkmFtEERfj8m1z1YvShTNEcJXagda/wwvx3kOks
- SG9nyEkEo2TCuVyUvxoJz3qdlkSzqfw=
+ bh=/FhNk7aK05DMWJsZ59R4/qNaIYlHrI2BNxeomYeKlF8=;
+ b=ayYa1xjBTMoUVLuRsIBXr+aT2M778WJ63zdkFnsSF17JGd8iOGm4qqAvyEa7AQjfDOsw5H
+ IqJwqMxOsRyvk3OHFW1zfF2JyduEFpH3wZ3kE+d9LlK4ZY06srgr8EXPcd8CBGqGHDSGOL
+ 0z8JFJnfDhhOrKPosmtSVCnEnOgTLts=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-46-mTYLUauMN4G8fOGwDPieqQ-1; Mon, 21 Sep 2020 14:06:02 -0400
-X-MC-Unique: mTYLUauMN4G8fOGwDPieqQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-64-0XB2CgSVNCy_ea53-se-lg-1; Mon, 21 Sep 2020 14:08:21 -0400
+X-MC-Unique: 0XB2CgSVNCy_ea53-se-lg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE4B9802EA3;
- Mon, 21 Sep 2020 18:06:01 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 344B7AED40;
+ Mon, 21 Sep 2020 18:08:20 +0000 (UTC)
 Received: from redhat.com (ovpn-113-113.ams2.redhat.com [10.36.113.113])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F22810013BD;
- Mon, 21 Sep 2020 18:05:56 +0000 (UTC)
-Date: Mon, 21 Sep 2020 19:05:53 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D19995D9CD;
+ Mon, 21 Sep 2020 18:08:14 +0000 (UTC)
+Date: Mon, 21 Sep 2020 19:08:12 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH 3/7] tests/docker: Update the tricore container to debian
- 10
-Message-ID: <20200921180553.GV1942072@redhat.com>
+Subject: Re: [PATCH 5/7] tests/docker: Remove old Debian 9 containers
+Message-ID: <20200921180812.GX1942072@redhat.com>
 References: <20200921174320.46062-1-thuth@redhat.com>
- <20200921174320.46062-4-thuth@redhat.com>
+ <20200921174320.46062-6-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200921174320.46062-4-thuth@redhat.com>
+In-Reply-To: <20200921174320.46062-6-thuth@redhat.com>
 User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -111,16 +110,22 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 21, 2020 at 07:43:16PM +0200, Thomas Huth wrote:
-> We do not support Debian 9 anymore, thus update the Tricore container
-> to Debian 10 now.
+On Mon, Sep 21, 2020 at 07:43:18PM +0200, Thomas Huth wrote:
+> We do not support Debian 9 in QEMU anymore, and the Debian 9 containers
+> are now no longer used in the gitlab-CI. Time to remove them.
 > 
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  .gitlab-ci.d/containers.yml                          | 2 +-
->  tests/docker/Makefile.include                        | 2 +-
->  tests/docker/dockerfiles/debian-tricore-cross.docker | 2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
+>  .gitlab-ci.d/containers.yml                   | 12 -----
+>  .../dockerfiles/debian-win32-cross.docker     | 38 ----------------
+>  .../dockerfiles/debian-win64-cross.docker     | 45 -------------------
+>  tests/docker/dockerfiles/debian9-mxe.docker   | 21 ---------
+>  tests/docker/dockerfiles/debian9.docker       | 32 -------------
+>  5 files changed, 148 deletions(-)
+>  delete mode 100644 tests/docker/dockerfiles/debian-win32-cross.docker
+>  delete mode 100644 tests/docker/dockerfiles/debian-win64-cross.docker
+>  delete mode 100644 tests/docker/dockerfiles/debian9-mxe.docker
+>  delete mode 100644 tests/docker/dockerfiles/debian9.docker
 
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
