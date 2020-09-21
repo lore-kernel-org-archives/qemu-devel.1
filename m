@@ -7,65 +7,66 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEE62C4727C
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 22:30:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E09C1C4727D
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 22:33:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44FE920888
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 22:30:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 645D223600
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 22:33:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R7IHVlnv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44FE920888
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bdu9XgKk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 645D223600
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKUKn-0000D7-4s
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 18:30:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59280)
+	id 1kKUND-0002OX-Ed
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 18:33:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59304)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kKU2Q-0000hB-8F
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 18:11:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54512)
+ id 1kKU2S-0000k5-Q9
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 18:12:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54974)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kKU2H-0001hr-NO
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 18:11:57 -0400
+ id 1kKU2H-0001hg-NU
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 18:12:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600726303;
+ s=mimecast20190719; t=1600726301;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=sAYj6eanxpvOaG3xD5VarL0V3UnuN5CPZvESe5wO2/M=;
- b=R7IHVlnvYAIsEWSl2QOjLGFKXgYtoz82fIw8qTBBSRyU+UKP9lcljvTBKFsnb40VVEW1DQ
- xnQ2D1IGAXyVPoF2uW03mJcloNXc/8mF5itTH4Skyn/UAWlIaoSM6woZ/8iXa57RwPvmQI
- QVc69WuMyguPiSPu1acdrzODdBpufig=
+ bh=ZAodmTsWx2xlqVJ73KVGampglMnGqEHVO9pba0Go1gY=;
+ b=bdu9XgKk+xXPliewKLTK+0ycdB3ip6/h219YHM6yKP1wpXGpHfLzjcdINcbgp0VLfsRjl2
+ G2TyUeEXzd/Gl3gMbv6nLVqAriliZMCkSf0fCrFV80eX2A+dLV9o8HrS3SQxG7YIGjs6tw
+ J5qtchh8sUC8sKXdy8SKg1sv2gKtm1s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-203-N6HzcBesN9i2RJJj3vvZew-1; Mon, 21 Sep 2020 18:11:41 -0400
-X-MC-Unique: N6HzcBesN9i2RJJj3vvZew-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-471-hVIob0fWPZq4otkI19w9kA-1; Mon, 21 Sep 2020 18:11:39 -0400
+X-MC-Unique: hVIob0fWPZq4otkI19w9kA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E61A5873084;
- Mon, 21 Sep 2020 22:11:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 369C510059A7;
+ Mon, 21 Sep 2020 22:11:38 +0000 (UTC)
 Received: from localhost (unknown [10.10.67.5])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 985715D9CD;
- Mon, 21 Sep 2020 22:11:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 915297366D;
+ Mon, 21 Sep 2020 22:11:34 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 23/24] sifive_e: Register "revb" as class property
-Date: Mon, 21 Sep 2020 18:10:44 -0400
-Message-Id: <20200921221045.699690-24-ehabkost@redhat.com>
+Subject: [PATCH 22/24] i440fx: Register i440FX-pcihost properties as class
+ properties
+Date: Mon, 21 Sep 2020 18:10:43 -0400
+Message-Id: <20200921221045.699690-23-ehabkost@redhat.com>
 In-Reply-To: <20200921221045.699690-1-ehabkost@redhat.com>
 References: <20200921221045.699690-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -95,12 +96,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-riscv@nongnu.org,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+Cc: John Snow <jsnow@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -110,45 +108,63 @@ they don't require an object to be instantiated.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Cc: Palmer Dabbelt <palmer@dabbelt.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: qemu-riscv@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Cc: qemu-devel@nongnu.org
 ---
- hw/riscv/sifive_e.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ hw/pci-host/i440fx.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index 40bbf530d49..9fe0c12df64 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -137,11 +137,6 @@ static void sifive_e_machine_instance_init(Object *obj)
-     SiFiveEState *s = RISCV_E_MACHINE(obj);
- 
-     s->revb = false;
--    object_property_add_bool(obj, "revb", sifive_e_machine_get_revb,
--                             sifive_e_machine_set_revb);
--    object_property_set_description(obj, "revb",
--                                    "Set on to tell QEMU that it should model "
--                                    "the revB HiFive1 board");
+diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
+index 93c62235ca7..4454ba06621 100644
+--- a/hw/pci-host/i440fx.c
++++ b/hw/pci-host/i440fx.c
+@@ -212,22 +212,6 @@ static void i440fx_pcihost_initfn(Object *obj)
+                           "pci-conf-idx", 4);
+     memory_region_init_io(&s->data_mem, obj, &pci_host_data_le_ops, s,
+                           "pci-conf-data", 4);
+-
+-    object_property_add(obj, PCI_HOST_PROP_PCI_HOLE_START, "uint32",
+-                        i440fx_pcihost_get_pci_hole_start,
+-                        NULL, NULL, NULL);
+-
+-    object_property_add(obj, PCI_HOST_PROP_PCI_HOLE_END, "uint32",
+-                        i440fx_pcihost_get_pci_hole_end,
+-                        NULL, NULL, NULL);
+-
+-    object_property_add(obj, PCI_HOST_PROP_PCI_HOLE64_START, "uint64",
+-                        i440fx_pcihost_get_pci_hole64_start,
+-                        NULL, NULL, NULL);
+-
+-    object_property_add(obj, PCI_HOST_PROP_PCI_HOLE64_END, "uint64",
+-                        i440fx_pcihost_get_pci_hole64_end,
+-                        NULL, NULL, NULL);
  }
  
- static void sifive_e_machine_class_init(ObjectClass *oc, void *data)
-@@ -152,6 +147,12 @@ static void sifive_e_machine_class_init(ObjectClass *oc, void *data)
-     mc->init = sifive_e_machine_init;
-     mc->max_cpus = 1;
-     mc->default_cpu_type = SIFIVE_E_CPU;
+ static void i440fx_pcihost_realize(DeviceState *dev, Error **errp)
+@@ -403,6 +387,22 @@ static void i440fx_pcihost_class_init(ObjectClass *klass, void *data)
+     device_class_set_props(dc, i440fx_props);
+     /* Reason: needs to be wired up by pc_init1 */
+     dc->user_creatable = false;
 +
-+    object_class_property_add_bool(oc, "revb", sifive_e_machine_get_revb,
-+                                   sifive_e_machine_set_revb);
-+    object_class_property_set_description(oc, "revb",
-+                                          "Set on to tell QEMU that it should model "
-+                                          "the revB HiFive1 board");
++    object_class_property_add(klass, PCI_HOST_PROP_PCI_HOLE_START, "uint32",
++                              i440fx_pcihost_get_pci_hole_start,
++                              NULL, NULL, NULL);
++
++    object_class_property_add(klass, PCI_HOST_PROP_PCI_HOLE_END, "uint32",
++                              i440fx_pcihost_get_pci_hole_end,
++                              NULL, NULL, NULL);
++
++    object_class_property_add(klass, PCI_HOST_PROP_PCI_HOLE64_START, "uint64",
++                              i440fx_pcihost_get_pci_hole64_start,
++                              NULL, NULL, NULL);
++
++    object_class_property_add(klass, PCI_HOST_PROP_PCI_HOLE64_END, "uint64",
++                              i440fx_pcihost_get_pci_hole64_end,
++                              NULL, NULL, NULL);
  }
  
- static const TypeInfo sifive_e_machine_typeinfo = {
+ static const TypeInfo i440fx_pcihost_info = {
 -- 
 2.26.2
 
