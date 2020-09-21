@@ -7,69 +7,71 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C8C7C43463
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 07:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A459FC43466
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 07:59:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2404C2085B
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 07:58:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B88D2085B
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 07:59:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IHC8jDSZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2404C2085B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gpgXzVVO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B88D2085B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKGiA-00063N-1J
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 03:58:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41976)
+	id 1kKGjG-0007BX-Df
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 03:59:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41968)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kKGge-0004Tg-J9; Mon, 21 Sep 2020 03:56:40 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55636)
+ id 1kKGgd-0004TS-Ch; Mon, 21 Sep 2020 03:56:36 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51378)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kKGgc-0005th-I2; Mon, 21 Sep 2020 03:56:35 -0400
-Received: by mail-wm1-x341.google.com with SMTP id d4so11137889wmd.5;
+ id 1kKGgb-0005tc-UP; Mon, 21 Sep 2020 03:56:35 -0400
+Received: by mail-wm1-x342.google.com with SMTP id w2so11140255wmi.1;
  Mon, 21 Sep 2020 00:56:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=JjzDLZKocLNXbXwLaMQHkkBQ+3Bkq4AUITFlMs6JsJw=;
- b=IHC8jDSZnQUPjMl9lRKd539CmVZ1hVNPFuEPK+oWYapd3NuIH7t8XLuxG0OTGJ66T9
- TNj9zMJ/zVqxfqF3TVzfQSXjH9nKYC4OMyZ7tgJOPFdGNaDYaWUQ95rcbmBN/G6qWlzO
- Q++ndGjzft3lNVaelaXKFFI87P9fPDrjOtutufoaSXYt+/P5E9okGouRE46kkZvpOdiz
- OnQbR6aTSoAm/skEB0Oly0+0prtcufibcp6ysZa3WV445AhOxoPfjzhQEgQyTICJ6xoJ
- 8sNP7v7QeGqcR7CEtGkLBRES7Zjb1bVIoDXsoU46uaILClMz1RxJnlAzeu2w0fSL0Pzi
- tEOw==
+ bh=cW7dIGVbLQRxcINm7s/47MM1xbv6QEuEycp0D1/7E0k=;
+ b=gpgXzVVOO+zBlYb0re2X/evLPDGwyGDIhqHOJnk/q7YD7/asCH0I8PpUlA3uGmRUr/
+ RdKKNBldda8vjCpLtwP5f94sXXbM6q2HFVgGQxwJU3lc37zedSznVzsBV3Y6F1gtPum9
+ EP1kN50X3WeiXDrmVJM1u4Y5vFCWmuSd08pt+2QPJJ/gG7mNxbCMwf+CLJJbXruYBlQ4
+ bWWUhvqGU+XFVIV4QixSPpQBXNxy6kIlUWCk3RmFslRgdRLOqJdoB1lDXxjJZQIJjiF/
+ EwPNtfOPHO/FxiLDUo7JQvWI5MIDUuwm2j5GpBvZVr1ecebpD+82AWYChomr2RCrOydN
+ SXQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=JjzDLZKocLNXbXwLaMQHkkBQ+3Bkq4AUITFlMs6JsJw=;
- b=WeSc4QtWS/+348uBRcVC5Z7uZpQEplsWvPMCKplY/Vz6Vl0AkocV3xBpRfX2l2/w0g
- 0emfUcqtFCUwiq3jByMYH/FEVh3pCssyFffGcEKQQ2j5eyRxYLDKpP3yIlL81wnKHRyi
- 9trZ19iMTpCWlOnI/4Qy23ilnT6I1rpyRVLpFGAWcQITTxXZo2nNvvzS7BKpWvTGbvVC
- C9u7omaO+0AbVAiKJsQQGle5d99fquPPGgPE8AgYFjWij9dESWzyD3PA68uXDR8+BcnK
- uAlTv8fyNvSgAGkd2ZSzGGuzuiy4zJ/NNEK8lLYAoQWNrRmY0X/LU3KG5YCQDwGnNEIR
- EKQw==
-X-Gm-Message-State: AOAM533ZxHGmS6Y3x1XMmOdOmhKvx83+wvtjrAf6q3fuRITlNMT+qMZw
- dMyKGMyeGRz8DSBdDt45KnlBiCSQPf8=
-X-Google-Smtp-Source: ABdhPJwkcsGzaGcAs3wJHX6D9hTJM8GvTCfkFXC82vZcZ+QO8TtLnWzbL/Na8lZQL4h2wHX7gawKKw==
-X-Received: by 2002:a1c:7f14:: with SMTP id a20mr29369727wmd.95.1600674992712; 
- Mon, 21 Sep 2020 00:56:32 -0700 (PDT)
+ bh=cW7dIGVbLQRxcINm7s/47MM1xbv6QEuEycp0D1/7E0k=;
+ b=g0w4BueLNs2HMLbewAo8xQReYDSlAJxjHhrlhn8Gqdqx3biBNJFCCFVXCd+FffPurd
+ MhU9PWXWvSYTo08p2GAgQqGYu/8B2eOROTnVnaM/Ys0dvIDFGTF8mwwewWKEUbiyuNBj
+ l9g3HAJ2hyja1iPGXiBenKMmhpDw3ak4BRRqamZoKTxAY/5e2gN1Q6LIdQwZd5mLOa/N
+ 4IjqOlS4DKUTH8Czqn4VsLin+y1ySZSlGJ2/m2ctY4HJPui9w6tivS4lpDqCAVW+5OJz
+ ussZ09k1oYQWBkBPga01RYhGzZJHnuU38woZmvNLs0ZdDHvYXJUOoaqVcpC/7eh8Hs82
+ jK8g==
+X-Gm-Message-State: AOAM533qnfB0uvCajixM9qWyOPEWBnp6pZkGsAZeFYdjXkPwHjmBZBTy
+ gX4bcGhvmlQbxiTJTyi9NlaHHgl94eQ=
+X-Google-Smtp-Source: ABdhPJxI/1LlX+OaqnI7x6OSbQKlglj2xH+IBdTAZaHagYNfJkLl9cl0dx5NPyrXp7bYnD3SxZkXgA==
+X-Received: by 2002:a05:600c:215:: with SMTP id
+ 21mr28514189wmi.105.1600674991610; 
+ Mon, 21 Sep 2020 00:56:31 -0700 (PDT)
 Received: from localhost.localdomain (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id o15sm17807538wmh.29.2020.09.21.00.56.31
+ by smtp.gmail.com with ESMTPSA id o15sm17807538wmh.29.2020.09.21.00.56.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 21 Sep 2020 00:56:32 -0700 (PDT)
+ Mon, 21 Sep 2020 00:56:31 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 2/8] hw/arm/raspi: Load the firmware on the first core
-Date: Mon, 21 Sep 2020 09:56:22 +0200
-Message-Id: <20200921075628.466506-3-f4bug@amsat.org>
+Subject: [PATCH v3 1/8] hw/arm/raspi: Display the board revision in the
+ machine description
+Date: Mon, 21 Sep 2020 09:56:21 +0200
+Message-Id: <20200921075628.466506-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200921075628.466506-1-f4bug@amsat.org>
 References: <20200921075628.466506-1-f4bug@amsat.org>
@@ -77,8 +79,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -110,37 +112,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The 'first_cpu' is more a QEMU accelerator-related concept
-than a variable the machine requires to use.
-Since the machine is aware of its CPUs, directly use the
-first one to load the firmware.
+Display the board revision in the machine description.
+
+Before:
+
+  $ qemu-system-aarch64 -M help | fgrep raspi
+  raspi2               Raspberry Pi 2B
+  raspi3               Raspberry Pi 3B
+
+After:
+
+  raspi2               Raspberry Pi 2B (revision 1.1)
+  raspi3               Raspberry Pi 3B (revision 1.2)
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/raspi.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/arm/raspi.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index 46d9ed7f054..8716a80a75e 100644
+index 811eaf52ff5..46d9ed7f054 100644
 --- a/hw/arm/raspi.c
 +++ b/hw/arm/raspi.c
-@@ -205,6 +205,7 @@ static void reset_secondary(ARMCPU *cpu, const struct arm_boot_info *info)
+@@ -312,7 +312,9 @@ static void raspi_machine_class_init(ObjectClass *oc, void *data)
+     uint32_t board_rev = (uint32_t)(uintptr_t)data;
  
- static void setup_boot(MachineState *machine, int version, size_t ram_size)
- {
-+    RaspiMachineState *s = RASPI_MACHINE(machine);
-     static struct arm_boot_info binfo;
-     int r;
- 
-@@ -253,7 +254,7 @@ static void setup_boot(MachineState *machine, int version, size_t ram_size)
-         binfo.firmware_loaded = true;
-     }
- 
--    arm_load_kernel(ARM_CPU(first_cpu), machine, &binfo);
-+    arm_load_kernel(&s->soc.cpu[0].core, machine, &binfo);
- }
- 
- static void raspi_machine_init(MachineState *machine)
+     rmc->board_rev = board_rev;
+-    mc->desc = g_strdup_printf("Raspberry Pi %s", board_type(board_rev));
++    mc->desc = g_strdup_printf("Raspberry Pi %s (revision 1.%u)",
++                               board_type(board_rev),
++                               FIELD_EX32(board_rev, REV_CODE, REVISION));
+     mc->init = raspi_machine_init;
+     mc->block_default_type = IF_SD;
+     mc->no_parallel = 1;
 -- 
 2.26.2
 
