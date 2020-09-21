@@ -2,83 +2,72 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBFEAC4363C
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 21:33:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EE52C4363C
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 21:39:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6591B23A60
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 21:33:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ov4RUPjm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6591B23A60
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8716723A60
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 21:39:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8716723A60
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKTRJ-0006Hw-K0
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 17:33:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50034)
+	id 1kKTX2-00089V-DZ
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 17:39:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kKTQE-0005fG-Jb
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 17:32:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58908)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kKTQC-0005HU-To
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 17:32:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600723947;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type;
- bh=AmaGFTevTljYUgExxR+nBv5J9s3FJ1UdrnEKjTex4k0=;
- b=Ov4RUPjmAjTAZdRwipf0Mhp9+UL4fHGWs3biCewQc//gcTNKNkSCkN1IQAo9h+aMo4mmVA
- wwwMwihPuulqizZDlE+Lj9l7wNKoz97aRbOkHGsDlxtKmwtF0BGMmd8uNoecNX+EgBbNRF
- zJleP26sGGUnmcTYscY7hsLIZi4l9M4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-290-fVLC4bm3NZu_ieFI93bvSA-1; Mon, 21 Sep 2020 17:32:23 -0400
-X-MC-Unique: fVLC4bm3NZu_ieFI93bvSA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6C71420EA;
- Mon, 21 Sep 2020 21:32:22 +0000 (UTC)
-Received: from horse.redhat.com (ovpn-114-27.rdu2.redhat.com [10.10.114.27])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BC76E5C1D0;
- Mon, 21 Sep 2020 21:32:16 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
- id 43D35220C56; Mon, 21 Sep 2020 17:32:16 -0400 (EDT)
-Date: Mon, 21 Sep 2020 17:32:16 -0400
-From: Vivek Goyal <vgoyal@redhat.com>
-To: virtio-fs-list <virtio-fs@redhat.com>, qemu-devel@nongnu.org
-Subject: [PATCH] virtiofsd: Used glib "shared" thread pool
-Message-ID: <20200921213216.GE13362@redhat.com>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kKTVr-0007V6-DC; Mon, 21 Sep 2020 17:38:19 -0400
+Resent-Date: Mon, 21 Sep 2020 17:38:19 -0400
+Resent-Message-Id: <E1kKTVr-0007V6-DC@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21769)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kKTVo-0005u3-Rp; Mon, 21 Sep 2020 17:38:19 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1600724284; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=Pngb46SO/BQJXWDfnyNrdu2rYdt44M5yBDnM62WxgehBDfddnpw9BOweGqzrjv3VVcJw9z1iV6Ru1EA/XgctiGl7d0Vvxjx0/V2DPcOfGZXKwSCPhLzFaxwUX/CL4fp58CLhOqJ5kKmy2hc9HwrypZif18G24gsWvGCIZt3CjOo=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1600724284;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=6n4qahukW+elT1QPo6yTdztSK+Qa8GNrhU9qAzskCdI=; 
+ b=Q2WFpHOAt/xxqcyidWqzeA4fAFICe4bWPBFU+SdwPMlCd0ndmDDe9fxIb5Dkw0fl6ipYbxTj5hI6hexII1nTMwQvZWEvBv2qXFFYV/jbqGbO6iKxAya6BK6cDb1bUsJeNfeDrFeqsl4v7otTBefhkM1DUEPE3wm7qGoYMa45LH8=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1600724283037315.22808888137035;
+ Mon, 21 Sep 2020 14:38:03 -0700 (PDT)
+Subject: Re: [PATCH 0/6] block/nvme: Map doorbells pages write-only,
+ remove magic from nvme_init
+Message-ID: <160072428143.23987.9788898676311598209@66eaa9a8a123>
+In-Reply-To: <20200921162949.553863-1-philmd@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vgoyal@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=vgoyal@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:44:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: philmd@redhat.com
+Date: Mon, 21 Sep 2020 14:38:03 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 16:58:26
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,45 +80,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-glib offers thread pools and it seems to support "exclusive" and "shared"
-thread pools.
-
-https://developer.gnome.org/glib/stable/glib-Thread-Pools.html#g-thread-pool-new
-
-Currently we use "exlusive" thread pools but its performance seems to be
-poor. I tried using "shared" thread pools and performance seems much
-better. I posted performance results here.
-
-https://www.redhat.com/archives/virtio-fs/2020-September/msg00080.html
-
-So lets switch to shared thread pools. We can think of making it optional
-once somebody can show in what cases exclusive thread pools offer better
-results. For now, my simple performance tests across the board see
-better results with shared thread pools.
-
-Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
----
- tools/virtiofsd/fuse_virtio.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-Index: qemu/tools/virtiofsd/fuse_virtio.c
-===================================================================
---- qemu.orig/tools/virtiofsd/fuse_virtio.c	2020-09-21 17:28:27.444438015 -0400
-+++ qemu/tools/virtiofsd/fuse_virtio.c	2020-09-21 17:28:30.584568910 -0400
-@@ -695,7 +695,7 @@ static void *fv_queue_thread(void *opaqu
-     struct fuse_session *se = qi->virtio_dev->se;
-     GThreadPool *pool;
- 
--    pool = g_thread_pool_new(fv_queue_worker, qi, se->thread_pool_size, TRUE,
-+    pool = g_thread_pool_new(fv_queue_worker, qi, se->thread_pool_size, FALSE,
-                              NULL);
-     if (!pool) {
-         fuse_log(FUSE_LOG_ERR, "%s: g_thread_pool_new failed\n", __func__);
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkyMTE2Mjk0OS41NTM4
+NjMtMS1waGlsbWRAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
+IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
+Zm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMjAwOTIxMTYyOTQ5LjU1Mzg2
+My0xLXBoaWxtZEByZWRoYXQuY29tClN1YmplY3Q6IFtQQVRDSCAwLzZdIGJsb2NrL252bWU6IE1h
+cCBkb29yYmVsbHMgcGFnZXMgd3JpdGUtb25seSwgcmVtb3ZlIG1hZ2ljIGZyb20gbnZtZV9pbml0
+Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFz
+ZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
+aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
+aWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
+MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
+J3Rlc3QnCmIwZWY4YjcgYmxvY2svbnZtZTogUmVwbGFjZSBtYWdpYyB2YWx1ZSBieSBTQ0FMRV9N
+UyBkZWZpbml0aW9uCjE3OTJjNGQgYmxvY2svbnZtZTogVXNlIHJlZ2lzdGVyIGRlZmluaXRpb25z
+IGZyb20gJ2Jsb2NrL252bWUuaCcKMzUyYmUwYyBibG9jay9udm1lOiBEcm9wIE5WTWVSZWdzIHN0
+cnVjdHVyZSwgZGlyZWN0bHkgdXNlIE52bWVCYXIKN2FhMTg0YSBibG9jay9udm1lOiBSZWR1Y2Ug
+SS9PIHJlZ2lzdGVycyBzY29wZQo0YjFlZmZjIGJsb2NrL252bWU6IE1hcCBkb29yYmVsbHMgcGFn
+ZXMgd3JpdGUtb25seQo3YWU0NjUzIHV0aWwvdmZpby1oZWxwZXJzOiBQYXNzIHBhZ2UgcHJvdGVj
+dGlvbnMgdG8gcWVtdV92ZmlvX3BjaV9tYXBfYmFyKCkKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEv
+NiBDaGVja2luZyBjb21taXQgN2FlNDY1MzYzNjlhICh1dGlsL3ZmaW8taGVscGVyczogUGFzcyBw
+YWdlIHByb3RlY3Rpb25zIHRvIHFlbXVfdmZpb19wY2lfbWFwX2JhcigpKQoyLzYgQ2hlY2tpbmcg
+Y29tbWl0IDRiMWVmZmNmY2QyYiAoYmxvY2svbnZtZTogTWFwIGRvb3JiZWxscyBwYWdlcyB3cml0
+ZS1vbmx5KQozLzYgQ2hlY2tpbmcgY29tbWl0IDdhYTE4NGE3NTZkYyAoYmxvY2svbnZtZTogUmVk
+dWNlIEkvTyByZWdpc3RlcnMgc2NvcGUpCjQvNiBDaGVja2luZyBjb21taXQgMzUyYmUwYzk3ODY5
+IChibG9jay9udm1lOiBEcm9wIE5WTWVSZWdzIHN0cnVjdHVyZSwgZGlyZWN0bHkgdXNlIE52bWVC
+YXIpCkVSUk9SOiBVc2Ugb2Ygdm9sYXRpbGUgaXMgdXN1YWxseSB3cm9uZywgcGxlYXNlIGFkZCBh
+IGNvbW1lbnQKIzQzOiBGSUxFOiBibG9jay9udm1lLmM6NjkyOgorICAgIHZvbGF0aWxlIE52bWVC
+YXIgKnJlZ3M7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDYyIGxpbmVzIGNoZWNrZWQK
+ClBhdGNoIDQvNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
+dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
+YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNS82IENoZWNraW5nIGNvbW1p
+dCAxNzkyYzRkYTRiYzIgKGJsb2NrL252bWU6IFVzZSByZWdpc3RlciBkZWZpbml0aW9ucyBmcm9t
+ICdibG9jay9udm1lLmgnKQo2LzYgQ2hlY2tpbmcgY29tbWl0IGIwZWY4Yjc3NmViMSAoYmxvY2sv
+bnZtZTogUmVwbGFjZSBtYWdpYyB2YWx1ZSBieSBTQ0FMRV9NUyBkZWZpbml0aW9uKQo9PT0gT1VU
+UFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwg
+bG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDkyMTE2Mjk0
+OS41NTM4NjMtMS1waGlsbWRAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVz
+c2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBz
+Oi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRl
+dmVsQHJlZGhhdC5jb20=
 
