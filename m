@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82DB9C43463
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 02:34:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDF41C43463
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 02:34:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24E3E2078E
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 02:34:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5CB3E2078E
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 02:34:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="fQNz25ae"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24E3E2078E
+	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="Q322wDJ0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CB3E2078E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKBep-0006gI-7n
-	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 22:34:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41528)
+	id 1kKBfM-0007VS-HX
+	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 22:34:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41578)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kKBWY-0003Dv-4N
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 22:25:52 -0400
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kKBWe-0003Lv-Ld
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 22:25:56 -0400
 Received: from mail-dm6nam12on2117.outbound.protection.outlook.com
  ([40.107.243.117]:28256 helo=NAM12-DM6-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kKBWW-0000b7-FF
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 22:25:49 -0400
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kKBWc-0000b7-U8
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 22:25:56 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZaXw3FHAMIiLBVsHd9XcPfBilkuzAFngDHsSJ7tbeRDhMth4oWaNDZ3I7X5XjLqNrl2Bcqk2t9Y7GDPlaR1GaXCfxcaqPN/WCXEW0utUA+33RizOQZJFIJjjGhOaoM3SmfvCOsZPpw9hog7hy9P5XyT4vwUABlu7M4cgCNdtkd16WDcVoWHP8ghmp4+Q2uTUS9Cvtx/OrbDpJdqToQsagdykFATfn/z2SYhi/U8Ai9AbspY9Cy73pMx3zOAVqn9R4dDFj+oZM6HeqlxkobObPEpo4mCR0tHEafVRgPul0lQWD1dYXr9h4Gd9BhGEdKxHFuNXoq9zAALAvIVQwqy33w==
+ b=giscUlcdGilV4/eXV2ke0SzANvsSd5JkFvlaF9++i1hNOcOBOaruOzBasR83L6PSg43fZX5nUnddtvRcQnC62KjN8+E3LBoWUUoKeyU21z3G4fXwTT61/ooDA1moIxbgdKgIQ0o3okfIdbX1EaOQBE28/n/ur6YtY22qvdMOMGrGfYqKlugSCZn1wwgexw9PnZnVtf7U3DzFluZd4q+CspRSrn8kiOmYP+iNDZZ7MTcP3ZGVU9zujrsngFSzI0oal8vbKmJ9oR79fybkFse2jNHssaYZtDDcesEUL0Hc3lYPcPg2Qp3m1NCVR9ALoSZbZhQ/O5kbnBKlv5vnaM9IYw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PdbSPAuFvXRPyMkLVUBpMuOypvkPeOU9Oeq5sCNBAbk=;
- b=deQhs1knGwJbGBd/5sb/+WX9ncMU0/TFBr0fnRTMeLufmhdivivOLxQsxt9zYPqlyrvWYblfuSMp6b0SIPz5gb/Wppxelovbm7owK2V/2xeJPYpZG6wae0ImirNnRZj3E/kjm5prncVCUVo8ffkBwbC1lIc6DG3PoDopY1iu5ZW6FZ1XhXOMICLqfjP3COWSQ++qX16mYVZpwccnCQMxjjJKfjpXKSxCkf9QcJezLw7LhI85zgU/e6UVHK4Pb+y2sM9+ItgDcUN6MmTH/7Cs9u0dhtPUgZJF2koC956QF56u/Se4NE5aamLOvByBthernjvLCnbBRFewqxuXEFlZmw==
+ bh=92Pi8V0q/CvMNhMCwNiYCwCGdchrZHzjQakpHWWY51Y=;
+ b=UXbvOPKUXY20fiFNHr+PdTwNf+SQKXLbb21uRjiztjEW0n1Ygc7d2auBwwxGybLdf++Yc3RryGqJnDKOFF0JdCbWsU+P+sfN+7+CObvPwXO+dc2pPKk+mT8qCHM+AFwd0vdLuH4rJIxiQX11z8OV1Y8JXLe/kcZUuk0CtR93mcTH8pci1xvVoo9wk4GXFNLsDNNHtiue5c2fdGRpdKicaK0EF4etcyH9+TGdMZ33lpQJHZa7LmvGF2fO7cX5TuT0Tv73wwOm/rPgKB4rkOUdVpMeDCd7wAaR2NdzcgEh5qFzMYi8DMUmZEFnisectN00JaXHdXUttWyOeS8Y7dmeGQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
  header.d=bu.edu; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PdbSPAuFvXRPyMkLVUBpMuOypvkPeOU9Oeq5sCNBAbk=;
- b=fQNz25ae0P54GHpZyYVnICm0iXj2ZOe4n+CuXGkJnVMRxcfDLof/MZ9hOGPVA06TNWhX/h3Rjv+3pVLSn80mZAtWkFrfylgQYgZWB8yynygtIyANR23ok2y/qoPwetkq8IPv3xxGiCtC9fAESFgDVWkPEnxAaKTZx7CJBGP3hYs=
+ bh=92Pi8V0q/CvMNhMCwNiYCwCGdchrZHzjQakpHWWY51Y=;
+ b=Q322wDJ0P2DyrDyFW1hObTzvJM/XWpvJ9EcZvuV025HVvR7l2T+0XjTS5+J6RuNMbEkb01ghPssEntLWw9c9y3XtPslFcqK3JQM6+zBqJXYyaxcwDA4mhk1hEQA5dfO34bmzenVp0SuLfLsBPuk3DbpuFX6ZhAEuLzu78DiR+5o=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
  by SN2PR03MB2237.namprd03.prod.outlook.com (2603:10b6:804:e::27) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.11; Mon, 21 Sep
- 2020 02:25:33 +0000
+ 2020 02:25:40 +0000
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::61ae:93a8:b26c:77b8]) by SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::61ae:93a8:b26c:77b8%4]) with mapi id 15.20.3391.024; Mon, 21 Sep 2020
- 02:25:33 +0000
+ 02:25:40 +0000
 From: Alexander Bulekov <alxndr@bu.edu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 07/16] fuzz: Add support for custom crossover functions
-Date: Sun, 20 Sep 2020 22:24:57 -0400
-Message-Id: <20200921022506.873303-8-alxndr@bu.edu>
+Subject: [PATCH v3 11/16] scripts/oss-fuzz: Add general-fuzzer build script
+Date: Sun, 20 Sep 2020 22:25:01 -0400
+Message-Id: <20200921022506.873303-12-alxndr@bu.edu>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200921022506.873303-1-alxndr@bu.edu>
 References: <20200921022506.873303-1-alxndr@bu.edu>
@@ -78,32 +78,32 @@ Received: from stormtrooper.vrmnet (72.93.72.163) by
  BL0PR1501CA0034.namprd15.prod.outlook.com (2603:10b6:207:17::47) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.14 via Frontend
- Transport; Mon, 21 Sep 2020 02:25:32 +0000
+ Transport; Mon, 21 Sep 2020 02:25:39 +0000
 X-Mailer: git-send-email 2.28.0
 X-Originating-IP: [72.93.72.163]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: fb05b5b6-6720-4f55-b1bd-08d85dd59dab
+X-MS-Office365-Filtering-Correlation-Id: eb742b7a-fa79-4ff6-f694-08d85dd5a1e9
 X-MS-TrafficTypeDiagnostic: SN2PR03MB2237:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN2PR03MB2237C019514FADC3F0F8564DBA3A0@SN2PR03MB2237.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-Microsoft-Antispam-PRVS: <SN2PR03MB22377949AF46DCF1FA3E4834BA3A0@SN2PR03MB2237.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:972;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: u8udvrnZXdrVnIbBcDrU9PLE8ouxdnXqKjrx4puMmCcuYB3Tefg4ti/RYxi6egtEGDPDo/zB1Ush2YbxaxBum9x49UrU8Ebrnr20Txik4jmIGrrvE1NWr2xY+1j8hSZN1V4gc+WrXTuoTwmevo/IC/NL9IH9xzxS0KOmrY/Zfuzo5fK6QqoT/rp9/52ePsgj8Tw/MOwGvnRb6P/98sRW0k5xWCaXxHgLsLWkFIxzzFSjpIg52/K/PSelzGcPTE+4BltFz9HRqGabJMD3EfU823H8bP2YVfOU3eY/AGMPqxgklpUCkW1nKljpXzilWEEAZI68QR9vaj8O2tTlYJE0X/DjbFjWw0rAF666yJaF/8OEclFSOTMqwiZyG3MTlHEC
+X-Microsoft-Antispam-Message-Info: Sndoy3h70Qh0ocEFJ/ft11zMAFUBjqXZidM0azWKaWn4a0nowQalkkPDGuv1cR8i2c/P1ru2of8c7f/iCudJzZwUybcGKp7CAHgrfH2LH3WPnOtGdnNiRI1tXY35C3JA9We5zk1POwng6vCjmuaWJJ/tVE2/LBkeeEzd+mgbByeNC1Qj8XVvUbATTtcVZVo5mNKteT+ILyU2k0C6Gya1NIlJN9dhlNGaEplGD86YZlX43R/xB81Tq0i5D+XlSh8flWm+26rcPO3g4JTk5N53eOMVyzUnpnldP3H8KMz4D5kOEuTsqElx4TEK6wS5ZWOZ+xsFpItf7O9lSHGcKvsVl124U7J6a2AkRV7yxyxzDl7vAAiHpdWBT38/zeXTC3ja
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
  SFS:(4636009)(396003)(366004)(376002)(136003)(346002)(39860400002)(2616005)(956004)(4326008)(54906003)(26005)(478600001)(16526019)(6666004)(8936002)(316002)(6486002)(66476007)(1076003)(6512007)(186003)(6916009)(86362001)(66946007)(5660300002)(36756003)(75432002)(2906002)(6506007)(8676002)(66556008)(52116002)(786003);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 67FAfmIlhjHiuCz9DqpabfoONeNpIPd0dydqmQ/oD/Ww3zLlKxBqLnKTUIkyV7GpGG1KlkeAyqxpcrMxOD7WdieGV0qTytgmEub8E3w+1aLSHaLGg5VtoRyo/OLVZPiQDW5n+FsPSJs9e8GOfkVjK5vjT9ClkzuXq+6rWS66tMV99jDucZ8xLbhupQ2aJu0Ag2f1HQrYAN8rDnKF26qa0L1ecEqDlcphnb5xF/e9qPquqmjQ9KqMSqVTssDVL/KWSVXpb9UEif1J0qRET/C5pBabwgQ9zKGa3gASox4Op7qI4fb5S6jXBXoo+bicPiHyGZeVDkxHl7324iPda3WEXFtADW1qIgMLrGeU2l4EMRn7hWF5GcbLCU6e+ZUzAzLvESSx8sgi+VH2LawAvOYlCKjMI1lZ52orJX6dlrYqzVjGypI68j+osKriI2bM+i2+2LIlNNqqgt95GKIRsCiPBl3ImJYIyhWqIK4IjxrbsLZzfYyV3CwGuTYEOfA4SgIp5aBg/Qs65aILWlWPpU2nwmQx8ISyAXrcBT0c7xtOyRtswudy9HygUH1CwgI49rkNNmL53rojQ9zsNUUY1pdJe6hTTvS03+/oTMy0f12z2HSKQSWERXbQOY76ZQAv8A8/I8NEMD3Lz47IUYG0Wp+Juw==
+X-MS-Exchange-AntiSpam-MessageData: 5YsHwUdBFNC6PNHxdlTMfAMSwQnDxLqFcaQcZJQjVjPGMSA3tZWPgtuRov8FnwqlqxBrfeMvnIcZxlZo41tP0r7Ejw5d4x/NcJjxrYdwrcaDYdzFSNrDN3681J9slNCfHJkdV225EUTbUUTwPQqcra+h9m3FBPAFFWr4Gkr1Yp2px9Jad+Tih1tvJ9CxW25kQMIxXyDDRwevd1AXTaIwb+ou1lqrtt3ioj1oqU+Lmj9u2Je3+oVBYj1Fl8Y8awxYequGMwAsBjANNmMihE/EaH9XxvhFHPpbo7Q+yNmej+l/fJVarQ09iUvS3VNFSncGiI5RNocWjqewoLi0/HlVlh5/m6Lh4KDLBSdc8O/c4yExTW0HhLpRtnZrMI0RSVJCTTGtiw1ev39KPnldLiapqz6ITIuWKCtxckrgKcofK0CHoIVbKqJzurakIz482vtWN242INSeUuLLaXqcCxVWC3XoIgE6Kzlmjimm+DLua2pEamUG9sgvhhlq+P+yqQWluDl5ly1CCbFWy7xhXSLIp20zcqUQnLL/4i8t+hoTC2JPMOz2OHprytp8BBfkTl3rKXUmWCkf8ZPQ8RjJx62x4y0ZTcJVfn7Cv8HvShTFtINMmpro34+6aNv+7EP0pD7Wj6P4+i2aoEh4DB6tbwlEsA==
 X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: fb05b5b6-6720-4f55-b1bd-08d85dd59dab
+X-MS-Exchange-CrossTenant-Network-Message-Id: eb742b7a-fa79-4ff6-f694-08d85dd5a1e9
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR03MB3871.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2020 02:25:32.9926 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2020 02:25:40.1125 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6HdJbDxcRqTY94zPQalDmGtIVQ2qMf01nfbm0eW981pATPGGFDP5B+MHanuLau/I
+X-MS-Exchange-CrossTenant-UserPrincipalName: U8/SuRFsmU4C/N6e2U8iYSE5V0Tf/lnrzL1lai5bKGpqwVH36sM3cvh4SO00aun/
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN2PR03MB2237
 Received-SPF: pass client-ip=40.107.243.117; envelope-from=alxndr@bu.edu;
  helo=NAM12-DM6-obe.outbound.protection.outlook.com
@@ -129,95 +129,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Alexander Bulekov <alxndr@bu.edu>, darren.kenny@oracle.com, bsd@redhat.com,
- stefanha@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
+Cc: Thomas Huth <thuth@redhat.com>, Alexander Bulekov <alxndr@bu.edu>,
+ darren.kenny@oracle.com, bsd@redhat.com, stefanha@redhat.com,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-libfuzzer supports a "custom crossover function". Libfuzzer often tries
-to blend two inputs to create a new interesting input. Sometimes, we
-have a better idea about how to blend inputs together. This change
-allows fuzzers to specify a custom function for blending two inputs
-together.
+This parses a yaml file containing general-fuzzer configs and builds a
+separate oss-fuzz wrapper binary for each one, changing some
+preprocessor macros for each configuration. To avoid dealing with
+escaping and stringifying, convert each string into a byte-array
+representation
 
 Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
-Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
 ---
- tests/qtest/fuzz/fuzz.c | 13 +++++++++++++
- tests/qtest/fuzz/fuzz.h | 27 +++++++++++++++++++++++++++
- 2 files changed, 40 insertions(+)
+ scripts/oss-fuzz/build_general_fuzzers.py | 69 +++++++++++++++++++++++
+ 1 file changed, 69 insertions(+)
+ create mode 100755 scripts/oss-fuzz/build_general_fuzzers.py
 
-diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
-index 7f266ffc63..87a1b88f9b 100644
---- a/tests/qtest/fuzz/fuzz.c
-+++ b/tests/qtest/fuzz/fuzz.c
-@@ -118,6 +118,19 @@ static FuzzTarget *fuzz_get_target(char* name)
- }
- 
- 
-+/* Sometimes called by libfuzzer to mutate two inputs into one */
-+size_t LLVMFuzzerCustomCrossOver(const uint8_t *data1, size_t size1,
-+                                 const uint8_t *data2, size_t size2,
-+                                 uint8_t *out, size_t max_out_size,
-+                                 unsigned int seed)
-+{
-+    if (fuzz_target->crossover) {
-+        return fuzz_target->crossover(data1, size1, data2, size2, out,
-+                                      max_out_size, seed);
-+    }
-+    return 0;
-+}
+diff --git a/scripts/oss-fuzz/build_general_fuzzers.py b/scripts/oss-fuzz/build_general_fuzzers.py
+new file mode 100755
+index 0000000000..918f1143a5
+--- /dev/null
++++ b/scripts/oss-fuzz/build_general_fuzzers.py
+@@ -0,0 +1,69 @@
++#!/usr/bin/env python3
++# -*- coding: utf-8 -*-
 +
- /* Executed for each fuzzing-input */
- int LLVMFuzzerTestOneInput(const unsigned char *Data, size_t Size)
- {
-diff --git a/tests/qtest/fuzz/fuzz.h b/tests/qtest/fuzz/fuzz.h
-index 8eb765edc8..ed9ce17154 100644
---- a/tests/qtest/fuzz/fuzz.h
-+++ b/tests/qtest/fuzz/fuzz.h
-@@ -77,6 +77,29 @@ typedef struct FuzzTarget {
-      */
-     void(*fuzz)(QTestState *, const unsigned char *, size_t);
- 
-+    /*
-+     * The fuzzer can specify a "Custom Crossover" function for combining two
-+     * inputs from the corpus. This function is sometimes called by libfuzzer
-+     * when mutating inputs.
-+     *
-+     * data1: location of first input
-+     * size1: length of first input
-+     * data1: location of second input
-+     * size1: length of second input
-+     * out: where to place the resulting, mutated input
-+     * max_out_size: the maximum length of the input that can be placed in out
-+     * seed: the seed that should be used to make mutations deterministic, when
-+     *       needed
-+     *
-+     * See libfuzzer's LLVMFuzzerCustomCrossOver API for more info.
-+     *
-+     * Can be NULL
-+     */
-+    size_t(*crossover)(const uint8_t *data1, size_t size1,
-+                       const uint8_t *data2, size_t size2,
-+                       uint8_t *out, size_t max_out_size,
-+                       unsigned int seed);
++"""
++This script creates wrapper binaries that invoke the general-device-fuzzer with
++configurations specified in a yaml config file.
++"""
++import sys
++import os
++import yaml
++import tempfile
 +
- } FuzzTarget;
- 
- void flush_events(QTestState *);
-@@ -91,6 +114,10 @@ void fuzz_qtest_set_serialize(bool option);
-  */
- void fuzz_add_target(const FuzzTarget *target);
- 
-+size_t LLVMFuzzerCustomCrossOver(const uint8_t *data1, size_t size1,
-+                                 const uint8_t *data2, size_t size2,
-+                                 uint8_t *out, size_t max_out_size,
-+                                 unsigned int seed);
- int LLVMFuzzerTestOneInput(const unsigned char *Data, size_t Size);
- int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp);
- 
++CC = ""
++TEMPLATE_FILENAME = "target_template.c"
++TEMPLATE_PATH = ""
++
++
++def usage():
++    print("Usage: CC=COMPILER {} CONFIG_PATH \
++OUTPUT_PATH_PREFIX".format(sys.argv[0]))
++    sys.exit(0)
++
++
++def str_to_c_byte_array(s):
++    """
++    Convert strings to byte-arrays so we don't worry about formatting
++    strings to play nicely with cc -DQEMU_FUZZARGS etc
++    """
++    return ','.join('0x{:02x}'.format(ord(x)) for x in s)
++
++
++def compile_wrapper(cfg, path):
++    os.system('$CC -DQEMU_FUZZ_ARGS="{fuzz_args}" \
++               -DQEMU_FUZZ_OBJECTS="{fuzz_objs}" \
++               {wrapper_template} -o {output_bin}'.format(
++                   fuzz_args=str_to_c_byte_array(cfg["args"].replace("\n", " ")),
++                   fuzz_objs=str_to_c_byte_array(cfg["objects"].replace("\n", " ")),
++                   wrapper_template=TEMPLATE_PATH,
++                   output_bin=path))
++
++
++def main():
++    global CC
++    global TEMPLATE_PATH
++    global OUTPUT_BIN_NAME
++
++    if len(sys.argv) != 3:
++        usage()
++
++    cfg_path = sys.argv[1]
++    out_path = sys.argv[2]
++
++    CC = os.getenv("CC", default="cc")
++    TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), TEMPLATE_FILENAME)
++    if not os.path.exists(TEMPLATE_PATH):
++        print("Error {} doesn't exist".format(TEMPLATE_PATH))
++        sys.exit(1)
++
++    with open(cfg_path, "r") as f:
++        configs = yaml.load(f)["configs"]
++    for cfg in configs:
++        assert "name" in cfg
++        assert "args" in cfg
++        assert "objects" in cfg
++        compile_wrapper(cfg, out_path + cfg["name"])
++
++
++if __name__ == '__main__':
++    main()
 -- 
 2.28.0
 
