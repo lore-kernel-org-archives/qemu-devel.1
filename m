@@ -2,94 +2,89 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71342C43463
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 02:23:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0324EC43463
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 02:27:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D520A2076E
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 02:23:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7FC602078E
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 02:27:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="W/FzUPlH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D520A2076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bytedance.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S1fVUUuE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FC602078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKBUO-0002Ua-05
-	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 22:23:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41040)
+	id 1kKBYD-0004ql-Kh
+	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 22:27:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pizhenwei@bytedance.com>)
- id 1kKBTd-00024r-0w
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 22:22:49 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:38493)
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1kKBWP-000371-PP
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 22:25:42 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:42160)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <pizhenwei@bytedance.com>)
- id 1kKBTY-0000Jq-IY
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 22:22:46 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id u3so6348014pjr.3
- for <qemu-devel@nongnu.org>; Sun, 20 Sep 2020 19:22:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bytedance-com.20150623.gappssmtp.com; s=20150623;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=2W1I0uAm+1POor6UtKbJVyr/Nv8e6JyklZ++7kOlyDc=;
- b=W/FzUPlHW/ZY3P98Obau/VYJRZyTzjTnYR2pUWSXqaQV2Xfe2YhWM1O+VMyzMPtuNM
- gDlF2ODdz86iPHxqBNoOGhpRXeMh8LrZv8WdHSbBnrwHas8vmdOxVTar7ta5LMSOft6p
- 3uYPmBOyGnGGUAown1mKNROcMKht4UVwjAwC7D+cs7FtpNpIDf+pelqby4Y+MqwAS3sl
- RBDm3hiUYwZGNDwffossyEYuY9ifji1gEmLDlNHm7yulGWjwrcUslX84qRTKx158txBE
- FcDcU8+UCfw3CMRetSiWipaUFVwLn1kp/jVWdCen4nseLkb6v5N+szNd7Deuj1C4qQlz
- h5mQ==
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1kKBWJ-0000ak-UV
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 22:25:41 -0400
+Received: by mail-lj1-x244.google.com with SMTP id k25so9754832ljg.9
+ for <qemu-devel@nongnu.org>; Sun, 20 Sep 2020 19:25:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=stZ/MScYI4lX4D5+/Vjv6s6etq74BRHgj3z7ErPvgP4=;
+ b=S1fVUUuE6f4Lj4sADK/V3/5QPosCKusawJakKiyr7HcFSmjMleZXHnPw8eGOiub1Iv
+ PvNGv0dBvqogvxZvRMOyn08kQ3JxlH/zq+dwsCmOc9aaLTJ+axxVQVnRTWWwit+3zhK2
+ w3eamp0LgaC+XteLlGo8Y13VLMJUf/z/aV9Io/V0PWf+X6ZX2WKepEjOiNw5+Eu60Hos
+ IqI+pytj2i7wmBgauoy0SJiHnWPJZSgMjzcsxiky5jEY7KXfGeQYR6CGyPZ63vrueImV
+ ED8zoAeqbQtShioII5yfQ6A0Ls3uZ4BVRsXSiOt8/HhhgXbcbpxTDTvf9ivB2GXSs3O1
+ ePcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=2W1I0uAm+1POor6UtKbJVyr/Nv8e6JyklZ++7kOlyDc=;
- b=i0PudaUq2qv5ircetLNwH6dP5i3XDvLrk6oObiuYaIkVG5/UhmNF9pOPanK9qOsfp/
- w2BWMvOZh6LoOSE6ti/wGqUGrS86MpplZbL8ryPCKrslAJZ1q2DtBm3w/TFGcvK7b4p3
- ykZTgyCcYnj2FB0Az2JeVft5FhueiB82cy57ifPXHzxvdT9NJimAeJ7jpUFTXsfc5zBY
- rmSSt/mt3CVNGScIZMSoccFL4DXfNi+8Pf/4G1R9dMmLmhWH6rAj75avTpBsCwH1Zb/u
- 3xJzxWuStsWDCRppUw5Ihc8KhROqd5+MO1UZinPr2V8LibldzTEz+6FWeD1pckcwru6L
- Xrig==
-X-Gm-Message-State: AOAM533uneAZWGJoRxhe0EQGQLOe9rC9pA+L4oW3+ZDOZ+LdkjeT4lVR
- GkRf0vJpi08C557addFsKDPc2w==
-X-Google-Smtp-Source: ABdhPJyU8Em9II/6I72wzoHBy2NptA+/68YNGPyTxCX7elFYgS+LW2uo+auX+G1pSNKCFSYA28tzKg==
-X-Received: by 2002:a17:90a:9912:: with SMTP id
- b18mr24024458pjp.192.1600654962267; 
- Sun, 20 Sep 2020 19:22:42 -0700 (PDT)
-Received: from [10.2.218.189] ([61.120.150.75])
- by smtp.gmail.com with ESMTPSA id z129sm9816585pgb.84.2020.09.20.19.22.39
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 20 Sep 2020 19:22:41 -0700 (PDT)
-Subject: ping: [PATCH 0/3] add MEMORY_FAILURE event
-To: armbru@redhat.com, pbonzini@redhat.com, mtosatti@redhat.com
-References: <20200914134321.958079-1-pizhenwei@bytedance.com>
-From: zhenwei pi <pizhenwei@bytedance.com>
-Message-ID: <b38abe18-0211-d2fc-d843-c081227ac05e@bytedance.com>
-Date: Mon, 21 Sep 2020 10:22:37 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=stZ/MScYI4lX4D5+/Vjv6s6etq74BRHgj3z7ErPvgP4=;
+ b=AQHWJOfkFNs4kNAJncJZ37vv7H9SrSSAlxLqnN6uGCJpZhX2hGQx1AkWGDe3odbuVS
+ ZzjsEqj5QCiIjfqXns3GjOMadHMyd807wJzmK9TTuHmROO/BHuOCgAy0aGvFucJ/ECZH
+ bmgPXdQK3sB+ppaiN5kcVQiB3GjDAtNH+MPoKE90QaMhyKJFL/vM97JhU5Ffl9JcG0yW
+ Ieom1aRJIaGHMr5aDceymDm2UM+lufXd6PZDokYwYgBoPuNb784znq6+rskhpfpxMNH3
+ hNjiEjaSjSL0TQxSOAOxgBbFD+V1zi2xhiRWn7GM5U+sLGZc+DT4+uimwyh0C3VB+SYS
+ Khpg==
+X-Gm-Message-State: AOAM531aZ6LXbp7d8FjgOtI1LEuB5+sa6VWwy1nlyEVw5G4mnSbW0lUt
+ SqFrAeUfLTyEC9zrcOtZbOipfOdo20EeCDbK6g0=
+X-Google-Smtp-Source: ABdhPJy3aUyYagk8oYBb1NGOPKt94ISuaIku5QKeC2k95LCtx8uF+b00vcMfUbh95/2MFxLDikf2qmeROHGNwzrqvY8=
+X-Received: by 2002:a05:651c:110:: with SMTP id
+ a16mr15838588ljb.110.1600655134084; 
+ Sun, 20 Sep 2020 19:25:34 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200914134321.958079-1-pizhenwei@bytedance.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=pizhenwei@bytedance.com; helo=mail-pj1-x1043.google.com
+References: <1600222344-16808-1-git-send-email-chenhc@lemote.com>
+ <7c38105a-831f-b306-9250-8d0c43fc4108@amsat.org>
+In-Reply-To: <7c38105a-831f-b306-9250-8d0c43fc4108@amsat.org>
+From: chen huacai <zltjiangshi@gmail.com>
+Date: Mon, 21 Sep 2020 10:25:21 +0800
+Message-ID: <CABDp7Vqz=x=WhvcU=aZKpO2oRPjJsjNgrutODUqdRjMYj=8uEg@mail.gmail.com>
+Subject: Re: [PATCH V9 0/6] mips: Add Loongson-3 machine support
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::244;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-lj1-x244.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,41 +98,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Huacai Chen <chenhuacai@gmail.com>, qemu-level <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+Hi, Philippe,
 
-A patchset about handling 'MCE' might have been ignored, can anyone tell 
-me whether the purpose is reasonable?
+On Thu, Sep 17, 2020 at 3:56 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+>
+> Hi Huacai,
+>
+> On 9/16/20 4:12 AM, Huacai Chen wrote:
+> > Loongson-3 CPU family include Loongson-3A R1/R2/R3/R4 and Loongson-3B
+> > R1/R2. Loongson-3A R1 is the oldest and its ISA is the smallest, while
+> > Loongson-3A R4 is the newest and its ISA is almost the superset of all
+> > others. To reduce complexity, in QEMU we just define two CPU types:
+> >
+> > 1, "Loongson-3A1000" CPU which is corresponding to Loongson-3A R1. It i=
+s
+> >    suitable for TCG because Loongson-3A R1 has fewest ASE.
+> > 2, "Loongson-3A4000" CPU which is corresponding to Loongson-3A R4. It i=
+s
+> >    suitable for KVM because Loongson-3A R4 has the VZ ASE.
+> >
+> [...]
+>
+> > Of course the upstream kernel is also usable (though it is "unstable"
+> > now):
+> >
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+> >
+> > How to use QEMU/Loongson-3?
+> > 1, Download kernel source from the above URL;
+> > 2, Build a kernel with arch/mips/configs/loongson3_{def,hpc}config;
+> > 3, Boot a Loongson-3A4000 host with this kernel (for KVM mode);
+> > 4, Build QEMU-master with this patchset;
+> > 5, modprobe kvm (only necessary for KVM mode);
+> > 6, Use QEMU with TCG:
+> >        qemu-system-mips64el -M loongson3-virt,accel=3Dtcg -cpu Loongson=
+-3A1000 -kernel <path_to_kernel> -append ...
+> >    Use QEMU with KVM:
+> >        qemu-system-mips64el -M loongson3-virt,accel=3Dkvm -cpu Loongson=
+-3A4000 -kernel <path_to_kernel> -append ...
+>
+> Can you add a KVM-only build CI job?
+> Simply building, not running test, as there is no MIPS CI.
+>
+> See for example commit 41e1f0e2256 (".travis.yml: Add a KVM-only
+> s390x job"), but add it to GitLab instead.
+I have some difficulties in CI testing (I think I should setup a CI
+environment first), can this work be done by others, or in future
+after this series?
 
-https://patchwork.kernel.org/cover/11773795/
+Huacai
+>
+> Thanks!
+>
+> Phil.
 
-On 9/14/20 9:43 PM, zhenwei pi wrote:
-> Although QEMU could catch signal BUS to handle hardware memory
-> corrupted event, sadly, QEMU just prints a little log and try to fix
-> it silently.
-> 
-> In these patches, introduce a 'MEMORY_FAILURE' event with 4 detailed
-> actions of QEMU, then uplayer could know what situaction QEMU hit and
-> did. And further step we can do: if a host server hits a 'hypervisor-ignore'
-> or 'guest-mce', scheduler could migrate VM to another host; if hitting
-> 'hypervisor-stop' or 'guest-triple-fault', scheduler could select other
-> healthy servers to launch VM.
-> 
-> zhenwei pi (3):
->    target-i386: seperate MCIP & MCE_MASK error reason
->    iqapi/run-state.json: introduce memory failure event
->    target-i386: post memory failure event to uplayer
-> 
->   qapi/run-state.json  | 46 ++++++++++++++++++++++++++++++++++++++++++++++
->   target/i386/helper.c | 30 +++++++++++++++++++++++-------
->   target/i386/kvm.c    |  5 ++++-
->   3 files changed, 73 insertions(+), 8 deletions(-)
-> 
 
--- 
-zhenwei pi
+
+--=20
+Huacai Chen
 
