@@ -2,86 +2,91 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75EB9C4363C
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 17:53:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4492C4363C
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 17:53:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E29220BED
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 17:53:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3FAFA20BED
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 17:53:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YP/Lnlos"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E29220BED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VFTisdKo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FAFA20BED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKPzt-0003n5-Qe
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 13:53:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46670)
+	id 1kKPzx-0003td-9Q
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 13:53:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46126)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kKPr8-0001vV-BC
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 13:44:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38534)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kKPr4-0000UM-78
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 13:44:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600710237;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=txVtSusGIWUv9yp1/LucJfBamvhPtUCA/Mzl8njc4j4=;
- b=YP/LnlosQATb5tPLzCTt4yO6J1lsJyt1bHzenHVRjVQrh2tNcCMQ2/pYnyblm6TK6b+fBg
- j8lnqzUdshpAcPzfbPfLbhSfQnkp21nGgoeE3Ghy4ImGwgFXxR8puFbXV/lYUhzl4aUUmO
- 4Z69X9KWOSXf9Yf39Sm6eq8WNJsFQ4I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-493-Czk9A0wDPZaGps6Q6BZwKg-1; Mon, 21 Sep 2020 13:43:53 -0400
-X-MC-Unique: Czk9A0wDPZaGps6Q6BZwKg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 711451018F60;
- Mon, 21 Sep 2020 17:43:52 +0000 (UTC)
-Received: from thuth.com (ovpn-112-14.ams2.redhat.com [10.36.112.14])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 378EE5D9CD;
- Mon, 21 Sep 2020 17:43:46 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH 5/7] tests/docker: Remove old Debian 9 containers
-Date: Mon, 21 Sep 2020 19:43:18 +0200
-Message-Id: <20200921174320.46062-6-thuth@redhat.com>
-In-Reply-To: <20200921174320.46062-1-thuth@redhat.com>
-References: <20200921174320.46062-1-thuth@redhat.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kKPoy-0008Ba-Rf
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 13:41:50 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:40714)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kKPom-0000J1-P6
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 13:41:48 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id gf14so145058pjb.5
+ for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 10:41:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=i9goDzbjSTWkoFEIajUOTkDHVXwsFM6EiBokklPiC/I=;
+ b=VFTisdKorwd8Ug81L0VzhpB2ZYpTKCGXicOUlJ+oIpROe9+eryyIg2VDRnptv1zV9s
+ CD1Q1Vkmuf4rEfEBcAOR5Or8P94Gk+2Zh11fapkdK0l249MMslthDG81zPw5oPVBLB6A
+ sZFn8681Ga+aCB/uls98LTqU2K8NJoyNb9Rmm05DZzopWJwvimpTM0IQ+vSG168KOzT2
+ V6KYD6dKsGaG9R3EyTwfb2EQFJonrmagE30Nq3XDHh4OSQI1ffgSt+qSsJTiTxx1QwcP
+ UIOoLOyKVDverJKKUOk9G41zBqbBEMw8taX74mICXpM87CsAosYqUWe2AkaNYh0hwNM4
+ mvlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=i9goDzbjSTWkoFEIajUOTkDHVXwsFM6EiBokklPiC/I=;
+ b=OsWwuWzFNMGZ02b//AbIyNQd3jNwn+sYLCPYfqXvZEmjdwbZWLAxFy+5AeuBKsWBHN
+ jqJNSguZSGr9MYVGjpDi6aFNaAovqZWrb0dKJ2wlUDVfmuw70H2maFi9qEHQiF7/6MHD
+ WkDADPB1SuO/Tzte7jWH8na9+ms0gEMRqEjvPG7XUv4KOs98sPmgWV6uAm8sb5EAUvva
+ TpK+aeDdseeB8Nf4GC/9Z5FaKQ8ZsDhyRAXZlS6J5Euj6c+jQkFTyc1/KOukqyq1bCvD
+ PxWscFj8LxWhuIkiYZa2++s1Wk1UKG+oOh9PWX03P6ExaGW3m3s4Xe6tj5yIcTo+ed3O
+ hUZg==
+X-Gm-Message-State: AOAM531PliGVP04uX3qkW/W0DMz8PEZ56l1P0aQ3jnaAgp4VHXEIGY0k
+ ssmjEk3+Lq+bUa+wokGPchs5op7agpp50w==
+X-Google-Smtp-Source: ABdhPJyzC1eb0mCyxNxQVwoBJPqOHcZJML3V5oGsIJ5YS5dyAX+aAqPXL4Hphyx3nF0jY9sSqE6jzg==
+X-Received: by 2002:a17:90a:6701:: with SMTP id n1mr414465pjj.87.1600710093492; 
+ Mon, 21 Sep 2020 10:41:33 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id x4sm12585379pfm.86.2020.09.21.10.41.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 21 Sep 2020 10:41:32 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 09/11] disas: Split out capstone code to disas/capstone.c
+Date: Mon, 21 Sep 2020 10:41:16 -0700
+Message-Id: <20200921174118.39352-10-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200921174118.39352-1-richard.henderson@linaro.org>
+References: <20200921174118.39352-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:43:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,216 +99,658 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We do not support Debian 9 in QEMU anymore, and the Debian 9 containers
-are now no longer used in the gitlab-CI. Time to remove them.
+There is nothing target-specific about this code, so it
+can be added to common_ss.  This also requires that the
+base capstone dependency be added to common_ss, so that
+we get the correct include paths added to CFLAGS.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- .gitlab-ci.d/containers.yml                   | 12 -----
- .../dockerfiles/debian-win32-cross.docker     | 38 ----------------
- .../dockerfiles/debian-win64-cross.docker     | 45 -------------------
- tests/docker/dockerfiles/debian9-mxe.docker   | 21 ---------
- tests/docker/dockerfiles/debian9.docker       | 32 -------------
- 5 files changed, 148 deletions(-)
- delete mode 100644 tests/docker/dockerfiles/debian-win32-cross.docker
- delete mode 100644 tests/docker/dockerfiles/debian-win64-cross.docker
- delete mode 100644 tests/docker/dockerfiles/debian9-mxe.docker
- delete mode 100644 tests/docker/dockerfiles/debian9.docker
+ include/disas/dis-asm.h |  12 ++
+ disas.c                 | 275 --------------------------------------
+ disas/capstone.c        | 286 ++++++++++++++++++++++++++++++++++++++++
+ disas/meson.build       |   1 +
+ meson.build             |   1 +
+ 5 files changed, 300 insertions(+), 275 deletions(-)
+ create mode 100644 disas/capstone.c
 
-diff --git a/.gitlab-ci.d/containers.yml b/.gitlab-ci.d/containers.yml
-index 089cea7c14..11d079ea58 100644
---- a/.gitlab-ci.d/containers.yml
-+++ b/.gitlab-ci.d/containers.yml
-@@ -48,18 +48,6 @@ amd64-debian11-container:
-   variables:
-     NAME: debian11
+diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
+index 6b45aa9898..2164762b46 100644
+--- a/include/disas/dis-asm.h
++++ b/include/disas/dis-asm.h
+@@ -460,6 +460,18 @@ int print_insn_riscv32          (bfd_vma, disassemble_info*);
+ int print_insn_riscv64          (bfd_vma, disassemble_info*);
+ int print_insn_rx(bfd_vma, disassemble_info *);
  
--amd64-debian9-container:
--  <<: *container_job_definition
--  variables:
--    NAME: debian9
++#ifdef CONFIG_CAPSTONE
++bool cap_disas_target(disassemble_info *info, uint64_t pc, size_t size);
++bool cap_disas_host(disassemble_info *info, void *code, size_t size);
++bool cap_disas_monitor(disassemble_info *info, uint64_t pc, int count);
++bool cap_disas_plugin(disassemble_info *info, uint64_t pc, size_t size);
++#else
++# define cap_disas_target(i, p, s)  false
++# define cap_disas_host(i, p, s)    false
++# define cap_disas_monitor(i, p, c) false
++# define cap_disas_plugin(i, p, c)  false
++#endif /* CONFIG_CAPSTONE */
++
+ #ifndef ATTRIBUTE_UNUSED
+ #define ATTRIBUTE_UNUSED __attribute__((unused))
+ #endif
+diff --git a/disas.c b/disas.c
+index 01c8bc6c9e..e27dea2c19 100644
+--- a/disas.c
++++ b/disas.c
+@@ -107,255 +107,6 @@ static int print_insn_od_target(bfd_vma pc, disassemble_info *info)
+     return print_insn_objdump(pc, info, "OBJD-T");
+ }
+ 
+-#ifdef CONFIG_CAPSTONE
+-/* Temporary storage for the capstone library.  This will be alloced via
+-   malloc with a size private to the library; thus there's no reason not
+-   to share this across calls and across host vs target disassembly.  */
+-static __thread cs_insn *cap_insn;
 -
--amd64-debian9-mxe-container:
--  <<: *container_job_definition
--  stage: containers-layer2
--  needs: ['amd64-debian9-container']
--  variables:
--    NAME: debian9-mxe
+-/* Initialize the Capstone library.  */
+-/* ??? It would be nice to cache this.  We would need one handle for the
+-   host and one for the target.  For most targets we can reset specific
+-   parameters via cs_option(CS_OPT_MODE, new_mode), but we cannot change
+-   CS_ARCH_* in this way.  Thus we would need to be able to close and
+-   re-open the target handle with a different arch for the target in order
+-   to handle AArch64 vs AArch32 mode switching.  */
+-static cs_err cap_disas_start(disassemble_info *info, csh *handle)
+-{
+-    cs_mode cap_mode = info->cap_mode;
+-    cs_err err;
 -
- alpha-debian-cross-container:
-   <<: *container_job_definition
-   stage: containers-layer2
-diff --git a/tests/docker/dockerfiles/debian-win32-cross.docker b/tests/docker/dockerfiles/debian-win32-cross.docker
-deleted file mode 100644
-index b045e821b9..0000000000
---- a/tests/docker/dockerfiles/debian-win32-cross.docker
-+++ /dev/null
-@@ -1,38 +0,0 @@
--#
--# Docker mingw32 cross-compiler target
--#
--# This docker target builds on the debian Stretch MXE base image.
--#
--FROM qemu/debian9-mxe
+-    cap_mode += (info->endian == BFD_ENDIAN_BIG ? CS_MODE_BIG_ENDIAN
+-                 : CS_MODE_LITTLE_ENDIAN);
 -
--MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
+-    err = cs_open(info->cap_arch, cap_mode, handle);
+-    if (err != CS_ERR_OK) {
+-        return err;
+-    }
 -
--ENV TARGET i686
+-    /* ??? There probably ought to be a better place to put this.  */
+-    if (info->cap_arch == CS_ARCH_X86) {
+-        /* We don't care about errors (if for some reason the library
+-           is compiled without AT&T syntax); the user will just have
+-           to deal with the Intel syntax.  */
+-        cs_option(*handle, CS_OPT_SYNTAX, CS_OPT_SYNTAX_ATT);
+-    }
 -
--ENV PATH $PATH:/usr/lib/mxe/usr/bin:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/bin
+-    /* "Disassemble" unknown insns as ".byte W,X,Y,Z".  */
+-    cs_option(*handle, CS_OPT_SKIPDATA, CS_OPT_ON);
 -
--ENV PKG_CONFIG_PATH \
--    $PKG_CONFIG_PATH:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/lib/pkgconfig
+-    /* Allocate temp space for cs_disasm_iter.  */
+-    if (cap_insn == NULL) {
+-        cap_insn = cs_malloc(*handle);
+-        if (cap_insn == NULL) {
+-            cs_close(handle);
+-            return CS_ERR_MEM;
+-        }
+-    }
+-    return CS_ERR_OK;
+-}
 -
--RUN apt-get update && \
--    DEBIAN_FRONTEND=noninteractive eatmydata \
--    apt-get install -y --no-install-recommends \
--        mxe-$TARGET-w64-mingw32.shared-bzip2 \
--        mxe-$TARGET-w64-mingw32.shared-curl \
--        mxe-$TARGET-w64-mingw32.shared-glib \
--        mxe-$TARGET-w64-mingw32.shared-libgcrypt \
--        mxe-$TARGET-w64-mingw32.shared-libusb1 \
--        mxe-$TARGET-w64-mingw32.shared-lzo \
--        mxe-$TARGET-w64-mingw32.shared-nettle \
--        mxe-$TARGET-w64-mingw32.shared-ncurses \
--        mxe-$TARGET-w64-mingw32.shared-nsis \
--        mxe-$TARGET-w64-mingw32.shared-pixman \
--        mxe-$TARGET-w64-mingw32.shared-pkgconf \
--        mxe-$TARGET-w64-mingw32.shared-pthreads \
--        mxe-$TARGET-w64-mingw32.shared-sdl2 \
--        mxe-$TARGET-w64-mingw32.shared-sdl2-mixer \
--        mxe-$TARGET-w64-mingw32.shared-sdl2-gfx \
--        mxe-$TARGET-w64-mingw32.shared-zlib
+-static void cap_dump_insn_units(disassemble_info *info, cs_insn *insn,
+-                                int i, int n)
+-{
+-    fprintf_function print = info->fprintf_func;
+-    FILE *stream = info->stream;
 -
--# Specify the cross prefix for this image (see tests/docker/common.rc)
--ENV QEMU_CONFIGURE_OPTS --cross-prefix=$TARGET-w64-mingw32.shared-
-diff --git a/tests/docker/dockerfiles/debian-win64-cross.docker b/tests/docker/dockerfiles/debian-win64-cross.docker
-deleted file mode 100644
-index 4cc4a3f365..0000000000
---- a/tests/docker/dockerfiles/debian-win64-cross.docker
-+++ /dev/null
-@@ -1,45 +0,0 @@
--#
--# Docker mingw64 cross-compiler target
--#
--# This docker target builds on the debian Stretch MXE base image.
--#
--FROM qemu/debian9-mxe
+-    switch (info->cap_insn_unit) {
+-    case 4:
+-        if (info->endian == BFD_ENDIAN_BIG) {
+-            for (; i < n; i += 4) {
+-                print(stream, " %08x", ldl_be_p(insn->bytes + i));
 -
--MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
+-            }
+-        } else {
+-            for (; i < n; i += 4) {
+-                print(stream, " %08x", ldl_le_p(insn->bytes + i));
+-            }
+-        }
+-        break;
 -
--ENV TARGET x86-64
+-    case 2:
+-        if (info->endian == BFD_ENDIAN_BIG) {
+-            for (; i < n; i += 2) {
+-                print(stream, " %04x", lduw_be_p(insn->bytes + i));
+-            }
+-        } else {
+-            for (; i < n; i += 2) {
+-                print(stream, " %04x", lduw_le_p(insn->bytes + i));
+-            }
+-        }
+-        break;
 -
--ENV PATH $PATH:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/bin
+-    default:
+-        for (; i < n; i++) {
+-            print(stream, " %02x", insn->bytes[i]);
+-        }
+-        break;
+-    }
+-}
 -
--ENV PKG_CONFIG_PATH \
--    $PKG_CONFIG_PATH:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/lib/pkgconfig
+-static void cap_dump_insn(disassemble_info *info, cs_insn *insn)
+-{
+-    fprintf_function print = info->fprintf_func;
+-    int i, n, split;
 -
--RUN apt-get update && \
--    DEBIAN_FRONTEND=noninteractive eatmydata \
--    apt-get install -y --no-install-recommends \
--        mxe-$TARGET-w64-mingw32.shared-bzip2 \
--        mxe-$TARGET-w64-mingw32.shared-curl \
--        mxe-$TARGET-w64-mingw32.shared-glib \
--        mxe-$TARGET-w64-mingw32.shared-libgcrypt \
--        mxe-$TARGET-w64-mingw32.shared-libusb1 \
--        mxe-$TARGET-w64-mingw32.shared-lzo \
--        mxe-$TARGET-w64-mingw32.shared-nettle \
--        mxe-$TARGET-w64-mingw32.shared-ncurses \
--        mxe-$TARGET-w64-mingw32.shared-nsis \
--        mxe-$TARGET-w64-mingw32.shared-pixman \
--        mxe-$TARGET-w64-mingw32.shared-pkgconf \
--        mxe-$TARGET-w64-mingw32.shared-pthreads \
--        mxe-$TARGET-w64-mingw32.shared-sdl2 \
--        mxe-$TARGET-w64-mingw32.shared-sdl2-mixer \
--        mxe-$TARGET-w64-mingw32.shared-sdl2-gfx \
--        mxe-$TARGET-w64-mingw32.shared-zlib \
--        curl && \
--    curl -s -S -o /usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/WinHvEmulation.h \
--        "https://sourceforge.net/p/mingw-w64/mingw-w64/ci/master/tree/mingw-w64-headers/include/winhvemulation.h?format=raw" && \
--    curl -s -S -o /usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/WinHvPlatform.h \
--        "https://sourceforge.net/p/mingw-w64/mingw-w64/ci/master/tree/mingw-w64-headers/include/winhvplatform.h?format=raw" && \
--    curl -s -S -o /usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/winhvplatformdefs.h \
--        "https://sourceforge.net/p/mingw-w64/mingw-w64/ci/master/tree/mingw-w64-headers/include/winhvplatformdefs.h?format=raw"
+-    print(info->stream, "0x%08" PRIx64 ": ", insn->address);
 -
--# Specify the cross prefix for this image (see tests/docker/common.rc)
--ENV QEMU_CONFIGURE_OPTS --cross-prefix=x86_64-w64-mingw32.shared-
-diff --git a/tests/docker/dockerfiles/debian9-mxe.docker b/tests/docker/dockerfiles/debian9-mxe.docker
-deleted file mode 100644
-index ae2c222a6f..0000000000
---- a/tests/docker/dockerfiles/debian9-mxe.docker
-+++ /dev/null
-@@ -1,21 +0,0 @@
--#
--# Docker mingw cross-compiler target
--#
--# This docker target builds on the debian Stretch base image.
--#
--FROM qemu/debian9
+-    n = insn->size;
+-    split = info->cap_insn_split;
 -
--MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
+-    /* Dump the first SPLIT bytes of the instruction.  */
+-    cap_dump_insn_units(info, insn, 0, MIN(n, split));
 -
--RUN DEBIAN_FRONTEND=noninteractive eatmydata \
--    apt install -y --no-install-recommends gnupg dirmngr
+-    /* Add padding up to SPLIT so that mnemonics line up.  */
+-    if (n < split) {
+-        int width = (split - n) / info->cap_insn_unit;
+-        width *= (2 * info->cap_insn_unit + 1);
+-        print(info->stream, "%*s", width, "");
+-    }
 -
--# Add the foreign architecture we want and install dependencies
--RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C6BF758A33A3A276 && \
--    echo "deb http://pkg.mxe.cc/repos/apt stretch main" > /etc/apt/sources.list.d/mxeapt.list
--RUN apt-get update && \
--    DEBIAN_FRONTEND=noninteractive eatmydata \
--    apt-get install -y --no-install-recommends \
--        $(apt-get -s install -y --no-install-recommends gw32.shared-mingw-w64 | egrep "^Inst mxe-x86-64-unknown-" | cut -d\  -f2)
+-    /* Print the actual instruction.  */
+-    print(info->stream, "  %-8s %s\n", insn->mnemonic, insn->op_str);
 -
--ENV PATH $PATH:/usr/lib/mxe/usr/bin/
-diff --git a/tests/docker/dockerfiles/debian9.docker b/tests/docker/dockerfiles/debian9.docker
-deleted file mode 100644
-index 3edb5147ef..0000000000
---- a/tests/docker/dockerfiles/debian9.docker
-+++ /dev/null
-@@ -1,32 +0,0 @@
--#
--# Docker multiarch cross-compiler target
--#
--# This docker target is builds on Debian cross compiler targets to build distro
--# with a selection of cross compilers for building test binaries.
--#
--# On its own you can't build much but the docker-foo-cross targets
--# build on top of the base debian image.
--#
--FROM debian:stretch-slim
+-    /* Dump any remaining part of the insn on subsequent lines.  */
+-    for (i = split; i < n; i += split) {
+-        print(info->stream, "0x%08" PRIx64 ": ", insn->address + i);
+-        cap_dump_insn_units(info, insn, i, MIN(n, i + split));
+-        print(info->stream, "\n");
+-    }
+-}
 -
--# Duplicate deb line as deb-src
--RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
+-/* Disassemble SIZE bytes at PC for the target.  */
+-static bool cap_disas_target(disassemble_info *info, uint64_t pc, size_t size)
+-{
+-    uint8_t cap_buf[1024];
+-    csh handle;
+-    cs_insn *insn;
+-    size_t csize = 0;
 -
--# Install common build utilities
--RUN apt update && \
--    DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata && \
--    DEBIAN_FRONTEND=noninteractive eatmydata \
--    apt install -y --no-install-recommends \
--        bc \
--        build-essential \
--        ca-certificates \
--        clang \
--        gdb-multiarch \
--        gettext \
--        git \
--        libncurses5-dev \
--        pkg-config \
--        psmisc \
--        python3 \
--        python3-setuptools \
--        $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\  -f2)
+-    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
+-        return false;
+-    }
+-    insn = cap_insn;
+-
+-    while (1) {
+-        size_t tsize = MIN(sizeof(cap_buf) - csize, size);
+-        const uint8_t *cbuf = cap_buf;
+-
+-        target_read_memory(pc + csize, cap_buf + csize, tsize, info);
+-        csize += tsize;
+-        size -= tsize;
+-
+-        while (cs_disasm_iter(handle, &cbuf, &csize, &pc, insn)) {
+-            cap_dump_insn(info, insn);
+-        }
+-
+-        /* If the target memory is not consumed, go back for more... */
+-        if (size != 0) {
+-            /* ... taking care to move any remaining fractional insn
+-               to the beginning of the buffer.  */
+-            if (csize != 0) {
+-                memmove(cap_buf, cbuf, csize);
+-            }
+-            continue;
+-        }
+-
+-        /* Since the target memory is consumed, we should not have
+-           a remaining fractional insn.  */
+-        if (csize != 0) {
+-            (*info->fprintf_func)(info->stream,
+-                "Disassembler disagrees with translator "
+-                "over instruction decoding\n"
+-                "Please report this to qemu-devel@nongnu.org\n");
+-        }
+-        break;
+-    }
+-
+-    cs_close(&handle);
+-    return true;
+-}
+-
+-/* Disassemble SIZE bytes at CODE for the host.  */
+-static bool cap_disas_host(disassemble_info *info, void *code, size_t size)
+-{
+-    csh handle;
+-    const uint8_t *cbuf;
+-    cs_insn *insn;
+-    uint64_t pc;
+-
+-    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
+-        return false;
+-    }
+-    insn = cap_insn;
+-
+-    cbuf = code;
+-    pc = (uintptr_t)code;
+-
+-    while (cs_disasm_iter(handle, &cbuf, &size, &pc, insn)) {
+-        cap_dump_insn(info, insn);
+-    }
+-    if (size != 0) {
+-        (*info->fprintf_func)(info->stream,
+-            "Disassembler disagrees with TCG over instruction encoding\n"
+-            "Please report this to qemu-devel@nongnu.org\n");
+-    }
+-
+-    cs_close(&handle);
+-    return true;
+-}
+-
+-#if !defined(CONFIG_USER_ONLY)
+-/* Disassemble COUNT insns at PC for the target.  */
+-static bool cap_disas_monitor(disassemble_info *info, uint64_t pc, int count)
+-{
+-    uint8_t cap_buf[32];
+-    csh handle;
+-    cs_insn *insn;
+-    size_t csize = 0;
+-
+-    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
+-        return false;
+-    }
+-    insn = cap_insn;
+-
+-    while (1) {
+-        /* We want to read memory for one insn, but generically we do not
+-           know how much memory that is.  We have a small buffer which is
+-           known to be sufficient for all supported targets.  Try to not
+-           read beyond the page, Just In Case.  For even more simplicity,
+-           ignore the actual target page size and use a 1k boundary.  If
+-           that turns out to be insufficient, we'll come back around the
+-           loop and read more.  */
+-        uint64_t epc = QEMU_ALIGN_UP(pc + csize + 1, 1024);
+-        size_t tsize = MIN(sizeof(cap_buf) - csize, epc - pc);
+-        const uint8_t *cbuf = cap_buf;
+-
+-        /* Make certain that we can make progress.  */
+-        assert(tsize != 0);
+-        info->read_memory_func(pc, cap_buf + csize, tsize, info);
+-        csize += tsize;
+-
+-        if (cs_disasm_iter(handle, &cbuf, &csize, &pc, insn)) {
+-            cap_dump_insn(info, insn);
+-            if (--count <= 0) {
+-                break;
+-            }
+-        }
+-        memmove(cap_buf, cbuf, csize);
+-    }
+-
+-    cs_close(&handle);
+-    return true;
+-}
+-#endif /* !CONFIG_USER_ONLY */
+-#else
+-# define cap_disas_target(i, p, s)  false
+-# define cap_disas_host(i, p, s)  false
+-# define cap_disas_monitor(i, p, c)  false
+-# define cap_disas_plugin(i, p, c) false
+-#endif /* CONFIG_CAPSTONE */
+-
+ static void initialize_debug(CPUDebug *s)
+ {
+     memset(s, 0, sizeof(*s));
+@@ -513,32 +264,6 @@ static void plugin_print_address(bfd_vma addr, struct disassemble_info *info)
+ }
+ 
+ 
+-#ifdef CONFIG_CAPSTONE
+-/* Disassemble a single instruction directly into plugin output */
+-static
+-bool cap_disas_plugin(disassemble_info *info, uint64_t pc, size_t size)
+-{
+-    uint8_t cap_buf[64];
+-    const uint8_t *cbuf = cap_buf;
+-    csh handle;
+-
+-    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
+-        return false;
+-    }
+-
+-    assert(size < sizeof(cap_buf));
+-    target_read_memory(pc, cap_buf, size, info);
+-
+-    if (cs_disasm_iter(handle, &cbuf, &size, &pc, cap_insn)) {
+-        GString *s = (GString *)info->stream;
+-        g_string_printf(s, "%s %s", cap_insn->mnemonic, cap_insn->op_str);
+-    }
+-
+-    cs_close(&handle);
+-    return true;
+-}
+-#endif
+-
+ /*
+  * We should only be dissembling one instruction at a time here. If
+  * there is left over it usually indicates the front end has read more
+diff --git a/disas/capstone.c b/disas/capstone.c
+new file mode 100644
+index 0000000000..b48f83958d
+--- /dev/null
++++ b/disas/capstone.c
+@@ -0,0 +1,286 @@
++/*
++ * Interface to the capstone disassembler.
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/bswap.h"
++#include "disas/dis-asm.h"
++#include "disas/capstone.h"
++
++
++/*
++ * Temporary storage for the capstone library.  This will be alloced via
++ * malloc with a size private to the library; thus there's no reason not
++ * to share this across calls and across host vs target disassembly.
++ */
++static __thread cs_insn *cap_insn;
++
++/*
++ * Initialize the Capstone library.
++ *
++ * ??? It would be nice to cache this.  We would need one handle for the
++ * host and one for the target.  For most targets we can reset specific
++ * parameters via cs_option(CS_OPT_MODE, new_mode), but we cannot change
++ * CS_ARCH_* in this way.  Thus we would need to be able to close and
++ * re-open the target handle with a different arch for the target in order
++ * to handle AArch64 vs AArch32 mode switching.
++ */
++static cs_err cap_disas_start(disassemble_info *info, csh *handle)
++{
++    cs_mode cap_mode = info->cap_mode;
++    cs_err err;
++
++    cap_mode += (info->endian == BFD_ENDIAN_BIG ? CS_MODE_BIG_ENDIAN
++                 : CS_MODE_LITTLE_ENDIAN);
++
++    err = cs_open(info->cap_arch, cap_mode, handle);
++    if (err != CS_ERR_OK) {
++        return err;
++    }
++
++    /* "Disassemble" unknown insns as ".byte W,X,Y,Z".  */
++    cs_option(*handle, CS_OPT_SKIPDATA, CS_OPT_ON);
++
++    if (info->cap_arch == CS_ARCH_X86) {
++        /*
++         * We don't care about errors (if for some reason the library
++         * is compiled without AT&T syntax); the user will just have
++         * to deal with the Intel syntax.
++         */
++        cs_option(*handle, CS_OPT_SYNTAX, CS_OPT_SYNTAX_ATT);
++    }
++
++    /* Allocate temp space for cs_disasm_iter.  */
++    if (cap_insn == NULL) {
++        cap_insn = cs_malloc(*handle);
++        if (cap_insn == NULL) {
++            cs_close(handle);
++            return CS_ERR_MEM;
++        }
++    }
++    return CS_ERR_OK;
++}
++
++static void cap_dump_insn_units(disassemble_info *info, cs_insn *insn,
++                                int i, int n)
++{
++    fprintf_function print = info->fprintf_func;
++    FILE *stream = info->stream;
++
++    switch (info->cap_insn_unit) {
++    case 4:
++        if (info->endian == BFD_ENDIAN_BIG) {
++            for (; i < n; i += 4) {
++                print(stream, " %08x", ldl_be_p(insn->bytes + i));
++
++            }
++        } else {
++            for (; i < n; i += 4) {
++                print(stream, " %08x", ldl_le_p(insn->bytes + i));
++            }
++        }
++        break;
++
++    case 2:
++        if (info->endian == BFD_ENDIAN_BIG) {
++            for (; i < n; i += 2) {
++                print(stream, " %04x", lduw_be_p(insn->bytes + i));
++            }
++        } else {
++            for (; i < n; i += 2) {
++                print(stream, " %04x", lduw_le_p(insn->bytes + i));
++            }
++        }
++        break;
++
++    default:
++        for (; i < n; i++) {
++            print(stream, " %02x", insn->bytes[i]);
++        }
++        break;
++    }
++}
++
++static void cap_dump_insn(disassemble_info *info, cs_insn *insn)
++{
++    fprintf_function print = info->fprintf_func;
++    FILE *stream = info->stream;
++    int i, n, split;
++
++    print(stream, "0x%08" PRIx64 ": ", insn->address);
++
++    n = insn->size;
++    split = info->cap_insn_split;
++
++    /* Dump the first SPLIT bytes of the instruction.  */
++    cap_dump_insn_units(info, insn, 0, MIN(n, split));
++
++    /* Add padding up to SPLIT so that mnemonics line up.  */
++    if (n < split) {
++        int width = (split - n) / info->cap_insn_unit;
++        width *= (2 * info->cap_insn_unit + 1);
++        print(stream, "%*s", width, "");
++    }
++
++    /* Print the actual instruction.  */
++    print(stream, "  %-8s %s\n", insn->mnemonic, insn->op_str);
++
++    /* Dump any remaining part of the insn on subsequent lines.  */
++    for (i = split; i < n; i += split) {
++        print(stream, "0x%08" PRIx64 ": ", insn->address + i);
++        cap_dump_insn_units(info, insn, i, MIN(n, i + split));
++        print(stream, "\n");
++    }
++}
++
++/* Disassemble SIZE bytes at PC for the target.  */
++bool cap_disas_target(disassemble_info *info, uint64_t pc, size_t size)
++{
++    uint8_t cap_buf[1024];
++    csh handle;
++    cs_insn *insn;
++    size_t csize = 0;
++
++    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
++        return false;
++    }
++    insn = cap_insn;
++
++    while (1) {
++        size_t tsize = MIN(sizeof(cap_buf) - csize, size);
++        const uint8_t *cbuf = cap_buf;
++
++        info->read_memory_func(pc + csize, cap_buf + csize, tsize, info);
++        csize += tsize;
++        size -= tsize;
++
++        while (cs_disasm_iter(handle, &cbuf, &csize, &pc, insn)) {
++            cap_dump_insn(info, insn);
++        }
++
++        /* If the target memory is not consumed, go back for more... */
++        if (size != 0) {
++            /*
++             * ... taking care to move any remaining fractional insn
++             * to the beginning of the buffer.
++             */
++            if (csize != 0) {
++                memmove(cap_buf, cbuf, csize);
++            }
++            continue;
++        }
++
++        /*
++         * Since the target memory is consumed, we should not have
++         * a remaining fractional insn.
++         */
++        if (csize != 0) {
++            info->fprintf_func(info->stream,
++                "Disassembler disagrees with translator "
++                "over instruction decoding\n"
++                "Please report this to qemu-devel@nongnu.org\n");
++        }
++        break;
++    }
++
++    cs_close(&handle);
++    return true;
++}
++
++/* Disassemble SIZE bytes at CODE for the host.  */
++bool cap_disas_host(disassemble_info *info, void *code, size_t size)
++{
++    csh handle;
++    const uint8_t *cbuf;
++    cs_insn *insn;
++    uint64_t pc;
++
++    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
++        return false;
++    }
++    insn = cap_insn;
++
++    cbuf = code;
++    pc = (uintptr_t)code;
++
++    while (cs_disasm_iter(handle, &cbuf, &size, &pc, insn)) {
++        cap_dump_insn(info, insn);
++    }
++    if (size != 0) {
++        info->fprintf_func(info->stream,
++            "Disassembler disagrees with TCG over instruction encoding\n"
++            "Please report this to qemu-devel@nongnu.org\n");
++    }
++
++    cs_close(&handle);
++    return true;
++}
++
++/* Disassemble COUNT insns at PC for the target.  */
++bool cap_disas_monitor(disassemble_info *info, uint64_t pc, int count)
++{
++    uint8_t cap_buf[32];
++    csh handle;
++    cs_insn *insn;
++    size_t csize = 0;
++
++    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
++        return false;
++    }
++    insn = cap_insn;
++
++    while (1) {
++        /*
++         * We want to read memory for one insn, but generically we do not
++         * know how much memory that is.  We have a small buffer which is
++         * known to be sufficient for all supported targets.  Try to not
++         * read beyond the page, Just In Case.  For even more simplicity,
++         * ignore the actual target page size and use a 1k boundary.  If
++         * that turns out to be insufficient, we'll come back around the
++         * loop and read more.
++         */
++        uint64_t epc = QEMU_ALIGN_UP(pc + csize + 1, 1024);
++        size_t tsize = MIN(sizeof(cap_buf) - csize, epc - pc);
++        const uint8_t *cbuf = cap_buf;
++
++        /* Make certain that we can make progress.  */
++        assert(tsize != 0);
++        info->read_memory_func(pc, cap_buf + csize, tsize, info);
++        csize += tsize;
++
++        if (cs_disasm_iter(handle, &cbuf, &csize, &pc, insn)) {
++            cap_dump_insn(info, insn);
++            if (--count <= 0) {
++                break;
++            }
++        }
++        memmove(cap_buf, cbuf, csize);
++    }
++
++    cs_close(&handle);
++    return true;
++}
++
++/* Disassemble a single instruction directly into plugin output */
++bool cap_disas_plugin(disassemble_info *info, uint64_t pc, size_t size)
++{
++    uint8_t cap_buf[32];
++    const uint8_t *cbuf = cap_buf;
++    csh handle;
++
++    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
++        return false;
++    }
++
++    assert(size < sizeof(cap_buf));
++    info->read_memory_func(pc, cap_buf, size, info);
++
++    if (cs_disasm_iter(handle, &cbuf, &size, &pc, cap_insn)) {
++        info->fprintf_func(info->stream, "%s %s",
++                           cap_insn->mnemonic, cap_insn->op_str);
++    }
++
++    cs_close(&handle);
++    return true;
++}
+diff --git a/disas/meson.build b/disas/meson.build
+index bde8280c73..09a852742e 100644
+--- a/disas/meson.build
++++ b/disas/meson.build
+@@ -21,5 +21,6 @@ common_ss.add(when: 'CONFIG_S390_DIS', if_true: files('s390.c'))
+ common_ss.add(when: 'CONFIG_SH4_DIS', if_true: files('sh4.c'))
+ common_ss.add(when: 'CONFIG_SPARC_DIS', if_true: files('sparc.c'))
+ common_ss.add(when: 'CONFIG_XTENSA_DIS', if_true: files('xtensa.c'))
++common_ss.add(when: capstone, if_true: files('capstone.c'))
+ 
+ specific_ss.add(when: 'CONFIG_TCG_INTERPRETER', if_true: files('tci.c'))
+diff --git a/meson.build b/meson.build
+index 114b136129..f06e3a1b65 100644
+--- a/meson.build
++++ b/meson.build
+@@ -965,6 +965,7 @@ common_ss.add(files('cpus-common.c'))
+ 
+ subdir('softmmu')
+ 
++common_ss.add(capstone)
+ specific_ss.add(files('disas.c', 'exec.c', 'gdbstub.c'), capstone, libpmem, libdaxctl)
+ specific_ss.add(files('exec-vary.c'))
+ specific_ss.add(when: 'CONFIG_TCG', if_true: files(
 -- 
-2.18.2
+2.25.1
 
 
