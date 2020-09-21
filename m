@@ -2,85 +2,96 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85A27C43463
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 10:42:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66FD2C43464
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 10:55:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B425B214F1
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 10:42:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DB5820719
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 10:55:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="INGG3Jhd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B425B214F1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fDzRAZRf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DB5820719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKJHB-00011G-Mm
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 06:42:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59082)
+	id 1kKJTi-0003Hz-GM
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 06:55:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33566)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kKJG6-0000TF-TG
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 06:41:22 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46900
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kKJG4-0003KA-LW
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 06:41:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600684879;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=rIWQR4Fyrrte8nYlAtvYxFdoZSp0D2WoKSHF1VOh040=;
- b=INGG3JhdmMV0/oh8C277t2++sJi0IaxRMElj98SgDqVpMX8hfd628yUlWPX6haOSfx0w8/
- TSbwlJajvS8vngj6acBncNS4IxBb/PdcXVXRNOA3AtUjsBdX3vWagSkNPhzEWR1hOzRxeo
- jAb9aSUZmkP9+iq0Ap1xm6diQyP1uEw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-452-0KoNQcPCPb-_d_zhf_g9Gg-1; Mon, 21 Sep 2020 06:41:13 -0400
-X-MC-Unique: 0KoNQcPCPb-_d_zhf_g9Gg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8FD91107466C;
- Mon, 21 Sep 2020 10:41:12 +0000 (UTC)
-Received: from localhost (ovpn-114-170.ams2.redhat.com [10.36.114.170])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F180210013BD;
- Mon, 21 Sep 2020 10:41:08 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [RFC] Move to C11 Atomics
-Date: Mon, 21 Sep 2020 11:41:07 +0100
-Message-Id: <20200921104107.134323-1-stefanha@redhat.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kKJSl-0002Yo-8T
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 06:54:27 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44649)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kKJSi-0004ab-OH
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 06:54:26 -0400
+Received: by mail-wr1-x444.google.com with SMTP id s12so12215640wrw.11
+ for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 03:54:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=I6Rp97E/QcYp0nDigq8dBBD3XqmoSh8t5UVNtY3qWXk=;
+ b=fDzRAZRfIMtq1BoDhsy8yFVBekMexDcyJ74Gq3MkclPyQqwMqh9ah0tksxIsv/lnMV
+ qnrTXPdeaxUsubXGzS1xd3Pf6qBtCOLRt8tFXFRd+0i/IFeLjnqn27Ssdf1qlZx1TyMA
+ A8TwsKsbBWZrTgCH8yFeVy0ZTNuC2lyGrr4Yx8Ak03gRUV7j7RcQbfzrkTUZPxj4WIJg
+ 2jBpq6HnRTw4iDy3RYlq8bdLhj9ahys7CefD4rwSeNZMTve2qB2NZwm9bm8E2tvxhbiR
+ kWAhwdbMSLzJYax3VG7nBaxpPId2Rrt/kIUwxGOrZorFlULb1NAk+yEawxYSn8sHU2/b
+ ePzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=I6Rp97E/QcYp0nDigq8dBBD3XqmoSh8t5UVNtY3qWXk=;
+ b=TpbOP+vN+hwYKlaXNByLIKPicn0ogacLgZVwQ8xL4NelVcGerAee4pZZvf5+osn/zY
+ /b+HYYIFLmvdjRBuLLeuHyITN1NLZcPiGGviThZf/503//zFvM+3MWlWq1F0dgf/iQUU
+ 8vaM+UVYyu6RM3L4v4XORqY5mB6sihlNZOXuxlysfKJNGtxARtBe/yKctfcpO1FD7Rf+
+ lJFt4Sygu/sTvjiPE8IFIFU7t2ax7m+mABvQhJIM0h2vRJM5ZLKZVd6K/wrnsugNe2kM
+ g0WWvGe6NBhQgWxnN+JZNwOdEA6517kMdvDd3bBLxgNH8ns4zNpaxaCLAt0+edOAbswA
+ g7Mw==
+X-Gm-Message-State: AOAM533/6P8nwvOP4oUTWlBf0JTL503OCaH7SUF7+iAavq72Byci9PKx
+ cDUJ50iKOQHd2e5TVennmtoxug==
+X-Google-Smtp-Source: ABdhPJyY11HOCn/i9E4XzsUAFqioyYW0ueLx0fOVcZhD+oKJNp4a4QywsDmDLlDKmTu5FBYLqXLkPg==
+X-Received: by 2002:a5d:4081:: with SMTP id o1mr53437821wrp.338.1600685662550; 
+ Mon, 21 Sep 2020 03:54:22 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 97sm20622776wrm.15.2020.09.21.03.54.21
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 21 Sep 2020 03:54:21 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id DE7D41FF7E;
+ Mon, 21 Sep 2020 11:54:20 +0100 (BST)
+References: <20200917235720.2685978-1-richard.henderson@linaro.org>
+ <20200917235720.2685978-2-richard.henderson@linaro.org>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v3 01/10] capstone: Convert Makefile bits to meson bits
+In-reply-to: <20200917235720.2685978-2-richard.henderson@linaro.org>
+Date: Mon, 21 Sep 2020 11:54:20 +0100
+Message-ID: <87wo0no0wz.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 04:38:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.501,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MIME_BASE64_TEXT=1.741, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,181 +104,410 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Daniel Berrange <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-VGhpcyBwYXRjaCBpcyBpbmNvbXBsZXRlIGJ1dCBJIGFtIGxvb2tpbmcgZm9yIGZlZWRiYWNrIG9u
-IHRoZSBhcHByb2FjaApiZWZvcmUgZnVsbHkgaW1wbGVtZW50aW5nIGl0ICh3aGljaCB3aWxsIGlu
-dm9sdmUgbG90cyBvZiBjaGFuZ2VzKS4KClFFTVUncyBhdG9taWMuaCBwcm92aWRlcyBhdG9taWMg
-b3BlcmF0aW9ucyBhbmQgaXMgaW50ZW5kZWQgdG8gd29yayB3aXRoCm9yIHdpdGhvdXQgPHN0ZGF0
-b21pYy5oPi4gU29tZSBvZiB0aGUgYXRvbWljLmggQVBJcyBhcmUgZnJvbSBDMTEgQXRvbWljcwp3
-aGlsZSBvdGhlcnMgYXJlIExpbnV4LWluc3BpcmVkIG9yIFFFTVUtc3BlY2lmaWMgZXh0ZW5zaW9u
-cy4KCmF0b21pYy5oIHdvcmtzIGZpbmUgd2l0aCBnY2MgYnV0IGNsYW5nIGVuZm9yY2VzIHRoZSBm
-b2xsb3dpbmc6CgogIGF0b21pY19mZXRjaF9hZGQoKSBhbmQgZnJpZW5kcyBtdXN0IHVzZSBDMTEg
-QXRvbWljIGF0b21pY18qIHR5cGVzLgoKICBfX2F0b21pY19mZXRjaF9hZGQoKSBhbmQgZnJpZW5k
-cyBtdXN0IHVzZSBkaXJlY3QgdHlwZXMgKGludCwgZXRjKSBhbmQKICBOT1QgQzExIEF0b21pYyB0
-eXBlcy4KClRoZSBjb25zZXF1ZW5jZXMgYXJlOgoKMS4gYXRvbWljX2ZldGNoXyooKSBwcm9kdWNl
-cyBjb21waWxhdGlvbiBlcnJvcnMgc2luY2UgUUVNVSBjb2RlIHVzZXMKICAgZGlyZWN0IHR5cGVz
-IGFuZCBub3QgQzExIEF0b21pYyB0eXBlcy4KCjIuIGF0b21pY19mZXRjaF8qKCkgY2Fubm90IGJl
-IHVzZWQgb24gdGhlIHNhbWUgdmFyaWFibGVzIGFzCiAgIF9fYXRvbWljX2ZldGNoXyooKSBiZWNh
-dXNlIHRoZXkgc3VwcG9ydCBkaWZmZXJlbnQgdHlwZXMuIFRoaXMgaXMgYQogICBwcm9ibGVtIGJl
-Y2F1c2UgUUVNVSdzIGF0b21pYy5oIGJ1aWxkcyBvbiBfX2F0b21pY19mZXRjaF8qKCkgYW5kIGNv
-ZGUKICAgZXhwZWN0cyB0byB1c2UgYm90aCBhdG9taWNfZmV0Y2hfKigpIGFuZCBRRU1VIGF0b21p
-Yy5oIEFQSXMgb24gdGhlCiAgIHNhbWUgdmFyaWFibGVzLgoKSSB3b3VsZCBsaWtlIHRvIG1vdmUg
-UUVNVSB0byBDMTEgQXRvbWljcywgcmVtb3ZpbmcgUUVNVS1zcGVjaWZpYyBBUElzCndoaWNoIGhh
-dmUgQzExIGVxdWl2YWxlbnRzLiBUaGUgbmV3IGF0b21pYy5oIHdvdWxkICNpbmNsdWRlCjxzdGRh
-dG9taWMuaD4gYW5kIGRlZmluZSBhZGRpdGlvbmFsIEFQSXMgb24gdG9wLiBJdCBhbHNvIG5lZWRz
-IHRvIGNhcnJ5CmEgPHN0ZGF0b21pYy5oPiBmYWxsYmFjayBpbXBsZW1lbnRhdGlvbiBmb3IgUkhF
-TCA3IGJlY2F1c2UgZ2NjIGRvZXMgbm90CmhhdmUgPHN0ZGF0b21pYy5oPiB0aGVyZS4KClRoZSB1
-cHNob3QgaXMgdGhhdCBhbGwgYXRvbWljIHZhcmlhYmxlcyBpbiBRRU1VIG5lZWQgdG8gdXNlIEMx
-MSBBdG9taWMKYXRvbWljXyogdHlwZXMuIFRoaXMgaXMgYSBiaWcgY2hhbmdlIQoKQWxzbywgZXhp
-c3RpbmcgYXRvbWljLmggQVBJcyB0aGF0IHVzZSBfX2F0b21pY19mZXRjaF8qKCkgbmVlZCB0byBt
-b3ZlIHRvCkMxMSBBdG9taWNzIGluc3RlYWQgc28gdGhhdCB0aGV5IHRha2UgYXRvbWljXyogdHlw
-ZXMuCgpUaGlzIHBhdGNoIGNvbnRhaW5zIGEgZmV3IGV4YW1wbGVzIG9mIHRoaXMgY29udmVyc2lv
-bi4gVGhpbmdzIHRvIG5vdGU6CgoxLiBSZWltcGxlbWVudCBldmVyeXRoaW5nIGluIHRlcm1zIG9m
-IGF0b21pY19mZXRjaF8qKCkgYW5kIG90aGVyIEMxMQogICBBdG9taWMgQVBJcy4gRm9yIGV4YW1w
-bGUgYXRvbWljX2ZldGNoX2luYygpIGJlY29tZXMKICAgYXRvbWljX2ZldGNoX2FkZChwdHIsIDEp
-LgoKMi4gYXRvbWljXypfZmV0Y2goKSBpcyBub3QgYXZhaWxhYmxlIGluIEMxMSBBdG9taWNzIHNv
-IGVtdWxhdGUgaXQgYnkKICAgcGVyZm9ybWluZyB0aGUgb3BlcmF0aW9uIHR3aWNlIChvbmNlIGF0
-b21pYywgdGhlbiBhZ2FpbiBub24tYXRvbWljCiAgIHVzaW5nIHRoZSBmZXRjaGVkIG9sZCBhdG9t
-aWMgdmFsdWUpLiBZdWNrIQoKMy4gQ2FuIGV2ZXJ5dGhpbmcgaW4gYXRvbWljLmggcmVhbGx5IGJl
-IGNvbnZlcnRlZCB0byBDMTEgQXRvbWljcz8gSSdtCiAgIG5vdCBzdXJlIHlldCA6KC4KCkJldHRl
-ciBpZGVhcz8KClNpZ25lZC1vZmYtYnk6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0
-LmNvbT4KLS0tCiBpbmNsdWRlL2Jsb2NrL2Fpby5oICAgfCAgMiArLQogaW5jbHVkZS9xZW11L2F0
-b21pYy5oIHwgNzkgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLQog
-aW5jbHVkZS9xZW11L2JpdG9wcy5oIHwgIDIgKy0KIGluY2x1ZGUvcW9tL29iamVjdC5oICB8ICAz
-ICstCiB1dGlsL2Fpby1wb3NpeC5oICAgICAgfCAgMiArLQogdXRpbC9hc3luYy5jICAgICAgICAg
-IHwgIDIgKy0KIG1lc29uLmJ1aWxkICAgICAgICAgICB8ICAzICsrCiA3IGZpbGVzIGNoYW5nZWQs
-IDcwIGluc2VydGlvbnMoKyksIDIzIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2luY2x1ZGUv
-YmxvY2svYWlvLmggYi9pbmNsdWRlL2Jsb2NrL2Fpby5oCmluZGV4IGIyZjcwM2ZhM2YuLjQ2NmMw
-NTg4ODAgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvYmxvY2svYWlvLmgKKysrIGIvaW5jbHVkZS9ibG9j
-ay9haW8uaApAQCAtMjIwLDcgKzIyMCw3IEBAIHN0cnVjdCBBaW9Db250ZXh0IHsKICAgICAgKi8K
-ICAgICBRRU1VVGltZXJMaXN0R3JvdXAgdGxnOwogCi0gICAgaW50IGV4dGVybmFsX2Rpc2FibGVf
-Y250OworICAgIGF0b21pY19pbnQgZXh0ZXJuYWxfZGlzYWJsZV9jbnQ7CiAKICAgICAvKiBOdW1i
-ZXIgb2YgQWlvSGFuZGxlcnMgd2l0aG91dCAuaW9fcG9sbCgpICovCiAgICAgaW50IHBvbGxfZGlz
-YWJsZV9jbnQ7CmRpZmYgLS1naXQgYS9pbmNsdWRlL3FlbXUvYXRvbWljLmggYi9pbmNsdWRlL3Fl
-bXUvYXRvbWljLmgKaW5kZXggZmY3MmRiNTExNS4uNGZiYmQ1ZjM2MiAxMDA2NDQKLS0tIGEvaW5j
-bHVkZS9xZW11L2F0b21pYy5oCisrKyBiL2luY2x1ZGUvcWVtdS9hdG9taWMuaApAQCAtMTUsNiAr
-MTUsMzIgQEAKICNpZm5kZWYgUUVNVV9BVE9NSUNfSAogI2RlZmluZSBRRU1VX0FUT01JQ19ICiAK
-KyNpbmNsdWRlIDxzdGRib29sLmg+CisjaW5jbHVkZSA8c3RkZGVmLmg+CisKKy8qIFVzZSBDMTEg
-QXRvbWljcyBpZiBwb3NzaWJsZSwgb3RoZXJ3aXNlIGZhbGwgYmFjayB0byBjdXN0b20gZGVmaW5p
-dGlvbnMgKi8KKyNpZmRlZiBDT05GSUdfU1REQVRPTUlDX0gKKyNpbmNsdWRlIDxzdGRhdG9taWMu
-aD4KKyNlbHNlCisvKiBDb21tb25seSB1c2VkIHR5cGVzIGZyb20gQzExICI3LjE3LjYgQXRvbWlj
-IGludGVnZXIgdHlwZXMiICovCit0eXBlZGVmIGJvb2wgYXRvbWljX2Jvb2w7Cit0eXBlZGVmIGNo
-YXIgYXRvbWljX2NoYXI7Cit0eXBlZGVmIHNpZ25lZCBjaGFyIGF0b21pY19zY2hhcjsKK3R5cGVk
-ZWYgdW5zaWduZWQgY2hhciBhdG9taWNfdWNoYXI7Cit0eXBlZGVmIHNob3J0IGF0b21pY19zaG9y
-dDsKK3R5cGVkZWYgdW5zaWduZWQgc2hvcnQgYXRvbWljX3VzaG9ydDsKK3R5cGVkZWYgaW50IGF0
-b21pY19pbnQ7Cit0eXBlZGVmIHVuc2lnbmVkIGludCBhdG9taWNfdWludDsKK3R5cGVkZWYgbG9u
-ZyBhdG9taWNfbG9uZzsKK3R5cGVkZWYgdW5zaWduZWQgbG9uZyBhdG9taWNfdWxvbmc7Cit0eXBl
-ZGVmIGxvbmcgbG9uZyBhdG9taWNfbGxvbmc7Cit0eXBlZGVmIHVuc2lnbmVkIGxvbmcgbG9uZyBh
-dG9taWNfdWxsb25nOwordHlwZWRlZiBpbnRwdHJfdCBhdG9taWNfaW50cHRyX3Q7Cit0eXBlZGVm
-IHVpbnRwdHJfdCBhdG9taWNfdWludHB0cl90OwordHlwZWRlZiBzaXplX3QgYXRvbWljX3NpemVf
-dDsKK3R5cGVkZWYgcHRyZGlmZl90IGF0b21pY19wdHJkaWZmX3Q7CisjZW5kaWYKKwogLyogQ29t
-cGlsZXIgYmFycmllciAqLwogI2RlZmluZSBiYXJyaWVyKCkgICAoeyBhc20gdm9sYXRpbGUoIiIg
-Ojo6ICJtZW1vcnkiKTsgKHZvaWQpMDsgfSkKIApAQCAtMjA1LDEwICsyMzEsNiBAQAogICAgIGF0
-b21pY19jbXB4Y2hnX19ub2NoZWNrKHB0ciwgb2xkLCBuZXcpOyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgXAogfSkKIAotLyogUHJvdmlkZSBzaG9ydGVyIG5hbWVzIGZvciBHQ0MgYXRvbWlj
-IGJ1aWx0aW5zLCByZXR1cm4gb2xkIHZhbHVlICovCi0jZGVmaW5lIGF0b21pY19mZXRjaF9pbmMo
-cHRyKSAgX19hdG9taWNfZmV0Y2hfYWRkKHB0ciwgMSwgX19BVE9NSUNfU0VRX0NTVCkKLSNkZWZp
-bmUgYXRvbWljX2ZldGNoX2RlYyhwdHIpICBfX2F0b21pY19mZXRjaF9zdWIocHRyLCAxLCBfX0FU
-T01JQ19TRVFfQ1NUKQotCiAjaWZuZGVmIGF0b21pY19mZXRjaF9hZGQKICNkZWZpbmUgYXRvbWlj
-X2ZldGNoX2FkZChwdHIsIG4pIF9fYXRvbWljX2ZldGNoX2FkZChwdHIsIG4sIF9fQVRPTUlDX1NF
-UV9DU1QpCiAjZGVmaW5lIGF0b21pY19mZXRjaF9zdWIocHRyLCBuKSBfX2F0b21pY19mZXRjaF9z
-dWIocHRyLCBuLCBfX0FUT01JQ19TRVFfQ1NUKQpAQCAtMjE3LDIyICsyMzksNDEgQEAKICNkZWZp
-bmUgYXRvbWljX2ZldGNoX3hvcihwdHIsIG4pIF9fYXRvbWljX2ZldGNoX3hvcihwdHIsIG4sIF9f
-QVRPTUlDX1NFUV9DU1QpCiAjZW5kaWYKIAotI2RlZmluZSBhdG9taWNfaW5jX2ZldGNoKHB0cikg
-ICAgX19hdG9taWNfYWRkX2ZldGNoKHB0ciwgMSwgX19BVE9NSUNfU0VRX0NTVCkKLSNkZWZpbmUg
-YXRvbWljX2RlY19mZXRjaChwdHIpICAgIF9fYXRvbWljX3N1Yl9mZXRjaChwdHIsIDEsIF9fQVRP
-TUlDX1NFUV9DU1QpCi0jZGVmaW5lIGF0b21pY19hZGRfZmV0Y2gocHRyLCBuKSBfX2F0b21pY19h
-ZGRfZmV0Y2gocHRyLCBuLCBfX0FUT01JQ19TRVFfQ1NUKQotI2RlZmluZSBhdG9taWNfc3ViX2Zl
-dGNoKHB0ciwgbikgX19hdG9taWNfc3ViX2ZldGNoKHB0ciwgbiwgX19BVE9NSUNfU0VRX0NTVCkK
-LSNkZWZpbmUgYXRvbWljX2FuZF9mZXRjaChwdHIsIG4pIF9fYXRvbWljX2FuZF9mZXRjaChwdHIs
-IG4sIF9fQVRPTUlDX1NFUV9DU1QpCi0jZGVmaW5lIGF0b21pY19vcl9mZXRjaChwdHIsIG4pICBf
-X2F0b21pY19vcl9mZXRjaChwdHIsIG4sIF9fQVRPTUlDX1NFUV9DU1QpCi0jZGVmaW5lIGF0b21p
-Y194b3JfZmV0Y2gocHRyLCBuKSBfX2F0b21pY194b3JfZmV0Y2gocHRyLCBuLCBfX0FUT01JQ19T
-RVFfQ1NUKQorLyogUHJvdmlkZSBzaG9ydGVyIG5hbWVzIGZvciBHQ0MgYXRvbWljIGJ1aWx0aW5z
-LCByZXR1cm4gb2xkIHZhbHVlICovCisjZGVmaW5lIGF0b21pY19mZXRjaF9pbmMocHRyKSAgYXRv
-bWljX2ZldGNoX2FkZChwdHIsIDEpCisjZGVmaW5lIGF0b21pY19mZXRjaF9kZWMocHRyKSAgYXRv
-bWljX2ZldGNoX3N1YihwdHIsIDEpCisKKyNkZWZpbmUgYXRvbWljX2luY19mZXRjaChwdHIpICAg
-IChhdG9taWNfZmV0Y2hfYWRkKHB0ciwgMSkgKyAxKQorI2RlZmluZSBhdG9taWNfZGVjX2ZldGNo
-KHB0cikgICAgKGF0b21pY19mZXRjaF9zdWIocHRyLCAxKSAtIDEpCisjZGVmaW5lIGF0b21pY19h
-ZGRfZmV0Y2gocHRyLCBuKSAoeyBcCisgICAgdHlwZW9mKG4pIF9uID0gbjsgXAorICAgIGF0b21p
-Y19mZXRjaF9hZGQocHRyLCBfbikgKyBfbjsgXAorfSkKKyNkZWZpbmUgYXRvbWljX3N1Yl9mZXRj
-aChwdHIsIG4pICh7IFwKKyAgICB0eXBlb2YobikgX24gPSBuOyBcCisgICAgYXRvbWljX2ZldGNo
-X3N1YihwdHIsIF9uKSAtIG47IFwKK30pCisjZGVmaW5lIGF0b21pY19hbmRfZmV0Y2gocHRyLCBu
-KSAoeyBcCisgICAgdHlwZW9mKG4pIF9uID0gbjsgXAorICAgIGF0b21pY19mZXRjaF9hbmQocHRy
-LCBfbikgJiBfbjsgXAorfSkKKyNkZWZpbmUgYXRvbWljX29yX2ZldGNoKHB0ciwgbikgKHsgXAor
-ICAgIHR5cGVvZihuKSBfbiA9IG47IFwKKyAgICBhdG9taWNfZmV0Y2hfb3IocHRyLCBfbikgfCBf
-bjsgXAorfSkKKyNkZWZpbmUgYXRvbWljX3hvcl9mZXRjaChwdHIsIG4pICh7IFwKKyAgICB0eXBl
-b2YobikgX24gPSBuOyBcCisgICAgYXRvbWljX2ZldGNoX3hvcihwdHIsIF9uKSBeIF9uOyBcCit9
-KQogCiAvKiBBbmQgZXZlbiBzaG9ydGVyIG5hbWVzIHRoYXQgcmV0dXJuIHZvaWQuICAqLwotI2Rl
-ZmluZSBhdG9taWNfaW5jKHB0cikgICAgKCh2b2lkKSBfX2F0b21pY19mZXRjaF9hZGQocHRyLCAx
-LCBfX0FUT01JQ19TRVFfQ1NUKSkKLSNkZWZpbmUgYXRvbWljX2RlYyhwdHIpICAgICgodm9pZCkg
-X19hdG9taWNfZmV0Y2hfc3ViKHB0ciwgMSwgX19BVE9NSUNfU0VRX0NTVCkpCi0jZGVmaW5lIGF0
-b21pY19hZGQocHRyLCBuKSAoKHZvaWQpIF9fYXRvbWljX2ZldGNoX2FkZChwdHIsIG4sIF9fQVRP
-TUlDX1NFUV9DU1QpKQotI2RlZmluZSBhdG9taWNfc3ViKHB0ciwgbikgKCh2b2lkKSBfX2F0b21p
-Y19mZXRjaF9zdWIocHRyLCBuLCBfX0FUT01JQ19TRVFfQ1NUKSkKLSNkZWZpbmUgYXRvbWljX2Fu
-ZChwdHIsIG4pICgodm9pZCkgX19hdG9taWNfZmV0Y2hfYW5kKHB0ciwgbiwgX19BVE9NSUNfU0VR
-X0NTVCkpCi0jZGVmaW5lIGF0b21pY19vcihwdHIsIG4pICAoKHZvaWQpIF9fYXRvbWljX2ZldGNo
-X29yKHB0ciwgbiwgX19BVE9NSUNfU0VRX0NTVCkpCi0jZGVmaW5lIGF0b21pY194b3IocHRyLCBu
-KSAoKHZvaWQpIF9fYXRvbWljX2ZldGNoX3hvcihwdHIsIG4sIF9fQVRPTUlDX1NFUV9DU1QpKQor
-I2RlZmluZSBhdG9taWNfaW5jKHB0cikgICAgKCh2b2lkKSBhdG9taWNfZmV0Y2hfYWRkKHB0ciwg
-MSkpCisjZGVmaW5lIGF0b21pY19kZWMocHRyKSAgICAoKHZvaWQpIGF0b21pY19mZXRjaF9zdWIo
-cHRyLCAxKSkKKyNkZWZpbmUgYXRvbWljX2FkZChwdHIsIG4pICgodm9pZCkgYXRvbWljX2ZldGNo
-X2FkZChwdHIsIG4pKQorI2RlZmluZSBhdG9taWNfc3ViKHB0ciwgbikgKCh2b2lkKSBhdG9taWNf
-ZmV0Y2hfc3ViKHB0ciwgbikpCisjZGVmaW5lIGF0b21pY19hbmQocHRyLCBuKSAoKHZvaWQpIGF0
-b21pY19mZXRjaF9hbmQocHRyLCBuKSkKKyNkZWZpbmUgYXRvbWljX29yKHB0ciwgbikgICgodm9p
-ZCkgYXRvbWljX2ZldGNoX29yKHB0ciwgbikpCisjZGVmaW5lIGF0b21pY194b3IocHRyLCBuKSAo
-KHZvaWQpIGF0b21pY19mZXRjaF94b3IocHRyLCBuKSkKIAogI2Vsc2UgLyogX19BVE9NSUNfUkVM
-QVhFRCAqLwogCkBAIC00MjQsNiArNDY1LDggQEAKICNkZWZpbmUgYXRvbWljX29yKHB0ciwgbikg
-ICAgICAoKHZvaWQpIF9fc3luY19mZXRjaF9hbmRfb3IocHRyLCBuKSkKICNkZWZpbmUgYXRvbWlj
-X3hvcihwdHIsIG4pICAgICAoKHZvaWQpIF9fc3luY19mZXRjaF9hbmRfeG9yKHB0ciwgbikpCiAK
-KyNlcnJvciBUT0RPCisKICNlbmRpZiAvKiBfX0FUT01JQ19SRUxBWEVEICovCiAKICNpZm5kZWYg
-c21wX3dtYgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9xZW11L2JpdG9wcy5oIGIvaW5jbHVkZS9xZW11
-L2JpdG9wcy5oCmluZGV4IGY1NWNlOGIzMjAuLmU5ZDY3NmQxMTIgMTAwNjQ0Ci0tLSBhL2luY2x1
-ZGUvcWVtdS9iaXRvcHMuaAorKysgYi9pbmNsdWRlL3FlbXUvYml0b3BzLmgKQEAgLTQ5LDcgKzQ5
-LDcgQEAgc3RhdGljIGlubGluZSB2b2lkIHNldF9iaXQobG9uZyBuciwgdW5zaWduZWQgbG9uZyAq
-YWRkcikKIHN0YXRpYyBpbmxpbmUgdm9pZCBzZXRfYml0X2F0b21pYyhsb25nIG5yLCB1bnNpZ25l
-ZCBsb25nICphZGRyKQogewogICAgIHVuc2lnbmVkIGxvbmcgbWFzayA9IEJJVF9NQVNLKG5yKTsK
-LSAgICB1bnNpZ25lZCBsb25nICpwID0gYWRkciArIEJJVF9XT1JEKG5yKTsKKyAgICBhdG9taWNf
-dWxvbmcgKnAgPSAoYXRvbWljX3Vsb25nICopKGFkZHIgKyBCSVRfV09SRChucikpOwogCiAgICAg
-YXRvbWljX29yKHAsIG1hc2spOwogfQpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9xb20vb2JqZWN0Lmgg
-Yi9pbmNsdWRlL3FvbS9vYmplY3QuaAppbmRleCAwNTZmNjdhYjNiLi5mNTEyNDRiNjFmIDEwMDY0
-NAotLS0gYS9pbmNsdWRlL3FvbS9vYmplY3QuaAorKysgYi9pbmNsdWRlL3FvbS9vYmplY3QuaApA
-QCAtMTUsNiArMTUsNyBAQAogI2RlZmluZSBRRU1VX09CSkVDVF9ICiAKICNpbmNsdWRlICJxYXBp
-L3FhcGktYnVpbHRpbi10eXBlcy5oIgorI2luY2x1ZGUgInFlbXUvYXRvbWljLmgiCiAjaW5jbHVk
-ZSAicWVtdS9tb2R1bGUuaCIKICNpbmNsdWRlICJxb20vb2JqZWN0LmgiCiAKQEAgLTU1MCw3ICs1
-NTEsNyBAQCBzdHJ1Y3QgT2JqZWN0CiAgICAgT2JqZWN0Q2xhc3MgKmNsYXNzOwogICAgIE9iamVj
-dEZyZWUgKmZyZWU7CiAgICAgR0hhc2hUYWJsZSAqcHJvcGVydGllczsKLSAgICB1aW50MzJfdCBy
-ZWY7CisgICAgYXRvbWljX3VpbnQgcmVmOwogICAgIE9iamVjdCAqcGFyZW50OwogfTsKIApkaWZm
-IC0tZ2l0IGEvdXRpbC9haW8tcG9zaXguaCBiL3V0aWwvYWlvLXBvc2l4LmgKaW5kZXggYzgwYzA0
-NTA2YS4uYzViNDQ2ZjBhMSAxMDA2NDQKLS0tIGEvdXRpbC9haW8tcG9zaXguaAorKysgYi91dGls
-L2Fpby1wb3NpeC5oCkBAIC0zMyw3ICszMyw3IEBAIHN0cnVjdCBBaW9IYW5kbGVyIHsKICAgICBR
-TElTVF9FTlRSWShBaW9IYW5kbGVyKSBub2RlX3BvbGw7CiAjaWZkZWYgQ09ORklHX0xJTlVYX0lP
-X1VSSU5HCiAgICAgUVNMSVNUX0VOVFJZKEFpb0hhbmRsZXIpIG5vZGVfc3VibWl0dGVkOwotICAg
-IHVuc2lnbmVkIGZsYWdzOyAvKiBzZWUgZmRtb24taW9fdXJpbmcuYyAqLworICAgIGF0b21pY191
-aW50IGZsYWdzOyAvKiBzZWUgZmRtb24taW9fdXJpbmcuYyAqLwogI2VuZGlmCiAgICAgaW50NjRf
-dCBwb2xsX2lkbGVfdGltZW91dDsgLyogd2hlbiB0byBzdG9wIHVzZXJzcGFjZSBwb2xsaW5nICov
-CiAgICAgYm9vbCBpc19leHRlcm5hbDsKZGlmZiAtLWdpdCBhL3V0aWwvYXN5bmMuYyBiL3V0aWwv
-YXN5bmMuYwppbmRleCA0MjY2NzQ1ZGVlLi5kY2YxYTMyNDkyIDEwMDY0NAotLS0gYS91dGlsL2Fz
-eW5jLmMKKysrIGIvdXRpbC9hc3luYy5jCkBAIC02MCw3ICs2MCw3IEBAIHN0cnVjdCBRRU1VQkgg
-ewogICAgIFFFTVVCSEZ1bmMgKmNiOwogICAgIHZvaWQgKm9wYXF1ZTsKICAgICBRU0xJU1RfRU5U
-UlkoUUVNVUJIKSBuZXh0OwotICAgIHVuc2lnbmVkIGZsYWdzOworICAgIGF0b21pY191aW50IGZs
-YWdzOwogfTsKIAogLyogQ2FsbGVkIGNvbmN1cnJlbnRseSBmcm9tIGFueSB0aHJlYWQgKi8KZGlm
-ZiAtLWdpdCBhL21lc29uLmJ1aWxkIGIvbWVzb24uYnVpbGQKaW5kZXggZjRkMWFiMTA5Ni4uOGQ4
-MDAzM2Q5MCAxMDA2NDQKLS0tIGEvbWVzb24uYnVpbGQKKysrIGIvbWVzb24uYnVpbGQKQEAgLTQz
-Myw4ICs0MzMsMTEgQEAga2V5dXRpbHMgPSBkZXBlbmRlbmN5KCdsaWJrZXl1dGlscycsIHJlcXVp
-cmVkOiBmYWxzZSwKIAogaGFzX2dldHRpZCA9IGNjLmhhc19mdW5jdGlvbignZ2V0dGlkJykKIAor
-aGFzX3N0ZGF0b21pY19oID0gY2MuaGFzX2hlYWRlcignc3RkYXRvbWljLmgnKQorCiAjIENyZWF0
-ZSBjb25maWctaG9zdC5oCiAKK2NvbmZpZ19ob3N0X2RhdGEuc2V0KCdDT05GSUdfU1REQVRPTUlD
-X0gnLCBoYXNfc3RkYXRvbWljX2gpCiBjb25maWdfaG9zdF9kYXRhLnNldCgnQ09ORklHX1NETCcs
-IHNkbC5mb3VuZCgpKQogY29uZmlnX2hvc3RfZGF0YS5zZXQoJ0NPTkZJR19TRExfSU1BR0UnLCBz
-ZGxfaW1hZ2UuZm91bmQoKSkKIGNvbmZpZ19ob3N0X2RhdGEuc2V0KCdDT05GSUdfVk5DJywgdm5j
-LmZvdW5kKCkpCi0tIAoyLjI2LjIKCg==
 
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> There are better ways to do this, e.g. meson cmake subproject,
+> but that requires cmake 3.7 and some of our CI environments
+> only provide cmake 3.5.
+>
+> Nor can we add a meson.build file to capstone/, because the git
+> submodule would then always report "untracked files".  Fixing that
+> would require creating our own branch on the qemu git mirror, at
+> which point we could just as easily create a native meson subproject.
+>
+> Instead, build the library via the main meson.build.
+>
+> This improves the current state of affairs in that we will re-link
+> the qemu executables against a changed libcapstone.a, which we wouldn't
+> do before-hand.  In addition, the use of the configuration header file
+> instead of command-line -DEFINES means that we will rebuild the
+> capstone objects with changes to meson.build.
+
+Something is breaking when switching to a branch with this on from
+current master:
+
+  Linking target qemu-hppa
+  /usr/bin/ld: libcommon.fa.p/disas_alpha.c.o: in function `print_insn_alph=
+a':
+  /home/alex/lsrc/qemu.git/builds/all/../../disas/alpha.c:1818: undefined r=
+eference to `bfd_getl32'
+  collect2: error: ld returned 1 exit status
+  make: *** [Makefile.ninja:5965: qemu-alpha] Error 1
+  make: *** Waiting for unfinished jobs....
+  /usr/bin/ld: libcommon.fa.p/disas_hppa.c.o: in function `print_insn_hppa':
+  /home/alex/lsrc/qemu.git/builds/all/../../disas/hppa.c:1969: undefined re=
+ference to `bfd_getb32'
+  collect2: error: ld returned 1 exit status
+  make: *** [Makefile.ninja:6259: qemu-hppa] Error 1
+
+Aggressively wiping out the submodule and doing a fresh configure in a
+empty build directory and I still see a failure:
+
+  ../../disas/capstone.c:25:1: error: expected =E2=80=98=3D=E2=80=99, =E2=
+=80=98,=E2=80=99, =E2=80=98;=E2=80=99, =E2=80=98asm=E2=80=99 or =E2=80=98__=
+attribute__=E2=80=99 before =E2=80=98cap_skipdata_s390x_cb=E2=80=99
+   cap_skipdata_s390x_cb(const uint8_t *code, size_t code_size,
+   ^~~~~~~~~~~~~~~~~~~~~
+  ../../disas/capstone.c:49:17: error: =E2=80=98cap_skipdata_s390x_cb=E2=80=
+=99 undeclared here (not in a function); did you mean =E2=80=98cap_skipdata=
+_s390x=E2=80=99?
+       .callback =3D cap_skipdata_s390x_cb
+                   ^~~~~~~~~~~~~~~~~~~~~
+                   cap_skipdata_s390x
+  Makefile.ninja:1424: recipe for target 'libcommon.fa.p/disas_capstone.c.o=
+' failed
+  make: *** [libcommon.fa.p/disas_capstone.c.o] Error 1
+  make: *** Waiting for unfinished jobs....
+
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> v2: Further reduce probing in configure (paolo),
+>     Drop state 'internal' and use 'git' even when it isn't git.
+>     Move CONFIG_CAPSTONE to config_host_data.
+> v3: Add Submodules separator; fix default in meson_options.txt.
+> ---
+>  configure         |  61 +++----------------------
+>  Makefile          |  16 -------
+>  meson.build       | 111 +++++++++++++++++++++++++++++++++++++++++++---
+>  meson_options.txt |   4 ++
+>  4 files changed, 115 insertions(+), 77 deletions(-)
+>
+> diff --git a/configure b/configure
+> index 7564479008..76636c430d 100755
+> --- a/configure
+> +++ b/configure
+> @@ -478,7 +478,7 @@ opengl=3D""
+>  opengl_dmabuf=3D"no"
+>  cpuid_h=3D"no"
+>  avx2_opt=3D""
+> -capstone=3D""
+> +capstone=3D"auto"
+>  lzo=3D""
+>  snappy=3D""
+>  bzip2=3D""
+> @@ -1580,7 +1580,7 @@ for opt do
+>    ;;
+>    --enable-capstone) capstone=3D"yes"
+>    ;;
+> -  --enable-capstone=3Dgit) capstone=3D"git"
+> +  --enable-capstone=3Dgit) capstone=3D"internal"
+>    ;;
+>    --enable-capstone=3Dsystem) capstone=3D"system"
+>    ;;
+> @@ -5128,51 +5128,11 @@ fi
+>  # capstone
+>=20=20
+>  case "$capstone" in
+> -  "" | yes)
+> -    if $pkg_config capstone; then
+> -      capstone=3Dsystem
+> -    elif test -e "${source_path}/.git" && test $git_update =3D 'yes' ; t=
+hen
+> -      capstone=3Dgit
+> -    elif test -e "${source_path}/capstone/Makefile" ; then
+> -      capstone=3Dinternal
+> -    elif test -z "$capstone" ; then
+> -      capstone=3Dno
+> -    else
+> -      feature_not_found "capstone" "Install capstone devel or git submod=
+ule"
+> -    fi
+> -    ;;
+> -
+> -  system)
+> -    if ! $pkg_config capstone; then
+> -      feature_not_found "capstone" "Install capstone devel"
+> -    fi
+> -    ;;
+> -esac
+> -
+> -case "$capstone" in
+> -  git | internal)
+> -    if test "$capstone" =3D git; then
+> +  auto | yes | internal)
+> +    # Simpler to always update submodule, even if not needed.
+> +    if test -e "${source_path}/.git" && test $git_update =3D 'yes' ; then
+>        git_submodules=3D"${git_submodules} capstone"
+>      fi
+> -    mkdir -p capstone
+> -    if test "$mingw32" =3D "yes"; then
+> -      LIBCAPSTONE=3Dcapstone.lib
+> -    else
+> -      LIBCAPSTONE=3Dlibcapstone.a
+> -    fi
+> -    capstone_libs=3D"-Lcapstone -lcapstone"
+> -    capstone_cflags=3D"-I${source_path}/capstone/include"
+> -    ;;
+> -
+> -  system)
+> -    capstone_libs=3D"$($pkg_config --libs capstone)"
+> -    capstone_cflags=3D"$($pkg_config --cflags capstone)"
+> -    ;;
+> -
+> -  no)
+> -    ;;
+> -  *)
+> -    error_exit "Unknown state for capstone: $capstone"
+>      ;;
+>  esac
+>=20=20
+> @@ -7292,11 +7252,6 @@ fi
+>  if test "$ivshmem" =3D "yes" ; then
+>    echo "CONFIG_IVSHMEM=3Dy" >> $config_host_mak
+>  fi
+> -if test "$capstone" !=3D "no" ; then
+> -  echo "CONFIG_CAPSTONE=3Dy" >> $config_host_mak
+> -  echo "CAPSTONE_CFLAGS=3D$capstone_cflags" >> $config_host_mak
+> -  echo "CAPSTONE_LIBS=3D$capstone_libs" >> $config_host_mak
+> -fi
+>  if test "$debug_mutex" =3D "yes" ; then
+>    echo "CONFIG_DEBUG_MUTEX=3Dy" >> $config_host_mak
+>  fi
+> @@ -7819,9 +7774,6 @@ done # for target in $targets
+>  if [ "$fdt" =3D "git" ]; then
+>    subdirs=3D"$subdirs dtc"
+>  fi
+> -if [ "$capstone" =3D "git" -o "$capstone" =3D "internal" ]; then
+> -  subdirs=3D"$subdirs capstone"
+> -fi
+>  echo "SUBDIRS=3D$subdirs" >> $config_host_mak
+>  if test -n "$LIBCAPSTONE"; then
+>    echo "LIBCAPSTONE=3D$LIBCAPSTONE" >> $config_host_mak
+> @@ -8008,7 +7960,8 @@ NINJA=3D${ninja:-$PWD/ninjatool} $meson setup \
+>          -Db_coverage=3D$(if test "$gcov" =3D yes; then echo true; else e=
+cho false; fi) \
+>  	-Dsdl=3D$sdl -Dsdl_image=3D$sdl_image \
+>  	-Dvnc=3D$vnc -Dvnc_sasl=3D$vnc_sasl -Dvnc_jpeg=3D$vnc_jpeg -Dvnc_png=3D=
+$vnc_png \
+> -	-Dgettext=3D$gettext -Dxkbcommon=3D$xkbcommon -Du2f=3D$u2f\
+> +	-Dgettext=3D$gettext -Dxkbcommon=3D$xkbcommon -Du2f=3D$u2f \
+> +	-Dcapstone=3D$capstone \
+>          $cross_arg \
+>          "$PWD" "$source_path"
+>=20=20
+> diff --git a/Makefile b/Makefile
+> index 7c60b9dcb8..f3da1760ad 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -156,22 +156,6 @@ dtc/all: .git-submodule-status dtc/libfdt
+>  dtc/%: .git-submodule-status
+>  	@mkdir -p $@
+>=20=20
+> -# Overriding CFLAGS causes us to lose defines added in the sub-makefile.
+> -# Not overriding CFLAGS leads to mis-matches between compilation modes.
+> -# Therefore we replicate some of the logic in the sub-makefile.
+> -# Remove all the extra -Warning flags that QEMU uses that Capstone doesn=
+'t;
+> -# no need to annoy QEMU developers with such things.
+> -CAP_CFLAGS =3D $(patsubst -W%,,$(CFLAGS) $(QEMU_CFLAGS)) $(CAPSTONE_CFLA=
+GS)
+> -CAP_CFLAGS +=3D -DCAPSTONE_USE_SYS_DYN_MEM
+> -CAP_CFLAGS +=3D -DCAPSTONE_HAS_ARM
+> -CAP_CFLAGS +=3D -DCAPSTONE_HAS_ARM64
+> -CAP_CFLAGS +=3D -DCAPSTONE_HAS_POWERPC
+> -CAP_CFLAGS +=3D -DCAPSTONE_HAS_X86
+> -
+> -.PHONY: capstone/all
+> -capstone/all: .git-submodule-status
+> -	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=3D=
+no BUILDDIR=3D"$(BUILD_DIR)/capstone" CC=3D"$(CC)" AR=3D"$(AR)" LD=3D"$(LD)=
+" RANLIB=3D"$(RANLIB)" CFLAGS=3D"$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(BUILD=
+_DIR)/capstone/$(LIBCAPSTONE))
+> -
+>  .PHONY: slirp/all
+>  slirp/all: .git-submodule-status
+>  	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/slirp		\
+> diff --git a/meson.build b/meson.build
+> index f4d1ab1096..f23273693d 100644
+> --- a/meson.build
+> +++ b/meson.build
+> @@ -10,6 +10,7 @@ else
+>    keyval =3D import('unstable-keyval')
+>  endif
+>  ss =3D import('sourceset')
+> +fs =3D import('fs')
+>=20=20
+>  sh =3D find_program('sh')
+>  cc =3D meson.get_compiler('c')
+> @@ -409,11 +410,6 @@ if 'CONFIG_USB_LIBUSB' in config_host
+>    libusb =3D declare_dependency(compile_args: config_host['LIBUSB_CFLAGS=
+'].split(),
+>                                link_args: config_host['LIBUSB_LIBS'].spli=
+t())
+>  endif
+> -capstone =3D not_found
+> -if 'CONFIG_CAPSTONE' in config_host
+> -  capstone =3D declare_dependency(compile_args: config_host['CAPSTONE_CF=
+LAGS'].split(),
+> -                                link_args: config_host['CAPSTONE_LIBS'].=
+split())
+> -endif
+>  libpmem =3D not_found
+>  if 'CONFIG_LIBPMEM' in config_host
+>    libpmem =3D declare_dependency(compile_args: config_host['LIBPMEM_CFLA=
+GS'].split(),
+> @@ -470,7 +466,6 @@ foreach k, v: config_host
+>      config_host_data.set(k, v =3D=3D 'y' ? 1 : v)
+>    endif
+>  endforeach
+> -genh +=3D configure_file(output: 'config-host.h', configuration: config_=
+host_data)
+>=20=20
+>  minikconf =3D find_program('scripts/minikconf.py')
+>  config_all_devices =3D {}
+> @@ -610,6 +605,108 @@ config_all +=3D {
+>    'CONFIG_ALL': true,
+>  }
+>=20=20
+> +# Submodules
+> +
+> +capstone =3D not_found
+> +capstone_opt =3D get_option('capstone')
+> +if capstone_opt =3D=3D 'no'
+> +  capstone_opt =3D false
+> +elif capstone_opt in ['yes', 'auto', 'system']
+> +  have_internal =3D fs.exists('capstone/Makefile')
+> +  capstone =3D dependency('capstone', static: enable_static,
+> +                        required: capstone_opt =3D=3D 'system' or
+> +                                  capstone_opt =3D=3D 'yes' and not have=
+_internal)
+> +  if capstone.found()
+> +    capstone_opt =3D 'system'
+> +  elif have_internal
+> +    capstone_opt =3D 'internal'
+> +  else
+> +    capstone_opt =3D false
+> +  endif
+> +endif
+> +if capstone_opt =3D=3D 'internal'
+> +  capstone_data =3D configuration_data()
+> +  capstone_data.set('CAPSTONE_USE_SYS_DYN_MEM', '1')
+> +
+> +  capstone_files =3D files(
+> +    'capstone/cs.c',
+> +    'capstone/MCInst.c',
+> +    'capstone/MCInstrDesc.c',
+> +    'capstone/MCRegisterInfo.c',
+> +    'capstone/SStream.c',
+> +    'capstone/utils.c'
+> +  )
+> +
+> +  if 'CONFIG_ARM_DIS' in config_all_disas
+> +    capstone_data.set('CAPSTONE_HAS_ARM', '1')
+> +    capstone_files +=3D files(
+> +      'capstone/arch/ARM/ARMDisassembler.c',
+> +      'capstone/arch/ARM/ARMInstPrinter.c',
+> +      'capstone/arch/ARM/ARMMapping.c',
+> +      'capstone/arch/ARM/ARMModule.c'
+> +    )
+> +  endif
+> +
+> +  # FIXME: This config entry currently depends on a c++ compiler.
+> +  # Which is needed for building libvixl, but not for capstone.
+> +  if 'CONFIG_ARM_A64_DIS' in config_all_disas
+> +    capstone_data.set('CAPSTONE_HAS_ARM64', '1')
+> +    capstone_files +=3D files(
+> +      'capstone/arch/AArch64/AArch64BaseInfo.c',
+> +      'capstone/arch/AArch64/AArch64Disassembler.c',
+> +      'capstone/arch/AArch64/AArch64InstPrinter.c',
+> +      'capstone/arch/AArch64/AArch64Mapping.c',
+> +      'capstone/arch/AArch64/AArch64Module.c'
+> +    )
+> +  endif
+> +
+> +  if 'CONFIG_PPC_DIS' in config_all_disas
+> +    capstone_data.set('CAPSTONE_HAS_POWERPC', '1')
+> +    capstone_files +=3D files(
+> +      'capstone/arch/PowerPC/PPCDisassembler.c',
+> +      'capstone/arch/PowerPC/PPCInstPrinter.c',
+> +      'capstone/arch/PowerPC/PPCMapping.c',
+> +      'capstone/arch/PowerPC/PPCModule.c'
+> +    )
+> +  endif
+> +
+> +  if 'CONFIG_I386_DIS' in config_all_disas
+> +    capstone_data.set('CAPSTONE_HAS_X86', 1)
+> +    capstone_files +=3D files(
+> +      'capstone/arch/X86/X86Disassembler.c',
+> +      'capstone/arch/X86/X86DisassemblerDecoder.c',
+> +      'capstone/arch/X86/X86ATTInstPrinter.c',
+> +      'capstone/arch/X86/X86IntelInstPrinter.c',
+> +      'capstone/arch/X86/X86Mapping.c',
+> +      'capstone/arch/X86/X86Module.c'
+> +    )
+> +  endif
+> +
+> +  configure_file(output: 'capstone-defs.h', configuration: capstone_data)
+> +
+> +  capstone_cargs =3D [
+> +    # FIXME: There does not seem to be a way to completely replace the c=
+_args
+> +    # that come from add_project_arguments() -- we can only add to them.
+> +    # So: disable all warnings with a big hammer.
+> +    '-Wno-error', '-w',
+> +
+> +    # Include all configuration defines via a header file, which will wi=
+nd up
+> +    # as a dependency on the object file, and thus changes here will res=
+ult
+> +    # in a rebuild.
+> +    '-include', 'capstone-defs.h'
+> +  ]
+> +
+> +  libcapstone =3D static_library('capstone',
+> +                               sources: capstone_files,
+> +                               c_args: capstone_cargs,
+> +                               include_directories: 'capstone/include')
+> +  capstone =3D declare_dependency(link_with: libcapstone,
+> +                                include_directories: 'capstone/include')
+> +endif
+> +config_host_data.set('CONFIG_CAPSTONE', capstone.found())
+> +
+> +genh +=3D configure_file(output: 'config-host.h', configuration: config_=
+host_data)
+> +
+>  # Generators
+>=20=20
+>  hxtool =3D find_program('scripts/hxtool')
+> @@ -1512,7 +1609,7 @@ summary_info +=3D {'vvfat support':     config_host=
+.has_key('CONFIG_VVFAT')}
+>  summary_info +=3D {'qed support':       config_host.has_key('CONFIG_QED'=
+)}
+>  summary_info +=3D {'parallels support': config_host.has_key('CONFIG_PARA=
+LLELS')}
+>  summary_info +=3D {'sheepdog support':  config_host.has_key('CONFIG_SHEE=
+PDOG')}
+> -summary_info +=3D {'capstone':          config_host.has_key('CONFIG_CAPS=
+TONE')}
+> +summary_info +=3D {'capstone':          capstone_opt}
+>  summary_info +=3D {'libpmem support':   config_host.has_key('CONFIG_LIBP=
+MEM')}
+>  summary_info +=3D {'libdaxctl support': config_host.has_key('CONFIG_LIBD=
+AXCTL')}
+>  summary_info +=3D {'libudev':           config_host.has_key('CONFIG_LIBU=
+DEV')}
+> diff --git a/meson_options.txt b/meson_options.txt
+> index 543cf70043..e650a937e7 100644
+> --- a/meson_options.txt
+> +++ b/meson_options.txt
+> @@ -22,3 +22,7 @@ option('vnc_sasl', type : 'feature', value : 'auto',
+>         description: 'SASL authentication for VNC server')
+>  option('xkbcommon', type : 'feature', value : 'auto',
+>         description: 'xkbcommon support')
+> +
+> +option('capstone', type: 'combo', value: 'auto',
+> +       choices: ['no', 'yes', 'auto', 'system', 'internal'],
+> +       description: 'Whether and how to find the capstone library')
+
+
+--=20
+Alex Benn=C3=A9e
 
