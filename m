@@ -2,88 +2,84 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9E0BC43463
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 09:04:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFD28C43463
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 09:08:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B00520773
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 09:04:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5D9AA20773
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 09:08:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="En9qxgWK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B00520773
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="ooRlojMw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D9AA20773
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKHkM-0001Xv-C7
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 05:04:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60270)
+	id 1kKHnv-0003Ff-91
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 05:08:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34586)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kKHf2-0005kQ-N3
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 04:59:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55749)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kKHf0-00060T-DY
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 04:59:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600678736;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Pm15xvqVjw9kncvzQ8oUo9hebAkTM85nEwxLtDkV1Kw=;
- b=En9qxgWKmQYMucIeqbTHAlySeEl9SmaRsUDvB2BdE6Z/EoHZrSuqlSjzXHsW/diGMYPrRu
- ZgKpEo92BT1ezJUmehXSwsHEgfKmFK/YcCdQD2c7m2xr2bt1aSwjFc+0LPDDXBCA/be9Hp
- IHjeFLxWxlA4DYpgdRG9JktbIqG2mIU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-110-wOjK47XuNMm7-8gFn8SGTg-1; Mon, 21 Sep 2020 04:58:30 -0400
-X-MC-Unique: wOjK47XuNMm7-8gFn8SGTg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 930AB85C734;
- Mon, 21 Sep 2020 08:58:28 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
- [10.36.112.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BBD56277B7;
- Mon, 21 Sep 2020 08:58:24 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 10E1B9D77; Mon, 21 Sep 2020 10:58:24 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kKHn5-0002n5-Ko
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 05:07:19 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:46195)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kKHn3-00072H-M4
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 05:07:19 -0400
+Received: by mail-pf1-x443.google.com with SMTP id b124so8693005pfg.13
+ for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 02:07:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id;
+ bh=kR9iCYe84KslL3W3ktEJjo+Xu7hMFud5I6WivYPB80k=;
+ b=ooRlojMwaXpmsm7BlYnVeM9BWBApaw9LWrDmvTwt1M/smGxgG3xqym2ge6p/pkR/+f
+ AUQlYvnx4iPKoLXVouf81Cuo2MUzUSe26oQ1SpKkpMP7C6TLm7wb/tWFLMAsNrKQBFQI
+ 6uaG6rCtHNcWNyEd04AxiRu61k5KK8AezRiEL3SogUgGH7mAhERmRioa/cAY8DHwJ1os
+ fq0P8BhjgqkerOBwKzYdYhja1YTG4in9xUA78R86N912zminnRqWN1r9Xds+znwEi4AE
+ VoOg3DlhFuBtufCSGlUmDLJ4YfE9SbQhc4NCD2gf5eOK4l7ypfduCto6Uxa69w5RN8hP
+ 71Bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=kR9iCYe84KslL3W3ktEJjo+Xu7hMFud5I6WivYPB80k=;
+ b=k4Lg4nJbObfXIdMT5s56Cfc6NEHmsm16SCAA1DSQmI6nsG4p8xLdLee32LmcNhVE2m
+ /0VF9kgLPsW8gaamJHv5s6ym0ElRmtwmt1z9cd7UxOS8bfkNPE7OXfjvf59ERK7CR151
+ 1bqOhjlt99wJsUSyP9h8HRYkrGMglTX90t85UuzHDmZ/nlRXNZQhIjUjJ7bw5Q6DsDSj
+ 1LQQH/bkHiKI9CF3n81SPzSLwyTCAoQeXCiXKXK0/50jmEly5u8ULXyn7YpIXA1pAMn3
+ RhYlTJnX01UN2D1ZxGUHQYlWM15uALUIEYdBzz9XzioNtfD+nZTGcTkt0r773QboWfDh
+ e/fg==
+X-Gm-Message-State: AOAM530q71Vfycov88gvWIYqWJ4aPXOR3Rp7jYJgwB0X4s7E6+dHoe3D
+ JhKhUIa5pTaE+LJC3nW3tSWAgiBhonjNBX2E
+X-Google-Smtp-Source: ABdhPJy1pgCMXNCZiJ1Rqu0j9O/4FuAYrsxd/TIptISch0UwgW08UpDJPj9radX4ylC9pgcgD4S+ug==
+X-Received: by 2002:a63:d449:: with SMTP id i9mr34479341pgj.83.1600679235346; 
+ Mon, 21 Sep 2020 02:07:15 -0700 (PDT)
+Received: from localhost.localdomain ([115.96.132.156])
+ by smtp.googlemail.com with ESMTPSA id q7sm10743256pgg.10.2020.09.21.02.07.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 21 Sep 2020 02:07:14 -0700 (PDT)
+From: Ani Sinha <ani@anisinha.ca>
 To: qemu-devel@nongnu.org
-Subject: [PULL 2/3] hw: usb: hcd-ohci: check len and frame_number variables
-Date: Mon, 21 Sep 2020 10:58:22 +0200
-Message-Id: <20200921085823.980-3-kraxel@redhat.com>
-In-Reply-To: <20200921085823.980-1-kraxel@redhat.com>
-References: <20200921085823.980-1-kraxel@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:44:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -45
-X-Spam_score: -4.6
-X-Spam_bar: ----
-X-Spam_report: (-4.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.501,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Subject: [PATCH v2] qom: code hardening - have bound checking while looping
+ with integer value
+Date: Mon, 21 Sep 2020 14:37:04 +0530
+Message-Id: <20200921090704.25353-1-ani@anisinha.ca>
+X-Mailer: git-send-email 2.17.1
+Received-SPF: none client-ip=2607:f8b0:4864:20::443;
+ envelope-from=ani@anisinha.ca; helo=mail-pf1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,104 +92,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yi Ren <yunye.ry@alibaba-inc.com>, Yongkang Jia <j_kangel@163.com>,
- Gaoning Pan <pgn@zju.edu.cn>, Gerd Hoffmann <kraxel@redhat.com>,
- Prasad J Pandit <pjp@fedoraproject.org>
+Cc: Ani Sinha <ani@anisinha.ca>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+Object property insertion code iterates over an integer to get an unused
+index that can be used as an unique name for an object property. This loop
+increments the integer value indefinitely. Although very unlikely, this can
+still cause an integer overflow.
+In this change, we fix the above code by checking against INT_MAX and making
+sure that the interger index does not overflow beyond that value. If no
+available index is found, the code would cause an assertion failure. This
+assertion failure is necessary because the callers of the function do not check
+the return value for NULL.
 
-While servicing the OHCI transfer descriptors(TD), OHCI host
-controller derives variables 'start_addr', 'end_addr', 'len'
-etc. from values supplied by the host controller driver.
-Host controller driver may supply values such that using
-above variables leads to out-of-bounds access issues.
-Add checks to avoid them.
-
-AddressSanitizer: stack-buffer-overflow on address 0x7ffd53af76a0
-  READ of size 2 at 0x7ffd53af76a0 thread T0
-  #0 ohci_service_iso_td ../hw/usb/hcd-ohci.c:734
-  #1 ohci_service_ed_list ../hw/usb/hcd-ohci.c:1180
-  #2 ohci_process_lists ../hw/usb/hcd-ohci.c:1214
-  #3 ohci_frame_boundary ../hw/usb/hcd-ohci.c:1257
-  #4 timerlist_run_timers ../util/qemu-timer.c:572
-  #5 qemu_clock_run_timers ../util/qemu-timer.c:586
-  #6 qemu_clock_run_all_timers ../util/qemu-timer.c:672
-  #7 main_loop_wait ../util/main-loop.c:527
-  #8 qemu_main_loop ../softmmu/vl.c:1676
-  #9 main ../softmmu/main.c:50
-
-Reported-by: Gaoning Pan <pgn@zju.edu.cn>
-Reported-by: Yongkang Jia <j_kangel@163.com>
-Reported-by: Yi Ren <yunye.ry@alibaba-inc.com>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-Message-id: 20200915182259.68522-2-ppandit@redhat.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Signed-off-by: Ani Sinha <ani@anisinha.ca>
 ---
- hw/usb/hcd-ohci.c | 24 ++++++++++++++++++++++--
- 1 file changed, 22 insertions(+), 2 deletions(-)
+ qom/object.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
-index 1e6e85e86a8d..9dc59101f958 100644
---- a/hw/usb/hcd-ohci.c
-+++ b/hw/usb/hcd-ohci.c
-@@ -731,7 +731,11 @@ static int ohci_service_iso_td(OHCIState *ohci, struct ohci_ed *ed,
-     }
+diff --git a/qom/object.c b/qom/object.c
+index 387efb25eb..9962874598 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -1166,11 +1166,11 @@ object_property_try_add(Object *obj, const char *name, const char *type,
  
-     start_offset = iso_td.offset[relative_frame_number];
--    next_offset = iso_td.offset[relative_frame_number + 1];
-+    if (relative_frame_number < frame_count) {
-+        next_offset = iso_td.offset[relative_frame_number + 1];
-+    } else {
-+        next_offset = iso_td.be;
-+    }
+     if (name_len >= 3 && !memcmp(name + name_len - 3, "[*]", 4)) {
+         int i;
+-        ObjectProperty *ret;
++        ObjectProperty *ret = NULL;
+         char *name_no_array = g_strdup(name);
  
-     if (!(OHCI_BM(start_offset, TD_PSW_CC) & 0xe) || 
-         ((relative_frame_number < frame_count) && 
-@@ -764,7 +768,12 @@ static int ohci_service_iso_td(OHCIState *ohci, struct ohci_ed *ed,
+         name_no_array[name_len - 3] = '\0';
+-        for (i = 0; ; ++i) {
++        for (i = 0; i < INT16_MAX; ++i) {
+             char *full_name = g_strdup_printf("%s[%d]", name_no_array, i);
+ 
+             ret = object_property_try_add(obj, full_name, type, get, set,
+@@ -1181,6 +1181,7 @@ object_property_try_add(Object *obj, const char *name, const char *type,
+             }
          }
-     } else {
-         /* Last packet in the ISO TD */
--        end_addr = iso_td.be;
-+        end_addr = next_offset;
-+    }
-+
-+    if (start_addr > end_addr) {
-+        trace_usb_ohci_iso_td_bad_cc_overrun(start_addr, end_addr);
-+        return 1;
+         g_free(name_no_array);
++        assert(ret);
+         return ret;
      }
  
-     if ((start_addr & OHCI_PAGE_MASK) != (end_addr & OHCI_PAGE_MASK)) {
-@@ -773,6 +782,9 @@ static int ohci_service_iso_td(OHCIState *ohci, struct ohci_ed *ed,
-     } else {
-         len = end_addr - start_addr + 1;
-     }
-+    if (len > sizeof(ohci->usb_buf)) {
-+        len = sizeof(ohci->usb_buf);
-+    }
- 
-     if (len && dir != OHCI_TD_DIR_IN) {
-         if (ohci_copy_iso_td(ohci, start_addr, end_addr, ohci->usb_buf, len,
-@@ -975,8 +987,16 @@ static int ohci_service_td(OHCIState *ohci, struct ohci_ed *ed)
-         if ((td.cbp & 0xfffff000) != (td.be & 0xfffff000)) {
-             len = (td.be & 0xfff) + 0x1001 - (td.cbp & 0xfff);
-         } else {
-+            if (td.cbp > td.be) {
-+                trace_usb_ohci_iso_td_bad_cc_overrun(td.cbp, td.be);
-+                ohci_die(ohci);
-+                return 1;
-+            }
-             len = (td.be - td.cbp) + 1;
-         }
-+        if (len > sizeof(ohci->usb_buf)) {
-+            len = sizeof(ohci->usb_buf);
-+        }
- 
-         pktlen = len;
-         if (len && dir != OHCI_TD_DIR_IN) {
 -- 
-2.27.0
+2.17.1
 
 
