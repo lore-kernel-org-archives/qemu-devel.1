@@ -7,92 +7,85 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91B23C43463
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 09:59:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 108E8C43464
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 10:07:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8B052193E
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 09:59:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7938120EDD
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 10:07:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ty4J3FZM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8B052193E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QZqTfNXm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7938120EDD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKIbf-0000PS-2d
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 05:59:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46874)
+	id 1kKIjL-0008NM-H7
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 06:07:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50336)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1kKIZo-0007WE-0d
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 05:57:40 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30070
+ (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
+ id 1kKIgn-0005SF-9O
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 06:04:53 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22981
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1kKIZl-0004kl-6p
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 05:57:39 -0400
+ (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
+ id 1kKIgk-0006TR-Qs
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 06:04:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600682255;
+ s=mimecast20190719; t=1600682688;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=L7QkMGbEDI0WD941tQiZUc1lhZ7YCrJQ0gVRGM7T8cc=;
- b=Ty4J3FZMGcBk/INvoyejVL5T7mHbKbwWKwsHG+jXyXDEjuy6xYwRihiirRLpo4QTsWUWyz
- 4lwH9SA7I4itgcc8r/yUdl+RGvQjK3Vy3vrTWi6J/jvQc0l/hlpPAbyDNagwgNfY+JRbpt
- XZxGonPR0kr9N0QH8WhUqykTzdy3nEY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-TP_A6UnyMhalOXHjX5A1Ag-1; Mon, 21 Sep 2020 05:57:33 -0400
-X-MC-Unique: TP_A6UnyMhalOXHjX5A1Ag-1
-Received: by mail-wm1-f69.google.com with SMTP id s24so2323582wmh.1
- for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 02:57:33 -0700 (PDT)
+ bh=pAV7uh4FV14AYPx+0FZmDI7iXzhZjCJ0zQQpqYuwiSQ=;
+ b=QZqTfNXmp2F4TKcq11eupoXXfISYAu6o1rXXV774M3gg8r9YXGn0oG8FaxnwC9PTZlVuvn
+ xM0quHjBXRI3G/m1hJexiW2EtEdmXkB6U+LixQOf8Lf0IReFoyOcX3xNCKjQnAS8oohsrE
+ ZMhRU9MdU/t4s/I3XAdyUyu2mixE7hk=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-281-GJFGo3b0Pzu-HtjuCdFeeA-1; Mon, 21 Sep 2020 06:04:43 -0400
+X-MC-Unique: GJFGo3b0Pzu-HtjuCdFeeA-1
+Received: by mail-io1-f70.google.com with SMTP id t187so9465596iof.22
+ for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 03:04:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=L7QkMGbEDI0WD941tQiZUc1lhZ7YCrJQ0gVRGM7T8cc=;
- b=Z5Pp5aW5X+9dkQmyP1ElaTBtPB9nuNl38ckKpzCz1et8+BclVRuRmb6hHmAIdC93N9
- VN9f+9hZJUEG25ioCqg/pgZHzRNURa0iOIzNfUubc5IinnobSvORiDb4lVyjHw1382se
- OEMvG44LYLoT2mv1mH2Z+2VsoYX72I1zMtwwEJGhW+MlC0sFkQ8dwWqChAIcQQcuS/Yu
- fUD0nNkD6XR6fyYZCtMk53VbR2LPcTm40eYg4wNqncEUA6CaWUzO0/5cWTOVgXlGRJpK
- i1NdRSkmTY26KwXk1eVVQqVVS3RMCZWSvmR04/3P2Nmp1UlnnApggycX+jjoZmQYJ+Ix
- AW3A==
-X-Gm-Message-State: AOAM531DwM8uCd7e2zZt4Es8TmtiaptKDVhoLqlRdg1Yq3mGBik00m75
- NYqrPEpOopGTSw61OUp0D8+V4SlTU6yLbAx/iAbQ1Qzx+usBXeUfkdU3ucORSoLYx+mz4RRYXlY
- 8ZI6dUL0j+ycnKvg=
-X-Received: by 2002:a1c:bdc4:: with SMTP id
- n187mr29156274wmf.109.1600682252725; 
- Mon, 21 Sep 2020 02:57:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz0L3uT0NnctiJdOssrwS2Iix91pUjXBspOETW30vEcI/xerBuPhjvuQ/8HAWyk4AaXBiJyNw==
-X-Received: by 2002:a1c:bdc4:: with SMTP id
- n187mr29156246wmf.109.1600682252484; 
- Mon, 21 Sep 2020 02:57:32 -0700 (PDT)
-Received: from steredhat (host-79-13-204-53.retail.telecomitalia.it.
- [79.13.204.53])
- by smtp.gmail.com with ESMTPSA id l17sm18696916wme.11.2020.09.21.02.57.31
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 21 Sep 2020 02:57:31 -0700 (PDT)
-Date: Mon, 21 Sep 2020 11:57:29 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v4 2/4] vhost-vsock-pci: force virtio version 1
-Message-ID: <20200921095729.pqgxh4zcbwisscw5@steredhat>
-References: <20200921083807.48380-1-sgarzare@redhat.com>
- <20200921083807.48380-3-sgarzare@redhat.com>
- <20200921114602.46372eb4.cohuck@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=pAV7uh4FV14AYPx+0FZmDI7iXzhZjCJ0zQQpqYuwiSQ=;
+ b=skQ+fupzeHEu4BSVpyKt0PLDGTBlLfGuOrj3eJexvNJFEc6+awCSQPTIa5I8iTlbfI
+ 8g8rr8lmGmyB2SWfht4v8I9BtF/5tnJvAznRFM3y4exB1bpReI06afjXeoWNf3D4ctCn
+ +4za3y6oKTShPJZw+mnCbmYBaUFyY2YMah6/bz66EmAyDpMTZFyGdq+gBrMZYgsSaiaT
+ 9+Nf5+fJfQRCYIqMaRYL0tlQ3v4KrAG40O3GLUto5XlG+NKn+qz7hzN1/8icTLBdwPZW
+ H5FVC5NifgWU3gv+ew6ib97hc5CEpFnuLgVbvb7I88P9hxHXP95VGedI/bEDgQy1ohkd
+ 5/RQ==
+X-Gm-Message-State: AOAM532r3ZRhAfCCMsmkt300C9fUf4icoj9Uk9ZuD5EcPAe4O32Xw1AG
+ X0gROj+XR9Ti0BXl3zXTXta3Zt1iOeAcTcFkRMycyOYt3faQFxS/xEFVribIgGkOr3zD9HhbyyF
+ e3aXFC86A8RTaS48tRuL05rq7HIwqLeI=
+X-Received: by 2002:a92:4183:: with SMTP id o125mr12737145ila.82.1600682682684; 
+ Mon, 21 Sep 2020 03:04:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx4rYzn/pZ/kEe7n0ir7SXTPcJ9LnE4NgcU7HwOZKm2M54Gymv1+LEaom0n8EjQvez6ox7tWs4lysU0pgtHkws=
+X-Received: by 2002:a92:4183:: with SMTP id o125mr12737121ila.82.1600682682413; 
+ Mon, 21 Sep 2020 03:04:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200921114602.46372eb4.cohuck@redhat.com>
+References: <20200910174850.716104-1-marcandre.lureau@redhat.com>
+ <87mu1j8p7p.fsf@dusky.pond.sub.org>
+In-Reply-To: <87mu1j8p7p.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Mon, 21 Sep 2020 14:04:31 +0400
+Message-ID: <CAMxuvayvRfjUMYDiB5fm5QBD76kfD8-G1wTEucQTBbZUtnwXrA@mail.gmail.com>
+Subject: Re: [PATCH] PoC: Rust binding for QAPI (qemu-ga only, for now)
+To: Markus Armbruster <armbru@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=sgarzare@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlureau@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=sgarzare@redhat.com;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mlureau@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 03:43:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -115,71 +108,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Qinghua Cheng <qcheng@redhat.com>,
- Qian Cai <caiqian@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-stable@nongnu.org, David Hildenbrand <david@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: "P. Berrange, Daniel" <berrange@redhat.com>,
+ Sergio Lopez Pascual <slp@redhat.com>, "Hajnoczi, Stefan" <stefanha@gmail.com>,
+ qemu-devel <qemu-devel@nongnu.org>, "Bonzini, Paolo" <pbonzini@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 21, 2020 at 11:46:02AM +0200, Cornelia Huck wrote:
-> On Mon, 21 Sep 2020 10:38:05 +0200
-> Stefano Garzarella <sgarzare@redhat.com> wrote:
-> 
-> > Commit 9b3a35ec82 ("virtio: verify that legacy support is not
-> > accidentally on") added a safety check that requires to set
-> > 'disable-legacy=on' on vhost-vsock-pci device:
-> > 
-> >     $ ./qemu-system-x86_64 ... -device vhost-vsock-pci,guest-cid=5
-> >         qemu-system-x86_64: -device vhost-vsock-pci,guest-cid=5:
-> >         device is modern-only, use disable-legacy=on
-> > 
-> > virtio-vsock was introduced after the release of VIRTIO 1.0
-> > specifications, so it should be 'modern-only'.
-> > In addition Cornelia verified that forcing a legacy mode on
-> > vhost-vsock-pci device using x86-64 host and s390x guest, so with
-> > different endianness, produces strange behaviours.
-> > 
-> > This patch forces virtio version 1 and removes the 'transitional_name'
-> > property removing the need to specify 'disable-legacy=on' on
-> > vhost-vsock-pci device.
-> > 
-> > To avoid migration issues, we force virtio version 1 only when
-> > legacy check is enabled in the new machine types (>= 5.1).
-> 
-> Maybe add
-> 
-> "As the transitional device name is not commonly used, we do not
-> provide compatibility handling for it." ?
+Hi
 
-Yes, I'll add in v5.
+On Mon, Sep 21, 2020 at 1:16 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
+>
+> marcandre.lureau@redhat.com writes:
+>
+> > From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> >
+> > Hi,
+> >
+> > Among the QEMU developers, there is a desire to use Rust. (see previous
+> > thread from Stefan "Why QEMU should move from C to Rust", the rust-vmm
+> > related projects and other experiments).
+> >
+> > Thanks to our QAPI type system and the associate code generator, it is
+> > relatively straightforward to create Rust bindings for the generated C
+> > types (also called sys/ffi binding) and functions. (rust-bindgen could
+> > probably do a similar job, but it would probably bring other issues).
+> > This provides an important internal API already.
+> >
+> > Slightly more complicated is to expose a Rust API for those, and provid=
+e
+> > convenient conversions C<->Rust. Taking inspiration from glib-rs
+> > binding, I implemented a simplified version of the FromGlib/ToGlib
+> > traits, with simpler ownership model, sufficient for QAPI needs.
+> >
+> > The usage is relatively simple:
+> >
+> > - from_qemu_none(ptr: *const sys::P) -> T
+> >   Return a Rust type T for a const ffi pointer P.
+> >
+> > - from_qemu_full(ptr: *mut sys::P) -> T
+> >   Return a Rust type T for a ffi pointer P, taking ownership.
+> >
+> > - T::to_qemu_none() -> Stash<P>
+> >   Returns a borrowed ffi pointer P (using a Stash to destroy "glue"
+> >   storage data, if any).
+> >
+> > - T::to_qemu_full() -> P
+> >   Returns a ffi pointer P. (P resources are leaked/passed to C/ffi)
+> >
+> > With those traits, it's relatively easy to implement the QMP callbacks.
+> > With enough interest, we could eventually start rewriting QGA in
+> > Rust, as it is a simple service. See qga/qmp.rs for some examples.
+> > We could also try to tackle qemu itself.
+>
+> Up to here, you're talking about *internal* interfaces.  Correct?
+>
+> Your motivation is enabling use of Rust in QEMU.  Correct?
 
-> 
-> > 
-> > Cc: qemu-stable@nongnu.org
-> > Reported-by: Qian Cai <caiqian@redhat.com>
-> > Reported-by: Qinghua Cheng <qcheng@redhat.com>
-> > Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1868449
-> > Suggested-by: Cornelia Huck <cohuck@redhat.com>
-> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > ---
-> > v3:
-> >  - forced virtio version 1 only with new machine types
-> > v2:
-> >  - fixed commit message [Cornelia]
-> > ---
-> >  hw/virtio/vhost-vsock-pci.c | 10 +++++++++-
-> >  1 file changed, 9 insertions(+), 1 deletion(-)
-> > 
-> 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+That's the first motivation, indeed.
 
-Thanks,
-Stefano
+
+>
+> > Finally, given that the QAPI types are easy to serialize, it was simple
+> > to use "serde" on them, and provide a D-Bus interface for QMP with zbus=
+.
+> > (a similar approach could probably be taken for other protocols, that
+> > could be dynamically loaded... anyone like protobuf better?)
+>
+> QMP is an *external* interface.
+>
+> It supports compatible evolution: we can make certain kinds of changes
+> without affecting clients.  These include:
+>
+> * Adding optional arguments
+
+This would change the signature of the function, and would need an
+interface version bump.
+
+Alternative: pass optional arguments as an extra dictionary. This is a
+common idiom in D-Bus (the "a{sv}" type that maps strings to generic
+values)
+
+Potentially, use gvariant serialization format, which has maybe type.
+But gvariant isn't implemented by most D-Bus libraries (that was the
+plan long time ago, but it didn't happen as people lost interest).
+
+> * Adding results
+
+Also change the signature of the function.
+
+However, since messages have boundaries, it is easy to ignore return values=
+.
+
+>
+> * Adding values to an enumeration type, branches to a union or
+>   alternate
+>
+
+As long as the discriminant is represented as a string, it should be fine.
+
+> * Reordering members of enumerations, structs, unions
+
+Again, if the discriminant is a string, it should be the same as with json.
+
+For the members, the usage of dictionaries is required in this case
+(else the type signature would change).
+
+> * Turning an argument type into an alternate with the old type as branch
+
+That would also change the function signature.
+
+There isn't much solution I can think of, unless we have an implicit
+tagged enum for every argument, which would be quite nasty.
+
+>
+> We've made use of this extensively.  See also
+> docs/devel/qapi-code-gen.txt section "Compatibility considerations."
+>
+> How do such changes affect clients of the proposed D-Bus interface?
+
+The introspection XML will always reflect the expected signature. You
+should bump your interface version whenever you make incompatible
+changes.
+
+If this happens too often, we could also introduce a D-Bus override
+mechanism to do manual translations from external interface to
+internal.
+
+>
+> > This PoC modifies qemu-ga to provide the interface on the session bus:
+> > $ qga/qemu-ga -m unix-listen -p /tmp/qga.sock -t /tmp -v
+> > $ busctl --user introspect org.qemu.qga /org/qemu/qga org.qemu.QgaQapi
+> > ...
+> > $ busctl --user call org.qemu.qga /org/qemu/qga org.qemu.QgaQapi
+> > GuestSetVcpus aa\{sv\} 1 2 logical-id x 0 online b 1
+> > ...
+> >
+> > Note: the generated code doesn't work with the qemu schema, there is a
+> > couple of fixme/todo left.
+> >
+> > Shameful pain point: meson & cargo don't play nicely together.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
 
 
