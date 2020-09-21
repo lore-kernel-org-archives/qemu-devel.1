@@ -2,48 +2,46 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8FE2C43466
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 17:09:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6251FC43466
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 17:16:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8489B2073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 17:09:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8489B2073A
+	by mail.kernel.org (Postfix) with ESMTPS id AABA720758
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 17:16:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AABA720758
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKPJy-0007Cv-BK
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 13:09:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38674)
+	id 1kKPQ4-0000h5-Fh
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 13:16:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40038)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kKPJL-0006fr-JC; Mon, 21 Sep 2020 13:09:07 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:59038
+ id 1kKPOu-0000D1-AU; Mon, 21 Sep 2020 13:14:53 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:59058
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kKPJJ-0004e1-KW; Mon, 21 Sep 2020 13:09:07 -0400
+ id 1kKPOq-0005K6-L0; Mon, 21 Sep 2020 13:14:51 -0400
 Received: from host81-154-161-117.range81-154.btcentralplus.com
  ([81.154.161.117] helo=[192.168.1.65])
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kKPJq-0000kC-5g; Mon, 21 Sep 2020 18:09:42 +0100
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- armbru@redhat.com, david@gibson.dropbear.id.au, atar4qemu@gmail.com,
- qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+ id 1kKPPR-0000le-LY; Mon, 21 Sep 2020 18:15:25 +0100
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Markus Armbruster <armbru@redhat.com>
 References: <20200920082018.16135-1-mark.cave-ayland@ilande.co.uk>
  <20200920082018.16135-5-mark.cave-ayland@ilande.co.uk>
- <0ea7090a-34f0-d437-1c7d-34570b529943@amsat.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+ <87imc78osh.fsf@dusky.pond.sub.org>
+ <2211cf4a-c35d-cfe2-f123-9a312ea5d72c@ilande.co.uk>
 Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
  mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
  3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
@@ -68,15 +66,15 @@ Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
  Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
  KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
  imgcU9TTGC5qd9g=
-Message-ID: <c9ae2d9d-4a4e-8b68-1f58-4e1fe3bbd55a@ilande.co.uk>
-Date: Mon, 21 Sep 2020 18:08:56 +0100
+Message-ID: <b7e58136-925d-efb3-34e3-652c9dbd71c3@ilande.co.uk>
+Date: Mon, 21 Sep 2020 18:14:43 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <0ea7090a-34f0-d437-1c7d-34570b529943@amsat.org>
+In-Reply-To: <2211cf4a-c35d-cfe2-f123-9a312ea5d72c@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-SA-Exim-Connect-IP: 81.154.161.117
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
 Subject: Re: [PATCH 4/6] sparc32-ledma: don't reference nd_table directly
@@ -105,63 +103,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, atar4qemu@gmail.com,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/09/2020 10:57, Philippe Mathieu-Daudé wrote:
+On 21/09/2020 18:03, Mark Cave-Ayland wrote:
 
-> Hi Mark,
-> 
-> On 9/20/20 10:20 AM, Mark Cave-Ayland wrote:
->> Instead use qdev_set_nic_properties() to configure the on-board NIC at the
->> sun4m machine level.
->>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> ---
->>  hw/dma/sparc32_dma.c |  5 -----
->>  hw/sparc/sun4m.c     | 21 +++++++++++++--------
->>  2 files changed, 13 insertions(+), 13 deletions(-)
->>
->> diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
->> index 2cbe331959..b643b413c5 100644
->> --- a/hw/dma/sparc32_dma.c
->> +++ b/hw/dma/sparc32_dma.c
->> @@ -342,12 +342,7 @@ static void sparc32_ledma_device_realize(DeviceState *dev, Error **errp)
->>  {
->>      LEDMADeviceState *s = SPARC32_LEDMA_DEVICE(dev);
->>      SysBusPCNetState *lance = SYSBUS_PCNET(&s->lance);
->> -    NICInfo *nd = &nd_table[0];
->>  
->> -    /* FIXME use qdev NIC properties instead of nd_table[] */
->> -    qemu_check_nic_model(nd, TYPE_LANCE);
->> -
->> -    qdev_set_nic_properties(DEVICE(lance), nd);
->>      object_property_set_link(OBJECT(lance), "dma", OBJECT(dev), &error_abort);
->>      sysbus_realize(SYS_BUS_DEVICE(lance), &error_fatal);
->>  }
->> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
->> index 947b69d159..ed5f3ccd9f 100644
->> --- a/hw/sparc/sun4m.c
->> +++ b/hw/sparc/sun4m.c
->> @@ -319,7 +319,7 @@ static void *iommu_init(hwaddr addr, uint32_t version, qemu_irq irq)
->>  
->>  static void *sparc32_dma_init(hwaddr dma_base,
->>                                hwaddr esp_base, qemu_irq espdma_irq,
->> -                              hwaddr le_base, qemu_irq ledma_irq)
->> +                              hwaddr le_base, qemu_irq ledma_irq, NICInfo *nd)
-> 
-> Instead of passing NICInfo to sparc32_dma_init,
-> shouldn't you extract the lance code from it?
+> The lance and esp devices are embedded within ledma and espdma devices respectively,
+> but are actually sysbus devices because they can be used by other machines. I'm not
+> sure if lance is used anywhere else, but esp certainly is. Hence they are mapped
+> after the dma device is realised as it feels odd to attach devices to sysbus outside
+> of a machine init function.
 
-Hi Philippe,
-
-I'm not sure I understand what you mean here? The sparc32-dma device is realised
-within the sparc32_dma_init() function and qdev_set_nic_properties() must be called
-before realise happens.
-
-If you can explain a bit more about how you think it can be separated out then I can
-take a look.
+Actually I have a better idea for this: use sysbus_mmio_get_region() within the
+sparc32-dma device to attach the lance and esp memory regions to its own container
+memory region: then the single sysbus_mmio_map() for the sparc32-dma device will just
+work on its own.
 
 
 ATB,
