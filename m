@@ -2,73 +2,120 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD03FC43463
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 06:27:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52A05C43464
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 06:47:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59DFF20739
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 06:27:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59DFF20739
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 86374207BC
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 06:47:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="CYrW6eAS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86374207BC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKFI5-0005o8-Hj
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 02:27:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50548)
+	id 1kKFbf-0000oN-Bv
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 02:47:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53284)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kKFHE-000540-7T
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 02:26:16 -0400
-Resent-Date: Mon, 21 Sep 2020 02:26:16 -0400
-Resent-Message-Id: <E1kKFHE-000540-7T@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21702)
+ (Exim 4.90_1) (envelope-from <dovmurik@linux.vnet.ibm.com>)
+ id 1kKFZq-00085P-Ot
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 02:45:31 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32284
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kKFHB-0002ug-NW
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 02:26:15 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1600669566; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=kViuTDPfoHtAIyPOC1OuTD4m6CeGqgpxxktzlr/hpO0qj1WoyExp6cYqVaUIXqLZd7fc6IOUM/79UG5Q8iSsayxAb4utl3TwXC7N7gO7adFrVrUqGTyHQXzwgRbg3p0Xxca0Vcto9GIfZEiNaOaG7bPc5R2NFFgzcTm7uDwy6GQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1600669566;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=leRptd5klYazZgTeO0jq6e5yL1jBDdAJMIbcIzNKaBE=; 
- b=PlaMhbNAIvUXr1ZUI7SqFQAXquJCyDJKVznel1++zp7ad2W8X9YkdoW9ufQDyMQGoQ3vOU/1h8YA1PbhJ/KxX0Z8pLkO9KzbVy9f1eic8NjDyQmfXbuBkHCuqVUoaoAUCNZ9KANbgAlKG7sa/1nk8G0MjFBFGrdxXGPQ3Plnolk=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1600669563883888.5616046556277;
- Sun, 20 Sep 2020 23:26:03 -0700 (PDT)
-Subject: Re: [PATCH v3 00/16] Add a General Virtual Device Fuzzer
-Message-ID: <160066956241.23907.16089556899170719204@66eaa9a8a123>
-In-Reply-To: <20200921022506.873303-1-alxndr@bu.edu>
+ (Exim 4.90_1) (envelope-from <dovmurik@linux.vnet.ibm.com>)
+ id 1kKFZk-0004pc-TF
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 02:45:30 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 08L6XCpx121323; Mon, 21 Sep 2020 02:45:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : subject : to : cc
+ : references : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Qc+TFvGdxkbzSsv1yg1yWx1oPyx1PkEfeCodzvuGZo4=;
+ b=CYrW6eAShvqWn23QIKnpprhrsJnjI0bqxovMQBHV06uTByjxOv257BQTQsMun2TbWIwY
+ 0YrZWF2YelX4wF+T6AIc4qGTkGjJNd4YcqqRLLwSaN7Jj6YilZ6cEKuAnpg/r0xJSGN7
+ +0b7Q3kCVvLLZJtSjW/u+vw30HWuVdalZr21AY/JV8/jeyF7t1HE0N4m8QuZqCqN7Mq1
+ hsQf8fn7YupstrkxZe5v6rVya9NiEMrBvLcsLrJ4is5BjI4QgElj0Dwb6QcrB0U+4lQB
+ lVkzyvw1VmHUzcXxqCnB9Gth7PCEEoazjevygTqYnKwLV7NoZ+3u2G2ZOApEq1EfqObG aA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33pprhgjye-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 21 Sep 2020 02:45:16 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08L6YMq8124106;
+ Mon, 21 Sep 2020 02:45:15 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.108])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33pprhgjwm-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 21 Sep 2020 02:45:13 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+ by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08L6bEro007577;
+ Mon, 21 Sep 2020 06:45:09 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com
+ (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+ by ppma05fra.de.ibm.com with ESMTP id 33n9m7rvfk-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 21 Sep 2020 06:45:09 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 08L6j7lw26738998
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 21 Sep 2020 06:45:07 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 73A6A5206D;
+ Mon, 21 Sep 2020 06:45:07 +0000 (GMT)
+Received: from [9.65.232.226] (unknown [9.65.232.226])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 13F3852054;
+ Mon, 21 Sep 2020 06:45:03 +0000 (GMT)
+From: Dov Murik <dovmurik@linux.vnet.ibm.com>
+Subject: Re: [PATCH v3 1/5] sev/i386: Add initial support for SEV-ES
+To: Tom Lendacky <thomas.lendacky@amd.com>, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org
+References: <cover.1600205384.git.thomas.lendacky@amd.com>
+ <e2456cc461f329f52aa6eb3fcd0d0ce9451b8fa7.1600205384.git.thomas.lendacky@amd.com>
+Message-ID: <e8cf44ef-3180-8922-5f0a-2ce532005e51@linux.vnet.ibm.com>
+Date: Mon, 21 Sep 2020 09:45:02 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: alxndr@bu.edu
-Date: Sun, 20 Sep 2020 23:26:03 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/20 22:46:02
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <e2456cc461f329f52aa6eb3fcd0d0ce9451b8fa7.1600205384.git.thomas.lendacky@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-21_01:2020-09-21,
+ 2020-09-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 adultscore=0
+ clxscore=1011 mlxscore=0 spamscore=0 phishscore=0 mlxlogscore=999
+ bulkscore=0 impostorscore=0 malwarescore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009210049
+Received-SPF: none client-ip=148.163.158.5;
+ envelope-from=dovmurik@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 02:45:18
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
+X-Spam_bar: --
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,81 +128,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: alxndr@bu.edu, qemu-devel@nongnu.org, darren.kenny@oracle.com,
- bsd@redhat.com, stefanha@redhat.com, philmd@redhat.com
+Cc: Brijesh Singh <brijesh.singh@amd.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Connor Kuehl <ckuehl@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Jiri Slaby <jslaby@suse.cz>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkyMTAyMjUwNi44NzMz
-MDMtMS1hbHhuZHJAYnUuZWR1LwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9ja2Vy
-LW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5k
-cyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5
-b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJF
-R0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9ja2VyLWltYWdl
-LWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRvcmEg
-Sj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCkhvc3QgbWFjaGluZSBjcHU6
-IHg4Nl82NApUYXJnZXQgbWFjaGluZSBjcHUgZmFtaWx5OiB4ODYKVGFyZ2V0IG1hY2hpbmUgY3B1
-OiB4ODZfNjQKLi4vc3JjL21lc29uLmJ1aWxkOjEwOiBXQVJOSU5HOiBNb2R1bGUgdW5zdGFibGUt
-a2V5dmFsIGhhcyBubyBiYWNrd2FyZHMgb3IgZm9yd2FyZHMgY29tcGF0aWJpbGl0eSBhbmQgbWln
-aHQgbm90IGV4aXN0IGluIGZ1dHVyZSByZWxlYXNlcy4KUHJvZ3JhbSBzaCBmb3VuZDogWUVTClBy
-b2dyYW0gcHl0aG9uMyBmb3VuZDogWUVTICgvdXNyL2Jpbi9weXRob24zKQpDb25maWd1cmluZyBu
-aW5qYXRvb2wgdXNpbmcgY29uZmlndXJhdGlvbgotLS0KbWFrZVsxXTogTm90aGluZyB0byBiZSBk
-b25lIGZvciAnYWxsJy4KbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgJy90bXAvcWVtdS10ZXN0
-L3NyYy9zbGlycCcKR2VuZXJhdGluZyBuc2lzIHdpdGggYSBjdXN0b20gY29tbWFuZAptYWtlWzFd
-OiB3YXJuaW5nOiBqb2JzZXJ2ZXIgdW5hdmFpbGFibGU6IHVzaW5nIC1qMS4gIEFkZCAnKycgdG8g
-cGFyZW50IG1ha2UgcnVsZS4KbWFrZVsxXTogRW50ZXJpbmcgZGlyZWN0b3J5ICcvdG1wL3FlbXUt
-dGVzdC9idWlsZCcKbWFrZVsyXTogRW50ZXJpbmcgZGlyZWN0b3J5ICcvdG1wL3FlbXUtdGVzdC9z
-cmMvc2xpcnAnCm1ha2VbMl06IE5vdGhpbmcgdG8gYmUgZG9uZSBmb3IgJ2FsbCcuCi0tLQpIb3N0
-IG1hY2hpbmUgY3B1OiBpMzg2ClRhcmdldCBtYWNoaW5lIGNwdSBmYW1pbHk6IHg4NgpUYXJnZXQg
-bWFjaGluZSBjcHU6IGkzODYKLi4vc3JjL21lc29uLmJ1aWxkOjEwOiBXQVJOSU5HOiBNb2R1bGUg
-dW5zdGFibGUta2V5dmFsIGhhcyBubyBiYWNrd2FyZHMgb3IgZm9yd2FyZHMgY29tcGF0aWJpbGl0
-eSBhbmQgbWlnaHQgbm90IGV4aXN0IGluIGZ1dHVyZSByZWxlYXNlcy4KUHJvZ3JhbSBzaCBmb3Vu
-ZDogWUVTClByb2dyYW0gcHl0aG9uMyBmb3VuZDogWUVTICgvdXNyL2Jpbi9weXRob24zKQpDb25m
-aWd1cmluZyBuaW5qYXRvb2wgdXNpbmcgY29uZmlndXJhdGlvbgotLS0KQ29tcGlsaW5nIEMgb2Jq
-ZWN0IGxpYmJsb2NrLmZhLnAvYmxvY2tfY3J5cHRvLmMub2JqCkNvbXBpbGluZyBDIG9iamVjdCBs
-aWJibG9jay5mYS5wL25iZF9jbGllbnQuYy5vYmoKLi4vc3JjL3NvZnRtbXUvbWVtb3J5LmM6IElu
-IGZ1bmN0aW9uICdmbGF0dmlld19mb3JfZWFjaF9yYW5nZSc6Ci4uL3NyYy9zb2Z0bW11L21lbW9y
-eS5jOjY2MjoyNDogZXJyb3I6IGluY29tcGF0aWJsZSB0eXBlIGZvciBhcmd1bWVudCAxIG9mICdj
-YicKICA2NjIgfCAgICAgICAgIGlmIChjYihmci0+YWRkci5zdGFydCwgZnItPmFkZHIuc2l6ZSwg
-ZnItPm1yLCBvcGFxdWUpKQogICAgICB8ICAgICAgICAgICAgICAgIH5+fn5+fn5+Xn5+fn5+CiAg
-ICAgIHwgICAgICAgICAgICAgICAgICAgICAgICB8CiAgICAgIHwgICAgICAgICAgICAgICAgICAg
-ICAgICBJbnQxMjgge2FrYSBzdHJ1Y3QgSW50MTI4fQouLi9zcmMvc29mdG1tdS9tZW1vcnkuYzo2
-NjI6MjQ6IG5vdGU6IGV4cGVjdGVkICdyYW1fYWRkcl90JyB7YWthICd1bnNpZ25lZCBpbnQnfSBi
-dXQgYXJndW1lbnQgaXMgb2YgdHlwZSAnSW50MTI4JyB7YWthICdzdHJ1Y3QgSW50MTI4J30KLi4v
-c3JjL3NvZnRtbXUvbWVtb3J5LmM6NjYyOjQwOiBlcnJvcjogaW5jb21wYXRpYmxlIHR5cGUgZm9y
-IGFyZ3VtZW50IDIgb2YgJ2NiJwogIDY2MiB8ICAgICAgICAgaWYgKGNiKGZyLT5hZGRyLnN0YXJ0
-LCBmci0+YWRkci5zaXplLCBmci0+bXIsIG9wYXF1ZSkpCiAgICAgIHwgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIH5+fn5+fn5+Xn5+fn4KICAgICAgfCAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICB8CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgSW50MTI4IHtha2Egc3RydWN0IEludDEyOH0KLi4vc3JjL3NvZnRtbXUvbWVt
-b3J5LmM6NjYyOjQwOiBub3RlOiBleHBlY3RlZCAncmFtX2FkZHJfdCcge2FrYSAndW5zaWduZWQg
-aW50J30gYnV0IGFyZ3VtZW50IGlzIG9mIHR5cGUgJ0ludDEyOCcge2FrYSAnc3RydWN0IEludDEy
-OCd9CkNvbXBpbGluZyBDIG9iamVjdCBsaWJibG9jay5mYS5wL2Jsb2NrX2Jsa3JlcGxheS5jLm9i
-agptYWtlOiAqKiogW01ha2VmaWxlLm5pbmphOjE2MzE6IGxpYnFlbXUteDg2XzY0LXNvZnRtbXUu
-ZmEucC9zb2Z0bW11X21lbW9yeS5jLm9ial0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3Ig
-dW5maW5pc2hlZCBqb2JzLi4uLgp3cml0aW5nIG91dHB1dC4uLiBbIDkxJV0gdGFyZ2V0LXNwYXJj
-NjQKd3JpdGluZyBvdXRwdXQuLi4gWyA5MyVdIHRhcmdldC14dGVuc2EKLS0tCiAgICByYWlzZSBD
-YWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NF
-cnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1ybScsICct
-LWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9Y2RjNTA3Y2RkYWFlNDM2YmI5NjFmZjUx
-Y2U5MzQxNGEnLCAnLXUnLCAnMTAwMScsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29u
-ZmluZWQnLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRT
-PScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9X
-X0VOVj0nLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUv
-cGF0Y2hldy8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12
-JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC03czN4cDRrNi9zcmMvZG9ja2VyLXNyYy4y
-MDIwLTA5LTIxLTAyLjE4LjM1LjE3ODY1Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11L2ZlZG9y
-YScsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LW1pbmd3J10nIHJldHVybmVkIG5vbi16ZXJv
-IGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51
-dWlkPWNkYzUwN2NkZGFhZTQzNmJiOTYxZmY1MWNlOTM0MTRhCm1ha2VbMV06ICoqKiBbZG9ja2Vy
-LXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hl
-dy10ZXN0ZXItdG1wLTdzM3hwNGs2L3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtbWlu
-Z3dAZmVkb3JhXSBFcnJvciAyCgpyZWFsICAgIDdtMjYuOTkycwp1c2VyICAgIDBtMjIuMjMwcwoK
-ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAy
-MDA5MjEwMjI1MDYuODczMzAzLTEtYWx4bmRyQGJ1LmVkdS90ZXN0aW5nLmRvY2tlci1taW5nd0Bm
-ZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
-IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
-ayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 16/09/2020 0:29, Tom Lendacky wrote:
+> From: Tom Lendacky <thomas.lendacky@amd.com>
+> 
+> Provide initial support for SEV-ES. This includes creating a function to
+> indicate the guest is an SEV-ES guest (which will return false until all
+> support is in place), performing the proper SEV initialization and
+> ensuring that the guest CPU state is measured as part of the launch.
+> 
+> Co-developed-by: Jiri Slaby <jslaby@suse.cz>
+> Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> ---
+>   target/i386/cpu.c      |  1 +
+>   target/i386/sev-stub.c |  5 +++++
+>   target/i386/sev.c      | 46 ++++++++++++++++++++++++++++++++++++++++--
+>   target/i386/sev_i386.h |  1 +
+>   4 files changed, 51 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 588f32e136..bbbe581d35 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -5969,6 +5969,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>           break;
+>       case 0x8000001F:
+>           *eax = sev_enabled() ? 0x2 : 0;
+> +        *eax |= sev_es_enabled() ? 0x8 : 0;
+>           *ebx = sev_get_cbit_position();
+>           *ebx |= sev_get_reduced_phys_bits() << 6;
+>           *ecx = 0;
+> diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
+> index 88e3f39a1e..040ac90563 100644
+> --- a/target/i386/sev-stub.c
+> +++ b/target/i386/sev-stub.c
+> @@ -49,3 +49,8 @@ SevCapability *sev_get_capabilities(Error **errp)
+>       error_setg(errp, "SEV is not available in this QEMU");
+>       return NULL;
+>   }
+> +
+> +bool sev_es_enabled(void)
+> +{
+> +    return false;
+> +}
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index c3ecf86704..6c9cd0854b 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -359,6 +359,12 @@ sev_enabled(void)
+>       return !!sev_guest;
+>   }
+> 
+> +bool
+> +sev_es_enabled(void)
+> +{
+> +    return false;
+> +}
+> +
+>   uint64_t
+>   sev_get_me_mask(void)
+>   {
+> @@ -578,6 +584,22 @@ sev_launch_update_data(SevGuestState *sev, uint8_t *addr, uint64_t len)
+>       return ret;
+>   }
+> 
+> +static int
+> +sev_launch_update_vmsa(SevGuestState *sev)
+> +{
+> +    int ret, fw_error;
+> +
+> +    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL, &fw_error);
+> +    if (ret) {
+> +        error_report("%s: LAUNCH_UPDATE_VMSA ret=%d fw_error=%d '%s'",
+> +                __func__, ret, fw_error, fw_error_to_str(fw_error));
+> +        goto err;
+
+goto (and the err: label) is not needed.
+
+> +    }
+> +
+> +err:
+> +    return ret;
+> +}
+> +
+>   static void
+>   sev_launch_get_measure(Notifier *notifier, void *unused)
+>   {
+> @@ -590,6 +612,14 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
+>           return;
+>       }
+> 
+> +    if (sev_es_enabled()) {
+> +        /* measure all the VM save areas before getting launch_measure */
+> +        ret = sev_launch_update_vmsa(sev);
+> +        if (ret) {
+> +            exit(1);
+
+Other error cases in this function just return on error. Why quit QEMU here?
+
+> +        }
+> +    }
+> +
+>       measurement = g_new0(struct kvm_sev_launch_measure, 1);
+> 
+>       /* query the measurement blob length */
+> @@ -684,7 +714,7 @@ sev_guest_init(const char *id)
+>   {
+>       SevGuestState *sev;
+>       char *devname;
+> -    int ret, fw_error;
+> +    int ret, fw_error, cmd;
+>       uint32_t ebx;
+>       uint32_t host_cbitpos;
+>       struct sev_user_data_status status = {};
+> @@ -745,8 +775,20 @@ sev_guest_init(const char *id)
+>       sev->api_major = status.api_major;
+>       sev->api_minor = status.api_minor;
+> 
+> +    if (sev_es_enabled()) {
+> +        if (!(status.flags & SEV_STATUS_FLAGS_CONFIG_ES)) {
+> +            error_report("%s: guest policy requires SEV-ES, but "
+> +                         "host SEV-ES support unavailable",
+> +                         __func__);
+> +            goto err;
+> +        }
+> +        cmd = KVM_SEV_ES_INIT;
+> +    } else {
+> +        cmd = KVM_SEV_INIT;
+> +    }
+> +
+>       trace_kvm_sev_init();
+> -    ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
+> +    ret = sev_ioctl(sev->sev_fd, cmd, NULL, &fw_error);
+>       if (ret) {
+>           error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
+>                        __func__, ret, fw_error, fw_error_to_str(fw_error));
+> diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
+> index 4db6960f60..4f9a5e9b21 100644
+> --- a/target/i386/sev_i386.h
+> +++ b/target/i386/sev_i386.h
+> @@ -29,6 +29,7 @@
+>   #define SEV_POLICY_SEV          0x20
+> 
+>   extern bool sev_enabled(void);
+> +extern bool sev_es_enabled(void);
+>   extern uint64_t sev_get_me_mask(void);
+>   extern SevInfo *sev_get_info(void);
+>   extern uint32_t sev_get_cbit_position(void);
+> 
 
