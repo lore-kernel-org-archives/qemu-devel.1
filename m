@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 326E4C43465
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 00:18:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A17CC43463
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 00:19:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 614BA207EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 00:18:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF93D207EA
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 00:19:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gSTxHZ8l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 614BA207EA
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iATSbpTq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF93D207EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kK9X2-0004YG-7D
-	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 20:18:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53460)
+	id 1kK9YX-0005jB-WD
+	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 20:19:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53508)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kK9WA-00047D-CB
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 20:17:18 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:33942)
+ id 1kK9Wo-0004SN-Oy
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 20:17:58 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:41241)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kK9W8-00047S-GA
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 20:17:18 -0400
-Received: by mail-pg1-x542.google.com with SMTP id u13so7416111pgh.1
- for <qemu-devel@nongnu.org>; Sun, 20 Sep 2020 17:17:15 -0700 (PDT)
+ id 1kK9Wn-00049e-7C
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 20:17:58 -0400
+Received: by mail-pg1-x542.google.com with SMTP id y1so7392018pgk.8
+ for <qemu-devel@nongnu.org>; Sun, 20 Sep 2020 17:17:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:references:from:message-id:date:user-agent:mime-version
  :in-reply-to:content-language:content-transfer-encoding;
- bh=HmI/g+flIsgcW5Dc0JcldOlIZS1l55x9lSH86Kyh7aE=;
- b=gSTxHZ8l/IW5hCCj+u9y+HxPYqxBn09V5vkzVSQJVhvP5GOIN6N3Hid2/ql0O2/xnB
- 6amkzYTdsGOGlfS20DJdrz3/PFtue5+CaX1TkYVTq8MnuvuyevE//RBc7jIPJyEelrSc
- Tfr3TPs2HoFE0ntXv1z8+EgZ6f+SLg+pNij7uzvFVB8kCLOO8raiGJHKOXHA6bcP8O/b
- Fw3jn98HHbng0kb8IwUBcRywQ3CJI1Iq4tusXc/wMVmaD8gfanaHedBfHEPjAGumlgx2
- NKFuORHYcAdepD+nda6a5DZDTiNpefw45oAjx/3P0y6fLYVMmLriKvuw2KlzArqcJAB0
- fFoA==
+ bh=KbQscvn4KMmUNmmr2vGphlEz+ltGO3hrk08931qsflU=;
+ b=iATSbpTqDwJ/jfH2a2AlMIVZvN+Je+eMO6q2wAGKVdC/1zGxvr10Cgm0M2FIN1ahOk
+ GA29fnPyA3aPz5VE0+UcpjjR8bI2/9y5PSkBNnO4YEJMT6EDEn+qD5cRaQpq5hH4VKh1
+ dy0FOieBRgsV/8GY7msXJ49ioJ4JZtpDLegchsF5/GnaycEJLpf26R8e0l4VVuoojmoE
+ GXU/yA8mNqS/VjWesnZ2lSB0HELpT/qiSlwLJhYJqOJ7Okx9TpFuqxB1CD/hLhuGLX1g
+ oAwsizgEsjB5CPcCR0kg6Fv6NWEko3vd0fMJSs66UqX6Ebt9SuULnb3AdM72nxX0pCTa
+ z+ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=HmI/g+flIsgcW5Dc0JcldOlIZS1l55x9lSH86Kyh7aE=;
- b=TKsQMirP4904PbKf3UpData4e5GFBap2L1PeEJU9EZlTzS5Ma2qPYJJx7wNQYnU1fd
- 7nGTFeJN1WkxhLFxk2VH+cKs24AblNIncebuVx72KWgvXHPGf/ljSBTLDVZ+o12h4vpQ
- rbuEO1p8byl9WH6eL37dVh5ehHrL3OxbkCjOGksIEIPOfk/kvcZ+At/nbUpfvMd2Yq0M
- BoqoYTcE2gRdDlFHLWCs1Ol1u0dPqW9kknmMLl5IUo0MEozhnlO+A5sn8NGq5LAxhIqD
- 1/reo9NmGpOfKVKzT7J+NozliAep0r7IIt4KrKf8fhRsP74dDrVNKJwGWmnvQ7OEkBzU
- olTg==
-X-Gm-Message-State: AOAM533hC2lSjFhBCWfu3tg7Wqq3PLflW3LuMVHga+jHPGSrQ0c3aqul
- 2iHIrDOR0y9FBpfKokuUdennEsE4cOWmeQ==
-X-Google-Smtp-Source: ABdhPJz0pnzk6reD7/xo8V8T0HvQnTsXZZaUdpHVEzTdtp8goPmc0uFPP/JcM+Z17oz++kCxMya5cQ==
-X-Received: by 2002:a17:902:c692:b029:d0:90a3:24f4 with SMTP id
- r18-20020a170902c692b02900d090a324f4mr41683491plx.12.1600647434268; 
- Sun, 20 Sep 2020 17:17:14 -0700 (PDT)
+ bh=KbQscvn4KMmUNmmr2vGphlEz+ltGO3hrk08931qsflU=;
+ b=N/1l/Lm69eMsdfWGSkkVri4UtcjgoaeO6Wp59BhvsFgXCuGHL5U+2/e62RnJFbWcuB
+ IR8a6e0gHTVGZyqANAhQkDNixjd9G+q32Rh23CGgtu78Fok2TZZwMPveQH9JPCPjB+fW
+ 7OD1FnPbp+7dE6PrlEugOsbQ1YwSuQJNOf/8UrgRmz0Gy3nS4KZqyd+3AdEosPuFWBFp
+ OkPyoltKLctOopLH3uGtwBxz83txozUn9nJHE9+3squv0EHiVlCkXIIScXpIbYF3tEvQ
+ yX16usKt3byMjgt7OfHs4uOzf2eijVnR66DdlSxl6ClMKH0mwoxdb+DyH7hRTv7LgcH0
+ s2zg==
+X-Gm-Message-State: AOAM533IswKSROmF3n6rOX9+R2MWuusv1GNOJSFn/b2rfThbKPzMbSTW
+ bnC7m2KXPZ4nfL5gkKQJQ3ajuw+4cECxlw==
+X-Google-Smtp-Source: ABdhPJyn4pEOiT5rCfM62tWgfyJ2QP8EvWquql4jR4T/xiKJLDSio2Dbyq4qrSW8PpUNvqbtQTCMlQ==
+X-Received: by 2002:a63:d25:: with SMTP id c37mr34262105pgl.403.1600647475470; 
+ Sun, 20 Sep 2020 17:17:55 -0700 (PDT)
 Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id a3sm10014000pfl.213.2020.09.20.17.17.13
+ by smtp.gmail.com with ESMTPSA id a13sm9863754pfl.184.2020.09.20.17.17.54
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 20 Sep 2020 17:17:13 -0700 (PDT)
-Subject: Re: [PATCH 4/9] configure: move accelerator logic to meson
+ Sun, 20 Sep 2020 17:17:54 -0700 (PDT)
+Subject: Re: [PATCH 5/9] configure: remove dead variable
 To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 References: <20200920130708.1156310-1-pbonzini@redhat.com>
- <20200920130708.1156310-5-pbonzini@redhat.com>
+ <20200920130708.1156310-6-pbonzini@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b3aa323a-2a32-8ff3-9d8f-6575e623866c@linaro.org>
-Date: Sun, 20 Sep 2020 17:17:11 -0700
+Message-ID: <738de9f6-015d-feb3-7e5f-80c346154564@linaro.org>
+Date: Sun, 20 Sep 2020 17:17:53 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200920130708.1156310-5-pbonzini@redhat.com>
+In-Reply-To: <20200920130708.1156310-6-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -110,15 +109,10 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/20/20 6:07 AM, Paolo Bonzini wrote:
-> Move to meson the code to detect the presence of accelerators, and
-> to define accelerator-specific config-target.h symbols.
-> 
-> The logic for now is duplicated in configure because it is still
-> in use to build the list of targets (which is in turn used to
-> create the config-target.mak files).  The next patches remove it.
-> 
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
+>  configure | 11 -----------
+>  1 file changed, 11 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
