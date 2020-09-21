@@ -2,88 +2,92 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48B16C4363D
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 18:08:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C34CDC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 18:10:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAD57206FB
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 18:08:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 44369207BC
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 18:10:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U8hh+LRD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAD57206FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jHduOQHs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44369207BC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKQF1-0002WP-Un
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 14:08:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48936)
+	id 1kKQGl-000475-9e
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 14:10:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kKQ2B-00077Q-Ek
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 13:55:27 -0400
-Received: from mail-ej1-x62a.google.com ([2a00:1450:4864:20::62a]:34119)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kKQ29-0001nD-GF
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 13:55:27 -0400
-Received: by mail-ej1-x62a.google.com with SMTP id gr14so19070010ejb.1
- for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 10:55:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=bCrE34MnbVdDowmPT6kMQGf/vb7ALGieKX82jIu37ZE=;
- b=U8hh+LRDUImDxn440ZLufEt7EyVObg0TINZQMA3BDQN1SZV/RXz8oRr/+H8hr04Moz
- j2pol5qC5Qr71y5mtMsIL/kjbkUauvSMJN1RdoveqbAaebahLSBAtl0ospcAk5439Rt+
- aBJ5cZ10MeDs4kDk3KifjbW/9iUGQdsa8WPGNr/OA4sN1xQ6vLim1UUMyEvavts83GbO
- E9MmSpVeCu6GWPnZC9d/PJMOmH9bb2L/Ubmh8YolLHdIe327jUQ5hcVGGKAaK8mNprgE
- /Ut7iUmtmju6ICT0vuhaHm/VI0NcxVwfYE0LSdagzZx+NgqlHgDtq8gDK0CjWN9qXVgw
- q7oQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=bCrE34MnbVdDowmPT6kMQGf/vb7ALGieKX82jIu37ZE=;
- b=UR653wW7oYpb2QG6V82guQ3qu3Mkls1F9jvPsWkyyNThKd9ZfQfsofEfM+LK3wtxXt
- 5X7C1nEzhUHdQmmGBLXtbZVnxlnl0Eg3eeuNemRQ8URSKEFyOYiJ1doX1GPLTjnLoQOo
- XhYO4vwNUuhcSpW158B5EpdK3VNHjA0rN81ihbr6WGVmWcYu71X4GI9o03w0G/iZWTsC
- +HA9y2ziul5je/nS0WuSRZ4a5WFf/tU9qIIgrhsodJyZITYBnKqLUhauX4DoRXDJ/p5s
- qKqeqgMpl7utZye07plabcSet/8F7a8qQoA8mBkqQyj16Uaul3Rt1OimaD2ZsXqUxI91
- 3n8g==
-X-Gm-Message-State: AOAM533BBIfsFeSuYS6tRL2GeuwvWeGEGljJpBTQKHYHLiQ6dKzv5VaQ
- P50cCFbaxGndq6Ib/d2+ppxmZThvuPvEb+YXO16Zew==
-X-Google-Smtp-Source: ABdhPJwwjJQ5uCRGyddt+SCfScS2eR9k3t+oeWDdMWf1OnG6OG/W4ekZAx6y8i3tqkzr69o7ZQTNC5UVDBpRW00rc7k=
-X-Received: by 2002:a17:906:24d6:: with SMTP id
- f22mr627848ejb.85.1600710923790; 
- Mon, 21 Sep 2020 10:55:23 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kKQCV-0000pI-Kz
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 14:06:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20108)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kKQCT-0003OV-Nl
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 14:06:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600711565;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=iW3QHzbX8W0Yc7R0BjPkkZ/gXL0wTQFyAlxL92NNsKI=;
+ b=jHduOQHsfNUNHDDR7UfpvMjA0x5wmiEcDt0qy7kg4xSN6AiSeJqQWF0kZBja0In4iOlJsK
+ GIwUrqBCX0c5rbMLlppxELzD1wLuSWJAkmFtEERfj8m1z1YvShTNEcJXagda/wwvx3kOks
+ SG9nyEkEo2TCuVyUvxoJz3qdlkSzqfw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-46-mTYLUauMN4G8fOGwDPieqQ-1; Mon, 21 Sep 2020 14:06:02 -0400
+X-MC-Unique: mTYLUauMN4G8fOGwDPieqQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE4B9802EA3;
+ Mon, 21 Sep 2020 18:06:01 +0000 (UTC)
+Received: from redhat.com (ovpn-113-113.ams2.redhat.com [10.36.113.113])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F22810013BD;
+ Mon, 21 Sep 2020 18:05:56 +0000 (UTC)
+Date: Mon, 21 Sep 2020 19:05:53 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH 3/7] tests/docker: Update the tricore container to debian
+ 10
+Message-ID: <20200921180553.GV1942072@redhat.com>
+References: <20200921174320.46062-1-thuth@redhat.com>
+ <20200921174320.46062-4-thuth@redhat.com>
 MIME-Version: 1.0
-References: <20200918202750.10358-1-ehabkost@redhat.com>
-In-Reply-To: <20200918202750.10358-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 Sep 2020 18:55:11 +0100
-Message-ID: <CAFEAcA_AJcHaUjXdRH4jc5hkEq63d5ngap9vpp-yx4JsTDiQiA@mail.gmail.com>
-Subject: Re: [PULL 0/4] x86 queue, 2020-09-18
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::62a;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x62a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200921174320.46062-4-thuth@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:44:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,48 +100,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kvm-devel <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Cameron Esfahani <dirty@apple.com>, Roman Bolshakov <r.bolshakov@yadro.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 18 Sep 2020 at 21:28, Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> The following changes since commit 053a4177817db307ec854356e95b5b350800a2=
-16:
->
->   Merge remote-tracking branch 'remotes/philmd-gitlab/tags/fw_cfg-2020091=
-8' into staging (2020-09-18 16:34:26 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/x86-next-pull-request
->
-> for you to fetch changes up to 31ada106d891f56f54d4234ce58c552bc2e734af:
->
->   i386: Simplify CPUID_8000_001E for AMD (2020-09-18 13:50:31 -0400)
->
-> ----------------------------------------------------------------
-> x86 queue, 2020-09-18
->
-> Cleanups:
-> * Correct the meaning of '0xffffffff' value for hv-spinlocks (Vitaly Kuzn=
-etsov)
-> * vmport: Drop superfluous parenthesis (Philippe Mathieu-Daud=C3=A9)
->
-> Fixes:
-> * Use generic APIC ID encoding code for EPYC (Babu Moger)
->
-> ----------------------------------------------------------------
+On Mon, Sep 21, 2020 at 07:43:16PM +0200, Thomas Huth wrote:
+> We do not support Debian 9 anymore, thus update the Tricore container
+> to Debian 10 now.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  .gitlab-ci.d/containers.yml                          | 2 +-
+>  tests/docker/Makefile.include                        | 2 +-
+>  tests/docker/dockerfiles/debian-tricore-cross.docker | 2 +-
+>  3 files changed, 3 insertions(+), 3 deletions(-)
+
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
 
-Applied, thanks.
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
-
--- PMM
 
