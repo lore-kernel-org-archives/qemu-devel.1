@@ -2,101 +2,85 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97948C4346E
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 19:21:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B40AC4346E
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 19:22:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0B61216C4
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 19:21:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8028820757
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 19:22:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w9p8H/cK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0B61216C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="aN4zOKoo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8028820757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKRN2-0001xc-T5
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 15:21:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41116)
+	id 1kKROL-0003Te-Hq
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 15:22:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41204)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kKRLF-0000Qb-Dj
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 15:19:14 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39722)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kKRLC-0004FS-LM
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 15:19:13 -0400
-Received: by mail-wr1-x443.google.com with SMTP id a17so13972164wrn.6
- for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 12:19:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=p/46lf7KgoRWxFjDc8zVc/mnSwdV96dR3E3d2SDzyV4=;
- b=w9p8H/cKCsJCnrRIhXpnMHSdta0hlx9iqE3hdNSMkDatvW+3xNwjMnIovGAuFp+A1G
- gnXX4OD7IrMP+k54jDxsJUWDAXhRkdbHB/KL55L6MkX0eRZ6PqEkyiKrHHIzUhanHZVa
- uGMxyVW+0g1I4ClxhmYMUHV+WSKKpeVgSqt0PLT0iEFTaAK32OiUMgkLLyTToAayK9w8
- lBeGZ2mi1egm5zdME2sMjKSGlD/g9GFgY/Fb/gHw/fLdfyBCD6kzcCNAHFOwyZY3UURn
- BqPQ0WP/ZQPTODt3TMdC2vkXk83I1tOTbKm0LfbQyCoViIiDCcNPty4pdgJjZME4g3MW
- 4i2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=p/46lf7KgoRWxFjDc8zVc/mnSwdV96dR3E3d2SDzyV4=;
- b=jn8kBfoYYDBPMu6sJa4vzS+KXfCgOR+pgTgGtjenzjsSCJQ9keqk+XpGwkDKRIU7gu
- 14v3sRbG7S7Kox/kOB1mTcAHiEFnlWkqNfxR6sh0AbZ1BbHDBTxJElxnvPKhFUgJaitC
- C+RyXNzTkaM+7EyLNdqw/sc3av4TWU1OIEc+3LRafDBSsRpRiGpWqsvys7nyaF2E14G3
- pyiyX5lf05f8gK4O2xTkUnrFRZC/xiOuCxwxVc9N6Ga/F9OM1xuM3sOgXtIrW2wXwwAz
- GUUtdu+PPYE5Ka/Gpf2gMReo8pddcyE1tPOnoC5tFJ8HxvgJe5ajj42CQjvb8WBJr/UB
- 7+ew==
-X-Gm-Message-State: AOAM532Nrzr0QQ6gooQ2T7i51nuwAM2uqHf9rRxP2KNciBjzP9NIIqq3
- 58of2KJwCvXc9pbtHsdvBscd2lgvkdcM3A==
-X-Google-Smtp-Source: ABdhPJzcNWJjsvhPqxKKYxKNvymO/bcmBVf5w1z3emQRenC/4tqafTRlZ7VLe5phfKYnIShkpNPILw==
-X-Received: by 2002:a5d:4910:: with SMTP id x16mr1434916wrq.204.1600715949310; 
- Mon, 21 Sep 2020 12:19:09 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 185sm770965wma.18.2020.09.21.12.19.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 21 Sep 2020 12:19:08 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 48D241FF7E;
- Mon, 21 Sep 2020 20:19:07 +0100 (BST)
-References: <20200921174118.39352-1-richard.henderson@linaro.org>
- <20200921174118.39352-4-richard.henderson@linaro.org>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v4 03/11] capstone: Require version 4.0 from a system
- library
-In-reply-to: <20200921174118.39352-4-richard.henderson@linaro.org>
-Date: Mon, 21 Sep 2020 20:19:07 +0100
-Message-ID: <87ft7bndjo.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
+ id 1kKRLZ-0000pR-2j
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 15:19:33 -0400
+Received: from forwardcorp1p.mail.yandex.net
+ ([2a02:6b8:0:1472:2741:0:8b6:217]:42724)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
+ id 1kKRLU-0004Fv-GM
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 15:19:31 -0400
+Received: from myt5-23f0be3aa648.qloud-c.yandex.net
+ (myt5-23f0be3aa648.qloud-c.yandex.net
+ [IPv6:2a02:6b8:c12:3e29:0:640:23f0:be3a])
+ by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 341692E0EBF;
+ Mon, 21 Sep 2020 22:19:21 +0300 (MSK)
+Received: from myt4-18a966dbd9be.qloud-c.yandex.net
+ (myt4-18a966dbd9be.qloud-c.yandex.net [2a02:6b8:c00:12ad:0:640:18a9:66db])
+ by myt5-23f0be3aa648.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ dhi4BUjH3O-JKvekXts; Mon, 21 Sep 2020 22:19:21 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1600715961; bh=XiE3esPpBcN1RWiC5vxaFhExcNrgBPR2W5fHbjEu4ho=;
+ h=Message-Id:Date:Subject:To:From:Cc;
+ b=aN4zOKoojfI2WgyG8ZIaZbk3UE+vdDtujCIahvzw7A4DrQFzSjyt9d5JvfaSLdsA+
+ DvJ2lxef+orrWcI+1ndQ9HPx0JMS1XKRqityd47VfEVDnrN0H0hFVd8CbKB5tl/PYU
+ 9Hd1MBPMtiUYgX5NTyJ2UwQptm/DhAhl03ud0fVQ=
+Authentication-Results: myt5-23f0be3aa648.qloud-c.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
+ [2a02:6b8:b080:6416::1:4])
+ by myt4-18a966dbd9be.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ 3Nc4XKVFl3-JKl45YtE; Mon, 21 Sep 2020 22:19:20 +0300
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (Client certificate not present)
+From: Alexey Kirillov <lekiravi@yandex-team.ru>
+To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>
+Subject: [PATCH v4 0/4] Introducing QMP query-netdev command
+Date: Mon, 21 Sep 2020 22:19:08 +0300
+Message-Id: <20200921191912.105305-1-lekiravi@yandex-team.ru>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a02:6b8:0:1472:2741:0:8b6:217;
+ envelope-from=lekiravi@yandex-team.ru; helo=forwardcorp1p.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 15:19:21
+X-ACL-Warn: Detected OS   = ???
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -105,43 +89,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org,
+ Vincenzo Maffione <v.maffione@gmail.com>, yc-core@yandex-team.ru,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This patch series introduces a new QMP command "query-netdev" to get
+information about currently attached backend network devices (netdevs).
+Also, since the "info_str" field of "NetClientState" is now deprecated,
+we no longer use it for netdevs, only for NIC/hubports.
+The HMP command "info network" now also uses the new QMP command inside.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Usage example:
 
-> We're about to use a portion of the 4.0 API.
-> Reject a system library version prior to that.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+-> { "execute": "query-netdev" }
+<- { "return": [
+         {
+             "listen": "127.0.0.1:90",
+             "type": "socket",
+             "peer-id": "hub0port1",
+             "id": "__org.qemu.net1"
+         },
+         {
+             "script": "/etc/qemu-ifup",
+             "downscript": "/etc/qemu-ifdown",
+             "ifname": "tap0",
+             "type": "tap",
+             "peer-id": "net5",
+             "vnet_hdr": true,
+             "id": "tap0"
+         },
+         {
+             "ipv6": true,
+             "ipv4": true,
+             "host": "10.0.2.2",
+             "ipv6-dns": "fec0::3",
+             "ipv6-prefix": "fec0::",
+             "net": "10.0.2.0/255.255.255.0",
+             "ipv6-host": "fec0::2",
+             "type": "user",
+             "peer-id": "net0",
+             "dns": "10.0.2.3",
+             "hostfwd": [
+                 {
+                     "str": "tcp::20004-:22"
+                 }
+             ],
+             "ipv6-prefixlen": 64,
+             "id": "netdev0",
+             "restrict": false
+         }
+     ]
+   }
 
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+v3->v4:
+- Rename "query-netdevs" to "query-netdev".
+- Copy netdev drivers to new QAPI enum "NetBackend".
 
-> ---
->  meson.build | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/meson.build b/meson.build
-> index 4c92b43fe5..114b136129 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -613,7 +613,7 @@ if capstone_opt =3D=3D 'no'
->    capstone_opt =3D false
->  elif capstone_opt in ['yes', 'auto', 'system']
->    have_internal =3D fs.exists('capstone/Makefile')
-> -  capstone =3D dependency('capstone', static: enable_static,
-> +  capstone =3D dependency('capstone', version: '>=3D4.0', static: enable=
-_static,
->                          required: capstone_opt =3D=3D 'system' or
->                                    capstone_opt =3D=3D 'yes' and not have=
-_internal)
->    if capstone.found()
+v2->v3:
+- Remove NIC and hubports from query-netdevs.
+- Remove several fields from NetdevInfo since they are unnecessary.
+- Rename field @peer to @peer-id.
+- Add support of vhost-vdpa.
+- Keep "info_str" for NIC/hubports, but remove it for netdevs.
 
+v1->v2:
+- Rewrite HMP "info network" to get information from results of QMP command.
+- Remove obsolete field "info_str" from "NetClientState".
 
---=20
-Alex Benn=C3=A9e
+Alexey Kirillov (4):
+  qapi: net: Add query-netdev command
+  tests: Add tests for query-netdev command
+  hmp: Use QMP query-netdev in hmp_info_network
+  net: Do not use legacy info_str for backends
+
+ include/net/net.h               |   4 +-
+ net/clients.h                   |   1 +
+ net/hub.c                       |   4 +-
+ net/hub.h                       |   2 +-
+ net/l2tpv3.c                    |  21 +++-
+ net/net.c                       | 213 +++++++++++++++++++++++++++++++-
+ net/netmap.c                    |  13 ++
+ net/slirp.c                     | 128 ++++++++++++++++++-
+ net/socket.c                    |  91 ++++++++++----
+ net/tap-win32.c                 |  10 +-
+ net/tap.c                       | 107 ++++++++++++++--
+ net/vde.c                       |  39 +++++-
+ net/vhost-user.c                |  20 ++-
+ net/vhost-vdpa.c                |  15 ++-
+ qapi/net.json                   |  80 ++++++++++++
+ tests/qtest/meson.build         |   3 +
+ tests/qtest/test-query-netdev.c | 115 +++++++++++++++++
+ 17 files changed, 807 insertions(+), 59 deletions(-)
+ create mode 100644 tests/qtest/test-query-netdev.c
+
+-- 
+2.25.1
+
 
