@@ -2,147 +2,85 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0807C43463
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 12:44:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6018DC43463
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 12:46:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2252E20EDD
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 12:44:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E19720874
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 12:46:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MBcv3rx2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2252E20EDD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EWhp4YVO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E19720874
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKLAl-00025t-8R
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 08:43:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33164)
+	id 1kKLDU-0003Xd-QT
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 08:46:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34274)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1kKL9c-0001Xm-HQ
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 08:42:48 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53476
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <rjones@redhat.com>) id 1kKLCM-0002n2-DN
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 08:45:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43801)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1kKL9a-0002np-LI
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 08:42:48 -0400
+ (Exim 4.90_1) (envelope-from <rjones@redhat.com>) id 1kKLCJ-0003Kb-Tv
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 08:45:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600692165;
+ s=mimecast20190719; t=1600692334;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=rRUmhed8bUld7cOQUb/TnMvrMI8tUydxNio83GwzpZ8=;
- b=MBcv3rx2L6MNl/Vx5LHORjCuCSXVZtrRXRmptor8vtn05H5nZMcK2DNL9UrGwxPj+jYuz4
- /l8/4/3/z6/MYVUx4IxiBl9E3vc9iaOIZIH5VDAZDlDLBB8vb/Jl0vahdbW7lcurYhj/l2
- V7MbcXSgNVwz9p5hJBBWmbmDmaORpFY=
+ in-reply-to:in-reply-to:references:references;
+ bh=CRaYQeABCq5zvQFptaQvK21ARBCKPhQDuNhVVqHvFUA=;
+ b=EWhp4YVOFq4Nfdonmrz7QC5o0DtcKXAeA+G9OD/ZU9L0EzfYCez9xNcvGs357q61pL6CQP
+ GFFuBVo6i0tPNt6cVh0aAKtxJkBZRJE7+jJ/N0XN/Otv6U3714Cb/5OzXCsN9QwFIpBjej
+ ckqlfWgqyuZd6NILo2DRXVsHT7pxOmU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-396-ZAe-m7yMPTaRtJRI735ilQ-1; Mon, 21 Sep 2020 08:42:43 -0400
-X-MC-Unique: ZAe-m7yMPTaRtJRI735ilQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-194-Dk-rmTGsPPOS7ydU9VcbzQ-1; Mon, 21 Sep 2020 08:45:22 -0400
+X-MC-Unique: Dk-rmTGsPPOS7ydU9VcbzQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5BE2A8014D8
- for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 12:42:42 +0000 (UTC)
-Received: from [10.36.113.15] (ovpn-113-15.ams2.redhat.com [10.36.113.15])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2A73510021AA;
- Mon, 21 Sep 2020 12:42:33 +0000 (UTC)
-Subject: Re: [PATCH 0/2] vhost-vdpa: add trace functions in vhost-vdpa.c
-To: "Michael S. Tsirkin" <mst@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
-References: <20200920162434.868041-1-lvivier@redhat.com>
- <20200921084136.GB71121@stefanha-x1.localdomain>
- <20200921083214-mutt-send-email-mst@kernel.org>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <857f9301-0ac7-299a-7a6a-ddd8f62faed6@redhat.com>
-Date: Mon, 21 Sep 2020 14:42:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9477C801AB3;
+ Mon, 21 Sep 2020 12:45:21 +0000 (UTC)
+Received: from localhost (ovpn-112-51.ams2.redhat.com [10.36.112.51])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4AA497B7A0;
+ Mon, 21 Sep 2020 12:45:15 +0000 (UTC)
+Date: Mon, 21 Sep 2020 13:45:14 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v5 0/8] Configurable policy for handling deprecated
+ interfaces
+Message-ID: <20200921124514.GB27434@redhat.com>
+References: <20200914084802.4185028-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200921083214-mutt-send-email-mst@kernel.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200914084802.4185028-1-armbru@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lvivier@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=rjones@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=lvivier@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 04:38:49
+Content-Type: multipart/mixed; boundary="Kj7319i9nmIyA2yE"
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=rjones@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:44:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
 X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -156,42 +94,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
- Cindy Lu <lulu@redhat.com>
+Cc: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
+ "Daniel P . Berrange" <berrange@redhat.com>, libvir-list@redhat.com,
+ qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, marcandre.lureau@gmail.com,
+ libguestfs@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/09/2020 14:32, Michael S. Tsirkin wrote:
-> On Mon, Sep 21, 2020 at 09:41:36AM +0100, Stefan Hajnoczi wrote:
->> On Sun, Sep 20, 2020 at 06:24:32PM +0200, Laurent Vivier wrote:
->>> Add trace events functions in vdpa functions.
->>>
->>> Modify qemu_hexdump() to be able to dump the vdpa config
->>> in trace logs in hexadecimal form.
->>>
->>> Laurent Vivier (2):
->>>   util/hexdump: introduce qemu_hexdump_line()
->>>   vhost-vdpa: add trace-events
->>>
->>>  hw/virtio/trace-events | 29 ++++++++++++++
->>>  hw/virtio/vhost-vdpa.c | 85 +++++++++++++++++++++++++++++++++++++++---
->>>  include/qemu-common.h  |  8 ++++
->>>  util/hexdump.c         | 54 +++++++++++++++++----------
->>>  4 files changed, 151 insertions(+), 25 deletions(-)
->>
->> Please take this through the VIRTIO/vhost/vDPA tree:
->>
->> Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
-> 
-> 
-> Will do, tagged.
-> 
-Not yet, please; There are some tabs remaining.
+--Kj7319i9nmIyA2yE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Wait the v2.
+Some general comments on using the patch:
 
-Thanks,
-Laurent
+* For libguestfs I chose to add
+
+  -compat deprecated-input=reject,deprecated-output=hide
+
+  This is only enabled in developer builds of libguestfs when we
+  are running qemu directly (not via libvirt).  The patch for
+  this is attached.
+
+* What's the point/difference in having reject vs crash?
+
+* I hope that by hiding deprecated QAPI fields we may detect
+  errors in libguestfs, but I suspect what'll happen is it'll
+  cause fall-back behaviour which might be harder to detect.
+
+* Be *really* good to have this for command line parameters!
+
+Notes on the attached patch:
+
+* https://libguestfs.org/guestfs-building.1.html
+
+* Simple test:
+
+LIBGUESTFS_BACKEND=direct \
+LIBGUESTFS_HV=~/d/qemu/build/x86_64-softmmu/qemu-system-x86_64 \
+./run libguestfs-test-tool
+
+* Run the full test suite:
+
+LIBGUESTFS_HV=~/d/qemu/build/x86_64-softmmu/qemu-system-x86_64 \
+make -k check-direct
+
+Rich.
+
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+Fedora Windows cross-compiler. Compile Windows programs, test, and
+build Windows installers. Over 100 libraries supported.
+http://fedoraproject.org/wiki/MinGW
+
+--Kj7319i9nmIyA2yE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="0001-lib-direct-Pass-qemu-compat-to-detect-deprecated-fea.patch"
+
+From 90df6dc8a3278800f9f9dc23f626df5fa00b5950 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Mon, 21 Sep 2020 13:18:05 +0100
+Subject: [PATCH] lib: direct: Pass qemu -compat to detect deprecated features.
+
+In developer versions of libguestfs only, pass the qemu -compat option
+which will reject deprecated qemu features, giving us early warning if
+we are using something that may be removed in future.  This does not
+affect stable branch builds or old versions of qemu which did not have
+this flag.
+---
+ lib/guestfs-internal.h |  3 +++
+ lib/launch-direct.c    | 11 +++++++++++
+ 2 files changed, 14 insertions(+)
+
+diff --git a/lib/guestfs-internal.h b/lib/guestfs-internal.h
+index d7ec7215d..4ad1cd125 100644
+--- a/lib/guestfs-internal.h
++++ b/lib/guestfs-internal.h
+@@ -33,6 +33,9 @@
+ 
+ #include <pcre.h>
+ 
++/* Is this a developer version of libguestfs? */
++#define IS_DEVELOPER_VERSION ((PACKAGE_VERSION_MINOR & 1) == 1)
++
+ /* Minimum required version of libvirt for the libvirt backend.
+  *
+  * This is also checked at runtime because you can dynamically link
+diff --git a/lib/launch-direct.c b/lib/launch-direct.c
+index b6ed9766f..3e42609ff 100644
+--- a/lib/launch-direct.c
++++ b/lib/launch-direct.c
+@@ -501,6 +501,17 @@ launch_direct (guestfs_h *g, void *datav, const char *arg)
+   if (guestfs_int_qemu_supports (g, data->qemu_data, "-enable-fips"))
+     flag ("-enable-fips");
+ 
++  /* In non-stable versions of libguestfs, pass the -compat option to
++   * qemu so we can look for potentially deprecated features.
++   */
++  if (IS_DEVELOPER_VERSION &&
++      guestfs_int_qemu_supports (g, data->qemu_data, "-compat")) {
++    start_list ("-compat") {
++      append_list ("deprecated-input=reject");
++      append_list ("deprecated-output=hide");
++    } end_list ();
++  }
++
+   /* Newer versions of qemu (from around 2009/12) changed the
+    * behaviour of monitors so that an implicit '-monitor stdio' is
+    * assumed if we are in -nographic mode and there is no other
+-- 
+2.28.0.rc2
+
+
+--Kj7319i9nmIyA2yE--
 
 
