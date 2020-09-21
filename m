@@ -4,99 +4,91 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82FFBC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 18:13:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57BAEC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 18:13:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6429207BC
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 18:13:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B4359207BC
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 18:13:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EAqZBtQL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6429207BC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VIKlBbdn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4359207BC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKQJD-0006qY-Us
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 14:13:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49614)
+	id 1kKQJq-0007kh-NE
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 14:13:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52480)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kKQ4n-0002R3-IT; Mon, 21 Sep 2020 13:58:09 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38592)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kKQ4k-0002CJ-0H; Mon, 21 Sep 2020 13:58:08 -0400
-Received: by mail-wr1-x443.google.com with SMTP id g4so13743089wrs.5;
- Mon, 21 Sep 2020 10:58:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=UlxmOjXuOR+ZkFFBxFLY+lAZ2WLFKoQ4QLYdAyvOkrI=;
- b=EAqZBtQLFQyYdnzJQeTbg5Z/67BBZQqtNtmD4B47InMD1RjhE9AObzntVtcpk7Hhss
- EFV1iDXzi88370Z0Jt3JUw/24xrNpAFWglkzR42SX5pcZLiugJ23+btwir5xRvu0a1us
- UY5Ajrx/ShhIRFuErrfEDJVxWEcznd2JMa4DELIw9i9D2qwh8zX3uvrmdEgBpMrAOzOf
- 4dAzUjxFBAjIp0c5sLs7vs/RJU8ObFr1Vyt4WCRtD6nwsIoQSFJSySdmn6OEeEssFDFV
- TFKSolr/3kQ0AWDraRwm/TfOhAXBAQWm8x3VVDuJpwDR0KqKy8UvtZ473ebASuftqPug
- BBWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=UlxmOjXuOR+ZkFFBxFLY+lAZ2WLFKoQ4QLYdAyvOkrI=;
- b=mbCZZA01OP/P51omY3EBiZy49Cl1Pw6HzMwdG+I1vT9oS8sEGJuzcCusWyAZaIP853
- wrR0w+/ySe+liL9enY3nXq4d3PFnHH5/9+MaUskZby6bP9ktePh/tEigaOzYMK0VlNQq
- v8R9Gb1VW9Dp3Gf+LPt3kxESUkwvFs8WTFgcGKQ8OQwCqxtBfxJWckOD7Y2VgPwq5M+V
- XirlOV43WKnvHWnCzeO1A9AJmzRJJp3z9jG+WUXOP6VMlhFTR/ySG5nT5pIngfREvCnQ
- cifGsGkFdDa1TeSY8+IUwPIDt+WsrA+BTJpjqRgJSsvGfNefEEzZaakGLrm5qK3xDNUG
- 3V+g==
-X-Gm-Message-State: AOAM531zKB+l3ZTAJXC1og/YjNLL0j9tcS8UgtAWltcBIEHKOQCBGqbw
- j7jt5D2O6rjm8cpUOsgIY5DwA1ZeOCA=
-X-Google-Smtp-Source: ABdhPJzVC2oNVI0hoRuzr1P7NMonkuQ8Yf6ON8YbBptXvSM+W8+3BspMzSEMkEBFHfyW+lbiAijlPw==
-X-Received: by 2002:adf:eb8f:: with SMTP id t15mr916368wrn.417.1600711083837; 
- Mon, 21 Sep 2020 10:58:03 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id e1sm22781149wrp.49.2020.09.21.10.58.02
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 21 Sep 2020 10:58:03 -0700 (PDT)
-Subject: Re: [PATCH 4/6] sparc32-ledma: don't reference nd_table directly
- within the device
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, armbru@redhat.com,
- david@gibson.dropbear.id.au, atar4qemu@gmail.com, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org
-References: <20200920082018.16135-1-mark.cave-ayland@ilande.co.uk>
- <20200920082018.16135-5-mark.cave-ayland@ilande.co.uk>
- <0ea7090a-34f0-d437-1c7d-34570b529943@amsat.org>
- <c9ae2d9d-4a4e-8b68-1f58-4e1fe3bbd55a@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4bab3a2c-919b-621e-5ba8-6a124f8c642e@amsat.org>
-Date: Mon, 21 Sep 2020 19:58:02 +0200
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kKQED-000280-9n
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 14:07:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59078
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kKQEA-0003Wf-Uh
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 14:07:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600711668;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zp4/q4+u+q7ty92X1EakdpD0ZzZP5/YeSu9FyOL6iko=;
+ b=VIKlBbdn6WNRbC1PZrKTV9+g0dp2QAQhiyx5UHN7mZxaGVbaCNcD2YWLd1Ew5J8WgZjI7H
+ MdpGLKrItgPBFYaZxDUVF17mftUyH+AX+YlIl1i2i9Hgs7hODiXwz8BzSf6efAIzd1gKYF
+ MUVwoGKo4MrmaOT8AVDEblovAapX2QQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-203-MbtJPEypP3CjogswCFbsYw-1; Mon, 21 Sep 2020 14:07:47 -0400
+X-MC-Unique: MbtJPEypP3CjogswCFbsYw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E879A873081;
+ Mon, 21 Sep 2020 18:07:45 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-14.ams2.redhat.com [10.36.112.14])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7896D73689;
+ Mon, 21 Sep 2020 18:07:43 +0000 (UTC)
+Subject: Re: [PATCH 1/7] tests/docker: Use Fedora containers for MinGW
+ cross-builds in the gitlab-CI
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20200921174320.46062-1-thuth@redhat.com>
+ <20200921174320.46062-2-thuth@redhat.com>
+ <20200921180342.GT1942072@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <77749876-7b07-efbe-a277-925077d8ff57@redhat.com>
+Date: Mon, 21 Sep 2020 20:07:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <c9ae2d9d-4a4e-8b68-1f58-4e1fe3bbd55a@ilande.co.uk>
+In-Reply-To: <20200921180342.GT1942072@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.248,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 07:01:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,88 +101,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/21/20 7:08 PM, Mark Cave-Ayland wrote:
-> On 21/09/2020 10:57, Philippe Mathieu-Daudé wrote:
-> 
->> Hi Mark,
+On 21/09/2020 20.03, Daniel P. Berrangé wrote:
+> On Mon, Sep 21, 2020 at 07:43:14PM +0200, Thomas Huth wrote:
+>> According to our support policy, we do not support Debian 9 in QEMU
+>> anymore, and we only support building the Windows binaries with a
+>> very recent version of the MinGW toolchain. So we should not test
+>> the MinGW cross-compilation with Debian 9 anymore, but switch to
+>> something newer like Fedora. To do this, we need a separate Fedora
+>> container for each build that provides the QEMU_CONFIGURE_OPTS
+>> environment variable.
+>> Unfortunately, the MinGW 64-bit compiler seems to be a little bit
+>> slow, so we also have to disable some features like "capstone" in the
+>> build here to make sure that the CI pipelines still finish within a
+>> reasonable amount of time.
 >>
->> On 9/20/20 10:20 AM, Mark Cave-Ayland wrote:
->>> Instead use qdev_set_nic_properties() to configure the on-board NIC at the
->>> sun4m machine level.
->>>
->>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>> ---
->>>  hw/dma/sparc32_dma.c |  5 -----
->>>  hw/sparc/sun4m.c     | 21 +++++++++++++--------
->>>  2 files changed, 13 insertions(+), 13 deletions(-)
->>>
->>> diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
->>> index 2cbe331959..b643b413c5 100644
->>> --- a/hw/dma/sparc32_dma.c
->>> +++ b/hw/dma/sparc32_dma.c
->>> @@ -342,12 +342,7 @@ static void sparc32_ledma_device_realize(DeviceState *dev, Error **errp)
->>>  {
->>>      LEDMADeviceState *s = SPARC32_LEDMA_DEVICE(dev);
->>>      SysBusPCNetState *lance = SYSBUS_PCNET(&s->lance);
->>> -    NICInfo *nd = &nd_table[0];
->>>  
->>> -    /* FIXME use qdev NIC properties instead of nd_table[] */
->>> -    qemu_check_nic_model(nd, TYPE_LANCE);
->>> -
->>> -    qdev_set_nic_properties(DEVICE(lance), nd);
->>>      object_property_set_link(OBJECT(lance), "dma", OBJECT(dev), &error_abort);
->>>      sysbus_realize(SYS_BUS_DEVICE(lance), &error_fatal);
->>>  }
->>> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
->>> index 947b69d159..ed5f3ccd9f 100644
->>> --- a/hw/sparc/sun4m.c
->>> +++ b/hw/sparc/sun4m.c
->>> @@ -319,7 +319,7 @@ static void *iommu_init(hwaddr addr, uint32_t version, qemu_irq irq)
->>>  
->>>  static void *sparc32_dma_init(hwaddr dma_base,
->>>                                hwaddr esp_base, qemu_irq espdma_irq,
->>> -                              hwaddr le_base, qemu_irq ledma_irq)
->>> +                              hwaddr le_base, qemu_irq ledma_irq, NICInfo *nd)
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  .gitlab-ci.d/containers.yml                   | 10 +++++
+>>  .gitlab-ci.d/crossbuilds.yml                  |  4 +-
+>>  .../dockerfiles/fedora-win32-cross.docker     | 42 +++++++++++++++++++
+>>  .../dockerfiles/fedora-win64-cross.docker     | 38 +++++++++++++++++
+>>  4 files changed, 92 insertions(+), 2 deletions(-)
+>>  create mode 100644 tests/docker/dockerfiles/fedora-win32-cross.docker
+>>  create mode 100644 tests/docker/dockerfiles/fedora-win64-cross.docker
 >>
->> Instead of passing NICInfo to sparc32_dma_init,
->> shouldn't you extract the lance code from it?
+>> diff --git a/.gitlab-ci.d/containers.yml b/.gitlab-ci.d/containers.yml
+>> index 8c89efeb6d..15e7b564f9 100644
+>> --- a/.gitlab-ci.d/containers.yml
+>> +++ b/.gitlab-ci.d/containers.yml
+>> @@ -248,6 +248,16 @@ i386-fedora-cross-container:
+>>    variables:
+>>      NAME: fedora-i386-cross
+>>  
+>> +win32-fedora-cross-container:
+>> +  <<: *container_job_definition
+>> +  variables:
+>> +    NAME: fedora-win32-cross
+>> +
+>> +win64-fedora-cross-container:
+>> +  <<: *container_job_definition
+>> +  variables:
+>> +    NAME: fedora-win64-cross
+>> +
+>>  amd64-ubuntu1804-container:
+>>    <<: *container_job_definition
+>>    variables:
+>> diff --git a/.gitlab-ci.d/crossbuilds.yml b/.gitlab-ci.d/crossbuilds.yml
+>> index 4ec7226b5c..510cfec03b 100644
+>> --- a/.gitlab-ci.d/crossbuilds.yml
+>> +++ b/.gitlab-ci.d/crossbuilds.yml
+>> @@ -105,9 +105,9 @@ cross-s390x-user:
+>>  cross-win32-system:
+>>    <<: *cross_system_build_job_definition
+>>    variables:
+>> -    IMAGE: debian-win32-cross
+>> +    IMAGE: fedora-win32-cross
+>>  
+>>  cross-win64-system:
+>>    <<: *cross_system_build_job_definition
+>>    variables:
+>> -    IMAGE: debian-win64-cross
+>> +    IMAGE: fedora-win64-cross
+>> diff --git a/tests/docker/dockerfiles/fedora-win32-cross.docker b/tests/docker/dockerfiles/fedora-win32-cross.docker
+>> new file mode 100644
+>> index 0000000000..5903e1b0b4
+>> --- /dev/null
+>> +++ b/tests/docker/dockerfiles/fedora-win32-cross.docker
+>> @@ -0,0 +1,42 @@
+>> +FROM fedora:32
+>> +
+>> +# Please keep this list sorted alphabetically
+>> +ENV PACKAGES \
+>> +    bc \
+>> +    bzip2 \
+>> +    diffutils \
+>> +    findutils \
+>> +    gcc \
+>> +    gettext \
+>> +    git \
+>> +    hostname \
+>> +    make \
+>> +    meson \
+>> +    mingw32-bzip2 \
+>> +    mingw32-curl \
+>> +    mingw32-glib2 \
+>> +    mingw32-gmp \
+>> +    mingw32-gnutls \
+>> +    mingw32-gtk3 \
+>> +    mingw32-libjpeg-turbo \
+>> +    mingw32-libpng \
+>> +    mingw32-libtasn1 \
+>> +    mingw32-nettle \
+>> +    mingw32-nsis \
+>> +    mingw32-pixman \
+>> +    mingw32-pkg-config \
+>> +    mingw32-SDL2 \
 > 
-> Hi Philippe,
-> 
-> I'm not sure I understand what you mean here? The sparc32-dma device is realised
-> within the sparc32_dma_init() function and qdev_set_nic_properties() must be called
-> before realise happens.
-> 
-> If you can explain a bit more about how you think it can be separated out then I can
-> take a look.
+> It feels like we could be removing the mingw packages from the
+> main fedora.docker now, so it results in smaller images.
 
-Sorry I guess I got confused by the 2 different sparc32_dma_init()
-functions.
+I wasn't quite sure whether anybody uses the mingw packages in that main
+fedora docker image ... Philippe, do you know?
 
-Since ledma always expose lance, maybe you can use:
+ Thomas
 
-diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
-index 2cbe331959a..9a907a30373 100644
---- a/hw/dma/sparc32_dma.c
-+++ b/hw/dma/sparc32_dma.c
-@@ -336,18 +336,14 @@ static void sparc32_ledma_device_init(Object *obj)
-                           "ledma-mmio", DMA_SIZE);
-
-     object_initialize_child(obj, "lance", &ls->lance, TYPE_LANCE);
-+    qdev_alias_all_properties(DEVICE(&ls->lance), obj);
- }
-
-This way you set the properties directly on the ledma and only
-have to sysbus_map lance.
-
-> 
-> 
-> ATB,
-> 
-> Mark.
-> 
 
