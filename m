@@ -2,95 +2,66 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6251FC43466
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 17:16:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BA9DC4346F
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 17:32:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AABA720758
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 17:16:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AABA720758
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 8C04220B1F
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 17:32:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="aLmMk7A+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C04220B1F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKPQ4-0000h5-Fh
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 13:16:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40038)
+	id 1kKPgC-0005f9-Dq
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 13:32:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43762)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kKPOu-0000D1-AU; Mon, 21 Sep 2020 13:14:53 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:59058
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kKPOq-0005K6-L0; Mon, 21 Sep 2020 13:14:51 -0400
-Received: from host81-154-161-117.range81-154.btcentralplus.com
- ([81.154.161.117] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kKPPR-0000le-LY; Mon, 21 Sep 2020 18:15:25 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200920082018.16135-1-mark.cave-ayland@ilande.co.uk>
- <20200920082018.16135-5-mark.cave-ayland@ilande.co.uk>
- <87imc78osh.fsf@dusky.pond.sub.org>
- <2211cf4a-c35d-cfe2-f123-9a312ea5d72c@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <b7e58136-925d-efb3-34e3-652c9dbd71c3@ilande.co.uk>
-Date: Mon, 21 Sep 2020 18:14:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1kKPeF-0004nk-P8; Mon, 21 Sep 2020 13:30:43 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:42863)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1kKPe9-0007KW-VZ; Mon, 21 Sep 2020 13:30:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:Cc:To:From;
+ bh=JmcDG1B5/8OdVbH+Fhn5Lce2tHZEcej0OECmsnc39bE=; 
+ b=aLmMk7A+k/UNGcZ29MYuhaoqJkcC+mjiSwxcrJNaK91+Qls/BCUMUnq29YX7MQdg4zegHPZ0gHkyhnz6HpTY81mQ96wIcCFlRzilQ3LHmLXbpeC7i+COAJamz/Ox5PZ9tj53RgNdlETLaCR0ucdkxLv55wBpvhkqP7OybXVk/uegWDWS/mKxumiHnEj4Ft7Z5/yEdRpTZQjvmWd31UK+TIxXY2HRAKY67DKZYcRuKA/yBUkFbSTs4SdI6R6ZiprLeWN4OS6x+giYa2gU6m8EZtdBPAGnCD0dtuqHYb7PobcHMrzQIS3GCaZeypmOBV917fLgjbWU9nKlAw2HbAZBFw==;
+Received: from [81.0.34.134] (helo=perseus.local)
+ by fanzine.igalia.com with esmtpsa 
+ (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
+ id 1kKPe5-0006qU-Aw; Mon, 21 Sep 2020 19:30:33 +0200
+Received: from berto by perseus.local with local (Exim 4.92)
+ (envelope-from <berto@igalia.com>)
+ id 1kKPdq-0007HJ-75; Mon, 21 Sep 2020 19:30:18 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] docs: Document the throttle block filter
+Date: Mon, 21 Sep 2020 19:30:16 +0200
+Message-Id: <20200921173016.27935-1-berto@igalia.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <2211cf4a-c35d-cfe2-f123-9a312ea5d72c@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 81.154.161.117
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH 4/6] sparc32-ledma: don't reference nd_table directly
- within the device
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
+ helo=fanzine.igalia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 13:30:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,27 +74,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, atar4qemu@gmail.com,
- david@gibson.dropbear.id.au
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/09/2020 18:03, Mark Cave-Ayland wrote:
+This filter was added back in 2017 for QEMU 2.11 but it was never
+properly documented, so let's explain how it works and add a couple of
+examples.
 
-> The lance and esp devices are embedded within ledma and espdma devices respectively,
-> but are actually sysbus devices because they can be used by other machines. I'm not
-> sure if lance is used anywhere else, but esp certainly is. Hence they are mapped
-> after the dma device is realised as it feels odd to attach devices to sysbus outside
-> of a machine init function.
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ docs/throttle.txt | 107 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 106 insertions(+), 1 deletion(-)
 
-Actually I have a better idea for this: use sysbus_mmio_get_region() within the
-sparc32-dma device to attach the lance and esp memory regions to its own container
-memory region: then the single sysbus_mmio_map() for the sparc32-dma device will just
-work on its own.
+diff --git a/docs/throttle.txt b/docs/throttle.txt
+index cd4e109d39..c06d1b9662 100644
+--- a/docs/throttle.txt
++++ b/docs/throttle.txt
+@@ -1,6 +1,6 @@
+ The QEMU throttling infrastructure
+ ==================================
+-Copyright (C) 2016 Igalia, S.L.
++Copyright (C) 2016,2020 Igalia, S.L.
+ Author: Alberto Garcia <berto@igalia.com>
+ 
+ This work is licensed under the terms of the GNU GPL, version 2 or
+@@ -253,3 +253,108 @@ up. After those 60 seconds the bucket will have leaked 60 x 100 =
+ 
+ Also, due to the way the algorithm works, longer burst can be done at
+ a lower I/O rate, e.g. 1000 IOPS during 120 seconds.
++
++
++The 'throttle' block filter
++---------------------------
++Since QEMU 2.11 it is possible to configure the I/O limits using a
++'throttle' block filter. This filter uses the exact same throttling
++infrastructure described above but can be used anywhere in the node
++graph, allowing for more flexibility.
++
++The user can create an arbitrary number of filters and each one of
++them must be assigned to a group that contains the actual I/O limits.
++Different filters can use the same group so the limits are shared as
++described earlier in "Applying I/O limits to groups of disks".
++
++A group can be created using the object-add QMP function:
++
++   { "execute": "object-add",
++     "arguments": {
++       "qom-type": "throttle-group",
++       "id": "group0",
++       "props": {
++         "limits" : {
++           "iops-total": 1000
++           "bps-write": 2097152
++         }
++       }
++     }
++   }
++
++throttle-group has a 'limits' property (of type ThrottleLimits as
++defined in qapi/block-core.json) which can be set on creation or later
++with 'qom-set'.
++
++A throttle-group can also be created with the -object command line
++option but at the moment there is no way to pass a 'limits' parameter
++that contains a ThrottleLimits structure. The solution is to set the
++individual values directly, like in this example:
++
++   -object throttle-group,id=group0,x-iops-total=1000,x-bps-write=2097152
++
++Note however that this not stable API (hence the 'x-' prefixes) and
++can change or disappear in the future.
++
++Once we have a throttle-group we can use the throttle block filter,
++where the 'file' property must be set to the block device that we want
++to filter:
++
++   { "execute": "blockdev-add",
++     "arguments": {
++        "options":  {
++           "driver": "qcow2",
++           "node-name": "disk0",
++           "file": {
++              "driver": "file",
++              "filename": "/path/to/disk.qcow2"
++           }
++        }
++     }
++   }
++
++   { "execute": "blockdev-add",
++     "arguments": {
++        "driver": "throttle",
++        "node-name": "throttle0",
++        "throttle-group": "group0",
++        "file": "disk0"
++     }
++   }
++
++A similar setup can also be done with the command line, for example:
++
++   -drive driver=throttle,throttle-group=group0,
++          file.driver=qcow2,file.file.filename=/path/to/disk.qcow2
++
++The scenario described so far is very simple but the throttle block
++filter allows for more complex configurations. For example, let's say
++that we have three different drives and we want to set I/O limits for
++each one of them and an additional set of limits for the combined I/O
++of all three drives.
++
++First we would define all throttle groups, one for each one of the
++drives and one that would apply to all of them:
++
++   -object throttle-group,id=limits0,x-iops-total=2000
++   -object throttle-group,id=limits1,x-iops-total=2500
++   -object throttle-group,id=limits2,x-iops-total=3000
++   -object throttle-group,id=limits012,x-iops-total=4000
++
++Now we can define the drives, and for each one of them we use two
++chained throttle filters: the drive's own filter and the combined
++filter.
++
++   -drive driver=throttle,throttle-group=limits012,
++          file.driver=throttle,file.throttle-group=limits0
++          file.file.driver=qcow2,file.file.file.filename=/path/to/disk0.qcow2
++   -drive driver=throttle,throttle-group=limits012,
++          file.driver=throttle,file.throttle-group=limits1
++          file.file.driver=qcow2,file.file.file.filename=/path/to/disk1.qcow2
++   -drive driver=throttle,throttle-group=limits012,
++          file.driver=throttle,file.throttle-group=limits2
++          file.file.driver=qcow2,file.file.file.filename=/path/to/disk2.qcow2
++
++In this example the individual drives have IOPS limits of 2000, 2500
++and 3000 respectively but the total combined I/O can never exceed 4000
++IOPS.
+-- 
+2.20.1
 
-
-ATB,
-
-Mark.
 
