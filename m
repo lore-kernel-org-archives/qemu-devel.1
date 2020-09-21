@@ -2,83 +2,80 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B79CC43463
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F0EC43464
 	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 03:48:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 093EC207D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 03:48:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 617A7207D8
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 03:48:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jxiIAdJ7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 093EC207D3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lyecehn8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 617A7207D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKCop-0007kf-1n
+	id 1kKCop-0007k4-AC
 	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 23:48:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53358)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53356)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kKCnh-0006OM-1G; Sun, 20 Sep 2020 23:47:37 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36618)
+ id 1kKCng-0006OG-SV; Sun, 20 Sep 2020 23:47:36 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36120)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kKCnf-0001wL-Iy; Sun, 20 Sep 2020 23:47:36 -0400
-Received: by mail-wm1-x343.google.com with SMTP id z9so11039790wmk.1;
- Sun, 20 Sep 2020 20:47:34 -0700 (PDT)
+ id 1kKCnf-0001w1-JG; Sun, 20 Sep 2020 23:47:36 -0400
+Received: by mail-wr1-x444.google.com with SMTP id z1so11168719wrt.3;
+ Sun, 20 Sep 2020 20:47:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=KdvaemirANjxASMz4DV4dQ6pghmLGYonwRX/Dh0qzZc=;
- b=jxiIAdJ77HW4opFpV5DRvKmQBqumR8pwmz3L/YxvsJpMOyN+n/GDDQKe5dCZfW0OyE
- J+kune1gasTRfaEIlrEE0rLBCA8ObmizUJu05tUQ1olc8Lj1eWH9WV/12wPtF2FpcqUD
- BzqRW9Cq3/Sra6gkjQaciEM/yS/zGDoYv/B0ddMBZXp3CMIn77iV6AUA8huE29ZhnWCy
- T7t6iqk0+wbb+sPNaTuB/IvxXFgvJlvQqsdTdHSvrVRs7nHuVnJZCl6A74ghfWgbwdQN
- lWnWVHLAOSQJIPR0H4dWf3BwLhIn9EjsDl/I3jR3y8w9jIX+fYsZKYk/raRrtzFilygn
- FtSA==
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=kmr7MIPQlRUdBq38A4ZkR03WaABT/YA95v2kz3M2+68=;
+ b=Lyecehn8f6wmq+u+BVCAKxq7knocuduyZDXR0LZ+ZnuKojTuNiYkDCPxbYlmlOernG
+ X1N4espeiS61lBiVKCzq9AExGeLJSfoVtNvB7Sta1zip5BwCql+wcvJHxpFSQTnWf/d3
+ xuSDAqQF/S5DIRtiFRY9DR5CZAS3nEW5r6jJT4tRpEwSqZ746pwIIfUC+IiK5LdfjsFu
+ 11xfrWjxmpZbPaODtHvvVgojXhMLWV0Syk4ORu1YRtn35zgnusjxCDNQbPVCjDY79RmO
+ mXXOcBGObIFOwwXNF9Lq8vcj0ve75CpK/BtHAm/G19LtcXYGVPcsZ204ZHYfPgWlqEPJ
+ muOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=KdvaemirANjxASMz4DV4dQ6pghmLGYonwRX/Dh0qzZc=;
- b=jW3GMyKvapG6/N5sjvr+G7wV2nVFSoWQpVD0Y9masVMJw3G5XgoqcFl4Qrod+zcUJt
- 65qscCjPkZ2gwUgtHBGNS1/7qdmCBQuxOutDtqMFp+vGRz/RFR3M6+JZZkpOiBor5twK
- 5Zn2tffxhV6rTjycLgEDLFdY6njLk12Q8OCix9u5X9Y5Uxgt4QJVaaaGQBw3rj831tZh
- pPFhwg0Kwa2WCLM7tc0Gj6j4072B2YqZUf5BoR5WVer+cqK1GNrD1cSqCU7zOEi2Kwwq
- pQt9XWLIAzd+/IKNsXmLNSJf4tulNogckkEJZIQ2J+LjCvneQdya58K8K5LdRcsrI4rs
- nRKQ==
-X-Gm-Message-State: AOAM533T8RzPsILFX/vuC+oRPas49XkfFuJAVOgFplK2h0sNH9WreGZP
- U+ha7rKfdSV7WbzwsVQIZ87WWpDNC+k=
-X-Google-Smtp-Source: ABdhPJz18Kw2GyVmY0FqBltnwOd4Z0OESTnapcUh3oPmzu3Xe6kv2JNhZSnsJcjWUg3KhBe4LlUTWQ==
-X-Received: by 2002:a1c:4303:: with SMTP id q3mr27817605wma.158.1600660053209; 
- Sun, 20 Sep 2020 20:47:33 -0700 (PDT)
+ :mime-version:content-transfer-encoding;
+ bh=kmr7MIPQlRUdBq38A4ZkR03WaABT/YA95v2kz3M2+68=;
+ b=rc/siiaLHXgdST61MBDnlXINak91kE/xcql0I5uMHxoTpjEncPJGAc9KXHqJSepqTP
+ 4rrfitgh/2R+SzR8lDAMuFDqzVG7WkzmSwhR+M94aMnyp84DwomsR4B0ol6qti1tbNuW
+ PIYz0A73mw+t6jRkxNAqcUmoSDDpZdiAYyqDG6Fm323fnPsQNiXjKA7tqn0qx8sWxjCO
+ mWZv6Z1V0+RX8IQswbEb9bCOM4stTuEI3S90qPwrsdJaxG0hjXbqWYmy5TysQnmg1ZfS
+ JgCTBAopQyg9OGwvQqfx43wfRBrytTNY4Ru2NAKHT5PkYMANjX1YsHxHERpDpKXkCPNC
+ mr/Q==
+X-Gm-Message-State: AOAM530qieAB9Z41P1v+yNYI0uzLrt1W62vyzJve6DE59Q/04amCIjYM
+ 5zZHfpAZ+1ZGL39s86kT8QBwaRj7kzw=
+X-Google-Smtp-Source: ABdhPJxHL4Te7wqCw5K5vp3qd9CInSZoK1H67pXe2gyJQRYY3SiYELmW1IACz/iEZAWg/g7vzVHKaQ==
+X-Received: by 2002:a5d:4a4b:: with SMTP id v11mr49298294wrs.36.1600660050913; 
+ Sun, 20 Sep 2020 20:47:30 -0700 (PDT)
 Received: from localhost.localdomain (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id u63sm11751440wmb.13.2020.09.20.20.47.32
+ by smtp.gmail.com with ESMTPSA id u63sm11751440wmb.13.2020.09.20.20.47.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 20 Sep 2020 20:47:32 -0700 (PDT)
+ Sun, 20 Sep 2020 20:47:30 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/3] hw/arm/bcm2835: Add more unimplemented peripherals
-Date: Mon, 21 Sep 2020 05:47:28 +0200
-Message-Id: <20200921034729.432931-3-f4bug@amsat.org>
+Subject: [PATCH 0/3] hw/arm/raspi: Remove ignore_memory_transaction_failures
+ on the raspi2
+Date: Mon, 21 Sep 2020 05:47:26 +0200
+Message-Id: <20200921034729.432931-1-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200921034729.432931-1-f4bug@amsat.org>
-References: <20200921034729.432931-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -110,57 +107,19 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The bcm2835-v3d is used since Linux 4.7, see commit
-49ac67e0c39c ("ARM: bcm2835: Add VC4 to the device tree"),
-and the bcm2835-txp since Linux 4.19, see commit
-b7dd29b401f5 ("ARM: dts: bcm283x: Add Transposer block").
+Patch 1 and 3 are review, patch 2 is new and trivial.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/hw/arm/bcm2835_peripherals.h | 2 ++
- hw/arm/bcm2835_peripherals.c         | 2 ++
- 2 files changed, 4 insertions(+)
+Philippe Mathieu-Daudé (3):
+  hw/arm/raspi: Define various blocks base addresses
+  hw/arm/bcm2835: Add more unimplemented peripherals
+  hw/arm/raspi: Remove ignore_memory_transaction_failures on the raspi2
 
-diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
-index b4d3ae121ac..ccd9eb11102 100644
---- a/include/hw/arm/bcm2835_peripherals.h
-+++ b/include/hw/arm/bcm2835_peripherals.h
-@@ -47,6 +47,7 @@ struct BCM2835PeripheralState {
- 
-     BCM2835SystemTimerState systmr;
-     BCM2835MphiState mphi;
-+    UnimplementedDeviceState txp;
-     UnimplementedDeviceState armtmr;
-     UnimplementedDeviceState cprman;
-     UnimplementedDeviceState a2w;
-@@ -68,6 +69,7 @@ struct BCM2835PeripheralState {
-     UnimplementedDeviceState otp;
-     UnimplementedDeviceState dbus;
-     UnimplementedDeviceState ave0;
-+    UnimplementedDeviceState v3d;
-     UnimplementedDeviceState bscsl;
-     UnimplementedDeviceState smi;
-     DWC2State dwc2;
-diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-index a9d7f53f6e9..15c5c72e465 100644
---- a/hw/arm/bcm2835_peripherals.c
-+++ b/hw/arm/bcm2835_peripherals.c
-@@ -343,6 +343,7 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-         qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
-                                INTERRUPT_USB));
- 
-+    create_unimp(s, &s->txp, "bcm2835-txp", TXP_OFFSET, 0x1000);
-     create_unimp(s, &s->armtmr, "bcm2835-sp804", ARMCTRL_TIMER0_1_OFFSET, 0x40);
-     create_unimp(s, &s->cprman, "bcm2835-cprman", CPRMAN_OFFSET, 0x1000);
-     create_unimp(s, &s->a2w, "bcm2835-a2w", A2W_OFFSET, 0x1000);
-@@ -356,6 +357,7 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-     create_unimp(s, &s->otp, "bcm2835-otp", OTP_OFFSET, 0x80);
-     create_unimp(s, &s->dbus, "bcm2835-dbus", DBUS_OFFSET, 0x8000);
-     create_unimp(s, &s->ave0, "bcm2835-ave0", AVE0_OFFSET, 0x8000);
-+    create_unimp(s, &s->v3d, "bcm2835-v3d", V3D_OFFSET, 0x1000);
-     create_unimp(s, &s->sdramc, "bcm2835-sdramc", SDRAMC_OFFSET, 0x100);
- }
- 
+ include/hw/arm/bcm2835_peripherals.h |  2 ++
+ include/hw/arm/raspi_platform.h      | 51 +++++++++++++++++++++++-----
+ hw/arm/bcm2835_peripherals.c         |  2 ++
+ hw/arm/raspi.c                       |  3 --
+ 4 files changed, 47 insertions(+), 11 deletions(-)
+
 -- 
 2.26.2
 
