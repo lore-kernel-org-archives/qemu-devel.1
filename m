@@ -7,57 +7,56 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 901DEC4363C
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 20:00:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D05BC4363C
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 20:01:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB0B02084C
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 20:00:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0128F20791
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 20:01:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="lCuscgxd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB0B02084C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="vDmsE2gZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0128F20791
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKRzZ-0004Gp-Lr
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 16:00:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53078)
+	id 1kKS06-0004UC-U4
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 16:01:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54878)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luc.michel@greensocs.com>)
- id 1kKRoM-0005Ws-Mq; Mon, 21 Sep 2020 15:49:18 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:41026)
+ id 1kKRt7-000801-Fn; Mon, 21 Sep 2020 15:54:13 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:41298)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luc.michel@greensocs.com>)
- id 1kKRoK-0000g3-J8; Mon, 21 Sep 2020 15:49:18 -0400
+ id 1kKRt5-0001JH-QC; Mon, 21 Sep 2020 15:54:13 -0400
 Received: from [172.17.10.14] (unknown [172.17.10.14])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 343B121CBD;
- Mon, 21 Sep 2020 19:49:13 +0000 (UTC)
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 7710221CC5;
+ Mon, 21 Sep 2020 19:54:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1600717753;
+ s=mail; t=1600718049;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=L04vEc55pwpJzOzEUvgFTOXbRY6nScq4D1eZfzFtMQQ=;
- b=lCuscgxdZhD60Keab7LMatDa5SBBNohm7RAUnhsQQU0Gv6bZUpgGIWuEKLygOO4LWg5b5m
- Q7OKcxo56VVM6e1/A2W5rJYZOAIllFtp6lDGx4Gm/OlMbkc4yg4pmbDzproxYnEmCz3uX/
- T4Hl8/dqzkY8LrF9A9sjt0ByR4Jc9xA=
-Subject: Re: [PATCH v2 5/5] hw/arm/bcm2835_peripherals: Correctly wire the
- SYS_timer IRQs
+ bh=+XVbwrUEvUKZdJ79HWuQzHiiHHBy19dq2igKd7smsJo=;
+ b=vDmsE2gZofSdG4pQk4hYS7h8nf5XTSO27W3JyoHmaLqFMAOPWtXoUk2PxPjsd+3Qu9zpvy
+ Y68/5ZVPbGjFEmzARygyaHmGPVRGAK8BUfK3mKSBeb/1K1QBr147ZLvJDc36PLDva0PcGr
+ 3xgUtvi19737+OUYzKzzezBZCpl042c=
+Subject: Re: [PATCH v3 2/8] hw/arm/raspi: Load the firmware on the first core
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
-References: <20200921035257.434532-1-f4bug@amsat.org>
- <20200921035257.434532-6-f4bug@amsat.org>
+References: <20200921075628.466506-1-f4bug@amsat.org>
+ <20200921075628.466506-3-f4bug@amsat.org>
 From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <45d0647d-a717-eafb-b722-44a23a365d46@greensocs.com>
-Date: Mon, 21 Sep 2020 21:50:08 +0200
+Message-ID: <7aaea771-0dae-6bac-c1c0-2325e035f484@greensocs.com>
+Date: Mon, 21 Sep 2020 21:55:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20200921035257.434532-6-f4bug@amsat.org>
+In-Reply-To: <20200921075628.466506-3-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -83,49 +82,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org,
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
  Andrew Baumann <Andrew.Baumann@microsoft.com>,
  Paul Zimmerman <pauldzim@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/21/20 5:52 AM, Philippe Mathieu-Daudé wrote:
-> The SYS_timer is not directly wired to the ARM core, but to the
-> SoC (peripheral) interrupt controller.
+On 9/21/20 9:56 AM, Philippe Mathieu-Daudé wrote:
+> The 'first_cpu' is more a QEMU accelerator-related concept
+> than a variable the machine requires to use.
+> Since the machine is aware of its CPUs, directly use the
+> first one to load the firmware.
 > 
-> Fixes: 0e5bbd74064 ("hw/arm/bcm2835_peripherals: Use the SYS_timer")
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 Reviewed-by: Luc Michel <luc.michel@greensocs.com>
 
 > ---
->   hw/arm/bcm2835_peripherals.c | 13 +++++++++++--
->   1 file changed, 11 insertions(+), 2 deletions(-)
+>   hw/arm/raspi.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-> index 15c5c72e465..48909a43c32 100644
-> --- a/hw/arm/bcm2835_peripherals.c
-> +++ b/hw/arm/bcm2835_peripherals.c
-> @@ -171,8 +171,17 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
->       memory_region_add_subregion(&s->peri_mr, ST_OFFSET,
->                   sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->systmr), 0));
->       sysbus_connect_irq(SYS_BUS_DEVICE(&s->systmr), 0,
-> -        qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_ARM_IRQ,
-> -                               INTERRUPT_ARM_TIMER));
-> +        qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
-> +                               INTERRUPT_TIMER0));
-> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->systmr), 1,
-> +        qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
-> +                               INTERRUPT_TIMER1));
-> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->systmr), 2,
-> +        qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
-> +                               INTERRUPT_TIMER2));
-> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->systmr), 3,
-> +        qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
-> +                               INTERRUPT_TIMER3));
+> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+> index 46d9ed7f054..8716a80a75e 100644
+> --- a/hw/arm/raspi.c
+> +++ b/hw/arm/raspi.c
+> @@ -205,6 +205,7 @@ static void reset_secondary(ARMCPU *cpu, const struct arm_boot_info *info)
 >   
->       /* UART0 */
->       qdev_prop_set_chr(DEVICE(&s->uart0), "chardev", serial_hd(0));
+>   static void setup_boot(MachineState *machine, int version, size_t ram_size)
+>   {
+> +    RaspiMachineState *s = RASPI_MACHINE(machine);
+>       static struct arm_boot_info binfo;
+>       int r;
+>   
+> @@ -253,7 +254,7 @@ static void setup_boot(MachineState *machine, int version, size_t ram_size)
+>           binfo.firmware_loaded = true;
+>       }
+>   
+> -    arm_load_kernel(ARM_CPU(first_cpu), machine, &binfo);
+> +    arm_load_kernel(&s->soc.cpu[0].core, machine, &binfo);
+>   }
+>   
+>   static void raspi_machine_init(MachineState *machine)
 > 
 
