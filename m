@@ -2,71 +2,89 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B96FBC43463
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:07:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7184C43463
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:11:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 174842076B
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:07:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 26F55207BC
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:11:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="jJb/3a51"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 174842076B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JZjCi3Nz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26F55207BC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKJfd-0007Yv-9W
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 07:07:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36546)
+	id 1kKJj9-0002VY-4k
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 07:11:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37516)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1kKJeb-0006pI-NA; Mon, 21 Sep 2020 07:06:41 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:49905)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1kKJeX-00065Q-Cs; Mon, 21 Sep 2020 07:06:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=Oqs0EEChIDa1c2jLCpt0uOYFg354tHomPDn7YHhy1mM=; 
- b=jJb/3a51U8JOudgkSiqmXw0eT9E1zEhdCiC9edS6bMByhLRIYDR+2AYhA6/1LAhFzU6KAybiAT5FLzDpI5jc4EwAMBus+IjJyxmzYFhk+3oYNC1NgdBA1jvIpQ7vvPnV/HtQ8ubCIviZdL8rq7eowb4pzavW7KSUsXxP8AX7AAudcQtg2W8atN3Vdjrsc5Fv8JCy9aL3hqY70ROoRpELYhGpzIbC66zvsNpdwV1tCgUOWJh9guQuUPzm9agBu+MgIZE7oPK5BnN1/sGUMSMmATQ1dACGsx7C5ZJ9m4TyRg9JQqFlP+8ntTbnkrWS41By201pUGLuoz30U4r73rH4/A==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1kKJe9-0008C2-2u; Mon, 21 Sep 2020 13:06:13 +0200
-Received: from berto by mail.igalia.com with local (Exim)
- id 1kKJe8-0007MA-Op; Mon, 21 Sep 2020 13:06:12 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-Subject: Re: [PATCH] block/sheepdog: Replace magic val by
- NANOSECONDS_PER_SECOND definition
-In-Reply-To: <20200921110145.520944-1-philmd@redhat.com>
-References: <20200921110145.520944-1-philmd@redhat.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Mon, 21 Sep 2020 13:06:12 +0200
-Message-ID: <w51v9g7crtn.fsf@maestria.local.igalia.com>
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kKJha-00013X-EX
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 07:09:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32226)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kKJhW-0006Sb-3f
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 07:09:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600686579;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=jDFe6uG1hTBeYm4keIn1qKro+OHwiLWWlPCe18C7lNc=;
+ b=JZjCi3NzfkTd8AWvKCoVpYArJkzf07B2HFKoVxVPOYqMsl7hms/jh+QM+jFZrTWzMBiUp5
+ r6hO5M+/cKlk7GfLnlVSndqYJ10k4vbFU5QDH2/22fi5NJsAL6EMoUDsKkyek2opqr0Kn9
+ LW5REKwKIKKsHqiFwjutOkbVDlzCV8c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-468-D87dqLCTNou3PQeenXAqBg-1; Mon, 21 Sep 2020 07:09:35 -0400
+X-MC-Unique: D87dqLCTNou3PQeenXAqBg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB4D91017DE9;
+ Mon, 21 Sep 2020 11:09:33 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
+ [10.36.112.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4A5A319C4F;
+ Mon, 21 Sep 2020 11:09:30 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 3644E16E16; Mon, 21 Sep 2020 13:09:29 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 1/1] hw/input/tsc2xxx: Reduce MouseTransformInfo structure
+ exposure
+Date: Mon, 21 Sep 2020 13:09:29 +0200
+Message-Id: <20200921110929.7410-2-kraxel@redhat.com>
+In-Reply-To: <20200921110929.7410-1-kraxel@redhat.com>
+References: <20200921110929.7410-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
- helo=fanzine.igalia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 07:06:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:44:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -45
+X-Spam_score: -4.6
+X-Spam_bar: ----
+X-Spam_report: (-4.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.501,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,21 +97,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, sheepdog@lists.wpkg.org,
- qemu-block@nongnu.org, qemu-trivial@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Liu Yuan <namei.unix@gmail.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon 21 Sep 2020 01:01:45 PM CEST, Philippe Mathieu-Daud=C3=A9 wrote:
-> Use self-explicit NANOSECONDS_PER_SECOND definition instead
-> of magic value.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+Commit a5d7eb6534a ("Add TSC2301 touchscreen & keypad controller")
+added the MouseTransformInfo declaration in "ui/console.h",
+however it is only used in "hw/input/tsc2xxx.h".
+Reduce the structure exposure by moving it to the single include
+where it is used.
 
-Berto
+This should fix a build failure on OpenBSD:
+
+  In file included from hw/arm/nseries.c:30:
+  In file included from include/hw/arm/omap.h:24:
+  In file included from include/hw/input/tsc2xxx.h:14:
+  include/ui/console.h:11:11: fatal error: 'epoxy/gl.h' file not found
+  # include <epoxy/gl.h>
+            ^~~~~~~~~~~~
+  1 error generated.
+  gmake: *** [Makefile.ninja:1735:
+  libqemu-aarch64-softmmu.fa.p/hw_arm_nseries.c.o] Error 1
+
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20200907010155.815131-1-f4bug@amsat.org
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ include/hw/input/tsc2xxx.h | 8 +++++++-
+ include/ui/console.h       | 8 --------
+ 2 files changed, 7 insertions(+), 9 deletions(-)
+
+diff --git a/include/hw/input/tsc2xxx.h b/include/hw/input/tsc2xxx.h
+index 3cd8f1bf55be..5b76ebc17761 100644
+--- a/include/hw/input/tsc2xxx.h
++++ b/include/hw/input/tsc2xxx.h
+@@ -11,7 +11,13 @@
+ #ifndef HW_INPUT_TSC2XXX_H
+ #define HW_INPUT_TSC2XXX_H
+ 
+-#include "ui/console.h"
++typedef struct MouseTransformInfo {
++    /* Touchscreen resolution */
++    int x;
++    int y;
++    /* Calibration values as used/generated by tslib */
++    int a[7];
++} MouseTransformInfo;
+ 
+ typedef struct uWireSlave {
+     uint16_t (*receive)(void *opaque);
+diff --git a/include/ui/console.h b/include/ui/console.h
+index 8602203523d9..f02da5372599 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -65,14 +65,6 @@ void qemu_remove_led_event_handler(QEMUPutLEDEntry *entry);
+ 
+ void kbd_put_ledstate(int ledstate);
+ 
+-typedef struct MouseTransformInfo {
+-    /* Touchscreen resolution */
+-    int x;
+-    int y;
+-    /* Calibration values as used/generated by tslib */
+-    int a[7];
+-} MouseTransformInfo;
+-
+ void hmp_mouse_set(Monitor *mon, const QDict *qdict);
+ 
+ /* keysym is a unicode code except for special keys (see QEMU_KEY_xxx
+-- 
+2.27.0
+
 
