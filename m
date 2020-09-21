@@ -2,123 +2,74 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B7E6C4363C
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 20:49:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2655C4363C
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 20:59:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3E7A216C4
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 20:49:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gQPUECbk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3E7A216C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2DBC823A5D
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 20:59:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DBC823A5D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKSkO-0002x4-Jw
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 16:49:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38648)
+	id 1kKSuK-0006RF-UK
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 16:59:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44346)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tobin@linux.ibm.com>)
- id 1kKSVK-0006SS-Dn
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 16:33:43 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28894
- helo=mx0a-001b2d01.pphosted.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kKStR-0005mS-IJ; Mon, 21 Sep 2020 16:58:39 -0400
+Resent-Date: Mon, 21 Sep 2020 16:58:37 -0400
+Resent-Message-Id: <E1kKStR-0005mS-IJ@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21757)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tobin@linux.ibm.com>)
- id 1kKSVG-0006vA-Ro
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 16:33:42 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 08LKWH87064198; Mon, 21 Sep 2020 16:33:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=mime-version :
- content-type : content-transfer-encoding : date : from : to : cc : subject
- : in-reply-to : references : message-id; s=pp1;
- bh=eTx6mYU7LQhlYMa5QEYRsFMLZ1oiYdRotyvvVLb4OlQ=;
- b=gQPUECbkooxFwB5vT7gg5Ugn9gSOuSdBR6ngHNkLSkG+1qVcfZZRmqGuZ/qmz6EptPR1
- LgsdOSvu1lOl2BFa2pcdP66KIQAit9w/8ExLSvCQLZWpJSvecVZIgmGfexmAKbay9Odq
- uGkPqNHuE+yZu4Hirp+Bj3S4GPwtP0iaodo94MFgxgrQ4WgPlQ4PjlHiKeRkYjgdBtab
- WJrlM9PBLooHSAxjEQDqiBm5Y38dPm7N4oZEi7SdEsSbKlSw3K7M0uwOXO8wP1olizyX
- qYPfSjJi2CEPQ1HNNnmjWn8hze2GLuYtcG7Mef4JnBpUjF3AUN9tpjwTtZWTYoeN95P2 qA== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 33q3530790-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 21 Sep 2020 16:33:33 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08LKWTpN064788;
- Mon, 21 Sep 2020 16:33:33 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
- [169.53.41.122])
- by mx0b-001b2d01.pphosted.com with ESMTP id 33q353078p-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 21 Sep 2020 16:33:33 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
- by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08LKVfWH013081;
- Mon, 21 Sep 2020 20:33:32 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
- [9.57.198.29]) by ppma04dal.us.ibm.com with ESMTP id 33n9m8pbc2-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 21 Sep 2020 20:33:32 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
- [9.57.199.106])
- by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 08LKXV6s52494846
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 21 Sep 2020 20:33:31 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C46E82805E;
- Mon, 21 Sep 2020 20:33:31 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0E1D628058;
- Mon, 21 Sep 2020 20:33:31 +0000 (GMT)
-Received: from ltc.linux.ibm.com (unknown [9.16.170.189])
- by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Mon, 21 Sep 2020 20:33:30 +0000 (GMT)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kKStM-0001VG-VV; Mon, 21 Sep 2020 16:58:37 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1600721770; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=Y4gWBlSWg+0yA/gHFZUKbv/aMAk9AUKqn8ASWkrnMSVwHS0GeyNyzgzCexb3E2K2o5ehvvuzsOYYReCGDtDPk/SAS3am04HqItocyU51l7yMP7T6cSS9fbYrLRT8n/VD3rIzcetDKYwbVfXBmLVrbYWrYWTQZyHyseocv8tVWWA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1600721770;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=rh/2U/XNxyoy7UhLIqfqEI+QrbkE8n1oyRx5QDn7yPw=; 
+ b=AEvoK4QvKTNtA2Dhmd8SOhTcxIYiuX9jnIQyDmU6Mf+vXAl+XD9/iL6g2oaUpGaileEIQc23xBhZ7ucl/eqZlC8Q6aXZvPdBPq+kUVB5Cx9HxMAym0aOtxOnlplteFrjYMJyqUDcFvCKJeWj5yYtORNVSPSteOElQw2swJ+mY6U=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1600721768767227.91629257311638;
+ Mon, 21 Sep 2020 13:56:08 -0700 (PDT)
+Subject: Re: [PATCH] qemu/atomic.h: prefix qemu_ to solve <stdatomic.h>
+ collisions
+Message-ID: <160072176188.21069.7427016597134663502@66eaa9a8a123>
+In-Reply-To: <20200921162346.188997-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Mon, 21 Sep 2020 16:33:30 -0400
-From: Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v3] SEV: QMP support for Inject-Launch-Secret
-In-Reply-To: <20200921190800.GA32491@work-vm>
-References: <20200706215451.59179-1-tobin@linux.vnet.ibm.com>
- <20200921190800.GA32491@work-vm>
-Message-ID: <b7faab72e909b709797e6098ec894c72@linux.vnet.ibm.com>
-X-Sender: tobin@linux.ibm.com
-User-Agent: Roundcube Webmail/1.0.1
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-09-21_08:2020-09-21,
- 2020-09-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1011 spamscore=0
- lowpriorityscore=0 mlxscore=0 suspectscore=2 priorityscore=1501
- malwarescore=0 adultscore=0 bulkscore=0 impostorscore=0 phishscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009210146
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=tobin@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 16:33:35
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
-X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: stefanha@redhat.com
+Date: Mon, 21 Sep 2020 13:56:08 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 16:58:26
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
  RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
-X-Mailman-Approved-At: Mon, 21 Sep 2020 16:48:22 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -130,280 +81,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thomas.lendacky@amd.com, brijesh.singh@amd.com, jejb@linux.ibm.com,
- tobin@ibm.com, qemu-devel@nongnu.org, pbonzini@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, peter.maydell@linaro.org, sheepdog@lists.wpkg.org,
+ kvm@vger.kernel.org, david@redhat.com, jasowang@redhat.com,
+ qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, jcmvbkbc@gmail.com,
+ Alistair.Francis@wdc.com, kraxel@redhat.com, chenhc@lemote.com,
+ sstabellini@kernel.org, berto@igalia.com, sagark@eecs.berkeley.edu,
+ ysato@users.sourceforge.jp, quintela@redhat.com, jslaby@suse.cz,
+ mst@redhat.com, armbru@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ aleksandar.qemu.devel@gmail.com, thuth@redhat.com, marcandre.lureau@redhat.com,
+ mjrosato@linux.ibm.com, aleksandar.rikalo@syrmia.com, ehabkost@redhat.com,
+ sw@weilnetz.de, pl@kamp.de, dgilbert@redhat.com, yuval.shaia.ml@gmail.com,
+ paul@xen.org, anthony.perard@citrix.com, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, stefanha@redhat.com, namei.unix@gmail.com,
+ qemu-riscv@nongnu.org, sunilmut@microsoft.com, jsnow@redhat.com,
+ zhang.zhanghailiang@huawei.com, rth@twiddle.net, kwolf@redhat.com,
+ berrange@redhat.com, qemu-block@nongnu.org, kbastian@mail.uni-paderborn.de,
+ cohuck@redhat.com, laurent@vivier.eu, mreitz@redhat.com, palmer@dabbelt.com,
+ pbonzini@redhat.com, xen-devel@lists.xenproject.org, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020-09-21 15:16, Dr. David Alan Gilbert wrote:
-> * Tobin Feldman-Fitzthum (tobin@linux.vnet.ibm.com) wrote:
->> AMD SEV allows a guest owner to inject a secret blob
->> into the memory of a virtual machine. The secret is
->> encrypted with the SEV Transport Encryption Key and
->> integrity is guaranteed with the Transport Integrity
->> Key. Although QEMU faciliates the injection of the
->> launch secret, it cannot access the secret.
->> 
->> Signed-off-by: Tobin Feldman-Fitzthum <tobin@linux.vnet.ibm.com>
-> 
-> Hi Tobin,
->   Did the ovmf stuff for agreeing the GUID for automating this ever
-> happen?
-> 
-OVMF patches have not been upstreamed yet. I think we are planning
-to do that relatively soon.
-
--Tobin
-> Dave
-> 
->> ---
->>  include/monitor/monitor.h |  3 ++
->>  include/sysemu/sev.h      |  2 ++
->>  monitor/misc.c            |  8 ++---
->>  qapi/misc-target.json     | 18 +++++++++++
->>  target/i386/monitor.c     |  9 ++++++
->>  target/i386/sev-stub.c    |  5 +++
->>  target/i386/sev.c         | 66 
->> +++++++++++++++++++++++++++++++++++++++
->>  target/i386/trace-events  |  1 +
->>  8 files changed, 108 insertions(+), 4 deletions(-)
->> 
->> diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
->> index 1018d754a6..bf049c5b00 100644
->> --- a/include/monitor/monitor.h
->> +++ b/include/monitor/monitor.h
->> @@ -4,6 +4,7 @@
->>  #include "block/block.h"
->>  #include "qapi/qapi-types-misc.h"
->>  #include "qemu/readline.h"
->> +#include "include/exec/hwaddr.h"
->> 
->>  extern __thread Monitor *cur_mon;
->>  typedef struct MonitorHMP MonitorHMP;
->> @@ -36,6 +37,8 @@ void monitor_flush(Monitor *mon);
->>  int monitor_set_cpu(int cpu_index);
->>  int monitor_get_cpu_index(void);
->> 
->> +void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, uint64_t size, Error 
->> **errp);
->> +
->>  void monitor_read_command(MonitorHMP *mon, int show_prompt);
->>  int monitor_read_password(MonitorHMP *mon, ReadLineFunc 
->> *readline_func,
->>                            void *opaque);
->> diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
->> index 98c1ec8d38..b279b293e8 100644
->> --- a/include/sysemu/sev.h
->> +++ b/include/sysemu/sev.h
->> @@ -18,4 +18,6 @@
->> 
->>  void *sev_guest_init(const char *id);
->>  int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len);
->> +int sev_inject_launch_secret(const char *hdr, const char *secret,
->> +                             uint64_t gpa);
->>  #endif
->> diff --git a/monitor/misc.c b/monitor/misc.c
->> index 89bb970b00..b9ec8ba410 100644
->> --- a/monitor/misc.c
->> +++ b/monitor/misc.c
->> @@ -674,10 +674,10 @@ static void hmp_physical_memory_dump(Monitor 
->> *mon, const QDict *qdict)
->>      memory_dump(mon, count, format, size, addr, 1);
->>  }
->> 
->> -static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error **errp)
->> +void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, uint64_t size, Error 
->> **errp)
->>  {
->>      MemoryRegionSection mrs = memory_region_find(get_system_memory(),
->> -                                                 addr, 1);
->> +                                                 addr, size);
->> 
->>      if (!mrs.mr) {
->>          error_setg(errp, "No memory is mapped at address 0x%" 
->> HWADDR_PRIx, addr);
->> @@ -701,7 +701,7 @@ static void hmp_gpa2hva(Monitor *mon, const QDict 
->> *qdict)
->>      MemoryRegion *mr = NULL;
->>      void *ptr;
->> 
->> -    ptr = gpa2hva(&mr, addr, &local_err);
->> +    ptr = gpa2hva(&mr, addr, 1, &local_err);
->>      if (local_err) {
->>          error_report_err(local_err);
->>          return;
->> @@ -777,7 +777,7 @@ static void hmp_gpa2hpa(Monitor *mon, const QDict 
->> *qdict)
->>      void *ptr;
->>      uint64_t physaddr;
->> 
->> -    ptr = gpa2hva(&mr, addr, &local_err);
->> +    ptr = gpa2hva(&mr, addr, 1, &local_err);
->>      if (local_err) {
->>          error_report_err(local_err);
->>          return;
->> diff --git a/qapi/misc-target.json b/qapi/misc-target.json
->> index dee3b45930..d145f916b3 100644
->> --- a/qapi/misc-target.json
->> +++ b/qapi/misc-target.json
->> @@ -200,6 +200,24 @@
->>  { 'command': 'query-sev-capabilities', 'returns': 'SevCapability',
->>    'if': 'defined(TARGET_I386)' }
->> 
->> +##
->> +# @sev-inject-launch-secret:
->> +#
->> +# This command injects a secret blob into memory of SEV guest.
->> +#
->> +# @packet-header: the launch secret packet header encoded in base64
->> +#
->> +# @secret: the launch secret data to be injected encoded in base64
->> +#
->> +# @gpa: the guest physical address where secret will be injected.
->> +#
->> +# Since: 5.1
->> +#
->> +##
->> +{ 'command': 'sev-inject-launch-secret',
->> +  'data': { 'packet-header': 'str', 'secret': 'str', 'gpa': 'uint64' 
->> },
->> +  'if': 'defined(TARGET_I386)' }
->> +
->>  ##
->>  # @dump-skeys:
->>  #
->> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
->> index 27ebfa3ad2..42bcfe6dc0 100644
->> --- a/target/i386/monitor.c
->> +++ b/target/i386/monitor.c
->> @@ -736,3 +736,12 @@ SevCapability *qmp_query_sev_capabilities(Error 
->> **errp)
->> 
->>      return data;
->>  }
->> +
->> +void qmp_sev_inject_launch_secret(const char *packet_hdr,
->> +                                  const char *secret, uint64_t gpa,
->> +                                  Error **errp)
->> +{
->> +    if (sev_inject_launch_secret(packet_hdr, secret, gpa) != 0) {
->> +        error_setg(errp, "SEV inject secret failed");
->> +    }
->> +}
->> diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
->> index e5ee13309c..fed4588185 100644
->> --- a/target/i386/sev-stub.c
->> +++ b/target/i386/sev-stub.c
->> @@ -48,3 +48,8 @@ SevCapability *sev_get_capabilities(void)
->>  {
->>      return NULL;
->>  }
->> +int sev_inject_launch_secret(const char *hdr, const char *secret,
->> +                             uint64_t gpa)
->> +{
->> +    return 1;
->> +}
->> diff --git a/target/i386/sev.c b/target/i386/sev.c
->> index d273174ad3..cbeb8f2e02 100644
->> --- a/target/i386/sev.c
->> +++ b/target/i386/sev.c
->> @@ -28,6 +28,8 @@
->>  #include "sysemu/runstate.h"
->>  #include "trace.h"
->>  #include "migration/blocker.h"
->> +#include "exec/address-spaces.h"
->> +#include "monitor/monitor.h"
->> 
->>  #define TYPE_SEV_GUEST "sev-guest"
->>  #define SEV_GUEST(obj)                                          \
->> @@ -769,6 +771,70 @@ sev_encrypt_data(void *handle, uint8_t *ptr, 
->> uint64_t len)
->>      return 0;
->>  }
->> 
->> +int sev_inject_launch_secret(const char *packet_hdr,
->> +                             const char *secret, uint64_t gpa)
->> +{
->> +    struct kvm_sev_launch_secret input;
->> +    guchar *data = NULL, *hdr = NULL;
->> +    int error, ret = 1;
->> +    void *hva;
->> +    gsize hdr_sz = 0, data_sz = 0;
->> +    Error *local_err = NULL;
->> +    MemoryRegion *mr = NULL;
->> +
->> +    /* secret can be inject only in this state */
->> +    if (!sev_check_state(sev_guest, SEV_STATE_LAUNCH_SECRET)) {
->> +        error_report("SEV: Not in correct state. (LSECRET) %x",
->> +                     sev_guest->state);
->> +        return 1;
->> +    }
->> +
->> +    hdr = g_base64_decode(packet_hdr, &hdr_sz);
->> +    if (!hdr || !hdr_sz) {
->> +        error_report("SEV: Failed to decode sequence header");
->> +        return 1;
->> +    }
->> +
->> +    data = g_base64_decode(secret, &data_sz);
->> +    if (!data || !data_sz) {
->> +        error_report("SEV: Failed to decode data");
->> +        goto err;
->> +    }
->> +
->> +    hva = gpa2hva(&mr, gpa, data_sz, &local_err);
->> +    if (!hva) {
->> +        error_report("SEV: Failed to calculate guest address.");
->> +        goto err;
->> +    }
->> +
->> +    input.hdr_uaddr = (uint64_t)(unsigned long)hdr;
->> +    input.hdr_len = hdr_sz;
->> +
->> +    input.trans_uaddr = (uint64_t)(unsigned long)data;
->> +    input.trans_len = data_sz;
->> +
->> +    input.guest_uaddr = (uint64_t)(unsigned long)hva;
->> +    input.guest_len = data_sz;
->> +
->> +    trace_kvm_sev_launch_secret(gpa, input.guest_uaddr,
->> +                                input.trans_uaddr, input.trans_len);
->> +
->> +    ret = sev_ioctl(sev_guest->sev_fd, KVM_SEV_LAUNCH_SECRET,
->> +                    &input, &error);
->> +    if (ret) {
->> +        error_report("SEV: failed to inject secret ret=%d fw_error=%d 
->> '%s'",
->> +                     ret, error, fw_error_to_str(error));
->> +        goto err;
->> +    }
->> +
->> +    ret = 0;
->> +
->> +err:
->> +    g_free(data);
->> +    g_free(hdr);
->> +    return ret;
->> +}
->> +
->>  static void
->>  sev_register_types(void)
->>  {
->> diff --git a/target/i386/trace-events b/target/i386/trace-events
->> index 789c700d4a..9f299e94a2 100644
->> --- a/target/i386/trace-events
->> +++ b/target/i386/trace-events
->> @@ -15,3 +15,4 @@ kvm_sev_launch_start(int policy, void *session, void 
->> *pdh) "policy 0x%x session
->>  kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 
->> 0x%" PRIu64
->>  kvm_sev_launch_measurement(const char *value) "data %s"
->>  kvm_sev_launch_finish(void) ""
->> +kvm_sev_launch_secret(uint64_t hpa, uint64_t hva, uint64_t secret, 
->> int len) "hpa 0x%" PRIx64 " hva 0x%" PRIx64 " data 0x%" PRIx64 " len 
->> %d"
->> --
->> 2.20.1 (Apple Git-117)
->> 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkyMTE2MjM0Ni4xODg5
+OTctMS1zdGVmYW5oYUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
+dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
+aW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDA5MjExNjIzNDYuMTg4
+OTk3LTEtc3RlZmFuaGFAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUEFUQ0hdIHFlbXUvYXRvbWljLmg6
+IHByZWZpeCBxZW11XyB0byBzb2x2ZSA8c3RkYXRvbWljLmg+IGNvbGxpc2lvbnMKCj09PSBURVNU
+IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9u
+dWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5h
+bGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFz
+ZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
+NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJv
+amVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAyMDA5MTgxMDM0MzAuMjk3
+MTY3LTEtdGh1dGhAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMjAwOTE4MTAzNDMwLjI5NzE2Ny0x
+LXRodXRoQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoyNWNhNzAy
+IHFlbXUvYXRvbWljLmg6IHByZWZpeCBxZW11XyB0byBzb2x2ZSA8c3RkYXRvbWljLmg+IGNvbGxp
+c2lvbnMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBNYWNyb3Mgd2l0aCBtdWx0aXBsZSBz
+dGF0ZW1lbnRzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBhIGRvIC0gd2hpbGUgbG9vcAojMjk2ODog
+RklMRTogaW5jbHVkZS9xZW11L2F0b21pYy5oOjE1MjoKKyNkZWZpbmUgcWVtdV9hdG9taWNfcmN1
+X3JlYWRfX25vY2hlY2socHRyLCB2YWxwdHIpICAgICAgXAogICAgIF9fYXRvbWljX2xvYWQocHRy
+LCB2YWxwdHIsIF9fQVRPTUlDX1JFTEFYRUQpOyAgICAgICBcCiAgICAgc21wX3JlYWRfYmFycmll
+cl9kZXBlbmRzKCk7CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoYXQgJyonIChjdHg6
+VnhCKQojMzEyMzogRklMRTogaW5jbHVkZS9xZW11L2F0b21pYy5oOjM0NzoKKyNkZWZpbmUgcWVt
+dV9hdG9taWNfcmVhZF9fbm9jaGVjayhwKSAoKihfX3R5cGVvZl9fKCoocCkpIHZvbGF0aWxlKikg
+KHApKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBeCgpFUlJPUjogVXNlIG9mIHZvbGF0aWxlIGlzIHVzdWFsbHkgd3Jvbmcs
+IHBsZWFzZSBhZGQgYSBjb21tZW50CiMzMTIzOiBGSUxFOiBpbmNsdWRlL3FlbXUvYXRvbWljLmg6
+MzQ3OgorI2RlZmluZSBxZW11X2F0b21pY19yZWFkX19ub2NoZWNrKHApICgqKF9fdHlwZW9mX18o
+KihwKSkgdm9sYXRpbGUqKSAocCkpCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoYXQg
+JyonIChjdHg6VnhCKQojMzEyNTogRklMRTogaW5jbHVkZS9xZW11L2F0b21pYy5oOjM0OToKKyAg
+ICAoKCooX190eXBlb2ZfXygqKHApKSB2b2xhdGlsZSopIChwKSkgPSAoaSkpCiAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogVXNlIG9mIHZvbGF0aWxlIGlzIHVzdWFs
+bHkgd3JvbmcsIHBsZWFzZSBhZGQgYSBjb21tZW50CiMzMTI1OiBGSUxFOiBpbmNsdWRlL3FlbXUv
+YXRvbWljLmg6MzQ5OgorICAgICgoKihfX3R5cGVvZl9fKCoocCkpIHZvbGF0aWxlKikgKHApKSA9
+IChpKSkKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzMx
+MzA6IEZJTEU6IGluY2x1ZGUvcWVtdS9hdG9taWMuaDozNTI6CisjZGVmaW5lIHFlbXVfYXRvbWlj
+X3NldChwdHIsIGkpICAgICBxZW11X2F0b21pY19zZXRfX25vY2hlY2socHRyLGkpCiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+XgoKRVJST1I6IG1lbW9yeSBiYXJyaWVyIHdpdGhvdXQgY29tbWVudAojMzIwNTogRklMRTogaW5j
+bHVkZS9xZW11L2F0b21pYy5oOjQxMDoKKyNkZWZpbmUgcWVtdV9hdG9taWNfeGNoZyhwdHIsIGkp
+IChzbXBfbWIoKSwgX19zeW5jX2xvY2tfdGVzdF9hbmRfc2V0KHB0ciwgaSkpCgpXQVJOSU5HOiBC
+bG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMzI4MDog
+RklMRTogaW5jbHVkZS9xZW11L2F0b21pYy5oOjQ2MjoKKy8qIHFlbXVfYXRvbWljX21iX3JlYWQv
+c2V0IHNlbWFudGljcyBtYXAgSmF2YSB2b2xhdGlsZSB2YXJpYWJsZXMuIFRoZXkgYXJlCgpXQVJO
+SU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQoj
+NjM5NDogRklMRTogdXRpbC9iaXRtYXAuYzoyMTQ6CisgICAgICAgIC8qIElmIHdlIGF2b2lkZWQg
+dGhlIGZ1bGwgYmFycmllciBpbiBxZW11X2F0b21pY19vcigpLCBpc3N1ZSBhCgpXQVJOSU5HOiBC
+bG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojNzQzMDog
+RklMRTogdXRpbC9yY3UuYzo4NToKKyAgICAgICAgLyogSW5zdGVhZCBvZiB1c2luZyBxZW11X2F0
+b21pY19tYl9zZXQgZm9yIGluZGV4LT53YWl0aW5nLCBhbmQKCldBUk5JTkc6IEJsb2NrIGNvbW1l
+bnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM3NDU2OiBGSUxFOiB1dGls
+L3JjdS5jOjE1NDoKKyAgICAgICAgLyogSW4gZWl0aGVyIGNhc2UsIHRoZSBxZW11X2F0b21pY19t
+Yl9zZXQgYmVsb3cgYmxvY2tzIHN0b3JlcyB0aGF0IGZyZWUKCnRvdGFsOiA3IGVycm9ycywgNCB3
+YXJuaW5ncywgNjUwNyBsaW5lcyBjaGVja2VkCgpDb21taXQgMjVjYTcwMjliMmYyIChxZW11L2F0
+b21pYy5oOiBwcmVmaXggcWVtdV8gdG8gc29sdmUgPHN0ZGF0b21pYy5oPiBjb2xsaXNpb25zKSBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
+ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRw
+Oi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDkyMTE2MjM0Ni4xODg5OTctMS1zdGVmYW5oYUByZWRo
+YXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
+dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
+c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
