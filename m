@@ -2,104 +2,88 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 597E2C43469
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 16:41:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58761C43465
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 16:43:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2A9023998
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 16:41:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CEEFD23998
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 16:43:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZkTS0ODV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2A9023998
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pwosWG6b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEEFD23998
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKOsH-00062u-O3
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 12:41:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57348)
+	id 1kKOuz-00080m-Tr
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 12:43:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60268)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kKOhw-0004iG-A1
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 12:30:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60728)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kKOhu-0007Tv-G7
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 12:30:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600705825;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VFUnGI39xPjzTrYSbqi9ooQfeOOci8dGNYXdLQ1TjBg=;
- b=ZkTS0ODV5H4mq3OFkXXS1AYv05zsAOksXzrqd1savfJSBqlbLZPc+3xlLvnhbGTxohDgX9
- HczlWTS+3o/1ghL6MRfLlBz8xYFl1GdlEnR0WmCzK/xDl1sp4sDre/QIRefj0Zc5hcZLMp
- PCMR7oLO6etsi7AbpWueWA7F9U1qUh4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-86-HYyPF9nKPs2Q-ICUMUQSAw-1; Mon, 21 Sep 2020 12:30:23 -0400
-X-MC-Unique: HYyPF9nKPs2Q-ICUMUQSAw-1
-Received: by mail-wr1-f69.google.com with SMTP id l17so6050676wrw.11
- for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 09:30:23 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kKOsf-0006aZ-6x
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 12:41:33 -0400
+Received: from mail-ej1-x632.google.com ([2a00:1450:4864:20::632]:34358)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kKOsc-00014Q-G8
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 12:41:32 -0400
+Received: by mail-ej1-x632.google.com with SMTP id gr14so18740169ejb.1
+ for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 09:41:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=NrbhbaPfUUKx6zEVY61pouTTY7SjTKE1h1Ou4rDRU98=;
+ b=pwosWG6bQaL9dtVRF0KD1YHAsqhMPzxcMyxtbkLNnl/BW3xMABjTn8HkbcW9GTIMxh
+ WkXMf8mLhGiYSyEwtNG+eyYyAowCgjguT9BQ5JxNFUdUV5F3AZkjgujWgt1HjruvNNhV
+ Tl4Vvzjk1urceroiSKThVtt9ZppgWzNqcfU8LUBgNOov/gM+bqzeEbNFSWhOxJ83TsmV
+ OP8IFN0i+xO1Io+xD3GAyopS9VSIGT1a37nxMSETQS5uEZIAX6+LDcRRBDB5BSNOatm4
+ Z5ZTZh+2DSrNhSUOu7qDb9PQn9suMnPmmZTng1Z/MZmKUQAZZBQyrKXKbfGv/00p2N9p
+ UJJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=VFUnGI39xPjzTrYSbqi9ooQfeOOci8dGNYXdLQ1TjBg=;
- b=TP7uw8ExHbs6na/j03tMnn7LwiNELqQ7kBCun6p921KBGA28AON1+vW0XjF+X3DuOJ
- wvw7cQ5unMsY9vjVA07xtouD3PMpjXxqeOBvroqYsT0GDQuUB7GMSI13epRcGsoupupl
- gohH4bOPC8Hg3bA3ENAQdNj2Vc6yFIqzz33Wll3+eEGCVP+H9bYjz6XTb7M5Vi6tMOSI
- G4k5GmaSHppKcJqe0+/BWH3GNjCuxShKlYhk42N2jN05pzxC5U+i9WPKAcB13xgE8iqb
- 21xeUsLokXKQiV7t3dve8jFPwc2VwFgS07tQZd9k53KVXEvEoBPqVZ/0sD/xZEZQshAa
- BkXw==
-X-Gm-Message-State: AOAM531wK97W6r2U85vDjkjTKGEA47uo881UQOf3eMVqY1w87Ro3Sx7N
- 9TzVyZLVlYzISEl3OK1XkQpcfynyjUno2eBoUkoHNh2/WNNhnW/EAcnhesZ3dFiQVExkK4P1nIv
- 5uYUHcCcP/GCryio=
-X-Received: by 2002:a1c:6484:: with SMTP id y126mr167559wmb.177.1600705822498; 
- Mon, 21 Sep 2020 09:30:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxqAMnvvzX7KRFUB9AMMq50VEuwDyDmX1j4JarJc9ypAQHEYr/rthZ9b2cqS3DipFFGazQQIA==
-X-Received: by 2002:a1c:6484:: with SMTP id y126mr167544wmb.177.1600705822362; 
- Mon, 21 Sep 2020 09:30:22 -0700 (PDT)
-Received: from x1w.redhat.com (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id f12sm148215wmf.26.2020.09.21.09.30.21
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 21 Sep 2020 09:30:21 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>,
-	qemu-devel@nongnu.org
-Subject: [PATCH 6/6] block/nvme: Replace magic value by SCALE_MS definition
-Date: Mon, 21 Sep 2020 18:29:49 +0200
-Message-Id: <20200921162949.553863-7-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200921162949.553863-1-philmd@redhat.com>
-References: <20200921162949.553863-1-philmd@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=NrbhbaPfUUKx6zEVY61pouTTY7SjTKE1h1Ou4rDRU98=;
+ b=NM3ZOwHy0/ZqCY0an99Y/8x2RacxVFxKFE3V2+7au6oPZxx2q2ktEcO+HPKXxF4zvg
+ AC/3hC/XuAUnO+dHglUjf5IDQru3lmSNXOMJUdRnR89MpWwqsssjSSttLUByV1w9nGzk
+ LnvcEMa73eYEg+nsMwjvqubaayRqhYwdbnD5XCzyBEq8fQHmdlWefU+MpwNU99SReBaZ
+ Tq3+qpygQCFQTKUuPdOg0uYrz5XQW5aaTsjx9Nb9Vn+v3h7b3pgw5px23roWmTnLSz14
+ VF6uEjU1jMpmV0FabG9VxC7z+VjBZNipsQLeBDNBjdlxU7Wepbm+vMdCcTQl/ATPxSeI
+ 2olQ==
+X-Gm-Message-State: AOAM530f+yhyuW/q09sX1MgynMRN7nbC62+cq5U/N5ndnvoFIZzALsZK
+ 0cOPHjbN9uYH71Uwrd+B82WlwZrmWkdf+zM8qjWhcQ==
+X-Google-Smtp-Source: ABdhPJy/4+crIUYKldg5YFW2bem835cfyAWpuh+QomFnug61mcgfF7LefilirDyKRMYpaH/s+lUrCt6Upt11Hrqh3q0=
+X-Received: by 2002:a17:906:4a53:: with SMTP id
+ a19mr368048ejv.56.1600706486056; 
+ Mon, 21 Sep 2020 09:41:26 -0700 (PDT)
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:44:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200918191852.189151-1-philmd@redhat.com>
+In-Reply-To: <20200918191852.189151-1-philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 21 Sep 2020 17:41:14 +0100
+Message-ID: <CAFEAcA8nkRt5KPLJo2qkJX+6_XZoQYdL6_Vy4tU7kiQLY=yUfw@mail.gmail.com>
+Subject: Re: [PULL 0/2] Acceptance patches for 2020-09-18
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::632;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x632.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,35 +96,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use self-explicit SCALE_MS definition instead of magic value
-(missed in similar commit e4f310fe7f5).
+On Fri, 18 Sep 2020 at 21:14, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> The following changes since commit 053a4177817db307ec854356e95b5b350800a2=
+16:
+>
+>   Merge remote-tracking branch 'remotes/philmd-gitlab/tags/fw_cfg-2020091=
+8' i=3D
+> nto staging (2020-09-18 16:34:26 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://gitlab.com/philmd/qemu.git tags/acceptance-next-20200918
+>
+> for you to fetch changes up to b6eea069ab3926e110b8ddf037ff7ea7b2c8c1f5:
+>
+>   tests/acceptance: Skip slow quanta-gsj U-boot+Linux test (2020-09-18 19=
+:46:=3D
+> 38 +0200)
+>
+> ----------------------------------------------------------------
+> Acceptance tests queue
+>
+> Get GitLab CI acceptance jobs green again.
+>
+> CI jobs results:
+>   https://gitlab.com/philmd/qemu/-/pipelines/191795388
+> ----------------------------------------------------------------
+>
+> Philippe Mathieu-Daud=3DC3=3DA9 (2):
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- block/nvme.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Something in your workflow is mangling UTF-8. (The actual
+commits in the pull look OK.)
 
-diff --git a/block/nvme.c b/block/nvme.c
-index d18e897c7c9..b3dab1c4610 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -772,7 +772,7 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
-                            CC_EN_MASK);
-     /* Wait for CSTS.RDY = 1. */
-     now = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
--    deadline = now + timeout_ms * 1000000;
-+    deadline = now + timeout_ms * SCALE_MS;
-     while (!NVME_CSTS_RDY(le32_to_cpu(regs->csts))) {
-         if (qemu_clock_get_ns(QEMU_CLOCK_REALTIME) > deadline) {
-             error_setg(errp, "Timeout while waiting for device to start (%"
--- 
-2.26.2
 
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
+
+-- PMM
 
