@@ -2,87 +2,87 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08F73C43463
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82535C43464
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:48:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85ACC20EDD
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:47:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 10E7420EDD
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:48:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E1CjE783"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85ACC20EDD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gwYzEgYd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10E7420EDD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKKIM-00053D-L3
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 07:47:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45950)
+	id 1kKKId-0005an-5H
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 07:48:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46252)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kKKG3-0002st-Oo
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 07:45:25 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35346)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kKKFz-0002Zd-UR
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 07:45:22 -0400
-Received: by mail-ot1-x343.google.com with SMTP id o6so12035730ota.2
- for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 04:45:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=JMmm8TGPn//jd5jY6m0a826oipVywIyf/+rAMPgzmhY=;
- b=E1CjE783yBqOVFbA7nfNzhoK068a9Bua+lm14hHj6GfJz2ivyylrxyoL+0kj0ND3iK
- ipYZC2AXgxyBT0dMwjZ2OK1CT51bIox0/t/8lb3wC999bbZNpVyP69gtXgy+iRWxc75Y
- UaZDYk+c71MuzKKWLrnEJ7+0P6FekD7RDHuWQMPcX9tkRPv4s3e8impRm8Rv2JqgF1QV
- DK7BTLJcgehNiq/6ZeJEmYrzEmfUG04+/QRsceBx7+3mrNBF8i2EOVuoS00Ecaa3V6ZQ
- cGb8ZiTrwn0H2yXKGNdvzbggpBo3ZBk/7Zc6EDCAaJLJemswzGF090qu8EFBzKQkvjZd
- eLBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=JMmm8TGPn//jd5jY6m0a826oipVywIyf/+rAMPgzmhY=;
- b=USiqFDhh3lc8Hyze1RYBPhAJdr6pH3r3KoDvC7yRSWmNpwzMCDJRpWQxpvR4QwFSi7
- 0Ep7kuFemW6yid1jkVvXx2JOSLDWxQnbzVGH+nhHtkSBllGH++WHET6EcE44z6ChtHP8
- Hj7vL9A4nvgDikjcZxeB0dOMKrMx2Sctmi869khswh+pVLbIDypYB82YMBAyrAaKRMw+
- 1ywtdfC55kciMwfMW2rIS9JnWsm/JltiuSVg1F1oXQeM7FR3DeHXji1phgncqgq/Jp/w
- 1R9fHReEHdBCDQBD9/j6BvqLkBM68hYHVZghAZdbfquXkGo4HjebKs6XL1AXOePEJeO4
- 7UHQ==
-X-Gm-Message-State: AOAM532LGnWn/o0jqiTiZsqskqFdV9en3sD42eFXEuH/aKK9GQlX1PQA
- nB0oMEcmE+iWZjDHjjyHwKPt8tb8QE7J8unHHtI=
-X-Google-Smtp-Source: ABdhPJzkJeC8u4ooJFTQ1jmjg/ogq7a4ZYsHt+9WvC9+NVvl/uQE4JCTwExhCLuaPMxwd4+ez3c3AE22A36bcARU+xI=
-X-Received: by 2002:a05:6830:610:: with SMTP id
- w16mr28975320oti.353.1600688718672; 
- Mon, 21 Sep 2020 04:45:18 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kKKGt-0003tV-PY
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 07:46:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43432)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kKKGr-0002rx-L4
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 07:46:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600688772;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=njt5GKwNwD3br/ho+W/vjGBbfFj+3zSgM3djLXGwuH8=;
+ b=gwYzEgYdwcqAbEfeISwaNtFtRvbUlfiAJf8TwCknRE5LX1xHL2pRSRm/zK70YDUpoGtX3Z
+ vmYqKDu0KD1C2Z86CVvlQwCUpztFcmEqH2xwlW7ooBttyHE1rNCh67YIlM2r/2TmApxSZI
+ v7QATxULeibVqYyN8FJ0L65ZOUtrujI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-19-Tl660fxoNx-PeF0qVNjBeA-1; Mon, 21 Sep 2020 07:46:08 -0400
+X-MC-Unique: Tl660fxoNx-PeF0qVNjBeA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 67EF281C478;
+ Mon, 21 Sep 2020 11:46:07 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3153073688;
+ Mon, 21 Sep 2020 11:46:03 +0000 (UTC)
+Date: Mon, 21 Sep 2020 13:46:01 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH v5 00/10] x86: fix cpu hotplug with secure boot
+Message-ID: <20200921134601.55d12fdc@redhat.com>
+In-Reply-To: <20200907112348.530921-1-imammedo@redhat.com>
+References: <20200907112348.530921-1-imammedo@redhat.com>
 MIME-Version: 1.0
-References: <20200921112913.555392-1-mst@redhat.com>
-In-Reply-To: <20200921112913.555392-1-mst@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Mon, 21 Sep 2020 19:44:42 +0800
-Message-ID: <CAKXe6SLYL0DDWTbPEwa7y47BOpagg8HkUf+nfgzz_3Or_ebUqQ@mail.gmail.com>
-Subject: Re: [PULL v3 00/15] virtio,pc,acpi: fixes, tests
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
- envelope-from=liq3ea@gmail.com; helo=mail-ot1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:43:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,135 +95,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Qemu Developers <qemu-devel@nongnu.org>
+Cc: boris.ostrovsky@oracle.com, lersek@redhat.com, aaron.young@oracle.com,
+ mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Michael S. Tsirkin <mst@redhat.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=8821=E6=
-=97=A5=E5=91=A8=E4=B8=80 =E4=B8=8B=E5=8D=887:30=E5=86=99=E9=81=93=EF=BC=9A
->
-> The following changes since commit 053a4177817db307ec854356e95b5b350800a2=
-16:
->
->   Merge remote-tracking branch 'remotes/philmd-gitlab/tags/fw_cfg-2020091=
-8' into staging (2020-09-18 16:34:26 +0100)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to acbdbd5db6dab68534702987a487360fd8ae02b7:
->
->   virtio-iommu-pci: force virtio version 1 (2020-09-21 06:14:46 -0400)
->
-> ----------------------------------------------------------------
-> virtio,pc,acpi: fixes, tests
->
-> Fixes and tests all over the place.
-> Batch iommu updates for vdpa.
-> Removal of deprecated cpu hotplug commands.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
-> ----------------------------------------------------------------
-> David Hildenbrand (1):
->       pc: fix auto_enable_numa_with_memhp/auto_enable_numa_with_memdev fo=
-r the 5.0 machine
->
-> Dima Stepanov (7):
->       vhost: recheck dev state in the vhost_migration_log routine
->       vhost: check queue state in the vhost_dev_set_log routine
->       tests/qtest/vhost-user-test: prepare the tests for adding new dev c=
-lass
->       tests/qtest/libqos/virtio-blk: add support for vhost-user-blk
->       tests/qtest/vhost-user-test: add support for the vhost-user-blk dev=
-ice
->       tests/qtest/vhost-user-test: add migrate_reconnect test
->       tests/qtest/vhost-user-test: enable the reconnect tests
->
-> Eric Auger (2):
->       virtio-iommu: Check gtrees are non null before destroying them
->       virtio-iommu-pci: force virtio version 1
->
-> Igor Mammedov (1):
->       cphp: remove deprecated cpu-add command(s)
->
-> Jason Wang (3):
->       linux headers: sync to 5.9-rc4
->       vhost: switch to use IOTLB v2 format
->       vhost-vdpa: batch updating IOTLB mappings
->
-> Li Qiang (1):
->       virtio-mem: detach the element from the virtqueue when error occurs
+On Mon,  7 Sep 2020 07:23:38 -0400
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-Hello Michael,
-It seems you lost the virtio-pmem patch.
+> v5:
+>   - fix hotplug on Windows when there is more than 256 possible CPUs
+>     (Windows isn't able to handle VarPackage over 255 elements
+>      so process CPUs in batches)
+>   - fix off-by-one in package length (Laszlo)
+>   - fix not selecting CPU before clearing insert event (Laszlo)
+>   - use aml_lgreater() instead of aml_lnot(aml_equal(num_added_cpus, zero) (Laszlo)
+>   - split 'x68: acpi: trigger SMI before sending hotplug Notify event to OSPM'
+>     in samller chunks (Laszlo)
+>   - fix comment to match spec (Laszlo)
+>   - reorder aml_lor() and aml_land() in header (Laszlo)
+> v4:
+>   - fix 5.2 machine types so they won't apply pc_compat_5_1 (Laszlo)
+> v3:
+>   - rebase on top of "[PATCH v2] hw: add compat machines for 5.2"
+>     so apply that before this patch
+> v2:
+>   - AML: clean is_inserted flag only after SMI callback
+>   - make x-smi-cpu-hotunplug false by default
+>   - massage error hint on not supported unplug
+> v1:
+>   - fix typos and some phrases (Laszlo)
+>   - add unplug check (Laszlo)
+>   - redo AML scan logic to avoid race when adding multiple CPUs
 
-https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg02639.html
+Michael,
 
-Anyway, it can be queued in the next pr.
+just saw your pull request which missed this series.
+Is there any plans to queue it for the next pull request?
 
-Thanks,
-Li Qiang
 
->
->  qapi/machine.json                                  |  24 --
->  include/hw/boards.h                                |   1 -
->  include/hw/i386/pc.h                               |   1 -
->  include/hw/virtio/vhost-backend.h                  |   2 +
->  include/hw/virtio/vhost-user-blk.h                 |  10 +
->  include/hw/virtio/vhost-vdpa.h                     |   1 +
->  include/hw/virtio/vhost.h                          |   1 +
->  include/monitor/hmp.h                              |   1 -
->  include/standard-headers/drm/drm_fourcc.h          | 140 ++++++++++
->  include/standard-headers/linux/ethtool.h           |  87 +++++++
->  include/standard-headers/linux/input-event-codes.h |   3 +-
->  include/standard-headers/linux/vhost_types.h       |  11 +
->  include/standard-headers/linux/virtio_9p.h         |   4 +-
->  include/standard-headers/linux/virtio_blk.h        |  26 +-
->  include/standard-headers/linux/virtio_config.h     |   8 +-
->  include/standard-headers/linux/virtio_console.h    |   8 +-
->  include/standard-headers/linux/virtio_net.h        |   6 +-
->  include/standard-headers/linux/virtio_scsi.h       |  20 +-
->  linux-headers/asm-generic/unistd.h                 |   6 +-
->  linux-headers/asm-mips/unistd_n32.h                |   1 +
->  linux-headers/asm-mips/unistd_n64.h                |   1 +
->  linux-headers/asm-mips/unistd_o32.h                |   1 +
->  linux-headers/asm-powerpc/kvm.h                    |   5 +
->  linux-headers/asm-powerpc/unistd_32.h              |   1 +
->  linux-headers/asm-powerpc/unistd_64.h              |   1 +
->  linux-headers/asm-s390/kvm.h                       |   7 +-
->  linux-headers/asm-s390/unistd_32.h                 |   1 +
->  linux-headers/asm-s390/unistd_64.h                 |   1 +
->  linux-headers/asm-x86/unistd_32.h                  |   1 +
->  linux-headers/asm-x86/unistd_64.h                  |   1 +
->  linux-headers/asm-x86/unistd_x32.h                 |   1 +
->  linux-headers/linux/kvm.h                          |   4 +
->  linux-headers/linux/vfio.h                         |   2 +-
->  linux-headers/linux/vhost.h                        |   2 +
->  hw/block/vhost-user-blk.c                          |  19 +-
->  hw/core/machine-hmp-cmds.c                         |  12 -
->  hw/core/machine-qmp-cmds.c                         |  12 -
->  hw/i386/pc.c                                       |  27 --
->  hw/i386/pc_piix.c                                  |   1 -
->  hw/i386/pc_q35.c                                   |   2 +-
->  hw/s390x/s390-virtio-ccw.c                         |  12 -
->  hw/virtio/vhost-backend.c                          |  88 +++++--
->  hw/virtio/vhost-vdpa.c                             |  66 +++++
->  hw/virtio/vhost.c                                  |  49 +++-
->  hw/virtio/virtio-iommu-pci.c                       |   2 +-
->  hw/virtio/virtio-iommu.c                           |   8 +-
->  hw/virtio/virtio-mem.c                             |   3 +
->  tests/qtest/cpu-plug-test.c                        | 100 +------
->  tests/qtest/libqos/virtio-blk.c                    |  14 +-
->  tests/qtest/test-hmp.c                             |   1 -
->  tests/qtest/vhost-user-test.c                      | 289 +++++++++++++++=
-+++---
->  docs/system/deprecated.rst                         |  25 +-
->  hmp-commands.hx                                    |  15 --
->  53 files changed, 812 insertions(+), 323 deletions(-)
->
->
+
+> CPU hotplug with Secure Boot was not really supported and firmware wasn't aware
+> of hotplugged CPUs (which might lead to guest crashes). During 4.2 we introduced
+> locked SMI handler RAM arrea to make sure that guest OS wasn't able to inject
+> its own SMI handler and OVMF added initial CPU hotplug support.
+> 
+> This series is QEMU part of that support which lets QMVF tell QEMU that
+> CPU hotplug with SMI broadcast enabled is supported so that QEMU would be able
+> to prevent hotplug in case it's not supported and trigger SMI on hotplug when
+> it's necessary.
+> 
+> Igor Mammedov (10):
+>   x86: lpc9: let firmware negotiate 'CPU hotplug with SMI' features
+>   x86: cpuhp: prevent guest crash on CPU hotplug when broadcast SMI is
+>     in use
+>   x86: cpuhp: refuse cpu hot-unplug request earlier if not supported
+>   acpi: add aml_land() and aml_break() primitives
+>   tests: acpi: mark to be changed tables in
+>     bios-tables-test-allowed-diff
+>   x86: ich9: expose "smi_negotiated_features" as a QOM property
+>   x86: acpi: introduce AcpiPmInfo::smi_on_cpuhp
+>   x86: acpi: introduce the PCI0.SMI0 ACPI device
+>   x68: acpi: trigger SMI before sending hotplug Notify event to OSPM
+>   tests: acpi: update acpi blobs with new AML
+> 
+>  include/hw/acpi/aml-build.h       |   2 +
+>  include/hw/acpi/cpu.h             |   1 +
+>  include/hw/i386/ich9.h            |   4 +
+>  hw/acpi/aml-build.c               |  16 +++
+>  hw/acpi/cpu.c                     | 156 ++++++++++++++++++++++++------
+>  hw/acpi/ich9.c                    |  24 ++++-
+>  hw/i386/acpi-build.c              |  35 ++++++-
+>  hw/i386/pc.c                      |  15 ++-
+>  hw/isa/lpc_ich9.c                 |  16 +++
+>  tests/data/acpi/pc/DSDT           | Bin 4934 -> 5060 bytes
+>  tests/data/acpi/pc/DSDT.acpihmat  | Bin 6258 -> 6385 bytes
+>  tests/data/acpi/pc/DSDT.bridge    | Bin 6793 -> 6919 bytes
+>  tests/data/acpi/pc/DSDT.cphp      | Bin 5397 -> 5524 bytes
+>  tests/data/acpi/pc/DSDT.dimmpxm   | Bin 6587 -> 6714 bytes
+>  tests/data/acpi/pc/DSDT.ipmikcs   | Bin 5006 -> 5132 bytes
+>  tests/data/acpi/pc/DSDT.memhp     | Bin 6293 -> 6419 bytes
+>  tests/data/acpi/pc/DSDT.numamem   | Bin 4940 -> 5066 bytes
+>  tests/data/acpi/q35/DSDT          | Bin 7678 -> 7804 bytes
+>  tests/data/acpi/q35/DSDT.acpihmat | Bin 9002 -> 9129 bytes
+>  tests/data/acpi/q35/DSDT.bridge   | Bin 7695 -> 7821 bytes
+>  tests/data/acpi/q35/DSDT.cphp     | Bin 8141 -> 8268 bytes
+>  tests/data/acpi/q35/DSDT.dimmpxm  | Bin 9331 -> 9458 bytes
+>  tests/data/acpi/q35/DSDT.ipmibt   | Bin 7753 -> 7879 bytes
+>  tests/data/acpi/q35/DSDT.memhp    | Bin 9037 -> 9163 bytes
+>  tests/data/acpi/q35/DSDT.mmio64   | Bin 8808 -> 8934 bytes
+>  tests/data/acpi/q35/DSDT.numamem  | Bin 7684 -> 7810 bytes
+>  tests/data/acpi/q35/DSDT.tis      | Bin 8283 -> 8409 bytes
+>  27 files changed, 239 insertions(+), 30 deletions(-)
+> 
+
 
