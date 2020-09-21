@@ -2,86 +2,86 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38076C43464
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 12:26:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B0C0C43463
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 12:27:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD01A206C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 12:26:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DACC206C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 12:27:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="blBdo5E7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD01A206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e4zwur7r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DACC206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKKu8-0004zO-SU
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 08:26:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56780)
+	id 1kKKuc-0005a4-Ml
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 08:27:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56946)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kKKsL-0003Sl-Fc
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 08:24:57 -0400
-Received: from mail-ej1-x634.google.com ([2a00:1450:4864:20::634]:39297)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kKKsJ-0008Co-Mj
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 08:24:57 -0400
-Received: by mail-ej1-x634.google.com with SMTP id p9so17429978ejf.6
- for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 05:24:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=D9ILPTnTd3evgExyihJg5et0y5smLpdZbD6ijZcbpjw=;
- b=blBdo5E7Z6bhf75xK3/xgi3CROtwjNuwTtkURDh0U/7lJFVuyWV4bfTlZWqRzR/ywW
- HLDRE/+L6IbSIzIdeb2s+wD7a2EIM9+D1a1ynWHG4TBVytx11omlQr94mc6e+LZe3Kfs
- wZV7kNIXLZ/z7UNM5sVDoW5upZjxpi3ltFbkZlszDe+Dh+OkZe6cQD1NJYyO+7m0gXr+
- K/zWmpA7kkseVAzI+f3LHBQtqh2Kxpr6UDUC4S9bBSHN+ty1mwnuHP/Vd4cjy6ZUGLUh
- A2+ovqknwP2x/Z8b8bpW1qBYdirpauZtB/tOwmKrVvH/CgtqS1PLVQGfaGC/JnmWfSyN
- ZNMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=D9ILPTnTd3evgExyihJg5et0y5smLpdZbD6ijZcbpjw=;
- b=L37GNg9YuOM2Y32eFbSPCvLcY131VpkQ4BFyjaKV0uwklmZvt3dDNRq6XW/5UWB6bF
- Hzx3zgylmg/dRQ3qXTcu5sE/xlZVJTZrSgxVXwjuOl5ugv8CWQB3D+yNxN72kZGRWbCa
- Ngm17octmw45JhkiI97lyU2DH7pZZyPdXe9Yy0JGsWdAMQ60VViVQiR/iP/XqSq9HF3O
- 3Px1J25mDodBssg2ETwVa9Cmku2o8FPZbn2HokaYz0M6+OZr1O0enhNxHQCmxeU9BAvW
- 8XYbvFt3Bwz6ME8RROHU0Z6WT+GLctKSv5B30yoLB4gON0IZm2/9g4A8Cpxr2qKGcP+K
- +smw==
-X-Gm-Message-State: AOAM533SRpxsQuplQs7fyXGFpdloXNJ3jFbPe9oqmDfjUJ3GeZk0DjcM
- 8xMt+FoKw1QMPGJc1iDsy258GLYIRoUBqOkB2C+WJg==
-X-Google-Smtp-Source: ABdhPJxGEL4lTmPNz6qcYwXsLLF7/GYkEzX1gmO7Pr+OSORZBNM9avv0HV+upoljS0eZpkQDAUA9fUBnk2t7Ktnk6pQ=
-X-Received: by 2002:a17:906:4a53:: with SMTP id
- a19mr52020223ejv.56.1600691093894; 
- Mon, 21 Sep 2020 05:24:53 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1kKKst-000450-BM
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 08:25:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30737)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1kKKsr-0008Ke-8m
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 08:25:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600691126;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=0fvhbzkZBlah2ukn27UuxBi4t3g/ZUc8XC+naQ5iTZY=;
+ b=e4zwur7r0CYWey0NODg7/rOi9YZ+r3FD0CPes8vXLpHUXBc2/Mq7rNr6pJJ9X/Z5lei/D0
+ NFy1e44y6+nIWvZrJ49FaVZpLeSzVI66pZLrUO92DefvcJxDXYxFsKmp6xRqjRNJb1gzW5
+ qLP0O+UzVvz/1zWtKHnlBIkyymV8MlI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-592-DPSIcjk6MTOpBXI3a1A37A-1; Mon, 21 Sep 2020 08:25:23 -0400
+X-MC-Unique: DPSIcjk6MTOpBXI3a1A37A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C789118BA289;
+ Mon, 21 Sep 2020 12:25:21 +0000 (UTC)
+Received: from steredhat.redhat.com (ovpn-113-150.ams2.redhat.com
+ [10.36.113.150])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2C95E6198B;
+ Mon, 21 Sep 2020 12:25:06 +0000 (UTC)
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org
+Subject: [PATCH v5 0/4] vhost-vsock: force virtio version 1
+Date: Mon, 21 Sep 2020 14:25:02 +0200
+Message-Id: <20200921122506.82515-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-References: <20200918180451.1121055-1-ehabkost@redhat.com>
-In-Reply-To: <20200918180451.1121055-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 Sep 2020 13:24:42 +0100
-Message-ID: <CAFEAcA_mm2rDwQcb4TGp9uws3=r5RwR21pvM63CrUzd7yGfW7w@mail.gmail.com>
-Subject: Re: [PULL 0/2] Python queue, 2020-09-18
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::634;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x634.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=sgarzare@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=sgarzare@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:44:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,42 +94,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Qinghua Cheng <qcheng@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>,
+ Qian Cai <caiqian@redhat.com>, qemu-stable@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 18 Sep 2020 at 19:04, Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> Leftovers from pre-5.1.0 days.
->
-> The following changes since commit 053a4177817db307ec854356e95b5b350800a216:
->
->   Merge remote-tracking branch 'remotes/philmd-gitlab/tags/fw_cfg-20200918' into staging (2020-09-18 16:34:26 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
->
-> for you to fetch changes up to 14f9cec7132bc60f9839048b0a0f8ef7ae9ed64c:
->
->   analyze-migration.py: fix read_migration_debug_json() return type (2020-09-18 14:00:32 -0400)
->
-> ----------------------------------------------------------------
-> Python queue, 2020-09-18
->
-> Alexey Kirillov (1):
->       analyze-migration.py: fix read_migration_debug_json() return type
->
-> Andrey Shinkevich (1):
->       scripts/simplebench: compare write request performance
+v5:
+   - Patch 2: added a phrase about transitional device in the commit
+     message [Cornelia]
+   - All patches reviewed by Cornelia
 
+v4: https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg07353.html
+v3: https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg06549.html
+v2: https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg04437.html
+v1: https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg04373.html
 
-Applied, thanks.
+Recently changes in QEMU 5.1 requires to set 'disable-legacy=on'
+on vhost-vsock-pci and vhost-user-vsock-pci devices:
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
+    $ ./qemu-system-x86_64 ... -device vhost-vsock-pci,guest-cid=5
+        qemu-system-x86_64: -device vhost-vsock-pci,guest-cid=5:
+        device is modern-only, use disable-legacy=on
 
--- PMM
+As discussed with Cornelia [2], this series forces virtio version 1
+to vhost-vsock-pci, vhost-user-vsock-pci, and vhost-vsock-ccw devices.
+
+virtio-vsock was introduced after the release of VIRTIO 1.0 specifications,
+so it should be 'modern-only'.
+In addition Cornelia verified that forcing a legacy mode on vhost-vsock-pci
+device using x86-64 host and s390x guest, so with different endianness,
+produces strange behaviours.
+
+This series should be merged in stable branch since it fixes migration issues
+with QEMU 5.1:
+- we skip legacy support check in the old machine types (< 5.1)
+- we force virtio version 1 for vhost-vsock-pci and vhost-vsock-ccw devices
+  only in the new machine types (>= 5.1). vhost-user-vsock-pci was introduced
+  in 5.1 and doesn't support migration, so we forced virtio version 1 in any
+  case,
+
+Thanks,
+Stefano
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg05312.html
+[2] https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg02515.html
+
+Stefano Garzarella (4):
+  virtio: skip legacy support check on machine types less than 5.1
+  vhost-vsock-pci: force virtio version 1
+  vhost-user-vsock-pci: force virtio version 1
+  vhost-vsock-ccw: force virtio version 1
+
+ include/hw/virtio/virtio.h       |  2 ++
+ hw/core/machine.c                |  1 +
+ hw/s390x/vhost-vsock-ccw.c       | 12 ++++++++++++
+ hw/s390x/virtio-ccw.c            | 15 ++++++++++++---
+ hw/virtio/vhost-user-vsock-pci.c |  4 +++-
+ hw/virtio/vhost-vsock-pci.c      | 10 +++++++++-
+ hw/virtio/virtio-pci.c           | 14 ++++++++++++--
+ hw/virtio/virtio.c               |  7 +++++++
+ 8 files changed, 58 insertions(+), 7 deletions(-)
+
+-- 
+2.26.2
+
 
