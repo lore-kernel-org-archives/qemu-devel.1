@@ -2,91 +2,90 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49DDCC43463
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 09:18:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 257AAC43464
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 09:26:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3B9A214F1
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 09:18:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 697D720BED
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 09:26:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Im7/gVgH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3B9A214F1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hyz2BMMY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 697D720BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKHxR-0000gZ-Je
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 05:18:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37736)
+	id 1kKI5L-0003eB-9X
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 05:26:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39540)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kKHvs-00086r-Ph
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 05:16:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44603
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kKI4d-00039p-4x
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 05:25:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34990)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kKHvq-0008If-Sh
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 05:16:24 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kKI4b-0000wP-AX
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 05:25:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600679781;
+ s=mimecast20190719; t=1600680324;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=q4DLeSX4c4qeoNRuPbh+Lob+ar95x/GhSFvR/Wl8UFQ=;
- b=Im7/gVgHZ7BIHXUz0Nta6bAe0H8OT02nXT24wI8aeTDdDuNLLFGwvO/K8nlLfF8NAmkl8z
- eY9iYNk2EGH3sohZ9uK64VMe6EuG0w7BFntJ8fFAnse6eFbf+oF1IAq4X9QnpthcbzzLFB
- 7PGtMfTggtDAsc0fgTpkTzz+eSIf8x0=
+ bh=gpfHcTNgr2JhEmkpAE2KDrUzkB6fU6zQgrW+S2qvNgQ=;
+ b=hyz2BMMYzlV7GYmoziBlC70ngxqOF4n4IJoPDo11o8WlZhioydOiuyYbT1NjB8cu6S1MzN
+ 1NHSwePAoXbrBiO/LAuLu+xWWLav2s7Ja+hrbnG+Iyy6V8f2qD6Zovn2CfiflRNh18yE0U
+ ux/JYmt5/k8+615nTqm1UvbmqHkYU3s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-554-qDWsSJ0cNe6Z0oalc0x0XA-1; Mon, 21 Sep 2020 05:16:19 -0400
-X-MC-Unique: qDWsSJ0cNe6Z0oalc0x0XA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-100-F1jYJVgTPgqkL1n5xMdS7A-1; Mon, 21 Sep 2020 05:25:22 -0400
+X-MC-Unique: F1jYJVgTPgqkL1n5xMdS7A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B167818C520D;
- Mon, 21 Sep 2020 09:16:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E76F1005E5B;
+ Mon, 21 Sep 2020 09:25:21 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
  [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 32CEB26359;
- Mon, 21 Sep 2020 09:16:12 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7D92455768;
+ Mon, 21 Sep 2020 09:25:20 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id BBD5B1132E9A; Mon, 21 Sep 2020 11:16:10 +0200 (CEST)
+ id AB3111132E9A; Mon, 21 Sep 2020 11:25:18 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: marcandre.lureau@redhat.com
-Subject: Re: [PATCH] PoC: Rust binding for QAPI (qemu-ga only, for now)
-References: <20200910174850.716104-1-marcandre.lureau@redhat.com>
-Date: Mon, 21 Sep 2020 11:16:10 +0200
-In-Reply-To: <20200910174850.716104-1-marcandre.lureau@redhat.com> (marcandre
- lureau's message of "Thu, 10 Sep 2020 21:48:50 +0400")
-Message-ID: <87mu1j8p7p.fsf@dusky.pond.sub.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Subject: Re: [PATCH 4/6] sparc32-ledma: don't reference nd_table directly
+ within the device
+References: <20200920082018.16135-1-mark.cave-ayland@ilande.co.uk>
+ <20200920082018.16135-5-mark.cave-ayland@ilande.co.uk>
+Date: Mon, 21 Sep 2020 11:25:18 +0200
+In-Reply-To: <20200920082018.16135-5-mark.cave-ayland@ilande.co.uk> (Mark
+ Cave-Ayland's message of "Sun, 20 Sep 2020 09:20:16 +0100")
+Message-ID: <87imc78osh.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 04:38:52
+Content-Type: text/plain
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:44:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.501,
+X-Spam_score_int: -45
+X-Spam_score: -4.6
+X-Spam_bar: ----
+X-Spam_report: (-4.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.501,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,97 +98,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, slp@redhat.com, stefanha@gmail.com,
- qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com,
- jsnow@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, atar4qemu@gmail.com,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-marcandre.lureau@redhat.com writes:
+Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
 
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Instead use qdev_set_nic_properties() to configure the on-board NIC at the
+> sun4m machine level.
 >
-> Hi,
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  hw/dma/sparc32_dma.c |  5 -----
+>  hw/sparc/sun4m.c     | 21 +++++++++++++--------
+>  2 files changed, 13 insertions(+), 13 deletions(-)
 >
-> Among the QEMU developers, there is a desire to use Rust. (see previous
-> thread from Stefan "Why QEMU should move from C to Rust", the rust-vmm
-> related projects and other experiments).
->
-> Thanks to our QAPI type system and the associate code generator, it is
-> relatively straightforward to create Rust bindings for the generated C
-> types (also called sys/ffi binding) and functions. (rust-bindgen could
-> probably do a similar job, but it would probably bring other issues).
-> This provides an important internal API already.
->
-> Slightly more complicated is to expose a Rust API for those, and provide
-> convenient conversions C<->Rust. Taking inspiration from glib-rs
-> binding, I implemented a simplified version of the FromGlib/ToGlib
-> traits, with simpler ownership model, sufficient for QAPI needs.
->
-> The usage is relatively simple:
->
-> - from_qemu_none(ptr: *const sys::P) -> T
->   Return a Rust type T for a const ffi pointer P.
->
-> - from_qemu_full(ptr: *mut sys::P) -> T
->   Return a Rust type T for a ffi pointer P, taking ownership.
->
-> - T::to_qemu_none() -> Stash<P>
->   Returns a borrowed ffi pointer P (using a Stash to destroy "glue"
->   storage data, if any).
->
-> - T::to_qemu_full() -> P
->   Returns a ffi pointer P. (P resources are leaked/passed to C/ffi)
->
-> With those traits, it's relatively easy to implement the QMP callbacks.
-> With enough interest, we could eventually start rewriting QGA in
-> Rust, as it is a simple service. See qga/qmp.rs for some examples.
-> We could also try to tackle qemu itself.
+> diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
+> index 2cbe331959..b643b413c5 100644
+> --- a/hw/dma/sparc32_dma.c
+> +++ b/hw/dma/sparc32_dma.c
+> @@ -342,12 +342,7 @@ static void sparc32_ledma_device_realize(DeviceState *dev, Error **errp)
+>  {
+>      LEDMADeviceState *s = SPARC32_LEDMA_DEVICE(dev);
+>      SysBusPCNetState *lance = SYSBUS_PCNET(&s->lance);
+> -    NICInfo *nd = &nd_table[0];
+>  
+> -    /* FIXME use qdev NIC properties instead of nd_table[] */
+> -    qemu_check_nic_model(nd, TYPE_LANCE);
+> -
+> -    qdev_set_nic_properties(DEVICE(lance), nd);
+>      object_property_set_link(OBJECT(lance), "dma", OBJECT(dev), &error_abort);
+>      sysbus_realize(SYS_BUS_DEVICE(lance), &error_fatal);
+>  }
+> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+> index 947b69d159..ed5f3ccd9f 100644
+> --- a/hw/sparc/sun4m.c
+> +++ b/hw/sparc/sun4m.c
+> @@ -319,7 +319,7 @@ static void *iommu_init(hwaddr addr, uint32_t version, qemu_irq irq)
+>  
+>  static void *sparc32_dma_init(hwaddr dma_base,
+>                                hwaddr esp_base, qemu_irq espdma_irq,
+> -                              hwaddr le_base, qemu_irq ledma_irq)
+> +                              hwaddr le_base, qemu_irq ledma_irq, NICInfo *nd)
+>  {
+>      DeviceState *dma;
+>      ESPDMADeviceState *espdma;
+> @@ -328,16 +328,11 @@ static void *sparc32_dma_init(hwaddr dma_base,
+>      SysBusPCNetState *lance;
+>  
+>      dma = qdev_new(TYPE_SPARC32_DMA);
+> -    sysbus_realize_and_unref(SYS_BUS_DEVICE(dma), &error_fatal);
+> -    sysbus_mmio_map(SYS_BUS_DEVICE(dma), 0, dma_base);
+> -
+>      espdma = SPARC32_ESPDMA_DEVICE(object_resolve_path_component(
+>                                     OBJECT(dma), "espdma"));
+>      sysbus_connect_irq(SYS_BUS_DEVICE(espdma), 0, espdma_irq);
+>  
+>      esp = ESP(object_resolve_path_component(OBJECT(espdma), "esp"));
+> -    sysbus_mmio_map(SYS_BUS_DEVICE(esp), 0, esp_base);
+> -    scsi_bus_legacy_handle_cmdline(&esp->esp.bus);
+>  
+>      ledma = SPARC32_LEDMA_DEVICE(object_resolve_path_component(
+>                                   OBJECT(dma), "ledma"));
+> @@ -345,6 +340,14 @@ static void *sparc32_dma_init(hwaddr dma_base,
+>  
+>      lance = SYSBUS_PCNET(object_resolve_path_component(
+>                           OBJECT(ledma), "lance"));
+> +    qdev_set_nic_properties(DEVICE(lance), nd);
+> +
+> +    sysbus_realize_and_unref(SYS_BUS_DEVICE(dma), &error_fatal);
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(dma), 0, dma_base);
+> +
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(esp), 0, esp_base);
+> +    scsi_bus_legacy_handle_cmdline(&esp->esp.bus);
+> +
+>      sysbus_mmio_map(SYS_BUS_DEVICE(lance), 0, le_base);
+>  
+>      return dma;
 
-Up to here, you're talking about *internal* interfaces.  Correct?
+You delay a bit of work on devices @dma and @esp.  Can you explain why?
 
-Your motivation is enabling use of Rust in QEMU.  Correct?
-
-> Finally, given that the QAPI types are easy to serialize, it was simple
-> to use "serde" on them, and provide a D-Bus interface for QMP with zbus.
-> (a similar approach could probably be taken for other protocols, that
-> could be dynamically loaded... anyone like protobuf better?)
-
-QMP is an *external* interface.
-
-It supports compatible evolution: we can make certain kinds of changes
-without affecting clients.  These include:
-
-* Adding optional arguments
-
-* Adding results
-
-* Adding values to an enumeration type, branches to a union or
-  alternate
-
-* Reordering members of enumerations, structs, unions
-
-* Turning an argument type into an alternate with the old type as branch
-
-We've made use of this extensively.  See also
-docs/devel/qapi-code-gen.txt section "Compatibility considerations."
-
-How do such changes affect clients of the proposed D-Bus interface?
-
-> This PoC modifies qemu-ga to provide the interface on the session bus:
-> $ qga/qemu-ga -m unix-listen -p /tmp/qga.sock -t /tmp -v
-> $ busctl --user introspect org.qemu.qga /org/qemu/qga org.qemu.QgaQapi
-> ...
-> $ busctl --user call org.qemu.qga /org/qemu/qga org.qemu.QgaQapi
-> GuestSetVcpus aa\{sv\} 1 2 logical-id x 0 online b 1
-> ...
->
-> Note: the generated code doesn't work with the qemu schema, there is a
-> couple of fixme/todo left.
->
-> Shameful pain point: meson & cargo don't play nicely together.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> @@ -854,6 +857,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+>      unsigned int max_cpus = machine->smp.max_cpus;
+>      Object *ram_memdev = object_resolve_path_type(machine->ram_memdev_id,
+>                                                    TYPE_MEMORY_BACKEND, NULL);
+> +    NICInfo *nd = &nd_table[0];
+>  
+>      if (machine->ram_size > hwdef->max_mem) {
+>          error_report("Too much memory for this machine: %" PRId64 ","
+> @@ -914,9 +918,10 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+>                          hwdef->iommu_pad_base, hwdef->iommu_pad_len);
+>      }
+>  
+> +    qemu_check_nic_model(nd, TYPE_LANCE);
+>      sparc32_dma_init(hwdef->dma_base,
+>                       hwdef->esp_base, slavio_irq[18],
+> -                     hwdef->le_base, slavio_irq[16]);
+> +                     hwdef->le_base, slavio_irq[16], nd);
+>  
+>      if (graphic_depth != 8 && graphic_depth != 24) {
+>          error_report("Unsupported depth: %d", graphic_depth);
+> @@ -1047,7 +1052,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+>                                      machine->initrd_filename,
+>                                      machine->ram_size, &initrd_size);
+>  
+> -    nvram_init(nvram, (uint8_t *)&nd_table[0].macaddr, machine->kernel_cmdline,
+> +    nvram_init(nvram, (uint8_t *)&nd->macaddr, machine->kernel_cmdline,
+>                 machine->boot_order, machine->ram_size, kernel_size,
+>                 graphic_width, graphic_height, graphic_depth,
+>                 hwdef->nvram_machine_id, "Sun4m");
 
 
