@@ -2,89 +2,63 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B26B1C43469
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 14:43:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73A52C43465
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 14:44:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E5FE235FC
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 14:43:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="emgf+YMr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E5FE235FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E67F12076E
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 14:44:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E67F12076E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKN2g-0005Wh-5p
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 10:43:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52422)
+	id 1kKN3B-0005wi-WB
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 10:44:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kKN1U-0004Ni-TT
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 10:42:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41738)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kKN1S-0005tF-UM
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 10:42:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600699350;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=xoMAFBwb8ptKT6pJ90YzaJr1+KGeRrVDE4llFWuUbuE=;
- b=emgf+YMr1kG6FiOtg/66k/1C7zzKrJJZVd+4GApyexlVB8eggHAK6k53MUiCsODmajZ4O+
- pN1+hqlppCYfUVfIadP1yy6cet+SxfYpi0AILP9athzWAEdR7cPEO4khUQH86kvxB8nj9u
- ZRQOwf7aLwmTX1d6TmPBcjwenC8hFcE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-520-3RemWG0HMmiD6-sZ0D8sUQ-1; Mon, 21 Sep 2020 10:42:27 -0400
-X-MC-Unique: 3RemWG0HMmiD6-sZ0D8sUQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E018010082E5;
- Mon, 21 Sep 2020 14:42:26 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
- [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B337478823;
- Mon, 21 Sep 2020 14:42:26 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 4F5771132E9A; Mon, 21 Sep 2020 16:42:25 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v5 8/8] qapi: New -compat deprecated-input=crash
-References: <20200914084802.4185028-1-armbru@redhat.com>
- <20200914084802.4185028-9-armbru@redhat.com>
- <e1c94dc7-b97f-4919-0210-fe3c0e19e93f@redhat.com>
-Date: Mon, 21 Sep 2020 16:42:25 +0200
-In-Reply-To: <e1c94dc7-b97f-4919-0210-fe3c0e19e93f@redhat.com> (Eric Blake's
- message of "Mon, 14 Sep 2020 10:58:55 -0500")
-Message-ID: <87d02f199q.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kKN1s-0004jH-2e
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 10:42:56 -0400
+Received: from relay68.bu.edu ([128.197.228.73]:52948)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kKN1o-0005vL-Rz
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 10:42:55 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 08LEfdj4011443
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Mon, 21 Sep 2020 10:41:44 -0400
+Date: Mon, 21 Sep 2020 10:41:39 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH v3 03/16] fuzz: Add PCI features to the general fuzzer
+Message-ID: <20200921144139.r424ql3ck2dvih2m@mozz.bu.edu>
+References: <20200921022506.873303-1-alxndr@bu.edu>
+ <20200921022506.873303-4-alxndr@bu.edu>
+ <407cc86f-a705-115d-dd75-2d1c899811cd@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:44:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <407cc86f-a705-115d-dd75-2d1c899811cd@redhat.com>
+Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
+ helo=relay68.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 10:34:35
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -25
+X-Spam_score: -2.6
+X-Spam_bar: --
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,44 +71,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org,
- mdroth@linux.vnet.ibm.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org, darren.kenny@oracle.com, bsd@redhat.com,
+ stefanha@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
-
-> On 9/14/20 3:48 AM, Markus Armbruster wrote:
->> Policy "crash" calls abort() when deprecated input is received.
->> Bugs in integration tests may mask the error from policy "reject".
->> Provide a larger hammer: crash outright.  Masking that seems unlikely.
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
+On 200921 0744, Philippe Mathieu-Daudé wrote:
+> On 9/21/20 4:24 AM, Alexander Bulekov wrote:
+> > This patch compares TYPE_PCI_DEVICE objects against the user-provided
+> > matching pattern. If there is a match, we use some hacks and leverage
+> > QOS to map each possible BAR for that device. Now fuzzed inputs might be
+> > converted to pci_read/write commands which target specific. This means
+> > that we can fuzz a particular device's PCI configuration space,
+> > 
+> > Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+> > Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+> > ---
+> >  tests/qtest/fuzz/general_fuzz.c | 81 +++++++++++++++++++++++++++++++++
+> >  1 file changed, 81 insertions(+)
+> > 
+> > diff --git a/tests/qtest/fuzz/general_fuzz.c b/tests/qtest/fuzz/general_fuzz.c
+> > index bf75b215ca..7c4c1398a7 100644
+> > --- a/tests/qtest/fuzz/general_fuzz.c
+> > +++ b/tests/qtest/fuzz/general_fuzz.c
+> > @@ -24,6 +24,7 @@
+> >  #include "exec/ramblock.h"
+> >  #include "exec/address-spaces.h"
+> >  #include "hw/qdev-core.h"
+> > +#include "hw/pci/pci.h"
+> >  
+> >  /*
+> >   * SEPARATOR is used to separate "operations" in the fuzz input
+> > @@ -35,12 +36,17 @@ enum cmds {
+> >      OP_OUT,
+> >      OP_READ,
+> >      OP_WRITE,
+> > +    OP_PCI_READ,
+> > +    OP_PCI_WRITE,
+> >      OP_CLOCK_STEP,
+> >  };
+> 
+> As there is no versioning, does adding new commands
+> invalidates the corpus?
+> 
+> [...]
 >
->> +++ b/qemu-options.hx
->> @@ -3392,7 +3392,7 @@ DEFHEADING()
->>   DEFHEADING(Debug/Expert options:)
->>     DEF("compat", HAS_ARG, QEMU_OPTION_compat,
->> -    "-compat [deprecated-input=accept|reject][,deprecated-output=accept|hide]\n"
->> +    "-compat [deprecated-input=accept|reject|crash][,deprecated-output=accept|hide]\n"
->>       "                Policy for handling deprecated management interfaces\n",
->>       QEMU_ARCH_ALL)
->>   SRST
->> @@ -3403,6 +3403,8 @@ SRST
->>           Accept deprecated commands and arguments
->>       ``deprecated-input=reject``
->>           Reject deprecated commands and arguments
->> +    ``deprecated-input=crash``
->> +        Crash on deprecated command
->
-> Missing 'and arguments'?
 
-Yes.
+Yes. I think there are a few approaches:
+1.) Write a separate OP parser/converter in python that will convert the
+corpus to a newer version. Each time we change the code:
+    a. write a converter
+    b. download corpus from oss-fuzz
+    c. convert the corpus
+    d. commit new corpus to the seed corpus repo (we don't have one
+    right now)
+2.) Same as (1) but instead of corpus_v1 -> corpus_v2, 
+try to convert corpus_v1 -> qtest commands -> corpus_v2
+3.) Use 1st byte to pick corpus format version. I think this could lead
+to a lot of code-bloat and could hurt fuzzing performance (fuzzer
+mutations could make new inputs that still use old corpus versions)...
+4.) Do nothing and wait..
 
-> Otherwise,
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
-
+Do you have any suggestion?
+-Alex
 
