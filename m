@@ -2,74 +2,87 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F702C43466
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 15:34:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28D48C43465
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 15:34:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F201C20874
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 15:34:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E31320874
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 15:34:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="uEMKUZGi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F201C20874
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AEwq9Mp5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E31320874
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKNpw-0006wN-Qd
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 11:34:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38356)
+	id 1kKNq2-0007cg-Ft
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 11:34:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39702)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc.michel@greensocs.com>)
- id 1kKNix-0004Bj-CB; Mon, 21 Sep 2020 11:27:28 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:57660)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc.michel@greensocs.com>)
- id 1kKNir-0004rn-Hm; Mon, 21 Sep 2020 11:27:26 -0400
-Received: from [172.17.10.14] (unknown [172.17.10.14])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 0D19C21CBD;
- Mon, 21 Sep 2020 15:27:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1600702035;
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kKNoR-0006su-KO
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 11:33:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21561
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kKNoL-0005pl-92
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 11:33:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600702379;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hxJ4PdvFYAs4L5U0XHX5tLQsiwbC0irTnH3fLQiq3Cw=;
- b=uEMKUZGihkqoMNTwjD/WPgqYo+VxxQ6heU+/YXEROCjpcUufzRhdaF0MuiTwKUwPeRd5xo
- T+4VedncEwNo4m/VFhjfx5ZegPQ1yKvnuchwgRxp+crd8d2eYfEGhjiYEaWVRkJsvzJ/nP
- F0V8lH0KSoxPTHiHcl7JelzlJ3ogLhs=
-Subject: Re: [PATCH 1/3] hw/arm/raspi: Define various blocks base addresses
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200921034729.432931-1-f4bug@amsat.org>
- <20200921034729.432931-2-f4bug@amsat.org>
-From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <63cb517b-87a4-b6a3-a895-f778e3d1f37f@greensocs.com>
-Date: Mon, 21 Sep 2020 17:28:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ bh=ppMqlyz29WQ+6okIWu2qVq1vAw0JRtCNW4i0J0v/ANw=;
+ b=AEwq9Mp5nTciB4Uim7JIi8W8kqsZRwdAYAKI7h6wPUT/JSXhicbC70K2Kei99Ufrcmo+2u
+ HJbeK/ISarweT+EKkeh90zrJttovnfTNOZyUMjvuk/bF7HWZ7rsyew7wU9Fz++nMmKNZwF
+ 3guZC+Xo2uXoyb73RBgyir2zzoB6iII=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-499-RGukSrMvN1KslNYISg7Mvw-1; Mon, 21 Sep 2020 11:32:55 -0400
+X-MC-Unique: RGukSrMvN1KslNYISg7Mvw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 76B16186DD3C;
+ Mon, 21 Sep 2020 15:32:54 +0000 (UTC)
+Received: from work-vm (ovpn-114-207.ams2.redhat.com [10.36.114.207])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 920EB78823;
+ Mon, 21 Sep 2020 15:32:46 +0000 (UTC)
+Date: Mon, 21 Sep 2020 16:32:43 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Vivek Goyal <vgoyal@redhat.com>
+Subject: Re: tools/virtiofs: Multi threading seems to hurt performance
+Message-ID: <20200921153243.GK3221@work-vm>
+References: <20200918213436.GA3520@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200921034729.432931-2-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=5.135.226.135;
- envelope-from=luc.michel@greensocs.com; helo=beetle.greensocs.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 11:27:16
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200918213436.GA3520@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 07:01:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,123 +95,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Paul Zimmerman <pauldzim@gmail.com>
+Cc: jose.carlos.venegas.munoz@intel.com, qemu-devel@nongnu.org,
+ cdupontd@redhat.com, virtio-fs-list <virtio-fs@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, archana.m.shinde@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/21/20 5:47 AM, Philippe Mathieu-Daudé wrote:
-> The Raspberry firmware is closed-source. While running it, it
-> accesses various I/O registers. Logging these accesses as UNIMP
-> (unimplemented) help to understand what the firmware is doing
-> (ideally we want it able to boot a Linux kernel).
-> 
-> Document various blocks we might use later.
-> 
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Hi,
+  I've been doing some of my own perf tests and I think I agree
+about the thread pool size;  my test is a kernel build
+and I've tried a bunch of different options.
 
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
+My config:
+  Host: 16 core AMD EPYC (32 thread), 128G RAM,
+     5.9.0-rc4 kernel, rhel 8.2ish userspace.
+  5.1.0 qemu/virtiofsd built from git.
+  Guest: Fedora 32 from cloud image with just enough extra installed for
+a kernel build.
 
-> ---
->   include/hw/arm/raspi_platform.h | 51 +++++++++++++++++++++++++++------
->   1 file changed, 43 insertions(+), 8 deletions(-)
-> 
-> diff --git a/include/hw/arm/raspi_platform.h b/include/hw/arm/raspi_platform.h
-> index 61b04a1bd4a..c7f50b260f6 100644
-> --- a/include/hw/arm/raspi_platform.h
-> +++ b/include/hw/arm/raspi_platform.h
-> @@ -20,20 +20,29 @@
->    * You should have received a copy of the GNU General Public License
->    * along with this program; if not, write to the Free Software
->    * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-> + *
-> + * Various undocumented addresses and names come from Herman Hermitage's VC4
-> + * documentation:
-> + * https://github.com/hermanhermitage/videocoreiv/wiki/MMIO-Register-map
->    */
->   
->   #ifndef HW_ARM_RASPI_PLATFORM_H
->   #define HW_ARM_RASPI_PLATFORM_H
->   
->   #define MSYNC_OFFSET            0x0000   /* Multicore Sync Block */
-> -#define IC0_OFFSET              0x2000
-> +#define CCPT_OFFSET             0x1000   /* Compact Camera Port 2 TX */
-> +#define INTE_OFFSET             0x2000   /* VC Interrupt controller */
->   #define ST_OFFSET               0x3000   /* System Timer */
-> +#define TXP_OFFSET              0x4000   /* Transposer */
-> +#define JPEG_OFFSET             0x5000
->   #define MPHI_OFFSET             0x6000   /* Message-based Parallel Host Intf. */
->   #define DMA_OFFSET              0x7000   /* DMA controller, channels 0-14 */
-> -#define ARM_OFFSET              0xB000   /* BCM2708 ARM control block */
-> +#define ARBA_OFFSET             0x9000
-> +#define BRDG_OFFSET             0xa000
-> +#define ARM_OFFSET              0xB000   /* ARM control block */
->   #define ARMCTRL_OFFSET          (ARM_OFFSET + 0x000)
->   #define ARMCTRL_IC_OFFSET       (ARM_OFFSET + 0x200) /* Interrupt controller */
-> -#define ARMCTRL_TIMER0_1_OFFSET (ARM_OFFSET + 0x400) /* Timer 0 and 1 */
-> +#define ARMCTRL_TIMER0_1_OFFSET (ARM_OFFSET + 0x400) /* Timer 0 and 1 (SP804) */
->   #define ARMCTRL_0_SBM_OFFSET    (ARM_OFFSET + 0x800) /* User 0 (ARM) Semaphores
->                                                         * Doorbells & Mailboxes */
->   #define CPRMAN_OFFSET           0x100000 /* Power Management, Watchdog */
-> @@ -42,24 +51,50 @@
->   #define AVS_OFFSET              0x103000 /* Audio Video Standard */
->   #define RNG_OFFSET              0x104000
->   #define GPIO_OFFSET             0x200000
-> -#define UART0_OFFSET            0x201000
-> -#define MMCI0_OFFSET            0x202000
-> -#define I2S_OFFSET              0x203000
-> -#define SPI0_OFFSET             0x204000
-> +#define UART0_OFFSET            0x201000 /* PL011 */
-> +#define MMCI0_OFFSET            0x202000 /* Legacy MMC */
-> +#define I2S_OFFSET              0x203000 /* PCM */
-> +#define SPI0_OFFSET             0x204000 /* SPI master */
->   #define BSC0_OFFSET             0x205000 /* BSC0 I2C/TWI */
-> +#define PIXV0_OFFSET            0x206000
-> +#define PIXV1_OFFSET            0x207000
-> +#define DPI_OFFSET              0x208000
-> +#define DSI0_OFFSET             0x209000 /* Display Serial Interface */
-> +#define PWM_OFFSET              0x20c000
-> +#define PERM_OFFSET             0x20d000
-> +#define TEC_OFFSET              0x20e000
->   #define OTP_OFFSET              0x20f000
-> +#define SLIM_OFFSET             0x210000 /* SLIMbus */
-> +#define CPG_OFFSET              0x211000
->   #define THERMAL_OFFSET          0x212000
-> -#define BSC_SL_OFFSET           0x214000 /* SPI slave */
-> +#define AVSP_OFFSET             0x213000
-> +#define BSC_SL_OFFSET           0x214000 /* SPI slave (bootrom) */
->   #define AUX_OFFSET              0x215000 /* AUX: UART1/SPI1/SPI2 */
->   #define EMMC1_OFFSET            0x300000
-> +#define EMMC2_OFFSET            0x340000
-> +#define HVS_OFFSET              0x400000
->   #define SMI_OFFSET              0x600000
-> +#define DSI1_OFFSET             0x700000
-> +#define UCAM_OFFSET             0x800000
-> +#define CMI_OFFSET              0x802000
->   #define BSC1_OFFSET             0x804000 /* BSC1 I2C/TWI */
->   #define BSC2_OFFSET             0x805000 /* BSC2 I2C/TWI */
-> +#define VECA_OFFSET             0x806000
-> +#define PIXV2_OFFSET            0x807000
-> +#define HDMI_OFFSET             0x808000
-> +#define HDCP_OFFSET             0x809000
-> +#define ARBR0_OFFSET            0x80a000
->   #define DBUS_OFFSET             0x900000
->   #define AVE0_OFFSET             0x910000
->   #define USB_OTG_OFFSET          0x980000 /* DTC_OTG USB controller */
-> +#define V3D_OFFSET              0xc00000
->   #define SDRAMC_OFFSET           0xe00000
-> +#define L2CC_OFFSET             0xe01000 /* Level 2 Cache controller */
-> +#define L1CC_OFFSET             0xe02000 /* Level 1 Cache controller */
-> +#define ARBR1_OFFSET            0xe04000
->   #define DMA15_OFFSET            0xE05000 /* DMA controller, channel 15 */
-> +#define DCRC_OFFSET             0xe07000
-> +#define AXIP_OFFSET             0xe08000
->   
->   /* GPU interrupts */
->   #define INTERRUPT_TIMER0               0
-> 
+  git cloned and checkout v5.8 of Linux into /dev/shm/linux on the host
+fresh before each test.  Then log into the guest, make defconfig,
+time make -j 16 bzImage,  make clean; time make -j 16 bzImage 
+The numbers below are the 'real' time in the guest from the initial make
+(the subsequent makes dont vary much)
+
+Below are the detauls of what each of these means, but here are the
+numbers first
+
+virtiofsdefault        4m0.978s
+9pdefault              9m41.660s
+virtiofscache=none    10m29.700s
+9pmmappass             9m30.047s
+9pmbigmsize           12m4.208s
+9pmsecnone             9m21.363s
+virtiofscache=noneT1   7m17.494s
+virtiofsdefaultT1      3m43.326s
+
+So the winner there by far is the 'virtiofsdefaultT1' - that's
+the default virtiofs settings, but with --thread-pool-size=1 - so
+yes it gives a small benefit.
+But interestingly the cache=none virtiofs performance is pretty bad,
+but thread-pool-size=1 on that makes a BIG improvement.
+
+
+virtiofsdefault:
+  ./virtiofsd --socket-path=/tmp/vhostqemu -o source=/dev/shm/linux
+  ./x86_64-softmmu/qemu-system-x86_64 -M pc,memory-backend=mem,accel=kvm -smp 8 -cpu host -m 32G,maxmem=64G,slots=1 -object memory-backend-memfd,id=mem,size=32G,share=on -drive if=virtio,file=/home/images/f-32-kernel.qcow2 -nographic -chardev socket,id=char0,path=/tmp/vhostqemu -device vhost-user-fs-pci,queue-size=1024,chardev=char0,tag=kernel
+  mount -t virtiofs kernel /mnt
+
+9pdefault
+  ./x86_64-softmmu/qemu-system-x86_64 -M pc,accel=kvm -smp 8 -cpu host -m 32G -drive if=virtio,file=/home/images/f-32-kernel.qcow2 -nographic -virtfs local,path=/dev/shm/linux,mount_tag=kernel,security_model=passthrough
+  mount -t 9p -o trans=virtio kernel /mnt -oversion=9p2000.L
+
+virtiofscache=none
+  ./virtiofsd --socket-path=/tmp/vhostqemu -o source=/dev/shm/linux -o cache=none
+  ./x86_64-softmmu/qemu-system-x86_64 -M pc,memory-backend=mem,accel=kvm -smp 8 -cpu host -m 32G,maxmem=64G,slots=1 -object memory-backend-memfd,id=mem,size=32G,share=on -drive if=virtio,file=/home/images/f-32-kernel.qcow2 -nographic -chardev socket,id=char0,path=/tmp/vhostqemu -device vhost-user-fs-pci,queue-size=1024,chardev=char0,tag=kernel
+  mount -t virtiofs kernel /mnt
+
+9pmmappass
+  ./x86_64-softmmu/qemu-system-x86_64 -M pc,accel=kvm -smp 8 -cpu host -m 32G -drive if=virtio,file=/home/images/f-32-kernel.qcow2 -nographic -virtfs local,path=/dev/shm/linux,mount_tag=kernel,security_model=passthrough
+  mount -t 9p -o trans=virtio kernel /mnt -oversion=9p2000.L,cache=mmap
+
+9pmbigmsize
+   ./x86_64-softmmu/qemu-system-x86_64 -M pc,accel=kvm -smp 8 -cpu host -m 32G -drive if=virtio,file=/home/images/f-32-kernel.qcow2 -nographic -virtfs local,path=/dev/shm/linux,mount_tag=kernel,security_model=passthrough
+   mount -t 9p -o trans=virtio kernel /mnt -oversion=9p2000.L,cache=mmap,msize=1048576
+
+9pmsecnone
+   ./x86_64-softmmu/qemu-system-x86_64 -M pc,accel=kvm -smp 8 -cpu host -m 32G -drive if=virtio,file=/home/images/f-32-kernel.qcow2 -nographic -virtfs local,path=/dev/shm/linux,mount_tag=kernel,security_model=none
+   mount -t 9p -o trans=virtio kernel /mnt -oversion=9p2000.L
+
+virtiofscache=noneT1
+   ./virtiofsd --socket-path=/tmp/vhostqemu -o source=/dev/shm/linux -o cache=none --thread-pool-size=1
+   mount -t virtiofs kernel /mnt
+
+virtiofsdefaultT1
+   ./virtiofsd --socket-path=/tmp/vhostqemu -o source=/dev/shm/linux --thread-pool-size=1
+    ./x86_64-softmmu/qemu-system-x86_64 -M pc,memory-backend=mem,accel=kvm -smp 8 -cpu host -m 32G,maxmem=64G,slots=1 -object memory-backend-memfd,id=mem,size=32G,share=on -drive if=virtio,file=/home/images/f-32-kernel.qcow2 -nographic -chardev socket,id=char0,path=/tmp/vhostqemu -device vhost-user-fs-pci,queue-size=1024,chardev=char0,tag=kernel
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
