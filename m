@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB163C43463
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 02:32:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C98D6C43463
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 02:32:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38D742078E
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 02:32:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5736B2078E
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 02:32:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="qmZl5XoI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38D742078E
+	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="4Fbg1oiK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5736B2078E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKBcz-0003Sp-7O
-	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 22:32:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41604)
+	id 1kKBd5-0003kM-DF
+	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 22:32:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41504)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kKBWg-0003Rm-IU
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 22:25:58 -0400
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kKBWW-0003BX-8o
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 22:25:48 -0400
 Received: from mail-dm6nam12on2117.outbound.protection.outlook.com
  ([40.107.243.117]:28256 helo=NAM12-DM6-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kKBWe-0000b7-Rx
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 22:25:58 -0400
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kKBWU-0000b7-5B
+ for qemu-devel@nongnu.org; Sun, 20 Sep 2020 22:25:47 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fpdjvad1UUoxuflKjkrnKnq6NsmgPeTTjJjkdU99K6esE1HnFyHcT8kJB6jtHf+gHRaRb2MQnIC666nNLQ1aFBdsiZ68cXC8brI1TGdFdWG9cptKd7uwFQhUUVYBmI+pynz3Johxr2Ueb3UaIJ9vqLzhdW9xpEvnrY52E39JolsPc9843zaF+EdGZW94V8S6d4h14yBu6oWR28Zy7hP8yyAB3zJrapUgw0/5muSvmz+18Ow2cxMVo6jcnPazVk950gq2oolIlmHIRH5Bm1WQsqerXhWnrszIvm7xDts46yuxDQJdFljx0uy8X6F6eqLSoSOxQKb2BfW597DpYULjdw==
+ b=FA7Foc+S48w1lnh9WPhKNGHDvpJpgicLBbF//5Vse41xPpibYTfaZ/KJBOR0tweaxSdKIE7K79PyGIoJgGWxEgx/3wfvzOR2PWAuRFyrw0+jjpNjvLABhDF6MvyMob/CxJHVhVtNpFtZ3wkXQKwdGYDX0ZGH30Xpivl9O4XvM+HFtculGyrZlsIpD2+oiqzEqW0cBF1QW1NEBXnNZ9SE+kwqWU1x8Ikim6/EHAGMOOU2ArflkeGyHdqLJZbHH88yjMIJV5xf6zfGz8qLM28ctJVnPjI8QQaOISYvalPpGUegCeA+Aa2GgWjJfXBpqA3Qkzu2yZg8XT3DSMsBmg2NOw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DTmTlyBJh6n8z64s22Lli8J7bcfVKAeNDxwX97zyLpk=;
- b=RPiHyDNO8eWHe9ke7oG3mmUlcXUi4GN+I06q7supTWRvj+lXMEc1p1L8LlRDH7/7i3nVlf8L++n86m5It5oZwcNI3mAI0CfuQFzVYsYnVxwtDZXRviHbU+c9J8Lym5xXD/jV4V9qs+SyduVg+K93dVcFr48ACsZzvLr6E148/shKGaCHGjpmckvNv2IKhx7X4biZNfXw2SyYLYEQHLoJA56espYouyBt3JVEx+IVMfEY+G6ne5Xye45KZlbUrCmzMRk6drgP1Da7+qugCifHtqYX7LhcBM/Pt3rh4C2JvCcEGPxLMQ8+POrbkpokqsju1KrU/eIjgh/U+vytVzZyFA==
+ bh=P7ascJrHgiZuqYmVrSZhWk6zqYLMFU6jGYbOISteTtk=;
+ b=BBPZTdSwzEgPcs3gR/7NV/mgNthA23ag1sRp07mNOAyrMDx09wVUmyXj3+UUPLTya45Qd955JpBw49EsGMcQX1YLGF2479BTEsGV+21toUS4xyNHIvDGGBVFdNlY70Wp91I/ElXKbo9zDY8goOSBSIdHkJ52OEjn1ByqAkzG3t6ehITgYwfyx022En4M0rIxUvUZI0bZTK9PkW46mMA3oPkltvRaYKL/OgnommjFu8VQstPfgHaBybHLR84xio9iZB5aV7FlJr2l4c3JGC+mI1R13WU96nWszR9/9ilHaI0SRkADaOfWTZuFNyw9kNksiK1SMYljBNDe3aTSx/fjQw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
  header.d=bu.edu; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DTmTlyBJh6n8z64s22Lli8J7bcfVKAeNDxwX97zyLpk=;
- b=qmZl5XoIp2qrcphGSU/Sn5l0VHdr5DYUsouFgZrHOTsmQDdvBj43rlp2Hm9lnutzkq9bmmGs3aDUB98dvTn3TanqC0EmIhbFW6+2juSpcaMkRmWqy5SboaSQAqM20bBcwn8ffIrDIeCPRPyV1HVNjO7qYj2HVefWcfMuuh1vMwA=
+ bh=P7ascJrHgiZuqYmVrSZhWk6zqYLMFU6jGYbOISteTtk=;
+ b=4Fbg1oiKIrD0T8L4mj+buNKoRtDK4l+XBxx7irtQYiHV0W+FtUaP6shzAc4Br8LUXAfDJDYSgil424/s4uBCy3hMzHA9RzADQv3nSNPBxndw8eMwETnUb58oERoUwjNPCit+tZl5vKNxwWEX5WZX94eEd7DG0QszfhPWhBkEPwE=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
  by SN2PR03MB2237.namprd03.prod.outlook.com (2603:10b6:804:e::27) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.11; Mon, 21 Sep
- 2020 02:25:44 +0000
+ 2020 02:25:29 +0000
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::61ae:93a8:b26c:77b8]) by SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::61ae:93a8:b26c:77b8%4]) with mapi id 15.20.3391.024; Mon, 21 Sep 2020
- 02:25:44 +0000
+ 02:25:29 +0000
 From: Alexander Bulekov <alxndr@bu.edu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 13/16] scripts/oss-fuzz: build the general-fuzzer configs
-Date: Sun, 20 Sep 2020 22:25:03 -0400
-Message-Id: <20200921022506.873303-14-alxndr@bu.edu>
+Subject: [PATCH v3 05/16] fuzz: Declare DMA Read callback function
+Date: Sun, 20 Sep 2020 22:24:55 -0400
+Message-Id: <20200921022506.873303-6-alxndr@bu.edu>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200921022506.873303-1-alxndr@bu.edu>
 References: <20200921022506.873303-1-alxndr@bu.edu>
@@ -78,32 +78,32 @@ Received: from stormtrooper.vrmnet (72.93.72.163) by
  BL0PR1501CA0034.namprd15.prod.outlook.com (2603:10b6:207:17::47) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.14 via Frontend
- Transport; Mon, 21 Sep 2020 02:25:41 +0000
+ Transport; Mon, 21 Sep 2020 02:25:27 +0000
 X-Mailer: git-send-email 2.28.0
 X-Originating-IP: [72.93.72.163]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d355978b-56b4-4ec9-ffe0-08d85dd5a35c
+X-MS-Office365-Filtering-Correlation-Id: 8d30576a-3a58-486a-2aab-08d85dd59abc
 X-MS-TrafficTypeDiagnostic: SN2PR03MB2237:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN2PR03MB2237547A469139500D792498BA3A0@SN2PR03MB2237.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-Microsoft-Antispam-PRVS: <SN2PR03MB2237DD1AD5FE35DD9F1732E0BA3A0@SN2PR03MB2237.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2512;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KySy3n6jYGpTu9UJx71MOjhmrFWO7BQcpd+nUI7nX/jO9vZwdrVL1WlyrSWiPnrt7lZRofq0mfUPKS1dV7ROm261e+IRBHfXowVuERuDVc/tmi1uK6zOyIBBhjs3svvwrjmj6e/eYv/L0O3e40b2JoUnkoMaverB2/W2rjBzpgGMxle7tXjIh29N/9veiMkst7fLN3A87xwCmXLoMwN4Cktb0TzCGDc5fDaZpXz5wVfmDNjy8CRadX22ouvbqIcQYvRR0Jib9mBGHAKEo4uk950f2DBkC2a33flemyZAp8NNON9npfzh0aBgGuOo2n7A6QfmOUzTOe/sDYpNkaQ+0ziCQnHbf0LoQlAYfmDW+hdyL1Wb8hafbpJhaTZLqCDs
+X-Microsoft-Antispam-Message-Info: NEQcMl6gAUkCxexlr/imay7xNXE4rRVvfOAef3DMZq4j+sDIX78iC839LnnVcP9P3jS7F1dBt3ZKHAWznupPF9rVCdncFTptUsmzuXIwDnYv3zyBiA6euA3Oex/YiYHu2AyxBTrXBc27oxlY5f8INgaTG+DBbdV5JvjqjNjO4dhqdXYt9lkYU7cNowZo4IX6wySc5l0SNoIOI2StHkSfPEABfMzD0pJQmO601GO9+aMKoZ0kmSokM60YncttNoJ+GHCXTRlmF/9QDs2knchA0I0VLxFj3d0BWYnasX6Tqdye49/oidP/iIWUSQl7N33gcCYzf+W9EG/7Ehtz6dMwH1AxROUZfvlma1syZ2VZEfuRAHdyRBgd7FiRZCGNyYBA
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
  SFS:(4636009)(396003)(366004)(376002)(136003)(346002)(39860400002)(2616005)(956004)(4326008)(54906003)(26005)(478600001)(16526019)(6666004)(8936002)(316002)(6486002)(66476007)(1076003)(6512007)(186003)(6916009)(86362001)(66946007)(5660300002)(36756003)(75432002)(2906002)(6506007)(8676002)(66556008)(52116002)(786003);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: UBWjtGmchTgF9HvduivUeIfp411fzRGqyJqmJYI4NsYY5nNwtEwUsekVsfuNRw0fzh80nJk3tcxEcqs7gRiltojIVfZjODhkAzqR7eaYNYt+GdOVoqxzH+zhQeIakZkWu0dU/Ep4LkX9vh48l81BER9WM7nnipVUiBxQ/eryWWe3zBnn3LGg8kPeusLOzmJzSwnZDQKrMAYYBDyOqj+cVkkM2oXPh5WgLLO/RQD16iFtToWYfrauDMaPqZcEAFeev6VSl/Prs0lbTpMawEKIpSaTBl0WtBl8wV4jap+l1zT63//M5ImFJPiH48XUZusNMWsir93xfPfDDisPN0xqnOILISb05ujXV994Jlsfc/zkI+sHNZIjsiMB/3Eq9Pki3JNkTnawAiPCGHR6LUssQBsd550H0WLuvTRwYNL9dmdabQUNEOOzbyIKNczaKXz848GsWXQ9l6XCabRCz5fXYEX16oItXyo3u08Tei1aFsGemIDIF+8bBf3spXE0A+fPPkTrsZGaKyi57xqQSBr6J6sda8sx/kA8KjsUSkGzTG1a9DGnWDFkVVd3dj6+fGwACxvQng+OCJUUhc6Wf87eUlkyp266KUVhuudIoTmN/fvlu/D+JsC9/9c1mviT3Y3vWp+rOCFV40Uo360Hb5A1Uw==
+X-MS-Exchange-AntiSpam-MessageData: ywtz921CfNzyiQmCiuy04z0kohhXQOyPKrM5b7qTovrciwr40SuY/5tlFjglXmcySV2cBDqsaoe8m3ahVTFF6vca8G7dq3qYr549PFSrwitVmvDhzN+9GzXjrzCTNExW6V/9/+nIsjdsDJAaj8FuSzDTWvAAQjgTEpjNFmIZwZmuY893MFhGwOpFZSQPhMjBmuPwnoaAMk8rwAC1RVrdkay9sGoRDqZDLIMGxYVo7PPgxqVEKJljMZe+wYqFEOPs0tU6wFMG5aY9NizP8HQ+iwTpk8QVnlAKqe//ewnaLjkxYGztO14R+qm4qj4mt9hR9jmggqqwdI6w/S3XiCQVp1PytzWNWN7BKgMrXRsQGTAYhmZ9uhOK3FCV2kXnU7CmUnp9eiAgOquZBmW5rMw/WCCeb17By0bxWcxraHUHyLudqM3AEJaeE5ppGbm0UStKJZ4dZEBAPYgIdgZQAaL2rkVZitt2gpLYo6ONXqkLlp7FwZX+Pmd99HeekRs+d/jHjbla5a13YvF5Ulwm41zUVtyTOd/gh7+Cz9wFvH0iD39ht3iJJGhDP09CLUxt8+/G07MfH2D8SFSU2qnWYZsdQNofJYrmllAY7TaCU5rFBlvzv9XCL+MZ8lWRHyDDziFmUopkpXmpYBQXf2vLGFda6g==
 X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: d355978b-56b4-4ec9-ffe0-08d85dd5a35c
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8d30576a-3a58-486a-2aab-08d85dd59abc
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR03MB3871.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2020 02:25:43.7745 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2020 02:25:28.8719 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CBWbgpiQMiaOD3lRLTj3Rtz/hvvxtdw5X6bWJX/UhxvmHzC/mQADplAWxoFGLB/a
+X-MS-Exchange-CrossTenant-UserPrincipalName: f6UA2K/WFEZIEGQxw7xz/j6kplF7GjOtcR7PtIQIUz7PZWxtcADjyV9gJKaDFr5x
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN2PR03MB2237
 Received-SPF: pass client-ip=40.107.243.117; envelope-from=alxndr@bu.edu;
  helo=NAM12-DM6-obe.outbound.protection.outlook.com
@@ -129,47 +129,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Alexander Bulekov <alxndr@bu.edu>,
- darren.kenny@oracle.com, bsd@redhat.com, stefanha@redhat.com,
- Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
+Cc: Alexander Bulekov <alxndr@bu.edu>, darren.kenny@oracle.com, bsd@redhat.com,
+ stefanha@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Build general-fuzzer wrappers for each configuration defined in
-general_fuzzer_configs.yml and move the actual general-fuzzer to a
-subdirectory, so oss-fuzz doesn't treat it as a standalone fuzzer.
+This patch declares the fuzz_dma_read_cb function and uses the
+preprocessor and linker(weak symbols) to handle these cases:
+
+When we build softmmu/all with --enable-fuzzing, there should be no
+strong symbol defined for fuzz_dma_read_cb, and we link against a weak
+stub function.
+
+When we build softmmu/fuzz with --enable-fuzzing, we link against the
+strong symbol in general_fuzz.c
+
+When we build softmmu/all without --enable-fuzzing, fuzz_dma_read_cb is
+an empty, inlined function. As long as we don't call any other functions
+when building the arguments, there should be no overhead.
 
 Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
 Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
 ---
- scripts/oss-fuzz/build.sh | 7 +++++++
- 1 file changed, 7 insertions(+)
+ include/exec/memory.h | 15 +++++++++++++++
+ softmmu/memory.c      | 13 +++++++++++++
+ 2 files changed, 28 insertions(+)
 
-diff --git a/scripts/oss-fuzz/build.sh b/scripts/oss-fuzz/build.sh
-index d16207eb67..16b9f39d07 100755
---- a/scripts/oss-fuzz/build.sh
-+++ b/scripts/oss-fuzz/build.sh
-@@ -87,6 +87,7 @@ make "-j$(nproc)" qemu-fuzz-i386 V=1
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 975a90c871..d5511c7222 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -42,6 +42,21 @@ typedef struct IOMMUMemoryRegionClass IOMMUMemoryRegionClass;
+ DECLARE_OBJ_CHECKERS(IOMMUMemoryRegion, IOMMUMemoryRegionClass,
+                      IOMMU_MEMORY_REGION, TYPE_IOMMU_MEMORY_REGION)
  
- # Copy over the datadir
- cp  -r ../pc-bios/ "$DEST_DIR/pc-bios"
-+cp  -r ../pc-bios/ "$DEST_DIR/deps/pc-bios"
- 
- # Run the fuzzer with no arguments, to print the help-string and get the list
- # of available fuzz-targets. Copy over the qemu-fuzz-i386, naming it according
-@@ -97,5 +98,11 @@ do
-     cp qemu-fuzz-i386 "$DEST_DIR/qemu-fuzz-i386-target-$target"
- done
- 
-+mkdir -p "$DEST_DIR/deps"
-+mv "$DEST_DIR/qemu-fuzz-i386-target-general-fuzz" "$DEST_DIR/deps/"
++#ifdef CONFIG_FUZZ
++void fuzz_dma_read_cb(size_t addr,
++                      size_t len,
++                      MemoryRegion *mr,
++                      bool is_write);
++#else
++static inline void fuzz_dma_read_cb(size_t addr,
++                                    size_t len,
++                                    MemoryRegion *mr,
++                                    bool is_write)
++{
++    /* Do Nothing */
++}
++#endif
 +
-+./scripts/oss-fuzz/build_general_fuzzers.py \
-+    "./scripts/oss-fuzz/general_fuzzer_configs.yml" "$DEST_DIR/general-fuzz-"
+ extern bool global_dirty_log;
+ 
+ typedef struct MemoryRegionOps MemoryRegionOps;
+diff --git a/softmmu/memory.c b/softmmu/memory.c
+index 9db5fbe43a..24e59593ca 100644
+--- a/softmmu/memory.c
++++ b/softmmu/memory.c
+@@ -3232,6 +3232,19 @@ void memory_region_init_rom_device(MemoryRegion *mr,
+     vmstate_register_ram(mr, owner_dev);
+ }
+ 
++/*
++ * Support softmmu builds with CONFIG_FUZZ using a weak symbol and a stub for
++ * the fuzz_dma_read_cb callback
++ */
++#ifdef CONFIG_FUZZ
++void __attribute__((weak)) fuzz_dma_read_cb(size_t addr,
++                      size_t len,
++                      MemoryRegion *mr,
++                      bool is_write)
++{
++}
++#endif
 +
- echo "Done. The fuzzers are located in $DEST_DIR"
- exit 0
+ static const TypeInfo memory_region_info = {
+     .parent             = TYPE_OBJECT,
+     .name               = TYPE_MEMORY_REGION,
 -- 
 2.28.0
 
