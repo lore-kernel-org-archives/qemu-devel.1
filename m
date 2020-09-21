@@ -2,83 +2,80 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E787C43464
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:33:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E294C43463
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:33:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 619A020874
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:33:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 210AB20874
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:33:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Epr7RMMV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 619A020874
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BnSF1k50"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 210AB20874
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKK4K-0005of-FH
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 07:33:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42766)
+	id 1kKK4w-00070c-Dz
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 07:33:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42470)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kKK1Z-0003SL-EZ
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 07:30:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37520)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kKK11-0002YI-7j
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 07:29:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25928)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kKK1X-0000nh-Ej
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 07:30:25 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kKK0z-0000ed-4E
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 07:29:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600687822;
+ s=mimecast20190719; t=1600687788;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=IiK5qvCobeUOC+twrCHu2MpA9Z7XZegxxrbNBvwmzOg=;
- b=Epr7RMMVyqBDDbUd++eETvCk6xORNFNmVOAZJRyz92oJ9k8XI1zgsQPV82rsYjzngaF0uf
- CCpj2ZgzRwR3ofi3+dcE6C5hdjT9hPwy673SEQF3fFjvy/uXT3m/IaSH2vinFJgj3Mi6nq
- ZTLMBdIMKXeY37hBqVdpHD1+WJlnoAE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-dj7agwWGPEue77u2wJ89pw-1; Mon, 21 Sep 2020 07:30:19 -0400
-X-MC-Unique: dj7agwWGPEue77u2wJ89pw-1
-Received: by mail-wr1-f71.google.com with SMTP id v12so5741474wrm.9
- for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 04:30:19 -0700 (PDT)
+ bh=qmTXxwrSFY2mMpUUnscQSUtPOEOWVGicMQRRdIRDUlc=;
+ b=BnSF1k50NScTm05TP4P95yATDWAdAkng0yaBn8mEsAkTeozVIW9bvv6HeDehQ71agwjwYL
+ nbVcorvF5trPSZ7m0JUGtlzNz6gwdkmXMaiyFiC7RaeKWByabUh/wBfHmfcUVWv81yzf8i
+ 4Tt1GH4LfuZ+kjRnURAtN4ttxwl1X8Q=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-267-EEaxqOFlM_yGv_jdXnr2Ag-1; Mon, 21 Sep 2020 07:29:46 -0400
+X-MC-Unique: EEaxqOFlM_yGv_jdXnr2Ag-1
+Received: by mail-wm1-f72.google.com with SMTP id w3so3625749wmg.4
+ for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 04:29:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=IiK5qvCobeUOC+twrCHu2MpA9Z7XZegxxrbNBvwmzOg=;
- b=LdjDa3z/DV4DpaNaLNlQm3dja/Be5tzzv8yn3/2ZS0UNaGdpsLmxwdJ6ZiE3zI2O2D
- JepIJTwoRdtT1XjuojyIEj2cTf2cvfehl1muHl20AdZlWmo13BtBUUKgScdXuzoF2wKc
- GOmUGVS7lvKWZ3Id5BKhPB0+6j3CLc4TeeaTJvHGQy3huZUYhwqn1C0CLQfDar/lHaaT
- nJYcC8GOpHRlFmmR8M784da0PqZ/qyDQhBUdIU0R0olnGH18oTU16Fks405ZB2TZ9acP
- HxsD5xQ0WVAHz0csdOeeSFdhPfBaklMugUJiGk5JQaSDypUxJIzfF6ot0ZLozl4g5BBY
- Vw4A==
-X-Gm-Message-State: AOAM532YsmibinlwtUsHNRgKk4xsnD/Cyr2TB/b4/MyJQ6MevAurAxKk
- ZgxMZfPqHpRq5EeMCLbrQrxNyrEwEPxscGswFIwMXwqSF2VYf0v3zDzxL1wVw49IKTRRg0/nn8K
- h4RREig/SnMHPfQE=
-X-Received: by 2002:a05:600c:2047:: with SMTP id
- p7mr31950193wmg.168.1600687818307; 
- Mon, 21 Sep 2020 04:30:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyyu9HZSkLxW1FxZ6YEDr2eUXbgKaiUjkpLdEl4u9qO9mSYEe0suFAgdxEaHaMfiidkBuaAXQ==
-X-Received: by 2002:a05:600c:2047:: with SMTP id
- p7mr31950181wmg.168.1600687818092; 
- Mon, 21 Sep 2020 04:30:18 -0700 (PDT)
+ bh=qmTXxwrSFY2mMpUUnscQSUtPOEOWVGicMQRRdIRDUlc=;
+ b=UJyn9ONy/MmY9lxAphM132eYbhVE9M93PEsatOfacfE7pvbix5YGcTtEpfwADzCbiH
+ JfVqepLfKHeme1AfB1WJzz8wd0MMNKagLA5vm/gedCwO3YohVvId9+uewcCDfxYKi27M
+ jPEp7jsop+6rz1fnenUzRWqMeyrXO6SLGdx42mAivTHCgTjE6S8Cy4nfeHl6aqjVeibo
+ 5zle+O9OVuxpST1FKpGPmVHDQylUZuh1gaf3qXt8SkiodDht93kTjHTCLQdUbWFryiIZ
+ wFsA+yUb3bpedJ+RJkT6qksVx+D39YoBdjs4L+vGc2Kor1yZ1NEieqwiBaZdeXErujH0
+ RYzQ==
+X-Gm-Message-State: AOAM533c7JB/4F+D4CBrwCYaaDIT/W5fqnmWkg7EX+OtwN0p8bszl+4w
+ F2xrSGJZGdyPIuIlwvv4pzo5eSrX2POCQSU8KM1XUP+INzt/YVbLziUIiVJMOke9csazSg2Jolb
+ VHYO+MylFmpnRabQ=
+X-Received: by 2002:adf:ec87:: with SMTP id z7mr55881462wrn.57.1600687784581; 
+ Mon, 21 Sep 2020 04:29:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzqs/CTxguv/+NxE7QCwkPsQ4zBlqJ0Eo9TBQJTDDEgG3mfwBQHOjCRzrkwHjzthPEXCFRucQ==
+X-Received: by 2002:adf:ec87:: with SMTP id z7mr55881446wrn.57.1600687784386; 
+ Mon, 21 Sep 2020 04:29:44 -0700 (PDT)
 Received: from redhat.com (bzq-109-65-116-225.red.bezeqint.net.
  [109.65.116.225])
- by smtp.gmail.com with ESMTPSA id b84sm20931540wmd.0.2020.09.21.04.30.16
+ by smtp.gmail.com with ESMTPSA id u66sm35327317wme.1.2020.09.21.04.29.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 21 Sep 2020 04:30:17 -0700 (PDT)
-Date: Mon, 21 Sep 2020 07:30:15 -0400
+ Mon, 21 Sep 2020 04:29:43 -0700 (PDT)
+Date: Mon, 21 Sep 2020 07:29:41 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v3 14/15] virtio-iommu: Check gtrees are non null before
- destroying them
-Message-ID: <20200921112913.555392-15-mst@redhat.com>
+Subject: [PULL v3 02/15] vhost: switch to use IOTLB v2 format
+Message-ID: <20200921112913.555392-3-mst@redhat.com>
 References: <20200921112913.555392-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200921112913.555392-1-mst@redhat.com>
@@ -90,9 +87,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:44:53
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:43:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
@@ -113,51 +110,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
- qemu-stable@nongnu.org, Eric Auger <eric.auger@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Auger <eric.auger@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
 
-If realize fails, domains and endpoints trees may be NULL. On
-unrealize(), this produces assertions:
+This patch tries to switch to use new kernel IOTLB format V2. Previous
+version may have inconsistent ABI between 32bit and 64bit machines
+because of the hole after type field. Refer kernel commit
+("429711aec282 vhost: switch to use new message format") for more
+information.
 
-"GLib: g_tree_destroy: assertion 'tree != NULL' failed"
+To enable this feature, qemu need to use a new ioctl
+VHOST_SET_BACKEND_FEATURE with VHOST_BACKEND_F_IOTLB_MSG_V2 bit. A new
+vhost setting backend features ops was introduced. And when we try to
+set features for vhost dev, we will examine the support of new IOTLB
+format and enable it. This process is total transparent to guest,
+which means we can have different IOTLB message type in src and dst
+during migration.
 
-Check that the trees are non NULL before destroying them.
+The conversion of IOTLB message is straightforward, just check the
+type and behave accordingly.
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-
-Message-Id: <20200908193309.20569-2-eric.auger@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+Message-Id: <20200907104903.31551-3-jasowang@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio-iommu.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ include/hw/virtio/vhost-backend.h |  2 +
+ include/hw/virtio/vhost.h         |  1 +
+ hw/virtio/vhost-backend.c         | 88 +++++++++++++++++++++++++------
+ hw/virtio/vhost.c                 | 10 ++++
+ 4 files changed, 84 insertions(+), 17 deletions(-)
 
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 5d56865e56..21ec63b108 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -801,8 +801,12 @@ static void virtio_iommu_device_unrealize(DeviceState *dev)
-     VirtIOIOMMU *s = VIRTIO_IOMMU(dev);
+diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
+index 8825bd278f..8a6f8e2a7a 100644
+--- a/include/hw/virtio/vhost-backend.h
++++ b/include/hw/virtio/vhost-backend.h
+@@ -74,6 +74,7 @@ typedef int (*vhost_set_features_op)(struct vhost_dev *dev,
+                                      uint64_t features);
+ typedef int (*vhost_get_features_op)(struct vhost_dev *dev,
+                                      uint64_t *features);
++typedef int (*vhost_set_backend_cap_op)(struct vhost_dev *dev);
+ typedef int (*vhost_set_owner_op)(struct vhost_dev *dev);
+ typedef int (*vhost_reset_device_op)(struct vhost_dev *dev);
+ typedef int (*vhost_get_vq_index_op)(struct vhost_dev *dev, int idx);
+@@ -146,6 +147,7 @@ typedef struct VhostOps {
+     vhost_set_vring_busyloop_timeout_op vhost_set_vring_busyloop_timeout;
+     vhost_set_features_op vhost_set_features;
+     vhost_get_features_op vhost_get_features;
++    vhost_set_backend_cap_op vhost_set_backend_cap;
+     vhost_set_owner_op vhost_set_owner;
+     vhost_reset_device_op vhost_reset_device;
+     vhost_get_vq_index_op vhost_get_vq_index;
+diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
+index 767a95ec0b..94585067f7 100644
+--- a/include/hw/virtio/vhost.h
++++ b/include/hw/virtio/vhost.h
+@@ -79,6 +79,7 @@ struct vhost_dev {
+     uint64_t backend_features;
+     uint64_t protocol_features;
+     uint64_t max_queues;
++    uint64_t backend_cap;
+     bool started;
+     bool log_enabled;
+     uint64_t log_size;
+diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
+index 782b1d67d9..88c8ecc9e0 100644
+--- a/hw/virtio/vhost-backend.c
++++ b/hw/virtio/vhost-backend.c
+@@ -156,6 +156,28 @@ static int vhost_kernel_set_features(struct vhost_dev *dev,
+     return vhost_kernel_call(dev, VHOST_SET_FEATURES, &features);
+ }
  
-     g_hash_table_destroy(s->as_by_busptr);
--    g_tree_destroy(s->domains);
--    g_tree_destroy(s->endpoints);
-+    if (s->domains) {
-+        g_tree_destroy(s->domains);
++static int vhost_kernel_set_backend_cap(struct vhost_dev *dev)
++{
++    uint64_t features;
++    uint64_t f = 0x1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2;
++    int r;
++
++    if (vhost_kernel_call(dev, VHOST_GET_BACKEND_FEATURES, &features)) {
++        return 0;
 +    }
-+    if (s->endpoints) {
-+        g_tree_destroy(s->endpoints);
++
++    features &= f;
++    r = vhost_kernel_call(dev, VHOST_SET_BACKEND_FEATURES,
++                              &features);
++    if (r) {
++        return 0;
 +    }
++
++    dev->backend_cap = features;
++
++    return 0;
++}
++
+ static int vhost_kernel_get_features(struct vhost_dev *dev,
+                                      uint64_t *features)
+ {
+@@ -195,34 +217,65 @@ static int vhost_kernel_vsock_set_running(struct vhost_dev *dev, int start)
+ static void vhost_kernel_iotlb_read(void *opaque)
+ {
+     struct vhost_dev *dev = opaque;
+-    struct vhost_msg msg;
+     ssize_t len;
  
-     virtio_delete_queue(s->req_vq);
-     virtio_delete_queue(s->event_vq);
+-    while ((len = read((uintptr_t)dev->opaque, &msg, sizeof msg)) > 0) {
+-        if (len < sizeof msg) {
+-            error_report("Wrong vhost message len: %d", (int)len);
+-            break;
+-        }
+-        if (msg.type != VHOST_IOTLB_MSG) {
+-            error_report("Unknown vhost iotlb message type");
+-            break;
+-        }
++    if (dev->backend_cap &
++        (0x1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)) {
++        struct vhost_msg_v2 msg;
+ 
+-        vhost_backend_handle_iotlb_msg(dev, &msg.iotlb);
++        while ((len = read((uintptr_t)dev->opaque, &msg, sizeof msg)) > 0) {
++            if (len < sizeof msg) {
++                error_report("Wrong vhost message len: %d", (int)len);
++                break;
++            }
++            if (msg.type != VHOST_IOTLB_MSG_V2) {
++                error_report("Unknown vhost iotlb message type");
++                break;
++            }
++
++            vhost_backend_handle_iotlb_msg(dev, &msg.iotlb);
++        }
++    } else {
++        struct vhost_msg msg;
++
++        while ((len = read((uintptr_t)dev->opaque, &msg, sizeof msg)) > 0) {
++            if (len < sizeof msg) {
++                error_report("Wrong vhost message len: %d", (int)len);
++                break;
++            }
++            if (msg.type != VHOST_IOTLB_MSG) {
++                error_report("Unknown vhost iotlb message type");
++                break;
++            }
++
++            vhost_backend_handle_iotlb_msg(dev, &msg.iotlb);
++        }
+     }
+ }
+ 
+ static int vhost_kernel_send_device_iotlb_msg(struct vhost_dev *dev,
+                                               struct vhost_iotlb_msg *imsg)
+ {
+-    struct vhost_msg msg;
++    if (dev->backend_cap & (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)) {
++        struct vhost_msg_v2 msg;
+ 
+-    msg.type = VHOST_IOTLB_MSG;
+-    msg.iotlb = *imsg;
++        msg.type = VHOST_IOTLB_MSG_V2;
++        msg.iotlb = *imsg;
+ 
+-    if (write((uintptr_t)dev->opaque, &msg, sizeof msg) != sizeof msg) {
+-        error_report("Fail to update device iotlb");
+-        return -EFAULT;
++        if (write((uintptr_t)dev->opaque, &msg, sizeof msg) != sizeof msg) {
++            error_report("Fail to update device iotlb");
++            return -EFAULT;
++        }
++    } else {
++        struct vhost_msg msg;
++
++        msg.type = VHOST_IOTLB_MSG;
++        msg.iotlb = *imsg;
++
++        if (write((uintptr_t)dev->opaque, &msg, sizeof msg) != sizeof msg) {
++            error_report("Fail to update device iotlb");
++            return -EFAULT;
++        }
+     }
+ 
+     return 0;
+@@ -260,6 +313,7 @@ static const VhostOps kernel_ops = {
+                                 vhost_kernel_set_vring_busyloop_timeout,
+         .vhost_set_features = vhost_kernel_set_features,
+         .vhost_get_features = vhost_kernel_get_features,
++        .vhost_set_backend_cap = vhost_kernel_set_backend_cap,
+         .vhost_set_owner = vhost_kernel_set_owner,
+         .vhost_reset_device = vhost_kernel_reset_device,
+         .vhost_get_vq_index = vhost_kernel_get_vq_index,
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 1a1384e7a6..e986bf53e4 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -818,7 +818,17 @@ static int vhost_dev_set_features(struct vhost_dev *dev,
+     r = dev->vhost_ops->vhost_set_features(dev, features);
+     if (r < 0) {
+         VHOST_OPS_DEBUG("vhost_set_features failed");
++        goto out;
+     }
++    if (dev->vhost_ops->vhost_set_backend_cap) {
++        r = dev->vhost_ops->vhost_set_backend_cap(dev);
++        if (r < 0) {
++            VHOST_OPS_DEBUG("vhost_set_backend_cap failed");
++            goto out;
++        }
++    }
++
++out:
+     return r < 0 ? -errno : 0;
+ }
+ 
 -- 
 MST
 
