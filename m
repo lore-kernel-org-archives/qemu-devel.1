@@ -2,94 +2,145 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0121C43463
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 07:47:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4437C43464
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 07:50:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4948120809
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 07:47:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 60AFA20809
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 07:50:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RUtztKVH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4948120809
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="YP7Ek+v+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60AFA20809
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKGXw-0005uX-B3
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 03:47:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38854)
+	id 1kKGag-00006Q-Dp
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 03:50:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40174)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kKGTq-0004Xt-UL
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 03:43:22 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34851
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kKGTn-00040p-QE
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 03:43:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600674194;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=C2WHT3yNYYCK3XWpo/rfz9tq9qKGBn9AP5S3Kp1CL4s=;
- b=RUtztKVHFchfj2qlYR811tTpLfuvUNIRQxMLUSF77pT+Hf/3JXurd0OuW4KCluHL9tb2dX
- 62WeB/Sx6r2NvJOmvVcKPF1iwp3P8a1Fq35tbZX13pXCBPddah4cXgAT4S42GDEnS/L41R
- zuWkF/bYJTpwO5slQQ5wm4O03UWBLoE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-357-3zy5A49zPjKVXY6zfDQM7g-1; Mon, 21 Sep 2020 03:43:10 -0400
-X-MC-Unique: 3zy5A49zPjKVXY6zfDQM7g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDCC210BBEC2;
- Mon, 21 Sep 2020 07:43:08 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
- [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 954FB10013D0;
- Mon, 21 Sep 2020 07:43:08 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 2A0311132E9A; Mon, 21 Sep 2020 09:43:07 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 09/37] qapi/common.py: Add indent manager
-References: <20200915224027.2529813-1-jsnow@redhat.com>
- <20200915224027.2529813-10-jsnow@redhat.com>
- <87k0wtiwlb.fsf@dusky.pond.sub.org>
- <37ea889c-746e-bea9-a719-6bee9e86f1a8@redhat.com>
- <87v9gcesh8.fsf@dusky.pond.sub.org>
- <301fb683-9b57-d355-3b08-776ab4869975@redhat.com>
- <87363fjqv6.fsf@dusky.pond.sub.org>
- <084495dc-dfb3-084d-ff83-cdfb90cd61f4@redhat.com>
-Date: Mon, 21 Sep 2020 09:43:07 +0200
-In-Reply-To: <084495dc-dfb3-084d-ff83-cdfb90cd61f4@redhat.com> (John Snow's
- message of "Fri, 18 Sep 2020 12:08:19 -0400")
-Message-ID: <87r1qva838.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <luwei.kang@intel.com>)
+ id 1kKGZt-0007hd-EC
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 03:49:37 -0400
+Received: from mga18.intel.com ([134.134.136.126]:20365)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <luwei.kang@intel.com>)
+ id 1kKGZo-0004jP-4e
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 03:49:36 -0400
+IronPort-SDR: w3XRKqOYHQJr/bNnKRZbJtlhWmpoFCfAW3lFdpXQBo6OUcf+31nvhyD33qa6YNaDBIb4QVxY5c
+ ZVx9UzCn6v8Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9750"; a="148080345"
+X-IronPort-AV: E=Sophos;i="5.77,286,1596524400"; d="scan'208";a="148080345"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 21 Sep 2020 00:49:26 -0700
+IronPort-SDR: 9nCX0QBD7wheHv1eu8wCeb5Oh8Gi2EnrrFS7M+O97/SHhoZXIMzcfuFe2tiH1LmasACBwrUrlZ
+ Cgs8hhB8K+yg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,286,1596524400"; d="scan'208";a="453897790"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+ by orsmga004.jf.intel.com with ESMTP; 21 Sep 2020 00:49:26 -0700
+Received: from fmsmsx606.amr.corp.intel.com (10.18.126.86) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 21 Sep 2020 00:49:25 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
+ via Frontend Transport; Mon, 21 Sep 2020 00:49:25 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.170)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.1713.5; Mon, 21 Sep 2020 00:49:23 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=A20xpvxmheH4rSIbNLuhI/YGWTMzp3fagBU1tA8zlHsppiaTcU2Be1LMkBYaJn/NI4snZmuodpfm+XHo7MDmKsxR0ls2qJgDzjTtyo1Gu6nHSmllTiV8eWsqQEoBl7gdg95hU6278n14ZAFPlXEhm/JNOvrPQDmYXNs1ophSvzBkNXhHS9cmuSS9+Stsq0fnZipj6Bwap0tgFAW86co8nVaaNb+yEALTy94VX4rEF0008w3t1glo5T8pCIkbiKgIcDJ2ccgMosXaBV9AslkhRDbxJdiZCg3Sg1biu+Qa2hCGyC1lcg/l1Mb2iHrS98bme9H1CS2VjKuOmR8XXRgXxQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zulm6MdFKHEN8ps8yFOFhraDKZWVxyrSPMe8ea8e+NY=;
+ b=O4BJCYGAAmPNfScqaBkgT8HdqzNKDevdyUcNkbZGjikDmWXdXXVsUvRStY85C1iIXM6gP5lc7PkoCrlI4aRprZyzNZrXYPqTmv+1G4emw3xawlpv9EVwh81qoBFxVdDdI5qKi0gR6XMt5OUnqJlXSgNyMztpb5Br3wnzacpkgYHKU/4GvMF+w/bhEcDWRnyFPQRYCQtXf5jacFuu9IThegq1qG80Fp4KyhfYpC4IfOFPzrXrfWjEA+DD2gTkXxoPGBqfkpmWWbGVmL9YOX7hp5IIdtvuwZrlBoU4TThd+kkFGXVRzYq0GOmLJ6s4dUYpGkCOop0vVWagdcJ+rvTPBw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com; 
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zulm6MdFKHEN8ps8yFOFhraDKZWVxyrSPMe8ea8e+NY=;
+ b=YP7Ek+v+X4E2s6V0tR+NZAdUPPANPSoS40dTMNOX6B3ameHd/vhK75HbMJXmr4rll0XMGEegP/njXHxzyE7Se5XrbxdE66ZWq7ZTJuDdc80Eh6dBTqYEjWIUb/8frbbziHBR01kELbDzUjcQKOBWRKAv0adD426QlROemJEMKrY=
+Received: from CY4PR11MB1447.namprd11.prod.outlook.com (2603:10b6:910:10::16)
+ by CY4PR11MB1317.namprd11.prod.outlook.com (2603:10b6:903:2f::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.15; Mon, 21 Sep
+ 2020 07:49:22 +0000
+Received: from CY4PR11MB1447.namprd11.prod.outlook.com
+ ([fe80::c9f:501b:232d:893a]) by CY4PR11MB1447.namprd11.prod.outlook.com
+ ([fe80::c9f:501b:232d:893a%5]) with mapi id 15.20.3391.024; Mon, 21 Sep 2020
+ 07:49:22 +0000
+From: "Kang, Luwei" <luwei.kang@intel.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: RE: [PATCH v1 0/3] Remove the limitation of Intel PT CPUID info
+Thread-Topic: [PATCH v1 0/3] Remove the limitation of Intel PT CPUID info
+Thread-Index: AQHV6xfqjs/57yfCb0eiFZpFzYKOh6hhHEKQgQ8ceoCAA8SvIA==
+Date: Mon, 21 Sep 2020 07:49:22 +0000
+Message-ID: <CY4PR11MB14473A594C244A5B403ADC26803A0@CY4PR11MB1447.namprd11.prod.outlook.com>
+References: <1582580312-19864-1-git-send-email-luwei.kang@intel.com>
+ <82D7661F83C1A047AF7DC287873BF1E1738B07FF@SHSMSX104.ccr.corp.intel.com>
+ <20200918220255.GB57321@habkost.net>
+In-Reply-To: <20200918220255.GB57321@habkost.net>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [192.55.46.36]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 627e5f18-f21f-4874-878a-08d85e02da9b
+x-ms-traffictypediagnostic: CY4PR11MB1317:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <CY4PR11MB1317F1FFDBBDC395654A9B42803A0@CY4PR11MB1317.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Uu9WGgvRH4WG4v2PsIBr7k4voWq0+TEigfQB9clQEoeH8Z8qnW7dtQQwGloRxobtMdt8D6xEuEWGhSrRRpI/l7JhCtR6Pn3quvRqHNUrfgHr++N5mx+fRLPf66hRUSha59Ku+1/zDliz6RZJ7lSpyUn2t8xSFWtN/IVW1VSRfyjeLz/ACDYtTAz6+5E+BXMi+vOP+0i9fhv6JKTwSuflQZEm3RhW9lFigJEgwTGmQSmDBbW2n7nrW5dRHye+9cpA57j3DXNiM308mQM9NAk1FIVeyT64zEic29UPM8FpDAheVbXsGYdQWQH8q94Pbwl/Bn5YGvzldgkdGw60oqteEZxKZUfe3AE+rEEOaLPbivaSvfXBHu5PxX8xaI0T8r2NrErff/KyDRU2YKDSNWRvOw==
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:CY4PR11MB1447.namprd11.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(396003)(366004)(376002)(346002)(39860400002)(136003)(64756008)(66556008)(66476007)(66946007)(66446008)(71200400001)(76116006)(86362001)(52536014)(966005)(186003)(7696005)(8676002)(6916009)(2906002)(54906003)(8936002)(6506007)(478600001)(316002)(53546011)(26005)(55016002)(9686003)(33656002)(5660300002)(83380400001)(4326008);
+ DIR:OUT; SFP:1102; 
+x-ms-exchange-antispam-messagedata: /fQORKSkDICZiw1be1Xf1f2t/wpKr/e+H8b07NLiQ8sX+PT6u/0Bz4jQ1BotA20SNSlkIigc9lNkorUUB+HTH3POUCrE4cUFW4Cz0EkTeldi+JrjvL0RiukJfCsHyFFRsvCfV4Tu9CJ/GfUUTr/VyKFMUfV+cm1IikQbWT/5FBIpSk9qM7W1JUECEwJF2ag2XceI7LfAy97y0xyx0Xor+vP8ISyUfSbHzkMcUoN62azFnT1R2ImZO6g142TaXTmg/m/oaaT1ZrcjUAHgwEci/PqhZ3taUgRbOzK9G8pdNlrBwnaigVBbzTWpWE3NetJhyXA4yESgtxdxYLc4jYqiGcv5AA29re/I2uFst4zUJ6WfbMY/vIaaozBerm69C1OdJLsUS9XD/Kc/tdw0gzq/kkySnPEgkeUavqzGr2tzDcCiuRc3ejOSJfLMai/de2sUmrFDMuznVFx3I5SHhR+v/LwUz63+Fao73sWzpO/PeAxdQIyFNfJe4HUyysIUglrBYZzD3pnYvEHYTcGuba+BZtecbk6SorWAKYhlFm4IgYoP1BDQxeTpkhDBLg3Vj+o+qLvHfY3vdQSm76TtT9xga0/vmvg2tXHv0lC1oFYJM9Z9LRNV3K3NrCteaF8IIQfl2miPL5bp81K7mZpfK+p/Xg==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 03:43:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.501,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CY4PR11MB1447.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 627e5f18-f21f-4874-878a-08d85e02da9b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Sep 2020 07:49:22.2916 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: LmSvO0nXQtT3j1OajwNnDjSK035474kjGWDPZmhL49M16V71M77zvLiANR3sVC6o3URWzmpLtrIMo0JBfZjjpw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR11MB1317
+X-OriginatorOrg: intel.com
+Received-SPF: pass client-ip=134.134.136.126;
+ envelope-from=luwei.kang@intel.com; helo=mga18.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 03:49:27
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,81 +154,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <crosa@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Strong, Beeman" <beeman.strong@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Robert Hoo <robert.hu@linux.intel.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ Jiri Denemark <jdenemar@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
-
-> On 9/18/20 6:55 AM, Markus Armbruster wrote:
->> John Snow <jsnow@redhat.com> writes:
->
->>> We'll get to them in due time. For now, please admire the lipstick.
->> If I take off my glasses and step six feet back, I just might be
->> able to
->> overlook it.
->> 
->
-> I consider writing a nice __repr__ good habit, I'd prefer not to
-> delete it just because the rest of our code doesn't do so yet. (Give
-> me time.)
->
-> I spend a lot of my time in the interactive python console: having
-> nice __repr__ methods is a good habit, not an unsightly blemish.
->
->>>>>>> +    def pop(self, amount: int = 4) -> int:
->>>>>>> +        """Pop `amount` spaces off of the indent, default four."""
->>>>>>> +        if self._level < amount:
->>>>>>> +            raise ArithmeticError(
->>>>>>> +                "Can't pop {:d} spaces from {:s}".format(amount, repr(self)))
->>>> I think assert(amount <= self._level) would do just fine.
->>>>
->>>
->>> Secretly, asserts can be disabled in Python just like they can in C code.
->> There are compilers that let you switch off array bounds checking.
->> Would you advocate manual bounds checking to protect people from their
->> own folly?
->> 
->>> My habit: if it's something that should already be true given the
->>> nature of how the code is laid out, use an assertion. If I am
->>> preventing an erroneous state (Especially from callers in other
->>> modules), explicitly raise an exception.
->> I check function preconditions ruthlessly with assert.  There's no
->> sane
->> way to recover anyway.
->> Without a way to recover, the only benefit is crashing more
->> prettily.
->> If the error is six levels deep in a some fancy-pants framework, then
->> prettier crashes might actually help someone finding the error slightly
->> faster.  But it ain't.
->> My final argument is local consistency: use of assertions to check
->> preconditions is pervasive in scripts/qapi/.
->> 
->
-> You're right that there's no safe recovery from an error such as
-> this. The only actual difference is whether you see AssertionError or 
-> ArithmeticError.
->
-> One can be disabled (But you rightly shouldn't), the other can't. One
-> has more semantic meaning and information to it.
-
-YAGNI.
-
-> I prefer what I've currently written.
-
-Where personal preference collides with local consistency, I'm with
-local consistency.
-
-You can get the two in line: change everything to your preference.
-
-You signalled intent to do that for __repr__(): "Give me time".
-Alright, having such __repr__() is obviously more important / useful to
-you than avoiding the extra code is to me.
-
-I received no such signal for checking preconditions.  Good, because I'd
-go "are you serious?" :)
-
+SGkgRWR1YXJkbywNCiAgICBUaGlzIHBhdGNoIHNldCB3aWxsIHJlbW92ZSBzb21lIGxpbWl0YXRp
+b25zIG9mIEludGVsIFBUIENQVUlEIGluZm9ybWF0aW9uLg0KICAgIDEuIFRoZSAiSVAgcGF5bG9h
+ZHMiIGZlYXR1cmUgd2lsbCBkaXNhYmxlIHRoZSBJbnRlbCBQVCBpbiBndWVzdHMgYW5kIGl0IHdp
+bGwgYmUgY29taW5nIHNvb24uDQogICAgMi4gVG8gbWFrZSB0aGUgbGl2ZSBtaWdyYXRpb24gc2Fm
+ZSwgd2Ugc2V0IHRoZSBJbnRlbCBQVCBDUFVJRCBhcyBhIGNvbnN0YW50IHZhbHVlKEljZWxha2Ug
+c2VydmVyIENQVUlEKS4gSXQgd2lsbCBtYXNrIG9mZiB0aGUgbmV3IGZlYXR1cmUgb2YgSW50ZWwg
+UFQuDQoNCiAgICBBYm91dCB0aGlzIGlzc3VlIGh0dHBzOi8vYnVnemlsbGEucmVkaGF0LmNvbS9z
+aG93X2J1Zy5jZ2k/aWQ9MTg1Mzk3MiwgSW50ZWwgUFQgaXMgZGlzYWJsZWQgaW4gdGhlIGd1ZXN0
+IGJ5IGRlZmF1bHQsIHdlIHNob3VsZCB1c2UgIi1jcHUgSWNlbGFrZS1TZXJ2ZXIsK2ludGVsLXB0
+IiB0byBlbmFibGUgdGhlIEludGVsIFBULg0KDQpUaGFua3MsDQpMdXdlaSBLYW5nDQoNCj4gLS0t
+LS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRWR1YXJkbyBIYWJrb3N0IDxlaGFia29z
+dEByZWRoYXQuY29tPg0KPiBTZW50OiBTYXR1cmRheSwgU2VwdGVtYmVyIDE5LCAyMDIwIDY6MDMg
+QU0NCj4gVG86IEthbmcsIEx1d2VpIDxsdXdlaS5rYW5nQGludGVsLmNvbT4NCj4gQ2M6IHBib256
+aW5pQHJlZGhhdC5jb207IHJ0aEB0d2lkZGxlLm5ldDsgcWVtdS1kZXZlbEBub25nbnUub3JnOyBT
+dHJvbmcsDQo+IEJlZW1hbiA8YmVlbWFuLnN0cm9uZ0BpbnRlbC5jb20+OyBKaXJpIERlbmVtYXJr
+DQo+IDxqZGVuZW1hckByZWRoYXQuY29tPjsgUm9iZXJ0IEhvbyA8cm9iZXJ0Lmh1QGxpbnV4Lmlu
+dGVsLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MSAwLzNdIFJlbW92ZSB0aGUgbGltaXRh
+dGlvbiBvZiBJbnRlbCBQVCBDUFVJRCBpbmZvDQo+IA0KPiBIaSBMdXdlaSBLYW5nLA0KPiANCj4g
+SSB3YXMgbG9va2luZyBmb3IgaW5mbyBvbiBpbnRlbC1wdCBhbmQganVzdCBzYXcgdGhpcyBzZXJp
+ZXMsIGFuZCBpdCB3YXMgbmV2ZXINCj4gcmV2aWV3ZWQgb3IgbWVyZ2VkIChzb3JyeSBmb3IgbWlz
+c2luZyBpdCEpLiAgSXMgdGhpcyBzdGlsbCB0aGUgYXBwcm9hY2ggd2Ugd2FudCB0bw0KPiBmb2xs
+b3cgZm9yIGludGVsLXB0Pw0KPiANCj4gSSdtIENDaW5nIEppcmkgRGVuZW1hcmsgYmVjYXVzZSB0
+aGlzIG1pZ2h0IGJlIHJlbGV2YW50IGZvciBhIGxpYnZpcnQgaXNzdWUgcmVsYXRlZA0KPiB0byBp
+bnRlbC1wdCB3ZSB3ZXJlIGludmVzdGlnYXRpbmdbMV0uDQo+IA0KPiBbMV0gaHR0cHM6Ly9idWd6
+aWxsYS5yZWRoYXQuY29tL3Nob3dfYnVnLmNnaT9pZD0xODUzOTcyDQo+IA0KPiANCj4gT24gTW9u
+LCBNYXIgMzAsIDIwMjAgYXQgMDk6NTY6MDlBTSArMDAwMCwgS2FuZywgTHV3ZWkgd3JvdGU6DQo+
+ID4gPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+ID4gRnJvbTogS2FuZywgTHV3ZWkg
+PGx1d2VpLmthbmdAaW50ZWwuY29tPg0KPiA+ID4gU2VudDogVHVlc2RheSwgRmVicnVhcnkgMjUs
+IDIwMjAgNTozOCBBTQ0KPiA+ID4gVG86IHBib256aW5pQHJlZGhhdC5jb207IHJ0aEB0d2lkZGxl
+Lm5ldDsgZWhhYmtvc3RAcmVkaGF0LmNvbQ0KPiA+ID4gQ2M6IHFlbXUtZGV2ZWxAbm9uZ251Lm9y
+ZzsgU3Ryb25nLCBCZWVtYW4NCj4gPGJlZW1hbi5zdHJvbmdAaW50ZWwuY29tPjsNCj4gPiA+IEth
+bmcsIEx1d2VpIDxsdXdlaS5rYW5nQGludGVsLmNvbT4NCj4gPiA+IFN1YmplY3Q6IFtQQVRDSCB2
+MSAwLzNdIFJlbW92ZSB0aGUgbGltaXRhdGlvbiBvZiBJbnRlbCBQVCBDUFVJRCBpbmZvDQo+ID4g
+Pg0KPiA+ID4gVGhlIEludGVsIFBUIGZlYXR1cmUgaW5jbHVkZXMgc29tZQ0KPiA+ID4gc3ViLWZl
+YXR1cmVzKENQVUlELihFQVg9MTRILEVDWD0wSCkpDQo+ID4gPiBhbmQgdGhlc2Ugc3ViLWZlYXR1
+cmVzIGFyZSBkaWZmZXJlbnQgb24gZGlmZmVyZW50IEhXIHBsYXRmb3Jtcy4gVG8NCj4gPiA+IG1h
+a2UgdGhlIGxpdmUgbWlncmF0aW9uIHNhZmV0eShnZXQgdGhlIHNhbWUgQ1BVSUQgaW5mbyB3aXRo
+IHNhbWUgY3B1DQo+ID4gPiBtb2RlbCBvbiBkaWZmZXJlbnQgSFcgcGxhdGZvcm0pLCB0aGUgY3Vy
+cmVudCBJbnRlbCBQVCBDUFVJRA0KPiA+ID4gaW5mb3JtYXRpb24gaXMgc2V0IHRvIGEgY29uc3Rh
+bnQgdmFsdWUoZnJvbSBJQ0VMQUtFIFNlcnZlcikuDQo+ID4gPg0KPiA+ID4gSXQgd2lsbCBibG9j
+ayB0aGUgbmV3IGZlYXR1cmUgaW4gdGhlIGxhdGVyIEhXIHBsYXRmb3JtLiB3aGF0J3MgbW9yZSwN
+Cj4gPiA+IHRoZSBzdXBwb3J0IG9mICJJUCBwYXlsb2FkcyIgd2lsbCBkaXNhYmxlIHRoZSBJbnRl
+bCBQVCBpbiBLVk0NCj4gPiA+IGd1ZXN0KHBhdGNoIDEpIGJ1dCBpdCB3aWxsIGNvbWUgc29vbi4N
+Cj4gPiA+DQo+ID4gPiBUaGlzIHBhdGNoc2V0IHJlbW92ZSB0aGlzIGxpbWl0YXRpb24gYW5kIGV4
+cG9zZSBhbGwgdGhlIGNhcGFiaWxpdGllcw0KPiA+ID4gdG8gS1ZNIGd1ZXN0LiBBcyBpdCB3aWxs
+IGJyZWFrIHRoZSBsaXZlIG1pZ3JhdGlvbiBzYWZlLCBJbnRlbCBQVA0KPiA+ID4gd2lsbCBiZSBt
+YXNrZWQgYXMgdW5taWdyYXRhYmxlLg0KPiA+DQo+ID4gUGluZy4NCj4gPg0KPiA+IFRoYW5rcywN
+Cj4gPiBMdXdlaSBLYW5nDQo+ID4NCj4gPiA+DQo+ID4gPiBMdXdlaSBLYW5nICgzKToNCj4gPiA+
+ICAgaTM4NjogUmVtb3ZlIHRoZSBsaW1pdGF0aW9uIG9mIElQIHBheWxvYWRzIGZvciBJbnRlbCBQ
+VA0KPiA+ID4gICBpMzg2OiBSZW1vdmUgdGhlIENQVUlEIGxpbWl0YXRpb24gb2YgSW50ZWwgUFQN
+Cj4gPiA+ICAgaTM4NjogTWFyayB0aGUgJ0lOVEVMX1BUJyBDUFVJRCBiaXQgYXMgdW5taWdyYXRh
+YmxlDQo+ID4gPg0KPiA+ID4gIHRhcmdldC9pMzg2L2NwdS5jIHwgNjkNCj4gPiA+ICsrKystLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gPiA+ICAx
+IGZpbGUgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspLCA2NCBkZWxldGlvbnMoLSkNCj4gPiA+DQo+
+ID4gPiAtLQ0KPiA+ID4gMS44LjMuMQ0KPiA+DQo+IA0KPiAtLQ0KPiBFZHVhcmRvDQoNCg==
 
