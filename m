@@ -2,128 +2,108 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5AF3C43466
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 14:14:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87FFAC43465
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 14:18:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48A8F20B1F
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 14:14:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EBE4D20BED
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 14:18:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="aCm9aaDq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48A8F20B1F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R/qvSvIV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBE4D20BED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKMaO-0001z5-3b
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 10:14:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39668)
+	id 1kKMdl-0003ft-0l
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 10:18:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
- id 1kKMWk-0006k3-2f
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 10:10:46 -0400
-Received: from mail-co1nam11on2041.outbound.protection.outlook.com
- ([40.107.220.41]:21802 helo=NAM11-CO1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
- id 1kKMWh-0000jC-3G
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 10:10:45 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LiPeA9Y8DC5lFuDPCPioh7veGHlA+prLDlA6Wqa0C+gn/csnurAJaI3Jv+e/lGgiGjjViFa+NcrD/NGybqsakVfQ66ty6pZ9GPZ14oDoOjz+wdZkiiwHTzqHqj2Gn3Ct4i+Moy+iDbILKZNcRSPE8e+/VjLzrgT8mduik0ee9n0MI/PI78z/GUPHxyGL83S8c/9xkVDGx1W0rFn/eDAdMBGJFiExGeBTrgcLoyRY13G7LAlw61RvGjrt6bGf9slAvP+UkqZASHM9E0sufOFV71WY+yKJ609gFXYGD4ouK6jqsSjvloiGDD0mt79WW/KAUwnThGzSJc5WH5SXxYuxCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=degpsbBo984arjxl2XYhfPiKZ5IRhJ1LWWxCdWq19ig=;
- b=jJmmqineiWxfYj03H9olmjnCnRTLTEz+aWD+ZE6ngcfclN/qQoLjeJBvY5RbfEmv9U7fKVzgLBK2T7CpY8caBf0+ahP4u8iTAqK2rvnHt36YTAhuIhMnHHFfKJQTg++EzCrr33CeBcYz5AL29P1z65MnJA1MeF9kbjUg5KgOd3BV9My2vAcuaIeHyZzBfKhxDyC8xNagGVTz4Zp3TuBhJyFfM4f6Kzwa+N5GlEc8laLt5Ona3hwygfT/kyCQXeBV0oNMj8lUiVNsPmEZZA0OrOsUoOC448dJExkkLgs4548XpllwReaaQGibpBKT8Z+BTRyaXrEUKq40IMdEqw/m+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=degpsbBo984arjxl2XYhfPiKZ5IRhJ1LWWxCdWq19ig=;
- b=aCm9aaDqGWlr1sgYJERdAO+bwRx2jNwrzN+7NS0aXtv1QyAuoK7yjaoGEkFhB1oZewhIAebSsGvdtvVb3I1kMK3h3qkTpHN7vkMM10abWWXcPRdgXLhumBaQC9D++NPIbVhcL24URen0XJneOsn9wb37xx+/HUwZPlV+0pvZRh0=
-Authentication-Results: twiddle.net; dkim=none (message not signed)
- header.d=none;twiddle.net; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM6PR12MB3273.namprd12.prod.outlook.com (2603:10b6:5:188::17) with
- Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3391.14; Mon, 21 Sep 2020 13:55:36 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346%3]) with mapi id 15.20.3391.024; Mon, 21 Sep 2020
- 13:55:36 +0000
-Subject: Re: [PATCH v3 1/5] sev/i386: Add initial support for SEV-ES
-To: Dov Murik <dovmurik@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org
-References: <cover.1600205384.git.thomas.lendacky@amd.com>
- <e2456cc461f329f52aa6eb3fcd0d0ce9451b8fa7.1600205384.git.thomas.lendacky@amd.com>
- <e8cf44ef-3180-8922-5f0a-2ce532005e51@linux.vnet.ibm.com>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <2d1c5321-4c4a-e98c-ca91-7fbea9ae4ba4@amd.com>
-Date: Mon, 21 Sep 2020 08:55:34 -0500
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kKMc5-0002wj-BI
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 10:16:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54435)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kKMc2-0001d7-EW
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 10:16:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600697773;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=RLEao7MexzyfFt4A22pF9B8msxKiRQ3kUMgQGtfkcyE=;
+ b=R/qvSvIVvdBKOzyVl9rLNAgMxN6BlFNKejGXKVSROoBjs3zAUZVk7l5v3uOdoyjiiaBTNi
+ mXaNmSflB+v2G4Eb4Ta3CrYNZwM0PIxv4Hni6zX4qSJ62/x92ppCC44OLXC0ExkY45V16q
+ YzSLarBFN8mh6IrFNpnfVwu4QygDQ1w=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-502-0lWNDV8CMSSwebpKv5jWMg-1; Mon, 21 Sep 2020 10:16:11 -0400
+X-MC-Unique: 0lWNDV8CMSSwebpKv5jWMg-1
+Received: by mail-wm1-f69.google.com with SMTP id w3so3804132wmg.4
+ for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 07:16:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to;
+ bh=MxSQ+/VT7jxoULMAB6ENxExKkpQSG3hnmi7mwloL+CQ=;
+ b=NLht9ZnDSG9T1PGFq655R3embiU13iQzV0Rznf2JPjaHuWDpku1Mlm4MgNZLZno0yY
+ SQ07uhM93PGfv3T4Cz9THzkoznWYCRzjIH/6YQ2ia2CScjPkCXlS/RmWVbAVh+n571IE
+ a62dASzplkq3OdoOAmCF0IjYR6EHFoX74TU9zBnkK+weIhWNr/HDX4Ua+0iIJbao2Nu7
+ wrOobMrayZ5AQsmogjjDn3cqKxKe+bbHXNKoK/LBZ20aFRZO9cGmbVYk/NgQ6/dEcLkp
+ 3xa7NZp75DWAbiUK8vtqqbwbYsGRR7JsjJ2B+sR6Uiq6m1SKxY1+D3Y7phkM0SlUqnDz
+ uSQw==
+X-Gm-Message-State: AOAM5326DgOg+D09P4u2ct0W1rQ/1yRIrEsWqsYLz2mbCvqoNWKdNgKZ
+ 8yO4+DNvjlwRvgcVaD3Far5C9TLlVyae0VD+uEpY0RxFQjts7Z18j3Q6HGiCcdthG+3kLCueihg
+ zW/Uv58REmBriB1w=
+X-Received: by 2002:a1c:4d14:: with SMTP id o20mr38911wmh.115.1600697769786;
+ Mon, 21 Sep 2020 07:16:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyIEXEMRiLlWfOTN5Sx+ogSHqMIhXCttzIJ1hWpMiQrExxAO0ut6F4RerRyTGOR5O+ZjIa6AA==
+X-Received: by 2002:a1c:4d14:: with SMTP id o20mr38868wmh.115.1600697769411;
+ Mon, 21 Sep 2020 07:16:09 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d153:8d0f:94cf:5114?
+ ([2001:b07:6468:f312:d153:8d0f:94cf:5114])
+ by smtp.gmail.com with ESMTPSA id q4sm20637248wru.65.2020.09.21.07.16.08
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 21 Sep 2020 07:16:08 -0700 (PDT)
+Subject: Re: [RFC] Move to C11 Atomics
+To: Stefan Hajnoczi <stefanha@redhat.com>
+References: <20200921104107.134323-1-stefanha@redhat.com>
+ <b32450b7-13e4-9968-cd99-fe8210040d3b@redhat.com>
+ <20200921134423.GA156064@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <439bbea5-60d7-aa9c-e693-3a3b1143154c@redhat.com>
+Date: Mon, 21 Sep 2020 16:16:07 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <e8cf44ef-3180-8922-5f0a-2ce532005e51@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: DM5PR16CA0045.namprd16.prod.outlook.com
- (2603:10b6:4:15::31) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.118] (165.204.77.1) by
- DM5PR16CA0045.namprd16.prod.outlook.com (2603:10b6:4:15::31) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3391.14 via Frontend Transport; Mon, 21 Sep 2020 13:55:35 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: ea9ecd52-6d7e-48c1-341a-08d85e3603c6
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3273:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB3273064F310C9F5633E9E762EC3A0@DM6PR12MB3273.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:534;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: hQEDaXrl512eNa5EyInkUXIqDMZ/ZP8+xs6JH9GAdwqe7gINsyVNPO0Gp19bnXgzqvnWke7hUCst4lL0S1KBdEHYESe9OfmxXw0xfREvs5cIIgC+ZfrSj2vn0w7O4wsvxJ+L4g59jL9myM5fx3Bzg3Lf5wfzxSLT/LwE/vkaLQhjcWTV9njcy3i3fWOZgYo7MN6Fj2Iuv9MWpeSTC79dEaUpaK/WQj3BQHCCK4IegIAt3PsZ7bTUefAAvxeG9ThUXP42CFvbhNyy8Ah5807+fs02TL4IvcihuEm4Tgb6VGy2YrI7A0sETawIuekH2oE6++oxO5kSm7sz7/6ZxtbwuKcVaJe4zU822deywTww3QOve8PDLve3enWXLy96B0j+cj6KR1/UlcQRZAZiOppjX+0ek/EE/ZuirkpDK97oehA=
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:DM5PR12MB1355.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(396003)(136003)(366004)(39860400002)(346002)(376002)(478600001)(7416002)(66556008)(8936002)(66946007)(83380400001)(4326008)(86362001)(52116002)(66476007)(8676002)(5660300002)(186003)(316002)(31686004)(956004)(2906002)(26005)(54906003)(6486002)(16526019)(36756003)(31696002)(53546011)(16576012)(2616005)(43740500002)(309714004);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: JReioS71rsPf25GILv4qTlt72yADdG40BeN6lTCS6VpFn8sAActSkBwiRvIiVC/tAsfWc9jrysQzvnJbKMJVdMnXh/T0m0CrP6DEkCYjdzl8pyZ+soYrDHOwwRzagv+6l52jKUJKI03+BIj+I+vkSpiUfwgh7gavHwf8Rzc9bMGoAZgsb1diuoAdeOvE++5xNJV5x6a5TmeKwYhar8eMts7DOgdT95inbc0JRRhorB5cA251QOmArotEdnYWAPp/3CN+gGfQxvge5a3jn6AB2ttGebx0CfA2Dny9kFBZu9qCfZDD+TsLQcTiLhfTlO1v6Ub0B60dHA239Z9fe5gue7yXHPsa7vPfWrbjIka8rtlLtovGO0pTMPI9afrylZe1cryH7GXqfVyahoJZsWyxPk4HqPcGocEs1cJLNJ+GwLSMpfUOp4EGgwOcEeSLEO0jrUQvhCikAlIEhyPDHWjnCSHjrWRRKtZ7i9g3MF2clkYVSVcuoUShrH7Z0xSi0a9Tl1Y2PZbgZSNe4/gF7UzVzmEZzT/1oneu9D2QqHaQOK+9mfTU0I6vxJcYdGpLjln0XQ3foULga7NVv/NCpe9ecccQBxcTok3724J7O7JFNAFyHIsU6oyVUzzpU8SX2pWrvZkb108clteVnzMTyP02cA==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ea9ecd52-6d7e-48c1-341a-08d85e3603c6
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2020 13:55:36.0329 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PrOdQiAL89/NkLk29fIwgUKZYnrEmdsxphTBfOaKgd5zuGODuBo9Ko37aBAKfboXaUqIL5fRy1dhFXMfR+wUKg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3273
-Received-SPF: none client-ip=40.107.220.41;
- envelope-from=Thomas.Lendacky@amd.com;
- helo=NAM11-CO1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 10:10:41
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -8
-X-Spam_score: -0.9
-X-Spam_bar: /
-X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_NONE=0.001 autolearn=no autolearn_force=no
+In-Reply-To: <20200921134423.GA156064@stefanha-x1.localdomain>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="HxOFWWUTyL9j5WspOOxIxiIvnYK7C8lCD"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:44:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -136,178 +116,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Brijesh Singh <brijesh.singh@amd.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Connor Kuehl <ckuehl@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Jiri Slaby <jslaby@suse.cz>,
- Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Daniel Berrange <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/21/20 1:45 AM, Dov Murik wrote:
-> On 16/09/2020 0:29, Tom Lendacky wrote:
->> From: Tom Lendacky <thomas.lendacky@amd.com>
->>
->> Provide initial support for SEV-ES. This includes creating a function to
->> indicate the guest is an SEV-ES guest (which will return false until all
->> support is in place), performing the proper SEV initialization and
->> ensuring that the guest CPU state is measured as part of the launch.
->>
->> Co-developed-by: Jiri Slaby <jslaby@suse.cz>
->> Signed-off-by: Jiri Slaby <jslaby@suse.cz>
->> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
->> ---
->>   target/i386/cpu.c      |  1 +
->>   target/i386/sev-stub.c |  5 +++++
->>   target/i386/sev.c      | 46 ++++++++++++++++++++++++++++++++++++++++--
->>   target/i386/sev_i386.h |  1 +
->>   4 files changed, 51 insertions(+), 2 deletions(-)
->>
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index 588f32e136..bbbe581d35 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -5969,6 +5969,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t
->> index, uint32_t count,
->>           break;
->>       case 0x8000001F:
->>           *eax = sev_enabled() ? 0x2 : 0;
->> +        *eax |= sev_es_enabled() ? 0x8 : 0;
->>           *ebx = sev_get_cbit_position();
->>           *ebx |= sev_get_reduced_phys_bits() << 6;
->>           *ecx = 0;
->> diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
->> index 88e3f39a1e..040ac90563 100644
->> --- a/target/i386/sev-stub.c
->> +++ b/target/i386/sev-stub.c
->> @@ -49,3 +49,8 @@ SevCapability *sev_get_capabilities(Error **errp)
->>       error_setg(errp, "SEV is not available in this QEMU");
->>       return NULL;
->>   }
->> +
->> +bool sev_es_enabled(void)
->> +{
->> +    return false;
->> +}
->> diff --git a/target/i386/sev.c b/target/i386/sev.c
->> index c3ecf86704..6c9cd0854b 100644
->> --- a/target/i386/sev.c
->> +++ b/target/i386/sev.c
->> @@ -359,6 +359,12 @@ sev_enabled(void)
->>       return !!sev_guest;
->>   }
->>
->> +bool
->> +sev_es_enabled(void)
->> +{
->> +    return false;
->> +}
->> +
->>   uint64_t
->>   sev_get_me_mask(void)
->>   {
->> @@ -578,6 +584,22 @@ sev_launch_update_data(SevGuestState *sev, uint8_t
->> *addr, uint64_t len)
->>       return ret;
->>   }
->>
->> +static int
->> +sev_launch_update_vmsa(SevGuestState *sev)
->> +{
->> +    int ret, fw_error;
->> +
->> +    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL,
->> &fw_error);
->> +    if (ret) {
->> +        error_report("%s: LAUNCH_UPDATE_VMSA ret=%d fw_error=%d '%s'",
->> +                __func__, ret, fw_error, fw_error_to_str(fw_error));
->> +        goto err;
-> 
-> goto (and the err: label) is not needed.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--HxOFWWUTyL9j5WspOOxIxiIvnYK7C8lCD
+Content-Type: multipart/mixed; boundary="Mg6yjmpBcvud8J52XPKpgsveFucMDA5YA"
 
-Yup, will remove both.
+--Mg6yjmpBcvud8J52XPKpgsveFucMDA5YA
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> 
->> +    }
->> +
->> +err:
->> +    return ret;
->> +}
->> +
->>   static void
->>   sev_launch_get_measure(Notifier *notifier, void *unused)
->>   {
->> @@ -590,6 +612,14 @@ sev_launch_get_measure(Notifier *notifier, void
->> *unused)
->>           return;
->>       }
+On 21/09/20 15:44, Stefan Hajnoczi wrote:
+> On Mon, Sep 21, 2020 at 01:15:30PM +0200, Paolo Bonzini wrote:
+>> On 21/09/20 12:41, Stefan Hajnoczi wrote:
+>>> The upshot is that all atomic variables in QEMU need to use C11 Atomic
+>>> atomic_* types. This is a big change!
 >>
->> +    if (sev_es_enabled()) {
->> +        /* measure all the VM save areas before getting launch_measure */
->> +        ret = sev_launch_update_vmsa(sev);
->> +        if (ret) {
->> +            exit(1);
-> 
-> Other error cases in this function just return on error. Why quit QEMU here?
+>> The main issue with this is that C11 atomic types do too much magic,
+>> including defaulting to seq-cst operations for loads and stores. As
+>> documented in docs/devel/atomics.rst, seq-cst loads and stores are
+>> almost never what you want (they're only a little below volatile :)):
+>=20
+> I can't find where atomics.rst says seq-cst operations are almost never
+> what you want?
 
-This is inside an void return function so an error can't be returned. It
-matches what happens if sev_launch_finish() fails. To that end, a
-LAUNCH_MEASURE error should probably exit(), also.
+Note that I'm talking only about loads and stores.  They are so much
+never what you want that we don't even provide a wrapper for them in
+qemu/atomic.h.
 
-Thanks,
-Tom
+  ``qemu/atomic.h`` also provides loads and stores that cannot be
+  reordered with each other::
 
-> 
->> +        }
->> +    }
->> +
->>       measurement = g_new0(struct kvm_sev_launch_measure, 1);
->>
->>       /* query the measurement blob length */
->> @@ -684,7 +714,7 @@ sev_guest_init(const char *id)
->>   {
->>       SevGuestState *sev;
->>       char *devname;
->> -    int ret, fw_error;
->> +    int ret, fw_error, cmd;
->>       uint32_t ebx;
->>       uint32_t host_cbitpos;
->>       struct sev_user_data_status status = {};
->> @@ -745,8 +775,20 @@ sev_guest_init(const char *id)
->>       sev->api_major = status.api_major;
->>       sev->api_minor = status.api_minor;
->>
->> +    if (sev_es_enabled()) {
->> +        if (!(status.flags & SEV_STATUS_FLAGS_CONFIG_ES)) {
->> +            error_report("%s: guest policy requires SEV-ES, but "
->> +                         "host SEV-ES support unavailable",
->> +                         __func__);
->> +            goto err;
->> +        }
->> +        cmd = KVM_SEV_ES_INIT;
->> +    } else {
->> +        cmd = KVM_SEV_INIT;
->> +    }
->> +
->>       trace_kvm_sev_init();
->> -    ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
->> +    ret = sev_ioctl(sev->sev_fd, cmd, NULL, &fw_error);
->>       if (ret) {
->>           error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
->>                        __func__, ret, fw_error, fw_error_to_str(fw_error));
->> diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
->> index 4db6960f60..4f9a5e9b21 100644
->> --- a/target/i386/sev_i386.h
->> +++ b/target/i386/sev_i386.h
->> @@ -29,6 +29,7 @@
->>   #define SEV_POLICY_SEV          0x20
->>
->>   extern bool sev_enabled(void);
->> +extern bool sev_es_enabled(void);
->>   extern uint64_t sev_get_me_mask(void);
->>   extern SevInfo *sev_get_info(void);
->>   extern uint32_t sev_get_cbit_position(void);
->>
+    typeof(*ptr) atomic_mb_read(ptr)
+    void         atomic_mb_set(ptr, val)
+
+  However these do not provide sequential consistency and, in
+  particular, they do not participate in the total ordering enforced by
+  sequentially-consistent operations.  For this reason they are
+  deprecated.  They should instead be replaced with any of the following
+  (ordered from easiest to hardest):
+
+  - accesses inside a mutex or spinlock
+
+  - lightweight synchronization primitives such as ``QemuEvent``
+
+  - RCU operations (``atomic_rcu_read``, ``atomic_rcu_set``) when
+  publishing or accessing a new version of a data structure
+
+  - other atomic accesses: ``atomic_read`` and ``atomic_load_acquire``
+  for loads, ``atomic_set`` and ``atomic_store_release`` for stores,
+  ``smp_mb`` to forbid reordering subsequent loads before a store.
+
+where seq-cst loads and stores are again completely missing.  smp_mb is
+there to replace them, as we did in commit 5710a3e0 ("async: use
+explicit memory barriers").
+
+>> we can use store-release/load-acquire
+>=20
+> They don't provide atomic arithmetic/logic operations. The only
+> non-seq-cst ALU operation I see in atomic.h is
+> atomic_fetch_inc_nonzero(), and it's a cmpxchg() loop (ugly compared to
+> an atomic ALU instruction).
+
+Seq-cst is fine for RMW operations (arithmetic/logic, xchg, cmpxchg),
+also because they're usually less performance critical than loads and
+stores.  It's only loads and stores that give a false sense of
+correctness as in the above commit.
+
+Paolo
+
+
+--Mg6yjmpBcvud8J52XPKpgsveFucMDA5YA--
+
+--HxOFWWUTyL9j5WspOOxIxiIvnYK7C8lCD
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl9otacACgkQv/vSX3jH
+roN82Af8DitMvRQ39kET3eMpMr06j1oGBHcG8XXbR6RumoKwJYS/kesf/zICI3d5
+yUq2iaQL05kTq1Mhu5gdxjEUce/G4MM24UwgE4fDiAemSL+beF64GJG4RYjEKBFR
+1SvdPE2enB8HEHDXMFR8QQDMmb0y+WXzQk65T2PpBor/wsEdMTnhapk0SunbYiLE
+HN7AsTOIDmrL9EYJL0aV8RlfTrJy0dJAw154ebJj7F1Rdmdmwl+CliwBOQu6Meom
+jOCUSZ2m3D5N/GQ92p6t6xSlhYVRap5noHvBxh7/h7925kBfkABIBqCVZbZU7FGf
+pgpz+UZEKZBjio63L5o86yRA1mcDog==
+=V6pn
+-----END PGP SIGNATURE-----
+
+--HxOFWWUTyL9j5WspOOxIxiIvnYK7C8lCD--
+
 
