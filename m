@@ -7,72 +7,75 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4C2DC4363D
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 18:23:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9301EC4363C
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 18:25:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52AAC221E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 18:23:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 08068222BB
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 18:25:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eeIHy4IS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52AAC221E2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i1fOBC2B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08068222BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKQTK-0006Mw-HQ
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 14:23:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52476)
+	id 1kKQUv-0007LQ-6d
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 14:25:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52956)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kKQEC-00027Y-1G
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 14:07:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49903)
+ id 1kKQFy-0003t4-GY
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 14:09:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51704)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kKQE9-0003WY-2u
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 14:07:51 -0400
+ id 1kKQFw-0003g9-DV
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 14:09:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600711668;
+ s=mimecast20190719; t=1600711779;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=PtZ7r3WsAvJjqb08OKZYM8g/0SC3J1JnwX6NevgEAiY=;
- b=eeIHy4IS0vbPVf3Da41zUPqvBHpNOCGdRM3TZz8WLOzKrlzwojYVMrd/dVzSEhWW6Mbe4G
- O+rwjfty8BU8fZVnzKuV+jEmQB7UGJqJs8S23UPWb3mRKMZ/xG4jTkSc+3uO33euBSS2LR
- KS5Pox02BtIX0ritO4/PqsVoBu8xuVk=
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=DXPFvONr3DDfea6nuAneeuRTopdj5Vqy0kJ3SnjcJnY=;
+ b=i1fOBC2B4GLt1H7//GRilVUtbk4MuAA55lT8DVYjOrAYBlo6CSNDqat1OkvS4cwaJv9cZr
+ o/XFahovFcyaOw/5Tb1Fvd1EDNgTd3dWPt/I+aTquExvWUId/o/Rjs+QRQtacRoZY0yKea
+ 8jqMUaCNG8wuVtkAkdNITRYUR7dS58s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-_-ASZlj6NsmIc8kOUf0NUg-1; Mon, 21 Sep 2020 14:07:44 -0400
-X-MC-Unique: _-ASZlj6NsmIc8kOUf0NUg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-514-l44BIDwrOVyotFmGwLC0XA-1; Mon, 21 Sep 2020 14:09:37 -0400
+X-MC-Unique: l44BIDwrOVyotFmGwLC0XA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86321801FD7;
- Mon, 21 Sep 2020 18:07:43 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73702800135;
+ Mon, 21 Sep 2020 18:09:36 +0000 (UTC)
 Received: from redhat.com (ovpn-113-113.ams2.redhat.com [10.36.113.113])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8850673688;
- Mon, 21 Sep 2020 18:07:38 +0000 (UTC)
-Date: Mon, 21 Sep 2020 19:07:35 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E4CD110013DB;
+ Mon, 21 Sep 2020 18:09:30 +0000 (UTC)
+Date: Mon, 21 Sep 2020 19:09:27 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH 4/7] shippable.yml: Remove the Debian9-based MinGW
- cross-compiler tests
-Message-ID: <20200921180735.GW1942072@redhat.com>
+Subject: Re: [PATCH 6/7] gitlab-ci: Increase the timeout for the
+ cross-compiler builds
+Message-ID: <20200921180927.GY1942072@redhat.com>
 References: <20200921174320.46062-1-thuth@redhat.com>
- <20200921174320.46062-5-thuth@redhat.com>
+ <20200921174320.46062-7-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200921174320.46062-5-thuth@redhat.com>
+In-Reply-To: <20200921174320.46062-7-thuth@redhat.com>
 User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
@@ -108,38 +111,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 21, 2020 at 07:43:17PM +0200, Thomas Huth wrote:
-> We're not supporting Debian 9 anymore, and we are now testing
-> MinGW cross-compiler builds in the gitlab-CI, too, so we do not
-> really need these jobs in the shippable.yml anymore.
+On Mon, Sep 21, 2020 at 07:43:19PM +0200, Thomas Huth wrote:
+> Some of the cross-compiler builds (the mips build and the win64 build
+> for example) are quite slow and sometimes hit the 1h time limit.
+> Increase the limit a little bit to make sure that we do not get failures
+> in the CI runs just because of some few minutes.
 
-For that matter aren't all the other shippable entries obsolete
-now too since we added .gitlab-ci.d/crossbuilds.yml ?
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
-IOW, can we remove shippable entirely at this point ?
 
 > 
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  .shippable.yml | 4 ----
->  1 file changed, 4 deletions(-)
+>  .gitlab-ci.d/crossbuilds.yml | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/.shippable.yml b/.shippable.yml
-> index 0b4fd6df1d..14350e6de8 100644
-> --- a/.shippable.yml
-> +++ b/.shippable.yml
-> @@ -7,10 +7,6 @@ env:
->    matrix:
->      - IMAGE=debian-amd64
->        TARGET_LIST=x86_64-softmmu,x86_64-linux-user
-> -    - IMAGE=debian-win32-cross
-> -      TARGET_LIST=arm-softmmu,i386-softmmu
-> -    - IMAGE=debian-win64-cross
-> -      TARGET_LIST=aarch64-softmmu,sparc64-softmmu,x86_64-softmmu
->      - IMAGE=debian-armel-cross
->        TARGET_LIST=arm-softmmu,arm-linux-user,armeb-linux-user
->      - IMAGE=debian-armhf-cross
-
+> diff --git a/.gitlab-ci.d/crossbuilds.yml b/.gitlab-ci.d/crossbuilds.yml
+> index 510cfec03b..03ebfabb3f 100644
+> --- a/.gitlab-ci.d/crossbuilds.yml
+> +++ b/.gitlab-ci.d/crossbuilds.yml
+> @@ -2,6 +2,7 @@
+>  .cross_system_build_job_template: &cross_system_build_job_definition
+>    stage: build
+>    image: $CI_REGISTRY_IMAGE/qemu/$IMAGE:latest
+> +  timeout: 80m
+>    script:
+>      - mkdir build
+>      - cd build
 > -- 
 > 2.18.2
 > 
