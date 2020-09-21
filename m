@@ -2,88 +2,88 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F496C43468
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 16:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05773C43466
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 16:55:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D44A206DC
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 16:54:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7AB50206DC
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 16:55:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QrzcVEFI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D44A206DC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fw/ERSgy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AB50206DC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKP4x-0006Vz-4x
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 12:54:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34172)
+	id 1kKP66-0007SX-HG
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 12:55:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34246)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kKP1Q-0004id-26
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 12:50:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22040)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kKP1N-0002N5-Va
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 12:50:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600707033;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=PjvE9YzL00mg2t6x/rsy9xvERlUVELpr5h+HEMD/XH4=;
- b=QrzcVEFIOo30zEu4OhQ68Ktt8AK9pHSTiNnjxsOG9Q2ODFKhji/x5+pIbhW/cFskSLyQLd
- qgjXIwHFzb1E+NxOuHOwwKchKhSOtwCGc2UyI5kslk7yS1E/fZCLe9xAytTRnqYzaOqK0b
- mCaC20tCFusniWoPW7kHlrF8zTJ88q4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-301-ZFzwHe-5OEeFPplaPKXy5w-1; Mon, 21 Sep 2020 12:50:31 -0400
-X-MC-Unique: ZFzwHe-5OEeFPplaPKXy5w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E767C10082E7;
- Mon, 21 Sep 2020 16:50:29 +0000 (UTC)
-Received: from localhost (unknown [10.10.67.5])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 789DF19744;
- Mon, 21 Sep 2020 16:50:29 +0000 (UTC)
-Date: Mon, 21 Sep 2020 12:50:28 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: "Kang, Luwei" <luwei.kang@intel.com>
-Subject: Re: [PATCH v1 0/3] Remove the limitation of Intel PT CPUID info
-Message-ID: <20200921165028.GP57321@habkost.net>
-References: <1582580312-19864-1-git-send-email-luwei.kang@intel.com>
- <82D7661F83C1A047AF7DC287873BF1E1738B07FF@SHSMSX104.ccr.corp.intel.com>
- <20200918220255.GB57321@habkost.net>
- <CY4PR11MB14473A594C244A5B403ADC26803A0@CY4PR11MB1447.namprd11.prod.outlook.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kKP1l-0004xi-Td
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 12:50:57 -0400
+Received: from mail-ej1-x630.google.com ([2a00:1450:4864:20::630]:34870)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kKP1j-0002Tm-Lr
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 12:50:57 -0400
+Received: by mail-ej1-x630.google.com with SMTP id u21so18752478eja.2
+ for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 09:50:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=JKwZjtuAZvXKjSPWyVU1ge3ImJyQdzxjsi2npcHNE+M=;
+ b=fw/ERSgyS4Xe5n8qf4ZbsXego8++xYYXDaAr7S9B0gKcVq5GHXxEu5WCrO/UhotJ92
+ 8F/eNkGeYbDr0UhAGSeium8A9mLklWloM83l7Y9jIxpTUCWEl6b+O1fTk8NuSxei3YLW
+ UA7T4tM8bpyYRS7KaF6+1KWk1J14KZ62MD6UPfWxYMurUiuaclZpofOTegXbj/1u0kIZ
+ k11G/pkIayJudMeLkfqOnvn9T5JaDiKW9egGYQ3QJnD4fwSvc5Rgj+axubiyGxNAmqa/
+ l+lYE7uUibV5fTapa+WTbi7BWrxOJ3l3L3EcJc3QugZ7bVb8IlKX67fqWQmfArXc6qkX
+ 3j4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=JKwZjtuAZvXKjSPWyVU1ge3ImJyQdzxjsi2npcHNE+M=;
+ b=MColiKCj/xP4hImWIKY+EZjsoMkV5TMuXqi2H1L5Jvb6/SnXEyVIXssWFkNEIpu9a7
+ yvcuc8C7YTUg9nYJ0wA0b7lZbuJcK4FDkGifuBWvSfILK9k9bTGi5IRak7RbnK6CLQGm
+ ViQ4hsKvmcfCJSmHsR61RC21VhaKYzm50Egm3vpACDgSUEbzMQWrFFRdNChUwV+btHt3
+ 2ss5VyjZN3AG1/t0a6GkDnAiY8c2Q4/r4YghxX/4NWPeVghbqCsXi5qOTj+x9exWunZl
+ vw9iF1wNzDO9eCrcZMk0E+EHJB44fUjcEQgNfcqr6KO0/hSU6MKwV3M3f2C2ihuu8wMr
+ ol9g==
+X-Gm-Message-State: AOAM530C8PqivCqPc2WK80EhgCKz6o4zxHwNVhNZhrwBi2qzAgR06/gP
+ O5caZw4W3exSz+xWYPG4nDzsgMaPIkhKczEv/3Y+nA==
+X-Google-Smtp-Source: ABdhPJzH0+6/wvFvR4EvsBWCiK0Sdj/u37evB8GTNSa+6LLrDlHPM4zcLCIjbmrLykCBpFL0a9vhhkgL2CcCImHpwRY=
+X-Received: by 2002:a17:906:24d6:: with SMTP id
+ f22mr333161ejb.85.1600707053901; 
+ Mon, 21 Sep 2020 09:50:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CY4PR11MB14473A594C244A5B403ADC26803A0@CY4PR11MB1447.namprd11.prod.outlook.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:43:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200810195019.25427-1-peter.maydell@linaro.org>
+ <20200810195019.25427-10-peter.maydell@linaro.org>
+ <87eenh38lp.fsf@dusky.pond.sub.org>
+In-Reply-To: <87eenh38lp.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 21 Sep 2020 17:50:42 +0100
+Message-ID: <CAFEAcA8unnV=bQiaks-YnD0LOrfwMx2FQFN=Zf4zshrgccrwAQ@mail.gmail.com>
+Subject: Re: [PATCH v5 09/20] docs/sphinx: Add new qapi-doc Sphinx extension
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::630;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x630.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,112 +96,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Strong, Beeman" <beeman.strong@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Robert Hoo <robert.hu@linux.intel.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- Jiri Denemark <jdenemar@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 21, 2020 at 07:49:22AM +0000, Kang, Luwei wrote:
-> Hi Eduardo,
->     This patch set will remove some limitations of Intel PT CPUID information.
->     1. The "IP payloads" feature will disable the Intel PT in guests and it will be coming soon.
->     2. To make the live migration safe, we set the Intel PT CPUID as a constant value(Icelake server CPUID). It will mask off the new feature of Intel PT.
+On Fri, 4 Sep 2020 at 15:44, Markus Armbruster <armbru@redhat.com> wrote:
+>
+> $ pycodestyle docs/sphinx/qapidoc.py
+> docs/sphinx/qapidoc.py:42:1: E302 expected 2 blank lines, found 1
+> docs/sphinx/qapidoc.py:50:1: E302 expected 2 blank lines, found 1
+> docs/sphinx/qapidoc.py:74:80: E501 line too long (80 > 79 characters)
+> docs/sphinx/qapidoc.py:388:80: E501 line too long (80 > 79 characters)
+> docs/sphinx/qapidoc.py:391:80: E501 line too long (80 > 79 characters)
+> docs/sphinx/qapidoc.py:430:1: E302 expected 2 blank lines, found 1
+> docs/sphinx/qapidoc.py:489:80: E501 line too long (80 > 79 characters)
+> docs/sphinx/qapidoc.py:495:1: E302 expected 2 blank lines, found 1
 
-Isn't this series doing the opposite of 2?  It replaces all
-constant CPUID values with kvm_arch_get_supported_cpuid(), making
-the feature unavailable in migration-safe mode.
+All fixed.
 
-Does it mean the plan is to drop intel-pt migration support
-entirely?
+> $ PYTHONPATH=scripts pylint docs/sphinx/qapidoc.py
+> ************* Module qapidoc
+> docs/sphinx/qapidoc.py:36:4: E0611: No name 'AutodocReporter' in module 'sphinx.ext.autodoc' (no-name-in-module)
+> docs/sphinx/qapidoc.py:45:10: R1708: Do not raise StopIteration in generator, use return statement instead (stop-iteration-return)
+> docs/sphinx/qapidoc.py:104:4: R0201: Method could be a function (no-self-use)
+> docs/sphinx/qapidoc.py:253:4: R0201: Method could be a function (no-self-use)
+> docs/sphinx/qapidoc.py:34:4: C0412: Imports from package sphinx are not grouped (ungrouped-imports)
 
-> 
->     About this issue https://bugzilla.redhat.com/show_bug.cgi?id=1853972, Intel PT is disabled in the guest by default, we should use "-cpu Icelake-Server,+intel-pt" to enable the Intel PT.
+Not fixed: I disagree with the linter on all these.
 
-That's correct.  The point of the BZ is that libvirt
-mode=host-model was expected to include intel-pt automatically
-when available.  With this series, the request in the BZ stops
-making sense (because intel-pt won't be migration-safe anymore),
-but I'm not sure yet that's really the plan.
+The first and fifth of these are unfixable because they are the
+result of code that is trying to adapt to multiple versions of
+Sphinx (one of which has AutodocReporter and the other of which
+does not).
 
+The second makes no sense and appears to me to be a linter
+bug, because the code doesn't (directly) raise StopIteration.
+In any case the function being complained about is just a
+straight borrowing from pydash.
 
-> 
-> Thanks,
-> Luwei Kang
-> 
-> > -----Original Message-----
-> > From: Eduardo Habkost <ehabkost@redhat.com>
-> > Sent: Saturday, September 19, 2020 6:03 AM
-> > To: Kang, Luwei <luwei.kang@intel.com>
-> > Cc: pbonzini@redhat.com; rth@twiddle.net; qemu-devel@nongnu.org; Strong,
-> > Beeman <beeman.strong@intel.com>; Jiri Denemark
-> > <jdenemar@redhat.com>; Robert Hoo <robert.hu@linux.intel.com>
-> > Subject: Re: [PATCH v1 0/3] Remove the limitation of Intel PT CPUID info
-> > 
-> > Hi Luwei Kang,
-> > 
-> > I was looking for info on intel-pt and just saw this series, and it was never
-> > reviewed or merged (sorry for missing it!).  Is this still the approach we want to
-> > follow for intel-pt?
-> > 
-> > I'm CCing Jiri Denemark because this might be relevant for a libvirt issue related
-> > to intel-pt we were investigating[1].
-> > 
-> > [1] https://bugzilla.redhat.com/show_bug.cgi?id=1853972
-> > 
-> > 
-> > On Mon, Mar 30, 2020 at 09:56:09AM +0000, Kang, Luwei wrote:
-> > > > -----Original Message-----
-> > > > From: Kang, Luwei <luwei.kang@intel.com>
-> > > > Sent: Tuesday, February 25, 2020 5:38 AM
-> > > > To: pbonzini@redhat.com; rth@twiddle.net; ehabkost@redhat.com
-> > > > Cc: qemu-devel@nongnu.org; Strong, Beeman
-> > <beeman.strong@intel.com>;
-> > > > Kang, Luwei <luwei.kang@intel.com>
-> > > > Subject: [PATCH v1 0/3] Remove the limitation of Intel PT CPUID info
-> > > >
-> > > > The Intel PT feature includes some
-> > > > sub-features(CPUID.(EAX=14H,ECX=0H))
-> > > > and these sub-features are different on different HW platforms. To
-> > > > make the live migration safety(get the same CPUID info with same cpu
-> > > > model on different HW platform), the current Intel PT CPUID
-> > > > information is set to a constant value(from ICELAKE Server).
-> > > >
-> > > > It will block the new feature in the later HW platform. what's more,
-> > > > the support of "IP payloads" will disable the Intel PT in KVM
-> > > > guest(patch 1) but it will come soon.
-> > > >
-> > > > This patchset remove this limitation and expose all the capabilities
-> > > > to KVM guest. As it will break the live migration safe, Intel PT
-> > > > will be masked as unmigratable.
-> > >
-> > > Ping.
-> > >
-> > > Thanks,
-> > > Luwei Kang
-> > >
-> > > >
-> > > > Luwei Kang (3):
-> > > >   i386: Remove the limitation of IP payloads for Intel PT
-> > > >   i386: Remove the CPUID limitation of Intel PT
-> > > >   i386: Mark the 'INTEL_PT' CPUID bit as unmigratable
-> > > >
-> > > >  target/i386/cpu.c | 69
-> > > > ++++---------------------------------------------------
-> > > >  1 file changed, 5 insertions(+), 64 deletions(-)
-> > > >
-> > > > --
-> > > > 1.8.3.1
-> > >
-> > 
-> > --
-> > Eduardo
-> 
+The third and fourth would mean that two of the 10 or so
+_nodes_for_whatever methods would become functions and
+gratuitously different in call signature from the rest
+just because it happens that the current implementation
+doesn't need 'self'.
 
--- 
-Eduardo
+(The version of pylint I have also warns about:
+ * comments that say "TODO", both of which are ones that
+   are carried over from the texinfo generator about dropping
+   fallback code when undocumented members are outlawed
+ * methods that are part of the QAPISchemaVisitor
+   interface and apparently have "too many arguments")
+ * single-letter variables
+ * the Use_SSI variable name which is from the kerneldoc plugin
+I'm going to ignore those too.)
 
+thanks
+-- PMM
 
