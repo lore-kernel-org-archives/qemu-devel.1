@@ -2,106 +2,87 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB78AC43464
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 09:45:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AE41C43465
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 09:47:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DAFC2076B
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 09:45:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E519521789
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 09:47:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="is/jjkA4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DAFC2076B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d0b1Jh01"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E519521789
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKINy-0002ku-9m
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 05:45:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43784)
+	id 1kKIPz-0004d9-0N
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 05:47:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44082)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1kKINI-0002Dj-PU
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 05:44:44 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42967
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kKIOv-0003wj-2s
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 05:46:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22027)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1kKINE-0003AB-S2
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 05:44:43 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kKIOs-0003Sc-Qt
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 05:46:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600681479;
+ s=mimecast20190719; t=1600681580;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=JtIaGIRQH+XKmLToCgcjltukAzXZYnxy92kz6UYau3E=;
- b=is/jjkA4hnKuf0BjI6J5ZDUnJWyRqwU7zuWrM3jCJXACIrOAYBzm8/hicpaOA6eetyC+a9
- H5mcNQeDLXgGonHHI9x1S1+5IeKHUyj3vXNBg0z4Z551bnF9IEhc9m6+EHMtvWKEiRGlWL
- KgjIhYO0buTvJ9pnBmIkTTPgugu6+cQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-567-z7Zs1Z4nOn2w8a2iMaL9cg-1; Mon, 21 Sep 2020 05:44:37 -0400
-X-MC-Unique: z7Zs1Z4nOn2w8a2iMaL9cg-1
-Received: by mail-wm1-f71.google.com with SMTP id c200so3523855wmd.5
- for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 02:44:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=JtIaGIRQH+XKmLToCgcjltukAzXZYnxy92kz6UYau3E=;
- b=WgAExnuvSu7hfnLfOnTF/NjbxRK8a7klY2v+jcOpXGyHZ7poyLnCUA+vnZwgG1Dacv
- ddEjWy7Mq5aKwvk6lfkTHTkV7sPsU8fFs6M9Ao9cF7diCwz8l3iPCm5Lu5AMsOI/ZLKo
- bZ/Jq/OUbr1/255ZiV/8TpLd4xna+jLFA78xGvT6wsCFOgs5mJj0QwxIboxsDnDoh4eL
- wzYXRnjs9BhHQkmKE844YRYdFEzlPoINij8ZBHwPCA1Lmr8td74wIhFm8sJ+/UyR+7PI
- FyPgpioGDDGgJyxWzwr9p3GpQ/rVuXs2yAFKrS9W5a0QtDCySNhnUhePSZZDef8401N/
- tIoA==
-X-Gm-Message-State: AOAM532KLNmz0DT3sdwh5s9GHbAx3RojBRrzNMBGNXN8nOlm7z6UY3nj
- 38W2nzfqx9JojTpfO62canOVwPLmIdCcFGofDdQxgiUcxYKIM/THJPv+P90cVaXEBw+lCYON1T0
- iBlW+n/DALDvYCXQ=
-X-Received: by 2002:a1c:7308:: with SMTP id d8mr28916013wmb.55.1600681476745; 
- Mon, 21 Sep 2020 02:44:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx3OEAJlLjjfnD4TbspwoTTAVOAYYn0hhtIzVlHhCCK99+HhceE9Vd3BEejnRh6ybcpKFZiuw==
-X-Received: by 2002:a1c:7308:: with SMTP id d8mr28915983wmb.55.1600681476460; 
- Mon, 21 Sep 2020 02:44:36 -0700 (PDT)
-Received: from steredhat (host-79-13-204-53.retail.telecomitalia.it.
- [79.13.204.53])
- by smtp.gmail.com with ESMTPSA id z14sm19749551wrh.14.2020.09.21.02.44.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 21 Sep 2020 02:44:35 -0700 (PDT)
-Date: Mon, 21 Sep 2020 11:44:28 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v4 1/4] virtio: skip legacy support check on machine
- types less than 5.1
-Message-ID: <20200921094428.2ttnxzgtvtma3dm2@steredhat>
+ bh=0GEFx06t/OwKjcPuzCjLPh5UPP2kUWjSYrPVcdQbyvw=;
+ b=d0b1Jh01lt0oaJHXZSGW6MMOtHBHWVcqgZYwwz6INiyu038ScEO2oeLBZY9sgBlsk2Ut8r
+ mN9L/CVkCKHekENjrYb9ERbdAxmRM0JCOTOEHyU8Gz446NU0M4TYQqT6BfVXnIB0bmZZlT
+ pZtszdp8KtPY/jvI1Nwqknyq4D6K5Rk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-246-PArGVvP6Pk-2aGH4T6p6NQ-1; Mon, 21 Sep 2020 05:46:18 -0400
+X-MC-Unique: PArGVvP6Pk-2aGH4T6p6NQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E76DB18B9ECD;
+ Mon, 21 Sep 2020 09:46:16 +0000 (UTC)
+Received: from gondolin (ovpn-112-187.ams2.redhat.com [10.36.112.187])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 442505C1DC;
+ Mon, 21 Sep 2020 09:46:05 +0000 (UTC)
+Date: Mon, 21 Sep 2020 11:46:02 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Subject: Re: [PATCH v4 2/4] vhost-vsock-pci: force virtio version 1
+Message-ID: <20200921114602.46372eb4.cohuck@redhat.com>
+In-Reply-To: <20200921083807.48380-3-sgarzare@redhat.com>
 References: <20200921083807.48380-1-sgarzare@redhat.com>
- <20200921083807.48380-2-sgarzare@redhat.com>
- <20200921114054.75917251.cohuck@redhat.com>
+ <20200921083807.48380-3-sgarzare@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200921114054.75917251.cohuck@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=sgarzare@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=sgarzare@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 03:43:14
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:44:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.501,
+X-Spam_score_int: -45
+X-Spam_score: -4.6
+X-Spam_bar: ----
+X-Spam_report: (-4.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.501,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -126,86 +107,52 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 21, 2020 at 11:40:54AM +0200, Cornelia Huck wrote:
-> On Mon, 21 Sep 2020 10:38:04 +0200
-> Stefano Garzarella <sgarzare@redhat.com> wrote:
-> 
-> > Commit 9b3a35ec82 ("virtio: verify that legacy support is not accidentally
-> > on") added a check that returns an error if legacy support is on, but the
-> > device does not support legacy.
-> > 
-> > Unfortunately some devices were wrongly declared legacy capable even if
-> > they were not (e.g vhost-vsock).
-> > 
-> > To avoid migration issues, we add a virtio-device property
-> > (x-disable-legacy-check) to skip the legacy error, printing a warning
-> > instead, for machine types < 5.1.
-> > 
-> > Cc: qemu-stable@nongnu.org
-> > Fixes: 9b3a35ec82 ("virtio: verify that legacy support is not accidentally on")
-> > Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > Suggested-by: Cornelia Huck <cohuck@redhat.com>
-> > Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > ---
-> > v4:
-> >  - fixed commit message and warning message [Cornelia]
-> > v3:
-> >  - added virtio_legacy_check_disabled() helper
-> >  - moved warning where error was returned [Cornelia]
-> > v2:
-> >  - fixed Cornelia's e-mail address
-> > ---
-> >  include/hw/virtio/virtio.h |  2 ++
-> >  hw/core/machine.c          |  1 +
-> >  hw/s390x/virtio-ccw.c      | 15 ++++++++++++---
-> >  hw/virtio/virtio-pci.c     | 14 ++++++++++++--
-> >  hw/virtio/virtio.c         |  7 +++++++
-> >  5 files changed, 34 insertions(+), 5 deletions(-)
-> > 
-> 
-> (...)
-> 
-> > diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-> > index 8feb3451a0..c534cdf2e5 100644
-> > --- a/hw/s390x/virtio-ccw.c
-> > +++ b/hw/s390x/virtio-ccw.c
-> > @@ -1122,9 +1122,18 @@ static void virtio_ccw_device_plugged(DeviceState *d, Error **errp)
-> >      }
-> >  
-> >      if (!virtio_ccw_rev_max(dev) && !virtio_legacy_allowed(vdev)) {
-> > -        error_setg(errp, "Invalid value of property max_rev "
-> > -                   "(is %d expected >= 1)", virtio_ccw_rev_max(dev));
-> > -        return;
-> > +        /*
-> > +         * To avoid migration issues, we allow legacy mode when legacy
-> > +         * check is disabled in the old machine types (< 5.1).
-> > +         */
-> > +        if (virtio_legacy_check_disabled(vdev)) {
-> > +            warn_report("device requires revision >= 1, but for backward "
-> > +                        "compatibility max_revision=0 is allowed");
+On Mon, 21 Sep 2020 10:38:05 +0200
+Stefano Garzarella <sgarzare@redhat.com> wrote:
 
-I forgot to mention that I changed 'max_rev' to 'max_revision' since it
-is the parameter that the user can touch.
+> Commit 9b3a35ec82 ("virtio: verify that legacy support is not
+> accidentally on") added a safety check that requires to set
+> 'disable-legacy=on' on vhost-vsock-pci device:
+> 
+>     $ ./qemu-system-x86_64 ... -device vhost-vsock-pci,guest-cid=5
+>         qemu-system-x86_64: -device vhost-vsock-pci,guest-cid=5:
+>         device is modern-only, use disable-legacy=on
+> 
+> virtio-vsock was introduced after the release of VIRTIO 1.0
+> specifications, so it should be 'modern-only'.
+> In addition Cornelia verified that forcing a legacy mode on
+> vhost-vsock-pci device using x86-64 host and s390x guest, so with
+> different endianness, produces strange behaviours.
+> 
+> This patch forces virtio version 1 and removes the 'transitional_name'
+> property removing the need to specify 'disable-legacy=on' on
+> vhost-vsock-pci device.
+> 
+> To avoid migration issues, we force virtio version 1 only when
+> legacy check is enabled in the new machine types (>= 5.1).
+
+Maybe add
+
+"As the transitional device name is not commonly used, we do not
+provide compatibility handling for it." ?
 
 > 
-> Message looks good to me.
-
-Thanks!
-
-Stefano
-
+> Cc: qemu-stable@nongnu.org
+> Reported-by: Qian Cai <caiqian@redhat.com>
+> Reported-by: Qinghua Cheng <qcheng@redhat.com>
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1868449
+> Suggested-by: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+> v3:
+>  - forced virtio version 1 only with new machine types
+> v2:
+>  - fixed commit message [Cornelia]
+> ---
+>  hw/virtio/vhost-vsock-pci.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
 > 
-> > +        } else {
-> > +            error_setg(errp, "Invalid value of property max_rev "
-> > +                       "(is %d expected >= 1)", virtio_ccw_rev_max(dev));
-> > +            return;
-> > +        }
-> >      }
-> >  
-> >      if (virtio_get_num_queues(vdev) > VIRTIO_QUEUE_MAX) {
-> 
-> (...)
-> 
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
 
