@@ -7,70 +7,69 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 309A1C43464
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 08:04:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD015C43464
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 08:04:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AED5C20874
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 08:04:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5419520874
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 08:04:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HHGnt+RF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AED5C20874
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cHXGAWZj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5419520874
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKGo9-0002kt-PR
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 04:04:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42102)
+	id 1kKGoX-0003Hx-8v
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 04:04:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42052)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kKGgl-0004Vk-Nt; Mon, 21 Sep 2020 03:56:44 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41397)
+ id 1kKGgk-0004V9-Ar; Mon, 21 Sep 2020 03:56:42 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51152)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kKGgj-0005uc-EC; Mon, 21 Sep 2020 03:56:43 -0400
-Received: by mail-wr1-x442.google.com with SMTP id w5so11644009wrp.8;
- Mon, 21 Sep 2020 00:56:40 -0700 (PDT)
+ id 1kKGge-0005u7-W0; Mon, 21 Sep 2020 03:56:41 -0400
+Received: by mail-wm1-x344.google.com with SMTP id e17so11141197wme.0;
+ Mon, 21 Sep 2020 00:56:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=3cUAmcXEySvZuiPUDhUwrBrWEw0aliYA7aOM+n1UWOI=;
- b=HHGnt+RFag9XZfkWzme5pKMLKAPNbLZq1vHaYb2qtu+SFuxHrDXFvaz3DELv/QkAnk
- 3Y74UyD9FYSZZXOW32Al4PVpx6coBMzUUlB5rXR9DY1MEkc9yliI9D6bMBamMtLrwlBg
- cBZ9qnuA1VX16P2t9zB27TTJDy2Gc86hcgGVedGlSiIDlY24HIRRe7dxzV8bAYMesxCL
- Gdcrr7HR51fxftvwjXNoGOD0Dfxnjzm8na99RtXDUO1geAN1Glumrqea8QiH5+CA37rz
- /GaGcyLk0FsEfykRgqEwFapqYMamvd8MCnry759Uh/0kiA9Q06uc5PI2rmhWCq1H2Fd6
- Obdg==
+ bh=4jv3gV83IdvS5OKXioOXbKRM8ceNFIHhtNFiZgXYFU8=;
+ b=cHXGAWZjs1mtTUP9QmNplWdwi6b+Rs2EjtEhI6Zo/5ZsnErlZaZoLBlHof1qTAYpX5
+ XOgWIjJg4+bInmCeLclSYc3xZROxL3KzJoCKsvf7HNeBXIclPj3N/LlQ3vkaYTxsXOr7
+ BQp39Ys97LMGZcR+QV2DW2QGF4tXVYLn0XskzQoDCt8EFFrzg2G7Guuj5F1X3mMvpUH2
+ rl5Kxk6Uw9nNPzLSVBMJwZwCIaeCcZRKfVqsUt9RAZ3QGOn5HqooNbwUrQbhchPM+/IK
+ YXzfEuh76kGlo68VZnxc8pXKLBVspvDqfkjrC21PvJ5o5YSMM/b4o2Pd5kpyO5YXFjaE
+ fLZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=3cUAmcXEySvZuiPUDhUwrBrWEw0aliYA7aOM+n1UWOI=;
- b=I0qP/4OQuLPW9EuddO2TN3h2GBIywhi4jmsjc0W4t22SKCe+wiqzNfEFFBMC5/AXZq
- 4hohoTxqWhll3NkdKHi+z9jdr5pKU74nzhH+UVY2OqXA21ATC2iwGppDXLPfHHmpIndW
- 1cBWqltydrdPP8mG9HzvJHvRLtxwTDqtn0um4unnm9EpGjUSXg/BaEYBThAKWlCi//wT
- J8oWHEEtgAAs0/vdt8U8Rt03uxSnpN6WVeZ4etuK/U+cLvIqKov9Xy3FcWGYRNcJ8R59
- g7ZjjEgMrbgFk3ar4ajOtPmHxDzhqTcbtsa+flln4vu9tB3uWOl8YVbCryfZIktRSEzP
- psCw==
-X-Gm-Message-State: AOAM532icoUZQrs4xBuGnEGnryICh3f9bk+siwPlVI8X5qaoYPPJxG6U
- qrRhmGl9NcS1/2toqfJmwoVEwX1gANQ=
-X-Google-Smtp-Source: ABdhPJyYhBHjfebxHKTyJVFY+HdnLw1Z/14Lys9WpMdXMRbXNFVqgci3j600qn/bWT8Imrxom2LVeg==
-X-Received: by 2002:a5d:60c6:: with SMTP id x6mr19007867wrt.157.1600674999332; 
- Mon, 21 Sep 2020 00:56:39 -0700 (PDT)
+ bh=4jv3gV83IdvS5OKXioOXbKRM8ceNFIHhtNFiZgXYFU8=;
+ b=smu4gOxq/OxIdcIfmYygf802yrzsZEBTGDZx7ilvOOCedDlunOdbmiLgkttFRqT/ZT
+ w+l69d45Clc1sYwHDH3IoG+efOH8cP0pT2wOBNqESGk8GqEx+YfOy38aI8Uwh93PnM/j
+ quyfA7zrBX3jEm9tM0OMepEt/Sa0lWRkRLmnfc0iUfaE1Qfz/SpPTod9NjUXmjggCSxo
+ /EpcKRAYpY3RkTYKwGtIzm3nrU7H4qvb4eedc2D+svMCnH5kcdj/bp4CHgvBFW6QsikB
+ u80iWa8z9v8VXVQTjzJ7tjJYVzPNyWfbAmIy8Q4RefWqgjtb8Jw/gYqcBBS4a9OAuftH
+ gTCA==
+X-Gm-Message-State: AOAM531IzC7CS1QSD4MFJcOi64E5YC07JWGIN+9jY0/el7OL/kdSiVNp
+ cGS2YQk4WuweOCglRmu5JQuApz8uLFg=
+X-Google-Smtp-Source: ABdhPJww7xSU+20lcuogel/zC7bg9gL+mkcYm+dtCXKAOrt4i5Ys4AV7wKtMz7Rh1P6MBRUL5Kkihg==
+X-Received: by 2002:a1c:1f42:: with SMTP id f63mr27866952wmf.1.1600674994992; 
+ Mon, 21 Sep 2020 00:56:34 -0700 (PDT)
 Received: from localhost.localdomain (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id o15sm17807538wmh.29.2020.09.21.00.56.38
+ by smtp.gmail.com with ESMTPSA id o15sm17807538wmh.29.2020.09.21.00.56.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 21 Sep 2020 00:56:38 -0700 (PDT)
+ Mon, 21 Sep 2020 00:56:34 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 8/8] hw/arm/raspi: Remove use of the 'version' value in the
- board code
-Date: Mon, 21 Sep 2020 09:56:28 +0200
-Message-Id: <20200921075628.466506-9-f4bug@amsat.org>
+Subject: [PATCH v3 4/8] hw/arm/raspi: Avoid using TypeInfo::class_data pointer
+Date: Mon, 21 Sep 2020 09:56:24 +0200
+Message-Id: <20200921075628.466506-5-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200921075628.466506-1-f4bug@amsat.org>
 References: <20200921075628.466506-1-f4bug@amsat.org>
@@ -78,8 +77,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -103,106 +102,95 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Andrew Baumann <Andrew.Baumann@microsoft.com>,
  Paul Zimmerman <pauldzim@gmail.com>, qemu-arm@nongnu.org,
- Luc Michel <luc.michel@greensocs.com>
+ Igor Mammedov <imammedo@redhat.com>, Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We expected the 'version' ID to match the board processor ID,
-but this is not always true (for example boards with revision
-id 0xa02042/0xa22042 are Raspberry Pi 2 with a BCM2837 SoC).
-This was not important because we were not modelling them, but
-since the recent refactor now allow to model these boards, it
-is safer to check the processor id directly. Remove the version
-check.
+Using class_data pointer to create a MachineClass is not
+the recommended way anymore. The correct way is to open-code
+the MachineClass::fields in the class_init() method.
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
+We can not use TYPE_RASPI_MACHINE::class_base_init() because
+it is called *before* each machine class_init(), therefore the
+board_rev field is not populated. We have to manually call
+raspi_machine_class_common_init() for each machine.
+
+This partly reverts commit a03bde3674e.
+
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/raspi.c | 29 +++++++++++++----------------
- 1 file changed, 13 insertions(+), 16 deletions(-)
+ hw/arm/raspi.c | 34 ++++++++++++++++++++++++----------
+ 1 file changed, 24 insertions(+), 10 deletions(-)
 
 diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index ae98a2fbfca..b5b30f0f38f 100644
+index 16e6c83c925..3000e6d57e6 100644
 --- a/hw/arm/raspi.c
 +++ b/hw/arm/raspi.c
-@@ -98,11 +98,6 @@ static RaspiProcessorId board_processor_id(uint32_t board_rev)
-     return proc_id;
+@@ -306,13 +306,9 @@ static void raspi_machine_init(MachineState *machine)
+     setup_boot(machine, version, machine->ram_size - vcram_size);
  }
  
--static int board_version(uint32_t board_rev)
--{
--    return board_processor_id(board_rev) + 1;
--}
+-static void raspi_machine_class_init(ObjectClass *oc, void *data)
++static void raspi_machine_class_common_init(MachineClass *mc,
++                                            uint32_t board_rev)
+ {
+-    MachineClass *mc = MACHINE_CLASS(oc);
+-    RaspiMachineClass *rmc = RASPI_MACHINE_CLASS(oc);
+-    uint32_t board_rev = (uint32_t)(uintptr_t)data;
 -
- static const char *board_soc_type(uint32_t board_rev)
- {
-     return soc_property[board_processor_id(board_rev)].type;
-@@ -201,7 +196,8 @@ static void reset_secondary(ARMCPU *cpu, const struct arm_boot_info *info)
-     cpu_set_pc(cs, info->smp_loader_start);
- }
+-    rmc->board_rev = board_rev;
+     mc->desc = g_strdup_printf("Raspberry Pi %s (revision 1.%u)",
+                                board_type(board_rev),
+                                FIELD_EX32(board_rev, REV_CODE, REVISION));
+@@ -326,18 +322,36 @@ static void raspi_machine_class_init(ObjectClass *oc, void *data)
+     mc->default_ram_id = "ram";
+ };
  
--static void setup_boot(MachineState *machine, int version, size_t ram_size)
-+static void setup_boot(MachineState *machine, RaspiProcessorId processor_id,
-+                       size_t ram_size)
- {
-     RaspiMachineState *s = RASPI_MACHINE(machine);
-     int r;
-@@ -210,12 +206,13 @@ static void setup_boot(MachineState *machine, int version, size_t ram_size)
-     s->binfo.ram_size = ram_size;
-     s->binfo.nb_cpus = machine->smp.cpus;
- 
--    if (version <= 2) {
--        /* The rpi1 and 2 require some custom setup code to run in Secure
--         * mode before booting a kernel (to set up the SMC vectors so
--         * that we get a no-op SMC; this is used by Linux to call the
-+    if (processor_id <= PROCESSOR_ID_BCM2836) {
-+        /*
-+         * The BCM2835 and BCM2836 require some custom setup code to run
-+         * in Secure mode before booting a kernel (to set up the SMC vectors
-+         * so that we get a no-op SMC; this is used by Linux to call the
-          * firmware for some cache maintenance operations.
--         * The rpi3 doesn't need this.
-+         * The BCM2837 doesn't need this.
-          */
-         s->binfo.board_setup_addr = BOARDSETUP_ADDR;
-         s->binfo.write_board_setup = write_board_setup;
-@@ -223,10 +220,10 @@ static void setup_boot(MachineState *machine, int version, size_t ram_size)
-         s->binfo.secure_boot = true;
-     }
- 
--    /* Pi2 and Pi3 requires SMP setup */
--    if (version >= 2) {
-+    /* BCM2836 and BCM2837 requires SMP setup */
-+    if (processor_id >= PROCESSOR_ID_BCM2836) {
-         s->binfo.smp_loader_start = SMPBOOT_ADDR;
--        if (version == 2) {
-+        if (processor_id == PROCESSOR_ID_BCM2836) {
-             s->binfo.write_secondary_boot = write_smpboot;
-         } else {
-             s->binfo.write_secondary_boot = write_smpboot64;
-@@ -260,7 +257,6 @@ static void raspi_machine_init(MachineState *machine)
-     RaspiMachineClass *mc = RASPI_MACHINE_GET_CLASS(machine);
-     RaspiMachineState *s = RASPI_MACHINE(machine);
-     uint32_t board_rev = mc->board_rev;
--    int version = board_version(board_rev);
-     uint64_t ram_size = board_ram_size(board_rev);
-     uint32_t vcram_size;
-     DriveInfo *di;
-@@ -301,7 +297,8 @@ static void raspi_machine_init(MachineState *machine)
- 
-     vcram_size = object_property_get_uint(OBJECT(&s->soc), "vcram-size",
-                                           &error_abort);
--    setup_boot(machine, version, machine->ram_size - vcram_size);
-+    setup_boot(machine, board_processor_id(mc->board_rev),
-+               machine->ram_size - vcram_size);
- }
- 
- static void raspi_machine_class_common_init(MachineClass *mc,
++static void raspi2b_machine_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc = MACHINE_CLASS(oc);
++    RaspiMachineClass *rmc = RASPI_MACHINE_CLASS(oc);
++
++    rmc->board_rev = 0xa21041;
++    raspi_machine_class_common_init(mc, rmc->board_rev);
++};
++
++#ifdef TARGET_AARCH64
++static void raspi3b_machine_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc = MACHINE_CLASS(oc);
++    RaspiMachineClass *rmc = RASPI_MACHINE_CLASS(oc);
++
++    rmc->board_rev = 0xa02082;
++    raspi_machine_class_common_init(mc, rmc->board_rev);
++};
++#endif /* TARGET_AARCH64 */
++
+ static const TypeInfo raspi_machine_types[] = {
+     {
+         .name           = MACHINE_TYPE_NAME("raspi2"),
+         .parent         = TYPE_RASPI_MACHINE,
+-        .class_init     = raspi_machine_class_init,
+-        .class_data     = (void *)0xa21041,
++        .class_init     = raspi2b_machine_class_init,
+ #ifdef TARGET_AARCH64
+     }, {
+         .name           = MACHINE_TYPE_NAME("raspi3"),
+         .parent         = TYPE_RASPI_MACHINE,
+-        .class_init     = raspi_machine_class_init,
+-        .class_data     = (void *)0xa02082,
++        .class_init     = raspi3b_machine_class_init,
+ #endif
+     }, {
+         .name           = TYPE_RASPI_MACHINE,
 -- 
 2.26.2
 
