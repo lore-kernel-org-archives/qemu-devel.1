@@ -2,65 +2,90 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BA9DC4346F
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 17:32:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30094C4347E
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 17:44:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C04220B1F
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 17:32:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 923842223E
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 17:44:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="aLmMk7A+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C04220B1F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aLon5PQl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 923842223E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKPgC-0005f9-Dq
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 13:32:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43762)
+	id 1kKPrC-0001TL-HI
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 13:44:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45924)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1kKPeF-0004nk-P8; Mon, 21 Sep 2020 13:30:43 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:42863)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kKPoe-00085J-V1
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 13:41:31 -0400
+Received: from mail-pj1-x1030.google.com ([2607:f8b0:4864:20::1030]:51160)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1kKPe9-0007KW-VZ; Mon, 21 Sep 2020 13:30:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:Cc:To:From;
- bh=JmcDG1B5/8OdVbH+Fhn5Lce2tHZEcej0OECmsnc39bE=; 
- b=aLmMk7A+k/UNGcZ29MYuhaoqJkcC+mjiSwxcrJNaK91+Qls/BCUMUnq29YX7MQdg4zegHPZ0gHkyhnz6HpTY81mQ96wIcCFlRzilQ3LHmLXbpeC7i+COAJamz/Ox5PZ9tj53RgNdlETLaCR0ucdkxLv55wBpvhkqP7OybXVk/uegWDWS/mKxumiHnEj4Ft7Z5/yEdRpTZQjvmWd31UK+TIxXY2HRAKY67DKZYcRuKA/yBUkFbSTs4SdI6R6ZiprLeWN4OS6x+giYa2gU6m8EZtdBPAGnCD0dtuqHYb7PobcHMrzQIS3GCaZeypmOBV917fLgjbWU9nKlAw2HbAZBFw==;
-Received: from [81.0.34.134] (helo=perseus.local)
- by fanzine.igalia.com with esmtpsa 
- (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1kKPe5-0006qU-Aw; Mon, 21 Sep 2020 19:30:33 +0200
-Received: from berto by perseus.local with local (Exim 4.92)
- (envelope-from <berto@igalia.com>)
- id 1kKPdq-0007HJ-75; Mon, 21 Sep 2020 19:30:18 +0200
-From: Alberto Garcia <berto@igalia.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kKPoa-0000Gi-8w
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 13:41:27 -0400
+Received: by mail-pj1-x1030.google.com with SMTP id fa1so169753pjb.0
+ for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 10:41:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=JhQrswFWtXkW7zh73QbRSHRG8o2YQ8bcQ9ITeWC+23k=;
+ b=aLon5PQlrA674ndKex3OBqaPWd/11cL/PqMKvUHLtwT4drbkMCypL3mjPzQfASScsn
+ 63pt3XZNSzElaN1z9jJ1yxjnzzm9f7QapDJEgMY1XiyjY2frRVCd5jFceCNtZNMSchOS
+ sLjeSJygvB+aWKDGEr+S2YfvcooGbME9QccUWSLXNzF0zPPQdjxLOAKykrP7JkMeDsDB
+ vKQmAAoCyPCftiFzFLVKCsAquHnlIgfPqGI+5+z8MjLotjT/3qNGZg5tfSrmaKcChIHf
+ zclDyPncRYTx84x3o0lZ0JUz6QOm7G83MmmoZ0F4o6MzTtg2q4Hx6eqb7APNlj5aEJX6
+ mtxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=JhQrswFWtXkW7zh73QbRSHRG8o2YQ8bcQ9ITeWC+23k=;
+ b=cMxCBs76xWnIMco5Mc1Jiea+tvSm57ajThNCHhEiJE5N6vk+aH0aClzRTeMFvQxMXg
+ r/RkG2l8jkLXBHEiRnTTrB9udBfyWv0eOei5aqLHWJef/q7ZgkyvKfEcpzjto7ZzP0Hk
+ 5B7mDKiTyzaZwBIJ5n7vwuegDAoci27grR9kqoMrhgDIVR5wBtoU9yZGuNCsHa9Rfte5
+ OTVhLu+bdf3gz+R7uO+W18MykuDQBVKxxqnj/Fqz/7WPiAUrSooH6OR9vce3IaLiJqb3
+ AZpsQuu//ujyt5BK5Tsklg62sbw/R36Vl38cVODOIbNfh6asuYbN+lHvNN6RUYQhaDuA
+ APkA==
+X-Gm-Message-State: AOAM531SnKojHyS9NmRzxxWPqbPzUm1A3Jd8f/bnBnpaEw4B6pp6eVi2
+ sVBUbtklGIeD2BOTXyK+7pmCng7JW6lfKA==
+X-Google-Smtp-Source: ABdhPJzdbiqTso8cd+v2tG+ItgKqasfPXVyHM+5JGf+GZPkCojeS0rEbuHiKrlBiykHCedahdQkSNA==
+X-Received: by 2002:a17:90a:65ca:: with SMTP id
+ i10mr400513pjs.137.1600710081338; 
+ Mon, 21 Sep 2020 10:41:21 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id x4sm12585379pfm.86.2020.09.21.10.41.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 21 Sep 2020 10:41:19 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] docs: Document the throttle block filter
-Date: Mon, 21 Sep 2020 19:30:16 +0200
-Message-Id: <20200921173016.27935-1-berto@igalia.com>
-X-Mailer: git-send-email 2.20.1
+Subject: [PATCH v4 00/11] capstone + disassembler patches
+Date: Mon, 21 Sep 2020 10:41:07 -0700
+Message-Id: <20200921174118.39352-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
- helo=fanzine.igalia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 13:30:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1030;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1030.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -74,143 +99,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This filter was added back in 2017 for QEMU 2.11 but it was never
-properly documented, so let's explain how it works and add a couple of
-examples.
+Patches lacking review:
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- docs/throttle.txt | 107 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 106 insertions(+), 1 deletion(-)
+0002-capstone-Update-to-upstream-next-branch.patch
+0003-capstone-Require-version-4.0-from-a-system-librar.patch
+0007-disas-Cleanup-plugin_disas.patch
+0009-disas-Split-out-capstone-code-to-disas-capstone.c.patch
 
-diff --git a/docs/throttle.txt b/docs/throttle.txt
-index cd4e109d39..c06d1b9662 100644
---- a/docs/throttle.txt
-+++ b/docs/throttle.txt
-@@ -1,6 +1,6 @@
- The QEMU throttling infrastructure
- ==================================
--Copyright (C) 2016 Igalia, S.L.
-+Copyright (C) 2016,2020 Igalia, S.L.
- Author: Alberto Garcia <berto@igalia.com>
- 
- This work is licensed under the terms of the GNU GPL, version 2 or
-@@ -253,3 +253,108 @@ up. After those 60 seconds the bucket will have leaked 60 x 100 =
- 
- Also, due to the way the algorithm works, longer burst can be done at
- a lower I/O rate, e.g. 1000 IOPS during 120 seconds.
-+
-+
-+The 'throttle' block filter
-+---------------------------
-+Since QEMU 2.11 it is possible to configure the I/O limits using a
-+'throttle' block filter. This filter uses the exact same throttling
-+infrastructure described above but can be used anywhere in the node
-+graph, allowing for more flexibility.
-+
-+The user can create an arbitrary number of filters and each one of
-+them must be assigned to a group that contains the actual I/O limits.
-+Different filters can use the same group so the limits are shared as
-+described earlier in "Applying I/O limits to groups of disks".
-+
-+A group can be created using the object-add QMP function:
-+
-+   { "execute": "object-add",
-+     "arguments": {
-+       "qom-type": "throttle-group",
-+       "id": "group0",
-+       "props": {
-+         "limits" : {
-+           "iops-total": 1000
-+           "bps-write": 2097152
-+         }
-+       }
-+     }
-+   }
-+
-+throttle-group has a 'limits' property (of type ThrottleLimits as
-+defined in qapi/block-core.json) which can be set on creation or later
-+with 'qom-set'.
-+
-+A throttle-group can also be created with the -object command line
-+option but at the moment there is no way to pass a 'limits' parameter
-+that contains a ThrottleLimits structure. The solution is to set the
-+individual values directly, like in this example:
-+
-+   -object throttle-group,id=group0,x-iops-total=1000,x-bps-write=2097152
-+
-+Note however that this not stable API (hence the 'x-' prefixes) and
-+can change or disappear in the future.
-+
-+Once we have a throttle-group we can use the throttle block filter,
-+where the 'file' property must be set to the block device that we want
-+to filter:
-+
-+   { "execute": "blockdev-add",
-+     "arguments": {
-+        "options":  {
-+           "driver": "qcow2",
-+           "node-name": "disk0",
-+           "file": {
-+              "driver": "file",
-+              "filename": "/path/to/disk.qcow2"
-+           }
-+        }
-+     }
-+   }
-+
-+   { "execute": "blockdev-add",
-+     "arguments": {
-+        "driver": "throttle",
-+        "node-name": "throttle0",
-+        "throttle-group": "group0",
-+        "file": "disk0"
-+     }
-+   }
-+
-+A similar setup can also be done with the command line, for example:
-+
-+   -drive driver=throttle,throttle-group=group0,
-+          file.driver=qcow2,file.file.filename=/path/to/disk.qcow2
-+
-+The scenario described so far is very simple but the throttle block
-+filter allows for more complex configurations. For example, let's say
-+that we have three different drives and we want to set I/O limits for
-+each one of them and an additional set of limits for the combined I/O
-+of all three drives.
-+
-+First we would define all throttle groups, one for each one of the
-+drives and one that would apply to all of them:
-+
-+   -object throttle-group,id=limits0,x-iops-total=2000
-+   -object throttle-group,id=limits1,x-iops-total=2500
-+   -object throttle-group,id=limits2,x-iops-total=3000
-+   -object throttle-group,id=limits012,x-iops-total=4000
-+
-+Now we can define the drives, and for each one of them we use two
-+chained throttle filters: the drive's own filter and the combined
-+filter.
-+
-+   -drive driver=throttle,throttle-group=limits012,
-+          file.driver=throttle,file.throttle-group=limits0
-+          file.file.driver=qcow2,file.file.file.filename=/path/to/disk0.qcow2
-+   -drive driver=throttle,throttle-group=limits012,
-+          file.driver=throttle,file.throttle-group=limits1
-+          file.file.driver=qcow2,file.file.file.filename=/path/to/disk1.qcow2
-+   -drive driver=throttle,throttle-group=limits012,
-+          file.driver=throttle,file.throttle-group=limits2
-+          file.file.driver=qcow2,file.file.file.filename=/path/to/disk2.qcow2
-+
-+In this example the individual drives have IOPS limits of 2000, 2500
-+and 3000 respectively but the total combined I/O can never exceed 4000
-+IOPS.
+Changes for v4:
+  * Require v4.0 from the system library.
+    Fixes an issue AJB found from v3.0.5 from ubuntu 18.
+
+Changes for v3:
+  * Fix default value for capstone in meson_options.txt.
+  * Add "Submodules" separator in meson.build (paolo).
+  * Remove form-feed characters in dis-asm.h (thuth).
+
+Changes for v2:
+  * Several configury changes in patch 1, along the lines
+    of that suggested by Paolo, but not exactly the same.
+  * Drop sparc capstone enablement (I suddenly have a memory
+    of doing the same thing last year).
+
+
+r~
+
+
+Richard Henderson (11):
+  capstone: Convert Makefile bits to meson bits
+  capstone: Update to upstream "next" branch
+  capstone: Require version 4.0 from a system library
+  disas: Move host asm annotations to tb_gen_code
+  disas: Clean up CPUDebug initialization
+  disas: Use qemu/bswap.h for bfd endian loads
+  disas: Cleanup plugin_disas
+  disas: Configure capstone for aarch64 host without libvixl
+  disas: Split out capstone code to disas/capstone.c
+  disas: Enable capstone disassembly for s390x
+  disas/capstone: Add skipdata hook for s390x
+
+ configure                 |  64 +---
+ Makefile                  |  16 -
+ include/disas/dis-asm.h   | 104 +++---
+ include/disas/disas.h     |   2 +-
+ include/exec/log.h        |   4 +-
+ accel/tcg/translate-all.c |  24 +-
+ disas.c                   | 703 +++++++++-----------------------------
+ disas/capstone.c          | 326 ++++++++++++++++++
+ target/s390x/cpu.c        |   4 +
+ tcg/tcg.c                 |   4 +-
+ capstone                  |   2 +-
+ disas/meson.build         |   1 +
+ meson.build               | 124 ++++++-
+ meson_options.txt         |   4 +
+ 14 files changed, 678 insertions(+), 704 deletions(-)
+ create mode 100644 disas/capstone.c
+
 -- 
-2.20.1
+2.25.1
 
 
