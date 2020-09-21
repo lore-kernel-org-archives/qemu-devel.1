@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53A63C43464
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:35:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47710C43464
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:36:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E25022071A
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:35:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D97532071A
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:36:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RYUZl4qn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E25022071A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cc71cOBm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D97532071A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKK6g-0000sQ-Rq
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 07:35:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42812)
+	id 1kKK7S-0002CP-R7
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 07:36:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42574)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kKK1c-0003Z5-J0
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 07:30:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60369)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kKK1E-0002sJ-ST
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 07:30:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35360)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kKK1a-0000s5-Fo
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 07:30:28 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kKK1C-0000iX-Ad
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 07:30:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600687825;
+ s=mimecast20190719; t=1600687801;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=QGEKUXK8Ua+eb00vBAjJ3dQj8Co+dbRWsNgAI1iqUvA=;
- b=RYUZl4qn7uwWEuqj1H82Ry63Bp6+ZpqmRMf9aXI5aODUQRqSTt3pg2HJiPbfuH7iLeZpGw
- dFW0fe/RgdSsV0hoRlHNPUl8pZsd/fEpny5uAJxTElULP4He43ma+Bda7nQriUTiy36TzH
- sS6XngTonHQ1FKscCMC40Ahk7rm/Spw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-338-ZrNVeUYWNwSnFTAqunqWTw-1; Mon, 21 Sep 2020 07:30:22 -0400
-X-MC-Unique: ZrNVeUYWNwSnFTAqunqWTw-1
-Received: by mail-wr1-f71.google.com with SMTP id v5so5690095wrs.17
- for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 04:30:22 -0700 (PDT)
+ bh=oO9eeSTOhXhb/ICfMDRNeszMFF9HmLKnPc0ew6L2QLY=;
+ b=cc71cOBmMDJYIETLXDPuASn1H7r1n8AmL0S7kO560fHhKnmUFUjJ4lv1ogRczhUdhbWc4Z
+ Y+z/CsxoXIVNkBUwBQ5elRpeqXdkDelRT58joYvdXwi6BzLQsyiu9a8CR3bn8MuzS9NOSc
+ v+PZZLQ+mi5tCDrlnDUmHKDkErWa2zw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-367-tKSzTA7KNNq7WbSCwBGTTw-1; Mon, 21 Sep 2020 07:29:58 -0400
+X-MC-Unique: tKSzTA7KNNq7WbSCwBGTTw-1
+Received: by mail-wm1-f70.google.com with SMTP id a7so3627901wmc.2
+ for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 04:29:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=QGEKUXK8Ua+eb00vBAjJ3dQj8Co+dbRWsNgAI1iqUvA=;
- b=WIgUILovj8uOdH0yHNxGGEMskn4eSVh4RVHLwBI7Z/3n1ZiPuQw6kzfN+IpkpkmRIe
- H3sK1Qguu39fZyPIvjLGuhbvy2Y6a8FW9hRkaUPyWIB7JDOOaq0/46OmL/Bgu09U2m/E
- vTj1UtzuQEuShB48voijhP6b4l5p1tEoU7Qhr47q2dki6FqFumR4u8pErX8htQJc3jps
- NpDqa4gNZEj1ji/tszkQTPVsBvI0kMrMcsKuNNOoTZl/lOZbyofQTNdeTthjfhNTCyAz
- rARq088MJUM0EsTiQQbRFDD8h9CMaDRgAEXGvGCz4FSvk6sGNCHnM/g6wmUqItxw/uDW
- gPnQ==
-X-Gm-Message-State: AOAM530OykzGgA73Yzh4xd3y9toF7L473eJX26nYVvfFNtCOU0UzrUeY
- 6Yg4D3RsEd4qVZ2zZ8KbXi1G+aaFL2/uuofyfKaxN7hXUGHjG9E/ToorPs9r6Db44+ZW45Xi884
- onE2JPNgskbr6eLg=
-X-Received: by 2002:a5d:4710:: with SMTP id y16mr53663001wrq.203.1600687820841; 
- Mon, 21 Sep 2020 04:30:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyv7S7M+jDpJ6fHP1jEept0BRI/xhsbyO/Nh5eVzfMEwLcCqKXFojmbRuBrL3nttLieRzkEXg==
-X-Received: by 2002:a5d:4710:: with SMTP id y16mr53662991wrq.203.1600687820696; 
- Mon, 21 Sep 2020 04:30:20 -0700 (PDT)
+ bh=oO9eeSTOhXhb/ICfMDRNeszMFF9HmLKnPc0ew6L2QLY=;
+ b=jTR2yzPVF6TOsi8l3DbripHm2YWPUgadOjFKv22zehwsMT0/Pcl2KxlyLKSi75n8hT
+ hE5dr/znt3P5BgcsjaQTia/0nX6aWXo9ffxpbpdzPCwAThhkRco+07Iu1ArbpaS/50X9
+ fPbXClBnkSbs6raiF01Yt6aK6Ez/CZLdD+EOoeIvhfAW3ugDK66nD6ramb/M3il8cjzB
+ 4WogGugW8Mw6wtsVas3gN9/gEN6vlevc+muc1fTya5TQDI1iecaMXP3b74Xeg4mHup7p
+ v5fc4OKPBiqaLEQthJ7ZXqvz994nj7Z1gYqYdV/xjfdFvnuYWXoTaakhSuZK9i3aDweb
+ +hyA==
+X-Gm-Message-State: AOAM533HN3fenSLQ2EeKNEeVHbxCJIydiJBAK4/RrTy7V5DMXrMD0RSH
+ 8ViqrQVTluNhJjCwIqw03nlYUIOFSujd9iMe0v6v255v54ZQeaXCN+Adiv+2wA5pmNzc8RZrukG
+ oPqsjF9KLkYI+QJI=
+X-Received: by 2002:a7b:ce86:: with SMTP id q6mr31330708wmj.163.1600687795685; 
+ Mon, 21 Sep 2020 04:29:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzzhVz76TVKQb7ULIbTms/8UaOja9BqXclG4SZUaXl9WNj7Fz6dFDJfsJ/CRrFAuAT9QsHUKQ==
+X-Received: by 2002:a7b:ce86:: with SMTP id q6mr31330683wmj.163.1600687795387; 
+ Mon, 21 Sep 2020 04:29:55 -0700 (PDT)
 Received: from redhat.com (bzq-109-65-116-225.red.bezeqint.net.
  [109.65.116.225])
- by smtp.gmail.com with ESMTPSA id y6sm20479084wrn.41.2020.09.21.04.30.19
+ by smtp.gmail.com with ESMTPSA id u8sm18478732wmj.45.2020.09.21.04.29.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 21 Sep 2020 04:30:20 -0700 (PDT)
-Date: Mon, 21 Sep 2020 07:30:18 -0400
+ Mon, 21 Sep 2020 04:29:54 -0700 (PDT)
+Date: Mon, 21 Sep 2020 07:29:52 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v3 15/15] virtio-iommu-pci: force virtio version 1
-Message-ID: <20200921112913.555392-16-mst@redhat.com>
+Subject: [PULL v3 06/15] vhost: recheck dev state in the vhost_migration_log
+ routine
+Message-ID: <20200921112913.555392-7-mst@redhat.com>
 References: <20200921112913.555392-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200921112913.555392-1-mst@redhat.com>
@@ -87,9 +88,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:44:53
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:43:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
@@ -97,7 +98,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,59 +111,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
- qemu-stable@nongnu.org, Eric Auger <eric.auger@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>,
+ Dima Stepanov <dimastep@yandex-team.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Auger <eric.auger@redhat.com>
+From: Dima Stepanov <dimastep@yandex-team.ru>
 
-Commit 9b3a35ec82 ("virtio: verify that legacy support is not
-accidentally on") added a safety check that requires to set
-'disable-legacy=on' on virtio-iommu-pci:
+vhost-user devices can get a disconnect in the middle of the VHOST-USER
+handshake on the migration start. If disconnect event happened right
+before sending next VHOST-USER command, then the vhost_dev_set_log()
+call in the vhost_migration_log() function will return error. This error
+will lead to the assert() and close the QEMU migration source process.
+For the vhost-user devices the disconnect event should not break the
+migration process, because:
+  - the device will be in the stopped state, so it will not be changed
+    during migration
+  - if reconnect will be made the migration log will be reinitialized as
+    part of reconnect/init process:
+    #0  vhost_log_global_start (listener=0x563989cf7be0)
+    at hw/virtio/vhost.c:920
+    #1  0x000056398603d8bc in listener_add_address_space (listener=0x563989cf7be0,
+        as=0x563986ea4340 <address_space_memory>)
+    at softmmu/memory.c:2664
+    #2  0x000056398603dd30 in memory_listener_register (listener=0x563989cf7be0,
+        as=0x563986ea4340 <address_space_memory>)
+    at softmmu/memory.c:2740
+    #3  0x0000563985fd6956 in vhost_dev_init (hdev=0x563989cf7bd8,
+        opaque=0x563989cf7e30, backend_type=VHOST_BACKEND_TYPE_USER,
+        busyloop_timeout=0)
+    at hw/virtio/vhost.c:1385
+    #4  0x0000563985f7d0b8 in vhost_user_blk_connect (dev=0x563989cf7990)
+    at hw/block/vhost-user-blk.c:315
+    #5  0x0000563985f7d3f6 in vhost_user_blk_event (opaque=0x563989cf7990,
+        event=CHR_EVENT_OPENED)
+    at hw/block/vhost-user-blk.c:379
+Update the vhost-user-blk device with the internal started_vu field which
+will be used for initialization (vhost_user_blk_start) and clean up
+(vhost_user_blk_stop). This additional flag in the VhostUserBlk structure
+will be used to track whether the device really needs to be stopped and
+cleaned up on a vhost-user level.
+The disconnect event will set the overall VHOST device (not vhost-user) to
+the stopped state, so it can be used by the general vhost_migration_log
+routine.
+Such approach could be propogated to the other vhost-user devices, but
+better idea is just to make the same connect/disconnect code for all the
+vhost-user devices.
 
-qemu-system-aarch64: -device virtio-iommu-pci: device is modern-only,
-use disable-legacy=on
+This migration issue was slightly discussed earlier:
+  - https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg01509.html
+  - https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg05241.html
 
-virtio-iommu was introduced after the release of VIRTIO 1.0
-specifications, so it should be 'modern-only'.
-
-This patch forces virtio version 1 and removes the 'transitional_name'
-property removing the need to specify 'disable-legacy=on' on
-virtio-iommu-pci device.
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-
-Message-Id: <20200908193309.20569-3-eric.auger@redhat.com>
+Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+Reviewed-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
+Message-Id: <9fbfba06791a87813fcee3e2315f0b904cc6789a.1599813294.git.dimastep@yandex-team.ru>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio-iommu-pci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/hw/virtio/vhost-user-blk.h | 10 ++++++++++
+ hw/block/vhost-user-blk.c          | 19 ++++++++++++++++---
+ hw/virtio/vhost.c                  | 27 ++++++++++++++++++++++++---
+ 3 files changed, 50 insertions(+), 6 deletions(-)
 
-diff --git a/hw/virtio/virtio-iommu-pci.c b/hw/virtio/virtio-iommu-pci.c
-index 76540e57b1..378f63b210 100644
---- a/hw/virtio/virtio-iommu-pci.c
-+++ b/hw/virtio/virtio-iommu-pci.c
-@@ -69,6 +69,7 @@ static void virtio_iommu_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-     object_property_set_link(OBJECT(dev), "primary-bus",
-                              OBJECT(pci_get_bus(&vpci_dev->pci_dev)),
-                              &error_abort);
-+    virtio_pci_force_virtio_1(vpci_dev);
-     qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
+diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost-user-blk.h
+index dc40ab6f11..5d86ff2e87 100644
+--- a/include/hw/virtio/vhost-user-blk.h
++++ b/include/hw/virtio/vhost-user-blk.h
+@@ -42,7 +42,17 @@ struct VHostUserBlk {
+     VhostUserState vhost_user;
+     struct vhost_virtqueue *vhost_vqs;
+     VirtQueue **virtqs;
++
++    /*
++     * There are at least two steps of initialization of the
++     * vhost-user device. The first is a "connect" step and
++     * second is a "start" step. Make a separation between
++     * those initialization phases by using two fields.
++     */
++    /* vhost_user_blk_connect/vhost_user_blk_disconnect */
+     bool connected;
++    /* vhost_user_blk_start/vhost_user_blk_stop */
++    bool started_vu;
+ };
+ 
+ #endif
+diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+index 39aec42dae..a076b1e54d 100644
+--- a/hw/block/vhost-user-blk.c
++++ b/hw/block/vhost-user-blk.c
+@@ -150,6 +150,7 @@ static int vhost_user_blk_start(VirtIODevice *vdev)
+         error_report("Error starting vhost: %d", -ret);
+         goto err_guest_notifiers;
+     }
++    s->started_vu = true;
+ 
+     /* guest_notifier_mask/pending not used yet, so just unmask
+      * everything here. virtio-pci will do the right thing by
+@@ -175,6 +176,11 @@ static void vhost_user_blk_stop(VirtIODevice *vdev)
+     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
+     int ret;
+ 
++    if (!s->started_vu) {
++        return;
++    }
++    s->started_vu = false;
++
+     if (!k->set_guest_notifiers) {
+         return;
+     }
+@@ -341,9 +347,7 @@ static void vhost_user_blk_disconnect(DeviceState *dev)
+     }
+     s->connected = false;
+ 
+-    if (s->dev.started) {
+-        vhost_user_blk_stop(vdev);
+-    }
++    vhost_user_blk_stop(vdev);
+ 
+     vhost_dev_cleanup(&s->dev);
+ }
+@@ -399,6 +403,15 @@ static void vhost_user_blk_event(void *opaque, QEMUChrEvent event)
+                     NULL, NULL, false);
+             aio_bh_schedule_oneshot(ctx, vhost_user_blk_chr_closed_bh, opaque);
+         }
++
++        /*
++         * Move vhost device to the stopped state. The vhost-user device
++         * will be clean up and disconnected in BH. This can be useful in
++         * the vhost migration code. If disconnect was caught there is an
++         * option for the general vhost code to get the dev state without
++         * knowing its type (in this case vhost-user).
++         */
++        s->dev.started = false;
+         break;
+     case CHR_EVENT_BREAK:
+     case CHR_EVENT_MUX_IN:
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index e986bf53e4..1b2d735b54 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -871,21 +871,42 @@ static int vhost_migration_log(MemoryListener *listener, bool enable)
+         dev->log_enabled = enable;
+         return 0;
+     }
++
++    r = 0;
+     if (!enable) {
+         r = vhost_dev_set_log(dev, false);
+         if (r < 0) {
+-            return r;
++            goto check_dev_state;
+         }
+         vhost_log_put(dev, false);
+     } else {
+         vhost_dev_log_resize(dev, vhost_get_log_size(dev));
+         r = vhost_dev_set_log(dev, true);
+         if (r < 0) {
+-            return r;
++            goto check_dev_state;
+         }
+     }
++
++check_dev_state:
+     dev->log_enabled = enable;
+-    return 0;
++    /*
++     * vhost-user-* devices could change their state during log
++     * initialization due to disconnect. So check dev state after
++     * vhost communication.
++     */
++    if (!dev->started) {
++        /*
++         * Since device is in the stopped state, it is okay for
++         * migration. Return success.
++         */
++        r = 0;
++    }
++    if (r) {
++        /* An error is occured. */
++        dev->log_enabled = false;
++    }
++
++    return r;
  }
  
-@@ -98,7 +99,6 @@ static void virtio_iommu_pci_instance_init(Object *obj)
- static const VirtioPCIDeviceTypeInfo virtio_iommu_pci_info = {
-     .base_name             = TYPE_VIRTIO_IOMMU_PCI,
-     .generic_name          = "virtio-iommu-pci",
--    .transitional_name     = "virtio-iommu-pci-transitional",
-     .non_transitional_name = "virtio-iommu-pci-non-transitional",
-     .instance_size = sizeof(VirtIOIOMMUPCI),
-     .instance_init = virtio_iommu_pci_instance_init,
+ static void vhost_log_global_start(MemoryListener *listener)
 -- 
 MST
 
