@@ -2,87 +2,103 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC518C43464
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:45:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9CACC43464
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:46:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 926552085B
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:45:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5800620EDD
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 11:46:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m8F+NPA8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 926552085B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VTR5ePTu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5800620EDD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKKGI-0002tJ-Jw
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 07:45:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43114)
+	id 1kKKHa-0004Hl-F2
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 07:46:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42708)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1kKK2d-0004UM-8p
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 07:31:31 -0400
-Received: from mail-pg1-x52f.google.com ([2607:f8b0:4864:20::52f]:43941)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1kKK2b-00015n-KN
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 07:31:30 -0400
-Received: by mail-pg1-x52f.google.com with SMTP id t14so8757738pgl.10
- for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 04:31:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=7/Cf4+bQ+JCv4CMTx69Me1q6TM58iCqVGSPw4dCcDeI=;
- b=m8F+NPA8XhFVWXSamfPp836sDzMNdOtRGP+zI9961QsMx67V+D5LNMEQ2Eb4gSy3UA
- v8DoxgkZv/4Rh1AWByG+19ugf8CxuiGm9La9FUKzfVeVgp7PlEsBChJdXkYYUZuZyXv1
- aFKNrapVD4LAtAxvzKVvkgK/iW6GlrKM5ZfElAjmvPt2/yme8ivlP4MgFKiB5AzhturB
- XSXQAHtW33hI5pCGS4qEtg9n0M2fUzO/I/mMplLalQ9DLGuV5ZcwFL+c4rt0oXv/TE8C
- VCtseu8gKwTjU81Rv/vmqjUvFniHJKXHTIZApKWkTuC6Cj5QztpGP9fk76uls8NUXRey
- CeEw==
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kKK1S-0003BX-Su
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 07:30:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39064)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kKK1Q-0000mj-Ur
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 07:30:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600687816;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=KU3CQZix1HzPA27WzsYYTB+dAz58fIp+8wyLXMfCqA0=;
+ b=VTR5ePTuNEMlO7Ni//5btI5nCnEgvfAi2oVmSdbkyLceTKlTZwyIOL5eWcSnSknQIG7ONU
+ oYslXhupEXZK6Zgt0LTqGe+LmfsvyWHPalPYoZ+wVgwC8FFhtumZb0Tq1pAp9OA18XD5uc
+ sIHxm120FA0u3YEcwLatndjcKfPHAD4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-307-9N1ZMDAVMHGJQNdSIuahpA-1; Mon, 21 Sep 2020 07:30:13 -0400
+X-MC-Unique: 9N1ZMDAVMHGJQNdSIuahpA-1
+Received: by mail-wr1-f70.google.com with SMTP id n15so5714452wrv.23
+ for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 04:30:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=7/Cf4+bQ+JCv4CMTx69Me1q6TM58iCqVGSPw4dCcDeI=;
- b=B4Ja+FSZPdvuOHQxkVrUR0hQWHGzPcF9ve1Du37R4LnCR1xDN9yuELgmsjtya9Rbef
- iOhbQGw4IkrohxesKVxe2ujOI7zRMNZiZwm4qrZPvRUOT1JtLNHgkuznEHTw/uEuwds8
- nfU0QA049T5KtdcJ0SBocbe7KtTEDB/LxOE3Xs4S4io2S0d2ZxNTiIVMIzvjEv4sN1S0
- XI+1S3JayLDpAIct1k4U8sGXda5IL4ls4cuymVIZOLefaJbFsBZMDYxQWIbL+J6UsGsR
- a/7yTaKSDYaBg+JaxIQSeHYz2DBYFEPIPyM2xFSlr0ObHXUc4LZ1YS3pNhmCNsGhXlkI
- /+vg==
-X-Gm-Message-State: AOAM530MyMCwanIMdJStla40rNoTmIitOYsnm558nEyqlRfBYDrwT8PE
- hvum9Sg1h3WNdcFKxDZdyqhzldiLa9tziMh/yUU=
-X-Google-Smtp-Source: ABdhPJxqLKkpQ3jdk7GZbSj7ZN9kF6U8AVizFK/ZKnwyx4icK/042ujdPkiwJbovdwhlPDSJIK/z7Tl/11zyvkrB2u0=
-X-Received: by 2002:aa7:9730:0:b029:13e:d13d:a091 with SMTP id
- k16-20020aa797300000b029013ed13da091mr42278198pfg.40.1600687888335; Mon, 21
- Sep 2020 04:31:28 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=KU3CQZix1HzPA27WzsYYTB+dAz58fIp+8wyLXMfCqA0=;
+ b=sfH9YK+UGkQqfaYBFGPCYvf1kbF/Mbmu1Zv0z8yfbAWSXJiNRh5Q2BAqL6t/sNZzaL
+ CxxJY2JWOPWslFfChk3YGmC+W7iT+QZBRspoIQwnwwYi1qfbebgr/1khVAQ/bGqUXWaG
+ ZkzRkrvU0SPEHhjx3Pef8Ih+tTegr3zG4gZPTGm81azeuci4d7lRhulsKwHcx+xEkfb8
+ f3fNrH8F0VQVn5s9SXtcOux0sjExMiYBXxTJsarzg9seioPoSPTTCjAslq0A5S0sDs8v
+ tHdYMGe2YzYEaPGdfiFegT9I4UzBCaU0iGsDygttP1/RF4GWOFOBI0WAeCZ/+a7s6uat
+ r5CA==
+X-Gm-Message-State: AOAM5322yNV8Qw+pzxnoisrZawxRZK3TQO2eRxe3EqF88mT6AC0lcREa
+ k6jp98oDzYp/CNChkvp9WbLWw/MnRoEBNXv+goJ0JfZQbiezJWqB1Tfv4WyLkvwMxgrn54GPlRa
+ rtWVX4MaLnT8NlhM=
+X-Received: by 2002:adf:8544:: with SMTP id 62mr51629620wrh.262.1600687811902; 
+ Mon, 21 Sep 2020 04:30:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzojiz9irGa+Z5d09e363yKQDPo18DTjLQtL2ERELXhj+qIAOq2A+fJBzNIYQkqEfIvjTARXw==
+X-Received: by 2002:adf:8544:: with SMTP id 62mr51629602wrh.262.1600687811713; 
+ Mon, 21 Sep 2020 04:30:11 -0700 (PDT)
+Received: from redhat.com (bzq-109-65-116-225.red.bezeqint.net.
+ [109.65.116.225])
+ by smtp.gmail.com with ESMTPSA id u12sm21010496wrt.81.2020.09.21.04.30.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 21 Sep 2020 04:30:11 -0700 (PDT)
+Date: Mon, 21 Sep 2020 07:30:09 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL v3 12/15] tests/qtest/vhost-user-test: enable the reconnect
+ tests
+Message-ID: <20200921112913.555392-13-mst@redhat.com>
+References: <20200921112913.555392-1-mst@redhat.com>
 MIME-Version: 1.0
-References: <160044888692.1133.11388395637815022535.malonedeb@chaenomeles.canonical.com>
-In-Reply-To: <160044888692.1133.11388395637815022535.malonedeb@chaenomeles.canonical.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Mon, 21 Sep 2020 12:31:16 +0100
-Message-ID: <CAJSP0QXp5dq_nHdFZgyh5Ye1Pv+kOvVS0GRici2y1Xadu+LbGw@mail.gmail.com>
-Subject: Re: [Bug 1896263] [NEW] The bios-tables-test test causes QEMU to
- crash (Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed) on AMD processors
-To: Bug 1896263 <1896263@bugs.launchpad.net>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52f;
- envelope-from=stefanha@gmail.com; helo=mail-pg1-x52f.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200921112913.555392-1-mst@redhat.com>
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:43:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,20 +111,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Dima Stepanov <dimastep@yandex-team.ru>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 18, 2020 at 6:18 PM Apteryx <1896263@bugs.launchpad.net> wrote:
-> Host CPU: AMD Ryzen 3900X
+From: Dima Stepanov <dimastep@yandex-team.ru>
 
-I also hit this test failure.
+For now a QTEST_VHOST_USER_FIXME environment variable is used to
+separate reconnect tests for the vhost-user-net device. Looks like the
+reconnect functionality is pretty stable, so this separation is
+deprecated.
+Remove it and enable these tests for the default run.
 
-Host CPU: Intel(R) Core(TM) i7-8665U CPU @ 1.90GHz
-Host kernel: Linux 5.8.6-201.fc32.x86_64
+Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+Message-Id: <9fee5b17c7940f9126ba7cc014b09106c98118db.1599813294.git.dimastep@yandex-team.ru>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ tests/qtest/vhost-user-test.c | 21 +++++++++------------
+ 1 file changed, 9 insertions(+), 12 deletions(-)
 
-qemu-system-x86_64: error: failed to set MSR 0x4b564d02 to 0x0
-qemu-system-x86_64: ../target/i386/kvm.c:2714: kvm_buf_set_msrs:
-Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
+diff --git a/tests/qtest/vhost-user-test.c b/tests/qtest/vhost-user-test.c
+index 6e64df7a45..1fc5dd6584 100644
+--- a/tests/qtest/vhost-user-test.c
++++ b/tests/qtest/vhost-user-test.c
+@@ -1139,20 +1139,17 @@ static void register_vhost_user_test(void)
+                  "virtio-net",
+                  test_migrate, &opts);
+ 
+-    /* keeps failing on build-system since Aug 15 2017 */
+-    if (getenv("QTEST_VHOST_USER_FIXME")) {
+-        opts.before = vhost_user_test_setup_reconnect;
+-        qos_add_test("vhost-user/reconnect", "virtio-net",
+-                     test_reconnect, &opts);
++    opts.before = vhost_user_test_setup_reconnect;
++    qos_add_test("vhost-user/reconnect", "virtio-net",
++                 test_reconnect, &opts);
+ 
+-        opts.before = vhost_user_test_setup_connect_fail;
+-        qos_add_test("vhost-user/connect-fail", "virtio-net",
+-                     test_vhost_user_started, &opts);
++    opts.before = vhost_user_test_setup_connect_fail;
++    qos_add_test("vhost-user/connect-fail", "virtio-net",
++                 test_vhost_user_started, &opts);
+ 
+-        opts.before = vhost_user_test_setup_flags_mismatch;
+-        qos_add_test("vhost-user/flags-mismatch", "virtio-net",
+-                     test_vhost_user_started, &opts);
+-    }
++    opts.before = vhost_user_test_setup_flags_mismatch;
++    qos_add_test("vhost-user/flags-mismatch", "virtio-net",
++                 test_vhost_user_started, &opts);
+ 
+     opts.before = vhost_user_test_setup_multiqueue;
+     opts.edge.extra_device_opts = "mq=on";
+-- 
+MST
+
 
