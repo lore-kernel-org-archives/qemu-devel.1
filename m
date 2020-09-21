@@ -2,74 +2,93 @@ Return-Path: <SRS0=MAm8=C6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E920C43463
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 03:47:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B79CC43463
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 03:48:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B64C6207D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 03:47:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B64C6207D3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 093EC207D3
+	for <qemu-devel@archiver.kernel.org>; Mon, 21 Sep 2020 03:48:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jxiIAdJ7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 093EC207D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKCn5-0005up-QP
-	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 23:46:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53114)
+	id 1kKCop-0007kf-1n
+	for qemu-devel@archiver.kernel.org; Sun, 20 Sep 2020 23:48:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53358)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kKCmN-0005Uk-Jh
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 23:46:15 -0400
-Resent-Date: Sun, 20 Sep 2020 23:46:15 -0400
-Resent-Message-Id: <E1kKCmN-0005Uk-Jh@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21776)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kKCmL-0001p7-Ji
- for qemu-devel@nongnu.org; Sun, 20 Sep 2020 23:46:15 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1600659964; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=cggPu+cyzuSg3ZA2c2HqJAHRaU5vc6eRyw057GPyfr95YmD/6BCgbMLqQ4fYX3tERu+kFbnIJPW3ce9qeqfHVU8dW7sLKhxCzDAkyaevpsQAJRMvfOO/dAicvhLUkrYE79wHr3MxqQgm9N9c0pZw45tFEOwAe2IkstcNze3X7h0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1600659964;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=/lqVkxh41RR/9fmc8jb3HTvyDDdnYoVh5vQThRuWLZk=; 
- b=joM4xAn6MBcalZP2GxH3U3V6WUXAeqxkdwuKX/3gABoOxJCkvre38CYVp9oMxVT3zp+q9q7hKw8PMHCIA1tm+Wve3/p1wO2TwErZtNxs/jVIpeZIpJUXLmPOAUCW9JZ6l70ApWaqW+eU3bOeF65uISYcOY2sUDkA1THxA7nd1H8=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1600659962170770.7953739352894;
- Sun, 20 Sep 2020 20:46:02 -0700 (PDT)
-Subject: Re: [PATCH v3 00/16] Add a General Virtual Device Fuzzer
-Message-ID: <160065996066.23907.2099536325482191947@66eaa9a8a123>
-In-Reply-To: <20200921022506.873303-1-alxndr@bu.edu>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kKCnh-0006OM-1G; Sun, 20 Sep 2020 23:47:37 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36618)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kKCnf-0001wL-Iy; Sun, 20 Sep 2020 23:47:36 -0400
+Received: by mail-wm1-x343.google.com with SMTP id z9so11039790wmk.1;
+ Sun, 20 Sep 2020 20:47:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=KdvaemirANjxASMz4DV4dQ6pghmLGYonwRX/Dh0qzZc=;
+ b=jxiIAdJ77HW4opFpV5DRvKmQBqumR8pwmz3L/YxvsJpMOyN+n/GDDQKe5dCZfW0OyE
+ J+kune1gasTRfaEIlrEE0rLBCA8ObmizUJu05tUQ1olc8Lj1eWH9WV/12wPtF2FpcqUD
+ BzqRW9Cq3/Sra6gkjQaciEM/yS/zGDoYv/B0ddMBZXp3CMIn77iV6AUA8huE29ZhnWCy
+ T7t6iqk0+wbb+sPNaTuB/IvxXFgvJlvQqsdTdHSvrVRs7nHuVnJZCl6A74ghfWgbwdQN
+ lWnWVHLAOSQJIPR0H4dWf3BwLhIn9EjsDl/I3jR3y8w9jIX+fYsZKYk/raRrtzFilygn
+ FtSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=KdvaemirANjxASMz4DV4dQ6pghmLGYonwRX/Dh0qzZc=;
+ b=jW3GMyKvapG6/N5sjvr+G7wV2nVFSoWQpVD0Y9masVMJw3G5XgoqcFl4Qrod+zcUJt
+ 65qscCjPkZ2gwUgtHBGNS1/7qdmCBQuxOutDtqMFp+vGRz/RFR3M6+JZZkpOiBor5twK
+ 5Zn2tffxhV6rTjycLgEDLFdY6njLk12Q8OCix9u5X9Y5Uxgt4QJVaaaGQBw3rj831tZh
+ pPFhwg0Kwa2WCLM7tc0Gj6j4072B2YqZUf5BoR5WVer+cqK1GNrD1cSqCU7zOEi2Kwwq
+ pQt9XWLIAzd+/IKNsXmLNSJf4tulNogckkEJZIQ2J+LjCvneQdya58K8K5LdRcsrI4rs
+ nRKQ==
+X-Gm-Message-State: AOAM533T8RzPsILFX/vuC+oRPas49XkfFuJAVOgFplK2h0sNH9WreGZP
+ U+ha7rKfdSV7WbzwsVQIZ87WWpDNC+k=
+X-Google-Smtp-Source: ABdhPJz18Kw2GyVmY0FqBltnwOd4Z0OESTnapcUh3oPmzu3Xe6kv2JNhZSnsJcjWUg3KhBe4LlUTWQ==
+X-Received: by 2002:a1c:4303:: with SMTP id q3mr27817605wma.158.1600660053209; 
+ Sun, 20 Sep 2020 20:47:33 -0700 (PDT)
+Received: from localhost.localdomain (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id u63sm11751440wmb.13.2020.09.20.20.47.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 20 Sep 2020 20:47:32 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 2/3] hw/arm/bcm2835: Add more unimplemented peripherals
+Date: Mon, 21 Sep 2020 05:47:28 +0200
+Message-Id: <20200921034729.432931-3-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200921034729.432931-1-f4bug@amsat.org>
+References: <20200921034729.432931-1-f4bug@amsat.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: alxndr@bu.edu
-Date: Sun, 20 Sep 2020 20:46:02 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/20 22:46:02
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,116 +101,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: alxndr@bu.edu, qemu-devel@nongnu.org, darren.kenny@oracle.com,
- bsd@redhat.com, stefanha@redhat.com, philmd@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Paul Zimmerman <pauldzim@gmail.com>, qemu-arm@nongnu.org,
+ Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkyMTAyMjUwNi44NzMz
-MDMtMS1hbHhuZHJAYnUuZWR1LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUgc29t
-ZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5mb3Jt
-YXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDA5MjEwMjI1MDYuODczMzAzLTEt
-YWx4bmRyQGJ1LmVkdQpTdWJqZWN0OiBbUEFUQ0ggdjMgMDAvMTZdIEFkZCBhIEdlbmVyYWwgVmly
-dHVhbCBEZXZpY2UgRnV6emVyCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
-CmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRy
-dWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMv
-Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
-VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0
-dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAg
-ICBwYXRjaGV3LzIwMjAwOTIxMDIyNTA2Ljg3MzMwMy0xLWFseG5kckBidS5lZHUgLT4gcGF0Y2hl
-dy8yMDIwMDkyMTAyMjUwNi44NzMzMDMtMS1hbHhuZHJAYnUuZWR1ClN3aXRjaGVkIHRvIGEgbmV3
-IGJyYW5jaCAndGVzdCcKMDhmOTY3MiBmdXp6OiBBZGQgaW5zdHJ1Y3Rpb25zIGZvciB1c2luZyBn
-ZW5lcmFsLWZ1enoKNDEwYzhiZSBzY3JpcHRzL29zcy1mdXp6OiBBZGQgY3Jhc2ggdHJhY2UgbWlu
-aW1pemF0aW9uIHNjcmlwdAo4ZTBhYmVkIHNjcmlwdHMvb3NzLWZ1eno6IEFkZCBzY3JpcHQgdG8g
-cmVvcmRlciBhIGdlbmVyYWwtZnV6emVyIHRyYWNlCjc1MTM3OTUgc2NyaXB0cy9vc3MtZnV6ejog
-YnVpbGQgdGhlIGdlbmVyYWwtZnV6emVyIGNvbmZpZ3MKMDUzNTNjZiBzY3JpcHRzL29zcy1mdXp6
-OiBBZGQgZ2VuZXJhbC1mdXp6ZXIgY29uZmlncyBmb3Igb3NzLWZ1enoKN2FiZGExMSBzY3JpcHRz
-L29zcy1mdXp6OiBBZGQgZ2VuZXJhbC1mdXp6ZXIgYnVpbGQgc2NyaXB0CjYyNjFlNzcgc2NyaXB0
-cy9vc3MtZnV6ejogQWRkIHdyYXBwZXIgcHJvZ3JhbSBmb3IgZ2VuZXJpYyBmdXp6ZXIKMjlmZDg1
-MyBmdXp6OiBhZGQgYSBjcm9zc292ZXIgZnVuY3Rpb24gdG8gZ2VuZXJpYy1mdXp6ZXIKZjY5NDEz
-YSBmdXp6OiBhZGQgYSBESVNBQkxFX1BDSSBvcCB0byBnZW5lcmFsLWZ1enplcgo3MDEzZWYwIGZ1
-eno6IEFkZCBzdXBwb3J0IGZvciBjdXN0b20gY3Jvc3NvdmVyIGZ1bmN0aW9ucwoyMzBhN2JkIGZ1
-eno6IEFkZCBmdXp6ZXIgY2FsbGJhY2tzIHRvIERNQS1yZWFkIGZ1bmN0aW9ucwplNzEzY2EyIGZ1
-eno6IERlY2xhcmUgRE1BIFJlYWQgY2FsbGJhY2sgZnVuY3Rpb24KMGZiMzMzMSBmdXp6OiBBZGQg
-RE1BIHN1cHBvcnQgdG8gdGhlIGdlbmVyaWMtZnV6emVyCjU4NWU2ZjAgZnV6ejogQWRkIFBDSSBm
-ZWF0dXJlcyB0byB0aGUgZ2VuZXJhbCBmdXp6ZXIKNDRiYWM5MCBmdXp6OiBBZGQgZ2VuZXJhbCB2
-aXJ0dWFsLWRldmljZSBmdXp6ZXIKZDY4MDc1YiBtZW1vcnk6IEFkZCBGbGF0VmlldyBmb3JlYWNo
-IGZ1bmN0aW9uCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzE2IENoZWNraW5nIGNvbW1pdCBkNjgw
-NzViMjNmYzMgKG1lbW9yeTogQWRkIEZsYXRWaWV3IGZvcmVhY2ggZnVuY3Rpb24pCjIvMTYgQ2hl
-Y2tpbmcgY29tbWl0IDQ0YmFjOTBiNDQxMyAoZnV6ejogQWRkIGdlbmVyYWwgdmlydHVhbC1kZXZp
-Y2UgZnV6emVyKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
-IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxOTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0
-b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDUwNSBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzE2
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjMvMTYgQ2hlY2tpbmcgY29tbWl0IDU4NWU2ZjAx
-NTNiNSAoZnV6ejogQWRkIFBDSSBmZWF0dXJlcyB0byB0aGUgZ2VuZXJhbCBmdXp6ZXIpCjQvMTYg
-Q2hlY2tpbmcgY29tbWl0IDBmYjMzMzFkMzVkYiAoZnV6ejogQWRkIERNQSBzdXBwb3J0IHRvIHRo
-ZSBnZW5lcmljLWZ1enplcikKRVJST1I6IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMg
-ZmlsZXMKIzg0OiBGSUxFOiB0ZXN0cy9xdGVzdC9mdXp6L2dlbmVyYWxfZnV6ei5jOjEyMDoKK3Zv
-aWQgZnV6el9kbWFfcmVhZF9jYihzaXplX3QgYWRkciwgc2l6ZV90IGxlbiwgTWVtb3J5UmVnaW9u
-ICptciwgYm9vbCBpc193cml0ZSk7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDI0NyBs
-aW5lcyBjaGVja2VkCgpQYXRjaCA0LzE2IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo1LzE2
-IENoZWNraW5nIGNvbW1pdCBlNzEzY2EyZmNkN2QgKGZ1eno6IERlY2xhcmUgRE1BIFJlYWQgY2Fs
-bGJhY2sgZnVuY3Rpb24pCjYvMTYgQ2hlY2tpbmcgY29tbWl0IDIzMGE3YmRmODFhZCAoZnV6ejog
-QWRkIGZ1enplciBjYWxsYmFja3MgdG8gRE1BLXJlYWQgZnVuY3Rpb25zKQo3LzE2IENoZWNraW5n
-IGNvbW1pdCA3MDEzZWYwMjliM2QgKGZ1eno6IEFkZCBzdXBwb3J0IGZvciBjdXN0b20gY3Jvc3Nv
-dmVyIGZ1bmN0aW9ucykKOC8xNiBDaGVja2luZyBjb21taXQgZjY5NDEzYTRiZjhmIChmdXp6OiBh
-ZGQgYSBESVNBQkxFX1BDSSBvcCB0byBnZW5lcmFsLWZ1enplcikKOS8xNiBDaGVja2luZyBjb21t
-aXQgMjlmZDg1MzY1ZGY3IChmdXp6OiBhZGQgYSBjcm9zc292ZXIgZnVuY3Rpb24gdG8gZ2VuZXJp
-Yy1mdXp6ZXIpCjEwLzE2IENoZWNraW5nIGNvbW1pdCA2MjYxZTc3NTI5NTMgKHNjcmlwdHMvb3Nz
-LWZ1eno6IEFkZCB3cmFwcGVyIHByb2dyYW0gZm9yIGdlbmVyaWMgZnV6emVyKQpXQVJOSU5HOiBh
-ZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBk
-YXRpbmc/CiMyMDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fy
-bmluZ3MsIDQwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDEwLzE2IGhhcyBzdHlsZSBwcm9ibGVtcywg
-cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
-cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
-SU5FUlMuCjExLzE2IENoZWNraW5nIGNvbW1pdCA3YWJkYTExNTliZDAgKHNjcmlwdHMvb3NzLWZ1
-eno6IEFkZCBnZW5lcmFsLWZ1enplciBidWlsZCBzY3JpcHQpCldBUk5JTkc6IGFkZGVkLCBtb3Zl
-ZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE3
-OiAKbmV3IGZpbGUgbW9kZSAxMDA3NTUKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
-CiM1NzogRklMRTogc2NyaXB0cy9vc3MtZnV6ei9idWlsZF9nZW5lcmFsX2Z1enplcnMucHk6MzY6
-CisgICAgICAgICAgICAgICAgICAgZnV6el9hcmdzPXN0cl90b19jX2J5dGVfYXJyYXkoY2ZnWyJh
-cmdzIl0ucmVwbGFjZSgiXG4iLCAiICIpKSwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
-ZXJzCiM1ODogRklMRTogc2NyaXB0cy9vc3MtZnV6ei9idWlsZF9nZW5lcmFsX2Z1enplcnMucHk6
-Mzc6CisgICAgICAgICAgICAgICAgICAgZnV6el9vYmpzPXN0cl90b19jX2J5dGVfYXJyYXkoY2Zn
-WyJvYmplY3RzIl0ucmVwbGFjZSgiXG4iLCAiICIpKSwKCnRvdGFsOiAwIGVycm9ycywgMyB3YXJu
-aW5ncywgNjkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTEvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KMTIvMTYgQ2hlY2tpbmcgY29tbWl0IDA1MzUzY2ZkZWQ0YSAoc2NyaXB0cy9vc3MtZnV6
-ejogQWRkIGdlbmVyYWwtZnV6emVyIGNvbmZpZ3MgZm9yIG9zcy1mdXp6KQpXQVJOSU5HOiBhZGRl
-ZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRp
-bmc/CiMxNzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fybmlu
-Z3MsIDEwMyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMi8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgoxMy8xNiBDaGVja2luZyBjb21taXQgNzUxMzc5NWM3MDhmIChzY3JpcHRzL29zcy1mdXp6
-OiBidWlsZCB0aGUgZ2VuZXJhbC1mdXp6ZXIgY29uZmlncykKMTQvMTYgQ2hlY2tpbmcgY29tbWl0
-IDhlMGFiZWQ5ZmI1NSAoc2NyaXB0cy9vc3MtZnV6ejogQWRkIHNjcmlwdCB0byByZW9yZGVyIGEg
-Z2VuZXJhbC1mdXp6ZXIgdHJhY2UpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
-bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzIyOiAKbmV3IGZpbGUgbW9k
-ZSAxMDA3NTUKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgOTQgbGluZXMgY2hlY2tlZAoK
-UGF0Y2ggMTQvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTUvMTYgQ2hlY2tpbmcgY29t
-bWl0IDQxMGM4YmUxZDc2ZSAoc2NyaXB0cy9vc3MtZnV6ejogQWRkIGNyYXNoIHRyYWNlIG1pbmlt
-aXphdGlvbiBzY3JpcHQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
-IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE3OiAKbmV3IGZpbGUgbW9kZSAxMDA3
-NTUKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTU3IGxpbmVzIGNoZWNrZWQKClBhdGNo
-IDE1LzE2IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE2LzE2IENoZWNraW5nIGNvbW1pdCAw
-OGY5NjcyODVhNWQgKGZ1eno6IEFkZCBpbnN0cnVjdGlvbnMgZm9yIHVzaW5nIGdlbmVyYWwtZnV6
-eikKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
-ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAy
-MDA5MjEwMjI1MDYuODczMzAzLTEtYWx4bmRyQGJ1LmVkdS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5
-cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
-W2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
-aGV3LWRldmVsQHJlZGhhdC5jb20=
+The bcm2835-v3d is used since Linux 4.7, see commit
+49ac67e0c39c ("ARM: bcm2835: Add VC4 to the device tree"),
+and the bcm2835-txp since Linux 4.19, see commit
+b7dd29b401f5 ("ARM: dts: bcm283x: Add Transposer block").
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ include/hw/arm/bcm2835_peripherals.h | 2 ++
+ hw/arm/bcm2835_peripherals.c         | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
+index b4d3ae121ac..ccd9eb11102 100644
+--- a/include/hw/arm/bcm2835_peripherals.h
++++ b/include/hw/arm/bcm2835_peripherals.h
+@@ -47,6 +47,7 @@ struct BCM2835PeripheralState {
+ 
+     BCM2835SystemTimerState systmr;
+     BCM2835MphiState mphi;
++    UnimplementedDeviceState txp;
+     UnimplementedDeviceState armtmr;
+     UnimplementedDeviceState cprman;
+     UnimplementedDeviceState a2w;
+@@ -68,6 +69,7 @@ struct BCM2835PeripheralState {
+     UnimplementedDeviceState otp;
+     UnimplementedDeviceState dbus;
+     UnimplementedDeviceState ave0;
++    UnimplementedDeviceState v3d;
+     UnimplementedDeviceState bscsl;
+     UnimplementedDeviceState smi;
+     DWC2State dwc2;
+diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+index a9d7f53f6e9..15c5c72e465 100644
+--- a/hw/arm/bcm2835_peripherals.c
++++ b/hw/arm/bcm2835_peripherals.c
+@@ -343,6 +343,7 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+         qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
+                                INTERRUPT_USB));
+ 
++    create_unimp(s, &s->txp, "bcm2835-txp", TXP_OFFSET, 0x1000);
+     create_unimp(s, &s->armtmr, "bcm2835-sp804", ARMCTRL_TIMER0_1_OFFSET, 0x40);
+     create_unimp(s, &s->cprman, "bcm2835-cprman", CPRMAN_OFFSET, 0x1000);
+     create_unimp(s, &s->a2w, "bcm2835-a2w", A2W_OFFSET, 0x1000);
+@@ -356,6 +357,7 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+     create_unimp(s, &s->otp, "bcm2835-otp", OTP_OFFSET, 0x80);
+     create_unimp(s, &s->dbus, "bcm2835-dbus", DBUS_OFFSET, 0x8000);
+     create_unimp(s, &s->ave0, "bcm2835-ave0", AVE0_OFFSET, 0x8000);
++    create_unimp(s, &s->v3d, "bcm2835-v3d", V3D_OFFSET, 0x1000);
+     create_unimp(s, &s->sdramc, "bcm2835-sdramc", SDRAMC_OFFSET, 0x100);
+ }
+ 
+-- 
+2.26.2
+
 
