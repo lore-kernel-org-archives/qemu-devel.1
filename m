@@ -2,93 +2,86 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02D2EC4363D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 17:55:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28F00C4727D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 17:56:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B6C220709
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 17:55:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 93D3F23787
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 17:56:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Se6gP4o2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B6C220709
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B9YgA3ZU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93D3F23787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKmVt-0007mw-Mn
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 13:55:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45624)
+	id 1kKmWd-0000B3-Ow
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 13:56:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45440)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kKmOj-00086M-Et
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 13:48:13 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:39912)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kKmOf-0004LA-MT
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 13:48:13 -0400
-Received: by mail-pf1-x443.google.com with SMTP id n14so13132292pff.6
- for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 10:47:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=c3L7ongZcFIrjIrL9FZxznJ0aLcGoTeG6OyijrdzkkY=;
- b=Se6gP4o2PGt3zFRfnC4L3JHF73dkbf7H8OpwU7H88ODAfQa9oAwOQYNo9Wp23pqZqM
- 6VPYtk5fvOk1n3sXjf38ySkcCEbqmG+xIJL+FE/nmZV+c/RbpqvZabIIvBGrZa2lwWCU
- 6aVsU+dTmXjtoFyF0n2rL5U594+mOXHdiUgqKG6bS8ErMsX4FIkZoXONL9PwziUf6ysi
- IG82e7G0W5A1aYRGU/HnUCLAWz5oO2CMX2Ws4QY1zzk54xWNojcifDASM47MU4eKGaY6
- Lm2awsgBBlVK3bhZe0le+HG6Ssa7AXZZUlsgSesDghkH5aIbLDwbDqmslsVxFAZKFMng
- FOHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=c3L7ongZcFIrjIrL9FZxznJ0aLcGoTeG6OyijrdzkkY=;
- b=YDNrtZytmQBJ7tCJsBEcgQflFkBFT48t/LmDNAdHxkUEW1USOZ0O2Kx837wjYA5H/U
- XhKx3U0WJmO249//7GUv9vf+YO6g8PN2r96E+Om+eTDLe/dL5NPvYXYBymzBwvu6PUUK
- UGH0Y3GdxEKim1rZAZqbDzVvj+0xf5NsMmLbyIJ4aTf8+YoHOniYnOJEj6Jz6cIeb1hG
- n79o8wYkAPKTJ/X+rsH77TwnnMQTUJHTayPmJ4VJ+vzrtKeBHejuQTylaCo8XIqQcmSQ
- UBnhrELJSl9KdENaxJmtgsLVxJMBWoXEkipmqpYhGYygl5AptaUC426okrTXAtK7kxRJ
- cbVQ==
-X-Gm-Message-State: AOAM532Qzke6rINP0ef98LTdKTeKp2Zro59216VAWKde4smNnymqmltO
- QhJSHGbvG3oZVuSzgfKHqgM2sGw9j+qQAg==
-X-Google-Smtp-Source: ABdhPJxIybTfPjzUTkxU2jMCrWRYL32D1s7+4a8JZiz2E7mI1OyJ7NAacAeukYklcVeAABQN6w24mw==
-X-Received: by 2002:a62:7c82:0:b029:13c:1611:66b9 with SMTP id
- x124-20020a627c820000b029013c161166b9mr5018303pfc.4.1600796874830; 
- Tue, 22 Sep 2020 10:47:54 -0700 (PDT)
-Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id r1sm14825310pgl.66.2020.09.22.10.47.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 22 Sep 2020 10:47:54 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 07/11] disas: Cleanup plugin_disas
-Date: Tue, 22 Sep 2020 10:47:37 -0700
-Message-Id: <20200922174741.475876-8-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200922174741.475876-1-richard.henderson@linaro.org>
-References: <20200922174741.475876-1-richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kKmOK-0007vu-NT
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 13:47:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30625)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kKmOI-0004KD-Le
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 13:47:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600796865;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Lj3UbafpoojkTj52+qJnHyCGtSx65I6ftVoJpK00Z5Y=;
+ b=B9YgA3ZUCngBRR6ydpAb5aV1JDEDYba54W5dg1pFW3y01bN3GaEZXDz4Itcqs5pKRNJpki
+ ScDl0OhVvJpOxsk9Mt20MV0c5kMK/dmb0Q2FWhgSRAAzZpqW7OJZLqRWce8DF7vBEcCbCw
+ OB2wXr40ZjzE7tg4spGf7+Vr0lue/ug=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-494-0sK8dVRHPQGpxi2V4oEbyQ-1; Tue, 22 Sep 2020 13:47:41 -0400
+X-MC-Unique: 0sK8dVRHPQGpxi2V4oEbyQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B71311007278;
+ Tue, 22 Sep 2020 17:47:40 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-116-78.rdu2.redhat.com [10.10.116.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9A07F5C1A3;
+ Tue, 22 Sep 2020 17:47:34 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+ id 1E96E223B13; Tue, 22 Sep 2020 13:47:33 -0400 (EDT)
+Date: Tue, 22 Sep 2020 13:47:33 -0400
+From: Vivek Goyal <vgoyal@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: tools/virtiofs: Multi threading seems to hurt performance
+Message-ID: <20200922174733.GD57620@redhat.com>
+References: <20200918213436.GA3520@redhat.com> <20200921153243.GK3221@work-vm>
+ <20200922102531.GA2837@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- T_PDS_OTHER_BAD_TLD=0.01 autolearn=ham autolearn_force=no
+In-Reply-To: <20200922102531.GA2837@work-vm>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vgoyal@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=vgoyal@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,131 +94,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: jose.carlos.venegas.munoz@intel.com, qemu-devel@nongnu.org,
+ cdupontd@redhat.com, virtio-fs-list <virtio-fs@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, archana.m.shinde@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Do not retain a GString in thread-local storage.  Allocate a
-new one and free it on every invocation.  Do not g_strdup the
-result; return the buffer from the GString.  Do not use
-warn_report.
+On Tue, Sep 22, 2020 at 11:25:31AM +0100, Dr. David Alan Gilbert wrote:
+> * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+> > Hi,
+> >   I've been doing some of my own perf tests and I think I agree
+> > about the thread pool size;  my test is a kernel build
+> > and I've tried a bunch of different options.
+> > 
+> > My config:
+> >   Host: 16 core AMD EPYC (32 thread), 128G RAM,
+> >      5.9.0-rc4 kernel, rhel 8.2ish userspace.
+> >   5.1.0 qemu/virtiofsd built from git.
+> >   Guest: Fedora 32 from cloud image with just enough extra installed for
+> > a kernel build.
+> > 
+> >   git cloned and checkout v5.8 of Linux into /dev/shm/linux on the host
+> > fresh before each test.  Then log into the guest, make defconfig,
+> > time make -j 16 bzImage,  make clean; time make -j 16 bzImage 
+> > The numbers below are the 'real' time in the guest from the initial make
+> > (the subsequent makes dont vary much)
+> > 
+> > Below are the detauls of what each of these means, but here are the
+> > numbers first
+> > 
+> > virtiofsdefault        4m0.978s
+> > 9pdefault              9m41.660s
+> > virtiofscache=none    10m29.700s
+> > 9pmmappass             9m30.047s
+> > 9pmbigmsize           12m4.208s
+> > 9pmsecnone             9m21.363s
+> > virtiofscache=noneT1   7m17.494s
+> > virtiofsdefaultT1      3m43.326s
+> > 
+> > So the winner there by far is the 'virtiofsdefaultT1' - that's
+> > the default virtiofs settings, but with --thread-pool-size=1 - so
+> > yes it gives a small benefit.
+> > But interestingly the cache=none virtiofs performance is pretty bad,
+> > but thread-pool-size=1 on that makes a BIG improvement.
+> 
+> Here are fio runs that Vivek asked me to run in my same environment
+> (there are some 0's in some of the mmap cases, and I've not investigated
+> why yet).
 
-Using cs_disasm allocated memory via the &insn parameter, but
-that was never freed.  Use cs_disasm_iter so that we use the
-memory that we've already allocated, and so that we only try
-to disassemble one insn, as desired.  Do not allocate 1k to
-hold the bytes for a single instruction.
+cache=none does not allow mmap in case of virtiofs. That's when you
+are seeing 0.
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- disas.c | 55 +++++++++++++++++++------------------------------------
- 1 file changed, 19 insertions(+), 36 deletions(-)
+>virtiofs is looking good here in I think all of the cases;
+> there's some division over which cinfig; cache=none
+> seems faster in some cases which surprises me.
 
-diff --git a/disas.c b/disas.c
-index 8d1403dedc..54a540180f 100644
---- a/disas.c
-+++ b/disas.c
-@@ -493,13 +493,12 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
-     }
- }
- 
--static __thread GString plugin_disas_output;
--
- static int plugin_printf(FILE *stream, const char *fmt, ...)
- {
--    va_list va;
--    GString *s = &plugin_disas_output;
-+    /* We abuse the FILE parameter to pass a GString. */
-+    GString *s = (GString *)stream;
-     int initial_len = s->len;
-+    va_list va;
- 
-     va_start(va, fmt);
-     g_string_append_vprintf(s, fmt, va);
-@@ -519,28 +518,20 @@ static void plugin_print_address(bfd_vma addr, struct disassemble_info *info)
- static
- bool cap_disas_plugin(disassemble_info *info, uint64_t pc, size_t size)
- {
--    uint8_t cap_buf[1024];
-+    uint8_t cap_buf[64];
-+    const uint8_t *cbuf = cap_buf;
-     csh handle;
--    cs_insn *insn;
--    size_t csize = 0;
--    int count;
--    GString *s = &plugin_disas_output;
- 
-     if (cap_disas_start(info, &handle) != CS_ERR_OK) {
-         return false;
-     }
--    insn = cap_insn;
- 
--    size_t tsize = MIN(sizeof(cap_buf) - csize, size);
--    const uint8_t *cbuf = cap_buf;
--    target_read_memory(pc, cap_buf, tsize, info);
-+    assert(size < sizeof(cap_buf));
-+    target_read_memory(pc, cap_buf, size, info);
- 
--    count = cs_disasm(handle, cbuf, size, 0, 1, &insn);
--
--    if (count) {
--        g_string_printf(s, "%s %s", insn->mnemonic, insn->op_str);
--    } else {
--        g_string_printf(s, "cs_disasm failed");
-+    if (cs_disasm_iter(handle, &cbuf, &size, &pc, cap_insn)) {
-+        GString *s = (GString *)info->stream;
-+        g_string_printf(s, "%s %s", cap_insn->mnemonic, cap_insn->op_str);
-     }
- 
-     cs_close(&handle);
-@@ -555,34 +546,26 @@ bool cap_disas_plugin(disassemble_info *info, uint64_t pc, size_t size)
-  */
- char *plugin_disas(CPUState *cpu, uint64_t addr, size_t size)
- {
--    int count;
-     CPUDebug s;
--    GString *ds = g_string_set_size(&plugin_disas_output, 0);
--
--    g_assert(ds == &plugin_disas_output);
-+    GString *ds = g_string_new(NULL);
- 
-     initialize_debug_target(&s, cpu);
-     s.info.fprintf_func = plugin_printf;
-+    s.info.stream = (FILE *)ds;  /* abuse this slot */
-     s.info.buffer_vma = addr;
-     s.info.buffer_length = size;
-     s.info.print_address_func = plugin_print_address;
- 
-     if (s.info.cap_arch >= 0 && cap_disas_plugin(&s.info, addr, size)) {
--        return g_strdup(ds->str);
-+        ; /* done */
-+    } else if (s.info.print_insn) {
-+        s.info.print_insn(addr, &s.info);
-+    } else {
-+        ; /* cannot disassemble -- return empty string */
-     }
- 
--    if (s.info.print_insn == NULL) {
--        s.info.print_insn = print_insn_od_target;
--    }
--
--    count = s.info.print_insn(addr, &s.info);
--
--    /* The decoder probably read more than it needed it's not critical */
--    if (count < size) {
--        warn_report("%s: %zu bytes left over", __func__, size - count);
--    }
--
--    return g_strdup(ds->str);
-+    /* Return the buffer, freeing the GString container.  */
-+    return g_string_free(ds, false);
- }
- 
- /* Disassemble this for me please... (debugging). */
--- 
-2.25.1
+I know cache=none is faster in case of write workloads. It forces
+direct write where we don't call file_remove_privs(). While cache=auto
+goes through file_remove_privs() and that adds a GETXATTR request to
+every WRITE request.
+
+Vivek
 
 
