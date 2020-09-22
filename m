@@ -2,104 +2,54 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74A87C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 09:26:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2019C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 09:26:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C02F12075E
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 09:26:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C02F12075E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 039212075E
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 09:26:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 039212075E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKeYg-00056U-Ce
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 05:26:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60244)
+	id 1kKeZT-0006zb-R5
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 05:26:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37096)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kKeE1-000220-03; Tue, 22 Sep 2020 05:04:37 -0400
-Received: from new4-smtp.messagingengine.com ([66.111.4.230]:33939)
+ (Exim 4.90_1) (envelope-from <f.gruenbichler@proxmox.com>)
+ id 1kKeVz-0002Av-Hz; Tue, 22 Sep 2020 05:23:11 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:1900)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kKeDv-000300-7T; Tue, 22 Sep 2020 05:04:36 -0400
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
- by mailnew.nyi.internal (Postfix) with ESMTP id 146DE5803F7;
- Tue, 22 Sep 2020 05:04:30 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
- by compute7.internal (MEProxy); Tue, 22 Sep 2020 05:04:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-type:in-reply-to; s=fm1; bh=TqSENd0b6/MDWDuKtmOg1LK7A+P
- AOD11PQRiUIxmVoo=; b=aBSlszBGYLoIwb771bhABUePMLO7vpISUuSysmdAUXK
- U1IB8lThZKvWsoEACCZl2A7FjhBuKN2dcksClKoJPhgeTGIWhPQX0mD7zbjvWwoR
- lGslcYSP/ijDp9y60/1gSzbWQyVHjasPCvmOKYtahJZzDdMCALWlMWBRxW3XnWsp
- oghAb0I4PrxGwVLAUbDO63k1GdKPU3bOKaluN0PRnAw7Q0x5CuKXafDlxu1ahPN0
- i1ZKqRVEvKYSfl07N46xfBEr4cURsO9V+2IJ/K+UQTDWGfWWiZ/3cR/MIaJO+cxl
- Nxd1tsNAhvpyGAk8LJ3PlwhGcFAdWP03NsNaN5gBN3g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=TqSENd
- 0b6/MDWDuKtmOg1LK7A+PAOD11PQRiUIxmVoo=; b=FF+wrlxBlxRxKJ/g8wr60y
- iTVO2SOskrognpSFa3tEd2rnLB3CSjT8ESTQDIMBj/Wn/rqp/XVFELC3jpqZy2zT
- 1327/iJGsQlWC9G7RHkT1YPbuVzugfdZi9RP15YwIiTJOj1FDtJe9EUWiDoeRe/Y
- ZtsS76MPGoz1r3f4B9j2E0X5d+KN1FYSDJgi8LQ82ZAOlUdxC+gKrtF3J43bU3wC
- WAGUJXSFx2QUMcslar/CGv7vOck8cAEQfI0ommDsNEZJeF8Ep91p4ifW2/Yh6ZyN
- 1my5BKKYkQ+z2OB4CwrpUGNKz0QMxbYoEw5sxtrL/TYiJv/Gxfxb60hzg2pIYMKg
- ==
-X-ME-Sender: <xms:HL5pX0KkuwEpkYhlcp-EsCNm5NxzTFCqWWna_cwKKKIW0PGSnER_sw>
- <xme:HL5pX0JYRkOg_Key7bxXN16If0MwMqPuiZeMfTdvul1A9I6MZkumyIPyRy4ah60bI
- cksCJ40cwEb6XcI--4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrudeggdduvdcutefuodetggdotefrodftvf
- curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
- uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
- fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepmfhlrghushcu
- lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
- hrnhepjeegudffueeiteekieelkedvueelteevjeduieeludfffeejgeffhfduvdduffek
- necukfhppeektddrudeijedrleekrdduledtnecuvehluhhsthgvrhfuihiivgeptdenuc
- frrghrrghmpehmrghilhhfrhhomhepihhtshesihhrrhgvlhgvvhgrnhhtrdgukh
-X-ME-Proxy: <xmx:HL5pX0s4d2haSNNK__y4umMtXjA50FwSnQUvtUYqG2bRF31zHhShEQ>
- <xmx:HL5pXxbGXcsaG0B5uhCHrD9GpxC1vFrAxP41fWL5AChY9axdcD9Q6g>
- <xmx:HL5pX7bfcMN0txrf504M8Co8AgsqswEBhw5ON6ItQV047VWiM1fHZw>
- <xmx:Hb5pX6Ul-Wz0b2LT4oMm5IJSlVmujYhtE02QvyhYkbWFpc3gTExQTw>
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id 277F4328005E;
- Tue, 22 Sep 2020 05:04:27 -0400 (EDT)
-Date: Tue, 22 Sep 2020 11:04:25 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-Subject: Re: [PATCH v6 2/2] nvme: allow cmb and pmr to be enabled on same
- device
-Message-ID: <20200922090425.GA1236186@apples.localdomain>
-References: <20200729220107.37758-1-andrzej.jakowski@linux.intel.com>
- <20200729220107.37758-3-andrzej.jakowski@linux.intel.com>
- <20200729225019.GA346228@apples.localdomain>
- <20200817062911.GA7412@apples.localdomain>
+ (Exim 4.90_1) (envelope-from <f.gruenbichler@proxmox.com>)
+ id 1kKeVx-0005cc-BP; Tue, 22 Sep 2020 05:23:11 -0400
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id C72CA454A9;
+ Tue, 22 Sep 2020 11:14:24 +0200 (CEST)
+From: =?UTF-8?q?Fabian=20Gr=C3=BCnbichler?= <f.gruenbichler@proxmox.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH qemu 0/4] mirror: implement incremental and bitmap modes
+Date: Tue, 22 Sep 2020 11:14:14 +0200
+Message-Id: <20200922091418.53562-1-f.gruenbichler@proxmox.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="fdj2RfSjLxBAspz7"
-Content-Disposition: inline
-In-Reply-To: <20200817062911.GA7412@apples.localdomain>
-Received-SPF: pass client-ip=66.111.4.230; envelope-from=its@irrelevant.dk;
- helo=new4-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 04:45:36
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=212.186.127.180;
+ envelope-from=f.gruenbichler@proxmox.com; helo=proxmox-new.maurer-it.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 05:14:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,60 +62,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kbusch@kernel.org, kwolf@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, mreitz@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+based on John's in-progress work from last year, this series introduces
+incremental drive-/block-dev mirror support using bitmaps with three bitmap
+modes.
 
---fdj2RfSjLxBAspz7
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+changes since RFC:
+- rebased on current master
+- squashed patches 2-4
+- re-ordered patches 5/6, and moved all test code to patch 6
 
-On Aug 17 08:29, Klaus Jensen wrote:
-> On Jul 30 00:50, Klaus Jensen wrote:
-> > On Jul 29 15:01, Andrzej Jakowski wrote:
-> > > So far it was not possible to have CMB and PMR emulated on the same
-> > > device, because BAR2 was used exclusively either of PMR or CMB. This
-> > > patch places CMB at BAR4 offset so it not conflicts with MSI-X vector=
-s.
-> > >=20
-> > > Signed-off-by: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-> > > ---
-> >=20
-> > Well, I'm certainly happy now. LGTM!
-> >=20
-> > Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
-> >=20
->=20
-> Are anyone willing to chip in with another review on this?
->=20
+NOTE: patch #2 is still requiring a S-O-B by John before applying!
 
-I think this patch is ready (and have been for some time) for inclusion,
-but would really like an additional review on this; preferably from
-Keith, since he is the one that originally mentioned that we could do
-something like this.
+Fabian Grünbichler (2):
+  mirror: move some checks to qmp
+  iotests: add test for bitmap mirror
 
-I've mentioned it before, but I would prefer that the MSI-X stuff was in
-BAR0 instead of mixing it with the CMB, but that's bikeshedding and my
-R-b still holds of course.
+John Snow (2):
+  drive-mirror: add support for sync=bitmap mode=never
+  drive-mirror: add support for conditional and always bitmap sync modes
 
---fdj2RfSjLxBAspz7
-Content-Type: application/pgp-signature; name="signature.asc"
+ include/block/block_int.h   |    4 +-
+ block/mirror.c              |   96 +-
+ blockdev.c                  |   71 +-
+ tests/test-block-iothread.c |    4 +-
+ qapi/block-core.json        |   29 +-
+ tests/qemu-iotests/306      |  546 +++++++
+ tests/qemu-iotests/306.out  | 2846 +++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group    |    1 +
+ 8 files changed, 3566 insertions(+), 31 deletions(-)
+ create mode 100755 tests/qemu-iotests/306
+ create mode 100644 tests/qemu-iotests/306.out
 
------BEGIN PGP SIGNATURE-----
+-- 
+2.20.1
 
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9pvhQACgkQTeGvMW1P
-Dek+OQf+JwP1ZNjVQp3z7ZoBpUmbja0bGHLX4/yKaZvJ6oGK9p0LMXaCAMyqgAIy
-od32BeIBzZJ1lyqspio2gkrQ1Lji4iC2jyA0neVJdS6ye/cvWAoFqkg/FXSSvDO5
-OpCq2WvEndImQkR7r24/HioeqfvY5TmlYPrtiO1JpomVDZWPlDMzb0Mxn2mkR+oW
-cxLVv3ouQE82XflKX/drnCrR8udIMmnM044IU3qf2n4PgeaS22IIsQaKO1A4FzF7
-sd3ZDkOIpi9SgIOef+d415RkrWY4FgNvIdsggGYLap+W9UmNox9JTCJJ2QX5+3bm
-6LX5NcAuMdBJaRcHVr97mfOUpaEcwA==
-=swfn
------END PGP SIGNATURE-----
 
---fdj2RfSjLxBAspz7--
 
