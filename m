@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84DFCC4727D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:40:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18BBBC4727D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:41:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C1E820936
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:40:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E33C221EB
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:41:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SrCP1h2k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C1E820936
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H8zxzwBo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E33C221EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKqx7-0002fi-6m
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 18:40:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57994)
+	id 1kKqyj-0004N1-M7
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 18:41:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58080)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKqsr-00048M-5U
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:35:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22325)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKqsv-0004Hv-Kh
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:35:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35844)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKqso-0007bI-FI
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:35:36 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKqst-0007d7-Uf
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:35:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600814133;
+ s=mimecast20190719; t=1600814138;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ZMY/wzTC1WX5rSMzZEfkvQygIqZldMtlPzP4tLxY3L4=;
- b=SrCP1h2kq2utpzdO5t0HcRe4cQqyiTShXuOvXoruHakpT+TSGNp8AjwLANZ2GDt4GfTGv+
- EBoe65L8baW4aWUgDgcNSnWDF962E1HLPI/V4xCm3qi+DFoLbUjLsXpqb4mVLRUZajrdxh
- /DuqcBgRbFTP0N99a1IEGk3DdT0sNwE=
+ bh=EFGub7ZhjjnhzVH7ElCNIqLLQL5ff0E2HEr5DzbLLds=;
+ b=H8zxzwBo3LUM/hZG9ihb1Lfc+nCRZg4vdJy8MkORRNqcorj+qsM1J0nqt7tnf5ytN2fMzT
+ M2IzP+0W3CatmUkT0EMRP0lAbTPWKe7B91zQdkNG/ATxOyZSXcKp6wI3zPI9XB70xIvuoP
+ Az9bFitNwml8suUYenoC5bVC2MSLS0s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-490-VLWWGsa4N92iU4kRc2aWCw-1; Tue, 22 Sep 2020 18:35:29 -0400
-X-MC-Unique: VLWWGsa4N92iU4kRc2aWCw-1
+ us-mta-138-giPYim8bNeCw0kcI1VU16A-1; Tue, 22 Sep 2020 18:35:36 -0400
+X-MC-Unique: giPYim8bNeCw0kcI1VU16A-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B2731074641;
- Tue, 22 Sep 2020 22:35:28 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01BBF1005E64;
+ Tue, 22 Sep 2020 22:35:36 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8445460C05;
- Tue, 22 Sep 2020 22:35:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EE026610AF;
+ Tue, 22 Sep 2020 22:35:34 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH 01/26] qapi/parser.py: refactor parsing routine into method
-Date: Tue, 22 Sep 2020 18:35:00 -0400
-Message-Id: <20200922223525.4085762-2-jsnow@redhat.com>
+Subject: [PATCH 08/26] qapi/parser.py: Assert lexer value is a string
+Date: Tue, 22 Sep 2020 18:35:07 -0400
+Message-Id: <20200922223525.4085762-9-jsnow@redhat.com>
 In-Reply-To: <20200922223525.4085762-1-jsnow@redhat.com>
 References: <20200922223525.4085762-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -100,78 +100,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For the sake of keeping __init__ easier to reason about, with fewer
-variables in play.
+The type checker can't constrain the token value to string in this case,
+because it's only loosely correlated with the return token, which is
+"stringly typed".
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- scripts/qapi/parser.py | 30 ++++++++++++++++++------------
- 1 file changed, 18 insertions(+), 12 deletions(-)
+ scripts/qapi/parser.py | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
-index 8be4570c31..55117f5754 100644
+index 78355ca93f..6774b6c736 100644
 --- a/scripts/qapi/parser.py
 +++ b/scripts/qapi/parser.py
-@@ -46,28 +46,34 @@ class QAPIDocError(QAPIError):
- class QAPISchemaParser:
- 
-     def __init__(self, fname, previously_included=None, incl_info=None):
--        previously_included = previously_included or set()
--        previously_included.add(os.path.abspath(fname))
-+        self._fname = fname
-+        self._included = previously_included or set()
-+        self._included.add(os.path.abspath(self._fname))
-+
-+        self.cursor = 0
-+        self.info = QAPISourceInfo(self._fname, 1, incl_info)
-+        self.line_pos = 0
-+        self.exprs = []
-+        self.docs = []
- 
-         try:
--            fp = open(fname, 'r', encoding='utf-8')
-+            fp = open(self._fname, 'r', encoding='utf-8')
-             self.src = fp.read()
-         except IOError as e:
-             raise QAPISemError(incl_info or QAPISourceInfo(None, None, None),
-                                "can't read %s file '%s': %s"
-                                % ("include" if incl_info else "schema",
--                                  fname,
-+                                  self._fname,
-                                   e.strerror))
-+        self._parse()
- 
-+    def _parse(self):
-+        cur_doc = None
-+
-+        # Prime the lexer:
-         if self.src == '' or self.src[-1] != '\n':
-             self.src += '\n'
--        self.cursor = 0
--        self.info = QAPISourceInfo(fname, 1, incl_info)
--        self.line_pos = 0
--        self.exprs = []
--        self.docs = []
-         self.accept()
--        cur_doc = None
- 
-         while self.tok is not None:
-             info = self.info
-@@ -86,12 +92,12 @@ def __init__(self, fname, previously_included=None, incl_info=None):
-                 if not isinstance(include, str):
-                     raise QAPISemError(info,
-                                        "value of 'include' must be a string")
--                incl_fname = os.path.join(os.path.dirname(fname),
-+                incl_fname = os.path.join(os.path.dirname(self._fname),
-                                           include)
-                 self.exprs.append({'expr': {'include': incl_fname},
-                                    'info': info})
-                 exprs_include = self._include(include, info, incl_fname,
--                                              previously_included)
-+                                              self._included)
-                 if exprs_include:
-                     self.exprs.extend(exprs_include.exprs)
-                     self.docs.extend(exprs_include.docs)
+@@ -312,6 +312,7 @@ def _get_doc(self, info):
+         cur_doc = QAPIDoc(info)
+         self.accept(False)
+         while self.tok == '#':
++            assert isinstance(self.val, str), "Expected str value"
+             if self.val.startswith('##'):
+                 # End of doc comment
+                 if self.val != '##':
 -- 
 2.26.2
 
