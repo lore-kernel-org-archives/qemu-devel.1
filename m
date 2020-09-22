@@ -7,63 +7,64 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0F88C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:37:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25C6BC4727E
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:37:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5520620757
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:37:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BF43E20757
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:37:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NUrkQbua"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5520620757
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LMbEfQkh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF43E20757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKpy9-0005sc-8C
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 17:37:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39894)
+	id 1kKpyB-0005za-Rh
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 17:37:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37500)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpbK-0000rB-LD
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:13:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52301)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpQY-0002nN-Ju
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:02:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22015)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpbI-00061g-Tm
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:13:26 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpQW-0004fq-HB
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:02:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600809204;
+ s=mimecast20190719; t=1600808535;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=FMPYL/Fj+O8VtFiDqOGxK2lFd9x8jB/8yhs9MnJy+mE=;
- b=NUrkQbuaJ4GeIJ04qSf5LpoFwYxCHdPtIRHWZDJFZpmJyez5oZ8MdfCwYdABPwNHuEdD2G
- WFHgSjeisGx0DPY2kwg0feKNEtucDNhSBiC1JZlMoFCTbnnYzGnZGniUNUsSscAScSQq+J
- 2hlWUx0eMAfVhG2EtdkhEUYJ8U3j3KE=
+ bh=6v1QZedyVDhCtOAjeUf7VmKC1JSzpMgb4c04RWcAjQc=;
+ b=LMbEfQkhVLUMdGttvXz1ujN/aADmqeaJQDiT1ftzsK26Jx85uZWTDz30u4WkiVAcJpJxAW
+ CQKQKOzvR4F8kStQhhm58/SomyyJ+edaVh1WM/TfBsz9q5lzcgVQtaZ284MI/HZu5/bb3Y
+ +tmdcldr7/SERlVazENE2Ys/jrubtwY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-252-AVT_yaSgP3SnIg_Sf6SG2g-1; Tue, 22 Sep 2020 17:13:22 -0400
-X-MC-Unique: AVT_yaSgP3SnIg_Sf6SG2g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-470-1YbrltPrOSalI_V1etwKmQ-1; Tue, 22 Sep 2020 17:01:51 -0400
+X-MC-Unique: 1YbrltPrOSalI_V1etwKmQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46D8A64091;
- Tue, 22 Sep 2020 21:13:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20FC71868422;
+ Tue, 22 Sep 2020 21:01:50 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1431873689;
- Tue, 22 Sep 2020 21:13:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3273755765;
+ Tue, 22 Sep 2020 21:01:49 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH 05/16] qapi/expr.py: move string check upwards in check_type
-Date: Tue, 22 Sep 2020 17:13:02 -0400
-Message-Id: <20200922211313.4082880-6-jsnow@redhat.com>
-In-Reply-To: <20200922211313.4082880-1-jsnow@redhat.com>
-References: <20200922211313.4082880-1-jsnow@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>,
+	qemu-devel@nongnu.org
+Subject: [PATCH v2 31/38] qapi/introspect.py: add _gen_features helper
+Date: Tue, 22 Sep 2020 17:00:54 -0400
+Message-Id: <20200922210101.4081073-32-jsnow@redhat.com>
+In-Reply-To: <20200922210101.4081073-1-jsnow@redhat.com>
+References: <20200922210101.4081073-1-jsnow@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -93,46 +94,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Cleber Rosa <crosa@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's a simple case, shimmy the early return upwards.
+_make_tree doesn't know if it is receiving an object or some other type;
+adding features information should arguably be performed by the caller.
+
+This will help us refactor _make_tree more gracefully in the next patch.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- scripts/qapi/expr.py | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ scripts/qapi/introspect.py | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
 
-diff --git a/scripts/qapi/expr.py b/scripts/qapi/expr.py
-index 67892502e9..3f5af5f5e4 100644
---- a/scripts/qapi/expr.py
-+++ b/scripts/qapi/expr.py
-@@ -143,6 +143,10 @@ def check_type(value, info, source,
-     if value is None:
-         return
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index 41ca8afc67..e1edd0b179 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -10,7 +10,7 @@
+ See the COPYING file in the top-level directory.
+ """
  
-+    # Type name
-+    if isinstance(value, str):
-+        return
+-from typing import (NamedTuple, Optional, Sequence)
++from typing import (NamedTuple, List, Optional, Sequence)
+ 
+ from .common import (
+     c_name,
+@@ -20,7 +20,7 @@
+ )
+ from .gen import QAPISchemaMonolithicCVisitor
+ from .schema import (QAPISchemaArrayType, QAPISchemaBuiltinType,
+-                     QAPISchemaType)
++                     QAPISchemaFeature, QAPISchemaType)
+ 
+ 
+ class Extra(NamedTuple):
+@@ -31,12 +31,10 @@ class Extra(NamedTuple):
+     ifcond: Sequence[str] = tuple()
+ 
+ 
+-def _make_tree(obj, ifcond, features,
++def _make_tree(obj, ifcond,
+                extra: Optional[Extra] = None):
+     comment = extra.comment if extra else None
+     extra = Extra(comment, ifcond)
+-    if features:
+-        obj['features'] = [(f.name, Extra(None, f.ifcond)) for f in features]
+     return (obj, extra)
+ 
+ 
+@@ -169,6 +167,10 @@ def _use_type(self, typ):
+             return '[' + self._use_type(typ.element_type) + ']'
+         return self._name(typ.name)
+ 
++    @classmethod
++    def _gen_features(cls, features: List[QAPISchemaFeature]):
++        return [_make_tree(f.name, f.ifcond) for f in features]
 +
-     # Array type
-     if isinstance(value, list):
-         if not allow_array:
-@@ -153,10 +157,6 @@ def check_type(value, info, source,
-                                source)
-         return
+     def _gen_tree(self, name, mtype, obj, ifcond, features):
+         extra = None
+         if mtype not in ('command', 'event', 'builtin', 'array'):
+@@ -179,13 +181,17 @@ def _gen_tree(self, name, mtype, obj, ifcond, features):
+             name = self._name(name)
+         obj['name'] = name
+         obj['meta-type'] = mtype
+-        self._trees.append(_make_tree(obj, ifcond, features, extra))
++        if features:
++            obj['features'] = self._gen_features(features)
++        self._trees.append(_make_tree(obj, ifcond, extra))
  
--    # Type name
--    if isinstance(value, str):
--        return
--
-     # Anonymous type
+     def _gen_member(self, member):
+         obj = {'name': member.name, 'type': self._use_type(member.type)}
+         if member.optional:
+             obj['default'] = None
+-        return _make_tree(obj, member.ifcond, member.features)
++        if member.features:
++            obj['features'] = self._gen_features(member.features)
++        return _make_tree(obj, member.ifcond)
  
-     if not allow_dict:
+     def _gen_variants(self, tag_name, variants):
+         return {'tag': tag_name,
+@@ -193,7 +199,7 @@ def _gen_variants(self, tag_name, variants):
+ 
+     def _gen_variant(self, variant):
+         obj = {'case': variant.name, 'type': self._use_type(variant.type)}
+-        return _make_tree(obj, variant.ifcond, None)
++        return _make_tree(obj, variant.ifcond)
+ 
+     def visit_builtin_type(self, name, info, json_type):
+         self._gen_tree(name, 'builtin', {'json-type': json_type}, [], None)
 -- 
 2.26.2
 
