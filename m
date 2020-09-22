@@ -2,89 +2,91 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1BADC4363D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 06:51:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 224CFC4363D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 06:53:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AD23239E5
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 06:51:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3AA2A239E5
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 06:53:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EWdtITIW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AD23239E5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RwDH7uIg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AA2A239E5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKc8r-00079X-Vr
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 02:51:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56980)
+	id 1kKcAe-00009n-0U
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 02:53:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kKc6W-0004xW-2u
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 02:48:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35764)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kKc6V-0004wv-ES
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 02:48:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46730
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kKc6T-00034r-Gw
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kKc6S-00034m-VE
  for qemu-devel@nongnu.org; Tue, 22 Sep 2020 02:48:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1600757320;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OxTdqA6OSrPn5QCnzEGgD7GexcPXsJ3Qzsa8fr/GmMg=;
- b=EWdtITIW3XNRqEFXp6KeNo7kd1Ku3/epzssmTKrtFRHi8ffuauWeR47xwVJoIwtm0SmW9R
- cspXtsPiXLHkHfofRPqy1tiLbH/HcjZxxoJoaSDykwRK/o3+WvF8BILLgIzAOW6F4Zq6oV
- 4Sp07HgbFqRbFt5MXdZffuP4J5lWBnk=
+ bh=Kfo12jbG6Em66ftrlz0h/CVFgHo0/Px79NiByqjZgc0=;
+ b=RwDH7uIgaNHC9lxobx5g4gWFQHhjYCHs7L3t2eytDI2e75OdR5k87I6PiYuBaiqqp4JuDp
+ is2ZH3dvx9F005rQ1p55tktOPkd/8dobh2r1JIWlajVLBBUGUfkXSbjoc/7d+KHxoRKdJV
+ xnIq/DT7o7BduuuB9suUdd5g40jUl/A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-232-rf63SeoSNZi3uLvLzoIhHw-1; Tue, 22 Sep 2020 02:48:39 -0400
-X-MC-Unique: rf63SeoSNZi3uLvLzoIhHw-1
+ us-mta-405-E0KZzpd4NQC5offBSrYidg-1; Tue, 22 Sep 2020 02:48:34 -0400
+X-MC-Unique: E0KZzpd4NQC5offBSrYidg-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25D231084C9A
- for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 06:48:38 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 04A2918EDE;
- Tue, 22 Sep 2020 06:48:36 +0000 (UTC)
-Date: Tue, 22 Sep 2020 08:48:36 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH 17/24] cpu/core: Register core-id and nr-threads as
- class properties
-Message-ID: <20200922084836.1e876578@redhat.com>
-In-Reply-To: <20200921221045.699690-18-ehabkost@redhat.com>
-References: <20200921221045.699690-1-ehabkost@redhat.com>
- <20200921221045.699690-18-ehabkost@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D57DE800470;
+ Tue, 22 Sep 2020 06:48:33 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-113-122.ams2.redhat.com [10.36.113.122])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 33F0C5DD99;
+ Tue, 22 Sep 2020 06:48:31 +0000 (UTC)
+Subject: Re: [PATCH 3/6] migration: Silence compiler warning in
+ global_state_store_running()
+To: Cleber Rosa <crosa@redhat.com>
+References: <20200918103430.297167-1-thuth@redhat.com>
+ <20200918103430.297167-4-thuth@redhat.com>
+ <20200921203902.GA15763@localhost.localdomain>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <a1601662-9650-ecab-e61b-36b7d49c3d0d@redhat.com>
+Date: Tue, 22 Sep 2020 08:48:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <20200921203902.GA15763@localhost.localdomain>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="IvtEZOvnApbkU2MsBJf8WJP0rbbRAM2IX"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 01:57:21
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
 X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,54 +99,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 21 Sep 2020 18:10:38 -0400
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--IvtEZOvnApbkU2MsBJf8WJP0rbbRAM2IX
+Content-Type: multipart/mixed; boundary="0t7wRjiCGYIvYaETlffrynT0fMZ8Q9MAM"
 
-> Class properties make QOM introspection simpler and easier, as
-> they don't require an object to be instantiated.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+--0t7wRjiCGYIvYaETlffrynT0fMZ8Q9MAM
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+On 21/09/2020 22.39, Cleber Rosa wrote:
+> On Fri, Sep 18, 2020 at 12:34:27PM +0200, Thomas Huth wrote:
+>> GCC 9.3.0 on Ubuntu complains:
+>>
+>> In file included from /usr/include/string.h:495,
+>>                  from /home/travis/build/huth/qemu/include/qemu/osdep.h:=
+87,
+>>                  from ../migration/global_state.c:13:
+>> In function =E2=80=98strncpy=E2=80=99,
+>>     inlined from =E2=80=98global_state_store_running=E2=80=99 at ../migr=
+ation/global_state.c:47:5:
+>> /usr/include/x86_64-linux-gnu/bits/string_fortified.h:106:10: error:
+>>  =E2=80=98__builtin_strncpy=E2=80=99 specified bound 100 equals destinat=
+ion size [-Werror=3Dstringop-truncation]
+>>   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (_=
+_dest));
+>>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~~~~
+>>
+>> ... but we apparently really want to do a strncpy here - the size is alr=
+eady
+>> checked with the assert() statement right in front of it. To silence the
+>> warning, simply replace it with our strpadcpy() function.
+>>
+>> Suggested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> (two years=
+ ago)
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  migration/global_state.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/migration/global_state.c b/migration/global_state.c
+>> index 25311479a4..a33947ca32 100644
+>> --- a/migration/global_state.c
+>> +++ b/migration/global_state.c
+>> @@ -44,8 +44,8 @@ void global_state_store_running(void)
+>>  {
+>>      const char *state =3D RunState_str(RUN_STATE_RUNNING);
+>>      assert(strlen(state) < sizeof(global_state.runstate));
+>> -    strncpy((char *)global_state.runstate,
+>> -           state, sizeof(global_state.runstate));
+>> +    strpadcpy((char *)global_state.runstate, sizeof(global_state.runsta=
+te),
+>> +              state, '\0');
+>>  }
+>> =20
+>>  bool global_state_received(void)
+>> --=20
+>> 2.18.2
+>>
+>>
+>=20
+> Hi Thomas,
+>=20
+> FIY, I couldn't reproduce the complaint from GCC.  I've tested it on foca=
+l,
+> "gcc (Ubuntu 9.3.0-10ubuntu2) 9.3.0", with QEMU 5df6c87e8.
 
-> ---
-> Cc: qemu-devel@nongnu.org
-> ---
->  hw/cpu/core.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/cpu/core.c b/hw/cpu/core.c
-> index 3a659291eae..92d3b2fbad6 100644
-> --- a/hw/cpu/core.c
-> +++ b/hw/cpu/core.c
-> @@ -69,10 +69,6 @@ static void cpu_core_instance_init(Object *obj)
->      MachineState *ms = MACHINE(qdev_get_machine());
->      CPUCore *core = CPU_CORE(obj);
->  
-> -    object_property_add(obj, "core-id", "int", core_prop_get_core_id,
-> -                        core_prop_set_core_id, NULL, NULL);
-> -    object_property_add(obj, "nr-threads", "int", core_prop_get_nr_threads,
-> -                        core_prop_set_nr_threads, NULL, NULL);
->      core->nr_threads = ms->smp.threads;
->  }
->  
-> @@ -81,6 +77,10 @@ static void cpu_core_class_init(ObjectClass *oc, void *data)
->      DeviceClass *dc = DEVICE_CLASS(oc);
->  
->      set_bit(DEVICE_CATEGORY_CPU, dc->categories);
-> +    object_class_property_add(oc, "core-id", "int", core_prop_get_core_id,
-> +                              core_prop_set_core_id, NULL, NULL);
-> +    object_class_property_add(oc, "nr-threads", "int", core_prop_get_nr_threads,
-> +                              core_prop_set_nr_threads, NULL, NULL);
->  }
->  
->  static const TypeInfo cpu_core_type_info = {
+ Hi Cleber,
+
+I've hit the error here:
+
+ https://travis-ci.com/github/huth/qemu/jobs/385871010#L2930
+
+It seems to use the very same compiler version as you did, so that's
+kind of weird... Maybe it's related to the other compiler flags, either
+--enable-gprof, --enable-gcov or --disable-pie ?
+
+ Thomas
+
+
+--0t7wRjiCGYIvYaETlffrynT0fMZ8Q9MAM--
+
+--IvtEZOvnApbkU2MsBJf8WJP0rbbRAM2IX
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEJ7iIR+7gJQEY8+q5LtnXdP5wLbUFAl9pnj4ACgkQLtnXdP5w
+LbX5bA/9EfhOQRT1vdzwtlVbzWBesLh5TCyRyq05NKV7W0SPVKLI1uGGiOBneSTB
+YsbXEsP5p+9ufTAjYxSeYCIIO110x9pmRzsNlJvZxxHre3doQpRQmzREtohkc4KC
+s0Ff5LzvGm76u0TA5I1Tk/X+l7jGFDiuSlTHn3h/EuUemCQbf6aeHqLnxqjDAiWS
+rzPdBrXHDBgpzHvcbmwZihD3d+QqR+EwANd2js+/ihjTZ5Oq/0yAYjg1sju9er4C
+2trtzP/JQ4wO7cGnftMZl7i+0pm4enw9sk/u7OlNUnXOTMEeq7JizjTpUe1WuC7t
+UFERK/Rxcqc3WG2xRiSKR+YV3TqndAGaPwdRon0XbQvKbUBcdgCi3EQ4pLTlFX+6
+e1LaMVu3FoMyjV0lvUeek6GCNyDI+QX036H+b5j7cSypiwndCejWfeRap4eAShcU
+si0gq4SzVMqgrSA2CNz2adI0tEFg47pn6+PGgarV3G/ByiU+xAcwAhmYn73mehX4
+lYKzfHL+SqrHied0SWUEmLAUlBptr+BGe0xwk8pjmhePEuSLYDzW25pICeYXoz5d
+8q24Z79g9WrVY6OK5XSmJ0jJpudOlh44Bvh3aU3eCkADOa9qSd+oalt1x8oQA1Uh
+ADRdd2/ukB6DZgjrPawfuS4T5xCPx2HOCNhX6Bo/knI4VQsivs8=
+=P/nE
+-----END PGP SIGNATURE-----
+
+--IvtEZOvnApbkU2MsBJf8WJP0rbbRAM2IX--
 
 
