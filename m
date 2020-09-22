@@ -7,59 +7,60 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42EFBC4727D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:44:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 896B4C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:44:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA4732371F
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:44:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2742D22262
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:44:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W87Hwlno"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA4732371F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WYNkLxOb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2742D22262
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKq5j-0008Fu-OU
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 17:44:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40044)
+	id 1kKq5n-0008Ph-2a
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 17:44:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39860)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpbV-0001J8-T8
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:13:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56526)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpbJ-0000mu-2J
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:13:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53693)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpbS-00064M-T0
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:13:37 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpbE-0005zO-6j
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:13:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600809214;
+ s=mimecast20190719; t=1600809199;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=otO27sep0nJ6bA9EFn+q7sPXFbyUG38myhQs4Z2myn0=;
- b=W87Hwlnogy3uFwIJZAZR6JoawH3YrS4kpbzHY0SovrKTO279Jn9YbE2R64lUHCGFFihLyx
- HaUD6orRW/XZLvbAnAEqESUFkhTQOH3It0GlYiJhYf4DkMU5Wf5af2u77WeKKgpgHyyOrU
- nO1eIT/dgZy6oQHVZOumVxMnnkoLWtM=
+ bh=l3aFvixgKbhP6pi+lbQ0yIOSVJdkTdzW2xDLUdXZuV8=;
+ b=WYNkLxObc2b41txYaVtHYVGqhVQk96lR9yu4YiiwaolJI/VOSPsT+ZYQ9x+loDZN+BcXa5
+ WJB4pEJNNBY+d9SZ5cieygr49D2/o9sDfA2SN4QSiEhw/wXQLD7LnJpvw76wpBG21NRGsT
+ iJX7DP6qjGyMWvYxtnH5QoXw6lSRt+c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-iyCikDqyO3K0c0TFUimbZg-1; Tue, 22 Sep 2020 17:13:32 -0400
-X-MC-Unique: iyCikDqyO3K0c0TFUimbZg-1
+ us-mta-178-mHUEAdzCMKaeLjYwBMKlvg-1; Tue, 22 Sep 2020 17:13:17 -0400
+X-MC-Unique: mHUEAdzCMKaeLjYwBMKlvg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E78C81CBE9;
- Tue, 22 Sep 2020 21:13:31 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 354D910BBEC3;
+ Tue, 22 Sep 2020 21:13:16 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 64FC173682;
- Tue, 22 Sep 2020 21:13:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F28FC614F5;
+ Tue, 22 Sep 2020 21:13:14 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH 13/16] qapi/expr.py: Modify check_keys to accept any Iterable
-Date: Tue, 22 Sep 2020 17:13:10 -0400
-Message-Id: <20200922211313.4082880-14-jsnow@redhat.com>
+Subject: [PATCH 01/16] qapi/expr.py: Remove 'info' argument from nested
+ check_if_str
+Date: Tue, 22 Sep 2020 17:12:58 -0400
+Message-Id: <20200922211313.4082880-2-jsnow@redhat.com>
 In-Reply-To: <20200922211313.4082880-1-jsnow@redhat.com>
 References: <20200922211313.4082880-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -100,17 +101,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a very minor adjustment.
-
-a + b is list-specific behavior, but we can accept a wider variety of
-types in a more pythonic fashion if we avoid that behavior.
-
-Typing it this way allows callers to use things like dict.keys() and
-other iterables that are not their own discrete lists.
-
-Including it just as a statement of practice if nothing else: It's nice
-to use the least-specific type possible as function input and use the
-most-specific type for returns.
+The function can just use the argument from the scope above. Otherwise,
+we get shadowed argument errors because the parameter name clashes with
+the name of a variable already in-scope.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
@@ -118,29 +111,30 @@ Signed-off-by: John Snow <jsnow@redhat.com>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/scripts/qapi/expr.py b/scripts/qapi/expr.py
-index 4bba09f6e5..2a1f37ca88 100644
+index 03b31ecfc1..de659a54ad 100644
 --- a/scripts/qapi/expr.py
 +++ b/scripts/qapi/expr.py
-@@ -132,8 +132,8 @@ def check_defn_name_str(name: str, info: QAPISourceInfo, meta: str) -> None:
- def check_keys(value: _JSObject,
-                info: QAPISourceInfo,
-                source: str,
--               required: List[str],
--               optional: List[str]) -> None:
-+               required: Iterable[str] = (),
-+               optional: Iterable[str] = ()) -> None:
-     """
-     Ensures an object has a specific set of keys. [Const]
+@@ -96,7 +96,7 @@ def check_flags(expr, info):
  
-@@ -154,7 +154,7 @@ def pprint(elems: Iterable[str]) -> str:
-             "%s misses key%s %s"
-             % (source, 's' if len(missing) > 1 else '',
-                pprint(missing)))
--    allowed = set(required + optional)
-+    allowed = set(required) | set(optional)
-     unknown = set(value) - allowed
-     if unknown:
-         raise QAPISemError(
+ def check_if(expr, info, source):
+ 
+-    def check_if_str(ifcond, info):
++    def check_if_str(ifcond):
+         if not isinstance(ifcond, str):
+             raise QAPISemError(
+                 info,
+@@ -116,9 +116,9 @@ def check_if_str(ifcond, info):
+             raise QAPISemError(
+                 info, "'if' condition [] of %s is useless" % source)
+         for elt in ifcond:
+-            check_if_str(elt, info)
++            check_if_str(elt)
+     else:
+-        check_if_str(ifcond, info)
++        check_if_str(ifcond)
+         expr['if'] = [ifcond]
+ 
+ 
 -- 
 2.26.2
 
