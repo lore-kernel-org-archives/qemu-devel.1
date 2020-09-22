@@ -2,76 +2,93 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D286C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 09:47:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4915FC2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 09:52:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 005A32145D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 09:47:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 641662388B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 09:52:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=euphon.net header.i=fam@euphon.net header.b="N0v/b+0l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 005A32145D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=euphon.net
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mJCAf9Cv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 641662388B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKetJ-0005DC-Oc
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 05:47:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43210)
+	id 1kKexv-0007Re-P8
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 05:52:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <fam@euphon.net>)
- id 1kKerv-0003pQ-A0; Tue, 22 Sep 2020 05:45:51 -0400
-Received: from sender2-op-o12.zoho.com.cn ([163.53.93.243]:17607)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <fam@euphon.net>)
- id 1kKerr-0000TT-3e; Tue, 22 Sep 2020 05:45:51 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1600767927; cv=none; d=zoho.com.cn; s=zohoarc; 
- b=YsuV0/6tvJu0vQYqGPy5cnE7E8OXRSpBKZ8PhWZkM9K2xmhN1HnRPZScspNVx4rBzBwsnxP8e/RHG1YqZ3+ukCK2MguhoYFCSvCy125UWbY9LzWNZ3+lwyU84BVBcEK96quZWukd3cMZI3ZcrzA+JEX939tdqk+/I9dyJbzRdek=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com.cn;
- s=zohoarc; t=1600767927;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To;
- bh=EcrY6ophsbBEUHkM/1XrDL/mKiT+jIvBa63QKOkXXyY=; 
- b=MVlt6MI5HuYo/qHMjycL/waxl5ngD3bVYYX8RQACgQXd5m1Jiv4Nw67oVByWvhXqib7ShDWXMqAgROWFYkyGTQUQBMNLHUakEd7QPl9djbUrJWrJAJckOy3exoj7p+8CcFdBL8HFFOk0Jx0z2w1nkPh+VofLpo89rybwFVsrFzU=
-ARC-Authentication-Results: i=1; mx.zoho.com.cn;
- dkim=pass  header.i=euphon.net;
- spf=pass  smtp.mailfrom=fam@euphon.net;
- dmarc=pass header.from=<fam@euphon.net> header.from=<fam@euphon.net>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1600767927; 
- s=zoho; d=euphon.net; i=fam@euphon.net;
- h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:Content-Type:Mime-Version:Content-Transfer-Encoding;
- bh=EcrY6ophsbBEUHkM/1XrDL/mKiT+jIvBa63QKOkXXyY=;
- b=N0v/b+0li6jXdrEGHfrx+3qTiYeo72POjbZC8n9qg1MHXbQ7MDGUy8pJBJo9YtZQ
- 6f+hQvTrRM2ttGBqxvl6CZeewLhctYEHGXH7s6s7HEpehcmcKutcMi71TwXw4L27Aef
- LXBLPOR10IlMMamq1uT5kIui2m+bp3+t9fRIl9rw=
-Received: from vpn-10-85-95-225.fra53.corp.amazon.com (54.239.6.177
- [54.239.6.177]) by mx.zoho.com.cn
- with SMTPS id 1600767926351195.99045056638624;
- Tue, 22 Sep 2020 17:45:26 +0800 (CST)
-Message-ID: <a8e87383339c264bf9d99aebafaf45d7a023f0d8.camel@euphon.net>
-Subject: Re: [PATCH v2 0/6] block/nvme: Map doorbells pages write-only,
- remove magic from nvme_init
-From: Fam Zheng <fam@euphon.net>
-To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, 
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 22 Sep 2020 10:45:20 +0100
-In-Reply-To: <20200922083821.578519-1-philmd@redhat.com>
-References: <20200922083821.578519-1-philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
-Mime-Version: 1.0
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kKewa-0006nZ-Mn
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 05:50:40 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44999)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kKewY-000195-HJ
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 05:50:40 -0400
+Received: by mail-wr1-x443.google.com with SMTP id s12so16317389wrw.11
+ for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 02:50:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=sQPhss5DWjtqofnkMpdYG5L2+8qhzRQPv6JYWrgqoeo=;
+ b=mJCAf9CvFXonSS2gyuInGdKmLrjz3yeI5c8KygioUpRJRhtjL8O4wgZlRqXLvGhiSG
+ DqoWeNCZMUup2j7Mxvs/OZzdGfi6TqWCN18N8WJIXXWSGgiHj5NtTi6oSfEbMOnt01EV
+ uhPK9DRMWBg8XqnumJn+IxYDtQbORN4QX0WlDYSkqZq3ynEJGK8e7lGoysmD4iqu6W+r
+ oU8ZVB9JxIWC6Bq2eaVQwA71sDUBR3zsQksw5XxZMyNSRUE7LCF0BbCO0ClR/rW5BkML
+ Nio72NCgPxhf4xjaKj00ah0h96Nzx+nbzeLIllclGyHp3O6IRVZ1NVPeNc0RlBwHKse0
+ 225A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=sQPhss5DWjtqofnkMpdYG5L2+8qhzRQPv6JYWrgqoeo=;
+ b=ZAcDCDXQg4t9zYtN4/O0zBam6zISza8kl4VxbVr6dxrdGbugHIq4z7c/NiTE6oIngp
+ zcuQlljKaMm5KcKKEiq/COZJAdGhIyXg1MBdgWvUjfakbOhAejdXBuyOz+PO+8wJLa6S
+ iZVcwlvutPu3cZF8i95XWLDEYPAj/Op4VH9J3uIjxe0NTZfLpxCp+1n7WM3SMkP5GgzT
+ UQJxng0ECY8HEsv2jZg6xMm0+fr+LVDz8ts5P6EFyTmVlN4+WMCXBYDS5sGKSphQGBir
+ olsY/fXNKeYP1rXine6Kx6t4E52NV8aGXGk37EryX2ON5ceJfNhV+7CMHMwWG15DEbIE
+ ZCBw==
+X-Gm-Message-State: AOAM531szVp6yJYx9Ipfo6ZDzd2hrj8lTxp0AybVFyqWzruLqPkm97wB
+ aDR5+nVQlxddbItEJx46N3s1TQ==
+X-Google-Smtp-Source: ABdhPJwm2Xzmgd3cUxp91oqin7Q7/9hHvoaEoFsltGvUp56TShtd7qaVf3KImcWbdFhbxXll7oFncA==
+X-Received: by 2002:a05:6000:12cf:: with SMTP id
+ l15mr4284392wrx.312.1600768236688; 
+ Tue, 22 Sep 2020 02:50:36 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id x10sm3846499wmi.37.2020.09.22.02.50.35
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 22 Sep 2020 02:50:35 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 9458F1FF7E;
+ Tue, 22 Sep 2020 10:50:34 +0100 (BST)
+References: <20200921174118.39352-1-richard.henderson@linaro.org>
+ <20200921174118.39352-5-richard.henderson@linaro.org>
+ <87d02fnd1y.fsf@linaro.org>
+ <8e1ac018-dac8-b049-aae3-059f86698f3a@linaro.org>
+ <d3a5ec4f-259e-2f5a-2ae9-9bbc46d24298@amsat.org>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v4 04/11] disas: Move host asm annotations to tb_gen_code
+In-reply-to: <d3a5ec4f-259e-2f5a-2ae9-9bbc46d24298@amsat.org>
+Date: Tue, 22 Sep 2020 10:50:34 +0100
+Message-ID: <871riunnrp.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-ZohoCNMailClient: External
-Received-SPF: pass client-ip=163.53.93.243; envelope-from=fam@euphon.net;
- helo=sender2-op-o12.zoho.com.cn
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 04:19:31
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -91,36 +108,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 2020-09-22 at 10:38 +0200, Philippe Mathieu-Daud=C3=A9 wrote:
-> Instead of mapping 8K of I/O + doorbells as RW during the whole
-> execution, maps I/O temporarly at init, and map doorbells WO.
->=20
-> Replace various magic values by slighly more explicit macros from
-> "block/nvme.h".
->=20
-> Since v1: Fix uninitialized regs* (patchew)
->=20
-> Philippe Mathieu-Daud=C3=A9 (6):
->   util/vfio-helpers: Pass page protections to qemu_vfio_pci_map_bar()
->   block/nvme: Map doorbells pages write-only
->   block/nvme: Reduce I/O registers scope
->   block/nvme: Drop NVMeRegs structure, directly use NvmeBar
->   block/nvme: Use register definitions from 'block/nvme.h'
->   block/nvme: Replace magic value by SCALE_MS definition
->=20
->  include/qemu/vfio-helpers.h |  2 +-
->  block/nvme.c                | 73 +++++++++++++++++++++------------
-> ----
->  util/vfio-helpers.c         |  4 +-
->  3 files changed, 44 insertions(+), 35 deletions(-)
->=20
 
-Reviewed-by: Fam Zheng <fam@euphon.net>
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
+> On 9/21/20 9:53 PM, Richard Henderson wrote:
+>> On 9/21/20 12:29 PM, Alex Benn=C3=A9e wrote:
+>>>
+>>> Richard Henderson <richard.henderson@linaro.org> writes:
+>>>
+>>>> Instead of creating GStrings and passing them into log_disas,
+>>>> just print the annotations directly in tb_gen_code.
+>>>>
+>>>> Fix the annotations for the slow paths of the TB, after the
+>>>> part implementing the final guest instruction.
+>>>>
+>>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>>>
+>>> I guess what we loose in the inline annotation we gain in simpler code.
+>>> We can always grep stuff out of the logs if we need to:
+>>=20
+>> What information do you think we're losing?
+>
+> This in tb_gen_code()?
+>
+>   note =3D g_string_new("[tb header & initial instruction]");
+>
+>   g_string_printf(note, "[guest addr: " TARGET_FMT_lx "]",
+>                   tcg_ctx->gen_insn_data[insn][0]);
+
+We are not loosing information - just it's placement is slightly
+different. It's nothing you can't work around.
+
+--=20
+Alex Benn=C3=A9e
 
