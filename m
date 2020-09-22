@@ -2,75 +2,121 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 042BCC2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:33:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FA64C4727F
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:33:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C2B22396D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:33:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF2492396D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:33:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V63vtVgd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C2B22396D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NTI0mBiy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF2492396D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKfbX-0005Sj-8I
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 06:32:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54326)
+	id 1kKfbt-0005xQ-LI
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 06:33:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54032)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kKfaM-00043i-4S
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:31:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22929)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kKfZa-0003Vl-PF
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:30:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20614)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kKfaK-0006R3-3n
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:31:45 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kKfZW-0006N6-Ux
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:30:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600770703;
+ s=mimecast20190719; t=1600770654;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MPgFiifJH5K6+Z0e1+d84KSygjRUxBz0uDl0bxL56po=;
- b=V63vtVgd/flvm7YGTP/j1iFNMkjBs36jh/3TeU5sRX+2/wacbmH8w8Eafhz9LX5OZ09Amh
- GgiLVRSXNCo+IP9VLcPBz0YyvJsagMorvWAJGC/UZ2MlPy+CBLtCaRHB/24qrr9Ny7GFI7
- I9Bbfqvgh238MJ75QuMRF+4KHjyQuZY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-192-x03nDxkROK-NwP4G-5Y2gQ-1; Tue, 22 Sep 2020 06:31:41 -0400
-X-MC-Unique: x03nDxkROK-NwP4G-5Y2gQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4DA2810BBEC3;
- Tue, 22 Sep 2020 10:31:40 +0000 (UTC)
-Received: from t480s.redhat.com (ovpn-113-20.ams2.redhat.com [10.36.113.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D3AB619C4F;
- Tue, 22 Sep 2020 10:31:38 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v1 3/8] s390x/tcg: Implement MULTIPLY (MG, MGRK)
-Date: Tue, 22 Sep 2020 12:31:24 +0200
-Message-Id: <20200922103129.12824-4-david@redhat.com>
-In-Reply-To: <20200922103129.12824-1-david@redhat.com>
-References: <20200922103129.12824-1-david@redhat.com>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=aeC1d0suPO6COpBh6ctF9xV8ka5nwhD/y7ZxKS/7wXg=;
+ b=NTI0mBiyJZcAlgwt7XkjiqjwPX0sIjoCW+LLTaKNZAZ09T4cp59ye8zZCVibvOgbv2vjIf
+ V5GefugqQUwF69sKTN1v6dMSAXWg/YliWyn3McFNNYuh9Z1u03wfuVcf1/Wcv8nszfw+rK
+ z0r5a+R3a1lKa0zmLYJXJo8wf8U2EDg=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-504-d1iCwh8TO62Yor9TivcElA-1; Tue, 22 Sep 2020 06:30:52 -0400
+X-MC-Unique: d1iCwh8TO62Yor9TivcElA-1
+Received: by mail-wr1-f71.google.com with SMTP id b7so7223183wrn.6
+ for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 03:30:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=aeC1d0suPO6COpBh6ctF9xV8ka5nwhD/y7ZxKS/7wXg=;
+ b=OwJG7Dh1dvNWJ9h8KEMHhIUIpo3/v7rPRT/iCHlZ+bkR2VDVCMp+N3zJqV8ccJzkFl
+ YiWNKED693B0xq9/YS7Evn3w3R3GIOOuYmfRktFC7YHLgb2uVNSZ108bJlZ5seYmtMFC
+ 5DBzDUfC7+BtICkXctD5U9qFEWVOKVTbebdUAsBLCKC8itI0Om+qN0d00yWVzrBt6WuN
+ wavnwVnh/9QN7r0u/UaiMUc81fLtFT6CaUI66tMSSEEcPUKR+yuuqbWcXXneaUXfKqu9
+ qTu3+oSbBvtPHCgUJ3AB0azqwFjE7E8tRNMbXCMebSz9PIzAyH/pwd5SrGMYQoeNPJKr
+ CoJw==
+X-Gm-Message-State: AOAM530U+2iMX0j88DArMNawnwPrJDiAF2qaBZK4wLMTRCOcEU+iHSLD
+ SYPr9KfG1Pjf+DHig4acFk6CBovqx6ERWsIrZp6JnaxruDOJTEw3Tf2lc8vW0XjLpVN08jW6HUO
+ fxuucPb5R0Kflayk=
+X-Received: by 2002:a1c:dd45:: with SMTP id u66mr237368wmg.117.1600770651125; 
+ Tue, 22 Sep 2020 03:30:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxmUdD/U75JiNzMebzTelwLDoagOVmr1S+QaeIFV3W2xai8vY3M+jOJ1dLEobqEit5LrKLxng==
+X-Received: by 2002:a1c:dd45:: with SMTP id u66mr237349wmg.117.1600770650878; 
+ Tue, 22 Sep 2020 03:30:50 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id 11sm3972254wmi.14.2020.09.22.03.30.49
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 22 Sep 2020 03:30:49 -0700 (PDT)
+Subject: Re: [PATCH v2 3/3] target-i386: post memory failure event to uplayer
+To: zhenwei pi <pizhenwei@bytedance.com>, pbonzini@redhat.com,
+ peter.maydell@linaro.org
+References: <20200922095630.394893-1-pizhenwei@bytedance.com>
+ <20200922095630.394893-4-pizhenwei@bytedance.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <776b6afe-022e-f304-4bc9-f1f486d75af2@redhat.com>
+Date: Tue, 22 Sep 2020 12:30:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200922095630.394893-4-pizhenwei@bytedance.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=david@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -79,8 +125,9 @@ X-Spam_score: -3.6
 X-Spam_bar: ---
 X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,69 +140,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: mtosatti@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Multiply two signed 64bit values and store the 128bit result in r1 (0-63)
-and r1 + 1 (64-127).
+On 9/22/20 11:56 AM, zhenwei pi wrote:
+> Post memory failure event to uplayer to handle hardware memory
+> corrupted event. Rather than simple QEMU log, QEMU could report more
+> effective message to uplayer. For example, guest crashes by MCE,
+> selecting another host server is a better choice.
+> 
+> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
+> ---
+>  target/i386/helper.c | 15 +++++++++++++++
+>  target/i386/kvm.c    |  7 ++++++-
+>  2 files changed, 21 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/i386/helper.c b/target/i386/helper.c
+> index 0c7fd32491..47823c29e4 100644
+> --- a/target/i386/helper.c
+> +++ b/target/i386/helper.c
+> @@ -18,6 +18,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include "qapi/qapi-events-run-state.h"
+>  #include "cpu.h"
+>  #include "exec/exec-all.h"
+>  #include "qemu/qemu-print.h"
+> @@ -858,6 +859,7 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
+>      CPUX86State *cenv = &cpu->env;
+>      uint64_t *banks = cenv->mce_banks + 4 * params->bank;
+>      char msg[64];
+> +    MemoryFailureFlags mf_flags = {0};
+>      bool need_reset = false;
+>  
+>      cpu_synchronize_state(cs);
+> @@ -869,6 +871,12 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
+>      if (!(params->flags & MCE_INJECT_UNCOND_AO)
+>          && !(params->status & MCI_STATUS_AR)
+>          && (cenv->mcg_status & MCG_STATUS_MCIP)) {
+> +        mf_flags.has_action_required = true;
+> +        mf_flags.action_required = false;
+> +        mf_flags.has_recursive = true;
+> +        mf_flags.recursive = true;
+> +        qapi_event_send_memory_failure(MEMORY_FAILURE_ACTION_GUEST_MCE_INJECT,
+> +                                       true, &mf_flags);
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/insn-data.def |  2 ++
- target/s390x/translate.c   | 13 +++++++++++++
- 2 files changed, 15 insertions(+)
+Can you extract a function such:
 
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index e851e9df5e..2b4ad1530d 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -650,8 +650,10 @@
- 
- /* MULTIPLY */
-     C(0x1c00, MR,      RR_a,  Z,   r1p1_32s, r2_32s, new, r1_D32, mul, 0)
-+    C(0xb9ec, MGRK,    RRF_a, MIE2,r3_o, r2_o, r1_P, 0, muls128, 0)
-     C(0x5c00, M,       RX_a,  Z,   r1p1_32s, m2_32s, new, r1_D32, mul, 0)
-     C(0xe35c, MFY,     RXY_a, GIE, r1p1_32s, m2_32s, new, r1_D32, mul, 0)
-+    C(0xe384, MG,      RXY_a, MIE2,r1p1_o, m2_64, r1_P, 0, muls128, 0)
-     F(0xb317, MEEBR,   RRE,   Z,   e1, e2, new, e1, meeb, 0, IF_BFP)
-     F(0xb31c, MDBR,    RRE,   Z,   f1, f2, new, f1, mdb, 0, IF_BFP)
-     F(0xb34c, MXBR,    RRE,   Z,   x2h, x2l, x1, x1, mxb, 0, IF_BFP)
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 21d77b7e74..b536491892 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -3518,6 +3518,12 @@ static DisasJumpType op_mul128(DisasContext *s, DisasOps *o)
-     return DISAS_NEXT;
- }
- 
-+static DisasJumpType op_muls128(DisasContext *s, DisasOps *o)
-+{
-+    tcg_gen_muls2_i64(o->out2, o->out, o->in1, o->in2);
-+    return DISAS_NEXT;
-+}
-+
- static DisasJumpType op_meeb(DisasContext *s, DisasOps *o)
- {
-     gen_helper_meeb(o->out, cpu_env, o->in1, o->in2);
-@@ -5542,6 +5548,13 @@ static void in1_r1p1(DisasContext *s, DisasOps *o)
- }
- #define SPEC_in1_r1p1 SPEC_r1_even
- 
-+static void in1_r1p1_o(DisasContext *s, DisasOps *o)
-+{
-+    o->in1 = regs[get_field(s, r1) + 1];
-+    o->g_in1 = true;
-+}
-+#define SPEC_in1_r1p1_o SPEC_r1_even
-+
- static void in1_r1p1_32s(DisasContext *s, DisasOps *o)
- {
-     o->in1 = tcg_temp_new_i64();
--- 
-2.26.2
+static void emit_guest_mce_failure(bool action_required, bool recursive)
+{
+  ...
+}
+
+To use as:
+
+           emit_guest_mce_failure(true, true);
+
+>          return;
+>      }
+>  
+> @@ -909,6 +917,8 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
+>          }
+>  
+>          if (need_reset) {
+> +            qapi_event_send_memory_failure(
+> +                 MEMORY_FAILURE_ACTION_GUEST_MCE_FATAL, false, NULL);
+>              monitor_printf(params->mon, "%s", msg);
+>              qemu_log_mask(CPU_LOG_RESET, "%s\n", msg);
+>              qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+> @@ -934,6 +944,11 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
+>      } else {
+>          banks[1] |= MCI_STATUS_OVER;
+>      }
+> +
+> +    mf_flags.has_action_required = true;
+> +    mf_flags.action_required = !!(params->status & MCI_STATUS_AR);
+> +    qapi_event_send_memory_failure(MEMORY_FAILURE_ACTION_GUEST_MCE_INJECT,
+> +                                   true, &mf_flags);
+
+And here:
+
+       emit_guest_mce_failure(params->status & MCI_STATUS_AR, false);
+
+>  }
+>  
+>  void cpu_x86_inject_mce(Monitor *mon, X86CPU *cpu, int bank,
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 9efb07e7c8..989889c291 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -14,6 +14,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+> +#include "qapi/qapi-events-run-state.h"
+>  #include <sys/ioctl.h>
+>  #include <sys/utsname.h>
+>  
+> @@ -577,6 +578,8 @@ static void kvm_mce_inject(X86CPU *cpu, hwaddr paddr, int code)
+>  
+>  static void hardware_memory_error(void *host_addr)
+>  {
+> +    qapi_event_send_memory_failure(MEMORY_FAILURE_ACTION_HYPERVISOR_FATAL,
+> +                                   false, NULL);
+>      error_report("QEMU got Hardware memory error at addr %p", host_addr);
+>      exit(1);
+>  }
+> @@ -631,7 +634,9 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+>          hardware_memory_error(addr);
+>      }
+>  
+> -    /* Hope we are lucky for AO MCE */
+> +    /* Hope we are lucky for AO MCE, just notify a event */
+> +    qapi_event_send_memory_failure(MEMORY_FAILURE_ACTION_HYPERVISOR_IGNORE,
+> +                                   false, NULL);
+>  }
+>  
+>  static void kvm_reset_exception(CPUX86State *env)
+> 
 
 
