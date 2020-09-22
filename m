@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B021C4363D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 01:56:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF8B5C4363D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 01:57:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 667CC23A74
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 01:56:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4DAA923A74
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 01:57:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BTwLPssC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 667CC23A74
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jQT3+dI2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DAA923A74
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKXXo-0003Oo-9s
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 21:56:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38690)
+	id 1kKXYx-0004Xk-DS
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 21:57:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39044)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kKXWM-0002kZ-Ep
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 21:55:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23121)
+ id 1kKXXr-0003al-5o
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 21:56:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38039)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kKXWJ-00010p-PS
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 21:55:06 -0400
+ id 1kKXXo-0001Ka-Kg
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 21:56:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600739702;
+ s=mimecast20190719; t=1600739795;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=I7HR886flX/6ypC227zOY3RqICeZIpZA1edTbcB5Al0=;
- b=BTwLPssCwpP+4E5GcDPvyDrzDcXUewjp3eeupTWRspBWzOoICSLfSNLKYUAacKuyTRRIDd
- znE4Us9BFYzxLhoUjxpzE+kXGhCYY4F36PfS50dcBteXer5n5SVbL5T1bHcDd0UdkZOoJS
- h6ExSI2Q80s7DKVBt6I8+gLFC7JabrU=
+ bh=mfi6QGSCyh/3tvi4gIq9B1LvJfVKbAeaEHa65qGYWmY=;
+ b=jQT3+dI2/54wmAbfo1TRwY59UZ1TpLWs45OzYDj+7NOkXuS3YBwlclD48ETXBIZRII0KrB
+ n7TBLVSaARa22M5Se+2K6P2rBLRfc5lVQl2NE5YBuugKqEfnoySVPtMmYZC8In+m/HVmvr
+ N33BIe6IRoD8yJx/fb+w+wZdrnhsGg4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-188-GcZ_XmXYNc27uPAvdv6bZw-1; Mon, 21 Sep 2020 21:55:00 -0400
-X-MC-Unique: GcZ_XmXYNc27uPAvdv6bZw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-319-JQeSCXBnN0iedOiF10tF2w-1; Mon, 21 Sep 2020 21:56:34 -0400
+X-MC-Unique: JQeSCXBnN0iedOiF10tF2w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 116271084D6B;
- Tue, 22 Sep 2020 01:54:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC629188C132;
+ Tue, 22 Sep 2020 01:56:32 +0000 (UTC)
 Received: from [10.72.13.139] (ovpn-13-139.pek2.redhat.com [10.72.13.139])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CC5A87366D;
- Tue, 22 Sep 2020 01:54:54 +0000 (UTC)
-Subject: Re: [PATCH 1/3] virtio-net: Set mac address to hardware if the peer
- is vdpa
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 84B6078823;
+ Tue, 22 Sep 2020 01:56:28 +0000 (UTC)
+Subject: Re: [PATCH 2/3] vhost-vdpa: Add qemu_close in vhost_vdpa_cleanup
 To: Cindy Lu <lulu@redhat.com>, mst@redhat.com, qemu-devel@nongnu.org
 References: <20200917155851.20636-1-lulu@redhat.com>
+ <20200917155851.20636-2-lulu@redhat.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <b5ac3a30-6d81-117c-37af-e16b9a21ddad@redhat.com>
-Date: Tue, 22 Sep 2020 09:54:53 +0800
+Message-ID: <582dede8-34a1-58ef-6deb-aa11098b63d4@redhat.com>
+Date: Tue, 22 Sep 2020 09:56:27 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200917155851.20636-1-lulu@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200917155851.20636-2-lulu@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -76,9 +76,9 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jasowang@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jasowang@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:44:53
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 01:43:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
@@ -107,68 +107,32 @@ Sender: "Qemu-devel"
 
 
 On 2020/9/17 下午11:58, Cindy Lu wrote:
-> If the peer's type is vdpa,set the mac address to NIC in virtio_net_device_realize,
-> Also sometime vdpa get an all 0 macaddress from the hardware, this will cause the traffic down
-> So we add the check for this part.
-> if we get an 0 mac address we will use the default mac address instead
+> fix the bug that fd will still open after the cleanup
 >
 > Signed-off-by: Cindy Lu <lulu@redhat.com>
+
+
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+
 > ---
->   hw/net/virtio-net.c | 12 +++++++++++-
->   1 file changed, 11 insertions(+), 1 deletion(-)
+>   net/vhost-vdpa.c | 4 ++++
+>   1 file changed, 4 insertions(+)
 >
-> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> index cb0d27084c..7db9da1482 100644
-> --- a/hw/net/virtio-net.c
-> +++ b/hw/net/virtio-net.c
-> @@ -126,6 +126,7 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
->       VirtIONet *n = VIRTIO_NET(vdev);
->       struct virtio_net_config netcfg;
->       NetClientState *nc = qemu_get_queue(n->nic);
-> +    static const MACAddr zero = { .a = { 0, 0, 0, 0, 0, 0 } };
->   
->       int ret = 0;
->       memset(&netcfg, 0 , sizeof(struct virtio_net_config));
-> @@ -151,7 +152,11 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
->           ret = vhost_net_get_config(get_vhost_net(nc->peer), (uint8_t *)&netcfg,
->                                      n->config_size);
->           if (ret != -1) {
-> -            memcpy(config, &netcfg, n->config_size);
-> +            if (memcmp(&netcfg.mac, &zero, sizeof(zero)) != 0) {
-> +                memcpy(config, &netcfg, n->config_size);
-> +        } else {
-> +                error_report("Get an all zero mac address from hardware");
-
-
-This is probably a hint that MAC is not properly provisioned.
-
-So I guess we can leave this as is, or simply warn until the management 
-interface is finalized.
-
-
-> +            }
->           }
+> diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+> index bc0e0d2d35..0480b92102 100644
+> --- a/net/vhost-vdpa.c
+> +++ b/net/vhost-vdpa.c
+> @@ -144,6 +144,10 @@ static void vhost_vdpa_cleanup(NetClientState *nc)
+>           g_free(s->vhost_net);
+>           s->vhost_net = NULL;
 >       }
->   }
-> @@ -3399,6 +3404,11 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
->       nc = qemu_get_queue(n->nic);
->       nc->rxfilter_notify_enabled = 1;
->   
-> +   if (nc->peer && nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
-> +        struct virtio_net_config netcfg = {};
-> +        memcpy(&netcfg.mac, &n->nic_conf.macaddr, ETH_ALEN);
-> +        virtio_net_set_config(vdev, (uint8_t *)&netcfg);
-
-
-Won't this overwrite all other fields in the netcfg? I think we should 
-only touch mac part.
-
-Thanks
-
-
+> +     if (s->vhost_vdpa.device_fd >= 0) {
+> +        qemu_close(s->vhost_vdpa.device_fd);
+> +        s->vhost_vdpa.device_fd = -1;
 > +    }
->       QTAILQ_INIT(&n->rsc_chains);
->       n->qdev = dev;
+>   }
 >   
+>   static bool vhost_vdpa_has_vnet_hdr(NetClientState *nc)
 
 
