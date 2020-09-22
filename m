@@ -7,59 +7,60 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B05A3C4727D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 23:06:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC522C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 23:07:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45275221EF
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 23:06:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 36EC9221EF
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 23:07:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="InkBcOeE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45275221EF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dDuo6DsP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36EC9221EF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKrN8-0000W4-De
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 19:06:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60290)
+	id 1kKrO0-0001nF-2I
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 19:07:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60560)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKr2L-000241-49
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:45:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50538)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKr2n-0002ON-18
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:45:53 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25216
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKr2E-0000NE-MH
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:45:24 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKr2j-0000Wn-IJ
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:45:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600814717;
+ s=mimecast20190719; t=1600814738;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4i0nXnx6nFKikPewz7URO7NseWYpQvmkJ8S26wzTqRc=;
- b=InkBcOeE4zWDZzW1zjJ0NPoMqGOsITqdzUv3dj7H0PxFyOnS1k0A4zo0atW8x8HNkqUVYw
- 9jRN5xq2YhtWpwYCOdliD2tU526YuFvz65+8MRsjFvawF6yxaxQfe4hgsuXgSzxltkYWGG
- pDe+30EG06V/M9qDAAt4AR/KM8VL7ME=
+ bh=XrUgTRA8QMzgLVL135EN0gXPBOcBUr7kDEoIxyID/C0=;
+ b=dDuo6DsPgG6FygEGjCLwjxE6pjsjcc7yODY2F0gRVlAzjYbUXF06m3QLZJeg7pyC/NxO4J
+ +qAFbo2xjKfw6eblmDPRkyZGxM5uPzJQLC1JXJugTVYm+Sv5szRVG1Bxv5PNp7CHSeR+OL
+ 00C5VSyc8neDLETxWEgA6cvxwW+6Vjg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-4-CJh2crTLO_GEAYFQ5ilhcA-1; Tue, 22 Sep 2020 18:45:16 -0400
-X-MC-Unique: CJh2crTLO_GEAYFQ5ilhcA-1
+ us-mta-176-A7XYGYkIPGuaRV0mWF7LSw-1; Tue, 22 Sep 2020 18:45:36 -0400
+X-MC-Unique: A7XYGYkIPGuaRV0mWF7LSw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 385EB1074641;
- Tue, 22 Sep 2020 22:45:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07300801AEA;
+ Tue, 22 Sep 2020 22:45:36 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6A57D5C1A3;
- Tue, 22 Sep 2020 22:45:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 38B105C1A3;
+ Tue, 22 Sep 2020 22:45:35 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH 07/25] qapi/schema.py: constrain tag_member type
-Date: Tue, 22 Sep 2020 18:44:43 -0400
-Message-Id: <20200922224501.4087749-8-jsnow@redhat.com>
+Subject: [PATCH 25/25] qapi/schema.py: Use python3 style super()
+Date: Tue, 22 Sep 2020 18:45:01 -0400
+Message-Id: <20200922224501.4087749-26-jsnow@redhat.com>
 In-Reply-To: <20200922224501.4087749-1-jsnow@redhat.com>
 References: <20200922224501.4087749-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -68,19 +69,19 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 17:00:46
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
 X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,34 +103,22 @@ Sender: "Qemu-devel"
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- scripts/qapi/schema.py | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ scripts/qapi/schema.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index aaf20f776b..15ff441660 100644
+index baafe3babf..6b47ca26e0 100644
 --- a/scripts/qapi/schema.py
 +++ b/scripts/qapi/schema.py
-@@ -546,15 +546,18 @@ def set_defined_in(self, name):
+@@ -309,7 +309,7 @@ def doc_type(self) -> Optional[str]:
+         return self.name
  
-     def check(self, schema, seen):
-         if not self.tag_member:  # flat union
--            self.tag_member = seen.get(c_name(self._tag_name))
-+            tag_member = seen.get(c_name(self._tag_name))
-             base = "'base'"
-             # Pointing to the base type when not implicit would be
-             # nice, but we don't know it here
--            if not self.tag_member or self._tag_name != self.tag_member.name:
-+            if not tag_member or self._tag_name != tag_member.name:
-                 raise QAPISemError(
-                     self.info,
-                     "discriminator '%s' is not a member of %s"
-                     % (self._tag_name, base))
-+
-+            assert isinstance(tag_member, QAPISchemaObjectTypeMember)
-+            self.tag_member = tag_member
-             # Here we do:
-             base_type = schema.lookup_type(self.tag_member.defined_in)
-             assert base_type
+     def check(self, schema: 'QAPISchema') -> None:
+-        QAPISchemaEntity.check(self, schema)
++        super().check(schema)
+         if 'deprecated' in [f.name for f in self.features]:
+             raise QAPISemError(
+                 self.info, "feature 'deprecated' is not supported for types")
 -- 
 2.26.2
 
