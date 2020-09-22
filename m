@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3083C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:03:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED318C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:03:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10B38206FB
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:03:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3AE0D206FB
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:03:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lkw5YVpf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10B38206FB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z1+y0zjW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AE0D206FB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKpRa-0003Xp-0j
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 17:03:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36894)
+	id 1kKpRe-0003g2-80
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 17:03:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37080)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpPU-0001tA-8t
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:01:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57192)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpPw-00022Y-JC
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:01:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45950)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpPR-0004XA-Co
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:01:10 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpPq-0004Z3-PV
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:01:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600808468;
+ s=mimecast20190719; t=1600808488;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mZWXq7GO5mx558feE0Kb1/8jgJE3wrTyvSY41kIzuWY=;
- b=Lkw5YVpfleKaQGP1FWIWle0zTMyxc+HWNaPKebszaF4Y1X+/IGWZcYg/IIqxXfGL/waW4p
- Mw1AswQrHNgvdNXPlzJlGZh8XAX9B6xMmoHQ07w2BVjj2Kv2GImSN8hujPTlhdkxJGfx2m
- PUsU5j2i7pVO2NLCzpU7zeS518SjOII=
+ bh=ghDb5rKOmGTyb03vCBBcn9DARDR8dEGxmDStUABhhqE=;
+ b=Z1+y0zjWolhB2hKcYB+HH/FfcBaZniUJH2FpdnXiVr1Oms8Dw81wpuAMx4ydt1Tkz5a6JN
+ FjO7Fjk4ZL31bq7UO1R29qXuf73b6bBtxN35rND84NyOmuOm4Fa/PStYXtFs64KRoLAn0g
+ ElEFg1RNs2yXlW7ShpAiiaLgoHKBOlw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-403-R-AA6rvxNWKnodzD_SpNSg-1; Tue, 22 Sep 2020 17:01:06 -0400
-X-MC-Unique: R-AA6rvxNWKnodzD_SpNSg-1
+ us-mta-109-6Vv_IK32Nu2WhiCCUWCLOA-1; Tue, 22 Sep 2020 17:01:21 -0400
+X-MC-Unique: 6Vv_IK32Nu2WhiCCUWCLOA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 537C21007464;
- Tue, 22 Sep 2020 21:01:05 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8506F80F056;
+ Tue, 22 Sep 2020 21:01:20 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A33FE5577A;
- Tue, 22 Sep 2020 21:01:03 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0A3FB55765;
+ Tue, 22 Sep 2020 21:01:18 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>,
 	qemu-devel@nongnu.org
-Subject: [PATCH v2 01/38] [DO-NOT-MERGE] qapi: add debugging tools
-Date: Tue, 22 Sep 2020 17:00:24 -0400
-Message-Id: <20200922210101.4081073-2-jsnow@redhat.com>
+Subject: [PATCH v2 09/38] qapi/common.py: Add indent manager
+Date: Tue, 22 Sep 2020 17:00:32 -0400
+Message-Id: <20200922210101.4081073-10-jsnow@redhat.com>
 In-Reply-To: <20200922210101.4081073-1-jsnow@redhat.com>
 References: <20200922210101.4081073-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -103,99 +103,124 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds some really childishly simple debugging tools. Maybe they're
-interesting for someone else, too?
+Code style tools really dislike the use of global keywords, because it
+generally involves re-binding the name at runtime which can have strange
+effects depending on when and how that global name is referenced in
+other modules.
+
+Make a little indent level manager instead.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- scripts/qapi/debug.py | 78 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 78 insertions(+)
- create mode 100644 scripts/qapi/debug.py
+ scripts/qapi/common.py | 51 +++++++++++++++++++++++++++++-------------
+ scripts/qapi/visit.py  |  7 +++---
+ 2 files changed, 38 insertions(+), 20 deletions(-)
 
-diff --git a/scripts/qapi/debug.py b/scripts/qapi/debug.py
-new file mode 100644
-index 0000000000..bacf5ee180
---- /dev/null
-+++ b/scripts/qapi/debug.py
-@@ -0,0 +1,78 @@
-+"""
-+Small debugging facilities for mypy static analysis work.
-+(C) 2020 John Snow, for Red Hat, Inc.
-+"""
-+
-+import inspect
-+import json
-+from typing import Dict, List, Any
-+from types import FrameType
-+
-+
-+OBSERVED_TYPES: Dict[str, List[str]] = {}
-+
-+
-+# You have no idea how long it took to find this return type...
-+def caller_frame() -> FrameType:
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index cee63eb95c..e0c5871b10 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -93,33 +93,52 @@ def c_name(name, protect=True):
+ pointer_suffix = ' *' + eatspace
+ 
+ 
+-def genindent(count):
+-    ret = ''
+-    for _ in range(count):
+-        ret += ' '
+-    return ret
++class Indentation:
 +    """
-+    Returns the stack frame of the caller's caller.
-+    e.g. foo() -> caller() -> caller_frame() return's foo's stack frame.
++    Indentation level management.
+ 
++    :param initial: Initial number of spaces, default 0.
 +    """
-+    stack = inspect.stack()
-+    caller = stack[2].frame
-+    if caller is None:
-+        msg = "Python interpreter does not support stack frame inspection"
-+        raise RuntimeError(msg)
-+    return caller
++    def __init__(self, initial: int = 0) -> None:
++        self._level = initial
+ 
+-indent_level = 0
++    def __int__(self) -> int:
++        return self._level
+ 
++    def __repr__(self) -> str:
++        return "{}({:d})".format(type(self).__name__, self._level)
+ 
+-def push_indent(indent_amount=4):
+-    global indent_level
+-    indent_level += indent_amount
++    def __str__(self) -> str:
++        """Return the current indentation as a string of spaces."""
++        return ' ' * self._level
+ 
++    def __bool__(self) -> bool:
++        """True when there is a non-zero indentation."""
++        return bool(self._level)
+ 
+-def pop_indent(indent_amount=4):
+-    global indent_level
+-    indent_level -= indent_amount
++    def increase(self, amount: int = 4) -> int:
++        """Increase the indentation level by `amount`, default 4."""
++        self._level += amount
++        return self._level
++
++    def decrease(self, amount: int = 4) -> int:
++        """Decrease the indentation level by `amount`, default 4."""
++        if self._level < amount:
++            raise ArithmeticError(
++                f"Can't remove {amount:d} spaces from {self!r}")
++        self._level -= amount
++        return self._level
 +
 +
-+def _add_type_record(name: str, typestr: str) -> None:
-+    seen = OBSERVED_TYPES.setdefault(name, [])
-+    if typestr not in seen:
-+        seen.append(typestr)
-+
-+
-+def record_type(name: str, value: Any, dict_names: bool = False) -> None:
-+    """
-+    Record the type of a variable.
-+
-+    :param name: The name of the variable
-+    :param value: The value of the variable
-+    """
-+    _add_type_record(name, str(type(value)))
-+
-+    try:
-+        for key, subvalue in value.items():
-+            subname = f"{name}.{key}" if dict_names else f"{name}.[dict_value]"
-+            _add_type_record(subname, str(type(subvalue)))
-+        return
-+    except AttributeError:
-+        # (Wasn't a dict or anything resembling one.)
-+        pass
-+
-+    # str is iterable, but not in the way we want!
-+    if isinstance(value, str):
-+        return
-+
-+    try:
-+        for elem in value:
-+            _add_type_record(f"{name}.[list_elem]", str(type(elem)))
-+    except TypeError:
-+        # (Wasn't a list or anything else iterable.)
-+        pass
-+
-+
-+def show_types() -> None:
-+    """
-+    Print all of the currently known variable types to stdout.
-+    """
-+    print(json.dumps(OBSERVED_TYPES, indent=2))
-+
-+
-+def record_locals(show: bool = False, dict_names: bool = False) -> None:
-+    caller = caller_frame()
-+    name = caller.f_code.co_name
-+    for key, value in caller.f_locals.items():
-+        record_type(f"{name}.{key}", value, dict_names=dict_names)
-+    if show:
-+        show_types()
++indent = Indentation()
+ 
+ 
+ # Generate @code with @kwds interpolated.
+-# Obey indent_level, and strip eatspace.
++# Obey indent, and strip eatspace.
+ def cgen(code, **kwds):
+     raw = code % kwds
+-    if indent_level:
+-        indent = genindent(indent_level)
+-        raw = re.sub(r'^(?!(#|$))', indent, raw, flags=re.MULTILINE)
++    if indent:
++        raw = re.sub(r'^(?!(#|$))', str(indent), raw, flags=re.MULTILINE)
+     return re.sub(re.escape(eatspace) + r' *', '', raw)
+ 
+ 
+diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+index 808410d6f1..4edaee33e3 100644
+--- a/scripts/qapi/visit.py
++++ b/scripts/qapi/visit.py
+@@ -19,8 +19,7 @@
+     gen_endif,
+     gen_if,
+     mcgen,
+-    pop_indent,
+-    push_indent,
++    indent,
+ )
+ from .gen import QAPISchemaModularCVisitor, ifcontext
+ from .schema import QAPISchemaObjectType
+@@ -69,7 +68,7 @@ def gen_visit_object_members(name, base, members, variants):
+     if (visit_optional(v, "%(name)s", &obj->has_%(c_name)s)) {
+ ''',
+                          name=memb.name, c_name=c_name(memb.name))
+-            push_indent()
++            indent.increase()
+         ret += mcgen('''
+     if (!visit_type_%(c_type)s(v, "%(name)s", &obj->%(c_name)s, errp)) {
+         return false;
+@@ -78,7 +77,7 @@ def gen_visit_object_members(name, base, members, variants):
+                      c_type=memb.type.c_name(), name=memb.name,
+                      c_name=c_name(memb.name))
+         if memb.optional:
+-            pop_indent()
++            indent.decrease()
+             ret += mcgen('''
+     }
+ ''')
 -- 
 2.26.2
 
