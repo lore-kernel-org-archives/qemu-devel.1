@@ -2,66 +2,66 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C6E2C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:19:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED9BC2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:21:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA23320888
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:19:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9817A20936
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:21:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EZLHrBFW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA23320888
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RlOd+vN7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9817A20936
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKphD-0000JD-OB
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 17:19:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37220)
+	id 1kKpj3-0002X9-NN
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 17:21:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37288)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpQ2-0002Cn-Fg
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:01:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20517
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpQ5-0002JG-ER
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:01:49 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51889
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpPy-0004ZX-1P
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:01:45 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpPx-0004aB-W4
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:01:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600808494;
+ s=mimecast20190719; t=1600808500;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=yk7qdnfo2EkoVtbV2vkLhMfyH9Zy0jgdEoRibxlIgcE=;
- b=EZLHrBFWgSQrKEzPqk5gjP8Mw1AeN4TVjKia6sU62W3vh3XrqmQLjAzHyrMHlolVYATxZj
- 2BVjGOFTFB2IB9nIR09iGSYR8gQW7HGFOaaNozkGyP/LH6Qt/uG5a2vCDVL2hyMjNjEekK
- h3mT/3u62J0wk+jJGxT240dyS3nRmwE=
+ bh=2giffaOrqGEsDrWJW1W81X4oET/EhvdY0U7WXfADDV4=;
+ b=RlOd+vN71lJcWP8Rfmjowk+1cJH8T8LbCSXglkfzU4aAaVybXQhJ2rHgX2LRyY6iXmqtw+
+ 4P6tH8WqW7fxCdvPXOvnuzZWoqgRT2JjdEBZ74T0X7MaKH7r7ETorOtgKOs96twO93bb2H
+ wubRuL8zp5q4/3dANvBUKUOBlTl96wQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-543-es7J_1xjPreLsZULCXJfrA-1; Tue, 22 Sep 2020 17:01:32 -0400
-X-MC-Unique: es7J_1xjPreLsZULCXJfrA-1
+ us-mta-455-XYLPXVwpMWW8qd0UE6_LLg-1; Tue, 22 Sep 2020 17:01:36 -0400
+X-MC-Unique: XYLPXVwpMWW8qd0UE6_LLg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1B861074659;
- Tue, 22 Sep 2020 21:01:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 790AE188C122;
+ Tue, 22 Sep 2020 21:01:35 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A293255765;
- Tue, 22 Sep 2020 21:01:28 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 883FA55765;
+ Tue, 22 Sep 2020 21:01:34 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>,
 	qemu-devel@nongnu.org
-Subject: [PATCH v2 16/38] qapi: establish mypy type-checking baseline
-Date: Tue, 22 Sep 2020 17:00:39 -0400
-Message-Id: <20200922210101.4081073-17-jsnow@redhat.com>
+Subject: [PATCH v2 20/38] qapi/commands.py: add notational type hints
+Date: Tue, 22 Sep 2020 17:00:43 -0400
+Message-Id: <20200922210101.4081073-21-jsnow@redhat.com>
 In-Reply-To: <20200922210101.4081073-1-jsnow@redhat.com>
 References: <20200922210101.4081073-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -72,9 +72,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 17:01:35
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 17:01:22
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
@@ -104,127 +104,178 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fix two very minor issues, and then establish a mypy type-checking
-baseline.
-
-Like pylint, this should be run from the folder above:
-
- > mypy --config-file=qapi/mypy.ini qapi/
-
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- scripts/qapi/doc.py    |  3 +-
- scripts/qapi/mypy.ini  | 65 ++++++++++++++++++++++++++++++++++++++++++
- scripts/qapi/schema.py |  3 +-
- 3 files changed, 69 insertions(+), 2 deletions(-)
- create mode 100644 scripts/qapi/mypy.ini
+ scripts/qapi/commands.py | 66 +++++++++++++++++++++++++++++-----------
+ 1 file changed, 49 insertions(+), 17 deletions(-)
 
-diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
-index cbf7076ed9..70f7cdfaa6 100644
---- a/scripts/qapi/doc.py
-+++ b/scripts/qapi/doc.py
-@@ -5,7 +5,8 @@
- """This script produces the documentation of a qapi schema in texinfo format"""
+diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+index 389dd879a6..80f22d562d 100644
+--- a/scripts/qapi/commands.py
++++ b/scripts/qapi/commands.py
+@@ -13,19 +13,32 @@
+ See the COPYING file in the top-level directory.
+ """
  
- import re
--from .gen import QAPIGenDoc, QAPISchemaVisitor
-+from .gen import QAPIGenDoc
-+from .schema import QAPISchemaVisitor
- 
- 
- MSG_FMT = """
-diff --git a/scripts/qapi/mypy.ini b/scripts/qapi/mypy.ini
-new file mode 100644
-index 0000000000..a0f2365a53
---- /dev/null
-+++ b/scripts/qapi/mypy.ini
-@@ -0,0 +1,65 @@
-+[mypy]
-+strict = True
-+strict_optional = False
-+disallow_untyped_calls = False
-+python_version = 3.6
++from typing import Dict, Optional, List, Set
 +
-+[mypy-qapi.commands]
-+disallow_untyped_defs = False
-+disallow_incomplete_defs = False
-+check_untyped_defs = False
-+
-+[mypy-qapi.doc]
-+disallow_subclassing_any = False
-+disallow_untyped_defs = False
-+disallow_incomplete_defs = False
-+
-+[mypy-qapi.error]
-+disallow_untyped_defs = False
-+disallow_incomplete_defs = False
-+check_untyped_defs = False
-+
-+[mypy-qapi.events]
-+disallow_untyped_defs = False
-+disallow_incomplete_defs = False
-+check_untyped_defs = False
-+
-+[mypy-qapi.expr]
-+disallow_untyped_defs = False
-+disallow_incomplete_defs = False
-+check_untyped_defs = False
-+
-+[mypy-qapi.gen]
-+disallow_untyped_defs = False
-+disallow_incomplete_defs = False
-+check_untyped_defs = False
-+
-+[mypy-qapi.introspect]
-+disallow_untyped_defs = False
-+disallow_incomplete_defs = False
-+check_untyped_defs = False
-+
-+[mypy-qapi.parser]
-+disallow_untyped_defs = False
-+disallow_incomplete_defs = False
-+check_untyped_defs = False
-+
-+[mypy-qapi.schema]
-+disallow_untyped_defs = False
-+disallow_incomplete_defs = False
-+check_untyped_defs = False
-+
-+[mypy-qapi.source]
-+disallow_untyped_defs = False
-+disallow_incomplete_defs = False
-+check_untyped_defs = False
-+
-+[mypy-qapi.types]
-+disallow_untyped_defs = False
-+disallow_incomplete_defs = False
-+check_untyped_defs = False
-+
-+[mypy-qapi.visit]
-+disallow_untyped_defs = False
-+disallow_incomplete_defs = False
-+check_untyped_defs = False
-diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index b4921b46c9..bb0cd717f1 100644
---- a/scripts/qapi/schema.py
-+++ b/scripts/qapi/schema.py
-@@ -17,6 +17,7 @@
- import os
- import re
- from collections import OrderedDict
-+from typing import Optional
- 
- from .common import c_name, POINTER_SUFFIX
- from .error import QAPIError, QAPISemError
-@@ -25,7 +26,7 @@
+ from .common import (
+     c_name,
+     mcgen,
+ )
+ from .gen import (
++    QAPIGenC,
+     QAPIGenCCode,
+     QAPISchemaModularCVisitor,
+     build_params,
+     ifcontext,
+ )
++from .schema import (
++    QAPISchema,
++    QAPISchemaFeature,
++    QAPISchemaObjectType,
++    QAPISchemaType,
++)
++from .source import QAPISourceInfo
  
  
- class QAPISchemaEntity:
--    meta = None
-+    meta: Optional[str] = None
+-def gen_command_decl(name, arg_type, boxed, ret_type):
++def gen_command_decl(name: str,
++                     arg_type: Optional[QAPISchemaObjectType],
++                     boxed: bool,
++                     ret_type: Optional[QAPISchemaType]) -> str:
+     return mcgen('''
+ %(c_type)s qmp_%(c_name)s(%(params)s);
+ ''',
+@@ -34,7 +47,10 @@ def gen_command_decl(name, arg_type, boxed, ret_type):
+                  params=build_params(arg_type, boxed, 'Error **errp'))
  
-     def __init__(self, name, info, doc, ifcond=None, features=None):
-         assert name is None or isinstance(name, str)
+ 
+-def gen_call(name, arg_type, boxed, ret_type):
++def gen_call(name: str,
++             arg_type: Optional[QAPISchemaObjectType],
++             boxed: bool,
++             ret_type: Optional[QAPISchemaType]) -> str:
+     ret = ''
+ 
+     argstr = ''
+@@ -70,7 +86,7 @@ def gen_call(name, arg_type, boxed, ret_type):
+     return ret
+ 
+ 
+-def gen_marshal_output(ret_type):
++def gen_marshal_output(ret_type: QAPISchemaType) -> str:
+     return mcgen('''
+ 
+ static void qmp_marshal_output_%(c_name)s(%(c_type)s ret_in,
+@@ -91,19 +107,22 @@ def gen_marshal_output(ret_type):
+                  c_type=ret_type.c_type(), c_name=ret_type.c_name())
+ 
+ 
+-def build_marshal_proto(name):
++def build_marshal_proto(name: str) -> str:
+     return ('void qmp_marshal_%s(QDict *args, QObject **ret, Error **errp)'
+             % c_name(name))
+ 
+ 
+-def gen_marshal_decl(name):
++def gen_marshal_decl(name: str) -> str:
+     return mcgen('''
+ %(proto)s;
+ ''',
+                  proto=build_marshal_proto(name))
+ 
+ 
+-def gen_marshal(name, arg_type, boxed, ret_type):
++def gen_marshal(name: str,
++                arg_type: Optional[QAPISchemaObjectType],
++                boxed: bool,
++                ret_type: Optional[QAPISchemaType]) -> str:
+     have_args = boxed or (arg_type and not arg_type.is_empty())
+ 
+     ret = mcgen('''
+@@ -185,7 +204,10 @@ def gen_marshal(name, arg_type, boxed, ret_type):
+     return ret
+ 
+ 
+-def gen_register_command(name, success_response, allow_oob, allow_preconfig):
++def gen_register_command(name: str,
++                         success_response: bool,
++                         allow_oob: bool,
++                         allow_preconfig: bool) -> str:
+     options = []
+ 
+     if not success_response:
+@@ -207,7 +229,7 @@ def gen_register_command(name, success_response, allow_oob, allow_preconfig):
+     return ret
+ 
+ 
+-def gen_registry(registry, prefix):
++def gen_registry(registry: str, prefix: str) -> str:
+     ret = mcgen('''
+ 
+ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds)
+@@ -224,15 +246,14 @@ def gen_registry(registry, prefix):
+ 
+ 
+ class QAPISchemaGenCommandVisitor(QAPISchemaModularCVisitor):
+-
+-    def __init__(self, prefix):
++    def __init__(self, prefix: str):
+         super().__init__(
+             prefix, 'qapi-commands',
+             ' * Schema-defined QAPI/QMP commands', None, __doc__)
+         self._regy = QAPIGenCCode(None)
+-        self._visited_ret_types = {}
++        self._visited_ret_types: Dict[QAPIGenC, Set[QAPISchemaType]] = {}
+ 
+-    def _begin_user_module(self, name):
++    def _begin_user_module(self, name: str) -> None:
+         self._visited_ret_types[self._genc] = set()
+         commands = self._module_basename('qapi-commands', name)
+         types = self._module_basename('qapi-types', name)
+@@ -256,7 +277,7 @@ def _begin_user_module(self, name):
+ ''',
+                              types=types))
+ 
+-    def visit_end(self):
++    def visit_end(self) -> None:
+         self._add_system_module('init', ' * QAPI Commands initialization')
+         self._genh.add(mcgen('''
+ #include "qapi/qmp/dispatch.h"
+@@ -272,9 +293,18 @@ def visit_end(self):
+                                       prefix=self._prefix))
+         self._genc.add(gen_registry(self._regy.get_content(), self._prefix))
+ 
+-    def visit_command(self, name, info, ifcond, features,
+-                      arg_type, ret_type, gen, success_response, boxed,
+-                      allow_oob, allow_preconfig):
++    def visit_command(self,
++                      name: str,
++                      info: QAPISourceInfo,
++                      ifcond: List[str],
++                      features: List[QAPISchemaFeature],
++                      arg_type: Optional[QAPISchemaObjectType],
++                      ret_type: Optional[QAPISchemaType],
++                      gen: bool,
++                      success_response: bool,
++                      boxed: bool,
++                      allow_oob: bool,
++                      allow_preconfig: bool) -> None:
+         if not gen:
+             return
+         # FIXME: If T is a user-defined type, the user is responsible
+@@ -295,7 +325,9 @@ def visit_command(self, name, info, ifcond, features,
+                                                 allow_oob, allow_preconfig))
+ 
+ 
+-def gen_commands(schema, output_dir, prefix):
++def gen_commands(schema: QAPISchema,
++                 output_dir: str,
++                 prefix: str) -> None:
+     vis = QAPISchemaGenCommandVisitor(prefix)
+     schema.visit(vis)
+     vis.write(output_dir)
 -- 
 2.26.2
 
