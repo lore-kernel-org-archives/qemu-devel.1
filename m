@@ -2,82 +2,141 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCFD9C4363D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 16:33:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A21D0C4363D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 16:34:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 121212086A
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 16:33:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 121212086A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id E4A402086A
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 16:34:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z4qzs0NN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4A402086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKlEi-0000cX-4B
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 12:33:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41110)
+	id 1kKlFc-0001fI-1J
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 12:34:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50852)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kKkUP-0006NQ-0V
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 11:45:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51126)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kKkUE-0001TP-9s
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 11:45:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kKkUB-0003Ui-Qb
- for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 15:45:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C798B2E80AB
- for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 15:45:43 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kKl15-0003D9-9A
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 12:19:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47258)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kKl12-0008IX-1X
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 12:19:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600791577;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=JsLgrKae6WcWyn269U7Vu0KWKhPv3upBCry1GcHCYHs=;
+ b=Z4qzs0NNNPbc3odDLROk/6qvQKyVko+SXfWYnj/WjfgXggmsww3njye6NgwV4qfojUVL8D
+ Nqj/mOyEj7Xx2WiZEmpiwt3WiIYUjSNst3i3hENQhnMldIu0p0G6sG2cxUBywYOm2ticpE
+ sy3aP1nKncHdjqhkwjuvHqBbLq3Op+s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-374-5atGWw4rNX62Zb9TAaJWOw-1; Tue, 22 Sep 2020 12:19:35 -0400
+X-MC-Unique: 5atGWw4rNX62Zb9TAaJWOw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B9041008548;
+ Tue, 22 Sep 2020 16:19:34 +0000 (UTC)
+Received: from [10.36.113.20] (ovpn-113-20.ams2.redhat.com [10.36.113.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6B5333A40;
+ Tue, 22 Sep 2020 16:19:33 +0000 (UTC)
+Subject: Re: [PATCH v1 6/8] s390x/tcg: Implement MULTIPLY SINGLE (MSC, MSGC,
+ MSGRKC, MSRKC)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200922103129.12824-1-david@redhat.com>
+ <20200922103129.12824-7-david@redhat.com>
+ <7d304a2c-0dc3-8690-acce-4fb2bfa6e7ef@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat GmbH
+Message-ID: <68972761-4a2e-687c-2c3b-ea0416b4795e@redhat.com>
+Date: Tue, 22 Sep 2020 18:19:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Sep 2020 15:38:12 -0000
-From: Vitaly Kuznetsov <1896263@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ehabkost laurent-vivier maxco stefanha vkuznets
-X-Launchpad-Bug-Reporter: Apteryx (maxco)
-X-Launchpad-Bug-Modifier: Vitaly Kuznetsov (vkuznets)
-References: <160044888692.1133.11388395637815022535.malonedeb@chaenomeles.canonical.com>
- <20200922151455.1763896-1-ehabkost@redhat.com>
-Message-ID: <87v9g5es9n.fsf@vitty.brq.redhat.com>
-Subject: [Bug 1896263] Re: [PATCH] i386: Don't try to set MSR_KVM_ASYNC_PF_EN
- if kernel-irqchip=off
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: 1fb3dfdf1546e61c41a916441ad2eb35b4d72d07
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 09:57:39
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <7d304a2c-0dc3-8690-acce-4fb2bfa6e7ef@linaro.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=david@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,260 +145,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1896263 <1896263@bugs.launchpad.net>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200922153812.bzXE-UIQdSkTB-hdZPYXCsF8Yto4h6tofCOO2SLDvNY@z>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+On 22.09.20 18:14, Richard Henderson wrote:
+> On 9/22/20 3:31 AM, David Hildenbrand wrote:
+>> @@ -512,6 +544,8 @@ static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
+>>      case CC_OP_COMP_32:
+>>          r =  cc_calc_comp_32(dst);
+>>          break;
+>> +    case CC_OP_MULS_32:
+>> +        r = cc_calc_muls_32(dst);
+>>  
+>>      case CC_OP_ICM:
+> 
+> Missing break.
 
-> This addresses the following crash when running Linux v5.8
-> with kernel-irqchip=3Doff:
->
->   qemu-system-x86_64: error: failed to set MSR 0x4b564d02 to 0x0
->   qemu-system-x86_64: ../target/i386/kvm.c:2714: kvm_buf_set_msrs: Assert=
-ion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
->
-> There is a kernel-side fix for the issue too (kernel commit
-> d831de177217 "KVM: x86: always allow writing '0' to
-> MSR_KVM_ASYNC_PF_EN"), but it's nice to simply not trigger
-> the bug if running an older kernel.
->
-> Fixes: https://bugs.launchpad.net/bugs/1896263
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  target/i386/kvm.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 9efb07e7c83..1492f41349f 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -2818,7 +2818,12 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
->          kvm_msr_entry_add(cpu, MSR_IA32_TSC, env->tsc);
->          kvm_msr_entry_add(cpu, MSR_KVM_SYSTEM_TIME, env->system_time_msr=
-);
->          kvm_msr_entry_add(cpu, MSR_KVM_WALL_CLOCK, env->wall_clock_msr);
-> -        if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_ASYNC_PF)) {
-> +        /*
-> +         * Some kernel versions (v5.8) won't let MSR_KVM_ASYNC_PF_EN to =
-be set
-> +         * at all if kernel-irqchip=3Doff, so don't try to set it in tha=
-t case.
-> +         */
-> +        if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_ASYNC_PF) &&
-> +            kvm_irqchip_in_kernel()) {
->              kvm_msr_entry_add(cpu, MSR_KVM_ASYNC_PF_EN, env->async_pf_en=
-_msr);
->          }
->          if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_PV_EOI)) {
+Argh, thanks!
 
-I'm not sure kvm_irqchip_in_kernel() was required before we switched to
-interrupt-based APF (as we were always injecting #PF) but with
-kernel-5.8+ this should work. We'll need to merge this with
 
-https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg02963.html
-(queued by Paolo) and
-https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg06196.html
-which fixes a bug in it.
+-- 
+Thanks,
 
-as kvm_irqchip_in_kernel() should go around both KVM_FEATURE_ASYNC_PF
-and KVM_FEATURE_ASYNC_PF_INT I believe.
+David / dhildenb
 
--- =
-
-Vitaly
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1896263
-
-Title:
-  The bios-tables-test test causes QEMU to crash (Assertion `ret =3D=3D
-  cpu->kvm_msr_buf->nmsrs' failed) on AMD processors
-
-Status in QEMU:
-  New
-
-Bug description:
-  QEMU release version: Any recent version (5.0.0, 5.1.0, git master)
-  Host CPU: AMD Ryzen 3900X
-
-  The following backtrace is from commit
-  e883b492c221241d28aaa322c61536436090538a.
-
-  QTEST_QEMU_BINARY=3D./build/qemu-system-x86_64 gdb ./build/tests/qtest/bi=
-os-tables-test
-  GNU gdb (GDB) 9.2
-  Copyright (C) 2020 Free Software Foundation, Inc.
-  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.h=
-tml>
-  This is free software: you are free to change and redistribute it.
-  There is NO WARRANTY, to the extent permitted by law.
-  Type "show copying" and "show warranty" for details.
-  This GDB was configured as "x86_64-unknown-linux-gnu".
-  Type "show configuration" for configuration details.
-  For bug reporting instructions, please see:
-  <http://www.gnu.org/software/gdb/bugs/>.
-  Find the GDB manual and other documentation resources online at:
-      <http://www.gnu.org/software/gdb/documentation/>.
-
-  For help, type "help".
-  Type "apropos word" to search for commands related to "word"...
-  Reading symbols from ./build/tests/qtest/bios-tables-test...
-  (gdb) run
-  Starting program: /home/mcournoyer/src/qemu/build/tests/qtest/bios-tables=
--test =
-
-  [Thread debugging using libthread_db enabled]
-  Using host libthread_db library "/gnu/store/fa6wj5bxkj5ll1d7292a70knmyl7a=
-0cr-glibc-2.31/lib/libthread_db.so.1".
-  [New Thread 0x7ffff7af6700 (LWP 18955)]
-  # random seed: R02S5106b7afa2fd84a0353605795c04ab7d
-  1..19
-  # Start of x86_64 tests
-  # Start of acpi tests
-  # starting QEMU: exec ./build/qemu-system-x86_64 -qtest unix:/tmp/qtest-1=
-8951.sock -qtest-log /dev/null -chardev socket,path=3D/tmp/qtest-18951.qmp,=
-id=3Dchar0 -mon chardev=3Dchar0,mode=3Dcontrol -display none -machine pc,ke=
-rnel-irqchip=3Doff -accel kvm -accel tcg -net none -display none  -drive id=
-=3Dhd0,if=3Dnone,file=3Dtests/acpi-test-disk-R3kbyc,format=3Draw -device id=
-e-hd,drive=3Dhd0  -accel qtest
-  [Attaching after Thread 0x7ffff7af7900 (LWP 18951) fork to child process =
-18956]
-  [New inferior 2 (process 18956)]
-  [Detaching after fork from parent process 18951]
-  [Inferior 1 (process 18951) detached]
-  [Thread debugging using libthread_db enabled]
-  Using host libthread_db library "/gnu/store/fa6wj5bxkj5ll1d7292a70knmyl7a=
-0cr-glibc-2.31/lib/libthread_db.so.1".
-  [New Thread 0x7ffff7af6700 (LWP 18957)]
-  [Thread 0x7ffff7af6700 (LWP 18957) exited]
-  process 18956 is executing new program: /gnu/store/87kif0bpf0anwbsaw0jvg8=
-fyciw4sz67-bash-5.0.16/bin/bash
-  process 18956 is executing new program: /home/mcournoyer/src/qemu/build/q=
-emu-system-x86_64
-  [Thread debugging using libthread_db enabled]
-  Using host libthread_db library "/gnu/store/fa6wj5bxkj5ll1d7292a70knmyl7a=
-0cr-glibc-2.31/lib/libthread_db.so.1".
-  [New Thread 0x7ffff48ed700 (LWP 18958)]
-  [New Thread 0x7fffeffff700 (LWP 18960)]
-  [New Thread 0x7fffef61c700 (LWP 18961)]
-  [New Thread 0x7fffed5ff700 (LWP 18962)]
-  qemu-system-x86_64: error: failed to set MSR 0x4b564d02 to 0x0
-  qemu-system-x86_64: ../target/i386/kvm.c:2714: kvm_buf_set_msrs: Assertio=
-n `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-
-  Thread 2.5 "qemu-system-x86" received signal SIGABRT, Aborted.
-  [Switching to Thread 0x7fffef61c700 (LWP 18961)]
-  0x00007ffff65dbaba in raise () from /gnu/store/fa6wj5bxkj5ll1d7292a70knmy=
-l7a0cr-glibc-2.31/lib/libc.so.6
-  (gdb) taas bt
-
-  Thread 2.6 (Thread 0x7fffed5ff700 (LWP 18962)):
-  #0  0x00007ffff6770c4d in pthread_cond_timedwait@@GLIBC_2.3.2 () from /gn=
-u/store/fa6wj5bxkj5ll1d7292a70knmyl7a0cr-glibc-2.31/lib/libpthread.so.0
-  #1  0x0000555555cc8a0e in qemu_sem_timedwait (sem=3Dsem@entry=3D0x5555566=
-2f758, ms=3Dms@entry=3D10000) at ../util/qemu-thread-posix.c:282
-  #2  0x0000555555cd91b5 in worker_thread (opaque=3Dopaque@entry=3D0x555556=
-62f6e0) at ../util/thread-pool.c:91
-  #3  0x0000555555cc7e86 in qemu_thread_start (args=3D<optimized out>) at .=
-./util/qemu-thread-posix.c:521
-  #4  0x00007ffff6769f64 in start_thread () from /gnu/store/fa6wj5bxkj5ll1d=
-7292a70knmyl7a0cr-glibc-2.31/lib/libpthread.so.0
-  #5  0x00007ffff669b9af in clone () from /gnu/store/fa6wj5bxkj5ll1d7292a70=
-knmyl7a0cr-glibc-2.31/lib/libc.so.6
-
-  Thread 2.5 (Thread 0x7fffef61c700 (LWP 18961)):
-  #0  0x00007ffff65dbaba in raise () from /gnu/store/fa6wj5bxkj5ll1d7292a70=
-knmyl7a0cr-glibc-2.31/lib/libc.so.6
-  #1  0x00007ffff65dcbf5 in abort () from /gnu/store/fa6wj5bxkj5ll1d7292a70=
-knmyl7a0cr-glibc-2.31/lib/libc.so.6
-  #2  0x00007ffff65d470a in __assert_fail_base () from /gnu/store/fa6wj5bxk=
-j5ll1d7292a70knmyl7a0cr-glibc-2.31/lib/libc.so.6
-  #3  0x00007ffff65d4782 in __assert_fail () from /gnu/store/fa6wj5bxkj5ll1=
-d7292a70knmyl7a0cr-glibc-2.31/lib/libc.so.6
-  #4  0x0000555555a3e979 in kvm_buf_set_msrs (cpu=3D0x555556688a20) at ../t=
-arget/i386/kvm.c:2714
-  #5  0x0000555555a438cc in kvm_put_msrs (level=3D3, cpu=3D0x555556688a20) =
-at ../target/i386/kvm.c:3005
-  #6  kvm_arch_put_registers (cpu=3Dcpu@entry=3D0x555556688a20, level=3Dlev=
-el@entry=3D3) at ../target/i386/kvm.c:3989
-  #7  0x0000555555af7b0e in do_kvm_cpu_synchronize_post_init (cpu=3D0x55555=
-6688a20, arg=3D...) at ../accel/kvm/kvm-all.c:2355
-  #8  0x00005555558ef8e2 in process_queued_cpu_work (cpu=3Dcpu@entry=3D0x55=
-5556688a20) at ../cpus-common.c:343
-  #9  0x0000555555b6ac25 in qemu_wait_io_event_common (cpu=3Dcpu@entry=3D0x=
-555556688a20) at ../softmmu/cpus.c:1117
-  #10 0x0000555555b6ac84 in qemu_wait_io_event (cpu=3Dcpu@entry=3D0x5555566=
-88a20) at ../softmmu/cpus.c:1157
-  #11 0x0000555555b6aec8 in qemu_kvm_cpu_thread_fn (arg=3Darg@entry=3D0x555=
-556688a20) at ../softmmu/cpus.c:1193
-  #12 0x0000555555cc7e86 in qemu_thread_start (args=3D<optimized out>) at .=
-./util/qemu-thread-posix.c:521
-  #13 0x00007ffff6769f64 in start_thread () from /gnu/store/fa6wj5bxkj5ll1d=
-7292a70knmyl7a0cr-glibc-2.31/lib/libpthread.so.0
-  #14 0x00007ffff669b9af in clone () from /gnu/store/fa6wj5bxkj5ll1d7292a70=
-knmyl7a0cr-glibc-2.31/lib/libc.so.6
-
-  Thread 2.4 (Thread 0x7fffeffff700 (LWP 18960)):
-  #0  0x00007ffff66919d9 in poll () from /gnu/store/fa6wj5bxkj5ll1d7292a70k=
-nmyl7a0cr-glibc-2.31/lib/libc.so.6
-  #1  0x00007ffff78f0051 in g_main_context_iterate.isra () from /gnu/store/=
-n1mx1dp0hcrzm1akf8qdqa9gmybzazs2-profile/lib/libglib-2.0.so.0
-  #2  0x00007ffff78f0392 in g_main_loop_run () from /gnu/store/n1mx1dp0hcrz=
-m1akf8qdqa9gmybzazs2-profile/lib/libglib-2.0.so.0
-  #3  0x000055555584b5a1 in iothread_run (opaque=3Dopaque@entry=3D0x5555565=
-57720) at ../iothread.c:80
-  #4  0x0000555555cc7e86 in qemu_thread_start (args=3D<optimized out>) at .=
-./util/qemu-thread-posix.c:521
-  #5  0x00007ffff6769f64 in start_thread () from /gnu/store/fa6wj5bxkj5ll1d=
-7292a70knmyl7a0cr-glibc-2.31/lib/libpthread.so.0
-  #6  0x00007ffff669b9af in clone () from /gnu/store/fa6wj5bxkj5ll1d7292a70=
-knmyl7a0cr-glibc-2.31/lib/libc.so.6
-
-  Thread 2.3 (Thread 0x7ffff48ed700 (LWP 18958)):
-  #0  0x00007ffff66657a1 in clock_nanosleep@GLIBC_2.2.5 () from /gnu/store/=
-fa6wj5bxkj5ll1d7292a70knmyl7a0cr-glibc-2.31/lib/libc.so.6
-  #1  0x00007ffff666ac03 in nanosleep () from /gnu/store/fa6wj5bxkj5ll1d729=
-2a70knmyl7a0cr-glibc-2.31/lib/libc.so.6
-  #2  0x00007ffff7919cdf in g_usleep () from /gnu/store/n1mx1dp0hcrzm1akf8q=
-dqa9gmybzazs2-profile/lib/libglib-2.0.so.0
-  #3  0x0000555555cb3b04 in call_rcu_thread (opaque=3Dopaque@entry=3D0x0) a=
-t ../util/rcu.c:250
-  #4  0x0000555555cc7e86 in qemu_thread_start (args=3D<optimized out>) at .=
-./util/qemu-thread-posix.c:521
-  #5  0x00007ffff6769f64 in start_thread () from /gnu/store/fa6wj5bxkj5ll1d=
-7292a70knmyl7a0cr-glibc-2.31/lib/libpthread.so.0
-  #6  0x00007ffff669b9af in clone () from /gnu/store/fa6wj5bxkj5ll1d7292a70=
-knmyl7a0cr-glibc-2.31/lib/libc.so.6
-
-  Thread 2.1 (Thread 0x7ffff48f2c80 (LWP 18956)):
-  #0  0x00007ffff677094c in pthread_cond_wait@@GLIBC_2.3.2 () from /gnu/sto=
-re/fa6wj5bxkj5ll1d7292a70knmyl7a0cr-glibc-2.31/lib/libpthread.so.0
-  #1  0x0000555555cc854f in qemu_cond_wait_impl (cond=3D0x5555563b0020 <qem=
-u_work_cond>, mutex=3D0x5555563cd620 <qemu_global_mutex>, file=3D0x555555db=
-ad06 "../cpus-common.c", line=3D154) at ../util/qemu-thread-posix.c:174
-  #2  0x00005555558ef484 in do_run_on_cpu (cpu=3Dcpu@entry=3D0x555556688a20=
-, func=3Dfunc@entry=3D0x555555af7b00 <do_kvm_cpu_synchronize_post_init>, da=
-ta=3D..., mutex=3Dmutex@entry=3D0x5555563cd620 <qemu_global_mutex>) at ../c=
-pus-common.c:154
-  #3  0x0000555555b6aa7c in run_on_cpu (cpu=3Dcpu@entry=3D0x555556688a20, f=
-unc=3Dfunc@entry=3D0x555555af7b00 <do_kvm_cpu_synchronize_post_init>, data=
-=3D..., data@entry=3D...) at ../softmmu/cpus.c:1085
-  #4  0x0000555555af8d4e in kvm_cpu_synchronize_post_init (cpu=3Dcpu@entry=
-=3D0x555556688a20) at ../accel/kvm/kvm-all.c:2361
-  #5  0x0000555555b6a94a in cpu_synchronize_post_init (cpu=3D0x555556688a20=
-) at /home/mcournoyer/src/qemu/include/sysemu/hw_accel.h:55
-  #6  cpu_synchronize_all_post_init () at ../softmmu/cpus.c:953
-  #7  0x0000555555b0dca7 in qemu_init (argc=3D<optimized out>, argv=3D<opti=
-mized out>, envp=3D<optimized out>) at ../softmmu/vl.c:4387
-  #8  0x0000555555840609 in main (argc=3D<optimized out>, argv=3D<optimized=
- out>, envp=3D<optimized out>) at ../softmmu/main.c:49
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1896263/+subscriptions
 
