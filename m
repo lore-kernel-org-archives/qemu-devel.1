@@ -7,70 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0A8BC4727E
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:51:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A716C4727F
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:51:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D668206A5
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:51:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E6AE7206A5
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:51:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FhstZodi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D668206A5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QOfmr4lf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6AE7206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKr7j-00017a-7C
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 18:50:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58162)
+	id 1kKr7l-00018Y-Oi
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 18:51:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59994)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKqt1-0004Zo-T0
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:35:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22280)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kKr1Y-0001Z9-LN
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:44:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23238)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKqt0-0007fS-0L
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:35:47 -0400
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kKr1V-0000AV-V9
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:44:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600814145;
+ s=mimecast20190719; t=1600814672;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ZaO4qj/yTu41gKQZ04f3gMKYh6PkBbR6GMOvXDRhB7k=;
- b=FhstZodiiuaxDmIX2N/N10ITdhj5f3QUa0yBS14GeH5uZbLcE3a/vKFxwM4L81rUa+M7L7
- QqUBJyEF7YsHXohcIfo2n84toRRCAG5MUFqrCRCE9mZgWipr+Yl5840uCoX03rPoCndR+7
- BfAXNTZIQ469gqAO/3dh427ZjJw3vq8=
+ bh=dv5S/RuLSXx/cX64hVORvnV/0WKZGi8KJd1obKvKHEo=;
+ b=QOfmr4lfQCUQ8CSv+z79GD3nKMJuAeUZxSeHTIDbmfFvViCUF/m1MHGR6eFMq+UtRGyggJ
+ cSu2oMgTGmApxkCdnCQvIWaLVhNsjgDF/t+zAUGBAwAdbRhdx6Az0l4psvvml0JYJuB1pe
+ LvLSH/ABEFjFCBa53XB++vV831OC8g4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-406-WSV9awEwPGCz8mjvddRMmQ-1; Tue, 22 Sep 2020 18:35:43 -0400
-X-MC-Unique: WSV9awEwPGCz8mjvddRMmQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-430--a0E_8fMM46CALJ31MIGuw-1; Tue, 22 Sep 2020 18:44:30 -0400
+X-MC-Unique: -a0E_8fMM46CALJ31MIGuw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70D92107465D;
- Tue, 22 Sep 2020 22:35:42 +0000 (UTC)
-Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8CC2860CCC;
- Tue, 22 Sep 2020 22:35:41 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH 14/26] qapi/parser.py: add docstrings
-Date: Tue, 22 Sep 2020 18:35:13 -0400
-Message-Id: <20200922223525.4085762-15-jsnow@redhat.com>
-In-Reply-To: <20200922223525.4085762-1-jsnow@redhat.com>
-References: <20200922223525.4085762-1-jsnow@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C18E81CBE9;
+ Tue, 22 Sep 2020 22:44:29 +0000 (UTC)
+Received: from localhost (unknown [10.10.67.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F087C2C31E;
+ Tue, 22 Sep 2020 22:44:28 +0000 (UTC)
+Date: Tue, 22 Sep 2020 18:44:28 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH v2 13/38] qapi/common.py: add type hint annotations
+Message-ID: <20200922224428.GN2044576@habkost.net>
+References: <20200922210101.4081073-1-jsnow@redhat.com>
+ <20200922210101.4081073-14-jsnow@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200922210101.4081073-14-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -93,83 +95,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- scripts/qapi/parser.py | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+On Tue, Sep 22, 2020 at 05:00:36PM -0400, John Snow wrote:
+> Annotations do not change runtime behavior.
+> This commit *only* adds annotations.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  scripts/qapi/common.py | 27 ++++++++++++++++-----------
+>  1 file changed, 16 insertions(+), 11 deletions(-)
+> 
+> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> index 682e74fe65..0ce4a107e6 100644
+> --- a/scripts/qapi/common.py
+> +++ b/scripts/qapi/common.py
+> @@ -12,6 +12,7 @@
+[...]
+> @@ -176,7 +179,7 @@ def gen_if(ifcond):
+>      return ret
+>  
+>  
+> -def gen_endif(ifcond):
+> +def gen_endif(ifcond: Sequence[str]) -> str:
 
-diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
-index d9aae4ddb7..490436b48a 100644
---- a/scripts/qapi/parser.py
-+++ b/scripts/qapi/parser.py
-@@ -61,7 +61,15 @@ class QAPIDocError(QAPIError):
- 
- 
- class QAPISchemaParser:
-+    """
-+    Performs parsing of a QAPI schema source file.
- 
-+    :param fname: Path to the source file
-+    :param previously_included: Set of absolute paths of previously included
-+                                source files; these will not be parsed again.
-+    :param incl_info: QAPISourceInfo for the parent document;
-+                      Can be None for the parent document.
-+    """
-     def __init__(self,
-                  fname: str,
-                  previously_included: Optional[Set[str]] = None,
-@@ -97,6 +105,10 @@ def __init__(self,
-         self._parse()
- 
-     def _parse(self) -> None:
-+        """
-+        Parse the QAPI Schema Document.
-+        Build self.exprs, self.docs
-+        """
-         cur_doc = None
- 
-         # Prime the lexer:
-@@ -216,6 +228,32 @@ def _pragma(cls,
-             raise QAPISemError(info, "unknown pragma '%s'" % name)
- 
-     def accept(self, skip_comment: bool = True) -> None:
-+        """
-+        Read the next lexeme.
-+
-+        - `tok` is the current lexeme/token type.
-+          It will always be a single char in `"[]{},:'tf#"`.
-+        - `pos` is the position of the first character in the lexeme.
-+        - `cursor` is the position of the next character.
-+        - `val` is the value of the lexeme.
-+
-+        Single-char lexemes:
-+          LBRACE, RBRACE, COLON, COMMA, LSQB, RSQB:
-+            `tok` holds the single-char value of the lexeme.
-+
-+        Multi-char lexemes:
-+          COMMENT - `tok` is `'#'`.
-+                    `val` is a string including all chars until end-of-line.
-+                          (The '#' is excluded.)
-+          STRING  - `tok` is `"'"`.
-+                    `val` is the string, excluding the quotes.
-+          TRUE    - `tok` is `"t"`. `val` is `True`.
-+          FALSE   - `tok` is `"f"`. `val` is `False`.
-+
-+        NEWLINE and SPACE lexemes are consumed by the lexer directly.
-+        `line_pos` and `info` are advanced when NEWLINE is encountered.
-+        `tok` is set to `None` upon reaching EOF.
-+        """
-         while True:
-             self.tok = self.src[self.cursor]
-             self.pos = self.cursor
+Does this need to require a Sequence?  It looks like it could be
+Iterable.
+
+I don't think this should block the patch, though, so:
+
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
+
+>      ret = ''
+>      for ifc in reversed(ifcond):
+>          ret += mcgen('''
+> @@ -185,7 +188,9 @@ def gen_endif(ifcond):
+>      return ret
+>  
+>  
+> -def build_params(arg_type, boxed, extra=None):
+> +def build_params(arg_type,
+> +                 boxed: bool,
+> +                 extra: Optional[str] = None) -> str:
+>      ret = ''
+>      sep = ''
+>      if boxed:
+> -- 
+> 2.26.2
+> 
+
 -- 
-2.26.2
+Eduardo
 
 
