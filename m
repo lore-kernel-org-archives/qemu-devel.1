@@ -2,89 +2,82 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 413B8C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:49:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 528EAC2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:51:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A01BE206FC
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:49:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZLqGX4uN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A01BE206FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 951442076B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:51:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 951442076B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKqAK-00075s-Oj
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 17:49:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41948)
+	id 1kKqBs-0000WM-JB
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 17:51:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43612)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpj9-0003L8-4R
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:21:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30953)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpj5-000750-JM
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:21:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600809686;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=d1w7A9tf/5Qzt1yH408ACdCWC7OW5p+S8aaxkJNuoPE=;
- b=ZLqGX4uNnQwFkGCCuOEd2ryka/C/DNnHVQDI0SjdpnKJ+IPwAVmlhd3syXnMPcZM85AxLB
- v+8c/JEn8CwXKy69grz5qihFFTyC29DekGYczcNSmwq+XTekoQFUN7wVIWMHg3yb2ccqz9
- xXc0XSL5Bm6Tku8M83sK5CbmSqbhprE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-102-g7yzsh0ENwqX1za9HGQXlw-1; Tue, 22 Sep 2020 17:21:22 -0400
-X-MC-Unique: g7yzsh0ENwqX1za9HGQXlw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1FE01DE09;
- Tue, 22 Sep 2020 21:21:21 +0000 (UTC)
-Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1FB0D5DE86;
- Tue, 22 Sep 2020 21:21:21 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH 2/6] qapi/parser.py: remove parser context from QAPIDoc
-Date: Tue, 22 Sep 2020 17:21:11 -0400
-Message-Id: <20200922212115.4084301-3-jsnow@redhat.com>
-In-Reply-To: <20200922212115.4084301-1-jsnow@redhat.com>
-References: <20200922212115.4084301-1-jsnow@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kKps8-0006ic-DM
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:30:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55024)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kKps6-0008Et-4Z
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:30:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kKps4-0002st-Ca
+ for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 21:30:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5CD0C2E8071
+ for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 21:30:44 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 22 Sep 2020 21:25:06 -0000
+From: Toolybird <1896096@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange bonzini fredb74 laurent-vivier pmaydell
+ toolybird
+X-Launchpad-Bug-Reporter: Frederic Bezies (fredb74)
+X-Launchpad-Bug-Modifier: Toolybird (toolybird)
+References: <160036517624.17887.51064102046414127.malonedeb@soybean.canonical.com>
+Message-Id: <160080990655.13994.13997780293497049824.malone@gac.canonical.com>
+Subject: [Bug 1896096] Re: Git version: Build process is broken in
+ block_curl.c.o
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: 2b7bf90f991c6aff028977b25a921acfef78d3f1
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 15:45:37
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -93,177 +86,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
- John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Reply-To: Bug 1896096 <1896096@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We only need the parser context for the purpose of raising
-exceptions. What we can do instead is to raise a unique document parsing
-error and affix additional context from the caller. This way, the
-document parsing can be isolated.
+> Posted "[PATCH 0/4] configure: bugfixes and cleanups for CFLAGS".
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- scripts/qapi/parser.py | 56 ++++++++++++++++++++++--------------------
- 1 file changed, 30 insertions(+), 26 deletions(-)
+(sorry for delay)
 
-diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
-index 327cf05736..cb2595ce60 100644
---- a/scripts/qapi/parser.py
-+++ b/scripts/qapi/parser.py
-@@ -18,10 +18,14 @@
- import re
- from collections import OrderedDict
- 
--from .error import QAPIParseError, QAPISemError
-+from .error import QAPIError, QAPIParseError, QAPISemError
- from .source import QAPISourceInfo
- 
- 
-+class QAPIDocError(QAPIError):
-+    """Documentation parsing error."""
-+
-+
- class QAPISchemaParser:
- 
-     def __init__(self, fname, previously_included=None, incl_info=None):
-@@ -265,13 +269,13 @@ def get_expr(self, nested):
-                 self, "expected '{', '[', string, boolean or 'null'")
-         return expr
- 
--    def get_doc(self, info):
-+    def _get_doc(self, info):
-         if self.val != '##':
-             raise QAPIParseError(
-                 self, "junk after '##' at start of documentation comment")
- 
-         docs = []
--        cur_doc = QAPIDoc(self, info)
-+        cur_doc = QAPIDoc(info)
-         self.accept(False)
-         while self.tok == '#':
-             if self.val.startswith('##'):
-@@ -292,12 +296,22 @@ def get_doc(self, info):
-                 if cur_doc.body.text:
-                     cur_doc.end_comment()
-                     docs.append(cur_doc)
--                    cur_doc = QAPIDoc(self, info)
-+                    cur_doc = QAPIDoc(info)
-             cur_doc.append(self.val)
-             self.accept(False)
- 
-         raise QAPIParseError(self, "documentation comment must end with '##'")
- 
-+    def get_doc(self, info):
-+        try:
-+            return self._get_doc(info)
-+        except QAPIDocError as err:
-+            # Tie the Doc parsing error to our parsing state. The
-+            # resulting error position depends on the state of the
-+            # parser. It happens to be the beginning of the comment.
-+            # More or less servicable, but action at a distance.
-+            raise QAPIParseError(self, str(err)) from err
-+
- 
- class QAPIDoc:
-     """
-@@ -335,12 +349,7 @@ def __init__(self, name):
-         def connect(self, member):
-             self.member = member
- 
--    def __init__(self, parser, info):
--        # self._parser is used to report errors with QAPIParseError.  The
--        # resulting error position depends on the state of the parser.
--        # It happens to be the beginning of the comment.  More or less
--        # servicable, but action at a distance.
--        self._parser = parser
-+    def __init__(self, info):
-         self.info = info
-         self.symbol = None
-         self.body = QAPIDoc.Section()
-@@ -377,7 +386,7 @@ def append(self, line):
-             return
- 
-         if line[0] != ' ':
--            raise QAPIParseError(self._parser, "missing space after #")
-+            raise QAPIDocError("missing space after #")
-         line = line[1:]
-         self._append_line(line)
- 
-@@ -411,11 +420,11 @@ def _append_body_line(self, line):
-         # recognized, and get silently treated as ordinary text
-         if not self.symbol and not self.body.text and line.startswith('@'):
-             if not line.endswith(':'):
--                raise QAPIParseError(self._parser, "line should end with ':'")
-+                raise QAPIDocError("line should end with ':'")
-             self.symbol = line[1:-1]
-             # FIXME invalid names other than the empty string aren't flagged
-             if not self.symbol:
--                raise QAPIParseError(self._parser, "invalid name")
-+                raise QAPIDocError("invalid name")
-         elif self.symbol:
-             # This is a definition documentation block
-             if name.startswith('@') and name.endswith(':'):
-@@ -498,9 +507,8 @@ def _append_various_line(self, line):
-         name = line.split(' ', 1)[0]
- 
-         if name.startswith('@') and name.endswith(':'):
--            raise QAPIParseError(self._parser,
--                                 "'%s' can't follow '%s' section"
--                                 % (name, self.sections[0].name))
-+            raise QAPIDocError("'%s' can't follow '%s' section"
-+                               % (name, self.sections[0].name))
-         if self._is_section_tag(name):
-             line = line[len(name)+1:]
-             self._start_section(name[:-1])
-@@ -514,10 +522,9 @@ def _append_various_line(self, line):
-     def _start_symbol_section(self, symbols_dict, name):
-         # FIXME invalid names other than the empty string aren't flagged
-         if not name:
--            raise QAPIParseError(self._parser, "invalid parameter name")
-+            raise QAPIDocError("invalid parameter name")
-         if name in symbols_dict:
--            raise QAPIParseError(self._parser,
--                                 "'%s' parameter name duplicated" % name)
-+            raise QAPIDocError("'%s' parameter name duplicated" % name)
-         assert not self.sections
-         self._end_section()
-         self._section = QAPIDoc.ArgSection(name)
-@@ -531,8 +538,7 @@ def _start_features_section(self, name):
- 
-     def _start_section(self, name=None):
-         if name in ('Returns', 'Since') and self.has_section(name):
--            raise QAPIParseError(self._parser,
--                                 "duplicated '%s' section" % name)
-+            raise QAPIDocError("duplicated '%s' section" % name)
-         self._end_section()
-         self._section = QAPIDoc.Section(name)
-         self.sections.append(self._section)
-@@ -541,17 +547,15 @@ def _end_section(self):
-         if self._section:
-             text = self._section.text = self._section.text.strip()
-             if self._section.name and (not text or text.isspace()):
--                raise QAPIParseError(
--                    self._parser,
-+                raise QAPIDocError(
-                     "empty doc section '%s'" % self._section.name)
-             self._section = None
- 
-     def _append_freeform(self, line):
-         match = re.match(r'(@\S+:)', line)
-         if match:
--            raise QAPIParseError(self._parser,
--                                 "'%s' not allowed in free-form documentation"
--                                 % match.group(1))
-+            raise QAPIDocError("'%s' not allowed in free-form documentation"
-+                               % match.group(1))
-         self._section.append(line)
- 
-     def connect_member(self, member):
--- 
-2.26.2
+Thanks for the patches. They seem to fix the Arch case i.e. build
+succeeds without hacks and FLAGS in the build env are being respected.
 
+However, I tested the "unset FLAGS" case and patch 4/4 seems to cause a
+weird failure I don't understand:
+
+../qemu/meson.build:1:0: ERROR: Unable to determine dynamic linker
+
+A full log can be found at /build/qemu-git/src/build-full/meson-logs
+/meson-log.txt
+
+ERROR: meson setup failed
+
+There is nothing in meson-log to indicate the failure reason. Any ideas?
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1896096
+
+Title:
+  Git version: Build process is broken in block_curl.c.o
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  Gcc version: 10.2.0
+  Glusterfs: 8.1
+  Libguestfs: 1.42
+
+  Configure options used:
+
+  configure \
+      --prefix=3D/usr \
+      --sysconfdir=3D/etc \
+      --localstatedir=3D/var \
+      --libexecdir=3D/usr/lib/qemu \
+      --extra-ldflags=3D"$LDFLAGS" \
+      --smbd=3D/usr/bin/smbd \
+      --enable-modules \
+      --enable-sdl \
+      --disable-werror \
+      --enable-slirp=3Dsystem \
+      --enable-xfsctl \
+      --audio-drv-list=3D"pa alsa sdl"
+      =
+
+  Error log attached. Here is the beginning:
+
+  /usr/bin/ld: /usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../lib/Scrt=
+1.o: in function `_start':
+  (.text+0x24): undefined reference to `main'
+  /usr/bin/ld: libblock-curl.a(block_curl.c.o): in function `curl_block_ini=
+t':
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1896096/+subscriptions
 
