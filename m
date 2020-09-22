@@ -2,75 +2,89 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89928C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 06:51:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1BADC4363D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 06:51:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00B03239E5
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 06:51:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00B03239E5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cn.fujitsu.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0AD23239E5
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 06:51:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EWdtITIW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AD23239E5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKc8x-0007GC-08
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 02:51:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57212)
+	id 1kKc8r-00079X-Vr
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 02:51:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56980)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lizhijian@cn.fujitsu.com>)
- id 1kKc7e-0005w2-7C
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 02:49:55 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:37273
- helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lizhijian@cn.fujitsu.com>) id 1kKc7b-00039Y-El
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 02:49:53 -0400
-X-IronPort-AV: E=Sophos;i="5.77,289,1596470400"; d="scan'208";a="99495201"
-Received: from unknown (HELO cn.fujitsu.com) ([10.167.33.5])
- by heian.cn.fujitsu.com with ESMTP; 22 Sep 2020 14:49:49 +0800
-Received: from G08CNEXMBPEKD04.g08.fujitsu.local (unknown [10.167.33.201])
- by cn.fujitsu.com (Postfix) with ESMTP id DE34B48990D3;
- Tue, 22 Sep 2020 14:49:43 +0800 (CST)
-Received: from [10.167.226.45] (10.167.226.45) by
- G08CNEXMBPEKD04.g08.fujitsu.local (10.167.33.201) with Microsoft SMTP Server
- (TLS) id 15.0.1497.2; Tue, 22 Sep 2020 14:49:42 +0800
-Subject: Re: [PATCH 1/3] Optimize seq_sorter function for colo-compare
-To: leirao <lei.rao@intel.com>, <chen.zhang@intel.com>, <jasowang@redhat.com>, 
- <quintela@redhat.com>, <dgilbert@redhat.com>, <pbonzini@redhat.com>
-References: <1600485023-263643-1-git-send-email-lei.rao@intel.com>
- <1600485023-263643-2-git-send-email-lei.rao@intel.com>
-From: Li Zhijian <lizhijian@cn.fujitsu.com>
-Message-ID: <b48d0d92-b65d-4e22-88f2-42dfc8b07fa6@cn.fujitsu.com>
-Date: Tue, 22 Sep 2020 14:49:42 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kKc6W-0004xW-2u
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 02:48:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35764)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kKc6T-00034r-Gw
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 02:48:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600757320;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=OxTdqA6OSrPn5QCnzEGgD7GexcPXsJ3Qzsa8fr/GmMg=;
+ b=EWdtITIW3XNRqEFXp6KeNo7kd1Ku3/epzssmTKrtFRHi8ffuauWeR47xwVJoIwtm0SmW9R
+ cspXtsPiXLHkHfofRPqy1tiLbH/HcjZxxoJoaSDykwRK/o3+WvF8BILLgIzAOW6F4Zq6oV
+ 4Sp07HgbFqRbFt5MXdZffuP4J5lWBnk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-232-rf63SeoSNZi3uLvLzoIhHw-1; Tue, 22 Sep 2020 02:48:39 -0400
+X-MC-Unique: rf63SeoSNZi3uLvLzoIhHw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25D231084C9A
+ for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 06:48:38 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 04A2918EDE;
+ Tue, 22 Sep 2020 06:48:36 +0000 (UTC)
+Date: Tue, 22 Sep 2020 08:48:36 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH 17/24] cpu/core: Register core-id and nr-threads as
+ class properties
+Message-ID: <20200922084836.1e876578@redhat.com>
+In-Reply-To: <20200921221045.699690-18-ehabkost@redhat.com>
+References: <20200921221045.699690-1-ehabkost@redhat.com>
+ <20200921221045.699690-18-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1600485023-263643-2-git-send-email-lei.rao@intel.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.167.226.45]
-X-ClientProxiedBy: G08CNEXCHPEKD05.g08.fujitsu.local (10.167.33.203) To
- G08CNEXMBPEKD04.g08.fujitsu.local (10.167.33.201)
-X-yoursite-MailScanner-ID: DE34B48990D3.ABCFF
-X-yoursite-MailScanner: Found to be clean
-X-yoursite-MailScanner-From: lizhijian@cn.fujitsu.com
-Received-SPF: none client-ip=183.91.158.132;
- envelope-from=lizhijian@cn.fujitsu.com; helo=heian.cn.fujitsu.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:14:59
-X-ACL-Warn: Detected OS   = ???
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,43 +97,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, 21 Sep 2020 18:10:38 -0400
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
+> Class properties make QOM introspection simpler and easier, as
+> they don't require an object to be instantiated.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-On 9/19/20 11:10 AM, leirao wrote:
-> The seq of tcp has been filled in fill_pkt_tcp_info, it
-> can be used directly here.
->
-> Signed-off-by: leirao <lei.rao@intel.com>
-Reviewed-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
 > ---
->   net/colo-compare.c | 6 +-----
->   1 file changed, 1 insertion(+), 5 deletions(-)
->
-> diff --git a/net/colo-compare.c b/net/colo-compare.c
-> index 3a45d64..86980ce 100644
-> --- a/net/colo-compare.c
-> +++ b/net/colo-compare.c
-> @@ -196,11 +196,7 @@ static void colo_compare_inconsistency_notify(CompareState *s)
->   
->   static gint seq_sorter(Packet *a, Packet *b, gpointer data)
->   {
-> -    struct tcp_hdr *atcp, *btcp;
-> -
-> -    atcp = (struct tcp_hdr *)(a->transport_header);
-> -    btcp = (struct tcp_hdr *)(b->transport_header);
-> -    return ntohl(atcp->th_seq) - ntohl(btcp->th_seq);
-> +    return a->tcp_seq - b->tcp_seq;
->   }
->   
->   static void fill_pkt_tcp_info(void *data, uint32_t *max_ack)
-
-
+> Cc: qemu-devel@nongnu.org
+> ---
+>  hw/cpu/core.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/cpu/core.c b/hw/cpu/core.c
+> index 3a659291eae..92d3b2fbad6 100644
+> --- a/hw/cpu/core.c
+> +++ b/hw/cpu/core.c
+> @@ -69,10 +69,6 @@ static void cpu_core_instance_init(Object *obj)
+>      MachineState *ms = MACHINE(qdev_get_machine());
+>      CPUCore *core = CPU_CORE(obj);
+>  
+> -    object_property_add(obj, "core-id", "int", core_prop_get_core_id,
+> -                        core_prop_set_core_id, NULL, NULL);
+> -    object_property_add(obj, "nr-threads", "int", core_prop_get_nr_threads,
+> -                        core_prop_set_nr_threads, NULL, NULL);
+>      core->nr_threads = ms->smp.threads;
+>  }
+>  
+> @@ -81,6 +77,10 @@ static void cpu_core_class_init(ObjectClass *oc, void *data)
+>      DeviceClass *dc = DEVICE_CLASS(oc);
+>  
+>      set_bit(DEVICE_CATEGORY_CPU, dc->categories);
+> +    object_class_property_add(oc, "core-id", "int", core_prop_get_core_id,
+> +                              core_prop_set_core_id, NULL, NULL);
+> +    object_class_property_add(oc, "nr-threads", "int", core_prop_get_nr_threads,
+> +                              core_prop_set_nr_threads, NULL, NULL);
+>  }
+>  
+>  static const TypeInfo cpu_core_type_info = {
 
 
