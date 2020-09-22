@@ -2,77 +2,91 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12C4AC4727C
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 00:51:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47349C4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 00:56:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7596E23A61
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 00:51:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7596E23A61
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 20B7523A61
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 00:56:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="ufG4q/dd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20B7523A61
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKWX3-00061L-Bn
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 20:51:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57216)
+	id 1kKWbE-0007Rg-Rk
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 20:56:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57946)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kKWWF-0005c1-0k
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 20:50:55 -0400
-Resent-Date: Mon, 21 Sep 2020 20:50:55 -0400
-Resent-Message-Id: <E1kKWWF-0005c1-0k@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21338)
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1kKWaL-0006px-TA; Mon, 21 Sep 2020 20:55:10 -0400
+Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:47722)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kKWWB-0002PF-97
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 20:50:54 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1600735844; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=coR+dRcwx4T8kWP72lvtBoGCcbqOg8JoTx2euzwu/VqfQtccfLD3yJtcKjz9jgczhOC0yi9mOI3GEK0uHw1U2612dv97YA21DY9t89AGBHgcdETLDmqdu+G2iNWCMT63Xasi7qiqCfKNVVe3gZDKzMG57ZPk/QzXGzJG9EdCVoY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1600735844;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=/0aS1Q5IV5snmWAr0LOCFLn4sQXG6tktDAjsWgqf/fY=; 
- b=RgGYBzei19mwz4X0OW6yfUMcjugEf9qjFTIp+Tj2uOkgad+/5Q7BxDc1NGtecmf2dsfYWolRjKMD2rdZD3xTtnnxPO7fDW21Q/hdvqtJq9og5pWNUm5Id6CltbeUo828eELXYTiNOXye1dYQCGNdfHbMhjc9WUcJ0DsaSOe6zpY=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1600735842775684.9698956257887;
- Mon, 21 Sep 2020 17:50:42 -0700 (PDT)
-Subject: Re: [PATCH v4 00/11] capstone + disassembler patches
-Message-ID: <160073584167.23987.5739705917333363444@66eaa9a8a123>
-In-Reply-To: <20200921174118.39352-1-richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1kKWaH-0002mL-Ha; Mon, 21 Sep 2020 20:55:08 -0400
+Received: from iva8-d077482f1536.qloud-c.yandex.net
+ (iva8-d077482f1536.qloud-c.yandex.net
+ [IPv6:2a02:6b8:c0c:2f26:0:640:d077:482f])
+ by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id CF2122E159A;
+ Tue, 22 Sep 2020 03:54:59 +0300 (MSK)
+Received: from iva8-88b7aa9dc799.qloud-c.yandex.net
+ (iva8-88b7aa9dc799.qloud-c.yandex.net [2a02:6b8:c0c:77a0:0:640:88b7:aa9d])
+ by iva8-d077482f1536.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ hwMocanruS-swvKSpml; Tue, 22 Sep 2020 03:54:59 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1600736099; bh=9FTthf4JcJytK48DfDvq5/Cw17R0lm+Kl5QD/gFaChA=;
+ h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
+ b=ufG4q/ddkEOdrm9gyCm6PYM2PNMAgqZCs7jXLLqSF1g7EiSA3lKjVZFnuD6Llt2eG
+ nl/1vhPoR4aw0WxJmZg/4WacDGDx9Q37cSykap9ogFDqRutiQQVCxImOu5A2g/1Vj9
+ MYGf8UYWblpft595QNoTa/JE+OumhQXlrsKuz/Oc=
+Authentication-Results: iva8-d077482f1536.qloud-c.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-iva.dhcp.yndx.net (dynamic-iva.dhcp.yndx.net
+ [2a02:6b8:b080:9018::1:0])
+ by iva8-88b7aa9dc799.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ D71TUrk78P-srnG5lvN; Tue, 22 Sep 2020 03:54:58 +0300
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Client certificate not present)
+Date: Tue, 22 Sep 2020 03:54:49 +0300
+From: Dima Stepanov <dimastep@yandex-team.ru>
+To: Raphael Norwitz <raphael.s.norwitz@gmail.com>
+Subject: Re: [PATCH v5 4/7] tests/qtest/libqos/virtio-blk: add support for
+ vhost-user-blk
+Message-ID: <20200922005448.GA5538@dimastep-nix>
+References: <cover.1599813294.git.dimastep@yandex-team.ru>
+ <4d3e683a87557bcef520826c54aa3e5ab7c64111.1599813294.git.dimastep@yandex-team.ru>
+ <CAFubqFssie0eqor4sL+v09kwam6aaoa8P7k+y0x=KHLZXs_7bA@mail.gmail.com>
+ <20200916221313.GA3324@dimastep-nix>
+ <CAFubqFv-YotywwD=aBJg_pgWGMi2qxC6cfRbu7rKzVbzxpr0gw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: richard.henderson@linaro.org
-Date: Mon, 21 Sep 2020 17:50:42 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 20:50:48
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFubqFv-YotywwD=aBJg_pgWGMi2qxC6cfRbu7rKzVbzxpr0gw@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+Received-SPF: pass client-ip=77.88.29.217;
+ envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1p.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 20:55:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,70 +95,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, stefanha@gmail.com, jasowang@redhat.com,
+ QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>, fengli@smartx.com,
+ yc-core@yandex-team.ru, Paolo Bonzini <pbonzini@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkyMTE3NDExOC4zOTM1
-Mi0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
-bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
-b3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMDkyMTE3
-NDExOC4zOTM1Mi0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKU3ViamVjdDogW1BBVENI
-IHY0IDAwLzExXSBjYXBzdG9uZSArIGRpc2Fzc2VtYmxlciBwYXRjaGVzCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8
-fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3Jp
-dGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9
-PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
-ZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjNkNzY0ZDMg
-ZGlzYXMvY2Fwc3RvbmU6IEFkZCBza2lwZGF0YSBob29rIGZvciBzMzkweAowNGMxY2ZhIGRpc2Fz
-OiBFbmFibGUgY2Fwc3RvbmUgZGlzYXNzZW1ibHkgZm9yIHMzOTB4CjkzYTJkYTUgZGlzYXM6IFNw
-bGl0IG91dCBjYXBzdG9uZSBjb2RlIHRvIGRpc2FzL2NhcHN0b25lLmMKZDI5NzM2ZSBkaXNhczog
-Q29uZmlndXJlIGNhcHN0b25lIGZvciBhYXJjaDY0IGhvc3Qgd2l0aG91dCBsaWJ2aXhsCmYyODM5
-NTkgZGlzYXM6IENsZWFudXAgcGx1Z2luX2Rpc2FzCmIzYTU0OGUgZGlzYXM6IFVzZSBxZW11L2Jz
-d2FwLmggZm9yIGJmZCBlbmRpYW4gbG9hZHMKMWI2ZTE4NSBkaXNhczogQ2xlYW4gdXAgQ1BVRGVi
-dWcgaW5pdGlhbGl6YXRpb24KM2IxZjZmOSBkaXNhczogTW92ZSBob3N0IGFzbSBhbm5vdGF0aW9u
-cyB0byB0Yl9nZW5fY29kZQo4NTY1MDdlIGNhcHN0b25lOiBSZXF1aXJlIHZlcnNpb24gNC4wIGZy
-b20gYSBzeXN0ZW0gbGlicmFyeQphNzE0YzI4IGNhcHN0b25lOiBVcGRhdGUgdG8gdXBzdHJlYW0g
-Im5leHQiIGJyYW5jaAo4MjNhM2UyIGNhcHN0b25lOiBDb252ZXJ0IE1ha2VmaWxlIGJpdHMgdG8g
-bWVzb24gYml0cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMSBDaGVja2luZyBjb21taXQgODIz
-YTNlMmE5ZjNjIChjYXBzdG9uZTogQ29udmVydCBNYWtlZmlsZSBiaXRzIHRvIG1lc29uIGJpdHMp
-CjIvMTEgQ2hlY2tpbmcgY29tbWl0IGE3MTRjMjg5MTdkYSAoY2Fwc3RvbmU6IFVwZGF0ZSB0byB1
-cHN0cmVhbSAibmV4dCIgYnJhbmNoKQozLzExIENoZWNraW5nIGNvbW1pdCA4NTY1MDdlZWRjZTQg
-KGNhcHN0b25lOiBSZXF1aXJlIHZlcnNpb24gNC4wIGZyb20gYSBzeXN0ZW0gbGlicmFyeSkKNC8x
-MSBDaGVja2luZyBjb21taXQgM2IxZjZmOWNhM2EwIChkaXNhczogTW92ZSBob3N0IGFzbSBhbm5v
-dGF0aW9ucyB0byB0Yl9nZW5fY29kZSkKNS8xMSBDaGVja2luZyBjb21taXQgMWI2ZTE4NWVlZTNl
-IChkaXNhczogQ2xlYW4gdXAgQ1BVRGVidWcgaW5pdGlhbGl6YXRpb24pCldBUk5JTkc6IEJsb2Nr
-IGNvbW1lbnRzIHVzZSBhIHRyYWlsaW5nICovIG9uIGEgc2VwYXJhdGUgbGluZQojNzM6IEZJTEU6
-IGRpc2FzLmM6NDg6CisgICBhbiBlcnJvciByZXR1cm4gZnJvbSB7aG9zdCx0YXJnZXR9X3JlYWRf
-bWVtb3J5LiAgKi8KCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzkx
-OiBGSUxFOiBkaXNhcy5jOjU4OgorXkleSV5JICAgIkFkZHJlc3MgMHglIiBQUkl4NjQgIiBpcyBv
-dXQgb2YgYm91bmRzLlxuIiwkCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5l
-cyBzaG91bGQgYmUgYXZvaWRlZAojMjAzOiBGSUxFOiBkaXNhcy5jOjQ3OToKKyNpZiBkZWZpbmVk
-KF9JTFAzMikgfHwgKF9fcmlzY3ZfeGxlbiA9PSAzMikKCnRvdGFsOiAxIGVycm9ycywgMiB3YXJu
-aW5ncywgNDkwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDUvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KCjYvMTEgQ2hlY2tpbmcgY29tbWl0IGIzYTU0OGUxOTk2ZSAoZGlzYXM6IFVzZSBxZW11
-L2Jzd2FwLmggZm9yIGJmZCBlbmRpYW4gbG9hZHMpCjcvMTEgQ2hlY2tpbmcgY29tbWl0IGYyODM5
-NTkxZTU4MyAoZGlzYXM6IENsZWFudXAgcGx1Z2luX2Rpc2FzKQo4LzExIENoZWNraW5nIGNvbW1p
-dCBkMjk3MzZlMTEzNjYgKGRpc2FzOiBDb25maWd1cmUgY2Fwc3RvbmUgZm9yIGFhcmNoNjQgaG9z
-dCB3aXRob3V0IGxpYnZpeGwpCjkvMTEgQ2hlY2tpbmcgY29tbWl0IDkzYTJkYTU4ZDk5NyAoZGlz
-YXM6IFNwbGl0IG91dCBjYXBzdG9uZSBjb2RlIHRvIGRpc2FzL2NhcHN0b25lLmMpCldBUk5JTkc6
-IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1
-cGRhdGluZz8KIzMwOTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEg
-d2FybmluZ3MsIDYwNCBsaW5lcyBjaGVja2VkCgpQYXRjaCA5LzExIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCjEwLzExIENoZWNraW5nIGNvbW1pdCAwNGMxY2ZhMThjYTggKGRpc2FzOiBFbmFi
-bGUgY2Fwc3RvbmUgZGlzYXNzZW1ibHkgZm9yIHMzOTB4KQoxMS8xMSBDaGVja2luZyBjb21taXQg
-M2Q3NjRkM2QxZTdiIChkaXNhcy9jYXBzdG9uZTogQWRkIHNraXBkYXRhIGhvb2sgZm9yIHMzOTB4
-KQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
-VGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIw
-MDkyMTE3NDExOC4zOTM1Mi0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvdGVzdGluZy5j
-aGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
-eSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
-ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Mon, Sep 21, 2020 at 07:04:20PM -0400, Raphael Norwitz wrote:
+> MST already sent a PR with all the patches :)
+
+Thank you! )
+
+> 
+> On Wed, Sep 16, 2020 at 6:13 PM Dima Stepanov <dimastep@yandex-team.ru> wrote:
+> >
+> > On Mon, Sep 14, 2020 at 09:23:42PM -0400, Raphael Norwitz wrote:
+> > > On Fri, Sep 11, 2020 at 4:43 AM Dima Stepanov <dimastep@yandex-team.ru> wrote:
+> > > >
+> > > > Add support for the vhost-user-blk-pci device. This node can be used by
+> > > > the vhost-user-blk tests. Tests for the vhost-user-blk device are added
+> > > > in the following patches.
+> > > >
+> > > > Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+> > >
+> > > Reviewed-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
+> > Hi,
+> >
+> > Looks like that all the patch set is reviewed except 7/7. If it is an
+> > issue, we can cut it from the set and merge other six commits.
+> >
+> > Raphael,
+> >
+> > Will you take it for merge?
+> >
+> > Thanks, Dima.
+> >
+> > >
+> > > > ---
+> > > >  tests/qtest/libqos/virtio-blk.c | 14 +++++++++++++-
+> > > >  1 file changed, 13 insertions(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/tests/qtest/libqos/virtio-blk.c b/tests/qtest/libqos/virtio-blk.c
+> > > > index 5da0259..c0fd9d2 100644
+> > > > --- a/tests/qtest/libqos/virtio-blk.c
+> > > > +++ b/tests/qtest/libqos/virtio-blk.c
+> > > > @@ -30,7 +30,8 @@
+> > > >  static void *qvirtio_blk_get_driver(QVirtioBlk *v_blk,
+> > > >                                      const char *interface)
+> > > >  {
+> > > > -    if (!g_strcmp0(interface, "virtio-blk")) {
+> > > > +    if (!g_strcmp0(interface, "virtio-blk") ||
+> > > > +            !g_strcmp0(interface, "vhost-user-blk")) {
+> > > >          return v_blk;
+> > > >      }
+> > > >      if (!g_strcmp0(interface, "virtio")) {
+> > > > @@ -120,6 +121,17 @@ static void virtio_blk_register_nodes(void)
+> > > >      qos_node_produces("virtio-blk-pci", "virtio-blk");
+> > > >
+> > > >      g_free(arg);
+> > > > +
+> > > > +    /* vhost-user-blk-pci */
+> > > > +    arg = g_strdup_printf("id=drv0,chardev=chdev0,addr=%x.%x",
+> > > > +                                PCI_SLOT, PCI_FN);
+> > > > +    opts.extra_device_opts = arg;
+> > > > +    add_qpci_address(&opts, &addr);
+> > > > +    qos_node_create_driver("vhost-user-blk-pci", virtio_blk_pci_create);
+> > > > +    qos_node_consumes("vhost-user-blk-pci", "pci-bus", &opts);
+> > > > +    qos_node_produces("vhost-user-blk-pci", "vhost-user-blk");
+> > > > +
+> > > > +    g_free(arg);
+> > > >  }
+> > > >
+> > > >  libqos_init(virtio_blk_register_nodes);
+> > > > --
+> > > > 2.7.4
+> > > >
+> > > >
 
