@@ -2,97 +2,73 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B600BC2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:31:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 534E8C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:32:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14C65208A9
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:31:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0AE12396D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:32:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QWO+6NyC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14C65208A9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G/9uiU2Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0AE12396D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKfaB-0003iV-VR
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 06:31:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53888)
+	id 1kKfbC-0005He-Rk
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 06:32:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kKfYv-0003AE-L6
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:30:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33210)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kKfaH-0003wo-17
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:31:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39463)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kKfYu-0006Ad-1O
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:30:17 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kKfaF-0006QU-9j
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:31:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600770615;
+ s=mimecast20190719; t=1600770698;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=tQaJ0aggWGudDKfMOsaTf6G5YzJLFw+62F+PgtDgPc4=;
- b=QWO+6NyC7ZwcfpZtb12XEs+pmtOXgVMvO7sLy5EZ9Iqrf/QdtTYpL6fFs5vH+YAKRK8wwW
- xJZdcapmiMLxkx/F6PIk/hWUYjSuiWeBf0jbtoRQ6GcEyYFZrBSQ2TsL6cjHvK4anyv2r2
- 2SwGmvXiUKdNEai7VyBXlNFZL1MSOMg=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-Hb0TjU42MJKwjWBoWZh84g-1; Tue, 22 Sep 2020 06:30:13 -0400
-X-MC-Unique: Hb0TjU42MJKwjWBoWZh84g-1
-Received: by mail-ed1-f71.google.com with SMTP id c3so5586193eds.6
- for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 03:30:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
- :message-id:mime-version;
- bh=tQaJ0aggWGudDKfMOsaTf6G5YzJLFw+62F+PgtDgPc4=;
- b=D+MYT1+iAM1gfe+mt5PePdvcwSAIKwYWd0s+/sFa0iiQRwIzibpHRz8vMoCkxC/4g5
- d0ZFpt96rYVMSyiWDxJVwgXR5Q3kqSqAkzQVC4TwsrI3h6o47UsLdPS9R0XQyv5OpaEh
- aBOHXc1lP9vdpD8ve/oa0G+Itjhdsx4OJdnTz/7kYMvZetHy97dsecYeC2lNnsKmI8AY
- BePkE+Ug/6gg9d+B0w3lxZmdLRrOrKf+l2tIMvsT44xVHhy1uMfD0g7diX/DlZ2wbSEk
- iMZ0G4yrcU85ahrrsQ6f10l804nbHdoKuajyMWUlwtRnsi7/kUe+rmACbnv/TNjQGZfU
- OkDg==
-X-Gm-Message-State: AOAM5337TFMC1/9K5joR1gITIRVN4r5Uphw/mQLTxHjUhNRHT4Fuuw75
- snvsuSKOFv1L3SXSdJL1v5SRTBhFjyNTuOFm/JPnKiQ4HKbYY1L1pEVZsYgSkJOTc/vkvcp3zJK
- F7lSlYrEIhLyN4T8=
-X-Received: by 2002:a17:906:ae45:: with SMTP id
- lf5mr3947906ejb.339.1600770612137; 
- Tue, 22 Sep 2020 03:30:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzW5QpsMDSU3Um0cL6+g8xDkwSfo6AmvX//M+Xp5xxRTVYN2nvDEEbQaJMhGj+Uu68WYrJC9g==
-X-Received: by 2002:a17:906:ae45:: with SMTP id
- lf5mr3947889ejb.339.1600770611935; 
- Tue, 22 Sep 2020 03:30:11 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
- by smtp.gmail.com with ESMTPSA id m10sm10875181ejx.123.2020.09.22.03.30.10
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 22 Sep 2020 03:30:11 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH RFC 12/22] i386: always fill Hyper-V CPUID feature leaves
- from X86CPU data
-In-Reply-To: <20200918223217.GJ57321@habkost.net>
-References: <20200904145431.196885-1-vkuznets@redhat.com>
- <20200904145431.196885-13-vkuznets@redhat.com>
- <20200918223217.GJ57321@habkost.net>
-Date: Tue, 22 Sep 2020 12:30:10 +0200
-Message-ID: <87eemuf6j1.fsf@vitty.brq.redhat.com>
+ content-transfer-encoding:content-transfer-encoding;
+ bh=SHG/AznOFCMT4rKY3pR9HG4Gd+sq0z+OmGOOHtPpKao=;
+ b=G/9uiU2YvcNLguoo1t4txJirfCbX+f2Z7IOR9ullctTxSdmlGG4pqg1ple4+eUErQJHXXB
+ ITxA1el8JWDnoCv27Ca19iYLSo5fuK0uJrZcqhWtpxBwlzoSBww8VChpFBHCysZ8quGMsD
+ sLhZxJ7a/7LcIgmyPGL+mGIwffeOLFE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-199-r-c3fOl7P16IKCIWLIz3Kg-1; Tue, 22 Sep 2020 06:31:36 -0400
+X-MC-Unique: r-c3fOl7P16IKCIWLIz3Kg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17A8710BBEC0;
+ Tue, 22 Sep 2020 10:31:35 +0000 (UTC)
+Received: from t480s.redhat.com (ovpn-113-20.ams2.redhat.com [10.36.113.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B87A027BD1;
+ Tue, 22 Sep 2020 10:31:30 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1 0/8] s390x/tcg: Implement some z14 facilities
+Date: Tue, 22 Sep 2020 12:31:21 +0200
+Message-Id: <20200922103129.12824-1-david@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vkuznets@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=vkuznets@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=david@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 00:31:51
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
@@ -113,69 +89,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+With this patchset, I can boot a kernel compiled for z14 (requiring
+Miscellaneous-Instruction-Extensions Facility 2) (using -cpu max).
 
-> On Fri, Sep 04, 2020 at 04:54:21PM +0200, Vitaly Kuznetsov wrote:
->> We have all the required data in X86CPU already and as we are about to
->> split hyperv_handle_properties() into hyperv_expand_features()/
->> hyperv_fill_cpuids() we can remove the blind copy. The functional change
->> is that QEMU won't pass CPUID leaves it doesn't currently know about
->> to the guest but arguably this is a good change.
->
-> Is it, though?  Maybe we don't want it to be the default, but a
-> blind passthrough mode that copies all CPUID leaves would be
-> useful for testing new features.
->
+I am currently working on "vector-enhancements facility 1", I have most
+stuff in place except:
+- VECTOR FP (MAXIMUM|MINIMUM): needs some manual work to cover all types of
+                               comparisons.
+- VECTOR FP (NEGATIVE) MULTIPLY AND (ADD|SUBTRACT): needs float128_muladd()
 
-We already have Hyper-V features which require extra work to get enabled
-(SynIC, EVMCS). Passing corresponding feature bits to guests without
-actually enabling these features in KVM will likely break them. So a pure
-'blind passthrough' mode is not possible. 
+Once we have that in place, we can convert the QEMU machine to a
+stripped-down z14.
 
->> 
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>  target/i386/kvm.c | 9 ---------
->>  1 file changed, 9 deletions(-)
->> 
->> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->> index 87b83a2aa2cb..b7f0e200a75f 100644
->> --- a/target/i386/kvm.c
->> +++ b/target/i386/kvm.c
->> @@ -1221,9 +1221,6 @@ static int hyperv_handle_properties(CPUState *cs,
->>      }
->>  
->>      if (cpu->hyperv_passthrough) {
->> -        memcpy(cpuid_ent, &cpuid->entries[0],
->> -               cpuid->nent * sizeof(cpuid->entries[0]));
->> -
->>          c = cpuid_find_entry(cpuid, HV_CPUID_VENDOR_AND_MAX_FUNCTIONS, 0);
->>          if (c) {
->>              cpu->hyperv_vendor_id[0] = c->ebx;
->> @@ -1325,12 +1322,6 @@ static int hyperv_handle_properties(CPUState *cs,
->>          goto free;
->>      }
->>  
->> -    if (cpu->hyperv_passthrough) {
->> -        /* We already copied all feature words from KVM as is */
->> -        r = cpuid->nent;
->> -        goto free;
->> -    }
->> -
->>      c = &cpuid_ent[cpuid_i++];
->>      c->function = HV_CPUID_VENDOR_AND_MAX_FUNCTIONS;
->>      c->eax = hyperv_feat_enabled(cpu, HYPERV_FEAT_EVMCS) ?
->> -- 
->> 2.25.4
->> 
+David Hildenbrand (8):
+  s390x/tcg: Implement ADD HALFWORD (AGH)
+  s390x/tcg: Implement SUBTRACT HALFWORD (SGH)
+  s390x/tcg: Implement MULTIPLY (MG, MGRK)
+  s390x/tcg: Implement MULTIPLY HALFWORD (MGH)
+  s390x/tcg: Implement BRANCH INDIRECT ON CONDITION (BIC)
+  s390x/tcg: Implement MULTIPLY SINGLE (MSC, MSGC, MSGRKC, MSRKC)
+  s390x/tcg: We support Miscellaneous-Instruction-Extensions Facility 2
+  s390x/tcg: Implement CIPHER MESSAGE WITH AUTHENTICATION (KMA)
+
+ target/s390x/cc_helper.c    | 34 ++++++++++++++++++++++++++++
+ target/s390x/gen-features.c |  2 ++
+ target/s390x/helper.c       |  2 ++
+ target/s390x/insn-data.def  | 12 ++++++++++
+ target/s390x/internal.h     |  2 ++
+ target/s390x/translate.c    | 45 +++++++++++++++++++++++++++++++++++++
+ 6 files changed, 97 insertions(+)
 
 -- 
-Vitaly
+2.26.2
 
 
