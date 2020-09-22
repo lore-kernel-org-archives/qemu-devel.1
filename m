@@ -2,84 +2,99 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,HTML_OBFUSCATE_05_10,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C218C4363D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 05:19:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F4142C4727C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 05:38:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0CBE23A84
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 05:19:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qnap.com header.i=@qnap.com header.b="F4rBhX7l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0CBE23A84
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qnap.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2DC9223A9C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 05:38:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DC9223A9C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKahs-0006un-Rj
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 01:19:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41378)
+	id 1kKb0u-0003F8-3L
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 01:38:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dereksu@qnap.com>) id 1kKahI-0006Se-G7
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 01:18:36 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54418)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <dereksu@qnap.com>) id 1kKahG-0001LU-8K
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 01:18:36 -0400
-Received: by mail-wm1-x343.google.com with SMTP id s13so1945056wmh.4
- for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 22:18:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qnap.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Kw1tvxYBhKskojKIYFplLjCPX+Er5BLn4d+pxS71Em0=;
- b=F4rBhX7lKUMWnqcKB4VMePxjsdnSfQvaUaNvVo5WHhw2xyoIEGwXaB+ibi35o9SOC1
- Is7wqWsTscfRCC9Ii7MzbSJ6uiykU0qaBabR7Te3aysqMNc3Kjk//3WYsNrdSR5iVA7w
- rVDKEe4XAQVmesFmuhNTO2pPijdKfk57lmGa8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Kw1tvxYBhKskojKIYFplLjCPX+Er5BLn4d+pxS71Em0=;
- b=QMxTQfFuftmnGIN2gqp64MlOPVRl7tsZTrgETPS3w9PVXqx98xHBDuC/ovQu9QxS2z
- dmy5AyhC3Y9KsqIKkpF18JiXkdIzDkuMf0h2spBNeRYZ8MOlbyLGugbsQ5KkTxPr8L8B
- gq4VNaLYHfPWImnDHQQqH8V5aA6fd59kG2wk1ogEfZRgYCSQhayfqocd9oTd5jFju5UG
- k12eA2RvGrYZL9w2PaLNzXXdEmzv33Ax13kElMDYVQ4MesIB64i93ckTZRjP9oXZ5Xie
- LPYJ4GSyFB8bMM1aZ0eqkYYgwTV7hN6KpJi+ne5z2fU8q//QNfUCj7d188XBYalgFpha
- EJ5A==
-X-Gm-Message-State: AOAM531A/YWch7AvOcI63rts1RZPSeMw5lozXkfvsc1LhR5nOkig14/q
- vBE+9Yvy4BkUiELeVNZ6voTpcTwY1eZkbB2m5ic1gA==
-X-Google-Smtp-Source: ABdhPJyKRTs5SBcGdr2OlUDjSLY7gwwt99EyT49A73hGdeDYpTizAvt7ovnPC1LLbre/jcMlnxITZrWJSEXAwnhLy04=
-X-Received: by 2002:a1c:f208:: with SMTP id s8mr2580530wmc.85.1600751911031;
- Mon, 21 Sep 2020 22:18:31 -0700 (PDT)
-MIME-Version: 1.0
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1kKb09-0002oO-Qx
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 01:38:05 -0400
+Received: from mga17.intel.com ([192.55.52.151]:21251)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1kKb06-0003W0-4j
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 01:38:05 -0400
+IronPort-SDR: awqtmLgx54+LgIm0DYLEB1ZVRL0vjv7aTsj9+q6cxqv3fUfBfwVL79Rx3Is+ILWuYCnIPtvvHz
+ m5bWAFc5gZtg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9751"; a="140539314"
+X-IronPort-AV: E=Sophos;i="5.77,289,1596524400"; 
+ d="scan'208,217";a="140539314"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 21 Sep 2020 22:37:59 -0700
+IronPort-SDR: effYwvwQ1PUNE1cRZYMXGZIWMU6M80bvWSOXQkKlVxrHmfl6InhqdSvifmfCM+WPuduhfzp+Qf
+ Mb6LaHdavJ+w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,289,1596524400"; 
+ d="scan'208,217";a="290268945"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+ by fmsmga007.fm.intel.com with ESMTP; 21 Sep 2020 22:37:58 -0700
+Received: from shsmsx601.ccr.corp.intel.com (10.109.6.141) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 21 Sep 2020 22:37:58 -0700
+Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
+ SHSMSX601.ccr.corp.intel.com (10.109.6.141) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Tue, 22 Sep 2020 13:37:56 +0800
+Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
+ SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
+ Tue, 22 Sep 2020 13:37:56 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: Derek Su <dereksu@qnap.com>, "Rao, Lei" <lei.rao@intel.com>
+Subject: RE: [PATCH v1 1/1] COLO: only flush dirty ram pages from colo cache
+Thread-Topic: [PATCH v1 1/1] COLO: only flush dirty ram pages from colo cache
+Thread-Index: AQHWh1/dgjfXRbYmWk6DdoD9BvpKCalzjL0AgACIBWD//3zAAIAAFWGAgAAD0YCAAIs3cA==
+Date: Tue, 22 Sep 2020 05:37:56 +0000
+Message-ID: <e348615c9f0c47d7bfd471698a093535@intel.com>
 References: <20200910104650.1182807-1-dereksu@qnap.com>
  <20200910104650.1182807-2-dereksu@qnap.com>
  <CAKEOLWXPfULXx5-vzg3w-DRS3azhkizo-Ne05FJE+t5mtPd4Mg@mail.gmail.com>
  <b92f4c7b02fd448a949fed3b304cafa8@intel.com>
  <CAKEOLWW+zWuA6BYMcM35pqJFdSS+jz+1OfScsksb5izemfrGig@mail.gmail.com>
  <SN6PR11MB310385A0573115166280241DFD3B0@SN6PR11MB3103.namprd11.prod.outlook.com>
-In-Reply-To: <SN6PR11MB310385A0573115166280241DFD3B0@SN6PR11MB3103.namprd11.prod.outlook.com>
-From: Derek Su <dereksu@qnap.com>
-Date: Tue, 22 Sep 2020 13:18:19 +0800
-Message-ID: <CAKEOLWW+1qkNpBu27eqEvkp-OG4T_xGgpJd=L2i5YJ33WGKFOQ@mail.gmail.com>
-Subject: Re: [PATCH v1 1/1] COLO: only flush dirty ram pages from colo cache
-To: "Rao, Lei" <lei.rao@intel.com>
-Content-Type: multipart/alternative; boundary="00000000000007ebe705afe01914"
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=dereksu@qnap.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -35
-X-Spam_score: -3.6
+ <CAKEOLWW+1qkNpBu27eqEvkp-OG4T_xGgpJd=L2i5YJ33WGKFOQ@mail.gmail.com>
+In-Reply-To: <CAKEOLWW+1qkNpBu27eqEvkp-OG4T_xGgpJd=L2i5YJ33WGKFOQ@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.5.1.3
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.36]
+Content-Type: multipart/alternative;
+ boundary="_000_e348615c9f0c47d7bfd471698a093535intelcom_"
+MIME-Version: 1.0
+Received-SPF: pass client-ip=192.55.52.151; envelope-from=chen.zhang@intel.com;
+ helo=mga17.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 01:37:59
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -38
+X-Spam_score: -3.9
 X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
+ HTML_OBFUSCATE_05_10=0.26, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,8 +108,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhang, Chen" <chen.zhang@intel.com>,
- "quintela@redhat.com" <quintela@redhat.com>,
+Cc: "quintela@redhat.com" <quintela@redhat.com>,
  qemu-devel <qemu-devel@nongnu.org>,
  "dgilbert@redhat.com" <dgilbert@redhat.com>,
  "zhang.zhanghailiang@huawei.com" <zhang.zhanghailiang@huawei.com>
@@ -102,346 +116,296 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000007ebe705afe01914
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+--_000_e348615c9f0c47d7bfd471698a093535intelcom_
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 
-Hi, Lei
+U28sIERlcmVrLCB5b3Ugd2lsbCBzZW5kIG5ldyB2ZXJzaW9uIHBhdGNoPw0KDQpUaGFua3MNClpo
+YW5nIENoZW4NCg0KRnJvbTogRGVyZWsgU3UgPGRlcmVrc3VAcW5hcC5jb20+DQpTZW50OiBUdWVz
+ZGF5LCBTZXB0ZW1iZXIgMjIsIDIwMjAgMToxOCBQTQ0KVG86IFJhbywgTGVpIDxsZWkucmFvQGlu
+dGVsLmNvbT4NCkNjOiBaaGFuZywgQ2hlbiA8Y2hlbi56aGFuZ0BpbnRlbC5jb20+OyBxZW11LWRl
+dmVsIDxxZW11LWRldmVsQG5vbmdudS5vcmc+OyB6aGFuZy56aGFuZ2hhaWxpYW5nQGh1YXdlaS5j
+b207IHF1aW50ZWxhQHJlZGhhdC5jb207IGRnaWxiZXJ0QHJlZGhhdC5jb20NClN1YmplY3Q6IFJl
+OiBbUEFUQ0ggdjEgMS8xXSBDT0xPOiBvbmx5IGZsdXNoIGRpcnR5IHJhbSBwYWdlcyBmcm9tIGNv
+bG8gY2FjaGUNCg0KSGksIExlaQ0KDQpHb3QgaXQuIFRoYW5rcy4NCg0KUmVnYXJkcywNCkRlcmVr
+DQoNClJhbywgTGVpIDxsZWkucmFvQGludGVsLmNvbTxtYWlsdG86bGVpLnJhb0BpbnRlbC5jb20+
+PiDmlrwgMjAyMOW5tDnmnIgyMuaXpSDpgLHkuowg5LiL5Y2IMTowNOWvq+mBk++8mg0KSGksIERl
+cmVrIGFuZCBDaGVuDQoNCnJhbV9idWxrX3N0YWdlIGlzIGZhbHNlIGJ5IGRlZmF1bHQgYmVmb3Jl
+IEhhaWxpYW5nJ3MgcGF0Y2guDQpGb3IgQ09MTywgaXQgZG9lcyBub3Qgc2VlbSB0byBiZSB1c2Vk
+LCBzbyBJIHRoaW5rIHRoZXJlIGlzIG5vIG5lZWQgdG8gcmVzZXQgaXQgdG8gdHJ1ZS4NCg0KVGhh
+bmtzLA0KTGVpLg0KDQpGcm9tOiBEZXJlayBTdSA8ZGVyZWtzdUBxbmFwLmNvbTxtYWlsdG86ZGVy
+ZWtzdUBxbmFwLmNvbT4+DQpTZW50OiBUdWVzZGF5LCBTZXB0ZW1iZXIgMjIsIDIwMjAgMTE6NDgg
+QU0NClRvOiBaaGFuZywgQ2hlbiA8Y2hlbi56aGFuZ0BpbnRlbC5jb208bWFpbHRvOmNoZW4uemhh
+bmdAaW50ZWwuY29tPj4NCkNjOiBxZW11LWRldmVsIDxxZW11LWRldmVsQG5vbmdudS5vcmc8bWFp
+bHRvOnFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4+OyBSYW8sIExlaSA8bGVpLnJhb0BpbnRlbC5jb208
+bWFpbHRvOmxlaS5yYW9AaW50ZWwuY29tPj47IHpoYW5nLnpoYW5naGFpbGlhbmdAaHVhd2VpLmNv
+bTxtYWlsdG86emhhbmcuemhhbmdoYWlsaWFuZ0BodWF3ZWkuY29tPjsgcXVpbnRlbGFAcmVkaGF0
+LmNvbTxtYWlsdG86cXVpbnRlbGFAcmVkaGF0LmNvbT47IGRnaWxiZXJ0QHJlZGhhdC5jb208bWFp
+bHRvOmRnaWxiZXJ0QHJlZGhhdC5jb20+DQpTdWJqZWN0OiBSZTogW1BBVENIIHYxIDEvMV0gQ09M
+Tzogb25seSBmbHVzaCBkaXJ0eSByYW0gcGFnZXMgZnJvbSBjb2xvIGNhY2hlDQoNCkhpLCBDaGVu
+DQoNClN1cmUuDQoNCkJUVywgSSBqdXN0IHdlbnQgdGhyb3VnaCBMZWkncyBwYXRjaC4NCnJhbV9i
+dWxrX3N0YWdlKCkgbWlnaHQgbmVlZCB0byByZXNldCB0byB0cnVlIGFmdGVyIHN0b3BwaW5nIENP
+TE8gc2VydmljZSBhcyBteSBwYXRjaC4NCkhvdyBhYm91dCB5b3VyIG9waW5pb24/DQoNClRoYW5r
+cy4NCg0KDQpCZXN0IHJlZ2FyZHMsDQpEZXJlaw0KDQoNClpoYW5nLCBDaGVuIDxtYWlsdG86Y2hl
+bi56aGFuZ0BpbnRlbC5jb208bWFpbHRvOmNoZW4uemhhbmdAaW50ZWwuY29tPj4g5pa8IDIwMjDl
+ubQ55pyIMjLml6Ug6YCx5LqMIOS4iuWNiDExOjQx5a+r6YGT77yaDQpIaSBEZXJlayBhbmQgTGVp
+LA0KDQpJdCBsb29rcyBzYW1lIHdpdGggTGVp4oCZIHBhdGNoOg0KW1BBVENIIDIvM10gUmVkdWNl
+IHRoZSB0aW1lIG9mIGNoZWNrcG9pbnQgZm9yIENPTE8NCkNhbiB5b3UgZGlzY3VzcyB0byBtZXJn
+ZSBpdCBpbnRvIG9uZSBwYXRjaD8NCg0KVGhhbmtzDQpaaGFuZyBDaGVuDQoNCkZyb206IERlcmVr
+IFN1IDxtYWlsdG86ZGVyZWtzdUBxbmFwLmNvbTxtYWlsdG86ZGVyZWtzdUBxbmFwLmNvbT4+DQpT
+ZW50OiBUdWVzZGF5LCBTZXB0ZW1iZXIgMjIsIDIwMjAgMTE6MzEgQU0NClRvOiBxZW11LWRldmVs
+IDxtYWlsdG86cWVtdS1kZXZlbEBub25nbnUub3JnPG1haWx0bzpxZW11LWRldmVsQG5vbmdudS5v
+cmc+Pg0KQ2M6IG1haWx0bzp6aGFuZy56aGFuZ2hhaWxpYW5nQGh1YXdlaS5jb208bWFpbHRvOnpo
+YW5nLnpoYW5naGFpbGlhbmdAaHVhd2VpLmNvbT47IG1haWx0bzpxdWludGVsYUByZWRoYXQuY29t
+PG1haWx0bzpxdWludGVsYUByZWRoYXQuY29tPjsgbWFpbHRvOmRnaWxiZXJ0QHJlZGhhdC5jb208
+bWFpbHRvOmRnaWxiZXJ0QHJlZGhhdC5jb20+OyBaaGFuZywgQ2hlbiA8bWFpbHRvOmNoZW4uemhh
+bmdAaW50ZWwuY29tPG1haWx0bzpjaGVuLnpoYW5nQGludGVsLmNvbT4+DQpTdWJqZWN0OiBSZTog
+W1BBVENIIHYxIDEvMV0gQ09MTzogb25seSBmbHVzaCBkaXJ0eSByYW0gcGFnZXMgZnJvbSBjb2xv
+IGNhY2hlDQoNCkhlbGxvLCBhbGwNCg0KUGluZy4uLg0KDQpSZWdhcmRzLA0KRGVyZWsgU3UNCg0K
+RGVyZWsgU3UgPG1haWx0bzpkZXJla3N1QHFuYXAuY29tPG1haWx0bzpkZXJla3N1QHFuYXAuY29t
+Pj4g5pa8IDIwMjDlubQ55pyIMTDml6Ug6YCx5ZubIOS4i+WNiDY6NDflr6vpgZPvvJoNCkluIHNl
+Y29uZGFyeSBzaWRlLCB0aGUgY29sb19mbHVzaF9yYW1fY2FjaGUoKSBjYWxscw0KbWlncmF0aW9u
+X2JpdG1hcF9maW5kX2RpcnR5KCkgdG8gZmluZGluZyB0aGUgZGlydHkgcGFnZXMgYW5kDQpmbHVz
+aCB0aGVtIHRvIGhvc3QuIEJ1dCByYW1fc3RhdGUncyByYW1fYnVsa19zdGFnZSBmbGFnIGlzIGFs
+d2F5cw0KZW5hYmxlZCBpbiBzZWNvbmRhcnkgc2lkZSwgaXQgbGVhZHMgdG8gdGhlIHdob2xlIHJh
+bSBwYWdlcyBjb3B5DQppbnN0ZWFkIG9mIG9ubHkgZGlydHkgcGFnZXMuDQoNCkhlcmUsIHRoZSBy
+YW1fYnVsa19zdGFnZSBpbiBzZWNvbmRhcnkgc2lkZSBpcyBkaXNhYmxlZCBpbiB0aGUNCnByZXBh
+cmF0aW9uIG9mIENPTE8gaW5jb21pbmcgcHJvY2VzcyB0byBhdm9pZCB0aGUgd2hvbGUgZGlydHkN
+CnJhbSBwYWdlcyBmbHVzaC4NCg0KU2lnbmVkLW9mZi1ieTogRGVyZWsgU3UgPG1haWx0bzpkZXJl
+a3N1QHFuYXAuY29tPG1haWx0bzpkZXJla3N1QHFuYXAuY29tPj4NCi0tLQ0KIG1pZ3JhdGlvbi9j
+b2xvLmMgfCAgNiArKysrKy0NCiBtaWdyYXRpb24vcmFtLmMgIHwgMTAgKysrKysrKysrKw0KIG1p
+Z3JhdGlvbi9yYW0uaCAgfCAgMyArKysNCiAzIGZpbGVzIGNoYW5nZWQsIDE4IGluc2VydGlvbnMo
+KyksIDEgZGVsZXRpb24oLSkNCg0KZGlmZiAtLWdpdCBhL21pZ3JhdGlvbi9jb2xvLmMgYi9taWdy
+YXRpb24vY29sby5jDQppbmRleCBlYTdkMWU5ZDRlLi42ZTY0NGRiMzA2IDEwMDY0NA0KLS0tIGEv
+bWlncmF0aW9uL2NvbG8uYw0KKysrIGIvbWlncmF0aW9uL2NvbG8uYw0KQEAgLTg0NCw2ICs4NDQs
+OCBAQCB2b2lkICpjb2xvX3Byb2Nlc3NfaW5jb21pbmdfdGhyZWFkKHZvaWQgKm9wYXF1ZSkNCiAg
+ICAgICAgIHJldHVybiBOVUxMOw0KICAgICB9DQoNCisgICAgY29sb19kaXNhYmxlX3JhbV9idWxr
+X3N0YWdlKCk7DQorDQogICAgIGZhaWxvdmVyX2luaXRfc3RhdGUoKTsNCg0KICAgICBtaXMtPnRv
+X3NyY19maWxlID0gcWVtdV9maWxlX2dldF9yZXR1cm5fcGF0aChtaXMtPmZyb21fc3JjX2ZpbGUp
+Ow0KQEAgLTg3Myw3ICs4NzUsNyBAQCB2b2lkICpjb2xvX3Byb2Nlc3NfaW5jb21pbmdfdGhyZWFk
+KHZvaWQgKm9wYXF1ZSkNCiAgICAgICAgIGdvdG8gb3V0Ow0KICAgICB9DQogI2Vsc2UNCi0gICAg
+ICAgIGFib3J0KCk7DQorICAgIGFib3J0KCk7DQogI2VuZGlmDQogICAgIHZtX3N0YXJ0KCk7DQog
+ICAgIHRyYWNlX2NvbG9fdm1fc3RhdGVfY2hhbmdlKCJzdG9wIiwgInJ1biIpOw0KQEAgLTkyNCw2
+ICs5MjYsOCBAQCBvdXQ6DQogICAgICAgICBxZW11X2ZjbG9zZShmYik7DQogICAgIH0NCg0KKyAg
+ICBjb2xvX2VuYWJsZV9yYW1fYnVsa19zdGFnZSgpOw0KKw0KICAgICAvKiBIb3BlIHRoaXMgbm90
+IHRvIGJlIHRvbyBsb25nIHRvIGxvb3AgaGVyZSAqLw0KICAgICBxZW11X3NlbV93YWl0KCZtaXMt
+PmNvbG9faW5jb21pbmdfc2VtKTsNCiAgICAgcWVtdV9zZW1fZGVzdHJveSgmbWlzLT5jb2xvX2lu
+Y29taW5nX3NlbSk7DQpkaWZmIC0tZ2l0IGEvbWlncmF0aW9uL3JhbS5jIGIvbWlncmF0aW9uL3Jh
+bS5jDQppbmRleCA3NmQ0ZmVlNWQ1Li42NWU5YjEyMDU4IDEwMDY0NA0KLS0tIGEvbWlncmF0aW9u
+L3JhbS5jDQorKysgYi9taWdyYXRpb24vcmFtLmMNCkBAIC0zMzU3LDYgKzMzNTcsMTYgQEAgc3Rh
+dGljIGJvb2wgcG9zdGNvcHlfaXNfcnVubmluZyh2b2lkKQ0KICAgICByZXR1cm4gcHMgPj0gUE9T
+VENPUFlfSU5DT01JTkdfTElTVEVOSU5HICYmIHBzIDwgUE9TVENPUFlfSU5DT01JTkdfRU5EOw0K
+IH0NCg0KK3ZvaWQgY29sb19lbmFibGVfcmFtX2J1bGtfc3RhZ2Uodm9pZCkNCit7DQorICAgIHJh
+bV9zdGF0ZS0+cmFtX2J1bGtfc3RhZ2UgPSB0cnVlOw0KK30NCisNCit2b2lkIGNvbG9fZGlzYWJs
+ZV9yYW1fYnVsa19zdGFnZSh2b2lkKQ0KK3sNCisgICAgcmFtX3N0YXRlLT5yYW1fYnVsa19zdGFn
+ZSA9IGZhbHNlOw0KK30NCisNCiAvKg0KICAqIEZsdXNoIGNvbnRlbnQgb2YgUkFNIGNhY2hlIGlu
+dG8gU1ZNJ3MgbWVtb3J5Lg0KICAqIE9ubHkgZmx1c2ggdGhlIHBhZ2VzIHRoYXQgYmUgZGlydGll
+ZCBieSBQVk0gb3IgU1ZNIG9yIGJvdGguDQpkaWZmIC0tZ2l0IGEvbWlncmF0aW9uL3JhbS5oIGIv
+bWlncmF0aW9uL3JhbS5oDQppbmRleCAyZWVhYWNmYTEzLi5jMWMwZWJiZTBmIDEwMDY0NA0KLS0t
+IGEvbWlncmF0aW9uL3JhbS5oDQorKysgYi9taWdyYXRpb24vcmFtLmgNCkBAIC02OSw0ICs2OSw3
+IEBAIHZvaWQgY29sb19mbHVzaF9yYW1fY2FjaGUodm9pZCk7DQogdm9pZCBjb2xvX3JlbGVhc2Vf
+cmFtX2NhY2hlKHZvaWQpOw0KIHZvaWQgY29sb19pbmNvbWluZ19zdGFydF9kaXJ0eV9sb2codm9p
+ZCk7DQoNCit2b2lkIGNvbG9fZW5hYmxlX3JhbV9idWxrX3N0YWdlKHZvaWQpOw0KK3ZvaWQgY29s
+b19kaXNhYmxlX3JhbV9idWxrX3N0YWdlKHZvaWQpOw0KKw0KICNlbmRpZg0KLS0NCjIuMjUuMQ0K
 
-Got it. Thanks.
+--_000_e348615c9f0c47d7bfd471698a093535intelcom_
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: base64
 
-Regards,
-Derek
+PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
+bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
+YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
+cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
+VFIvUkVDLWh0bWw0MCI+DQo8aGVhZD4NCjxtZXRhIGh0dHAtZXF1aXY9IkNvbnRlbnQtVHlwZSIg
+Y29udGVudD0idGV4dC9odG1sOyBjaGFyc2V0PXV0Zi04Ij4NCjxtZXRhIG5hbWU9IkdlbmVyYXRv
+ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTUgKGZpbHRlcmVkIG1lZGl1bSkiPg0KPHN0eWxl
+PjwhLS0NCi8qIEZvbnQgRGVmaW5pdGlvbnMgKi8NCkBmb250LWZhY2UNCgl7Zm9udC1mYW1pbHk6
+IkNhbWJyaWEgTWF0aCI7DQoJcGFub3NlLTE6MiA0IDUgMyA1IDQgNiAzIDIgNDt9DQpAZm9udC1m
+YWNlDQoJe2ZvbnQtZmFtaWx5OkRlbmdYaWFuOw0KCXBhbm9zZS0xOjIgMSA2IDAgMyAxIDEgMSAx
+IDE7fQ0KQGZvbnQtZmFjZQ0KCXtmb250LWZhbWlseTpDYWxpYnJpOw0KCXBhbm9zZS0xOjIgMTUg
+NSAyIDIgMiA0IDMgMiA0O30NCkBmb250LWZhY2UNCgl7Zm9udC1mYW1pbHk6IlxARGVuZ1hpYW4i
+Ow0KCXBhbm9zZS0xOjIgMSA2IDAgMyAxIDEgMSAxIDE7fQ0KLyogU3R5bGUgRGVmaW5pdGlvbnMg
+Ki8NCnAuTXNvTm9ybWFsLCBsaS5Nc29Ob3JtYWwsIGRpdi5Nc29Ob3JtYWwNCgl7bWFyZ2luOjBp
+bjsNCgltYXJnaW4tYm90dG9tOi4wMDAxcHQ7DQoJZm9udC1zaXplOjExLjBwdDsNCglmb250LWZh
+bWlseToiQ2FsaWJyaSIsc2Fucy1zZXJpZjt9DQphOmxpbmssIHNwYW4uTXNvSHlwZXJsaW5rDQoJ
+e21zby1zdHlsZS1wcmlvcml0eTo5OTsNCgljb2xvcjpibHVlOw0KCXRleHQtZGVjb3JhdGlvbjp1
+bmRlcmxpbmU7fQ0Kc3Bhbi5FbWFpbFN0eWxlMTgNCgl7bXNvLXN0eWxlLXR5cGU6cGVyc29uYWwt
+cmVwbHk7DQoJZm9udC1mYW1pbHk6IkNhbGlicmkiLHNhbnMtc2VyaWY7DQoJY29sb3I6d2luZG93
+dGV4dDt9DQouTXNvQ2hwRGVmYXVsdA0KCXttc28tc3R5bGUtdHlwZTpleHBvcnQtb25seTsNCglm
+b250LWZhbWlseToiQ2FsaWJyaSIsc2Fucy1zZXJpZjt9DQpAcGFnZSBXb3JkU2VjdGlvbjENCgl7
+c2l6ZTo4LjVpbiAxMS4waW47DQoJbWFyZ2luOjEuMGluIDEuMGluIDEuMGluIDEuMGluO30NCmRp
+di5Xb3JkU2VjdGlvbjENCgl7cGFnZTpXb3JkU2VjdGlvbjE7fQ0KLS0+PC9zdHlsZT48IS0tW2lm
+IGd0ZSBtc28gOV0+PHhtbD4NCjxvOnNoYXBlZGVmYXVsdHMgdjpleHQ9ImVkaXQiIHNwaWRtYXg9
+IjEwMjYiIC8+DQo8L3htbD48IVtlbmRpZl0tLT48IS0tW2lmIGd0ZSBtc28gOV0+PHhtbD4NCjxv
+OnNoYXBlbGF5b3V0IHY6ZXh0PSJlZGl0Ij4NCjxvOmlkbWFwIHY6ZXh0PSJlZGl0IiBkYXRhPSIx
+IiAvPg0KPC9vOnNoYXBlbGF5b3V0PjwveG1sPjwhW2VuZGlmXS0tPg0KPC9oZWFkPg0KPGJvZHkg
+bGFuZz0iRU4tVVMiIGxpbms9ImJsdWUiIHZsaW5rPSJwdXJwbGUiPg0KPGRpdiBjbGFzcz0iV29y
+ZFNlY3Rpb24xIj4NCjxwIGNsYXNzPSJNc29Ob3JtYWwiPlNvLCBEZXJlaywgeW91IHdpbGwgc2Vu
+ZCBuZXcgdmVyc2lvbiBwYXRjaD88bzpwPjwvbzpwPjwvcD4NCjxwIGNsYXNzPSJNc29Ob3JtYWwi
+PjxvOnA+Jm5ic3A7PC9vOnA+PC9wPg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+VGhhbmtzPG86cD48
+L286cD48L3A+DQo8cCBjbGFzcz0iTXNvTm9ybWFsIj5aaGFuZyBDaGVuPG86cD48L286cD48L3A+
+DQo8cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4NCjxkaXYgc3R5bGU9
+ImJvcmRlcjpub25lO2JvcmRlci1sZWZ0OnNvbGlkIGJsdWUgMS41cHQ7cGFkZGluZzowaW4gMGlu
+IDBpbiA0LjBwdCI+DQo8ZGl2Pg0KPGRpdiBzdHlsZT0iYm9yZGVyOm5vbmU7Ym9yZGVyLXRvcDpz
+b2xpZCAjRTFFMUUxIDEuMHB0O3BhZGRpbmc6My4wcHQgMGluIDBpbiAwaW4iPg0KPHAgY2xhc3M9
+Ik1zb05vcm1hbCI+PGI+RnJvbTo8L2I+IERlcmVrIFN1ICZsdDtkZXJla3N1QHFuYXAuY29tJmd0
+OyA8YnI+DQo8Yj5TZW50OjwvYj4gVHVlc2RheSwgU2VwdGVtYmVyIDIyLCAyMDIwIDE6MTggUE08
+YnI+DQo8Yj5Ubzo8L2I+IFJhbywgTGVpICZsdDtsZWkucmFvQGludGVsLmNvbSZndDs8YnI+DQo8
+Yj5DYzo8L2I+IFpoYW5nLCBDaGVuICZsdDtjaGVuLnpoYW5nQGludGVsLmNvbSZndDs7IHFlbXUt
+ZGV2ZWwgJmx0O3FlbXUtZGV2ZWxAbm9uZ251Lm9yZyZndDs7IHpoYW5nLnpoYW5naGFpbGlhbmdA
+aHVhd2VpLmNvbTsgcXVpbnRlbGFAcmVkaGF0LmNvbTsgZGdpbGJlcnRAcmVkaGF0LmNvbTxicj4N
+CjxiPlN1YmplY3Q6PC9iPiBSZTogW1BBVENIIHYxIDEvMV0gQ09MTzogb25seSBmbHVzaCBkaXJ0
+eSByYW0gcGFnZXMgZnJvbSBjb2xvIGNhY2hlPG86cD48L286cD48L3A+DQo8L2Rpdj4NCjwvZGl2
+Pg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PG86cD4mbmJzcDs8L286cD48L3A+DQo8ZGl2Pg0KPGRp
+dj4NCjxkaXY+DQo8ZGl2Pg0KPGRpdj4NCjxkaXY+DQo8ZGl2Pg0KPGRpdj4NCjxkaXY+DQo8cCBj
+bGFzcz0iTXNvTm9ybWFsIj5IaSwgTGVpPG86cD48L286cD48L3A+DQo8L2Rpdj4NCjxkaXY+DQo8
+cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4NCjwvZGl2Pg0KPGRpdj4N
+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPkdvdCBpdC4gVGhhbmtzLjxvOnA+PC9vOnA+PC9wPg0KPC9k
+aXY+DQo8ZGl2Pg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PG86cD4mbmJzcDs8L286cD48L3A+DQo8
+L2Rpdj4NCjxkaXY+DQo8cCBjbGFzcz0iTXNvTm9ybWFsIj5SZWdhcmRzLDxvOnA+PC9vOnA+PC9w
+Pg0KPC9kaXY+DQo8ZGl2Pg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+RGVyZWs8bzpwPjwvbzpwPjwv
+cD4NCjwvZGl2Pg0KPGRpdj4NCjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+
+PC9wPg0KPC9kaXY+DQo8L2Rpdj4NCjwvZGl2Pg0KPC9kaXY+DQo8L2Rpdj4NCjwvZGl2Pg0KPC9k
+aXY+DQo8L2Rpdj4NCjxkaXY+DQo8ZGl2Pg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+UmFvLCBMZWkg
+Jmx0OzxhIGhyZWY9Im1haWx0bzpsZWkucmFvQGludGVsLmNvbSIgdGFyZ2V0PSJfYmxhbmsiPmxl
+aS5yYW9AaW50ZWwuY29tPC9hPiZndDsNCjxzcGFuIGxhbmc9IlpILUNOIiBzdHlsZT0iZm9udC1m
+YW1pbHk6RGVuZ1hpYW4iPuaWvDwvc3Bhbj4gMjAyMDxzcGFuIGxhbmc9IlpILUNOIiBzdHlsZT0i
+Zm9udC1mYW1pbHk6RGVuZ1hpYW4iPuW5tDwvc3Bhbj45PHNwYW4gbGFuZz0iWkgtQ04iIHN0eWxl
+PSJmb250LWZhbWlseTpEZW5nWGlhbiI+5pyIPC9zcGFuPjIyPHNwYW4gbGFuZz0iWkgtQ04iIHN0
+eWxlPSJmb250LWZhbWlseTpEZW5nWGlhbiI+5pelPC9zcGFuPjxzcGFuIGxhbmc9IlpILUNOIj4N
+Cjwvc3Bhbj48c3BhbiBsYW5nPSJaSC1DTiIgc3R5bGU9ImZvbnQtZmFtaWx5OkRlbmdYaWFuIj7p
+gLHkuow8L3NwYW4+PHNwYW4gbGFuZz0iWkgtQ04iPg0KPC9zcGFuPjxzcGFuIGxhbmc9IlpILUNO
+IiBzdHlsZT0iZm9udC1mYW1pbHk6RGVuZ1hpYW4iPuS4i+WNiDwvc3Bhbj4xOjA0PHNwYW4gbGFu
+Zz0iWkgtQ04iIHN0eWxlPSJmb250LWZhbWlseTpEZW5nWGlhbiI+5a+r6YGT77yaPC9zcGFuPjxv
+OnA+PC9vOnA+PC9wPg0KPC9kaXY+DQo8YmxvY2txdW90ZSBzdHlsZT0iYm9yZGVyOm5vbmU7Ym9y
+ZGVyLWxlZnQ6c29saWQgI0NDQ0NDQyAxLjBwdDtwYWRkaW5nOjBpbiAwaW4gMGluIDYuMHB0O21h
+cmdpbi1sZWZ0OjQuOHB0O21hcmdpbi1yaWdodDowaW4iPg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+
+SGksIERlcmVrIGFuZCBDaGVuPGJyPg0KPGJyPg0KcmFtX2J1bGtfc3RhZ2UgaXMgZmFsc2UgYnkg
+ZGVmYXVsdCBiZWZvcmUgSGFpbGlhbmcncyBwYXRjaC48YnI+DQpGb3IgQ09MTywgaXQgZG9lcyBu
+b3Qgc2VlbSB0byBiZSB1c2VkLCBzbyBJIHRoaW5rIHRoZXJlIGlzIG5vIG5lZWQgdG8gcmVzZXQg
+aXQgdG8gdHJ1ZS48YnI+DQo8YnI+DQpUaGFua3MsPGJyPg0KTGVpLjxicj4NCjxicj4NCkZyb206
+IERlcmVrIFN1ICZsdDs8YSBocmVmPSJtYWlsdG86ZGVyZWtzdUBxbmFwLmNvbSIgdGFyZ2V0PSJf
+YmxhbmsiPmRlcmVrc3VAcW5hcC5jb208L2E+Jmd0Ow0KPGJyPg0KU2VudDogVHVlc2RheSwgU2Vw
+dGVtYmVyIDIyLCAyMDIwIDExOjQ4IEFNPGJyPg0KVG86IFpoYW5nLCBDaGVuICZsdDs8YSBocmVm
+PSJtYWlsdG86Y2hlbi56aGFuZ0BpbnRlbC5jb20iIHRhcmdldD0iX2JsYW5rIj5jaGVuLnpoYW5n
+QGludGVsLmNvbTwvYT4mZ3Q7PGJyPg0KQ2M6IHFlbXUtZGV2ZWwgJmx0OzxhIGhyZWY9Im1haWx0
+bzpxZW11LWRldmVsQG5vbmdudS5vcmciIHRhcmdldD0iX2JsYW5rIj5xZW11LWRldmVsQG5vbmdu
+dS5vcmc8L2E+Jmd0OzsgUmFvLCBMZWkgJmx0OzxhIGhyZWY9Im1haWx0bzpsZWkucmFvQGludGVs
+LmNvbSIgdGFyZ2V0PSJfYmxhbmsiPmxlaS5yYW9AaW50ZWwuY29tPC9hPiZndDs7DQo8YSBocmVm
+PSJtYWlsdG86emhhbmcuemhhbmdoYWlsaWFuZ0BodWF3ZWkuY29tIiB0YXJnZXQ9Il9ibGFuayI+
+emhhbmcuemhhbmdoYWlsaWFuZ0BodWF3ZWkuY29tPC9hPjsNCjxhIGhyZWY9Im1haWx0bzpxdWlu
+dGVsYUByZWRoYXQuY29tIiB0YXJnZXQ9Il9ibGFuayI+cXVpbnRlbGFAcmVkaGF0LmNvbTwvYT47
+IDxhIGhyZWY9Im1haWx0bzpkZ2lsYmVydEByZWRoYXQuY29tIiB0YXJnZXQ9Il9ibGFuayI+DQpk
+Z2lsYmVydEByZWRoYXQuY29tPC9hPjxicj4NClN1YmplY3Q6IFJlOiBbUEFUQ0ggdjEgMS8xXSBD
+T0xPOiBvbmx5IGZsdXNoIGRpcnR5IHJhbSBwYWdlcyBmcm9tIGNvbG8gY2FjaGU8YnI+DQo8YnI+
+DQpIaSwgQ2hlbjxicj4NCjxicj4NClN1cmUuPGJyPg0KPGJyPg0KQlRXLCBJIGp1c3Qgd2VudCB0
+aHJvdWdoIExlaSdzIHBhdGNoLjxicj4NCnJhbV9idWxrX3N0YWdlKCkgbWlnaHQgbmVlZCB0byBy
+ZXNldCB0byB0cnVlIGFmdGVyIHN0b3BwaW5nIENPTE8gc2VydmljZSBhcyBteSBwYXRjaC48YnI+
+DQpIb3cgYWJvdXQgeW91ciBvcGluaW9uPzxicj4NCjxicj4NClRoYW5rcy48YnI+DQo8YnI+DQo8
+YnI+DQpCZXN0IHJlZ2FyZHMsPGJyPg0KRGVyZWs8YnI+DQo8YnI+DQo8YnI+DQpaaGFuZywgQ2hl
+biAmbHQ7bWFpbHRvOjxhIGhyZWY9Im1haWx0bzpjaGVuLnpoYW5nQGludGVsLmNvbSIgdGFyZ2V0
+PSJfYmxhbmsiPmNoZW4uemhhbmdAaW50ZWwuY29tPC9hPiZndDsNCjxzcGFuIGxhbmc9IlpILUNO
+IiBzdHlsZT0iZm9udC1mYW1pbHk6RGVuZ1hpYW4iPuaWvDwvc3Bhbj4gMjAyMDxzcGFuIGxhbmc9
+IlpILUNOIiBzdHlsZT0iZm9udC1mYW1pbHk6RGVuZ1hpYW4iPuW5tDwvc3Bhbj45PHNwYW4gbGFu
+Zz0iWkgtQ04iIHN0eWxlPSJmb250LWZhbWlseTpEZW5nWGlhbiI+5pyIPC9zcGFuPjIyPHNwYW4g
+bGFuZz0iWkgtQ04iIHN0eWxlPSJmb250LWZhbWlseTpEZW5nWGlhbiI+5pelPC9zcGFuPjxzcGFu
+IGxhbmc9IlpILUNOIj4NCjwvc3Bhbj48c3BhbiBsYW5nPSJaSC1DTiIgc3R5bGU9ImZvbnQtZmFt
+aWx5OkRlbmdYaWFuIj7pgLHkuow8L3NwYW4+PHNwYW4gbGFuZz0iWkgtQ04iPg0KPC9zcGFuPjxz
+cGFuIGxhbmc9IlpILUNOIiBzdHlsZT0iZm9udC1mYW1pbHk6RGVuZ1hpYW4iPuS4iuWNiDwvc3Bh
+bj4xMTo0MTxzcGFuIGxhbmc9IlpILUNOIiBzdHlsZT0iZm9udC1mYW1pbHk6RGVuZ1hpYW4iPuWv
+q+mBk++8mjwvc3Bhbj48YnI+DQpIaSBEZXJlayBhbmQgTGVpLDxicj4NCiZuYnNwOzxicj4NCkl0
+IGxvb2tzIHNhbWUgd2l0aCBMZWnigJkgcGF0Y2g6PGJyPg0KW1BBVENIIDIvM10gUmVkdWNlIHRo
+ZSB0aW1lIG9mIGNoZWNrcG9pbnQgZm9yIENPTE88YnI+DQpDYW4geW91IGRpc2N1c3MgdG8gbWVy
+Z2UgaXQgaW50byBvbmUgcGF0Y2g/PGJyPg0KJm5ic3A7PGJyPg0KVGhhbmtzPGJyPg0KWmhhbmcg
+Q2hlbjxicj4NCiZuYnNwOzxicj4NCkZyb206IERlcmVrIFN1ICZsdDttYWlsdG86PGEgaHJlZj0i
+bWFpbHRvOmRlcmVrc3VAcW5hcC5jb20iIHRhcmdldD0iX2JsYW5rIj5kZXJla3N1QHFuYXAuY29t
+PC9hPiZndDsNCjxicj4NClNlbnQ6IFR1ZXNkYXksIFNlcHRlbWJlciAyMiwgMjAyMCAxMTozMSBB
+TTxicj4NClRvOiBxZW11LWRldmVsICZsdDttYWlsdG86PGEgaHJlZj0ibWFpbHRvOnFlbXUtZGV2
+ZWxAbm9uZ251Lm9yZyIgdGFyZ2V0PSJfYmxhbmsiPnFlbXUtZGV2ZWxAbm9uZ251Lm9yZzwvYT4m
+Z3Q7PGJyPg0KQ2M6IG1haWx0bzo8YSBocmVmPSJtYWlsdG86emhhbmcuemhhbmdoYWlsaWFuZ0Bo
+dWF3ZWkuY29tIiB0YXJnZXQ9Il9ibGFuayI+emhhbmcuemhhbmdoYWlsaWFuZ0BodWF3ZWkuY29t
+PC9hPjsgbWFpbHRvOjxhIGhyZWY9Im1haWx0bzpxdWludGVsYUByZWRoYXQuY29tIiB0YXJnZXQ9
+Il9ibGFuayI+cXVpbnRlbGFAcmVkaGF0LmNvbTwvYT47IG1haWx0bzo8YSBocmVmPSJtYWlsdG86
+ZGdpbGJlcnRAcmVkaGF0LmNvbSIgdGFyZ2V0PSJfYmxhbmsiPmRnaWxiZXJ0QHJlZGhhdC5jb208
+L2E+Ow0KIFpoYW5nLCBDaGVuICZsdDttYWlsdG86PGEgaHJlZj0ibWFpbHRvOmNoZW4uemhhbmdA
+aW50ZWwuY29tIiB0YXJnZXQ9Il9ibGFuayI+Y2hlbi56aGFuZ0BpbnRlbC5jb208L2E+Jmd0Ozxi
+cj4NClN1YmplY3Q6IFJlOiBbUEFUQ0ggdjEgMS8xXSBDT0xPOiBvbmx5IGZsdXNoIGRpcnR5IHJh
+bSBwYWdlcyBmcm9tIGNvbG8gY2FjaGU8YnI+DQombmJzcDs8YnI+DQpIZWxsbywgYWxsPGJyPg0K
+Jm5ic3A7PGJyPg0KUGluZy4uLjxicj4NCiZuYnNwOzxicj4NClJlZ2FyZHMsPGJyPg0KRGVyZWsg
+U3U8YnI+DQombmJzcDs8YnI+DQpEZXJlayBTdSAmbHQ7bWFpbHRvOjxhIGhyZWY9Im1haWx0bzpk
+ZXJla3N1QHFuYXAuY29tIiB0YXJnZXQ9Il9ibGFuayI+ZGVyZWtzdUBxbmFwLmNvbTwvYT4mZ3Q7
+DQo8c3BhbiBsYW5nPSJaSC1DTiIgc3R5bGU9ImZvbnQtZmFtaWx5OkRlbmdYaWFuIj7mlrw8L3Nw
+YW4+IDIwMjA8c3BhbiBsYW5nPSJaSC1DTiIgc3R5bGU9ImZvbnQtZmFtaWx5OkRlbmdYaWFuIj7l
+ubQ8L3NwYW4+OTxzcGFuIGxhbmc9IlpILUNOIiBzdHlsZT0iZm9udC1mYW1pbHk6RGVuZ1hpYW4i
+PuaciDwvc3Bhbj4xMDxzcGFuIGxhbmc9IlpILUNOIiBzdHlsZT0iZm9udC1mYW1pbHk6RGVuZ1hp
+YW4iPuaXpTwvc3Bhbj48c3BhbiBsYW5nPSJaSC1DTiI+DQo8L3NwYW4+PHNwYW4gbGFuZz0iWkgt
+Q04iIHN0eWxlPSJmb250LWZhbWlseTpEZW5nWGlhbiI+6YCx5ZubPC9zcGFuPjxzcGFuIGxhbmc9
+IlpILUNOIj4NCjwvc3Bhbj48c3BhbiBsYW5nPSJaSC1DTiIgc3R5bGU9ImZvbnQtZmFtaWx5OkRl
+bmdYaWFuIj7kuIvljYg8L3NwYW4+Njo0NzxzcGFuIGxhbmc9IlpILUNOIiBzdHlsZT0iZm9udC1m
+YW1pbHk6RGVuZ1hpYW4iPuWvq+mBk++8mjwvc3Bhbj48YnI+DQpJbiBzZWNvbmRhcnkgc2lkZSwg
+dGhlIGNvbG9fZmx1c2hfcmFtX2NhY2hlKCkgY2FsbHM8YnI+DQptaWdyYXRpb25fYml0bWFwX2Zp
+bmRfZGlydHkoKSB0byBmaW5kaW5nIHRoZSBkaXJ0eSBwYWdlcyBhbmQ8YnI+DQpmbHVzaCB0aGVt
+IHRvIGhvc3QuIEJ1dCByYW1fc3RhdGUncyByYW1fYnVsa19zdGFnZSBmbGFnIGlzIGFsd2F5czxi
+cj4NCmVuYWJsZWQgaW4gc2Vjb25kYXJ5IHNpZGUsIGl0IGxlYWRzIHRvIHRoZSB3aG9sZSByYW0g
+cGFnZXMgY29weTxicj4NCmluc3RlYWQgb2Ygb25seSBkaXJ0eSBwYWdlcy48YnI+DQo8YnI+DQpI
+ZXJlLCB0aGUgcmFtX2J1bGtfc3RhZ2UgaW4gc2Vjb25kYXJ5IHNpZGUgaXMgZGlzYWJsZWQgaW4g
+dGhlPGJyPg0KcHJlcGFyYXRpb24gb2YgQ09MTyBpbmNvbWluZyBwcm9jZXNzIHRvIGF2b2lkIHRo
+ZSB3aG9sZSBkaXJ0eTxicj4NCnJhbSBwYWdlcyBmbHVzaC48YnI+DQo8YnI+DQpTaWduZWQtb2Zm
+LWJ5OiBEZXJlayBTdSAmbHQ7bWFpbHRvOjxhIGhyZWY9Im1haWx0bzpkZXJla3N1QHFuYXAuY29t
+IiB0YXJnZXQ9Il9ibGFuayI+ZGVyZWtzdUBxbmFwLmNvbTwvYT4mZ3Q7PGJyPg0KLS0tPGJyPg0K
+Jm5ic3A7bWlncmF0aW9uL2NvbG8uYyB8Jm5ic3A7IDYgJiM0MzsmIzQzOyYjNDM7JiM0MzsmIzQz
+Oy08YnI+DQombmJzcDttaWdyYXRpb24vcmFtLmMmbmJzcDsgfCAxMCAmIzQzOyYjNDM7JiM0Mzsm
+IzQzOyYjNDM7JiM0MzsmIzQzOyYjNDM7JiM0MzsmIzQzOzxicj4NCiZuYnNwO21pZ3JhdGlvbi9y
+YW0uaCZuYnNwOyB8Jm5ic3A7IDMgJiM0MzsmIzQzOyYjNDM7PGJyPg0KJm5ic3A7MyBmaWxlcyBj
+aGFuZ2VkLCAxOCBpbnNlcnRpb25zKCYjNDM7KSwgMSBkZWxldGlvbigtKTxicj4NCjxicj4NCmRp
+ZmYgLS1naXQgYS9taWdyYXRpb24vY29sby5jIGIvbWlncmF0aW9uL2NvbG8uYzxicj4NCmluZGV4
+IGVhN2QxZTlkNGUuLjZlNjQ0ZGIzMDYgMTAwNjQ0PGJyPg0KLS0tIGEvbWlncmF0aW9uL2NvbG8u
+Yzxicj4NCiYjNDM7JiM0MzsmIzQzOyBiL21pZ3JhdGlvbi9jb2xvLmM8YnI+DQpAQCAtODQ0LDYg
+JiM0Mzs4NDQsOCBAQCB2b2lkICpjb2xvX3Byb2Nlc3NfaW5jb21pbmdfdGhyZWFkKHZvaWQgKm9w
+YXF1ZSk8YnI+DQombmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7cmV0dXJuIE5VTEw7
+PGJyPg0KJm5ic3A7ICZuYnNwOyAmbmJzcDt9PGJyPg0KPGJyPg0KJiM0MzsmbmJzcDsgJm5ic3A7
+IGNvbG9fZGlzYWJsZV9yYW1fYnVsa19zdGFnZSgpOzxicj4NCiYjNDM7PGJyPg0KJm5ic3A7ICZu
+YnNwOyAmbmJzcDtmYWlsb3Zlcl9pbml0X3N0YXRlKCk7PGJyPg0KPGJyPg0KJm5ic3A7ICZuYnNw
+OyAmbmJzcDttaXMtJmd0O3RvX3NyY19maWxlID0gcWVtdV9maWxlX2dldF9yZXR1cm5fcGF0aCht
+aXMtJmd0O2Zyb21fc3JjX2ZpbGUpOzxicj4NCkBAIC04NzMsNyAmIzQzOzg3NSw3IEBAIHZvaWQg
+KmNvbG9fcHJvY2Vzc19pbmNvbWluZ190aHJlYWQodm9pZCAqb3BhcXVlKTxicj4NCiZuYnNwOyAm
+bmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDtnb3RvIG91dDs8YnI+DQombmJzcDsgJm5ic3A7ICZu
+YnNwO308YnI+DQombmJzcDsjZWxzZTxicj4NCi0mbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsg
+YWJvcnQoKTs8YnI+DQomIzQzOyZuYnNwOyAmbmJzcDsgYWJvcnQoKTs8YnI+DQombmJzcDsjZW5k
+aWY8YnI+DQombmJzcDsgJm5ic3A7ICZuYnNwO3ZtX3N0YXJ0KCk7PGJyPg0KJm5ic3A7ICZuYnNw
+OyAmbmJzcDt0cmFjZV9jb2xvX3ZtX3N0YXRlX2NoYW5nZSgmcXVvdDtzdG9wJnF1b3Q7LCAmcXVv
+dDtydW4mcXVvdDspOzxicj4NCkBAIC05MjQsNiAmIzQzOzkyNiw4IEBAIG91dDo8YnI+DQombmJz
+cDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7cWVtdV9mY2xvc2UoZmIpOzxicj4NCiZuYnNw
+OyAmbmJzcDsgJm5ic3A7fTxicj4NCjxicj4NCiYjNDM7Jm5ic3A7ICZuYnNwOyBjb2xvX2VuYWJs
+ZV9yYW1fYnVsa19zdGFnZSgpOzxicj4NCiYjNDM7PGJyPg0KJm5ic3A7ICZuYnNwOyAmbmJzcDsv
+KiBIb3BlIHRoaXMgbm90IHRvIGJlIHRvbyBsb25nIHRvIGxvb3AgaGVyZSAqLzxicj4NCiZuYnNw
+OyAmbmJzcDsgJm5ic3A7cWVtdV9zZW1fd2FpdCgmYW1wO21pcy0mZ3Q7Y29sb19pbmNvbWluZ19z
+ZW0pOzxicj4NCiZuYnNwOyAmbmJzcDsgJm5ic3A7cWVtdV9zZW1fZGVzdHJveSgmYW1wO21pcy0m
+Z3Q7Y29sb19pbmNvbWluZ19zZW0pOzxicj4NCmRpZmYgLS1naXQgYS9taWdyYXRpb24vcmFtLmMg
+Yi9taWdyYXRpb24vcmFtLmM8YnI+DQppbmRleCA3NmQ0ZmVlNWQ1Li42NWU5YjEyMDU4IDEwMDY0
+NDxicj4NCi0tLSBhL21pZ3JhdGlvbi9yYW0uYzxicj4NCiYjNDM7JiM0MzsmIzQzOyBiL21pZ3Jh
+dGlvbi9yYW0uYzxicj4NCkBAIC0zMzU3LDYgJiM0MzszMzU3LDE2IEBAIHN0YXRpYyBib29sIHBv
+c3Rjb3B5X2lzX3J1bm5pbmcodm9pZCk8YnI+DQombmJzcDsgJm5ic3A7ICZuYnNwO3JldHVybiBw
+cyAmZ3Q7PSBQT1NUQ09QWV9JTkNPTUlOR19MSVNURU5JTkcgJmFtcDsmYW1wOyBwcyAmbHQ7IFBP
+U1RDT1BZX0lOQ09NSU5HX0VORDs8YnI+DQombmJzcDt9PGJyPg0KPGJyPg0KJiM0Mzt2b2lkIGNv
+bG9fZW5hYmxlX3JhbV9idWxrX3N0YWdlKHZvaWQpPGJyPg0KJiM0Mzt7PGJyPg0KJiM0MzsmbmJz
+cDsgJm5ic3A7IHJhbV9zdGF0ZS0mZ3Q7cmFtX2J1bGtfc3RhZ2UgPSB0cnVlOzxicj4NCiYjNDM7
+fTxicj4NCiYjNDM7PGJyPg0KJiM0Mzt2b2lkIGNvbG9fZGlzYWJsZV9yYW1fYnVsa19zdGFnZSh2
+b2lkKTxicj4NCiYjNDM7ezxicj4NCiYjNDM7Jm5ic3A7ICZuYnNwOyByYW1fc3RhdGUtJmd0O3Jh
+bV9idWxrX3N0YWdlID0gZmFsc2U7PGJyPg0KJiM0Mzt9PGJyPg0KJiM0Mzs8YnI+DQombmJzcDsv
+Kjxicj4NCiZuYnNwOyAqIEZsdXNoIGNvbnRlbnQgb2YgUkFNIGNhY2hlIGludG8gU1ZNJ3MgbWVt
+b3J5Ljxicj4NCiZuYnNwOyAqIE9ubHkgZmx1c2ggdGhlIHBhZ2VzIHRoYXQgYmUgZGlydGllZCBi
+eSBQVk0gb3IgU1ZNIG9yIGJvdGguPGJyPg0KZGlmZiAtLWdpdCBhL21pZ3JhdGlvbi9yYW0uaCBi
+L21pZ3JhdGlvbi9yYW0uaDxicj4NCmluZGV4IDJlZWFhY2ZhMTMuLmMxYzBlYmJlMGYgMTAwNjQ0
+PGJyPg0KLS0tIGEvbWlncmF0aW9uL3JhbS5oPGJyPg0KJiM0MzsmIzQzOyYjNDM7IGIvbWlncmF0
+aW9uL3JhbS5oPGJyPg0KQEAgLTY5LDQgJiM0Mzs2OSw3IEBAIHZvaWQgY29sb19mbHVzaF9yYW1f
+Y2FjaGUodm9pZCk7PGJyPg0KJm5ic3A7dm9pZCBjb2xvX3JlbGVhc2VfcmFtX2NhY2hlKHZvaWQp
+Ozxicj4NCiZuYnNwO3ZvaWQgY29sb19pbmNvbWluZ19zdGFydF9kaXJ0eV9sb2codm9pZCk7PGJy
+Pg0KPGJyPg0KJiM0Mzt2b2lkIGNvbG9fZW5hYmxlX3JhbV9idWxrX3N0YWdlKHZvaWQpOzxicj4N
+CiYjNDM7dm9pZCBjb2xvX2Rpc2FibGVfcmFtX2J1bGtfc3RhZ2Uodm9pZCk7PGJyPg0KJiM0Mzs8
+YnI+DQombmJzcDsjZW5kaWY8YnI+DQotLSA8YnI+DQoyLjI1LjE8bzpwPjwvbzpwPjwvcD4NCjwv
+YmxvY2txdW90ZT4NCjwvZGl2Pg0KPC9kaXY+DQo8L2Rpdj4NCjwvZGl2Pg0KPC9ib2R5Pg0KPC9o
+dG1sPg0K
 
-Rao, Lei <lei.rao@intel.com> =E6=96=BC 2020=E5=B9=B49=E6=9C=8822=E6=97=A5 =
-=E9=80=B1=E4=BA=8C =E4=B8=8B=E5=8D=881:04=E5=AF=AB=E9=81=93=EF=BC=9A
-
-> Hi, Derek and Chen
->
-> ram_bulk_stage is false by default before Hailiang's patch.
-> For COLO, it does not seem to be used, so I think there is no need to
-> reset it to true.
->
-> Thanks,
-> Lei.
->
-> From: Derek Su <dereksu@qnap.com>
-> Sent: Tuesday, September 22, 2020 11:48 AM
-> To: Zhang, Chen <chen.zhang@intel.com>
-> Cc: qemu-devel <qemu-devel@nongnu.org>; Rao, Lei <lei.rao@intel.com>;
-> zhang.zhanghailiang@huawei.com; quintela@redhat.com; dgilbert@redhat.com
-> Subject: Re: [PATCH v1 1/1] COLO: only flush dirty ram pages from colo
-> cache
->
-> Hi, Chen
->
-> Sure.
->
-> BTW, I just went through Lei's patch.
-> ram_bulk_stage() might need to reset to true after stopping COLO service
-> as my patch.
-> How about your opinion?
->
-> Thanks.
->
->
-> Best regards,
-> Derek
->
->
-> Zhang, Chen <mailto:chen.zhang@intel.com> =E6=96=BC 2020=E5=B9=B49=E6=9C=
-=8822=E6=97=A5 =E9=80=B1=E4=BA=8C =E4=B8=8A=E5=8D=8811:41=E5=AF=AB=E9=81=93=
-=EF=BC=9A
-> Hi Derek and Lei,
->
-> It looks same with Lei=E2=80=99 patch:
-> [PATCH 2/3] Reduce the time of checkpoint for COLO
-> Can you discuss to merge it into one patch?
->
-> Thanks
-> Zhang Chen
->
-> From: Derek Su <mailto:dereksu@qnap.com>
-> Sent: Tuesday, September 22, 2020 11:31 AM
-> To: qemu-devel <mailto:qemu-devel@nongnu.org>
-> Cc: mailto:zhang.zhanghailiang@huawei.com; mailto:quintela@redhat.com;
-> mailto:dgilbert@redhat.com; Zhang, Chen <mailto:chen.zhang@intel.com>
-> Subject: Re: [PATCH v1 1/1] COLO: only flush dirty ram pages from colo
-> cache
->
-> Hello, all
->
-> Ping...
->
-> Regards,
-> Derek Su
->
-> Derek Su <mailto:dereksu@qnap.com> =E6=96=BC 2020=E5=B9=B49=E6=9C=8810=E6=
-=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=886:47=E5=AF=AB=E9=81=93=EF=BC=9A
-> In secondary side, the colo_flush_ram_cache() calls
-> migration_bitmap_find_dirty() to finding the dirty pages and
-> flush them to host. But ram_state's ram_bulk_stage flag is always
-> enabled in secondary side, it leads to the whole ram pages copy
-> instead of only dirty pages.
->
-> Here, the ram_bulk_stage in secondary side is disabled in the
-> preparation of COLO incoming process to avoid the whole dirty
-> ram pages flush.
->
-> Signed-off-by: Derek Su <mailto:dereksu@qnap.com>
-> ---
->  migration/colo.c |  6 +++++-
->  migration/ram.c  | 10 ++++++++++
->  migration/ram.h  |  3 +++
->  3 files changed, 18 insertions(+), 1 deletion(-)
->
-> diff --git a/migration/colo.c b/migration/colo.c
-> index ea7d1e9d4e..6e644db306 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -844,6 +844,8 @@ void *colo_process_incoming_thread(void *opaque)
->          return NULL;
->      }
->
-> +    colo_disable_ram_bulk_stage();
-> +
->      failover_init_state();
->
->      mis->to_src_file =3D qemu_file_get_return_path(mis->from_src_file);
-> @@ -873,7 +875,7 @@ void *colo_process_incoming_thread(void *opaque)
->          goto out;
->      }
->  #else
-> -        abort();
-> +    abort();
->  #endif
->      vm_start();
->      trace_colo_vm_state_change("stop", "run");
-> @@ -924,6 +926,8 @@ out:
->          qemu_fclose(fb);
->      }
->
-> +    colo_enable_ram_bulk_stage();
-> +
->      /* Hope this not to be too long to loop here */
->      qemu_sem_wait(&mis->colo_incoming_sem);
->      qemu_sem_destroy(&mis->colo_incoming_sem);
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 76d4fee5d5..65e9b12058 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -3357,6 +3357,16 @@ static bool postcopy_is_running(void)
->      return ps >=3D POSTCOPY_INCOMING_LISTENING && ps <
-> POSTCOPY_INCOMING_END;
->  }
->
-> +void colo_enable_ram_bulk_stage(void)
-> +{
-> +    ram_state->ram_bulk_stage =3D true;
-> +}
-> +
-> +void colo_disable_ram_bulk_stage(void)
-> +{
-> +    ram_state->ram_bulk_stage =3D false;
-> +}
-> +
->  /*
->   * Flush content of RAM cache into SVM's memory.
->   * Only flush the pages that be dirtied by PVM or SVM or both.
-> diff --git a/migration/ram.h b/migration/ram.h
-> index 2eeaacfa13..c1c0ebbe0f 100644
-> --- a/migration/ram.h
-> +++ b/migration/ram.h
-> @@ -69,4 +69,7 @@ void colo_flush_ram_cache(void);
->  void colo_release_ram_cache(void);
->  void colo_incoming_start_dirty_log(void);
->
-> +void colo_enable_ram_bulk_stage(void);
-> +void colo_disable_ram_bulk_stage(void);
-> +
->  #endif
-> --
-> 2.25.1
->
-
---00000000000007ebe705afe01914
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div><div dir=3D"ltr" data-smartmail=3D"gmail_signature"><=
-div dir=3D"ltr"><div><div dir=3D"ltr"><div><div dir=3D"ltr"><div>Hi, Lei</d=
-iv><div><br></div><div>Got it. Thanks.</div><div><br></div><div>Regards,</d=
-iv><div>Derek</div><div><br></div></div></div></div></div></div></div></div=
-><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">Rao, Lei =
-&lt;<a href=3D"mailto:lei.rao@intel.com" target=3D"_blank">lei.rao@intel.co=
-m</a>&gt; =E6=96=BC 2020=E5=B9=B49=E6=9C=8822=E6=97=A5 =E9=80=B1=E4=BA=8C =
-=E4=B8=8B=E5=8D=881:04=E5=AF=AB=E9=81=93=EF=BC=9A<br></div><blockquote clas=
-s=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid r=
-gb(204,204,204);padding-left:1ex">Hi, Derek and Chen<br>
-<br>
-ram_bulk_stage is false by default before Hailiang&#39;s patch.<br>
-For COLO, it does not seem to be used, so I think there is no need to reset=
- it to true.<br>
-<br>
-Thanks,<br>
-Lei.<br>
-<br>
-From: Derek Su &lt;<a href=3D"mailto:dereksu@qnap.com" target=3D"_blank">de=
-reksu@qnap.com</a>&gt; <br>
-Sent: Tuesday, September 22, 2020 11:48 AM<br>
-To: Zhang, Chen &lt;<a href=3D"mailto:chen.zhang@intel.com" target=3D"_blan=
-k">chen.zhang@intel.com</a>&gt;<br>
-Cc: qemu-devel &lt;<a href=3D"mailto:qemu-devel@nongnu.org" target=3D"_blan=
-k">qemu-devel@nongnu.org</a>&gt;; Rao, Lei &lt;<a href=3D"mailto:lei.rao@in=
-tel.com" target=3D"_blank">lei.rao@intel.com</a>&gt;; <a href=3D"mailto:zha=
-ng.zhanghailiang@huawei.com" target=3D"_blank">zhang.zhanghailiang@huawei.c=
-om</a>; <a href=3D"mailto:quintela@redhat.com" target=3D"_blank">quintela@r=
-edhat.com</a>; <a href=3D"mailto:dgilbert@redhat.com" target=3D"_blank">dgi=
-lbert@redhat.com</a><br>
-Subject: Re: [PATCH v1 1/1] COLO: only flush dirty ram pages from colo cach=
-e<br>
-<br>
-Hi, Chen<br>
-<br>
-Sure.<br>
-<br>
-BTW, I just went through Lei&#39;s patch.<br>
-ram_bulk_stage() might need to reset to true after stopping COLO service as=
- my patch.<br>
-How about your opinion?<br>
-<br>
-Thanks.<br>
-<br>
-<br>
-Best regards,<br>
-Derek<br>
-<br>
-<br>
-Zhang, Chen &lt;mailto:<a href=3D"mailto:chen.zhang@intel.com" target=3D"_b=
-lank">chen.zhang@intel.com</a>&gt; =E6=96=BC 2020=E5=B9=B49=E6=9C=8822=E6=
-=97=A5 =E9=80=B1=E4=BA=8C =E4=B8=8A=E5=8D=8811:41=E5=AF=AB=E9=81=93=EF=BC=
-=9A<br>
-Hi Derek and Lei,<br>
-=C2=A0<br>
-It looks same with Lei=E2=80=99 patch:<br>
-[PATCH 2/3] Reduce the time of checkpoint for COLO<br>
-Can you discuss to merge it into one patch?<br>
-=C2=A0<br>
-Thanks<br>
-Zhang Chen<br>
-=C2=A0<br>
-From: Derek Su &lt;mailto:<a href=3D"mailto:dereksu@qnap.com" target=3D"_bl=
-ank">dereksu@qnap.com</a>&gt; <br>
-Sent: Tuesday, September 22, 2020 11:31 AM<br>
-To: qemu-devel &lt;mailto:<a href=3D"mailto:qemu-devel@nongnu.org" target=
-=3D"_blank">qemu-devel@nongnu.org</a>&gt;<br>
-Cc: mailto:<a href=3D"mailto:zhang.zhanghailiang@huawei.com" target=3D"_bla=
-nk">zhang.zhanghailiang@huawei.com</a>; mailto:<a href=3D"mailto:quintela@r=
-edhat.com" target=3D"_blank">quintela@redhat.com</a>; mailto:<a href=3D"mai=
-lto:dgilbert@redhat.com" target=3D"_blank">dgilbert@redhat.com</a>; Zhang, =
-Chen &lt;mailto:<a href=3D"mailto:chen.zhang@intel.com" target=3D"_blank">c=
-hen.zhang@intel.com</a>&gt;<br>
-Subject: Re: [PATCH v1 1/1] COLO: only flush dirty ram pages from colo cach=
-e<br>
-=C2=A0<br>
-Hello, all<br>
-=C2=A0<br>
-Ping...<br>
-=C2=A0<br>
-Regards,<br>
-Derek Su<br>
-=C2=A0<br>
-Derek Su &lt;mailto:<a href=3D"mailto:dereksu@qnap.com" target=3D"_blank">d=
-ereksu@qnap.com</a>&gt; =E6=96=BC 2020=E5=B9=B49=E6=9C=8810=E6=97=A5 =E9=80=
-=B1=E5=9B=9B =E4=B8=8B=E5=8D=886:47=E5=AF=AB=E9=81=93=EF=BC=9A<br>
-In secondary side, the colo_flush_ram_cache() calls<br>
-migration_bitmap_find_dirty() to finding the dirty pages and<br>
-flush them to host. But ram_state&#39;s ram_bulk_stage flag is always<br>
-enabled in secondary side, it leads to the whole ram pages copy<br>
-instead of only dirty pages.<br>
-<br>
-Here, the ram_bulk_stage in secondary side is disabled in the<br>
-preparation of COLO incoming process to avoid the whole dirty<br>
-ram pages flush.<br>
-<br>
-Signed-off-by: Derek Su &lt;mailto:<a href=3D"mailto:dereksu@qnap.com" targ=
-et=3D"_blank">dereksu@qnap.com</a>&gt;<br>
----<br>
-=C2=A0migration/colo.c |=C2=A0 6 +++++-<br>
-=C2=A0migration/ram.c=C2=A0 | 10 ++++++++++<br>
-=C2=A0migration/ram.h=C2=A0 |=C2=A0 3 +++<br>
-=C2=A03 files changed, 18 insertions(+), 1 deletion(-)<br>
-<br>
-diff --git a/migration/colo.c b/migration/colo.c<br>
-index ea7d1e9d4e..6e644db306 100644<br>
---- a/migration/colo.c<br>
-+++ b/migration/colo.c<br>
-@@ -844,6 +844,8 @@ void *colo_process_incoming_thread(void *opaque)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return NULL;<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-<br>
-+=C2=A0 =C2=A0 colo_disable_ram_bulk_stage();<br>
-+<br>
-=C2=A0 =C2=A0 =C2=A0failover_init_state();<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0mis-&gt;to_src_file =3D qemu_file_get_return_path(mis-&=
-gt;from_src_file);<br>
-@@ -873,7 +875,7 @@ void *colo_process_incoming_thread(void *opaque)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0goto out;<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-=C2=A0#else<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 abort();<br>
-+=C2=A0 =C2=A0 abort();<br>
-=C2=A0#endif<br>
-=C2=A0 =C2=A0 =C2=A0vm_start();<br>
-=C2=A0 =C2=A0 =C2=A0trace_colo_vm_state_change(&quot;stop&quot;, &quot;run&=
-quot;);<br>
-@@ -924,6 +926,8 @@ out:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qemu_fclose(fb);<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-<br>
-+=C2=A0 =C2=A0 colo_enable_ram_bulk_stage();<br>
-+<br>
-=C2=A0 =C2=A0 =C2=A0/* Hope this not to be too long to loop here */<br>
-=C2=A0 =C2=A0 =C2=A0qemu_sem_wait(&amp;mis-&gt;colo_incoming_sem);<br>
-=C2=A0 =C2=A0 =C2=A0qemu_sem_destroy(&amp;mis-&gt;colo_incoming_sem);<br>
-diff --git a/migration/ram.c b/migration/ram.c<br>
-index 76d4fee5d5..65e9b12058 100644<br>
---- a/migration/ram.c<br>
-+++ b/migration/ram.c<br>
-@@ -3357,6 +3357,16 @@ static bool postcopy_is_running(void)<br>
-=C2=A0 =C2=A0 =C2=A0return ps &gt;=3D POSTCOPY_INCOMING_LISTENING &amp;&amp=
-; ps &lt; POSTCOPY_INCOMING_END;<br>
-=C2=A0}<br>
-<br>
-+void colo_enable_ram_bulk_stage(void)<br>
-+{<br>
-+=C2=A0 =C2=A0 ram_state-&gt;ram_bulk_stage =3D true;<br>
-+}<br>
-+<br>
-+void colo_disable_ram_bulk_stage(void)<br>
-+{<br>
-+=C2=A0 =C2=A0 ram_state-&gt;ram_bulk_stage =3D false;<br>
-+}<br>
-+<br>
-=C2=A0/*<br>
-=C2=A0 * Flush content of RAM cache into SVM&#39;s memory.<br>
-=C2=A0 * Only flush the pages that be dirtied by PVM or SVM or both.<br>
-diff --git a/migration/ram.h b/migration/ram.h<br>
-index 2eeaacfa13..c1c0ebbe0f 100644<br>
---- a/migration/ram.h<br>
-+++ b/migration/ram.h<br>
-@@ -69,4 +69,7 @@ void colo_flush_ram_cache(void);<br>
-=C2=A0void colo_release_ram_cache(void);<br>
-=C2=A0void colo_incoming_start_dirty_log(void);<br>
-<br>
-+void colo_enable_ram_bulk_stage(void);<br>
-+void colo_disable_ram_bulk_stage(void);<br>
-+<br>
-=C2=A0#endif<br>
--- <br>
-2.25.1<br>
-</blockquote></div></div>
-
---00000000000007ebe705afe01914--
+--_000_e348615c9f0c47d7bfd471698a093535intelcom_--
 
