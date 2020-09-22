@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 921B6C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:39:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AAADC2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:39:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1ABF820715
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:39:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFF3A20715
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:39:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RFaA7pt8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ABF820715
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UtG/i6b5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFF3A20715
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKqwG-0000wL-5S
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 18:39:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58014)
+	id 1kKqwJ-00013F-1k
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 18:39:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58050)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKqss-0004A5-4y
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:35:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47681)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKqsu-0004EE-1Y
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:35:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49102)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKqsq-0007c7-GG
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:35:37 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKqss-0007cj-Cp
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:35:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600814135;
+ s=mimecast20190719; t=1600814137;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=78Pk7z0SL79eqX9LpB/A0ZFDcXbAXaC/dqYUGtV0ckg=;
- b=RFaA7pt8XvhNAZQ6fQJy1CejLou5d+nFlTPvRwmDFsYsKNvJA6yEcKXSG3nlvWYugogKl7
- JfPTKjI9U/8tSlLmoosfS79bvJf0fYR/PQ9MheHTtVXHy9kVrK8YqhvXKfilmR8wfHVNYM
- bpUc15+9KFQ0l9tHL2yxr/mTHFpoDTY=
+ bh=HY4iHPLX+Mtqs4MtwyCFbQw0nV6/SF3Tme+QPV8lnWE=;
+ b=UtG/i6b55LRmpw6+VIHwyXurFRim34/lZgmCivFaejuKY23ahFSvIB8Byz0mc9f5p9vOvm
+ iswsy4O439K6d3PCCYiqJRS82LCly7i6TKwUBxy46hA2OMP8irXqUExnJxDBIzmjDL0xAY
+ TjLP9gKwdPRUkjW/79VPiKsqGsXWRjk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-9Z2S4PshODySUI640UdPWQ-1; Tue, 22 Sep 2020 18:35:33 -0400
-X-MC-Unique: 9Z2S4PshODySUI640UdPWQ-1
+ us-mta-54-wAUacH1bOYyLil5r-ogUwg-1; Tue, 22 Sep 2020 18:35:35 -0400
+X-MC-Unique: wAUacH1bOYyLil5r-ogUwg-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A92FB186DD28;
- Tue, 22 Sep 2020 22:35:32 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2AEB186DD27;
+ Tue, 22 Sep 2020 22:35:34 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D69F360CCC;
- Tue, 22 Sep 2020 22:35:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EA1A760BF4;
+ Tue, 22 Sep 2020 22:35:33 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH 05/26] qapi/parser.py: start source info at line 0
-Date: Tue, 22 Sep 2020 18:35:04 -0400
-Message-Id: <20200922223525.4085762-6-jsnow@redhat.com>
+Subject: [PATCH 07/26] qapi/parser.py: fully remove 'null' constant
+Date: Tue, 22 Sep 2020 18:35:06 -0400
+Message-Id: <20200922223525.4085762-8-jsnow@redhat.com>
 In-Reply-To: <20200922223525.4085762-1-jsnow@redhat.com>
 References: <20200922223525.4085762-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -70,9 +70,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 15:47:47
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
@@ -100,35 +100,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Before we have any actual line context, we still have a file context. We
-can use this to report errors without mentioning a specific line.
+Based on the docs, we don't support the null constant, and the code
+agrees. There's a few remnants where callers check .tok for 'n', and
+these can be removed.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- scripts/qapi/parser.py | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ scripts/qapi/parser.py                    | 8 ++++----
+ tests/qapi-schema/leading-comma-list.err  | 2 +-
+ tests/qapi-schema/trailing-comma-list.err | 2 +-
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
-index db4e9ae872..fc0b1516cc 100644
+index 5a7233bc76..78355ca93f 100644
 --- a/scripts/qapi/parser.py
 +++ b/scripts/qapi/parser.py
-@@ -55,7 +55,7 @@ def __init__(self, fname, previously_included=None, incl_info=None):
-         self.pos = 0
-         self.cursor = 0
-         self.val = None
--        self.info = QAPISourceInfo(self._fname, 1, incl_info)
-+        self.info = QAPISourceInfo(self._fname, parent=incl_info)
-         self.line_pos = 0
+@@ -274,9 +274,9 @@ def get_values(self):
+         if self.tok == ']':
+             self.accept()
+             return expr
+-        if self.tok not in "{['tfn":
++        if self.tok not in "{['tf":
+             raise self._parse_error(
+-                "expected '{', '[', ']', string, boolean or 'null'")
++                "expected '{', '[', ']', string, or boolean")
+         while True:
+             expr.append(self.get_expr(True))
+             if self.tok == ']':
+@@ -295,12 +295,12 @@ def get_expr(self, nested):
+         elif self.tok == '[':
+             self.accept()
+             expr = self.get_values()
+-        elif self.tok in "'tfn":
++        elif self.tok in "'tf":
+             expr = self.val
+             self.accept()
+         else:
+             raise self._parse_error(
+-                "expected '{', '[', string, boolean or 'null'")
++                "expected '{', '[', string, or boolean")
+         return expr
  
-         # Parser output:
-@@ -78,6 +78,7 @@ def _parse(self):
-         cur_doc = None
- 
-         # Prime the lexer:
-+        self.info.line += 1
-         if self.src == '' or self.src[-1] != '\n':
-             self.src += '\n'
-         self.accept()
+     def _get_doc(self, info):
+diff --git a/tests/qapi-schema/leading-comma-list.err b/tests/qapi-schema/leading-comma-list.err
+index 76eed2b5b3..0725d6529f 100644
+--- a/tests/qapi-schema/leading-comma-list.err
++++ b/tests/qapi-schema/leading-comma-list.err
+@@ -1 +1 @@
+-leading-comma-list.json:2:13: expected '{', '[', ']', string, boolean or 'null'
++leading-comma-list.json:2:13: expected '{', '[', ']', string, or boolean
+diff --git a/tests/qapi-schema/trailing-comma-list.err b/tests/qapi-schema/trailing-comma-list.err
+index ad2f2d7c97..bb5f8c3c90 100644
+--- a/tests/qapi-schema/trailing-comma-list.err
++++ b/tests/qapi-schema/trailing-comma-list.err
+@@ -1 +1 @@
+-trailing-comma-list.json:2:36: expected '{', '[', string, boolean or 'null'
++trailing-comma-list.json:2:36: expected '{', '[', string, or boolean
 -- 
 2.26.2
 
