@@ -2,76 +2,72 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEB0AC2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:02:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F0C8C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:03:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C0FD20735
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:02:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC22E20B1F
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:03:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="acJLxXYd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C0FD20735
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H9ilRlPK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC22E20B1F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKqMf-0005hW-CY
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 18:02:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48332)
+	id 1kKqNG-0006FH-CW
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 18:02:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41894)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kKqFa-0006Yt-IZ
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:55:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20022)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpj3-00038f-Px
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:21:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49662)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kKqFW-0002SA-WE
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:55:01 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpj1-00074j-SV
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:21:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600811696;
+ s=mimecast20190719; t=1600809683;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=GzKXC3xLfZ4R7mSigB7/jrkfc9wtR9HjglQAFpT8IF0=;
- b=acJLxXYdlycXCsyhH6NZVbUbx/TuC970nKJipEYE4IZGz5MbPE8Gzdf3q1Mq5p9Al2Bnwp
- RVM8CMKWoxB0aJ+nMo09ffbHXLXYTRu5CAXDkIiFpdyzlkRqO8SZCNyobzFKkGMwpRzxeT
- Y6RfRm2I0CsWJHu1Iwg1z1uGW28TkiU=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=X+Rbeql97Nua52db8mYi11B7/W48z48bdtrk2XfVR7w=;
+ b=H9ilRlPKhpxrRc47dDM+bpAepdfTpnerqkzbWhUJrjk3gcGQPI3jcGBZX1Qqpi7RFv8Fev
+ kngpJ6G7ddW70/ndiiXQfDNj9CLSadegOMt1/llZxNGCz8JCKXop5tpVNIRnHpQyfR22kT
+ nTWrdOPTlZzl0N3Fl3VYaMBOvpYDnak=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-208-3feBeDqtPxWdDBsg0ipnCA-1; Tue, 22 Sep 2020 17:54:52 -0400
-X-MC-Unique: 3feBeDqtPxWdDBsg0ipnCA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-442-nEbkCAXbMLGUx5xPQ1ATPw-1; Tue, 22 Sep 2020 17:21:20 -0400
+X-MC-Unique: nEbkCAXbMLGUx5xPQ1ATPw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 367E7186DD35;
- Tue, 22 Sep 2020 21:54:51 +0000 (UTC)
-Received: from localhost (unknown [10.10.67.5])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E125578810;
- Tue, 22 Sep 2020 21:54:50 +0000 (UTC)
-Date: Tue, 22 Sep 2020 17:54:49 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v2 07/38] qapi: add pylintrc
-Message-ID: <20200922215449.GI2044576@habkost.net>
-References: <20200922210101.4081073-1-jsnow@redhat.com>
- <20200922210101.4081073-8-jsnow@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED559186DD27;
+ Tue, 22 Sep 2020 21:21:19 +0000 (UTC)
+Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C56515DA7B;
+ Tue, 22 Sep 2020 21:21:15 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: [PATCH 0/6] qapi: static typing conversion, pt4
+Date: Tue, 22 Sep 2020 17:21:09 -0400
+Message-Id: <20200922212115.4084301-1-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200922210101.4081073-8-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -94,44 +90,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 22, 2020 at 05:00:30PM -0400, John Snow wrote:
-> Using `pylint --generate-rcfile > pylintrc`, generate a skeleton
-> pylintrc file. Sections that are not presently relevant (by the end of
-> this series) are removed leaving just the empty section as a search
-> engine / documentation hint to future authors.
-> 
-> Right now, quite a few modules are ignored as they are known to fail as
-> of this commit. modules will be removed from the known-bad list
-> throughout this and following series as they are repaired.
-> 
-> Note: Normally, pylintrc would go in the folder above the module, but as
-> that folder is shared by many things, it is going inside the module
-> folder (for now). Due to a bug in pylint 2.5.x, pylint does not
-> correctly recognize when it is being run from "inside" a package, and
-> must be run *outside* of the package.
-> 
-> Therefore, to run it, you must:
-> 
->  > pylint scripts/qapi/ --rcfile=scripts/qapi/pylintrc
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-
-Tested-by: Eduardo Habkost <ehabkost@redhat.com>
-
-This doesn't generate any warnings after this patch, but at the
-end of your -pt6 branch I got some pylint warnings.  I am
-bisecting it to try to identify the patch where the warnings are
-introduced.
-
--- 
-Eduardo
+based-on: <20200922211802.4083666-1-jsnow@redhat.com>=0D
+          [PATCH 00/14] qapi: static typing conversion, pt3=0D
+=0D
+Hi, this series adds static type hints to the QAPI module.=0D
+This is part four!=0D
+=0D
+Part 4: https://gitlab.com/jsnow/qemu/-/tree/python-qapi-cleanup-pt4=0D
+Everything: https://gitlab.com/jsnow/qemu/-/tree/python-qapi-cleanup-pt6=0D
+=0D
+- Requires Python 3.6+=0D
+- Requires mypy 0.770 or newer (for type analysis only)=0D
+- Requires pylint 2.6.0 or newer (for lint checking only)=0D
+=0D
+This part of the series focuses on error.py.=0D
+=0D
+Type hints are added in patches that add *only* type hints and change no=0D
+other behavior. Any necessary changes to behavior to accommodate typing=0D
+are split out into their own tiny patches.=0D
+=0D
+Every commit should pass with:=0D
+ - flake8 qapi/=0D
+ - pylint --rcfile=3Dqapi/pylintrc qapi/=0D
+ - mypy --config-file=3Dqapi/mypy.ini qapi/=0D
+=0D
+John Snow (6):=0D
+  qapi/error.py: refactor error classes=0D
+  qapi/parser.py: remove parser context from QAPIDoc=0D
+  qapi/error.py: move QAPIParseError to parser.py=0D
+  qapi/parser.py: refactor QAPIParseError=0D
+  qapi/error.py: enable mypy checks=0D
+  qapi/error.py: enable pylint checks=0D
+=0D
+ scripts/qapi/error.py  |  41 +++++++-------=0D
+ scripts/qapi/main.py   |   2 +-=0D
+ scripts/qapi/mypy.ini  |   5 --=0D
+ scripts/qapi/parser.py | 120 ++++++++++++++++++++++++-----------------=0D
+ scripts/qapi/pylintrc  |   3 +-=0D
+ scripts/qapi/schema.py |   4 +-=0D
+ 6 files changed, 94 insertions(+), 81 deletions(-)=0D
+=0D
+--=20=0D
+2.26.2=0D
+=0D
 
 
