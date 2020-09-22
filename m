@@ -2,90 +2,68 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80CA1C4363D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 01:19:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58B07C4363D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 01:26:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CB0623A79
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 01:19:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F42423A62
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 01:26:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rxwJIHQL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CB0623A79
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="I0mcnmrc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F42423A62
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKWxY-0003xK-TU
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 21:19:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32984)
+	id 1kKX4v-0005JA-DH
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 21:26:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kKWwu-0003Su-1Q; Mon, 21 Sep 2020 21:18:28 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38531)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kKWws-0005L3-Ca; Mon, 21 Sep 2020 21:18:27 -0400
-Received: by mail-ot1-x341.google.com with SMTP id y5so14162619otg.5;
- Mon, 21 Sep 2020 18:18:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=GnCsAYztQqgczgLc++weGUcUC37O51w4WulNLHvkge0=;
- b=rxwJIHQLOE5qxIp8vnC9+EypD5DY1H5zxMamXuP7lWwtNtBQfYdsDAI5M8VF8z51wX
- pa0wXbH3kx4Vwh1ILsN4Et5lx/x4haJ+mpvbBV91H8C7XYTvFzsKBo+xGZ3QWgfKgEGZ
- 4Vz+6Brm2A9ihBRKfUbN4kB8brskhKWJ3jqc4YUxc02OzOqoZKBFU59AxlnjA2fsQUYj
- giNxj+lgz+rH7Wdm9di71acTsBmfv3977n7VcIGCEeWwM7FLYCw2okUK213NuYLDlblz
- TMeVCZVbsrxSRtVRWFti9WLgPlCRgg3mcp/l0CVuO+TVjK/58DD6nDTOgQBJtnYRXJpo
- OI+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=GnCsAYztQqgczgLc++weGUcUC37O51w4WulNLHvkge0=;
- b=H9mqP+YB13gNbNdD4+nn5GxPQ5TetZCh0cJdquDoNowGhNtUfsqbvEEhDucg6XIY8+
- H9rLvChKemrfZVbjN8feKWyF8ZOR/zIgRiLuL73CzsGH0uI/7D6ZD+NVP4K5xjLVuGoP
- JjhibP8ab0WFvblT94bFkciX6Us9o4L8Sqw6rJQTOJY/9dzGetPX2AeALAthEMRTyPVb
- F8r3qy54pRhD0UPpuT4QjysFOPb7NcpCHgNFCAdbwfT5tAqfAYvhvVPs3iUCvHAzElab
- wdl2YYNgF6+x4XjFQ7QzskfZGGd2sp8eiUKKHU6JO79/n23DaHKaMqEcN6fFAt7S9jaJ
- Hl8A==
-X-Gm-Message-State: AOAM533ybfHslsmEC8x1QOfk5oyYwOruKyurHoYyqxx3pkD/uSfBbRoG
- BYdexSW/B0Z8N49xXdqk0f+OuLSg9T70DF1MK7c=
-X-Google-Smtp-Source: ABdhPJyNGJXyiG7juIwA2Rtg9VoZBozCrWpc9HUXmn2640IzPvV3KuUYyU4adIr1cislDZLX1DWj1QsP2GUhSZN+sY4=
-X-Received: by 2002:a05:6830:1187:: with SMTP id
- u7mr666951otq.181.1600737504681; 
- Mon, 21 Sep 2020 18:18:24 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kKX4M-0004sh-1T
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 21:26:10 -0400
+Received: from ozlabs.org ([203.11.71.1]:53867)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kKX4G-0006BF-T0
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 21:26:09 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4BwNtB4P5dz9sTh; Tue, 22 Sep 2020 11:25:53 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1600737954;
+ bh=e4kAdbjFVqxoM3qvCqMxzo/52ElOYuuBhaNFCOCtS64=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=I0mcnmrcdqoZs123Fjdu1vUnFkaveL6bYBVuPD7+e71IsUO8a/gCQsnsHmngn4jiZ
+ hQBxEQ6XxVYmb8rtYwJQeWgWNDXntzIEx9uDEfYQzkkW1J0tIO+6hsLvM9X8eVwMBu
+ pDGW8aqH4vvg8wmcAqR/BofTY2dtfVFjmD0uErP0=
+Date: Tue, 22 Sep 2020 10:46:15 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Laurent Vivier <lvivier@redhat.com>
+Subject: Re: [PATCH] migration: increase max-bandwidth to 128 MiB/s (1 Gib/s)
+Message-ID: <20200922004615.GE17169@yekko.fritz.box>
+References: <20200921144957.979989-1-lvivier@redhat.com>
 MIME-Version: 1.0
-References: <20200815072052.73228-1-liq3ea@163.com>
- <CAKXe6SJkqaeDBpDC__N6-RYgOMdTRO8NcJ0jkaFvAheEkfqbbw@mail.gmail.com>
- <CAKXe6S+Qq+GN6JYJa69+s0UHUd=2EKRAwJAjUKVt3+jPqdWeCQ@mail.gmail.com>
- <CAKXe6SJdkgYsenYLKrsWZSBya531dp-+rz2WRZuFLyC+NxR7Zg@mail.gmail.com>
-In-Reply-To: <CAKXe6SJdkgYsenYLKrsWZSBya531dp-+rz2WRZuFLyC+NxR7Zg@mail.gmail.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 22 Sep 2020 09:17:48 +0800
-Message-ID: <CAKXe6S+SHCYT=iF=6Nsij3AAY7R4H2DFaiAb=tFHj9H+71ReeQ@mail.gmail.com>
-Subject: Re: [PATCH] hw: ide: check the pointer before do dma memory unmap
-To: Li Qiang <liq3ea@163.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=liq3ea@gmail.com; helo=mail-ot1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="M/SuVGWktc5uNpra"
+Content-Disposition: inline
+In-Reply-To: <20200921144957.979989-1-lvivier@redhat.com>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 21:25:57
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,66 +76,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>, John Snow <jsnow@redhat.com>,
- Qemu Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org
+Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, Greg Kurz <groug@kaod.org>,
+ qemu-devel@nongnu.org, Andrea Bolognani <abologna@redhat.com>,
+ David Gibson <dgibson@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Frediano Ziglio <fziglio@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping!!
 
-Li Qiang <liq3ea@gmail.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=8815=E6=97=A5=E5=
-=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=889:38=E5=86=99=E9=81=93=EF=BC=9A
->
-> ping!!
->
-> Li Qiang <liq3ea@gmail.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=887=E6=97=A5=E5=
-=91=A8=E4=B8=80 =E4=B8=8A=E5=8D=889:39=E5=86=99=E9=81=93=EF=BC=9A
-> >
-> > Ping!
-> >
-> > Li Qiang <liq3ea@gmail.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=881=E6=97=A5=
-=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=886:34=E5=86=99=E9=81=93=EF=BC=9A
-> > >
-> > > Ping.
-> > >
-> > > Li Qiang <liq3ea@163.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8815=E6=97=A5=
-=E5=91=A8=E5=85=AD =E4=B8=8B=E5=8D=883:21=E5=86=99=E9=81=93=EF=BC=9A
-> > > >
-> > > > In 'map_page' we need to check the return value of
-> > > > 'dma_memory_map' to ensure the we actully maped something.
-> > > > Otherwise, we will hit an assert in 'address_space_unmap'.
-> > > > This is because we can't find the MR with the NULL buffer.
-> > > > This is the LP#1884693:
-> > > >
-> > > > -->https://bugs.launchpad.net/qemu/+bug/1884693
-> > > >
-> > > > Reported-by: Alexander Bulekov <alxndr@bu.edu>
-> > > > Signed-off-by: Li Qiang <liq3ea@163.com>
-> > > > ---
-> > > >  hw/ide/ahci.c | 5 +++++
-> > > >  1 file changed, 5 insertions(+)
-> > > >
-> > > > diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-> > > > index 009120f88b..63e9fccdbe 100644
-> > > > --- a/hw/ide/ahci.c
-> > > > +++ b/hw/ide/ahci.c
-> > > > @@ -250,6 +250,11 @@ static void map_page(AddressSpace *as, uint8_t=
- **ptr, uint64_t addr,
-> > > >      }
-> > > >
-> > > >      *ptr =3D dma_memory_map(as, addr, &len, DMA_DIRECTION_FROM_DEV=
-ICE);
-> > > > +
-> > > > +    if (!*ptr) {
-> > > > +        return;
-> > > > +    }
-> > > > +
-> > > >      if (len < wanted) {
-> > > >          dma_memory_unmap(as, *ptr, len, DMA_DIRECTION_FROM_DEVICE,=
- len);
-> > > >          *ptr =3D NULL;
-> > > > --
-> > > > 2.17.1
-> > > >
+--M/SuVGWktc5uNpra
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Sep 21, 2020 at 04:49:57PM +0200, Laurent Vivier wrote:
+> max-bandwidth is set by default to 32 MiB/s (256 Mib/s)
+> since 2008 (5bb7910af031c).
+>=20
+> Most of the CPUs can dirty memory faster than that now,
+> and this is clearly a problem with POWER where the page
+> size is 64 kiB and not 4 KiB.
+>=20
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  migration/migration.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 58a5452471f9..1c4174947181 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -57,7 +57,7 @@
+>  #include "qemu/queue.h"
+>  #include "multifd.h"
+> =20
+> -#define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed thrott=
+ling */
+> +#define MAX_THROTTLE  (128 << 20)      /* Migration transfer speed throt=
+tling */
+> =20
+>  /* Amount of time to allocate to each "chunk" of bandwidth-throttled
+>   * data. */
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--M/SuVGWktc5uNpra
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9pSVcACgkQbDjKyiDZ
+s5ILQA/+N7u84W+a7grYWHwPo3D+qGXjeBdG7Xq3ZvHlf/3qChvv/l7hsgJHPluf
+GqjuH1fjrbsVjLB2z6fi7rBq7gXufBJPdA0fjWyAFmGywUJ5NCS0GzJPAGYxfi81
+pv253MO+N7VC5p1q42DPjEoqeEzD80q8jmkUE2fvn8lHnHmZToRvvKE4klrndxbO
+yn2tSEASmHly+EA8A/MeRAVqkJNEAEMc0qJMVh/GX5qtXlC6FUFN2sqEYYtu7sP3
+FuCAp1d1Ow4JPTJMutguA1D1NkbYs6jFrvU+FUDv10efPgL8FTmMNBwggij9LO/2
+oMKHGzCyKa0uXMEv2GaieOkhlErqWOfWd/YvYSxU7E2DPsjL++svOXtJ0LxgjQ0s
+HdvCMa1UIxgHIp9/xaJJqniIsRGxIpjAIzrJF8TyQMdZuNTqoCpog/6c15NcqlsJ
+0B3v32HWI5u4tUSxcvnFT2qcuSTY6A7PmktPsUXtU3alILFuMXvouf1hKHmE93+v
+TD3SdZZYTaCPbFMSjjXDiuYBDadGm/4mj3J9Tl9nHTt47dHKkv7RM3+q6GURsbzp
+KXG81ZA3tsAc6mLy40/XFPzJgEMuhCkgCwye6dfUsvhxiiwz6KuXRJvqgkEFXLio
+qLE6qnBJS9/eLEK3ZMw43WXbed5337VYegG+NDl5LzL+YtKEeK8=
+=smhN
+-----END PGP SIGNATURE-----
+
+--M/SuVGWktc5uNpra--
 
