@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25C6BC4727E
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:37:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 816A3C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:37:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF43E20757
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:37:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EAFBE20757
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:37:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LMbEfQkh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF43E20757
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MZk5HchV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAFBE20757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKpyB-0005za-Rh
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 17:37:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37500)
+	id 1kKpyJ-0006Hg-W3
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 17:37:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37540)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpQY-0002nN-Ju
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:02:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22015)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpQb-0002sf-PD
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:02:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52724)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpQW-0004fq-HB
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:02:18 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpQZ-0004gF-3f
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:02:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600808535;
+ s=mimecast20190719; t=1600808538;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6v1QZedyVDhCtOAjeUf7VmKC1JSzpMgb4c04RWcAjQc=;
- b=LMbEfQkhVLUMdGttvXz1ujN/aADmqeaJQDiT1ftzsK26Jx85uZWTDz30u4WkiVAcJpJxAW
- CQKQKOzvR4F8kStQhhm58/SomyyJ+edaVh1WM/TfBsz9q5lzcgVQtaZ284MI/HZu5/bb3Y
- +tmdcldr7/SERlVazENE2Ys/jrubtwY=
+ bh=JPrStWWZbcECY3Td1vYTtBWaUYqjwCSycYgpvCspoLg=;
+ b=MZk5HchVk5Cb2kL0tZVU0+9tzVB9LtooavyaFBEHC3Tucs3fIawO7ZNdznpIwnyyRKlVF0
+ mFhnAoztOvKk1BT8wvDn4M++W1wBSPumzNahOJ44mNYHQRveMjKSTMD7b1NTo7Ct3rO18I
+ 59nY2LVFiN9GtgA5hISfwEx2oTCx0OY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-470-1YbrltPrOSalI_V1etwKmQ-1; Tue, 22 Sep 2020 17:01:51 -0400
-X-MC-Unique: 1YbrltPrOSalI_V1etwKmQ-1
+ us-mta-402-fp8epnaVOe2sRnZs_X8wEA-1; Tue, 22 Sep 2020 17:01:53 -0400
+X-MC-Unique: fp8epnaVOe2sRnZs_X8wEA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20FC71868422;
- Tue, 22 Sep 2020 21:01:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51BB7873081;
+ Tue, 22 Sep 2020 21:01:52 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3273755765;
- Tue, 22 Sep 2020 21:01:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 61A5255765;
+ Tue, 22 Sep 2020 21:01:51 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>,
 	qemu-devel@nongnu.org
-Subject: [PATCH v2 31/38] qapi/introspect.py: add _gen_features helper
-Date: Tue, 22 Sep 2020 17:00:54 -0400
-Message-Id: <20200922210101.4081073-32-jsnow@redhat.com>
+Subject: [PATCH v2 33/38] qapi/introspect.py: add type hint annotations
+Date: Tue, 22 Sep 2020 17:00:56 -0400
+Message-Id: <20200922210101.4081073-34-jsnow@redhat.com>
 In-Reply-To: <20200922210101.4081073-1-jsnow@redhat.com>
 References: <20200922210101.4081073-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -103,92 +103,319 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-_make_tree doesn't know if it is receiving an object or some other type;
-adding features information should arguably be performed by the caller.
-
-This will help us refactor _make_tree more gracefully in the next patch.
+Annotations do not change runtime behavior.
+This commit *only* adds annotations.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- scripts/qapi/introspect.py | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
+ scripts/qapi/introspect.py | 135 ++++++++++++++++++++++++++-----------
+ scripts/qapi/mypy.ini      |   5 --
+ scripts/qapi/schema.py     |   2 +-
+ 3 files changed, 96 insertions(+), 46 deletions(-)
 
 diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-index 41ca8afc67..e1edd0b179 100644
+index e0f5007ab7..7c0444170d 100644
 --- a/scripts/qapi/introspect.py
 +++ b/scripts/qapi/introspect.py
-@@ -10,7 +10,7 @@
+@@ -10,7 +10,15 @@
  See the COPYING file in the top-level directory.
  """
  
--from typing import (NamedTuple, Optional, Sequence)
-+from typing import (NamedTuple, List, Optional, Sequence)
+-from typing import (NamedTuple, List, Optional, Sequence)
++from typing import (
++    Dict,
++    Generic,
++    List,
++    NamedTuple,
++    Optional,
++    Sequence,
++    TypeVar,
++)
  
  from .common import (
      c_name,
-@@ -20,7 +20,7 @@
+@@ -19,8 +27,24 @@
+     mcgen,
  )
  from .gen import QAPISchemaMonolithicCVisitor
- from .schema import (QAPISchemaArrayType, QAPISchemaBuiltinType,
--                     QAPISchemaType)
-+                     QAPISchemaFeature, QAPISchemaType)
+-from .schema import (QAPISchemaArrayType, QAPISchemaBuiltinType,
+-                     QAPISchemaFeature, QAPISchemaType)
++from .schema import (
++    QAPISchema,
++    QAPISchemaArrayType,
++    QAPISchemaBuiltinType,
++    QAPISchemaEntity,
++    QAPISchemaEnumMember,
++    QAPISchemaFeature,
++    QAPISchemaObjectType,
++    QAPISchemaObjectTypeMember,
++    QAPISchemaType,
++    QAPISchemaVariant,
++    QAPISchemaVariants,
++)
++from .source import QAPISourceInfo
++
++
++_NodeType = TypeVar('_NodeType')
++_DObject = Dict[str, object]
  
  
  class Extra(NamedTuple):
-@@ -31,12 +31,10 @@ class Extra(NamedTuple):
+@@ -31,23 +55,24 @@ class Extra(NamedTuple):
      ifcond: Sequence[str] = tuple()
  
  
--def _make_tree(obj, ifcond, features,
-+def _make_tree(obj, ifcond,
-                extra: Optional[Extra] = None):
-     comment = extra.comment if extra else None
-     extra = Extra(comment, ifcond)
--    if features:
--        obj['features'] = [(f.name, Extra(None, f.ifcond)) for f in features]
-     return (obj, extra)
+-class Node:
++class Node(Generic[_NodeType]):
+     """
+     Node generally contains a SchemaInfo-like type (as a dict),
+     But it also used to wrap comments/ifconds around leaf value types.
+     """
+     # Remove after 3.7 adds @dataclass:
+     # pylint: disable=too-few-public-methods
+-    def __init__(self, data, ifcond: List[str],
++    def __init__(self, data: _NodeType, ifcond: List[str],
+                  extra: Optional[Extra] = None):
+         self.data = data
+         comment = extra.comment if extra else None
+         self.extra = Extra(comment, ifcond)
  
  
-@@ -169,6 +167,10 @@ def _use_type(self, typ):
-             return '[' + self._use_type(typ.element_type) + ']'
+-def _tree_to_qlit(obj, level=0, suppress_first_indent=False):
++def _tree_to_qlit(obj: object, level: int = 0,
++                  suppress_first_indent: bool = False) -> str:
+ 
+-    def indent(level):
++    def indent(level: int) -> str:
+         return level * 4 * ' '
+ 
+     if isinstance(obj, Node):
+@@ -94,21 +119,20 @@ def indent(level):
+     return ret
+ 
+ 
+-def to_c_string(string):
++def to_c_string(string: str) -> str:
+     return '"' + string.replace('\\', r'\\').replace('"', r'\"') + '"'
+ 
+ 
+ class QAPISchemaGenIntrospectVisitor(QAPISchemaMonolithicCVisitor):
+-
+-    def __init__(self, prefix, unmask):
++    def __init__(self, prefix: str, unmask: bool):
+         super().__init__(
+             prefix, 'qapi-introspect',
+             ' * QAPI/QMP schema introspection', __doc__)
+         self._unmask = unmask
+-        self._schema = None
+-        self._trees = []
+-        self._used_types = []
+-        self._name_map = {}
++        self._schema: Optional[QAPISchema] = None
++        self._trees: List[Node[_DObject]] = []
++        self._used_types: List[QAPISchemaType] = []
++        self._name_map: Dict[str, str] = {}
+         self._genc.add(mcgen('''
+ #include "qemu/osdep.h"
+ #include "%(prefix)sqapi-introspect.h"
+@@ -116,10 +140,10 @@ def __init__(self, prefix, unmask):
+ ''',
+                              prefix=prefix))
+ 
+-    def visit_begin(self, schema):
++    def visit_begin(self, schema: QAPISchema) -> None:
+         self._schema = schema
+ 
+-    def visit_end(self):
++    def visit_end(self) -> None:
+         # visit the types that are actually used
+         for typ in self._used_types:
+             typ.visit(self)
+@@ -141,18 +165,18 @@ def visit_end(self):
+         self._used_types = []
+         self._name_map = {}
+ 
+-    def visit_needed(self, entity):
++    def visit_needed(self, entity: QAPISchemaEntity) -> bool:
+         # Ignore types on first pass; visit_end() will pick up used types
+         return not isinstance(entity, QAPISchemaType)
+ 
+-    def _name(self, name):
++    def _name(self, name: str) -> str:
+         if self._unmask:
+             return name
+         if name not in self._name_map:
+             self._name_map[name] = '%d' % len(self._name_map)
+         return self._name_map[name]
+ 
+-    def _use_type(self, typ):
++    def _use_type(self, typ: QAPISchemaType) -> str:
+         # Map the various integer types to plain int
+         if typ.json_type() == 'int':
+             typ = self._schema.lookup_type('int')
+@@ -172,10 +196,13 @@ def _use_type(self, typ):
          return self._name(typ.name)
  
-+    @classmethod
-+    def _gen_features(cls, features: List[QAPISchemaFeature]):
-+        return [_make_tree(f.name, f.ifcond) for f in features]
-+
-     def _gen_tree(self, name, mtype, obj, ifcond, features):
+     @classmethod
+-    def _gen_features(cls, features: List[QAPISchemaFeature]):
++    def _gen_features(cls,
++                      features: List[QAPISchemaFeature]) -> List[Node[str]]:
+         return [Node(f.name, f.ifcond) for f in features]
+ 
+-    def _gen_tree(self, name, mtype, obj, ifcond, features):
++    def _gen_tree(self, name: str, mtype: str, obj: _DObject,
++                  ifcond: List[str],
++                  features: Optional[List[QAPISchemaFeature]]) -> None:
          extra = None
          if mtype not in ('command', 'event', 'builtin', 'array'):
-@@ -179,13 +181,17 @@ def _gen_tree(self, name, mtype, obj, ifcond, features):
-             name = self._name(name)
-         obj['name'] = name
-         obj['meta-type'] = mtype
--        self._trees.append(_make_tree(obj, ifcond, features, extra))
-+        if features:
-+            obj['features'] = self._gen_features(features)
-+        self._trees.append(_make_tree(obj, ifcond, extra))
+             if not self._unmask:
+@@ -189,45 +216,65 @@ def _gen_tree(self, name, mtype, obj, ifcond, features):
+             obj['features'] = self._gen_features(features)
+         self._trees.append(Node(obj, ifcond, extra))
  
-     def _gen_member(self, member):
-         obj = {'name': member.name, 'type': self._use_type(member.type)}
+-    def _gen_member(self, member):
+-        obj = {'name': member.name, 'type': self._use_type(member.type)}
++    def _gen_member(self,
++                    member: QAPISchemaObjectTypeMember) -> Node[_DObject]:
++        obj: _DObject = {
++            'name': member.name,
++            'type': self._use_type(member.type)
++        }
          if member.optional:
              obj['default'] = None
--        return _make_tree(obj, member.ifcond, member.features)
-+        if member.features:
-+            obj['features'] = self._gen_features(member.features)
-+        return _make_tree(obj, member.ifcond)
+         if member.features:
+             obj['features'] = self._gen_features(member.features)
+         return Node(obj, member.ifcond)
  
-     def _gen_variants(self, tag_name, variants):
+-    def _gen_variants(self, tag_name, variants):
++    def _gen_variants(self, tag_name: str,
++                      variants: List[QAPISchemaVariant]) -> _DObject:
          return {'tag': tag_name,
-@@ -193,7 +199,7 @@ def _gen_variants(self, tag_name, variants):
+                 'variants': [self._gen_variant(v) for v in variants]}
  
-     def _gen_variant(self, variant):
-         obj = {'case': variant.name, 'type': self._use_type(variant.type)}
--        return _make_tree(obj, variant.ifcond, None)
-+        return _make_tree(obj, variant.ifcond)
+-    def _gen_variant(self, variant):
+-        obj = {'case': variant.name, 'type': self._use_type(variant.type)}
++    def _gen_variant(self, variant: QAPISchemaVariant) -> Node[_DObject]:
++        obj: _DObject = {
++            'case': variant.name,
++            'type': self._use_type(variant.type)
++        }
+         return Node(obj, variant.ifcond)
  
-     def visit_builtin_type(self, name, info, json_type):
+-    def visit_builtin_type(self, name, info, json_type):
++    def visit_builtin_type(self, name: str, info: Optional[QAPISourceInfo],
++                           json_type: str) -> None:
          self._gen_tree(name, 'builtin', {'json-type': json_type}, [], None)
+ 
+-    def visit_enum_type(self, name, info, ifcond, features, members, prefix):
++    def visit_enum_type(self, name: str, info: QAPISourceInfo,
++                        ifcond: List[str], features: List[QAPISchemaFeature],
++                        members: List[QAPISchemaEnumMember],
++                        prefix: Optional[str]) -> None:
+         self._gen_tree(name, 'enum',
+                        {'values': [Node(m.name, m.ifcond) for m in members]},
+                        ifcond, features)
+ 
+-    def visit_array_type(self, name, info, ifcond, element_type):
++    def visit_array_type(self, name: str, info: Optional[QAPISourceInfo],
++                         ifcond: List[str],
++                         element_type: QAPISchemaType) -> None:
+         element = self._use_type(element_type)
+         self._gen_tree('[' + element + ']', 'array', {'element-type': element},
+                        ifcond, None)
+ 
+-    def visit_object_type_flat(self, name, info, ifcond, features,
+-                               members, variants):
+-        obj = {'members': [self._gen_member(m) for m in members]}
++    def visit_object_type_flat(self, name: str, info: Optional[QAPISourceInfo],
++                               ifcond: List[str],
++                               features: List[QAPISchemaFeature],
++                               members: Sequence[QAPISchemaObjectTypeMember],
++                               variants: Optional[QAPISchemaVariants]) -> None:
++        obj: _DObject = {'members': [self._gen_member(m) for m in members]}
+         if variants:
+             obj.update(self._gen_variants(variants.tag_member.name,
+                                           variants.variants))
+ 
+         self._gen_tree(name, 'object', obj, ifcond, features)
+ 
+-    def visit_alternate_type(self, name, info, ifcond, features, variants):
++    def visit_alternate_type(self, name: str, info: QAPISourceInfo,
++                             ifcond: List[str],
++                             features: List[QAPISchemaFeature],
++                             variants: QAPISchemaVariants) -> None:
+         self._gen_tree(name, 'alternate',
+                        {'members': [
+                            Node({'type': self._use_type(m.type)}, m.ifcond)
+@@ -235,24 +282,32 @@ def visit_alternate_type(self, name, info, ifcond, features, variants):
+                        ]},
+                        ifcond, features)
+ 
+-    def visit_command(self, name, info, ifcond, features,
+-                      arg_type, ret_type, gen, success_response, boxed,
+-                      allow_oob, allow_preconfig):
++    def visit_command(self, name: str, info: QAPISourceInfo, ifcond: List[str],
++                      features: List[QAPISchemaFeature],
++                      arg_type: QAPISchemaObjectType,
++                      ret_type: Optional[QAPISchemaType], gen: bool,
++                      success_response: bool, boxed: bool, allow_oob: bool,
++                      allow_preconfig: bool) -> None:
+         arg_type = arg_type or self._schema.the_empty_object_type
+         ret_type = ret_type or self._schema.the_empty_object_type
+-        obj = {'arg-type': self._use_type(arg_type),
+-               'ret-type': self._use_type(ret_type)}
++        obj: _DObject = {
++            'arg-type': self._use_type(arg_type),
++            'ret-type': self._use_type(ret_type)
++        }
+         if allow_oob:
+             obj['allow-oob'] = allow_oob
+         self._gen_tree(name, 'command', obj, ifcond, features)
+ 
+-    def visit_event(self, name, info, ifcond, features, arg_type, boxed):
++    def visit_event(self, name: str, info: QAPISourceInfo,
++                    ifcond: List[str], features: List[QAPISchemaFeature],
++                    arg_type: QAPISchemaObjectType, boxed: bool) -> None:
+         arg_type = arg_type or self._schema.the_empty_object_type
+         self._gen_tree(name, 'event', {'arg-type': self._use_type(arg_type)},
+                        ifcond, features)
+ 
+ 
+-def gen_introspect(schema, output_dir, prefix, opt_unmask):
++def gen_introspect(schema: QAPISchema, output_dir: str, prefix: str,
++                   opt_unmask: bool) -> None:
+     vis = QAPISchemaGenIntrospectVisitor(prefix, opt_unmask)
+     schema.visit(vis)
+     vis.write(output_dir)
+diff --git a/scripts/qapi/mypy.ini b/scripts/qapi/mypy.ini
+index dbfeda748c..9ce8b56f22 100644
+--- a/scripts/qapi/mypy.ini
++++ b/scripts/qapi/mypy.ini
+@@ -19,11 +19,6 @@ disallow_untyped_defs = False
+ disallow_incomplete_defs = False
+ check_untyped_defs = False
+ 
+-[mypy-qapi.introspect]
+-disallow_untyped_defs = False
+-disallow_incomplete_defs = False
+-check_untyped_defs = False
+-
+ [mypy-qapi.parser]
+ disallow_untyped_defs = False
+ disallow_incomplete_defs = False
+diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
+index bb0cd717f1..3023bab44b 100644
+--- a/scripts/qapi/schema.py
++++ b/scripts/qapi/schema.py
+@@ -28,7 +28,7 @@
+ class QAPISchemaEntity:
+     meta: Optional[str] = None
+ 
+-    def __init__(self, name, info, doc, ifcond=None, features=None):
++    def __init__(self, name: str, info, doc, ifcond=None, features=None):
+         assert name is None or isinstance(name, str)
+         for f in features or []:
+             assert isinstance(f, QAPISchemaFeature)
 -- 
 2.26.2
 
