@@ -2,107 +2,89 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32609C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:05:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40CE9C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:13:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B59F920936
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:05:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 673722395C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:13:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AiOCjTqt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B59F920936
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b+LVlgM7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 673722395C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKh3U-0004wn-U7
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 08:05:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35580)
+	id 1kKhAa-0007CH-4P
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 08:13:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37446)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kKh2l-0004Oh-2R
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 08:05:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34459
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kKh2f-0004zk-M0
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 08:05:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600776300;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Fbci2o4pg9HYWGHwlSBIthUnoYF+N3Iupz+SYZ3MYgk=;
- b=AiOCjTqtCb7YOhftO4GK/I3wUeB23ruOzcjKKXSStrhcynyRJofYNEqLmQhbncqfwBnjTb
- PZayzaZzM4l9RPgypaHf46EUuYX0S24uJHz6NmMJCJhpySTiBg2Txkz7t8ShWuBHKkKq97
- we32WvsGHiu0TixlCCCL2k12n6+WPUk=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-327-DNaqxy0gMveIc5aEvFB-mw-1; Tue, 22 Sep 2020 08:04:58 -0400
-X-MC-Unique: DNaqxy0gMveIc5aEvFB-mw-1
-Received: by mail-wr1-f72.google.com with SMTP id f18so7320401wrv.19
- for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 05:04:57 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1kKh93-0006Ok-0l; Tue, 22 Sep 2020 08:11:41 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:42361)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1kKh91-0005sG-1P; Tue, 22 Sep 2020 08:11:40 -0400
+Received: by mail-oi1-x241.google.com with SMTP id x14so20766336oic.9;
+ Tue, 22 Sep 2020 05:11:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=xeER2YlUdnOqK55WdlNYgEIDSiXKkPMVCn9y941icN0=;
+ b=b+LVlgM7w2dmN0f5FrBLZLiIAF2y/LioJe0fhdv5Se4DlMgz56t9pTXJZAc916aTe+
+ L0Sz1rOAhnbeMzrNidgHitXDb50pkMp30TZNAOV4y+AQhK0GZxJ2PcynXFPMIs/VqE7d
+ CWE+oF4vvK3kAGP5+CsjCU6g+SEmKFNNSvGbywknX2AQ4YZsGNKvt0dx8plBRA9gZO7a
+ S0jh31O+loI5LleBW8uN8JZtu5p98Tlp3vhESP+DSYiwx6dSwJsTKnVZ3X5ANjSoo4MH
+ YKaxTyPqXRAWIJ3H3iJVGvE56NOypkUdTp4SEZPRdZXVMPPrdXw/dlyzrZk7HjFcuoHQ
+ 0O6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Fbci2o4pg9HYWGHwlSBIthUnoYF+N3Iupz+SYZ3MYgk=;
- b=r1IGzAIJr627cV7gItslP0QcfBZNcoXdI0GZtzT9xdLcpI2g0pS5SGSZhR30XYUzae
- lD2zRbTy3nscmDVOpKZG6HcheL2ZMEY5pyX8kCPf7A6FneA4R9N7eLpdwnfL+YAgvGxL
- q+/hWMsso+RXz8RUFnw6n6hNNIziVyJCKwkippsACISLV+DeYKR5kLyfpLm2eYK5Aq1H
- Fg8YPibmyEyCb9X3n5OYwZHgZb9E4WQRWhPdwP5FGV+tlzwUPS/sC1ZDQQKuM2sSqDUQ
- 5rsp2lX4zpTTE+rzoaF/IUKPmGmGx/mFN27BFRnT8OuWZmPJ1GOxfoVHfpBbQqcSyAcX
- n2pQ==
-X-Gm-Message-State: AOAM532lC8LeQodfrNwb+vDTeh89stgfsiumSkvTBoqidu2UO1rVD0dQ
- eR7K6fCd24+FGoAH7CdXaeFO9lBj6OW7LIBH4ui64hwSP7wOamiMq+YLsgn1cfZMI2ycKnFZosl
- QkHIozyzl1vFDY2o=
-X-Received: by 2002:adf:912b:: with SMTP id j40mr5024949wrj.42.1600776296815; 
- Tue, 22 Sep 2020 05:04:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxBSdRMIFDbeFYSwXPTwdTNJcRlTstv7TCD4th7Pmb5S2XhaFvh8ZSfQvOa360U8yFnt2uJtA==
-X-Received: by 2002:adf:912b:: with SMTP id j40mr5024917wrj.42.1600776296416; 
- Tue, 22 Sep 2020 05:04:56 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ec2c:90a9:1236:ebc6?
- ([2001:b07:6468:f312:ec2c:90a9:1236:ebc6])
- by smtp.gmail.com with ESMTPSA id t15sm25711348wrp.20.2020.09.22.05.04.55
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 22 Sep 2020 05:04:55 -0700 (PDT)
-Subject: Re: [PATCH] helper_syscall x86_64: clear exception_is_int
-To: Douglas Crosher <dtc-ubuntu@scieneer.com>, qemu-devel@nongnu.org
-References: <a7dab33e-eda6-f988-52e9-f3d32db7538d@scieneer.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <651980e0-4413-47e5-73fd-5970ede99117@redhat.com>
-Date: Tue, 22 Sep 2020 14:04:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=xeER2YlUdnOqK55WdlNYgEIDSiXKkPMVCn9y941icN0=;
+ b=QSnsJUz8s4O4oCpmDP7cgIx0SgCTQRIYn0k/bSPTYS4+R/u8nLql5e1530/J9mxJhF
+ w4jbLuzcwEAUv/VibNsH2K4m3lruZLARh5c9PGyx8fqmRP838vog21SHgkdldGjfTx7y
+ PT4VkDMBC4MESDwaHwy8c6muwUevpbqugZ4Bx4G/E41yo1ayh6krHZsTJGC0l0V1LWUr
+ SPwNjGZNH8tbtw7Nzuq3L3rEcdXeSXop/qn1Zlu0p/uZ5HZLbQtDRdcDvuPvIC3oR1DX
+ mq2eQ0YVujaXLVBdJyaANM+igMjQpRj0N8i0D0/qIWa/K712XO2MUTmL3M8moNVeVjs/
+ 1QiQ==
+X-Gm-Message-State: AOAM530WqPO81cc06nTkSVWGjCkr5ncmh9wNFjo0PnTG9IQEKa+WNbUJ
+ iKM+FLnTnftDmZk4jc0MrD6RNpQLrvL3t9ioJi8q8EbLfSAIHA==
+X-Google-Smtp-Source: ABdhPJxrU2q69owlucCI8MdO/6ij42bSHS/0ZzMJ5zdGCeMqIl9jwB4T+GdJdB54GkcYvq747kT/vF7BPOdWA+icNQ8=
+X-Received: by 2002:aca:b454:: with SMTP id d81mr2329524oif.150.1600776697346; 
+ Tue, 22 Sep 2020 05:11:37 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <a7dab33e-eda6-f988-52e9-f3d32db7538d@scieneer.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 01:57:21
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+References: <20200815072052.73228-1-liq3ea@163.com>
+ <20200922013411.auucs5t2hhw4romx@mozz.bu.edu>
+ <8dcc2e29-6bd8-92d5-eaa6-9331aafe752a@redhat.com>
+ <CAKXe6S+r2W-jM2kp-Rhai_14STkZP2mVEDYDTn3=tVECgE8bAw@mail.gmail.com>
+ <9fa20393-4a48-d687-3d2b-92156734b685@redhat.com>
+In-Reply-To: <9fa20393-4a48-d687-3d2b-92156734b685@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue, 22 Sep 2020 20:11:01 +0800
+Message-ID: <CAKXe6SL+RaKFsbjYoVD3Mkm8vDy04byh9+jdQRoX5oY5zEzKLQ@mail.gmail.com>
+Subject: Re: [PATCH] hw: ide: check the pointer before do dma memory unmap
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
+ envelope-from=liq3ea@gmail.com; helo=mail-oi1-x241.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -116,38 +98,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, rth@twiddle.net
+Cc: John Snow <jsnow@redhat.com>, Alexander Bulekov <alxndr@bu.edu>,
+ Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22/09/20 06:17, Douglas Crosher wrote:
-> 
-> The exception_is_int flag may be set on entry to helper_syscall,
-> e.g. after a prior interrupt that has returned, and processing
-> EXCP_SYSCALL as an interrupt causes it to fail so clear this flag.
-> 
-> Signed-off-by: Douglas Crosher <dtc-ubuntu@scieneer.com>
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2020=E5=B9=B49=E6=
+=9C=8822=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=886:46=E5=86=99=E9=81=
+=93=EF=BC=9A
+>
+> On 9/22/20 12:37 PM, Li Qiang wrote:
+> > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2020=E5=B9=B49=
+=E6=9C=8822=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=884:19=E5=86=99=E9=
+=81=93=EF=BC=9A
+> >>
+> >> On 9/22/20 3:34 AM, Alexander Bulekov wrote:
+> >>> On 200815 0020, Li Qiang wrote:
+> >>>> In 'map_page' we need to check the return value of
+> >>>> 'dma_memory_map' to ensure the we actully maped something.
+> >>>> Otherwise, we will hit an assert in 'address_space_unmap'.
+> >>>> This is because we can't find the MR with the NULL buffer.
+> >>>> This is the LP#1884693:
+> >>>>
+> >>>> -->https://bugs.launchpad.net/qemu/+bug/1884693
+> >>>>
+> >>>> Reported-by: Alexander Bulekov <alxndr@bu.edu>
+> >>>> Signed-off-by: Li Qiang <liq3ea@163.com>
+> >>>
+> >>> I'm not very familiar with the IDE code, but this seems like a simple
+> >>> null-ptr check, and Li has not received a response in over a month.
+> >>
+> >> Yeah well it is not an easy bug... I spent few hours but at some
+> >> point it became too AHCI specific. I wanted to understand the bug
+> >> to answer the "Why do we get there?" "Can we get there with real
+> >> hardware?" questions, to be able to discern if this patch is OK,
+> >> or if it is hiding bugs and what we really use here is an assert().
+> >
+> > Hi Philippe,
+> > I think you have complicated this issue. The root cause is that
+> > 'dma_memory_map' maybe fail.
+> > The gpa is from guest and can be any value so this is expected.
+> > It can return NULL pointer (no map) or it can be do partially
+> > mapped(len < wanted).
+> > Though in most situation the map result is 'ret =3D=3D NULL and len <
+> > wanted'. It may also has '
+> > ret !=3D NULL and len < wanted' I think.
+>
+> Then this form is easier to review to my taste:
+>
+> -- >8 --
+> @@ -250,7 +250,7 @@ static void map_page(AddressSpace *as, uint8_t
+> **ptr, uint64_t addr,
+>      }
+>
+>      *ptr =3D dma_memory_map(as, addr, &len, DMA_DIRECTION_FROM_DEVICE);
+> -    if (len < wanted) {
+> +    if (*ptr && len < wanted) {
+>          dma_memory_unmap(as, *ptr, len, DMA_DIRECTION_FROM_DEVICE, len);
+>          *ptr =3D NULL;
+>      }
+
+Yes, in this case your patch is more clean and less code change.
+But in generic case, my origin patch is more easy to understand and also
+It is easy to do resource clean or trace (such as 'ahci_populate_sglist').
+
+Anyway just let John do the choice.
+
+Thanks,
+Li Qiang
+
 > ---
->  target/i386/seg_helper.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/target/i386/seg_helper.c b/target/i386/seg_helper.c
-> index b96de068ca..be88938c2a 100644
-> --- a/target/i386/seg_helper.c
-> +++ b/target/i386/seg_helper.c
-> @@ -975,6 +975,7 @@ void helper_syscall(CPUX86State *env, int
-> next_eip_addend)
->      CPUState *cs = env_cpu(env);
-> 
->      cs->exception_index = EXCP_SYSCALL;
-> +    env->exception_is_int = 0;
->      env->exception_next_eip = env->eip + next_eip_addend;
->      cpu_loop_exit(cs);
->  }
-
-Queued, thanks.
-
-Paolo
-
+>
+> >
+> > The assert is come from that we pass NULL to 'dma_memory_unmap'.
+> >
+> > So the standard usage of 'dma_memory_map' I think is first check if
+> > the return value to ensure it is not NULL.
+> > Then check whether it mapped the len as the caller expected.
+> >
+> > There are several places in the code base that doesn't following this
+> > usage which I think it is wrong.
+> >
+> > Thanks,
+> > Li Qiang
+> >
+> >>
+> >>>
+> >>> Reviewed-by: Alexander Bulekov <alxndr@bu.edu>
+> >>>
+> >>>> ---
+> >>>>  hw/ide/ahci.c | 5 +++++
+> >>>>  1 file changed, 5 insertions(+)
+> >>>>
+> >>>> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+> >>>> index 009120f88b..63e9fccdbe 100644
+> >>>> --- a/hw/ide/ahci.c
+> >>>> +++ b/hw/ide/ahci.c
+> >>>> @@ -250,6 +250,11 @@ static void map_page(AddressSpace *as, uint8_t =
+**ptr, uint64_t addr,
+> >>>>      }
+> >>>>
+> >>>>      *ptr =3D dma_memory_map(as, addr, &len, DMA_DIRECTION_FROM_DEVI=
+CE);
+> >>>> +
+> >>>> +    if (!*ptr) {
+> >>>> +        return;
+> >>>> +    }
+> >>>> +
+> >>>>      if (len < wanted) {
+> >>>>          dma_memory_unmap(as, *ptr, len, DMA_DIRECTION_FROM_DEVICE, =
+len);
+> >>>>          *ptr =3D NULL;
+> >>>> --
+> >>>> 2.17.1
+> >>>>
+> >>>
+> >>
+> >
+>
 
