@@ -2,78 +2,105 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E468C4346E
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 03:02:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9540EC4346E
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 03:03:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3229239D4
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 03:02:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3229239D4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0C627239D4
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 03:03:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WtNEbalz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C627239D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKYZD-0004Yp-Ma
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 23:02:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49180)
+	id 1kKYa9-0005MP-4t
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 23:03:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49330)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kKYXy-0003vV-Gf
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 23:00:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40812)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kKYXv-0005Ks-V3
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 23:00:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kKYXt-0004az-NN
- for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 03:00:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id ADD872E804B
- for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 03:00:45 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1kKYYq-0004LG-NM
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 23:01:45 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32539
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1kKYYo-0005e1-1n
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 23:01:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600743698;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hhD43Hh+Bg1ZpFOROJt1cA6yuABHUBMZhBeRP2eCN60=;
+ b=WtNEbalz+HfWed/o01/sMAllHCrNKKh+yd8Emgp1WqpNLFoIArDsY/S60dpW39DWc0JoM9
+ Yww+N4uxhGOGiIxsmSOop0mx1zPSV2kQ9eIiHzbyMaXiuo4AgPu6jL3uYbyFnpYXki3FPC
+ JnL+CXf6IzRUXNbkHTxII5wojpPfiWM=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-594-V0ylz17rP9Cf3BpC459Zeg-1; Mon, 21 Sep 2020 23:01:37 -0400
+X-MC-Unique: V0ylz17rP9Cf3BpC459Zeg-1
+Received: by mail-pj1-f72.google.com with SMTP id q95so1282921pja.0
+ for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 20:01:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=hhD43Hh+Bg1ZpFOROJt1cA6yuABHUBMZhBeRP2eCN60=;
+ b=VdZFu6znGdvcK7m/IxXRTKxow4H2VYBQ/GARR+e6IVl0rojZ+tGX+o+V3izayKI6qj
+ cbqXtjjyqbaB7zLohmrD2lA9OYFXmq8HONQbh5xaFEEQqHLt37Vb7yeJV9PxHSDU7k7L
+ ezg3X248VdLGACukXEziTuKhFur/82ufnhnDHbR0bqJfXBvMcPFeA5vsIw7QupLtlESi
+ E3kEDztN436+leYqAVT/k8IPFjG6OGiagvtXaUPxIbV+iRElU7YmpeuFzI4gqc9nYpgk
+ alb3A3GsX2RAcpcMFqDRigTvSRSFvZiTKyuAueHSIEnAFkADDdAQll+0D7KyGDQu1N9f
+ xNKw==
+X-Gm-Message-State: AOAM531dWPSMQuU5qkCLRJtzT6Eb2OhgOlGTQVfWhL9UbNrGMgWz25Xf
+ 4egdRU8hgB5TMJHWGs1NLCV9QVN72P0vpwtxpIKDC5P22ZyYJrIXSGNYzJyS5xyKQSH2XqU+zQN
+ PUByNJT/CFuVk6Gz3zC6Mmonizin9dng=
+X-Received: by 2002:a17:902:d714:b029:d0:cbe1:e7a2 with SMTP id
+ w20-20020a170902d714b02900d0cbe1e7a2mr2603031ply.19.1600743695834; 
+ Mon, 21 Sep 2020 20:01:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz38N04dPxpOKoGSqZX+deBhqw9qYh0On1arhTS46qeJQEbRS8Z+bkhGFb/icIuuBrpM75UQ7thKVOZMhBlg+4=
+X-Received: by 2002:a17:902:d714:b029:d0:cbe1:e7a2 with SMTP id
+ w20-20020a170902d714b02900d0cbe1e7a2mr2602997ply.19.1600743695198; Mon, 21
+ Sep 2020 20:01:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20200917155851.20636-1-lulu@redhat.com>
+ <b5ac3a30-6d81-117c-37af-e16b9a21ddad@redhat.com>
+In-Reply-To: <b5ac3a30-6d81-117c-37af-e16b9a21ddad@redhat.com>
+From: Cindy Lu <lulu@redhat.com>
+Date: Tue, 22 Sep 2020 11:01:24 +0800
+Message-ID: <CACLfguUNqfKYb-4Yo6-7Zn4NwYq94WHSKn+2KPX1+W0JH7Re2A@mail.gmail.com>
+Subject: Re: [PATCH 1/3] virtio-net: Set mac address to hardware if the peer
+ is vdpa
+To: Jason Wang <jasowang@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lulu@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Sep 2020 02:52:04 -0000
-From: Benjamin David Lunt <1896561@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: fysnet
-X-Launchpad-Bug-Reporter: Benjamin David Lunt (fysnet)
-X-Launchpad-Bug-Modifier: Benjamin David Lunt (fysnet)
-Message-Id: <160074312416.13871.13514895218862238849.malonedeb@gac.canonical.com>
-Subject: [Bug 1896561] [NEW] EFI GOP Mode 1366x768
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: cacea6e8574983a27d2987b9246514a6dd2eeeea
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 23:00:46
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=lulu@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 23:01:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,134 +109,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1896561 <1896561@bugs.launchpad.net>
+Cc: qemu-stable@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>,
+ Michael Tsirkin <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On Tue, Sep 22, 2020 at 9:55 AM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2020/9/17 =E4=B8=8B=E5=8D=8811:58, Cindy Lu wrote:
+> > If the peer's type is vdpa,set the mac address to NIC in virtio_net_dev=
+ice_realize,
+> > Also sometime vdpa get an all 0 macaddress from the hardware, this will=
+ cause the traffic down
+> > So we add the check for this part.
+> > if we get an 0 mac address we will use the default mac address instead
+> >
+> > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > ---
+> >   hw/net/virtio-net.c | 12 +++++++++++-
+> >   1 file changed, 11 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> > index cb0d27084c..7db9da1482 100644
+> > --- a/hw/net/virtio-net.c
+> > +++ b/hw/net/virtio-net.c
+> > @@ -126,6 +126,7 @@ static void virtio_net_get_config(VirtIODevice *vde=
+v, uint8_t *config)
+> >       VirtIONet *n =3D VIRTIO_NET(vdev);
+> >       struct virtio_net_config netcfg;
+> >       NetClientState *nc =3D qemu_get_queue(n->nic);
+> > +    static const MACAddr zero =3D { .a =3D { 0, 0, 0, 0, 0, 0 } };
+> >
+> >       int ret =3D 0;
+> >       memset(&netcfg, 0 , sizeof(struct virtio_net_config));
+> > @@ -151,7 +152,11 @@ static void virtio_net_get_config(VirtIODevice *vd=
+ev, uint8_t *config)
+> >           ret =3D vhost_net_get_config(get_vhost_net(nc->peer), (uint8_=
+t *)&netcfg,
+> >                                      n->config_size);
+> >           if (ret !=3D -1) {
+> > -            memcpy(config, &netcfg, n->config_size);
+> > +            if (memcmp(&netcfg.mac, &zero, sizeof(zero)) !=3D 0) {
+> > +                memcpy(config, &netcfg, n->config_size);
+> > +        } else {
+> > +                error_report("Get an all zero mac address from hardwar=
+e");
+>
+>
+> This is probably a hint that MAC is not properly provisioned.
+>
+> So I guess we can leave this as is, or simply warn until the management
+> interface is finalized.
+>
+Hi Jason, For sure this is NIC card's problem, They cannot provide an
+correct MAC address,
+But if we continue use this 0 mac address will cause this traffic
+down, maybe will cost a lot of effort in debugging
+So I think maybe Just an warn is not enough, We can use the default
+mac address  and let the traffic working
+>
+> > +            }
+> >           }
+> >       }
+> >   }
+> > @@ -3399,6 +3404,11 @@ static void virtio_net_device_realize(DeviceStat=
+e *dev, Error **errp)
+> >       nc =3D qemu_get_queue(n->nic);
+> >       nc->rxfilter_notify_enabled =3D 1;
+> >
+> > +   if (nc->peer && nc->peer->info->type =3D=3D NET_CLIENT_DRIVER_VHOST=
+_VDPA) {
+> > +        struct virtio_net_config netcfg =3D {};
+> > +        memcpy(&netcfg.mac, &n->nic_conf.macaddr, ETH_ALEN);
+> > +        virtio_net_set_config(vdev, (uint8_t *)&netcfg);
+>
+>
+> Won't this overwrite all other fields in the netcfg? I think we should
+> only touch mac part.
+>
+> Thanks
+>
+>
+Sure, will fix this
+> > +    }
+> >       QTAILQ_INIT(&n->rsc_chains);
+> >       n->qdev =3D dev;
+> >
+>
 
-When using the EFI firmware from
-https://www.kraxel.org/repos/jenkins/edk2/
-(https://www.kraxel.org/repos/jenkins/edk2/edk2.git-
-ovmf-x64-0-20200919.1453.g7faece6985.noarch.rpm) (OVMF-pure-efi.fd and
-OVMF_VARS-pure-efi.fd) then using the GOP, setting the mode to 1366x768,
-QEMU uses a width of 1360 instead.
-
-I am using QEMU for windows (https://qemu.weilnetz.de/) on a Windows 10
-machine.
-
-To verify, while in the EFI firmware loaded code (within BOOTx64.EFI)
-and before ExitBootServices(), I choose the 1360x768 mode.  I then took
-notice of where the host window was and how many pixels it occupied.  I
-then reset the emulation (without quitting) and chose the 1366x768 mode.
-QEMU set the host window to the exact same width as the 1360 mode.
-i.e.: The same exact pixels where shown in the host background.  The
-window did not expand the extra 6 pixels.
-
-I allowed the firmware to run its course to my test environment when
-using mode 1366x768, all pixels are 6 pixels off to the right.  i.e.: 6
-pixels down the Frame Buffer.  If my test environment changes its HORZ
-WIDTH and PIXELS PER SCANLINE to 1360 while using this (1366x768) mode,
-the display is correct.
-
-This told me that it could be a few things.
-1) Since most (I didn't check them all) of the other modes have the width v=
-alue's bits 2:0 clear, mode 1366x768 is the only mode the EDK2 firmware has=
- with a width where bits 2:0 are not zero.  Could EDK2 or QEMU (which for t=
-he Windows version may use SDL2 so it must be considered here) be clearing =
-these bits?  The value of 1366 when clearing bits 2:0 is 1360.
-
-2) Could there be a typo in the code EDK2 where the width should have been =
-1366?
-(I went looking at both QEMU (for Windows) and EDK2 and after looking at ma=
-ny lines of code, I could not find anywhere where this might happen. =
-
-
-By the way, in /ui/sdl2-2d.c (QEMU Windows version only?), there is a
-typo in a comment, missing the second 'e':
-
-Line 156:  * the native ones. Thes are the ones I have tested.
-
-3) Could EDK2 be sending 1360 instead of 1366?
-4) Could QEMU (passing it on to SDL2 in SDL_SetWindowSize()?) be destroying=
- the value (bottom three bits)?
-
-Anyway, using the latest version of the EDK2 from the URL listed above,
-choosing the 1366x768 mode, does not set QEMU (for Windows) to 1366
-pixels in width.
-
-Ben
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1896561
-
-Title:
-  EFI GOP Mode 1366x768
-
-Status in QEMU:
-  New
-
-Bug description:
-  When using the EFI firmware from
-  https://www.kraxel.org/repos/jenkins/edk2/
-  (https://www.kraxel.org/repos/jenkins/edk2/edk2.git-
-  ovmf-x64-0-20200919.1453.g7faece6985.noarch.rpm) (OVMF-pure-efi.fd and
-  OVMF_VARS-pure-efi.fd) then using the GOP, setting the mode to
-  1366x768, QEMU uses a width of 1360 instead.
-
-  I am using QEMU for windows (https://qemu.weilnetz.de/) on a Windows
-  10 machine.
-
-  To verify, while in the EFI firmware loaded code (within BOOTx64.EFI)
-  and before ExitBootServices(), I choose the 1360x768 mode.  I then
-  took notice of where the host window was and how many pixels it
-  occupied.  I then reset the emulation (without quitting) and chose the
-  1366x768 mode.  QEMU set the host window to the exact same width as
-  the 1360 mode.  i.e.: The same exact pixels where shown in the host
-  background.  The window did not expand the extra 6 pixels.
-
-  I allowed the firmware to run its course to my test environment when
-  using mode 1366x768, all pixels are 6 pixels off to the right.  i.e.:
-  6 pixels down the Frame Buffer.  If my test environment changes its
-  HORZ WIDTH and PIXELS PER SCANLINE to 1360 while using this (1366x768)
-  mode, the display is correct.
-
-  This told me that it could be a few things.
-  1) Since most (I didn't check them all) of the other modes have the width=
- value's bits 2:0 clear, mode 1366x768 is the only mode the EDK2 firmware h=
-as with a width where bits 2:0 are not zero.  Could EDK2 or QEMU (which for=
- the Windows version may use SDL2 so it must be considered here) be clearin=
-g these bits?  The value of 1366 when clearing bits 2:0 is 1360.
-
-  2) Could there be a typo in the code EDK2 where the width should have bee=
-n 1366?
-  (I went looking at both QEMU (for Windows) and EDK2 and after looking at =
-many lines of code, I could not find anywhere where this might happen. =
-
-
-  By the way, in /ui/sdl2-2d.c (QEMU Windows version only?), there is a
-  typo in a comment, missing the second 'e':
-
-  Line 156:  * the native ones. Thes are the ones I have tested.
-
-  3) Could EDK2 be sending 1360 instead of 1366?
-  4) Could QEMU (passing it on to SDL2 in SDL_SetWindowSize()?) be destroyi=
-ng the value (bottom three bits)?
-
-  Anyway, using the latest version of the EDK2 from the URL listed
-  above, choosing the 1366x768 mode, does not set QEMU (for Windows) to
-  1366 pixels in width.
-
-  Ben
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1896561/+subscriptions
 
