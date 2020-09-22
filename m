@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC98BC2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:24:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F405BC4727E
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:24:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27D1E208A9
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:24:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27D1E208A9
+	by mail.kernel.org (Postfix) with ESMTPS id E24CE208A9
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:24:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E24CE208A9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKhLG-000080-27
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 08:24:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38846)
+	id 1kKhLJ-0000Jm-UU
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 08:24:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38530)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kKhEF-0001UO-Ns
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 08:17:03 -0400
-Received: from mail.ispras.ru ([83.149.199.84]:47730)
+ id 1kKhDJ-00013v-UM
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 08:16:05 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:47522)
  by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kKhE9-0006V8-5X
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 08:17:03 -0400
+ id 1kKhDH-0006QF-9j
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 08:16:05 -0400
 Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 34AD841B1032;
- Tue, 22 Sep 2020 12:16:53 +0000 (UTC)
-Subject: [PATCH v5 13/15] docs: convert replay.txt to rst
+ by mail.ispras.ru (Postfix) with ESMTPSA id 3DDB540A2071;
+ Tue, 22 Sep 2020 12:16:01 +0000 (UTC)
+Subject: [PATCH v5 04/15] migration: introduce icount field for snapshots
 From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
 To: qemu-devel@nongnu.org
-Date: Tue, 22 Sep 2020 15:16:52 +0300
-Message-ID: <160077701288.10249.16846150592069982759.stgit@pasha-ThinkPad-X280>
+Date: Tue, 22 Sep 2020 15:16:00 +0300
+Message-ID: <160077696086.10249.6447310285319511116.stgit@pasha-ThinkPad-X280>
 In-Reply-To: <160077693745.10249.9707329107813662236.stgit@pasha-ThinkPad-X280>
 References: <160077693745.10249.9707329107813662236.stgit@pasha-ThinkPad-X280>
 User-Agent: StGit/0.17.1-dirty
@@ -75,860 +75,347 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch converts record/replay documentation into rst format.
+Saving icount as a parameters of the snapshot allows navigation between
+them in the execution replay scenario.
+This information can be used for finding a specific snapshot for proceeding
+the recorded execution to the specific moment of the time.
+E.g., 'reverse step' action (introduced in one of the following patches)
+needs to load the nearest snapshot which is prior to the current moment
+of time.
+This patch also updates snapshot test which verifies qemu monitor output.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
----
- docs/replay.txt        |  410 ------------------------------------------------
- docs/system/index.rst  |    1 
- docs/system/replay.rst |  410 ++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 411 insertions(+), 410 deletions(-)
- delete mode 100644 docs/replay.txt
- create mode 100644 docs/system/replay.rst
+Acked-by: Markus Armbruster <armbru@redhat.com>
+Acked-by: Kevin Wolf <kwolf@redhat.com>
 
-diff --git a/docs/replay.txt b/docs/replay.txt
-deleted file mode 100644
-index 39fe5e9740..0000000000
---- a/docs/replay.txt
-+++ /dev/null
-@@ -1,410 +0,0 @@
--Copyright (c) 2010-2015 Institute for System Programming
--                        of the Russian Academy of Sciences.
--
--This work is licensed under the terms of the GNU GPL, version 2 or later.
--See the COPYING file in the top-level directory.
--
--Record/replay
---------------
--
--Record/replay functions are used for the deterministic replay of qemu execution.
--Execution recording writes a non-deterministic events log, which can be later
--used for replaying the execution anywhere and for unlimited number of times.
--It also supports checkpointing for faster rewind to the specific replay moment.
--Execution replaying reads the log and replays all non-deterministic events
--including external input, hardware clocks, and interrupts.
--
--Deterministic replay has the following features:
-- * Deterministically replays whole system execution and all contents of
--   the memory, state of the hardware devices, clocks, and screen of the VM.
-- * Writes execution log into the file for later replaying for multiple times
--   on different machines.
-- * Supports i386, x86_64, and Arm hardware platforms.
-- * Performs deterministic replay of all operations with keyboard and mouse
--   input devices.
--
--Usage of the record/replay:
-- * First, record the execution with the following command line:
--    qemu-system-i386 \
--     -icount shift=7,rr=record,rrfile=replay.bin \
--     -drive file=disk.qcow2,if=none,snapshot,id=img-direct \
--     -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
--     -device ide-hd,drive=img-blkreplay \
--     -netdev user,id=net1 -device rtl8139,netdev=net1 \
--     -object filter-replay,id=replay,netdev=net1
-- * After recording, you can replay it by using another command line:
--    qemu-system-i386 \
--     -icount shift=7,rr=replay,rrfile=replay.bin \
--     -drive file=disk.qcow2,if=none,snapshot,id=img-direct \
--     -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
--     -device ide-hd,drive=img-blkreplay \
--     -netdev user,id=net1 -device rtl8139,netdev=net1 \
--     -object filter-replay,id=replay,netdev=net1
--   The only difference with recording is changing the rr option
--   from record to replay.
-- * Block device images are not actually changed in the recording mode,
--   because all of the changes are written to the temporary overlay file.
--   This behavior is enabled by using blkreplay driver. It should be used
--   for every enabled block device, as described in 'Block devices' section.
-- * '-net none' option should be specified when network is not used,
--   because QEMU adds network card by default. When network is needed,
--   it should be configured explicitly with replay filter, as described
--   in 'Network devices' section.
-- * Interaction with audio devices and serial ports are recorded and replayed
--   automatically when such devices are enabled.
--
--Academic papers with description of deterministic replay implementation:
--http://www.computer.org/csdl/proceedings/csmr/2012/4666/00/4666a553-abs.html
--http://dl.acm.org/citation.cfm?id=2786805.2803179
--
--Modifications of qemu include:
-- * wrappers for clock and time functions to save their return values in the log
-- * saving different asynchronous events (e.g. system shutdown) into the log
-- * synchronization of the bottom halves execution
-- * synchronization of the threads from thread pool
-- * recording/replaying user input (mouse, keyboard, and microphone)
-- * adding internal checkpoints for cpu and io synchronization
-- * network filter for recording and replaying the packets
-- * block driver for making block layer deterministic
-- * serial port input record and replay
-- * recording of random numbers obtained from the external sources
--
--Locking and thread synchronisation
------------------------------------
--
--Previously the synchronisation of the main thread and the vCPU thread
--was ensured by the holding of the BQL. However the trend has been to
--reduce the time the BQL was held across the system including under TCG
--system emulation. As it is important that batches of events are kept
--in sequence (e.g. expiring timers and checkpoints in the main thread
--while instruction checkpoints are written by the vCPU thread) we need
--another lock to keep things in lock-step. This role is now handled by
--the replay_mutex_lock. It used to be held only for each event being
--written but now it is held for a whole execution period. This results
--in a deterministic ping-pong between the two main threads.
--
--As the BQL is now a finer grained lock than the replay_lock it is almost
--certainly a bug, and a source of deadlocks, to take the
--replay_mutex_lock while the BQL is held. This is enforced by an assert.
--While the unlocks are usually in the reverse order, this is not
--necessary; you can drop the replay_lock while holding the BQL, without
--doing a more complicated unlock_iothread/replay_unlock/lock_iothread
--sequence.
--
--Non-deterministic events
--------------------------
--
--Our record/replay system is based on saving and replaying non-deterministic
--events (e.g. keyboard input) and simulating deterministic ones (e.g. reading
--from HDD or memory of the VM). Saving only non-deterministic events makes
--log file smaller and simulation faster.
--
--The following non-deterministic data from peripheral devices is saved into
--the log: mouse and keyboard input, network packets, audio controller input,
--serial port input, and hardware clocks (they are non-deterministic
--too, because their values are taken from the host machine). Inputs from
--simulated hardware, memory of VM, software interrupts, and execution of
--instructions are not saved into the log, because they are deterministic and
--can be replayed by simulating the behavior of virtual machine starting from
--initial state.
--
--We had to solve three tasks to implement deterministic replay: recording
--non-deterministic events, replaying non-deterministic events, and checking
--that there is no divergence between record and replay modes.
--
--We changed several parts of QEMU to make event log recording and replaying.
--Devices' models that have non-deterministic input from external devices were
--changed to write every external event into the execution log immediately.
--E.g. network packets are written into the log when they arrive into the virtual
--network adapter.
--
--All non-deterministic events are coming from these devices. But to
--replay them we need to know at which moments they occur. We specify
--these moments by counting the number of instructions executed between
--every pair of consecutive events.
--
--Instruction counting
----------------------
--
--QEMU should work in icount mode to use record/replay feature. icount was
--designed to allow deterministic execution in absence of external inputs
--of the virtual machine. We also use icount to control the occurrence of the
--non-deterministic events. The number of instructions elapsed from the last event
--is written to the log while recording the execution. In replay mode we
--can predict when to inject that event using the instruction counter.
--
--Timers
--------
--
--Timers are used to execute callbacks from different subsystems of QEMU
--at the specified moments of time. There are several kinds of timers:
-- * Real time clock. Based on host time and used only for callbacks that
--   do not change the virtual machine state. For this reason real time
--   clock and timers does not affect deterministic replay at all.
-- * Virtual clock. These timers run only during the emulation. In icount
--   mode virtual clock value is calculated using executed instructions counter.
--   That is why it is completely deterministic and does not have to be recorded.
-- * Host clock. This clock is used by device models that simulate real time
--   sources (e.g. real time clock chip). Host clock is the one of the sources
--   of non-determinism. Host clock read operations should be logged to
--   make the execution deterministic.
-- * Virtual real time clock. This clock is similar to real time clock but
--   it is used only for increasing virtual clock while virtual machine is
--   sleeping. Due to its nature it is also non-deterministic as the host clock
--   and has to be logged too.
--
--Checkpoints
-------------
--
--Replaying of the execution of virtual machine is bound by sources of
--non-determinism. These are inputs from clock and peripheral devices,
--and QEMU thread scheduling. Thread scheduling affect on processing events
--from timers, asynchronous input-output, and bottom halves.
--
--Invocations of timers are coupled with clock reads and changing the state
--of the virtual machine. Reads produce non-deterministic data taken from
--host clock. And VM state changes should preserve their order. Their relative
--order in replay mode must replicate the order of callbacks in record mode.
--To preserve this order we use checkpoints. When a specific clock is processed
--in record mode we save to the log special "checkpoint" event.
--Checkpoints here do not refer to virtual machine snapshots. They are just
--record/replay events used for synchronization.
--
--QEMU in replay mode will try to invoke timers processing in random moment
--of time. That's why we do not process a group of timers until the checkpoint
--event will be read from the log. Such an event allows synchronizing CPU
--execution and timer events.
--
--Two other checkpoints govern the "warping" of the virtual clock.
--While the virtual machine is idle, the virtual clock increments at
--1 ns per *real time* nanosecond.  This is done by setting up a timer
--(called the warp timer) on the virtual real time clock, so that the
--timer fires at the next deadline of the virtual clock; the virtual clock
--is then incremented (which is called "warping" the virtual clock) as
--soon as the timer fires or the CPUs need to go out of the idle state.
--Two functions are used for this purpose; because these actions change
--virtual machine state and must be deterministic, each of them creates a
--checkpoint.  qemu_start_warp_timer checks if the CPUs are idle and if so
--starts accounting real time to virtual clock.  qemu_account_warp_timer
--is called when the CPUs get an interrupt or when the warp timer fires,
--and it warps the virtual clock by the amount of real time that has passed
--since qemu_start_warp_timer.
--
--Bottom halves
---------------
--
--Disk I/O events are completely deterministic in our model, because
--in both record and replay modes we start virtual machine from the same
--disk state. But callbacks that virtual disk controller uses for reading and
--writing the disk may occur at different moments of time in record and replay
--modes.
--
--Reading and writing requests are created by CPU thread of QEMU. Later these
--requests proceed to block layer which creates "bottom halves". Bottom
--halves consist of callback and its parameters. They are processed when
--main loop locks the global mutex. These locks are not synchronized with
--replaying process because main loop also processes the events that do not
--affect the virtual machine state (like user interaction with monitor).
--
--That is why we had to implement saving and replaying bottom halves callbacks
--synchronously to the CPU execution. When the callback is about to execute
--it is added to the queue in the replay module. This queue is written to the
--log when its callbacks are executed. In replay mode callbacks are not processed
--until the corresponding event is read from the events log file.
--
--Sometimes the block layer uses asynchronous callbacks for its internal purposes
--(like reading or writing VM snapshots or disk image cluster tables). In this
--case bottom halves are not marked as "replayable" and do not saved
--into the log.
--
--Block devices
---------------
--
--Block devices record/replay module intercepts calls of
--bdrv coroutine functions at the top of block drivers stack.
--To record and replay block operations the drive must be configured
--as following:
-- -drive file=disk.qcow2,if=none,snapshot,id=img-direct
-- -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay
-- -device ide-hd,drive=img-blkreplay
--
--blkreplay driver should be inserted between disk image and virtual driver
--controller. Therefore all disk requests may be recorded and replayed.
--
--All block completion operations are added to the queue in the coroutines.
--Queue is flushed at checkpoints and information about processed requests
--is recorded to the log. In replay phase the queue is matched with
--events read from the log. Therefore block devices requests are processed
--deterministically.
--
--Snapshotting
--------------
--
--New VM snapshots may be created in replay mode. They can be used later
--to recover the desired VM state. All VM states created in replay mode
--are associated with the moment of time in the replay scenario.
--After recovering the VM state replay will start from that position.
--
--Default starting snapshot name may be specified with icount field
--rrsnapshot as follows:
-- -icount shift=7,rr=record,rrfile=replay.bin,rrsnapshot=snapshot_name
--
--This snapshot is created at start of recording and restored at start
--of replaying. It also can be loaded while replaying to roll back
--the execution.
--
--'snapshot' flag of the disk image must be removed to save the snapshots
--in the overlay (or original image) instead of using the temporary overlay.
-- -drive file=disk.ovl,if=none,id=img-direct
-- -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay
-- -device ide-hd,drive=img-blkreplay
--
--Use QEMU monitor to create additional snapshots. 'savevm <name>' command
--created the snapshot and 'loadvm <name>' restores it. To prevent corruption
--of the original disk image, use overlay files linked to the original images.
--Therefore all new snapshots (including the starting one) will be saved in
--overlays and the original image remains unchanged.
--
--When you need to use snapshots with diskless virtual machine,
--it must be started with 'orphan' qcow2 image. This image will be used
--for storing VM snapshots. Here is the example of the command line for this:
--
--  qemu-system-i386 -icount shift=3,rr=replay,rrfile=record.bin,rrsnapshot=init \
--    -net none -drive file=empty.qcow2,if=none,id=rr
--
--empty.qcow2 drive does not connected to any virtual block device and used
--for VM snapshots only.
--
--Network devices
-----------------
--
--Record and replay for network interactions is performed with the network filter.
--Each backend must have its own instance of the replay filter as follows:
-- -netdev user,id=net1 -device rtl8139,netdev=net1
-- -object filter-replay,id=replay,netdev=net1
--
--Replay network filter is used to record and replay network packets. While
--recording the virtual machine this filter puts all packets coming from
--the outer world into the log. In replay mode packets from the log are
--injected into the network device. All interactions with network backend
--in replay mode are disabled.
--
--Audio devices
---------------
--
--Audio data is recorded and replay automatically. The command line for recording
--and replaying must contain identical specifications of audio hardware, e.g.:
-- -soundhw ac97
--
--Serial ports
--------------
--
--Serial ports input is recorded and replay automatically. The command lines
--for recording and replaying must contain identical number of ports in record
--and replay modes, but their backends may differ.
--E.g., '-serial stdio' in record mode, and '-serial null' in replay mode.
--
--Reverse debugging
-------------------
--
--Reverse debugging allows "executing" the program in reverse direction.
--GDB remote protocol supports "reverse step" and "reverse continue"
--commands. The first one steps single instruction backwards in time,
--and the second one finds the last breakpoint in the past.
--
--Recorded executions may be used to enable reverse debugging. QEMU can't
--execute the code in backwards direction, but can load a snapshot and
--replay forward to find the desired position or breakpoint.
--
--The following GDB commands are supported:
-- - reverse-stepi (or rsi) - step one instruction backwards
-- - reverse-continue (or rc) - find last breakpoint in the past
--
--Reverse step loads the nearest snapshot and replays the execution until
--the required instruction is met.
--
--Reverse continue may include several passes of examining the execution
--between the snapshots. Each of the passes include the following steps:
-- 1. loading the snapshot
-- 2. replaying to examine the breakpoints
-- 3. if breakpoint or watchpoint was met
--    - loading the snaphot again
--    - replaying to the required breakpoint
-- 4. else
--    - proceeding to the p.1 with the earlier snapshot
--
--Therefore usage of the reverse debugging requires at least one snapshot
--created in advance. This can be done by omitting 'snapshot' option
--for the block drives and adding 'rrsnapshot' for both record and replay
--command lines.
--See the "Snapshotting" section to learn more about running record/replay
--and creating the snapshot in these modes.
--
--Replay log format
-------------------
--
--Record/replay log consists of the header and the sequence of execution
--events. The header includes 4-byte replay version id and 8-byte reserved
--field. Version is updated every time replay log format changes to prevent
--using replay log created by another build of qemu.
--
--The sequence of the events describes virtual machine state changes.
--It includes all non-deterministic inputs of VM, synchronization marks and
--instruction counts used to correctly inject inputs at replay.
--
--Synchronization marks (checkpoints) are used for synchronizing qemu threads
--that perform operations with virtual hardware. These operations may change
--system's state (e.g., change some register or generate interrupt) and
--therefore should execute synchronously with CPU thread.
--
--Every event in the log includes 1-byte event id and optional arguments.
--When argument is an array, it is stored as 4-byte array length
--and corresponding number of bytes with data.
--Here is the list of events that are written into the log:
--
-- - EVENT_INSTRUCTION. Instructions executed since last event.
--   Argument: 4-byte number of executed instructions.
-- - EVENT_INTERRUPT. Used to synchronize interrupt processing.
-- - EVENT_EXCEPTION. Used to synchronize exception handling.
-- - EVENT_ASYNC. This is a group of events. They are always processed
--   together with checkpoints. When such an event is generated, it is
--   stored in the queue and processed only when checkpoint occurs.
--   Every such event is followed by 1-byte checkpoint id and 1-byte
--   async event id from the following list:
--     - REPLAY_ASYNC_EVENT_BH. Bottom-half callback. This event synchronizes
--       callbacks that affect virtual machine state, but normally called
--       asynchronously.
--       Argument: 8-byte operation id.
--     - REPLAY_ASYNC_EVENT_INPUT. Input device event. Contains
--       parameters of keyboard and mouse input operations
--       (key press/release, mouse pointer movement).
--       Arguments: 9-16 bytes depending of input event.
--     - REPLAY_ASYNC_EVENT_INPUT_SYNC. Internal input synchronization event.
--     - REPLAY_ASYNC_EVENT_CHAR_READ. Character (e.g., serial port) device input
--       initiated by the sender.
--       Arguments: 1-byte character device id.
--                  Array with bytes were read.
--     - REPLAY_ASYNC_EVENT_BLOCK. Block device operation. Used to synchronize
--       operations with disk and flash drives with CPU.
--       Argument: 8-byte operation id.
--     - REPLAY_ASYNC_EVENT_NET. Incoming network packet.
--       Arguments: 1-byte network adapter id.
--                  4-byte packet flags.
--                  Array with packet bytes.
-- - EVENT_SHUTDOWN. Occurs when user sends shutdown event to qemu,
--   e.g., by closing the window.
-- - EVENT_CHAR_WRITE. Used to synchronize character output operations.
--   Arguments: 4-byte output function return value.
--              4-byte offset in the output array.
-- - EVENT_CHAR_READ_ALL. Used to synchronize character input operations,
--   initiated by qemu.
--   Argument: Array with bytes that were read.
-- - EVENT_CHAR_READ_ALL_ERROR. Unsuccessful character input operation,
--   initiated by qemu.
--   Argument: 4-byte error code.
-- - EVENT_CLOCK + clock_id. Group of events for host clock read operations.
--   Argument: 8-byte clock value.
-- - EVENT_CHECKPOINT + checkpoint_id. Checkpoint for synchronization of
--   CPU, internal threads, and asynchronous input events. May be followed
--   by one or more EVENT_ASYNC events.
-- - EVENT_END. Last event in the log.
-diff --git a/docs/system/index.rst b/docs/system/index.rst
-index c0f685b818..39fe8177f5 100644
---- a/docs/system/index.rst
-+++ b/docs/system/index.rst
-@@ -27,6 +27,7 @@ Contents:
-    vnc-security
-    tls
-    gdb
-+   replay
-    managed-startup
-    targets
-    security
-diff --git a/docs/system/replay.rst b/docs/system/replay.rst
-new file mode 100644
-index 0000000000..d6395ab72a
---- /dev/null
-+++ b/docs/system/replay.rst
-@@ -0,0 +1,410 @@
-+Copyright (c) 2010-2015 Institute for System Programming
-+                        of the Russian Academy of Sciences.
+--
+
+v4 changes:
+ - squashed format update with test output update
+---
+ block/qapi.c               |   18 +++++++++++++----
+ block/qcow2-snapshot.c     |    2 ++
+ blockdev.c                 |   10 +++++++++
+ include/block/snapshot.h   |    1 +
+ migration/savevm.c         |    5 +++++
+ qapi/block-core.json       |   10 +++++++--
+ stubs/replay.c             |    5 +++++
+ tests/qemu-iotests/267.out |   48 ++++++++++++++++++++++----------------------
+ 8 files changed, 69 insertions(+), 30 deletions(-)
+
+diff --git a/block/qapi.c b/block/qapi.c
+index f423ece98c..1086ee0c76 100644
+--- a/block/qapi.c
++++ b/block/qapi.c
+@@ -230,6 +230,8 @@ int bdrv_query_snapshot_info_list(BlockDriverState *bs,
+         info->date_nsec     = sn_tab[i].date_nsec;
+         info->vm_clock_sec  = sn_tab[i].vm_clock_nsec / 1000000000;
+         info->vm_clock_nsec = sn_tab[i].vm_clock_nsec % 1000000000;
++        info->icount        = sn_tab[i].icount;
++        info->has_icount    = sn_tab[i].icount != -1ULL;
+ 
+         info_list = g_new0(SnapshotInfoList, 1);
+         info_list->value = info;
+@@ -694,14 +696,15 @@ BlockStatsList *qmp_query_blockstats(bool has_query_nodes,
+ void bdrv_snapshot_dump(QEMUSnapshotInfo *sn)
+ {
+     char date_buf[128], clock_buf[128];
++    char icount_buf[128] = {0};
+     struct tm tm;
+     time_t ti;
+     int64_t secs;
+     char *sizing = NULL;
+ 
+     if (!sn) {
+-        qemu_printf("%-10s%-20s%11s%20s%15s",
+-                    "ID", "TAG", "VM SIZE", "DATE", "VM CLOCK");
++        qemu_printf("%-10s%-18s%7s%20s%13s%11s",
++                    "ID", "TAG", "VM SIZE", "DATE", "VM CLOCK", "ICOUNT");
+     } else {
+         ti = sn->date_sec;
+         localtime_r(&ti, &tm);
+@@ -715,11 +718,16 @@ void bdrv_snapshot_dump(QEMUSnapshotInfo *sn)
+                  (int)(secs % 60),
+                  (int)((sn->vm_clock_nsec / 1000000) % 1000));
+         sizing = size_to_str(sn->vm_state_size);
+-        qemu_printf("%-10s%-20s%11s%20s%15s",
++        if (sn->icount != -1ULL) {
++            snprintf(icount_buf, sizeof(icount_buf),
++                "%"PRId64, sn->icount);
++        }
++        qemu_printf("%-10s%-18s%7s%20s%13s%11s",
+                     sn->id_str, sn->name,
+                     sizing,
+                     date_buf,
+-                    clock_buf);
++                    clock_buf,
++                    icount_buf);
+     }
+     g_free(sizing);
+ }
+@@ -881,6 +889,8 @@ void bdrv_image_info_dump(ImageInfo *info)
+                 .date_nsec = elem->value->date_nsec,
+                 .vm_clock_nsec = elem->value->vm_clock_sec * 1000000000ULL +
+                                  elem->value->vm_clock_nsec,
++                .icount = elem->value->has_icount ?
++                          elem->value->icount : -1ULL,
+             };
+ 
+             pstrcpy(sn.id_str, sizeof(sn.id_str), elem->value->id);
+diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
+index d68b25e0c5..2e98c7f4b6 100644
+--- a/block/qcow2-snapshot.c
++++ b/block/qcow2-snapshot.c
+@@ -663,6 +663,7 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUSnapshotInfo *sn_info)
+     sn->date_sec = sn_info->date_sec;
+     sn->date_nsec = sn_info->date_nsec;
+     sn->vm_clock_nsec = sn_info->vm_clock_nsec;
++    sn->icount = sn_info->icount;
+     sn->extra_data_size = sizeof(QCowSnapshotExtraData);
+ 
+     /* Allocate the L1 table of the snapshot and copy the current one there. */
+@@ -1007,6 +1008,7 @@ int qcow2_snapshot_list(BlockDriverState *bs, QEMUSnapshotInfo **psn_tab)
+         sn_info->date_sec = sn->date_sec;
+         sn_info->date_nsec = sn->date_nsec;
+         sn_info->vm_clock_nsec = sn->vm_clock_nsec;
++        sn_info->icount = sn->icount;
+     }
+     *psn_tab = sn_tab;
+     return s->nb_snapshots;
+diff --git a/blockdev.c b/blockdev.c
+index 7f2561081e..ac1c803a7f 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -59,6 +59,7 @@
+ #include "sysemu/arch_init.h"
+ #include "sysemu/qtest.h"
+ #include "sysemu/runstate.h"
++#include "sysemu/replay.h"
+ #include "qemu/cutils.h"
+ #include "qemu/help_option.h"
+ #include "qemu/main-loop.h"
+@@ -1190,6 +1191,10 @@ SnapshotInfo *qmp_blockdev_snapshot_delete_internal_sync(const char *device,
+     info->vm_state_size = sn.vm_state_size;
+     info->vm_clock_nsec = sn.vm_clock_nsec % 1000000000;
+     info->vm_clock_sec = sn.vm_clock_nsec / 1000000000;
++    if (sn.icount != -1ULL) {
++        info->icount = sn.icount;
++        info->has_icount = true;
++    }
+ 
+     return info;
+ 
+@@ -1350,6 +1355,11 @@ static void internal_snapshot_prepare(BlkActionState *common,
+     sn->date_sec = tv.tv_sec;
+     sn->date_nsec = tv.tv_usec * 1000;
+     sn->vm_clock_nsec = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    if (replay_mode != REPLAY_MODE_NONE) {
++        sn->icount = replay_get_current_icount();
++    } else {
++        sn->icount = -1ULL;
++    }
+ 
+     ret1 = bdrv_snapshot_create(bs, sn);
+     if (ret1 < 0) {
+diff --git a/include/block/snapshot.h b/include/block/snapshot.h
+index 2bfcd57578..b0fe42993d 100644
+--- a/include/block/snapshot.h
++++ b/include/block/snapshot.h
+@@ -42,6 +42,7 @@ typedef struct QEMUSnapshotInfo {
+     uint32_t date_sec; /* UTC date of the snapshot */
+     uint32_t date_nsec;
+     uint64_t vm_clock_nsec; /* VM clock relative to boot */
++    uint64_t icount; /* record/replay step */
+ } QEMUSnapshotInfo;
+ 
+ int bdrv_snapshot_find(BlockDriverState *bs, QEMUSnapshotInfo *sn_info,
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 304d98ff78..74378f8ebd 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2723,6 +2723,11 @@ int save_snapshot(const char *name, Error **errp)
+     sn->date_sec = tv.tv_sec;
+     sn->date_nsec = tv.tv_usec * 1000;
+     sn->vm_clock_nsec = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    if (replay_mode != REPLAY_MODE_NONE) {
++        sn->icount = replay_get_current_icount();
++    } else {
++        sn->icount = -1ULL;
++    }
+ 
+     if (name) {
+         ret = bdrv_snapshot_find(bs, old_sn, name);
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 2d94873ca0..e25aff4e4b 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -27,13 +27,18 @@
+ #
+ # @vm-clock-nsec: fractional part in nano seconds to be used with vm-clock-sec
+ #
++# @icount: Current instruction count. Appears when execution record/replay
++#          is enabled. Used for "time-traveling" to match the moment
++#          in the recorded execution with the snapshots. (since 5.2)
++#
+ # Since: 1.3
+ #
+ ##
+ { 'struct': 'SnapshotInfo',
+   'data': { 'id': 'str', 'name': 'str', 'vm-state-size': 'int',
+             'date-sec': 'int', 'date-nsec': 'int',
+-            'vm-clock-sec': 'int', 'vm-clock-nsec': 'int' } }
++            'vm-clock-sec': 'int', 'vm-clock-nsec': 'int',
++            '*icount': 'int' } }
+ 
+ ##
+ # @ImageInfoSpecificQCow2EncryptionBase:
+@@ -5527,7 +5532,8 @@
+ #                    "date-sec": 1000012,
+ #                    "date-nsec": 10,
+ #                    "vm-clock-sec": 100,
+-#                    "vm-clock-nsec": 20
++#                    "vm-clock-nsec": 20,
++#                    "icount": 220414
+ #      }
+ #    }
+ #
+diff --git a/stubs/replay.c b/stubs/replay.c
+index 5974ec1f50..eacb366aa8 100644
+--- a/stubs/replay.c
++++ b/stubs/replay.c
+@@ -88,3 +88,8 @@ int replay_read_random(void *buf, size_t len)
+ {
+     return 0;
+ }
 +
-+This work is licensed under the terms of the GNU GPL, version 2 or later.
-+See the COPYING file in the top-level directory.
-+
-+Record/replay
-+=============
-+
-+Record/replay functions are used for the deterministic replay of qemu execution.
-+Execution recording writes a non-deterministic events log, which can be later
-+used for replaying the execution anywhere and for unlimited number of times.
-+It also supports checkpointing for faster rewind to the specific replay moment.
-+Execution replaying reads the log and replays all non-deterministic events
-+including external input, hardware clocks, and interrupts.
-+
-+Deterministic replay has the following features:
-+ * Deterministically replays whole system execution and all contents of
-+   the memory, state of the hardware devices, clocks, and screen of the VM.
-+ * Writes execution log into the file for later replaying for multiple times
-+   on different machines.
-+ * Supports i386, x86_64, and Arm hardware platforms.
-+ * Performs deterministic replay of all operations with keyboard and mouse
-+   input devices.
-+
-+Usage of the record/replay:
-+ * First, record the execution with the following command line:
-+    qemu-system-i386 \
-+     -icount shift=7,rr=record,rrfile=replay.bin \
-+     -drive file=disk.qcow2,if=none,snapshot,id=img-direct \
-+     -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
-+     -device ide-hd,drive=img-blkreplay \
-+     -netdev user,id=net1 -device rtl8139,netdev=net1 \
-+     -object filter-replay,id=replay,netdev=net1
-+ * After recording, you can replay it by using another command line:
-+    qemu-system-i386 \
-+     -icount shift=7,rr=replay,rrfile=replay.bin \
-+     -drive file=disk.qcow2,if=none,snapshot,id=img-direct \
-+     -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
-+     -device ide-hd,drive=img-blkreplay \
-+     -netdev user,id=net1 -device rtl8139,netdev=net1 \
-+     -object filter-replay,id=replay,netdev=net1
-+   The only difference with recording is changing the rr option
-+   from record to replay.
-+ * Block device images are not actually changed in the recording mode,
-+   because all of the changes are written to the temporary overlay file.
-+   This behavior is enabled by using blkreplay driver. It should be used
-+   for every enabled block device, as described in 'Block devices' section.
-+ * '-net none' option should be specified when network is not used,
-+   because QEMU adds network card by default. When network is needed,
-+   it should be configured explicitly with replay filter, as described
-+   in 'Network devices' section.
-+ * Interaction with audio devices and serial ports are recorded and replayed
-+   automatically when such devices are enabled.
-+
-+Academic papers with description of deterministic replay implementation:
-+http://www.computer.org/csdl/proceedings/csmr/2012/4666/00/4666a553-abs.html
-+http://dl.acm.org/citation.cfm?id=2786805.2803179
-+
-+Modifications of qemu include:
-+ * wrappers for clock and time functions to save their return values in the log
-+ * saving different asynchronous events (e.g. system shutdown) into the log
-+ * synchronization of the bottom halves execution
-+ * synchronization of the threads from thread pool
-+ * recording/replaying user input (mouse, keyboard, and microphone)
-+ * adding internal checkpoints for cpu and io synchronization
-+ * network filter for recording and replaying the packets
-+ * block driver for making block layer deterministic
-+ * serial port input record and replay
-+ * recording of random numbers obtained from the external sources
-+
-+Locking and thread synchronisation
-+----------------------------------
-+
-+Previously the synchronisation of the main thread and the vCPU thread
-+was ensured by the holding of the BQL. However the trend has been to
-+reduce the time the BQL was held across the system including under TCG
-+system emulation. As it is important that batches of events are kept
-+in sequence (e.g. expiring timers and checkpoints in the main thread
-+while instruction checkpoints are written by the vCPU thread) we need
-+another lock to keep things in lock-step. This role is now handled by
-+the replay_mutex_lock. It used to be held only for each event being
-+written but now it is held for a whole execution period. This results
-+in a deterministic ping-pong between the two main threads.
-+
-+As the BQL is now a finer grained lock than the replay_lock it is almost
-+certainly a bug, and a source of deadlocks, to take the
-+replay_mutex_lock while the BQL is held. This is enforced by an assert.
-+While the unlocks are usually in the reverse order, this is not
-+necessary; you can drop the replay_lock while holding the BQL, without
-+doing a more complicated unlock_iothread/replay_unlock/lock_iothread
-+sequence.
-+
-+Non-deterministic events
-+------------------------
-+
-+Our record/replay system is based on saving and replaying non-deterministic
-+events (e.g. keyboard input) and simulating deterministic ones (e.g. reading
-+from HDD or memory of the VM). Saving only non-deterministic events makes
-+log file smaller and simulation faster.
-+
-+The following non-deterministic data from peripheral devices is saved into
-+the log: mouse and keyboard input, network packets, audio controller input,
-+serial port input, and hardware clocks (they are non-deterministic
-+too, because their values are taken from the host machine). Inputs from
-+simulated hardware, memory of VM, software interrupts, and execution of
-+instructions are not saved into the log, because they are deterministic and
-+can be replayed by simulating the behavior of virtual machine starting from
-+initial state.
-+
-+We had to solve three tasks to implement deterministic replay: recording
-+non-deterministic events, replaying non-deterministic events, and checking
-+that there is no divergence between record and replay modes.
-+
-+We changed several parts of QEMU to make event log recording and replaying.
-+Devices' models that have non-deterministic input from external devices were
-+changed to write every external event into the execution log immediately.
-+E.g. network packets are written into the log when they arrive into the virtual
-+network adapter.
-+
-+All non-deterministic events are coming from these devices. But to
-+replay them we need to know at which moments they occur. We specify
-+these moments by counting the number of instructions executed between
-+every pair of consecutive events.
-+
-+Instruction counting
-+--------------------
-+
-+QEMU should work in icount mode to use record/replay feature. icount was
-+designed to allow deterministic execution in absence of external inputs
-+of the virtual machine. We also use icount to control the occurrence of the
-+non-deterministic events. The number of instructions elapsed from the last event
-+is written to the log while recording the execution. In replay mode we
-+can predict when to inject that event using the instruction counter.
-+
-+Timers
-+------
-+
-+Timers are used to execute callbacks from different subsystems of QEMU
-+at the specified moments of time. There are several kinds of timers:
-+ * Real time clock. Based on host time and used only for callbacks that
-+   do not change the virtual machine state. For this reason real time
-+   clock and timers does not affect deterministic replay at all.
-+ * Virtual clock. These timers run only during the emulation. In icount
-+   mode virtual clock value is calculated using executed instructions counter.
-+   That is why it is completely deterministic and does not have to be recorded.
-+ * Host clock. This clock is used by device models that simulate real time
-+   sources (e.g. real time clock chip). Host clock is the one of the sources
-+   of non-determinism. Host clock read operations should be logged to
-+   make the execution deterministic.
-+ * Virtual real time clock. This clock is similar to real time clock but
-+   it is used only for increasing virtual clock while virtual machine is
-+   sleeping. Due to its nature it is also non-deterministic as the host clock
-+   and has to be logged too.
-+
-+Checkpoints
-+-----------
-+
-+Replaying of the execution of virtual machine is bound by sources of
-+non-determinism. These are inputs from clock and peripheral devices,
-+and QEMU thread scheduling. Thread scheduling affect on processing events
-+from timers, asynchronous input-output, and bottom halves.
-+
-+Invocations of timers are coupled with clock reads and changing the state
-+of the virtual machine. Reads produce non-deterministic data taken from
-+host clock. And VM state changes should preserve their order. Their relative
-+order in replay mode must replicate the order of callbacks in record mode.
-+To preserve this order we use checkpoints. When a specific clock is processed
-+in record mode we save to the log special "checkpoint" event.
-+Checkpoints here do not refer to virtual machine snapshots. They are just
-+record/replay events used for synchronization.
-+
-+QEMU in replay mode will try to invoke timers processing in random moment
-+of time. That's why we do not process a group of timers until the checkpoint
-+event will be read from the log. Such an event allows synchronizing CPU
-+execution and timer events.
-+
-+Two other checkpoints govern the "warping" of the virtual clock.
-+While the virtual machine is idle, the virtual clock increments at
-+1 ns per *real time* nanosecond.  This is done by setting up a timer
-+(called the warp timer) on the virtual real time clock, so that the
-+timer fires at the next deadline of the virtual clock; the virtual clock
-+is then incremented (which is called "warping" the virtual clock) as
-+soon as the timer fires or the CPUs need to go out of the idle state.
-+Two functions are used for this purpose; because these actions change
-+virtual machine state and must be deterministic, each of them creates a
-+checkpoint.  qemu_start_warp_timer checks if the CPUs are idle and if so
-+starts accounting real time to virtual clock.  qemu_account_warp_timer
-+is called when the CPUs get an interrupt or when the warp timer fires,
-+and it warps the virtual clock by the amount of real time that has passed
-+since qemu_start_warp_timer.
-+
-+Bottom halves
-+-------------
-+
-+Disk I/O events are completely deterministic in our model, because
-+in both record and replay modes we start virtual machine from the same
-+disk state. But callbacks that virtual disk controller uses for reading and
-+writing the disk may occur at different moments of time in record and replay
-+modes.
-+
-+Reading and writing requests are created by CPU thread of QEMU. Later these
-+requests proceed to block layer which creates "bottom halves". Bottom
-+halves consist of callback and its parameters. They are processed when
-+main loop locks the global mutex. These locks are not synchronized with
-+replaying process because main loop also processes the events that do not
-+affect the virtual machine state (like user interaction with monitor).
-+
-+That is why we had to implement saving and replaying bottom halves callbacks
-+synchronously to the CPU execution. When the callback is about to execute
-+it is added to the queue in the replay module. This queue is written to the
-+log when its callbacks are executed. In replay mode callbacks are not processed
-+until the corresponding event is read from the events log file.
-+
-+Sometimes the block layer uses asynchronous callbacks for its internal purposes
-+(like reading or writing VM snapshots or disk image cluster tables). In this
-+case bottom halves are not marked as "replayable" and do not saved
-+into the log.
-+
-+Block devices
-+-------------
-+
-+Block devices record/replay module intercepts calls of
-+bdrv coroutine functions at the top of block drivers stack.
-+To record and replay block operations the drive must be configured
-+as following:
-+ -drive file=disk.qcow2,if=none,snapshot,id=img-direct
-+ -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay
-+ -device ide-hd,drive=img-blkreplay
-+
-+blkreplay driver should be inserted between disk image and virtual driver
-+controller. Therefore all disk requests may be recorded and replayed.
-+
-+All block completion operations are added to the queue in the coroutines.
-+Queue is flushed at checkpoints and information about processed requests
-+is recorded to the log. In replay phase the queue is matched with
-+events read from the log. Therefore block devices requests are processed
-+deterministically.
-+
-+Snapshotting
-+------------
-+
-+New VM snapshots may be created in replay mode. They can be used later
-+to recover the desired VM state. All VM states created in replay mode
-+are associated with the moment of time in the replay scenario.
-+After recovering the VM state replay will start from that position.
-+
-+Default starting snapshot name may be specified with icount field
-+rrsnapshot as follows:
-+ -icount shift=7,rr=record,rrfile=replay.bin,rrsnapshot=snapshot_name
-+
-+This snapshot is created at start of recording and restored at start
-+of replaying. It also can be loaded while replaying to roll back
-+the execution.
-+
-+'snapshot' flag of the disk image must be removed to save the snapshots
-+in the overlay (or original image) instead of using the temporary overlay.
-+ -drive file=disk.ovl,if=none,id=img-direct
-+ -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay
-+ -device ide-hd,drive=img-blkreplay
-+
-+Use QEMU monitor to create additional snapshots. 'savevm <name>' command
-+created the snapshot and 'loadvm <name>' restores it. To prevent corruption
-+of the original disk image, use overlay files linked to the original images.
-+Therefore all new snapshots (including the starting one) will be saved in
-+overlays and the original image remains unchanged.
-+
-+When you need to use snapshots with diskless virtual machine,
-+it must be started with 'orphan' qcow2 image. This image will be used
-+for storing VM snapshots. Here is the example of the command line for this:
-+
-+  qemu-system-i386 -icount shift=3,rr=replay,rrfile=record.bin,rrsnapshot=init \
-+    -net none -drive file=empty.qcow2,if=none,id=rr
-+
-+empty.qcow2 drive does not connected to any virtual block device and used
-+for VM snapshots only.
-+
-+Network devices
-+---------------
-+
-+Record and replay for network interactions is performed with the network filter.
-+Each backend must have its own instance of the replay filter as follows:
-+ -netdev user,id=net1 -device rtl8139,netdev=net1
-+ -object filter-replay,id=replay,netdev=net1
-+
-+Replay network filter is used to record and replay network packets. While
-+recording the virtual machine this filter puts all packets coming from
-+the outer world into the log. In replay mode packets from the log are
-+injected into the network device. All interactions with network backend
-+in replay mode are disabled.
-+
-+Audio devices
-+-------------
-+
-+Audio data is recorded and replay automatically. The command line for recording
-+and replaying must contain identical specifications of audio hardware, e.g.:
-+ -soundhw ac97
-+
-+Serial ports
-+------------
-+
-+Serial ports input is recorded and replay automatically. The command lines
-+for recording and replaying must contain identical number of ports in record
-+and replay modes, but their backends may differ.
-+E.g., '-serial stdio' in record mode, and '-serial null' in replay mode.
-+
-+Reverse debugging
-+-----------------
-+
-+Reverse debugging allows "executing" the program in reverse direction.
-+GDB remote protocol supports "reverse step" and "reverse continue"
-+commands. The first one steps single instruction backwards in time,
-+and the second one finds the last breakpoint in the past.
-+
-+Recorded executions may be used to enable reverse debugging. QEMU can't
-+execute the code in backwards direction, but can load a snapshot and
-+replay forward to find the desired position or breakpoint.
-+
-+The following GDB commands are supported:
-+ - reverse-stepi (or rsi) - step one instruction backwards
-+ - reverse-continue (or rc) - find last breakpoint in the past
-+
-+Reverse step loads the nearest snapshot and replays the execution until
-+the required instruction is met.
-+
-+Reverse continue may include several passes of examining the execution
-+between the snapshots. Each of the passes include the following steps:
-+ 1. loading the snapshot
-+ 2. replaying to examine the breakpoints
-+ 3. if breakpoint or watchpoint was met
-+    - loading the snaphot again
-+    - replaying to the required breakpoint
-+ 4. else
-+    - proceeding to the p.1 with the earlier snapshot
-+
-+Therefore usage of the reverse debugging requires at least one snapshot
-+created in advance. This can be done by omitting 'snapshot' option
-+for the block drives and adding 'rrsnapshot' for both record and replay
-+command lines.
-+See the "Snapshotting" section to learn more about running record/replay
-+and creating the snapshot in these modes.
-+
-+Replay log format
-+-----------------
-+
-+Record/replay log consists of the header and the sequence of execution
-+events. The header includes 4-byte replay version id and 8-byte reserved
-+field. Version is updated every time replay log format changes to prevent
-+using replay log created by another build of qemu.
-+
-+The sequence of the events describes virtual machine state changes.
-+It includes all non-deterministic inputs of VM, synchronization marks and
-+instruction counts used to correctly inject inputs at replay.
-+
-+Synchronization marks (checkpoints) are used for synchronizing qemu threads
-+that perform operations with virtual hardware. These operations may change
-+system's state (e.g., change some register or generate interrupt) and
-+therefore should execute synchronously with CPU thread.
-+
-+Every event in the log includes 1-byte event id and optional arguments.
-+When argument is an array, it is stored as 4-byte array length
-+and corresponding number of bytes with data.
-+Here is the list of events that are written into the log:
-+
-+ - EVENT_INSTRUCTION. Instructions executed since last event.
-+   Argument: 4-byte number of executed instructions.
-+ - EVENT_INTERRUPT. Used to synchronize interrupt processing.
-+ - EVENT_EXCEPTION. Used to synchronize exception handling.
-+ - EVENT_ASYNC. This is a group of events. They are always processed
-+   together with checkpoints. When such an event is generated, it is
-+   stored in the queue and processed only when checkpoint occurs.
-+   Every such event is followed by 1-byte checkpoint id and 1-byte
-+   async event id from the following list:
-+     - REPLAY_ASYNC_EVENT_BH. Bottom-half callback. This event synchronizes
-+       callbacks that affect virtual machine state, but normally called
-+       asynchronously.
-+       Argument: 8-byte operation id.
-+     - REPLAY_ASYNC_EVENT_INPUT. Input device event. Contains
-+       parameters of keyboard and mouse input operations
-+       (key press/release, mouse pointer movement).
-+       Arguments: 9-16 bytes depending of input event.
-+     - REPLAY_ASYNC_EVENT_INPUT_SYNC. Internal input synchronization event.
-+     - REPLAY_ASYNC_EVENT_CHAR_READ. Character (e.g., serial port) device input
-+       initiated by the sender.
-+       Arguments: 1-byte character device id.
-+                  Array with bytes were read.
-+     - REPLAY_ASYNC_EVENT_BLOCK. Block device operation. Used to synchronize
-+       operations with disk and flash drives with CPU.
-+       Argument: 8-byte operation id.
-+     - REPLAY_ASYNC_EVENT_NET. Incoming network packet.
-+       Arguments: 1-byte network adapter id.
-+                  4-byte packet flags.
-+                  Array with packet bytes.
-+ - EVENT_SHUTDOWN. Occurs when user sends shutdown event to qemu,
-+   e.g., by closing the window.
-+ - EVENT_CHAR_WRITE. Used to synchronize character output operations.
-+   Arguments: 4-byte output function return value.
-+              4-byte offset in the output array.
-+ - EVENT_CHAR_READ_ALL. Used to synchronize character input operations,
-+   initiated by qemu.
-+   Argument: Array with bytes that were read.
-+ - EVENT_CHAR_READ_ALL_ERROR. Unsuccessful character input operation,
-+   initiated by qemu.
-+   Argument: 4-byte error code.
-+ - EVENT_CLOCK + clock_id. Group of events for host clock read operations.
-+   Argument: 8-byte clock value.
-+ - EVENT_CHECKPOINT + checkpoint_id. Checkpoint for synchronization of
-+   CPU, internal threads, and asynchronous input events. May be followed
-+   by one or more EVENT_ASYNC events.
-+ - EVENT_END. Last event in the log.
++uint64_t replay_get_current_icount(void)
++{
++    return 0;
++}
+diff --git a/tests/qemu-iotests/267.out b/tests/qemu-iotests/267.out
+index 215902b3ad..27471ffae8 100644
+--- a/tests/qemu-iotests/267.out
++++ b/tests/qemu-iotests/267.out
+@@ -33,8 +33,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+@@ -44,8 +44,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+@@ -69,8 +69,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+@@ -94,8 +94,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+@@ -105,8 +105,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+@@ -119,8 +119,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+@@ -134,8 +134,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+@@ -145,15 +145,15 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+ Internal snapshots on overlay:
+ Snapshot list:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+-1         snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++1         snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ Internal snapshots on backing file:
+ 
+ === -blockdev with NBD server on the backing file ===
+@@ -166,17 +166,17 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+ Internal snapshots on overlay:
+ Snapshot list:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+-1         snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++1         snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ Internal snapshots on backing file:
+ Snapshot list:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+-1         snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++1         snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ *** done
 
 
