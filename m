@@ -2,88 +2,81 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD943C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 15:22:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB23C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 15:24:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5B0E23A1B
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 15:22:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LUDapqRg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5B0E23A1B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A143923A1B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 15:24:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A143923A1B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKk7c-00028f-JJ
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 11:22:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34826)
+	id 1kKk9z-000435-Jf
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 11:24:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35190)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kKk53-0000jt-MZ
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 11:19:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30572)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kKk50-0006XD-GQ
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 11:19:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600787981;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=hxahp7jlcV8KWl44LwjwrRaKzzX7zcc0K4C9kwUJ3qI=;
- b=LUDapqRgZkAVAEYQUCQHOBzu5BcQMWxq29IE+CgSZFY9LZghMZFD0UQblQBLojlrZUuSvd
- sjyZRoNLi2yEUOl5fsuOul54cikfCch+mn6kX+APPkP7DxVGcszyFrsqtvJGX7Gx7/wNft
- UN1uS/xrvNwD+mO4cTu7cHluxfib04I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-9-laZ-QeasMrq61p0yVjdIiQ-1; Tue, 22 Sep 2020 11:19:39 -0400
-X-MC-Unique: laZ-QeasMrq61p0yVjdIiQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED9C71018721;
- Tue, 22 Sep 2020 15:19:37 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.193.59])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 19E6D60C05;
- Tue, 22 Sep 2020 15:19:35 +0000 (UTC)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] target/i386: always create kvmclock device
-Date: Tue, 22 Sep 2020 17:19:34 +0200
-Message-Id: <20200922151934.899555-1-vkuznets@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kKk65-00014m-0S
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 11:20:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42810)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kKk60-0006mh-6J
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 11:20:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kKk5t-0007Oa-GF
+ for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 15:20:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 75F4F2E80AB
+ for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 15:20:37 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vkuznets@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=vkuznets@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 00:31:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 22 Sep 2020 15:14:55 -0000
+From: Eduardo Habkost <1896263@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ehabkost laurent-vivier maxco stefanha
+X-Launchpad-Bug-Reporter: Apteryx (maxco)
+X-Launchpad-Bug-Modifier: Eduardo Habkost (ehabkost)
+References: <160044888692.1133.11388395637815022535.malonedeb@chaenomeles.canonical.com>
+Message-ID: <20200922151455.1763896-1-ehabkost@redhat.com>
+Subject: [Bug 1896263] [PATCH] i386: Don't try to set MSR_KVM_ASYNC_PF_EN if
+ kernel-irqchip=off
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: e879b55d22827a8e93ce3892338a5ae4dea70be4
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 09:57:39
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -92,205 +85,244 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Antoine Damhet <antoine.damhet@blade-group.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1896263 <1896263@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200922151455.R5-Y0lrkW6rvr4C2KIkYp_v3Ct5V1NHQXifDuuI_JuQ@z>
 
-QEMU's kvmclock device is only created when KVM PV feature bits for
-kvmclock (KVM_FEATURE_CLOCKSOURCE/KVM_FEATURE_CLOCKSOURCE2) are
-exposed to the guest. With 'kvm=off' cpu flag the device is not
-created and we don't call KVM_GET_CLOCK/KVM_SET_CLOCK upon migration.
-It was reported that without these call at least Hyper-V TSC page
-clocksouce (which can be enabled independently) gets broken after
-migration.
+This addresses the following crash when running Linux v5.8
+with kernel-irqchip=3Doff:
 
-Switch to creating kvmclock QEMU device unconditionally, it seems
-to always make sense to call KVM_GET_CLOCK/KVM_SET_CLOCK on migration.
-Use KVM_CAP_ADJUST_CLOCK check instead of CPUID feature bits.
+  qemu-system-x86_64: error: failed to set MSR 0x4b564d02 to 0x0
+  qemu-system-x86_64: ../target/i386/kvm.c:2714: kvm_buf_set_msrs: Assertio=
+n `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
 
-Reported-by: Antoine Damhet <antoine.damhet@blade-group.com>
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+There is a kernel-side fix for the issue too (kernel commit
+d831de177217 "KVM: x86: always allow writing '0' to
+MSR_KVM_ASYNC_PF_EN"), but it's nice to simply not trigger
+the bug if running an older kernel.
+
+Fixes: https://bugs.launchpad.net/bugs/1896263
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/i386/kvm/clock.c    | 7 +++++--
- hw/i386/microvm.c      | 2 +-
- hw/i386/pc.c           | 1 +
- hw/i386/pc_piix.c      | 7 +++++--
- hw/i386/pc_q35.c       | 5 ++++-
- include/hw/i386/pc.h   | 3 +++
- include/hw/kvm/clock.h | 4 ++--
- target/i386/kvm.c      | 5 +++++
- target/i386/kvm_i386.h | 1 +
- 9 files changed, 27 insertions(+), 8 deletions(-)
+ target/i386/kvm.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
-index 64283358f91d..30cf53393ee1 100644
---- a/hw/i386/kvm/clock.c
-+++ b/hw/i386/kvm/clock.c
-@@ -328,11 +328,14 @@ static const TypeInfo kvmclock_info = {
- };
- 
- /* Note: Must be called after VCPU initialization. */
--void kvmclock_create(void)
-+void kvmclock_create(bool create_always)
- {
-     X86CPU *cpu = X86_CPU(first_cpu);
- 
--    if (kvm_enabled() &&
-+    if (!kvm_enabled() || !kvm_has_adjust_clock())
-+        return;
-+
-+    if (create_always ||
-         cpu->env.features[FEAT_KVM] & ((1ULL << KVM_FEATURE_CLOCKSOURCE) |
-                                        (1ULL << KVM_FEATURE_CLOCKSOURCE2))) {
-         sysbus_create_simple(TYPE_KVM_CLOCK, -1, NULL);
-diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
-index 81d0888930d1..fd0b84109154 100644
---- a/hw/i386/microvm.c
-+++ b/hw/i386/microvm.c
-@@ -119,7 +119,7 @@ static void microvm_devices_init(MicrovmMachineState *mms)
- 
-     ioapic_init_gsi(gsi_state, "machine");
- 
--    kvmclock_create();
-+    kvmclock_create(true);
- 
-     for (i = 0; i < VIRTIO_NUM_TRANSPORTS; i++) {
-         sysbus_create_simple("virtio-mmio",
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index d11daacc23cf..0e036ef9c15f 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1956,6 +1956,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     pcmc->acpi_data_size = 0x20000 + 0x8000;
-     pcmc->linuxboot_dma_enabled = true;
-     pcmc->pvh_enabled = true;
-+    pcmc->kvmclock_create_always = true;
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler = pc_get_hotplug_handler;
-     mc->hotplug_allowed = pc_hotplug_allowed;
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 32b1453e6a82..1a68338c737b 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -158,8 +158,8 @@ static void pc_init1(MachineState *machine,
- 
-     x86_cpus_init(x86ms, pcmc->default_cpu_version);
- 
--    if (kvm_enabled() && pcmc->kvmclock_enabled) {
--        kvmclock_create();
-+    if (pcmc->kvmclock_enabled) {
-+        kvmclock_create(pcmc->kvmclock_create_always);
-     }
- 
-     if (pcmc->pci_enabled) {
-@@ -440,11 +440,14 @@ DEFINE_I440FX_MACHINE(v5_2, "pc-i440fx-5.2", NULL,
- 
- static void pc_i440fx_5_1_machine_options(MachineClass *m)
- {
-+    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+
-     pc_i440fx_5_2_machine_options(m);
-     m->alias = NULL;
-     m->is_default = false;
-     compat_props_add(m->compat_props, hw_compat_5_1, hw_compat_5_1_len);
-     compat_props_add(m->compat_props, pc_compat_5_1, pc_compat_5_1_len);
-+    pcmc->kvmclock_create_always = false;
- }
- 
- DEFINE_I440FX_MACHINE(v5_1, "pc-i440fx-5.1", NULL,
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 0cb9c18cd44d..0dd59bd765b1 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -185,7 +185,7 @@ static void pc_q35_init(MachineState *machine)
- 
-     x86_cpus_init(x86ms, pcmc->default_cpu_version);
- 
--    kvmclock_create();
-+    kvmclock_create(pcmc->kvmclock_create_always);
- 
-     /* pci enabled */
-     if (pcmc->pci_enabled) {
-@@ -366,10 +366,13 @@ DEFINE_Q35_MACHINE(v5_2, "pc-q35-5.2", NULL,
- 
- static void pc_q35_5_1_machine_options(MachineClass *m)
- {
-+    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+
-     pc_q35_5_2_machine_options(m);
-     m->alias = NULL;
-     compat_props_add(m->compat_props, hw_compat_5_1, hw_compat_5_1_len);
-     compat_props_add(m->compat_props, pc_compat_5_1, pc_compat_5_1_len);
-+    pcmc->kvmclock_create_always = false;
- }
- 
- DEFINE_Q35_MACHINE(v5_1, "pc-q35-5.1", NULL,
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index fe52e165b27c..6b22671434b9 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -118,6 +118,9 @@ typedef struct PCMachineClass {
- 
-     /* use PVH to load kernels that support this feature */
-     bool pvh_enabled;
-+
-+    /* create kvmclock device even when KVM PV features are not exposed */
-+    bool kvmclock_create_always;
- } PCMachineClass;
- 
- #define TYPE_PC_MACHINE "generic-pc-machine"
-diff --git a/include/hw/kvm/clock.h b/include/hw/kvm/clock.h
-index 81c66b230207..7994071c4fee 100644
---- a/include/hw/kvm/clock.h
-+++ b/include/hw/kvm/clock.h
-@@ -15,11 +15,11 @@
- 
- #ifdef CONFIG_KVM
- 
--void kvmclock_create(void);
-+void kvmclock_create(bool create_always);
- 
- #else /* CONFIG_KVM */
- 
--static inline void kvmclock_create(void)
-+static inline void kvmclock_create(bool create_always)
- {
- }
- 
 diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 4a8b3a41c1bc..20b31b65307b 100644
+index 9efb07e7c83..1492f41349f 100644
 --- a/target/i386/kvm.c
 +++ b/target/i386/kvm.c
-@@ -143,6 +143,11 @@ bool kvm_has_adjust_clock_stable(void)
-     return (ret == KVM_CLOCK_TSC_STABLE);
- }
- 
-+bool kvm_has_adjust_clock(void)
-+{
-+    return kvm_check_extension(kvm_state, KVM_CAP_ADJUST_CLOCK);
-+}
-+
- bool kvm_has_exception_payload(void)
- {
-     return has_exception_payload;
-diff --git a/target/i386/kvm_i386.h b/target/i386/kvm_i386.h
-index 064b8798a26c..0fce4e51d2d6 100644
---- a/target/i386/kvm_i386.h
-+++ b/target/i386/kvm_i386.h
-@@ -34,6 +34,7 @@
- 
- bool kvm_allows_irq0_override(void);
- bool kvm_has_smm(void);
-+bool kvm_has_adjust_clock(void);
- bool kvm_has_adjust_clock_stable(void);
- bool kvm_has_exception_payload(void);
- void kvm_synchronize_all_tsc(void);
--- 
-2.25.4
+@@ -2818,7 +2818,12 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+         kvm_msr_entry_add(cpu, MSR_IA32_TSC, env->tsc);
+         kvm_msr_entry_add(cpu, MSR_KVM_SYSTEM_TIME, env->system_time_msr);
+         kvm_msr_entry_add(cpu, MSR_KVM_WALL_CLOCK, env->wall_clock_msr);
+-        if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_ASYNC_PF)) {
++        /*
++         * Some kernel versions (v5.8) won't let MSR_KVM_ASYNC_PF_EN to be=
+ set
++         * at all if kernel-irqchip=3Doff, so don't try to set it in that =
+case.
++         */
++        if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_ASYNC_PF) &&
++            kvm_irqchip_in_kernel()) {
+             kvm_msr_entry_add(cpu, MSR_KVM_ASYNC_PF_EN, env->async_pf_en_m=
+sr);
+         }
+         if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_PV_EOI)) {
+-- =
 
+2.26.2
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1896263
+
+Title:
+  The bios-tables-test test causes QEMU to crash (Assertion `ret =3D=3D
+  cpu->kvm_msr_buf->nmsrs' failed) on AMD processors
+
+Status in QEMU:
+  New
+
+Bug description:
+  QEMU release version: Any recent version (5.0.0, 5.1.0, git master)
+  Host CPU: AMD Ryzen 3900X
+
+  The following backtrace is from commit
+  e883b492c221241d28aaa322c61536436090538a.
+
+  QTEST_QEMU_BINARY=3D./build/qemu-system-x86_64 gdb ./build/tests/qtest/bi=
+os-tables-test
+  GNU gdb (GDB) 9.2
+  Copyright (C) 2020 Free Software Foundation, Inc.
+  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.h=
+tml>
+  This is free software: you are free to change and redistribute it.
+  There is NO WARRANTY, to the extent permitted by law.
+  Type "show copying" and "show warranty" for details.
+  This GDB was configured as "x86_64-unknown-linux-gnu".
+  Type "show configuration" for configuration details.
+  For bug reporting instructions, please see:
+  <http://www.gnu.org/software/gdb/bugs/>.
+  Find the GDB manual and other documentation resources online at:
+      <http://www.gnu.org/software/gdb/documentation/>.
+
+  For help, type "help".
+  Type "apropos word" to search for commands related to "word"...
+  Reading symbols from ./build/tests/qtest/bios-tables-test...
+  (gdb) run
+  Starting program: /home/mcournoyer/src/qemu/build/tests/qtest/bios-tables=
+-test =
+
+  [Thread debugging using libthread_db enabled]
+  Using host libthread_db library "/gnu/store/fa6wj5bxkj5ll1d7292a70knmyl7a=
+0cr-glibc-2.31/lib/libthread_db.so.1".
+  [New Thread 0x7ffff7af6700 (LWP 18955)]
+  # random seed: R02S5106b7afa2fd84a0353605795c04ab7d
+  1..19
+  # Start of x86_64 tests
+  # Start of acpi tests
+  # starting QEMU: exec ./build/qemu-system-x86_64 -qtest unix:/tmp/qtest-1=
+8951.sock -qtest-log /dev/null -chardev socket,path=3D/tmp/qtest-18951.qmp,=
+id=3Dchar0 -mon chardev=3Dchar0,mode=3Dcontrol -display none -machine pc,ke=
+rnel-irqchip=3Doff -accel kvm -accel tcg -net none -display none  -drive id=
+=3Dhd0,if=3Dnone,file=3Dtests/acpi-test-disk-R3kbyc,format=3Draw -device id=
+e-hd,drive=3Dhd0  -accel qtest
+  [Attaching after Thread 0x7ffff7af7900 (LWP 18951) fork to child process =
+18956]
+  [New inferior 2 (process 18956)]
+  [Detaching after fork from parent process 18951]
+  [Inferior 1 (process 18951) detached]
+  [Thread debugging using libthread_db enabled]
+  Using host libthread_db library "/gnu/store/fa6wj5bxkj5ll1d7292a70knmyl7a=
+0cr-glibc-2.31/lib/libthread_db.so.1".
+  [New Thread 0x7ffff7af6700 (LWP 18957)]
+  [Thread 0x7ffff7af6700 (LWP 18957) exited]
+  process 18956 is executing new program: /gnu/store/87kif0bpf0anwbsaw0jvg8=
+fyciw4sz67-bash-5.0.16/bin/bash
+  process 18956 is executing new program: /home/mcournoyer/src/qemu/build/q=
+emu-system-x86_64
+  [Thread debugging using libthread_db enabled]
+  Using host libthread_db library "/gnu/store/fa6wj5bxkj5ll1d7292a70knmyl7a=
+0cr-glibc-2.31/lib/libthread_db.so.1".
+  [New Thread 0x7ffff48ed700 (LWP 18958)]
+  [New Thread 0x7fffeffff700 (LWP 18960)]
+  [New Thread 0x7fffef61c700 (LWP 18961)]
+  [New Thread 0x7fffed5ff700 (LWP 18962)]
+  qemu-system-x86_64: error: failed to set MSR 0x4b564d02 to 0x0
+  qemu-system-x86_64: ../target/i386/kvm.c:2714: kvm_buf_set_msrs: Assertio=
+n `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+
+  Thread 2.5 "qemu-system-x86" received signal SIGABRT, Aborted.
+  [Switching to Thread 0x7fffef61c700 (LWP 18961)]
+  0x00007ffff65dbaba in raise () from /gnu/store/fa6wj5bxkj5ll1d7292a70knmy=
+l7a0cr-glibc-2.31/lib/libc.so.6
+  (gdb) taas bt
+
+  Thread 2.6 (Thread 0x7fffed5ff700 (LWP 18962)):
+  #0  0x00007ffff6770c4d in pthread_cond_timedwait@@GLIBC_2.3.2 () from /gn=
+u/store/fa6wj5bxkj5ll1d7292a70knmyl7a0cr-glibc-2.31/lib/libpthread.so.0
+  #1  0x0000555555cc8a0e in qemu_sem_timedwait (sem=3Dsem@entry=3D0x5555566=
+2f758, ms=3Dms@entry=3D10000) at ../util/qemu-thread-posix.c:282
+  #2  0x0000555555cd91b5 in worker_thread (opaque=3Dopaque@entry=3D0x555556=
+62f6e0) at ../util/thread-pool.c:91
+  #3  0x0000555555cc7e86 in qemu_thread_start (args=3D<optimized out>) at .=
+./util/qemu-thread-posix.c:521
+  #4  0x00007ffff6769f64 in start_thread () from /gnu/store/fa6wj5bxkj5ll1d=
+7292a70knmyl7a0cr-glibc-2.31/lib/libpthread.so.0
+  #5  0x00007ffff669b9af in clone () from /gnu/store/fa6wj5bxkj5ll1d7292a70=
+knmyl7a0cr-glibc-2.31/lib/libc.so.6
+
+  Thread 2.5 (Thread 0x7fffef61c700 (LWP 18961)):
+  #0  0x00007ffff65dbaba in raise () from /gnu/store/fa6wj5bxkj5ll1d7292a70=
+knmyl7a0cr-glibc-2.31/lib/libc.so.6
+  #1  0x00007ffff65dcbf5 in abort () from /gnu/store/fa6wj5bxkj5ll1d7292a70=
+knmyl7a0cr-glibc-2.31/lib/libc.so.6
+  #2  0x00007ffff65d470a in __assert_fail_base () from /gnu/store/fa6wj5bxk=
+j5ll1d7292a70knmyl7a0cr-glibc-2.31/lib/libc.so.6
+  #3  0x00007ffff65d4782 in __assert_fail () from /gnu/store/fa6wj5bxkj5ll1=
+d7292a70knmyl7a0cr-glibc-2.31/lib/libc.so.6
+  #4  0x0000555555a3e979 in kvm_buf_set_msrs (cpu=3D0x555556688a20) at ../t=
+arget/i386/kvm.c:2714
+  #5  0x0000555555a438cc in kvm_put_msrs (level=3D3, cpu=3D0x555556688a20) =
+at ../target/i386/kvm.c:3005
+  #6  kvm_arch_put_registers (cpu=3Dcpu@entry=3D0x555556688a20, level=3Dlev=
+el@entry=3D3) at ../target/i386/kvm.c:3989
+  #7  0x0000555555af7b0e in do_kvm_cpu_synchronize_post_init (cpu=3D0x55555=
+6688a20, arg=3D...) at ../accel/kvm/kvm-all.c:2355
+  #8  0x00005555558ef8e2 in process_queued_cpu_work (cpu=3Dcpu@entry=3D0x55=
+5556688a20) at ../cpus-common.c:343
+  #9  0x0000555555b6ac25 in qemu_wait_io_event_common (cpu=3Dcpu@entry=3D0x=
+555556688a20) at ../softmmu/cpus.c:1117
+  #10 0x0000555555b6ac84 in qemu_wait_io_event (cpu=3Dcpu@entry=3D0x5555566=
+88a20) at ../softmmu/cpus.c:1157
+  #11 0x0000555555b6aec8 in qemu_kvm_cpu_thread_fn (arg=3Darg@entry=3D0x555=
+556688a20) at ../softmmu/cpus.c:1193
+  #12 0x0000555555cc7e86 in qemu_thread_start (args=3D<optimized out>) at .=
+./util/qemu-thread-posix.c:521
+  #13 0x00007ffff6769f64 in start_thread () from /gnu/store/fa6wj5bxkj5ll1d=
+7292a70knmyl7a0cr-glibc-2.31/lib/libpthread.so.0
+  #14 0x00007ffff669b9af in clone () from /gnu/store/fa6wj5bxkj5ll1d7292a70=
+knmyl7a0cr-glibc-2.31/lib/libc.so.6
+
+  Thread 2.4 (Thread 0x7fffeffff700 (LWP 18960)):
+  #0  0x00007ffff66919d9 in poll () from /gnu/store/fa6wj5bxkj5ll1d7292a70k=
+nmyl7a0cr-glibc-2.31/lib/libc.so.6
+  #1  0x00007ffff78f0051 in g_main_context_iterate.isra () from /gnu/store/=
+n1mx1dp0hcrzm1akf8qdqa9gmybzazs2-profile/lib/libglib-2.0.so.0
+  #2  0x00007ffff78f0392 in g_main_loop_run () from /gnu/store/n1mx1dp0hcrz=
+m1akf8qdqa9gmybzazs2-profile/lib/libglib-2.0.so.0
+  #3  0x000055555584b5a1 in iothread_run (opaque=3Dopaque@entry=3D0x5555565=
+57720) at ../iothread.c:80
+  #4  0x0000555555cc7e86 in qemu_thread_start (args=3D<optimized out>) at .=
+./util/qemu-thread-posix.c:521
+  #5  0x00007ffff6769f64 in start_thread () from /gnu/store/fa6wj5bxkj5ll1d=
+7292a70knmyl7a0cr-glibc-2.31/lib/libpthread.so.0
+  #6  0x00007ffff669b9af in clone () from /gnu/store/fa6wj5bxkj5ll1d7292a70=
+knmyl7a0cr-glibc-2.31/lib/libc.so.6
+
+  Thread 2.3 (Thread 0x7ffff48ed700 (LWP 18958)):
+  #0  0x00007ffff66657a1 in clock_nanosleep@GLIBC_2.2.5 () from /gnu/store/=
+fa6wj5bxkj5ll1d7292a70knmyl7a0cr-glibc-2.31/lib/libc.so.6
+  #1  0x00007ffff666ac03 in nanosleep () from /gnu/store/fa6wj5bxkj5ll1d729=
+2a70knmyl7a0cr-glibc-2.31/lib/libc.so.6
+  #2  0x00007ffff7919cdf in g_usleep () from /gnu/store/n1mx1dp0hcrzm1akf8q=
+dqa9gmybzazs2-profile/lib/libglib-2.0.so.0
+  #3  0x0000555555cb3b04 in call_rcu_thread (opaque=3Dopaque@entry=3D0x0) a=
+t ../util/rcu.c:250
+  #4  0x0000555555cc7e86 in qemu_thread_start (args=3D<optimized out>) at .=
+./util/qemu-thread-posix.c:521
+  #5  0x00007ffff6769f64 in start_thread () from /gnu/store/fa6wj5bxkj5ll1d=
+7292a70knmyl7a0cr-glibc-2.31/lib/libpthread.so.0
+  #6  0x00007ffff669b9af in clone () from /gnu/store/fa6wj5bxkj5ll1d7292a70=
+knmyl7a0cr-glibc-2.31/lib/libc.so.6
+
+  Thread 2.1 (Thread 0x7ffff48f2c80 (LWP 18956)):
+  #0  0x00007ffff677094c in pthread_cond_wait@@GLIBC_2.3.2 () from /gnu/sto=
+re/fa6wj5bxkj5ll1d7292a70knmyl7a0cr-glibc-2.31/lib/libpthread.so.0
+  #1  0x0000555555cc854f in qemu_cond_wait_impl (cond=3D0x5555563b0020 <qem=
+u_work_cond>, mutex=3D0x5555563cd620 <qemu_global_mutex>, file=3D0x555555db=
+ad06 "../cpus-common.c", line=3D154) at ../util/qemu-thread-posix.c:174
+  #2  0x00005555558ef484 in do_run_on_cpu (cpu=3Dcpu@entry=3D0x555556688a20=
+, func=3Dfunc@entry=3D0x555555af7b00 <do_kvm_cpu_synchronize_post_init>, da=
+ta=3D..., mutex=3Dmutex@entry=3D0x5555563cd620 <qemu_global_mutex>) at ../c=
+pus-common.c:154
+  #3  0x0000555555b6aa7c in run_on_cpu (cpu=3Dcpu@entry=3D0x555556688a20, f=
+unc=3Dfunc@entry=3D0x555555af7b00 <do_kvm_cpu_synchronize_post_init>, data=
+=3D..., data@entry=3D...) at ../softmmu/cpus.c:1085
+  #4  0x0000555555af8d4e in kvm_cpu_synchronize_post_init (cpu=3Dcpu@entry=
+=3D0x555556688a20) at ../accel/kvm/kvm-all.c:2361
+  #5  0x0000555555b6a94a in cpu_synchronize_post_init (cpu=3D0x555556688a20=
+) at /home/mcournoyer/src/qemu/include/sysemu/hw_accel.h:55
+  #6  cpu_synchronize_all_post_init () at ../softmmu/cpus.c:953
+  #7  0x0000555555b0dca7 in qemu_init (argc=3D<optimized out>, argv=3D<opti=
+mized out>, envp=3D<optimized out>) at ../softmmu/vl.c:4387
+  #8  0x0000555555840609 in main (argc=3D<optimized out>, argv=3D<optimized=
+ out>, envp=3D<optimized out>) at ../softmmu/main.c:49
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1896263/+subscriptions
 
