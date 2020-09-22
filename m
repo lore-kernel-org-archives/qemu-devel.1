@@ -2,71 +2,86 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AE3FC4727E
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:34:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D372C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:34:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 985E32371F
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:34:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 985E32371F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0572320757
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:34:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RShr8lRA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0572320757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKpvi-0002Dz-MC
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 17:34:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39440)
+	id 1kKpvr-0002ZH-T6
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 17:34:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37526)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kKpYx-0005hZ-Qt; Tue, 22 Sep 2020 17:10:59 -0400
-Resent-Date: Tue, 22 Sep 2020 17:10:59 -0400
-Resent-Message-Id: <E1kKpYx-0005hZ-Qt@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21723)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kKpYv-0005ma-7H; Tue, 22 Sep 2020 17:10:59 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1600809038; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=MMAJ2GOqo+IfSsDMiptCurjliTIZze6igdP9iHtximsaHAX5sv9OAHcNPItVts3AP2ARhkeipRnEWtOgko0nCrmsBfUx8T8x9iT8I4gWhL/C8T06P81lTixU+8BsiQpWBE0m3HFwpr0c+edij1WGMLM2Y/l/6UdT+ihk5Av5CJ8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1600809038;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=NIxmDzwFWBQDSPRZSd4HeNTzVEzr5SrUxJFc1WikTb8=; 
- b=Qis0GUXmahucFvrQ6kz8Io5yVXAqK3/3p+NjdVegwrZNl4dzlsnl9oZusF+bmGwY3sVqipoaMUz6nlaMCzewadCC1UrVN1WX9lK60xsIRM2oCowpfv419QupBFdUuYoBqbT81za2Vjqj50b2OIjBy2xKhjdppNzcVbzAs8R52/0=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 160080903753299.33392506457972;
- Tue, 22 Sep 2020 14:10:37 -0700 (PDT)
-Subject: Re: [PATCH v2 0/2] block: deprecate the sheepdog driver
-Message-ID: <160080903566.7431.16479285468818631518@66eaa9a8a123>
-In-Reply-To: <20200922161611.2049616-1-berrange@redhat.com>
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpQa-0002qL-LP
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:02:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27057)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpQY-0004g5-My
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:02:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600808537;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Gjv/1TCr1+x4mJxtRx4j/pu85zh+OSeH8cUFmDsVUqY=;
+ b=RShr8lRA2UlEqZSCoxwLHjIyxqufJjADqR9EPtv2c9LZ0d/ejAoGOSUv3TVhx7mC8sdreU
+ eR7t7+MJj3It+qFs48FEyiXMJbXzgflZ2gzNmmsyD90uSZFsYLbA3ODljT7NaYRVXacxGc
+ O1XgY6Rcoi6iuidWCAHid5kx8SlMhT8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-288-BsuXlV0WMFGXxqaiQTGs3w-1; Tue, 22 Sep 2020 17:01:56 -0400
+X-MC-Unique: BsuXlV0WMFGXxqaiQTGs3w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83B99185A0CA;
+ Tue, 22 Sep 2020 21:01:54 +0000 (UTC)
+Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 957E855765;
+ Tue, 22 Sep 2020 21:01:53 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>,
+	qemu-devel@nongnu.org
+Subject: [PATCH v2 35/38] qapi/types.py: remove one-letter variables
+Date: Tue, 22 Sep 2020 17:00:58 -0400
+Message-Id: <20200922210101.4081073-36-jsnow@redhat.com>
+In-Reply-To: <20200922210101.4081073-1-jsnow@redhat.com>
+References: <20200922210101.4081073-1-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: berrange@redhat.com
-Date: Tue, 22 Sep 2020 14:10:37 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 17:10:52
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,40 +94,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, thuth@redhat.com, sheepdog@lists.wpkg.org,
- qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, namei.unix@gmail.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Cleber Rosa <crosa@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkyMjE2MTYxMS4yMDQ5
-NjE2LTEtYmVycmFuZ2VAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMjAwOTIyMTYxNjExLjIw
-NDk2MTYtMS1iZXJyYW5nZUByZWRoYXQuY29tClN1YmplY3Q6IFtQQVRDSCB2MiAwLzJdIGJsb2Nr
-OiBkZXByZWNhdGUgdGhlIHNoZWVwZG9nIGRyaXZlcgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09
-PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dy
-YW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NS
-SVBUIEVORCA9PT0KClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMmMxMTYzNSBibG9j
-azogZGVwcmVjYXRlIHRoZSBzaGVlcGRvZyBibG9jayBkcml2ZXIKYWEzZDU0YyBibG9jazogZHJv
-cCBtb2RlcmF0ZWQgc2hlZXBkb2cgbWFpbGluZyBsaXN0IGZyb20gTUFJTlRBSU5FUlMgZmlsZQoK
-PT09IE9VVFBVVCBCRUdJTiA9PT0KMS8yIENoZWNraW5nIGNvbW1pdCBhYTNkNTRjZmEyOGYgKGJs
-b2NrOiBkcm9wIG1vZGVyYXRlZCBzaGVlcGRvZyBtYWlsaW5nIGxpc3QgZnJvbSBNQUlOVEFJTkVS
-UyBmaWxlKQoyLzIgQ2hlY2tpbmcgY29tbWl0IDJjMTE2MzU1ODU3OSAoYmxvY2s6IGRlcHJlY2F0
-ZSB0aGUgc2hlZXBkb2cgYmxvY2sgZHJpdmVyKQpFUlJPUjogZG8gbm90IGluaXRpYWxpc2Ugc3Rh
-dGljcyB0byAwIG9yIE5VTEwKIzU0OiBGSUxFOiBibG9jay9zaGVlcGRvZy5jOjI0NzoKKyAgICBz
-dGF0aWMgYm9vbCB3YXJuZWQgPSBmYWxzZTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywg
-NzEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8yIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
-dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
-dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9
-PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhl
-IGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDky
-MjE2MTYxMS4yMDQ5NjE2LTEtYmVycmFuZ2VAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gv
-P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+"John, if pylint told you to jump off a bridge, would you?"
+Hey, if it looked like fun, I might.
+
+Now that this file is clean, enable pylint checks on this file.
+
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ scripts/qapi/pylintrc |  1 -
+ scripts/qapi/types.py | 29 +++++++++++++++--------------
+ 2 files changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/scripts/qapi/pylintrc b/scripts/qapi/pylintrc
+index de132d03cf..cebaf600f9 100644
+--- a/scripts/qapi/pylintrc
++++ b/scripts/qapi/pylintrc
+@@ -7,7 +7,6 @@ ignore-patterns=doc.py,
+                 expr.py,
+                 parser.py,
+                 schema.py,
+-                types.py,
+                 visit.py,
+ 
+ 
+diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
+index 5533c5a126..78c2a5a3e9 100644
+--- a/scripts/qapi/types.py
++++ b/scripts/qapi/types.py
+@@ -49,14 +49,14 @@ def gen_enum_lookup(name: str,
+     .array = (const char *const[]) {
+ ''',
+                 c_name=c_name(name))
+-    for m in members:
+-        ret += gen_if(m.ifcond)
+-        index = c_enum_const(name, m.name, prefix)
++    for member in members:
++        ret += gen_if(member.ifcond)
++        index = c_enum_const(name, member.name, prefix)
+         ret += mcgen('''
+         [%(index)s] = "%(name)s",
+ ''',
+-                     index=index, name=m.name)
+-        ret += gen_endif(m.ifcond)
++                     index=index, name=member.name)
++        ret += gen_endif(member.ifcond)
+ 
+     ret += mcgen('''
+     },
+@@ -79,13 +79,13 @@ def gen_enum(name: str,
+ ''',
+                 c_name=c_name(name))
+ 
+-    for m in enum_members:
+-        ret += gen_if(m.ifcond)
++    for member in enum_members:
++        ret += gen_if(member.ifcond)
+         ret += mcgen('''
+     %(c_enum)s,
+ ''',
+-                     c_enum=c_enum_const(name, m.name, prefix))
+-        ret += gen_endif(m.ifcond)
++                     c_enum=c_enum_const(name, member.name, prefix))
++        ret += gen_endif(member.ifcond)
+ 
+     ret += mcgen('''
+ } %(c_name)s;
+@@ -148,11 +148,12 @@ def gen_object(name: str, ifcond: List[str],
+     objects_seen.add(name)
+ 
+     ret = ''
+-    if variants:
+-        for v in variants.variants:
+-            if isinstance(v.type, QAPISchemaObjectType):
+-                ret += gen_object(v.type.name, v.type.ifcond, v.type.base,
+-                                  v.type.local_members, v.type.variants)
++    for variant in variants.variants if variants else ():
++        obj = variant.type
++        if not isinstance(obj, QAPISchemaObjectType):
++            continue
++        ret += gen_object(obj.name, obj.ifcond, obj.base,
++                          obj.local_members, obj.variants)
+ 
+     ret += mcgen('''
+ 
+-- 
+2.26.2
+
 
