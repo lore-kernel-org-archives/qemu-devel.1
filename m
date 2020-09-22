@@ -4,62 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 166D2C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:46:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5FD4C4727D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:46:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69B1E20757
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:46:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74D3E20757
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:46:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H4lO1SUi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69B1E20757
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pk0h6liS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74D3E20757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKr3K-0002WP-5U
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 18:46:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58106)
+	id 1kKr3M-0002c2-Da
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 18:46:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58288)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKqsx-0004OI-VD
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:35:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48743)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKqtC-0004zv-1M
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:35:58 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23112
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKqsv-0007df-VT
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:35:43 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKqtA-0007jx-DF
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:35:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600814141;
+ s=mimecast20190719; t=1600814155;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UK4zDT6zPhLUZkX4SIut7rDgOTI/aCc0iI8mieLBlpQ=;
- b=H4lO1SUilHLnz/p1TtWNNskBEZDynYk9uBGCnfmXBnudSlZI3C5zEfJO5JW8gd7ZDx55Bk
- SgYNGW5yI8MSGkQwcdkTOAVaUqPX2VMtjSylk+ZWXRC4UhaC6e6+tgqMg5WdrGyX5dhBWY
- BTIk6HYiMX5w55GG3Qxqd6ltESSDIIw=
+ bh=5dDPP0KFvn7o6PYfniM7VGeH7Pm+p2luU/Vg6xwyPq8=;
+ b=Pk0h6liSTts+rAh94lFG2qtYkW1o/3TalNZt9qkh7rQYNy2Go6PP3LVX9fh1kVMlz/11lu
+ BsBPB+UYnvUHwo4+Fq8lWwDwkzj7gz5SIaTcjwCi9gohaZOgQcc0/SoWg++BrInKOLyfij
+ rDCQZjcixIKCg7FVdVrFZtQEuaBjrHw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-190-_GNqg23MPlWhexVnUdrgSQ-1; Tue, 22 Sep 2020 18:35:39 -0400
-X-MC-Unique: _GNqg23MPlWhexVnUdrgSQ-1
+ us-mta-418-MqNzN1qPNFy4sqVOKYK4Ig-1; Tue, 22 Sep 2020 18:35:53 -0400
+X-MC-Unique: MqNzN1qPNFy4sqVOKYK4Ig-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5BF57801AE8;
- Tue, 22 Sep 2020 22:35:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA66F1005CA7;
+ Tue, 22 Sep 2020 22:35:52 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 708CC60BF4;
- Tue, 22 Sep 2020 22:35:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D237A60BF4;
+ Tue, 22 Sep 2020 22:35:51 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH 10/26] qapi/parser.py: assert object keys are strings
-Date: Tue, 22 Sep 2020 18:35:09 -0400
-Message-Id: <20200922223525.4085762-11-jsnow@redhat.com>
+Subject: [PATCH 23/26] qapi/parser.py: enable mypy checks
+Date: Tue, 22 Sep 2020 18:35:22 -0400
+Message-Id: <20200922223525.4085762-24-jsnow@redhat.com>
 In-Reply-To: <20200922223525.4085762-1-jsnow@redhat.com>
 References: <20200922223525.4085762-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -70,17 +71,17 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 17:00:46
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
 X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,27 +101,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since values can also be other data types, add an assertion to ensure
-we're dealing with strings.
-
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- scripts/qapi/parser.py | 2 ++
- 1 file changed, 2 insertions(+)
+ scripts/qapi/mypy.ini | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
-index 1bc33e85ea..756c904257 100644
---- a/scripts/qapi/parser.py
-+++ b/scripts/qapi/parser.py
-@@ -256,6 +256,8 @@ def get_members(self):
-             raise self._parse_error("expected string or '}'")
-         while True:
-             key = self.val
-+            assert isinstance(key, str), f"expected str, got {type(key)!s}"
-+
-             self.accept()
-             if self.tok != ':':
-                 raise self._parse_error("expected ':'")
+diff --git a/scripts/qapi/mypy.ini b/scripts/qapi/mypy.ini
+index 4d341c6b2d..20ab509946 100644
+--- a/scripts/qapi/mypy.ini
++++ b/scripts/qapi/mypy.ini
+@@ -4,11 +4,6 @@ strict_optional = False
+ disallow_untyped_calls = False
+ python_version = 3.6
+ 
+-[mypy-qapi.parser]
+-disallow_untyped_defs = False
+-disallow_incomplete_defs = False
+-check_untyped_defs = False
+-
+ [mypy-qapi.schema]
+ disallow_untyped_defs = False
+ disallow_incomplete_defs = False
 -- 
 2.26.2
 
