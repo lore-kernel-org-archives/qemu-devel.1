@@ -7,61 +7,59 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B54EEC2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:57:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1548AC2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:58:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54F3F221EB
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:57:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9CC19221EB
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:58:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ccRPPNzG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54F3F221EB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D1MVOgOm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CC19221EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKrES-0004d8-Cm
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 18:57:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60402)
+	id 1kKrEa-0004j5-Ng
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 18:58:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60492)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKr2c-0002BU-4z
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:45:43 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33335
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKr2j-0002Ga-S3
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:45:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36570)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKr2K-0000PU-Pa
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:45:41 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKr2d-0000Ut-W9
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:45:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600814722;
+ s=mimecast20190719; t=1600814734;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Vkvv1cb8+m3KMT4QTk8T1JEPJ7jJa4e0nDR3l/fNNhM=;
- b=ccRPPNzG/uUGV/4txfSKssOU5eAnXG2zEZliK9gvctzslFmZp+cDD3d9WhI5YRQkrFzlrZ
- Hm26HTzZqav7wNHgiB/THTzNHz9tm7Iy/NjIjLhCm9MtVSWXrb/A3qt/2JXIbQOq/FsN0o
- Jg9Wxn951MMAVdmA+E7bez6hde4ftJ4=
+ bh=Cohb1cEnh9mW0nABzu7a1jDE4scr/fqNYNgm1Qm484s=;
+ b=D1MVOgOmKivkU2koC+E5Sk/zqz4WhRH16Kk2S7LRV+u7GX5NWW7UcusKV6/mnft53yucbC
+ RzhhWsFOJY+CgEwIyRanAGdw8L+yD9et7Wolv8NjtnDOoPyVlvF8ZXEqFHZ/a2z1HtJuxy
+ D+zP+rsBTQ07vQJzocxQC/TDo/HsJo8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-271-rCwE_BeKOkSZRPgTMbuQkw-1; Tue, 22 Sep 2020 18:45:20 -0400
-X-MC-Unique: rCwE_BeKOkSZRPgTMbuQkw-1
+ us-mta-556-RfqDWe25Nfu5m2TJF2pIIA-1; Tue, 22 Sep 2020 18:45:32 -0400
+X-MC-Unique: RfqDWe25Nfu5m2TJF2pIIA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 928C2801AE8;
- Tue, 22 Sep 2020 22:45:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9ADA7801AE8;
+ Tue, 22 Sep 2020 22:45:31 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A34385C1A3;
- Tue, 22 Sep 2020 22:45:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CF7D65C1A3;
+ Tue, 22 Sep 2020 22:45:30 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH 11/25] qapi/schema.py: Constrain type of QAPISchemaObjectType
- members field
-Date: Tue, 22 Sep 2020 18:44:47 -0400
-Message-Id: <20200922224501.4087749-12-jsnow@redhat.com>
+Subject: [PATCH 21/25] qapi/schema.py: disable pylint line limit
+Date: Tue, 22 Sep 2020 18:44:57 -0400
+Message-Id: <20200922224501.4087749-22-jsnow@redhat.com>
 In-Reply-To: <20200922224501.4087749-1-jsnow@redhat.com>
 References: <20200922224501.4087749-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -70,19 +68,19 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 17:01:22
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
 X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,40 +100,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This must always be QAPISchemaObjectTypeMember, and we do check and
-enforce this -- but because the seen dict is invariant and check methods
-need to operate in terms of a more abstract type, we need to tell the
-type system to believe us.
+It's a big file, but there's really nothing in here that doesn't belong
+in here -- and I don't think it's large enough to justify the
+one-module-per-class approach.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- scripts/qapi/schema.py | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ scripts/qapi/schema.py | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index 62b1a7e890..57343a1002 100644
+index a0e047c735..271befea1c 100644
 --- a/scripts/qapi/schema.py
 +++ b/scripts/qapi/schema.py
-@@ -17,6 +17,7 @@
- import os
- import re
- from collections import OrderedDict
-+from typing import cast, List
+@@ -12,6 +12,8 @@
+ # This work is licensed under the terms of the GNU GPL, version 2.
+ # See the COPYING file in the top-level directory.
  
- from .common import c_name, POINTER_SUFFIX
- from .error import QAPISourceError, QAPISemError
-@@ -391,7 +392,10 @@ def check(self, schema):
-         for m in self.local_members:
-             m.check(schema)
-             m.check_clash(self.info, seen)
--        members = seen.values()
++# pylint: disable=too-many-lines ¯\_(ツ)_/¯
 +
-+        # check_clash is abstract, but local_members is asserted to be
-+        # Sequence[QAPISchemaObjectTypeMember]. Cast to the narrower type.
-+        members = cast(List[QAPISchemaObjectTypeMember], list(seen.values()))
+ # TODO catching name collisions in generated code would be nice
  
-         if self.variants:
-             self.variants.check(schema, seen)
+ from collections import OrderedDict
 -- 
 2.26.2
 
