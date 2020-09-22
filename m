@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E595C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:30:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA267C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:31:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9370208A9
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:30:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 578702220D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:31:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GGB/Y9UW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9370208A9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bx/b/3tW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 578702220D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKqnX-00053l-RH
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 18:30:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55554)
+	id 1kKqoa-0006Hh-8j
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 18:31:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55530)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kKqjd-0008Nc-U4
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:26:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56146)
+ id 1kKqjc-0008Jf-21
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:26:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34305)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kKqjc-0006LB-80
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:26:05 -0400
+ id 1kKqja-0006L2-DK
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:26:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600813563;
+ s=mimecast20190719; t=1600813561;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QnyVU/vi6GJ+a+6szWz2En33hmnBmflgThBMoF42wK0=;
- b=GGB/Y9UWdDmmm2P84HIEjQgTaOSbFlRnhnUOnJJI5GZWy0p2beVXmpL65fVGvwLhx3asCu
- iRLiWCnRv0izge48GBZafSTz0Ho7RvgtFlY41wfgFsAwzoAIzKVbt+pc2fRBs0htmEf4OH
- 3uoHSCndtefjmyrx4uEYIhzS0XOkqn0=
+ bh=LTVcxs3zmZZPcq4t5Fo6eg7JspEqf85wc4p/gO4AeV8=;
+ b=Bx/b/3tWJYeF0L3BTw/W4EBM2HtjjNvf+AbkMCooPMtHnuhWFXLzPznAhVpc1nqKlBmPxC
+ C6Fi8cm2gvtajetSdUhM20ObWqXkuCddmDpZ0D04LKaUh6zsySwxCfx2gaVVKUJgOJhhcx
+ Pl0+wUMMdPzvjAOzQ5nyMpNrwqQNK28=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-131-fRugZDabPR2hpXT-_emX7g-1; Tue, 22 Sep 2020 18:26:01 -0400
-X-MC-Unique: fRugZDabPR2hpXT-_emX7g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-580-QrzPa4irMAuEklbji8MOuw-1; Tue, 22 Sep 2020 18:25:59 -0400
+X-MC-Unique: QrzPa4irMAuEklbji8MOuw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 276FB801FDD;
- Tue, 22 Sep 2020 22:26:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05D021005E64;
+ Tue, 22 Sep 2020 22:25:58 +0000 (UTC)
 Received: from localhost (unknown [10.10.67.5])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DCE9A55765;
- Tue, 22 Sep 2020 22:25:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C777273670;
+ Tue, 22 Sep 2020 22:25:57 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 08/11] machine: Register "memory-backend" as class property
-Date: Tue, 22 Sep 2020 18:25:39 -0400
-Message-Id: <20200922222542.2354748-9-ehabkost@redhat.com>
+Subject: [PULL 06/11] cpu/core: Register core-id and nr-threads as class
+ properties
+Date: Tue, 22 Sep 2020 18:25:37 -0400
+Message-Id: <20200922222542.2354748-7-ehabkost@redhat.com>
 In-Reply-To: <20200922222542.2354748-1-ehabkost@redhat.com>
 References: <20200922222542.2354748-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 15:47:47
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
@@ -108,42 +109,38 @@ they don't require an object to be instantiated.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <20200921221045.699690-21-ehabkost@redhat.com>
+Message-Id: <20200921221045.699690-18-ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/core/machine.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ hw/cpu/core.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 09aee4ea52b..9b02fb2f5ed 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -866,6 +866,12 @@ static void machine_class_init(ObjectClass *oc, void *data)
-         machine_get_memory_encryption, machine_set_memory_encryption);
-     object_class_property_set_description(oc, "memory-encryption",
-         "Set memory encryption object to use");
-+
-+    object_class_property_add_str(oc, "memory-backend",
-+                                  machine_get_memdev, machine_set_memdev);
-+    object_class_property_set_description(oc, "memory-backend",
-+                                          "Set RAM backend"
-+                                          "Valid value is ID of hostmem based backend");
+diff --git a/hw/cpu/core.c b/hw/cpu/core.c
+index 3a659291eae..92d3b2fbad6 100644
+--- a/hw/cpu/core.c
++++ b/hw/cpu/core.c
+@@ -69,10 +69,6 @@ static void cpu_core_instance_init(Object *obj)
+     MachineState *ms = MACHINE(qdev_get_machine());
+     CPUCore *core = CPU_CORE(obj);
+ 
+-    object_property_add(obj, "core-id", "int", core_prop_get_core_id,
+-                        core_prop_set_core_id, NULL, NULL);
+-    object_property_add(obj, "nr-threads", "int", core_prop_get_nr_threads,
+-                        core_prop_set_nr_threads, NULL, NULL);
+     core->nr_threads = ms->smp.threads;
  }
  
- static void machine_class_base_init(ObjectClass *oc, void *data)
-@@ -917,12 +923,6 @@ static void machine_initfn(Object *obj)
-                                         "Table (HMAT)");
-     }
+@@ -81,6 +77,10 @@ static void cpu_core_class_init(ObjectClass *oc, void *data)
+     DeviceClass *dc = DEVICE_CLASS(oc);
  
--    object_property_add_str(obj, "memory-backend",
--                            machine_get_memdev, machine_set_memdev);
--    object_property_set_description(obj, "memory-backend",
--                                    "Set RAM backend"
--                                    "Valid value is ID of hostmem based backend");
--
-     /* Register notifier when init is done for sysbus sanity checks */
-     ms->sysbus_notifier.notify = machine_init_notify;
-     qemu_add_machine_init_done_notifier(&ms->sysbus_notifier);
+     set_bit(DEVICE_CATEGORY_CPU, dc->categories);
++    object_class_property_add(oc, "core-id", "int", core_prop_get_core_id,
++                              core_prop_set_core_id, NULL, NULL);
++    object_class_property_add(oc, "nr-threads", "int", core_prop_get_nr_threads,
++                              core_prop_set_nr_threads, NULL, NULL);
+ }
+ 
+ static const TypeInfo cpu_core_type_info = {
 -- 
 2.26.2
 
