@@ -7,59 +7,60 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA873C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:48:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E3F9C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:48:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63E662076E
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:48:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AD4332076E
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:48:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hZfqKNqN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63E662076E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f5Z0/IWv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD4332076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKr5O-0005tC-Au
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 18:48:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58212)
+	id 1kKr5R-00061p-OZ
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 18:48:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58150)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKqt5-0004jN-Im
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:35:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43630)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKqt0-0004W3-EN
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:35:46 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26498
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKqt2-0007fs-St
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:35:51 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKqsy-0007e0-HA
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 18:35:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600814148;
+ s=mimecast20190719; t=1600814143;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UtEbxEEmIN+hGEWS4thp55WZFeorkKDSjE+eFLo91xc=;
- b=hZfqKNqN+JhmF0+y3y+RqdoO3LW+9aHIoOE5HBBwqOtd/KPww/rHZ/3aWj9Ihlojazug1w
- Inf0R2JqExPPqA+HtY5M2SjEt+0z50/CQVA3C6mppnh65/U79g9a9MRXsL+R5z6hUiCowH
- 63qDMq7AwD7bPVwdN2r/Q7VKnsAuy7Q=
+ bh=4HMxZnigJXfXaR7x/BM++m7Lnpe90f238nIkOFQGWJI=;
+ b=f5Z0/IWv6cfkn79PmpMcEWt9sdL6ULsqqmc/VSoys3EsEds1geiFiVFMXIrER4Hi3XpeuN
+ hl2iLcDHEC8Ke8yrTRn4dSsqWL6Z44IoXmbwgB1SjqVzc7WBUHY70BGMQJkmjWSprm2rRJ
+ cc6/7H6t8AKl+XaFObUO5rDKSUQ7mUc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-292-ZwgtsrW-PTKl5bdz19JcUA-1; Tue, 22 Sep 2020 18:35:44 -0400
-X-MC-Unique: ZwgtsrW-PTKl5bdz19JcUA-1
+ us-mta-316-0Tf8tEh_M9mWFIl1M4_rGQ-1; Tue, 22 Sep 2020 18:35:40 -0400
+X-MC-Unique: 0Tf8tEh_M9mWFIl1M4_rGQ-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7EB491005E64;
- Tue, 22 Sep 2020 22:35:43 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6230E186DD27;
+ Tue, 22 Sep 2020 22:35:39 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9E6DD60BF4;
- Tue, 22 Sep 2020 22:35:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 888A960CCC;
+ Tue, 22 Sep 2020 22:35:38 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH 15/26] qapi/parser.py: add ParsedExpression type
-Date: Tue, 22 Sep 2020 18:35:14 -0400
-Message-Id: <20200922223525.4085762-16-jsnow@redhat.com>
+Subject: [PATCH 11/26] qapi/parser.py: Convert several methods to @classmethod
+Date: Tue, 22 Sep 2020 18:35:10 -0400
+Message-Id: <20200922223525.4085762-12-jsnow@redhat.com>
 In-Reply-To: <20200922223525.4085762-1-jsnow@redhat.com>
 References: <20200922223525.4085762-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -70,17 +71,17 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 17:00:46
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
 X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,210 +101,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an immutable, named, typed tuple; it's nicer than arbitrary
-dicts for passing data around when using strict typing.
+It's usually nicer to keep static methods as class methods -- this
+allows them to call other class methods, to be subclassed and extended,
+etc.
 
-Turn parser.exprs into a list of ParsedExpressions instead, and adjust
-expr.py to match.
+Meanwhile, any method that doesn't utilize `self` can be a class method.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- scripts/qapi/expr.py   | 56 +++++++++++++++---------------------------
- scripts/qapi/parser.py | 32 +++++++++++++-----------
- scripts/qapi/schema.py |  6 ++---
- 3 files changed, 41 insertions(+), 53 deletions(-)
+ scripts/qapi/parser.py | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/scripts/qapi/expr.py b/scripts/qapi/expr.py
-index cfd342aa04..f2059c505c 100644
---- a/scripts/qapi/expr.py
-+++ b/scripts/qapi/expr.py
-@@ -46,7 +46,7 @@
- 
- from .common import c_name
- from .error import QAPISemError
--from .parser import QAPIDoc
-+from .parser import ParsedExpression
- from .source import QAPISourceInfo
- 
- 
-@@ -517,7 +517,7 @@ class ExpressionType(str, Enum):
- }
- 
- 
--def check_exprs(exprs: List[_JSObject]) -> List[_JSObject]:
-+def check_exprs(exprs: List[ParsedExpression]) -> List[ParsedExpression]:
-     """
-     Validate and normalize a list of parsed QAPI schema expressions. [RW]
- 
-@@ -526,49 +526,33 @@ def check_exprs(exprs: List[_JSObject]) -> List[_JSObject]:
- 
-     :param exprs: The list of expressions to normalize/validate.
-     """
--    for expr_elem in exprs:
--        # Expression
--        assert isinstance(expr_elem['expr'], dict)
--        expr: Expression = expr_elem['expr']
--        for key in expr.keys():
--            assert isinstance(key, str)
--
--        # QAPISourceInfo
--        assert isinstance(expr_elem['info'], QAPISourceInfo)
--        info: QAPISourceInfo = expr_elem['info']
--
--        # Optional[QAPIDoc]
--        tmp = expr_elem.get('doc')
--        assert tmp is None or isinstance(tmp, QAPIDoc)
--        doc: Optional[QAPIDoc] = tmp
--
-+    for expr in exprs:
-         for kind in ExpressionType:
--            if kind in expr:
-+            if kind in expr.expr:
-                 meta = kind
-                 break
-         else:
--            raise QAPISemError(info, "expression is missing metatype")
-+            raise QAPISemError(expr.info, "expression is missing metatype")
- 
-         if meta == ExpressionType.INCLUDE:
-             continue
- 
--        name = cast(str, expr[meta])  # asserted right below:
--        check_name_is_str(name, info, "'%s'" % meta.value)
--        info.set_defn(meta.value, name)
--        check_defn_name_str(name, info, meta.value)
-+        name = cast(str, expr.expr[meta])  # asserted right below:
-+        check_name_is_str(name, expr.info, "'%s'" % meta.value)
-+        expr.info.set_defn(meta.value, name)
-+        check_defn_name_str(name, expr.info, meta.value)
- 
--        if doc:
--            if doc.symbol != name:
--                raise QAPISemError(
--                    info, "documentation comment is for '%s'" % doc.symbol)
--            doc.check_expr(expr)
--        elif info.pragma.doc_required:
--            raise QAPISemError(info,
--                               "documentation comment required")
-+        if expr.doc:
-+            if expr.doc.symbol != name:
-+                msg = f"documentation comment is for '{expr.doc.symbol}'"
-+                raise QAPISemError(expr.info, msg)
-+            expr.doc.check_expr(expr.expr)
-+        elif expr.info.pragma.doc_required:
-+            raise QAPISemError(expr.info, "documentation comment required")
- 
--        _CHECK_FN[meta](expr, info)
--        check_if(expr, info, meta.value)
--        check_features(expr.get('features'), info)
--        check_flags(expr, info)
-+        _CHECK_FN[meta](expr.expr, expr.info)
-+        check_if(expr.expr, expr.info, meta.value)
-+        check_features(expr.expr.get('features'), expr.info)
-+        check_flags(expr.expr, expr.info)
- 
-     return exprs
 diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
-index 490436b48a..f65afa4eb2 100644
+index 756c904257..75a693a9d7 100644
 --- a/scripts/qapi/parser.py
 +++ b/scripts/qapi/parser.py
-@@ -19,9 +19,8 @@
- import os
- import re
- from typing import (
--    Any,
--    Dict,
-     List,
-+    NamedTuple,
-     Optional,
-     Set,
-     Type,
-@@ -34,13 +33,18 @@
- from .source import QAPISourceInfo
- 
- 
--Expression = Dict[str, Any]
- _Value = Union[List[object], 'OrderedDict[str, object]', str, bool]
- # Necessary imprecision: mypy does not (yet?) support recursive types;
- # so we must stub out that recursion with 'object'.
- # Note, we do not support numerics or null in this parser.
- 
- 
-+class ParsedExpression(NamedTuple):
-+    expr: 'OrderedDict[str, object]'
-+    info: QAPISourceInfo
-+    doc: Optional['QAPIDoc']
-+
-+
- class QAPIParseError(QAPISourceError):
-     """Error class for all QAPI schema parsing errors."""
-     T = TypeVar('T', bound='QAPIParseError')
-@@ -87,7 +91,7 @@ def __init__(self,
-         self.line_pos = 0
- 
-         # Parser output:
--        self.exprs: List[Expression] = []
-+        self.exprs: List[ParsedExpression] = []
-         self.docs: List[QAPIDoc] = []
- 
-         # Showtime!
-@@ -139,8 +143,7 @@ def _parse(self) -> None:
-                                        "value of 'include' must be a string")
-                 incl_fname = os.path.join(os.path.dirname(self._fname),
-                                           include)
--                self.exprs.append({'expr': {'include': incl_fname},
--                                   'info': info})
-+                self._add_expr(OrderedDict({'include': incl_fname}), info)
-                 exprs_include = self._include(include, info, incl_fname,
-                                               self._included)
-                 if exprs_include:
-@@ -157,20 +160,21 @@ def _parse(self) -> None:
-                 for name, value in pragma.items():
-                     self._pragma(name, value, info)
-             else:
--                expr_elem = {'expr': expr,
--                             'info': info}
--                if cur_doc:
--                    if not cur_doc.symbol:
--                        raise QAPISemError(
--                            cur_doc.info, "definition documentation required")
--                    expr_elem['doc'] = cur_doc
--                self.exprs.append(expr_elem)
-+                if cur_doc and not cur_doc.symbol:
-+                    raise QAPISemError(
-+                        cur_doc.info, "definition documentation required")
-+                self._add_expr(expr, info, cur_doc)
-             cur_doc = None
-         self.reject_expr_doc(cur_doc)
- 
+@@ -139,15 +139,16 @@ def _parse(self):
      def _parse_error(self, msg: str) -> QAPIParseError:
          return QAPIParseError.make(self, msg)
  
-+    def _add_expr(self, expr: 'OrderedDict[str, object]',
-+                  info: QAPISourceInfo,
-+                  doc: Optional['QAPIDoc'] = None) -> None:
-+        self.exprs.append(ParsedExpression(expr, info, doc))
-+
-     @classmethod
-     def reject_expr_doc(cls, doc: Optional['QAPIDoc']) -> None:
+-    @staticmethod
+-    def reject_expr_doc(doc):
++    @classmethod
++    def reject_expr_doc(cls, doc):
          if doc and doc.symbol:
-diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index 121d8488d2..51af0449f5 100644
---- a/scripts/qapi/schema.py
-+++ b/scripts/qapi/schema.py
-@@ -1106,9 +1106,9 @@ def _def_event(self, expr, info, doc):
+             raise QAPISemError(
+                 doc.info,
+                 "documentation for '%s' is not followed by the definition"
+                 % doc.symbol)
  
-     def _def_exprs(self, exprs):
-         for expr_elem in exprs:
--            expr = expr_elem['expr']
--            info = expr_elem['info']
--            doc = expr_elem.get('doc')
-+            expr = expr_elem.expr
-+            info = expr_elem.info
-+            doc = expr_elem.doc
-             if 'enum' in expr:
-                 self._def_enum_type(expr, info, doc)
-             elif 'struct' in expr:
+-    def _include(self, include, info, incl_fname, previously_included):
++    @classmethod
++    def _include(cls, include, info, incl_fname, previously_included):
+         incl_abs_fname = os.path.abspath(incl_fname)
+         # catch inclusion cycle
+         inf = info
+@@ -162,7 +163,8 @@ def _include(self, include, info, incl_fname, previously_included):
+ 
+         return QAPISchemaParser(incl_fname, previously_included, info)
+ 
+-    def _pragma(self, name, value, info):
++    @classmethod
++    def _pragma(cls, name, value, info):
+         if name == 'doc-required':
+             if not isinstance(value, bool):
+                 raise QAPISemError(info,
 -- 
 2.26.2
 
