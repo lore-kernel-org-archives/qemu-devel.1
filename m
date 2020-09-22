@@ -2,72 +2,87 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0F59C4363D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 18:54:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECE6FC4363D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 19:09:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36BE420756
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 18:54:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36BE420756
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 293A12311C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 19:09:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LuIA+8RZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 293A12311C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKnRH-0008A1-5u
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 14:54:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34794)
+	id 1kKneu-0003gZ-Va
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 15:09:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39508)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kKnPn-0007hQ-Kp
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 14:53:23 -0400
-Resent-Date: Tue, 22 Sep 2020 14:53:23 -0400
-Resent-Message-Id: <E1kKnPn-0007hQ-Kp@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21784)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kKnPk-0004qg-Ai
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 14:53:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1600800782; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=auDtMdt/gulmR0anz6asTctYxYQ4Dw9znfj7oWlBj6G+bVLoNCwHJ841IAmb+FF2mkrfpCHb72kqngSJ+UcAF76wKadBMF+3tH3aJVJZeXoOXAVEIR+F8tgIg133wikDB1TvU82sh2wzj7wnB2COfLm6wHGgOZmqS0Qzzb61CTE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1600800782;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=dtjAj3yX1+7FGh2xCVbq12Bnu6sfg34dB0jIz2AMGBI=; 
- b=ESzjsp5VWw4OllOXNZh7aO+46Ibc/StxoIQq9ESPGLLgBK0bLvPSSljTXkNqN2/RwDLJ3Wpmd65yV+rRE1E7c7ghI2ECcIPnhkZqifKWeUQhdiCHTJ3+cuNdhlfFsUt3oBcA80B8jfZCae79R8Sj4Hlv5pVk3y0vL6w/dS3PZ2s=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1600800781802931.8763157704797;
- Tue, 22 Sep 2020 11:53:01 -0700 (PDT)
-Subject: Re: [PATCH v5 00/15] Reverse debugging
-Message-ID: <160080077862.1915.9166264632516049336@66eaa9a8a123>
-In-Reply-To: <160077693745.10249.9707329107813662236.stgit@pasha-ThinkPad-X280>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kKndc-0003Dn-Py
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 15:07:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58448
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kKndZ-0006wW-Fz
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 15:07:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600801656;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=2BzXe18IsV1LrzEHTsIwXccyQAWc84p8PfOyFQSjMJA=;
+ b=LuIA+8RZ8rqifrl7ma++uti4UgxCBymfxfJJODw0LplNkqvr9bMS1sekaMOb65l+aGWV3T
+ 0j/ETMjKsnuYZXx+BVRZydzKuJAZ10BXIxVJj/X+Oe4ahW6/MSNJgScULSsTtQtot/NmDk
+ btF0Xnum2Adg7TlS2s6dUrVwMPcslTI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-234-1eDlTZxLOVSIGaNakTkYzQ-1; Tue, 22 Sep 2020 15:07:34 -0400
+X-MC-Unique: 1eDlTZxLOVSIGaNakTkYzQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C84C71084D6E;
+ Tue, 22 Sep 2020 19:07:32 +0000 (UTC)
+Received: from work-vm (ovpn-115-25.ams2.redhat.com [10.36.115.25])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6A58A75120;
+ Tue, 22 Sep 2020 19:07:25 +0000 (UTC)
+Date: Tue, 22 Sep 2020 20:07:22 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Anton Kuchin <antonkuchin@yandex-team.ru>, marcandre.lureau@redhat.com
+Subject: Re: vhost-user: questions regarding migration
+Message-ID: <20200922190722.GD2837@work-vm>
+References: <6ef03e9e-aaff-ce20-7f61-0771fcf007eb@yandex-team.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: pavel.dovgalyuk@ispras.ru
-Date: Tue, 22 Sep 2020 11:53:01 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 14:49:19
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+In-Reply-To: <6ef03e9e-aaff-ce20-7f61-0771fcf007eb@yandex-team.ru>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 13:33:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,66 +96,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pavel.dovgalyuk@ispras.ru, ehabkost@redhat.com,
- philmd@redhat.com, mtosatti@redhat.com, stefanha@redhat.com,
- qemu-devel@nongnu.org, armbru@redhat.com, wrampazz@redhat.com,
- crosa@redhat.com, pbonzini@redhat.com, mreitz@redhat.com,
- alex.bennee@linaro.org, zhiwei_liu@c-sky.com, rth@twiddle.net
+Cc: qemu-devel@nongnu.org, yc-core@yandex-team.ru, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNjAwNzc2OTM3NDUuMTAyNDku
-OTcwNzMyOTEwNzgxMzY2MjIzNi5zdGdpdEBwYXNoYS1UaGlua1BhZC1YMjgwLwoKCgpIaSwKClRo
-aXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVh
-c2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5
-b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdAps
-b2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFS
-Q0g9eDg2XzY0Cm1ha2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFr
-ZSBkb2NrZXItdGVzdC1taW5nd0BmZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBU
-IEVORCA9PT0KCkhvc3QgbWFjaGluZSBjcHU6IHg4Nl82NApUYXJnZXQgbWFjaGluZSBjcHUgZmFt
-aWx5OiB4ODYKVGFyZ2V0IG1hY2hpbmUgY3B1OiB4ODZfNjQKLi4vc3JjL21lc29uLmJ1aWxkOjEw
-OiBXQVJOSU5HOiBNb2R1bGUgdW5zdGFibGUta2V5dmFsIGhhcyBubyBiYWNrd2FyZHMgb3IgZm9y
-d2FyZHMgY29tcGF0aWJpbGl0eSBhbmQgbWlnaHQgbm90IGV4aXN0IGluIGZ1dHVyZSByZWxlYXNl
-cy4KUHJvZ3JhbSBzaCBmb3VuZDogWUVTClByb2dyYW0gcHl0aG9uMyBmb3VuZDogWUVTICgvdXNy
-L2Jpbi9weXRob24zKQpDb25maWd1cmluZyBuaW5qYXRvb2wgdXNpbmcgY29uZmlndXJhdGlvbgot
-LS0KQ29tcGlsaW5nIEMgb2JqZWN0IGxpYnFlbXV1dGlsLmEucC9tZXNvbi1nZW5lcmF0ZWRfLi5f
-dHJhY2VfdHJhY2UtaW8uYy5vYmoKQ29tcGlsaW5nIEMgb2JqZWN0IGxpYnFlbXV1dGlsLmEucC9t
-ZXNvbi1nZW5lcmF0ZWRfLi5fcWFwaV9xYXBpLWNvbW1hbmRzLWJsb2NrLmMub2JqCgpXYXJuaW5n
-LCB0cmVhdGVkIGFzIGVycm9yOgovdG1wL3FlbXUtdGVzdC9zcmMvZG9jcy9zeXN0ZW0vcmVwbGF5
-LnJzdDo0MzpEZWZpbml0aW9uIGxpc3QgZW5kcyB3aXRob3V0IGEgYmxhbmsgbGluZTsgdW5leHBl
-Y3RlZCB1bmluZGVudC4KQ29tcGlsaW5nIEMgb2JqZWN0IGxpYnFlbXV1dGlsLmEucC9tZXNvbi1n
-ZW5lcmF0ZWRfLi5fcWFwaV9xYXBpLXZpc2l0LWNyeXB0by5jLm9iagpDb21waWxpbmcgQyBvYmpl
-Y3QgbGlicWVtdXV0aWwuYS5wL21lc29uLWdlbmVyYXRlZF8uLl9xYXBpX3FhcGktZXZlbnRzLW1h
-Y2hpbmUuYy5vYmoKLS0tCkNvbXBpbGluZyBDIG9iamVjdCBsaWJxZW11dXRpbC5hLnAvbWVzb24t
-Z2VuZXJhdGVkXy4uX3FhcGlfcWFwaS1ldmVudHMtbmV0LmMub2JqCkNvbXBpbGluZyBDIG9iamVj
-dCBsaWJxZW11dXRpbC5hLnAvbWVzb24tZ2VuZXJhdGVkXy4uX3FhcGlfcWFwaS1ldmVudHMtaW50
-cm9zcGVjdC5jLm9iagpDb21waWxpbmcgQyBvYmplY3QgbGlicWVtdXV0aWwuYS5wL21lc29uLWdl
-bmVyYXRlZF8uLl9xYXBpX3FhcGktY29tbWFuZHMtbmV0LmMub2JqCm1ha2U6ICoqKiBbTWFrZWZp
-bGUubmluamE6MjI0NDogZG9jcy9zeXN0ZW0uc3RhbXBdIEVycm9yIDIKbWFrZTogKioqIERlbGV0
-aW5nIGZpbGUgJ2RvY3Mvc3lzdGVtLnN0YW1wJwptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5p
-c2hlZCBqb2JzLi4uLgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6Ci0tLQogICAg
-cmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQ
-cm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0t
-cm0nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTY2YmM5MDNhZjk1NjRkNzY4
-MzQ4NGEwZjlhOThhNmNkJywgJy11JywgJzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29t
-cD11bmNvbmZpbmVkJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdV
-UkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUn
-LCAnU0hPV19FTlY9JywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12Jywg
-Jy9ob21lL3BhdGNoZXcvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6
-eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtYXJkamhtMWIvc3JjL2RvY2tl
-ci1zcmMuMjAyMC0wOS0yMi0xNC40OS4zNS43MjA1Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11
-L2ZlZG9yYScsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LW1pbmd3J10nIHJldHVybmVkIG5v
-bi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0
-YW5jZS51dWlkPTY2YmM5MDNhZjk1NjRkNzY4MzQ4NGEwZjlhOThhNmNkCm1ha2VbMV06ICoqKiBb
-ZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAv
-cGF0Y2hldy10ZXN0ZXItdG1wLWFyZGpobTFiL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRl
-c3QtbWluZ3dAZmVkb3JhXSBFcnJvciAyCgpyZWFsICAgIDNtMjIuNjg0cwp1c2VyICAgIDBtMTYu
-MDg3cwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xv
-Z3MvMTYwMDc3NjkzNzQ1LjEwMjQ5Ljk3MDczMjkxMDc4MTM2NjIyMzYuc3RnaXRAcGFzaGEtVGhp
-bmtQYWQtWDI4MC90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hl
-dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
-dC5jb20=
+* Anton Kuchin (antonkuchin@yandex-team.ru) wrote:
+> Hi,
+> 
+> I'm implementing migration support in vhost-user backend and have a
+> couple of questions:
+
+Hi Anton,
+  I'ts a while since I've looked at this code, but from memory:
+
+> 1. How master can be sure that logging was started?
+> 
+> We expect that right after set_fatures command with VHOST_F_LOG_ALL flag
+> all memory modifications will be tracked in log, but slave can need a
+> little time to process this command so there is a chance that some
+> requests can be untracked. Is there a way to ensure all requests are
+> logged or determine the moment since when tracking starts and master can
+> start migrating memory?
+
+I think it happens after the set_mem_table command; I think if the
+command had the 'NEED_REPLY' flag set then the client responds to the
+qemu to say the command is done.
+
+> 2. Why do we need separate log_addr for vring and how can it be not
+> covered by mem table?
+
+Hmm I don't think I understand that question; isn't the vring covered by
+the memtable?
+
+> As far as I understand slave receives used address in set_vring_addr
+> command and to map it correctly we do need valid entry in memory table.
+> So this field looks redundant to me. Am I missing something?
+> 
+> BTW the word "log_guest_addr" is mentioned only once in the document and
+> in "vring address description" payload it is just called "log",
+> shouldn't we should change this names to match?
+
+Let's cc in Marc-Andre.
+
+Dave
+
+
+
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
