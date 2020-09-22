@@ -2,87 +2,89 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03F15C4727D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:42:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22185C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:45:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6000C2395C
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:42:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8B6F02395C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:45:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GXzFt8X9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6000C2395C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VsDGrXsu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B6F02395C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKhd0-0005aR-1U
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 08:42:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46770)
+	id 1kKhfM-00075G-KJ
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 08:45:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48008)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kKhbL-0004iR-Fa
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 08:40:56 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32209
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kKhei-0006aW-3d
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 08:44:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42827)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kKhbI-0001Ww-BF
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 08:40:54 -0400
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kKheg-0001yM-FN
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 08:44:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600778450;
+ s=mimecast20190719; t=1600778661;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=Z+iOUxLnNNbl03LGxa/4Gk+YWxDzedVk0LKpRY5k5Yo=;
- b=GXzFt8X9sbuElbPIDlmX5MCu++ZqdHFihVUatC2Q/zXakeQ1fOltUUvNi0YZT1J4V+QLE4
- U0qqAND5XFy6O72rvrKHoaqoxtU3YgaeeAH7mGL6PHl+iWBApLLNFT1GqkSSG8R2xaCRpc
- WqwdjIvZ8eg3dA6lXJU4RkeMiWuTNKg=
+ bh=iv2NoV/ks7jj16aeZsTf0bMrngGfyoRUQ7ZLABRiom8=;
+ b=VsDGrXsuKT717NCUFnh9QNZmP7IrvITDCFJbgFsS8BpbW2kiK5uD2hjLU//KhQuptI99oQ
+ xL29L35L1p9PczLwdLHS7OvmVnKdgYoiuHD9C+NkF06fBYJqBPFg12dPt68JwqZz4gx/TA
+ TyppMi0FuQzUxaaZRoB4vW60v0Ry5Bw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-399-3ON-wZS1OC6PWctf8Hs-Nw-1; Tue, 22 Sep 2020 08:40:45 -0400
-X-MC-Unique: 3ON-wZS1OC6PWctf8Hs-Nw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-545-4KNd9QWWMpetqdGl-17bWg-1; Tue, 22 Sep 2020 08:44:19 -0400
+X-MC-Unique: 4KNd9QWWMpetqdGl-17bWg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB8D264087;
- Tue, 22 Sep 2020 12:40:44 +0000 (UTC)
-Received: from horse.redhat.com (ovpn-116-78.rdu2.redhat.com [10.10.116.78])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 075687368D;
- Tue, 22 Sep 2020 12:40:38 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
- id 62E4F223B13; Tue, 22 Sep 2020 08:40:38 -0400 (EDT)
-Date: Tue, 22 Sep 2020 08:40:38 -0400
-From: Vivek Goyal <vgoyal@redhat.com>
-To: Miklos Szeredi <miklos@szeredi.hu>
-Subject: Re: [PATCH] virtiofsd: Used glib "shared" thread pool
-Message-ID: <20200922124038.GA57620@redhat.com>
-References: <20200921213216.GE13362@redhat.com>
- <CAJfpegujM0ygoBT5uPf4zBUDiphDTwgu97NfqaEgaa8HoSnuRw@mail.gmail.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 990B41008548;
+ Tue, 22 Sep 2020 12:44:18 +0000 (UTC)
+Received: from localhost (unknown [10.10.67.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6000D19D61;
+ Tue, 22 Sep 2020 12:44:18 +0000 (UTC)
+Date: Tue, 22 Sep 2020 08:44:17 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH 13/24] i386: Register most CPU properties as class
+ properties
+Message-ID: <20200922124417.GW57321@habkost.net>
+References: <20200921221045.699690-1-ehabkost@redhat.com>
+ <20200921221045.699690-14-ehabkost@redhat.com>
+ <20200922084149.706d8cf7@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJfpegujM0ygoBT5uPf4zBUDiphDTwgu97NfqaEgaa8HoSnuRw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200922084149.706d8cf7@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vgoyal@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=vgoyal@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 04:19:36
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 00:31:51
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
 X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,63 +97,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs-list <virtio-fs@redhat.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 22, 2020 at 02:03:18PM +0200, Miklos Szeredi wrote:
-> On Mon, Sep 21, 2020 at 11:32 PM Vivek Goyal <vgoyal@redhat.com> wrote:
+On Tue, Sep 22, 2020 at 08:41:49AM +0200, Igor Mammedov wrote:
+> On Mon, 21 Sep 2020 18:10:34 -0400
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
 > 
-> > glib offers thread pools and it seems to support "exclusive" and "shared"
-> > thread pools.
-> >
-> >
-> > https://developer.gnome.org/glib/stable/glib-Thread-Pools.html#g-thread-pool-new
-> >
-> > Currently we use "exlusive" thread pools but its performance seems to be
-> > poor. I tried using "shared" thread pools and performance seems much
-> > better. I posted performance results here.
-> >
-> > https://www.redhat.com/archives/virtio-fs/2020-September/msg00080.html
-> >
-> > So lets switch to shared thread pools. We can think of making it optional
-> > once somebody can show in what cases exclusive thread pools offer better
-> > results. For now, my simple performance tests across the board see
-> > better results with shared thread pools.
-> >
+> > Class properties make QOM introspection simpler and easier, as
+> > they don't require an object to be instantiated.
+> > 
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: Richard Henderson <rth@twiddle.net>
+> > Cc: Eduardo Habkost <ehabkost@redhat.com>
+> > Cc: qemu-devel@nongnu.org
+> > ---
+> >  target/i386/cpu.c | 66 ++++++++++++++++++++++++-----------------------
+> >  1 file changed, 34 insertions(+), 32 deletions(-)
+> > 
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > index 1c58f764dcb..66792f28ba7 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -6922,44 +6922,12 @@ static void x86_cpu_initfn(Object *obj)
+> >      env->nr_dies = 1;
+> >      cpu_set_cpustate_pointers(cpu);
+> >  
+> > -    object_property_add(obj, "family", "int",
+> > -                        x86_cpuid_version_get_family,
+> > -                        x86_cpuid_version_set_family, NULL, NULL);
+> > -    object_property_add(obj, "model", "int",
+> > -                        x86_cpuid_version_get_model,
+> > -                        x86_cpuid_version_set_model, NULL, NULL);
+> > -    object_property_add(obj, "stepping", "int",
+> > -                        x86_cpuid_version_get_stepping,
+> > -                        x86_cpuid_version_set_stepping, NULL, NULL);
+> > -    object_property_add_str(obj, "vendor",
+> > -                            x86_cpuid_get_vendor,
+> > -                            x86_cpuid_set_vendor);
+> > -    object_property_add_str(obj, "model-id",
+> > -                            x86_cpuid_get_model_id,
+> > -                            x86_cpuid_set_model_id);
+> > -    object_property_add(obj, "tsc-frequency", "int",
+> > -                        x86_cpuid_get_tsc_freq,
+> > -                        x86_cpuid_set_tsc_freq, NULL, NULL);
 > 
-> Needs this as well:
-
-Thanks Miklos. I am wondering why I did not face this issue. May be
-I don't have seccomp enabled. Will check.
-
-David, can you please pick this patch as well. May be merge both
-the patches.
-
-Do let me know if you want to me post a merged patch instead.
-
-Thanks
-Vivek
-
 > 
-> --- qemu.orig/tools/virtiofsd/passthrough_seccomp.c 2020-09-16
-> 20:21:13.168686176 +0200
-> +++ qemu/tools/virtiofsd/passthrough_seccomp.c 2020-09-22
-> 14:01:38.499164501 +0200
-> @@ -94,6 +94,8 @@ static const int syscall_whitelist[] = {
->      SCMP_SYS(rt_sigaction),
->      SCMP_SYS(rt_sigprocmask),
->      SCMP_SYS(rt_sigreturn),
-> +    SCMP_SYS(sched_getattr),
-> +    SCMP_SYS(sched_setattr),
->      SCMP_SYS(sendmsg),
->      SCMP_SYS(setresgid),
->      SCMP_SYS(setresuid),
+> >      object_property_add(obj, "feature-words", "X86CPUFeatureWordInfo",
+> >                          x86_cpu_get_feature_words,
+> >                          NULL, NULL, (void *)env->features);
+> >      object_property_add(obj, "filtered-features", "X86CPUFeatureWordInfo",
+> >                          x86_cpu_get_feature_words,
+> >                          NULL, NULL, (void *)cpu->filtered_features);
 > 
-> Thanks,
-> Miklos
+> I'm just curious why these weren't moved as well?
+
+Because of the (void*) arguments that need a pointer to the
+instance.
+
+-- 
+Eduardo
 
 
