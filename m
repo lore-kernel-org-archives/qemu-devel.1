@@ -2,79 +2,108 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70BA1C4727D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:04:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32609C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:05:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A354D2388B
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:04:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B59F920936
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:05:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="TxG3S7Bq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A354D2388B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=szeredi.hu
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AiOCjTqt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B59F920936
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKh25-0003sK-JM
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 08:04:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35190)
+	id 1kKh3U-0004wn-U7
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 08:05:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35580)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <miklos@szeredi.hu>) id 1kKh1C-0003Ps-Fz
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 08:03:34 -0400
-Received: from mail-ua1-x944.google.com ([2607:f8b0:4864:20::944]:34356)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <miklos@szeredi.hu>) id 1kKh19-0004s3-Nz
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 08:03:34 -0400
-Received: by mail-ua1-x944.google.com with SMTP id v8so5416628uaq.1
- for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 05:03:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=szeredi.hu; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=w1zk3N4S860pTM4e2x55L1XSkgMh5qjRuOy7Ag9dnp4=;
- b=TxG3S7Bq+549oubMaUPCzkx+vhPgamb7YMVIX2FY/inTxBA/uzovmfK8E06LW/ENJu
- 6fbQq7kkl4D3+UJHIoeQ43du0IVhP52fB8BW6GVtSqndqMCAXLgjbuItuWAhFMlswkJU
- CohJPCk5UcU6F0TnadAznMPyHqNOzlQplMYFU=
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kKh2l-0004Oh-2R
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 08:05:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34459
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kKh2f-0004zk-M0
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 08:05:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600776300;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Fbci2o4pg9HYWGHwlSBIthUnoYF+N3Iupz+SYZ3MYgk=;
+ b=AiOCjTqtCb7YOhftO4GK/I3wUeB23ruOzcjKKXSStrhcynyRJofYNEqLmQhbncqfwBnjTb
+ PZayzaZzM4l9RPgypaHf46EUuYX0S24uJHz6NmMJCJhpySTiBg2Txkz7t8ShWuBHKkKq97
+ we32WvsGHiu0TixlCCCL2k12n6+WPUk=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-327-DNaqxy0gMveIc5aEvFB-mw-1; Tue, 22 Sep 2020 08:04:58 -0400
+X-MC-Unique: DNaqxy0gMveIc5aEvFB-mw-1
+Received: by mail-wr1-f72.google.com with SMTP id f18so7320401wrv.19
+ for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 05:04:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=w1zk3N4S860pTM4e2x55L1XSkgMh5qjRuOy7Ag9dnp4=;
- b=raaVd7oVEZRdsfPJYD8pRfvez1cI4q3IwElYtfjLPeLHISoxyCU3wNkWBy9KaObgfS
- 2Wam+pfza0b4uABfP6fBEOLvZLhu0vU2hERkPeexxU9XKm5GCAzKANCLZ1yp7y0Th0gF
- o7qTh9FMDW+fV5s7XLcNUrhHDZuDrOgcqBEPUJsotKtd3VdkMz5Db7ig0Zs+aWJZFznx
- cY+ovkLpZyttbllTm2jOD/r1KZs+Cia9O693WUro6a7KAFixEFokQRUJjya2aaWHuRnF
- 4uSPJ4EsRMdOI2I3tWYckv05RtXurthPiYHOh0qosc6LthuVihvCt0XNND3NRrEC+7M7
- KfAw==
-X-Gm-Message-State: AOAM531tCCAL/ivThCTYqte+K+ANG4xrk502IY7mE1OJX8CzYghpoSMR
- zH8s2QmQm7MAqTZ3nP6WELT5PouBhjTrTYi1fphZqA==
-X-Google-Smtp-Source: ABdhPJzCxSV7Jyy1Ti5MnnfYjxBovAs0U7gNjYzGBe999BiSfV39a9/7ysOsUN2+vAo8x/+NRzfKlBQtcEZnZFoe/B0=
-X-Received: by 2002:ab0:25c7:: with SMTP id y7mr2846744uan.137.1600776209523; 
- Tue, 22 Sep 2020 05:03:29 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Fbci2o4pg9HYWGHwlSBIthUnoYF+N3Iupz+SYZ3MYgk=;
+ b=r1IGzAIJr627cV7gItslP0QcfBZNcoXdI0GZtzT9xdLcpI2g0pS5SGSZhR30XYUzae
+ lD2zRbTy3nscmDVOpKZG6HcheL2ZMEY5pyX8kCPf7A6FneA4R9N7eLpdwnfL+YAgvGxL
+ q+/hWMsso+RXz8RUFnw6n6hNNIziVyJCKwkippsACISLV+DeYKR5kLyfpLm2eYK5Aq1H
+ Fg8YPibmyEyCb9X3n5OYwZHgZb9E4WQRWhPdwP5FGV+tlzwUPS/sC1ZDQQKuM2sSqDUQ
+ 5rsp2lX4zpTTE+rzoaF/IUKPmGmGx/mFN27BFRnT8OuWZmPJ1GOxfoVHfpBbQqcSyAcX
+ n2pQ==
+X-Gm-Message-State: AOAM532lC8LeQodfrNwb+vDTeh89stgfsiumSkvTBoqidu2UO1rVD0dQ
+ eR7K6fCd24+FGoAH7CdXaeFO9lBj6OW7LIBH4ui64hwSP7wOamiMq+YLsgn1cfZMI2ycKnFZosl
+ QkHIozyzl1vFDY2o=
+X-Received: by 2002:adf:912b:: with SMTP id j40mr5024949wrj.42.1600776296815; 
+ Tue, 22 Sep 2020 05:04:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxBSdRMIFDbeFYSwXPTwdTNJcRlTstv7TCD4th7Pmb5S2XhaFvh8ZSfQvOa360U8yFnt2uJtA==
+X-Received: by 2002:adf:912b:: with SMTP id j40mr5024917wrj.42.1600776296416; 
+ Tue, 22 Sep 2020 05:04:56 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ec2c:90a9:1236:ebc6?
+ ([2001:b07:6468:f312:ec2c:90a9:1236:ebc6])
+ by smtp.gmail.com with ESMTPSA id t15sm25711348wrp.20.2020.09.22.05.04.55
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 22 Sep 2020 05:04:55 -0700 (PDT)
+Subject: Re: [PATCH] helper_syscall x86_64: clear exception_is_int
+To: Douglas Crosher <dtc-ubuntu@scieneer.com>, qemu-devel@nongnu.org
+References: <a7dab33e-eda6-f988-52e9-f3d32db7538d@scieneer.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <651980e0-4413-47e5-73fd-5970ede99117@redhat.com>
+Date: Tue, 22 Sep 2020 14:04:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200921213216.GE13362@redhat.com>
-In-Reply-To: <20200921213216.GE13362@redhat.com>
-From: Miklos Szeredi <miklos@szeredi.hu>
-Date: Tue, 22 Sep 2020 14:03:18 +0200
-Message-ID: <CAJfpegujM0ygoBT5uPf4zBUDiphDTwgu97NfqaEgaa8HoSnuRw@mail.gmail.com>
-Subject: Re: [PATCH] virtiofsd: Used glib "shared" thread pool
-To: Vivek Goyal <vgoyal@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000005577cd05afe5c1f8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::944;
- envelope-from=miklos@szeredi.hu; helo=mail-ua1-x944.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_INVALID=0.1,
- DKIM_SIGNED=0.1, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+In-Reply-To: <a7dab33e-eda6-f988-52e9-f3d32db7538d@scieneer.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 01:57:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -87,103 +116,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs-list <virtio-fs@redhat.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: ehabkost@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000005577cd05afe5c1f8
-Content-Type: text/plain; charset="UTF-8"
+On 22/09/20 06:17, Douglas Crosher wrote:
+> 
+> The exception_is_int flag may be set on entry to helper_syscall,
+> e.g. after a prior interrupt that has returned, and processing
+> EXCP_SYSCALL as an interrupt causes it to fail so clear this flag.
+> 
+> Signed-off-by: Douglas Crosher <dtc-ubuntu@scieneer.com>
+> ---
+>  target/i386/seg_helper.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/target/i386/seg_helper.c b/target/i386/seg_helper.c
+> index b96de068ca..be88938c2a 100644
+> --- a/target/i386/seg_helper.c
+> +++ b/target/i386/seg_helper.c
+> @@ -975,6 +975,7 @@ void helper_syscall(CPUX86State *env, int
+> next_eip_addend)
+>      CPUState *cs = env_cpu(env);
+> 
+>      cs->exception_index = EXCP_SYSCALL;
+> +    env->exception_is_int = 0;
+>      env->exception_next_eip = env->eip + next_eip_addend;
+>      cpu_loop_exit(cs);
+>  }
 
-On Mon, Sep 21, 2020 at 11:32 PM Vivek Goyal <vgoyal@redhat.com> wrote:
+Queued, thanks.
 
-> glib offers thread pools and it seems to support "exclusive" and "shared"
-> thread pools.
->
->
-> https://developer.gnome.org/glib/stable/glib-Thread-Pools.html#g-thread-pool-new
->
-> Currently we use "exlusive" thread pools but its performance seems to be
-> poor. I tried using "shared" thread pools and performance seems much
-> better. I posted performance results here.
->
-> https://www.redhat.com/archives/virtio-fs/2020-September/msg00080.html
->
-> So lets switch to shared thread pools. We can think of making it optional
-> once somebody can show in what cases exclusive thread pools offer better
-> results. For now, my simple performance tests across the board see
-> better results with shared thread pools.
->
+Paolo
 
-Needs this as well:
-
---- qemu.orig/tools/virtiofsd/passthrough_seccomp.c 2020-09-16
-20:21:13.168686176 +0200
-+++ qemu/tools/virtiofsd/passthrough_seccomp.c 2020-09-22
-14:01:38.499164501 +0200
-@@ -94,6 +94,8 @@ static const int syscall_whitelist[] = {
-     SCMP_SYS(rt_sigaction),
-     SCMP_SYS(rt_sigprocmask),
-     SCMP_SYS(rt_sigreturn),
-+    SCMP_SYS(sched_getattr),
-+    SCMP_SYS(sched_setattr),
-     SCMP_SYS(sendmsg),
-     SCMP_SYS(setresgid),
-     SCMP_SYS(setresuid),
-
-Thanks,
-Miklos
-
---0000000000005577cd05afe5c1f8
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><div class=3D"gmail_default" style=3D"fon=
-t-size:small"><br></div></div><br><div class=3D"gmail_quote"><div dir=3D"lt=
-r" class=3D"gmail_attr">On Mon, Sep 21, 2020 at 11:32 PM Vivek Goyal &lt;<a=
- href=3D"mailto:vgoyal@redhat.com">vgoyal@redhat.com</a>&gt; wrote:<br></di=
-v><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;borde=
-r-left:1px solid rgb(204,204,204);padding-left:1ex">glib offers thread pool=
-s and it seems to support &quot;exclusive&quot; and &quot;shared&quot;<br>
-thread pools.<br>
-<br>
-<a href=3D"https://developer.gnome.org/glib/stable/glib-Thread-Pools.html#g=
--thread-pool-new" rel=3D"noreferrer" target=3D"_blank">https://developer.gn=
-ome.org/glib/stable/glib-Thread-Pools.html#g-thread-pool-new</a><br>
-<br>
-Currently we use &quot;exlusive&quot; thread pools but its performance seem=
-s to be<br>
-poor. I tried using &quot;shared&quot; thread pools and performance seems m=
-uch<br>
-better. I posted performance results here.<br>
-<br>
-<a href=3D"https://www.redhat.com/archives/virtio-fs/2020-September/msg0008=
-0.html" rel=3D"noreferrer" target=3D"_blank">https://www.redhat.com/archive=
-s/virtio-fs/2020-September/msg00080.html</a><br>
-<br>
-So lets switch to shared thread pools. We can think of making it optional<b=
-r>
-once somebody can show in what cases exclusive thread pools offer better<br=
->
-results. For now, my simple performance tests across the board see<br>
-better results with shared thread pools.<br></blockquote><div><br></div><di=
-v style=3D"font-size:small" class=3D"gmail_default">Needs this as well:</di=
-v><div style=3D"font-size:small" class=3D"gmail_default"><br></div><div sty=
-le=3D"font-size:small" class=3D"gmail_default">--- qemu.orig/tools/virtiofs=
-d/passthrough_seccomp.c	2020-09-16 20:21:13.168686176 +0200<br>+++ qemu/too=
-ls/virtiofsd/passthrough_seccomp.c	2020-09-22 14:01:38.499164501 +0200<br>@=
-@ -94,6 +94,8 @@ static const int syscall_whitelist[] =3D {<br>=C2=A0 =C2=
-=A0 =C2=A0SCMP_SYS(rt_sigaction),<br>=C2=A0 =C2=A0 =C2=A0SCMP_SYS(rt_sigpro=
-cmask),<br>=C2=A0 =C2=A0 =C2=A0SCMP_SYS(rt_sigreturn),<br>+ =C2=A0 =C2=A0SC=
-MP_SYS(sched_getattr),<br>+ =C2=A0 =C2=A0SCMP_SYS(sched_setattr),<br>=C2=A0=
- =C2=A0 =C2=A0SCMP_SYS(sendmsg),<br>=C2=A0 =C2=A0 =C2=A0SCMP_SYS(setresgid)=
-,<br>=C2=A0 =C2=A0 =C2=A0SCMP_SYS(setresuid),<br></div></div><div class=3D"=
-gmail_quote"><div style=3D"font-size:small" class=3D"gmail_default"><br></d=
-iv><div style=3D"font-size:small" class=3D"gmail_default">Thanks,</div><div=
- style=3D"font-size:small" class=3D"gmail_default">Miklos</div><br></div></=
-div>
-
---0000000000005577cd05afe5c1f8--
 
