@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD6EBC4363D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 17:52:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CB19C4363D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 17:53:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56C962376F
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 17:52:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF3672376F
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 17:53:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rCRmzQtZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56C962376F
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MkImU6cA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF3672376F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKmSk-0003qm-9v
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 13:52:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45486)
+	id 1kKmTh-00051F-SB
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 13:53:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45594)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kKmOX-0007xp-K7
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 13:48:09 -0400
-Received: from mail-pg1-x52e.google.com ([2607:f8b0:4864:20::52e]:34243)
+ id 1kKmOh-000836-TF
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 13:48:11 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:54226)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kKmOM-0004Kj-Ta
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 13:47:59 -0400
-Received: by mail-pg1-x52e.google.com with SMTP id u24so1752152pgi.1
- for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 10:47:49 -0700 (PDT)
+ id 1kKmOf-0004Lb-Js
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 13:48:11 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id t7so1844154pjd.3
+ for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 10:48:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Nh1db1dZeJoMf+455PtMij2SzqSvT9UF/0EwtPYuxYM=;
- b=rCRmzQtZcOTLr4VP/p62Ndm89mwkUbhNCCL9dUAG+GvMLnfEV1L0APVkyjB6gt4Ujn
- wrgGck2FsZ0lpmU0XKoftyB/YDx8Cwdkwmy/N17xgM2rjkBg7+jfeGRSHAiCeS/LoYpP
- ZwqO6fBoppgRyapoI7x1tgQWAVJOb6kT0OQ+Hc6wrzkOVudQbMJPLupvD9dqJrWMpRdc
- 2MH8Ahyn/s4JmKQ0Q13pTrJu4zxOb3afDbbg3OeR2GS+iVpkQ0LGDoIQsyJhZNPYqHqC
- lymYznp7D18pKVC5Tv8Za3kJKEjQbKKVFaXWNuAXe/NOmTkYXiO16ogc4l027Vwim1LV
- 5d5A==
+ bh=fL9vcubZUcrgmVjSWEvSPM+/Ls8w7nQK9m+00GRHc10=;
+ b=MkImU6cAIAbe0MvakOL2TARvA6rK63JRjLZBh9PmpPSCogeg8NfZJc8cf/cfM+hn2I
+ jAhAxVdLdgTDJ+hh2NGlq7RPyAJWzF+kVPS0+cDvgpnECq/0EaWfVoX5bwkC7WcBVO6K
+ 2npIQJBSNTEgN3r+v/U7zqtDE3f4gd0zbxf6LZmXqeWYX2HlJmLuN2+IsOxEiUf71nKp
+ 7XQLafK7Tb2rSWsDfuJsVwGmHb2mUwNeCAfkOHx/rGwhWMy2RZNsk2AWvxTTc6B60q5Y
+ DOqY78P6TLXAU+MCbq2QEnz50yThZk7KrC7BwiR4amJK8kvdBqYNqUidetJ2jDE3c4ko
+ sBPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Nh1db1dZeJoMf+455PtMij2SzqSvT9UF/0EwtPYuxYM=;
- b=mhJAnGcm/pEbzwuOlLlRaQhuUrH2YubaopEWwuVAORwfx2PSu75PTsfu/7Mgi0iskN
- qQ4kPt4ju8QcnKOVDjmxdr4570+HO9iNALyLjv2rU7Q7kJUtgKC/2VYq064v+mqyVylc
- X0vTYb8BbzQ0IHi78eFfdv4w3WCzHiyE4N4smvqLXEWrtwVkcsjjqO0sC3Nsdue07nje
- lFqSVFGPsJ/3psMIjkIVP6JCQx55RXmaXQ651uGfVB65Y2lU5j5fH9s1P8xY+Ehv8axV
- pYEboVhUffPlrTQqnD2XA2eD9Y0t7AbnfOe7lMC/P5/2gVqnwVl+Mstrp4Jd1UVa1H2g
- C7wQ==
-X-Gm-Message-State: AOAM533rd1piAOs0xjgkcPABeQaufLoX4Wc6FWb/ans+FG57dJy79wnH
- NMUlXL+F+X6fhTgm4C90+uQWeKVclBPxcg==
-X-Google-Smtp-Source: ABdhPJyOfjFDPEXoXd5Sf8B+XN2kw/K/E8Vr5gwnmOaI/t8zhFnfj5RpID9z5crNVGN550dz0qflOA==
-X-Received: by 2002:a65:5902:: with SMTP id f2mr4195566pgu.379.1600796868535; 
- Tue, 22 Sep 2020 10:47:48 -0700 (PDT)
+ bh=fL9vcubZUcrgmVjSWEvSPM+/Ls8w7nQK9m+00GRHc10=;
+ b=TrRmZd5hdwG7J14UHRgHACOi3rE0BKEIKp37/81RqWrJ/lppYu6L9PW4h02I6Uxlxr
+ vgMMtjYpFZRONIuu6z29jUnuOFCHhk/LI7ZCqnnG379uY3DgBWDTUxKnexESgSXxGcCc
+ 7sXHo+pnxIHOkTWupmjRTXTNvfOQV2f6nDVnVlEBeitqjHeg1jABzp7YwMaO3aUyoh8q
+ mDZSjskoMqE72puVgqoXVFRIQXgY5ZnlFoG7O2EFGuZ86XK/Aavr9knrk6jgn7GBSqrA
+ 71LTX7eTryAUDK9Dyt9p7KU3jmFS3FjLrjzJWjWrSNwDqFvgfrXwK7dJVGxyxZJTGpu+
+ uy1Q==
+X-Gm-Message-State: AOAM531ihPetA3XWMZ1PaWfqYVDGDOwiRaeWkMe+KZ9hGuwCzIHoiMuI
+ vNMtU3BmQ0H3Yo1br/tuK/jK+QhMpiTrYQ==
+X-Google-Smtp-Source: ABdhPJwgduNFkYxk204k2YPCIi2kGLIwTnMvHvLdyBDw+wcYb0OZ5lzAHByCMrA/PKu7EMid8OYNQw==
+X-Received: by 2002:a17:90b:1098:: with SMTP id
+ gj24mr910074pjb.55.1600796881019; 
+ Tue, 22 Sep 2020 10:48:01 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id r1sm14825310pgl.66.2020.09.22.10.47.47
+ by smtp.gmail.com with ESMTPSA id r1sm14825310pgl.66.2020.09.22.10.47.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 22 Sep 2020 10:47:47 -0700 (PDT)
+ Tue, 22 Sep 2020 10:48:00 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/11] capstone: Require version 4.0 from a system library
-Date: Tue, 22 Sep 2020 10:47:33 -0700
-Message-Id: <20200922174741.475876-4-richard.henderson@linaro.org>
+Subject: [PULL 11/11] disas/capstone: Add skipdata hook for s390x
+Date: Tue, 22 Sep 2020 10:47:41 -0700
+Message-Id: <20200922174741.475876-12-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200922174741.475876-1-richard.henderson@linaro.org>
 References: <20200922174741.475876-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52e;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x52e.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -100,37 +101,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
+Cc: peter.maydell@linaro.org, Thomas Huth <thuth@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We're about to use a portion of the 4.0 API.
-Reject a system library version prior to that.
+It is always possible to tell the length of an insn, even if the
+actual insn is unknown.  Skip the correct number of bytes, so that
+we stay in sync with the instruction stream.
 
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
+Acked-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- meson.build | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ disas/capstone.c | 42 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 41 insertions(+), 1 deletion(-)
 
-diff --git a/meson.build b/meson.build
-index 4c92b43fe5..114b136129 100644
---- a/meson.build
-+++ b/meson.build
-@@ -613,7 +613,7 @@ if capstone_opt == 'no'
-   capstone_opt = false
- elif capstone_opt in ['yes', 'auto', 'system']
-   have_internal = fs.exists('capstone/Makefile')
--  capstone = dependency('capstone', static: enable_static,
-+  capstone = dependency('capstone', version: '>=4.0', static: enable_static,
-                         required: capstone_opt == 'system' or
-                                   capstone_opt == 'yes' and not have_internal)
-   if capstone.found()
+diff --git a/disas/capstone.c b/disas/capstone.c
+index b48f83958d..0a9ef9c892 100644
+--- a/disas/capstone.c
++++ b/disas/capstone.c
+@@ -16,6 +16,39 @@
+  */
+ static __thread cs_insn *cap_insn;
+ 
++/*
++ * The capstone library always skips 2 bytes for S390X.
++ * This is less than ideal, since we can tell from the first two bits
++ * the size of the insn and thus stay in sync with the insn stream.
++ */
++static size_t CAPSTONE_API
++cap_skipdata_s390x_cb(const uint8_t *code, size_t code_size,
++                      size_t offset, void *user_data)
++{
++    size_t ilen;
++
++    /* See get_ilen() in target/s390x/internal.h.  */
++    switch (code[offset] >> 6) {
++    case 0:
++        ilen = 2;
++        break;
++    case 1:
++    case 2:
++        ilen = 4;
++        break;
++    default:
++        ilen = 6;
++        break;
++    }
++
++    return ilen;
++}
++
++static const cs_opt_skipdata cap_skipdata_s390x = {
++    .mnemonic = ".byte",
++    .callback = cap_skipdata_s390x_cb
++};
++
+ /*
+  * Initialize the Capstone library.
+  *
+@@ -42,13 +75,20 @@ static cs_err cap_disas_start(disassemble_info *info, csh *handle)
+     /* "Disassemble" unknown insns as ".byte W,X,Y,Z".  */
+     cs_option(*handle, CS_OPT_SKIPDATA, CS_OPT_ON);
+ 
+-    if (info->cap_arch == CS_ARCH_X86) {
++    switch (info->cap_arch) {
++    case CS_ARCH_SYSZ:
++        cs_option(*handle, CS_OPT_SKIPDATA_SETUP,
++                  (uintptr_t)&cap_skipdata_s390x);
++        break;
++
++    case CS_ARCH_X86:
+         /*
+          * We don't care about errors (if for some reason the library
+          * is compiled without AT&T syntax); the user will just have
+          * to deal with the Intel syntax.
+          */
+         cs_option(*handle, CS_OPT_SYNTAX, CS_OPT_SYNTAX_ATT);
++        break;
+     }
+ 
+     /* Allocate temp space for cs_disasm_iter.  */
 -- 
 2.25.1
 
