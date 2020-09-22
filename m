@@ -2,96 +2,78 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1741CC4346E
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 02:57:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E468C4346E
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 03:02:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8156D239A1
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 02:57:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dPW37UKJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8156D239A1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id B3229239D4
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 03:02:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3229239D4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKYUn-00039P-Is
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 22:57:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47914)
+	id 1kKYZD-0004Yp-Ma
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 23:02:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49180)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1kKYPh-0005mN-8N
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 22:52:17 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:50884)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kKYXy-0003vV-Gf
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 23:00:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40812)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1kKYPe-0002WY-KT
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 22:52:16 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id fa1so784799pjb.0
- for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 19:52:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=YUIHrzcMqn9UNrbIZOFvqCxooTJnO+VVGg31sZJLmPU=;
- b=dPW37UKJSQrlJIYcqcHH26/x7A1HPf/vrYHD97Co1dyrwVyZb+KUAyzznEKas8lwbr
- xjyTzuNhSOQxxGbD431JVwu1vSUZr7b+hJ48FZu7e/kwZLcj29L7uCVSJr7xuRei1hdJ
- uInkrcOe3uwTAR4oiUFvV3ZNK8YsyzSGYAeRNq5XhaVJWDHYw5mI1Jrcl/jA+i3UHNXJ
- 9kuzboMN2IiWFQnPG8SfZMWc7FI9lXwHTj2v+jXwtlvKp6fNfirk8BfdUa4Xs9a9BFbh
- K+M5EcAAevP9ryHRzl1usNyRVFmgvfpNhwkIi01JskdoNGESU0NcCH5CPAwgtMqZJWHC
- qH1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=YUIHrzcMqn9UNrbIZOFvqCxooTJnO+VVGg31sZJLmPU=;
- b=QxdaDLhTcyC4TM89hzjJK6FTIE7IbhVIncSAWMiXvTVS01hdeq7PtwUMp6fUsa2h2Z
- bkUpXfYjdj6a9yOXKhUPk8/cbNhpQ3ERQ9hBAGfNpo8sm7309eOgGJzZJHm2Z92RxtuD
- 29kLYhi0zKvydDKpPXBs8mzrEThQEk0/1saALaF/NmbHmWeQCMzD/tctESxL1sHB6VoE
- L0mUXYRINSd4F514jnK8u+hnynnyAHrh4edheFZN7gEq+TKz2wKuQCHnM3NlOiQcUl3J
- 8ehPG397diGdUdxtG7kDrSpjg0lPB5DEnuDJrRqxl1fdA3ky8iXhudPFYiM4AmTrzxrA
- VBSA==
-X-Gm-Message-State: AOAM531j3cS03DeuI2w9tWCjuCc/UwL2WFDSgVmyaez2wSoF+8imNs1N
- Sj9qb3eK/M7FpyjKkcm42zo=
-X-Google-Smtp-Source: ABdhPJw/gpg05bB2Cszgd5AhUuO6luH2oA4KSp96J16Q6uAeJxtZpU+ANLqx15YG0GlKCbmG8QIOYg==
-X-Received: by 2002:a17:90b:164e:: with SMTP id
- il14mr1871974pjb.5.1600743131346; 
- Mon, 21 Sep 2020 19:52:11 -0700 (PDT)
-Received: from software.domain.org ([45.77.13.216])
- by smtp.gmail.com with ESMTPSA id q4sm13263677pfs.193.2020.09.21.19.52.07
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 21 Sep 2020 19:52:10 -0700 (PDT)
-From: Huacai Chen <zltjiangshi@gmail.com>
-X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
-To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: [PATCH V10 6/8] hw/mips: Implement fw_cfg_arch_key_name()
-Date: Tue, 22 Sep 2020 10:49:25 +0800
-Message-Id: <1600742967-12933-7-git-send-email-chenhc@lemote.com>
-X-Mailer: git-send-email 2.7.0
-In-Reply-To: <1600742967-12933-1-git-send-email-chenhc@lemote.com>
-References: <1600742967-12933-1-git-send-email-chenhc@lemote.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=zltjiangshi@gmail.com; helo=mail-pj1-x1042.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kKYXv-0005Ks-V3
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 23:00:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kKYXt-0004az-NN
+ for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 03:00:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id ADD872E804B
+ for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 03:00:45 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 22 Sep 2020 02:52:04 -0000
+From: Benjamin David Lunt <1896561@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: fysnet
+X-Launchpad-Bug-Reporter: Benjamin David Lunt (fysnet)
+X-Launchpad-Bug-Modifier: Benjamin David Lunt (fysnet)
+Message-Id: <160074312416.13871.13514895218862238849.malonedeb@gac.canonical.com>
+Subject: [Bug 1896561] [NEW] EFI GOP Mode 1366x768
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: cacea6e8574983a27d2987b9246514a6dd2eeeea
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 23:00:46
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -100,104 +82,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Huacai Chen <chenhuacai@gmail.com>, qemu-devel@nongnu.org,
- Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>
+Reply-To: Bug 1896561 <1896561@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implement fw_cfg_arch_key_name(), which returns the name of a
-mips-specific key.
+Public bug reported:
 
-Signed-off-by: Huacai Chen <chenhc@lemote.com>
-Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
----
- hw/mips/fw_cfg.c    | 35 +++++++++++++++++++++++++++++++++++
- hw/mips/fw_cfg.h    | 19 +++++++++++++++++++
- hw/mips/meson.build |  2 +-
- 3 files changed, 55 insertions(+), 1 deletion(-)
- create mode 100644 hw/mips/fw_cfg.c
- create mode 100644 hw/mips/fw_cfg.h
+When using the EFI firmware from
+https://www.kraxel.org/repos/jenkins/edk2/
+(https://www.kraxel.org/repos/jenkins/edk2/edk2.git-
+ovmf-x64-0-20200919.1453.g7faece6985.noarch.rpm) (OVMF-pure-efi.fd and
+OVMF_VARS-pure-efi.fd) then using the GOP, setting the mode to 1366x768,
+QEMU uses a width of 1360 instead.
 
-diff --git a/hw/mips/fw_cfg.c b/hw/mips/fw_cfg.c
-new file mode 100644
-index 0000000000..67c4a74f4b
---- /dev/null
-+++ b/hw/mips/fw_cfg.c
-@@ -0,0 +1,35 @@
-+/*
-+ * QEMU fw_cfg helpers (MIPS specific)
-+ *
-+ * Copyright (c) 2020 Lemote, Inc.
-+ *
-+ * Author:
-+ *   Huacai Chen (chenhc@lemote.com)
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/mips/fw_cfg.h"
-+#include "hw/nvram/fw_cfg.h"
-+
-+const char *fw_cfg_arch_key_name(uint16_t key)
-+{
-+    static const struct {
-+        uint16_t key;
-+        const char *name;
-+    } fw_cfg_arch_wellknown_keys[] = {
-+        {FW_CFG_MACHINE_VERSION, "machine_version"},
-+        {FW_CFG_CPU_FREQ, "cpu_frequency"},
-+    };
-+
-+    for (size_t i = 0; i < ARRAY_SIZE(fw_cfg_arch_wellknown_keys); i++) {
-+        if (fw_cfg_arch_wellknown_keys[i].key == key) {
-+            return fw_cfg_arch_wellknown_keys[i].name;
-+        }
-+    }
-+    return NULL;
-+}
-diff --git a/hw/mips/fw_cfg.h b/hw/mips/fw_cfg.h
-new file mode 100644
-index 0000000000..e317d5b9a3
---- /dev/null
-+++ b/hw/mips/fw_cfg.h
-@@ -0,0 +1,19 @@
-+/*
-+ * QEMU fw_cfg helpers (MIPS specific)
-+ *
-+ * Copyright (c) 2020 Huacai Chen
-+ *
-+ * SPDX-License-Identifier: MIT
-+ */
-+
-+#ifndef HW_MIPS_FW_CFG_H
-+#define HW_MIPS_FW_CFG_H
-+
-+#include "hw/boards.h"
-+#include "hw/nvram/fw_cfg.h"
-+
-+/* Data for BIOS to identify machine */
-+#define FW_CFG_MACHINE_VERSION  (FW_CFG_ARCH_LOCAL + 0)
-+#define FW_CFG_CPU_FREQ         (FW_CFG_ARCH_LOCAL + 1)
-+
-+#endif
-diff --git a/hw/mips/meson.build b/hw/mips/meson.build
-index 46294b7382..c98391ce99 100644
---- a/hw/mips/meson.build
-+++ b/hw/mips/meson.build
-@@ -1,5 +1,5 @@
- mips_ss = ss.source_set()
--mips_ss.add(files('addr.c', 'mips_int.c'))
-+mips_ss.add(files('addr.c', 'mips_int.c', 'fw_cfg.c'))
- mips_ss.add(when: 'CONFIG_FULOONG', if_true: files('fuloong2e.c'))
- mips_ss.add(when: 'CONFIG_JAZZ', if_true: files('jazz.c'))
- mips_ss.add(when: 'CONFIG_MALTA', if_true: files('gt64xxx_pci.c', 'malta.c'))
--- 
-2.17.2
+I am using QEMU for windows (https://qemu.weilnetz.de/) on a Windows 10
+machine.
 
+To verify, while in the EFI firmware loaded code (within BOOTx64.EFI)
+and before ExitBootServices(), I choose the 1360x768 mode.  I then took
+notice of where the host window was and how many pixels it occupied.  I
+then reset the emulation (without quitting) and chose the 1366x768 mode.
+QEMU set the host window to the exact same width as the 1360 mode.
+i.e.: The same exact pixels where shown in the host background.  The
+window did not expand the extra 6 pixels.
+
+I allowed the firmware to run its course to my test environment when
+using mode 1366x768, all pixels are 6 pixels off to the right.  i.e.: 6
+pixels down the Frame Buffer.  If my test environment changes its HORZ
+WIDTH and PIXELS PER SCANLINE to 1360 while using this (1366x768) mode,
+the display is correct.
+
+This told me that it could be a few things.
+1) Since most (I didn't check them all) of the other modes have the width v=
+alue's bits 2:0 clear, mode 1366x768 is the only mode the EDK2 firmware has=
+ with a width where bits 2:0 are not zero.  Could EDK2 or QEMU (which for t=
+he Windows version may use SDL2 so it must be considered here) be clearing =
+these bits?  The value of 1366 when clearing bits 2:0 is 1360.
+
+2) Could there be a typo in the code EDK2 where the width should have been =
+1366?
+(I went looking at both QEMU (for Windows) and EDK2 and after looking at ma=
+ny lines of code, I could not find anywhere where this might happen. =
+
+
+By the way, in /ui/sdl2-2d.c (QEMU Windows version only?), there is a
+typo in a comment, missing the second 'e':
+
+Line 156:  * the native ones. Thes are the ones I have tested.
+
+3) Could EDK2 be sending 1360 instead of 1366?
+4) Could QEMU (passing it on to SDL2 in SDL_SetWindowSize()?) be destroying=
+ the value (bottom three bits)?
+
+Anyway, using the latest version of the EDK2 from the URL listed above,
+choosing the 1366x768 mode, does not set QEMU (for Windows) to 1366
+pixels in width.
+
+Ben
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1896561
+
+Title:
+  EFI GOP Mode 1366x768
+
+Status in QEMU:
+  New
+
+Bug description:
+  When using the EFI firmware from
+  https://www.kraxel.org/repos/jenkins/edk2/
+  (https://www.kraxel.org/repos/jenkins/edk2/edk2.git-
+  ovmf-x64-0-20200919.1453.g7faece6985.noarch.rpm) (OVMF-pure-efi.fd and
+  OVMF_VARS-pure-efi.fd) then using the GOP, setting the mode to
+  1366x768, QEMU uses a width of 1360 instead.
+
+  I am using QEMU for windows (https://qemu.weilnetz.de/) on a Windows
+  10 machine.
+
+  To verify, while in the EFI firmware loaded code (within BOOTx64.EFI)
+  and before ExitBootServices(), I choose the 1360x768 mode.  I then
+  took notice of where the host window was and how many pixels it
+  occupied.  I then reset the emulation (without quitting) and chose the
+  1366x768 mode.  QEMU set the host window to the exact same width as
+  the 1360 mode.  i.e.: The same exact pixels where shown in the host
+  background.  The window did not expand the extra 6 pixels.
+
+  I allowed the firmware to run its course to my test environment when
+  using mode 1366x768, all pixels are 6 pixels off to the right.  i.e.:
+  6 pixels down the Frame Buffer.  If my test environment changes its
+  HORZ WIDTH and PIXELS PER SCANLINE to 1360 while using this (1366x768)
+  mode, the display is correct.
+
+  This told me that it could be a few things.
+  1) Since most (I didn't check them all) of the other modes have the width=
+ value's bits 2:0 clear, mode 1366x768 is the only mode the EDK2 firmware h=
+as with a width where bits 2:0 are not zero.  Could EDK2 or QEMU (which for=
+ the Windows version may use SDL2 so it must be considered here) be clearin=
+g these bits?  The value of 1366 when clearing bits 2:0 is 1360.
+
+  2) Could there be a typo in the code EDK2 where the width should have bee=
+n 1366?
+  (I went looking at both QEMU (for Windows) and EDK2 and after looking at =
+many lines of code, I could not find anywhere where this might happen. =
+
+
+  By the way, in /ui/sdl2-2d.c (QEMU Windows version only?), there is a
+  typo in a comment, missing the second 'e':
+
+  Line 156:  * the native ones. Thes are the ones I have tested.
+
+  3) Could EDK2 be sending 1360 instead of 1366?
+  4) Could QEMU (passing it on to SDL2 in SDL_SetWindowSize()?) be destroyi=
+ng the value (bottom three bits)?
+
+  Anyway, using the latest version of the EDK2 from the URL listed
+  above, choosing the 1366x768 mode, does not set QEMU (for Windows) to
+  1366 pixels in width.
+
+  Ben
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1896561/+subscriptions
 
