@@ -2,62 +2,66 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 534E8C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:32:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 042BCC2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:33:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0AE12396D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:32:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C2B22396D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:33:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G/9uiU2Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0AE12396D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V63vtVgd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C2B22396D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKfbC-0005He-Rk
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 06:32:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54248)
+	id 1kKfbX-0005Sj-8I
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 06:32:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54326)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kKfaH-0003wo-17
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:31:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39463)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kKfaM-00043i-4S
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:31:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22929)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kKfaF-0006QU-9j
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:31:40 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kKfaK-0006R3-3n
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:31:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600770698;
+ s=mimecast20190719; t=1600770703;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=SHG/AznOFCMT4rKY3pR9HG4Gd+sq0z+OmGOOHtPpKao=;
- b=G/9uiU2YvcNLguoo1t4txJirfCbX+f2Z7IOR9ullctTxSdmlGG4pqg1ple4+eUErQJHXXB
- ITxA1el8JWDnoCv27Ca19iYLSo5fuK0uJrZcqhWtpxBwlzoSBww8VChpFBHCysZ8quGMsD
- sLhZxJ7a/7LcIgmyPGL+mGIwffeOLFE=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MPgFiifJH5K6+Z0e1+d84KSygjRUxBz0uDl0bxL56po=;
+ b=V63vtVgd/flvm7YGTP/j1iFNMkjBs36jh/3TeU5sRX+2/wacbmH8w8Eafhz9LX5OZ09Amh
+ GgiLVRSXNCo+IP9VLcPBz0YyvJsagMorvWAJGC/UZ2MlPy+CBLtCaRHB/24qrr9Ny7GFI7
+ I9Bbfqvgh238MJ75QuMRF+4KHjyQuZY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-r-c3fOl7P16IKCIWLIz3Kg-1; Tue, 22 Sep 2020 06:31:36 -0400
-X-MC-Unique: r-c3fOl7P16IKCIWLIz3Kg-1
+ us-mta-192-x03nDxkROK-NwP4G-5Y2gQ-1; Tue, 22 Sep 2020 06:31:41 -0400
+X-MC-Unique: x03nDxkROK-NwP4G-5Y2gQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17A8710BBEC0;
- Tue, 22 Sep 2020 10:31:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4DA2810BBEC3;
+ Tue, 22 Sep 2020 10:31:40 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-113-20.ams2.redhat.com [10.36.113.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B87A027BD1;
- Tue, 22 Sep 2020 10:31:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D3AB619C4F;
+ Tue, 22 Sep 2020 10:31:38 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 0/8] s390x/tcg: Implement some z14 facilities
-Date: Tue, 22 Sep 2020 12:31:21 +0200
-Message-Id: <20200922103129.12824-1-david@redhat.com>
+Subject: [PATCH v1 3/8] s390x/tcg: Implement MULTIPLY (MG, MGRK)
+Date: Tue, 22 Sep 2020 12:31:24 +0200
+Message-Id: <20200922103129.12824-4-david@redhat.com>
+In-Reply-To: <20200922103129.12824-1-david@redhat.com>
+References: <20200922103129.12824-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
@@ -66,9 +70,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=david@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=david@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 00:31:51
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
@@ -96,36 +100,61 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With this patchset, I can boot a kernel compiled for z14 (requiring
-Miscellaneous-Instruction-Extensions Facility 2) (using -cpu max).
+Multiply two signed 64bit values and store the 128bit result in r1 (0-63)
+and r1 + 1 (64-127).
 
-I am currently working on "vector-enhancements facility 1", I have most
-stuff in place except:
-- VECTOR FP (MAXIMUM|MINIMUM): needs some manual work to cover all types of
-                               comparisons.
-- VECTOR FP (NEGATIVE) MULTIPLY AND (ADD|SUBTRACT): needs float128_muladd()
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/insn-data.def |  2 ++
+ target/s390x/translate.c   | 13 +++++++++++++
+ 2 files changed, 15 insertions(+)
 
-Once we have that in place, we can convert the QEMU machine to a
-stripped-down z14.
-
-David Hildenbrand (8):
-  s390x/tcg: Implement ADD HALFWORD (AGH)
-  s390x/tcg: Implement SUBTRACT HALFWORD (SGH)
-  s390x/tcg: Implement MULTIPLY (MG, MGRK)
-  s390x/tcg: Implement MULTIPLY HALFWORD (MGH)
-  s390x/tcg: Implement BRANCH INDIRECT ON CONDITION (BIC)
-  s390x/tcg: Implement MULTIPLY SINGLE (MSC, MSGC, MSGRKC, MSRKC)
-  s390x/tcg: We support Miscellaneous-Instruction-Extensions Facility 2
-  s390x/tcg: Implement CIPHER MESSAGE WITH AUTHENTICATION (KMA)
-
- target/s390x/cc_helper.c    | 34 ++++++++++++++++++++++++++++
- target/s390x/gen-features.c |  2 ++
- target/s390x/helper.c       |  2 ++
- target/s390x/insn-data.def  | 12 ++++++++++
- target/s390x/internal.h     |  2 ++
- target/s390x/translate.c    | 45 +++++++++++++++++++++++++++++++++++++
- 6 files changed, 97 insertions(+)
-
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index e851e9df5e..2b4ad1530d 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -650,8 +650,10 @@
+ 
+ /* MULTIPLY */
+     C(0x1c00, MR,      RR_a,  Z,   r1p1_32s, r2_32s, new, r1_D32, mul, 0)
++    C(0xb9ec, MGRK,    RRF_a, MIE2,r3_o, r2_o, r1_P, 0, muls128, 0)
+     C(0x5c00, M,       RX_a,  Z,   r1p1_32s, m2_32s, new, r1_D32, mul, 0)
+     C(0xe35c, MFY,     RXY_a, GIE, r1p1_32s, m2_32s, new, r1_D32, mul, 0)
++    C(0xe384, MG,      RXY_a, MIE2,r1p1_o, m2_64, r1_P, 0, muls128, 0)
+     F(0xb317, MEEBR,   RRE,   Z,   e1, e2, new, e1, meeb, 0, IF_BFP)
+     F(0xb31c, MDBR,    RRE,   Z,   f1, f2, new, f1, mdb, 0, IF_BFP)
+     F(0xb34c, MXBR,    RRE,   Z,   x2h, x2l, x1, x1, mxb, 0, IF_BFP)
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 21d77b7e74..b536491892 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -3518,6 +3518,12 @@ static DisasJumpType op_mul128(DisasContext *s, DisasOps *o)
+     return DISAS_NEXT;
+ }
+ 
++static DisasJumpType op_muls128(DisasContext *s, DisasOps *o)
++{
++    tcg_gen_muls2_i64(o->out2, o->out, o->in1, o->in2);
++    return DISAS_NEXT;
++}
++
+ static DisasJumpType op_meeb(DisasContext *s, DisasOps *o)
+ {
+     gen_helper_meeb(o->out, cpu_env, o->in1, o->in2);
+@@ -5542,6 +5548,13 @@ static void in1_r1p1(DisasContext *s, DisasOps *o)
+ }
+ #define SPEC_in1_r1p1 SPEC_r1_even
+ 
++static void in1_r1p1_o(DisasContext *s, DisasOps *o)
++{
++    o->in1 = regs[get_field(s, r1) + 1];
++    o->g_in1 = true;
++}
++#define SPEC_in1_r1p1_o SPEC_r1_even
++
+ static void in1_r1p1_32s(DisasContext *s, DisasOps *o)
+ {
+     o->in1 = tcg_temp_new_i64();
 -- 
 2.26.2
 
