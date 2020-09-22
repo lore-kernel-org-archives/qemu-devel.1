@@ -2,85 +2,95 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81F23C4363D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 17:00:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47CBFC2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 17:00:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B64523787
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 17:00:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A6B3A23787
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 17:00:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XEGD/F08"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B64523787
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ajU76ZMb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6B3A23787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKleO-0006TI-Qn
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 13:00:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60834)
+	id 1kKleQ-0006W2-NM
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 13:00:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49670)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kKlao-0002s1-Ri; Tue, 22 Sep 2020 12:56:38 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:40595)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kKkw3-0005yZ-L8
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 12:14:31 -0400
+Received: from mail-pf1-x42c.google.com ([2607:f8b0:4864:20::42c]:42104)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kKlam-00068B-G6; Tue, 22 Sep 2020 12:56:38 -0400
-Received: by mail-io1-xd44.google.com with SMTP id j2so20371515ioj.7;
- Tue, 22 Sep 2020 09:56:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=MOrrgD2OLrn/zJyHEpYBTkI3bZ7N3UGcFQFv8ErJHm4=;
- b=XEGD/F08HsGxVV6VFFN64ovR0VwKoE5DvTTf71Bv3nzoVFm1g+MIsTK294D+mUjA7r
- lF58ezNiXhXyHr06bQJ/zNhgrSyoYjFhVFSBvPbBeMytvbTGwiNyOrdFXcP161GmAebG
- lsE1W4oyahIW3aQy5jAhqJ1Rk46xWI9eepRguDL0/DuU8uNmegfVPCQcG6AqQ684U2Aw
- SbE+2bNHztGW8kcOFoNg5EPuM7AQBjDq9pAFDu1U4FhYCe90TfVcFuSVF4EC2XDps64w
- B0PVO2Pb/MEy4iD8U0WhXTSNhxDUubqdHiHFmbO8poBU/n9itK52zMd/eoHkbyr6gyhg
- peFg==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kKkw0-0007X5-Ja
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 12:14:30 -0400
+Received: by mail-pf1-x42c.google.com with SMTP id d6so12887828pfn.9
+ for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 09:14:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=ZfUDnVGIeTxZ6003lF3aK6uP9F+0y/NxRIoWLrUBePU=;
+ b=ajU76ZMbDzVP7L0BbjNtlVavZwMuSugkBFsYAdwYk5RctclEf6ocFD1SsWQdG9x1zH
+ EqUR0Zmh/bdjxTS3DY+ko/Uc1dWBBKdiTAVY59iKCL8oM8zy6uB3NfbKzdzSfQPtqQru
+ Xv5sjhq2Hdrea7jwoInQ0BEgd3tlsWjrRNflGyZcg/awx4AelVDrWPSMfY/y2eeA1Y7g
+ yZnnLKu57WJ5gthaJ+ui4YVzX0G3BOVkVayk56J+Y34ceQDk8jCuQGPVRBKFqHWxl5IX
+ MWPiEzccgB1XC0kKQBWic+Q7nLT6lFh2dp2ofjXEWjzGmdq/QK+RtbQ3DZbFpQKfXnYf
+ C0hA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=MOrrgD2OLrn/zJyHEpYBTkI3bZ7N3UGcFQFv8ErJHm4=;
- b=J0PS2N2V3Zn8bZfATEb1X5JUvbj28/XtdUfPF89J8W9udC2KBZBuRP/v8bbgeNFQmq
- 00gBezYVmXKnXzFcawSSD8W+FDsJfQIn9BL9eM6Q0BrsmfIlJPx0l8Hpn2Qq7OEbbRPP
- zcPonF5bJkWUsm90Z00mrw60+bAMaf33L8SvRTI92b5SLOHflKpftxnH6JBNKILmb+sG
- v+jbAqiiiKyY1EFUZu0VFvDREV5AvmmeWcKgA5T79mEOwQBm6gfpYjL/zTt4d6+0HzRI
- hpSY3DvAuvbTTs20HQMpeUqEjCOU4bpyC6cbcwwwHGNUhf7ECxWeVy57KUwKtVfjs9Jt
- Xg3A==
-X-Gm-Message-State: AOAM533MiGesYqi/yXFrUNcdd3ZA7UsSZdcK6GNZYyM/IqpQ+rO6fPRK
- kAhYKBKyQJGri5W9HU0FZkHho3x4mBX7F9vcfpc=
-X-Google-Smtp-Source: ABdhPJz4iiNgLQw0XLJQnRkYoJW7BUvA6kzd8qhQSW36S6rilyGj3Pl5ji+v0zzxQaQS9/pRN/vY/AqiNDeW1BHXZY0=
-X-Received: by 2002:a05:6638:3f2:: with SMTP id
- s18mr4993977jaq.26.1600793795257; 
- Tue, 22 Sep 2020 09:56:35 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ZfUDnVGIeTxZ6003lF3aK6uP9F+0y/NxRIoWLrUBePU=;
+ b=MbqiDzop1lwUkxJeqyn9CA84A0bO6/2cpWEBwflW8le9PEETbgDrkCQ8mJCdX+ktWa
+ +dBUbpnp8M9fHRIYMkdhS9ob4R98gUwiYPY1NIcUwK6zuC4LcOOZP49FBIidzEP9BUM/
+ ya1E45F5faVEitluF9hPtsdVZU03a6d1T9uMRGbkX9TRFFim9/2Nz9rAnCpXZhOAI7La
+ PaMmkEx0BS4NfMDenOQATvNX6EqVR97BuL0j3/sYzHkoXKNfDBVawHsrtZN9QhuTL6sy
+ 7OKUWyo/oL6/35seOEyCSe+DDIe90H2bDYl6HqvwJn0mt36drnPJpDRzYMIRGhUuU25H
+ yOGg==
+X-Gm-Message-State: AOAM533g2+WbwugtC/W+H76poe9ZCuu07en/IX3zb8YGDkn1XGaa+4fM
+ WxbJ3OPYViHa4uO8ogjVNWawsQ==
+X-Google-Smtp-Source: ABdhPJy3vVgxbAwlLoD9W7REN6BWjbJiFmbwSvtnBseCG5mv4akS49XNI0Zq/Qf5a3gSYC7gji/KCQ==
+X-Received: by 2002:a63:4e52:: with SMTP id o18mr3976104pgl.171.1600791263658; 
+ Tue, 22 Sep 2020 09:14:23 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id i25sm15969765pgi.9.2020.09.22.09.14.22
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 22 Sep 2020 09:14:22 -0700 (PDT)
+Subject: Re: [PATCH v1 6/8] s390x/tcg: Implement MULTIPLY SINGLE (MSC, MSGC,
+ MSGRKC, MSRKC)
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20200922103129.12824-1-david@redhat.com>
+ <20200922103129.12824-7-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7d304a2c-0dc3-8690-acce-4fb2bfa6e7ef@linaro.org>
+Date: Tue, 22 Sep 2020 09:14:20 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200921221045.699690-1-ehabkost@redhat.com>
- <20200921221045.699690-24-ehabkost@redhat.com>
-In-Reply-To: <20200921221045.699690-24-ehabkost@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 22 Sep 2020 09:45:21 -0700
-Message-ID: <CAKmqyKMxDQZaqt_XO9M98BWgomf1Wj=hVAxrUfN-YsM_PZAqDQ@mail.gmail.com>
-Subject: Re: [PATCH 23/24] sifive_e: Register "revb" as class property
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
+In-Reply-To: <20200922103129.12824-7-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::42c;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x42c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -95,71 +105,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>, John Snow <jsnow@redhat.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 21, 2020 at 3:30 PM Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> Class properties make QOM introspection simpler and easier, as
-> they don't require an object to be instantiated.
->
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+On 9/22/20 3:31 AM, David Hildenbrand wrote:
+> @@ -512,6 +544,8 @@ static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
+>      case CC_OP_COMP_32:
+>          r =  cc_calc_comp_32(dst);
+>          break;
+> +    case CC_OP_MULS_32:
+> +        r = cc_calc_muls_32(dst);
+>  
+>      case CC_OP_ICM:
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Missing break.
 
-Alistair
 
-> ---
-> Cc: Palmer Dabbelt <palmer@dabbelt.com>
-> Cc: Alistair Francis <Alistair.Francis@wdc.com>
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Cc: qemu-riscv@nongnu.org
-> Cc: qemu-devel@nongnu.org
-> ---
->  hw/riscv/sifive_e.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
->
-> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-> index 40bbf530d49..9fe0c12df64 100644
-> --- a/hw/riscv/sifive_e.c
-> +++ b/hw/riscv/sifive_e.c
-> @@ -137,11 +137,6 @@ static void sifive_e_machine_instance_init(Object *obj)
->      SiFiveEState *s = RISCV_E_MACHINE(obj);
->
->      s->revb = false;
-> -    object_property_add_bool(obj, "revb", sifive_e_machine_get_revb,
-> -                             sifive_e_machine_set_revb);
-> -    object_property_set_description(obj, "revb",
-> -                                    "Set on to tell QEMU that it should model "
-> -                                    "the revB HiFive1 board");
->  }
->
->  static void sifive_e_machine_class_init(ObjectClass *oc, void *data)
-> @@ -152,6 +147,12 @@ static void sifive_e_machine_class_init(ObjectClass *oc, void *data)
->      mc->init = sifive_e_machine_init;
->      mc->max_cpus = 1;
->      mc->default_cpu_type = SIFIVE_E_CPU;
-> +
-> +    object_class_property_add_bool(oc, "revb", sifive_e_machine_get_revb,
-> +                                   sifive_e_machine_set_revb);
-> +    object_class_property_set_description(oc, "revb",
-> +                                          "Set on to tell QEMU that it should model "
-> +                                          "the revB HiFive1 board");
->  }
->
->  static const TypeInfo sifive_e_machine_typeinfo = {
-> --
-> 2.26.2
->
->
+r~
 
