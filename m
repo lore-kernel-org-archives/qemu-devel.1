@@ -8,71 +8,70 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3B40C4363D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 16:57:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F40B3C4363D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 16:57:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4433922262
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 16:57:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7064F23119
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 16:57:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OuttFKve"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4433922262
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yc3t3CmQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7064F23119
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKlbj-0003hm-8b
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 12:57:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60696)
+	id 1kKlbv-0003wT-Bu
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 12:57:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60786)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kKla1-00025R-C7; Tue, 22 Sep 2020 12:55:50 -0400
-Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:43940)
+ id 1kKlaT-0002Nj-Ky; Tue, 22 Sep 2020 12:56:17 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:38249)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kKlZz-00065O-OZ; Tue, 22 Sep 2020 12:55:49 -0400
-Received: by mail-il1-x142.google.com with SMTP id a19so17986061ilq.10;
- Tue, 22 Sep 2020 09:55:46 -0700 (PDT)
+ id 1kKlaR-00066y-71; Tue, 22 Sep 2020 12:56:17 -0400
+Received: by mail-il1-x141.google.com with SMTP id t18so17997264ilp.5;
+ Tue, 22 Sep 2020 09:56:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=fPIloXHzv7gWibrXw2Xpn1iYJ0MbEW8JCdQeOBp0bBg=;
- b=OuttFKve44X/zIOmhJ+0gPi9QsNFxoJVLb63JF843VzLkU5E+YnKSKXMtJ8ehaz+fS
- ply2OWjdC18+J2FxAveopbP8gXaZA9aQPUqZu4HAgm1+U6OPI2PUCw1WhAQM34S8dcI3
- AvXfV34oqBDn0LL1Ckf3Uswj40XFsEUzfeueWxfPHB8kxpHsO7L7CKMt5hk84F4WmdJS
- BlcRNKtObi7RoxJTbfVM/wzCF7Jgiknx5mij4b1SpKjVnyAqOMJiKdsgyFS7l7SFNaqr
- +gaUy3lsWXHAemnUWjB+qjbjTUwGVM3vWZSG/5Ooh1EQCgJ1Ag2ukyCDW5IcHld1fN9O
- SKhQ==
+ :cc; bh=Gfsyb5lysBIdSfQQaxz5cxooYItsFeEgaOVO/+UrwjI=;
+ b=Yc3t3CmQCSBiUCucNK9dqtYk4iEChGge1mj1wmQGj6OD3kn3fZy4ZuFMbCDZ3f1eFv
+ itJO5SqrUUmEX2lIVo4mAPNnYa4a/txhYrI+1jhRBy07lmQZYyK8rYbM54Y0PaKR1WRP
+ H0M7auvT+/9ggW1KYijsqgOJPZQO79oB/Ueu/LOpbnrqDsMJE73EvwUv7evjTcnWXCMx
+ 3dtc+t7Nkab0je1rj2JZCPgm6pfoU1kVne+FePm1TToPu6Znfkw3sgH1jclkai6FT7fN
+ 4TFOqBvPG0/7X7IIQKUrYqUU9v6UbeCwdRsXEBkzL5QBbUeafiuwHDv4jr/7bWvPZCjR
+ nOgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=fPIloXHzv7gWibrXw2Xpn1iYJ0MbEW8JCdQeOBp0bBg=;
- b=Un0i96QVbqdSCXxurxfXQexiGWD2sKDUybC9jGotzZd7KXbHXxi/+S5A6UvQFyD/RQ
- XScvbv3KtYHTsY+beMuPVQSgw/k4zuNvQVC9rJ9IhCAkv7VyKMupfZF4A8Fbkm4whKus
- WoX38OwylENzYreh7rQDiUlDnyBVnzDRtLqS7GZwuujUMPNA9FB4bcAJME1Lb6cAmZ09
- hDtG1gqjfFqZvsbnIWJTo/QsV8K9jw8rWyybYo8HfAQLWSkcuz37g0e1V5bg8RSHtNW/
- U+zwIz5nM2dBOkI5u8UskoThz4ems4uD7WJXDziQ3EEMXfWrAyYM2eMmGNcjFalz9P5F
- PyxA==
-X-Gm-Message-State: AOAM532wbo5VAdauLljavEyI6o87XyZw/bQnQhiDuiekVplzcx44rJSN
- eCdlILN72rSdDZmGtVJXllYtZrlEhRXR1UqSSlk=
-X-Google-Smtp-Source: ABdhPJw6Qd1ggEET8h99DXMsVjOA8l4fVgHc7LdQX0iLHmv4bX2Nu8v2AkP8i9jEUqj4QIS8v8o8U32R7VB3JiRVDDA=
-X-Received: by 2002:a92:8b52:: with SMTP id i79mr5301777ild.177.1600793744864; 
- Tue, 22 Sep 2020 09:55:44 -0700 (PDT)
+ bh=Gfsyb5lysBIdSfQQaxz5cxooYItsFeEgaOVO/+UrwjI=;
+ b=ffWCY0Hx6gso4GM2Lw6ER3VkRUatHutsgp8y2BxUCigUGAlBLX6xPilRfr5T9als0Y
+ iIBUAq5lQnhkTmlGiPMyF8DVWiMcQ0k4zhiWEDB3YyMTNhnwEEo6cqloVsw8WTzu6QrM
+ NVlwCy9/3atse7w/YytP3gQ0MJZqd3dH2D4iHPSxlV6u+fWkyQxGntTZEbemrd48X5OA
+ mKZzPyqWG1YdFlPjXKRFx7ObvO9TBBmZM/PB3ytqG1h8NtXSDhOff4pZjxlCz7ZHt3+7
+ cDZgKoRa1d9QkxTwd1HN2x/8drvsMowRAxfiVgR98d7gVxNF3Co6igfJW3VJfkFQtl2F
+ cFEA==
+X-Gm-Message-State: AOAM531w19Ew5OUdZLaMvbtD0+2ilA1sX0kBPiT28wbuQtjIpSysB4g3
+ kYDV0omgCkZoBXWgDJZKtIaxLuuCbDPsBR2ehkg=
+X-Google-Smtp-Source: ABdhPJwdrx6SV9O24T1BJ8nJyx5opFJ3Xc4Eq1VrnsuOf5FxEROJf8m7QkKczHK3C96hWCj6rDnETWAhizpjuu+Hnbc=
+X-Received: by 2002:a92:4a08:: with SMTP id m8mr5445546ilf.227.1600793772665; 
+ Tue, 22 Sep 2020 09:56:12 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200921221045.699690-1-ehabkost@redhat.com>
- <20200921221045.699690-25-ehabkost@redhat.com>
-In-Reply-To: <20200921221045.699690-25-ehabkost@redhat.com>
+ <20200921221045.699690-20-ehabkost@redhat.com>
+In-Reply-To: <20200921221045.699690-20-ehabkost@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 22 Sep 2020 09:44:31 -0700
-Message-ID: <CAKmqyKM9OvBHzPSppDBcz4usa_ZgXu7v7Sxw8QRXRRiQ6mA8Mg@mail.gmail.com>
-Subject: Re: [PATCH 24/24] sifive_u: Register "start-in-flash" as class
- property
+Date: Tue, 22 Sep 2020 09:44:58 -0700
+Message-ID: <CAKmqyKPWN+7wWBnQ5ar1Fn8k8M6Lk6qpxmuVaz-f-iQJOv9qSA@mail.gmail.com>
+Subject: Re: [PATCH 19/24] xlnx-zcu102: Register properties as class properties
 To: Eduardo Habkost <ehabkost@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x142.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -95,19 +94,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
  "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>, John Snow <jsnow@redhat.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+ qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 21, 2020 at 3:21 PM Eduardo Habkost <ehabkost@redhat.com> wrote:
+On Mon, Sep 21, 2020 at 3:28 PM Eduardo Habkost <ehabkost@redhat.com> wrote:
 >
 > Class properties make QOM introspection simpler and easier, as
 > they don't require an object to be instantiated.
@@ -119,50 +116,60 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
-> Cc: Palmer Dabbelt <palmer@dabbelt.com>
-> Cc: Alistair Francis <Alistair.Francis@wdc.com>
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Cc: qemu-riscv@nongnu.org
+> Cc: Alistair Francis <alistair@alistair23.me>
+> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: qemu-arm@nongnu.org
 > Cc: qemu-devel@nongnu.org
 > ---
->  hw/riscv/sifive_u.c | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
+>  hw/arm/xlnx-zcu102.c | 25 +++++++++++++------------
+>  1 file changed, 13 insertions(+), 12 deletions(-)
 >
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 4f12a93188d..0f0fab9a47b 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -568,14 +568,6 @@ static void sifive_u_machine_instance_init(Object *obj)
->      SiFiveUState *s = RISCV_U_MACHINE(obj);
+> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+> index 19d5a4d4e0e..4deb96bfcc1 100644
+> --- a/hw/arm/xlnx-zcu102.c
+> +++ b/hw/arm/xlnx-zcu102.c
+> @@ -208,20 +208,8 @@ static void xlnx_zcu102_machine_instance_init(Object *obj)
 >
->      s->start_in_flash = false;
-> -    object_property_add_bool(obj, "start-in-flash",
-> -                             sifive_u_machine_get_start_in_flash,
-> -                             sifive_u_machine_set_start_in_flash);
-> -    object_property_set_description(obj, "start-in-flash",
-> -                                    "Set on to tell QEMU's ROM to jump to "
-> -                                    "flash. Otherwise QEMU will jump to DRAM "
-> -                                    "or L2LIM depending on the msel value");
+>      /* Default to secure mode being disabled */
+>      s->secure = false;
+> -    object_property_add_bool(obj, "secure", zcu102_get_secure,
+> -                             zcu102_set_secure);
+> -    object_property_set_description(obj, "secure",
+> -                                    "Set on/off to enable/disable the ARM "
+> -                                    "Security Extensions (TrustZone)");
 > -
->      s->msel = 0;
->      object_property_add(obj, "msel", "uint32",
->                          sifive_u_machine_get_uint32_prop,
-> @@ -599,6 +591,14 @@ static void sifive_u_machine_class_init(ObjectClass *oc, void *data)
->      mc->max_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + SIFIVE_U_COMPUTE_CPU_COUNT;
->      mc->min_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + 1;
->      mc->default_cpus = mc->min_cpus;
-> +
-> +    object_class_property_add_bool(oc, "start-in-flash",
-> +                                   sifive_u_machine_get_start_in_flash,
-> +                                   sifive_u_machine_set_start_in_flash);
-> +    object_class_property_set_description(oc, "start-in-flash",
-> +                                          "Set on to tell QEMU's ROM to jump to "
-> +                                          "flash. Otherwise QEMU will jump to DRAM "
-> +                                          "or L2LIM depending on the msel value");
+>      /* Default to virt (EL2) being disabled */
+>      s->virt = false;
+> -    object_property_add_bool(obj, "virtualization", zcu102_get_virt,
+> -                             zcu102_set_virt);
+> -    object_property_set_description(obj, "virtualization",
+> -                                    "Set on/off to enable/disable emulating a "
+> -                                    "guest CPU which implements the ARM "
+> -                                    "Virtualization Extensions");
 >  }
 >
->  static const TypeInfo sifive_u_machine_typeinfo = {
+>  static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
+> @@ -237,6 +225,19 @@ static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
+>      mc->max_cpus = XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
+>      mc->default_cpus = XLNX_ZYNQMP_NUM_APU_CPUS;
+>      mc->default_ram_id = "ddr-ram";
+> +
+> +    object_class_property_add_bool(oc, "secure", zcu102_get_secure,
+> +                                   zcu102_set_secure);
+> +    object_class_property_set_description(oc, "secure",
+> +                                          "Set on/off to enable/disable the ARM "
+> +                                          "Security Extensions (TrustZone)");
+> +
+> +    object_class_property_add_bool(oc, "virtualization", zcu102_get_virt,
+> +                                   zcu102_set_virt);
+> +    object_class_property_set_description(oc, "virtualization",
+> +                                          "Set on/off to enable/disable emulating a "
+> +                                          "guest CPU which implements the ARM "
+> +                                          "Virtualization Extensions");
+>  }
+>
+>  static const TypeInfo xlnx_zcu102_machine_init_typeinfo = {
 > --
 > 2.26.2
 >
