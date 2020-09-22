@@ -7,48 +7,47 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1375C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 00:07:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CEADC2D0E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 00:07:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74D4820757
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 00:07:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F147D20BED
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 00:07:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="hwdQWlFu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74D4820757
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="BjKyBclw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F147D20BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKsJJ-0000KI-Hz
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 20:07:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47370)
+	id 1kKsK3-0001xm-4F
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 20:07:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47118)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kKsGu-00058R-34
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 20:04:32 -0400
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:3896)
+ id 1kKsG9-0004Ms-Lc
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 20:03:46 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:3843)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kKsGr-0001H9-4k
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 20:04:31 -0400
+ id 1kKsG6-0001DG-SQ
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 20:03:45 -0400
 Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by
  hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
- id <B5f6a8fad0000>; Tue, 22 Sep 2020 16:58:37 -0700
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 22 Sep
- 2020 23:59:14 +0000
+ id <B5f6a8f810000>; Tue, 22 Sep 2020 16:57:54 -0700
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 22 Sep
+ 2020 23:58:26 +0000
 Received: from kwankhede-dev.nvidia.com (10.124.1.5) by mail.nvidia.com
  (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Tue, 22 Sep 2020 23:59:06 +0000
+ Transport; Tue, 22 Sep 2020 23:58:17 +0000
 From: Kirti Wankhede <kwankhede@nvidia.com>
 To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH v26 17/17] qapi: Add VFIO devices migration stats in Migration
- stats
-Date: Wed, 23 Sep 2020 04:54:19 +0530
-Message-ID: <1600817059-26721-18-git-send-email-kwankhede@nvidia.com>
+Subject: [PATCH v26 11/17] vfio: Get migration capability flags for container
+Date: Wed, 23 Sep 2020 04:54:13 +0530
+Message-ID: <1600817059-26721-12-git-send-email-kwankhede@nvidia.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1600817059-26721-1-git-send-email-kwankhede@nvidia.com>
 References: <1600817059-26721-1-git-send-email-kwankhede@nvidia.com>
@@ -56,15 +55,15 @@ X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1600819117; bh=06Dk6GrPxOyP7ELUmZBjCgQ+MM0vUwj1129i0MMRyuM=;
+ t=1600819074; bh=IjQiJvybIhsE1kXhU0QcmULhWUF1j/2sXxzQzst6YSU=;
  h=From:To:CC:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
  References:X-NVConfidentiality:MIME-Version:Content-Type;
- b=hwdQWlFucYmUAE0C9bUSDAVn0k8t8txzIAlfE4981QPtL+Hnxi9e0kmAMPJee2MvU
- VeUxOtLCZIDBBnCW9nUF7ha/2JpBz+s8QYi5Yaa10xeL4zIFYfNs+bBWj3WbInzUMS
- edFImCRiza4njiSyfh40+akcYSUA4ecXcgBdUZEtjbokK9nkMpqEA3VvtlEjb0g+4f
- i5yFFDGY5VI32p2NIuEii79K05ZQABZoryPCaYFVkM5shL1Db7vP2K9ThTJwa11F+q
- YifPngjjJj6sjLzGHxvYeI+wKaN2cXHMR7AufvObK8uhn0RCve528Wi++CyCrqknK8
- FYAtANcEioqVg==
+ b=BjKyBclwAZh6ljk854tvmcv7zy4r8MFQux0GrzdIK/1xXtxXh9QlVYfrXftYva6bd
+ DBaZxO+Nnic36wR7KnPJwmpBJoL9AD+HPHpF++MGXoCE7HrVb5d4P5x0rWUUEzbTha
+ RwgLjF8HixpaNFuvN9mLKOHyUUHS7IT70REowAo6obbcq3Jkl1T4wwzjVEglbQ+FeH
+ IKBU7MV3zc6M6v9RpZcjyFpFcr2ANhlSt6h5jHt7eC0951tEChpfPN4AspA+tfbo70
+ CtMzowfc8wysCpnkS5keJfYsH5YYYtTvCyTLl/Cq212SMqqHHgnmOA/4MEJHTOW1DX
+ R12hd2ArFk5xA==
 Received-SPF: pass client-ip=216.228.121.64; envelope-from=kwankhede@nvidia.com;
  helo=hqnvemgate25.nvidia.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 19:57:12
@@ -94,233 +93,191 @@ Cc: cohuck@redhat.com, aik@ozlabs.ru, Zhengxiao.zx@Alibaba-inc.com,
  quintela@redhat.com, ziye.yang@intel.com, armbru@redhat.com,
  mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
  zhi.a.wang@intel.com, kevin.tian@intel.com, yan.y.zhao@intel.com,
- dgilbert@redhat.com, changpeng.liu@intel.com, eskultet@redhat.com,
- Ken.Xue@amd.com, jonathan.davies@nutanix.com, pbonzini@redhat.com
+ dgilbert@redhat.com, Eric Auger <eric.auger@redhat.com>,
+ changpeng.liu@intel.com, eskultet@redhat.com, Shameer
+ Kolothum <shameerali.kolothum.thodi@huawei.com>, Ken.Xue@amd.com,
+ jonathan.davies@nutanix.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Added amount of bytes transferred to the target VM by all VFIO devices
+Added helper functions to get IOMMU info capability chain.
+Added function to get migration capability information from that
+capability chain for IOMMU container.
+
+Similar change was proposed earlier:
+https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg03759.html
+
+Disable migration for devices if IOMMU module doesn't support migration
+capability.
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc: Eric Auger <eric.auger@redhat.com>
 ---
-
-Note: Comments from v25 for this patch are not addressed yet.
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg715620.html
-
-Alex, need more pointer on documentation part raised Markus Armbruster.
-
-
- hw/vfio/common.c            | 20 ++++++++++++++++++++
- hw/vfio/migration.c         | 10 ++++++++++
- include/qemu/vfio-helpers.h |  3 +++
- migration/migration.c       | 14 ++++++++++++++
- monitor/hmp-cmds.c          |  6 ++++++
- qapi/migration.json         | 17 +++++++++++++++++
- 6 files changed, 70 insertions(+)
+ hw/vfio/common.c              | 90 +++++++++++++++++++++++++++++++++++++++----
+ hw/vfio/migration.c           |  7 +++-
+ include/hw/vfio/vfio-common.h |  3 ++
+ 3 files changed, 91 insertions(+), 9 deletions(-)
 
 diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 7eeaa368187a..286cdaac8674 100644
+index c6e98b8d61be..d4959c036dd1 100644
 --- a/hw/vfio/common.c
 +++ b/hw/vfio/common.c
-@@ -39,6 +39,7 @@
- #include "trace.h"
- #include "qapi/error.h"
- #include "migration/migration.h"
-+#include "qemu/vfio-helpers.h"
+@@ -1228,6 +1228,75 @@ static int vfio_init_container(VFIOContainer *container, int group_fd,
+     return 0;
+ }
  
- VFIOGroupList vfio_group_list =
-     QLIST_HEAD_INITIALIZER(vfio_group_list);
-@@ -292,6 +293,25 @@ const MemoryRegionOps vfio_region_ops = {
-  * Device state interfaces
-  */
- 
-+bool vfio_mig_active(void)
++static int vfio_get_iommu_info(VFIOContainer *container,
++                               struct vfio_iommu_type1_info **info)
 +{
-+    VFIOGroup *group;
-+    VFIODevice *vbasedev;
 +
-+    if (QLIST_EMPTY(&vfio_group_list)) {
-+        return false;
++    size_t argsz = sizeof(struct vfio_iommu_type1_info);
++
++    *info = g_new0(struct vfio_iommu_type1_info, 1);
++again:
++    (*info)->argsz = argsz;
++
++    if (ioctl(container->fd, VFIO_IOMMU_GET_INFO, *info)) {
++        g_free(*info);
++        *info = NULL;
++        return -errno;
 +    }
 +
-+    QLIST_FOREACH(group, &vfio_group_list, next) {
-+        QLIST_FOREACH(vbasedev, &group->device_list, next) {
-+            if (vbasedev->migration_blocker) {
-+                return false;
-+            }
++    if (((*info)->argsz > argsz)) {
++        argsz = (*info)->argsz;
++        *info = g_realloc(*info, argsz);
++        goto again;
++    }
++
++    return 0;
++}
++
++static struct vfio_info_cap_header *
++vfio_get_iommu_info_cap(struct vfio_iommu_type1_info *info, uint16_t id)
++{
++    struct vfio_info_cap_header *hdr;
++    void *ptr = info;
++
++    if (!(info->flags & VFIO_IOMMU_INFO_CAPS)) {
++        return NULL;
++    }
++
++    for (hdr = ptr + info->cap_offset; hdr != ptr; hdr = ptr + hdr->next) {
++        if (hdr->id == id) {
++            return hdr;
 +        }
 +    }
-+    return true;
++
++    return NULL;
 +}
 +
- static bool vfio_devices_all_stopped_and_saving(VFIOContainer *container)
++static void vfio_get_iommu_info_migration(VFIOContainer *container,
++                                         struct vfio_iommu_type1_info *info)
++{
++    struct vfio_info_cap_header *hdr;
++    struct vfio_iommu_type1_info_cap_migration *cap_mig;
++
++    hdr = vfio_get_iommu_info_cap(info, VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION);
++    if (!hdr) {
++        return;
++    }
++
++    cap_mig = container_of(hdr, struct vfio_iommu_type1_info_cap_migration,
++                            header);
++
++    /*
++     * cpu_physical_memory_set_dirty_lebitmap() expects pages in bitmap of
++     * TARGET_PAGE_SIZE to mark those dirty.
++     */
++    if (cap_mig->pgsize_bitmap & TARGET_PAGE_SIZE) {
++        container->dirty_pages_supported = true;
++        container->max_dirty_bitmap_size = cap_mig->max_dirty_bitmap_size;
++        container->dirty_pgsizes = cap_mig->pgsize_bitmap;
++    }
++}
++
+ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+                                   Error **errp)
  {
-     VFIOGroup *group;
+@@ -1297,6 +1366,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+     container->space = space;
+     container->fd = fd;
+     container->error = NULL;
++    container->dirty_pages_supported = false;
+     QLIST_INIT(&container->giommu_list);
+     QLIST_INIT(&container->hostwin_list);
+ 
+@@ -1309,7 +1379,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+     case VFIO_TYPE1v2_IOMMU:
+     case VFIO_TYPE1_IOMMU:
+     {
+-        struct vfio_iommu_type1_info info;
++        struct vfio_iommu_type1_info *info;
+ 
+         /*
+          * FIXME: This assumes that a Type1 IOMMU can map any 64-bit
+@@ -1318,15 +1388,19 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+          * existing Type1 IOMMUs generally support any IOVA we're
+          * going to actually try in practice.
+          */
+-        info.argsz = sizeof(info);
+-        ret = ioctl(fd, VFIO_IOMMU_GET_INFO, &info);
+-        /* Ignore errors */
+-        if (ret || !(info.flags & VFIO_IOMMU_INFO_PGSIZES)) {
++        ret = vfio_get_iommu_info(container, &info);
++
++        if (ret || !(info->flags & VFIO_IOMMU_INFO_PGSIZES)) {
+             /* Assume 4k IOVA page size */
+-            info.iova_pgsizes = 4096;
++            info->iova_pgsizes = 4096;
+         }
+-        vfio_host_win_add(container, 0, (hwaddr)-1, info.iova_pgsizes);
+-        container->pgsizes = info.iova_pgsizes;
++        vfio_host_win_add(container, 0, (hwaddr)-1, info->iova_pgsizes);
++        container->pgsizes = info->iova_pgsizes;
++
++        if (!ret) {
++            vfio_get_iommu_info_migration(container, info);
++        }
++        g_free(info);
+         break;
+     }
+     case VFIO_SPAPR_TCE_v2_IOMMU:
 diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-index 822b68b4e015..c4226fa8b183 100644
+index ffd70282dd0e..4306f6316417 100644
 --- a/hw/vfio/migration.c
 +++ b/hw/vfio/migration.c
-@@ -28,6 +28,7 @@
- #include "pci.h"
- #include "trace.h"
- #include "hw/hw.h"
-+#include "qemu/vfio-helpers.h"
+@@ -786,9 +786,14 @@ static int vfio_migration_init(VFIODevice *vbasedev,
  
- /*
-  * Flags used as delimiter:
-@@ -40,6 +41,8 @@
- #define VFIO_MIG_FLAG_DEV_SETUP_STATE   (0xffffffffef100003ULL)
- #define VFIO_MIG_FLAG_DEV_DATA_STATE    (0xffffffffef100004ULL)
- 
-+static int64_t bytes_transferred;
-+
- static inline int vfio_mig_access(VFIODevice *vbasedev, void *val, int count,
-                                   off_t off, bool iswrite)
- {
-@@ -289,6 +292,7 @@ static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev, uint64_t *size)
-         *size = data_size;
-     }
- 
-+    bytes_transferred += data_size;
-     return ret;
- }
- 
-@@ -770,6 +774,7 @@ static void vfio_migration_state_notifier(Notifier *notifier, void *data)
-         }
- 
-         vfio_set_dirty_page_tracking(vbasedev, false);
-+        bytes_transferred = 0;
-     }
- }
- 
-@@ -820,6 +825,11 @@ static int vfio_migration_init(VFIODevice *vbasedev,
- 
- /* ---------------------------------------------------------------------- */
- 
-+int64_t vfio_mig_bytes_transferred(void)
-+{
-+    return bytes_transferred;
-+}
-+
  int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
  {
-     VFIOContainer *container = vbasedev->group->container;
-diff --git a/include/qemu/vfio-helpers.h b/include/qemu/vfio-helpers.h
-index 1f057c2b9e40..26a7df0767b1 100644
---- a/include/qemu/vfio-helpers.h
-+++ b/include/qemu/vfio-helpers.h
-@@ -29,4 +29,7 @@ void qemu_vfio_pci_unmap_bar(QEMUVFIOState *s, int index, void *bar,
- int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNotifier *e,
-                            int irq_type, Error **errp);
- 
-+bool vfio_mig_active(void);
-+int64_t vfio_mig_bytes_transferred(void);
++    VFIOContainer *container = vbasedev->group->container;
+     struct vfio_region_info *info = NULL;
+     Error *local_err = NULL;
+-    int ret;
++    int ret = -ENOTSUP;
 +
- #endif
-diff --git a/migration/migration.c b/migration/migration.c
-index 58a5452471f9..b204bb1f6cd9 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -56,6 +56,7 @@
- #include "net/announce.h"
- #include "qemu/queue.h"
- #include "multifd.h"
-+#include "qemu/vfio-helpers.h"
- 
- #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
- 
-@@ -996,6 +997,17 @@ static void populate_disk_info(MigrationInfo *info)
-     }
- }
- 
-+static void populate_vfio_info(MigrationInfo *info)
-+{
-+#ifdef CONFIG_LINUX
-+    if (vfio_mig_active()) {
-+        info->has_vfio = true;
-+        info->vfio = g_malloc0(sizeof(*info->vfio));
-+        info->vfio->transferred = vfio_mig_bytes_transferred();
++    if (!container->dirty_pages_supported) {
++        goto add_blocker;
 +    }
-+#endif
-+}
-+
- static void fill_source_migration_info(MigrationInfo *info)
- {
-     MigrationState *s = migrate_get_current();
-@@ -1020,6 +1032,7 @@ static void fill_source_migration_info(MigrationInfo *info)
-         populate_time_info(info, s);
-         populate_ram_info(info, s);
-         populate_disk_info(info);
-+        populate_vfio_info(info);
-         break;
-     case MIGRATION_STATUS_COLO:
-         info->has_status = true;
-@@ -1028,6 +1041,7 @@ static void fill_source_migration_info(MigrationInfo *info)
-     case MIGRATION_STATUS_COMPLETED:
-         populate_time_info(info, s);
-         populate_ram_info(info, s);
-+        populate_vfio_info(info);
-         break;
-     case MIGRATION_STATUS_FAILED:
-         info->has_status = true;
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index 7711726fd222..40d60d6a6651 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -355,6 +355,12 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
-         }
-         monitor_printf(mon, "]\n");
-     }
-+
-+    if (info->has_vfio) {
-+        monitor_printf(mon, "vfio device transferred: %" PRIu64 " kbytes\n",
-+                       info->vfio->transferred >> 10);
-+    }
-+
-     qapi_free_MigrationInfo(info);
- }
  
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 675f70bb6734..3535977123d3 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -147,6 +147,18 @@
-             'active', 'postcopy-active', 'postcopy-paused',
-             'postcopy-recover', 'completed', 'failed', 'colo',
-             'pre-switchover', 'device', 'wait-unplug' ] }
-+##
-+# @VfioStats:
-+#
-+# Detailed VFIO devices migration statistics
-+#
-+# @transferred: amount of bytes transferred to the target VM by VFIO devices
-+#
-+# Since: 5.1
-+#
-+##
-+{ 'struct': 'VfioStats',
-+  'data': {'transferred': 'int' } }
- 
- ##
- # @MigrationInfo:
-@@ -208,11 +220,16 @@
- #
- # @socket-address: Only used for tcp, to know what the real port is (Since 4.0)
- #
-+# @vfio: @VfioStats containing detailed VFIO devices migration statistics,
-+#        only returned if VFIO device is present, migration is supported by all
-+#         VFIO devices and status is 'active' or 'completed' (since 5.1)
-+#
- # Since: 0.14.0
- ##
- { 'struct': 'MigrationInfo',
-   'data': {'*status': 'MigrationStatus', '*ram': 'MigrationStats',
-            '*disk': 'MigrationStats',
-+           '*vfio': 'VfioStats',
-            '*xbzrle-cache': 'XBZRLECacheStats',
-            '*total-time': 'int',
-            '*expected-downtime': 'int',
+     ret = vfio_get_dev_region_info(vbasedev, VFIO_REGION_TYPE_MIGRATION,
+                                    VFIO_REGION_SUBTYPE_MIGRATION, &info);
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index 471e444a364c..0a1651eda2d0 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -79,6 +79,9 @@ typedef struct VFIOContainer {
+     unsigned iommu_type;
+     Error *error;
+     bool initialized;
++    bool dirty_pages_supported;
++    uint64_t dirty_pgsizes;
++    uint64_t max_dirty_bitmap_size;
+     unsigned long pgsizes;
+     QLIST_HEAD(, VFIOGuestIOMMU) giommu_list;
+     QLIST_HEAD(, VFIOHostDMAWindow) hostwin_list;
 -- 
 2.7.0
 
