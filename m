@@ -2,84 +2,84 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC9F8C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:51:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C891C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:51:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 518A82396D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:51:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 62CAF2396D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:51:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OBjmYjJK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 518A82396D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LBaA0anj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62CAF2396D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKftG-0001YP-5d
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 06:51:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58078)
+	id 1kKftR-00023z-ET
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 06:51:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60678)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kKflN-0002QC-Re; Tue, 22 Sep 2020 06:43:09 -0400
-Received: from mail-oo1-xc42.google.com ([2607:f8b0:4864:20::c42]:41006)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kKflI-0007tC-2D; Tue, 22 Sep 2020 06:43:09 -0400
-Received: by mail-oo1-xc42.google.com with SMTP id t3so4008310ook.8;
- Tue, 22 Sep 2020 03:42:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Xt9RtER3UGIOsPyO5Env9GZG+EATgENlBkUh8gxsJoI=;
- b=OBjmYjJK2Ag0TPKkM86FqoHgJUv6w06pr0EQx56ohYFOwqqQ4YrbPN6MJ4Ju5kFEJh
- 8WLDdjUKGeKfiLWLydgb+qstVZidutw6lhTHKzs4Sw26G1ebGhGGCcID5ElE9SVv3oYG
- aoJ8dfiMoikYdCcY4DqBL+g1UNXzEyXtTsFfcyBPjLdZbLazfz1vYVW/NK3NNOGKsX54
- /u16Ew35awsatNZ3GufRuAwHjJZRmZ1ilvTycEQzHL7nuWT/3CR+BT/oZjxDvhBiLBVO
- kvmOK+MRJenszzwrkqNDKa31yUYCCYKQ5nC6HDyz/6m8U2FTpYjH+hw/sxNkfeflX4ep
- EFTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Xt9RtER3UGIOsPyO5Env9GZG+EATgENlBkUh8gxsJoI=;
- b=qP/JgvjnGasUHIfwN+58+pHXAkA3nWG0wt5CpQDwHzt6cQq8+DpIt7/sxcWxthGrQ4
- ar3xYCaEnGMf+1XFUkqwfT6HqSWkx+yg/mwWqm+VHUnVJSNLlgnn2eOXXyEczPVYcBgD
- gwmYGMrw6I3mzKTJdDMJjD+RXGEVl/l0lggby115FpPl6imi99wEfXh3G1ZiM/e+xO5m
- Q7ONLA9HDV2uoeYynQfrwrwxpmOvKGveUWrodwsFzY+UALKvGX50jTm2fiyASQEmeVzh
- VIgnBnvhnQ11oRyEU6RI5Nj5pBv9VLEKNM7xxHC5EpKJ0+6HDG1KY9Te7iMiutxpcbPh
- Ao6w==
-X-Gm-Message-State: AOAM532Su+dZyRmkRCrdI1U5UGPvtoPB5YP9RpvaAnTRBXIKMM8fjfj8
- g4Yj2peg+X8bEPKfd08jSsr+69zUq1ylPxmiUQk=
-X-Google-Smtp-Source: ABdhPJxokUuTlLKA2xMUYugeYjeELOaXhfv1wyJ88UAFMM3l8LJ8hkXlUzvYwWuJi8eeAyg5CkP79PsouD2IaXVRzvk=
-X-Received: by 2002:a4a:5d84:: with SMTP id w126mr2509562ooa.1.1600771378833; 
- Tue, 22 Sep 2020 03:42:58 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kKfrt-0008V1-KR
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:49:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40909
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kKfrm-0000Rt-UF
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:49:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600771785;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=q1aJG1Km4rcSQhjOJ0lnTuTVRdzX4MZUleXqSWlvaDw=;
+ b=LBaA0anj2uEgiP1jqfwqTTpn1XvBJfCWvgRtaNXITrcv6bWqdQTn/MiWPpu4RfJra02QLK
+ 3ZLqnposKDP8TDiz/nv9jfJ6HqpxF6vWk3nzLrPZYeoxhtIIjRAlkNMc0IuTeuwEjmdVw4
+ 30+EpTqgTtWwf0bbkckGH6CUyIOZrT4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-517-jXx2FdytNh6C1a-F_Gq4MA-1; Tue, 22 Sep 2020 06:49:43 -0400
+X-MC-Unique: jXx2FdytNh6C1a-F_Gq4MA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 848ED1084C8A;
+ Tue, 22 Sep 2020 10:49:42 +0000 (UTC)
+Received: from localhost (ovpn-114-26.ams2.redhat.com [10.36.114.26])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 44B8F5DD99;
+ Tue, 22 Sep 2020 10:49:39 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v2 01/20] configure: Detect libfuse
+Date: Tue, 22 Sep 2020 12:49:13 +0200
+Message-Id: <20200922104932.46384-2-mreitz@redhat.com>
+In-Reply-To: <20200922104932.46384-1-mreitz@redhat.com>
+References: <20200922104932.46384-1-mreitz@redhat.com>
 MIME-Version: 1.0
-References: <20200922092722.344518-1-ppandit@redhat.com>
-In-Reply-To: <20200922092722.344518-1-ppandit@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 22 Sep 2020 18:42:22 +0800
-Message-ID: <CAKXe6SLOgvwBtTthhB0zLv_cxB==jrT8eZcGioKTk1u=Rpio5w@mail.gmail.com>
-Subject: Re: [PATCH v2] fdc: check null block pointer before r/w data transfer
-To: P J P <ppandit@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c42;
- envelope-from=liq3ea@gmail.com; helo=mail-oo1-xc42.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 01:57:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -94,78 +94,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ruhr-University <bugs-syssec@rub.de>, John Snow <jsnow@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org,
- Prasad J Pandit <pjp@fedoraproject.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-P J P <ppandit@redhat.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=8822=E6=97=A5=E5=
-=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=885:29=E5=86=99=E9=81=93=EF=BC=9A
->
-> From: Prasad J Pandit <pjp@fedoraproject.org>
->
-> While transferring data via fdctrl_read/write_data() routines,
-> check that current drive does not have a null block pointer.
-> Avoid null pointer dereference.
->
->  -> https://ruhr-uni-bochum.sciebo.de/s/NNWP2GfwzYKeKwE?path=3D%2Ffdc_nul=
-lptr1
->     =3D=3D1658854=3D=3DHint: address points to the zero page.
->     #0 blk_inc_in_flight block/block-backend.c:1327
->     #1 blk_prw block/block-backend.c:1299
->     #2 blk_pwrite block/block-backend.c:1464
->     #3 fdctrl_write_data hw/block/fdc.c:2418
->     #4 fdctrl_write hw/block/fdc.c:962
->     #5 portio_write ioport.c:205
->     #6 memory_region_write_accessor memory.c:483
->     #7 access_with_adjusted_size memory.c:544
->     #8 memory_region_dispatch_write memory.c:1476
->
-> Reported-by: Ruhr-University <bugs-syssec@rub.de>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ configure   | 34 ++++++++++++++++++++++++++++++++++
+ meson.build |  6 ++++++
+ 2 files changed, 40 insertions(+)
 
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
+diff --git a/configure b/configure
+index ce27eafb0a..21c31e4694 100755
+--- a/configure
++++ b/configure
+@@ -538,6 +538,7 @@ meson=""
+ ninja=""
+ skip_meson=no
+ gettext=""
++fuse=""
+ 
+ bogus_os="no"
+ malloc_trim=""
+@@ -1621,6 +1622,10 @@ for opt do
+   ;;
+   --disable-libdaxctl) libdaxctl=no
+   ;;
++  --enable-fuse) fuse=yes
++  ;;
++  --disable-fuse) fuse=no
++  ;;
+   *)
+       echo "ERROR: unknown option $opt"
+       echo "Try '$0 --help' for more information"
+@@ -1945,6 +1950,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   xkbcommon       xkbcommon support
+   rng-none        dummy RNG, avoid using /dev/(u)random and getrandom()
+   libdaxctl       libdaxctl support
++  fuse            fuse block device export
+ 
+ NOTE: The object files are built at the place where configure is launched
+ EOF
+@@ -6206,6 +6212,28 @@ but not implemented on your system"
+     fi
+ fi
+ 
++##########################################
++# FUSE support
++
++if test "$fuse" != "no"; then
++  cat > $TMPC <<EOF
++#define FUSE_USE_VERSION 31
++#include <fuse.h>
++#include <fuse_lowlevel.h>
++int main(void) { return 0; }
++EOF
++  fuse_cflags=$(pkg-config --cflags fuse3)
++  fuse_libs=$(pkg-config --libs fuse3)
++  if compile_prog "$fuse_cflags" "$fuse_libs"; then
++    fuse=yes
++  else
++    if test "$fuse" = "yes"; then
++      feature_not_found "fuse"
++    fi
++    fuse=no
++  fi
++fi
++
+ ##########################################
+ # End of CC checks
+ # After here, no more $cc or $ld runs
+@@ -7393,6 +7421,12 @@ if test "$secret_keyring" = "yes" ; then
+   echo "CONFIG_SECRET_KEYRING=y" >> $config_host_mak
+ fi
+ 
++if test "$fuse" = "yes"; then
++  echo "CONFIG_FUSE=y" >> $config_host_mak
++  echo "FUSE_CFLAGS=$fuse_cflags" >> $config_host_mak
++  echo "FUSE_LIBS=$fuse_libs" >> $config_host_mak
++fi
++
+ if test "$tcg_interpreter" = "yes"; then
+   QEMU_INCLUDES="-iquote ${source_path}/tcg/tci $QEMU_INCLUDES"
+ elif test "$ARCH" = "sparc64" ; then
+diff --git a/meson.build b/meson.build
+index 86e1cca0ad..85addd8562 100644
+--- a/meson.build
++++ b/meson.build
+@@ -436,6 +436,11 @@ if 'CONFIG_TASN1' in config_host
+ endif
+ keyutils = dependency('libkeyutils', required: false,
+                       method: 'pkg-config', static: enable_static)
++libfuse = not_found
++if 'CONFIG_FUSE' in config_host
++  libfuse = declare_dependency(compile_args: config_host['FUSE_CFLAGS'].split(),
++                               link_args: config_host['FUSE_LIBS'].split())
++endif
+ 
+ has_gettid = cc.has_function('gettid')
+ 
+@@ -1531,6 +1536,7 @@ endif
+ summary_info += {'thread sanitizer':  config_host.has_key('CONFIG_TSAN')}
+ summary_info += {'rng-none':          config_host.has_key('CONFIG_RNG_NONE')}
+ summary_info += {'Linux keyring':     config_host.has_key('CONFIG_SECRET_KEYRING')}
++summary_info += {'fuse exports':      config_host.has_key('CONFIG_FUSE')}
+ summary(summary_info, bool_yn: true)
+ 
+ if not supported_cpus.contains(cpu)
+-- 
+2.26.2
 
-> ---
->  hw/block/fdc.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> Update v2: treat NULL blk pointer as an error
->   -> https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg06642.ht=
-ml
->
-> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-> index 224bac504f..bf968dc66f 100644
-> --- a/hw/block/fdc.c
-> +++ b/hw/block/fdc.c
-> @@ -1923,7 +1923,8 @@ static uint32_t fdctrl_read_data(FDCtrl *fdctrl)
->                                     fd_sector(cur_drv));
->                      return 0;
->                  }
-> -            if (blk_pread(cur_drv->blk, fd_offset(cur_drv), fdctrl->fifo=
-,
-> +            if (!cur_drv->blk
-> +                || blk_pread(cur_drv->blk, fd_offset(cur_drv), fdctrl->f=
-ifo,
->                            BDRV_SECTOR_SIZE)
->                  < 0) {
->                  FLOPPY_DPRINTF("error getting sector %d\n",
-> @@ -2427,7 +2428,8 @@ static void fdctrl_write_data(FDCtrl *fdctrl, uint3=
-2_t value)
->          if (pos =3D=3D FD_SECTOR_LEN - 1 ||
->              fdctrl->data_pos =3D=3D fdctrl->data_len) {
->              cur_drv =3D get_cur_drv(fdctrl);
-> -            if (blk_pwrite(cur_drv->blk, fd_offset(cur_drv), fdctrl->fif=
-o,
-> +            if (!cur_drv->blk
-> +                || blk_pwrite(cur_drv->blk, fd_offset(cur_drv), fdctrl->=
-fifo,
->                             BDRV_SECTOR_SIZE, 0) < 0) {
->                  FLOPPY_DPRINTF("error writing sector %d\n",
->                                 fd_sector(cur_drv));
-> --
-> 2.26.2
->
 
