@@ -2,83 +2,83 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C22A7C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:44:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 456C0C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:44:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 144CC2073A
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:44:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B44DB2073A
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:44:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kby9zyNM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 144CC2073A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hKe2IK3F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B44DB2073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKfmm-0003Xv-Qv
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 06:44:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54808)
+	id 1kKfn3-000496-LN
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 06:44:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57130)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kKfcA-0006cn-K8
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:33:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47245)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kKfj2-0007Nd-Sb
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:40:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36665)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kKfc8-0006at-UL
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:33:38 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kKfit-0007YI-Hh
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:40:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600770815;
+ s=mimecast20190719; t=1600771225;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=LE/yEhQnbn88gLikhRAtSmYUw/zD0uDELRKxLQEVbVw=;
- b=Kby9zyNM68S4/CqhJ6+O55rJRW7VL26Ru3OMSqLoQgy7pU7y6Eo8k2EuxPGhoxvPitS/9A
- 0mI0wb+sZ/PpzS0PHQlMVUQUKkgkd4P3+YxwjfDW44sepqjOArFhZZzWMJSAAlhg5SeWLJ
- awfeD7SyKa+miiTQyjkOsitef3ZEaBc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-329-0busL6rOOCqo9QLUW_3bHg-1; Tue, 22 Sep 2020 06:33:33 -0400
-X-MC-Unique: 0busL6rOOCqo9QLUW_3bHg-1
-Received: by mail-wr1-f71.google.com with SMTP id f18so7222297wrv.19
- for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 03:33:32 -0700 (PDT)
+ bh=+zp1318SHWPTZ4YaTPi3d8H5YYq7ILGNsXS1IHfyx1Y=;
+ b=hKe2IK3Fnr1K0H/hGLnTj0DUmckXTIVNMyo2h/JZLU2w6E936iHYf07hEPSrsKiCbrTB9j
+ eyDG0h9JA8WL1cquYggLu46XCXMaXQt44CfjU0UltvuHdvMMnTDbOxlKro04XCFlwuY00Q
+ scZZIgaidKWgZnf4jxhFqsqW5mjLJa8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-153-O3-8R5LSMHq8UgWzV5jmUg-1; Tue, 22 Sep 2020 06:40:23 -0400
+X-MC-Unique: O3-8R5LSMHq8UgWzV5jmUg-1
+Received: by mail-wr1-f70.google.com with SMTP id l15so7228697wro.10
+ for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 03:40:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=LE/yEhQnbn88gLikhRAtSmYUw/zD0uDELRKxLQEVbVw=;
- b=HzDjIj/NcQzqBI7C4wv6YbQX7SEoK8ngM2WZO15V2e2JTqmu51un5eDAfMwtMmlSJv
- ojeohIlJgeVAe4Qn/sHn34nDb2JLxs8hQ4b04Uwu5zOsH9ZLgRfITKwHdUBklr70ZcT9
- +EU9MEsObwFwG65kNGU9WJPygsmpreD5jmWt4k30MjbuiD5SvG4+qM2OpwM/WVhD3GWd
- odjQ3wqMrUd/cJhXX/onylCIftvlKwuHkF557VqbZZbYbHHdi06T+w3krB6f6G7xHlZo
- Zuho9rwacFbhUI1loskUUoP6jBAzucv4jiTgU4TvR3E321X7RVB27ZfPFh0oTvn4mdBR
- Q+mw==
-X-Gm-Message-State: AOAM532kTfjeLGTMDKQ0MaWesUb1joY/18XKh06LfgEKogHqIPB+zSOh
- wXDBTBTQ0PQYF8M7JW3QiSaQOk88IYsMM6m8SzA30Q6nqyPw3nQYvWed1uY59O5zTvHXmyiC8X2
- w/GNhnQretgw8OyI=
-X-Received: by 2002:a5d:660d:: with SMTP id n13mr4682366wru.308.1600770811455; 
- Tue, 22 Sep 2020 03:33:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz0+rm+I0ltSpmP/iK4UETJ+sptZQInOSXHP/zFMpPFrlfVjhrmb14PSoGsH0KAaOBLvEm2Mg==
-X-Received: by 2002:a5d:660d:: with SMTP id n13mr4682346wru.308.1600770811274; 
- Tue, 22 Sep 2020 03:33:31 -0700 (PDT)
+ bh=+zp1318SHWPTZ4YaTPi3d8H5YYq7ILGNsXS1IHfyx1Y=;
+ b=CcCoNRvO4506S2tl0SteA6KOvNJlow65I5XJnngCdCfPqaUfINTt2bX9YJivBEMinW
+ ZYwkQlWcIP/Xa+KPJjsy8eMNkZDd/oQfnBeNsp86VenzqMSzxwEjR2aFETY1itlD9Z1g
+ a6GFW2NTrXWgPmGjyYgftnpYEQ2UXTXwT8oLam/DnOVhAHcFrKmAT+c1eTv1BLH2pP9S
+ 3CljucUJA/hloqhq/ba8j7J1OK0QmB4mQ680s4JIcHCCLe61iJvHPVdjoVSJeMF94q6b
+ RUHZd/YrMbcZeCAA+HVfOtQ9NN4N7RwCun7hhSWvQLMSaR8eQmSoENwPhkEvS4wiOeib
+ hCKw==
+X-Gm-Message-State: AOAM532usmqxuNt8K5v0UXU57lYDKzXlvAVymP8ObokQ9iCDJoZ0A4Ft
+ Mwcb62A81FW+sgUkeeVbsL0MqNmDJ2KiomFf1o+PVB1OT1OkM36ol9VswxLkCI8usLZq4E298/M
+ 2EceSWfl3K+R+mgU=
+X-Received: by 2002:a05:6000:7:: with SMTP id h7mr4881970wrx.16.1600771222556; 
+ Tue, 22 Sep 2020 03:40:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzu4svCVl9BrTMKAQuHuRaJXsJ/wN8LI4YlwOsQbkR+ybz7wvJRwWU+cnzo3zyzEpTxPp8zFw==
+X-Received: by 2002:a05:6000:7:: with SMTP id h7mr4881941wrx.16.1600771222350; 
+ Tue, 22 Sep 2020 03:40:22 -0700 (PDT)
 Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id k15sm26686675wrv.90.2020.09.22.03.33.30
+ by smtp.gmail.com with ESMTPSA id i16sm25264289wrq.73.2020.09.22.03.40.20
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 22 Sep 2020 03:33:30 -0700 (PDT)
-Subject: Re: [PATCH v4 03/11] capstone: Require version 4.0 from a system
- library
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200921174118.39352-1-richard.henderson@linaro.org>
- <20200921174118.39352-4-richard.henderson@linaro.org>
+ Tue, 22 Sep 2020 03:40:20 -0700 (PDT)
+Subject: Re: [PATCH 6/7] gitlab-ci: Increase the timeout for the
+ cross-compiler builds
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20200921174320.46062-1-thuth@redhat.com>
+ <20200921174320.46062-7-thuth@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -103,12 +103,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <6c4a7b2d-896d-5792-bdd1-179a1c186aa6@redhat.com>
-Date: Tue, 22 Sep 2020 12:33:29 +0200
+Message-ID: <c74f0803-c213-e8a3-510b-3c1a28ced9e9@redhat.com>
+Date: Tue, 22 Sep 2020 12:40:20 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200921174118.39352-4-richard.henderson@linaro.org>
+In-Reply-To: <20200921174320.46062-7-thuth@redhat.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -140,36 +140,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org
+Cc: =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/21/20 7:41 PM, Richard Henderson wrote:
-> We're about to use a portion of the 4.0 API.
-> Reject a system library version prior to that.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 9/21/20 7:43 PM, Thomas Huth wrote:
+> Some of the cross-compiler builds (the mips build and the win64 build
+> for example) are quite slow and sometimes hit the 1h time limit.
+> Increase the limit a little bit to make sure that we do not get failures
+> in the CI runs just because of some few minutes.
+
+Good idea.
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> ---
->  meson.build | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/meson.build b/meson.build
-> index 4c92b43fe5..114b136129 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -613,7 +613,7 @@ if capstone_opt == 'no'
->    capstone_opt = false
->  elif capstone_opt in ['yes', 'auto', 'system']
->    have_internal = fs.exists('capstone/Makefile')
-> -  capstone = dependency('capstone', static: enable_static,
-> +  capstone = dependency('capstone', version: '>=4.0', static: enable_static,
->                          required: capstone_opt == 'system' or
->                                    capstone_opt == 'yes' and not have_internal)
->    if capstone.found()
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  .gitlab-ci.d/crossbuilds.yml | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/.gitlab-ci.d/crossbuilds.yml b/.gitlab-ci.d/crossbuilds.yml
+> index 510cfec03b..03ebfabb3f 100644
+> --- a/.gitlab-ci.d/crossbuilds.yml
+> +++ b/.gitlab-ci.d/crossbuilds.yml
+> @@ -2,6 +2,7 @@
+>  .cross_system_build_job_template: &cross_system_build_job_definition
+>    stage: build
+>    image: $CI_REGISTRY_IMAGE/qemu/$IMAGE:latest
+> +  timeout: 80m
+>    script:
+>      - mkdir build
+>      - cd build
 > 
 
 
