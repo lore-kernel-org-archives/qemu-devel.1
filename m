@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22090C4363D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 14:09:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06DC5C4363D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 14:14:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A00520936
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 14:09:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 431DB214F1
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 14:14:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Trwnizd+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A00520936
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jRzzXlu3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 431DB214F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKiyu-00020R-Gv
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 10:09:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43466)
+	id 1kKj3s-0005Zu-B3
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 10:14:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45040)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kKiyB-0001Vn-Gv
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 10:08:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60998)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kKj30-000584-Ou
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 10:13:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58745)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kKiy8-0004mo-S5
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 10:08:35 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kKj2y-0005ef-HU
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 10:13:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600783711;
+ s=mimecast20190719; t=1600784011;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lb6w2IsG208Bt0Nf3n6W39NlWk0hwTVLtHhfKAChqks=;
- b=Trwnizd+AcdrO+eWLsmjcmsNegnsh6mpIw4pP7hVfJp+0RiOlIRpjQ2vgY3AasFAfjsC+7
- g3huc7nCXtXccZ7Nnpl5S2dSbimTzizZIL1dk1mGSOVl8xgwpab9H2xyrwrt6k65AAKRA8
- l0sFytG6u2hOjep0d2+X48TMMeNugrI=
+ bh=/EIJB2Gdr6PcsqquBFohODzJp/sIzLD0tPb9sjVgIWo=;
+ b=jRzzXlu37DTh64fXD9R2+XJ99SMSiuSv+iyRRj7ij5V+v00W55aot9HzZWrS7E0vBTkCfr
+ pILXk5gU95fKClRDYD24TKfEtHhmotEuMP12BcXyziudLqg1zmT0xU+PgyQ5r+Krx9k+Z1
+ 4dk3n43Wtm622cKQW7Dd6FH1YTPr+Do=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-429-TTckVeh5PxGmR-JNm-pgdQ-1; Tue, 22 Sep 2020 10:08:27 -0400
-X-MC-Unique: TTckVeh5PxGmR-JNm-pgdQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-287-whDf1rRoPgikYq2R4g7EhA-1; Tue, 22 Sep 2020 10:13:13 -0400
+X-MC-Unique: whDf1rRoPgikYq2R4g7EhA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA4B110BBECC;
- Tue, 22 Sep 2020 14:08:25 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5EF891800D4A;
+ Tue, 22 Sep 2020 14:13:12 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
  [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 976F43782;
- Tue, 22 Sep 2020 14:08:25 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 31DBA7A41F;
+ Tue, 22 Sep 2020 14:13:12 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 230991132E9A; Tue, 22 Sep 2020 16:08:24 +0200 (CEST)
+ id ADB881132E9A; Tue, 22 Sep 2020 16:13:10 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v5 08/20] scripts/qapi/parser.py: improve doc comment
- indent handling
+Subject: Re: [PATCH v5 10/20] docs/interop: Convert qemu-ga-ref to rST
 References: <20200810195019.25427-1-peter.maydell@linaro.org>
- <20200810195019.25427-9-peter.maydell@linaro.org>
- <87wo19c3rr.fsf@dusky.pond.sub.org>
- <CAFEAcA_LEKRON2EUUCfXoAXmTGQSrqvFG_waBf1S-tsn8fJ6bA@mail.gmail.com>
- <87o8lytgoh.fsf@dusky.pond.sub.org>
- <CAFEAcA8+aPwyZEu8k8XL7F6eWvdhdP1ZZpv+6ZZXZr5vH4Lfzw@mail.gmail.com>
-Date: Tue, 22 Sep 2020 16:08:24 +0200
-In-Reply-To: <CAFEAcA8+aPwyZEu8k8XL7F6eWvdhdP1ZZpv+6ZZXZr5vH4Lfzw@mail.gmail.com>
- (Peter Maydell's message of "Tue, 22 Sep 2020 12:48:13 +0100")
-Message-ID: <877dslq4yv.fsf@dusky.pond.sub.org>
+ <20200810195019.25427-11-peter.maydell@linaro.org>
+ <875z8t7kd0.fsf@dusky.pond.sub.org>
+ <CAFEAcA9ZPO32XC1NwH=qa4mNF8c_xZeW8Z6MTrJ0FLmB6kytXQ@mail.gmail.com>
+ <87wo0mqavm.fsf@dusky.pond.sub.org>
+ <CAFEAcA8uYhrpsYM5u+0MJKOK3R_NwPefC1jdJMYF3VWohe4mfA@mail.gmail.com>
+Date: Tue, 22 Sep 2020 16:13:10 +0200
+In-Reply-To: <CAFEAcA8uYhrpsYM5u+0MJKOK3R_NwPefC1jdJMYF3VWohe4mfA@mail.gmail.com>
+ (Peter Maydell's message of "Tue, 22 Sep 2020 13:58:22 +0100")
+Message-ID: <873639q4qx.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 00:31:51
@@ -109,117 +110,47 @@ Sender: "Qemu-devel"
 
 Peter Maydell <peter.maydell@linaro.org> writes:
 
-> On Tue, 22 Sep 2020 at 08:27, Markus Armbruster <armbru@redhat.com> wrote:
->> How does
+> On Tue, 22 Sep 2020 at 13:01, Markus Armbruster <armbru@redhat.com> wrote=
+:
 >>
->>   @foo:  bar
->>          baz
->>   @frob: gnu
->>          gnat
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>> > The Sphinx interop manual has the usual footer:
+>> > https://www.qemu.org/docs/master/interop/index.html
+>> > "=C2=A92020, The QEMU Project Developers."
+>> >
+>> > The system manual has an explicit "License" section:
+>> > https://www.qemu.org/docs/master/system/license.html
+>> > but that's documenting the license of the program, not the
+>> > manual (it's docs/system/license.rst).
+>> >
+>> > We could do any or all of:
+>> >  * decide that we're happy with the current situation
+>> >  * expand the "copyright" footer to something like
+>> >    '=C2=A92020, The QEMU Project Developers; this manual is GPLv2'
+>> >  * have a docs/foo/license.rst for each manual, and expand
+>> >    it to mention the documentation license as well as the
+>> >    code license
+>> >
+>> > Given that the Texinfo generated QMP/QGA references don't
+>> > actually present this text to the reader, my inclination
+>> > is to say that this is something we should address in
+>> > a separate patchseries, not as part of this conversion.
 >>
->> behave?
+>> I think the manual should have a proper copyright notice.
 >
-> The rST fragments would be:
+> It does -- that's the standard Sphinx footer that reads
+> "=C2=A92020, The QEMU Project Developers." What it's missing
+> is more precise licensing information.
+
+Yes.
+
+>> If you'd prefer to (re-)add it later, stick in TODO comment.
 >
->  bar
->  baz
->
-> gnu
-> gnat
->
-> So you get what rST does with that. We do actually have examples
-> of this in the existing QAPI doc comments. It ends up treating it
-> as a definition list where the term is 'bar' and the
-> definition is 'baz' (which I don't entirely understand, I was
+> Where would you want a TODO to be ?
 
-The Perl of ASCII-based markups...
-
-> expecting a block-quote). That renders sufficiently close to correct
-> that I hadn't noticed it.
-
-Understandable :)
-
-> It would be a fairly small change to determine the indent level by
-> looking for the first non-ws character on line 1 after the colon.
-> Since we have a fair amount of this style in the code and it's
-> as you say a natural-seeming thing to write that seems the best
-> thing. (If you really wanted to start the option documentation with
-> some rST that required an initial indent, probably because you're
-> writing a literal-text Examples section, then you'd need to use the
-> "nothing after the : on line 1, rST fragment begins on line 2 in
-> column 0" style. Which would be the most natural way to write
-> that literal text anyway.)
-
-Agree.
-
-> I guess at this point I'll potentially create work for myself
-> by drawing your attention to the rST syntax for field lists
-> and option lists:
-> https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html#field-lists
-> which are kind of similar to what we're doing with @foo: stuff
-> markup, and which handle indentation like this:
->
-> :Hello: This field has a short field name, so aligning the field
->         body with the first line is feasible.
->
-> :Number-of-African-swallows-required-to-carry-a-coconut: It would
->     be very difficult to align the field body with the left edge
->     of the first line. It may even be preferable not to begin the
->     body on the same line as the marker.
->
-> The differences to what I have implemented in this series are:
->  * indent of lines 2+ is determined by the indent of line 2, not 1
->  * lines 2+ must be indented, so anything that currently uses
->    "no indent, start in column 0" would need indenting. (This would
->    be a lot of change to our current docs text.)
->  * it doesn't say in the spec, but I guess that spaces between
->    the colon and start of line 1 text are not significant.
->
-> The advantage would be a bit more consistency with rST syntax
-> otherwise; the disadvantage is that we have a *lot* of text
-> that uses the "start in column 0" format, like this:
->
-> # @QCryptoBlockOptionsBase:
-> #
-> # The common options that apply to all full disk
-> # encryption formats
->
-> and we'd need to reindent it all. My view is that trying to
-> look more like rST indent isn't sufficiently useful to be
-> worth having to change all that.
-
-We use @FOO: for two distinct things:
-
-1. Right at the beginning of a comment block, it makes the comment block
-a definition doc block for symbol FOO.
-
-2. At the beginning of an argument section, it names the argument /
-member being documented.
-
-Example:
-
-    ##
-    # @QCryptoBlockOptionsBase:                         <-- 1.
-    #
-    # The common options that apply to all full disk
-    # encryption formats
-    #
-    # @format: the encryption format                    <-- 2.
-    #
-    # Since: 2.6
-    ##
-
-We could switch just 2. to reST field list syntax, and either keep 1. as
-is, or switch it to some other reST markup that works for us.
-
-But even if we want this, we should do it on top, to avoid complicating
-and delaying this series.
-
->> This is something people may actually write.
->
-> Indeed, they have :-)
->
-> thanks
-> -- PMM
+Before the patch, the licensing information is in
+docs/interop/qemu-ga-ref.texi.  That file gets replaced by
+docs/interop/qemu-ga-ref.rst, losing the licensing information.  What
+about putting the TODO right there?
 
 
