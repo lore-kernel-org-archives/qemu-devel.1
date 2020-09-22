@@ -2,100 +2,72 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9540EC4346E
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 03:03:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B19B0C4346E
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 03:04:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C627239D4
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 03:03:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WtNEbalz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C627239D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 40FF1239D4
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 03:04:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40FF1239D4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKYa9-0005MP-4t
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 23:03:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49330)
+	id 1kKYbc-0006Jd-3r
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 23:04:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49540)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1kKYYq-0004LG-NM
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 23:01:45 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32539
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1kKYYo-0005e1-1n
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 23:01:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600743698;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hhD43Hh+Bg1ZpFOROJt1cA6yuABHUBMZhBeRP2eCN60=;
- b=WtNEbalz+HfWed/o01/sMAllHCrNKKh+yd8Emgp1WqpNLFoIArDsY/S60dpW39DWc0JoM9
- Yww+N4uxhGOGiIxsmSOop0mx1zPSV2kQ9eIiHzbyMaXiuo4AgPu6jL3uYbyFnpYXki3FPC
- JnL+CXf6IzRUXNbkHTxII5wojpPfiWM=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-594-V0ylz17rP9Cf3BpC459Zeg-1; Mon, 21 Sep 2020 23:01:37 -0400
-X-MC-Unique: V0ylz17rP9Cf3BpC459Zeg-1
-Received: by mail-pj1-f72.google.com with SMTP id q95so1282921pja.0
- for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 20:01:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=hhD43Hh+Bg1ZpFOROJt1cA6yuABHUBMZhBeRP2eCN60=;
- b=VdZFu6znGdvcK7m/IxXRTKxow4H2VYBQ/GARR+e6IVl0rojZ+tGX+o+V3izayKI6qj
- cbqXtjjyqbaB7zLohmrD2lA9OYFXmq8HONQbh5xaFEEQqHLt37Vb7yeJV9PxHSDU7k7L
- ezg3X248VdLGACukXEziTuKhFur/82ufnhnDHbR0bqJfXBvMcPFeA5vsIw7QupLtlESi
- E3kEDztN436+leYqAVT/k8IPFjG6OGiagvtXaUPxIbV+iRElU7YmpeuFzI4gqc9nYpgk
- alb3A3GsX2RAcpcMFqDRigTvSRSFvZiTKyuAueHSIEnAFkADDdAQll+0D7KyGDQu1N9f
- xNKw==
-X-Gm-Message-State: AOAM531dWPSMQuU5qkCLRJtzT6Eb2OhgOlGTQVfWhL9UbNrGMgWz25Xf
- 4egdRU8hgB5TMJHWGs1NLCV9QVN72P0vpwtxpIKDC5P22ZyYJrIXSGNYzJyS5xyKQSH2XqU+zQN
- PUByNJT/CFuVk6Gz3zC6Mmonizin9dng=
-X-Received: by 2002:a17:902:d714:b029:d0:cbe1:e7a2 with SMTP id
- w20-20020a170902d714b02900d0cbe1e7a2mr2603031ply.19.1600743695834; 
- Mon, 21 Sep 2020 20:01:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz38N04dPxpOKoGSqZX+deBhqw9qYh0On1arhTS46qeJQEbRS8Z+bkhGFb/icIuuBrpM75UQ7thKVOZMhBlg+4=
-X-Received: by 2002:a17:902:d714:b029:d0:cbe1:e7a2 with SMTP id
- w20-20020a170902d714b02900d0cbe1e7a2mr2602997ply.19.1600743695198; Mon, 21
- Sep 2020 20:01:35 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kKYZk-0005HQ-Rl
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 23:02:40 -0400
+Resent-Date: Mon, 21 Sep 2020 23:02:40 -0400
+Resent-Message-Id: <E1kKYZk-0005HQ-Rl@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21375)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kKYZf-0005tP-9R
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 23:02:40 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1600743746; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=NpywanoXSg4E1GO4CUfFe9gEjrftqSVkeF4fiVAI7kfiyrjZ9h8/pSyz2PeKHQreMFYZWC4c2BMReCUjcvGNW91peT0c4YNxL8YdsKYFNO1WMjI5eaqMvko89QTlr6X3/Ygwyac0fPYnOyzGIgx8lnTaEt1DRWoeW73YY08eeu4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1600743746;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=9107to9E/IcweaD59MgXDrlOirGWB0U2NKDzUCUsNKU=; 
+ b=jSDYGcht/wtuQBL1mG1mcS9k5DO+GqB37AEnxCSL9KY0FdUVNTDsb4yQKbudVmxcFXoA9wL5/z2jPBVGk5MU3CmGKFwi0hClFPoWGod1J2SwVlk7JjxkjhT/a0VVtWmqiQLMCP56TJhUJaH3os2FUeJElnH2HzBMcOKAiEftjbI=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1600743745264697.9446707519894;
+ Mon, 21 Sep 2020 20:02:25 -0700 (PDT)
+Subject: Re: [PATCH 00/24] qom: Convert some properties to class properties
+Message-ID: <160074374391.23987.9192777371902564218@66eaa9a8a123>
+In-Reply-To: <20200921221045.699690-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-References: <20200917155851.20636-1-lulu@redhat.com>
- <b5ac3a30-6d81-117c-37af-e16b9a21ddad@redhat.com>
-In-Reply-To: <b5ac3a30-6d81-117c-37af-e16b9a21ddad@redhat.com>
-From: Cindy Lu <lulu@redhat.com>
-Date: Tue, 22 Sep 2020 11:01:24 +0800
-Message-ID: <CACLfguUNqfKYb-4Yo6-7Zn4NwYq94WHSKn+2KPX1+W0JH7Re2A@mail.gmail.com>
-Subject: Re: [PATCH 1/3] virtio-net: Set mac address to hardware if the peer
- is vdpa
-To: Jason Wang <jasowang@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lulu@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=lulu@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 23:01:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: ehabkost@redhat.com
+Date: Mon, 21 Sep 2020 20:02:25 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 23:02:32
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,94 +81,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>,
- Michael Tsirkin <mst@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, berrange@redhat.com, jsnow@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 22, 2020 at 9:55 AM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> On 2020/9/17 =E4=B8=8B=E5=8D=8811:58, Cindy Lu wrote:
-> > If the peer's type is vdpa,set the mac address to NIC in virtio_net_dev=
-ice_realize,
-> > Also sometime vdpa get an all 0 macaddress from the hardware, this will=
- cause the traffic down
-> > So we add the check for this part.
-> > if we get an 0 mac address we will use the default mac address instead
-> >
-> > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > ---
-> >   hw/net/virtio-net.c | 12 +++++++++++-
-> >   1 file changed, 11 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> > index cb0d27084c..7db9da1482 100644
-> > --- a/hw/net/virtio-net.c
-> > +++ b/hw/net/virtio-net.c
-> > @@ -126,6 +126,7 @@ static void virtio_net_get_config(VirtIODevice *vde=
-v, uint8_t *config)
-> >       VirtIONet *n =3D VIRTIO_NET(vdev);
-> >       struct virtio_net_config netcfg;
-> >       NetClientState *nc =3D qemu_get_queue(n->nic);
-> > +    static const MACAddr zero =3D { .a =3D { 0, 0, 0, 0, 0, 0 } };
-> >
-> >       int ret =3D 0;
-> >       memset(&netcfg, 0 , sizeof(struct virtio_net_config));
-> > @@ -151,7 +152,11 @@ static void virtio_net_get_config(VirtIODevice *vd=
-ev, uint8_t *config)
-> >           ret =3D vhost_net_get_config(get_vhost_net(nc->peer), (uint8_=
-t *)&netcfg,
-> >                                      n->config_size);
-> >           if (ret !=3D -1) {
-> > -            memcpy(config, &netcfg, n->config_size);
-> > +            if (memcmp(&netcfg.mac, &zero, sizeof(zero)) !=3D 0) {
-> > +                memcpy(config, &netcfg, n->config_size);
-> > +        } else {
-> > +                error_report("Get an all zero mac address from hardwar=
-e");
->
->
-> This is probably a hint that MAC is not properly provisioned.
->
-> So I guess we can leave this as is, or simply warn until the management
-> interface is finalized.
->
-Hi Jason, For sure this is NIC card's problem, They cannot provide an
-correct MAC address,
-But if we continue use this 0 mac address will cause this traffic
-down, maybe will cost a lot of effort in debugging
-So I think maybe Just an warn is not enough, We can use the default
-mac address  and let the traffic working
->
-> > +            }
-> >           }
-> >       }
-> >   }
-> > @@ -3399,6 +3404,11 @@ static void virtio_net_device_realize(DeviceStat=
-e *dev, Error **errp)
-> >       nc =3D qemu_get_queue(n->nic);
-> >       nc->rxfilter_notify_enabled =3D 1;
-> >
-> > +   if (nc->peer && nc->peer->info->type =3D=3D NET_CLIENT_DRIVER_VHOST=
-_VDPA) {
-> > +        struct virtio_net_config netcfg =3D {};
-> > +        memcpy(&netcfg.mac, &n->nic_conf.macaddr, ETH_ALEN);
-> > +        virtio_net_set_config(vdev, (uint8_t *)&netcfg);
->
->
-> Won't this overwrite all other fields in the netcfg? I think we should
-> only touch mac part.
->
-> Thanks
->
->
-Sure, will fix this
-> > +    }
-> >       QTAILQ_INIT(&n->rsc_chains);
-> >       n->qdev =3D dev;
-> >
->
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkyMTIyMTA0NS42OTk2
+OTAtMS1laGFia29zdEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUg
+ZG9ja2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rpbmcg
+Y29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3Rh
+bGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEg
+TkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEg
+Sj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCkMgbGlua2VyIGZvciB0aGUg
+aG9zdCBtYWNoaW5lOiBjYyBsZC5iZmQgMi4yNy00MwpIb3N0IG1hY2hpbmUgY3B1IGZhbWlseTog
+eDg2XzY0Ckhvc3QgbWFjaGluZSBjcHU6IHg4Nl82NAouLi9zcmMvbWVzb24uYnVpbGQ6MTA6IFdB
+Uk5JTkc6IE1vZHVsZSB1bnN0YWJsZS1rZXl2YWwgaGFzIG5vIGJhY2t3YXJkcyBvciBmb3J3YXJk
+cyBjb21wYXRpYmlsaXR5IGFuZCBtaWdodCBub3QgZXhpc3QgaW4gZnV0dXJlIHJlbGVhc2VzLgpQ
+cm9ncmFtIHNoIGZvdW5kOiBZRVMKUHJvZ3JhbSBweXRob24zIGZvdW5kOiBZRVMgKC91c3IvYmlu
+L3B5dGhvbjMpCkNvbmZpZ3VyaW5nIG5pbmphdG9vbCB1c2luZyBjb25maWd1cmF0aW9uCi0tLQpS
+dW5uaW5nIHRlc3QgcXRlc3QteDg2XzY0OiBxb3MtdGVzdApCcm9rZW4gcGlwZQouLi9zcmMvdGVz
+dHMvcXRlc3QvbGlicXRlc3QuYzoxNzU6IGtpbGxfcWVtdSgpIGRldGVjdGVkIFFFTVUgZGVhdGgg
+ZnJvbSBzaWduYWwgNyAoQnVzIGVycm9yKSAoY29yZSBkdW1wZWQpCkVSUk9SIHF0ZXN0LXg4Nl82
+NDogZGV2aWNlLWludHJvc3BlY3QtdGVzdCAtIHRvbyBmZXcgdGVzdHMgcnVuIChleHBlY3RlZCA2
+LCBnb3QgNSkKbWFrZTogKioqIFtydW4tdGVzdC0xNTFdIEVycm9yIDEKbWFrZTogKioqIFdhaXRp
+bmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KCkxvb2tpbmcgZm9yIGV4cGVjdGVkIGZpbGUgJ3Rl
+c3RzL2RhdGEvYWNwaS9taWNyb3ZtL0ZBQ1AnCi0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vy
+cm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQg
+J1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tcm0nLCAnLS1sYWJlbCcsICdjb20u
+cWVtdS5pbnN0YW5jZS51dWlkPTEwMTJlZTkyMjY0OTQwNjk4YTllY2U0ODMyOWIyMDcyJywgJy11
+JywgJzEwMDMnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy1lJywg
+J1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0n
+LCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScs
+ICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Mi8uY2Fj
+aGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1w
+L3BhdGNoZXctdGVzdGVyLXRtcC1oMmlmYmRjdi9zcmMvZG9ja2VyLXNyYy4yMDIwLTA5LTIxLTIy
+LjU1LjAwLjE2NjI1Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11L2NlbnRvczcnLCAnL3Zhci90
+bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1
+cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD0xMDEyZWU5
+MjI2NDk0MDY5OGE5ZWNlNDgzMjliMjA3MgptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9y
+IDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRt
+cC1oMmlmYmRjdi9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRvczdd
+IEVycm9yIDIKCnJlYWwgICAgN20yMi42NDdzCnVzZXIgICAgMG0yMC4xNDlzCgoKVGhlIGZ1bGwg
+bG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDkyMTIyMTA0
+NS42OTk2OTAtMS1laGFia29zdEByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRv
+czcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
+dGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
+byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
