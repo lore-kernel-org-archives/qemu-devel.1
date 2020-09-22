@@ -7,85 +7,108 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0F4CC2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 07:09:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09FAEC4363D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 07:12:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41B5123A1E
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 07:09:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 386A6207C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 07:12:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BT4fnjxI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41B5123A1E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eQn9JXIa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 386A6207C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKcQc-0004wz-63
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 03:09:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33738)
+	id 1kKcTp-00069L-55
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 03:12:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34826)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kKcO7-0003Vd-0o
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 03:06:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59006
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kKcSo-0005fs-C6
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 03:11:46 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40968
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kKcO5-0005R7-5v
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 03:06:54 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kKcSm-00065G-N7
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 03:11:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600758412;
+ s=mimecast20190719; t=1600758703;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=sH66C2TNYQEllFyMCMzWSpUfL/dXm7fNW50MdW6cCCI=;
- b=BT4fnjxIrCzYv0JNimpBtRw4MSyg+lwMKSBYFZJcbsMNkQWyAEIXsF6TPbFhwQ3z3MpWQ2
- gT64y0pkHbeadbZ3teF002hoOsH9Ib5iXNO2W+qlSeQAlu6p09x1/9OpbsUuv2oi3L/mUD
- mpMbp/vFoR5i/VjMRh5sRGL7TJUuIvI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-293-KffxUZqKPRO7uVJRH9EcUg-1; Tue, 22 Sep 2020 03:06:50 -0400
-X-MC-Unique: KffxUZqKPRO7uVJRH9EcUg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B7001074655;
- Tue, 22 Sep 2020 07:06:49 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-113-122.ams2.redhat.com [10.36.113.122])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 46B845C1DC;
- Tue, 22 Sep 2020 07:06:41 +0000 (UTC)
-Subject: Re: [PATCH 0/7] Do not support Debian 9 and Python 3.5 anymore
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200921174320.46062-1-thuth@redhat.com>
- <87r1qvngsg.fsf@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <4b78dd56-c94d-5720-4f57-ac251526f461@redhat.com>
-Date: Tue, 22 Sep 2020 09:06:40 +0200
+ bh=BjZ/hfz30lfw0dw42fHBRmyvU9yvd2imdzJF3B5OVEA=;
+ b=eQn9JXIatEPkOq2B0ZHgtHEbiduGVq0INMwHqMgvrdZYuqsaXrquEcCCsmWCvxNiw46rXy
+ QX7PJCpqbiTndJVeYmpI1IVU6rhtpCyIqBhzK/puPGhPVgqVKB9yp8nbsNwvRirxVHLFe5
+ 1v7dPeRJRRIltG7YIJwkpj8XXn6BGfo=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-176-4X6qzhsdNoSbhbHRvnmfuw-1; Tue, 22 Sep 2020 03:11:41 -0400
+X-MC-Unique: 4X6qzhsdNoSbhbHRvnmfuw-1
+Received: by mail-wm1-f70.google.com with SMTP id x6so553927wmi.1
+ for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 00:11:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=BjZ/hfz30lfw0dw42fHBRmyvU9yvd2imdzJF3B5OVEA=;
+ b=UaWcdh9ZdtYBIsCwTD3ufjDasSpL+tG2NDyemsU5Fv1d5s8pnInjHYWvWA0aJYF1+2
+ CpIxIhEjolf1tWJdv4ua6HfHSTFdeKN6E2jS7yaftDxUs/R5ENnTnpyajlcQ1yLFz5ds
+ 74q7KM0wgFK54O/93btuIj3jvDcq0ksthHIvzEM9ghpxxQLy8OFJSUfLQesQbTKnHIXR
+ MouQ/jCPhAYBZn2ZFhZJcDDYHJTQfXyD8hKtQy9/dn9hWHXbBeCcrreR2xUEz8+0aaP+
+ waNYujdlR9j1/9d0LlM4kVSZQvEcrJ4sSr4J+tKGcwU7mbWusiE/In3E3B+FTCksEScw
+ eMfg==
+X-Gm-Message-State: AOAM533e223n6VC4j4HaNrwVfnjVBojZ8jhclnquFysoPeMrCHNEkPw+
+ URwrGzGTQBWQRH4Wcxtqpo4uT2Ab2Q4ji+ydap6AyCE40cQ0Lm/jCBlVEG0O42G6ytr4HcYygut
+ Jv4EKoG+JbmTLTAY=
+X-Received: by 2002:a5d:4448:: with SMTP id x8mr3824588wrr.207.1600758699787; 
+ Tue, 22 Sep 2020 00:11:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzj2FVHEB8SjqZfIVDRSbaL6ND6hrVf97m1J2tIp+GG//7j8Q/F+5sDJ1qCfnWy7o58ui4CBg==
+X-Received: by 2002:a5d:4448:: with SMTP id x8mr3824562wrr.207.1600758699557; 
+ Tue, 22 Sep 2020 00:11:39 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d153:8d0f:94cf:5114?
+ ([2001:b07:6468:f312:d153:8d0f:94cf:5114])
+ by smtp.gmail.com with ESMTPSA id i15sm25304979wrb.91.2020.09.22.00.11.38
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 22 Sep 2020 00:11:38 -0700 (PDT)
+Subject: Re: [External] Re: [PATCH 2/3] iqapi/run-state.json: introduce memory
+ failure event
+To: zhenwei pi <pizhenwei@bytedance.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20200914134321.958079-1-pizhenwei@bytedance.com>
+ <20200914134321.958079-3-pizhenwei@bytedance.com>
+ <CAFEAcA-KX6p3aaKxmMx2i1G2n+9GdOXjDL2mqmHcngq3M_f+Gw@mail.gmail.com>
+ <348159b8-0e10-ab93-42ca-5e6d586d5abc@bytedance.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <08d688b5-fe64-6bb7-3fa8-9e976640041a@redhat.com>
+Date: Tue, 22 Sep 2020 09:11:38 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <87r1qvngsg.fsf@linaro.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <348159b8-0e10-ab93-42ca-5e6d586d5abc@bytedance.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 01:57:21
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 01:27:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
 X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,40 +121,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Marcelo Tosatti <mtosatti@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/09/2020 20.09, Alex Bennée wrote:
-> 
-> Thomas Huth <thuth@redhat.com> writes:
-> 
->> Debian 9 is EOL now, and according to our support policy, we do not
->> support it anymore. Let's switch the corresponding CI builds to
->> either Fedora (for a more recent version of the MinGW compilers) or
->> Debian 10 instead.
+On 21/09/20 15:10, zhenwei pi wrote:
 >>
->> Together with the Travis patch series that I recently posted ("Update
->> Travis from Xenial to Bionic and Focal"), our CI should now be free of
->> distros that we do not support anymore. And all supported build systems
->> now use at least Python 3.6, so we can drop the support for Python 3.5.
->>
->> Based-on: <20200918103430.297167-1-thuth@redhat.com>
-> 
-> I'm inclined to take all of these but I'll take all the CI based ones
-> now and add the 3.6 bump if there is more review/acks for it.
+> Right, to make architecture-neutral, how about these changes:
+> 'PC-RAM' -> 'guest-memory'
+> 'guest-mce' -> 'guest-mce-inject'
+> 'guest-triple-fault' -> 'guest-mce-fault'
 
-Thanks! ... but I just noticed that I missed to send out the patch that
-removes the Python 3.5 job in .travis.yml. I just sent it out now, title
-is "[PATCH 7/6] travis.yml: Drop the Python 3.5 build" ... please make
-sure to also queue it if you include the patch that bumps the Python
-version.
+Perhaps we should have three fields
 
- Thomas
+1) recipient: 'hypervisor' or 'guest'
+
+2) action: 'ignore', 'inject', 'fatal'
+
+3) kind: 'action-optional' or 'action-required'
+
+And possibly:
+
+4) recursive: true or false
+
+On x86 "recursive" would be set if MCIP=1.
+
+Paolo
 
 
