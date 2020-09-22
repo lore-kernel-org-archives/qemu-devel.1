@@ -2,85 +2,133 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA82DC2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 13:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D077AC4727E
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 13:26:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21453206C9
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 13:24:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 51B9320888
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 13:26:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E+i3eUE5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21453206C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QQLcyieC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51B9320888
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKiHM-00082X-5A
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 09:24:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58232)
+	id 1kKiJW-0002Gw-9e
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 09:26:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58398)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kKiCD-00037L-Qw
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 09:19:01 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:36009)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kKiC6-0006ro-BM
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 09:19:01 -0400
-Received: by mail-ed1-x541.google.com with SMTP id w1so16167485edr.3
- for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 06:18:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=rVKaaQfdqgnqcB39rX+gHRcKcPho03HmuQBe2EGwK8I=;
- b=E+i3eUE5CLeZVucxA2g3yw26QEoa5CIQntJoKgBT2RALVeA1BVB3vikaXSltZQBPdY
- OQd2wLijIBaNePViidbwO7eba9LwZaLI6ToQh4Mqz3iwFsSSw0WraQ7bSE2Kdk02THdG
- if+7CmfW7Qk1Q/ecBOSyu0JMMdGoLOJpLOCt50ex8D1pz+9RziKtd5/lp45OtDSOC8g4
- Hgv0TPPcqyBs7aXp/74BRRLJUZwzjtVbf8Fkn7EjuxhjatYvtv+QXH9h6tM6bx8fjWfo
- hfjBtX7URAnqqAGSefq7BcZ/0jzywC4kZT027bQDKl07VGE8j1B0hscKBMSoPSajnoxq
- do0Q==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kKiCw-0003t0-7y
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 09:19:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41455)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kKiCo-0006vE-0W
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 09:19:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600780777;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=h5vbYrTtOG63BO9SZsI4jJaPrOWeXvbw07/1RgE6nqY=;
+ b=QQLcyieC6Hh9AKlhO58Wo9S7KpeI+YZBTYB34cJrR49R+ezfej5AWqVxujV5886hIIeZep
+ gsvpjTmSezDa2p0uY27cA6D1KRSFFeVkC2uLt2/QP+YMK+mmffxqy9QYCqhBLwKBv1GG6A
+ LfXgZn+6kdQikL1wl/XoBVUY5qH3SLk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-401-Qc-ckOgxPkyyAwmnBKHy5w-1; Tue, 22 Sep 2020 09:19:35 -0400
+X-MC-Unique: Qc-ckOgxPkyyAwmnBKHy5w-1
+Received: by mail-wr1-f69.google.com with SMTP id w7so7443451wrp.2
+ for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 06:19:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=rVKaaQfdqgnqcB39rX+gHRcKcPho03HmuQBe2EGwK8I=;
- b=Axa1NFo0oNpUS3Ioz9U32UvS52sVpGO2CaI5PWHcj6xFDbrL+BR4nAQb0+6Wajrsle
- FOY45mmSNiwtyW91A+yz3LeHtYXM7BIF2yv2EtRwIN59A51IUvx+JUqrz/de/edPrgeV
- mzutRkfFfm7naOsSpz3AyVXucJ9E2QVaMFanT7FNarWeuRKsNgR7edfH9m/e220MTPoc
- rDNpW3Mka1RvzRPVFp88qFiKTtp95HL3+cFR7x/SisdCBYEqgBCJ8v6PMJdXYfsKhF7a
- dowQVleTQNsWErw2r2PpALpi0SspDvAD4m8i0RHHcbL85WY6Kcd4MWjGQ4SKv7zk5SjJ
- FbVg==
-X-Gm-Message-State: AOAM532YkRORD9PamhB5KVz5hdinWOYaq/c5pn0haD6PaPCi9M2rt1lL
- 87TAYdDqQhLd3AyQiUEtZseRhxfi9YILl/kVw6ir1g==
-X-Google-Smtp-Source: ABdhPJx3beQLA6Exa34usZeWGS90LrFIRhJdB6bFa0aoD9WnPvbYQSNgzWCFK78zxakZi46J/AfYpiP05Zuk0luuy8g=
-X-Received: by 2002:aa7:d58e:: with SMTP id r14mr4086753edq.52.1600780732624; 
- Tue, 22 Sep 2020 06:18:52 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=h5vbYrTtOG63BO9SZsI4jJaPrOWeXvbw07/1RgE6nqY=;
+ b=JtvdrrhnShfSpXCibmnKQzb0O52Jpad8Q530PxYRNU6FTFV1IxJ/dmhg2+vG3rK/ql
+ aGPYco0KWngRSANsp0RdK1SYhbgkT7nTLZS4dt3XxJMZi5smdJ2C+JtH45IPWyGTMB2J
+ ApCkhjjDrAY6C93V3VOzqhBTmpzUMp9EEtfPH2jWVgbb+vrkSIuGLVXH4U1RtkleUzp0
+ pO12nEmnUNqJEJY8gSyY5UJbO/5TcUmeQbUW8mXGitilk8F3ZMibBzX5JzE3dF/XmEVF
+ vdktzbPi2pxTzyQMroUX5XV6uSVEya8gf7pzljeRi63my06tMJBPsso/AwYbPEzQXii4
+ GbMw==
+X-Gm-Message-State: AOAM5311Zf/zj6kz0OmA959l7FdnCXjSbHYU6UO/GVyvYrn8Grn6Hux0
+ RZmLWubjK0fNzXNOPfufE4Ejie03T6CZaoDusVZ7+SD2bzkNx7NIP26nSjam6TKIz0uakk1NmTC
+ 5wXqeaYq6Vt7Xtoc=
+X-Received: by 2002:a7b:cd88:: with SMTP id y8mr1034558wmj.24.1600780773910;
+ Tue, 22 Sep 2020 06:19:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwYA5lNIM+ekSAA44KPgdz3GbAUGCMwWHVyRmnEIlswsoiPYOaNKwYTAbFnrLos4QUqF7+ehA==
+X-Received: by 2002:a7b:cd88:: with SMTP id y8mr1034542wmj.24.1600780773729;
+ Tue, 22 Sep 2020 06:19:33 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id u2sm4592785wre.7.2020.09.22.06.19.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 22 Sep 2020 06:19:32 -0700 (PDT)
+Subject: Re: [PATCH 1/1] block: drop moderated sheepdog mailing list from
+ MAINTAINERS file
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200922090147.1993705-1-berrange@redhat.com>
+ <20200922090147.1993705-2-berrange@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <8045dcba-5613-91ab-89dc-e987b30b5c03@redhat.com>
+Date: Tue, 22 Sep 2020 15:19:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200922130806.1506324-1-pbonzini@redhat.com>
-In-Reply-To: <20200922130806.1506324-1-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Sep 2020 14:18:41 +0100
-Message-ID: <CAFEAcA8kovt998Ds0jbEAJTqkHmJETcHvfwqCS-JZWWW+=wLrw@mail.gmail.com>
-Subject: Re: [PATCH] coverity_scan: switch to vpath build
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::541;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x541.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200922090147.1993705-2-berrange@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 00:31:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,74 +141,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Liu Yuan <namei.unix@gmail.com>, sheepdog@lists.wpkg.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 22 Sep 2020 at 14:08, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> This is the patch that has been running on the coverity cronjob
-> for a few weeks now.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On 9/22/20 11:01 AM, Daniel P. Berrangé wrote:
+> The sheepdog mailing list is setup to stop and queue messages from
+> non-subscribers, pending moderator approval. Unfortunately it seems
+> that the moderation queue is not actively dealt with. Even when messages
+> are approved, the sender is never added to the whitelist, so every
+> future mail from the same sender continues to get stopped for moderation.
+> 
+> MAINTAINERS entries should be responsive and not uneccessarily block
+
+Typo "unnecessarily".
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> mails from QEMU contributors, so drop the sheepdog mailing list.
+> 
+> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 > ---
->  scripts/coverity-scan/run-coverity-scan | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
->
-> diff --git a/scripts/coverity-scan/run-coverity-scan b/scripts/coverity-scan/run-coverity-scan
-> index 6eefb4b558..7395bbfad4 100755
-> --- a/scripts/coverity-scan/run-coverity-scan
-> +++ b/scripts/coverity-scan/run-coverity-scan
-> @@ -380,15 +380,17 @@ export PATH="$TOOLBIN:$PATH"
->
->  cd "$SRCDIR"
->
-> -echo "Doing make distclean..."
-> -make distclean
-> +echo "Nuking build directory..."
-> +rm -rf +build
+>  MAINTAINERS | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 3d17cad19a..8e8a4fb0a8 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -2852,7 +2852,6 @@ F: block/rbd.c
+>  Sheepdog
+>  M: Liu Yuan <namei.unix@gmail.com>
+>  L: qemu-block@nongnu.org
+> -L: sheepdog@lists.wpkg.org
+>  S: Odd Fixes
+>  F: block/sheepdog.c
+>  
+> 
 
-As Philippe points out, odd name choice.
-
-It might also be nice to steal the logic from configure
-that avoids blowing away the build directory if it
-wasn't created by this script in the first place.
-
-> +mkdir +build
-> +cd +build
-
-I think this 'cd' will break use of the --results-tarball
-option with a relative path (eg "--results-tarball my-tarball.tgz")
-because it will now end up interpreted relative to the build
-subdir rather than relative to the source directory.
-
->  echo "Configuring..."
->  # We configure with a fixed set of enables here to ensure that we don't
->  # accidentally reduce the scope of the analysis by doing the build on
->  # the system that's missing a dependency that we need to build part of
->  # the codebase.
-> -./configure --disable-modules --enable-sdl --enable-gtk \
-> +../configure --disable-modules --enable-sdl --enable-gtk \
->      --enable-opengl --enable-vte --enable-gnutls \
->      --enable-nettle --enable-curses --enable-curl \
->      --audio-drv-list=oss,alsa,sdl,pa --enable-virtfs \
-
-This comment at the top of the script:
-
-# This script assumes that you're running it from a QEMU source
-# tree, and that tree is a fresh clean one, because we do an in-tree
-# build. (This is necessary so that the filenames that the Coverity
-# Scan server sees are relative paths that match up with the component
-# regular expressions it uses; an out-of-tree build won't work for this.)
-
-is now out of date and needs rephrasing.
-
-PS: on the subject of component regexes, they seem to have
-vanished from the Coverity website. I don't suppose you have
-a backup of them, do you ? (I have a list of what the component
-names were, but not the associated regexes.)
-
-thanks
--- PMM
 
