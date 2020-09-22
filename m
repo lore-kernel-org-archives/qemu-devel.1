@@ -7,95 +7,83 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4915FC2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 09:52:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D38DC2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 09:55:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 641662388B
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 09:52:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE6822388B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 09:55:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mJCAf9Cv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 641662388B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ctrfjisb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE6822388B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKexv-0007Re-P8
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 05:52:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44496)
+	id 1kKf1b-0000JV-0d
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 05:55:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45326)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kKewa-0006nZ-Mn
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 05:50:40 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44999)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kKewY-000195-HJ
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 05:50:40 -0400
-Received: by mail-wr1-x443.google.com with SMTP id s12so16317389wrw.11
- for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 02:50:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=sQPhss5DWjtqofnkMpdYG5L2+8qhzRQPv6JYWrgqoeo=;
- b=mJCAf9CvFXonSS2gyuInGdKmLrjz3yeI5c8KygioUpRJRhtjL8O4wgZlRqXLvGhiSG
- DqoWeNCZMUup2j7Mxvs/OZzdGfi6TqWCN18N8WJIXXWSGgiHj5NtTi6oSfEbMOnt01EV
- uhPK9DRMWBg8XqnumJn+IxYDtQbORN4QX0WlDYSkqZq3ynEJGK8e7lGoysmD4iqu6W+r
- oU8ZVB9JxIWC6Bq2eaVQwA71sDUBR3zsQksw5XxZMyNSRUE7LCF0BbCO0ClR/rW5BkML
- Nio72NCgPxhf4xjaKj00ah0h96Nzx+nbzeLIllclGyHp3O6IRVZ1NVPeNc0RlBwHKse0
- 225A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=sQPhss5DWjtqofnkMpdYG5L2+8qhzRQPv6JYWrgqoeo=;
- b=ZAcDCDXQg4t9zYtN4/O0zBam6zISza8kl4VxbVr6dxrdGbugHIq4z7c/NiTE6oIngp
- zcuQlljKaMm5KcKKEiq/COZJAdGhIyXg1MBdgWvUjfakbOhAejdXBuyOz+PO+8wJLa6S
- iZVcwlvutPu3cZF8i95XWLDEYPAj/Op4VH9J3uIjxe0NTZfLpxCp+1n7WM3SMkP5GgzT
- UQJxng0ECY8HEsv2jZg6xMm0+fr+LVDz8ts5P6EFyTmVlN4+WMCXBYDS5sGKSphQGBir
- olsY/fXNKeYP1rXine6Kx6t4E52NV8aGXGk37EryX2ON5ceJfNhV+7CMHMwWG15DEbIE
- ZCBw==
-X-Gm-Message-State: AOAM531szVp6yJYx9Ipfo6ZDzd2hrj8lTxp0AybVFyqWzruLqPkm97wB
- aDR5+nVQlxddbItEJx46N3s1TQ==
-X-Google-Smtp-Source: ABdhPJwm2Xzmgd3cUxp91oqin7Q7/9hHvoaEoFsltGvUp56TShtd7qaVf3KImcWbdFhbxXll7oFncA==
-X-Received: by 2002:a05:6000:12cf:: with SMTP id
- l15mr4284392wrx.312.1600768236688; 
- Tue, 22 Sep 2020 02:50:36 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id x10sm3846499wmi.37.2020.09.22.02.50.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 22 Sep 2020 02:50:35 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9458F1FF7E;
- Tue, 22 Sep 2020 10:50:34 +0100 (BST)
-References: <20200921174118.39352-1-richard.henderson@linaro.org>
- <20200921174118.39352-5-richard.henderson@linaro.org>
- <87d02fnd1y.fsf@linaro.org>
- <8e1ac018-dac8-b049-aae3-059f86698f3a@linaro.org>
- <d3a5ec4f-259e-2f5a-2ae9-9bbc46d24298@amsat.org>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v4 04/11] disas: Move host asm annotations to tb_gen_code
-In-reply-to: <d3a5ec4f-259e-2f5a-2ae9-9bbc46d24298@amsat.org>
-Date: Tue, 22 Sep 2020 10:50:34 +0100
-Message-ID: <871riunnrp.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kKf0T-0008Jc-EN
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 05:54:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38155)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kKf0R-0001Vs-6n
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 05:54:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600768478;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hG1pEW06fI1t6jcVAkIKcj7g/qVLS73waiwL/Y47AIA=;
+ b=CtrfjisbH5TIUB3WrbcwC+/pDIh4TMFMQXDnYUF8+OoTKdnLYQPH56aY+p1Qi4CpWqUv7z
+ sEC5V1ABbWXO/sz9Om+P3i5BIWPohXTAatCflYU67g4e1f4qw9wZ5GLQxHmFlynRGgmAP0
+ TgY5k56aLv4sV3Drt1VEn6F2ahFvgtU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-391-9ZGHB6fgM_yLtFhstemNHQ-1; Tue, 22 Sep 2020 05:54:34 -0400
+X-MC-Unique: 9ZGHB6fgM_yLtFhstemNHQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7666D802B51;
+ Tue, 22 Sep 2020 09:54:33 +0000 (UTC)
+Received: from gondolin (ovpn-112-114.ams2.redhat.com [10.36.112.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 600FE78822;
+ Tue, 22 Sep 2020 09:54:28 +0000 (UTC)
+Date: Tue, 22 Sep 2020 11:54:25 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH 12/24] s390x: Register all CPU properties as class
+ properties
+Message-ID: <20200922115425.343d8234.cohuck@redhat.com>
+In-Reply-To: <20200921221045.699690-13-ehabkost@redhat.com>
+References: <20200921221045.699690-1-ehabkost@redhat.com>
+ <20200921221045.699690-13-ehabkost@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 00:31:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,44 +96,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, "Daniel P.
+ Berrange" <berrange@redhat.com>, David Hildenbrand <david@redhat.com>,
+ qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, 21 Sep 2020 18:10:33 -0400
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+> Class properties make QOM introspection simpler and easier, as
+> they don't require an object to be instantiated.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: Halil Pasic <pasic@linux.ibm.com>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: qemu-s390x@nongnu.org
+> Cc: qemu-devel@nongnu.org
+> ---
+>  target/s390x/internal.h   |  1 -
+>  target/s390x/cpu.c        |  1 -
+>  target/s390x/cpu_models.c | 35 ++++++++++++++++-------------------
+>  3 files changed, 16 insertions(+), 21 deletions(-)
 
-> On 9/21/20 9:53 PM, Richard Henderson wrote:
->> On 9/21/20 12:29 PM, Alex Benn=C3=A9e wrote:
->>>
->>> Richard Henderson <richard.henderson@linaro.org> writes:
->>>
->>>> Instead of creating GStrings and passing them into log_disas,
->>>> just print the annotations directly in tb_gen_code.
->>>>
->>>> Fix the annotations for the slow paths of the TB, after the
->>>> part implementing the final guest instruction.
->>>>
->>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
->>>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->>>
->>> I guess what we loose in the inline annotation we gain in simpler code.
->>> We can always grep stuff out of the logs if we need to:
->>=20
->> What information do you think we're losing?
->
-> This in tb_gen_code()?
->
->   note =3D g_string_new("[tb header & initial instruction]");
->
->   g_string_printf(note, "[guest addr: " TARGET_FMT_lx "]",
->                   tcg_ctx->gen_insn_data[insn][0]);
+I presume that this patch is supposed to go with the complete series?
+(Have not looked.)
 
-We are not loosing information - just it's placement is slightly
-different. It's nothing you can't work around.
+Acked-by: Cornelia Huck <cohuck@redhat.com>
 
---=20
-Alex Benn=C3=A9e
 
