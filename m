@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D593BC2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:39:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75A9CC2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:39:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 404D1206FB
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:39:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC1EB206FB
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:39:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NBxoP/8q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 404D1206FB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IQsi3VgD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC1EB206FB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKfi5-0005tV-5E
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 06:39:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54424)
+	id 1kKfiF-0006Ht-T2
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 06:39:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kKfaR-0004EI-Fh
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:31:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30791)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kKfaV-0004N7-7V
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:31:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29951)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kKfaP-0006SN-0p
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:31:51 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kKfaS-0006T1-Iu
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:31:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600770708;
+ s=mimecast20190719; t=1600770711;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=c9jkd+9WrIX5vZF1mzci7p5oHp9uENb90pHj8SNwHtM=;
- b=NBxoP/8q1RlawSaQwYLA690FOx41M6ofyG/nqCfRqBF8p7s9rSaKeWGU4CjB6QOKANPznG
- iqB/H5Ed/8PaLGwwJUOyti3AH2w5Fu5msTY4vl86oXnxZJMhNyO+1rukbf1WoYNWb84Ruc
- N0BMO+m+VQTnQdo5mfH05848Q595nUc=
+ bh=woNXgy+g6diIx3edLt4lKkiGEuXFcC6Qn4PHaQTNE9g=;
+ b=IQsi3VgDef5U0gX/1YOtDi9qtD/XlCxXi1hTZ0xbPsysEX0j7y0r1KZEfu9QI3AQekgUNL
+ XWGev6WUtT6wm4Uq1531ae/JpyAgncPBVvUtqcZa/91oocTu0OW1wde8k2KeNBrJYdpGiP
+ lyFcrmA/X0ddQKi12TM9HMyVdMdy9vY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-502-pykDW5GUO7-Y77s81-VbOw-1; Tue, 22 Sep 2020 06:31:46 -0400
-X-MC-Unique: pykDW5GUO7-Y77s81-VbOw-1
+ us-mta-442-hkJENZLJOM6Ut41kAIQmAg-1; Tue, 22 Sep 2020 06:31:49 -0400
+X-MC-Unique: hkJENZLJOM6Ut41kAIQmAg-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 739F110BBECD;
- Tue, 22 Sep 2020 10:31:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3A751005E61;
+ Tue, 22 Sep 2020 10:31:48 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-113-20.ams2.redhat.com [10.36.113.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 192E819C4F;
- Tue, 22 Sep 2020 10:31:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 75B6019C4F;
+ Tue, 22 Sep 2020 10:31:47 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 6/8] s390x/tcg: Implement MULTIPLY SINGLE (MSC, MSGC, MSGRKC,
- MSRKC)
-Date: Tue, 22 Sep 2020 12:31:27 +0200
-Message-Id: <20200922103129.12824-7-david@redhat.com>
+Subject: [PATCH v1 8/8] s390x/tcg: Implement CIPHER MESSAGE WITH
+ AUTHENTICATION (KMA)
+Date: Tue, 22 Sep 2020 12:31:29 +0200
+Message-Id: <20200922103129.12824-9-david@redhat.com>
 In-Reply-To: <20200922103129.12824-1-david@redhat.com>
 References: <20200922103129.12824-1-david@redhat.com>
 MIME-Version: 1.0
@@ -101,184 +101,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We need new CC handling, determining the CC based on the intermediate
-result (64bit for MSC and MSRKC, 128bit for MSGC and MSGRKC).
-
-We want to store out2 ("low") after muls128 to r1, so add
-"wout_out2_r1".
+As with the other crypto functions, we only implement subcode 0 (query)
+and no actual encryption/decryption. We now implement S390_FEAT_MSA_EXT_8.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/cc_helper.c   | 34 ++++++++++++++++++++++++++++++++++
- target/s390x/helper.c      |  2 ++
- target/s390x/insn-data.def |  4 ++++
- target/s390x/internal.h    |  2 ++
- target/s390x/translate.c   | 19 +++++++++++++++++++
- 5 files changed, 61 insertions(+)
+ target/s390x/gen-features.c | 1 +
+ target/s390x/insn-data.def  | 1 +
+ target/s390x/translate.c    | 7 +++++++
+ 3 files changed, 9 insertions(+)
 
-diff --git a/target/s390x/cc_helper.c b/target/s390x/cc_helper.c
-index 44731e4a85..62074648e6 100644
---- a/target/s390x/cc_helper.c
-+++ b/target/s390x/cc_helper.c
-@@ -417,6 +417,35 @@ static uint32_t cc_calc_vc(uint64_t low, uint64_t high)
-     }
- }
+diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+index 1736b85ab0..8de18f7f41 100644
+--- a/target/s390x/gen-features.c
++++ b/target/s390x/gen-features.c
+@@ -717,6 +717,7 @@ static uint16_t qemu_MAX[] = {
+     /* features introduced after the z13 */
+     S390_FEAT_INSTRUCTION_EXEC_PROT,
+     S390_FEAT_MISC_INSTRUCTION_EXT,
++    S390_FEAT_MSA_EXT_8,
+ };
  
-+static uint32_t cc_calc_muls_32(int64_t res)
-+{
-+    /* Arithmetic shift with sign extension so we can compare against -1ull. */
-+    const uint64_t tmp = res >> 31;
-+
-+    if (!res) {
-+        return 0;
-+    } else if (!(!tmp || tmp == -1ull)) {
-+        return 3;
-+    } else if (res < 0) {
-+        return 1;
-+    }
-+    return 2;
-+}
-+
-+static uint64_t cc_calc_muls_64(int64_t res_high, uint64_t res_low)
-+{
-+    const uint8_t tmp = res_low >> 63;
-+
-+    if (!res_high && !res_low) {
-+        return 0;
-+    } else if (!(!res_high && !tmp) || !(res_high == -1ull && tmp)) {
-+        return 3;
-+    } else if (res_high < 0) {
-+        return 1;
-+    }
-+    return 2;
-+}
-+
- static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
-                                   uint64_t src, uint64_t dst, uint64_t vr)
- {
-@@ -484,6 +513,9 @@ static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
-     case CC_OP_COMP_64:
-         r =  cc_calc_comp_64(dst);
-         break;
-+    case CC_OP_MULS_64:
-+        r = cc_calc_muls_64(src, dst);
-+        break;
- 
-     case CC_OP_ADD_32:
-         r =  cc_calc_add_32(src, dst, vr);
-@@ -512,6 +544,8 @@ static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
-     case CC_OP_COMP_32:
-         r =  cc_calc_comp_32(dst);
-         break;
-+    case CC_OP_MULS_32:
-+        r = cc_calc_muls_32(dst);
- 
-     case CC_OP_ICM:
-         r =  cc_calc_icm(src, dst);
-diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-index 9257d388ba..b877690845 100644
---- a/target/s390x/helper.c
-+++ b/target/s390x/helper.c
-@@ -430,6 +430,8 @@ const char *cc_name(enum cc_op cc_op)
-         [CC_OP_FLOGR]     = "CC_OP_FLOGR",
-         [CC_OP_LCBB]      = "CC_OP_LCBB",
-         [CC_OP_VC]        = "CC_OP_VC",
-+        [CC_OP_MULS_32]   = "CC_OP_MULS_32",
-+        [CC_OP_MULS_64]   = "CC_OP_MULS_64",
-     };
- 
-     return cc_names[cc_op];
+ /****** END FEATURE DEFS ******/
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index dfb0ec067b..bcd424e9ae 100644
+index bcd424e9ae..1ffdc20d59 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -679,11 +679,15 @@
-     C(0xe386, MLG,     RXY_a, Z,   r1p1, m2_64, r1_P, 0, mul128, 0)
- /* MULTIPLY SINGLE */
-     C(0xb252, MSR,     RRE,   Z,   r1_o, r2_o, new, r1_32, mul, 0)
-+    C(0xb9fd, MSRKC,   RRF_a, MIE2,r3_32s, r2_32s, new, r1_32, mul, muls32)
-     C(0x7100, MS,      RX_a,  Z,   r1_o, m2_32s, new, r1_32, mul, 0)
-     C(0xe351, MSY,     RXY_a, LD,  r1_o, m2_32s, new, r1_32, mul, 0)
-+    C(0xe353, MSC,     RXY_a, MIE2,r1_32s, m2_32s, new, r1_32, mul, muls32)
-     C(0xb90c, MSGR,    RRE,   Z,   r1_o, r2_o, r1, 0, mul, 0)
-+    C(0xb9ed, MSGRKC,  RRF_a, MIE2,r3_o, r2_o, new_P, out2_r1, muls128, muls64)
-     C(0xb91c, MSGFR,   RRE,   Z,   r1_o, r2_32s, r1, 0, mul, 0)
-     C(0xe30c, MSG,     RXY_a, Z,   r1_o, m2_64, r1, 0, mul, 0)
-+    C(0xe383, MSGC,    RXY_a, MIE2,r1_o, m2_64, new_P, out2_r1, muls128, muls64)
-     C(0xe31c, MSGF,    RXY_a, Z,   r1_o, m2_32s, r1, 0, mul, 0)
- /* MULTIPLY SINGLE IMMEDIATE */
-     C(0xc201, MSFI,    RIL_a, GIE, r1_o, i2, new, r1_32, mul, 0)
-diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-index b1e0ebf67f..c5d32237ea 100644
---- a/target/s390x/internal.h
-+++ b/target/s390x/internal.h
-@@ -175,6 +175,7 @@ enum cc_op {
-     CC_OP_SUBB_64,              /* overflow on unsigned sub-borrow (64bit) */
-     CC_OP_ABS_64,               /* sign eval on abs (64bit) */
-     CC_OP_NABS_64,              /* sign eval on nabs (64bit) */
-+    CC_OP_MULS_64,              /* overflow on signed multiply (64bit) */
- 
-     CC_OP_ADD_32,               /* overflow on add (32bit) */
-     CC_OP_ADDU_32,              /* overflow on unsigned add (32bit) */
-@@ -184,6 +185,7 @@ enum cc_op {
-     CC_OP_SUBB_32,              /* overflow on unsigned sub-borrow (32bit) */
-     CC_OP_ABS_32,               /* sign eval on abs (64bit) */
-     CC_OP_NABS_32,              /* sign eval on nabs (64bit) */
-+    CC_OP_MULS_32,              /* overflow on signed multiply (32bit) */
- 
-     CC_OP_COMP_32,              /* complement */
-     CC_OP_COMP_64,              /* complement */
+@@ -979,6 +979,7 @@
+     D(0xb92d, KMCTR,   RRF_b, MSA4, 0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KMCTR)
+     D(0xb92e, KM,      RRE,   MSA,  0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KM)
+     D(0xb92f, KMC,     RRE,   MSA,  0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KMC)
++    D(0xb929, KMA,     RRF_b, MSA8, 0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KMA)
+     D(0xb93c, PPNO,    RRE,   MSA5, 0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_PPNO)
+     D(0xb93e, KIMD,    RRE,   MSA,  0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KIMD)
+     D(0xb93f, KLMD,    RRE,   MSA,  0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KLMD)
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 383edf7419..c90cb37aae 100644
+index c90cb37aae..df549e59e9 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -646,6 +646,7 @@ static void gen_op_calc_cc(DisasContext *s)
-     case CC_OP_NZ_F64:
-     case CC_OP_FLOGR:
-     case CC_OP_LCBB:
-+    case CC_OP_MULS_32:
-         /* 1 argument */
-         gen_helper_calc_cc(cc_op, cpu_env, local_cc_op, dummy, cc_dst, dummy);
-         break;
-@@ -660,6 +661,7 @@ static void gen_op_calc_cc(DisasContext *s)
-     case CC_OP_SLA_64:
-     case CC_OP_NZ_F128:
-     case CC_OP_VC:
-+    case CC_OP_MULS_64:
-         /* 2 arguments */
-         gen_helper_calc_cc(cc_op, cpu_env, local_cc_op, cc_src, cc_dst, dummy);
-         break;
-@@ -5294,6 +5296,17 @@ static void cout_tm64(DisasContext *s, DisasOps *o)
-     gen_op_update2_cc_i64(s, CC_OP_TM_64, o->in1, o->in2);
- }
+@@ -2715,6 +2715,12 @@ static DisasJumpType op_msa(DisasContext *s, DisasOps *o)
+     TCGv_i32 t_r1, t_r2, t_r3, type;
  
-+static void cout_muls32(DisasContext *s, DisasOps *o)
-+{
-+    gen_op_update1_cc_i64(s, CC_OP_MULS_32, o->out);
-+}
-+
-+static void cout_muls64(DisasContext *s, DisasOps *o)
-+{
-+    /* out contains "high" part, out2 contains "low" part of 128 bit result */
-+    gen_op_update2_cc_i64(s, CC_OP_MULS_64, o->out, o->out2);
-+}
-+
- /* ====================================================================== */
- /* The "PREParation" generators.  These initialize the DisasOps.OUT fields
-    with the TCG register to which we will write.  Used in combination with
-@@ -5349,6 +5362,12 @@ static void wout_r1(DisasContext *s, DisasOps *o)
- }
- #define SPEC_wout_r1 0
- 
-+static void wout_out2_r1(DisasContext *s, DisasOps *o)
-+{
-+    store_reg(get_field(s, r1), o->out2);
-+}
-+#define SPEC_wout_out2_r1 0
-+
- static void wout_r1_8(DisasContext *s, DisasOps *o)
- {
-     int r1 = get_field(s, r1);
+     switch (s->insn->data) {
++    case S390_FEAT_TYPE_KMA:
++        if (r3 == r1 || r3 == r2) {
++            gen_program_exception(s, PGM_SPECIFICATION);
++            return DISAS_NORETURN;
++        }
++        /* FALL THROUGH */
+     case S390_FEAT_TYPE_KMCTR:
+         if (r3 & 1 || !r3) {
+             gen_program_exception(s, PGM_SPECIFICATION);
+@@ -6130,6 +6136,7 @@ enum DisasInsnEnum {
+ #define FAC_MSA3        S390_FEAT_MSA_EXT_3 /* msa-extension-3 facility */
+ #define FAC_MSA4        S390_FEAT_MSA_EXT_4 /* msa-extension-4 facility */
+ #define FAC_MSA5        S390_FEAT_MSA_EXT_5 /* msa-extension-5 facility */
++#define FAC_MSA8        S390_FEAT_MSA_EXT_8 /* msa-extension-8 facility */
+ #define FAC_ECT         S390_FEAT_EXTRACT_CPU_TIME
+ #define FAC_PCI         S390_FEAT_ZPCI /* z/PCI facility */
+ #define FAC_AIS         S390_FEAT_ADAPTER_INT_SUPPRESSION
 -- 
 2.26.2
 
