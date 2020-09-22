@@ -2,112 +2,75 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0493EC4363D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 06:58:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76376C4363D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 06:59:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A72523A1E
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 06:58:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BLL6mPoH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A72523A1E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DB8DA23A1E
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 06:59:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB8DA23A1E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cn.fujitsu.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKcFu-0003ud-4c
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 02:58:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58616)
+	id 1kKcGz-0005MS-II
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 02:59:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58966)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kKcDu-0002fX-CT
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 02:56:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32924)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kKcDp-0003w5-Mp
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 02:56:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600757773;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=fdmGL0X3kZ623XBvGj6grePr2oGnneoqjceqFQ7hFKo=;
- b=BLL6mPoHhwG+NZEGA3eMiMf2V15xS8emNXEN1jHwRuHwoQCJUuiWeNTZKGn/AznxuUANZA
- V9BMSfg0zH95gZP1cgqKjLFD0SPzF0zuIILiJJNutQhU7SE73Otp+D4LugeLVLC2nNMMuu
- blhb3jNtX4sM/y7l453043UBbmV31JI=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-594-5MjuBhREN0mkFF2Bi8wLTg-1; Tue, 22 Sep 2020 02:56:10 -0400
-X-MC-Unique: 5MjuBhREN0mkFF2Bi8wLTg-1
-Received: by mail-wr1-f71.google.com with SMTP id l9so6972594wrq.20
- for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 23:56:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=fdmGL0X3kZ623XBvGj6grePr2oGnneoqjceqFQ7hFKo=;
- b=LqZo5ge10lAvC8wdvLmCoxNw6vu9X1240yO2mjfpvhrtJe5pXUo3k1xt41qiqwA0yN
- hxjRbMx4B9WyohrIL3Gf9bSVw6rzS0RjVL35aDeTE0924O32yZ3w6mSwBpQNNmWQxvYV
- xQXim4gvwYp9icVgsBcBtFGXueDvUP3RwXYuGounOllEM38CNVZp/qbA1IYkPfokBJin
- 4Q6rRH4A1AlxR6ksvbojJ4XPqujkCGRUZQUq8U3/HLwjR4bA46CZAu7DJdvqNxTo7pLn
- reV5UKngQrs7KPnv4vBds4VZGG7M7uQdszz94HKdN0ZkimD9khmdbvifJwHjcshTzQiR
- zjmw==
-X-Gm-Message-State: AOAM532X02mpAw7x9tGUe1e/twSxYMRGA4oHUyss1wwdAex2UT1GKjhh
- W+zRarcX9JiAEEZ5sVbTXxUKODOsdQlYidZa2eQUqxWVdWcDINwhNhGEM1CWs0EL7kjAD3SpmmM
- e7Yufm6Z8aBRn4y4=
-X-Received: by 2002:adf:8187:: with SMTP id 7mr3658825wra.266.1600757769269;
- Mon, 21 Sep 2020 23:56:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyKFFt/QRb04H8kSIfdQ5jqG5B6jsQvAnc25MIGryjLgYDuFqTx9G3VVN2PDZNnPRD+beCn4A==
-X-Received: by 2002:adf:8187:: with SMTP id 7mr3658757wra.266.1600757769000;
- Mon, 21 Sep 2020 23:56:09 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d153:8d0f:94cf:5114?
- ([2001:b07:6468:f312:d153:8d0f:94cf:5114])
- by smtp.gmail.com with ESMTPSA id g131sm3054048wmf.25.2020.09.21.23.56.06
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 21 Sep 2020 23:56:08 -0700 (PDT)
-Subject: Re: [PATCH] qemu/atomic.h: prefix qemu_ to solve <stdatomic.h>
- collisions
-To: David Hildenbrand <david@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-References: <20200921162346.188997-1-stefanha@redhat.com>
- <c8892b73-6cee-9fd3-54b0-289149926041@redhat.com>
- <52b8a46e-ab9e-1645-163d-497122ece907@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8610ca0e-0b3f-6d95-43b9-e2e49571e311@redhat.com>
-Date: Tue, 22 Sep 2020 08:56:06 +0200
+ (Exim 4.90_1) (envelope-from <lizhijian@cn.fujitsu.com>)
+ id 1kKcFY-0003sm-9z
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 02:58:04 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:21916
+ helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <lizhijian@cn.fujitsu.com>) id 1kKcFW-00045O-D3
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 02:58:03 -0400
+X-IronPort-AV: E=Sophos;i="5.77,289,1596470400"; d="scan'208";a="99495446"
+Received: from unknown (HELO cn.fujitsu.com) ([10.167.33.5])
+ by heian.cn.fujitsu.com with ESMTP; 22 Sep 2020 14:57:59 +0800
+Received: from G08CNEXMBPEKD04.g08.fujitsu.local (unknown [10.167.33.201])
+ by cn.fujitsu.com (Postfix) with ESMTP id 2C05548990D3;
+ Tue, 22 Sep 2020 14:57:57 +0800 (CST)
+Received: from [10.167.226.45] (10.167.226.45) by
+ G08CNEXMBPEKD04.g08.fujitsu.local (10.167.33.201) with Microsoft SMTP Server
+ (TLS) id 15.0.1497.2; Tue, 22 Sep 2020 14:57:55 +0800
+Subject: Re: [PATCH 2/3] Reduce the time of checkpoint for COLO
+To: leirao <lei.rao@intel.com>, <chen.zhang@intel.com>, <jasowang@redhat.com>, 
+ <quintela@redhat.com>, <dgilbert@redhat.com>, <pbonzini@redhat.com>
+References: <1600485023-263643-1-git-send-email-lei.rao@intel.com>
+ <1600485023-263643-3-git-send-email-lei.rao@intel.com>
+From: Li Zhijian <lizhijian@cn.fujitsu.com>
+Message-ID: <81e419c4-e844-aa01-c762-175ea547e93e@cn.fujitsu.com>
+Date: Tue, 22 Sep 2020 14:57:55 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <52b8a46e-ab9e-1645-163d-497122ece907@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1600485023-263643-3-git-send-email-lei.rao@intel.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Originating-IP: [10.167.226.45]
+X-ClientProxiedBy: G08CNEXCHPEKD05.g08.fujitsu.local (10.167.33.203) To
+ G08CNEXMBPEKD04.g08.fujitsu.local (10.167.33.201)
+X-yoursite-MailScanner-ID: 2C05548990D3.ABB45
+X-yoursite-MailScanner: Found to be clean
+X-yoursite-MailScanner-From: lizhijian@cn.fujitsu.com
+Received-SPF: none client-ip=183.91.158.132;
+ envelope-from=lizhijian@cn.fujitsu.com; helo=heian.cn.fujitsu.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:14:59
+X-ACL-Warn: Detected OS   = ???
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -120,50 +83,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- sheepdog@lists.wpkg.org, kvm@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Yuval Shaia <yuval.shaia.ml@gmail.com>, Markus Armbruster <armbru@redhat.com>,
- Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Huacai Chen <chenhc@lemote.com>,
- Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- Juan Quintela <quintela@redhat.com>, Jiri Slaby <jslaby@suse.cz>,
- Paul Durrant <paul@xen.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Matthew Rosato <mjrosato@linux.ibm.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>,
- Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, Liu Yuan <namei.unix@gmail.com>, qemu-riscv@nongnu.org,
- Sunil Muthuswamy <sunilmut@microsoft.com>, John Snow <jsnow@redhat.com>,
- Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Cornelia Huck <cohuck@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- Max Reitz <mreitz@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- xen-devel@lists.xenproject.org, Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22/09/20 08:45, David Hildenbrand wrote:
->> It's certainly a good idea but it's quite verbose.
->>
->> What about using atomic__* as the prefix?  It is not very common in QEMU
->> but there are some cases (and I cannot think of anything better).
+
+
+On 9/19/20 11:10 AM, leirao wrote:
+> we should set ram_bulk_stage to false after ram_state_init,
+> otherwise the bitmap will be unused in migration_bitmap_find_dirty.
+> all pages in ram cache will be flushed to the ram of secondary guest
+> for each checkpoint.
 >
-> aqomic_*, lol :)
+> Signed-off-by: leirao <lei.rao@intel.com>
+> ---
+>   migration/ram.c | 12 ++++++++++++
+>   1 file changed, 12 insertions(+)
+>
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 76d4fee..6a2b6c1 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -3019,6 +3019,17 @@ static void decompress_data_with_multi_threads(QEMUFile *f,
+>   }
+>   
+>   /*
+> + * we must set ram_bulk_stage to fasle, otherwise in
+> + * migation_bitmap_find_dirty the bitmap will be unused and
+> + * all the pages in ram cache wil be flushed to the ram of
+> + * secondary VM.
+> + */
+> +static void colo_set_ram_state(RAMState *rsp)
+this function name is too general, how about
 
-Actually qatomic_ would be a good one, wouldn't it?
+colo_init_ram_state(ram_state)
+{
+     ram_state_init(&ram_state);
+     ram_state->ram_bulk_stage = false;
+}
 
-Paolo
+Thanks
+Zhijian
+
+> +{
+> +    rsp->ram_bulk_stage = false;
+> +}
+> +
+> +/*
+>    * colo cache: this is for secondary VM, we cache the whole
+>    * memory of the secondary VM, it is need to hold the global lock
+>    * to call this helper.
+> @@ -3062,6 +3073,7 @@ int colo_init_ram_cache(void)
+>       }
+>   
+>       ram_state_init(&ram_state);
+> +    colo_set_ram_state(ram_state);
+>       return 0;
+>   }
+>   
+
+
 
 
