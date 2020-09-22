@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73955C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:28:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6B7DC2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:28:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5132221E8
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:28:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A468221E8
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:28:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CPVi97Tu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5132221E8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EvOn/CNg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A468221E8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKppZ-0002ku-Fj
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 17:28:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37262)
+	id 1kKpph-00032K-8m
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 17:28:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37336)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpQ4-0002H2-BK
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:01:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60089)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpQ9-0002Rb-7L
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:01:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26139)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpPy-0004Yx-1t
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:01:47 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpQ7-0004dn-66
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:01:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600808488;
+ s=mimecast20190719; t=1600808510;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=YxKa+PBG1Gkw9x/b9aY4+eW6f9wJE00d+CbIL8BiwRM=;
- b=CPVi97Tu6/1URO4qphW12WqUISTnu83oDIclasuVklj/paLNFiKTUirNTyQHC1dXBJC6jW
- TmPs2dYUsnumo9CVWi4LBEdf/u5Bs8B/7O/O60LA38pl92F3ancgPBq375rbmwDTAn+UgY
- 3CmjVE66d42MsgCHRwGtKn7EPKThPeo=
+ bh=p+VT7uJZOGfrmWudoqPbqJmNENOSpifBVctO6t6feII=;
+ b=EvOn/CNgwSbaMXESHC3Zl9UdsDeWtoV3ZFHOR0pO2PSehzeXeLiA2F8IIkVVu6dHYRwZNH
+ Hbd4Yh+j3kioXZJskrn5+994MlsOX/ziz6Tl3dcRmJwIeSUsH6N/mCEscET10W1KE2fbM0
+ 8V0yogmJLzmpQYWtkSae+3rx2j9ToQE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-Qclo0GSpMq2BoN5HyRLiKA-1; Tue, 22 Sep 2020 17:01:24 -0400
-X-MC-Unique: Qclo0GSpMq2BoN5HyRLiKA-1
+ us-mta-292-baOfa6ckPQmceDJdAf7QQg-1; Tue, 22 Sep 2020 17:01:46 -0400
+X-MC-Unique: baOfa6ckPQmceDJdAf7QQg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 792FA1074641;
- Tue, 22 Sep 2020 21:01:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25F8B85C706;
+ Tue, 22 Sep 2020 21:01:45 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 187B85577A;
- Tue, 22 Sep 2020 21:01:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3CD7E55767;
+ Tue, 22 Sep 2020 21:01:44 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>,
 	qemu-devel@nongnu.org
-Subject: [PATCH v2 11/38] qapi/common.py: Replace one-letter 'c' variable
-Date: Tue, 22 Sep 2020 17:00:34 -0400
-Message-Id: <20200922210101.4081073-12-jsnow@redhat.com>
+Subject: [PATCH v2 29/38] qapi/gen.py: delint with pylint
+Date: Tue, 22 Sep 2020 17:00:52 -0400
+Message-Id: <20200922210101.4081073-30-jsnow@redhat.com>
 In-Reply-To: <20200922210101.4081073-1-jsnow@redhat.com>
 References: <20200922210101.4081073-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -103,33 +103,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+'fp' and 'fd' are self-evident in context, add them to the list of OK
+names.
+
+_top and _bottom also need to stay class methods because some users
+override the method and need to use `self`. Tell pylint to shush.
+
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- scripts/qapi/common.py | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ scripts/qapi/gen.py   | 2 ++
+ scripts/qapi/pylintrc | 5 +++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index bddfb5a9e5..682e74fe65 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -30,14 +30,14 @@ def camel_to_upper(value):
-     new_name = ''
-     length = len(c_fun_str)
-     for i in range(length):
--        c = c_fun_str[i]
--        # When c is upper and no '_' appears before, do more checks
--        if c.isupper() and (i > 0) and c_fun_str[i - 1] != '_':
-+        char = c_fun_str[i]
-+        # When char is upper case and no '_' appears before, do more checks
-+        if char.isupper() and (i > 0) and c_fun_str[i - 1] != '_':
-             if i < length - 1 and c_fun_str[i + 1].islower():
-                 new_name += '_'
-             elif c_fun_str[i - 1].isdigit():
-                 new_name += '_'
--        new_name += c
-+        new_name += char
-     return new_name.lstrip('_').upper()
+diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
+index cf340e66d4..ed498397ad 100644
+--- a/scripts/qapi/gen.py
++++ b/scripts/qapi/gen.py
+@@ -50,9 +50,11 @@ def get_content(self) -> str:
+         return self._top() + self._preamble + self._body + self._bottom()
  
+     def _top(self) -> str:
++        # pylint: disable=no-self-use
+         return ''
+ 
+     def _bottom(self) -> str:
++        # pylint: disable=no-self-use
+         return ''
+ 
+     def write(self, output_dir: str) -> None:
+diff --git a/scripts/qapi/pylintrc b/scripts/qapi/pylintrc
+index 7438806096..de132d03cf 100644
+--- a/scripts/qapi/pylintrc
++++ b/scripts/qapi/pylintrc
+@@ -5,7 +5,6 @@
+ ignore-patterns=doc.py,
+                 error.py,
+                 expr.py,
+-                gen.py,
+                 parser.py,
+                 schema.py,
+                 types.py,
+@@ -46,7 +45,9 @@ good-names=i,
+            k,
+            ex,
+            Run,
+-           _
++           _,
++           fp,  # fp = open(...)
++           fd,  # fd = os.open(...)
+ 
+ [VARIABLES]
  
 -- 
 2.26.2
