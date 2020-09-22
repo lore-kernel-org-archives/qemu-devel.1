@@ -7,91 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 222CCC2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:39:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D593BC2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:39:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E4F4206FB
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:39:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 404D1206FB
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:39:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MdclZziA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E4F4206FB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NBxoP/8q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 404D1206FB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKfho-0005FK-Dt
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 06:39:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55798)
+	id 1kKfi5-0005tV-5E
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 06:39:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54424)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kKffb-0002s3-Q9
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:37:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57417)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kKfaR-0004EI-Fh
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:31:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30791)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kKffZ-00074P-24
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:37:11 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kKfaP-0006SN-0p
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:31:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600771028;
+ s=mimecast20190719; t=1600770708;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3H8ADfv5DBFnuBi74rc4l4UGL408Bs2YW9HKb1phSqg=;
- b=MdclZziAg9OJyClAquoVYW9DlV1+9PqHSuSZUWgavM3mYphTqnGIvqQvEByrmFyy6mApjv
- prdmUzvvn8aoo5j2779yU2YVMuHgpKEuGzesYSR/4kqSxY/cjOfrWBFueBzeAIRweeSHzP
- k2gMVjfLvXo/b9JSHelYTPairdGOeuM=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-6Ab2EKp8MkqQkw4oTd7XpQ-1; Tue, 22 Sep 2020 06:37:04 -0400
-X-MC-Unique: 6Ab2EKp8MkqQkw4oTd7XpQ-1
-Received: by mail-ed1-f72.google.com with SMTP id d13so5554072edz.18
- for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 03:37:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
- :message-id:mime-version;
- bh=3H8ADfv5DBFnuBi74rc4l4UGL408Bs2YW9HKb1phSqg=;
- b=OjEuTtktVXJJPSQgTUA3QpQRnUFD237z6sj4cgMhYmB5ZAGaiE7bOlnY2IBQB8ZUSQ
- qSY8o1P8QjWkciHLiZ0O4F5sNgfWU73sWh5nBciiT/T0J3xwqsiPFiLPUaEJxQC/9Z1I
- 7QeB23gEyXgerDck05w/L1bdgQ4UWIVWIoib6MxtPxFFgqNRvdAffFma8SJZ/a0pPVqu
- q8mXx63ZpqYKMtCmaiDx0PsrVdthTP4z4lO8vsL2NRKxwqAK2E9jPdM85Yqom0D34gtP
- OmcSssOr3hNaaolLVh3SRr7snzbVK2QBoj8tWKke656kXVGs/E6MvscKdwIHbvgOanFR
- xjUA==
-X-Gm-Message-State: AOAM5303NckWyg4+74pNRG3dnQJY3CVzDjzDE9a2Rw9HxGdcefMC+/i0
- QmZJRZnuZVAyehyMCvCF7/2K9jfXhwqgdhxoT5nqnpDcyrFHrCmYuLWc1JlZwp6Nj/uOFu9jgic
- sYYp2mGPQyb7gq5E=
-X-Received: by 2002:a05:6402:22fc:: with SMTP id
- dn28mr3065156edb.365.1600771023003; 
- Tue, 22 Sep 2020 03:37:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxM9K+9ivFPI+sHBkYf1JpBQzUfsgmKo61e+50+m+UJ7VMACYUfXuRB+Sxz35J9FZfW96UkoA==
-X-Received: by 2002:a05:6402:22fc:: with SMTP id
- dn28mr3065135edb.365.1600771022731; 
- Tue, 22 Sep 2020 03:37:02 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
- by smtp.gmail.com with ESMTPSA id n26sm10877609ejz.89.2020.09.22.03.37.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 22 Sep 2020 03:37:02 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH RFC 22/22] i386: expand Hyper-V features early
-In-Reply-To: <20200918224721.GL57321@habkost.net>
-References: <20200904145431.196885-1-vkuznets@redhat.com>
- <20200904145431.196885-23-vkuznets@redhat.com>
- <20200918224721.GL57321@habkost.net>
-Date: Tue, 22 Sep 2020 12:37:01 +0200
-Message-ID: <878sd2f67m.fsf@vitty.brq.redhat.com>
+ bh=c9jkd+9WrIX5vZF1mzci7p5oHp9uENb90pHj8SNwHtM=;
+ b=NBxoP/8q1RlawSaQwYLA690FOx41M6ofyG/nqCfRqBF8p7s9rSaKeWGU4CjB6QOKANPznG
+ iqB/H5Ed/8PaLGwwJUOyti3AH2w5Fu5msTY4vl86oXnxZJMhNyO+1rukbf1WoYNWb84Ruc
+ N0BMO+m+VQTnQdo5mfH05848Q595nUc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-502-pykDW5GUO7-Y77s81-VbOw-1; Tue, 22 Sep 2020 06:31:46 -0400
+X-MC-Unique: pykDW5GUO7-Y77s81-VbOw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 739F110BBECD;
+ Tue, 22 Sep 2020 10:31:45 +0000 (UTC)
+Received: from t480s.redhat.com (ovpn-113-20.ams2.redhat.com [10.36.113.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 192E819C4F;
+ Tue, 22 Sep 2020 10:31:43 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1 6/8] s390x/tcg: Implement MULTIPLY SINGLE (MSC, MSGC, MSGRKC,
+ MSRKC)
+Date: Tue, 22 Sep 2020 12:31:27 +0200
+Message-Id: <20200922103129.12824-7-david@redhat.com>
+In-Reply-To: <20200922103129.12824-1-david@redhat.com>
+References: <20200922103129.12824-1-david@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vkuznets@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=vkuznets@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=david@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 00:31:51
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
@@ -112,87 +94,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+We need new CC handling, determining the CC based on the intermediate
+result (64bit for MSC and MSRKC, 128bit for MSGC and MSGRKC).
 
-> On Fri, Sep 04, 2020 at 04:54:31PM +0200, Vitaly Kuznetsov wrote:
->> To make Hyper-V features appear in e.g. QMP query-cpu-model-expansion we
->> need to expand and set the corresponding CPUID leaves early. Modify
->> x86_cpu_get_supported_feature_word() to call newly intoduced Hyper-V
->> specific kvm_hv_get_supported_cpuid() instead of
->> kvm_arch_get_supported_cpuid(). We can't use kvm_arch_get_supported_cpuid()
->> as Hyper-V specific CPUID leaves intersect with KVM's.
->> 
->> Note, early expansion will only happen when KVM supports system wide
->> KVM_GET_SUPPORTED_HV_CPUID ioctl (KVM_CAP_SYS_HYPERV_CPUID).
->> 
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
-> [...]
->> +uint32_t kvm_hv_get_supported_cpuid(X86CPU *cpu, enum FeatureWord w)
->> +{
->> +    CPUState *cs = CPU(cpu);
->> +    CPUX86State *env = &cpu->env;
->> +    Error *local_err = NULL;
->> +
->> +    hyperv_expand_features(cs, &local_err);
->
-> This makes a function that sounds like it doesn't have any side
-> effect ("get supported cpuid") have an unintended side effect
-> (hyperv_expand_features() will change all CPUID data inside the
-> cpu object).
->
-> What about making it more similar to
-> kvm_arch_get_supported_cpuid(), and be just a wrapper to
-> get_supported_hv_cpuid()?
->
-> I would also make sure get_supported_hv_cpuid() doesn't get
-> CPUState as argument, just to be sure it will never touch the CPU
-> object state.
+We want to store out2 ("low") after muls128 to r1, so add
+"wout_out2_r1".
 
-Sure, I can try. The difference with get_supported_cpuid() is that
-get_supported_hv_cpuid() currently doesn't have cache and we don't
-probably want to call KVM_GET_SUPPORTED_HV_CPUID ioctl for every CPUID
-leaf. I don't see why it can't be introduced though.
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/cc_helper.c   | 34 ++++++++++++++++++++++++++++++++++
+ target/s390x/helper.c      |  2 ++
+ target/s390x/insn-data.def |  4 ++++
+ target/s390x/internal.h    |  2 ++
+ target/s390x/translate.c   | 19 +++++++++++++++++++
+ 5 files changed, 61 insertions(+)
 
->
->> +
->> +    if (local_err) {
->> +            error_report_err(local_err);
->> +    }
->> +
->> +    return env->features[w];
->> +}
->> +
->>  static Error *hv_passthrough_mig_blocker;
->>  static Error *hv_no_nonarch_cs_mig_blocker;
->>  
->> diff --git a/target/i386/kvm_i386.h b/target/i386/kvm_i386.h
->> index 064b8798a26c..2e7da4f39668 100644
->> --- a/target/i386/kvm_i386.h
->> +++ b/target/i386/kvm_i386.h
->> @@ -48,4 +48,11 @@ bool kvm_has_waitpkg(void);
->>  
->>  bool kvm_hv_vpindex_settable(void);
->>  
->> +static inline bool hyperv_feature_word(enum FeatureWord w)
->> +{
->> +    return w >= FEAT_HYPERV_EAX && w <= FEAT_HV_NESTED_EDX;
->> +}
->> +
->> +uint32_t kvm_hv_get_supported_cpuid(X86CPU *cpu, enum FeatureWord w);
->> +
->>  #endif
->> -- 
->> 2.25.4
->> 
-
+diff --git a/target/s390x/cc_helper.c b/target/s390x/cc_helper.c
+index 44731e4a85..62074648e6 100644
+--- a/target/s390x/cc_helper.c
++++ b/target/s390x/cc_helper.c
+@@ -417,6 +417,35 @@ static uint32_t cc_calc_vc(uint64_t low, uint64_t high)
+     }
+ }
+ 
++static uint32_t cc_calc_muls_32(int64_t res)
++{
++    /* Arithmetic shift with sign extension so we can compare against -1ull. */
++    const uint64_t tmp = res >> 31;
++
++    if (!res) {
++        return 0;
++    } else if (!(!tmp || tmp == -1ull)) {
++        return 3;
++    } else if (res < 0) {
++        return 1;
++    }
++    return 2;
++}
++
++static uint64_t cc_calc_muls_64(int64_t res_high, uint64_t res_low)
++{
++    const uint8_t tmp = res_low >> 63;
++
++    if (!res_high && !res_low) {
++        return 0;
++    } else if (!(!res_high && !tmp) || !(res_high == -1ull && tmp)) {
++        return 3;
++    } else if (res_high < 0) {
++        return 1;
++    }
++    return 2;
++}
++
+ static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
+                                   uint64_t src, uint64_t dst, uint64_t vr)
+ {
+@@ -484,6 +513,9 @@ static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
+     case CC_OP_COMP_64:
+         r =  cc_calc_comp_64(dst);
+         break;
++    case CC_OP_MULS_64:
++        r = cc_calc_muls_64(src, dst);
++        break;
+ 
+     case CC_OP_ADD_32:
+         r =  cc_calc_add_32(src, dst, vr);
+@@ -512,6 +544,8 @@ static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
+     case CC_OP_COMP_32:
+         r =  cc_calc_comp_32(dst);
+         break;
++    case CC_OP_MULS_32:
++        r = cc_calc_muls_32(dst);
+ 
+     case CC_OP_ICM:
+         r =  cc_calc_icm(src, dst);
+diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+index 9257d388ba..b877690845 100644
+--- a/target/s390x/helper.c
++++ b/target/s390x/helper.c
+@@ -430,6 +430,8 @@ const char *cc_name(enum cc_op cc_op)
+         [CC_OP_FLOGR]     = "CC_OP_FLOGR",
+         [CC_OP_LCBB]      = "CC_OP_LCBB",
+         [CC_OP_VC]        = "CC_OP_VC",
++        [CC_OP_MULS_32]   = "CC_OP_MULS_32",
++        [CC_OP_MULS_64]   = "CC_OP_MULS_64",
+     };
+ 
+     return cc_names[cc_op];
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index dfb0ec067b..bcd424e9ae 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -679,11 +679,15 @@
+     C(0xe386, MLG,     RXY_a, Z,   r1p1, m2_64, r1_P, 0, mul128, 0)
+ /* MULTIPLY SINGLE */
+     C(0xb252, MSR,     RRE,   Z,   r1_o, r2_o, new, r1_32, mul, 0)
++    C(0xb9fd, MSRKC,   RRF_a, MIE2,r3_32s, r2_32s, new, r1_32, mul, muls32)
+     C(0x7100, MS,      RX_a,  Z,   r1_o, m2_32s, new, r1_32, mul, 0)
+     C(0xe351, MSY,     RXY_a, LD,  r1_o, m2_32s, new, r1_32, mul, 0)
++    C(0xe353, MSC,     RXY_a, MIE2,r1_32s, m2_32s, new, r1_32, mul, muls32)
+     C(0xb90c, MSGR,    RRE,   Z,   r1_o, r2_o, r1, 0, mul, 0)
++    C(0xb9ed, MSGRKC,  RRF_a, MIE2,r3_o, r2_o, new_P, out2_r1, muls128, muls64)
+     C(0xb91c, MSGFR,   RRE,   Z,   r1_o, r2_32s, r1, 0, mul, 0)
+     C(0xe30c, MSG,     RXY_a, Z,   r1_o, m2_64, r1, 0, mul, 0)
++    C(0xe383, MSGC,    RXY_a, MIE2,r1_o, m2_64, new_P, out2_r1, muls128, muls64)
+     C(0xe31c, MSGF,    RXY_a, Z,   r1_o, m2_32s, r1, 0, mul, 0)
+ /* MULTIPLY SINGLE IMMEDIATE */
+     C(0xc201, MSFI,    RIL_a, GIE, r1_o, i2, new, r1_32, mul, 0)
+diff --git a/target/s390x/internal.h b/target/s390x/internal.h
+index b1e0ebf67f..c5d32237ea 100644
+--- a/target/s390x/internal.h
++++ b/target/s390x/internal.h
+@@ -175,6 +175,7 @@ enum cc_op {
+     CC_OP_SUBB_64,              /* overflow on unsigned sub-borrow (64bit) */
+     CC_OP_ABS_64,               /* sign eval on abs (64bit) */
+     CC_OP_NABS_64,              /* sign eval on nabs (64bit) */
++    CC_OP_MULS_64,              /* overflow on signed multiply (64bit) */
+ 
+     CC_OP_ADD_32,               /* overflow on add (32bit) */
+     CC_OP_ADDU_32,              /* overflow on unsigned add (32bit) */
+@@ -184,6 +185,7 @@ enum cc_op {
+     CC_OP_SUBB_32,              /* overflow on unsigned sub-borrow (32bit) */
+     CC_OP_ABS_32,               /* sign eval on abs (64bit) */
+     CC_OP_NABS_32,              /* sign eval on nabs (64bit) */
++    CC_OP_MULS_32,              /* overflow on signed multiply (32bit) */
+ 
+     CC_OP_COMP_32,              /* complement */
+     CC_OP_COMP_64,              /* complement */
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 383edf7419..c90cb37aae 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -646,6 +646,7 @@ static void gen_op_calc_cc(DisasContext *s)
+     case CC_OP_NZ_F64:
+     case CC_OP_FLOGR:
+     case CC_OP_LCBB:
++    case CC_OP_MULS_32:
+         /* 1 argument */
+         gen_helper_calc_cc(cc_op, cpu_env, local_cc_op, dummy, cc_dst, dummy);
+         break;
+@@ -660,6 +661,7 @@ static void gen_op_calc_cc(DisasContext *s)
+     case CC_OP_SLA_64:
+     case CC_OP_NZ_F128:
+     case CC_OP_VC:
++    case CC_OP_MULS_64:
+         /* 2 arguments */
+         gen_helper_calc_cc(cc_op, cpu_env, local_cc_op, cc_src, cc_dst, dummy);
+         break;
+@@ -5294,6 +5296,17 @@ static void cout_tm64(DisasContext *s, DisasOps *o)
+     gen_op_update2_cc_i64(s, CC_OP_TM_64, o->in1, o->in2);
+ }
+ 
++static void cout_muls32(DisasContext *s, DisasOps *o)
++{
++    gen_op_update1_cc_i64(s, CC_OP_MULS_32, o->out);
++}
++
++static void cout_muls64(DisasContext *s, DisasOps *o)
++{
++    /* out contains "high" part, out2 contains "low" part of 128 bit result */
++    gen_op_update2_cc_i64(s, CC_OP_MULS_64, o->out, o->out2);
++}
++
+ /* ====================================================================== */
+ /* The "PREParation" generators.  These initialize the DisasOps.OUT fields
+    with the TCG register to which we will write.  Used in combination with
+@@ -5349,6 +5362,12 @@ static void wout_r1(DisasContext *s, DisasOps *o)
+ }
+ #define SPEC_wout_r1 0
+ 
++static void wout_out2_r1(DisasContext *s, DisasOps *o)
++{
++    store_reg(get_field(s, r1), o->out2);
++}
++#define SPEC_wout_out2_r1 0
++
+ static void wout_r1_8(DisasContext *s, DisasOps *o)
+ {
+     int r1 = get_field(s, r1);
 -- 
-Vitaly
+2.26.2
 
 
