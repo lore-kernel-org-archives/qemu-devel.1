@@ -2,91 +2,61 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2067BC2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 07:35:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B778CC4727D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 07:37:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76ECC238D7
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 07:35:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OPNeyAAQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76ECC238D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3CAA92395B
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 07:37:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CAA92395B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=scieneer.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKcqD-00074r-Et
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 03:35:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39238)
+	id 1kKcs1-00088u-5x
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 03:37:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39614)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kKcpJ-0006YF-62
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 03:35:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36267)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kKcpH-0000G2-I5
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 03:35:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600760098;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=XdHOSsdJBdCfhEV5R54DGmv+pkaBorJXVfsaYd2e+2Q=;
- b=OPNeyAAQx5+ttevvk+EV4NvITd++t3mpCE2U6NyH8z00HLFPBAH6bpKNR31P8bmErkKgf/
- OQcliSIcoTJ8fUxw3bbeTzQ+DYDN7zcUchWaxmsr9ZLRG0ztE8fRBWICYjk8LYpCgf4Quh
- TmnEciIjty4LaBf6pXJh74bbv9rWO0E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-450-DOFuFLtBPL2Fe8FexJPvwQ-1; Tue, 22 Sep 2020 03:34:56 -0400
-X-MC-Unique: DOFuFLtBPL2Fe8FexJPvwQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A3D5C186DD23;
- Tue, 22 Sep 2020 07:34:55 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-112-3.ams2.redhat.com
- [10.36.112.3])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 45B7B5DA30;
- Tue, 22 Sep 2020 07:34:51 +0000 (UTC)
-Subject: Re: [PATCH 2/2] add maximum combined fw size as machine configuration
- option
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Erich Mcmillan <erich.mcmillan@hp.com>, dgilbert@redhat.com, mst@redhat.com,
- marcel.apfelbaum@gmail.com, imammedo@redhat.com
-References: <20200918042339.3477-1-erich.mcmillan@hp.com>
- <c5961bff-811b-2895-a96e-867a4c160ddd@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <1951c176-4c62-d60e-fcb0-064601759669@redhat.com>
-Date: Tue, 22 Sep 2020 09:34:50 +0200
+ (Exim 4.90_1) (envelope-from <dtc-ubuntu@scieneer.com>)
+ id 1kKcrB-0007h0-WE
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 03:36:58 -0400
+Received: from gw1.scieneer.com ([2001:470:5:c1c::1]:37992)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dtc-ubuntu@scieneer.com>)
+ id 1kKcr9-0000Xn-Dw
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 03:36:57 -0400
+Received: from dtc-pc.scieneer.com (dtc-pc.scieneer.com [192.168.2.100])
+ by gw1.scieneer.com (8.14.7/8.14.7) with ESMTP id 08M7alW6010978
+ (version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
+ Tue, 22 Sep 2020 17:36:50 +1000
+To: qemu-devel@nongnu.org
+From: Douglas Crosher <dtc-ubuntu@scieneer.com>
+Subject: [PATCH] linux user i386 fork: clone the GDT for each thread to,
+ separate TLS
+Message-ID: <74c9f1d9-4497-31c2-34a7-e21bef7932bd@scieneer.com>
+Date: Tue, 22 Sep 2020 17:36:47 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <c5961bff-811b-2895-a96e-867a4c160ddd@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=lersek@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2001:470:5:c1c::1;
+ envelope-from=dtc-ubuntu@scieneer.com; helo=gw1.scieneer.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,23 +69,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/18/20 10:17, Philippe Mathieu-Daudé wrote:
+The Linux kernel i386 maintains three GDT entries for TLS, and these
+are the same three indexes for all threads. The kernel swaps the GDT
+entries at these indexes before running each thread so each thread can
+have separate TLS.
 
-> I'm very confused by pc_system_flash_map()... Why not check
-> that no pflash exceeds 8MiB? Then 2 combined would be always
-> <16MiB.
+Current qemu linux user i386 implements a single GDT per process so
+shared by all threads. While it does cache the GDT entries per thread
+this cache can need to be reloaded from the GDT entry. Other threads
+are likely to have overwritten the GDT entry and so the thread TLS
+can become inconsistent.
 
-The requirement (limit) is on the total address range that is occupied
-by the flash chips that are mapped in sequence. There is no size limit
-that applies to an individual chip. It's also not required that chips
-have the same size (or be limited by the same individual size).
+For example, the segment registers are reloaded on a signal return
+path, so threaded coding returning from signals breaks.
 
-Thanks
-Laszlo
+This patch clones the GDT for each thread, to separate the TLS
+entries. It mmaps space from the target for this, just as the initial
+GDT is currently allocated. This memory is unmapped on thread exit.
+
+The Linux x86_64 kernel offers a different strategy for TLS, so this
+patch is limited to Linux user i386.
+
+If there were some code relying on a global GDT then this patch might 
+break that and a correct fix might be more involved and might need to 
+add separate per-thread GDT state for just the TLS entries and for just 
+Linux user. Would anyone be aware of such uses?
+
+Signed-off-by: Douglas Crosher <dtc-ubuntu@scieneer.com>
+---
+  linux-user/syscall.c | 15 +++++++++++++++
+  1 file changed, 15 insertions(+)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 55ac5c3208..099e4f875a 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -6424,6 +6424,15 @@ static int do_fork(CPUArchState *env, unsigned 
+int flags, abi_ulong newsp,
+              ts->child_tidptr = child_tidptr;
+          }
+
++#if defined(TARGET_I386) && defined(TARGET_ABI32)
++        new_env->gdt.base = target_mmap(0, sizeof(uint64_t) * 
+TARGET_GDT_ENTRIES,
++                                        PROT_READ|PROT_WRITE,
++                                        MAP_ANONYMOUS|MAP_PRIVATE, -1, 0);
++        new_env->gdt.limit = sizeof(uint64_t) * TARGET_GDT_ENTRIES - 1;
++        memcpy(g2h(new_env->gdt.base), g2h(env->gdt.base),
++               sizeof(uint64_t) * TARGET_GDT_ENTRIES);
++#endif
++
+          if (flags & CLONE_SETTLS) {
+              cpu_set_tls (new_env, newtls);
+          }
+@@ -8193,6 +8202,12 @@ static abi_long do_syscall1(void *cpu_env, int 
+num, abi_long arg1,
+          if (CPU_NEXT(first_cpu)) {
+              TaskState *ts = cpu->opaque;
+
++#if defined(TARGET_I386) && defined(TARGET_ABI32)
++            CPUX86State *env = cpu_env;
++            target_munmap(env->gdt.base, sizeof(uint64_t) * 
+TARGET_GDT_ENTRIES);
++            env->gdt.base = 0;
++#endif
++
+              object_property_set_bool(OBJECT(cpu), "realized", false, 
+NULL);
+              object_unref(OBJECT(cpu));
+              /*
+-- 
+2.25.4
 
 
