@@ -2,121 +2,95 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A6C6C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:24:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA1ABC2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:24:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 693FD2395C
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:24:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 211502395C
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 10:24:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NjUoSbUG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 693FD2395C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d+vUjUYa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 211502395C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKfTH-0007xZ-5p
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 06:24:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51856)
+	id 1kKfTU-0008Jj-6l
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 06:24:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51936)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kKfSU-0007Js-7X
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:23:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51021)
+ (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
+ id 1kKfSf-0007UW-T8
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:23:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42625)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kKfSS-00054m-Iz
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:23:37 -0400
+ (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
+ id 1kKfSc-00055U-IT
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 06:23:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600770215;
+ s=mimecast20190719; t=1600770225;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=NBaFfHAUhTdvgrpirg82c54WHYzYiWaCGBwkVdXpYyI=;
- b=NjUoSbUGZNe/+2CNR56zWk8mZjTyUHm+6z7ZSKemMe9jPKo25+rzsyWtDujYKTMvIzs5bN
- uoFEunij5ELnE9q3e5uZbYWj2Z6qIZ95ugK69j32hu/5w0v6Xs7b2IYGAbx+94CrktkubQ
- OYIqiXceQ7W0lqs0+YcFwfP2eg5yUGo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-47-XSG0hHlQP0Wj07Rqr4DanQ-1; Tue, 22 Sep 2020 06:23:34 -0400
-X-MC-Unique: XSG0hHlQP0Wj07Rqr4DanQ-1
-Received: by mail-wr1-f70.google.com with SMTP id r16so7184980wrm.18
- for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 03:23:33 -0700 (PDT)
+ in-reply-to:in-reply-to:references:references;
+ bh=Ua9NWhLhqHHrxEpmDckfJjcCngvUwGYs9BEm2jZrXcM=;
+ b=d+vUjUYaMY97XLCDnTDLUoIWZ5HLeElb7gLx9ZxbVNXZ9CQlQotos9QVzHxCoriVDWqZkQ
+ pDZ7CpHjWoSPsE8AX2KjeXTejcaRAPSBwSeXHFQ6K2mbXo4Dkj843PiqQJtAy2Y45HKX/i
+ YOC9IAvaRmI5KHwuyH5nHJWca3cJHBo=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-485-97YgrjC0OsyRVOG2SewOHw-1; Tue, 22 Sep 2020 06:23:43 -0400
+X-MC-Unique: 97YgrjC0OsyRVOG2SewOHw-1
+Received: by mail-ed1-f69.google.com with SMTP id b12so5608024edw.15
+ for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 03:23:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=NBaFfHAUhTdvgrpirg82c54WHYzYiWaCGBwkVdXpYyI=;
- b=S/KyjYuNPvmlN2uU3UMPb41xthdsnkyz8oaIZkOP6UDtKlYnEYhCK6zARUX/FSxm9c
- FyRwm8HFDOZiRXTBmZBh7TX5I9InxF9PAJXiFEmOVWQNFKLqCVmBUpzlmdTF06gEPq75
- PAbu2jmaKTti0I2vUWzdeKRXhPu6oJsSlU8FcMCQofBD8bTvG+oC+65qoh3H4QR2aZrM
- EqSeLxGRvNk5HqotCv/W5MQ+9MDzw8TtynMlkVzI6A1aXNNLY61XcMdRaTH09/yBbS+i
- k00Bgle1GdOwJ2JSYsTK1ew/WjgXYUZJTjKumx7i1e5nQdSQpvRai9dre67tVOO5sMMr
- rzog==
-X-Gm-Message-State: AOAM530+BT1xGGzPAswysfm1/A9V5TsvVJmxh6p4seGMoT/WN2z9nFr6
- 7Ch80Vt17OaK463zbRJ4airspIbseSblChcnqWLA+NEQaGYletVic8yHokNS6cRAG7ihWqveyQ7
- vteU6rW+BmQOURsc=
-X-Received: by 2002:a5d:6a42:: with SMTP id t2mr4369442wrw.425.1600770212707; 
- Tue, 22 Sep 2020 03:23:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxnwM5j8cd6wl9yxWfl5EEUyoDfPQ4nCReAusl0+Wj+oDytOm2j3WxkcTHZ9IvaGa73CD3A5g==
-X-Received: by 2002:a5d:6a42:: with SMTP id t2mr4369428wrw.425.1600770212498; 
- Tue, 22 Sep 2020 03:23:32 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id t1sm3705292wmi.16.2020.09.22.03.23.31
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 22 Sep 2020 03:23:31 -0700 (PDT)
-Subject: Re: [PATCH v2 1/3] target-i386: seperate MCIP & MCE_MASK error reason
-To: zhenwei pi <pizhenwei@bytedance.com>, pbonzini@redhat.com,
- peter.maydell@linaro.org
-References: <20200922095630.394893-1-pizhenwei@bytedance.com>
- <20200922095630.394893-2-pizhenwei@bytedance.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <dd556664-4419-28d6-e975-6e67724e9c2c@redhat.com>
-Date: Tue, 22 Sep 2020 12:23:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+ :message-id:mime-version;
+ bh=Ua9NWhLhqHHrxEpmDckfJjcCngvUwGYs9BEm2jZrXcM=;
+ b=l9X2sQjX9ccy8g72e3Yje7V7lfCzWpLZVuzH1Uc4vujO9KhiL2dX5ZsEjLwC/6Mws/
+ S6lXFIq7gHO9xEQ6nTwABIJqkqPdg+cn+2BMd7wxvFVkED9cfo+O647NU//udnOUTToa
+ bSFGvZXuZRulLg7+h4qa0u9Mx/cbe1z8l4ykkihWIh3iWCwTrgjDGMLtydsVbHxcYZyd
+ e5HOcjZHnZdWLvChRYcMpwAKc0MUSJeT9rn1k4syA5KH4AFVNwWBTm3GFWXg6v7aNuTz
+ wgD8GF6xxzSq0/JPIoFPB9puIPfqa2maNPN8GsVEdrJdFnU/2oSd+NlzMnOkTiYJxp+x
+ ZMXA==
+X-Gm-Message-State: AOAM531jzllDFTxSzpACHUwFi//pXiiyLli79dpHANvX2kGHZvQcwKxh
+ Y4sA6MxX8zd7KnXXV+TpmS781VpnLBPseLa2v8qQRq5slRiZRZz62eoqEXcLP80mMg+nUev8DjO
+ /+e3WlqJme1loIuY=
+X-Received: by 2002:a17:906:2747:: with SMTP id
+ a7mr3997479ejd.301.1600770222477; 
+ Tue, 22 Sep 2020 03:23:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw+NXTdXAUyrN1tC5GCqEMI7HN6X5HogeipE5JWjvC3lG3s83Q7Ih2luC/hjOKFZ7nf+cJwsw==
+X-Received: by 2002:a17:906:2747:: with SMTP id
+ a7mr3997460ejd.301.1600770222226; 
+ Tue, 22 Sep 2020 03:23:42 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+ by smtp.gmail.com with ESMTPSA id lo25sm10903698ejb.53.2020.09.22.03.23.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 22 Sep 2020 03:23:41 -0700 (PDT)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH RFC 03/22] i386: move hyperv_vendor_id initialization to
+ x86_cpu_realizefn()
+In-Reply-To: <20200918221454.GC57321@habkost.net>
+References: <20200904145431.196885-1-vkuznets@redhat.com>
+ <20200904145431.196885-4-vkuznets@redhat.com>
+ <20200918221454.GC57321@habkost.net>
+Date: Tue, 22 Sep 2020 12:23:40 +0200
+Message-ID: <87k0wmf6tv.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200922095630.394893-2-pizhenwei@bytedance.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vkuznets@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=vkuznets@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 00:31:51
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -125,9 +99,8 @@ X-Spam_score: -3.6
 X-Spam_bar: ---
 X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -140,71 +113,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mtosatti@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/22/20 11:56 AM, zhenwei pi wrote:
-> Previously we can only get a simple string "Triple fault" in qemu
-> log. Add detailed message for the two reasons to describe why qemu
-> has to reset the guest.
-> 
-> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
-> ---
->  target/i386/helper.c | 25 ++++++++++++++++++-------
->  1 file changed, 18 insertions(+), 7 deletions(-)
-> 
-> diff --git a/target/i386/helper.c b/target/i386/helper.c
-> index 70be53e2c3..0c7fd32491 100644
-> --- a/target/i386/helper.c
-> +++ b/target/i386/helper.c
-> @@ -857,6 +857,8 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
->      X86CPU *cpu = X86_CPU(cs);
->      CPUX86State *cenv = &cpu->env;
->      uint64_t *banks = cenv->mce_banks + 4 * params->bank;
-> +    char msg[64];
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-The preferred for is now to use 'g_autofree char *msg = NULL'
-here and g_strdup_printf() instead of snprintf().
+> On Fri, Sep 04, 2020 at 04:54:12PM +0200, Vitaly Kuznetsov wrote:
+>> As a preparation to expanding Hyper-V CPU features early, move
+>> hyperv_vendor_id initialization to x86_cpu_realizefn().
+>> 
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>  target/i386/cpu.c | 15 ++++++++++++++-
+>>  target/i386/cpu.h |  3 ++-
+>>  target/i386/kvm.c | 25 ++++++++++---------------
+>>  3 files changed, 26 insertions(+), 17 deletions(-)
+>> 
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index 14489def2177..07e9da9e567e 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -6625,6 +6625,19 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+>>          }
+>>      }
+>>  
+>> +    if (!cpu->hyperv_vendor) {
+>> +        memcpy(cpu->hyperv_vendor_id, "Microsoft Hv", 12);
+>> +    } else {
+>> +        size_t len = strlen(cpu->hyperv_vendor);
+>> +
+>> +        if (len > 12) {
+>> +            warn_report("hv-vendor-id truncated to 12 characters");
+>> +            len = 12;
+>> +        }
+>> +        memset(cpu->hyperv_vendor_id, 0, 12);
+>> +        memcpy(cpu->hyperv_vendor_id, cpu->hyperv_vendor, len);
+>> +    }
+>> +
+>
+> The change makes sense, but considering that we'll have a lot of
+> new code added to x86_cpu_realizefn(), I would prefer to create a
+> separate x86_cpu_hyperv_realize() function to make
+> x86_cpu_realizefn() a bit more readable.
+>
 
-> +    bool need_reset = false;
->  
->      cpu_synchronize_state(cs);
->  
-> @@ -894,16 +896,25 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
->              return;
->          }
->  
-> -        if ((cenv->mcg_status & MCG_STATUS_MCIP) ||
-> -            !(cenv->cr[4] & CR4_MCE_MASK)) {
-> -            monitor_printf(params->mon,
-> -                           "CPU %d: Previous MCE still in progress, raising"
-> -                           " triple fault\n",
-> -                           cs->cpu_index);
-> -            qemu_log_mask(CPU_LOG_RESET, "Triple fault\n");
-> +        if (cenv->mcg_status & MCG_STATUS_MCIP) {
-> +            need_reset = true;
-> +            snprintf(msg, sizeof(msg), "CPU %d: Previous MCE still in progress,"
-> +                     " raising triple fault", cs->cpu_index);
-> +        }
-> +
-> +        if (!(cenv->cr[4] & CR4_MCE_MASK)) {
-> +            need_reset = true;
-> +            snprintf(msg, sizeof(msg), "CPU %d: MCE capability is not enabled,"
-> +                     " raising triple fault", cs->cpu_index);
-> +        }
-> +
-> +        if (need_reset) {
-> +            monitor_printf(params->mon, "%s", msg);
-> +            qemu_log_mask(CPU_LOG_RESET, "%s\n", msg);
->              qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
->              return;
->          }
-> +
->          if (banks[1] & MCI_STATUS_VAL) {
->              params->status |= MCI_STATUS_OVER;
->          }
-> 
+Agreed.
+
+>
+>>      if (cpu->ucode_rev == 0) {
+>>          /* The default is the same as KVM's.  */
+>>          if (IS_AMD_CPU(env)) {
+>> @@ -7313,7 +7326,7 @@ static Property x86_cpu_properties[] = {
+>>      DEFINE_PROP_UINT32("min-xlevel2", X86CPU, env.cpuid_min_xlevel2, 0),
+>>      DEFINE_PROP_UINT64("ucode-rev", X86CPU, ucode_rev, 0),
+>>      DEFINE_PROP_BOOL("full-cpuid-auto-level", X86CPU, full_cpuid_auto_level, true),
+>> -    DEFINE_PROP_STRING("hv-vendor-id", X86CPU, hyperv_vendor_id),
+>> +    DEFINE_PROP_STRING("hv-vendor-id", X86CPU, hyperv_vendor),
+>>      DEFINE_PROP_BOOL("cpuid-0xb", X86CPU, enable_cpuid_0xb, true),
+>>      DEFINE_PROP_BOOL("lmce", X86CPU, enable_lmce, false),
+>>      DEFINE_PROP_BOOL("l3-cache", X86CPU, enable_l3_cache, true),
+>> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+>> index d3097be6a50a..903994818093 100644
+>> --- a/target/i386/cpu.h
+>> +++ b/target/i386/cpu.h
+>> @@ -1654,11 +1654,12 @@ struct X86CPU {
+>>      uint64_t ucode_rev;
+>>  
+>>      uint32_t hyperv_spinlock_attempts;
+>> -    char *hyperv_vendor_id;
+>> +    char *hyperv_vendor;
+>>      bool hyperv_synic_kvm_only;
+>>      uint64_t hyperv_features;
+>>      bool hyperv_passthrough;
+>>      OnOffAuto hyperv_no_nonarch_cs;
+>> +    uint32_t hyperv_vendor_id[3];
+>>  
+>>      bool check_cpuid;
+>>      bool enforce_cpuid;
+>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+>> index 205b68bc0ce8..47779c5e1efd 100644
+>> --- a/target/i386/kvm.c
+>> +++ b/target/i386/kvm.c
+>> @@ -1225,6 +1225,13 @@ static int hyperv_handle_properties(CPUState *cs,
+>>          memcpy(cpuid_ent, &cpuid->entries[0],
+>>                 cpuid->nent * sizeof(cpuid->entries[0]));
+>>  
+>> +        c = cpuid_find_entry(cpuid, HV_CPUID_VENDOR_AND_MAX_FUNCTIONS, 0);
+>> +        if (c) {
+>> +            cpu->hyperv_vendor_id[0] = c->ebx;
+>> +            cpu->hyperv_vendor_id[1] = c->ecx;
+>> +            cpu->hyperv_vendor_id[2] = c->edx;
+>> +        }
+>> +
+>
+> I can't find the equivalent of this code in the current tree?  Is
+> hyperv vendor ID broken when using hv-passthrough today?
+>
+> Maybe this could be done as a separate patch, as it changes
+> behavior of hv-passthrough?
+
+(this and similar changes in other patches) Actually we don't change
+anything. Before this series and with hv-passthrough we just don't
+reflect host's CPUIDs in our internal QEMU structures so
+e.g. X86CPU->hyperv_vendor remains 'Microsoft Hv' while in reality
+guest sees what kernel told us ("Linux KVM Hv" BTW). We just copy
+everything we get from KVM_GET_SUPPORTED_HV_CPUID into guest's CPUIDs.
+This is fine as we didn't actually need the information in QEMU but
+to achieve the goal of the series we need to keep proper in-QEMU
+representation.
+
+The real change is that post-series QEMU is not enabling any Hyper-V
+features which it doesn't know about while pre-series it was actually
+doing this. This is arguably a good change: enabling new features may
+require some additional work (e.g. enabling capabilities in KVM) and
+without it just passing CPUID feature bits the guest may get confused.
+
+>
+>>          c = cpuid_find_entry(cpuid, HV_CPUID_FEATURES, 0);
+>>          if (c) {
+>>              env->features[FEAT_HYPERV_EAX] = c->eax;
+>> @@ -1299,23 +1306,11 @@ static int hyperv_handle_properties(CPUState *cs,
+>>  
+>>      c = &cpuid_ent[cpuid_i++];
+>>      c->function = HV_CPUID_VENDOR_AND_MAX_FUNCTIONS;
+>> -    if (!cpu->hyperv_vendor_id) {
+>> -        memcpy(signature, "Microsoft Hv", 12);
+>> -    } else {
+>> -        size_t len = strlen(cpu->hyperv_vendor_id);
+>> -
+>> -        if (len > 12) {
+>> -            error_report("hv-vendor-id truncated to 12 characters");
+>> -            len = 12;
+>> -        }
+>> -        memset(signature, 0, 12);
+>> -        memcpy(signature, cpu->hyperv_vendor_id, len);
+>> -    }
+>>      c->eax = hyperv_feat_enabled(cpu, HYPERV_FEAT_EVMCS) ?
+>>          HV_CPUID_NESTED_FEATURES : HV_CPUID_IMPLEMENT_LIMITS;
+>> -    c->ebx = signature[0];
+>> -    c->ecx = signature[1];
+>> -    c->edx = signature[2];
+>> +    c->ebx = cpu->hyperv_vendor_id[0];
+>> +    c->ecx = cpu->hyperv_vendor_id[1];
+>> +    c->edx = cpu->hyperv_vendor_id[2];
+>>  
+>>      c = &cpuid_ent[cpuid_i++];
+>>      c->function = HV_CPUID_INTERFACE;
+>> -- 
+>> 2.25.4
+>> 
+
+-- 
+Vitaly
 
 
