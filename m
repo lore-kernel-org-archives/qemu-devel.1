@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A0DFC4727E
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:26:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73955C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:28:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A08E221E8
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:26:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D5132221E8
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 21:28:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hot9pERb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A08E221E8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CPVi97Tu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5132221E8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKpnm-0000IP-Hy
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 17:26:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40064)
+	id 1kKppZ-0002ku-Fj
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 17:28:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37262)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpbX-0001ME-4d
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:13:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57641)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpQ4-0002H2-BK
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:01:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60089)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpbV-00064d-4B
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:13:38 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpPy-0004Yx-1t
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:01:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600809216;
+ s=mimecast20190719; t=1600808488;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Je01v8tianvun5dGhcapKD/fWgdPcSCTuzFS6zyvrOM=;
- b=Hot9pERbAl/29Zt9984dahKmxrx3IOahAiXR3Zg7h7ocDsWaZUQIc9EAlyDZJ157B3gyIV
- aAFQZoNZY92K3e5mls1zkegSb6YySGN1kqbLmpq5lc/0/zZ1MMk37DlrJrldeFxcnuZSsk
- r0m+6nRpl8+8Hsrp8LXQUnmQtl539dc=
+ bh=YxKa+PBG1Gkw9x/b9aY4+eW6f9wJE00d+CbIL8BiwRM=;
+ b=CPVi97Tu6/1URO4qphW12WqUISTnu83oDIclasuVklj/paLNFiKTUirNTyQHC1dXBJC6jW
+ TmPs2dYUsnumo9CVWi4LBEdf/u5Bs8B/7O/O60LA38pl92F3ancgPBq375rbmwDTAn+UgY
+ 3CmjVE66d42MsgCHRwGtKn7EPKThPeo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-406-tnwVAhegNAic_vT0-kWgmg-1; Tue, 22 Sep 2020 17:13:34 -0400
-X-MC-Unique: tnwVAhegNAic_vT0-kWgmg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-198-Qclo0GSpMq2BoN5HyRLiKA-1; Tue, 22 Sep 2020 17:01:24 -0400
+X-MC-Unique: Qclo0GSpMq2BoN5HyRLiKA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8820310BBEC3;
- Tue, 22 Sep 2020 21:13:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 792FA1074641;
+ Tue, 22 Sep 2020 21:01:23 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A89DD73670;
- Tue, 22 Sep 2020 21:13:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 187B85577A;
+ Tue, 22 Sep 2020 21:01:21 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH 15/16] qapi/expr.py: move related checks inside check_xxx
- functions
-Date: Tue, 22 Sep 2020 17:13:12 -0400
-Message-Id: <20200922211313.4082880-16-jsnow@redhat.com>
-In-Reply-To: <20200922211313.4082880-1-jsnow@redhat.com>
-References: <20200922211313.4082880-1-jsnow@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>,
+	qemu-devel@nongnu.org
+Subject: [PATCH v2 11/38] qapi/common.py: Replace one-letter 'c' variable
+Date: Tue, 22 Sep 2020 17:00:34 -0400
+Message-Id: <20200922210101.4081073-12-jsnow@redhat.com>
+In-Reply-To: <20200922210101.4081073-1-jsnow@redhat.com>
+References: <20200922210101.4081073-1-jsnow@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -75,14 +75,13 @@ Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -34
-X-Spam_score: -3.5
+X-Spam_score_int: -35
+X-Spam_score: -3.6
 X-Spam_bar: ---
-X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- T_FILL_THIS_FORM_SHORT=0.01 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,143 +94,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Cleber Rosa <crosa@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There's not a big obvious difference between the types of checks that
-happen in the main function versus the kind that happen in the
-functions. Now they're in one place for each of the main types.
-
-As part of the move, spell out the required and optional keywords so
-they're obvious at a glance.
-
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- scripts/qapi/expr.py | 55 ++++++++++++++++++++++++++------------------
- 1 file changed, 33 insertions(+), 22 deletions(-)
+ scripts/qapi/common.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/scripts/qapi/expr.py b/scripts/qapi/expr.py
-index 69ee9e3f18..74b2681ef8 100644
---- a/scripts/qapi/expr.py
-+++ b/scripts/qapi/expr.py
-@@ -333,6 +333,10 @@ def check_enum(expr: Expression, info: QAPISourceInfo) -> None:
-     :param expr: `Expression` to validate.
-     :param info: QAPI source file information.
-     """
-+    check_keys(expr, info, 'enum',
-+               required=('enum', 'data'),
-+               optional=('if', 'features', 'prefix'))
-+
-     name = expr['enum']
-     members = expr['data']
-     prefix = expr.get('prefix')
-@@ -363,6 +367,11 @@ def check_struct(expr: Expression, info: QAPISourceInfo) -> None:
-     :param expr: `Expression` to validate.
-     :param info: QAPI source file information.
-     """
-+    check_keys(expr, info, 'struct',
-+               required=('struct', 'data'),
-+               optional=('base', 'if', 'features'))
-+    normalize_members(expr['data'])
-+
-     name = cast(str, expr['struct'])  # Asserted in check_exprs
-     members = expr['data']
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index bddfb5a9e5..682e74fe65 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -30,14 +30,14 @@ def camel_to_upper(value):
+     new_name = ''
+     length = len(c_fun_str)
+     for i in range(length):
+-        c = c_fun_str[i]
+-        # When c is upper and no '_' appears before, do more checks
+-        if c.isupper() and (i > 0) and c_fun_str[i - 1] != '_':
++        char = c_fun_str[i]
++        # When char is upper case and no '_' appears before, do more checks
++        if char.isupper() and (i > 0) and c_fun_str[i - 1] != '_':
+             if i < length - 1 and c_fun_str[i + 1].islower():
+                 new_name += '_'
+             elif c_fun_str[i - 1].isdigit():
+                 new_name += '_'
+-        new_name += c
++        new_name += char
+     return new_name.lstrip('_').upper()
  
-@@ -377,6 +386,13 @@ def check_union(expr: Expression, info: QAPISourceInfo) -> None:
-     :param expr: `Expression` to validate.
-     :param info: QAPI source file information.
-     """
-+    check_keys(expr, info, 'union',
-+               required=('union', 'data'),
-+               optional=('base', 'discriminator', 'if', 'features'))
-+
-+    normalize_members(expr.get('base'))
-+    normalize_members(expr['data'])
-+
-     name = cast(str, expr['union'])  # Asserted in check_exprs
-     base = expr.get('base')
-     discriminator = expr.get('discriminator')
-@@ -409,6 +425,11 @@ def check_alternate(expr: Expression, info: QAPISourceInfo) -> None:
-     :param expr: Expression to validate.
-     :param info: QAPI source file information.
-     """
-+    check_keys(expr, info, 'alternate',
-+               required=('alternate', 'data'),
-+               optional=('if', 'features'))
-+    normalize_members(expr['data'])
-+
-     members = expr['data']
  
-     if not members:
-@@ -432,6 +453,13 @@ def check_command(expr: Expression, info: QAPISourceInfo) -> None:
-     :param expr: `Expression` to validate.
-     :param info: QAPI source file information.
-     """
-+    check_keys(expr, info, 'command',
-+               required=['command'],
-+               optional=('data', 'returns', 'boxed', 'if', 'features',
-+                         'gen', 'success-response', 'allow-oob',
-+                         'allow-preconfig'))
-+    normalize_members(expr.get('data'))
-+
-     args = expr.get('data')
-     rets = expr.get('returns')
-     boxed = expr.get('boxed', False)
-@@ -453,6 +481,11 @@ def check_event(expr: Expression, info: QAPISourceInfo) -> None:
-         if:       `Optional[Ifcond]`
-         features: `Optional[Features]`
-     """
-+    normalize_members(expr.get('data'))
-+    check_keys(expr, info, 'event',
-+               required=['event'],
-+               optional=('data', 'boxed', 'if', 'features'))
-+
-     args = expr.get('data')
-     boxed = expr.get('boxed', False)
- 
-@@ -519,38 +552,16 @@ def check_exprs(exprs: List[_JSObject]) -> List[_JSObject]:
-                                "documentation comment required")
- 
-         if meta == 'enum':
--            check_keys(expr, info, meta,
--                       ['enum', 'data'], ['if', 'features', 'prefix'])
-             check_enum(expr, info)
-         elif meta == 'union':
--            check_keys(expr, info, meta,
--                       ['union', 'data'],
--                       ['base', 'discriminator', 'if', 'features'])
--            normalize_members(expr.get('base'))
--            normalize_members(expr['data'])
-             check_union(expr, info)
-         elif meta == 'alternate':
--            check_keys(expr, info, meta,
--                       ['alternate', 'data'], ['if', 'features'])
--            normalize_members(expr['data'])
-             check_alternate(expr, info)
-         elif meta == 'struct':
--            check_keys(expr, info, meta,
--                       ['struct', 'data'], ['base', 'if', 'features'])
--            normalize_members(expr['data'])
-             check_struct(expr, info)
-         elif meta == 'command':
--            check_keys(expr, info, meta,
--                       ['command'],
--                       ['data', 'returns', 'boxed', 'if', 'features',
--                        'gen', 'success-response', 'allow-oob',
--                        'allow-preconfig'])
--            normalize_members(expr.get('data'))
-             check_command(expr, info)
-         elif meta == 'event':
--            check_keys(expr, info, meta,
--                       ['event'], ['data', 'boxed', 'if', 'features'])
--            normalize_members(expr.get('data'))
-             check_event(expr, info)
-         else:
-             assert False, 'unexpected meta type'
 -- 
 2.26.2
 
