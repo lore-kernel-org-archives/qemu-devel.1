@@ -2,113 +2,70 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09FAEC4363D
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 07:12:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 429ECC2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 07:15:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 386A6207C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 07:12:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eQn9JXIa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 386A6207C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9B3192076E
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 07:15:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B3192076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKcTp-00069L-55
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 03:12:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34826)
+	id 1kKcWc-0007f8-IM
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 03:15:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35702)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kKcSo-0005fs-C6
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 03:11:46 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40968
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kKcSm-00065G-N7
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 03:11:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600758703;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BjZ/hfz30lfw0dw42fHBRmyvU9yvd2imdzJF3B5OVEA=;
- b=eQn9JXIatEPkOq2B0ZHgtHEbiduGVq0INMwHqMgvrdZYuqsaXrquEcCCsmWCvxNiw46rXy
- QX7PJCpqbiTndJVeYmpI1IVU6rhtpCyIqBhzK/puPGhPVgqVKB9yp8nbsNwvRirxVHLFe5
- 1v7dPeRJRRIltG7YIJwkpj8XXn6BGfo=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-176-4X6qzhsdNoSbhbHRvnmfuw-1; Tue, 22 Sep 2020 03:11:41 -0400
-X-MC-Unique: 4X6qzhsdNoSbhbHRvnmfuw-1
-Received: by mail-wm1-f70.google.com with SMTP id x6so553927wmi.1
- for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 00:11:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=BjZ/hfz30lfw0dw42fHBRmyvU9yvd2imdzJF3B5OVEA=;
- b=UaWcdh9ZdtYBIsCwTD3ufjDasSpL+tG2NDyemsU5Fv1d5s8pnInjHYWvWA0aJYF1+2
- CpIxIhEjolf1tWJdv4ua6HfHSTFdeKN6E2jS7yaftDxUs/R5ENnTnpyajlcQ1yLFz5ds
- 74q7KM0wgFK54O/93btuIj3jvDcq0ksthHIvzEM9ghpxxQLy8OFJSUfLQesQbTKnHIXR
- MouQ/jCPhAYBZn2ZFhZJcDDYHJTQfXyD8hKtQy9/dn9hWHXbBeCcrreR2xUEz8+0aaP+
- waNYujdlR9j1/9d0LlM4kVSZQvEcrJ4sSr4J+tKGcwU7mbWusiE/In3E3B+FTCksEScw
- eMfg==
-X-Gm-Message-State: AOAM533e223n6VC4j4HaNrwVfnjVBojZ8jhclnquFysoPeMrCHNEkPw+
- URwrGzGTQBWQRH4Wcxtqpo4uT2Ab2Q4ji+ydap6AyCE40cQ0Lm/jCBlVEG0O42G6ytr4HcYygut
- Jv4EKoG+JbmTLTAY=
-X-Received: by 2002:a5d:4448:: with SMTP id x8mr3824588wrr.207.1600758699787; 
- Tue, 22 Sep 2020 00:11:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzj2FVHEB8SjqZfIVDRSbaL6ND6hrVf97m1J2tIp+GG//7j8Q/F+5sDJ1qCfnWy7o58ui4CBg==
-X-Received: by 2002:a5d:4448:: with SMTP id x8mr3824562wrr.207.1600758699557; 
- Tue, 22 Sep 2020 00:11:39 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d153:8d0f:94cf:5114?
- ([2001:b07:6468:f312:d153:8d0f:94cf:5114])
- by smtp.gmail.com with ESMTPSA id i15sm25304979wrb.91.2020.09.22.00.11.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 22 Sep 2020 00:11:38 -0700 (PDT)
-Subject: Re: [External] Re: [PATCH 2/3] iqapi/run-state.json: introduce memory
- failure event
-To: zhenwei pi <pizhenwei@bytedance.com>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200914134321.958079-1-pizhenwei@bytedance.com>
- <20200914134321.958079-3-pizhenwei@bytedance.com>
- <CAFEAcA-KX6p3aaKxmMx2i1G2n+9GdOXjDL2mqmHcngq3M_f+Gw@mail.gmail.com>
- <348159b8-0e10-ab93-42ca-5e6d586d5abc@bytedance.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <08d688b5-fe64-6bb7-3fa8-9e976640041a@redhat.com>
-Date: Tue, 22 Sep 2020 09:11:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-MIME-Version: 1.0
-In-Reply-To: <348159b8-0e10-ab93-42ca-5e6d586d5abc@bytedance.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 01:27:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <robert.hu@linux.intel.com>)
+ id 1kKcVY-0006iy-M4
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 03:14:36 -0400
+Received: from mga06.intel.com ([134.134.136.31]:37153)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <robert.hu@linux.intel.com>)
+ id 1kKcVV-0006Lq-Au
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 03:14:36 -0400
+IronPort-SDR: HyhLptx9yxOJqOjeebNftHCEd4Z7Epvja0dJR0wXsvV5eW2mFTyh2vuWxh4NBzZ2/rm1sCZ4ne
+ u361xhdLnEgQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9751"; a="222141830"
+X-IronPort-AV: E=Sophos;i="5.77,289,1596524400"; d="scan'208";a="222141830"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+ by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 22 Sep 2020 00:14:32 -0700
+IronPort-SDR: l79sfWKdKxjwfXJbDUcJZIHMt/fnd7gbf2NGaPe8FnkJa2QyPSrCbgt6fz//W8nhI23BXjrEiY
+ 8l/EoKDJonXw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,289,1596524400"; d="scan'208";a="341918109"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org)
+ ([10.239.48.212])
+ by fmsmga002.fm.intel.com with ESMTP; 22 Sep 2020 00:14:29 -0700
+From: Robert Hoo <robert.hu@linux.intel.com>
+To: ehabkost@redhat.com, eblake@redhat.com, pbonzini@redhat.com,
+ rth@twiddle.net, armbru@redhat.com
+Subject: [PATCH v4 2/2] Mark Icelake-Client CPU models deprecated
+Date: Tue, 22 Sep 2020 15:14:15 +0800
+Message-Id: <1600758855-80046-2-git-send-email-robert.hu@linux.intel.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1600758855-80046-1-git-send-email-robert.hu@linux.intel.com>
+References: <1600758855-80046-1-git-send-email-robert.hu@linux.intel.com>
+Received-SPF: none client-ip=134.134.136.31;
+ envelope-from=robert.hu@linux.intel.com; helo=mga06.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 03:14:31
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -121,33 +78,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marcelo Tosatti <mtosatti@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: robert.hu@intel.com, qemu-devel@nongnu.org,
+ Robert Hoo <robert.hu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/09/20 15:10, zhenwei pi wrote:
->>
-> Right, to make architecture-neutral, how about these changes:
-> 'PC-RAM' -> 'guest-memory'
-> 'guest-mce' -> 'guest-mce-inject'
-> 'guest-triple-fault' -> 'guest-mce-fault'
+Going to obsolete Icelake-Client CPU models in the future.
 
-Perhaps we should have three fields
+Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+---
+Change log
+v4:
+Deprecation note is general now. More detailed information is moved to
+docs/system/deprecated.rst.
 
-1) recipient: 'hypervisor' or 'guest'
+v3:
+Obsolete in v5.2 --> v5.3.
 
-2) action: 'ignore', 'inject', 'fatal'
+---
+ docs/system/deprecated.rst |  6 ++++++
+ target/i386/cpu.c          | 10 +++++++---
+ 2 files changed, 13 insertions(+), 3 deletions(-)
 
-3) kind: 'action-optional' or 'action-required'
-
-And possibly:
-
-4) recursive: true or false
-
-On x86 "recursive" would be set if MCIP=1.
-
-Paolo
+diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+index 0cb8b01..5dc2ff3 100644
+--- a/docs/system/deprecated.rst
++++ b/docs/system/deprecated.rst
+@@ -329,6 +329,12 @@ The ``compat`` property used to set backwards compatibility modes for
+ the processor has been deprecated. The ``max-cpu-compat`` property of
+ the ``pseries`` machine type should be used instead.
+ 
++``Icelake-Client`` CPU Model (since 3.1)
++''''''''''''''''''''''''''''''''''''''''
++
++``Icelake-Client`` CPU Models are deprecated. Use ``Icelake-Server`` CPU
++Models instead.
++
+ System emulator devices
+ -----------------------
+ 
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 323c7e3..5566356 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -3358,10 +3358,13 @@ static X86CPUDefinition builtin_x86_defs[] = {
+         .xlevel = 0x80000008,
+         .model_id = "Intel Core Processor (Icelake)",
+         .versions = (X86CPUVersionDefinition[]) {
+-            { .version = 1 },
++            {
++                .version = 1,
++                .note = "Deprecated"
++            },
+             {
+                 .version = 2,
+-                .note = "no TSX",
++                .note = "no TSX, Deprecated",
+                 .alias = "Icelake-Client-noTSX",
+                 .props = (PropValue[]) {
+                     { "hle", "off" },
+@@ -3370,7 +3373,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
+                 },
+             },
+             { /* end of list */ }
+-        }
++        },
++        .deprecation_note = "Deprecated. Use Icelake-Server instead."
+     },
+     {
+         .name = "Icelake-Server",
+-- 
+1.8.3.1
 
 
