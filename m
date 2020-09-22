@@ -2,78 +2,78 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67641C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:06:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B86C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:07:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F026C208A9
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:06:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D024A208A9
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 22:06:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HTi5a4JF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F026C208A9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MOMxzEw/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D024A208A9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKqR3-0002IN-0g
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 18:06:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41206)
+	id 1kKqR8-0002XO-Uf
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 18:06:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44938)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpgD-0007WU-0r
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:18:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55146)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kKpyt-0007Ox-6d
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:37:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50192)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kKpgB-0006eH-3A
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:18:28 -0400
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kKpyl-0000U4-Sd
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 17:37:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600809506;
+ s=mimecast20190719; t=1600810657;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ebOceglSTdw4GEvJBey9gnPjX8dXLi8jeI5/H6dHIc8=;
- b=HTi5a4JFbVnKu9+WY1ZWVKQZX62P/2zxQi8cS5b64Vjs+Q6T5c2oOj2+5IzYxlsfEdaNSQ
- WXElc/oRySWOcrzTgw5UB0PGNyqOsnTIELLE83vMQIEYUausn3zvnVTtJyFC5T7Vfib3Q/
- OTo2Vbip5e3MJkhZUzRCqq22KAqpy7U=
+ bh=9PpALyBPw8w0QMA2NMDkUF3v9en/7dGngNIpadgGRX4=;
+ b=MOMxzEw/SujZ3jFafbhdn4t4GVcCjWqbmt3R1KeV0kSogNTrdWaxJUc9inaDE/K59KYeBG
+ pJMl5QXi3pauT0KD+rgA+uT94H9RZILdxy8Nh3ASGCpWMgJgqbcebBrlkeylGbMtHc9tHx
+ uPbPxNpFkfmRkgW+M/knpmGppZsW+JI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-486-ZLPmkTHmOgqyJwScLfBRBA-1; Tue, 22 Sep 2020 17:18:22 -0400
-X-MC-Unique: ZLPmkTHmOgqyJwScLfBRBA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-195-EkrIipBuPA64ymvvuBvNvw-1; Tue, 22 Sep 2020 17:37:36 -0400
+X-MC-Unique: EkrIipBuPA64ymvvuBvNvw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C69181CBEB;
- Tue, 22 Sep 2020 21:18:21 +0000 (UTC)
-Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D42CD5DA7B;
- Tue, 22 Sep 2020 21:18:19 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH 11/14] qapi/doc.py: Don't use private attributes of QAPIGen
- property
-Date: Tue, 22 Sep 2020 17:17:59 -0400
-Message-Id: <20200922211802.4083666-12-jsnow@redhat.com>
-In-Reply-To: <20200922211802.4083666-1-jsnow@redhat.com>
-References: <20200922211802.4083666-1-jsnow@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C35CC186DD27;
+ Tue, 22 Sep 2020 21:37:34 +0000 (UTC)
+Received: from localhost (unknown [10.10.67.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6AE3D5C1D0;
+ Tue, 22 Sep 2020 21:37:34 +0000 (UTC)
+Date: Tue, 22 Sep 2020 17:37:33 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH v2 05/38] qapi: Remove wildcard includes
+Message-ID: <20200922213733.GF2044576@habkost.net>
+References: <20200922210101.4081073-1-jsnow@redhat.com>
+ <20200922210101.4081073-6-jsnow@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200922210101.4081073-6-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 02:07:04
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 15:47:47
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
@@ -94,44 +94,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>,
- John Snow <jsnow@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use the new __bool__ method to do the same without exposing the private
-attribute.
+On Tue, Sep 22, 2020 at 05:00:28PM -0400, John Snow wrote:
+> Wildcard includes become hard to manage when refactoring and dealing
+> with circular dependencies with strictly typed mypy.
+> 
+> flake8 also flags each one as a warning, as it is not smart enough to
+> know which names exist in the imported file.
+> 
+> Remove them and include things explicitly by name instead.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- scripts/qapi/doc.py | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
-index 5f2b0cd51d..2914e93b1c 100644
---- a/scripts/qapi/doc.py
-+++ b/scripts/qapi/doc.py
-@@ -344,7 +344,7 @@ def visit_event(self,
-         self._gen.add(texi_msg('Event', doc, ifcond, members))
- 
-     def symbol(self, doc: QAPIDoc, entity: QAPISchemaEntity) -> None:
--        if self._gen._body:
-+        if self._gen:
-             self._gen.add('\n')
-         self.cur_doc = doc
-         entity.visit(self)
-@@ -352,7 +352,7 @@ def symbol(self, doc: QAPIDoc, entity: QAPISchemaEntity) -> None:
- 
-     def freeform(self, doc: QAPIDoc) -> None:
-         assert not doc.args
--        if self._gen._body:
-+        if self._gen:
-             self._gen.add('\n')
-         self._gen.add(texi_body(doc) + texi_sections(doc, None))
- 
 -- 
-2.26.2
+Eduardo
 
 
