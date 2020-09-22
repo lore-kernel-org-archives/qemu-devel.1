@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F83FC2D0E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:17:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13D77C4727D
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:19:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5021120756
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:17:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5021120756
+	by mail.kernel.org (Postfix) with ESMTPS id 6A7D720756
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 12:19:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A7D720756
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKhF6-0002RE-8a
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 08:17:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38500)
+	id 1kKhGD-0003jb-9F
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 08:19:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38820)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kKhDE-0000zI-OQ
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 08:16:00 -0400
-Received: from mail.ispras.ru ([83.149.199.84]:47502)
+ id 1kKhE9-0001Sh-I9
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 08:16:59 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:47710)
  by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kKhDC-0006Pv-Q0
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 08:16:00 -0400
+ id 1kKhE5-0006Uy-C1
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 08:16:57 -0400
 Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 5F6EE4360C5F;
- Tue, 22 Sep 2020 12:15:55 +0000 (UTC)
-Subject: [PATCH v5 03/15] qcow2: introduce icount field for snapshots
+ by mail.ispras.ru (Postfix) with ESMTPSA id 5AC9641741D2;
+ Tue, 22 Sep 2020 12:16:47 +0000 (UTC)
+Subject: [PATCH v5 12/15] replay: describe reverse debugging in docs/replay.txt
 From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
 To: qemu-devel@nongnu.org
-Date: Tue, 22 Sep 2020 15:15:55 +0300
-Message-ID: <160077695500.10249.1552059735686496579.stgit@pasha-ThinkPad-X280>
+Date: Tue, 22 Sep 2020 15:16:47 +0300
+Message-ID: <160077700705.10249.8717431230865871452.stgit@pasha-ThinkPad-X280>
 In-Reply-To: <160077693745.10249.9707329107813662236.stgit@pasha-ThinkPad-X280>
 References: <160077693745.10249.9707329107813662236.stgit@pasha-ThinkPad-X280>
 User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=83.149.199.84;
  envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 08:15:38
@@ -77,78 +77,84 @@ Sender: "Qemu-devel"
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-This patch introduces the icount field for saving within the snapshot.
-It is required for navigation between the snapshots in record/replay mode.
+This patch updates the documentation and describes usage of the reverse
+debugging in QEMU+GDB.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
-Acked-by: Kevin Wolf <kwolf@redhat.com>
----
- block/qcow2-snapshot.c |    7 +++++++
- block/qcow2.h          |    3 +++
- docs/interop/qcow2.txt |    5 +++++
- 3 files changed, 15 insertions(+)
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index 9b68690f56..d68b25e0c5 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -164,6 +164,12 @@ static int qcow2_do_read_snapshots(BlockDriverState *bs, bool repair,
-             sn->disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
-         }
+--
+
+v4 changes:
+ - added an example of the command line for reverse debugging of
+   the diskless machine
+---
+ docs/replay.txt |   46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+
+diff --git a/docs/replay.txt b/docs/replay.txt
+index 70c27edb36..39fe5e9740 100644
+--- a/docs/replay.txt
++++ b/docs/replay.txt
+@@ -265,6 +265,16 @@ of the original disk image, use overlay files linked to the original images.
+ Therefore all new snapshots (including the starting one) will be saved in
+ overlays and the original image remains unchanged.
  
-+        if (sn->extra_data_size >= endof(QCowSnapshotExtraData, icount)) {
-+            sn->icount = be64_to_cpu(extra.icount);
-+        } else {
-+            sn->icount = -1ULL;
-+        }
++When you need to use snapshots with diskless virtual machine,
++it must be started with 'orphan' qcow2 image. This image will be used
++for storing VM snapshots. Here is the example of the command line for this:
 +
-         if (sn->extra_data_size > sizeof(extra)) {
-             uint64_t extra_data_end;
-             size_t unknown_extra_data_size;
-@@ -333,6 +339,7 @@ int qcow2_write_snapshots(BlockDriverState *bs)
-         memset(&extra, 0, sizeof(extra));
-         extra.vm_state_size_large = cpu_to_be64(sn->vm_state_size);
-         extra.disk_size = cpu_to_be64(sn->disk_size);
-+        extra.icount = cpu_to_be64(sn->icount);
- 
-         id_str_size = strlen(sn->id_str);
-         name_size = strlen(sn->name);
-diff --git a/block/qcow2.h b/block/qcow2.h
-index b71e444fca..125ea9679b 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -206,6 +206,7 @@ typedef struct QEMU_PACKED QCowSnapshotHeader {
- typedef struct QEMU_PACKED QCowSnapshotExtraData {
-     uint64_t vm_state_size_large;
-     uint64_t disk_size;
-+    uint64_t icount;
- } QCowSnapshotExtraData;
- 
- 
-@@ -219,6 +220,8 @@ typedef struct QCowSnapshot {
-     uint32_t date_sec;
-     uint32_t date_nsec;
-     uint64_t vm_clock_nsec;
-+    /* icount value for the moment when snapshot was taken */
-+    uint64_t icount;
-     /* Size of all extra data, including QCowSnapshotExtraData if available */
-     uint32_t extra_data_size;
-     /* Data beyond QCowSnapshotExtraData, if any */
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index 7da0d81df8..0463f761ef 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -707,6 +707,11 @@ Snapshot table entry:
- 
-                     Byte 48 - 55:   Virtual disk size of the snapshot in bytes
- 
-+                    Byte 56 - 63:   icount value which corresponds to
-+                                    the record/replay instruction count
-+                                    when the snapshot was taken. Set to -1
-+                                    if icount was disabled
++  qemu-system-i386 -icount shift=3,rr=replay,rrfile=record.bin,rrsnapshot=init \
++    -net none -drive file=empty.qcow2,if=none,id=rr
 +
-                     Version 3 images must include extra data at least up to
-                     byte 55.
++empty.qcow2 drive does not connected to any virtual block device and used
++for VM snapshots only.
++
+ Network devices
+ ---------------
+ 
+@@ -294,6 +304,42 @@ for recording and replaying must contain identical number of ports in record
+ and replay modes, but their backends may differ.
+ E.g., '-serial stdio' in record mode, and '-serial null' in replay mode.
+ 
++Reverse debugging
++-----------------
++
++Reverse debugging allows "executing" the program in reverse direction.
++GDB remote protocol supports "reverse step" and "reverse continue"
++commands. The first one steps single instruction backwards in time,
++and the second one finds the last breakpoint in the past.
++
++Recorded executions may be used to enable reverse debugging. QEMU can't
++execute the code in backwards direction, but can load a snapshot and
++replay forward to find the desired position or breakpoint.
++
++The following GDB commands are supported:
++ - reverse-stepi (or rsi) - step one instruction backwards
++ - reverse-continue (or rc) - find last breakpoint in the past
++
++Reverse step loads the nearest snapshot and replays the execution until
++the required instruction is met.
++
++Reverse continue may include several passes of examining the execution
++between the snapshots. Each of the passes include the following steps:
++ 1. loading the snapshot
++ 2. replaying to examine the breakpoints
++ 3. if breakpoint or watchpoint was met
++    - loading the snaphot again
++    - replaying to the required breakpoint
++ 4. else
++    - proceeding to the p.1 with the earlier snapshot
++
++Therefore usage of the reverse debugging requires at least one snapshot
++created in advance. This can be done by omitting 'snapshot' option
++for the block drives and adding 'rrsnapshot' for both record and replay
++command lines.
++See the "Snapshotting" section to learn more about running record/replay
++and creating the snapshot in these modes.
++
+ Replay log format
+ -----------------
  
 
 
