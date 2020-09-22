@@ -2,87 +2,81 @@ Return-Path: <SRS0=0j61=C7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.4 required=3.0 tests=BAYES_00,
-	CHARSET_FARAWAY_HEADER,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35157C4346E
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 03:28:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECE62C4346E
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 03:32:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E805B23A32
-	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 03:28:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3139B206FB
+	for <qemu-devel@archiver.kernel.org>; Tue, 22 Sep 2020 03:32:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=tencent.com header.i=@tencent.com header.b="ivYhmu4T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E805B23A32
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=tencent.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qnap.com header.i=@qnap.com header.b="fGXd+ni2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3139B206FB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qnap.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKYz3-0001Rh-IQ
-	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 23:28:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53078)
+	id 1kKZ2a-0002ZW-UB
+	for qemu-devel@archiver.kernel.org; Mon, 21 Sep 2020 23:32:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53628)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <haibinzhang@tencent.com>)
- id 1kKYyS-0000zh-AU
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 23:28:13 -0400
-Received: from mail4.tencent.com ([183.57.53.109]:60920)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <haibinzhang@tencent.com>)
- id 1kKYyL-000532-Bv
- for qemu-devel@nongnu.org; Mon, 21 Sep 2020 23:28:09 -0400
-Received: from EX-SZ018.tencent.com (unknown [10.28.6.39])
- by mail4.tencent.com (Postfix) with ESMTP id C6BF072578;
- Tue, 22 Sep 2020 11:27:54 +0800 (CST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tencent.com;
- s=s202002; t=1600745274;
- bh=5qpVKvA2egJXwbKcD4TeoqIYuhE5xklLswijF2foncQ=;
- h=From:To:CC:Subject:Date;
- b=ivYhmu4Tx7C000J9uqW2TswCEvCCi13OblfP3IxLbajRhYv2HbTtvnqkPgwWf4SdD
- L7ty+ySlX57G/jdCayGHQ4zAOupFTZwKf/G2I1u/O2ss0Jr1fBCQQsYz3kGhfdFGUc
- SNnonGN0RgXfx0w6vo6reae8/C8gROWlU3nXXgZ0=
-Received: from EX-SZ007.tencent.com (10.28.6.31) by EX-SZ018.tencent.com
- (10.28.6.39) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2; Tue, 22 Sep
- 2020 11:27:54 +0800
-Received: from EX-SZ006.tencent.com (10.28.6.30) by EX-SZ007.tencent.com
- (10.28.6.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2; Tue, 22 Sep
- 2020 11:27:54 +0800
-Received: from EX-SZ006.tencent.com ([fe80::a84e:872e:7c90:2930]) by
- EX-SZ006.tencent.com ([fe80::a84e:872e:7c90:2930%2]) with mapi id
- 15.01.2106.002; Tue, 22 Sep 2020 11:27:54 +0800
-From: =?gb2312?B?aGFpYmluemhhbmco1cW6o7HzKQ==?= <haibinzhang@tencent.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Adrian Moreno <amorenoz@redhat.com>
-Subject: [PATCH] vhost-user: save features of multiqueues if chardev is closed
-Thread-Topic: [PATCH] vhost-user: save features of multiqueues if chardev is
- closed
-Thread-Index: AQHWkJBbURiqOHG7gEeDe0rUGA5Yvw==
-Date: Tue, 22 Sep 2020 03:27:54 +0000
-Message-ID: <46CBC206-E0CA-4249-81CD-10F75DA30441@tencent.com>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [9.19.161.114]
-Content-Type: text/plain; charset="gb2312"
-Content-ID: <690BCF2A1B3C524FBC55E4FBA166007B@tencent.com>
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <dereksu@qnap.com>) id 1kKZ1U-00028x-7B
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 23:31:20 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53971)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <dereksu@qnap.com>) id 1kKZ1S-0005Sn-20
+ for qemu-devel@nongnu.org; Mon, 21 Sep 2020 23:31:19 -0400
+Received: by mail-wm1-x343.google.com with SMTP id x23so1804164wmi.3
+ for <qemu-devel@nongnu.org>; Mon, 21 Sep 2020 20:31:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qnap.com; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=+LdL2E3a+rKxwsPcop7cnf7//aVUCRxOi324QqAd/eA=;
+ b=fGXd+ni2lryABxsizKm76vTS9fpnqJgw+e4OfOVZP09eORZyAFMBVjB/g+SOWrr7jr
+ CWt6xmipY9vvaHS0l55gg9+42ovSsdY7ETbxZpmJOhRYrUu1dKbLzx05y22umRgiVIMS
+ 4ePg79SgqAHQ/85SCftxR6lUPvtxQtQfJvjrA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=+LdL2E3a+rKxwsPcop7cnf7//aVUCRxOi324QqAd/eA=;
+ b=ofwXHCuxbwiAZW7KjSoOpQGM4QjWMvZNpjf/8F5HxDvtbnZozBsBnmseoVZM4f+GC6
+ 33p23JKOxbyYOX+pwlA0TVV0obbOH6eWHyijJHLVxmTMib8w+tggQdZ5d7qIo1y4Yvfd
+ wuvlpDRysq5xHweW0UrehiBgL/VlhbUsOyygSgEwGcY9Qv2aoogcorA9M/oUgMB46GPg
+ BGxrbpiSgd9gIGVw5uBhQ5LNtyr54uNKovfkxSFv0ZEDt5uoH431p7N1xYnlOBVLdnJI
+ 1Uxvt7Bb2H1+KNS5EEmNnzvj8dc2B65CIjpQ9p0cajV2v658aA07ZBq0yn2Ah+FlkAa+
+ 1a1Q==
+X-Gm-Message-State: AOAM530G/X6l89sEEld2Ve7ttHyYQjmq0PeoXGoLgMhDoaR1FqZJXn0t
+ ozDixA1awcjw4Q0pjvCIkCZQtA/UU8CMpuGUPfSwngKw5etfzg==
+X-Google-Smtp-Source: ABdhPJyzqvbjuhuR5ftepQP6DVdObMGdlL2pnl1/nqY4O0ug4z1vImu/ZK8+r0+McMIBt7A/vln/dm17RqNVJPs8N6A=
+X-Received: by 2002:a05:600c:258:: with SMTP id
+ 24mr2331634wmj.66.1600745475118; 
+ Mon, 21 Sep 2020 20:31:15 -0700 (PDT)
 MIME-Version: 1.0
-Received-SPF: pass client-ip=183.57.53.109;
- envelope-from=haibinzhang@tencent.com; helo=mail4.tencent.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/21 23:27:55
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -11
-X-Spam_score: -1.2
-X-Spam_bar: -
-X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, CHARSET_FARAWAY_HEADER=3.2,
+References: <20200910104650.1182807-1-dereksu@qnap.com>
+ <20200910104650.1182807-2-dereksu@qnap.com>
+In-Reply-To: <20200910104650.1182807-2-dereksu@qnap.com>
+From: Derek Su <dereksu@qnap.com>
+Date: Tue, 22 Sep 2020 11:31:04 +0800
+Message-ID: <CAKEOLWXPfULXx5-vzg3w-DRS3azhkizo-Ne05FJE+t5mtPd4Mg@mail.gmail.com>
+Subject: Re: [PATCH v1 1/1] COLO: only flush dirty ram pages from colo cache
+To: qemu-devel <qemu-devel@nongnu.org>
+Content-Type: multipart/alternative; boundary="0000000000006baeaa05afde9980"
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=dereksu@qnap.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,38 +90,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "xtay.haibin@gmail.com" <xtay.haibin@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Zhang, Chen" <chen.zhang@intel.com>, zhang.zhanghailiang@huawei.com,
+ dgilbert@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rm9yZS1jb21taXQoYzZiZWVmZDY3NCkgb25seSBzYXZlcyBmZWF0dXJlcyBvZiBxdWV1ZTAsDQp0
-aGlzIG1ha2VzIHdyb25nIGZlYXR1cmVzIG9mIG90aGVyIHF1ZXVlcyBpbiBtdWx0aXF1ZXVlcw0K
-c2l0dWF0aW9uLg0KRm9yIGV4YW1wbGVzOg0KICBxZW11LXN5c3RlbS1hYXJjaDY0IC4uLiBcDQog
-IC1jaGFyZGV2IHNvY2tldCxpZD1jaGFybmV0MCxwYXRoPS92YXIvcnVuL3Zob3N0X3NvY2sgXA0K
-ICAtbmV0ZGV2IHZob3N0LXVzZXIsY2hhcmRldj1jaGFybmV0MCxxdWV1ZXM9MixpZD1ob3N0bmV0
-MCBcDQogIC4uLg0KVGhlcmUgYXJlIHR3byBxdWV1ZXMgaW4gbmljIGFzc29jYXRlZCB3aXRoIG9u
-ZSBjaGFyZGV2Lg0KV2hlbiBjaGFyZGV2IGlzIHJlY29ubmVjdGVkLCBpdCBpcyBuZWNlc3Nhcnkg
-dG8gc2F2ZSBhbmQNCnJlc3RvcmUgZmVhdHVyZXMgb2YgYWxsIHF1ZXVlcy4NCg0KU2lnbmVkLW9m
-LWJ5OiBIYWliaW4gWmhhbmcgPGhhaWJpbnpoYW5nQHRlbmNlbnQuY29tPg0KLS0tDQogbmV0L3Zo
-b3N0LXVzZXIuYyB8IDEwICsrKysrKystLS0NCiAxIGZpbGUgY2hhbmdlZCwgNyBpbnNlcnRpb25z
-KCspLCAzIGRlbGV0aW9ucygtKQ0KDQpkaWZmIC0tZ2l0IGEvbmV0L3Zob3N0LXVzZXIuYyBiL25l
-dC92aG9zdC11c2VyLmMNCmluZGV4IDE3NTMyZGFhZjMuLmZmYmQ5NGQ5NDQgMTAwNjQ0DQotLS0g
-YS9uZXQvdmhvc3QtdXNlci5jDQorKysgYi9uZXQvdmhvc3QtdXNlci5jDQpAQCAtMjI2LDcgKzIy
-Niw3IEBAIHN0YXRpYyB2b2lkIGNocl9jbG9zZWRfYmgodm9pZCAqb3BhcXVlKQ0KICAgICBOZXRD
-bGllbnRTdGF0ZSAqbmNzW01BWF9RVUVVRV9OVU1dOw0KICAgICBOZXRWaG9zdFVzZXJTdGF0ZSAq
-czsNCiAgICAgRXJyb3IgKmVyciA9IE5VTEw7DQotICAgIGludCBxdWV1ZXM7DQorICAgIGludCBx
-dWV1ZXMsIGk7DQogDQogICAgIHF1ZXVlcyA9IHFlbXVfZmluZF9uZXRfY2xpZW50c19leGNlcHQo
-bmFtZSwgbmNzLA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE5F
-VF9DTElFTlRfRFJJVkVSX05JQywNCkBAIC0yMzUsOCArMjM1LDEyIEBAIHN0YXRpYyB2b2lkIGNo
-cl9jbG9zZWRfYmgodm9pZCAqb3BhcXVlKQ0KIA0KICAgICBzID0gRE9fVVBDQVNUKE5ldFZob3N0
-VXNlclN0YXRlLCBuYywgbmNzWzBdKTsNCiANCi0gICAgaWYgKHMtPnZob3N0X25ldCkgew0KLSAg
-ICAgICAgcy0+YWNrZWRfZmVhdHVyZXMgPSB2aG9zdF9uZXRfZ2V0X2Fja2VkX2ZlYXR1cmVzKHMt
-PnZob3N0X25ldCk7DQorICAgIGZvciAoaSA9IHF1ZXVlcyAtMTsgaSA+PSAwOyBpLS0pIHsNCisg
-ICAgICAgIHMgPSBET19VUENBU1QoTmV0Vmhvc3RVc2VyU3RhdGUsIG5jLCBuY3NbaV0pOw0KKw0K
-KyAgICAgICAgaWYgKHMtPnZob3N0X25ldCkgew0KKyAgICAgICAgICAgIHMtPmFja2VkX2ZlYXR1
-cmVzID0gdmhvc3RfbmV0X2dldF9hY2tlZF9mZWF0dXJlcyhzLT52aG9zdF9uZXQpOw0KKyAgICAg
-ICAgfQ0KICAgICB9DQogDQogICAgIHFtcF9zZXRfbGluayhuYW1lLCBmYWxzZSwgJmVycik7DQot
-LSANCjIuMjMuMA0KDQoNCg==
+--0000000000006baeaa05afde9980
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello, all
+
+Ping...
+
+Regards,
+Derek Su
+
+Derek Su <dereksu@qnap.com> =E6=96=BC 2020=E5=B9=B49=E6=9C=8810=E6=97=A5 =
+=E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=886:47=E5=AF=AB=E9=81=93=EF=BC=9A
+
+> In secondary side, the colo_flush_ram_cache() calls
+> migration_bitmap_find_dirty() to finding the dirty pages and
+> flush them to host. But ram_state's ram_bulk_stage flag is always
+> enabled in secondary side, it leads to the whole ram pages copy
+> instead of only dirty pages.
+>
+> Here, the ram_bulk_stage in secondary side is disabled in the
+> preparation of COLO incoming process to avoid the whole dirty
+> ram pages flush.
+>
+> Signed-off-by: Derek Su <dereksu@qnap.com>
+> ---
+>  migration/colo.c |  6 +++++-
+>  migration/ram.c  | 10 ++++++++++
+>  migration/ram.h  |  3 +++
+>  3 files changed, 18 insertions(+), 1 deletion(-)
+>
+> diff --git a/migration/colo.c b/migration/colo.c
+> index ea7d1e9d4e..6e644db306 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -844,6 +844,8 @@ void *colo_process_incoming_thread(void *opaque)
+>          return NULL;
+>      }
+>
+> +    colo_disable_ram_bulk_stage();
+> +
+>      failover_init_state();
+>
+>      mis->to_src_file =3D qemu_file_get_return_path(mis->from_src_file);
+> @@ -873,7 +875,7 @@ void *colo_process_incoming_thread(void *opaque)
+>          goto out;
+>      }
+>  #else
+> -        abort();
+> +    abort();
+>  #endif
+>      vm_start();
+>      trace_colo_vm_state_change("stop", "run");
+> @@ -924,6 +926,8 @@ out:
+>          qemu_fclose(fb);
+>      }
+>
+> +    colo_enable_ram_bulk_stage();
+> +
+>      /* Hope this not to be too long to loop here */
+>      qemu_sem_wait(&mis->colo_incoming_sem);
+>      qemu_sem_destroy(&mis->colo_incoming_sem);
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 76d4fee5d5..65e9b12058 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -3357,6 +3357,16 @@ static bool postcopy_is_running(void)
+>      return ps >=3D POSTCOPY_INCOMING_LISTENING && ps <
+> POSTCOPY_INCOMING_END;
+>  }
+>
+> +void colo_enable_ram_bulk_stage(void)
+> +{
+> +    ram_state->ram_bulk_stage =3D true;
+> +}
+> +
+> +void colo_disable_ram_bulk_stage(void)
+> +{
+> +    ram_state->ram_bulk_stage =3D false;
+> +}
+> +
+>  /*
+>   * Flush content of RAM cache into SVM's memory.
+>   * Only flush the pages that be dirtied by PVM or SVM or both.
+> diff --git a/migration/ram.h b/migration/ram.h
+> index 2eeaacfa13..c1c0ebbe0f 100644
+> --- a/migration/ram.h
+> +++ b/migration/ram.h
+> @@ -69,4 +69,7 @@ void colo_flush_ram_cache(void);
+>  void colo_release_ram_cache(void);
+>  void colo_incoming_start_dirty_log(void);
+>
+> +void colo_enable_ram_bulk_stage(void);
+> +void colo_disable_ram_bulk_stage(void);
+> +
+>  #endif
+> --
+> 2.25.1
+>
+>
+
+--0000000000006baeaa05afde9980
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div><div dir=3D"ltr" class=3D"gmail_signature" data-smart=
+mail=3D"gmail_signature"><div dir=3D"ltr"><div dir=3D"ltr"><div><font color=
+=3D"#000000" face=3D"Arial, sans-serif">Hello, all</font></div><div><font c=
+olor=3D"#000000" face=3D"Arial, sans-serif"><br></font></div><div><font fac=
+e=3D"Arial, sans-serif" color=3D"#000000">Ping...</font></div><div><br></di=
+v><div>Regards,</div></div></div></div></div>Derek Su</div><br><div class=
+=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">Derek Su &lt;<a href=
+=3D"mailto:dereksu@qnap.com">dereksu@qnap.com</a>&gt; =E6=96=BC 2020=E5=B9=
+=B49=E6=9C=8810=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=886:47=E5=AF=AB=
+=E9=81=93=EF=BC=9A<br></div><blockquote class=3D"gmail_quote" style=3D"marg=
+in:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1e=
+x">In secondary side, the colo_flush_ram_cache() calls<br>
+migration_bitmap_find_dirty() to finding the dirty pages and<br>
+flush them to host. But ram_state&#39;s ram_bulk_stage flag is always<br>
+enabled in secondary side, it leads to the whole ram pages copy<br>
+instead of only dirty pages.<br>
+<br>
+Here, the ram_bulk_stage in secondary side is disabled in the<br>
+preparation of COLO incoming process to avoid the whole dirty<br>
+ram pages flush.<br>
+<br>
+Signed-off-by: Derek Su &lt;<a href=3D"mailto:dereksu@qnap.com" target=3D"_=
+blank">dereksu@qnap.com</a>&gt;<br>
+---<br>
+=C2=A0migration/colo.c |=C2=A0 6 +++++-<br>
+=C2=A0migration/ram.c=C2=A0 | 10 ++++++++++<br>
+=C2=A0migration/ram.h=C2=A0 |=C2=A0 3 +++<br>
+=C2=A03 files changed, 18 insertions(+), 1 deletion(-)<br>
+<br>
+diff --git a/migration/colo.c b/migration/colo.c<br>
+index ea7d1e9d4e..6e644db306 100644<br>
+--- a/migration/colo.c<br>
++++ b/migration/colo.c<br>
+@@ -844,6 +844,8 @@ void *colo_process_incoming_thread(void *opaque)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return NULL;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
++=C2=A0 =C2=A0 colo_disable_ram_bulk_stage();<br>
++<br>
+=C2=A0 =C2=A0 =C2=A0failover_init_state();<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0mis-&gt;to_src_file =3D qemu_file_get_return_path(mis-&=
+gt;from_src_file);<br>
+@@ -873,7 +875,7 @@ void *colo_process_incoming_thread(void *opaque)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0goto out;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0#else<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 abort();<br>
++=C2=A0 =C2=A0 abort();<br>
+=C2=A0#endif<br>
+=C2=A0 =C2=A0 =C2=A0vm_start();<br>
+=C2=A0 =C2=A0 =C2=A0trace_colo_vm_state_change(&quot;stop&quot;, &quot;run&=
+quot;);<br>
+@@ -924,6 +926,8 @@ out:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qemu_fclose(fb);<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
++=C2=A0 =C2=A0 colo_enable_ram_bulk_stage();<br>
++<br>
+=C2=A0 =C2=A0 =C2=A0/* Hope this not to be too long to loop here */<br>
+=C2=A0 =C2=A0 =C2=A0qemu_sem_wait(&amp;mis-&gt;colo_incoming_sem);<br>
+=C2=A0 =C2=A0 =C2=A0qemu_sem_destroy(&amp;mis-&gt;colo_incoming_sem);<br>
+diff --git a/migration/ram.c b/migration/ram.c<br>
+index 76d4fee5d5..65e9b12058 100644<br>
+--- a/migration/ram.c<br>
++++ b/migration/ram.c<br>
+@@ -3357,6 +3357,16 @@ static bool postcopy_is_running(void)<br>
+=C2=A0 =C2=A0 =C2=A0return ps &gt;=3D POSTCOPY_INCOMING_LISTENING &amp;&amp=
+; ps &lt; POSTCOPY_INCOMING_END;<br>
+=C2=A0}<br>
+<br>
++void colo_enable_ram_bulk_stage(void)<br>
++{<br>
++=C2=A0 =C2=A0 ram_state-&gt;ram_bulk_stage =3D true;<br>
++}<br>
++<br>
++void colo_disable_ram_bulk_stage(void)<br>
++{<br>
++=C2=A0 =C2=A0 ram_state-&gt;ram_bulk_stage =3D false;<br>
++}<br>
++<br>
+=C2=A0/*<br>
+=C2=A0 * Flush content of RAM cache into SVM&#39;s memory.<br>
+=C2=A0 * Only flush the pages that be dirtied by PVM or SVM or both.<br>
+diff --git a/migration/ram.h b/migration/ram.h<br>
+index 2eeaacfa13..c1c0ebbe0f 100644<br>
+--- a/migration/ram.h<br>
++++ b/migration/ram.h<br>
+@@ -69,4 +69,7 @@ void colo_flush_ram_cache(void);<br>
+=C2=A0void colo_release_ram_cache(void);<br>
+=C2=A0void colo_incoming_start_dirty_log(void);<br>
+<br>
++void colo_enable_ram_bulk_stage(void);<br>
++void colo_disable_ram_bulk_stage(void);<br>
++<br>
+=C2=A0#endif<br>
+-- <br>
+2.25.1<br>
+<br>
+</blockquote></div>
+
+--0000000000006baeaa05afde9980--
 
