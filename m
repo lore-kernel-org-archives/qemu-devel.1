@@ -2,86 +2,88 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97BBEC4727D
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 19:29:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 259B6C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 19:36:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CF3320BED
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 19:29:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A3E5235FD
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 19:36:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h4odo7CB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CF3320BED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O/KMYdpt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A3E5235FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLASZ-0001Vb-3Y
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 15:29:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38390)
+	id 1kLAZJ-00044d-Uv
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 15:36:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39550)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLARZ-00012Z-0y
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 15:28:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47895)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLARX-0007li-HP
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 15:28:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600889319;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=LnjZ5EhywDhKOv3dcaCOoyu7NX3AoWe08F/aQR+SLKI=;
- b=h4odo7CBnkmGMMBiR6VyaT49Ig24t/TJDnH97gul+t2rbmFr02S1d2kpbGUcIoboaccGQz
- CKOtZqYL5IJo+9MbNINebc6qkJBysUjIZ3qqx4ZnTCVOhFwuj3Fi/jB7DXly0j/UgxuIFr
- q0JAAI31b6cvc7vIyVzW4boK2KyndgM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-210-B_PmSAvQMlq5jDXNXtvN7w-1; Wed, 23 Sep 2020 15:28:37 -0400
-X-MC-Unique: B_PmSAvQMlq5jDXNXtvN7w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A13A1074652;
- Wed, 23 Sep 2020 19:28:36 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
- [10.10.119.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6E98919D6C;
- Wed, 23 Sep 2020 19:28:35 +0000 (UTC)
-Date: Wed, 23 Sep 2020 15:28:33 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v2 13/38] qapi/common.py: add type hint annotations
-Message-ID: <20200923192833.GM191229@localhost.localdomain>
-References: <20200922210101.4081073-1-jsnow@redhat.com>
- <20200922210101.4081073-14-jsnow@redhat.com>
+ (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
+ id 1kLAXn-0002X0-Cr; Wed, 23 Sep 2020 15:35:11 -0400
+Received: from mail-qv1-xf44.google.com ([2607:f8b0:4864:20::f44]:43340)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
+ id 1kLAXl-0008UQ-I3; Wed, 23 Sep 2020 15:35:11 -0400
+Received: by mail-qv1-xf44.google.com with SMTP id cr8so589344qvb.10;
+ Wed, 23 Sep 2020 12:35:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=t5KFR6tivFfBv67ze4q62VptCBp6KR6G1kHGNM1ZOwE=;
+ b=O/KMYdptFJeMX7oGh+A0KPSUaUlBj58Rn732/nGGUD1Ht6xPzu9o4z8QRi1+GwWSbc
+ tiI68+/22CnRkkV8Sh6J0nSBcoIDs37tP97v8g8vLF+LfByxN79FkptxoZ5fOKKa3S3Y
+ If0MI0sM8ldAd/XmldoQ9Q9PWMC1BUxXeITCgsKmwiZIFBr40YAVfZMQiAU34Kzp9Dwt
+ fOl8TladeRcCT+6WLDUjX713+OKLe+7jHyJ2vQZ6RoCf2Oqa+EEX2NLTh958WMlv0Nij
+ tw1arbRN/ouE3IAaljWuNKJKi48DjOWeV3bJQlCrMm7CADQQJCe/d/iRGf/Pjjt4Sr1l
+ WN1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=t5KFR6tivFfBv67ze4q62VptCBp6KR6G1kHGNM1ZOwE=;
+ b=TTx2t/MjW7q7GBt6wJK/hB+boodwkFBaq2w+hk4XJ5PhFxOJjIghTu71JRmU5jje1i
+ W2ZGxiy6TNXLt20kToncmqkOI9M1fD4FOQ9Qj9ZIYw90S0VK/WXAB4u6b8Y0mH4W1VRb
+ CWnCy/snMjW5aknBu3bijH+5/QRPyYdvryMQnexqmWL3GIUKcGjSzKERnF1awxz/JDEO
+ RDiOdjOfn0omeVRqsbCqUuTGZysI78+uDcKgPouKJnwUkN7jcmNGCoH14Qgx6BnCYyjD
+ hUryZbjx6m/UNujwah7EbXhYBPjEoDTlFHy1oxxZkKXTQnVuyDrrpmXVXBg83n1/xAbe
+ grEQ==
+X-Gm-Message-State: AOAM532MIvr6nzTRB72XeA/PIt33IujZnqighRMq6AOpfvE8pN5un0aA
+ vajW9wHSJ0Gr+gs11LOHRThryXIf9De4Rg==
+X-Google-Smtp-Source: ABdhPJxkxeOhIuQdAscoIcYGEMYjeRFsM8yRUvBMm68oPnOHJY7P7LKxK2C6wIEOvpZzOcgGQviBFQ==
+X-Received: by 2002:a0c:f194:: with SMTP id m20mr1680819qvl.9.1600889707285;
+ Wed, 23 Sep 2020 12:35:07 -0700 (PDT)
+Received: from rekt.ibmuc.com ([2804:431:c7c7:9e50:6b84:53b8:5d9d:d408])
+ by smtp.gmail.com with ESMTPSA id u4sm612362qkk.68.2020.09.23.12.35.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 23 Sep 2020 12:35:06 -0700 (PDT)
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/6] pseries NUMA distance calculation
+Date: Wed, 23 Sep 2020 16:34:52 -0300
+Message-Id: <20200923193458.203186-1-danielhb413@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20200922210101.4081073-14-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="lRF4gxo9Z9M++D0O"
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=crosa@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 00:53:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::f44;
+ envelope-from=danielhb413@gmail.com; helo=mail-qv1-xf44.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,48 +96,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Markus Armbruster <armbru@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-ppc@nongnu.org,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---lRF4gxo9Z9M++D0O
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On Tue, Sep 22, 2020 at 05:00:36PM -0400, John Snow wrote:
-> Annotations do not change runtime behavior.
-> This commit *only* adds annotations.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
+This series is a follow-up of the reworked pSeries NUMA
+code that is already merged upstream. It contains some of
+the patches that were presented in the first version of this
+work [1], some of them changed based on the reviews made
+back there. 
 
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+With this series, we're able to take user input into consideration
+when setting up the NUMA topology of the guest. It is still an
+approximation, but at least user input is not completely ignored.
 
---lRF4gxo9Z9M++D0O
-Content-Type: application/pgp-signature; name="signature.asc"
+The changes will only be effective with pseries-5.2 and newer
+machines, and if more than one NUMA node is declared by the user.
+The idea is that we don't want to tamper with legacy guest behavior.
+Patch 6 has examples of how we are approximating NUMA distance
+via user input.
 
------BEGIN PGP SIGNATURE-----
+The series was rebased using David's ppc-for-5.2 at
+4cca31df828.
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl9rod4ACgkQZX6NM6Xy
-CfOTRA/9FLt65sGMV6db0fDY948LGtCKCkvJj7KjAiN4Ct96BWTWFSEjII2ODbUZ
-mAxdo0hRZETJpAr50kIlGFw4aY/9aqQwWjHvrDQDT7Qfec+VIf5lYRtRGf7ekj6E
-KpL5e4XPJLQCp66ihJoO2E3f8Qf5uQz0QKf6DATasmvISvcOO1vxQDdEr7yfYWCS
-CJGOfCNH2IXWPMhDX453t4gaXstW8PBYCID+D0Hmey5r4NiW0A2t2U0Cl+uNT8L9
-8MTfzQMJOG23Z/rH8psFNh6XpVtgHDUaqqVoecjMdBhO4VbEpQl6F5VOCiI0XHFx
-3fpw9TOUROF1uG/BtFvDls/oRRzDTvP6vvMMTY4DExWTx12Ydw7LfEd3X92S23XR
-t6CONUjOYJpiG5Cfg+c323m0xbaeY5JISIKhN1fITUB80BKfIkjF3yFfbNKsXlkr
-PNoBmEfbx5aMAz05+J0V1Q8IlH9C9/NwtN11CcrLF84ArjbdDoRGYerHPtqzjNcv
-7RLl8PEgmfCr1LsglbZb+RcSL5Mzm0PzuG1knqd5hjBq4Ql3wEoVpAtdBxZMB+ES
-SwJ5un8JGd4xqonMf6b1/zot3bTarJ4uqxd9aIJ9KHrsJJnzQCz6gd3Dz91GlUTI
-8YpmDI9w+xXdkdAxbuBhWTOhk2ev87F2gyHT+mIc4lz2xE5sBwo=
-=CgNs
------END PGP SIGNATURE-----
 
---lRF4gxo9Z9M++D0O--
+Changes carried over from [1]:
+- patch 1 (former 4): same patch, added David's r-b
+- patch 2 (former 2): the check for asymetrical NUMA was moved
+to spapr code as requested in the review
+- patch 4 is a merge of former patches 5 and 6
+- patch 5 (former 9): reworked
+- patch 6 (former 10): same patch
+
+Patch 3 is new in the series.
+
+
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg03169.html
+
+
+
+Daniel Henrique Barboza (6):
+  spapr: add spapr_machine_using_legacy_numa() helper
+  spapr_numa: forbid asymmetrical NUMA setups
+  spapr_numa: translate regular NUMA distance to PAPR distance
+  spapr_numa: change reference-points and maxdomain settings
+  spapr_numa: consider user input when defining associativity
+  specs/ppc-spapr-numa: update with new NUMA support
+
+ docs/specs/ppc-spapr-numa.rst | 213 ++++++++++++++++++++++++++++++++++
+ hw/ppc/spapr.c                |  12 ++
+ hw/ppc/spapr_numa.c           | 184 +++++++++++++++++++++++++++--
+ include/hw/ppc/spapr.h        |   2 +
+ 4 files changed, 402 insertions(+), 9 deletions(-)
+
+-- 
+2.26.2
 
 
