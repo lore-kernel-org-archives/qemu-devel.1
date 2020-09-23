@@ -2,90 +2,79 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35059C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 11:41:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEA43C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 11:43:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B382620663
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 11:41:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cl+jnQ7F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B382620663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F215720663
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 11:43:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F215720663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL390-0001EX-IG
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 07:41:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35106)
+	id 1kL3Bd-0003Fx-2D
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 07:43:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35306)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kL37V-0008Mb-7I
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 07:39:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49048
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kL37J-0006uR-PF
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 07:39:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600861158;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=rzgSlGw7H3J7S5y/h6O70w+/gWvkZWt2Ih2WpHAKQWo=;
- b=Cl+jnQ7Ft3xBIcKdcbg8RbMv7kTO+4lyDYpDH/8sj44wr/RNVuv1HV3OhAAVQk0JNHKGEW
- bZe67G07r+dFB4gwHM2InvrccD2uKRSc7MKE2zvjqW0tP5UGIvU9u/Tw4lSjk2fhHoyJ3j
- B5rUWlREl9Ro7EjMw3X552fLPqaUkOE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-175-YjO_PiCpP_OUH-SblpHfjw-1; Wed, 23 Sep 2020 07:39:14 -0400
-X-MC-Unique: YjO_PiCpP_OUH-SblpHfjw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 79FA3801AB7;
- Wed, 23 Sep 2020 11:39:13 +0000 (UTC)
-Received: from t480s.redhat.com (ovpn-112-54.ams2.redhat.com [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F1928702E7;
- Wed, 23 Sep 2020 11:39:11 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v1 3/5] memory-device: Support big alignment requirements
-Date: Wed, 23 Sep 2020 13:38:58 +0200
-Message-Id: <20200923113900.72718-4-david@redhat.com>
-In-Reply-To: <20200923113900.72718-1-david@redhat.com>
-References: <20200923113900.72718-1-david@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kL38k-0001Su-9C
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 07:40:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51148)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kL38i-0007BH-4s
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 07:40:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kL38g-00054v-8l
+ for <qemu-devel@nongnu.org>; Wed, 23 Sep 2020 11:40:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 37E272E80E7
+ for <qemu-devel@nongnu.org>; Wed, 23 Sep 2020 11:40:46 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 07:39:18
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 23 Sep 2020 11:33:35 -0000
+From: Maskim Bakulin <1896754@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ruspartisan
+X-Launchpad-Bug-Reporter: Maskim Bakulin (ruspartisan)
+X-Launchpad-Bug-Modifier: Maskim Bakulin (ruspartisan)
+Message-Id: <160086081591.406.2004357727821714311.malonedeb@chaenomeles.canonical.com>
+Subject: [Bug 1896754] [NEW] Performance degradation for WinXP boot time after
+ b55f54bc
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
+X-Launchpad-Hash: bf9a17a64308d8235eb4c921d87d0d333513ad6e
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 07:40:46
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -94,61 +83,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Wei Yang <richardw.yang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>
+Reply-To: Bug 1896754 <1896754@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's warn instead of bailing out - the worst thing that can happen is
-that we'll fail hot/coldplug later. The user got warned, and this should
-be rare.
+Public bug reported:
 
-This will be necessary for memory devices with rather big (user-defined)
-alignment requirements - say a virtio-mem device with a 2G block size -
-which will become important, for example, when supporting vfio in the
-future.
+Qemu 5.1 loads Windows XP in TCG mode 5-6 times slower (~2 minutes) than
+4.2 (25 seconds), I git bisected it, and it appears that commit
+b55f54bc965607c45b5010a107a792ba333ba654 causes this issue. Probably
+similar to an older fixed bug
+https://bugs.launchpad.net/qemu/+bug/1672383
 
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Wei Yang <richardw.yang@linux.intel.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/mem/memory-device.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+Command line is trivial: qemu-system-x86_64 -nodefaults -vga std -m
+4096M -hda WinXP.qcow2 -monitor stdio -snapshot
 
-diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-index 4bc9cf0917..8a736f1a26 100644
---- a/hw/mem/memory-device.c
-+++ b/hw/mem/memory-device.c
-@@ -119,9 +119,10 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
- 
-     /* start of address space indicates the maximum alignment we expect */
-     if (!QEMU_IS_ALIGNED(range_lob(&as), align)) {
--        error_setg(errp, "the alignment (0x%" PRIx64 ") is not supported",
--                   align);
--        return 0;
-+        warn_report("the alignment (0x%" PRIx64 ") exceeds the expected"
-+                    " maximum alignment, memory will get fragmented and not"
-+                    " all 'maxmem' might be usable for memory devices.",
-+                    align);
-     }
- 
-     memory_device_check_addable(ms, size, &err);
-@@ -151,7 +152,7 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
-             return 0;
-         }
-     } else {
--        if (range_init(&new, range_lob(&as), size)) {
-+        if (range_init(&new, QEMU_ALIGN_UP(range_lob(&as), align), size)) {
-             error_setg(errp, "can't add memory device, device too big");
-             return 0;
-         }
--- 
-2.26.2
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1896754
+
+Title:
+  Performance degradation for WinXP boot time after b55f54bc
+
+Status in QEMU:
+  New
+
+Bug description:
+  Qemu 5.1 loads Windows XP in TCG mode 5-6 times slower (~2 minutes)
+  than 4.2 (25 seconds), I git bisected it, and it appears that commit
+  b55f54bc965607c45b5010a107a792ba333ba654 causes this issue. Probably
+  similar to an older fixed bug
+  https://bugs.launchpad.net/qemu/+bug/1672383
+
+  Command line is trivial: qemu-system-x86_64 -nodefaults -vga std -m
+  4096M -hda WinXP.qcow2 -monitor stdio -snapshot
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1896754/+subscriptions
 
