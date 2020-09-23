@@ -2,87 +2,133 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19621C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 16:47:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EC89C4727D
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 16:48:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8964720936
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 16:46:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 134E420791
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 16:48:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gslxBaJu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8964720936
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YlfklcQv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 134E420791
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL7uy-00051t-OG
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 12:46:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57972)
+	id 1kL7wS-0006cV-8y
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 12:48:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58702)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kL7t9-00043A-EI
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 12:45:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33474)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kL7uq-0005D8-Vm
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 12:46:49 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41128
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kL7t7-0004ON-H7
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 12:45:03 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kL7un-0004kt-BA
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 12:46:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600879500;
+ s=mimecast20190719; t=1600879603;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wc6SuxQt6xddj1O7Zvt4atLv/11XMD1yPuRgdDUg71Q=;
- b=gslxBaJurwUQsNJu5JEbbAMuUBP8lNeKTgip/BUELAjKW/sMaE1x5yrl7I0AW/owlZGEGb
- vUvV2Ut9cmo7nqAj3/ZFoj4Q6nkKFQHV37phx5Ud2hfZpO7Kg8NWKKYYiCvP3iiezcu0A+
- bD3kr997rLjp7cVG3/48K+BlUWm8Scw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-442-BA-XynrSOP6H-YmZw9DWfw-1; Wed, 23 Sep 2020 12:44:56 -0400
-X-MC-Unique: BA-XynrSOP6H-YmZw9DWfw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A7B61017DC7;
- Wed, 23 Sep 2020 16:44:55 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-112-233.ams2.redhat.com
- [10.36.112.233])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E57155C1DC;
- Wed, 23 Sep 2020 16:44:50 +0000 (UTC)
-Subject: Re: [PATCH v6 00/11] x86: fix cpu hotplug with secure boot
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <20200923094650.1301166-1-imammedo@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <f416b0ff-f5d9-b303-e561-755819866dda@redhat.com>
-Date: Wed, 23 Sep 2020 18:44:50 +0200
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=2pulxwzVEOhTbW0sSMqbjneC1e2WfyUa0w0tnHTTIwU=;
+ b=YlfklcQvdc2xkRXsrJUVy+hr2njNlAheNqGw/EnGpkVacGOZSYnrhtqdI1tg3juytKefGa
+ TI178V6TJATMyyyL45SmVYHpVwpm4UcyhFQuEZ+K8Z9yEn0A/wfpzFMfUQmIzkrjv4cq6V
+ dtP0P1ZcPuT/S1yUO7sIuaMNWnu50NE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-189-XiuO3hoiNaiBXGJpwRzHRA-1; Wed, 23 Sep 2020 12:46:39 -0400
+X-MC-Unique: XiuO3hoiNaiBXGJpwRzHRA-1
+Received: by mail-wr1-f71.google.com with SMTP id d13so45710wrr.23
+ for <qemu-devel@nongnu.org>; Wed, 23 Sep 2020 09:46:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=2pulxwzVEOhTbW0sSMqbjneC1e2WfyUa0w0tnHTTIwU=;
+ b=nwbdhQ+RN3bui0fnjrkp4LByN4Pk88hHOlYsZXuE3Dxqirus40MwR3q6ulDiRarWsz
+ Sc0eQowsIXkZAiDrROsw2miDZnMdREjTc2qsXxJtxLQ9DkhFDqeLlPm4puJqYNS2EDfR
+ Ig+Ar91CRCaVm1bmgbEO5O3v2YDIX3r0fy3FsCnMaKLupM3mViyGHAFtikgr0t8fjpqw
+ NvZWqFGju2wd+H0F6xxGfgyRzC1zn0MsfQHLmOmuMaXU7yYZmY3qvBT2lnzV/kg3Ow9I
+ NqIX0s1adnwVqhLSGY67gxstfTsZN6sVV8Uw/zgm8pbya2Hby/4fkDuZDjeMRbvryjDe
+ MxlQ==
+X-Gm-Message-State: AOAM533v0RTtFuRJK2gTo6ARXrdbOCI5f6NJ+subkBLl/P2I0Dw8UPFp
+ 5TEweJ7mVSirsHi5L6RqIMu9oxvUGi1JBxPScvzptHqmo+hMxcWpss/T/WjdRt7SRGYh/Z2uIA8
+ 8rFlrq7/GROi7JM8=
+X-Received: by 2002:a1c:e256:: with SMTP id z83mr450089wmg.137.1600879598532; 
+ Wed, 23 Sep 2020 09:46:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxAsocPnYkEurd55LXiactKrfmCK8Ux/BjzrnUIS6DJxd5frxKJU//IoCuhfy7A6htPLc3BfQ==
+X-Received: by 2002:a1c:e256:: with SMTP id z83mr450050wmg.137.1600879598261; 
+ Wed, 23 Sep 2020 09:46:38 -0700 (PDT)
+Received: from [192.168.1.34] (234.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.234])
+ by smtp.gmail.com with ESMTPSA id b84sm456871wmd.0.2020.09.23.09.46.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 23 Sep 2020 09:46:37 -0700 (PDT)
+Subject: Re: [PATCH 00/13] dma: Let the DMA API take MemTxAttrs argument and
+ propagate MemTxResult
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>
+References: <20200904154439.643272-1-philmd@redhat.com>
+ <17d09f61-c65f-f248-7f07-e47295540a86@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <ce65770a-78f2-9ec7-8c01-1f45f28a116b@redhat.com>
+Date: Wed, 23 Sep 2020 18:46:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200923094650.1301166-1-imammedo@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <17d09f61-c65f-f248-7f07-e47295540a86@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=lersek@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 00:53:58
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 08:52:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
 X-Spam_bar: ---
 X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,78 +141,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ankur.a.arora@oracle.com, mst@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Peter Xu <peterx@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-block@nongnu.org,
+ Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>,
+ Laszlo Ersek <lersek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Beniamino Galvani <b.galvani@gmail.com>, Eric Auger <eric.auger@redhat.com>,
+ qemu-arm@nongnu.org, Jan Kiszka <jan.kiszka@web.de>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Richard Henderson <rth@twiddle.net>, Andrew Jeffery <andrew@aj.id.au>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-ppc@nongnu.org,
+ Peter Chubb <peter.chubb@nicta.com.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/23/20 11:46, Igor Mammedov wrote:
-> v6:
->   - [9/10] Add comment explaining why while_ctx2 restarts from the last processed CPU.
->   - rebase on top of current master, due to non trivial conflict
->     caused by microvm series, which moved/renamed pc_cpu_pre_plug()
+On 9/23/20 5:24 PM, John Snow wrote:
+> On 9/4/20 11:44 AM, Philippe Mathieu-Daudé wrote:
+>> Salvaging cleanups patches from the RFC series "Forbid DMA write
+>> accesses to MMIO regions" [*], propagating MemTxResult and
+>> adding documentation.
+>>
+>> [*] https://www.mail-archive.com/qemu-block@nongnu.org/msg72924.html
+>>
+>> Klaus Jensen (1):
+>>    pci: pass along the return value of dma_memory_rw
+>>
+> 
+> Paolo is on PTO. Are we waiting for him to merge this?
 
-So, I went back to my local branch where I had applied your v5, *plus*
-the comment fixup ("[PATCH v5 9/10] fixup! x68: acpi: trigger SMI before
-sending hotplug Notify event to OSPM") on top. I rebased that branch to
-its *same* base commit, only squashing the comment fixup into patch#9.
+I think so. This series now needs a rebase due to a change
+in hw/display/virtio-gpu.c. I'll respin when Paolo is back
+(or someone willing to queue this).
 
-Then I applied your v6 series on top of current master, using a
-different (new) local branch.
+Regards,
 
-Then I ran git-range-diff on these two local branches.
-
-In patches 6, 7, 8, and 9, you've picked up my feedback tags from the v5
-review session; that's good, there was nothing else to do.
-
-There is a trivial difference in patch 2 -- trivial to review, that is;
-I'm not saying that it's so trivial that git-rebase should have coped
-with it automatically on your end. Here's the git-range-diff output:
-
->  2:  e606a75432a8 !  2:  94702d2e3125 x86: cpuhp: prevent guest crash on CPU hotplug when broadcast SMI is in use
->     @@ -12,7 +12,7 @@
->          Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->          Reviewed-by: Laszlo Ersek <lersek@redhat.com>
->          Tested-by: Laszlo Ersek <lersek@redhat.com>
->     -    Message-Id: <20200907112348.530921-3-imammedo@redhat.com>
->     +    Message-Id: <20200923094650.1301166-3-imammedo@redhat.com>
->
->      diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
->      --- a/hw/acpi/ich9.c
->     @@ -40,17 +40,17 @@
->
->       void ich9_pm_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
->
->     -diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->     ---- a/hw/i386/pc.c
->     -+++ b/hw/i386/pc.c
->     +diff --git a/hw/i386/x86.c b/hw/i386/x86.c
->     +--- a/hw/i386/x86.c
->     ++++ b/hw/i386/x86.c
->      @@
->               return;
->           }
->
->     -+    if (pcms->acpi_dev) {
->     ++    if (x86ms->acpi_dev) {
->      +        Error *local_err = NULL;
->      +
->     -+        hotplug_handler_pre_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev,
->     ++        hotplug_handler_pre_plug(HOTPLUG_HANDLER(x86ms->acpi_dev), dev,
->      +                                 &local_err);
->      +        if (local_err) {
->      +            error_propagate(errp, local_err);
-
-Meaning that, in v6, you had to refer to "x86ms", rather than to "pcms",
-and that the code had to be introduced in a different file / function.
-
-The need for that originates from 0cca1a918b85 ("x86: move cpu hotplug
-from pc to x86", 2020-09-17).
-
-It looks innocent enough, but I should still retest patch#2. I'll report
-back under that patch in this series.
-
-Thanks
-Laszlo
+Phil.
 
 
