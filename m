@@ -2,143 +2,98 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFD05C4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:55:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A53C5C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:57:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2B0B21BE5
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:55:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30BBC2223E
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:57:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="KkHhF0QG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2B0B21BE5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mpB1M/25"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30BBC2223E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL8zF-000088-PV
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 13:55:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45594)
+	id 1kL91F-0001sD-8h
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 13:57:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33942)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1kL8rF-0000aG-JP
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 13:47:12 -0400
-Received: from mail-bn8nam12on2080.outbound.protection.outlook.com
- ([40.107.237.80]:39264 helo=NAM12-BN8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1kL8r4-0003x3-26
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 13:47:07 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mIeU1AOsf2RvRWmKb1dj2Fi24oKMx7rBOm8wbkI6rDZ5Je+hLvd68MvN2YIaROSd1nI8WYgr6oA6UOpV6mTNd1YvdF/Os4j11rIvDZ3o9fcoTKz+ZMYi0G/e42mQ/hCHtrRAmqzgrr59J+vLZbdYaZAdBKbyGvIEEgzR3ik6coDzXM7SuDihf8yROJk3b3WpiMxY179WKwelfNfC+s7IpiT/ZhLzmcw0H66Pp3R9c/s6+IyIEcM1UmmRVS85IxD3ehJ7Y1tQcjK32NE8uOyXUmCi+diMT7YcZBAl+Mt9tayORRwb1fGKuATF1MuexORJ7pInm96neGyIAmzHws/2kQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zaj3YJcYViR8UKMJ80luHY/YzNh5RbY1qPbySREXViw=;
- b=A1mK9iamjAu8z2yP3bqqjvGjBSyFMQHOsrgbig/7xzLjdxLFD17AaTCmVRSGW0SCyobN4X4/nQJsR1gX4Fzql8sC1NWMP+Jgv8oAGUT1Bd182t7lzR3a9S0AHppF3itPQh1rpJAcyglXgl30lqsqTu6NiEQK3M39ZgybDh5lZUnEw46+fCYBdALfp2/AWwSAv+s3O4VZFMG+6a+Ft5ttiO/2mIFIyNhd7B1moDvJU3zQRNbrXHD8jdWJ8lGzTu+rqMGpHqvEShGfsTIXtW6EozIuq/Y8sAJOOwV79USsmLvlpKJHY3zsoTJSX1Lw1PJKIc8Ex8vGXGyF/zVQwABYNA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=gmail.com smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zaj3YJcYViR8UKMJ80luHY/YzNh5RbY1qPbySREXViw=;
- b=KkHhF0QGKURNJPajnJ37XNLSNTnUBIePrg0kIasx+VX/eBtTMiIyFbOW1MM+d+ugh0xW5lsAQu1cRHczUu752RacO4sBmOeeXkDGnwe0WQKhNQmcyfcG5QXKmk6nyqR/ZBh6whIXUd0wH5bIDXK+A3NBM2Trj6rcYRxsush9Vc8=
-Received: from CY4PR20CA0048.namprd20.prod.outlook.com (2603:10b6:903:cb::34)
- by BN6PR02MB2657.namprd02.prod.outlook.com (2603:10b6:404:fc::10)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.19; Wed, 23 Sep
- 2020 17:46:55 +0000
-Received: from CY1NAM02FT042.eop-nam02.prod.protection.outlook.com
- (2603:10b6:903:cb:cafe::b9) by CY4PR20CA0048.outlook.office365.com
- (2603:10b6:903:cb::34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.21 via Frontend
- Transport; Wed, 23 Sep 2020 17:46:55 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- CY1NAM02FT042.mail.protection.outlook.com (10.152.75.136) with Microsoft SMTP
- Server id 15.20.3412.21 via Frontend Transport; Wed, 23 Sep 2020 17:46:54
- +0000
-Received: from [149.199.38.66] (port=50491 helo=smtp.xilinx.com)
- by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
- (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1kL8qk-00063W-QT; Wed, 23 Sep 2020 10:46:38 -0700
-Received: from [127.0.0.1] (helo=xsj-pvapsmtp01)
- by smtp.xilinx.com with esmtp (Exim 4.63)
- (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1kL8r0-0003Lk-Gs; Wed, 23 Sep 2020 10:46:54 -0700
-Received: from [10.140.6.35] (helo=xhdsaipava40.xilinx.com)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <saipava@xhdsaipava40.xilinx.com>)
- id 1kL8qz-0003LQ-P2; Wed, 23 Sep 2020 10:46:54 -0700
-Received: by xhdsaipava40.xilinx.com (Postfix, from userid 14131)
- id 9597313C01DD; Wed, 23 Sep 2020 23:20:17 +0530 (IST)
-From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
- Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?q?=27Marc-Andr=C3=A9=20Lureau=27?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Edgar Iglesias <edgari@xilinx.com>,
- Francisco Eduardo Iglesias <figlesia@xilinx.com>
-Subject: [PATCH v9 2/7] usb/hcd-xhci: Move qemu-xhci device to hcd-xhci-pci.c
-Date: Wed, 23 Sep 2020 23:20:02 +0530
-Message-Id: <1600883407-15147-3-git-send-email-sai.pavan.boddu@xilinx.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1600883407-15147-1-git-send-email-sai.pavan.boddu@xilinx.com>
-References: <1600883407-15147-1-git-send-email-sai.pavan.boddu@xilinx.com>
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-PublicTrafficType: Email
+ (Exim 4.90_1) (envelope-from <will.senn@gmail.com>)
+ id 1kL87p-0007EZ-MD; Wed, 23 Sep 2020 13:00:15 -0400
+Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:38816)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <will.senn@gmail.com>)
+ id 1kL87i-0006K3-3P; Wed, 23 Sep 2020 13:00:10 -0400
+Received: by mail-oi1-x22a.google.com with SMTP id 26so584655ois.5;
+ Wed, 23 Sep 2020 10:00:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language;
+ bh=qHpZzEacpXLsAtZUqq0yFHYGywfXgQksKlr2ULhjjwM=;
+ b=mpB1M/25aZIoIF4hpbwZ3wVyB4wX/753wYjfInCQkSUTiJDmUCLWAkravi8aL+fvG4
+ RDhMh+7kSsgLli6Rx3hKcgwgCjPiFPcaP0ZRa/NXY5HURik9BvvRoXRqTpvUQngr/otm
+ +5A1P96ff3UNBkngpnFEbT2mE7S5cKeFzDsEjSeR5OJI/H1YIKDlO+/tptx3xZnLypWQ
+ HXCz2TbwWJg9TWgR0dRPOFF2etlhxcVQV0FueOcNaVMNyfsj6yvzmOIRxiYmbPXBCiUO
+ SOPu1OkSM8GrBCbA2qL5Y3v1XxRzpVT84U9VgO63Ssw70m/pRad8VXKX3Y68AK/bjXWJ
+ VEsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language;
+ bh=qHpZzEacpXLsAtZUqq0yFHYGywfXgQksKlr2ULhjjwM=;
+ b=GHLGxM2dQGHoNAcFATE6mneA0Mac10m4r95MQGVYRDMt/Doq8hV/fbbK5wadrX8z9N
+ ukxg8GMF1PMN+UerddOx0bNu+XT3ym1znTLjSGh4wtwplPGCc8DA6qN98Hovppra2v0/
+ 9yWyfWXM12JWCYnMwkCKvFSAjlhnPrh7x3r1dd/PmwYrvGoOsYH9LNzwIJih6J4J+vAs
+ l+T3XLQ9d9sfCNmVqgFQ6J5gjLOeHZQbNWhVdTVxv2x/DSSQcygTyeQk1Bul24do30qi
+ uKsu2WuyiWhyreMPjv5jsTwqLB1xkWqBEmXiAb7aqW67jzBAxp869C9YAuHL1zjWN1n/
+ LksA==
+X-Gm-Message-State: AOAM533ATjlFnSIRGsAUDF+2427h3rOsZKOONwBeWhTPrUBV6amWmiy+
+ 1Gb12x+ooIjtC3e1Ncel+QQ=
+X-Google-Smtp-Source: ABdhPJxnnSabDdaVBkNiLwQaa9mIVNYnzO/SwwXK78OuTM+YDRI7yUq/DBjZzqdUaEX/hlJWMp1DGQ==
+X-Received: by 2002:a05:6808:2d7:: with SMTP id
+ a23mr248507oid.51.1600880402508; 
+ Wed, 23 Sep 2020 10:00:02 -0700 (PDT)
+Received: from terra.local ([12.154.58.98])
+ by smtp.gmail.com with ESMTPSA id y84sm57999oia.10.2020.09.23.10.00.01
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 23 Sep 2020 10:00:02 -0700 (PDT)
+Subject: Re: Minix 1.1 with QEMU
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-discuss@nongnu.org, qemu-devel <qemu-devel@nongnu.org>
+References: <5e534cc7-2a99-baa5-fc8f-63d0d8e85c97@gmail.com>
+ <edc82d55-e5d1-abba-9a8e-7954b1dbe66e@amsat.org>
+From: Will Senn <will.senn@gmail.com>
+Message-ID: <6ab2235a-519b-2079-34eb-2dfe3b774fe4@gmail.com>
+Date: Wed, 23 Sep 2020 12:00:01 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:78.0)
+ Gecko/20100101 Thunderbird/78.2.2
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: 3b9e9b53-ebed-4c79-6383-08d85fe8a941
-X-MS-TrafficTypeDiagnostic: BN6PR02MB2657:
-X-Microsoft-Antispam-PRVS: <BN6PR02MB2657900D5C7B80B53116F7EDCA380@BN6PR02MB2657.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zSVNnmdfP0lhznfqRFkf8I2IndiTbr9vAEMrK7R3Bvq5OlF3lIXH6CrcGmyXjEa1GmEUvPTcrfLDxjB0ge38QLGoWEa4IE3AtjWUbm931IEGHQEfTl5xguGZntorO2a6l7+OXTyMRP+mNoVGgXnD3ObYD8spxf5CuWWslMtNNgLJg6zUV0NZiQoH5HCYVKSUpXbQfmd0Nwq8NClbacIBL/sxyoYZ1dmcdwSmM/F5Fwn4LkYZJDtLi2LOEUtxrmxTgwz+bn4hkECP45M+c5aoT5bcfSP88e0MVyflrdktR1cRvFFSVcRc8NGXbPHRvnFkW5qi73ElhiFqYHfjJVTgTX08nPk5UNiTvCDNLuYD0Bbg+OmqAHSRJw8KW7cmXbSgoAEImH5278WfKGMMuZRMy3nzz8yrVtdoS6tLPTyoJt7t1fFtz0Beqm7VjPbMkYy+gmNqaTM2WsqE7pLPu6GZB6sTZPD/ZaoGz5SbnlbsyTNij7VZ1aW781oRu2yHyUko
-X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
- SFS:(376002)(396003)(346002)(136003)(39860400002)(46966005)(54906003)(83380400001)(110136005)(316002)(70206006)(70586007)(2616005)(26005)(6666004)(47076004)(81166007)(7416002)(478600001)(82740400003)(42186006)(186003)(356005)(8936002)(4326008)(2906002)(336012)(36756003)(426003)(5660300002)(82310400003)(8676002)(107886003)(6636002)(6266002)(2004002);
- DIR:OUT; SFP:1101; 
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2020 17:46:54.9461 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3b9e9b53-ebed-4c79-6383-08d85fe8a941
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
- Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-AuthSource: CY1NAM02FT042.eop-nam02.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR02MB2657
-Received-SPF: pass client-ip=40.107.237.80; envelope-from=saipava@xilinx.com;
- helo=NAM12-BN8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 13:46:56
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <edc82d55-e5d1-abba-9a8e-7954b1dbe66e@amsat.org>
+Content-Type: multipart/alternative;
+ boundary="------------5D98E4672419F97F14870E0B"
+Content-Language: en-GB
+Received-SPF: pass client-ip=2607:f8b0:4864:20::22a;
+ envelope-from=will.senn@gmail.com; helo=mail-oi1-x22a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
+X-Mailman-Approved-At: Wed, 23 Sep 2020 13:54:49 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -150,215 +105,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Vikram Garhwal <fnuv@xilinx.com>,
- qemu-devel@nongnu.org, Paul Zimmerman <pauldzim@gmail.com>,
- Sai Pavan Boddu <saipava@xilinx.com>,
- Alistair Francis <alistair.francis@wdc.com>, Ying Fang <fangying1@huawei.com>,
- =?UTF-8?q?=27Philippe=20Mathieu-Daud=C3=A9=27?= <philmd@redhat.com>
+Cc: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move pci specific devices to new file. This set the environment to move all
-pci specific hooks in hcd-xhci.c to hcd-xhci-pci.c.
+This is a multi-part message in MIME format.
+--------------5D98E4672419F97F14870E0B
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
----
- hw/usb/Kconfig        |  6 +++++
- hw/usb/hcd-xhci-pci.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++
- hw/usb/hcd-xhci.c     | 33 ++------------------------
- hw/usb/hcd-xhci.h     |  4 ++++
- hw/usb/meson.build    |  1 +
- 5 files changed, 79 insertions(+), 31 deletions(-)
- create mode 100644 hw/usb/hcd-xhci-pci.c
+On 9/23/20 11:53 AM, Philippe Mathieu-Daudé wrote:
+> Hi Will,
+>
+> On 9/23/20 6:45 PM, Will Senn wrote:
+>> Long time user, first time poster :)
+>>
+>> So, I'd like to be able to run Minix 1.1 on my Macbook Pro mid-2012
+>> w/16gb RAM (MacOS 10.14.6 Mojave). Qemu will run pretty ancient OS'es
+>> such as DOS 2.0, which I use all of the time. However, I'm having some
+>> difficulty getting Minix to run. I am able to boot the first floppy, but
+>> when I change to the second floppy, the system freezes and I can't tell
+>> what is going on. Here's what I did to get this far:
+>>
+>> brew install qemu
+>>
+>> qemu-system-i386 --version
+>> QEMU emulator version 5.1.0
+>>
+>> mkdir ~/workspaces/retro-workspace/minix-1.1
+>> cd ~/workspaces/retro-workspace/minix-1.1
+>> aria2c
+>> http://download.minix3.org/previous-versions/bzipped/Intel-1.1.tar.bz2
+>> tar xvjf Intel-1.1.tar.bz2
+>> cp Intel-1.1/floppy_disk1 ./Disk01.img
+>> cp Intel-1.1/floppy_disk2 ./Disk02.img
+>> cp Intel-1.1/floppy_disk3 ./Disk03.img
+>> cp Intel-1.1/floppy_disk4 ./Disk04.img
+>>
+>>
+>> qemu-system-i386 -drive
+>> file=Disk01.img,format=raw,if=floppy,media=disk,readonly=off,index=0,snapshot=on
+>> \
+>>    -boot a \
+>>    -no-fd-bootchk \
+>>    -monitor telnet::2222,server,nowait -serial mon:stdio
+>>
+>> Qemu boots to the Minix 1.1 Boot screen and says to swap to floppy 2, so
+>> in the monitor:
+>> change floppy0 Disk02.img raw
+>>
+>> I press l (el) and it scans the disk, lists the files on the disk and
+>> reports no errors, but when I press =, it does a carriage return and
+>> just sits there. I'm pretty sure this is the Minix going bye bye and not
+>> necessarily QEMU, but I'm wondering if there is a way to see what QEMU
+>> thinks it is doing or if it is what's hung? Usually, at this point,
+>> Minix reads the disk contents into a Ramdisk and boots Minix.
+>>
+>> Food for thought... Minix expects to run on an IBM PC (5150), IBM PC XT
+>> (5160), or compatible, and therefore the I/O is written for whatever
+>> floppy controller was extant at that time (I'm guessing here), so if
+>> that's different than modern day floppies, I suppose this could cause
+>> the problem I'm experiencing here. Is there a way to see the floppy
+>> controller activity in QEMU? Similarly, I gather it expects a CGA
+>> compatible monitor (EGA/VGA, etc should be fine).
+> Can you try adding '-machine isapc', which is closer to the 5150?
+>
+>> I appreciate your help on this.
+>>
+>> Minix 1.1 works 'ok' in 86Box and other IBM PC emulations, so I know the
+>> floppies are fine.
+>>
+>> Thanks!
+>>
+>> Will
+>>
+>>
+>>
+>> -- 
+>> GPG Fingerprint: 68F4 B3BD 1730 555A 4462  7D45 3EAA 5B6D A982 BAAF
+>>
+Phillipe,
 
-diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
-index 3fc8fbe..bab582f 100644
---- a/hw/usb/Kconfig
-+++ b/hw/usb/Kconfig
-@@ -36,6 +36,12 @@ config USB_XHCI
-     depends on PCI
-     select USB
- 
-+config USB_XHCI_PCI
-+    bool
-+    default y if PCI_DEVICES
-+    depends on PCI
-+    select USB_XHCI
-+
- config USB_XHCI_NEC
-     bool
-     default y if PCI_DEVICES
-diff --git a/hw/usb/hcd-xhci-pci.c b/hw/usb/hcd-xhci-pci.c
-new file mode 100644
-index 0000000..1562757
---- /dev/null
-+++ b/hw/usb/hcd-xhci-pci.c
-@@ -0,0 +1,66 @@
-+/*
-+ * USB xHCI controller with PCI bus emulation
-+ *
-+ * SPDX-FileCopyrightText: 2011 Securiforest
-+ * SPDX-FileContributor: Hector Martin <hector@marcansoft.com>
-+ * SPDX-sourceInfo: Based on usb-ohci.c, emulates Renesas NEC USB 3.0
-+ * SPDX-FileCopyrightText: 2020 Xilinx
-+ * SPDX-FileContributor: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-+ * SPDX-sourceInfo: Moved the pci specific content for hcd-xhci.c to
-+ *                  hcd-xhci-pci.c
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+#include "qemu/osdep.h"
-+#include "hw/pci/pci.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/pci/msi.h"
-+#include "hw/pci/msix.h"
-+#include "hcd-xhci.h"
-+#include "trace.h"
-+#include "qapi/error.h"
-+
-+static void qemu_xhci_class_init(ObjectClass *klass, void *data)
-+{
-+    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-+
-+    k->vendor_id    = PCI_VENDOR_ID_REDHAT;
-+    k->device_id    = PCI_DEVICE_ID_REDHAT_XHCI;
-+    k->revision     = 0x01;
-+}
-+
-+static void qemu_xhci_instance_init(Object *obj)
-+{
-+    XHCIState *xhci = XHCI(obj);
-+
-+    xhci->msi      = ON_OFF_AUTO_OFF;
-+    xhci->msix     = ON_OFF_AUTO_AUTO;
-+    xhci->numintrs = MAXINTRS;
-+    xhci->numslots = MAXSLOTS;
-+    xhci_set_flag(xhci, XHCI_FLAG_SS_FIRST);
-+}
-+
-+static const TypeInfo qemu_xhci_info = {
-+    .name          = TYPE_QEMU_XHCI,
-+    .parent        = TYPE_XHCI,
-+    .class_init    = qemu_xhci_class_init,
-+    .instance_init = qemu_xhci_instance_init,
-+};
-+
-+static void xhci_register_types(void)
-+{
-+    type_register_static(&qemu_xhci_info);
-+}
-+
-+type_init(xhci_register_types)
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index 254cf1e..f927567 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -23,7 +23,6 @@
- #include "qemu/timer.h"
- #include "qemu/module.h"
- #include "qemu/queue.h"
--#include "hw/usb.h"
- #include "migration/vmstate.h"
- #include "hw/pci/pci.h"
- #include "hw/qdev-properties.h"
-@@ -429,12 +428,12 @@ static const char *ep_state_name(uint32_t state)
-                        ARRAY_SIZE(ep_state_names));
- }
- 
--static bool xhci_get_flag(XHCIState *xhci, enum xhci_flags bit)
-+bool xhci_get_flag(XHCIState *xhci, enum xhci_flags bit)
- {
-     return xhci->flags & (1 << bit);
- }
- 
--static void xhci_set_flag(XHCIState *xhci, enum xhci_flags bit)
-+void xhci_set_flag(XHCIState *xhci, enum xhci_flags bit)
- {
-     xhci->flags |= (1 << bit);
- }
-@@ -3730,37 +3729,9 @@ static const TypeInfo xhci_info = {
-     },
- };
- 
--static void qemu_xhci_class_init(ObjectClass *klass, void *data)
--{
--    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
--
--    k->vendor_id    = PCI_VENDOR_ID_REDHAT;
--    k->device_id    = PCI_DEVICE_ID_REDHAT_XHCI;
--    k->revision     = 0x01;
--}
--
--static void qemu_xhci_instance_init(Object *obj)
--{
--    XHCIState *xhci = XHCI(obj);
--
--    xhci->msi      = ON_OFF_AUTO_OFF;
--    xhci->msix     = ON_OFF_AUTO_AUTO;
--    xhci->numintrs = MAXINTRS;
--    xhci->numslots = MAXSLOTS;
--    xhci_set_flag(xhci, XHCI_FLAG_SS_FIRST);
--}
--
--static const TypeInfo qemu_xhci_info = {
--    .name          = TYPE_QEMU_XHCI,
--    .parent        = TYPE_XHCI,
--    .class_init    = qemu_xhci_class_init,
--    .instance_init = qemu_xhci_instance_init,
--};
--
- static void xhci_register_types(void)
- {
-     type_register_static(&xhci_info);
--    type_register_static(&qemu_xhci_info);
- }
- 
- type_init(xhci_register_types)
-diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
-index c8a8ae4..effd46c 100644
---- a/hw/usb/hcd-xhci.h
-+++ b/hw/usb/hcd-xhci.h
-@@ -23,6 +23,8 @@
- #define HW_USB_HCD_XHCI_H
- #include "qom/object.h"
- 
-+#include "hw/usb.h"
-+
- #define TYPE_XHCI "base-xhci"
- #define TYPE_NEC_XHCI "nec-usb-xhci"
- #define TYPE_QEMU_XHCI "qemu-xhci"
-@@ -229,4 +231,6 @@ struct XHCIState {
-     bool nec_quirks;
- };
- 
-+bool xhci_get_flag(XHCIState *xhci, enum xhci_flags bit);
-+void xhci_set_flag(XHCIState *xhci, enum xhci_flags bit);
- #endif
-diff --git a/hw/usb/meson.build b/hw/usb/meson.build
-index b7c7ff2..90dc54f 100644
---- a/hw/usb/meson.build
-+++ b/hw/usb/meson.build
-@@ -21,6 +21,7 @@ softmmu_ss.add(when: 'CONFIG_USB_EHCI', if_true: files('hcd-ehci.c'))
- softmmu_ss.add(when: 'CONFIG_USB_EHCI_PCI', if_true: files('hcd-ehci-pci.c'))
- softmmu_ss.add(when: 'CONFIG_USB_EHCI_SYSBUS', if_true: files('hcd-ehci.c', 'hcd-ehci-sysbus.c'))
- softmmu_ss.add(when: 'CONFIG_USB_XHCI', if_true: files('hcd-xhci.c'))
-+softmmu_ss.add(when: 'CONFIG_USB_XHCI_PCI', if_true: files('hcd-xhci-pci.c'))
- softmmu_ss.add(when: 'CONFIG_USB_XHCI_NEC', if_true: files('hcd-xhci-nec.c'))
- softmmu_ss.add(when: 'CONFIG_USB_MUSB', if_true: files('hcd-musb.c'))
- softmmu_ss.add(when: 'CONFIG_USB_DWC2', if_true: files('hcd-dwc2.c'))
+My new incantation is:
+
+qemu-system-i386 -machine isapc -drive 
+file=Disk01.img,format=raw,if=floppy,media=disk,readonly=off,index=0,snapshot=on 
+-boot a   -no-fd-bootchk   -monitor telnet::2222,server,nowait -serial 
+mon:stdio
+
+with the same outcome :(. Thanks for the suggestion, I'll keep it in 
+mind for other projects.
+
+Will
+
 -- 
-2.7.4
+GPG Fingerprint: 68F4 B3BD 1730 555A 4462  7D45 3EAA 5B6D A982 BAAF
 
+
+--------------5D98E4672419F97F14870E0B
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 8bit
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <div class="moz-cite-prefix">On 9/23/20 11:53 AM, Philippe
+      Mathieu-Daudé wrote:<br>
+    </div>
+    <blockquote type="cite"
+      cite="mid:edc82d55-e5d1-abba-9a8e-7954b1dbe66e@amsat.org">
+      <pre class="moz-quote-pre" wrap="">Hi Will,
+
+On 9/23/20 6:45 PM, Will Senn wrote:
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">Long time user, first time poster :)
+
+So, I'd like to be able to run Minix 1.1 on my Macbook Pro mid-2012
+w/16gb RAM (MacOS 10.14.6 Mojave). Qemu will run pretty ancient OS'es
+such as DOS 2.0, which I use all of the time. However, I'm having some
+difficulty getting Minix to run. I am able to boot the first floppy, but
+when I change to the second floppy, the system freezes and I can't tell
+what is going on. Here's what I did to get this far:
+
+brew install qemu
+
+qemu-system-i386 --version
+QEMU emulator version 5.1.0
+
+mkdir ~/workspaces/retro-workspace/minix-1.1
+cd ~/workspaces/retro-workspace/minix-1.1
+aria2c
+<a class="moz-txt-link-freetext" href="http://download.minix3.org/previous-versions/bzipped/Intel-1.1.tar.bz2">http://download.minix3.org/previous-versions/bzipped/Intel-1.1.tar.bz2</a>
+tar xvjf Intel-1.1.tar.bz2
+cp Intel-1.1/floppy_disk1 ./Disk01.img
+cp Intel-1.1/floppy_disk2 ./Disk02.img
+cp Intel-1.1/floppy_disk3 ./Disk03.img
+cp Intel-1.1/floppy_disk4 ./Disk04.img
+
+
+qemu-system-i386 -drive
+file=Disk01.img,format=raw,if=floppy,media=disk,readonly=off,index=0,snapshot=on
+\
+  -boot a \
+  -no-fd-bootchk \
+  -monitor <a class="moz-txt-link-freetext" href="telnet::2222,server,nowait">telnet::2222,server,nowait</a> -serial mon:stdio
+
+Qemu boots to the Minix 1.1 Boot screen and says to swap to floppy 2, so
+in the monitor:
+change floppy0 Disk02.img raw
+
+I press l (el) and it scans the disk, lists the files on the disk and
+reports no errors, but when I press =, it does a carriage return and
+just sits there. I'm pretty sure this is the Minix going bye bye and not
+necessarily QEMU, but I'm wondering if there is a way to see what QEMU
+thinks it is doing or if it is what's hung? Usually, at this point,
+Minix reads the disk contents into a Ramdisk and boots Minix.
+
+Food for thought... Minix expects to run on an IBM PC (5150), IBM PC XT
+(5160), or compatible, and therefore the I/O is written for whatever
+floppy controller was extant at that time (I'm guessing here), so if
+that's different than modern day floppies, I suppose this could cause
+the problem I'm experiencing here. Is there a way to see the floppy
+controller activity in QEMU? Similarly, I gather it expects a CGA
+compatible monitor (EGA/VGA, etc should be fine).
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+Can you try adding '-machine isapc', which is closer to the 5150?
+
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">
+I appreciate your help on this.
+
+Minix 1.1 works 'ok' in 86Box and other IBM PC emulations, so I know the
+floppies are fine.
+
+Thanks!
+
+Will
+
+
+
+-- 
+GPG Fingerprint: 68F4 B3BD 1730 555A 4462  7D45 3EAA 5B6D A982 BAAF
+
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+</pre>
+    </blockquote>
+    <font face="Helvetica, Arial, sans-serif">Phillipe,<br>
+      <br>
+      My new incantation is:<br>
+      <br>
+      qemu-system-i386 -machine isapc -drive
+file=Disk01.img,format=raw,if=floppy,media=disk,readonly=off,index=0,snapshot=on  
+      -boot a   -no-fd-bootchk   -monitor <a class="moz-txt-link-freetext" href="telnet::2222,server,nowait">telnet::2222,server,nowait</a>
+      -serial mon:stdio<br>
+      <br>
+      with the same outcome :(. Thanks for the suggestion, I'll keep it
+      in mind for other projects.<br>
+      <br>
+      Will<br>
+    </font><br>
+    <pre class="moz-signature" cols="72">-- 
+GPG Fingerprint: 68F4 B3BD 1730 555A 4462  7D45 3EAA 5B6D A982 BAAF</pre>
+  </body>
+</html>
+
+--------------5D98E4672419F97F14870E0B--
 
