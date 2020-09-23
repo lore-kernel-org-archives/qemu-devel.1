@@ -6,65 +6,66 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C3FEC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 19:27:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44C93C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 19:28:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 885C820BED
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 19:27:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8EF9F20BED
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 19:28:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XgCfj6VE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 885C820BED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d1HzC3Xy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EF9F20BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLAQf-0008Ql-AJ
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 15:27:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38054)
+	id 1kLAQp-0008Ts-IA
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 15:27:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37992)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kLAPl-0007aw-95
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 15:26:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49861)
+ id 1kLAPZ-0007Xn-Gb
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 15:26:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46118)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kLAPj-0007bZ-F6
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 15:26:52 -0400
+ id 1kLAPX-0007ao-NW
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 15:26:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600889210;
+ s=mimecast20190719; t=1600889198;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=moFD3lMSVeD3tmD68Vwu6ep2jS7zAUloilOeOVraebw=;
- b=XgCfj6VESdoffyKgSVMroZ1nGvmwPB3wPNhmXZBJ37C7y4QworbDpMhD2Zup3Tmtfj+mHR
- chvOuIITWmoeICgEyK7d9urVLbzkLApq7doZyHQbTY5EdMos2Y/U2YSXGfY0Y8LpxMqIfu
- yoX+sFYiIqVsdrEznRw8scUMXS7Opbs=
+ bh=COQx/ReFSStWEUMijidMWig5dAVTpmxc97ITtO6uLsI=;
+ b=d1HzC3XyMbGxyxJHSSnImMtYh0zuF6l7TbbmsWETaTR5ZKSiW61bFssAJbm7Hy9+IoqHsO
+ x5mJrPnqA9wc+aBQS5Sb3j0iFZX9k8daDvFYyzz7pX5/u8+8nOEKHobxk3Zu/WPoUz/sQM
+ OldiT4P1PgdGg0+fJxChMx3OGD8zBMI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-550-235asaP4OsKzPQPzZjcWDg-1; Wed, 23 Sep 2020 15:26:48 -0400
-X-MC-Unique: 235asaP4OsKzPQPzZjcWDg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-508-r6Papr-rNwqAA5htBbd6KA-1; Wed, 23 Sep 2020 15:26:36 -0400
+X-MC-Unique: r6Papr-rNwqAA5htBbd6KA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2E10802B67;
- Wed, 23 Sep 2020 19:26:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF94D1017DD0;
+ Wed, 23 Sep 2020 19:26:35 +0000 (UTC)
 Received: from localhost (unknown [10.10.67.5])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6B9915D98D;
- Wed, 23 Sep 2020 19:26:47 +0000 (UTC)
-Date: Wed, 23 Sep 2020 15:26:46 -0400
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8C1949CBA;
+ Wed, 23 Sep 2020 19:26:35 +0000 (UTC)
+Date: Wed, 23 Sep 2020 15:26:34 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 02/16] qapi/expr.py: Check for dict instead of OrderedDict
-Message-ID: <20200923192646.GC3312949@habkost.net>
+Subject: Re: [PATCH 01/16] qapi/expr.py: Remove 'info' argument from nested
+ check_if_str
+Message-ID: <20200923192634.GB3312949@habkost.net>
 References: <20200922211313.4082880-1-jsnow@redhat.com>
- <20200922211313.4082880-3-jsnow@redhat.com>
+ <20200922211313.4082880-2-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200922211313.4082880-3-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200922211313.4082880-2-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -100,8 +101,10 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 22, 2020 at 05:12:59PM -0400, John Snow wrote:
-> OrderedDict is a subtype of dict, so we can check for a more general form.
+On Tue, Sep 22, 2020 at 05:12:58PM -0400, John Snow wrote:
+> The function can just use the argument from the scope above. Otherwise,
+> we get shadowed argument errors because the parameter name clashes with
+> the name of a variable already in-scope.
 > 
 > Signed-off-by: John Snow <jsnow@redhat.com>
 
