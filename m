@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E89C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 21:21:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AD25C4363D
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 21:37:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27D8E21D43
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 21:21:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5BC502311A
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 21:37:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LCK5NZpN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27D8E21D43
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bymQzv01"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BC502311A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLCCS-0003vI-WC
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 17:21:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60464)
+	id 1kLCSA-0002rL-VS
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 17:37:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36338)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLCAK-00025s-64
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 17:19:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22832)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLCQ3-0001JH-GA
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 17:35:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28648)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLCAH-0004Dm-Au
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 17:19:03 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLCQ0-0006Ic-Ca
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 17:35:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600895939;
+ s=mimecast20190719; t=1600896894;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=HeZs+WKxDkiQFXzLtgeTY9ObtSc8+zL8g3MDWbhx2jc=;
- b=LCK5NZpNpEIcNxL+4XnagSYOifCtTlNsN9oSoDwlL8Pv3mqZTOeylCStCeZzrgJWcBxPlf
- YML0NbA4FCbDFcGVGVUia4oowRXinMQnmJm/DNegS/NfNfh/1aaJVVavQHvttajKVzx3d3
- 6pcCjFO3h40/E39Pj5c02ql6IkpSLKE=
+ bh=B5yh53FmwY3+/90qA8El8PrtrMpIuHPP9WnnCmuiv/c=;
+ b=bymQzv01SnPqRa0uVyUCMgE1RXYY49PqVQS09CKUo7G5S2VFa7LWqmSYnn3HfYFRBvaUJQ
+ U7Q170O9ATLjFzDCsbAVo8qZ/MRzltmeZdg6/StduO4BoVIRyrwI3ox8RBv5FlDnRLmQp3
+ W0qZy3V+V4qwX6Bbv03zkZKVP0w2OgI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-175-um6lRSF6NACV5fnPL_RFlA-1; Wed, 23 Sep 2020 17:18:57 -0400
-X-MC-Unique: um6lRSF6NACV5fnPL_RFlA-1
+ us-mta-133---v4ZRZoOFq7XEz1j0J7pQ-1; Wed, 23 Sep 2020 17:34:29 -0400
+X-MC-Unique: --v4ZRZoOFq7XEz1j0J7pQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5520181F02E;
- Wed, 23 Sep 2020 21:18:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9413F1017DC1;
+ Wed, 23 Sep 2020 21:34:27 +0000 (UTC)
 Received: from [10.10.119.140] (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 16688196FB;
- Wed, 23 Sep 2020 21:18:54 +0000 (UTC)
-Subject: Re: [PATCH v2 14/38] qapi/common.py: Convert comments into
- docstrings, and elaborate
-To: Cleber Rosa <crosa@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9DB0119D7C;
+ Wed, 23 Sep 2020 21:34:26 +0000 (UTC)
+Subject: Re: [PATCH v2 30/38] qapi/introspect.py: Add a typed 'extra' structure
+To: Eduardo Habkost <ehabkost@redhat.com>
 References: <20200922210101.4081073-1-jsnow@redhat.com>
- <20200922210101.4081073-15-jsnow@redhat.com>
- <20200923193842.GN191229@localhost.localdomain>
+ <20200922210101.4081073-31-jsnow@redhat.com>
+ <20200923161306.GR3312949@habkost.net>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <24bfc59d-e97e-e5f1-7443-c625612575fb@redhat.com>
-Date: Wed, 23 Sep 2020 17:18:54 -0400
+Message-ID: <c82b8f2a-024c-fe4c-9391-1d184a3662df@redhat.com>
+Date: Wed, 23 Sep 2020 17:34:26 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200923193842.GN191229@localhost.localdomain>
+In-Reply-To: <20200923161306.GR3312949@habkost.net>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
@@ -101,127 +100,160 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Markus Armbruster <armbru@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>,
  =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/23/20 3:38 PM, Cleber Rosa wrote:
-> On Tue, Sep 22, 2020 at 05:00:37PM -0400, John Snow wrote:
->> As docstrings, they'll show up in documentation and IDE help.
+On 9/23/20 12:13 PM, Eduardo Habkost wrote:
+> On Tue, Sep 22, 2020 at 05:00:53PM -0400, John Snow wrote:
+>> Typing arbitrarily shaped dicts with mypy is difficult prior to Python
+>> 3.8; using explicit structures is nicer.
+>>
+>> Since we always define an Extra type now, the return type of _make_tree
+>> simplifies and always returns the tuple.
 >>
 >> Signed-off-by: John Snow <jsnow@redhat.com>
 >> ---
->>   scripts/qapi/common.py | 51 ++++++++++++++++++++++++++++++------------
->>   1 file changed, 37 insertions(+), 14 deletions(-)
+>>   scripts/qapi/introspect.py | 31 +++++++++++++++++++------------
+>>   1 file changed, 19 insertions(+), 12 deletions(-)
 >>
->> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
->> index 0ce4a107e6..730283722a 100644
->> --- a/scripts/qapi/common.py
->> +++ b/scripts/qapi/common.py
->> @@ -20,10 +20,18 @@
->>   _C_NAME_TRANS = str.maketrans('.-', '__')
->>   
->>   
->> -# ENUMName -> ENUM_NAME, EnumName1 -> ENUM_NAME1
->> -# ENUM_NAME -> ENUM_NAME, ENUM_NAME1 -> ENUM_NAME1, ENUM_Name2 -> ENUM_NAME2
->> -# ENUM24_Name -> ENUM24_NAME
->>   def camel_to_upper(value: str) -> str:
->> +    """
->> +    Converts CamelCase to CAMEL_CASE.
->> +
->> +    Examples:
->> +      ENUMName -> ENUM_NAME
->> +      EnumName1 -> ENUM_NAME1
->> +      ENUM_NAME -> ENUM_NAME
->> +      ENUM_NAME1 -> ENUM_NAME1
->> +      ENUM_Name2 -> ENUM_NAME2
->> +      ENUM24_Name -> ENUM24_NAME
->> +    """
->>       c_fun_str = c_name(value, False)
->>       if value.isupper():
->>           return c_fun_str
->> @@ -45,21 +53,33 @@ def camel_to_upper(value: str) -> str:
->>   def c_enum_const(type_name: str,
->>                    const_name: str,
->>                    prefix: Optional[str] = None) -> str:
->> +    """
->> +    Generate a C enumeration constant name.
->> +
->> +    :param type_name: The name of the enumeration.
->> +    :param const_name: The name of this constant.
->> +    :param prefix: Optional, prefix that overrides the type_name.
->> +    """
->>       if prefix is not None:
->>           type_name = prefix
->>       return camel_to_upper(type_name) + '_' + c_name(const_name, False).upper()
->>   
->>   
->> -# Map @name to a valid C identifier.
->> -# If @protect, avoid returning certain ticklish identifiers (like
->> -# C keywords) by prepending 'q_'.
->> -#
->> -# Used for converting 'name' from a 'name':'type' qapi definition
->> -# into a generated struct member, as well as converting type names
->> -# into substrings of a generated C function name.
->> -# '__a.b_c' -> '__a_b_c', 'x-foo' -> 'x_foo'
->> -# protect=True: 'int' -> 'q_int'; protect=False: 'int' -> 'int'
->>   def c_name(name: str, protect: bool = True) -> str:
->> +    """
->> +    Map `name` to a valid C identifier.
->> +
->> +    Used for converting 'name' from a 'name':'type' qapi definition
->> +    into a generated struct member, as well as converting type names
->> +    into substrings of a generated C function name.
->> +
->> +    '__a.b_c' -> '__a_b_c', 'x-foo' -> 'x_foo'
->> +    protect=True: 'int' -> 'q_int'; protect=False: 'int' -> 'int'
->> +
->> +    :param name: The name to map.
->> +    :param protect: If true, avoid returning certain ticklish identifiers
->> +                    (like C keywords) by prepending ``q_``.
->> +    """
->>       # ANSI X3J11/88-090, 3.1.1
->>       c89_words = set(['auto', 'break', 'case', 'char', 'const', 'continue',
->>                        'default', 'do', 'double', 'else', 'enum', 'extern',
->> @@ -134,9 +154,12 @@ def decrease(self, amount: int = 4) -> int:
->>   indent = Indentation()
->>   
->>   
->> -# Generate @code with @kwds interpolated.
->> -# Obey indent, and strip EATSPACE.
->>   def cgen(code: str, **kwds: object) -> str:
->> +    """
->> +    Generate `code` with `kwds` interpolated.
->> +
->> +    Obey `indent`, and strip `EATSPACE`.
->> +    """
 > 
-> This probably won't help on IDEs (never checked any), but sphinx will
-> let you do:
+> Here I'm confused by both the original code and the new code.
 > 
->     """
->     Generate `code` with `kwds` interpolated.
+> I will try to review as a refactoring of existing code, but I'll
+> have suggestions for follow ups:
 > 
->     Obey `indent`, and strip :data:`EATSPACE`.
->     """
+>> diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+>> index b036fcf9ce..41ca8afc67 100644
+>> --- a/scripts/qapi/introspect.py
+>> +++ b/scripts/qapi/introspect.py
+>> @@ -10,6 +10,8 @@
+>>   See the COPYING file in the top-level directory.
+>>   """
+>>   
+>> +from typing import (NamedTuple, Optional, Sequence)
+>> +
+>>   from .common import (
+>>       c_name,
+>>       gen_endif,
+>> @@ -21,16 +23,21 @@
+>>                        QAPISchemaType)
+>>   
+>>   
+>> -def _make_tree(obj, ifcond, features, extra=None):
+>> -    if extra is None:
+>> -        extra = {}
+>> -    if ifcond:
+>> -        extra['if'] = ifcond
+>> +class Extra(NamedTuple):
+>> +    """
+>> +    Extra contains data that isn't intended for output by introspection.
+>> +    """
+>> +    comment: Optional[str] = None
+>> +    ifcond: Sequence[str] = tuple()
+>> +
+>> +
+>> +def _make_tree(obj, ifcond, features,
+>> +               extra: Optional[Extra] = None):
+>> +    comment = extra.comment if extra else None
+>> +    extra = Extra(comment, ifcond)
 > 
-> I'm not sure that a maximum level of docstring "sphinxzation" is the
-> goal here, though.
-> 
-> Reviewed-by: Cleber Rosa <crosa@redhat.com>
+> Here we have one big difference: now `extra` is being recreated,
+> and all fields except `extra.comment` are being ignored.  On the
+> original version, all fields in `extra` were being kept.  This
+> makes the existence of the `extra` argument pointless.
 > 
 
-It isn't yet, but I intend to address that when I remove 
-missing-docstring from pylint exemptions. Do I need :data: if I set the 
-default role to 'any'?
+Yup, oops.
 
-I'll probably try to enable sphinx at that time (and put the docs in a 
-devel/python manual?) and worry about the formatting at that point.
+> If you are going through the trouble of changing the type of the
+> 4rd argument to _make_tree(), this seems more obvious:
+> 
 
---js
+Yes, agree. I came up with something similar after talking to you this 
+morning.
+
+>    diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+>    index 41ca8afc672..c62af94c9ad 100644
+>    --- a/scripts/qapi/introspect.py
+>    +++ b/scripts/qapi/introspect.py
+>    @@ -32,8 +32,7 @@ class Extra(NamedTuple):
+>     
+>     
+>     def _make_tree(obj, ifcond, features,
+>    -               extra: Optional[Extra] = None):
+>    -    comment = extra.comment if extra else None
+>    +               comment: Optional[str] = None):
+>         extra = Extra(comment, ifcond)
+>         if features:
+>             obj['features'] = [(f.name, Extra(None, f.ifcond)) for f in features]
+>    @@ -170,16 +169,16 @@ const QLitObject %(c_name)s = %(c_string)s;
+>             return self._name(typ.name)
+>     
+>         def _gen_tree(self, name, mtype, obj, ifcond, features):
+>    -        extra = None
+>    +        comment = None
+>             if mtype not in ('command', 'event', 'builtin', 'array'):
+>                 if not self._unmask:
+>                     # Output a comment to make it easy to map masked names
+>                     # back to the source when reading the generated output.
+>    -                extra = Extra(comment=f'"{self._name(name)}" = {name}')
+>    +                comment = f'"{self._name(name)}" = {name}'
+>                 name = self._name(name)
+>             obj['name'] = name
+>             obj['meta-type'] = mtype
+>    -        self._trees.append(_make_tree(obj, ifcond, features, extra))
+>    +        self._trees.append(_make_tree(obj, ifcond, features, comment))
+>     
+>         def _gen_member(self, member):
+>             obj = {'name': member.name, 'type': self._use_type(member.type)}
+> 
+> I understand you're trying to just make minimal refactoring, and I
+> don't think this should block your cleanup series.  So:
+> 
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>
+
+I appreciate the benefit-of-the-doubt, but I think this change is worth 
+making while we're here.
+
+> 
+>>       if features:
+>> -        obj['features'] = [(f.name, {'if': f.ifcond}) for f in features]
+>> -    if extra:
+>> -        return (obj, extra)
+>> -    return obj
+>> +        obj['features'] = [(f.name, Extra(None, f.ifcond)) for f in features]
+>> +    return (obj, extra)
+>>   
+>>   
+>>   def _tree_to_qlit(obj, level=0, suppress_first_indent=False):
+>> @@ -40,8 +47,8 @@ def indent(level):
+>>   
+>>       if isinstance(obj, tuple):
+>>           ifobj, extra = obj
+>> -        ifcond = extra.get('if')
+>> -        comment = extra.get('comment')
+>> +        ifcond = extra.ifcond
+>> +        comment = extra.comment
+>>           ret = ''
+>>           if comment:
+>>               ret += indent(level) + '/* %s */\n' % comment
+>> @@ -168,7 +175,7 @@ def _gen_tree(self, name, mtype, obj, ifcond, features):
+>>               if not self._unmask:
+>>                   # Output a comment to make it easy to map masked names
+>>                   # back to the source when reading the generated output.
+>> -                extra = {'comment': '"%s" = %s' % (self._name(name), name)}
+>> +                extra = Extra(comment=f'"{self._name(name)}" = {name}')
+>>               name = self._name(name)
+>>           obj['name'] = name
+>>           obj['meta-type'] = mtype
+>> -- 
+>> 2.26.2
+>>
+> 
 
 
