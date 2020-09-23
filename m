@@ -7,63 +7,62 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E494C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:51:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA67C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:52:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B67612076A
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:51:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D05C214D8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:52:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZsSLuxXU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B67612076A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ic3mRhib"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D05C214D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL1Qn-0003Y0-9O
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 05:51:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35378)
+	id 1kL1RX-0004LB-BL
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 05:52:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kL1Mx-00070R-Hr
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:47:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28749)
+ id 1kL1N6-0007HD-5w
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:47:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49764)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kL1Mv-0007XI-Ry
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:47:23 -0400
+ id 1kL1N2-0007Yg-64
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:47:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600854441;
+ s=mimecast20190719; t=1600854447;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=W+u0K2zsKjxWFiQyWffMFjyVYBSqF19i98LFi7MUtkE=;
- b=ZsSLuxXURqgk8+tlHYbfuhPVj9E68YK/01nStTdX2Dw/LattXHxuCiXVdiZGX1Fu16aCk/
- A7hPjS/WRsHAu8jcBfg28xx9Bw5KZgGZ80oe89GQn2lP+Qir8dGAxTF1IQyX9MQ0aPgVkv
- aJnuUR61+147f3EXRIpgtXX/YAUbHgM=
+ bh=oo3FyNnbdE1oNfEAiuyaQMsztgoSnO7oGPNBLGVebbs=;
+ b=ic3mRhibOHbyGlXzR0l8BIHnV6gZrJ59Yem/XLvw94/Pei4yNZL3NxRYloN84x+h3i+zze
+ w0By5ntslYyCVJoY9nH3ppMnEXowiNrmKQR80WHy543vqWhsNUFXkSQiYBg36hh/LbvKQt
+ DcVanx8q8fUbha+df7D1ho2ZVeo8qvw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-66-N6zA6ggnOr2ZmdbhkRhr6Q-1; Wed, 23 Sep 2020 05:47:19 -0400
-X-MC-Unique: N6zA6ggnOr2ZmdbhkRhr6Q-1
+ us-mta-236-3wznwnk3Poe_zpEBCKFHeg-1; Wed, 23 Sep 2020 05:47:25 -0400
+X-MC-Unique: 3wznwnk3Poe_zpEBCKFHeg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0931C81F004;
- Wed, 23 Sep 2020 09:47:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B37C4186DD35;
+ Wed, 23 Sep 2020 09:47:24 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 082A95576A;
- Wed, 23 Sep 2020 09:47:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B457F55778;
+ Wed, 23 Sep 2020 09:47:23 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 06/11] x86: ich9: expose "smi_negotiated_features" as a QOM
- property
-Date: Wed, 23 Sep 2020 05:46:45 -0400
-Message-Id: <20200923094650.1301166-7-imammedo@redhat.com>
+Subject: [PATCH v6 11/11] smp: drop support for deprecated (invalid topologies)
+Date: Wed, 23 Sep 2020 05:46:50 -0400
+Message-Id: <20200923094650.1301166-12-imammedo@redhat.com>
 In-Reply-To: <20200923094650.1301166-1-imammedo@redhat.com>
 References: <20200923094650.1301166-1-imammedo@redhat.com>
 MIME-Version: 1.0
@@ -102,44 +101,128 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Expose the "smi_negotiated_features" field of ICH9LPCState as
-a QOM property.
+it's was deprecated since 3.1
+
+Support for invalid topologies is removed, the user must ensure
+that topologies described with -smp include all possible cpus,
+i.e. (sockets * cores * threads) == maxcpus or QEMU will
+exit with error.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Tested-by: Laszlo Ersek <lersek@redhat.com>
 ---
- include/hw/i386/ich9.h | 2 ++
- hw/isa/lpc_ich9.c      | 3 +++
- 2 files changed, 5 insertions(+)
+ docs/system/deprecated.rst | 26 +++++++++++++-------------
+ hw/core/machine.c          | 16 ++++------------
+ hw/i386/pc.c               | 16 ++++------------
+ 3 files changed, 21 insertions(+), 37 deletions(-)
 
-diff --git a/include/hw/i386/ich9.h b/include/hw/i386/ich9.h
-index 703d56036a..294024be5f 100644
---- a/include/hw/i386/ich9.h
-+++ b/include/hw/i386/ich9.h
-@@ -245,6 +245,8 @@ struct ICH9LPCState {
- #define ICH9_SMB_HST_D1                         0x06
- #define ICH9_SMB_HOST_BLOCK_DB                  0x07
+diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+index 808c334fe7..fb95d2ecc4 100644
+--- a/docs/system/deprecated.rst
++++ b/docs/system/deprecated.rst
+@@ -47,19 +47,6 @@ The 'file' driver for drives is no longer appropriate for character or host
+ devices and will only accept regular files (S_IFREG). The correct driver
+ for these file types is 'host_cdrom' or 'host_device' as appropriate.
  
-+#define ICH9_LPC_SMI_NEGOTIATED_FEAT_PROP "x-smi-negotiated-features"
+-``-smp`` (invalid topologies) (since 3.1)
+-'''''''''''''''''''''''''''''''''''''''''
+-
+-CPU topology properties should describe whole machine topology including
+-possible CPUs.
+-
+-However, historically it was possible to start QEMU with an incorrect topology
+-where *n* <= *sockets* * *cores* * *threads* < *maxcpus*,
+-which could lead to an incorrect topology enumeration by the guest.
+-Support for invalid topologies will be removed, the user must ensure
+-topologies described with -smp include all possible cpus, i.e.
+-*sockets* * *cores* * *threads* = *maxcpus*.
+-
+ ``-vnc acl`` (since 4.0.0)
+ ''''''''''''''''''''''''''
+ 
+@@ -642,6 +629,19 @@ New machine versions (since 5.1) will not accept the option but it will still
+ work with old machine types. User can check the QAPI schema to see if the legacy
+ option is supported by looking at MachineInfo::numa-mem-supported property.
+ 
++``-smp`` (invalid topologies) (removed 5.2)
++'''''''''''''''''''''''''''''''''''''''''''
 +
- /* bit positions used in fw_cfg SMI feature negotiation */
- #define ICH9_LPC_SMI_F_BROADCAST_BIT            0
- #define ICH9_LPC_SMI_F_CPU_HOTPLUG_BIT          1
-diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
-index a54b3ec8bd..04e5323140 100644
---- a/hw/isa/lpc_ich9.c
-+++ b/hw/isa/lpc_ich9.c
-@@ -647,6 +647,9 @@ static void ich9_lpc_initfn(Object *obj)
-                                   &acpi_enable_cmd, OBJ_PROP_FLAG_READ);
-     object_property_add_uint8_ptr(OBJECT(lpc), ACPI_PM_PROP_ACPI_DISABLE_CMD,
-                                   &acpi_disable_cmd, OBJ_PROP_FLAG_READ);
-+    object_property_add_uint64_ptr(obj, ICH9_LPC_SMI_NEGOTIATED_FEAT_PROP,
-+                                   &lpc->smi_negotiated_features,
-+                                   OBJ_PROP_FLAG_READ);
++CPU topology properties should describe whole machine topology including
++possible CPUs.
++
++However, historically it was possible to start QEMU with an incorrect topology
++where *n* <= *sockets* * *cores* * *threads* < *maxcpus*,
++which could lead to an incorrect topology enumeration by the guest.
++Support for invalid topologies is removed, the user must ensure
++topologies described with -smp include all possible cpus, i.e.
++*sockets* * *cores* * *threads* = *maxcpus*.
++
+ Block devices
+ -------------
  
-     ich9_pm_add_properties(obj, &lpc->pm);
- }
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index ea26d61237..09aee4ea52 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -754,23 +754,15 @@ static void smp_parse(MachineState *ms, QemuOpts *opts)
+             exit(1);
+         }
+ 
+-        if (sockets * cores * threads > ms->smp.max_cpus) {
+-            error_report("cpu topology: "
+-                         "sockets (%u) * cores (%u) * threads (%u) > "
+-                         "maxcpus (%u)",
++        if (sockets * cores * threads != ms->smp.max_cpus) {
++            error_report("Invalid CPU topology: "
++                         "sockets (%u) * cores (%u) * threads (%u) "
++                         "!= maxcpus (%u)",
+                          sockets, cores, threads,
+                          ms->smp.max_cpus);
+             exit(1);
+         }
+ 
+-        if (sockets * cores * threads != ms->smp.max_cpus) {
+-            warn_report("Invalid CPU topology deprecated: "
+-                        "sockets (%u) * cores (%u) * threads (%u) "
+-                        "!= maxcpus (%u)",
+-                        sockets, cores, threads,
+-                        ms->smp.max_cpus);
+-        }
+-
+         ms->smp.cpus = cpus;
+         ms->smp.cores = cores;
+         ms->smp.threads = threads;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 2af660c55e..53e21a186d 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -748,23 +748,15 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
+             exit(1);
+         }
+ 
+-        if (sockets * dies * cores * threads > ms->smp.max_cpus) {
+-            error_report("cpu topology: "
+-                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) > "
+-                         "maxcpus (%u)",
++        if (sockets * dies * cores * threads != ms->smp.max_cpus) {
++            error_report("Invalid CPU topology deprecated: "
++                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) "
++                         "!= maxcpus (%u)",
+                          sockets, dies, cores, threads,
+                          ms->smp.max_cpus);
+             exit(1);
+         }
+ 
+-        if (sockets * dies * cores * threads != ms->smp.max_cpus) {
+-            warn_report("Invalid CPU topology deprecated: "
+-                        "sockets (%u) * dies (%u) * cores (%u) * threads (%u) "
+-                        "!= maxcpus (%u)",
+-                        sockets, dies, cores, threads,
+-                        ms->smp.max_cpus);
+-        }
+-
+         ms->smp.cpus = cpus;
+         ms->smp.cores = cores;
+         ms->smp.threads = threads;
 -- 
 2.27.0
 
