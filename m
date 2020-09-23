@@ -2,74 +2,89 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A21C4727D
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 18:49:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8627C4727E
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 19:00:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C8DF206DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 18:49:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C8DF206DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1984D206FB
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 19:00:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fPz/hW7E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1984D206FB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL9py-00089J-7z
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 14:49:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56422)
+	id 1kLA0Y-0004kM-Od
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 15:00:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33232)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kL9bH-0001Wv-5U
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 14:34:43 -0400
-Resent-Date: Wed, 23 Sep 2020 14:34:43 -0400
-Resent-Message-Id: <E1kL9bH-0001Wv-5U@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21395)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kL9bE-0001DZ-Uw
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 14:34:42 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1600886073; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=nHJIMnzGUz+PoWc1/8bI/XoQYcRJlYzhRqef3VYR0O/9iE5ygqrodYxYzDSwjrnjQF6sbHsMafixNq7rdHiZ3fjW/zva/jLTKJHKfohKLcpbUVH57ILQSt7eLtdTsnJXr6IyOQ3vo8MCMrnb9SWneCQ1QaRDSR4RFZhlwXX1k4Q=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1600886073;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=qv2S0aIxHzTqxQUJ1hK4yvxSpm8uJNbeYMHFl0eRBeI=; 
- b=kcvBse+21TNJjWuPoSzx2J2z/5B4OTy3T5hXzCatGxxaHsTB8vlLEpctkzHbWsFR1geFqaTG7vCZU653iHRCgGYazi8fdENuFHUysfFwN293yVits0Z4H1s2GLtHe8z0CrBeN/hyuyHNTUTPixyZeGOHKEWDDQMUbYC0AYJrDzI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 16008860718901005.8400749495094;
- Wed, 23 Sep 2020 11:34:31 -0700 (PDT)
-Subject: Re: [PATCH v4 0/2] qemu/atomic.h: rename atomic_ to qatomic_
-Message-ID: <160088607066.24678.12741892390996077474@66eaa9a8a123>
-In-Reply-To: <20200923151901.745277-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kL9z7-0004IF-7O
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 14:59:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44470)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kL9z4-0004UB-DP
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 14:59:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600887557;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=EvvKnHN55uswRIt1/KVKg2ByHdM7TnwpCrcplgbZqkg=;
+ b=fPz/hW7EWWkJKbDE8ti2Ta+MZv2WH0oB9KHtZ0DbmT8n1iXCg3Dmi/bwEbvJdv+hhZlWgA
+ ynzIBgGFvgX+aEKd5N4CKvZ/rUykP6ccUApRFfQIIVDIoUbAuUrfO4zE9q6pzcdEdK6yhV
+ 8HuklV3THkAczcVyja2N++QQu8gwoKU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-589-LdJ3d8QBN-ewXWBsK8OdUg-1; Wed, 23 Sep 2020 14:59:14 -0400
+X-MC-Unique: LdJ3d8QBN-ewXWBsK8OdUg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95FE2802B78;
+ Wed, 23 Sep 2020 18:59:13 +0000 (UTC)
+Received: from work-vm (ovpn-113-46.ams2.redhat.com [10.36.113.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4148719728;
+ Wed, 23 Sep 2020 18:59:12 +0000 (UTC)
+Date: Wed, 23 Sep 2020 19:59:09 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Dov Murik <dovmurik@linux.vnet.ibm.com>, sstabellini@kernel.org,
+ anthony.perard@citrix.com
+Subject: Re: [PATCH] migration: Truncate state file in xen-save-devices-state
+Message-ID: <20200923185909.GA150308@work-vm>
+References: <20200921094830.114028-1-dovmurik@linux.vnet.ibm.com>
+ <20200921111723.GF3221@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: philmd@redhat.com
-Date: Wed, 23 Sep 2020 11:34:31 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 14:34:38
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200921111723.GF3221@work-vm>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,62 +97,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: philmd@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkyMzE1MTkwMS43NDUy
-NzctMS1waGlsbWRAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMjAwOTIzMTUxOTAxLjc0NTI3
-Ny0xLXBoaWxtZEByZWRoYXQuY29tClN1YmplY3Q6IFtQQVRDSCB2NCAwLzJdIHFlbXUvYXRvbWlj
-Lmg6IHJlbmFtZSBhdG9taWNfIHRvIHFhdG9taWNfCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
-CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
-bQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJ
-UFQgRU5EID09PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
-ICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDIwMDkyMzE1MTkwMS43NDUyNzctMS1waGls
-bWRAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMjAwOTIzMTUxOTAxLjc0NTI3Ny0xLXBoaWxtZEBy
-ZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMTY2MWEyYyBxZW11L2F0
-b21pYy5oOiByZW5hbWUgYXRvbWljXyB0byBxYXRvbWljXwpiMjc5ODBiIHFlbXUvYXRvbWljOiBV
-cGRhdGUgY29kaW5nIHN0eWxlIHRvIG1ha2UgY2hlY2twYXRjaC5wbCBoYXBwaWVyCgo9PT0gT1VU
-UFVUIEJFR0lOID09PQoxLzIgQ2hlY2tpbmcgY29tbWl0IGIyNzk4MGJmMWRiNSAocWVtdS9hdG9t
-aWM6IFVwZGF0ZSBjb2Rpbmcgc3R5bGUgdG8gbWFrZSBjaGVja3BhdGNoLnBsIGhhcHBpZXIpCkVS
-Uk9SOiBVc2Ugb2Ygdm9sYXRpbGUgaXMgdXN1YWxseSB3cm9uZywgcGxlYXNlIGFkZCBhIGNvbW1l
-bnQKIzIzOiBGSUxFOiBpbmNsdWRlL3FlbXUvYXRvbWljLmg6MzI4OgorI2RlZmluZSBhdG9taWNf
-cmVhZF9fbm9jaGVjayhwKSAgICgqKF9fdHlwZW9mX18oKihwKSkgdm9sYXRpbGUgKikgKHApKQoK
-RVJST1I6IFVzZSBvZiB2b2xhdGlsZSBpcyB1c3VhbGx5IHdyb25nLCBwbGVhc2UgYWRkIGEgY29t
-bWVudAojMjQ6IEZJTEU6IGluY2x1ZGUvcWVtdS9hdG9taWMuaDozMjk6CisjZGVmaW5lIGF0b21p
-Y19zZXRfX25vY2hlY2socCwgaSkgKCgqKF9fdHlwZW9mX18oKihwKSkgdm9sYXRpbGUgKikgKHAp
-KSA9IChpKSkKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgNTAgbGluZXMgY2hlY2tlZAoK
-UGF0Y2ggMS8yIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyLzIgQ2hlY2tpbmcgY29tbWl0
-IDE2NjFhMmM0OGU2YyAocWVtdS9hdG9taWMuaDogcmVuYW1lIGF0b21pY18gdG8gcWF0b21pY18p
-CkVSUk9SOiBNYWNyb3Mgd2l0aCBtdWx0aXBsZSBzdGF0ZW1lbnRzIHNob3VsZCBiZSBlbmNsb3Nl
-ZCBpbiBhIGRvIC0gd2hpbGUgbG9vcAojMjgwMTogRklMRTogaW5jbHVkZS9xZW11L2F0b21pYy5o
-OjE1MjoKKyNkZWZpbmUgcWF0b21pY19yY3VfcmVhZF9fbm9jaGVjayhwdHIsIHZhbHB0cikgICAg
-ICAgICAgIFwKKyAgICBfX2F0b21pY19sb2FkKHB0ciwgdmFscHRyLCBfX0FUT01JQ19SRUxBWEVE
-KTsgICAgICAgIFwKICAgICBzbXBfcmVhZF9iYXJyaWVyX2RlcGVuZHMoKTsKCkVSUk9SOiBVc2Ug
-b2Ygdm9sYXRpbGUgaXMgdXN1YWxseSB3cm9uZywgcGxlYXNlIGFkZCBhIGNvbW1lbnQKIzI5NDY6
-IEZJTEU6IGluY2x1ZGUvcWVtdS9hdG9taWMuaDozMzM6CisjZGVmaW5lIHFhdG9taWNfcmVhZF9f
-bm9jaGVjayhwKSAgICgqKF9fdHlwZW9mX18oKihwKSkgdm9sYXRpbGUgKikgKHApKQoKRVJST1I6
-IFVzZSBvZiB2b2xhdGlsZSBpcyB1c3VhbGx5IHdyb25nLCBwbGVhc2UgYWRkIGEgY29tbWVudAoj
-Mjk0NzogRklMRTogaW5jbHVkZS9xZW11L2F0b21pYy5oOjMzNDoKKyNkZWZpbmUgcWF0b21pY19z
-ZXRfX25vY2hlY2socCwgaSkgKCgqKF9fdHlwZW9mX18oKihwKSkgdm9sYXRpbGUgKikgKHApKSA9
-IChpKSkKCkVSUk9SOiBtZW1vcnkgYmFycmllciB3aXRob3V0IGNvbW1lbnQKIzMwMjQ6IEZJTEU6
-IGluY2x1ZGUvcWVtdS9hdG9taWMuaDozOTU6CisjZGVmaW5lIHFhdG9taWNfeGNoZyhwdHIsIGkp
-ICAgIChzbXBfbWIoKSwgX19zeW5jX2xvY2tfdGVzdF9hbmRfc2V0KHB0ciwgaSkpCgp0b3RhbDog
-NCBlcnJvcnMsIDAgd2FybmluZ3MsIDYyNjkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8yIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
-eGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8v
-cGF0Y2hldy5vcmcvbG9ncy8yMDIwMDkyMzE1MTkwMS43NDUyNzctMS1waGlsbWRAcmVkaGF0LmNv
-bS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
-dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+* Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+> * Dov Murik (dovmurik@linux.vnet.ibm.com) wrote:
+> > When running the xen-save-devices-state QMP command, if the filename
+> > already exists it will be truncated before dumping the devices' state
+> > into it.
+> > 
+> > Signed-off-by: Dov Murik <dovmurik@linux.vnet.ibm.com>
+> > ---
+> 
+> OK, that looks fine to me, so:
+> 
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Queued
+
+> > 
+> > Note that I found the above issue while trying to debug
+> > xen-load-devices-state which simply fails (prints "Configuration section
+> > missing" to stderr) directly after xen-save-devices-state (in the same
+> > VM).  I wonder if I should file a bug report as-is or investigate some
+> > more.  Advice welcome.
+> 
+> I don't try the xen-* commands normally; I've cc'ing in Stefano and
+> Anthony.
+> 
+> Dave
+> 
+> > 
+> > -Dov
+> > 
+> > ---
+> >  migration/savevm.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/migration/savevm.c b/migration/savevm.c
+> > index 304d98ff78..e1b26672cc 100644
+> > --- a/migration/savevm.c
+> > +++ b/migration/savevm.c
+> > @@ -2803,7 +2803,8 @@ void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
+> >      vm_stop(RUN_STATE_SAVE_VM);
+> >      global_state_store_running();
+> >  
+> > -    ioc = qio_channel_file_new_path(filename, O_WRONLY | O_CREAT, 0660, errp);
+> > +    ioc = qio_channel_file_new_path(filename, O_WRONLY | O_CREAT | O_TRUNC,
+> > +                                    0660, errp);
+> >      if (!ioc) {
+> >          goto the_end;
+> >      }
+> > -- 
+> > 2.20.1
+> > 
+> -- 
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
