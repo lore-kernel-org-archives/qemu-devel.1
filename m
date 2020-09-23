@@ -2,89 +2,86 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24CF9C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:48:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D66C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:48:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA63820725
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:48:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 13ABD20725
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:48:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AWjuLq/n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA63820725
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ILVWfaU5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13ABD20725
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL1O1-00089H-Op
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 05:48:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35240)
+	id 1kL1O9-0008PR-1N
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 05:48:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35322)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kL1Ml-0006e0-1M
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:47:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49610)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kL1Mj-0007VR-Af
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:47:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600854428;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=NHtq1ZlVg94Kf+6wpeThJeaxQyTxlv+PX6zeAnjEKIs=;
- b=AWjuLq/nJmFq1ihDRTT3xGJzHzuveGfZaMbLyqQDjPW8BXoK+dipnILfCkIrBd/IS7liru
- 6kCRccHSjVnwGOJOs3uXzvho/KKcgXfoYvkxWOQjScX3PzJdrZ04bGyV80+Mb/6RY9HK98
- rCC4C0SAm+cK4DpyaxWeQLYJfGT4X1k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215-n61frQ6VNrezlZqimImCXQ-1; Wed, 23 Sep 2020 05:47:06 -0400
-X-MC-Unique: n61frQ6VNrezlZqimImCXQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3ED20186DD29;
- Wed, 23 Sep 2020 09:47:05 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D535155778;
- Wed, 23 Sep 2020 09:47:01 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 02/11] x86: cpuhp: prevent guest crash on CPU hotplug when
- broadcast SMI is in use
-Date: Wed, 23 Sep 2020 05:46:41 -0400
-Message-Id: <20200923094650.1301166-3-imammedo@redhat.com>
-In-Reply-To: <20200923094650.1301166-1-imammedo@redhat.com>
-References: <20200923094650.1301166-1-imammedo@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kL1Mq-0006nG-Gj
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:47:16 -0400
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:43873)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kL1Mo-0007WQ-2V
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:47:16 -0400
+Received: by mail-ej1-x644.google.com with SMTP id o8so26842262ejb.10
+ for <qemu-devel@nongnu.org>; Wed, 23 Sep 2020 02:47:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=8zBVHQ658sQFRqbSWvv5mS8gJaDut0pFnzYX/oWVWaQ=;
+ b=ILVWfaU5MTYPQmohVn4damaWJKUdm/bfLRxAXsKtEg0HC44625GSawxgx3gqUNN1Sw
+ HU66hIJ7+27A5XGbz3S+QhhsD4nuV4mfTsvOBskfNbEmb9ozoyDDJHZVN2ARsP7gXcwl
+ 3jAMNMZQlpGvbHKuXv/kg7sg3jvlcd6/8IdwHx/V7n5hSnk34xnPUnCKFHtfnir3z9sJ
+ /wCKXHje2lFQgeeQGDIr5goBsqcLhLanRCFrmfiM/MZws2xj0Eh1WSbCQlMuUagfsifl
+ 4LKYPN3Sdl/Y67cl9Tw4yTFtwq1KDeF3tuGHgtlfHHaXnOOgDYgiPlYeIvfIMfrHgek6
+ ZtzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=8zBVHQ658sQFRqbSWvv5mS8gJaDut0pFnzYX/oWVWaQ=;
+ b=OW/WopayvsVHt6x/tRH1oUDNfQKyEqtCKJHobTlJqpDY7IBBY7hj2a55EuXiGZvmSE
+ 0y8bCq3XWH8KezowFKXWFb24VTv6uHruonyfa/2rmPAunoKtNqsFBjIFf113R7VjFku9
+ bpXEjkZRaiyYiUBZ0Myc46Jy+uYBcsZ1ZO7A6SxvLt/jsc6uZTqQrzcYN/KiV0j8ZF7D
+ hC03WNsLnFrMWz32ZWGt3YS78DYji+gU5E0MBYZn8KYnS8gtEnnvHsXdCI1n+cfEMcmq
+ OFcBRKZLi1i5S8FnfJy5FIJYzbuYxcUfeUEDoT/5id5C0YztC0kd787tFu7Ico6hCBuv
+ wpBg==
+X-Gm-Message-State: AOAM531xXNb8ec5he7R5I7KGpwuGSxUrkBsFYRvMbBcHGeiTEytP5YMw
+ nZ0gs4+MxIPpfp95wdUcrypLH+2K/ODWmF5dDm3s4w==
+X-Google-Smtp-Source: ABdhPJwqEUTTKC38+PgCKAJL9AsJ+M4h3PQvPOT34D2IPncJ2sAOAd2T4HwN4B13LCuSeB/bM9SHJZ39vajoooW7h9o=
+X-Received: by 2002:a17:906:1f42:: with SMTP id
+ d2mr9112382ejk.407.1600854432477; 
+ Wed, 23 Sep 2020 02:47:12 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200827113259.25064-1-peter.maydell@linaro.org>
+ <a1dda44f-e521-ef82-f5bc-7435c81fe888@redhat.com>
+In-Reply-To: <a1dda44f-e521-ef82-f5bc-7435c81fe888@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 23 Sep 2020 10:47:01 +0100
+Message-ID: <CAFEAcA_zg123DgnyDzeQXe3eXGPOTrybhaL__qu+mAQqSgEr=w@mail.gmail.com>
+Subject: Re: [PATCH] Deprecate lm32 port
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,84 +94,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lersek@redhat.com, ankur.a.arora@oracle.com, mst@redhat.com
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Michael Walle <michael@walle.cc>, "Daniel P. Berrange" <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There were reports of guest crash on CPU hotplug, when using q35 machine
-type and OVMF with SMM, due to hotplugged CPU trying to process SMI at
-default SMI handler location without it being relocated by firmware first.
+On Wed, 23 Sep 2020 at 08:55, Thomas Huth <thuth@redhat.com> wrote:
+>
+> On 27/08/2020 13.32, Peter Maydell wrote:
+> > @@ -416,6 +416,14 @@ The above, converted to the current supported format::
+> >  linux-user mode CPUs
+> >  --------------------
+> >
+> > +``lm32`` CPUs (since 5.2.0)
+> > +'''''''''''''''''''''''''''
+> > +
+> > +The ``lm32`` guest CPU support is deprecated and will be removed in
+> > +a future version of QEMU. The only public user of this architecture
+> > +was the milkymist project, which has been dead for years; there was
+> > +never an upstream Linux port.
+>
+> I was just looking at the current version of deprecated.rst (which has
+> this patch included), and could it be that it ended up in the wrong
+> section here? "lm32" is rather a softmmu target, not a linux-user mode CPU?
 
-Fix it by refusing hotplug if firmware hasn't negotiated CPU hotplug with
-SMI support while SMI broadcast is in use.
+Yes, I think I just put it in the wrong place by mistake (ie next
+to the other target deprecation notices), not noticing the top-level
+section it was in.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Tested-by: Laszlo Ersek <lersek@redhat.com>
----
-v6:
-  - rebase on top of current master, due to non trivial conflicts
-    caused by microvm series, which moved/renamed pc_cpu_pre_plug()
-    (Ankur Arora <ankur.a.arora@oracle.com>)
-v1:
-   fix typos an use suggested wording in commit and error msg
-   s/secure boot/smm/; s/hotplug SMI/hotplug with SMI/
-      (Laszlo Ersek <lersek@redhat.com>)
----
- hw/acpi/ich9.c | 12 +++++++++++-
- hw/i386/x86.c  | 11 +++++++++++
- 2 files changed, 22 insertions(+), 1 deletion(-)
-
-diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
-index 6a19070cec..0acc9a3107 100644
---- a/hw/acpi/ich9.c
-+++ b/hw/acpi/ich9.c
-@@ -408,10 +408,20 @@ void ich9_pm_device_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-     ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
- 
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
--        !lpc->pm.acpi_memory_hotplug.is_enabled)
-+        !lpc->pm.acpi_memory_hotplug.is_enabled) {
-         error_setg(errp,
-                    "memory hotplug is not enabled: %s.memory-hotplug-support "
-                    "is not set", object_get_typename(OBJECT(lpc)));
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-+        uint64_t negotiated = lpc->smi_negotiated_features;
-+
-+        if (negotiated & BIT_ULL(ICH9_LPC_SMI_F_BROADCAST_BIT) &&
-+            !(negotiated & BIT_ULL(ICH9_LPC_SMI_F_CPU_HOTPLUG_BIT))) {
-+            error_setg(errp, "cpu hotplug with SMI wasn't enabled by firmware");
-+            error_append_hint(errp, "update machine type to newer than 5.1 "
-+                "and firmware that suppors CPU hotplug with SMM");
-+        }
-+    }
- }
- 
- void ich9_pm_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index c2ea989579..403c2b1dad 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -279,6 +279,17 @@ void x86_cpu_pre_plug(HotplugHandler *hotplug_dev,
-         return;
-     }
- 
-+    if (x86ms->acpi_dev) {
-+        Error *local_err = NULL;
-+
-+        hotplug_handler_pre_plug(HOTPLUG_HANDLER(x86ms->acpi_dev), dev,
-+                                 &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            return;
-+        }
-+    }
-+
-     init_topo_info(&topo_info, x86ms);
- 
-     env->nr_dies = x86ms->smp_dies;
--- 
-2.27.0
-
+thanks
+-- PMM
 
