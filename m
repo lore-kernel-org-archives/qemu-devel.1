@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB825C4741F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6EA2C4727D
 	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:13:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54BFC2176B
+	by mail.kernel.org (Postfix) with ESMTPS id 4D36F214D8
 	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:13:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OR8bkljW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54BFC2176B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JaIYY8Zx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D36F214D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL0qV-0004WH-Ez
+	id 1kL0qV-0004Tx-Ca
 	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 05:13:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52532)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52524)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kL0n2-0007lS-BF
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:10:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54642)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kL0n1-0007jm-9W
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:10:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50206)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kL0n0-00022T-DL
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:10:16 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kL0mz-00021M-Jy
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:10:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600852213;
+ s=mimecast20190719; t=1600852212;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=dUUhJZUJNQ98mPvRgxdG/nK0wS8NrKuyi1QgyFaNmvU=;
- b=OR8bkljW64+EQ3Y0iquIxK9WvAztcAkYNZq1STmFFJGITpqdbEt5OgAJ3JPcJj+GmiT1ZW
- pepYEPxvgPUsMEoRfW+qXuaxsMvxiuOU/sEWK40WZPlZGwmnLOrVZbaIsUxVwKlyiwiTQ4
- LKnG4VOzQk/8b7HjzxnucpLdCFyQ7nw=
+ bh=miyIlc08Uqjo9uTYNRdj0lv8hh2b6A33x0o9HQh2RxI=;
+ b=JaIYY8Zx+y4UtBajxRr3L5Mte9E9xjSuP8unYNRE4bjATM2OYr6/EX4EDcwWZIuv1b0WzY
+ mJhDlBCRwKrUeFo8CMXo2feDeiULXKdYm3QlRKlE39bbIXeXwzfmL2oVQ0HqAC2FzgaWFd
+ ExJk8pLFSG+t2+rN4pdQLBohufYklB4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-45-LG3ezJtPP-SU4yVcQpkSwA-1; Wed, 23 Sep 2020 05:10:10 -0400
-X-MC-Unique: LG3ezJtPP-SU4yVcQpkSwA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-461-TYPRBHd2OdCY94kqUdJZZw-1; Wed, 23 Sep 2020 05:10:09 -0400
+X-MC-Unique: TYPRBHd2OdCY94kqUdJZZw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16C9710BBEED;
- Wed, 23 Sep 2020 09:10:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E0B4F800475;
+ Wed, 23 Sep 2020 09:10:08 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
  [10.36.112.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7D84973691;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9D2D05C5B0;
  Wed, 23 Sep 2020 09:10:02 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id C831D1FCF5; Wed, 23 Sep 2020 11:10:01 +0200 (CEST)
+ id DC2B8204A1; Wed, 23 Sep 2020 11:10:01 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 2/9] audio/audio: fix video playback slowdown with spiceaudio
-Date: Wed, 23 Sep 2020 11:09:54 +0200
-Message-Id: <20200923091001.20814-3-kraxel@redhat.com>
+Subject: [PULL 4/9] audio: align audio_generic_read with audio_pcm_hw_run_in
+Date: Wed, 23 Sep 2020 11:09:56 +0200
+Message-Id: <20200923091001.20814-5-kraxel@redhat.com>
 In-Reply-To: <20200923091001.20814-1-kraxel@redhat.com>
 References: <20200923091001.20814-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -97,60 +97,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: =?UTF-8?q?Volker=20R=C3=BCmelin?= <vr_qemu@t-online.de>,
- Gerd Hoffmann <kraxel@redhat.com>, Qi Zhou <atmgnd@outlook.com>
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Volker Rümelin <vr_qemu@t-online.de>
 
-This patch allows the audio backends get_buffer_out() functions
-to drop audio data and mitigates a bug reported on the qemu-devel
-mailing list.
+The function audio_generic_read should work exactly like
+audio_pcm_hw_run_in. It's a very similar function working
+on a different buffer.
 
-https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg03832.html
-
-The new rules for the variables buf and size returned by
-get_buffer_out() are:
-size == 0: Downstream playback buffer is full. Retry later.
-size > 0, buf != NULL: Copy size bytes to buf for playback.
-size > 0, buf == NULL: Drop size bytes.
-
-The audio playback rate with spiceaudio for the no audio case is
-too fast, but that's what we had before commit fb35c2cec5
-"audio/dsound: fix invalid parameters error". The complete fix
-comes with the next patch.
-
-Reported-by: Qi Zhou <atmgnd@outlook.com>
 Signed-off-by: Volker Rümelin <vr_qemu@t-online.de>
-Message-id: 20200920171729.15861-2-vr_qemu@t-online.de
+Message-id: 20200920171729.15861-4-vr_qemu@t-online.de
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- audio/audio.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ audio/audio.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
 diff --git a/audio/audio.c b/audio/audio.c
-index 1a68cfaafb9f..7b660dd0c4d0 100644
+index d5891e1928bc..5c47a036028c 100644
 --- a/audio/audio.c
 +++ b/audio/audio.c
-@@ -1091,12 +1091,15 @@ static size_t audio_pcm_hw_run_out(HWVoiceOut *hw, size_t live)
-     while (live) {
-         size_t size, decr, proc;
-         void *buf = hw->pcm_ops->get_buffer_out(hw, &size);
--        if (!buf || size == 0) {
-+
-+        if (size == 0) {
-             break;
-         }
+@@ -1495,12 +1495,23 @@ size_t audio_generic_write(HWVoiceOut *hw, void *buf, size_t size)
  
-         decr = MIN(size / hw->info.bytes_per_frame, live);
--        audio_pcm_hw_clip_out(hw, buf, decr);
-+        if (buf) {
-+            audio_pcm_hw_clip_out(hw, buf, decr);
+ size_t audio_generic_read(HWVoiceIn *hw, void *buf, size_t size)
+ {
+-    void *src = hw->pcm_ops->get_buffer_in(hw, &size);
++    size_t total = 0;
+ 
+-    memcpy(buf, src, size);
+-    hw->pcm_ops->put_buffer_in(hw, src, size);
++    while (total < size) {
++        size_t src_size = size - total;
++        void *src = hw->pcm_ops->get_buffer_in(hw, &src_size);
+ 
+-    return size;
++        if (src_size == 0) {
++            hw->pcm_ops->put_buffer_in(hw, src, src_size);
++            break;
 +        }
-         proc = hw->pcm_ops->put_buffer_out(hw, buf,
-                                            decr * hw->info.bytes_per_frame) /
-             hw->info.bytes_per_frame;
++
++        memcpy((char *)buf + total, src, src_size);
++        hw->pcm_ops->put_buffer_in(hw, src, src_size);
++        total += src_size;
++    }
++
++    return total;
+ }
+ 
+ static int audio_driver_init(AudioState *s, struct audio_driver *drv,
 -- 
 2.27.0
 
