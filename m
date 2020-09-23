@@ -2,107 +2,117 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70FF3C4727F
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:45:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 238ACC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:46:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E009E20725
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:45:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C3CBC20725
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:46:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hYs4LjLM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E009E20725
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N3BuqkEC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3CBC20725
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL1LV-0005Om-1o
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 05:45:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60224)
+	id 1kL1Lg-0005f3-Pv
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 05:46:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34618)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kL1CP-0005x2-Dh
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:36:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25574
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <amorenoz@redhat.com>)
+ id 1kL1KV-0004as-LH
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:44:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47323)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kL1CM-00063z-GR
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:36:28 -0400
+ (Exim 4.90_1) (envelope-from <amorenoz@redhat.com>)
+ id 1kL1KT-00074o-F7
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:44:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600853784;
+ s=mimecast20190719; t=1600854286;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=h728GoLixq8UJds+V15FW4ONPpYQ6tZMor/1F82doTw=;
- b=hYs4LjLMbI1x69ZmCdCqMB8Ti/awKECDKPYzP8ZNDNi6B62+lrpagO4x5kA+xGBa+XdfrS
- EWsk+MqWNCsfyD54t3KTWDMEuwbtqF3YclClPPkKywx8lGyroD642lt6UZYQ6dkC3rVgDC
- j21/KWzdc9kBjk+FpIyuKl8vLjGpX74=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-173-CFZBUJmiN6mzyWkfBG0pug-1; Wed, 23 Sep 2020 05:36:22 -0400
-X-MC-Unique: CFZBUJmiN6mzyWkfBG0pug-1
-Received: by mail-wm1-f70.google.com with SMTP id c200so1999655wmd.5
- for <qemu-devel@nongnu.org>; Wed, 23 Sep 2020 02:36:22 -0700 (PDT)
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=P/7T/4JxjbU4RM4QDLjtRIVhPgsawxmcFdZoMNDAIis=;
+ b=N3BuqkECfw9j7gV5K5ehTig9OzVDxxXQ/F9Lq9ry5seCah1iHympPZYYd3QYKemRFgUZyb
+ qYvSb5ItPDARAiWAIliv46aMbY3BXCIEb2Cc+Vb0YvMYg8BF4i66+NQxG0FiX2hh2q8GGF
+ J5nDTb4Z5GgHn7LH1fEeo8195GnCjZI=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-569-AZEeIg-NN26xCtB_q5dbMg-1; Wed, 23 Sep 2020 05:44:44 -0400
+X-MC-Unique: AZEeIg-NN26xCtB_q5dbMg-1
+Received: by mail-wm1-f71.google.com with SMTP id b14so1166191wmj.3
+ for <qemu-devel@nongnu.org>; Wed, 23 Sep 2020 02:44:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=h728GoLixq8UJds+V15FW4ONPpYQ6tZMor/1F82doTw=;
- b=PM9Oj6s4MlMjf8ptxcllPJHwdQKktId9QtdMQEfAY2YVnm4u1aYvrSoBGPoqVWYBs+
- zb1tHklThdnJv3okbIFUb10/qYeFEZ9TNzGLerP+owM16sl1UzpovkP38HUgVcvTZtH2
- Re7CGTYwJEwF8geLDp0WJPB7Xa321lTMOizWEAdJkfgk5Z0m6rulSefTGkki8mE5cfOR
- PqyvIU8XGcyL9h9F584RAdOh5CV6lXmuFtEV6EV6Yz10VwcHqNagykqENbh7xPa1PtVd
- uytZHmA2B6WSX2+ULYR1Jum7jbwYdvnaFErh6XR1NusI1GcDescGl0XSJyVctR98Wosf
- 9kqw==
-X-Gm-Message-State: AOAM531YrjDpdCERC2k1Fy29W0VqPmjVaGVp6qs8UJcY3UhlVRdBc6bf
- Rf/Duv1LFvUB0wMw1yZOvzeJE1GNPIxKZhvayNJN98p5PeoaKHiha85LI7jEBbQOhprNJk7V/kI
- yGS4lq80+NOGsr7Q=
-X-Received: by 2002:a7b:c38f:: with SMTP id s15mr5626140wmj.16.1600853781638; 
- Wed, 23 Sep 2020 02:36:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzLPSjZlrqaLjyirCafluNU60SwxSigtUH5K2t3+W8bxvAjmSVCcGw3CLkMCgjAoIchLWFflw==
-X-Received: by 2002:a7b:c38f:: with SMTP id s15mr5626119wmj.16.1600853781391; 
- Wed, 23 Sep 2020 02:36:21 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:15f1:648d:7de6:bad9?
- ([2001:b07:6468:f312:15f1:648d:7de6:bad9])
- by smtp.gmail.com with ESMTPSA id f6sm30045884wro.5.2020.09.23.02.36.20
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=P/7T/4JxjbU4RM4QDLjtRIVhPgsawxmcFdZoMNDAIis=;
+ b=jLUgksKkObM9iXJCkUMzamet0EAudouVvXs/OgKL4cZmkS1IbQkoFqUApTo0xo8DEs
+ T6j6Z68OhX77WxNRiuP94fcdcr+LViJOxzduYA/R12gJFmr/QY0gK8HgviP9EVzFzeXD
+ nTQ07y65QYuEPDO3c96UP3bDVhQU0xWNoTRGXBd0SETV9/fV96brvAwqv1oJFZqHK7w0
+ 9ta93UDy31S5W24YayqqCBz8jd98nCPMmNQUTY5YlsTPakLtsNmXKRjoG+Vg3kaOi/vE
+ djSkKy+pA1zEfa6vApfCnzDS67HiRO29FGLuAdiyFT8+t4YZ2uDNXGz/VQk/Q2TUFX/i
+ JZXg==
+X-Gm-Message-State: AOAM533k+upFklPqdD4xPD8ugRqWqpyi+E7WQ8WJraIO0KQTD3QuHBuR
+ /FjiPe693F0GC3g8UK5GhFWUbsIhBpbBwQfyRreAZAEYY2Xx/gTVrxLeT6dV5wclPXJxFQFFUhJ
+ ifgR/5cJeCfEqc+A=
+X-Received: by 2002:a7b:c8cc:: with SMTP id f12mr5310939wml.169.1600854282760; 
+ Wed, 23 Sep 2020 02:44:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwV4Qr5WfEoMe1WvH5ynWfG5h2z0FKEiE3rPGFi1MKuG5ZSyJoCy/5uhvOi721L4kvtlIbm5Q==
+X-Received: by 2002:a7b:c8cc:: with SMTP id f12mr5310919wml.169.1600854282552; 
+ Wed, 23 Sep 2020 02:44:42 -0700 (PDT)
+Received: from amorenoz.users.ipa.redhat.com ([94.73.56.18])
+ by smtp.gmail.com with ESMTPSA id e13sm34011399wre.60.2020.09.23.02.44.41
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 23 Sep 2020 02:36:20 -0700 (PDT)
-Subject: Re: [PATCH v2] module: silence errors for module_load_qom_all().
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-References: <20200923091217.22662-1-kraxel@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fdd8b613-4a49-0dc0-9a82-ad4b2d56380b@redhat.com>
-Date: Wed, 23 Sep 2020 11:36:20 +0200
+ Wed, 23 Sep 2020 02:44:41 -0700 (PDT)
+Subject: Re: [PATCH] vhost-user: save features of multiqueues if chardev is
+ closed
+To: =?UTF-8?B?aGFpYmluemhhbmco5byg5rW35paMKQ==?= <haibinzhang@tencent.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
+References: <46CBC206-E0CA-4249-81CD-10F75DA30441@tencent.com>
+From: Adrian Moreno <amorenoz@redhat.com>
+Autocrypt: addr=amorenoz@redhat.com; prefer-encrypt=mutual; keydata=
+ mDMEX1iJRRYJKwYBBAHaRw8BAQdA9XK4r7431HtX+egvecRuaWTqF3VdWszR6pK3IyLHFW20
+ I0FkcmlhbiBNb3Jlbm8gPGFtb3Jlbm96QHJlZGhhdC5jb20+iJYEExYIAD4WIQTCvo3bo2x3
+ f+vPxWuVGptW5xa95gUCX1iJRQIbAwUJCWYBgAULCQgHAgYVCgkICwIEFgIDAQIeAQIXgAAK
+ CRCVGptW5xa95hNyAQDGrMiGEiW/RgXzO+UgmZeuGOhl2Jo0m7XKCyM4E281eQEAlJ/5Nr16
+ IdnEqtoYGbKE2WknEEAAx2oOGldEm5N+/Qi4OARfWIlFEgorBgEEAZdVAQUBAQdAkc5hZG7i
+ IpK4cjpZYqrw7W5UbePUuaFbf+1oyDGofncDAQgHiH4EGBYIACYWIQTCvo3bo2x3f+vPxWuV
+ GptW5xa95gUCX1iJRQIbDAUJCWYBgAAKCRCVGptW5xa95t7NAQDQ45Y5xAbZ/X6W05G0VeCA
+ xDRcmRnbPXbrfuXSdBI57gEA9pDtbcYXFEXvZaNc4JSwYC6sIa51ohTRuAfoJ26Amgc=
+Message-ID: <31d9f70a-f4b8-bc83-aa5d-c71e2b31e3f5@redhat.com>
+Date: Wed, 23 Sep 2020 11:44:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200923091217.22662-1-kraxel@redhat.com>
+In-Reply-To: <46CBC206-E0CA-4249-81CD-10F75DA30441@tencent.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=amorenoz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 05:08:50
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=amorenoz@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
 X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -116,137 +126,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: "xtay.haibin@gmail.com" <xtay.haibin@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23/09/20 11:12, Gerd Hoffmann wrote:
-> Add mayfail bool parameter to module loading functions.  Set it to true
-> for module_load_qom_all() because device modules might not load into all
-> system emulation variants.  qemu-system-s390x for example will not load
-> qxl because it lacks vga support.  Makes "make check" less chatty.
+Thanks Haibin,
+
+
+On 9/22/20 5:27 AM, haibinzhang(张海斌) wrote:
+> Fore-commit(c6beefd674) only saves features of queue0,
+> this makes wrong features of other queues in multiqueues
+> situation.
+> For examples:
+>   qemu-system-aarch64 ... \
+>   -chardev socket,id=charnet0,path=/var/run/vhost_sock \
+>   -netdev vhost-user,chardev=charnet0,queues=2,id=hostnet0 \
+>   ...
+> There are two queues in nic assocated with one chardev.
+> When chardev is reconnected, it is necessary to save and
+> restore features of all queues.
 > 
-> Drop module_loaded_qom_all check in module_load_qom_one to make sure we
-> see errors for explicit load requests, i.e. module_load_qom_one("qxl")
-> failing will log an error no matter whenever module_load_qom_all() was
-> called before or not.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  include/qemu/module.h |  8 ++++----
->  softmmu/qtest.c       |  2 +-
->  util/module.c         | 20 ++++++++++----------
->  3 files changed, 15 insertions(+), 15 deletions(-)
-> 
-> diff --git a/include/qemu/module.h b/include/qemu/module.h
-> index 9121a475c1b6..944d403cbd15 100644
-> --- a/include/qemu/module.h
-> +++ b/include/qemu/module.h
-> @@ -61,15 +61,15 @@ typedef enum {
->  #define fuzz_target_init(function) module_init(function, \
->                                                 MODULE_INIT_FUZZ_TARGET)
->  #define migration_init(function) module_init(function, MODULE_INIT_MIGRATION)
-> -#define block_module_load_one(lib) module_load_one("block-", lib)
-> -#define ui_module_load_one(lib) module_load_one("ui-", lib)
-> -#define audio_module_load_one(lib) module_load_one("audio-", lib)
-> +#define block_module_load_one(lib) module_load_one("block-", lib, false)
-> +#define ui_module_load_one(lib) module_load_one("ui-", lib, false)
-> +#define audio_module_load_one(lib) module_load_one("audio-", lib, false)
->  
->  void register_module_init(void (*fn)(void), module_init_type type);
->  void register_dso_module_init(void (*fn)(void), module_init_type type);
->  
->  void module_call_init(module_init_type type);
-> -bool module_load_one(const char *prefix, const char *lib_name);
-> +bool module_load_one(const char *prefix, const char *lib_name, bool mayfail);
->  void module_load_qom_one(const char *type);
->  void module_load_qom_all(void);
->  
-> diff --git a/softmmu/qtest.c b/softmmu/qtest.c
-> index 4e439caec7e9..6f697c8a6987 100644
-> --- a/softmmu/qtest.c
-> +++ b/softmmu/qtest.c
-> @@ -670,7 +670,7 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
->          g_assert(words[1] && words[2]);
->  
->          qtest_send_prefix(chr);
-> -        if (module_load_one(words[1], words[2])) {
-> +        if (module_load_one(words[1], words[2], false)) {
->              qtest_sendf(chr, "OK\n");
->          } else {
->              qtest_sendf(chr, "FAIL\n");
-> diff --git a/util/module.c b/util/module.c
-> index 34772e7d87eb..1535e7da4c06 100644
-> --- a/util/module.c
-> +++ b/util/module.c
-> @@ -109,7 +109,7 @@ void module_call_init(module_init_type type)
->  }
->  
->  #ifdef CONFIG_MODULES
-> -static int module_load_file(const char *fname)
-> +static int module_load_file(const char *fname, bool mayfail)
->  {
->      GModule *g_module;
->      void (*sym)(void);
-> @@ -133,8 +133,10 @@ static int module_load_file(const char *fname)
->  
->      g_module = g_module_open(fname, G_MODULE_BIND_LAZY | G_MODULE_BIND_LOCAL);
->      if (!g_module) {
-> -        fprintf(stderr, "Failed to open module: %s\n",
-> -                g_module_error());
-> +        if (!mayfail) {
-> +            fprintf(stderr, "Failed to open module: %s\n",
-> +                    g_module_error());
-> +        }
->          ret = -EINVAL;
->          goto out;
->      }
-> @@ -166,7 +168,7 @@ out:
->  }
->  #endif
->  
-> -bool module_load_one(const char *prefix, const char *lib_name)
-> +bool module_load_one(const char *prefix, const char *lib_name, bool mayfail)
->  {
->      bool success = false;
->  
-> @@ -222,7 +224,7 @@ bool module_load_one(const char *prefix, const char *lib_name)
->      for (i = 0; i < n_dirs; i++) {
->          fname = g_strdup_printf("%s/%s%s",
->                  dirs[i], module_name, CONFIG_HOST_DSOSUF);
-> -        ret = module_load_file(fname);
-> +        ret = module_load_file(fname, mayfail);
->          g_free(fname);
->          fname = NULL;
->          /* Try loading until loaded a module file */
-> @@ -279,13 +281,11 @@ void module_load_qom_one(const char *type)
->      if (!type) {
->          return;
->      }
-> -    if (module_loaded_qom_all) {
-> -        return;
-> -    }
->      for (i = 0; i < ARRAY_SIZE(qom_modules); i++) {
->          if (strcmp(qom_modules[i].type, type) == 0) {
->              module_load_one(qom_modules[i].prefix,
-> -                            qom_modules[i].module);
-> +                            qom_modules[i].module,
-> +                            false);
->              return;
->          }
->      }
-> @@ -306,7 +306,7 @@ void module_load_qom_all(void)
->              /* one module implementing multiple types -> load only once */
->              continue;
->          }
-> -        module_load_one(qom_modules[i].prefix, qom_modules[i].module);
-> +        module_load_one(qom_modules[i].prefix, qom_modules[i].module, true);
->      }
->      module_loaded_qom_all = true;
->  }
+> Signed-of-by: Haibin Zhang <haibinzhang@tencent.com>
 > 
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Indeed, this fixes the issue of vhost-user reconnection on multiqueue that I've
+also reproduced, thanks for posting it.
+
+However, I'd like to ask some questions to the experts:
+- Why do we need a feature negotiation per queue-pair on vhost-user?
+- Maybe I'm missing something but, isn't the problem that vhost-user device is
+reusing vhost_net layer (which forces nqueues = 2)?
+- Won't we have the same issue with vdpa?
+
+---
+>  net/vhost-user.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/vhost-user.c b/net/vhost-user.c
+> index 17532daaf3..ffbd94d944 100644
+> --- a/net/vhost-user.c
+> +++ b/net/vhost-user.c
+> @@ -226,7 +226,7 @@ static void chr_closed_bh(void *opaque)
+>      NetClientState *ncs[MAX_QUEUE_NUM];
+>      NetVhostUserState *s;
+>      Error *err = NULL;
+> -    int queues;
+> +    int queues, i;
+>  
+>      queues = qemu_find_net_clients_except(name, ncs,
+>                                            NET_CLIENT_DRIVER_NIC,
+> @@ -235,8 +235,12 @@ static void chr_closed_bh(void *opaque)
+>  
+>      s = DO_UPCAST(NetVhostUserState, nc, ncs[0]);
+>  
+> -    if (s->vhost_net) {
+> -        s->acked_features = vhost_net_get_acked_features(s->vhost_net);
+> +    for (i = queues -1; i >= 0; i--) {
+> +        s = DO_UPCAST(NetVhostUserState, nc, ncs[i]);
+> +
+> +        if (s->vhost_net) {
+> +            s->acked_features = vhost_net_get_acked_features(s->vhost_net);
+> +        }
+>      }
+>  
+>      qmp_set_link(name, false, &err);
+> 
+
+Thanks
+-- 
+Adrián Moreno
 
 
