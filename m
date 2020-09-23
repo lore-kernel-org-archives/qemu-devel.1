@@ -2,93 +2,108 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D04DC4363D
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 01:47:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2647C4363D
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 02:48:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E41042371F
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 01:47:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E41042371F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 05ED8206DC
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 02:48:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aEf6zLeW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05ED8206DC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKtsh-0008Mq-08
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 21:47:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48052)
+	id 1kKupO-0000Fs-ST
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 22:48:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56802)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1kKts7-0007vv-6G
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 21:47:03 -0400
-Received: from mga07.intel.com ([134.134.136.100]:48658)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1kKts4-00078r-Ff
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 21:47:02 -0400
-IronPort-SDR: wEcX52wx6R6a/Cpq+16hKy+yPw8n7X1ajj4AcZacuBfY3UkVbGGRW74shFOM/UMa37NFqk5i9S
- OgdKmmiR0zJQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9752"; a="224904738"
-X-IronPort-AV: E=Sophos;i="5.77,292,1596524400"; d="scan'208";a="224904738"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 22 Sep 2020 18:46:57 -0700
-IronPort-SDR: PR34qOzyvFDbbJWQV5tqqgMEAPa8UwWd0xvrnlGTNQX8KehlAzlf8YP4+lE8hdmAXD+eYxkiP1
- 1FxvWQA8bbCg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,292,1596524400"; d="scan'208";a="511446447"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
- by fmsmga005.fm.intel.com with ESMTP; 22 Sep 2020 18:46:57 -0700
-Received: from shsmsx601.ccr.corp.intel.com (10.109.6.141) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Tue, 22 Sep 2020 18:46:56 -0700
-Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
- SHSMSX601.ccr.corp.intel.com (10.109.6.141) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 23 Sep 2020 09:46:54 +0800
-Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
- SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
- Wed, 23 Sep 2020 09:46:54 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: Li Zhijian <lizhijian@cn.fujitsu.com>, "jasowang@redhat.com"
- <jasowang@redhat.com>
-Subject: RE: [PATCH 3/3] colo-compare: check mark in mutual exclusion
-Thread-Topic: [PATCH 3/3] colo-compare: check mark in mutual exclusion
-Thread-Index: AQHWkMaNWC8vtCWU7kaxMIpzD9ac/Kl1dNKA
-Date: Wed, 23 Sep 2020 01:46:54 +0000
-Message-ID: <a9a96714fd844d0baecef33d93577da8@intel.com>
-References: <20200922095525.4081603-1-lizhijian@cn.fujitsu.com>
- <20200922095525.4081603-4-lizhijian@cn.fujitsu.com>
-In-Reply-To: <20200922095525.4081603-4-lizhijian@cn.fujitsu.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.5.1.3
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.36]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kKunl-0007sI-Gr
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 22:46:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22451)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kKuni-0007cJ-FS
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 22:46:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600829191;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/lh34OiXB1TcHfGXtoYHhpPBDKHfjh7czJGs0xeiWY0=;
+ b=aEf6zLeWodx0B0jZhknoo17Y3HY5mKSdF6SkO2KDDhrZvRt6h2KaMcpl/Il/Zxm8uIqqnU
+ CSI4HKvjuKW1VOtk69vC0qDarwK+PLwSl8oOl1Sbqji1hzmaWBr1mqkCbZCenSX6svq9rV
+ 8FvZH5i8Kz4Nq2VFMmxX5ZRSTWy5weY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-328-R5a62sITM72idhhthrHvFA-1; Tue, 22 Sep 2020 22:46:24 -0400
+X-MC-Unique: R5a62sITM72idhhthrHvFA-1
+Received: by mail-wm1-f72.google.com with SMTP id m19so1628433wmg.6
+ for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 19:46:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=/lh34OiXB1TcHfGXtoYHhpPBDKHfjh7czJGs0xeiWY0=;
+ b=U9SE/uXrs74P6bkhN5FZGy0ydgHlwEfXziHdBpk4LPy7FpETbYAtCsXIaHry2WU1xM
+ GlJe5KmxVGs+pmglA/anhKpgQOvyktgDRo31Iz8+RaeVlU+prykIpK/b0X7qd4cnZrrN
+ NWwfOQs4RzMdDdt4UenW3sLRWvQd5cfpI9EytboTxeKCAsYtqVxvUlCV8SluBIzhre2I
+ EzS1Q64yfjaSxEfV+DsoZKZchQZ0ng1Emo/19atlUbWJxWGKM+VL7OK8NMJYvNan3tgQ
+ KYd4QITmFEh05TXmB8eJ9pNOSUfM/4iVOBL9kpVQbfbXz8SUkb5gN2vTBcW/b0MQ0kwa
+ 6bRw==
+X-Gm-Message-State: AOAM532UU0AkFIS840HAo3kR0tVR7qv5DY36LxnYPyL5HaXBkkIvplwG
+ A7dyqfabQgaV0J4Vyg9TDjymYoW/Xqf+nYtNqseDGkBcbckO/wPYplWZ/4TJN/YH+b6Tb8TZPK/
+ vU9NGYe0G6Zcz0ow=
+X-Received: by 2002:a1c:4e08:: with SMTP id g8mr3881132wmh.53.1600829182993;
+ Tue, 22 Sep 2020 19:46:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzMlWOpvs0Cr6KaiDZyCKfHgMcM0ynX9EDi//oefniNXLz8ACblp422O4KsV6BDoAAPQTPMHQ==
+X-Received: by 2002:a1c:4e08:: with SMTP id g8mr3881114wmh.53.1600829182770;
+ Tue, 22 Sep 2020 19:46:22 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:2eaa:3549:74e8:ad2b?
+ ([2001:b07:6468:f312:2eaa:3549:74e8:ad2b])
+ by smtp.gmail.com with ESMTPSA id g8sm6288908wmd.12.2020.09.22.19.46.21
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 22 Sep 2020 19:46:22 -0700 (PDT)
+Subject: Re: [PATCH] bios-tables-test: Remove kernel-irqchip=off option
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+References: <20200922194732.2100510-1-ehabkost@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4fd276da-3397-c315-b8b3-6166c92ae01c@redhat.com>
+Date: Wed, 23 Sep 2020 04:46:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Received-SPF: pass client-ip=134.134.136.100;
- envelope-from=chen.zhang@intel.com; helo=mga07.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 21:46:57
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200922194732.2100510-1-ehabkost@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 21:51:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,57 +116,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, 1896263@bugs.launchpad.net,
+ Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-> -----Original Message-----
-> From: Li Zhijian <lizhijian@cn.fujitsu.com>
-> Sent: Tuesday, September 22, 2020 5:55 PM
-> To: Zhang, Chen <chen.zhang@intel.com>; jasowang@redhat.com
-> Cc: qemu-devel@nongnu.org; Li Zhijian <lizhijian@cn.fujitsu.com>
-> Subject: [PATCH 3/3] colo-compare: check mark in mutual exclusion
->=20
-> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-
-Reviewed-by: Zhang Chen <chen.zhang@intel.com>
-By the way, we have other optimization here, will be sent in the future.
-
-Thanks
-Zhang Chen
-
+On 22/09/20 21:47, Eduardo Habkost wrote:
+> We don't need to use kernel-irqchip=off for irq0 override if IRQ
+> routing is supported by the host, which is the case since 2009
+> (IRQ routing was added to KVM in Linux v2.6.30).
+> 
+> This is a more straightforward fix for Launchpad bug #1896263, as
+> it doesn't require increasing the complexity of the MSR code.
+> kernel-irqchip=off is for debugging only and there's no need to
+> increase the complexity of the code just to work around an issue
+> that was already fixed in the kernel.
+> 
+> Fixes: https://bugs.launchpad.net/bugs/1896263
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
->  net/colo-compare.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
->=20
-> diff --git a/net/colo-compare.c b/net/colo-compare.c index
-> 039b515611..19633fc684 100644
-> --- a/net/colo-compare.c
-> +++ b/net/colo-compare.c
-> @@ -481,13 +481,11 @@ sec:
->              colo_release_primary_pkt(s, ppkt);
->              g_queue_push_head(&conn->secondary_list, spkt);
->              goto pri;
-> -        }
-> -        if (mark =3D=3D COLO_COMPARE_FREE_SECONDARY) {
-> +        } else if (mark =3D=3D COLO_COMPARE_FREE_SECONDARY) {
->              conn->compare_seq =3D spkt->seq_end;
->              packet_destroy(spkt, NULL);
->              goto sec;
-> -        }
-> -        if (mark =3D=3D (COLO_COMPARE_FREE_PRIMARY |
-> COLO_COMPARE_FREE_SECONDARY)) {
-> +        } else if (mark =3D=3D (COLO_COMPARE_FREE_PRIMARY |
-> + COLO_COMPARE_FREE_SECONDARY)) {
->              conn->compare_seq =3D ppkt->seq_end;
->              colo_release_primary_pkt(s, ppkt);
->              packet_destroy(spkt, NULL);
-> --
-> 2.28.0
->=20
->=20
+>  tests/qtest/bios-tables-test.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
+> index a9c8d478aee..27e8f0a1cb7 100644
+> --- a/tests/qtest/bios-tables-test.c
+> +++ b/tests/qtest/bios-tables-test.c
+> @@ -663,8 +663,7 @@ static void test_acpi_one(const char *params, test_data *data)
+>              data->uefi_fl1, data->uefi_fl2, data->cd, params ? params : "");
+>  
+>      } else {
+> -        /* Disable kernel irqchip to be able to override apic irq0. */
+> -        args = g_strdup_printf("-machine %s,kernel-irqchip=off %s -accel tcg "
+> +        args = g_strdup_printf("-machine %s %s -accel tcg "
+>              "-net none -display none %s "
+>              "-drive id=hd0,if=none,file=%s,format=raw "
+>              "-device %s,drive=hd0 ",
+> 
+
+Queued, thanks.
+
+Paolo
 
 
