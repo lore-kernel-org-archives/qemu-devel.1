@@ -2,78 +2,78 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D941C4741F
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 18:36:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50EEBC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 18:37:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FEBD2376E
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 18:36:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C388C206B2
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 18:37:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="pxA7w//r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FEBD2376E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="YA0tYJpg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C388C206B2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL9co-0002Iq-SS
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 14:36:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53546)
+	id 1kL9dg-0003Qs-PM
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 14:37:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53506)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=5287de305=dmitry.fomichev@wdc.com>)
- id 1kL9O5-00050I-AJ; Wed, 23 Sep 2020 14:21:05 -0400
+ id 1kL9O1-0004xk-9j; Wed, 23 Sep 2020 14:21:02 -0400
 Received: from esa2.hgst.iphmx.com ([68.232.143.124]:35018)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=5287de305=dmitry.fomichev@wdc.com>)
- id 1kL9O2-00087W-VZ; Wed, 23 Sep 2020 14:21:04 -0400
+ id 1kL9Ny-00087W-Gh; Wed, 23 Sep 2020 14:21:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1600886191; x=1632422191;
+ t=1600886184; x=1632422184;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=s6cDsW3WbSkWhspWjAxerfP9yy04QK9FuNgm9yBdiXc=;
- b=pxA7w//rCVlPHv3h2lg409V+2S2na9yV9j1/NKBBSLz+YDGfbrUPOIUL
- n4vdU5LZdf76Qa8cbNIn9218gRGgQNh9W0awDbAGnN8dQBkwh3Ok6JY0x
- HKT7fGiPmr7pKT3UwRCCQ1E4vlY1wjSfFgD70nRKLdcxCG6Csy13Ze9+h
- isYyPLMnrvA3q3xyOPMBDbj3o3TJcxAXH7d2+d5nkon9jgx4ws+dJjDvF
- aU+UE3J7r577XDSIlEejnHbEpnGjqWRc9erM2v58d8oBGUaDw3hRxqHsE
- YWK6NQfv9xZNZpj59T9bv40dvmfsvlns4w/WxFmFDfM/jGDBKrpN/YFYa g==;
-IronPort-SDR: Ghg0c3hKVLd9GRhmrJifBmGZwBrQF8ApwueoaBhgUtfuqvFL6mCLzfCeRXzC9FXYcGVy+hKqF/
- 4uRsOmc/zHOcHz1mUGt9WQCAkXYsettegTpOZ8zv30G9GsYJ57kgkW8vdvFRm4oZnHUk7tI+BF
- HV+lYQYzkuSGj497FzZVMEpnGu4FWSSwH7rSMIL2DOGzY9F8JwM2counL/Jtd0hR3IO0TlONQa
- BZGXGKu4ANWzBwCAjvRmd1SXvhhhcEyD6NtiqNBatfj71h74R6zf23L3aJgqH4pK4YZf6v0cPw
- IbE=
-X-IronPort-AV: E=Sophos;i="5.77,293,1596470400"; d="scan'208";a="251496355"
+ bh=xdpXusWybkFA9Rs2pAr0H5eIRfH4rvQ8cawqr2z0APg=;
+ b=YA0tYJpgoqDQP/9yg3N+VLCstVAeDTyJMxN26S0LGZZuCfDZAwmQxD8v
+ P4TWHHXHjTN/zHj+DCM8zM7qeuzN3kOVS6WAhh74AbFOQABoSRpS2Szd9
+ WfugraCDBL1QqTQe40KXdPLGHI8C7kTOgxFHsXmjvYRW5EN3Pp88EaAZ0
+ 5S1JtCiSD3DKEJFUJ1Q05VCH0Fhz2ojs+DtoTYKCnlMO3bPDNM5weX4pT
+ JsvPVVKTnvndTZRYGjfc7BQdUGQ+1l9bGi+sPUAQYYKCS5E1r1mUDzP8L
+ 4jq5RiRZs+ZNsd+pywXNq2fmMCrUhSI2vcMcwaNBQQBKEw2YP86qhbO3p A==;
+IronPort-SDR: Tb5UpFutWoOLVk58sMUaY4fWVHvq9ZLdmamcDOjcTryWuECtPbB2+yjPauRC+8SxqJXcWaGoNI
+ Pn2suUtWZgGhyadgF3JPjm9zP1EB0tqdVhedD+0HVoKQgcjR/HNIG+1L5A7qsNGM9e8dsImJrN
+ l+aFhTsJ9bzkDnDNkJrAEMKSTyyIF0SSomhv7n9c7/7jeuhG2cjBURVs/cgsbVPb7eN5xpR0GC
+ XE/32gpA4peZaiatcKHq1jqmpnRf+kW0ab6QLzOTcqp1IBxNaX8WpwJCusJ/cA2ZPyED6MbFba
+ hmw=
+X-IronPort-AV: E=Sophos;i="5.77,293,1596470400"; d="scan'208";a="251496343"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 24 Sep 2020 02:36:28 +0800
-IronPort-SDR: tkrUQUTiXHrVtT7dGiEagH7mwADsTTvZuwsI42aNiShHLGVvX4ZjqvGK16and2yV6YuZmV+aKd
- C7JAXToFDyIQ==
+ by ob1.hgst.iphmx.com with ESMTP; 24 Sep 2020 02:36:18 +0800
+IronPort-SDR: A53e7vhDOdMU0ZB8ACiu9S71PJr/EdtdvJQtUcuYoVU3xul4OHsqBeaxQ4gfkkk2RkkTYopIzc
+ 21Q9NwRksUsg==
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 23 Sep 2020 11:07:07 -0700
-IronPort-SDR: 5plRlXxzd730vhK1bjz8r9YeN32XZpIRIfaPaN9Ggt4qzo/ztapJDGCl7t3jUvmxBhiE2pwXei
- 9cTdh1LpDwOg==
+ 23 Sep 2020 11:07:01 -0700
+IronPort-SDR: q6ZWsI8gXxGsKy7C783rzTgwK84Yf0iJu2I43vgl0RVHKxJm01VpkTgiH32g/bfDLcWEMEKTuB
+ oDopo5bDRXyw==
 WDCIronportException: Internal
 Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
- by uls-op-cesaip02.wdc.com with ESMTP; 23 Sep 2020 11:20:59 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 23 Sep 2020 11:20:52 -0700
 From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 To: Keith Busch <kbusch@kernel.org>, Klaus Jensen <k.jensen@samsung.com>,
  Kevin Wolf <kwolf@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Maxim Levitsky <mlevitsk@redhat.com>, Fam Zheng <fam@euphon.net>
-Subject: [PATCH v4 06/14] hw/block/nvme: Add support for active/inactive
- namespaces
-Date: Thu, 24 Sep 2020 03:20:13 +0900
-Message-Id: <20200923182021.3724-7-dmitry.fomichev@wdc.com>
+Subject: [PATCH v4 03/14] hw/block/nvme: Introduce the Namespace Types
+ definitions
+Date: Thu, 24 Sep 2020 03:20:10 +0900
+Message-Id: <20200923182021.3724-4-dmitry.fomichev@wdc.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200923182021.3724-1-dmitry.fomichev@wdc.com>
 References: <20200923182021.3724-1-dmitry.fomichev@wdc.com>
@@ -113,221 +113,190 @@ Sender: "Qemu-devel"
 
 From: Niklas Cassel <niklas.cassel@wdc.com>
 
-In NVMe, a namespace is active if it exists and is attached to the
-controller.
-
-CAP.CSS (together with the I/O Command Set data structure) defines what
-command sets are supported by the controller.
-
-CC.CSS (together with Set Profile) can be set to enable a subset of the
-available command sets. The namespaces belonging to a disabled command set
-will not be able to attach to the controller, and will thus be inactive.
-
-E.g., if the user sets CC.CSS to Admin Only, NVM namespaces should be
-marked as inactive.
-
-The identify namespace, the identify namespace CSI specific, and the namespace
-list commands have two different versions, one that only shows active
-namespaces, and the other version that shows existing namespaces, regardless
-of whether the namespace is attached or not.
-
-Add an attached member to struct NvmeNamespace, and implement the missing CNS
-commands.
-
-The added functionality will also simplify the implementation of namespace
-management in the future, since namespace management can also attach and
-detach namespaces.
+Define the structures and constants required to implement
+Namespace Types support.
 
 Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
 Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 ---
- hw/block/nvme.c      | 54 ++++++++++++++++++++++++++++++++++++--------
- hw/block/nvme.h      |  1 +
- include/block/nvme.h | 20 +++++++++-------
- 3 files changed, 57 insertions(+), 18 deletions(-)
+ hw/block/nvme.c      |  2 +-
+ hw/block/nvme.h      |  3 ++
+ include/block/nvme.h | 74 +++++++++++++++++++++++++++++++++++---------
+ 3 files changed, 64 insertions(+), 15 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index e0f885498d..6c231b20f9 100644
+index 7807f296d3..96cd520feb 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -1189,7 +1189,8 @@ static uint16_t nvme_identify_ctrl_csi(NvmeCtrl *n, NvmeRequest *req)
-     return NVME_INVALID_FIELD | NVME_DNR;
- }
+@@ -1259,7 +1259,7 @@ static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeRequest *req)
+      * here.
+      */
+     ns_descrs->uuid.hdr.nidt = NVME_NIDT_UUID;
+-    ns_descrs->uuid.hdr.nidl = NVME_NIDT_UUID_LEN;
++    ns_descrs->uuid.hdr.nidl = NVME_NIDL_UUID;
+     stl_be_p(&ns_descrs->uuid.v, nsid);
  
--static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeRequest *req)
-+static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeRequest *req,
-+                                 bool only_active)
- {
-     NvmeNamespace *ns;
-     NvmeIdentify *c = (NvmeIdentify *)&req->cmd;
-@@ -1207,11 +1208,16 @@ static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeRequest *req)
-     ns = &n->namespaces[nsid - 1];
-     assert(nsid == ns->nsid);
- 
-+    if (only_active && !ns->attached) {
-+        return nvme_rpt_empty_id_struct(n, prp1, prp2, req);
-+    }
-+
-     return nvme_dma_prp(n, (uint8_t *)&ns->id_ns, sizeof(ns->id_ns), prp1,
-                         prp2, DMA_DIRECTION_FROM_DEVICE, req);
- }
- 
--static uint16_t nvme_identify_ns_csi(NvmeCtrl *n, NvmeRequest *req)
-+static uint16_t nvme_identify_ns_csi(NvmeCtrl *n, NvmeRequest *req,
-+                                     bool only_active)
- {
-     NvmeIdentify *c = (NvmeIdentify *)&req->cmd;
-     NvmeNamespace *ns;
-@@ -1229,6 +1235,10 @@ static uint16_t nvme_identify_ns_csi(NvmeCtrl *n, NvmeRequest *req)
-     ns = &n->namespaces[nsid - 1];
-     assert(nsid == ns->nsid);
- 
-+    if (only_active && !ns->attached) {
-+        return nvme_rpt_empty_id_struct(n, prp1, prp2, req);
-+    }
-+
-     if (c->csi == NVME_CSI_NVM) {
-         return nvme_rpt_empty_id_struct(n, prp1, prp2, req);
-     }
-@@ -1236,7 +1246,8 @@ static uint16_t nvme_identify_ns_csi(NvmeCtrl *n, NvmeRequest *req)
-     return NVME_INVALID_FIELD | NVME_DNR;
- }
- 
--static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeRequest *req)
-+static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeRequest *req,
-+                                     bool only_active)
- {
-     NvmeIdentify *c = (NvmeIdentify *)&req->cmd;
-     static const int data_len = NVME_IDENTIFY_DATA_SIZE;
-@@ -1261,7 +1272,7 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeRequest *req)
- 
-     list = g_malloc0(data_len);
-     for (i = 0; i < n->num_namespaces; i++) {
--        if (i < min_nsid) {
-+        if (i < min_nsid || (only_active && !n->namespaces[i].attached)) {
-             continue;
-         }
-         list[j++] = cpu_to_le32(i + 1);
-@@ -1275,7 +1286,8 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeRequest *req)
-     return ret;
- }
- 
--static uint16_t nvme_identify_nslist_csi(NvmeCtrl *n, NvmeRequest *req)
-+static uint16_t nvme_identify_nslist_csi(NvmeCtrl *n, NvmeRequest *req,
-+                                         bool only_active)
- {
-     NvmeIdentify *c = (NvmeIdentify *)&req->cmd;
-     static const int data_len = NVME_IDENTIFY_DATA_SIZE;
-@@ -1294,7 +1306,8 @@ static uint16_t nvme_identify_nslist_csi(NvmeCtrl *n, NvmeRequest *req)
- 
-     list = g_malloc0(data_len);
-     for (i = 0; i < n->num_namespaces; i++) {
--        if (i < min_nsid) {
-+        if (i < min_nsid || c->csi != n->namespaces[i].csi ||
-+            (only_active && !n->namespaces[i].attached)) {
-             continue;
-         }
-         list[j++] = cpu_to_le32(i + 1);
-@@ -1386,17 +1399,25 @@ static uint16_t nvme_identify(NvmeCtrl *n, NvmeRequest *req)
- 
-     switch (le32_to_cpu(c->cns)) {
-     case NVME_ID_CNS_NS:
--        return nvme_identify_ns(n, req);
-+        return nvme_identify_ns(n, req, true);
-     case NVME_ID_CNS_CS_NS:
--        return nvme_identify_ns_csi(n, req);
-+        return nvme_identify_ns_csi(n, req, true);
-+    case NVME_ID_CNS_NS_PRESENT:
-+        return nvme_identify_ns(n, req, false);
-+    case NVME_ID_CNS_CS_NS_PRESENT:
-+        return nvme_identify_ns_csi(n, req, false);
-     case NVME_ID_CNS_CTRL:
-         return nvme_identify_ctrl(n, req);
-     case NVME_ID_CNS_CS_CTRL:
-         return nvme_identify_ctrl_csi(n, req);
-     case NVME_ID_CNS_NS_ACTIVE_LIST:
--        return nvme_identify_nslist(n, req);
-+        return nvme_identify_nslist(n, req, true);
-     case NVME_ID_CNS_CS_NS_ACTIVE_LIST:
--        return nvme_identify_nslist_csi(n, req);
-+        return nvme_identify_nslist_csi(n, req, true);
-+    case NVME_ID_CNS_NS_PRESENT_LIST:
-+        return nvme_identify_nslist(n, req, false);
-+    case NVME_ID_CNS_CS_NS_PRESENT_LIST:
-+        return nvme_identify_nslist_csi(n, req, false);
-     case NVME_ID_CNS_NS_DESCR_LIST:
-         return nvme_identify_ns_descr_list(n, req);
-     case NVME_ID_CNS_IO_COMMAND_SET:
-@@ -1838,6 +1859,7 @@ static int nvme_start_ctrl(NvmeCtrl *n)
- {
-     uint32_t page_bits = NVME_CC_MPS(n->bar.cc) + 12;
-     uint32_t page_size = 1 << page_bits;
-+    int i;
- 
-     if (unlikely(n->cq[0])) {
-         trace_pci_nvme_err_startfail_cq();
-@@ -1924,6 +1946,18 @@ static int nvme_start_ctrl(NvmeCtrl *n)
-     nvme_init_sq(&n->admin_sq, n, n->bar.asq, 0, 0,
-         NVME_AQA_ASQS(n->bar.aqa) + 1);
- 
-+    for (i = 0; i < n->num_namespaces; i++) {
-+        n->namespaces[i].attached = false;
-+        switch (n->namespaces[i].csi) {
-+        case NVME_CSI_NVM:
-+            if (NVME_CC_CSS(n->bar.cc) == CSS_NVM_ONLY ||
-+                NVME_CC_CSS(n->bar.cc) == CSS_CSI) {
-+                n->namespaces[i].attached = true;
-+            }
-+            break;
-+        }
-+    }
-+
-     nvme_set_timestamp(n, 0ULL);
- 
-     QTAILQ_INIT(&n->aer_queue);
+     return nvme_dma_prp(n, list, NVME_IDENTIFY_DATA_SIZE, prp1, prp2,
 diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index c1deac9667..71e4344471 100644
+index 52ba794f2e..c1deac9667 100644
 --- a/hw/block/nvme.h
 +++ b/hw/block/nvme.h
-@@ -66,6 +66,7 @@ typedef struct NvmeNamespace {
+@@ -64,6 +64,9 @@ typedef struct NvmeCQueue {
+ 
+ typedef struct NvmeNamespace {
      NvmeIdNs        id_ns;
-     uint32_t        nsid;
-     uint8_t         csi;
-+    bool            attached;
-     QemuUUID        uuid;
++    uint32_t        nsid;
++    uint8_t         csi;
++    QemuUUID        uuid;
  } NvmeNamespace;
  
+ static inline NvmeLBAF *nvme_ns_lbaf(NvmeNamespace *ns)
 diff --git a/include/block/nvme.h b/include/block/nvme.h
-index 74cc11782e..f8356394f5 100644
+index 71126ae1ff..74cc11782e 100644
 --- a/include/block/nvme.h
 +++ b/include/block/nvme.h
-@@ -804,14 +804,18 @@ typedef struct QEMU_PACKED NvmePSD {
+@@ -51,6 +51,11 @@ enum NvmeCapMask {
+     CAP_PMR_MASK       = 0x1,
+ };
+ 
++enum NvmeCapCssBits {
++    CAP_CSS_NVM        = 0x01,
++    CAP_CSS_CSI_SUPP   = 0x40,
++};
++
+ #define NVME_CAP_MQES(cap)  (((cap) >> CAP_MQES_SHIFT)   & CAP_MQES_MASK)
+ #define NVME_CAP_CQR(cap)   (((cap) >> CAP_CQR_SHIFT)    & CAP_CQR_MASK)
+ #define NVME_CAP_AMS(cap)   (((cap) >> CAP_AMS_SHIFT)    & CAP_AMS_MASK)
+@@ -102,6 +107,12 @@ enum NvmeCcMask {
+     CC_IOCQES_MASK  = 0xf,
+ };
+ 
++enum NvmeCcCss {
++    CSS_NVM_ONLY        = 0,
++    CSS_CSI             = 6,
++    CSS_ADMIN_ONLY      = 7,
++};
++
+ #define NVME_CC_EN(cc)     ((cc >> CC_EN_SHIFT)     & CC_EN_MASK)
+ #define NVME_CC_CSS(cc)    ((cc >> CC_CSS_SHIFT)    & CC_CSS_MASK)
+ #define NVME_CC_MPS(cc)    ((cc >> CC_MPS_SHIFT)    & CC_MPS_MASK)
+@@ -110,6 +121,21 @@ enum NvmeCcMask {
+ #define NVME_CC_IOSQES(cc) ((cc >> CC_IOSQES_SHIFT) & CC_IOSQES_MASK)
+ #define NVME_CC_IOCQES(cc) ((cc >> CC_IOCQES_SHIFT) & CC_IOCQES_MASK)
+ 
++#define NVME_SET_CC_EN(cc, val)     \
++    (cc |= (uint32_t)((val) & CC_EN_MASK) << CC_EN_SHIFT)
++#define NVME_SET_CC_CSS(cc, val)    \
++    (cc |= (uint32_t)((val) & CC_CSS_MASK) << CC_CSS_SHIFT)
++#define NVME_SET_CC_MPS(cc, val)    \
++    (cc |= (uint32_t)((val) & CC_MPS_MASK) << CC_MPS_SHIFT)
++#define NVME_SET_CC_AMS(cc, val)    \
++    (cc |= (uint32_t)((val) & CC_AMS_MASK) << CC_AMS_SHIFT)
++#define NVME_SET_CC_SHN(cc, val)    \
++    (cc |= (uint32_t)((val) & CC_SHN_MASK) << CC_SHN_SHIFT)
++#define NVME_SET_CC_IOSQES(cc, val) \
++    (cc |= (uint32_t)((val) & CC_IOSQES_MASK) << CC_IOSQES_SHIFT)
++#define NVME_SET_CC_IOCQES(cc, val) \
++    (cc |= (uint32_t)((val) & CC_IOCQES_MASK) << CC_IOCQES_SHIFT)
++
+ enum NvmeCstsShift {
+     CSTS_RDY_SHIFT      = 0,
+     CSTS_CFS_SHIFT      = 1,
+@@ -524,8 +550,13 @@ typedef struct QEMU_PACKED NvmeIdentify {
+     uint64_t    rsvd2[2];
+     uint64_t    prp1;
+     uint64_t    prp2;
+-    uint32_t    cns;
+-    uint32_t    rsvd11[5];
++    uint8_t     cns;
++    uint8_t     rsvd10;
++    uint16_t    ctrlid;
++    uint16_t    nvmsetid;
++    uint8_t     rsvd11;
++    uint8_t     csi;
++    uint32_t    rsvd12[4];
+ } NvmeIdentify;
+ 
+ typedef struct QEMU_PACKED NvmeRwCmd {
+@@ -645,6 +676,7 @@ enum NvmeStatusCodes {
+     NVME_MD_SGL_LEN_INVALID     = 0x0010,
+     NVME_SGL_DESCR_TYPE_INVALID = 0x0011,
+     NVME_INVALID_USE_OF_CMB     = 0x0012,
++    NVME_CMD_SET_CMB_REJECTED   = 0x002b,
+     NVME_LBA_RANGE              = 0x0080,
+     NVME_CAP_EXCEEDED           = 0x0081,
+     NVME_NS_NOT_READY           = 0x0082,
+@@ -771,11 +803,15 @@ typedef struct QEMU_PACKED NvmePSD {
+ 
  #define NVME_IDENTIFY_DATA_SIZE 4096
  
- enum NvmeIdCns {
--    NVME_ID_CNS_NS                = 0x00,
--    NVME_ID_CNS_CTRL              = 0x01,
--    NVME_ID_CNS_NS_ACTIVE_LIST    = 0x02,
--    NVME_ID_CNS_NS_DESCR_LIST     = 0x03,
--    NVME_ID_CNS_CS_NS             = 0x05,
--    NVME_ID_CNS_CS_CTRL           = 0x06,
--    NVME_ID_CNS_CS_NS_ACTIVE_LIST = 0x07,
--    NVME_ID_CNS_IO_COMMAND_SET    = 0x1c,
-+    NVME_ID_CNS_NS                    = 0x00,
-+    NVME_ID_CNS_CTRL                  = 0x01,
-+    NVME_ID_CNS_NS_ACTIVE_LIST        = 0x02,
-+    NVME_ID_CNS_NS_DESCR_LIST         = 0x03,
-+    NVME_ID_CNS_CS_NS                 = 0x05,
-+    NVME_ID_CNS_CS_CTRL               = 0x06,
-+    NVME_ID_CNS_CS_NS_ACTIVE_LIST     = 0x07,
-+    NVME_ID_CNS_NS_PRESENT_LIST       = 0x10,
-+    NVME_ID_CNS_NS_PRESENT            = 0x11,
-+    NVME_ID_CNS_CS_NS_PRESENT_LIST    = 0x1a,
-+    NVME_ID_CNS_CS_NS_PRESENT         = 0x1b,
-+    NVME_ID_CNS_IO_COMMAND_SET        = 0x1c,
+-enum {
+-    NVME_ID_CNS_NS             = 0x0,
+-    NVME_ID_CNS_CTRL           = 0x1,
+-    NVME_ID_CNS_NS_ACTIVE_LIST = 0x2,
+-    NVME_ID_CNS_NS_DESCR_LIST  = 0x3,
++enum NvmeIdCns {
++    NVME_ID_CNS_NS                = 0x00,
++    NVME_ID_CNS_CTRL              = 0x01,
++    NVME_ID_CNS_NS_ACTIVE_LIST    = 0x02,
++    NVME_ID_CNS_NS_DESCR_LIST     = 0x03,
++    NVME_ID_CNS_CS_NS             = 0x05,
++    NVME_ID_CNS_CS_CTRL           = 0x06,
++    NVME_ID_CNS_CS_NS_ACTIVE_LIST = 0x07,
++    NVME_ID_CNS_IO_COMMAND_SET    = 0x1c,
  };
  
  typedef struct QEMU_PACKED NvmeIdCtrl {
+@@ -922,6 +958,7 @@ enum NvmeFeatureIds {
+     NVME_WRITE_ATOMICITY            = 0xa,
+     NVME_ASYNCHRONOUS_EVENT_CONF    = 0xb,
+     NVME_TIMESTAMP                  = 0xe,
++    NVME_COMMAND_SET_PROFILE        = 0x19,
+     NVME_SOFTWARE_PROGRESS_MARKER   = 0x80,
+     NVME_FID_MAX                    = 0x100,
+ };
+@@ -1006,18 +1043,26 @@ typedef struct QEMU_PACKED NvmeIdNsDescr {
+     uint8_t rsvd2[2];
+ } NvmeIdNsDescr;
+ 
+-enum {
+-    NVME_NIDT_EUI64_LEN =  8,
+-    NVME_NIDT_NGUID_LEN = 16,
+-    NVME_NIDT_UUID_LEN  = 16,
++enum NvmeNsIdentifierLength {
++    NVME_NIDL_EUI64             = 8,
++    NVME_NIDL_NGUID             = 16,
++    NVME_NIDL_UUID              = 16,
++    NVME_NIDL_CSI               = 1,
+ };
+ 
+ enum NvmeNsIdentifierType {
+-    NVME_NIDT_EUI64 = 0x1,
+-    NVME_NIDT_NGUID = 0x2,
+-    NVME_NIDT_UUID  = 0x3,
++    NVME_NIDT_EUI64             = 0x01,
++    NVME_NIDT_NGUID             = 0x02,
++    NVME_NIDT_UUID              = 0x03,
++    NVME_NIDT_CSI               = 0x04,
+ };
+ 
++enum NvmeCsi {
++    NVME_CSI_NVM                = 0x00,
++};
++
++#define NVME_SET_CSI(vec, csi) (vec |= (uint8_t)(1 << (csi)))
++
+ /*Deallocate Logical Block Features*/
+ #define NVME_ID_NS_DLFEAT_GUARD_CRC(dlfeat)       ((dlfeat) & 0x10)
+ #define NVME_ID_NS_DLFEAT_WRITE_ZEROES(dlfeat)    ((dlfeat) & 0x08)
+@@ -1068,6 +1113,7 @@ static inline void _nvme_check_size(void)
+     QEMU_BUILD_BUG_ON(sizeof(NvmeSmartLog) != 512);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeEffectsLog) != 4096);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeIdCtrl) != 4096);
++    QEMU_BUILD_BUG_ON(sizeof(NvmeIdNsDescr) != 4);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeIdNs) != 4096);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeSglDescriptor) != 16);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeIdNsDescr) != 4);
 -- 
 2.21.0
 
