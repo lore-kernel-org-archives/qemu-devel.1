@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 069D2C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 10:00:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5091C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 10:03:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A2882076A
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 10:00:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32F932076E
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 10:03:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="anuI8x8S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A2882076A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xv1rnsKw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32F932076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL1ZG-00060p-BF
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 06:00:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38276)
+	id 1kL1cR-00005Z-Ag
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 06:03:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38842)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kL1YP-0004V7-Oh
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:59:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40495)
+ id 1kL1aJ-000726-4i
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 06:01:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27215)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kL1YN-0000iE-UL
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:59:13 -0400
+ id 1kL1aF-0001BR-8S
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 06:01:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600855150;
+ s=mimecast20190719; t=1600855266;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Un/E+SIoS3nPwO0dmhX4EZ5qAEO9LLrXX4KK8U6KTDc=;
- b=anuI8x8SShjwdZWFCyHG5f/Czl+0fdn8QaqEmHHv3fx+hPOVn8jrReoz1qotSaw8kEoBU6
- FBAEuB0DsDZc6pGmYzIO63DKORXaOtS5vtfJ166SqjXbwKFX5fv+ar9VXSUcKFTZCLe5ak
- IgUWhp7m+ZSA2cDH/MdOWOrzur/rZlY=
+ bh=pi52iWRHgsMZpr49WGB3bFiELQk3paqcS7SmnIc5d3A=;
+ b=Xv1rnsKw8qmNvhRYgCg6loW4gNIT2iCggeWIKuFO4zq8GOOUhH5GrNalvlJmR9Wr+t+xNG
+ vxyrYbF8TgTB4N1C0u1cpuuiyE/7+JA5+xH25ADkW0WlTfZrpOSB0DaW2pQyMUNWqFB5QX
+ anG5XXMFHYmZnrEpJLxcNE5WpaQ9N04=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-593-QyirY-51OjSCronfx4IG4A-1; Wed, 23 Sep 2020 05:59:09 -0400
-X-MC-Unique: QyirY-51OjSCronfx4IG4A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-573-YgxuYUY-MYSsDjKNHk6xyg-1; Wed, 23 Sep 2020 06:01:04 -0400
+X-MC-Unique: YgxuYUY-MYSsDjKNHk6xyg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F332C186841D;
- Wed, 23 Sep 2020 09:59:07 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 619291882FC9;
+ Wed, 23 Sep 2020 10:01:03 +0000 (UTC)
 Received: from redhat.com (ovpn-114-73.ams2.redhat.com [10.36.114.73])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6AE5B19D6C;
- Wed, 23 Sep 2020 09:59:06 +0000 (UTC)
-Date: Wed, 23 Sep 2020 10:59:03 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B488A60BF1;
+ Wed, 23 Sep 2020 10:01:01 +0000 (UTC)
+Date: Wed, 23 Sep 2020 11:00:58 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH 03/24] rng-egd: Register "chardev" as class property
-Message-ID: <20200923095903.GK2053606@redhat.com>
+Subject: Re: [PATCH 07/24] rng: Register "opened" as class property
+Message-ID: <20200923100058.GM2053606@redhat.com>
 References: <20200921221045.699690-1-ehabkost@redhat.com>
- <20200921221045.699690-4-ehabkost@redhat.com>
+ <20200921221045.699690-8-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200921221045.699690-4-ehabkost@redhat.com>
+In-Reply-To: <20200921221045.699690-8-ehabkost@redhat.com>
 User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -107,7 +107,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 21, 2020 at 06:10:24PM -0400, Eduardo Habkost wrote:
+On Mon, Sep 21, 2020 at 06:10:28PM -0400, Eduardo Habkost wrote:
 > Class properties make QOM introspection simpler and easier, as
 > they don't require an object to be instantiated.
 > 
@@ -117,8 +117,8 @@ On Mon, Sep 21, 2020 at 06:10:24PM -0400, Eduardo Habkost wrote:
 > Cc: Amit Shah <amit@kernel.org>
 > Cc: qemu-devel@nongnu.org
 > ---
->  backends/rng-egd.c | 9 ++-------
->  1 file changed, 2 insertions(+), 7 deletions(-)
+>  backends/rng.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
