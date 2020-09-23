@@ -2,78 +2,82 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE3E7C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 13:49:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62D0BC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 13:52:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9C2521BE5
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 13:49:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E16E720B1F
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 13:52:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E+kwM4aC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9C2521BE5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UI7gyaH0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E16E720B1F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL59e-0002GF-TM
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 09:49:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39768)
+	id 1kL5CW-0004P6-11
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 09:52:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kL581-0001Bo-V9
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 09:48:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20544)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kL5At-0003k9-4O
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 09:51:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34755)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kL57z-0007Py-9S
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 09:48:13 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kL5An-0007s0-2r
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 09:51:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600868890;
+ s=mimecast20190719; t=1600869064;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zh2/An+F+GVOP48Peyd0VYG2kDzLn4AikGuGQlECes4=;
- b=E+kwM4aCv1g7fI2dsrX2RHq2p6maX+o3DQYCFeyoX5m5gVEXInjkAwC5QbOFOSCAqpj5wM
- dD7//Tt53AgQexwzN/0tjMJgYFdF0M2HoPYXk4I5mlKOgwOrzvNaCHbwioCzkLkls/oGEj
- fu0hKOYFBBBSEBsFI0QrWr2XNr2aRXg=
+ bh=zs90ozxccO5hxjIALZr1rjnn+hSLyazdJufnBa6XG0U=;
+ b=UI7gyaH0JEtgXwOv9qQc0dLfDnZNqx57rITa4cdIskpD74Zv5EdfIPj3hjsJo/vQa/a9he
+ Qg6e5RF0c39bLQPFeQWSJsbGsUjkLpADQpOVZP9MinjgwNqfgHpgqtH5esklNCd9j1iawD
+ X2rNVsXcsA1bi3txXZEvvfDn0OsB1mg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-441-Z7hatDlWOPi5wez9qvuoMw-1; Wed, 23 Sep 2020 09:48:08 -0400
-X-MC-Unique: Z7hatDlWOPi5wez9qvuoMw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-325-UqsZXtLQOsaRxxABtJMcwg-1; Wed, 23 Sep 2020 09:50:59 -0400
+X-MC-Unique: UqsZXtLQOsaRxxABtJMcwg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 030FA6408F;
- Wed, 23 Sep 2020 13:48:06 +0000 (UTC)
-Received: from localhost (ovpn-113-77.ams2.redhat.com [10.36.113.77])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B626F19930;
- Wed, 23 Sep 2020 13:47:58 +0000 (UTC)
-Date: Wed, 23 Sep 2020 14:47:57 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: elena.ufimtseva@oracle.com
-Subject: Re: [PATCH v9 06/20] multi-process: define MPQemuMsg format and
- transmission functions
-Message-ID: <20200923134757.GA62770@stefanha-x1.localdomain>
-References: <20200827181231.22778-1-elena.ufimtseva@oracle.com>
- <20200827181231.22778-7-elena.ufimtseva@oracle.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D33D2ACE32;
+ Wed, 23 Sep 2020 13:50:57 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-114-66.ams2.redhat.com
+ [10.36.114.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1FC467368B;
+ Wed, 23 Sep 2020 13:50:51 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id AA7C61132E9A; Wed, 23 Sep 2020 15:50:49 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
+Subject: Re: [PATCH v2 2/2] block: deprecate the sheepdog block driver
+References: <20200922161611.2049616-1-berrange@redhat.com>
+ <20200922161611.2049616-3-berrange@redhat.com>
+Date: Wed, 23 Sep 2020 15:50:49 +0200
+In-Reply-To: <20200922161611.2049616-3-berrange@redhat.com> ("Daniel
+ P. =?utf-8?Q?Berrang=C3=A9=22's?= message of "Tue, 22 Sep 2020 17:16:11
+ +0100")
+Message-ID: <87r1qs4n5y.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200827181231.22778-7-elena.ufimtseva@oracle.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ibTvN161/egqYuK8"
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -96,216 +100,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
- mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, jag.raman@oracle.com,
- quintela@redhat.com, armbru@redhat.com, kanth.ghatraju@oracle.com,
- felipe@nutanix.com, thuth@redhat.com, ehabkost@redhat.com,
- konrad.wilk@oracle.com, dgilbert@redhat.com, thanos.makatos@nutanix.com,
- rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ sheepdog@lists.wpkg.org, qemu-block@nongnu.org, libvir-list@redhat.com,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Liu Yuan <namei.unix@gmail.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---ibTvN161/egqYuK8
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-On Thu, Aug 27, 2020 at 11:12:17AM -0700, elena.ufimtseva@oracle.com wrote:
-> +/**
-> + * MPQemuCmd:
-> + *
-> + * MPQemuCmd enum type to specify the command to be executed on the remo=
-te
-> + * device.
-> + */
-> +typedef enum {
-> +    INIT =3D 0,
-> +    MAX =3D INT_MAX,
+> This thread from a little over a year ago:
+>
+>   http://lists.wpkg.org/pipermail/sheepdog/2019-March/thread.html
+>
+> states that sheepdog is no longer actively developed. The only mentioned
+> users are some companies who are said to have it for legacy reasons with
+> plans to replace it by Ceph. There is talk about cutting out existing
+> features to turn it into a simple demo of how to write a distributed
+> block service. There is no evidence of anyone working on that idea:
+>
+>   https://github.com/sheepdog/sheepdog/commits/master
+>
+> No real commits to git since Jan 2018, and before then just some minor
+> technical debt cleanup..
 
-enum members are in a global namespace. INIT and MAX are likely to
-collide with other code using these names. Please use MPQEMU_CMD_INIT
-and MPQEMU_CMD_MAX.
+Drop the extra period.
 
-Why is MAX =3D INT_MAX? I expected MAX to be related to the number of
-commands that have been defined (1 so far).
-
-> +} MPQemuCmd;
-> +
-> +/**
-> + * MPQemuMsg:
-> + * @cmd: The remote command
-> + * @size: Size of the data to be shared
-> + * @data: Structured data
-> + * @fds: File descriptors to be shared with remote device
-> + *
-> + * MPQemuMsg Format of the message sent to the remote device from QEMU.
-> + *
-> + */
-> +typedef struct {
-> +    int cmd;
-> +    size_t size;
-
-I worry about the hole (compiler-inserted padding) between the cmd and
-size fields.
-
-It is safer to use fixed-size types and use QEMU_PACKED for structs that
-are transferred over the network:
-
-  typedef struct {
-      int32_t cmd;
-      uint64_t size;
-      ...
-  } QEMU_PACKED MPQemuMsg;
-
-This way the struct layout is independent of the compilation environment
-(32-/64-bit, ABI) and there is no risk of accidentally exposing memory
-(information leaks) through holes.
-
-> +
-> +    union {
-> +        uint64_t u64;
-> +    } data;
-> +
-> +    int fds[REMOTE_MAX_FDS];
-> +    int num_fds;
-> +} MPQemuMsg;
-> +
-> +void mpqemu_msg_send(MPQemuMsg *msg, QIOChannel *ioc, Error **errp);
-> +void mpqemu_msg_recv(MPQemuMsg *msg, QIOChannel *ioc, Error **errp);
-> +
-> +bool mpqemu_msg_valid(MPQemuMsg *msg);
-> +
-> +#endif
-> diff --git a/io/meson.build b/io/meson.build
-> index 768c1b5ec3..3d40cd8867 100644
-> --- a/io/meson.build
-> +++ b/io/meson.build
-> @@ -15,6 +15,8 @@ io_ss.add(files(
->    'task.c',
->  ))
+>
+> There is essentially no activity on the mailing list aside from
+> patches to QEMU that get CC'd due to our MAINTAINERS entry.
+>
+> Fedora packages for sheepdog failed to build from upstream source
+> because of the more strict linker that no longer merges duplicate
+> global symbols. Fedora patches it to add the missing "extern"
+> annotations and presumably other distros do to, but upstream source
+> remains broken.
+>
+> There is only basic compile testing, no functional testing of the
+> driver.
+>
+> Since there are no build pre-requisites the sheepdog driver is currently
+> enabled unconditionally. This would result in configure issuing a
+> deprecation warning by default for all users. Thus the configure default
+> is changed to disable it, requiring users to pass --enable-sheepdog to
+> build the driver.
+>
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>  block/sheepdog.c           | 15 +++++++++++++++
+>  configure                  |  5 +++--
+>  docs/system/deprecated.rst |  9 +++++++++
+>  3 files changed, 27 insertions(+), 2 deletions(-)
+>
+> diff --git a/block/sheepdog.c b/block/sheepdog.c
+> index cbbebc1aaf..7f68bd6a1a 100644
+> --- a/block/sheepdog.c
+> +++ b/block/sheepdog.c
+> @@ -242,6 +242,17 @@ typedef struct SheepdogInode {
+>   */
+>  #define FNV1A_64_INIT ((uint64_t)0xcbf29ce484222325ULL)
 > =20
-> +io_ss.add(when: 'CONFIG_MPQEMU', if_true: files('mpqemu-link.c'))
-> +
->  io_ss =3D io_ss.apply(config_host, strict: false)
->  libio =3D static_library('io', io_ss.sources() + genh,
->                         dependencies: [io_ss.dependencies()],
-> diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
-> new file mode 100644
-> index 0000000000..d9be2bdeab
-> --- /dev/null
-> +++ b/io/mpqemu-link.c
-> @@ -0,0 +1,173 @@
-> +/*
-> + * Communication channel between QEMU and remote device process
-> + *
-> + * Copyright =A9 2018, 2020 Oracle and/or its affiliates.
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-> + * See the COPYING file in the top-level directory.
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +
-> +#include "qemu/module.h"
-> +#include "io/mpqemu-link.h"
-> +#include "qapi/error.h"
-> +#include "qemu/iov.h"
-> +#include "qemu/error-report.h"
-> +#include "qemu/main-loop.h"
-> +
-> +void mpqemu_msg_send(MPQemuMsg *msg, QIOChannel *ioc, Error **errp)
+> +static void deprecation_warning(void)
 > +{
-> +    bool iolock =3D qemu_mutex_iothread_locked();
-> +    Error *local_err =3D NULL;
-> +    struct iovec send[2];
-> +    int *fds =3D NULL;
-> +    size_t nfds =3D 0;
+> +    static bool warned =3D false;
+
+Obey checkpatch :)
+
 > +
-> +    send[0].iov_base =3D msg;
-> +    send[0].iov_len =3D MPQEMU_MSG_HDR_SIZE;
-> +
-> +    send[1].iov_base =3D (void *)&msg->data;
-> +    send[1].iov_len =3D msg->size;
-> +
-> +    if (msg->num_fds) {
-> +        nfds =3D msg->num_fds;
-> +        fds =3D msg->fds;
+> +    if (!warned) {
+> +        warn_report("the sheepdog block driver is deprecated and will be=
+ "
+> +                    "removed in a future release");
+
+Similar warnings elsewhere don't say "will be removed".
+
+Some of them are nice enough to advise what to use instead, but that may
+not be practical here.
+
+> +        warned =3D true;
 > +    }
-> +
-> +    if (iolock) {
-> +        qemu_mutex_unlock_iothread();
-> +    }
-> +
-> +    (void)qio_channel_writev_full_all(ioc, send, G_N_ELEMENTS(send), fds=
-, nfds,
-> +                                      &local_err);
-
-I tried to understand when it is safe to call this function:
-
-Thread    | Coroutine? | Comments
-------------------------------------
-Main loop | Yes        | Okay
-Main loop | No         | Do not use, blocks main loop
-vCPU      | Yes        | Careful, can move coroutine to main loop
-vCPU      | No         | Okay if no other ioc activity in main loop
-IOThread  | Yes        | Broken: we shouldn't touch the global mutex!
-IOThread  | No         | Do not use, blocks IOThread
-
-The IOThreads case with coroutines can be fixed by skipping
-qemu_mutex_lock_iothread() when running in an IOThread. Please address
-this.
-
-Cases that look usable to me are:
-1. Main loop with coroutines
-2. vCPU without coroutines
-3. IOThread with coroutines (needs fix though)
-
-All this is not obvious so a comment and assertions would be good. The
-following helpers are available for implementing assertions:
-1. bool qemu_in_coroutine() -> true if running in a coroutine
-2. qemu_get_current_aio_context() !=3D qemu_get_aio_context() -> true in
-   IOThread
-
-> +
-> +    if (iolock) {
-> +        qemu_mutex_lock_iothread();
-> +    }
-> +
-> +    if (errp) {
-> +        error_propagate(errp, local_err);
-> +    } else if (local_err) {
-> +        error_report_err(local_err);
-> +    }
-> +
-> +    return;
 > +}
 > +
-> +static ssize_t mpqemu_read(QIOChannel *ioc, void *buf, size_t len, int *=
-*fds,
-> +                           size_t *nfds, Error **errp)
+>  /*
+>   * 64 bit Fowler/Noll/Vo FNV-1a hash code
+>   */
+> @@ -1548,6 +1559,8 @@ static int sd_open(BlockDriverState *bs, QDict *opt=
+ions, int flags,
+>      char *buf =3D NULL;
+>      QemuOpts *opts;
+> =20
+> +    deprecation_warning();
+> +
+>      s->bs =3D bs;
+>      s->aio_context =3D bdrv_get_aio_context(bs);
+> =20
+> @@ -2007,6 +2020,8 @@ static int sd_co_create(BlockdevCreateOptions *opti=
+ons, Error **errp)
+> =20
+>      assert(options->driver =3D=3D BLOCKDEV_DRIVER_SHEEPDOG);
+> =20
+> +    deprecation_warning();
+> +
+>      s =3D g_new0(BDRVSheepdogState, 1);
+> =20
+>      /* Steal SocketAddress from QAPI, set NULL to prevent double free */
+> diff --git a/configure b/configure
+> index 7564479008..c6af83f2e6 100755
+> --- a/configure
+> +++ b/configure
+> @@ -533,7 +533,7 @@ vdi=3D"yes"
+>  vvfat=3D"yes"
+>  qed=3D"yes"
+>  parallels=3D"yes"
+> -sheepdog=3D"yes"
+> +sheepdog=3D"no"
+>  libxml2=3D""
+>  debug_mutex=3D"no"
+>  libpmem=3D""
+> @@ -1941,7 +1941,7 @@ disabled with --disable-FEATURE, default is enabled=
+ if available:
+>    vvfat           vvfat image format support
+>    qed             qed image format support
+>    parallels       parallels image format support
+> -  sheepdog        sheepdog block driver support
+> +  sheepdog        sheepdog block driver support (deprecated)
+>    crypto-afalg    Linux AF_ALG crypto backend driver
+>    capstone        capstone disassembler support
+>    debug-mutex     mutex debugging support
+> @@ -7350,6 +7350,7 @@ if test "$parallels" =3D "yes" ; then
+>    echo "CONFIG_PARALLELS=3Dy" >> $config_host_mak
+>  fi
+>  if test "$sheepdog" =3D "yes" ; then
+> +  add_to deprecated_features "sheepdog"
+>    echo "CONFIG_SHEEPDOG=3Dy" >> $config_host_mak
+>  fi
+>  if test "$pty_h" =3D "yes" ; then
+> diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+> index 0cb8b01424..49b9f4b02e 100644
+> --- a/docs/system/deprecated.rst
+> +++ b/docs/system/deprecated.rst
+> @@ -405,6 +405,15 @@ The above, converted to the current supported format=
+::
+> =20
+>    json:{"file.driver":"rbd", "file.pool":"rbd", "file.image":"name"}
+> =20
+> +``sheepdog`` driver (since 5.2.0)
+> +^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> +
+> +The ``sheepdog`` block device driver is deprecated. The corresponding up=
+stream
+> +server project is no longer actively maintained. Users are recommended t=
+o switch
+> +to an alternative distributed block device driver such as RBD. The
+> +``qemu-img convert`` command can be used to liberate existing data by mo=
+ving
+> +it out of sheepdog volumes into an alternative storage backend.
+> +
+>  linux-user mode CPUs
+>  --------------------
 
-The same constraints apply to this function.
-
---ibTvN161/egqYuK8
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9rUg0ACgkQnKSrs4Gr
-c8jfkwf/dZooZffkCo8Qv+gntxMJna/9vMUgli4mAUkdNjwwOhSKP3xSJgrypumD
-+WJUeMNEqTkHkqUxg528XGrqx8+gEcpKtRodn+Mh2N0bKrq04I1Geu7apR1OW4YT
-YbfaNe20+2B/Y1EKmB7H89CDARu2KjB621iIJ/TgkMIjFjjsXeX0tl9KSwXKcZ3B
-d7urm0Z9SNa3F0anujks/A+v+4tuSaxzrFLsFuo71nvjuwJGFc3alCY32gDaGc8p
-fYHni4nKx1qlBumK9nImHJOWjP6OyvVNbR6QdRjehfG6hLJl2qOyTJfM7SDrEhv5
-9SFvHFtcIAtnBYEe4oj1buM+mKCAfg==
-=ls5i
------END PGP SIGNATURE-----
-
---ibTvN161/egqYuK8--
+Preferably with my nits addressed:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
 
