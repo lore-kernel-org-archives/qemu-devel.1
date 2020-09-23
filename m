@@ -2,77 +2,80 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 760D8C4363D
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 23:52:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C982CC4363D
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 23:56:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0EB80212CC
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 23:52:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B7C120706
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 23:56:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DTxEUWrK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EB80212CC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S+568DI6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B7C120706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLEYv-0006My-5W
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 19:52:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58396)
+	id 1kLEcz-0007z0-4W
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 19:56:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59096)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLEXr-0005Vb-Tu
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 19:51:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42959)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLEc9-0007Z1-DS
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 19:55:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21325)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLEXq-000497-26
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 19:51:31 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLEc7-0004eA-5d
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 19:55:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600905088;
+ s=mimecast20190719; t=1600905354;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zsgkTIojpFBvyqkfM6cpIwxNdonYzKVZ789P4w5uR3g=;
- b=DTxEUWrKgDIdkGqE91aVaIirqDda7ielz3sdJ5SGfml0LLEkWlnaC7FFKx/fswLn2Zj9Gj
- 0zMF9ZLj1+ItipsJJcWA1NNxQqFMEyXdCU3MP0yWCKy3hygE04veTnAq5WeFNF8JvcFLfm
- BMCpm3al5OK6latfz8MV3WHQdZt+ajM=
+ bh=ZVZdTvDF+XSofFq11Zpple9ljLuM9NZzVqVuOmOjaII=;
+ b=S+568DI6wIas/MCClb26fXGwG+V+OAZDU2WwIA1GXnU5exqKkRsInWTfQ02K11C07Qw++a
+ vxnQeKj5SJugHgg22I3+5g8T+4urFC53TpDOltptPDflLnFKw9oPRW2LyL0Re5Kt7xaM36
+ 1wE6OY2h4+rIjDGUkOfWaL08fL76Bvk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-239-tB7W-LnkOBCbIXPcZHEzUA-1; Wed, 23 Sep 2020 19:51:26 -0400
-X-MC-Unique: tB7W-LnkOBCbIXPcZHEzUA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-281-dxFm5AH3PwKV6ZIDq8zUZg-1; Wed, 23 Sep 2020 19:55:52 -0400
+X-MC-Unique: dxFm5AH3PwKV6ZIDq8zUZg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD2EC1DE06;
- Wed, 23 Sep 2020 23:51:24 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
- [10.10.119.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D43B12C31E;
- Wed, 23 Sep 2020 23:51:23 +0000 (UTC)
-Date: Wed, 23 Sep 2020 19:51:22 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v2 25/38] qapi/gen.py: add type hint annotations
-Message-ID: <20200923235122.GZ191229@localhost.localdomain>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D0651084C80;
+ Wed, 23 Sep 2020 23:55:51 +0000 (UTC)
+Received: from [10.10.119.140] (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9C61B60BEC;
+ Wed, 23 Sep 2020 23:55:50 +0000 (UTC)
+Subject: Re: [PATCH v2 22/38] qapi/source.py: add type hint annotations
+To: Cleber Rosa <crosa@redhat.com>
 References: <20200922210101.4081073-1-jsnow@redhat.com>
- <20200922210101.4081073-26-jsnow@redhat.com>
+ <20200922210101.4081073-23-jsnow@redhat.com>
+ <20200923223619.GV191229@localhost.localdomain>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <0ace0c8d-0853-d078-d865-1453640b1c06@redhat.com>
+Date: Wed, 23 Sep 2020 19:55:50 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200922210101.4081073-26-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200923223619.GV191229@localhost.localdomain>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Tg5qL4DubmxJEzuM"
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=crosa@redhat.com;
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -81,8 +84,9 @@ X-Spam_score: -3.3
 X-Spam_bar: ---
 X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,196 +103,100 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
  Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
  Michael Roth <mdroth@linux.vnet.ibm.com>,
  Markus Armbruster <armbru@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Tg5qL4DubmxJEzuM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 9/23/20 6:36 PM, Cleber Rosa wrote:
+> On Tue, Sep 22, 2020 at 05:00:45PM -0400, John Snow wrote:
+>> Annotations do not change runtime behavior.
+>> This commit *only* adds annotations.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>   scripts/qapi/mypy.ini  |  5 -----
+>>   scripts/qapi/source.py | 31 ++++++++++++++++++-------------
+>>   2 files changed, 18 insertions(+), 18 deletions(-)
+>>
+>> diff --git a/scripts/qapi/mypy.ini b/scripts/qapi/mypy.ini
+>> index 9da1dccef4..43c8bd1973 100644
+>> --- a/scripts/qapi/mypy.ini
+>> +++ b/scripts/qapi/mypy.ini
+>> @@ -39,11 +39,6 @@ disallow_untyped_defs = False
+>>   disallow_incomplete_defs = False
+>>   check_untyped_defs = False
+>>   
+>> -[mypy-qapi.source]
+>> -disallow_untyped_defs = False
+>> -disallow_incomplete_defs = False
+>> -check_untyped_defs = False
+>> -
+> 
+> This is what I meant in my comment in the previous patch.  It looks
+> like a mix of commit grannurality styles.  Not a blocker though.
+> 
 
-On Tue, Sep 22, 2020 at 05:00:48PM -0400, John Snow wrote:
-> Annotations do not change runtime behavior.
-> This commit *only* adds annotations.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  scripts/qapi/gen.py | 102 +++++++++++++++++++++++---------------------
->  1 file changed, 53 insertions(+), 49 deletions(-)
->=20
-> diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
-> index cb2b2655c3..df8cf8271c 100644
-> --- a/scripts/qapi/gen.py
-> +++ b/scripts/qapi/gen.py
-> @@ -17,7 +17,7 @@
->  import errno
->  import os
->  import re
-> -from typing import Optional
-> +from typing import Dict, Generator, List, Optional, Tuple
-> =20
->  from .common import (
->      c_fname,
-> @@ -32,31 +32,31 @@
->      QAPISchemaObjectType,
->      QAPISchemaVisitor,
->  )
-> +from .source import QAPISourceInfo
-> =20
-> =20
->  class QAPIGen:
-> -
-> -    def __init__(self, fname):
-> +    def __init__(self, fname: Optional[str]):
->          self.fname =3D fname
->          self._preamble =3D ''
->          self._body =3D ''
-> =20
-> -    def preamble_add(self, text):
-> +    def preamble_add(self, text: str) -> None:
->          self._preamble +=3D text
-> =20
-> -    def add(self, text):
-> +    def add(self, text: str) -> None:
->          self._body +=3D text
-> =20
-> -    def get_content(self):
-> +    def get_content(self) -> str:
->          return self._top() + self._preamble + self._body + self._bottom(=
-)
-> =20
-> -    def _top(self):
-> +    def _top(self) -> str:
->          return ''
-> =20
-> -    def _bottom(self):
-> +    def _bottom(self) -> str:
->          return ''
-> =20
-> -    def write(self, output_dir):
-> +    def write(self, output_dir: str) -> None:
->          # Include paths starting with ../ are used to reuse modules of t=
-he main
->          # schema in specialised schemas. Don't overwrite the files that =
-are
->          # already generated for the main schema.
-> @@ -81,7 +81,7 @@ def write(self, output_dir):
->          f.close()
-> =20
-> =20
-> -def _wrap_ifcond(ifcond, before, after):
-> +def _wrap_ifcond(ifcond: List[str], before: str, after: str) -> str:
->      if before =3D=3D after:
->          return after   # suppress empty #if ... #endif
-> =20
-> @@ -121,40 +121,38 @@ def build_params(arg_type: Optional[QAPISchemaObjec=
-tType],
-> =20
-> =20
->  class QAPIGenCCode(QAPIGen):
-> -
-> -    def __init__(self, fname):
-> +    def __init__(self, fname: Optional[str]):
->          super().__init__(fname)
-> -        self._start_if =3D None
-> +        self._start_if: Optional[Tuple[List[str], str, str]] =3D None
-> =20
-> -    def start_if(self, ifcond):
-> +    def start_if(self, ifcond: List[str]) -> None:
->          assert self._start_if is None
->          self._start_if =3D (ifcond, self._body, self._preamble)
-> =20
-> -    def end_if(self):
-> +    def end_if(self) -> None:
->          assert self._start_if
->          self._wrap_ifcond()
->          self._start_if =3D None
-> =20
-> -    def _wrap_ifcond(self):
-> +    def _wrap_ifcond(self) -> None:
->          self._body =3D _wrap_ifcond(self._start_if[0],
->                                    self._start_if[1], self._body)
->          self._preamble =3D _wrap_ifcond(self._start_if[0],
->                                        self._start_if[2], self._preamble)
-> =20
-> -    def get_content(self):
-> +    def get_content(self) -> str:
->          assert self._start_if is None
->          return super().get_content()
-> =20
-> =20
->  class QAPIGenC(QAPIGenCCode):
-> -
-> -    def __init__(self, fname, blurb, pydoc):
-> +    def __init__(self, fname: str, blurb: str, pydoc: str):
->          super().__init__(fname)
->          self._blurb =3D blurb
->          self._copyright =3D '\n * '.join(re.findall(r'^Copyright .*', py=
-doc,
->                                                    re.MULTILINE))
-> =20
-> -    def _top(self):
-> +    def _top(self) -> str:
->          return mcgen('''
->  /* AUTOMATICALLY GENERATED, DO NOT MODIFY */
-> =20
-> @@ -170,7 +168,7 @@ def _top(self):
->  ''',
->                       blurb=3Dself._blurb, copyright=3Dself._copyright)
-> =20
-> -    def _bottom(self):
-> +    def _bottom(self) -> str:
->          return mcgen('''
-> =20
->  /* Dummy declaration to prevent empty .o file */
-> @@ -180,16 +178,16 @@ def _bottom(self):
-> =20
-> =20
->  class QAPIGenH(QAPIGenC):
-> -
-> -    def _top(self):
-> +    def _top(self) -> str:
->          return super()._top() + guardstart(self.fname)
-> =20
-> -    def _bottom(self):
-> +    def _bottom(self) -> str:
->          return guardend(self.fname)
-> =20
-> =20
->  @contextmanager
-> -def ifcontext(ifcond, *args):
-> +def ifcontext(ifcond: List[str],
-> +              *args: QAPIGenCCode) -> Generator[None, None, None]:
+Yep. Just how the chips fell. Some files were just very quick to cleanup 
+and I didn't have to refactor them much when I split things out, so the 
+enablements got rolled in.
 
-IIUC, this could simply be "Iterator[None]" instead of
-"Generator[None, None, None]".
+I will, once reviews are in (and there is a commitment to merge), try to 
+squash things where it seems appropriate.
 
-Anyway,
+>>   [mypy-qapi.types]
+>>   disallow_untyped_defs = False
+>>   disallow_incomplete_defs = False
+>> diff --git a/scripts/qapi/source.py b/scripts/qapi/source.py
+>> index e97b9a8e15..1cc6a5b82d 100644
+>> --- a/scripts/qapi/source.py
+>> +++ b/scripts/qapi/source.py
+>> @@ -11,37 +11,42 @@
+>>   
+>>   import copy
+>>   import sys
+>> +from typing import List, Optional, TypeVar
+>>   
+>>   
+>>   class QAPISchemaPragma:
+>> -    def __init__(self):
+>> +    def __init__(self) -> None:
+> 
+> I don't follow the reason for typing this...
+> 
+>>           # Are documentation comments required?
+>>           self.doc_required = False
+>>           # Whitelist of commands allowed to return a non-dictionary
+>> -        self.returns_whitelist = []
+>> +        self.returns_whitelist: List[str] = []
+>>           # Whitelist of entities allowed to violate case conventions
+>> -        self.name_case_whitelist = []
+>> +        self.name_case_whitelist: List[str] = []
+>>   
+>>   
+>>   class QAPISourceInfo:
+>> -    def __init__(self, fname, line, parent):
+>> +    T = TypeVar('T', bound='QAPISourceInfo')
+>> +
+>> +    def __init__(self: T, fname: str, line: int, parent: Optional[T]):
+> 
+> And not this... to tune my review approach, should I assume that this
+> series intends to add complete type hints or not?
+> 
 
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+This is a mypy quirk you've discovered that I've simply forgotten about.
 
---Tg5qL4DubmxJEzuM
-Content-Type: application/pgp-signature; name="signature.asc"
+When __init__ has *no* arguments, you need to annotate its return to 
+explain to mypy that you have fully typed that method. It's a sentinel 
+that says "Please type check this class!"
 
------BEGIN PGP SIGNATURE-----
+When __init__ has some arguments, you only need to type those arguments 
+and not the return type. The sentinel is not needed.
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl9r33cACgkQZX6NM6Xy
-CfMldw/+JPF+gErKk6sRk80kTrj5UaKWsKje6FmwjSemP49eiz9qkj//w2CD0CHf
-dn5EFIq88dZ+W8aiXV+IA11sSBU1p4yG4ne7qq2G7yHlzv33pe3TMb7ATAB/URH7
-tGAfXn5slPyTufKA6xHjrM9L9ptebTV23u5hyISTlanjeQCBmciph8w591wE43eT
-yomt7t1ZEPJNluZvGIvcM40erxBE6RE0r5BRPYMFiMuRqp4KhmJgxw8XwkHMIyab
-K6Dr4lFBsA6ntY9xtLTIRpgUdqyxtZxMM2CWWDWieafClXA/m1TTmNrCySRRnXtQ
-7EfiE2upkx5JjD6ehAMyCutx7MvZZ9dEgjctUsjMPl9aCwUhH+Xnq/YdXA9Cx1Bl
-G18DtILGm6HXvDg1qjEE/j+YUF+ojhnW8aZ0RpFiuYZDR7PyZOyVAIqBGqYTgy3K
-zPZ2k9HBJMLWA4gIfS2XCRsNFguh3wkEDQyb+MGQZApgOsJaq9ZJU0MAjj6q0sAS
-6oxJ0psACpv8sONPpfR0HUDH95fWXSsGcKjugQmfkVNmnToivPtYJnWBaFp+kXvp
-wni9d18mR+ftii2rtjGtYP42YU4FbWwjZxULmvcgKeg7h0ZzaGMI48odR32idlHd
-2IAbjRHsUQYUYRGWlm9HxmqSl69Gjc7Efx3keLcS6SDM+eS6aKY=
-=+s4k
------END PGP SIGNATURE-----
+__init__ *never* returns anything, so I opted to omit this useless 
+annotation whenever it was possible to do so.
 
---Tg5qL4DubmxJEzuM--
+> - Cleber.
+> 
 
 
