@@ -4,40 +4,38 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95E84C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:10:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0993C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:11:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 238C0205F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:10:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 238C0205F4
+	by mail.kernel.org (Postfix) with ESMTPS id 5A63020BED
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:11:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A63020BED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL8Hr-0004HD-U8
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 13:10:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36362)
+	id 1kL8J5-0005bu-D6
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 13:11:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36590)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kL8GT-00035O-2F; Wed, 23 Sep 2020 13:09:09 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:38439)
+ id 1kL8HR-0004DN-DM; Wed, 23 Sep 2020 13:10:09 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:54983)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kL8GR-0007LI-8m; Wed, 23 Sep 2020 13:09:08 -0400
+ id 1kL8HP-0007Q9-Hy; Wed, 23 Sep 2020 13:10:09 -0400
 Received: from [192.168.100.1] ([82.252.129.222]) by mrelayeu.kundenserver.de
  (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1M4JVv-1kKr962W6T-000Kcd; Wed, 23 Sep 2020 19:08:57 +0200
-Subject: Re: [PATCH] virtio: vdpa: omit check return of g_malloc
-To: Laurent Vivier <lvivier@redhat.com>, Li Qiang <liq3ea@163.com>,
- mst@redhat.com, jasowang@redhat.com
-References: <20200819144309.67579-1-liq3ea@163.com>
- <9e4f982e-2bd1-94f9-724e-6eada04d6096@redhat.com>
+ 1MGhi0-1kGEiv1LKE-00Dksf; Wed, 23 Sep 2020 19:10:03 +0200
+Subject: Re: [PATCH] Add *.pyc back to the .gitignore file
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20200919101859.28739-1-thuth@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,35 +79,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <09fd2c30-e086-8f01-aabc-358fde2eb2a7@vivier.eu>
-Date: Wed, 23 Sep 2020 19:08:56 +0200
+Message-ID: <94f65068-7928-afce-0286-21d6a76704e2@vivier.eu>
+Date: Wed, 23 Sep 2020 19:10:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <9e4f982e-2bd1-94f9-724e-6eada04d6096@redhat.com>
+In-Reply-To: <20200919101859.28739-1-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:hkaF7R+V+t9KKem+qw9yc4ARhEs96QxwKNw3hJVwQ4LnkS0yzpL
- VMjjalsUstie3mcBynnLj4t8YBtFXLwC8QajayXg41IBxFG7VPmhT7dgKsY5oWWfziCMq1K
- P3AUvN2wkShd0YktSgjUPBuaSHrxwhdMjiZ0vEAma+DLoZJymwpV3IIS5IJfCK4TN0Ry/ip
- 9dD2MW8/8B/El+fbp/Asw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:3QQUGof5nms=:orjQm51sWSSFSd80m0efVG
- J04MImp56d+iWt/RgDPO+MD8RlNe7Q0xMDzWomo/7Ws6xYja+dRUNaoAHTosadMGNpKbRZ0L8
- Rxi7xaJ3pGH4uYNTDfD0WpW9kcv1YsaA5IwbsPsTL0okoz6v+RW8WBfXI2O5Z9a+6R1r3Z1/6
- Psqd2i3WoI8FyvUIJhv0TEwq8Mup22yDCNvy189FMBaBvkDuFXpJkYNuR7UaosMsVGFU2D5xX
- dLTL7rfC0x16OVAwFcjmjSZt40IBZCGvWB2JQ43tL86WBKzyTl300QE3fBKc+H9VXmcAdJ58Y
- EORNP+8DjH9bKX8xSMKGZ/4qs9lpYr6Wk1+TMJP2wY4LOMj+Drm4MMLwNi3N0/F1UA+GI22Rf
- FZPgwn8csOP9wq/T6/39m4kKUZmEqK5Dt9ktFu0/8ggi9n/M81T+H5LpAOp4DJ6iCRrzcwayA
- I8pjpCq+afb0v/eSFnAoXMb/87Voa20H/ZUIwNlLYjQG6jZ/sivq9Tckx7Bmf7eTQqdeElMYp
- oX+/+Bt+kMQefNEOSYh1YsxCNK6twS4e6t164aK6llpraYhjzuRQMeVsmKWBnNT9QKdf8lS16
- Mqznj7qPanioEvQfRU1OYP+eZ56/N1wvE910WC3IxQTqzOEod8ks/Ope24XRR/FXvML2NK99O
- WPhn9qdjWDMczVaX0eNd37vQLQepVCZ/1jTTZLA617B6YJwq6ucqXSt1D74vaJB0WyuvQh9GU
- oMpsEZCUDLLJN1ITu6jM4B5r482NqQB+BJ5rB62eWAnf76XKFeqHWjM6XbC4fSSZPeAN1qf7y
- jMOUCTW6ToyOmKl6JI5Dw4Ec+4N5iYpz2QKXCiHTmelpxtuQb+8BUsMgM66qVHupDj0OCYN
-Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:zC5dXVh8LxWPQfePqRfBDfaqyLn8GXRUtOb++/CJgPpVNg3RX+R
+ uW4GeZSXteuh0jWIRaU9fJz4U8tuJOKVeBjtSmBFArz4mTkdkrxw3BwTh9D75KtotioDfKX
+ PHpD1588A9FQWlpTWmbNkEtgsRdGFxgrNJdzMOX+2kfPft/VBGenxmpYbH9zTAL1cUqVJwf
+ 9VfeuzgnmtOMoLPHdCkUQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:7ZYOOlgkRX4=:z2zSzO3KL8szuEUORfrapY
+ xwOk5idqMWwU1PbYBxXWPQSCcv9PA2mtcdJlVfdqt/oh1OOsV2mtv6IsaIANJf0SB36sf1Rh1
+ InLET7lRIwkllJRulFz4Hn8Lhl3YiqIstl0BvD+7nWVvBy1hZvhMhLuQtqSHY81rOMhWksOas
+ iP/PLYI5nncgLOfkEN7X1UBNmy2n0U9DGpPrcZlwj7A16xdK+xfUzxegvz4p7bJ7oKkt5PO41
+ 9GURV6PJQmuP+b/0emJZ9yRnKPgFpUMclw1NpdykQIkBOLENrSV+aV2QXwoRO0AmsHTXIQlwc
+ s2X//tyza7VNZoyCoWxrcwp1OemHJmOBDnvGTKSY7ydqpGwca4XH1ODhLYq9J7+nRVpSwv8Q2
+ O777w/PrUGFANDhvVHeQDGKiaEx65Jbgh/F+nUo8C0CBIoP1hOhEz+AniowQV9XyT7xWsvNJh
+ CCm2GDfx8UgOX31aLwLRZV/hvQmBs8T6bNgVMXhgT3jy703V08m2SMChXjtJSBeaqEW4KwywX
+ Ftz+tfeg3Ci+muDx35r4t+ZOxvPlAy5RPQ1RwpL2shJ1yBG9LGL+oeA/YxNsXAHf/Aj1BALMr
+ zIxJP8sIjmHycWjn6YW+IEwE12kOqYw5zGndk4aSuKz6yUcisgM25NT2+HmIso1E1zEktZRtY
+ WdN1RxmZQzBQ5+5vHkptTH0X12x9QdeebGJXty0N2ZilbAwvr2M2lCuZStBk+3cncTP7DkGHD
+ ctOZM+PZzeBoeR6uYB51lDw317XBl36MUVzL7E5CHqeQWYEaFl5c4rNhOTMBTaktMhQ1ZAwZe
+ IuuiYejJtHIDO7/kUIBxm5Gmq3/ZKv7tBxYcpvKafvaeobTCyg17rxvrNFoXqXxy8fOBlPA
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 13:09:05
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 13:10:06
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -129,53 +127,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, liq3ea@gmail.com,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Cindy Lu <lulu@redhat.com>
+Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 18/09/2020 à 14:53, Laurent Vivier a écrit :
-> On 19/08/2020 16:43, Li Qiang wrote:
->> If g_malloc fails, the application will be terminated.
->> No need to check the return value of g_malloc.
->>
->> Signed-off-by: Li Qiang <liq3ea@163.com>
->> ---
->>  hw/virtio/vhost-vdpa.c | 7 +------
->>  1 file changed, 1 insertion(+), 6 deletions(-)
->>
->> diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
->> index 4580f3efd8..403ae3ae07 100644
->> --- a/hw/virtio/vhost-vdpa.c
->> +++ b/hw/virtio/vhost-vdpa.c
->> @@ -320,10 +320,8 @@ static int vhost_vdpa_set_config(struct vhost_dev *dev, const uint8_t *data,
->>      struct vhost_vdpa_config *config;
->>      int ret;
->>      unsigned long config_size = offsetof(struct vhost_vdpa_config, buf);
->> +
->>      config = g_malloc(size + config_size);
->> -    if (config == NULL) {
->> -        return -1;
->> -    }
->>      config->off = offset;
->>      config->len = size;
->>      memcpy(config->buf, data, size);
->> @@ -340,9 +338,6 @@ static int vhost_vdpa_get_config(struct vhost_dev *dev, uint8_t *config,
->>      int ret;
->>  
->>      v_config = g_malloc(config_len + config_size);
->> -    if (v_config == NULL) {
->> -        return -1;
->> -    }
->>      v_config->len = config_len;
->>      v_config->off = 0;
->>      ret = vhost_vdpa_call(dev, VHOST_VDPA_GET_CONFIG, v_config);
->>
+Le 19/09/2020 à 12:18, Thomas Huth a écrit :
+> Python still dumps its bytecode into the source directory, so
+> we should continue to ignore the *.pyc files.
 > 
-> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+> Fixes: 0e72b7df4d ("Simplify the .gitignore file")
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  .gitignore | 1 +
+>  1 file changed, 1 insertion(+)
 > 
+> diff --git a/.gitignore b/.gitignore
+> index 5515f595e6..b32bca1315 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -1,5 +1,6 @@
+>  /GNUmakefile
+>  /build/
+> +*.pyc
+>  .sdk
+>  .stgit-*
+>  .git-submodule-status
 > 
 
 Applied to my trivial-patches branch.
