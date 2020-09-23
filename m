@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DCD2C4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 01:23:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB345C4727E
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 01:27:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BC342371F
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 01:23:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BC342371F
+	by mail.kernel.org (Postfix) with ESMTPS id 3E09C238D7
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 01:27:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E09C238D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKtVM-0006Mg-36
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 21:23:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42988)
+	id 1kKtZJ-0008Ul-4d
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 21:27:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1kKtSs-0004Kj-4W
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 21:20:58 -0400
-Received: from mga01.intel.com ([192.55.52.88]:38550)
+ id 1kKtXG-0007ZO-6d
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 21:25:30 -0400
+Received: from mga04.intel.com ([192.55.52.120]:65364)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1kKtSo-000446-6j
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 21:20:57 -0400
-IronPort-SDR: 1W1NEgnj3g6a5l8uqJxAkuAUvoso6L98U4uhmG/AqtCtHiss29xr/dAP3e5FZVKXRYJMGjT05A
- gaw6sRv/lKQQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9752"; a="178828596"
-X-IronPort-AV: E=Sophos;i="5.77,292,1596524400"; d="scan'208";a="178828596"
+ id 1kKtXD-0004OW-Ru
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 21:25:29 -0400
+IronPort-SDR: m3O1DY4/3RFIlo2cTQPLS0eAqOFAWwCxH2gMDYzuROaCVxURoP2JWEhnGp9kdDWuel9ZbJ0A6O
+ LJNZY6uPQQwQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9752"; a="158134696"
+X-IronPort-AV: E=Sophos;i="5.77,292,1596524400"; d="scan'208";a="158134696"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
- by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 22 Sep 2020 18:20:46 -0700
-IronPort-SDR: LbqzYbx8VncCJZYuWeWCadWDEcfH1JgW1E/qUaLXpD3xS33K+pvuwyBI0b+58pUH6df6A84T+y
- uc+xo+PEwN1g==
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 22 Sep 2020 18:25:23 -0700
+IronPort-SDR: tV+zLLvGOaw8iUwZmemxKM7wB8mYFv+hzH7L6AR+YuG1/nrhxe40XWNTxY0PZQUpbVYVAhVfWO
+ mdhdEV1ylKDw==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,292,1596524400"; d="scan'208";a="347146508"
-Received: from fmsmsx606.amr.corp.intel.com ([10.18.126.86])
- by FMSMGA003.fm.intel.com with ESMTP; 22 Sep 2020 18:20:45 -0700
-Received: from shsmsx606.ccr.corp.intel.com (10.109.6.216) by
- fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
+X-IronPort-AV: E=Sophos;i="5.77,292,1596524400"; d="scan'208";a="305171392"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+ by orsmga003.jf.intel.com with ESMTP; 22 Sep 2020 18:25:23 -0700
+Received: from shsmsx601.ccr.corp.intel.com (10.109.6.141) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Tue, 22 Sep 2020 18:20:45 -0700
+ 15.1.1713.5; Tue, 22 Sep 2020 18:25:22 -0700
 Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
- SHSMSX606.ccr.corp.intel.com (10.109.6.216) with Microsoft SMTP Server
+ SHSMSX601.ccr.corp.intel.com (10.109.6.141) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 23 Sep 2020 09:20:43 +0800
+ 15.1.1713.5; Wed, 23 Sep 2020 09:25:21 +0800
 Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
  SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
- Wed, 23 Sep 2020 09:20:43 +0800
+ Wed, 23 Sep 2020 09:25:21 +0800
 From: "Zhang, Chen" <chen.zhang@intel.com>
 To: "Rao, Lei" <lei.rao@intel.com>, "lizhijian@cn.fujitsu.com"
  <lizhijian@cn.fujitsu.com>, "jasowang@redhat.com" <jasowang@redhat.com>,
  "quintela@redhat.com" <quintela@redhat.com>, "dgilbert@redhat.com"
  <dgilbert@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
-Subject: RE: [PATCH v2 1/3] Optimize seq_sorter function for colo-compare
-Thread-Topic: [PATCH v2 1/3] Optimize seq_sorter function for colo-compare
-Thread-Index: AQHWkMSsLncnAdFNYUKoV4XqvVWxDql1ap6Q
-Date: Wed, 23 Sep 2020 01:20:43 +0000
-Message-ID: <4ab253f8cdb34d029260d579e9e77742@intel.com>
+Subject: RE: [PATCH v2 2/3] Reduce the time of checkpoint for COLO
+Thread-Topic: [PATCH v2 2/3] Reduce the time of checkpoint for COLO
+Thread-Index: AQHWkMSuP4cqj6LmLE2Yov7OLQt9Cql1byYA
+Date: Wed, 23 Sep 2020 01:25:20 +0000
+Message-ID: <b9ca78217db34fb2abebde21994580ff@intel.com>
 References: <1600766690-94980-1-git-send-email-lei.rao@intel.com>
- <1600766690-94980-2-git-send-email-lei.rao@intel.com>
-In-Reply-To: <1600766690-94980-2-git-send-email-lei.rao@intel.com>
+ <1600766690-94980-3-git-send-email-lei.rao@intel.com>
+In-Reply-To: <1600766690-94980-3-git-send-email-lei.rao@intel.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -82,16 +82,15 @@ x-originating-ip: [10.239.127.36]
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Received-SPF: pass client-ip=192.55.52.88; envelope-from=chen.zhang@intel.com;
- helo=mga01.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 21:20:46
+Received-SPF: pass client-ip=192.55.52.120; envelope-from=chen.zhang@intel.com;
+ helo=mga04.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 21:25:24
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,40 +117,58 @@ Sender: "Qemu-devel"
 > jasowang@redhat.com; quintela@redhat.com; dgilbert@redhat.com;
 > pbonzini@redhat.com
 > Cc: qemu-devel@nongnu.org; Rao, Lei <lei.rao@intel.com>
-> Subject: [PATCH v2 1/3] Optimize seq_sorter function for colo-compare
+> Subject: [PATCH v2 2/3] Reduce the time of checkpoint for COLO
 >=20
-> The seq of tcp has been filled in fill_pkt_tcp_info, it can be used direc=
-tly here.
+> we should set ram_bulk_stage to false after ram_state_init, otherwise the
+> bitmap will be unused in migration_bitmap_find_dirty.
+> all pages in ram cache will be flushed to the ram of secondary guest for =
+each
+> checkpoint.
 >=20
 > Signed-off-by: leirao <lei.rao@intel.com>
 
 Reviewed-by: Zhang Chen <chen.zhang@intel.com>
-By the way, please add Zhijian's reviewed-by in new version of patches.
 
 Thanks
 Zhang Chen
 
 > ---
->  net/colo-compare.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
+>  migration/ram.c | 14 +++++++++++++-
+>  1 file changed, 13 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/net/colo-compare.c b/net/colo-compare.c index
-> 3a45d64..86980ce 100644
-> --- a/net/colo-compare.c
-> +++ b/net/colo-compare.c
-> @@ -196,11 +196,7 @@ static void
-> colo_compare_inconsistency_notify(CompareState *s)
->=20
->  static gint seq_sorter(Packet *a, Packet *b, gpointer data)  {
-> -    struct tcp_hdr *atcp, *btcp;
-> -
-> -    atcp =3D (struct tcp_hdr *)(a->transport_header);
-> -    btcp =3D (struct tcp_hdr *)(b->transport_header);
-> -    return ntohl(atcp->th_seq) - ntohl(btcp->th_seq);
-> +    return a->tcp_seq - b->tcp_seq;
+> diff --git a/migration/ram.c b/migration/ram.c index 76d4fee..59ff0cf 100=
+644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -3018,6 +3018,18 @@ static void
+> decompress_data_with_multi_threads(QEMUFile *f,
+>      qemu_mutex_unlock(&decomp_done_lock);
 >  }
 >=20
->  static void fill_pkt_tcp_info(void *data, uint32_t *max_ack)
+> + /*
+> +  * we must set ram_bulk_stage to fasle, otherwise in
+> +  * migation_bitmap_find_dirty the bitmap will be unused and
+> +  * all the pages in ram cache wil be flushed to the ram of
+> +  * secondary VM.
+> +  */
+> +static void colo_init_ram_state(void)
+> +{
+> +    ram_state_init(&ram_state);
+> +    ram_state->ram_bulk_stage =3D false;
+> +}
+> +
+>  /*
+>   * colo cache: this is for secondary VM, we cache the whole
+>   * memory of the secondary VM, it is need to hold the global lock @@ -
+> 3061,7 +3073,7 @@ int colo_init_ram_cache(void)
+>          }
+>      }
+>=20
+> -    ram_state_init(&ram_state);
+> +    colo_init_ram_state();
+>      return 0;
+>  }
+>=20
 > --
 > 1.8.3.1
 
