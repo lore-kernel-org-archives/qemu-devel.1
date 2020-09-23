@@ -2,80 +2,80 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38ADEC4363D
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 23:15:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67DA6C4363D
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 23:51:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6E6F23600
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 23:15:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BF6E920C56
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 23:51:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CjdqCuTl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6E6F23600
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QazjD7sm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF6E920C56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLDyw-0004WO-Pm
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 19:15:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52642)
+	id 1kLEYE-0005kZ-Lp
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 19:51:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58318)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLDxR-0003UZ-0u
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 19:13:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29050)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLEXH-00059S-Uw
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 19:50:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35364)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLDxP-00008P-Bs
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 19:13:52 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLEXF-000423-DB
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 19:50:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600902830;
+ s=mimecast20190719; t=1600905051;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=9xXrordbkQC5MGSsUjGYSugWJzAZvBC8SJ/WYX4wNIg=;
- b=CjdqCuTlzsLEYlyjwXoOuzyXImxjuWkiIdWGfT8pWIy/OZmVhgA+8j5ODAFfwBQj2HFp0N
- 5yEtfwhWl5fYFMVBtF8a/2TDRDVAH4+Ztdw2XXTCU+ZDFPmoozA5Xpn2WMTzLKGdTQYbSS
- 7X7r4YfEmrrGcKRUKXHki4LmSGKFuYw=
+ bh=YAK+4Sk36Ktfh+jIItpAppGyZd2Ti2nDvgZIMh8Jd6E=;
+ b=QazjD7smrKHt3F7CiPaoVeolqCn9Ym3y1DUkLhH2oyA823omHWw8gVehSIYR3PnQ9ZjHDq
+ STYI9zkcV28Jzxgvu+0gJRuKAp/LJquXNSAeYNCZRw4k0RxykIV/cZtvRqLin/eRaUffsX
+ eHfI374p+80iJBjat0cR0S4RgPwNnqc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-373-OmmgeZaCPeSamOR7kvmh5Q-1; Wed, 23 Sep 2020 19:13:46 -0400
-X-MC-Unique: OmmgeZaCPeSamOR7kvmh5Q-1
+ us-mta-453-MxPxM-0dOOmG_4pyS3iIGg-1; Wed, 23 Sep 2020 19:50:47 -0400
+X-MC-Unique: MxPxM-0dOOmG_4pyS3iIGg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 368D21084C96;
- Wed, 23 Sep 2020 23:13:45 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
- [10.10.119.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4755C55768;
- Wed, 23 Sep 2020 23:13:44 +0000 (UTC)
-Date: Wed, 23 Sep 2020 19:13:42 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH v2 24/38] qapi/gen.py: Fix edge-case of _is_user_module
-Message-ID: <20200923231342.GB296416@localhost.localdomain>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89D3D1007464;
+ Wed, 23 Sep 2020 23:50:46 +0000 (UTC)
+Received: from [10.10.119.140] (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 97DC055778;
+ Wed, 23 Sep 2020 23:50:45 +0000 (UTC)
+Subject: Re: [PATCH v2 21/38] qapi/commands.py: enable checking with mypy
+To: Cleber Rosa <crosa@redhat.com>
 References: <20200922210101.4081073-1-jsnow@redhat.com>
- <20200922210101.4081073-25-jsnow@redhat.com>
- <20200923151743.GK3312949@habkost.net>
- <5723714c-e784-ece7-5523-d6d3b5f981a1@redhat.com>
- <20200923183335.GU3312949@habkost.net>
- <20200923231032.GY191229@localhost.localdomain>
+ <20200922210101.4081073-22-jsnow@redhat.com>
+ <20200923222118.GU191229@localhost.localdomain>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <2dfefea6-68ac-61e7-ff4f-e1f05f9c6c1a@redhat.com>
+Date: Wed, 23 Sep 2020 19:50:45 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200923231032.GY191229@localhost.localdomain>
+In-Reply-To: <20200923222118.GU191229@localhost.localdomain>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="dc+cDN39EJAMEtIO"
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=crosa@redhat.com;
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -84,8 +84,9 @@ X-Spam_score: -3.3
 X-Spam_bar: ---
 X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,64 +100,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---dc+cDN39EJAMEtIO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 9/23/20 6:21 PM, Cleber Rosa wrote:
+> On Tue, Sep 22, 2020 at 05:00:44PM -0400, John Snow wrote:
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>   scripts/qapi/mypy.ini | 5 -----
+>>   1 file changed, 5 deletions(-)
+>>
+>> diff --git a/scripts/qapi/mypy.ini b/scripts/qapi/mypy.ini
+>> index b668776d94..9da1dccef4 100644
+>> --- a/scripts/qapi/mypy.ini
+>> +++ b/scripts/qapi/mypy.ini
+>> @@ -4,11 +4,6 @@ strict_optional = False
+>>   disallow_untyped_calls = False
+>>   python_version = 3.6
+>>   
+>> -[mypy-qapi.commands]
+>> -disallow_untyped_defs = False
+>> -disallow_incomplete_defs = False
+>> -check_untyped_defs = False
+>> -
+>>   [mypy-qapi.doc]
+>>   disallow_subclassing_any = False
+>>   disallow_untyped_defs = False
+>> -- 
+>> 2.26.2
+>>
+> 
+> IMO, this increase of strictness for "commands" would make more sense
+> to be squashed together with the previous changes on "commands.py".
+> Not only here, but for the other patches for the other modules too.
+> 
+> Anyway,
+> 
+> Reviewed-by: Cleber Rosa <crosa@redhat.com>
+> 
 
-On Wed, Sep 23, 2020 at 07:10:35PM -0400, Cleber Rosa wrote:
-> On Wed, Sep 23, 2020 at 02:33:35PM -0400, Eduardo Habkost wrote:
-> > On Wed, Sep 23, 2020 at 02:29:28PM -0400, John Snow wrote:
-> > > On 9/23/20 11:17 AM, Eduardo Habkost wrote:
-> > > > This changes behavior if name=3D=3D'', and I guess this is OK, but
-> > > > I'm not sure.  I miss documentation on `visit_module()`,
-> > > > `visit_include()`, and `_is_user_module()`.  I don't know what
-> > > > `name` means here, and what is a "user module".
-> > > >=20
-> > >=20
-> > > Good spot, I missed that.
-> > >
->=20
-> Nice catch indeed.
->=20
-> > > I can probably do: bool(name and not name.startswith('./'))
-> > >
->=20
-> In this case I like my previous suggestion even better. :)
->=20
-> - Cleber.
+Admittedly, the only reason I *didn't* is because these patches have 
+been reordered a *lot* and in some cases, it helped me to have distinct 
+"This patch is last and enables the checks!" commits.
 
-Never mind me... I noticed that this actually gets called with None.
+(I am hedging my bets that more re-ordering is in my future.)
 
-- Cleber.
+I will squash the "Enable such-and-such" commits with whatever fixed the 
+last error for final inclusion, but I might keep them separate for now 
+just for my own convenience.
 
---dc+cDN39EJAMEtIO
-Content-Type: application/pgp-signature; name="signature.asc"
+Sorry for the volume.
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl9r1qYACgkQZX6NM6Xy
-CfM7jw/+IDKf3LN+3DwVooTZTCTsyUbdsQN81UlKKEr4Wz8qY+HTf2lRoSci9d5E
-enz34DQsYgQv6FdPVYYnPpUM2AE3sEVm2F/PuVqSwc9YZ/cNTDy+BpSi5EWtI4/q
-eEEYg80ST20o+GuTktq2BgaijLLmCbElWiuVKgFW4OWkq/WSJzTnra0gWu6iweY+
-5BWmdKeKImtcBg71s9E2/yU4oLJ4uOcTgAc5l+bqynGk/q4/7WhLvfK5mqkW9Yt7
-X9Lg4AVA/FbfDyBsCGaeDQc4eZFC90sm++LVdhGSVB7Iw9gNInmVpzyL0rx8TDuA
-TvFHXfgaNVadW0C/Mqs4yegTPS6YegGkDhDbMq4F0jZP/kCk07OP+21+0RdCaUMs
-5VpKVLL832+JloZ0jiegv7iDYmn7J94gUYFSN3TE9giPZRhBMvfJoR23MWrheTFV
-H3ZQZ3TndMB2s3Xyt8p5ghH3rx0E9+aS6Nf2u25SP3Z9PQNTtbaNurF7oxX2UMbr
-IzY46IXbkjmmZXqjicHsgszHPLWslB8NKGP1GDScBN9sG3eDYTFAUDoYIagyYaqH
-7qMRBZE9KUdRmC2wP53MtIlVTX5hiSZmwAjS9xfVIi7J8o5YlKVTZTOmfECODv1Q
-WfIfh9iBy8qdysknuXeX+8M6DLqAEgzyT8uZT7o87wfo69hSfWE=
-=jAhm
------END PGP SIGNATURE-----
-
---dc+cDN39EJAMEtIO--
+--js
 
 
