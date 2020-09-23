@@ -5,77 +5,78 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73E8AC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 11:02:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52566C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 11:02:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E70FD20725
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 11:02:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B996820725
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 11:02:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GC+EjTd6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E70FD20725
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IAyJXKDk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B996820725
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL2XM-00088q-0r
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 07:02:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54370)
+	id 1kL2Xe-000054-Pu
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 07:02:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54688)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kL2VY-0007EW-L9
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 07:00:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20077)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kL2Wd-0007eK-Af
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 07:01:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58093)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kL2VT-0000qV-Q9
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 07:00:20 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kL2WZ-0001Et-8K
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 07:01:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600858814;
+ s=mimecast20190719; t=1600858880;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=CDEDCaYxtkUHE3/VFWbsV2iaF0sc9MZJlBxXUHU+p2A=;
- b=GC+EjTd6HgwxaMuau7fEmexdk+j7/l9PDdIXzA+1b+BuHID8Nj00XgybvxgF/azSuTHb7r
- rQAWHCTv8vbdC5d3ea+w/U6e2ZvWAUY1apCoIUAR6PA+ew6sjH34vM76JYJk3pvBqQr3KB
- gL9/uEDlQAQSLc2RzMTeMvebw7tYwOQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-329-0NF_Yf2OPLKyNlgyCq8Eew-1; Wed, 23 Sep 2020 07:00:12 -0400
-X-MC-Unique: 0NF_Yf2OPLKyNlgyCq8Eew-1
-Received: by mail-wm1-f71.google.com with SMTP id r10so2182476wmh.0
- for <qemu-devel@nongnu.org>; Wed, 23 Sep 2020 04:00:12 -0700 (PDT)
+ bh=pthRUDkzuGBEaIuzGDJOz5c6Y8syb2XoGbsYV9g5YnI=;
+ b=IAyJXKDkIj0j9r7gBFWLI0AAkn+sKh7p8VKoX/8EAIIuTRY1gyPD3zZ52AT8405WClHrRn
+ L3w3t1LWSQoB4SXRtjpvF4gws2HRINC4aAzlEXVqOuyx3QbGWKk+eSQ8vvSWX5Ek/iMQkZ
+ 3ws5Lao6HYmhVVguGiRft0UkOy0Af+o=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-67-soIjIhDjNmCEl_HYp_KkmA-1; Wed, 23 Sep 2020 07:01:18 -0400
+X-MC-Unique: soIjIhDjNmCEl_HYp_KkmA-1
+Received: by mail-wr1-f70.google.com with SMTP id b2so2504673wrs.7
+ for <qemu-devel@nongnu.org>; Wed, 23 Sep 2020 04:01:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=CDEDCaYxtkUHE3/VFWbsV2iaF0sc9MZJlBxXUHU+p2A=;
- b=rhhdl/9q6heh1/okgrGwqOxrrFCVCg3oaV4l9vK+XqkoR/39Kh2vCSYJnVEtO8ZNmM
- jvdLudK3XWU2WIomYpyEXN8eO2QKabClvuQGCAAhCuBbufUswJBVgsXLbbC7EMe6cWgT
- yfccsCOfuGXT2zRDPLzoFKwmOb8NJjaZK4JLv9oGHw2WmrHIifvwtAuUfzzJWdfGzMud
- +Lmkvm0lMmM3Rf7yf3SnFnXuIoNufSj7aZpNZPPqD4xBLV7CgVaCfrYA3m87Y1yohfEV
- UmCSItmQmPe1GLA0NIdWzUIOkchSa/cFPn3o7sCRjDuEXKN8lUzKQIlRR8kE7Bcgzp5M
- 8NQw==
-X-Gm-Message-State: AOAM530Mchl5ICEkUvR5uvARUSw85wpN1s45QmViNayxqzQCDEGBz6W6
- RTY3jlHkmVG1QJx36r3FP7qLSz/kAy9OStrLM/B9QTP/FHq8khfaAp6RDFqABtmWthmuNBkWbk3
- TOhDR9r5kbZMY8dQ=
-X-Received: by 2002:adf:dcd1:: with SMTP id x17mr217622wrm.150.1600858811624; 
- Wed, 23 Sep 2020 04:00:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyX5uNLHBzTJgwTDaSeNSdv+k/xuYUOUScShwMQz6QRCFwEgmNM7+oJn0fYEqQM35DSY/ufcg==
-X-Received: by 2002:adf:dcd1:: with SMTP id x17mr217603wrm.150.1600858811428; 
- Wed, 23 Sep 2020 04:00:11 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=pthRUDkzuGBEaIuzGDJOz5c6Y8syb2XoGbsYV9g5YnI=;
+ b=bWaFbQdxNmOW1pW5NxwI83n4MD2leZe9ZCvBta/hyNTIBnPtYC+1Voh8pi4B6ayxws
+ nSD5/f4PEYWfmu/8y7YGsw6lkSXuYAKEP950RPV1jWzANti5ESjcJoMvEf4heO1cEg5m
+ rwwRrtDhd1ThyOp42oyGoxq5rlijbZZ5pfw4uClLGnrEzvu+z+/HWhr/J1+7zd71mRSN
+ wAcLwmxbvHXI+vnP9PiHyxxexy0fvwPmFBE2YlvI89RgTBmXZwtghGvIwoEqIaD+tnNY
+ UQVmp56+UbYSpHWtPDpWFlzN7zpIbaB/OtfkLSf7xEvNrdwOathg55PgEBmPxfbO3ZO1
+ enWQ==
+X-Gm-Message-State: AOAM530cgV5Lf7X3lk2d06QTpOWzGGpKu0YI9/LW1o7rMx0ThsTu6QZx
+ JUjOCwn0bJ4cGhjKzFzxRqnRH/vAX/kMl5OIIQBpcdai8mgPqGFG8dcjKz9Mg0ae3s6RHYYaTa/
+ MLspyBdd7Ate28/E=
+X-Received: by 2002:a1c:4c06:: with SMTP id z6mr5776625wmf.40.1600858877593;
+ Wed, 23 Sep 2020 04:01:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxVALvHCW8q2bJ5gjXxIGq2NrFzTp6mnnMnJr/94FWoKF12yoq1Xo1VB981+KruxWs/UdfjNg==
+X-Received: by 2002:a1c:4c06:: with SMTP id z6mr5776615wmf.40.1600858877441;
+ Wed, 23 Sep 2020 04:01:17 -0700 (PDT)
 Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id z127sm8299716wmc.2.2020.09.23.04.00.10
+ by smtp.gmail.com with ESMTPSA id h76sm8675825wme.10.2020.09.23.04.01.16
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 23 Sep 2020 04:00:10 -0700 (PDT)
-Subject: Re: [PATCH v2] modules: update qom object module comment
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-References: <20200923103728.12026-1-kraxel@redhat.com>
+ Wed, 23 Sep 2020 04:01:16 -0700 (PDT)
+Subject: Re: [PATCH] Add execute bit back to scripts/tracetool.py
+To: Anthony PERARD <anthony.perard@citrix.com>, qemu-devel@nongnu.org
+References: <20200923103620.1980151-1-anthony.perard@citrix.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -100,19 +101,19 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <aa8ab87b-c881-6323-2c02-76afaf728fda@redhat.com>
-Date: Wed, 23 Sep 2020 13:00:09 +0200
+Message-ID: <e886154a-6abf-457c-f728-7857953440d3@redhat.com>
+Date: Wed, 23 Sep 2020 13:01:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200923103728.12026-1-kraxel@redhat.com>
+In-Reply-To: <20200923103620.1980151-1-anthony.perard@citrix.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
@@ -137,32 +138,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/23/20 12:37 PM, Gerd Hoffmann wrote:
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  util/module.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+On 9/23/20 12:36 PM, Anthony PERARD via wrote:
+> Commit a81df1b68b65 ("libqemuutil, qapi, trace: convert to meson")
+> removed it without explanation and it is useful to be able to run a
+> script without having to figure out which interpreter to use.
 > 
-> diff --git a/util/module.c b/util/module.c
-> index 520986bd70ff..6eb1e917860e 100644
-> --- a/util/module.c
-> +++ b/util/module.c
-> @@ -255,8 +255,10 @@ bool module_load_one(const char *prefix, const char *lib_name)
->   * only a very few devices & objects.
->   *
->   * So with the expectation that this will be rather the exception than
-> - * to rule and the list will not gain that many entries go with a
-> + * the rule and the list will not gain that many entries, go with a
->   * simple manually maintained list for now.
-> + *
-> + * The list must be sorted by module (module_load_qom_all() needs this).
->   */
->  static struct {
->      const char *type;
+> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+> ---
+>  scripts/tracetool.py | 0
+>  1 file changed, 0 insertions(+), 0 deletions(-)
+>  mode change 100644 => 100755 scripts/tracetool.py
+> 
+> diff --git a/scripts/tracetool.py b/scripts/tracetool.py
+> old mode 100644
+> new mode 100755
 > 
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
