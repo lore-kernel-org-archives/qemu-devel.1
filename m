@@ -2,77 +2,78 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17A61C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 20:22:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FAB9C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 20:26:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91CCE206DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 20:22:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0098120725
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 20:26:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UzGdLx89"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91CCE206DB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ofgl7lkO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0098120725
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLBHT-0002MX-L9
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 16:22:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49188)
+	id 1kLBLK-0003r4-VD
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 16:26:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49902)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLBGL-0001GH-Vy
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 16:21:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42445)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kLBKH-0003EW-Hk
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 16:25:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60374)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLBGK-0005uL-4D
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 16:21:13 -0400
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kLBKF-0006F2-M1
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 16:25:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600892471;
+ s=mimecast20190719; t=1600892714;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=UATYJiv1u1A3qAnHW1JL3aiJ1xJ/Doe1puarUlIqFbQ=;
- b=UzGdLx89YJTRBitFXd0P8PH0LdyIB5f6tsjCC41bDaLQrsj+RicxPsj7okPPsZ8bUFwVQZ
- NSJl6+frfu/D9DjeARR+7tVlOpX9KtNOJhCID9n5O30HyhGytMfbupoVmk9QVH/TCy9e4L
- 4jsOEidIYRLLqH79B+DgytQ4/zjnJII=
+ bh=CC+vzMxuFPK5CLAV0epM+hZCdqhVbZXTfVQ3t3BJ1eI=;
+ b=Ofgl7lkOBF1eYlctAyCnUb2mrLuOAOiNDRoEybc4paFwebbVLNXcNHd9BGquTUVuOUMXMp
+ 6Hc6S6Ue1QI6g67DkAJQQW+JKGiU2jKe66w3ZcUS77+iY1Z3K1NsCsq0UtQhY1cjMhppBQ
+ Cj3XYbfPIOzKI2g6RiKkTq77QoNkY+o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-38-qrSTF8YoNUeDlQMpaFad6w-1; Wed, 23 Sep 2020 16:21:06 -0400
-X-MC-Unique: qrSTF8YoNUeDlQMpaFad6w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-382-bNw2lcRtO-SJND6oNLotEg-1; Wed, 23 Sep 2020 16:25:11 -0400
+X-MC-Unique: bNw2lcRtO-SJND6oNLotEg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA3F7801AF7;
- Wed, 23 Sep 2020 20:21:05 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
- [10.10.119.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 05C35702E7;
- Wed, 23 Sep 2020 20:21:04 +0000 (UTC)
-Date: Wed, 23 Sep 2020 16:21:03 -0400
-From: Cleber Rosa <crosa@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE288800135;
+ Wed, 23 Sep 2020 20:25:10 +0000 (UTC)
+Received: from localhost (unknown [10.10.67.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 88CE673668;
+ Wed, 23 Sep 2020 20:25:10 +0000 (UTC)
+Date: Wed, 23 Sep 2020 16:25:09 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
 To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v2 19/38] qapi/commands.py: Don't re-bind to variable of
- different type
-Message-ID: <20200923202103.GS191229@localhost.localdomain>
-References: <20200922210101.4081073-1-jsnow@redhat.com>
- <20200922210101.4081073-20-jsnow@redhat.com>
+Subject: Re: [PATCH 15/16] qapi/expr.py: move related checks inside check_xxx
+ functions
+Message-ID: <20200923202509.GK3717385@habkost.net>
+References: <20200922211313.4082880-1-jsnow@redhat.com>
+ <20200922211313.4082880-16-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200922210101.4081073-20-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200922211313.4082880-16-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="l4+/aJnPlhOv5JVj"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=crosa@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 00:53:58
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -95,48 +96,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Markus Armbruster <armbru@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Cleber Rosa <crosa@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---l4+/aJnPlhOv5JVj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Sep 22, 2020 at 05:00:42PM -0400, John Snow wrote:
-> Mypy isn't a fan of rebinding a variable with a new data type.
-> It's easy enough to avoid.
->=20
+On Tue, Sep 22, 2020 at 05:13:12PM -0400, John Snow wrote:
+> There's not a big obvious difference between the types of checks that
+> happen in the main function versus the kind that happen in the
+> functions. Now they're in one place for each of the main types.
+> 
+> As part of the move, spell out the required and optional keywords so
+> they're obvious at a glance.
+> 
 > Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  scripts/qapi/expr.py | 55 ++++++++++++++++++++++++++------------------
+>  1 file changed, 33 insertions(+), 22 deletions(-)
+> 
+> diff --git a/scripts/qapi/expr.py b/scripts/qapi/expr.py
+> index 69ee9e3f18..74b2681ef8 100644
+> --- a/scripts/qapi/expr.py
+> +++ b/scripts/qapi/expr.py
+> @@ -333,6 +333,10 @@ def check_enum(expr: Expression, info: QAPISourceInfo) -> None:
+>      :param expr: `Expression` to validate.
+>      :param info: QAPI source file information.
+>      """
+> +    check_keys(expr, info, 'enum',
+> +               required=('enum', 'data'),
+> +               optional=('if', 'features', 'prefix'))
+> +
+>      name = expr['enum']
+>      members = expr['data']
+>      prefix = expr.get('prefix')
+> @@ -363,6 +367,11 @@ def check_struct(expr: Expression, info: QAPISourceInfo) -> None:
+>      :param expr: `Expression` to validate.
+>      :param info: QAPI source file information.
+>      """
+> +    check_keys(expr, info, 'struct',
+> +               required=('struct', 'data'),
+> +               optional=('base', 'if', 'features'))
+> +    normalize_members(expr['data'])
+> +
+>      name = cast(str, expr['struct'])  # Asserted in check_exprs
+>      members = expr['data']
+>  
+> @@ -377,6 +386,13 @@ def check_union(expr: Expression, info: QAPISourceInfo) -> None:
+>      :param expr: `Expression` to validate.
+>      :param info: QAPI source file information.
+>      """
+> +    check_keys(expr, info, 'union',
+> +               required=('union', 'data'),
+> +               optional=('base', 'discriminator', 'if', 'features'))
+> +
+> +    normalize_members(expr.get('base'))
+> +    normalize_members(expr['data'])
+> +
+>      name = cast(str, expr['union'])  # Asserted in check_exprs
+>      base = expr.get('base')
+>      discriminator = expr.get('discriminator')
+> @@ -409,6 +425,11 @@ def check_alternate(expr: Expression, info: QAPISourceInfo) -> None:
+>      :param expr: Expression to validate.
+>      :param info: QAPI source file information.
+>      """
+> +    check_keys(expr, info, 'alternate',
+> +               required=('alternate', 'data'),
+> +               optional=('if', 'features'))
+> +    normalize_members(expr['data'])
+> +
+>      members = expr['data']
+>  
+>      if not members:
+> @@ -432,6 +453,13 @@ def check_command(expr: Expression, info: QAPISourceInfo) -> None:
+>      :param expr: `Expression` to validate.
+>      :param info: QAPI source file information.
+>      """
+> +    check_keys(expr, info, 'command',
+> +               required=['command'],
+> +               optional=('data', 'returns', 'boxed', 'if', 'features',
+> +                         'gen', 'success-response', 'allow-oob',
+> +                         'allow-preconfig'))
+> +    normalize_members(expr.get('data'))
+> +
+>      args = expr.get('data')
+>      rets = expr.get('returns')
+>      boxed = expr.get('boxed', False)
+> @@ -453,6 +481,11 @@ def check_event(expr: Expression, info: QAPISourceInfo) -> None:
+>          if:       `Optional[Ifcond]`
+>          features: `Optional[Features]`
+>      """
+> +    normalize_members(expr.get('data'))
+> +    check_keys(expr, info, 'event',
+> +               required=['event'],
+> +               optional=('data', 'boxed', 'if', 'features'))
 
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Why is the order reversed here?  The other functions call
+check_keys() before normalize_members().
 
---l4+/aJnPlhOv5JVj
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+> +
+>      args = expr.get('data')
+>      boxed = expr.get('boxed', False)
+>  
+> @@ -519,38 +552,16 @@ def check_exprs(exprs: List[_JSObject]) -> List[_JSObject]:
+>                                 "documentation comment required")
+>  
+>          if meta == 'enum':
+> -            check_keys(expr, info, meta,
+> -                       ['enum', 'data'], ['if', 'features', 'prefix'])
+>              check_enum(expr, info)
+>          elif meta == 'union':
+> -            check_keys(expr, info, meta,
+> -                       ['union', 'data'],
+> -                       ['base', 'discriminator', 'if', 'features'])
+> -            normalize_members(expr.get('base'))
+> -            normalize_members(expr['data'])
+>              check_union(expr, info)
+>          elif meta == 'alternate':
+> -            check_keys(expr, info, meta,
+> -                       ['alternate', 'data'], ['if', 'features'])
+> -            normalize_members(expr['data'])
+>              check_alternate(expr, info)
+>          elif meta == 'struct':
+> -            check_keys(expr, info, meta,
+> -                       ['struct', 'data'], ['base', 'if', 'features'])
+> -            normalize_members(expr['data'])
+>              check_struct(expr, info)
+>          elif meta == 'command':
+> -            check_keys(expr, info, meta,
+> -                       ['command'],
+> -                       ['data', 'returns', 'boxed', 'if', 'features',
+> -                        'gen', 'success-response', 'allow-oob',
+> -                        'allow-preconfig'])
+> -            normalize_members(expr.get('data'))
+>              check_command(expr, info)
+>          elif meta == 'event':
+> -            check_keys(expr, info, meta,
+> -                       ['event'], ['data', 'boxed', 'if', 'features'])
+> -            normalize_members(expr.get('data'))
+>              check_event(expr, info)
+>          else:
+>              assert False, 'unexpected meta type'
+> -- 
+> 2.26.2
+> 
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl9rri8ACgkQZX6NM6Xy
-CfPC7g//YCgT56+h9XF/zqjTkMBOaxVCS8TA7bAS90JKk9ta6+EKwQQn4qQxwp78
-shktkQIgtApdvOVdHKkQ28YXZnBVOkaJfBR0F6EeD3xpmqim2lA9qbT1V8HHyvb6
-LW31POdho0LaJqOVbcaaj/stmJGDokqntvaTfoz2ZUkyHKelMKgUR9YL5EhQIoFt
-uuaOkZRRNQkDnZI1uMR/KopayuEolpLt4ByAcANFl44VTNO1P7T10BpqzOmFG+ZY
-jBddsxAFSBsoBbpOr43FFK7z15Cjs+pe9eHJGZ4IpM7CiM8XjO+wpfuYaICl4/v5
-qk+6xCRLXXctzaXZ2mYc7ilOPAcyA4PU4EWIhx9vfAFZbfecko5Kf2PhhIH9t7oq
-bWsQKGiLSG48ERMXRxWVH4fQCcsG0kXx45xpyqiSAGPiLsQfGi8VwZoX/PaNpGkH
-zbR6JdglzePCMqoMsoUGKpMlFCdBPhSgz1ZHXEOlrp2yfRMtE1F8tchjS1s/5vQJ
-TXytrRPDOqupBK/qsQRRn5nfWiWkfvQiVfegxRAMnl/o0SIYTRPaf+O6cKWmBjY1
-YEFSzhKsrvQBojZgcl8fdoSjwVHpjKdhlJVTcutzZYIh6NK4Hs1f9Nnd52PCRteS
-975EXa8WTQtj7wVWS/Q+0KtuZ/sxjhor3kIjfSWpGgTJToxizK0=
-=PIRP
------END PGP SIGNATURE-----
-
---l4+/aJnPlhOv5JVj--
+-- 
+Eduardo
 
 
