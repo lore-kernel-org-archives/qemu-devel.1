@@ -2,88 +2,72 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FAB9C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 20:26:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A5CAC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 20:31:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0098120725
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 20:26:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ofgl7lkO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0098120725
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 54C7620725
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 20:31:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54C7620725
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLBLK-0003r4-VD
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 16:26:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49902)
+	id 1kLBQ2-0005UK-1l
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 16:31:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50650)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kLBKH-0003EW-Hk
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 16:25:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60374)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kLBKF-0006F2-M1
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 16:25:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600892714;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=CC+vzMxuFPK5CLAV0epM+hZCdqhVbZXTfVQ3t3BJ1eI=;
- b=Ofgl7lkOBF1eYlctAyCnUb2mrLuOAOiNDRoEybc4paFwebbVLNXcNHd9BGquTUVuOUMXMp
- 6Hc6S6Ue1QI6g67DkAJQQW+JKGiU2jKe66w3ZcUS77+iY1Z3K1NsCsq0UtQhY1cjMhppBQ
- Cj3XYbfPIOzKI2g6RiKkTq77QoNkY+o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-bNw2lcRtO-SJND6oNLotEg-1; Wed, 23 Sep 2020 16:25:11 -0400
-X-MC-Unique: bNw2lcRtO-SJND6oNLotEg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE288800135;
- Wed, 23 Sep 2020 20:25:10 +0000 (UTC)
-Received: from localhost (unknown [10.10.67.5])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 88CE673668;
- Wed, 23 Sep 2020 20:25:10 +0000 (UTC)
-Date: Wed, 23 Sep 2020 16:25:09 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 15/16] qapi/expr.py: move related checks inside check_xxx
- functions
-Message-ID: <20200923202509.GK3717385@habkost.net>
-References: <20200922211313.4082880-1-jsnow@redhat.com>
- <20200922211313.4082880-16-jsnow@redhat.com>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kLBNt-0004c1-NQ; Wed, 23 Sep 2020 16:29:02 -0400
+Resent-Date: Wed, 23 Sep 2020 16:29:01 -0400
+Resent-Message-Id: <E1kLBNt-0004c1-NQ@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21385)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kLBNq-0006kp-Sy; Wed, 23 Sep 2020 16:29:01 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1600892928; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=b15KScFi5S4zwYiCX19XyENC6oNikqUAx0Gto/GXjvDIt0GkJHZtg86RPTrBWeidMH4lABn4U2/2I81HNcgYW6kNaAT1csJAH/bHJTGCHN2pRUpNzhiM9qXyv/FYvp17mtGklk+m/fGwCngvyXjMme3Eqmt8vrw9LLiuzLB1Phk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1600892928;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=3qFm8C44N69lc4uVEDfGJgUvhn0b3voI7FSbuqPzWic=; 
+ b=YDZakmSGeXvrxLOvkcSUR8DhFAvDMjZYLyNoITgLnNsCGkvaPe5umY/6Q8fO/e+Lc7BDxu5CeRGAZjT6QVcm0f5Olpz/ydOdr1Ir9tJlZlzS3mTbDMXdNQ+pwgNGnNxDAwynI9SzSjggekswEwczyz8PJGqT/79uTO+wRHfrjNU=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1600892927234916.5673569931888;
+ Wed, 23 Sep 2020 13:28:47 -0700 (PDT)
+Subject: Re: [PULL 00/13] Block patches
+Message-ID: <160089292579.27646.6143023099150501377@66eaa9a8a123>
+In-Reply-To: <20200923161031.69474-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200922211313.4082880-16-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 00:53:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: stefanha@redhat.com
+Date: Wed, 23 Sep 2020 13:28:47 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 14:34:38
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,153 +80,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Cleber Rosa <crosa@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ stefanha@redhat.com, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 22, 2020 at 05:13:12PM -0400, John Snow wrote:
-> There's not a big obvious difference between the types of checks that
-> happen in the main function versus the kind that happen in the
-> functions. Now they're in one place for each of the main types.
-> 
-> As part of the move, spell out the required and optional keywords so
-> they're obvious at a glance.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  scripts/qapi/expr.py | 55 ++++++++++++++++++++++++++------------------
->  1 file changed, 33 insertions(+), 22 deletions(-)
-> 
-> diff --git a/scripts/qapi/expr.py b/scripts/qapi/expr.py
-> index 69ee9e3f18..74b2681ef8 100644
-> --- a/scripts/qapi/expr.py
-> +++ b/scripts/qapi/expr.py
-> @@ -333,6 +333,10 @@ def check_enum(expr: Expression, info: QAPISourceInfo) -> None:
->      :param expr: `Expression` to validate.
->      :param info: QAPI source file information.
->      """
-> +    check_keys(expr, info, 'enum',
-> +               required=('enum', 'data'),
-> +               optional=('if', 'features', 'prefix'))
-> +
->      name = expr['enum']
->      members = expr['data']
->      prefix = expr.get('prefix')
-> @@ -363,6 +367,11 @@ def check_struct(expr: Expression, info: QAPISourceInfo) -> None:
->      :param expr: `Expression` to validate.
->      :param info: QAPI source file information.
->      """
-> +    check_keys(expr, info, 'struct',
-> +               required=('struct', 'data'),
-> +               optional=('base', 'if', 'features'))
-> +    normalize_members(expr['data'])
-> +
->      name = cast(str, expr['struct'])  # Asserted in check_exprs
->      members = expr['data']
->  
-> @@ -377,6 +386,13 @@ def check_union(expr: Expression, info: QAPISourceInfo) -> None:
->      :param expr: `Expression` to validate.
->      :param info: QAPI source file information.
->      """
-> +    check_keys(expr, info, 'union',
-> +               required=('union', 'data'),
-> +               optional=('base', 'discriminator', 'if', 'features'))
-> +
-> +    normalize_members(expr.get('base'))
-> +    normalize_members(expr['data'])
-> +
->      name = cast(str, expr['union'])  # Asserted in check_exprs
->      base = expr.get('base')
->      discriminator = expr.get('discriminator')
-> @@ -409,6 +425,11 @@ def check_alternate(expr: Expression, info: QAPISourceInfo) -> None:
->      :param expr: Expression to validate.
->      :param info: QAPI source file information.
->      """
-> +    check_keys(expr, info, 'alternate',
-> +               required=('alternate', 'data'),
-> +               optional=('if', 'features'))
-> +    normalize_members(expr['data'])
-> +
->      members = expr['data']
->  
->      if not members:
-> @@ -432,6 +453,13 @@ def check_command(expr: Expression, info: QAPISourceInfo) -> None:
->      :param expr: `Expression` to validate.
->      :param info: QAPI source file information.
->      """
-> +    check_keys(expr, info, 'command',
-> +               required=['command'],
-> +               optional=('data', 'returns', 'boxed', 'if', 'features',
-> +                         'gen', 'success-response', 'allow-oob',
-> +                         'allow-preconfig'))
-> +    normalize_members(expr.get('data'))
-> +
->      args = expr.get('data')
->      rets = expr.get('returns')
->      boxed = expr.get('boxed', False)
-> @@ -453,6 +481,11 @@ def check_event(expr: Expression, info: QAPISourceInfo) -> None:
->          if:       `Optional[Ifcond]`
->          features: `Optional[Features]`
->      """
-> +    normalize_members(expr.get('data'))
-> +    check_keys(expr, info, 'event',
-> +               required=['event'],
-> +               optional=('data', 'boxed', 'if', 'features'))
-
-Why is the order reversed here?  The other functions call
-check_keys() before normalize_members().
-
-
-> +
->      args = expr.get('data')
->      boxed = expr.get('boxed', False)
->  
-> @@ -519,38 +552,16 @@ def check_exprs(exprs: List[_JSObject]) -> List[_JSObject]:
->                                 "documentation comment required")
->  
->          if meta == 'enum':
-> -            check_keys(expr, info, meta,
-> -                       ['enum', 'data'], ['if', 'features', 'prefix'])
->              check_enum(expr, info)
->          elif meta == 'union':
-> -            check_keys(expr, info, meta,
-> -                       ['union', 'data'],
-> -                       ['base', 'discriminator', 'if', 'features'])
-> -            normalize_members(expr.get('base'))
-> -            normalize_members(expr['data'])
->              check_union(expr, info)
->          elif meta == 'alternate':
-> -            check_keys(expr, info, meta,
-> -                       ['alternate', 'data'], ['if', 'features'])
-> -            normalize_members(expr['data'])
->              check_alternate(expr, info)
->          elif meta == 'struct':
-> -            check_keys(expr, info, meta,
-> -                       ['struct', 'data'], ['base', 'if', 'features'])
-> -            normalize_members(expr['data'])
->              check_struct(expr, info)
->          elif meta == 'command':
-> -            check_keys(expr, info, meta,
-> -                       ['command'],
-> -                       ['data', 'returns', 'boxed', 'if', 'features',
-> -                        'gen', 'success-response', 'allow-oob',
-> -                        'allow-preconfig'])
-> -            normalize_members(expr.get('data'))
->              check_command(expr, info)
->          elif meta == 'event':
-> -            check_keys(expr, info, meta,
-> -                       ['event'], ['data', 'boxed', 'if', 'features'])
-> -            normalize_members(expr.get('data'))
->              check_event(expr, info)
->          else:
->              assert False, 'unexpected meta type'
-> -- 
-> 2.26.2
-> 
-
--- 
-Eduardo
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkyMzE2MTAzMS42OTQ3
+NC0xLXN0ZWZhbmhhQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
+ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
+bmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMDkyMzE2MTAzMS42OTQ3
+NC0xLXN0ZWZhbmhhQHJlZGhhdC5jb20KU3ViamVjdDogW1BVTEwgMDAvMTNdIEJsb2NrIHBhdGNo
+ZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBi
+YXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVs
+aW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
+bWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpGcm9tIGh0dHBzOi8vZ2l0
+aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3
+LzIwMjAwOTIzMTYxMDMxLjY5NDc0LTEtc3RlZmFuaGFAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIw
+MjAwOTIzMTYxMDMxLjY5NDc0LTEtc3RlZmFuaGFAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5l
+dyBicmFuY2ggJ3Rlc3QnCjRiZjM3NDIgcWVtdS9hdG9taWMuaDogcmVuYW1lIGF0b21pY18gdG8g
+cWF0b21pY18KOGNlY2JiMyB0ZXN0czogYWRkIHRlc3QtZmRtb24tZXBvbGwKOGRmNGRmOCBmZG1v
+bi1wb2xsOiByZXNldCBucGZkIHdoZW4gdXBncmFkaW5nIHRvIGZkbW9uLWVwb2xsCjgyNTM4NmMg
+Z2l0bW9kdWxlczogYWRkIHFlbXUub3JnIHZib290cm9tIHN1Ym1vZHVsZQo1Y2FlNmY4IGdpdG1v
+ZHVsZXM6IHN3aXRjaCB0byBxZW11Lm9yZyBtZXNvbiBtaXJyb3IKOTgzNDlkMyBnaXRtb2R1bGVz
+OiBzd2l0Y2ggdG8gcWVtdS5vcmcgcWJvb3QgbWlycm9yCjVmOWQyOTggZG9jcy9zeXN0ZW06IGNs
+YXJpZnkgZGVwcmVjYXRpb24gc2NoZWR1bGUKYjQzMWMzYSB2aXJ0aW8tY3J5cHRvOiBkb24ndCBt
+b2RpZnkgZWxlbS0+aW4vb3V0X3NnCmMxZjk2OTEgdmlydGlvLWJsazogdW5kbyBkZXN0cnVjdGl2
+ZSBpb3ZfZGlzY2FyZF8qKCkgb3BlcmF0aW9ucwo0MTgyZDRmIHV0aWwvaW92OiBhZGQgaW92X2Rp
+c2NhcmRfdW5kbygpCmE1OWE4MzkgdmlydGlvOiBhZGQgdmhvc3QtdXNlci1mcy1jY3cgZGV2aWNl
+CjBkMjNhOGMgbGlidmhvc3QtdXNlcjogaGFuZGxlIGVuZGlhbm5lc3MgYXMgbWFuZGF0ZWQgYnkg
+dGhlIHNwZWMKMzE2N2Q4MSBNQUlOVEFJTkVSUzogYWRkIFN0ZWZhbiBIYWpub2N6aSBhcyBibG9j
+ay9udm1lLmMgbWFpbnRhaW5lcgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMyBDaGVja2luZyBj
+b21taXQgMzE2N2Q4MThlNjJhIChNQUlOVEFJTkVSUzogYWRkIFN0ZWZhbiBIYWpub2N6aSBhcyBi
+bG9jay9udm1lLmMgbWFpbnRhaW5lcikKMi8xMyBDaGVja2luZyBjb21taXQgMGQyM2E4Y2NkMmE5
+IChsaWJ2aG9zdC11c2VyOiBoYW5kbGUgZW5kaWFubmVzcyBhcyBtYW5kYXRlZCBieSB0aGUgc3Bl
+YykKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzUzOiBGSUxFOiBjb250cmliL2xp
+YnZob3N0LXVzZXIvbGlidmhvc3QtdXNlci5jOjU0ODoKKyAgICAgICAgdnVfcGFuaWMoZGV2LCAi
+dmlydGlvIGxlZ2FjeSBkZXZpY2VzIGFyZW4ndCBzdXBwb3J0ZWQgYnkgbGlidmhvc3QtdXNlciIp
+OwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMTcgbGluZXMgY2hlY2tlZAoKUGF0Y2gg
+Mi8xMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgozLzEzIENoZWNraW5nIGNvbW1pdCBhNTlh
+ODM5ZTFkNzYgKHZpcnRpbzogYWRkIHZob3N0LXVzZXItZnMtY2N3IGRldmljZSkKV0FSTklORzog
+YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
+ZGF0aW5nPwojMjg6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdh
+cm5pbmdzLCA4MiBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzEzIGhhcyBzdHlsZSBwcm9ibGVtcywg
+cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
+cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
+SU5FUlMuCjQvMTMgQ2hlY2tpbmcgY29tbWl0IDQxODJkNGY3NjY3OCAodXRpbC9pb3Y6IGFkZCBp
+b3ZfZGlzY2FyZF91bmRvKCkpCjUvMTMgQ2hlY2tpbmcgY29tbWl0IGMxZjk2OTE3YTNmMSAodmly
+dGlvLWJsazogdW5kbyBkZXN0cnVjdGl2ZSBpb3ZfZGlzY2FyZF8qKCkgb3BlcmF0aW9ucykKNi8x
+MyBDaGVja2luZyBjb21taXQgYjQzMWMzYTRiNDE1ICh2aXJ0aW8tY3J5cHRvOiBkb24ndCBtb2Rp
+ZnkgZWxlbS0+aW4vb3V0X3NnKQo3LzEzIENoZWNraW5nIGNvbW1pdCA1ZjlkMjk4YzcxYWQgKGRv
+Y3Mvc3lzdGVtOiBjbGFyaWZ5IGRlcHJlY2F0aW9uIHNjaGVkdWxlKQo4LzEzIENoZWNraW5nIGNv
+bW1pdCA5ODM0OWQzMTY0OTggKGdpdG1vZHVsZXM6IHN3aXRjaCB0byBxZW11Lm9yZyBxYm9vdCBt
+aXJyb3IpCjkvMTMgQ2hlY2tpbmcgY29tbWl0IDVjYWU2Zjg2YmIyMiAoZ2l0bW9kdWxlczogc3dp
+dGNoIHRvIHFlbXUub3JnIG1lc29uIG1pcnJvcikKMTAvMTMgQ2hlY2tpbmcgY29tbWl0IDgyNTM4
+NmM0ZjBmMiAoZ2l0bW9kdWxlczogYWRkIHFlbXUub3JnIHZib290cm9tIHN1Ym1vZHVsZSkKMTEv
+MTMgQ2hlY2tpbmcgY29tbWl0IDhkZjRkZjg5MGJmMSAoZmRtb24tcG9sbDogcmVzZXQgbnBmZCB3
+aGVuIHVwZ3JhZGluZyB0byBmZG1vbi1lcG9sbCkKMTIvMTMgQ2hlY2tpbmcgY29tbWl0IDhjZWNi
+YjM5NTA5ZiAodGVzdHM6IGFkZCB0ZXN0LWZkbW9uLWVwb2xsKQpXQVJOSU5HOiBhZGRlZCwgbW92
+ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0
+MjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDg5
+IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEyLzEzIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
+dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
+dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEz
+LzEzIENoZWNraW5nIGNvbW1pdCA0YmYzNzQyNmZmMDMgKHFlbXUvYXRvbWljLmg6IHJlbmFtZSBh
+dG9taWNfIHRvIHFhdG9taWNfKQpFUlJPUjogTWFjcm9zIHdpdGggbXVsdGlwbGUgc3RhdGVtZW50
+cyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gYSBkbyAtIHdoaWxlIGxvb3AKIzI4MDA6IEZJTEU6IGlu
+Y2x1ZGUvcWVtdS9hdG9taWMuaDoxNTI6CisjZGVmaW5lIHFhdG9taWNfcmN1X3JlYWRfX25vY2hl
+Y2socHRyLCB2YWxwdHIpICAgICAgICAgICBcCisgICAgX19hdG9taWNfbG9hZChwdHIsIHZhbHB0
+ciwgX19BVE9NSUNfUkVMQVhFRCk7ICAgICAgICBcCiAgICAgc21wX3JlYWRfYmFycmllcl9kZXBl
+bmRzKCk7CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoYXQgJyonIChjdHg6VnhCKQoj
+Mjk0NTogRklMRTogaW5jbHVkZS9xZW11L2F0b21pYy5oOjMzMzoKKyNkZWZpbmUgcWF0b21pY19y
+ZWFkX19ub2NoZWNrKHApICAgKCooX190eXBlb2ZfXygqKHApKSB2b2xhdGlsZSopIChwKSkKICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIF4KCkVSUk9SOiBVc2Ugb2Ygdm9sYXRpbGUgaXMgdXN1YWxseSB3cm9uZywgcGxlYXNlIGFk
+ZCBhIGNvbW1lbnQKIzI5NDU6IEZJTEU6IGluY2x1ZGUvcWVtdS9hdG9taWMuaDozMzM6CisjZGVm
+aW5lIHFhdG9taWNfcmVhZF9fbm9jaGVjayhwKSAgICgqKF9fdHlwZW9mX18oKihwKSkgdm9sYXRp
+bGUqKSAocCkpCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoYXQgJyonIChjdHg6VnhC
+KQojMjk0NjogRklMRTogaW5jbHVkZS9xZW11L2F0b21pYy5oOjMzNDoKKyNkZWZpbmUgcWF0b21p
+Y19zZXRfX25vY2hlY2socCwgaSkgKCgqKF9fdHlwZW9mX18oKihwKSkgdm9sYXRpbGUqKSAocCkp
+ID0gKGkpKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBVc2Ugb2Ygdm9sYXRpbGUgaXMgdXN1YWxseSB3cm9u
+ZywgcGxlYXNlIGFkZCBhIGNvbW1lbnQKIzI5NDY6IEZJTEU6IGluY2x1ZGUvcWVtdS9hdG9taWMu
+aDozMzQ6CisjZGVmaW5lIHFhdG9taWNfc2V0X19ub2NoZWNrKHAsIGkpICgoKihfX3R5cGVvZl9f
+KCoocCkpIHZvbGF0aWxlKikgKHApKSA9IChpKSkKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRl
+ciB0aGF0ICcsJyAoY3R4OlZ4VikKIzI5NTE6IEZJTEU6IGluY2x1ZGUvcWVtdS9hdG9taWMuaDoz
+Mzc6CisjZGVmaW5lIHFhdG9taWNfc2V0KHB0ciwgaSkgICAgIHFhdG9taWNfc2V0X19ub2NoZWNr
+KHB0cixpKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBeCgpFUlJPUjogbWVtb3J5IGJhcnJpZXIgd2l0aG91dCBjb21tZW50CiMzMDIzOiBG
+SUxFOiBpbmNsdWRlL3FlbXUvYXRvbWljLmg6Mzk1OgorI2RlZmluZSBxYXRvbWljX3hjaGcocHRy
+LCBpKSAgICAoc21wX21iKCksIF9fc3luY19sb2NrX3Rlc3RfYW5kX3NldChwdHIsIGkpKQoKV0FS
+TklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUK
+IzMwOTc6IEZJTEU6IGluY2x1ZGUvcWVtdS9hdG9taWMuaDo0NDc6CisvKiBxYXRvbWljX21iX3Jl
+YWQvc2V0IHNlbWFudGljcyBtYXAgSmF2YSB2b2xhdGlsZSB2YXJpYWJsZXMuIFRoZXkgYXJlCgpX
+QVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGlu
+ZQojNjE4MDogRklMRTogdXRpbC9iaXRtYXAuYzoyMTQ6CisgICAgICAgIC8qIElmIHdlIGF2b2lk
+ZWQgdGhlIGZ1bGwgYmFycmllciBpbiBxYXRvbWljX29yKCksIGlzc3VlIGEKCldBUk5JTkc6IEJs
+b2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM3MTk1OiBG
+SUxFOiB1dGlsL3JjdS5jOjg1OgorICAgICAgICAvKiBJbnN0ZWFkIG9mIHVzaW5nIHFhdG9taWNf
+bWJfc2V0IGZvciBpbmRleC0+d2FpdGluZywgYW5kCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1
+c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojNzIyMTogRklMRTogdXRpbC9yY3Uu
+YzoxNTQ6CisgICAgICAgIC8qIEluIGVpdGhlciBjYXNlLCB0aGUgcWF0b21pY19tYl9zZXQgYmVs
+b3cgYmxvY2tzIHN0b3JlcyB0aGF0IGZyZWUKCnRvdGFsOiA3IGVycm9ycywgNCB3YXJuaW5ncywg
+NjI2NyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMy8xMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+LgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
+ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAy
+MDA5MjMxNjEwMzEuNjk0NzQtMS1zdGVmYW5oYUByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRj
+aC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
+Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
