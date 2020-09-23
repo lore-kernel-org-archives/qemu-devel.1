@@ -2,94 +2,89 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21C71C4727D
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 18:37:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75712C4727D
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 18:39:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C116206B2
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 18:37:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A5A412193E
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 18:39:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="lhgyVMGG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C116206B2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MIejmBxE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5A412193E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL9di-0003TJ-Bb
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 14:37:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53816)
+	id 1kL9g5-0006Ws-Fk
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 14:39:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55078)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=5287de305=dmitry.fomichev@wdc.com>)
- id 1kL9Op-0005kh-Om; Wed, 23 Sep 2020 14:21:51 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:35078)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=5287de305=dmitry.fomichev@wdc.com>)
- id 1kL9On-0008F1-Ip; Wed, 23 Sep 2020 14:21:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1600886261; x=1632422261;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=lGHyu/b43oLezr+EFogfZjXlFa5wC/fZyJChOGCNuBQ=;
- b=lhgyVMGGi0mfUupIjHZfqxq/iKgBfmHb1eVhDQQ+aJnwDO4XKRA4KLTG
- Li+O/V+AOAaKtJqSu5PA34Y0vB43/H/0wBNypumUFG4/7Ys90HLCPhb1q
- ijnbuzqu5XacBx01giGmC9WGEgCX9V4J3xdKoz90aEUpv/4YaV4p9I0bv
- uJsH/eF8I+BVa9UmWj/T+ZwxJLXaIjnlwPUdyw7aSQcVgklJG9hSR24w+
- O13rp/WYDd/rHLXkoRx/cduXhQGfvott2eyiE4auC4GvULW/jL8Zp/i1T
- lUhJbRjDPaGDVJWN8vNKntlRnhCxeD+qTT+S6NO4Tv1OSmaJZ/R1itJVw g==;
-IronPort-SDR: cS7bsEojAH7EQOD2eHLpkekPj/8LCio5fab2hO0vTS4QNIqFzZWtXQ5GWULXJ+aVXQs1YgFghS
- r1ZorVilAmL/jROvvNxn6MFikfVC0fU91CIQRGSN1BI2ibW4aOau++P/HUJzMNTDg18wcUA4Et
- eqXPCPUF44bDu0TVcNV+wAjT36pY9CssCpRLhHu8ftkxvM7PRZyCs/2jPzgGEaObMN7Pe20AXh
- BhbxlGQAtRwvmVuIGT0O8lThf5lFmYUGudlcsJK31CSZcwjdfexQDJb8cGI5tUJoJtW1a1ybyh
- U3U=
-X-IronPort-AV: E=Sophos;i="5.77,293,1596470400"; d="scan'208";a="251496394"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 24 Sep 2020 02:36:56 +0800
-IronPort-SDR: ndSK29w+fmShXuWsoSsZeB7hofrOSFCCFQXieqDljXzoyhDU/501XO9Giddn8cabuv1vB2NekT
- gHN60KnP4ovg==
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 23 Sep 2020 11:07:26 -0700
-IronPort-SDR: DVTFOOIvNAEc+8gl2mrIqIJIKEOUnEp+oZYp/AMXSU2qhnidRxDoVsymNDDdT8XA90oyuW1vGq
- h1CDe6y8wi3A==
-WDCIronportException: Internal
-Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
- by uls-op-cesaip02.wdc.com with ESMTP; 23 Sep 2020 11:21:17 -0700
-From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-To: Keith Busch <kbusch@kernel.org>, Klaus Jensen <k.jensen@samsung.com>,
- Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Fam Zheng <fam@euphon.net>
-Subject: [PATCH v4 14/14] hw/block/nvme: Document zoned parameters in usage
- text
-Date: Thu, 24 Sep 2020 03:20:21 +0900
-Message-Id: <20200923182021.3724-15-dmitry.fomichev@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200923182021.3724-1-dmitry.fomichev@wdc.com>
-References: <20200923182021.3724-1-dmitry.fomichev@wdc.com>
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kL9UA-0002SN-3V
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 14:27:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35315)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kL9U8-0000WR-5X
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 14:27:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600885639;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=HUThgk63yrTEEbCNncbfoZ01l5yhDqO7ELDtAeOJw60=;
+ b=MIejmBxE5JsJnsQVdBaXgC71WIwwiH1JX+WTAf++P83cr3VUyl9e+ClvFx6Rzis/RWWNGA
+ ZK3/3hXRak6YEzfDBu2lO1kwMVD5gWaw+0z3N/ySC3QtF/SoeOGnJurdOsS9zhwDZFxZxf
+ fqR0qWFfeKnp6fO6DxHe0mf3ZtvAPFM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-5-spbyGzNWMRyxQC_NZd6yVg-1; Wed, 23 Sep 2020 14:27:16 -0400
+X-MC-Unique: spbyGzNWMRyxQC_NZd6yVg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8CE381F03F
+ for <qemu-devel@nongnu.org>; Wed, 23 Sep 2020 18:27:15 +0000 (UTC)
+Received: from localhost (ovpn-112-110.ams2.redhat.com [10.36.112.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 73CDF55778;
+ Wed, 23 Sep 2020 18:27:15 +0000 (UTC)
+Date: Wed, 23 Sep 2020 19:27:14 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH v4 1/2] qemu/atomic: Update coding style to make
+ checkpatch.pl happier
+Message-ID: <20200923182714.GA70694@stefanha-x1.localdomain>
+References: <20200923151901.745277-1-philmd@redhat.com>
+ <20200923151901.745277-2-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.143.124;
- envelope-from=prvs=5287de305=dmitry.fomichev@wdc.com; helo=esa2.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 14:20:48
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200923151901.745277-2-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="OXfL5xGRrasGEqWY"
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,95 +97,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Niklas Cassel <niklas.cassel@wdc.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
- Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
- Alistair Francis <alistair.francis@wdc.com>,
- Matias Bjorling <matias.bjorling@wdc.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Added brief descriptions of the new device properties that are
-now available to users to configure features of Zoned Namespace
-Command Set in the emulator.
+--OXfL5xGRrasGEqWY
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This patch is for documentation only, no functionality change.
+On Wed, Sep 23, 2020 at 05:19:00PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> To limit the number of checkpatch errors in the next commit,
+> clean coding style issues first.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> ---
+> False positive:
+>=20
+>  ERROR: Use of volatile is usually wrong, please add a comment
+>  #11: FILE: include/qemu/atomic.h:328:
+>  +#define atomic_read__nocheck(p)   (*(__typeof__(*(p)) volatile *) (p))
+>=20
+>  ERROR: Use of volatile is usually wrong, please add a comment
+>  #12: FILE: include/qemu/atomic.h:329:
+>  +#define atomic_set__nocheck(p, i) ((*(__typeof__(*(p)) volatile *) (p))=
+ =3D (i))
+> ---
+>  include/qemu/atomic.h | 9 +++++----
+>  util/bitmap.c         | 3 ++-
+>  util/rcu.c            | 6 ++++--
+>  3 files changed, 11 insertions(+), 7 deletions(-)
 
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
----
- hw/block/nvme.c | 43 +++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 41 insertions(+), 2 deletions(-)
+I already sent a pull request with the patch that renames atomic.h, but
+this patch can be rebased on top:
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 5f55e86a9a..f1cadc76fb 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -9,7 +9,7 @@
-  */
- 
- /**
-- * Reference Specs: http://www.nvmexpress.org, 1.2, 1.1, 1.0e
-+ * Reference Specs: http://www.nvmexpress.org, 1.4, 1.3, 1.2, 1.1, 1.0e
-  *
-  *  https://nvmexpress.org/developers/nvme-specification/
-  */
-@@ -22,7 +22,7 @@
-  *              [pmrdev=<mem_backend_file_id>,] \
-  *              max_ioqpairs=<N[optional]>, \
-  *              aerl=<N[optional]>, aer_max_queued=<N[optional]>, \
-- *              mdts=<N[optional]>
-+ *              mdts=<N[optional]>, zoned=<true|false[optional]>
-  *
-  * Note cmb_size_mb denotes size of CMB in MB. CMB is assumed to be at
-  * offset 0 in BAR2 and supports only WDS, RDS and SQS for now.
-@@ -48,6 +48,45 @@
-  *   completion when there are no oustanding AERs. When the maximum number of
-  *   enqueued events are reached, subsequent events will be dropped.
-  *
-+ * Setting `zoned` to true makes the device to support zoned namespaces.
-+ * In this case, of the following options are available to configure zoned
-+ * operation:
-+ *     zone_size=<zone size in MiB, default: 128MiB>
-+ *
-+ *     zone_capacity=<zone capacity in MiB, default: zone_size>
-+ *         The value 0 (default) forces zone capacity to be the same as zone
-+ *         size. The value of this property may not exceed zone size.
-+ *
-+ *     zone_file=<zone metadata file name, default: none>
-+ *         Zone metadata file, if specified, allows zone information
-+ *         to be persistent across shutdowns and restarts.
-+ *
-+ *     zone_descr_ext_size=<zone descriptor extension size, default 0>
-+ *         This value needs to be specified in 64B units. If it is zero,
-+ *         namespace(s) will not support zone descriptor extensions.
-+ *
-+ *     max_active=<Maximum Active Resources (zones), default: 0 - no limit>
-+ *
-+ *     max_open=<Maximum Open Resources (zones), default: 0 - no limit>
-+ *
-+ *     zone_append_size_limit=<zone append size limit, in KiB, default: MDTS>
-+ *         The maximum I/O size that can be supported by Zone Append
-+ *         command. Since internally this this value is maintained as
-+ *         ZASL = log2(<maximum append size> / <page size>), some
-+ *         values assigned to this property may be rounded down and
-+ *         result in a lower maximum ZA data size being in effect.
-+ *         If MDTS property is not assigned, the default value of 128KiB is
-+ *         used as ZASL.
-+ *
-+ *     offline_zones=<the number of offline zones to inject, default: 0>
-+ *
-+ *     rdonly_zones=<the number of read-only zones to inject, default: 0>
-+ *
-+ *     cross_zone_read=<enables Read Across Zone Boundaries, default: true>
-+ *
-+ *     fill_pattern=<data fill pattern, default: 0x00>
-+ *         The byte pattern to return for any portions of unwritten data
-+ *         during read.
-  */
- 
- #include "qemu/osdep.h"
--- 
-2.21.0
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--OXfL5xGRrasGEqWY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9rk4IACgkQnKSrs4Gr
+c8jFywf/TQBmzCf2sW7QC1ZKOmn9TBIdAsn9l6l+XD3k2NJY53KKg/anAkCJ1sUl
+SPdgSgJ3DW6aPkor5oGilk8IOoePdgNS8eR4UMXLcs6TM/abMXSNgrcjNyOXMYvb
+emPjsikjiEpjgSmYwCrhf8Nku4m1f1dEc70wLsRdBWkfBz/2mSDzLo+1pv8BumrZ
+5j0xozAR7iHN8CjvO/bWyu6ClcnDwxUjMUAWbdTHWRivu1fNqXZsGsW5i6X7TIPw
+qKN+4/RM1q26GK8ugX6a2XFIVUqRaf4U5EC2cy/noPrT3IUA4Wa9BlPqpE+VXtg3
+Ng46jFZiDhYX8s2s7nVMYy0l/xkVkw==
+=be15
+-----END PGP SIGNATURE-----
+
+--OXfL5xGRrasGEqWY--
 
 
