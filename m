@@ -4,78 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65E71C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:26:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D65BAC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:26:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD42C21D43
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:26:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C8CA2137B
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:26:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N/pXmZHn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD42C21D43
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E6BjPrFg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C8CA2137B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL12u-0002DG-SU
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 05:26:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53150)
+	id 1kL131-0002TX-Gq
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 05:26:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54896)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kL0oc-0001G0-HP
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:11:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28563)
+ id 1kL0uK-0001kV-NU
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:17:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57351)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kL0oS-0002N9-K2
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:11:54 -0400
+ id 1kL0uI-0003IG-Vl
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:17:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600852300;
+ s=mimecast20190719; t=1600852666;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qRuenM6xg1JBEEE11oXj+Vx3RalsCmbiYZ8kHQa3v2A=;
- b=N/pXmZHn/oEFxdOKIeRrh7XgVZ5s5EPx9P37RjsttfambsfXVDZcJAUgx2/UfF4xlYj4R3
- v46acubBFsiJQDO7gMB+WqcEploKlLEejtB9LejmUKLlLqiaWzp8hPtoGKPs9/NKOfiy1L
- awSzHgwTLQs9mdNeaDwVI+2sQ/a3Kik=
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=LqlVvN9HScDu//lJ9J3wE9Ps07A2/2LDG1GGb5/fRu8=;
+ b=E6BjPrFgRzdJgdGYyb0dSqDcDlh6WKOMC412vbuji73IlIwK858lq2lPxD6XyleP9gAVMs
+ XbfOAmkuT203my1P6JQo/ZFY5ich9gpd3q6CsUzB9wA1zcW58ZascZVc+GE4PHeFzXq4Zw
+ WT8K6NxY0PEnOpLbfLXx8KtIAitojUM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-RDL2NQNfOiWn7dgtffhP1Q-1; Wed, 23 Sep 2020 05:11:36 -0400
-X-MC-Unique: RDL2NQNfOiWn7dgtffhP1Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-113-i_V07quyN6iM6oUTwH18iw-1; Wed, 23 Sep 2020 05:17:44 -0400
+X-MC-Unique: i_V07quyN6iM6oUTwH18iw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A1441074641;
- Wed, 23 Sep 2020 09:11:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC8B69CC11
+ for <qemu-devel@nongnu.org>; Wed, 23 Sep 2020 09:17:43 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3F3945D9CC;
- Wed, 23 Sep 2020 09:11:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7A2ED19C4F
+ for <qemu-devel@nongnu.org>; Wed, 23 Sep 2020 09:17:43 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 06/12] configure: compute derivatives of target name in meson
-Date: Wed, 23 Sep 2020 05:11:25 -0400
-Message-Id: <20200923091131.1591563-7-pbonzini@redhat.com>
-In-Reply-To: <20200923091131.1591563-1-pbonzini@redhat.com>
-References: <20200923091131.1591563-1-pbonzini@redhat.com>
+Subject: [PATCH] kvm: remove now unnecessary stubs
+Date: Wed, 23 Sep 2020 05:17:43 -0400
+Message-Id: <20200923091743.1593109-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 00:53:58
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
@@ -96,140 +93,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Several CONFIG_* symbols in config-target.mak are easily computed from just
-the target name.  We do not need them in config-target.mak, and can instead
-place them in the config_target dictionary only.
+These two stubs are now used only in accel/kvm/kvm-all.c
+and accel/kvm/kvm-cpus.c.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- configure   | 11 +----------
- meson.build | 27 ++++++++++++++++++++++++---
- 2 files changed, 25 insertions(+), 13 deletions(-)
+ accel/stubs/kvm-stub.c | 9 ---------
+ 1 file changed, 9 deletions(-)
 
-diff --git a/configure b/configure
-index 903bbcbc46..2bd4336369 100755
---- a/configure
-+++ b/configure
-@@ -7622,7 +7622,6 @@ upper() {
+diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
+index 680e099463..d3874526f5 100644
+--- a/accel/stubs/kvm-stub.c
++++ b/accel/stubs/kvm-stub.c
+@@ -36,10 +36,6 @@ void kvm_flush_coalesced_mmio_buffer(void)
+ {
+ }
  
- target_arch_name="$(upper $TARGET_ARCH)"
- echo "TARGET_$target_arch_name=y" >> $config_target_mak
--echo "TARGET_NAME=$target_name" >> $config_target_mak
- echo "TARGET_BASE_ARCH=$TARGET_BASE_ARCH" >> $config_target_mak
- if [ "$TARGET_ABI_DIR" = "" ]; then
-   TARGET_ABI_DIR=$TARGET_ARCH
-@@ -7640,21 +7639,15 @@ if test "$target_bigendian" = "yes" ; then
-   echo "TARGET_WORDS_BIGENDIAN=y" >> $config_target_mak
- fi
- if test "$target_softmmu" = "yes" ; then
--  echo "CONFIG_SOFTMMU=y" >> $config_target_mak
-   if test "$mttcg" = "yes" ; then
-     echo "TARGET_SUPPORTS_MTTCG=y" >> $config_target_mak
-   fi
- fi
- if test "$target_user_only" = "yes" ; then
--  echo "CONFIG_USER_ONLY=y" >> $config_target_mak
--  echo "CONFIG_QEMU_INTERP_PREFIX=\"$interp_prefix1\"" >> $config_target_mak
-   symlink "../qemu-$target_name" "$target_dir/qemu-$target_name"
- else
-   symlink "../qemu-system-$target_name" "$target_dir/qemu-system-$target_name"
- fi
--if test "$target_linux_user" = "yes" ; then
--  echo "CONFIG_LINUX_USER=y" >> $config_target_mak
--fi
- list=""
- if test ! -z "$gdb_xml_files" ; then
-   for x in $gdb_xml_files; do
-@@ -7666,9 +7659,6 @@ fi
- if test "$target_user_only" = "yes" && test "$bflt" = "yes"; then
-   echo "TARGET_HAS_BFLT=y" >> $config_target_mak
- fi
--if test "$target_bsd_user" = "yes" ; then
--  echo "CONFIG_BSD_USER=y" >> $config_target_mak
--fi
+-void kvm_cpu_synchronize_state(CPUState *cpu)
+-{
+-}
+-
+ bool kvm_has_sync_mmu(void)
+ {
+     return false;
+@@ -149,11 +145,6 @@ bool kvm_has_free_slot(MachineState *ms)
+     return false;
+ }
  
- done # for target in $targets
- 
-@@ -7678,6 +7668,7 @@ fi
- if [ "$capstone" = "git" -o "$capstone" = "internal" ]; then
-   subdirs="$subdirs capstone"
- fi
-+echo "CONFIG_QEMU_INTERP_PREFIX=$interp_prefix" | sed 's/%M/@0@/' >> $config_host_mak
- echo "SUBDIRS=$subdirs" >> $config_host_mak
- if test -n "$LIBCAPSTONE"; then
-   echo "LIBCAPSTONE=$LIBCAPSTONE" >> $config_host_mak
-diff --git a/meson.build b/meson.build
-index 641378c1d9..3bd8cbacb7 100644
---- a/meson.build
-+++ b/meson.build
-@@ -638,12 +638,15 @@ config_host_data.set('QEMU_VERSION_MAJOR', meson.project_version().split('.')[0]
- config_host_data.set('QEMU_VERSION_MINOR', meson.project_version().split('.')[1])
- config_host_data.set('QEMU_VERSION_MICRO', meson.project_version().split('.')[2])
- 
-+ignored = ['CONFIG_QEMU_INTERP_PREFIX'] # actually per-target
- arrays = ['CONFIG_AUDIO_DRIVERS', 'CONFIG_BDRV_RW_WHITELIST', 'CONFIG_BDRV_RO_WHITELIST']
- strings = ['HOST_DSOSUF', 'CONFIG_IASL', 'bindir', 'prefix', 'qemu_confdir', 'qemu_datadir',
-            'qemu_moddir', 'qemu_localstatedir', 'qemu_helperdir', 'qemu_localedir',
-            'qemu_icondir', 'qemu_desktopdir', 'qemu_firmwarepath', 'sysconfdir']
- foreach k, v: config_host
--  if arrays.contains(k)
-+  if ignored.contains(k)
-+    # do nothing
-+  elif arrays.contains(k)
-     if v != ''
-       v = '"' + '", "'.join(v.split()) + '", '
-     endif
-@@ -719,7 +722,23 @@ kconfig_external_symbols = [
- ignored = ['TARGET_XML_FILES', 'TARGET_ABI_DIR', 'TARGET_DIRS']
- 
- foreach target : target_dirs
--  config_target = keyval.load(meson.current_build_dir() / target / 'config-target.mak')
-+  config_target = { 'TARGET_NAME': target.split('-')[0] }
-+  if target.endswith('linux-user')
-+    assert(targetos == 'linux')
-+    config_target += { 'CONFIG_LINUX_USER': 'y' }
-+  elif target.endswith('bsd-user')
-+    assert('CONFIG_BSD' in config_host)
-+    config_target += { 'CONFIG_BSD_USER': 'y' }
-+  elif target.endswith('softmmu')
-+    config_target += { 'CONFIG_SOFTMMU': 'y' }
-+  endif
-+  if target.endswith('-user')
-+    config_target += {
-+      'CONFIG_USER_ONLY': 'y',
-+      'CONFIG_QEMU_INTERP_PREFIX':
-+        config_host['CONFIG_QEMU_INTERP_PREFIX'].format(config_target['TARGET_NAME'])
-+    }
-+  endif
- 
-   have_accel = false
-   foreach sym: accelerators
-@@ -734,6 +753,8 @@ foreach target : target_dirs
-   endforeach
-   assert(have_accel)
- 
-+  config_target += keyval.load('default-configs/targets' / target + '.mak')
-+
-   foreach k, v: disassemblers
-     if config_host['ARCH'].startswith(k) or config_target['TARGET_BASE_ARCH'].startswith(k)
-       foreach sym: v
-@@ -751,7 +772,7 @@ foreach target : target_dirs
-       # do nothing
-     elif k == 'TARGET_BASE_ARCH'
-       config_target_data.set('TARGET_' + v.to_upper(), 1)
--    elif k == 'TARGET_NAME'
-+    elif k == 'TARGET_NAME' or k == 'CONFIG_QEMU_INTERP_PREFIX'
-       config_target_data.set_quoted(k, v)
-     elif v == 'y'
-       config_target_data.set(k, 1)
+-void kvm_init_cpu_signals(CPUState *cpu)
+-{
+-    abort();
+-}
+-
+ bool kvm_arm_supports_user_irq(void)
+ {
+     return false;
 -- 
 2.26.2
-
 
 
