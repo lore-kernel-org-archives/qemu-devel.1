@@ -2,86 +2,89 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 520FCC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 16:55:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC62BC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 16:59:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB24920936
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 16:55:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00FAC20BED
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 16:59:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MMD6Miz1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB24920936
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iOsPqxjq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00FAC20BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL838-0002ak-JM
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 12:55:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60578)
+	id 1kL871-0005uP-3q
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 12:59:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33378)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kL81h-0001kF-Uw; Wed, 23 Sep 2020 12:53:53 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33794)
+ id 1kL85K-0004UQ-Lr; Wed, 23 Sep 2020 12:57:38 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34367)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kL81g-0005Zs-1j; Wed, 23 Sep 2020 12:53:53 -0400
-Received: by mail-wr1-x444.google.com with SMTP id t10so828725wrv.1;
- Wed, 23 Sep 2020 09:53:47 -0700 (PDT)
+ id 1kL85J-000650-7m; Wed, 23 Sep 2020 12:57:38 -0400
+Received: by mail-wm1-x341.google.com with SMTP id l15so4951196wmh.1;
+ Wed, 23 Sep 2020 09:57:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:references:cc:from:message-id:date:user-agent
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=9Nls0ul5VAwvp9pDKm8eM8JbcgCJdrcZ66msakCrgWw=;
- b=MMD6Miz1NJz2LUkf2Qz7Sv8FUPQHr4mDjSVjCQ7m/tfd2v2OMAdQg7TRf1X7oU+pzd
- JH/jkZ1TVIFFEVv86+rcGSUnnF9AO5BrmNUZcw1HiWOtW/40GcdP76giHHCGv3PL/5Fw
- a1x/zpyso1K+rPv6YSEyEmnIsW+40ovVCUMNrRF4lrt7fFFJVWioPCAj6y3HEbmGKC0q
- ul/7GoMWFtAI3a38aYUEC5gMdNSw8/F95svtkoXhihmcV5+594yVzKXuJFemF4qEj9Aq
- Pf7/nreW947alNsy3mWVUTKNG8KQ/BKUibyov+BENMcNStM5YvUTuFC9yrJLQuA3urw5
- PkPw==
+ bh=eTOwXgcDvf0qJPusx8+dn0NqJdcIT1vyPwxo//UMpeU=;
+ b=iOsPqxjq6yhExkvFp0zLC0Pp5DvwnvJPxdvOdXm1QTB17AT5WrEDLc6jdFIavEPQ8P
+ q8BtHC7SyhqjHo536L/v/WZbrR1FbUdpjv2rs4A5b9pWPorNdNZ7JUX4agHQdGCjTdyN
+ +1TZazAu7hjt5dKVAl3N3ZG8doNpOz0Ng/liRjl9exUMBVjJnaSLwbh9+w2cKUmZVXYt
+ 89jRpabnC4o7IPULuoeYYunaLONKw8L4GklZ2x1svtGfDodRzoVDzOGHa5EcMPaUsd44
+ pRGmRBtmmIB0mNJf6bP/jVmOjijR9AF8flKEiSfjdqef0ebjob8He4f6pfUiEeWjJRx3
+ zDIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:references:cc:from:message-id
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=9Nls0ul5VAwvp9pDKm8eM8JbcgCJdrcZ66msakCrgWw=;
- b=Mc+nuBxNRWAAbb1b8ZFDeEFvz1vx3ZiDxdp+Sf4TEcCoSN1pQTVovHfq9t6O3KtVmr
- 8YZJum3SV06MkZ5jZVXaDK7IB7cGDuIEQcJfYfkowXOzjaIxzrAyZtzxcVBPLxjlI/5x
- gHyJbw+IAIBQ9PW16tG83dSS3F7mxY6crofzxhPXN+YPaciP8c/x4xc1WwkyYtk1L9c4
- IUxsIoQV2mRRUmkrCGSLVWN4HW9tQBvkn3jViZLXewBIwh5EdU3/poxnLzoUfmjDGFA7
- PNCGPgfx1U8GJHO4kDH4Al+UoaYOO+hiAhVMsHTWdaeXGeMK1LISP/9s39vzfikaktSZ
- ztNw==
-X-Gm-Message-State: AOAM532W1b5zhG66ycQ9QuQCtRYFD4HU4HpaH+EGjZ79enag5s37VmIQ
- 0jRgD4eKCThOY8RcEzJ2BcJGhbx5Slc=
-X-Google-Smtp-Source: ABdhPJwvI3YERQjI/yTKE8miMJuL/qf/Uvx6Pi6QToYQGMiSRkAFK1IAjz2BKtPZ+4yOkzK9htS2yg==
-X-Received: by 2002:adf:8162:: with SMTP id 89mr590258wrm.237.1600880026042;
- Wed, 23 Sep 2020 09:53:46 -0700 (PDT)
+ bh=eTOwXgcDvf0qJPusx8+dn0NqJdcIT1vyPwxo//UMpeU=;
+ b=P3XVMcW+uATzMUX/smCxHOhd/D1YpEIFRHtb4oWjTM+uBsODvoYh9gocrQn7yZe+Eg
+ MuLQ6Ufmd+EY7qJrqBppiVxcITdQfnFOyCneMT7rdc3nBVk5ZErIjp7gX8yLD/2xUf5Q
+ 7AT2Dg6GphnL/ouwwUneu3hJG5QFzcW5ZGQ2EBX4StJuozAPiBaHXaKI1YZaQdW9DNkx
+ itRdeprAwlhnTpDZHPm6b/Uf5+ZtP6WB62Tke4MHM9hLjD72IJepa2Q5Lp4B3p0yCquI
+ vKj5qSvi3i0oimejTFujEys8hmmGFeYAevAKGug+O9+jxLiPp8VurO+vewX46mT/ctLC
+ qNkQ==
+X-Gm-Message-State: AOAM532kQLf283nxHBbr12gfPvqP5/TPR372PVe10akjMkwai9S4lDHN
+ KRDV+M40dkVP4TTUj1tYRNc=
+X-Google-Smtp-Source: ABdhPJwMTR0YKsbCfqrf891xH0g+aAIN6MbgCzqHCBBkAje4TdSNsaI7Vw1bsdpXCcINjLrcQBH4lg==
+X-Received: by 2002:a1c:e904:: with SMTP id q4mr480668wmc.151.1600880254818;
+ Wed, 23 Sep 2020 09:57:34 -0700 (PDT)
 Received: from [192.168.1.34] (234.red-88-10-103.dynamicip.rima-tde.net.
  [88.10.103.234])
- by smtp.gmail.com with ESMTPSA id 63sm417682wrh.71.2020.09.23.09.53.45
+ by smtp.gmail.com with ESMTPSA id a81sm416099wmf.32.2020.09.23.09.57.33
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 23 Sep 2020 09:53:45 -0700 (PDT)
-Subject: Re: Minix 1.1 with QEMU
-To: Will Senn <will.senn@gmail.com>, qemu-discuss@nongnu.org,
- qemu-devel <qemu-devel@nongnu.org>
-References: <5e534cc7-2a99-baa5-fc8f-63d0d8e85c97@gmail.com>
+ Wed, 23 Sep 2020 09:57:33 -0700 (PDT)
+Subject: Re: [PATCH 3/7] hw/ide/core: Replace magic '512' value by
+ BDRV_SECTOR_SIZE
+To: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+References: <20200814082841.27000-1-f4bug@amsat.org>
+ <20200814082841.27000-4-f4bug@amsat.org>
+ <20200817111745.GG11402@linux.fritz.box>
+ <2347d8f7-5632-f7a4-6b81-bee179241da4@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <edc82d55-e5d1-abba-9a8e-7954b1dbe66e@amsat.org>
-Date: Wed, 23 Sep 2020 18:53:44 +0200
+Message-ID: <c5669c37-6727-89fd-a68f-518e56f39884@amsat.org>
+Date: Wed, 23 Sep 2020 18:57:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <5e534cc7-2a99-baa5-fc8f-63d0d8e85c97@gmail.com>
+In-Reply-To: <2347d8f7-5632-f7a4-6b81-bee179241da4@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -104,82 +107,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- John Snow <jsnow@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org, qemu-trivial@nongnu.org,
+ Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Will,
+On 9/23/20 4:53 PM, John Snow wrote:
+> On 8/17/20 7:17 AM, Kevin Wolf wrote:
+>> Am 14.08.2020 um 10:28 hat Philippe Mathieu-Daudé geschrieben:
+>>> Use self-explicit definitions instead of magic '512' value.
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>
+>> BDRV_SECTOR_SIZE is the arbitrary unit in which some block layer
+>> functions and variables work (such as bs->total_sectors). It happens to
+>> be 512.
+>>
+>> IDE disks have a sector size, too. Actually, two of them, a physical and
+>> a logical one. The more important one is the logical one. We happen to
+>> emulate only IDE devices for which the logical block size is 512 bytes
+>> (ide_dev_initfn() errors out otherwise).
+>>
+>> But just because two constants both happen to be 512 in practice, they
+>> are not the same thing.
+>>
+>> So if we want to replace all magic 512 values, we should probably
+>> introduce a new IDE_SECTOR_SIZE and then decide case by case whether
+>> IDE_SECTOR_SIZE or BDRV_SECTOR_SIZE is meant. I think most (if not all)
+>> of the places you converted in this patch need to be IDE_SECTOR_SIZE.
+>>
+>> Kevin
+>>
+> 
+> I didn't audit the other patches, but be mindful of the distinction that
+> Kevin is pointing out.
+> 
+> Luckily, I think we're low risk for deciding to change the
+> BDRV_SECTOR_SIZE default any time soon, so it probably won't matter in
+> the near future ...
 
-On 9/23/20 6:45 PM, Will Senn wrote:
-> Long time user, first time poster :)
-> 
-> So, I'd like to be able to run Minix 1.1 on my Macbook Pro mid-2012
-> w/16gb RAM (MacOS 10.14.6 Mojave). Qemu will run pretty ancient OS'es
-> such as DOS 2.0, which I use all of the time. However, I'm having some
-> difficulty getting Minix to run. I am able to boot the first floppy, but
-> when I change to the second floppy, the system freezes and I can't tell
-> what is going on. Here's what I did to get this far:
-> 
-> brew install qemu
-> 
-> qemu-system-i386 --version
-> QEMU emulator version 5.1.0
-> 
-> mkdir ~/workspaces/retro-workspace/minix-1.1
-> cd ~/workspaces/retro-workspace/minix-1.1
-> aria2c
-> http://download.minix3.org/previous-versions/bzipped/Intel-1.1.tar.bz2
-> tar xvjf Intel-1.1.tar.bz2
-> cp Intel-1.1/floppy_disk1 ./Disk01.img
-> cp Intel-1.1/floppy_disk2 ./Disk02.img
-> cp Intel-1.1/floppy_disk3 ./Disk03.img
-> cp Intel-1.1/floppy_disk4 ./Disk04.img
-> 
-> 
-> qemu-system-i386 -drive
-> file=Disk01.img,format=raw,if=floppy,media=disk,readonly=off,index=0,snapshot=on
-> \
->   -boot a \
->   -no-fd-bootchk \
->   -monitor telnet::2222,server,nowait -serial mon:stdio
-> 
-> Qemu boots to the Minix 1.1 Boot screen and says to swap to floppy 2, so
-> in the monitor:
-> change floppy0 Disk02.img raw
-> 
-> I press l (el) and it scans the disk, lists the files on the disk and
-> reports no errors, but when I press =, it does a carriage return and
-> just sits there. I'm pretty sure this is the Minix going bye bye and not
-> necessarily QEMU, but I'm wondering if there is a way to see what QEMU
-> thinks it is doing or if it is what's hung? Usually, at this point,
-> Minix reads the disk contents into a Ramdisk and boots Minix.
-> 
-> Food for thought... Minix expects to run on an IBM PC (5150), IBM PC XT
-> (5160), or compatible, and therefore the I/O is written for whatever
-> floppy controller was extant at that time (I'm guessing here), so if
-> that's different than modern day floppies, I suppose this could cause
-> the problem I'm experiencing here. Is there a way to see the floppy
-> controller activity in QEMU? Similarly, I gather it expects a CGA
-> compatible monitor (EGA/VGA, etc should be fine).
+TBO my only concern was code readability while reviewing
+(improve code readability).
 
-Can you try adding '-machine isapc', which is closer to the 5150?
+I'll address Kevin's review comment at some point, but this is
+a low priority.
+
+Thanks both for having a look,
+
+Phil.
 
 > 
-> I appreciate your help on this.
-> 
-> Minix 1.1 works 'ok' in 86Box and other IBM PC emulations, so I know the
-> floppies are fine.
-> 
-> Thanks!
-> 
-> Will
+> --js
 > 
 > 
-> 
-> -- 
-> GPG Fingerprint: 68F4 B3BD 1730 555A 4462  7D45 3EAA 5B6D A982 BAAF
-> 
-
 
