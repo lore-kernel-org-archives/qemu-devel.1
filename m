@@ -7,83 +7,84 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95742C4727E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2FC0C4727D
 	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:16:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0907821D91
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:16:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 765FB221F0
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:16:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ElHJ+OuE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0907821D91
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MHgDfbdc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 765FB221F0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL0sq-00084G-UB
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 05:16:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53026)
+	id 1kL0sr-00083s-GJ
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 05:16:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kL0oS-00019H-6L
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:11:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59387)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kL0n3-0007mi-00
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:10:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56306
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kL0oL-0002Mb-FK
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:11:41 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kL0mz-00021O-IV
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:10:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600852296;
+ s=mimecast20190719; t=1600852213;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NmGhtkB1QB5kLHSLDrmo5u7rX3bh1zscfyeedYPRWx4=;
- b=ElHJ+OuE2mfdtm9aqcFwkYOnrO42O/+0x6DNO3r6wwurqYf4ixOclizJnVm6UpsErhd2WO
- I9qiZ2/vdi/IPdn1UyAXAFzp21xd1g7hJz3RHfzjAnYHgf0q4veLScUW1d95ahX7HgPfUY
- xNx9phCc+zFCmLLe1qBg90e3UQEcN2U=
+ bh=7Rpgfk3s9p62fTEsPWdSnHkf4EXgJbNyQ4c7ZwpEErE=;
+ b=MHgDfbdcOlxzBgB8dysvk/DH8gB/TGxn6Jaf7xD5y79ozx7RApjrzzoPOKujJqwZCuFVIb
+ 6bDt+pBbuEvB7XMs5Wky9gSAJV+UIoMjlq8FYAFuqti7tMp8FWFK9uyM1fp3R8/Do3qVsN
+ PZD0l0iTHEWsqYoKDhzXMSbxlAIw0Fc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-342-07791cbYMxSbHCZovwdVtQ-1; Wed, 23 Sep 2020 05:11:35 -0400
-X-MC-Unique: 07791cbYMxSbHCZovwdVtQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-369-i3Fs6NB1PRWbY5vQPWL5Ow-1; Wed, 23 Sep 2020 05:10:11 -0400
+X-MC-Unique: i3Fs6NB1PRWbY5vQPWL5Ow-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07D6F107464E;
- Wed, 23 Sep 2020 09:11:34 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A0BF75D9CC;
- Wed, 23 Sep 2020 09:11:33 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1260887309E
+ for <qemu-devel@nongnu.org>; Wed, 23 Sep 2020 09:10:10 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
+ [10.36.112.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C82B35C230;
+ Wed, 23 Sep 2020 09:10:09 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 226F531E88; Wed, 23 Sep 2020 11:10:02 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 03/12] configure: rewrite accelerator defaults as tests
-Date: Wed, 23 Sep 2020 05:11:22 -0400
-Message-Id: <20200923091131.1591563-4-pbonzini@redhat.com>
-In-Reply-To: <20200923091131.1591563-1-pbonzini@redhat.com>
-References: <20200923091131.1591563-1-pbonzini@redhat.com>
+Subject: [PULL 9/9] audio: build spiceaudio as module
+Date: Wed, 23 Sep 2020 11:10:01 +0200
+Message-Id: <20200923091001.20814-10-kraxel@redhat.com>
+In-Reply-To: <20200923091001.20814-1-kraxel@redhat.com>
+References: <20200923091001.20814-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 00:53:58
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 05:08:50
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
 X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,145 +97,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Prepare to process "auto" in meson rather than configure: standardize the
-shape of the code that changes "auto" to enabled/disabled, to ease the review
-when it will be moved to meson.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 20200916084117.21828-3-kraxel@redhat.com
 ---
- configure | 58 ++++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 38 insertions(+), 20 deletions(-)
+ audio/meson.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/configure b/configure
-index 33bd3c4cb8..04cc25f7c8 100755
---- a/configure
-+++ b/configure
-@@ -429,10 +429,10 @@ vhost_scsi=""
- vhost_vsock=""
- vhost_user=""
- vhost_user_fs=""
--kvm="disabled"
--hax="disabled"
--hvf="disabled"
--whpx="disabled"
-+kvm="auto"
-+hax="auto"
-+hvf="auto"
-+whpx="auto"
- rdma=""
- pvrdma=""
- gprof="no"
-@@ -821,8 +821,6 @@ HOST_VARIANT_DIR=""
- case $targetos in
- MINGW32*)
-   mingw32="yes"
--  hax="enabled"
--  whpx="auto"
-   vhost_user="no"
-   audio_possible_drivers="dsound sdl"
-   if check_include dsound.h; then
-@@ -856,7 +854,6 @@ DragonFly)
- ;;
- NetBSD)
-   bsd="yes"
--  hax="enabled"
-   make="${MAKE-gmake}"
-   audio_drv_list="oss try-sdl"
-   audio_possible_drivers="oss sdl"
-@@ -873,8 +870,6 @@ OpenBSD)
- Darwin)
-   bsd="yes"
-   darwin="yes"
--  hax="enabled"
--  hvf="auto"
-   if [ "$cpu" = "x86_64" ] ; then
-     QEMU_CFLAGS="-arch x86_64 $QEMU_CFLAGS"
-     QEMU_LDFLAGS="-arch x86_64 $QEMU_LDFLAGS"
-@@ -910,7 +905,6 @@ Linux)
-   audio_possible_drivers="oss alsa sdl pa"
-   linux="yes"
-   linux_user="yes"
--  kvm="enabled"
-   QEMU_INCLUDES="-isystem ${source_path}/linux-headers -Ilinux-headers $QEMU_INCLUDES"
- ;;
- esac
-@@ -2668,6 +2662,29 @@ if test "$seccomp" != "no" ; then
-         seccomp="no"
-     fi
- fi
-+
-+##########################################
-+# simple accelerator probes
-+
-+if test "$kvm" != "disabled" ; then
-+  if test "$linux" = yes ; then
-+    kvm=enabled
-+  else
-+    if test "$kvm" = "enabled" ; then
-+      feature_not_found "kvm" "KVM is only available on Linux"
-+    fi
-+    kvm=disabled
-+  fi
-+fi
-+
-+if test "$hax" = "auto" ; then
-+  if test "$mingw" = yes || test "$darwin" = yes || test "$targetos" = NetBSD; then
-+    hax=enabled
-+  else
-+    hax=disabled
-+  fi
-+fi
-+
- ##########################################
- # xen probe
+diff --git a/audio/meson.build b/audio/meson.build
+index 15c06ba0453b..18a831129ed0 100644
+--- a/audio/meson.build
++++ b/audio/meson.build
+@@ -7,7 +7,6 @@ softmmu_ss.add(files(
+   'wavcapture.c',
+ ))
  
-@@ -2988,14 +3005,15 @@ fi
- 
- ##########################################
- # Windows Hypervisor Platform accelerator (WHPX) check
--if test "$whpx" = "enabled" && test "$ARCH" != "x86_64"; then
--  error_exit "WHPX requires 64-bit host"
--fi
--if test "$whpx" != "disabled" && test "$ARCH" = "x86_64"; then
--    if check_include "WinHvPlatform.h" && check_include "WinHvEmulation.h"; then
--        whpx="yes"
-+if test "$whpx" != "disabled"; then
-+    if test "$mingw32" = yes && test "$ARCH" = "x86_64" &&
-+            check_include "WinHvPlatform.h" && check_include "WinHvEmulation.h"; then
-+        whpx="enabled"
-     else
--        if test "$whpx" = "auto"; then
-+        if test "$whpx" = "enabled"; then
-+            if test "$ARCH" != "x86_64"; then
-+                error_exit "WHPX requires 64-bit host"
-+            fi
-             feature_not_found "WinHvPlatform" "WinHvEmulation is not installed"
-         fi
-         whpx="disabled"
-@@ -5831,13 +5849,13 @@ if [ "$hvf" != "disabled" ] ; then
- #include <Hypervisor/hv.h>
- int main() { return 0;}
- EOF
--  if ! compile_object ""; then
-+  if test "$darwin" = yes && compile_object ""; then
-+    hvf='enabled'
-+  else
-     if test "$hvf" = "enabled"; then
- 	error_exit "Hypervisor.framework not available"
-     fi
-     hvf='disabled'
--  else
--    hvf='enabled'
-   fi
- fi
- 
+-softmmu_ss.add(when: [spice, 'CONFIG_SPICE'], if_true: files('spiceaudio.c'))
+ softmmu_ss.add(when: [coreaudio, 'CONFIG_AUDIO_COREAUDIO'], if_true: files('coreaudio.c'))
+ softmmu_ss.add(when: [dsound, 'CONFIG_AUDIO_DSOUND'], if_true: files('dsoundaudio.c'))
+ softmmu_ss.add(when: ['CONFIG_AUDIO_WIN_INT'], if_true: files('audio_win_int.c'))
+@@ -18,7 +17,8 @@ foreach m : [
+   ['CONFIG_AUDIO_OSS', 'oss', oss, 'ossaudio.c'],
+   ['CONFIG_AUDIO_PA', 'pa', pulse, 'paaudio.c'],
+   ['CONFIG_AUDIO_SDL', 'sdl', sdl, 'sdlaudio.c'],
+-  ['CONFIG_AUDIO_JACK', 'jack', jack, 'jackaudio.c']
++  ['CONFIG_AUDIO_JACK', 'jack', jack, 'jackaudio.c'],
++  ['CONFIG_SPICE', 'spice', spice, 'spiceaudio.c']
+ ]
+   if config_host.has_key(m[0])
+     module_ss = ss.source_set()
 -- 
-2.26.2
-
+2.27.0
 
 
