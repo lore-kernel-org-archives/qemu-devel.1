@@ -2,69 +2,92 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B82AC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 10:04:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 971CFC4727F
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 10:04:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73E2E2076E
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 10:04:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73E2E2076E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2C6282076E
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 10:04:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=blade-group.com header.i=@blade-group.com header.b="fby1aIrN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C6282076E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=blade-group.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL1dL-0001Hp-JK
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 06:04:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39134)
+	id 1kL1dO-0001Lf-2s
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 06:04:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1kL1bF-0007yi-Fl
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 06:02:09 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:52744)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1kL1bA-0001GO-VL
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 06:02:09 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436283|-1; CH=green;
- DM=|CONTINUE|false|; DS=CONTINUE|ham_system_inform|0.33157-5.4566e-05-0.668375;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03302; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=4; RT=4; SR=0; TI=SMTPD_---.Ib8S2Dj_1600855313; 
-Received: from 30.225.208.89(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.Ib8S2Dj_1600855313)
- by smtp.aliyun-inc.com(10.147.44.118);
- Wed, 23 Sep 2020 18:01:54 +0800
-Subject: Re: [PATCH v3 51/81] target/arm: Pass separate addend to {U, S}DOT
- helpers
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200918183751.2787647-1-richard.henderson@linaro.org>
- <20200918183751.2787647-52-richard.henderson@linaro.org>
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <a0ad74b1-8445-710a-3d87-0310011e9163@c-sky.com>
-Date: Wed, 23 Sep 2020 18:01:17 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <antoine.damhet@blade-group.com>)
+ id 1kL1Yz-0005s2-E1
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:59:49 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41982)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <antoine.damhet@blade-group.com>)
+ id 1kL1Yw-0000ov-WC
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:59:48 -0400
+Received: by mail-wr1-x443.google.com with SMTP id w5so20332910wrp.8
+ for <qemu-devel@nongnu.org>; Wed, 23 Sep 2020 02:59:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=blade-group.com; s=google;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=VeI4rJ+QRs2b+8OFtq6s9oel2aBDc63fJkYH4ntwSEs=;
+ b=fby1aIrNzvU/cR1c5+6qaPdHVNmeE/LueEWms0xYJtByAW4kM66iExTRpPK9OIVoZH
+ 65Gy+FYQj+K+k7bY1JB7FIg8DfGcmiYcBZgwHDMh8VBa4espyv8km9SiLpk9DYZPnmVx
+ S2y5U/UGERAyA4YXbjdqDQesCiz3AMJYWBiuqlzk+n89J2MsYySYXAf4bPZ34LAstcVS
+ TFVpc7TQGvvhNKRsVY54hwmNzieLIVTiLFt8dTj+Uxl0TUrWTiLrgjVw04WaIhQEgP5y
+ mnHn1uy5FI/nUIRADBGQRCbK2rNGgZqslX4rHDrPZ7/ZcGoBMXio7/nB2QRv4OYlUt15
+ Xfkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=VeI4rJ+QRs2b+8OFtq6s9oel2aBDc63fJkYH4ntwSEs=;
+ b=ALDnJIro/7phdtxdE6TMpMIiKT2Z+bZK4BrxdxJQlSdiCQ8657ZMDm1ZIM7MH/cuLR
+ hyEOAKIlKcivQHzUzdTMlWhKE6yH+6AyZM/pu73xYc7Acj1iZ7AGt4JnRlflKdXBST1f
+ OoTB5yJ9D/q1r09M7uOZxWrSD35IYn8hYk408ESNOagJqsbZB/7LC85hZZUyYMTYunma
+ xAOmqzZwikN2mgJeFVX9Yvdj+5btoiCtmL2Ho12X8HXwcC88KfNpWyYSxarVLpdGVRqn
+ E4Oa0LCWfwfppcnjell9x6mGQ2C1+PmyGanJL/8TtZTmNbmCjgdISXHnILxPI6XW3Iyd
+ UWZg==
+X-Gm-Message-State: AOAM530WSU20rVnBdGiQzli55CDNn/0KYdh5kRTPnemIURqa3JNinJ1z
+ zHFvd0BnIVdhoGQ+XSmV2r8pLA==
+X-Google-Smtp-Source: ABdhPJxnNlttSizOK3Cl+T7RCEuCxLtnwUHcLh184MrWGmtI6O7gzxcE+wyMA8M1Da35+VgVEpunZg==
+X-Received: by 2002:a5d:634d:: with SMTP id b13mr10476497wrw.324.1600855184968; 
+ Wed, 23 Sep 2020 02:59:44 -0700 (PDT)
+Received: from localhost ([185.123.26.202])
+ by smtp.gmail.com with ESMTPSA id o15sm7449021wmh.29.2020.09.23.02.59.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 23 Sep 2020 02:59:43 -0700 (PDT)
+Date: Wed, 23 Sep 2020 11:59:43 +0200
+From: Antoine Damhet <antoine.damhet@blade-group.com>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH v2] target/i386: always create kvmclock device
+Message-ID: <20200923095943.nxp32wqaqalbddmf@tartarus>
+References: <20200922151934.899555-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200918183751.2787647-52-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 06:01:54
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="j64rnnc3jp4hhjoq"
+Content-Disposition: inline
+In-Reply-To: <20200922151934.899555-1-vkuznets@redhat.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=antoine.damhet@blade-group.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_INVALID=0.1,
+ DKIM_SIGNED=0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,453 +100,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+--j64rnnc3jp4hhjoq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2020/9/19 2:37, Richard Henderson wrote:
-> For SVE, we potentially have a 4th argument coming from the
-> movprfx instruction.  Currently we do not optimize movprfx,
-> so the problem is not visible.
-Hi Richard,
+Hi,
 
-I am a little confused.  If it is not immediately preceded by a MOVPRFX 
-instruction, the addend will
-still be used.
+The patch doesn't apply cleanly to master but it works (patched ->
+patched working, patched -> unpatched: old behavior, unpatched ->
+patched: old behavior)
 
-Is it right?
+Thanks to everyone for the swift responses :)
 
-Zhiwei
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On Tue, Sep 22, 2020 at 05:19:34PM +0200, Vitaly Kuznetsov wrote:
+> QEMU's kvmclock device is only created when KVM PV feature bits for
+> kvmclock (KVM_FEATURE_CLOCKSOURCE/KVM_FEATURE_CLOCKSOURCE2) are
+> exposed to the guest. With 'kvm=3Doff' cpu flag the device is not
+> created and we don't call KVM_GET_CLOCK/KVM_SET_CLOCK upon migration.
+> It was reported that without these call at least Hyper-V TSC page
+> clocksouce (which can be enabled independently) gets broken after
+> migration.
+>=20
+> Switch to creating kvmclock QEMU device unconditionally, it seems
+> to always make sense to call KVM_GET_CLOCK/KVM_SET_CLOCK on migration.
+> Use KVM_CAP_ADJUST_CLOCK check instead of CPUID feature bits.
+>=20
+> Reported-by: Antoine Damhet <antoine.damhet@blade-group.com>
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+Tested-by: Antoine Damhet <antoine.damhet@blade-group.com>
+
 > ---
->   target/arm/helper.h             |  20 +++---
->   target/arm/sve.decode           |   7 +-
->   target/arm/translate-a64.c      |  15 ++++-
->   target/arm/translate-sve.c      |  13 ++--
->   target/arm/vec_helper.c         | 112 ++++++++++++++++++--------------
->   target/arm/translate-neon.c.inc |  10 +--
->   6 files changed, 105 insertions(+), 72 deletions(-)
->
-> diff --git a/target/arm/helper.h b/target/arm/helper.h
-> index 8294055cab..97222bd256 100644
-> --- a/target/arm/helper.h
-> +++ b/target/arm/helper.h
-> @@ -595,15 +595,19 @@ DEF_HELPER_FLAGS_5(sve2_sqrdmlah_d, TCG_CALL_NO_RWG,
->   DEF_HELPER_FLAGS_5(sve2_sqrdmlsh_d, TCG_CALL_NO_RWG,
->                      void, ptr, ptr, ptr, ptr, i32)
->   
-> -DEF_HELPER_FLAGS_4(gvec_sdot_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-> -DEF_HELPER_FLAGS_4(gvec_udot_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-> -DEF_HELPER_FLAGS_4(gvec_sdot_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-> -DEF_HELPER_FLAGS_4(gvec_udot_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(gvec_sdot_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(gvec_udot_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(gvec_sdot_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(gvec_udot_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
->   
-> -DEF_HELPER_FLAGS_4(gvec_sdot_idx_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-> -DEF_HELPER_FLAGS_4(gvec_udot_idx_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-> -DEF_HELPER_FLAGS_4(gvec_sdot_idx_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-> -DEF_HELPER_FLAGS_4(gvec_udot_idx_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(gvec_sdot_idx_b, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(gvec_udot_idx_b, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(gvec_sdot_idx_h, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(gvec_udot_idx_h, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
->   
->   DEF_HELPER_FLAGS_5(gvec_fcaddh, TCG_CALL_NO_RWG,
->                      void, ptr, ptr, ptr, ptr, i32)
-> diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-> index 0688dae450..5815ba9b1c 100644
-> --- a/target/arm/sve.decode
-> +++ b/target/arm/sve.decode
-> @@ -756,12 +756,13 @@ UMIN_zzi        00100101 .. 101 011 110 ........ .....          @rdn_i8u
->   MUL_zzi         00100101 .. 110 000 110 ........ .....          @rdn_i8s
->   
->   # SVE integer dot product (unpredicated)
-> -DOT_zzz         01000100 1 sz:1 0 rm:5 00000 u:1 rn:5 rd:5      ra=%reg_movprfx
-> +DOT_zzzz        01000100 1 sz:1 0 rm:5 00000 u:1 rn:5 rd:5 \
-> +                ra=%reg_movprfx
->   
->   # SVE integer dot product (indexed)
-> -DOT_zzx         01000100 101 index:2 rm:3 00000 u:1 rn:5 rd:5 \
-> +DOT_zzxw        01000100 101 index:2 rm:3 00000 u:1 rn:5 rd:5 \
->                   sz=0 ra=%reg_movprfx
-> -DOT_zzx         01000100 111 index:1 rm:4 00000 u:1 rn:5 rd:5 \
-> +DOT_zzxw        01000100 111 index:1 rm:4 00000 u:1 rn:5 rd:5 \
->                   sz=1 ra=%reg_movprfx
->   
->   # SVE floating-point complex add (predicated)
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 76e54c1a4e..1a9251db67 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -692,6 +692,17 @@ static void gen_gvec_op3_qc(DisasContext *s, bool is_q, int rd, int rn,
->       tcg_temp_free_ptr(qc_ptr);
->   }
->   
-> +/* Expand a 4-operand operation using an out-of-line helper.  */
-> +static void gen_gvec_op4_ool(DisasContext *s, bool is_q, int rd, int rn,
-> +                             int rm, int ra, int data, gen_helper_gvec_4 *fn)
+>  hw/i386/kvm/clock.c    | 7 +++++--
+>  hw/i386/microvm.c      | 2 +-
+>  hw/i386/pc.c           | 1 +
+>  hw/i386/pc_piix.c      | 7 +++++--
+>  hw/i386/pc_q35.c       | 5 ++++-
+>  include/hw/i386/pc.h   | 3 +++
+>  include/hw/kvm/clock.h | 4 ++--
+>  target/i386/kvm.c      | 5 +++++
+>  target/i386/kvm_i386.h | 1 +
+>  9 files changed, 27 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
+> index 64283358f91d..30cf53393ee1 100644
+> --- a/hw/i386/kvm/clock.c
+> +++ b/hw/i386/kvm/clock.c
+> @@ -328,11 +328,14 @@ static const TypeInfo kvmclock_info =3D {
+>  };
+> =20
+>  /* Note: Must be called after VCPU initialization. */
+> -void kvmclock_create(void)
+> +void kvmclock_create(bool create_always)
+>  {
+>      X86CPU *cpu =3D X86_CPU(first_cpu);
+> =20
+> -    if (kvm_enabled() &&
+> +    if (!kvm_enabled() || !kvm_has_adjust_clock())
+> +        return;
+> +
+> +    if (create_always ||
+>          cpu->env.features[FEAT_KVM] & ((1ULL << KVM_FEATURE_CLOCKSOURCE)=
+ |
+>                                         (1ULL << KVM_FEATURE_CLOCKSOURCE2=
+))) {
+>          sysbus_create_simple(TYPE_KVM_CLOCK, -1, NULL);
+> diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
+> index 81d0888930d1..fd0b84109154 100644
+> --- a/hw/i386/microvm.c
+> +++ b/hw/i386/microvm.c
+> @@ -119,7 +119,7 @@ static void microvm_devices_init(MicrovmMachineState =
+*mms)
+> =20
+>      ioapic_init_gsi(gsi_state, "machine");
+> =20
+> -    kvmclock_create();
+> +    kvmclock_create(true);
+> =20
+>      for (i =3D 0; i < VIRTIO_NUM_TRANSPORTS; i++) {
+>          sysbus_create_simple("virtio-mmio",
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index d11daacc23cf..0e036ef9c15f 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1956,6 +1956,7 @@ static void pc_machine_class_init(ObjectClass *oc, =
+void *data)
+>      pcmc->acpi_data_size =3D 0x20000 + 0x8000;
+>      pcmc->linuxboot_dma_enabled =3D true;
+>      pcmc->pvh_enabled =3D true;
+> +    pcmc->kvmclock_create_always =3D true;
+>      assert(!mc->get_hotplug_handler);
+>      mc->get_hotplug_handler =3D pc_get_hotplug_handler;
+>      mc->hotplug_allowed =3D pc_hotplug_allowed;
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 32b1453e6a82..1a68338c737b 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -158,8 +158,8 @@ static void pc_init1(MachineState *machine,
+> =20
+>      x86_cpus_init(x86ms, pcmc->default_cpu_version);
+> =20
+> -    if (kvm_enabled() && pcmc->kvmclock_enabled) {
+> -        kvmclock_create();
+> +    if (pcmc->kvmclock_enabled) {
+> +        kvmclock_create(pcmc->kvmclock_create_always);
+>      }
+> =20
+>      if (pcmc->pci_enabled) {
+> @@ -440,11 +440,14 @@ DEFINE_I440FX_MACHINE(v5_2, "pc-i440fx-5.2", NULL,
+> =20
+>  static void pc_i440fx_5_1_machine_options(MachineClass *m)
+>  {
+> +    PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
+> +
+>      pc_i440fx_5_2_machine_options(m);
+>      m->alias =3D NULL;
+>      m->is_default =3D false;
+>      compat_props_add(m->compat_props, hw_compat_5_1, hw_compat_5_1_len);
+>      compat_props_add(m->compat_props, pc_compat_5_1, pc_compat_5_1_len);
+> +    pcmc->kvmclock_create_always =3D false;
+>  }
+> =20
+>  DEFINE_I440FX_MACHINE(v5_1, "pc-i440fx-5.1", NULL,
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 0cb9c18cd44d..0dd59bd765b1 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -185,7 +185,7 @@ static void pc_q35_init(MachineState *machine)
+> =20
+>      x86_cpus_init(x86ms, pcmc->default_cpu_version);
+> =20
+> -    kvmclock_create();
+> +    kvmclock_create(pcmc->kvmclock_create_always);
+> =20
+>      /* pci enabled */
+>      if (pcmc->pci_enabled) {
+> @@ -366,10 +366,13 @@ DEFINE_Q35_MACHINE(v5_2, "pc-q35-5.2", NULL,
+> =20
+>  static void pc_q35_5_1_machine_options(MachineClass *m)
+>  {
+> +    PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
+> +
+>      pc_q35_5_2_machine_options(m);
+>      m->alias =3D NULL;
+>      compat_props_add(m->compat_props, hw_compat_5_1, hw_compat_5_1_len);
+>      compat_props_add(m->compat_props, pc_compat_5_1, pc_compat_5_1_len);
+> +    pcmc->kvmclock_create_always =3D false;
+>  }
+> =20
+>  DEFINE_Q35_MACHINE(v5_1, "pc-q35-5.1", NULL,
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index fe52e165b27c..6b22671434b9 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -118,6 +118,9 @@ typedef struct PCMachineClass {
+> =20
+>      /* use PVH to load kernels that support this feature */
+>      bool pvh_enabled;
+> +
+> +    /* create kvmclock device even when KVM PV features are not exposed =
+*/
+> +    bool kvmclock_create_always;
+>  } PCMachineClass;
+> =20
+>  #define TYPE_PC_MACHINE "generic-pc-machine"
+> diff --git a/include/hw/kvm/clock.h b/include/hw/kvm/clock.h
+> index 81c66b230207..7994071c4fee 100644
+> --- a/include/hw/kvm/clock.h
+> +++ b/include/hw/kvm/clock.h
+> @@ -15,11 +15,11 @@
+> =20
+>  #ifdef CONFIG_KVM
+> =20
+> -void kvmclock_create(void);
+> +void kvmclock_create(bool create_always);
+> =20
+>  #else /* CONFIG_KVM */
+> =20
+> -static inline void kvmclock_create(void)
+> +static inline void kvmclock_create(bool create_always)
+>  {
+>  }
+> =20
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 4a8b3a41c1bc..20b31b65307b 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -143,6 +143,11 @@ bool kvm_has_adjust_clock_stable(void)
+>      return (ret =3D=3D KVM_CLOCK_TSC_STABLE);
+>  }
+> =20
+> +bool kvm_has_adjust_clock(void)
 > +{
-> +    tcg_gen_gvec_4_ool(vec_full_reg_offset(s, rd),
-> +                       vec_full_reg_offset(s, rn),
-> +                       vec_full_reg_offset(s, rm),
-> +                       vec_full_reg_offset(s, ra),
-> +                       is_q ? 16 : 8, vec_full_reg_size(s), data, fn);
+> +    return kvm_check_extension(kvm_state, KVM_CAP_ADJUST_CLOCK);
 > +}
 > +
->   /* Set ZF and NF based on a 64 bit result. This is alas fiddlier
->    * than the 32 bit equivalent.
->    */
-> @@ -12202,7 +12213,7 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
->           return;
->   
->       case 0x2: /* SDOT / UDOT */
-> -        gen_gvec_op3_ool(s, is_q, rd, rn, rm, 0,
-> +        gen_gvec_op4_ool(s, is_q, rd, rn, rm, rd, 0,
->                            u ? gen_helper_gvec_udot_b : gen_helper_gvec_sdot_b);
->           return;
->   
-> @@ -13461,7 +13472,7 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
->       switch (16 * u + opcode) {
->       case 0x0e: /* SDOT */
->       case 0x1e: /* UDOT */
-> -        gen_gvec_op3_ool(s, is_q, rd, rn, rm, index,
-> +        gen_gvec_op4_ool(s, is_q, rd, rn, rm, rd, index,
->                            u ? gen_helper_gvec_udot_idx_b
->                            : gen_helper_gvec_sdot_idx_b);
->           return;
-> diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-> index 5e8291e44b..66303dac54 100644
-> --- a/target/arm/translate-sve.c
-> +++ b/target/arm/translate-sve.c
-> @@ -3804,28 +3804,29 @@ DO_ZZI(UMIN, umin)
->   
->   #undef DO_ZZI
->   
-> -static bool trans_DOT_zzz(DisasContext *s, arg_DOT_zzz *a)
-> +static bool trans_DOT_zzzz(DisasContext *s, arg_DOT_zzzz *a)
->   {
-> -    static gen_helper_gvec_3 * const fns[2][2] = {
-> +    static gen_helper_gvec_4 * const fns[2][2] = {
->           { gen_helper_gvec_sdot_b, gen_helper_gvec_sdot_h },
->           { gen_helper_gvec_udot_b, gen_helper_gvec_udot_h }
->       };
->   
->       if (sve_access_check(s)) {
-> -        gen_gvec_ool_zzz(s, fns[a->u][a->sz], a->rd, a->rn, a->rm, 0);
-> +        gen_gvec_ool_zzzz(s, fns[a->u][a->sz], a->rd, a->rn, a->rm, a->ra, 0);
->       }
->       return true;
->   }
->   
-> -static bool trans_DOT_zzx(DisasContext *s, arg_DOT_zzx *a)
-> +static bool trans_DOT_zzxw(DisasContext *s, arg_DOT_zzxw *a)
->   {
-> -    static gen_helper_gvec_3 * const fns[2][2] = {
-> +    static gen_helper_gvec_4 * const fns[2][2] = {
->           { gen_helper_gvec_sdot_idx_b, gen_helper_gvec_sdot_idx_h },
->           { gen_helper_gvec_udot_idx_b, gen_helper_gvec_udot_idx_h }
->       };
->   
->       if (sve_access_check(s)) {
-> -        gen_gvec_ool_zzz(s, fns[a->u][a->sz], a->rd, a->rn, a->rm, a->index);
-> +        gen_gvec_ool_zzzz(s, fns[a->u][a->sz], a->rd, a->rn, a->rm,
-> +                          a->ra, a->index);
->       }
->       return true;
->   }
-> diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
-> index 32a4403256..d7ef31915b 100644
-> --- a/target/arm/vec_helper.c
-> +++ b/target/arm/vec_helper.c
-> @@ -375,71 +375,76 @@ void HELPER(sve2_sqrdmlsh_d)(void *vd, void *vn, void *vm,
->    * All elements are treated equally, no matter where they are.
->    */
->   
-> -void HELPER(gvec_sdot_b)(void *vd, void *vn, void *vm, uint32_t desc)
-> +void HELPER(gvec_sdot_b)(void *vd, void *vn, void *vm, void *va, uint32_t desc)
->   {
->       intptr_t i, opr_sz = simd_oprsz(desc);
-> -    uint32_t *d = vd;
-> +    int32_t *d = vd, *a = va;
->       int8_t *n = vn, *m = vm;
->   
->       for (i = 0; i < opr_sz / 4; ++i) {
-> -        d[i] += n[i * 4 + 0] * m[i * 4 + 0]
-> -              + n[i * 4 + 1] * m[i * 4 + 1]
-> -              + n[i * 4 + 2] * m[i * 4 + 2]
-> -              + n[i * 4 + 3] * m[i * 4 + 3];
-> +        d[i] = (a[i] +
-> +                n[i * 4 + 0] * m[i * 4 + 0] +
-> +                n[i * 4 + 1] * m[i * 4 + 1] +
-> +                n[i * 4 + 2] * m[i * 4 + 2] +
-> +                n[i * 4 + 3] * m[i * 4 + 3]);
->       }
->       clear_tail(d, opr_sz, simd_maxsz(desc));
->   }
->   
-> -void HELPER(gvec_udot_b)(void *vd, void *vn, void *vm, uint32_t desc)
-> +void HELPER(gvec_udot_b)(void *vd, void *vn, void *vm, void *va, uint32_t desc)
->   {
->       intptr_t i, opr_sz = simd_oprsz(desc);
-> -    uint32_t *d = vd;
-> +    uint32_t *d = vd, *a = va;
->       uint8_t *n = vn, *m = vm;
->   
->       for (i = 0; i < opr_sz / 4; ++i) {
-> -        d[i] += n[i * 4 + 0] * m[i * 4 + 0]
-> -              + n[i * 4 + 1] * m[i * 4 + 1]
-> -              + n[i * 4 + 2] * m[i * 4 + 2]
-> -              + n[i * 4 + 3] * m[i * 4 + 3];
-> +        d[i] = (a[i] +
-> +                n[i * 4 + 0] * m[i * 4 + 0] +
-> +                n[i * 4 + 1] * m[i * 4 + 1] +
-> +                n[i * 4 + 2] * m[i * 4 + 2] +
-> +                n[i * 4 + 3] * m[i * 4 + 3]);
->       }
->       clear_tail(d, opr_sz, simd_maxsz(desc));
->   }
->   
-> -void HELPER(gvec_sdot_h)(void *vd, void *vn, void *vm, uint32_t desc)
-> +void HELPER(gvec_sdot_h)(void *vd, void *vn, void *vm, void *va, uint32_t desc)
->   {
->       intptr_t i, opr_sz = simd_oprsz(desc);
-> -    uint64_t *d = vd;
-> +    int64_t *d = vd, *a = va;
->       int16_t *n = vn, *m = vm;
->   
->       for (i = 0; i < opr_sz / 8; ++i) {
-> -        d[i] += (int64_t)n[i * 4 + 0] * m[i * 4 + 0]
-> -              + (int64_t)n[i * 4 + 1] * m[i * 4 + 1]
-> -              + (int64_t)n[i * 4 + 2] * m[i * 4 + 2]
-> -              + (int64_t)n[i * 4 + 3] * m[i * 4 + 3];
-> +        d[i] = (a[i] +
-> +                (int64_t)n[i * 4 + 0] * m[i * 4 + 0] +
-> +                (int64_t)n[i * 4 + 1] * m[i * 4 + 1] +
-> +                (int64_t)n[i * 4 + 2] * m[i * 4 + 2] +
-> +                (int64_t)n[i * 4 + 3] * m[i * 4 + 3]);
->       }
->       clear_tail(d, opr_sz, simd_maxsz(desc));
->   }
->   
-> -void HELPER(gvec_udot_h)(void *vd, void *vn, void *vm, uint32_t desc)
-> +void HELPER(gvec_udot_h)(void *vd, void *vn, void *vm, void *va, uint32_t desc)
->   {
->       intptr_t i, opr_sz = simd_oprsz(desc);
-> -    uint64_t *d = vd;
-> +    uint64_t *d = vd, *a = va;
->       uint16_t *n = vn, *m = vm;
->   
->       for (i = 0; i < opr_sz / 8; ++i) {
-> -        d[i] += (uint64_t)n[i * 4 + 0] * m[i * 4 + 0]
-> -              + (uint64_t)n[i * 4 + 1] * m[i * 4 + 1]
-> -              + (uint64_t)n[i * 4 + 2] * m[i * 4 + 2]
-> -              + (uint64_t)n[i * 4 + 3] * m[i * 4 + 3];
-> +        d[i] = (a[i] +
-> +                (uint64_t)n[i * 4 + 0] * m[i * 4 + 0] +
-> +                (uint64_t)n[i * 4 + 1] * m[i * 4 + 1] +
-> +                (uint64_t)n[i * 4 + 2] * m[i * 4 + 2] +
-> +                (uint64_t)n[i * 4 + 3] * m[i * 4 + 3]);
->       }
->       clear_tail(d, opr_sz, simd_maxsz(desc));
->   }
->   
-> -void HELPER(gvec_sdot_idx_b)(void *vd, void *vn, void *vm, uint32_t desc)
-> +void HELPER(gvec_sdot_idx_b)(void *vd, void *vn, void *vm,
-> +                             void *va, uint32_t desc)
->   {
->       intptr_t i, segend, opr_sz = simd_oprsz(desc), opr_sz_4 = opr_sz / 4;
->       intptr_t index = simd_data(desc);
-> -    uint32_t *d = vd;
-> +    int32_t *d = vd, *a = va;
->       int8_t *n = vn;
->       int8_t *m_indexed = (int8_t *)vm + index * 4;
->   
-> @@ -455,10 +460,11 @@ void HELPER(gvec_sdot_idx_b)(void *vd, void *vn, void *vm, uint32_t desc)
->           int8_t m3 = m_indexed[i * 4 + 3];
->   
->           do {
-> -            d[i] += n[i * 4 + 0] * m0
-> -                  + n[i * 4 + 1] * m1
-> -                  + n[i * 4 + 2] * m2
-> -                  + n[i * 4 + 3] * m3;
-> +            d[i] = (a[i] +
-> +                    n[i * 4 + 0] * m0 +
-> +                    n[i * 4 + 1] * m1 +
-> +                    n[i * 4 + 2] * m2 +
-> +                    n[i * 4 + 3] * m3);
->           } while (++i < segend);
->           segend = i + 4;
->       } while (i < opr_sz_4);
-> @@ -466,11 +472,12 @@ void HELPER(gvec_sdot_idx_b)(void *vd, void *vn, void *vm, uint32_t desc)
->       clear_tail(d, opr_sz, simd_maxsz(desc));
->   }
->   
-> -void HELPER(gvec_udot_idx_b)(void *vd, void *vn, void *vm, uint32_t desc)
-> +void HELPER(gvec_udot_idx_b)(void *vd, void *vn, void *vm,
-> +                             void *va, uint32_t desc)
->   {
->       intptr_t i, segend, opr_sz = simd_oprsz(desc), opr_sz_4 = opr_sz / 4;
->       intptr_t index = simd_data(desc);
-> -    uint32_t *d = vd;
-> +    uint32_t *d = vd, *a = va;
->       uint8_t *n = vn;
->       uint8_t *m_indexed = (uint8_t *)vm + index * 4;
->   
-> @@ -486,10 +493,11 @@ void HELPER(gvec_udot_idx_b)(void *vd, void *vn, void *vm, uint32_t desc)
->           uint8_t m3 = m_indexed[i * 4 + 3];
->   
->           do {
-> -            d[i] += n[i * 4 + 0] * m0
-> -                  + n[i * 4 + 1] * m1
-> -                  + n[i * 4 + 2] * m2
-> -                  + n[i * 4 + 3] * m3;
-> +            d[i] = (a[i] +
-> +                    n[i * 4 + 0] * m0 +
-> +                    n[i * 4 + 1] * m1 +
-> +                    n[i * 4 + 2] * m2 +
-> +                    n[i * 4 + 3] * m3);
->           } while (++i < segend);
->           segend = i + 4;
->       } while (i < opr_sz_4);
-> @@ -497,11 +505,12 @@ void HELPER(gvec_udot_idx_b)(void *vd, void *vn, void *vm, uint32_t desc)
->       clear_tail(d, opr_sz, simd_maxsz(desc));
->   }
->   
-> -void HELPER(gvec_sdot_idx_h)(void *vd, void *vn, void *vm, uint32_t desc)
-> +void HELPER(gvec_sdot_idx_h)(void *vd, void *vn, void *vm,
-> +                             void *va, uint32_t desc)
->   {
->       intptr_t i, opr_sz = simd_oprsz(desc), opr_sz_8 = opr_sz / 8;
->       intptr_t index = simd_data(desc);
-> -    uint64_t *d = vd;
-> +    int64_t *d = vd, *a = va;
->       int16_t *n = vn;
->       int16_t *m_indexed = (int16_t *)vm + index * 4;
->   
-> @@ -509,14 +518,17 @@ void HELPER(gvec_sdot_idx_h)(void *vd, void *vn, void *vm, uint32_t desc)
->        * Process the entire segment all at once, writing back the results
->        * only after we've consumed all of the inputs.
->        */
-> -    for (i = 0; i < opr_sz_8 ; i += 2) {
-> -        uint64_t d0, d1;
-> +    for (i = 0; i < opr_sz_8; i += 2) {
-> +        int64_t d0, d1;
->   
-> -        d0  = n[i * 4 + 0] * (int64_t)m_indexed[i * 4 + 0];
-> +        d0  = a[i + 0];
-> +        d0 += n[i * 4 + 0] * (int64_t)m_indexed[i * 4 + 0];
->           d0 += n[i * 4 + 1] * (int64_t)m_indexed[i * 4 + 1];
->           d0 += n[i * 4 + 2] * (int64_t)m_indexed[i * 4 + 2];
->           d0 += n[i * 4 + 3] * (int64_t)m_indexed[i * 4 + 3];
-> -        d1  = n[i * 4 + 4] * (int64_t)m_indexed[i * 4 + 0];
-> +
-> +        d1  = a[i + 1];
-> +        d1 += n[i * 4 + 4] * (int64_t)m_indexed[i * 4 + 0];
->           d1 += n[i * 4 + 5] * (int64_t)m_indexed[i * 4 + 1];
->           d1 += n[i * 4 + 6] * (int64_t)m_indexed[i * 4 + 2];
->           d1 += n[i * 4 + 7] * (int64_t)m_indexed[i * 4 + 3];
-> @@ -524,15 +536,15 @@ void HELPER(gvec_sdot_idx_h)(void *vd, void *vn, void *vm, uint32_t desc)
->           d[i + 0] += d0;
->           d[i + 1] += d1;
->       }
-> -
->       clear_tail(d, opr_sz, simd_maxsz(desc));
->   }
->   
-> -void HELPER(gvec_udot_idx_h)(void *vd, void *vn, void *vm, uint32_t desc)
-> +void HELPER(gvec_udot_idx_h)(void *vd, void *vn, void *vm,
-> +                             void *va, uint32_t desc)
->   {
->       intptr_t i, opr_sz = simd_oprsz(desc), opr_sz_8 = opr_sz / 8;
->       intptr_t index = simd_data(desc);
-> -    uint64_t *d = vd;
-> +    uint64_t *d = vd, *a = va;
->       uint16_t *n = vn;
->       uint16_t *m_indexed = (uint16_t *)vm + index * 4;
->   
-> @@ -540,14 +552,17 @@ void HELPER(gvec_udot_idx_h)(void *vd, void *vn, void *vm, uint32_t desc)
->        * Process the entire segment all at once, writing back the results
->        * only after we've consumed all of the inputs.
->        */
-> -    for (i = 0; i < opr_sz_8 ; i += 2) {
-> +    for (i = 0; i < opr_sz_8; i += 2) {
->           uint64_t d0, d1;
->   
-> -        d0  = n[i * 4 + 0] * (uint64_t)m_indexed[i * 4 + 0];
-> +        d0  = a[i + 0];
-> +        d0 += n[i * 4 + 0] * (uint64_t)m_indexed[i * 4 + 0];
->           d0 += n[i * 4 + 1] * (uint64_t)m_indexed[i * 4 + 1];
->           d0 += n[i * 4 + 2] * (uint64_t)m_indexed[i * 4 + 2];
->           d0 += n[i * 4 + 3] * (uint64_t)m_indexed[i * 4 + 3];
-> -        d1  = n[i * 4 + 4] * (uint64_t)m_indexed[i * 4 + 0];
-> +
-> +        d1  = a[i + 1];
-> +        d1 += n[i * 4 + 4] * (uint64_t)m_indexed[i * 4 + 0];
->           d1 += n[i * 4 + 5] * (uint64_t)m_indexed[i * 4 + 1];
->           d1 += n[i * 4 + 6] * (uint64_t)m_indexed[i * 4 + 2];
->           d1 += n[i * 4 + 7] * (uint64_t)m_indexed[i * 4 + 3];
-> @@ -555,7 +570,6 @@ void HELPER(gvec_udot_idx_h)(void *vd, void *vn, void *vm, uint32_t desc)
->           d[i + 0] += d0;
->           d[i + 1] += d1;
->       }
-> -
->       clear_tail(d, opr_sz, simd_maxsz(desc));
->   }
->   
-> diff --git a/target/arm/translate-neon.c.inc b/target/arm/translate-neon.c.inc
-> index 4d1a292981..7efe3d9556 100644
-> --- a/target/arm/translate-neon.c.inc
-> +++ b/target/arm/translate-neon.c.inc
-> @@ -240,7 +240,7 @@ static bool trans_VCADD(DisasContext *s, arg_VCADD *a)
->   static bool trans_VDOT(DisasContext *s, arg_VDOT *a)
->   {
->       int opr_sz;
-> -    gen_helper_gvec_3 *fn_gvec;
-> +    gen_helper_gvec_4 *fn_gvec;
->   
->       if (!dc_isar_feature(aa32_dp, s)) {
->           return false;
-> @@ -262,9 +262,10 @@ static bool trans_VDOT(DisasContext *s, arg_VDOT *a)
->   
->       opr_sz = (1 + a->q) * 8;
->       fn_gvec = a->u ? gen_helper_gvec_udot_b : gen_helper_gvec_sdot_b;
-> -    tcg_gen_gvec_3_ool(vfp_reg_offset(1, a->vd),
-> +    tcg_gen_gvec_4_ool(vfp_reg_offset(1, a->vd),
->                          vfp_reg_offset(1, a->vn),
->                          vfp_reg_offset(1, a->vm),
-> +                       vfp_reg_offset(1, a->vd),
->                          opr_sz, opr_sz, 0, fn_gvec);
->       return true;
->   }
-> @@ -342,7 +343,7 @@ static bool trans_VCMLA_scalar(DisasContext *s, arg_VCMLA_scalar *a)
->   
->   static bool trans_VDOT_scalar(DisasContext *s, arg_VDOT_scalar *a)
->   {
-> -    gen_helper_gvec_3 *fn_gvec;
-> +    gen_helper_gvec_4 *fn_gvec;
->       int opr_sz;
->       TCGv_ptr fpst;
->   
-> @@ -367,9 +368,10 @@ static bool trans_VDOT_scalar(DisasContext *s, arg_VDOT_scalar *a)
->       fn_gvec = a->u ? gen_helper_gvec_udot_idx_b : gen_helper_gvec_sdot_idx_b;
->       opr_sz = (1 + a->q) * 8;
->       fpst = fpstatus_ptr(FPST_STD);
-> -    tcg_gen_gvec_3_ool(vfp_reg_offset(1, a->vd),
-> +    tcg_gen_gvec_4_ool(vfp_reg_offset(1, a->vd),
->                          vfp_reg_offset(1, a->vn),
->                          vfp_reg_offset(1, a->rm),
-> +                       vfp_reg_offset(1, a->vd),
->                          opr_sz, opr_sz, a->index, fn_gvec);
->       tcg_temp_free_ptr(fpst);
->       return true;
+>  bool kvm_has_exception_payload(void)
+>  {
+>      return has_exception_payload;
+> diff --git a/target/i386/kvm_i386.h b/target/i386/kvm_i386.h
+> index 064b8798a26c..0fce4e51d2d6 100644
+> --- a/target/i386/kvm_i386.h
+> +++ b/target/i386/kvm_i386.h
+> @@ -34,6 +34,7 @@
+> =20
+>  bool kvm_allows_irq0_override(void);
+>  bool kvm_has_smm(void);
+> +bool kvm_has_adjust_clock(void);
+>  bool kvm_has_adjust_clock_stable(void);
+>  bool kvm_has_exception_payload(void);
+>  void kvm_synchronize_all_tsc(void);
+> --=20
+> 2.25.4
+>=20
 
+--=20
+Antoine 'xdbob' Damhet
+
+--j64rnnc3jp4hhjoq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEArm1WbQx2GmOsfF83AmjLzzljz4FAl9rHIsACgkQ3AmjLzzl
+jz5z1Af8DUwFNHvCEkSZwutfv36K0wKFUNr28pvptVSAgS4IZXwUiRbjLzBVubz9
+q/RpO3JuCJKeKjTqDhYAvVU3oaH6e0Ctgdu7BczAer03IWWy8lYGkr+GRB1BNfQE
+kDb7uXKQpvQdZtCqSYNwah6h6y3Ph2lbv1P7kpOVoFFfoy8zmqHXULlRownOxEeC
+WCxUdHlALlA25dTlQfGgimejBsyFkFcgxzNChHsJiYhfmMf6q8cknoNiqmrS3Lji
+AnUfXKqmWlDFa4Uus3bjo5E6mGJC4v6W158HGZCFKOUcMlcIwx3u4MaEt4V8k+L7
+hjb92ytDWT8dpeLFVevFjqqrVhgLCw==
+=RAsy
+-----END PGP SIGNATURE-----
+
+--j64rnnc3jp4hhjoq--
 
