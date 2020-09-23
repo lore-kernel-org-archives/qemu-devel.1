@@ -2,70 +2,69 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C76BDC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 21:11:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D40D2C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 21:11:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 169FA2145D
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 21:11:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2931B2145D
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 21:11:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AbWMEF0a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 169FA2145D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UH5j6tC1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2931B2145D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLC3I-00077m-2N
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 17:11:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58208)
+	id 1kLC3J-0007AK-V6
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 17:11:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58318)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kLC0E-0004hH-Go
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 17:08:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52964)
+ id 1kLC0m-0004rP-SE
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 17:09:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36208)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kLC0C-0002ye-Sr
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 17:08:38 -0400
+ id 1kLC0l-00031h-9c
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 17:09:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600895316;
+ s=mimecast20190719; t=1600895350;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=bHN4alpFqqgu0fdV0Tb/zem+vtWZxt1Bs8U5S1A0sTo=;
- b=AbWMEF0aoc+5XosROtLknb2TUcEDpU7vQkORWzxGQIHZb/rRtoOfeRwqJjY8YyMIOvwOu5
- mTryMELKjdszC0DrTP+ffVtwh5p9LrvC7Z/YqTVRWeJQALTeZ4GzFZjlHcagzZIlE38OOK
- CK51mk3ETS4J2Z6tjcdFW98m9vULHy8=
+ bh=musVNb4QPtSFnMMeR4YtZ8z5JR2gCxzsiZFUJalyVB0=;
+ b=UH5j6tC1JjtLe42ayAj22AX9iRQFgvGyOSWJLhZ1MW3ZRzij2wWcYHDaPyb0Cx3NSXbY/Y
+ 8woUkDJrAJW8s8dd1O9oswKjB8NPpxk1yDyDDbvUu8SQE818LHpZbe3ZSClujlPP+5emW1
+ 1PSVdhaa5LiAoDwD+VKNaG4wk7eXqZg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-577-1F3kVaspO3uHMwiF-Q1B-Q-1; Wed, 23 Sep 2020 17:08:34 -0400
-X-MC-Unique: 1F3kVaspO3uHMwiF-Q1B-Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-463-m9KWbgp_Or6qND7idbz1vQ-1; Wed, 23 Sep 2020 17:09:08 -0400
+X-MC-Unique: m9KWbgp_Or6qND7idbz1vQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D8BD81F002;
- Wed, 23 Sep 2020 21:08:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 996331091062;
+ Wed, 23 Sep 2020 21:09:07 +0000 (UTC)
 Received: from localhost (unknown [10.10.67.5])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 066425C1C7;
- Wed, 23 Sep 2020 21:08:32 +0000 (UTC)
-Date: Wed, 23 Sep 2020 17:08:32 -0400
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2A1AD1002C01;
+ Wed, 23 Sep 2020 21:09:06 +0000 (UTC)
+Date: Wed, 23 Sep 2020 17:09:06 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 13/14] qapi/doc.py: Assert type of object variant
-Message-ID: <20200923210832.GX3717385@habkost.net>
+Subject: Re: [PATCH 14/14] qapi/doc.py: enable pylint checks
+Message-ID: <20200923210906.GY3717385@habkost.net>
 References: <20200922211802.4083666-1-jsnow@redhat.com>
- <20200922211802.4083666-14-jsnow@redhat.com>
+ <20200922211802.4083666-15-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200922211802.4083666-14-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200922211802.4083666-15-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -102,16 +101,10 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 22, 2020 at 05:18:01PM -0400, John Snow wrote:
-> Objects may have variants, but those variants must themselves be
-> objects. This is difficult to express with our current type system and
-> hierarchy, so instead pepper in an assertion.
-> 
-> Note: These assertions don't appear to be useful yet because schema.py
-> is not yet typed. Once it is, these assertions will matter.
-> 
+On Tue, Sep 22, 2020 at 05:18:02PM -0400, John Snow wrote:
 > Signed-off-by: John Snow <jsnow@redhat.com>
 
+Tested-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
 -- 
