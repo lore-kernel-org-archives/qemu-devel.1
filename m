@@ -7,36 +7,37 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A43F7C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:09:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F97DC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:10:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE01A20BED
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:09:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE01A20BED
+	by mail.kernel.org (Postfix) with ESMTPS id C2F5C20BED
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:10:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2F5C20BED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL8GK-0002Y7-PB
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 13:09:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35838)
+	id 1kL8HK-0003gl-PF
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 13:10:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35536)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kL8Ep-0001ZD-Vz; Wed, 23 Sep 2020 13:07:28 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:54141)
+ id 1kL8Dj-00011Y-UF; Wed, 23 Sep 2020 13:06:19 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:39685)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kL8Em-0007Ds-Ov; Wed, 23 Sep 2020 13:07:27 -0400
+ id 1kL8Dh-000796-U1; Wed, 23 Sep 2020 13:06:19 -0400
 Received: from [192.168.100.1] ([82.252.129.222]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MuDTn-1kbIfz0kbV-00uc7S; Wed, 23 Sep 2020 19:07:18 +0200
-Subject: Re: [PATCH] meson: fix static flag summary
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-References: <20200917140700.673171-1-lvivier@redhat.com>
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MHoZM-1kHL8u24DG-00Evlb; Wed, 23 Sep 2020 19:06:10 +0200
+Subject: Re: [PATCH] vhost-vdpa: fix indentation in vdpa_ops
 From: Laurent Vivier <laurent@vivier.eu>
+To: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org
+References: <20200916152634.56917-1-sgarzare@redhat.com>
+ <ffd81fe2-ad85-61c1-ed68-0b04385da42e@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
  WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
@@ -79,35 +80,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <9d7cdf34-14e6-6051-8107-947b7f83919b@vivier.eu>
-Date: Wed, 23 Sep 2020 19:07:16 +0200
+Message-ID: <dcfa4aec-23cb-5039-2006-fd89c5e5ef00@vivier.eu>
+Date: Wed, 23 Sep 2020 19:06:09 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200917140700.673171-1-lvivier@redhat.com>
+In-Reply-To: <ffd81fe2-ad85-61c1-ed68-0b04385da42e@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:v8Y9ZOj1GfIC4OekHmXaeGzbZqduISZm3EfuCN7jsZRyBVKcv/u
- 4x3+4xXt/uL3OlAvt5Res8NqrgknCLa2EcEJk2yUY2hN+ojkYzkdj4qOmhx2JqZCHo69Tg2
- R4JBxR7B2aF5BblGwEj93X1Z5c491pyQv/1h6J1x79YlJ5uxauWTIR3QDndvfubKdhHYbtI
- jyw/2nktXJqDyw892sx8Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:EVK9wXmwUpI=:bXkeWI1x0xcXZDOjJwmo3f
- PlFlt6KfrjT99V7+DnYNq61OC4ihtpP5YDqByK9agk1qdyDKi6EVieJ5mcEbfG+f48GB7fveG
- 1Rj1OtOHBDz5gbxSz60JkmZcbiC8ONNQfj/3TukFWsPmCTJUAl3sgvJDR+p4uyuIjdMT7IGtk
- /oe0M8miJtCS0+v7BCUbzsMEFHff1Vp2SaIeCkepmBdr1OIl9H8+lqPPWQyMzP+e+9hoo5XsA
- +RsmN13t2DEHfa3tu7tsUIoh8iTolxpdIvPXfrI+Rz4GYAEx3GWCW65+hUQR2b2AqjUe9vdK5
- A5Wwk0gmd+4G5E8pCe86021mfPn2hvc4jCoxa1VlsxTAKmwQN5RLTHEu5eHG6dIqg4OF7hkgs
- aTPhnYyiC/eRIOs8oJ3UlbfEH7/JANIgYHa7k51MmT8WtPim+7TEl0l9vQuXQqmKIz50JpVpV
- GLbCatO9dMG/TcCnfuyBdBP/hvdx+qHrYGT7D2rfLT18nZshaVIL3ct7DNuyjFjEVGdBNJdiM
- fAoQDL0D9rN5VacduY8tUoiz/ap6e57eFxrQ1WP/iJr8boSy/o4sr1owNHW0i5tlaQYolU1Ic
- yY0vOjHTZsvJFPuq4+BghLe/PuAnLEa0oLtmGGRxwupe7i9ukaDAnCHXF82BXUXU2vZleXoNt
- vx7HuBoWDgH+F4V1pAM+QIjGkWJ2K3tA872s89dIZqeeel8HQcNj8zYOK6XRygc2RpM/Dc6xw
- Du4RMuYzpBohdQ03nk6f1ROAW5aVvcNKS9Zfzi3XcL6TKurUSquJ5zyR/hh2NLazlTyxFoL+G
- NOiAXgHNinoyt3F//euCwlJeBNxk0NpT2myRWdJce8fjRnjzI5dnkgRLMaombf94IBDy9bB
-Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:PFhZlSzQN7/ZsU920esJrQEC8ekelXn6LMj1O67bhSTDBPwu/U0
+ qcfiu73Ynq0ROHWjwFRDASkeS1rF640vOPgHbexmYSs+vCBsd3vvKTAAMLqCC1CnyVtT0wM
+ usZX9FDzuRSQwrLCQb2xz7er+JTQt+S5oBPOCC57miZXawkE1UyPVVeAmjy1AcwgT2Qj/C9
+ YadzSxLHLlF2PLkOgNFZg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:vTb50qBndng=:SXfWDdEzUcknSWHI0fU0UA
+ p7zQh4Vwe69pvDmTowgYQlxMK/KDfKgnb4Ly/+6lJgHbn1bLEIZWe1bZr9UB7L1fMZr1yT1eR
+ MNNIJNd0Kli/sO9VwjOMTyyxdYzMqLMrIl4MAeOjRgymZ4Rcs8rDoRg9L1H1jnt3mKkEPfS4o
+ yjbWYTS1tfWItNDidtg0D6wsJa5/sm0rw9R0ONW5WZU+doyH3/2e2KHwKC2PPtlSlaq80Zrym
+ A9tv/KjVydDblQ7DbAQJIzbj9u7GbtethI52s2ufVJrC8EA5MDhvz4Twif23+SyHwmwmABphg
+ EIvQ0i4r5qsvUqGL0kMZ1RNLvZHZ1wA1YD4fjcxhzCI+M9LGnOUvGZcgnwo/QdmXQu4vW2lL0
+ SPSV7+GNaiZyJ9A1KYmmI0i0DWxvmCW6A1yzOFTYQtGsGbQHvsEOhoopvXka0lZBnVKuAUCuY
+ f+VT8Nf8p+2lR6QLPOPsyVPcCGfQs5P29PlGxRAnUnc8+JK8D1mbMfCgtv7+jUslnJ51DsNzD
+ g3TwcS3bnKmMKqid/g/AfN2PvPGfmBHsQZFkTZDGRL9vgcr5j61dUbqq7Gz3u7TomwZEyyrB8
+ iGdP1dq91DxylzovaIADp7zoggbAGndL8Bb+BCaQmUQa7wWhu347ExH96B5e+EM3rT/PX+8p+
+ lj8RGDutKxN0ynwZZjN+P5znuUGOYptsxuPPmKk9JXHq2waWgBWif6jm0UmuZkIEy1+RrR54O
+ fJXzbi45FtfAbYXDKBXYtbfI+DGcVVZUen51Qltt7suXbSFOjFIUbVPsK80xZh/Q4apbJG+sf
+ AvLEyvqpw/SZPnNhnz2az8paRdCLcvyLrLe5Vhr+iEJx6M8aSJq92WHqiG40TpXUexOLjM+
+Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 13:07:21
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 13:06:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -127,38 +128,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-trivial@nongnu.org, Jason Wang <jasowang@redhat.com>, lulu@redhat.com,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 17/09/2020 à 16:07, Laurent Vivier a écrit :
-> 'static build:' must display value of CONFIG_STATIC rather than value of
-> CONFIG_TOOLS.
+Le 16/09/2020 à 17:48, Laurent Vivier a écrit :
+> Le 16/09/2020 à 17:26, Stefano Garzarella a écrit :
+>> This patch fixes wrong indentation of some vdpa_ops fields introduced
+>> with the initial commit 108a64818e ("vhost-vdpa: introduce vhost-vdpa
+>> backend")
+>>
+>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>> ---
+>>  hw/virtio/vhost-vdpa.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
+>> index 4580f3efd8..e123837a55 100644
+>> --- a/hw/virtio/vhost-vdpa.c
+>> +++ b/hw/virtio/vhost-vdpa.c
+>> @@ -469,6 +469,6 @@ const VhostOps vdpa_ops = {
+>>          .vhost_send_device_iotlb_msg = NULL,
+>>          .vhost_dev_start = vhost_vdpa_dev_start,
+>>          .vhost_get_device_id = vhost_vdpa_get_device_id,
+>> -         .vhost_vq_get_addr = vhost_vdpa_vq_get_addr,
+>> -         .vhost_force_iommu = vhost_vdpa_force_iommu,
+>> +        .vhost_vq_get_addr = vhost_vdpa_vq_get_addr,
+>> +        .vhost_force_iommu = vhost_vdpa_force_iommu,
+>>  };
+>>
 > 
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->  meson.build | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 > 
-> diff --git a/meson.build b/meson.build
-> index 5421eca66a02..c174f0ab0948 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -1374,7 +1374,7 @@ summary_info += {'gprof enabled':     config_host.has_key('CONFIG_GPROF')}
->  summary_info += {'sparse enabled':    meson.get_compiler('c').cmd_array().contains('cgcc')}
->  summary_info += {'strip binaries':    get_option('strip')}
->  summary_info += {'profiler':          config_host.has_key('CONFIG_PROFILER')}
-> -summary_info += {'static build':      config_host.has_key('CONFIG_TOOLS')}
-> +summary_info += {'static build':      config_host.has_key('CONFIG_STATIC')}
->  if targetos == 'darwin'
->    summary_info += {'Cocoa support': config_host.has_key('CONFIG_COCOA')}
->  endif
+> CC: Jason (he already has a cleanup series for vDPA)
 > 
+
 
 Applied to my trivial-patches branch.
 
 Thanks,
 Laurent
-
 
