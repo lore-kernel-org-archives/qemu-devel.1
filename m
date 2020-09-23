@@ -2,99 +2,89 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72D3CC4363D
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 03:14:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE008C4727C
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 03:25:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B95E120838
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 03:14:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B99812065E
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 03:25:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="qDfZRAhJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B95E120838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bytedance.com
+	dkim=pass (1024-bit key) header.d=hp.com header.i=@hp.com header.b="cbVhX6Tj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B99812065E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=hp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKvEQ-0006MW-K1
-	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 23:14:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60422)
+	id 1kKvPW-0000Ov-K5
+	for qemu-devel@archiver.kernel.org; Tue, 22 Sep 2020 23:25:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34054)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pizhenwei@bytedance.com>)
- id 1kKvDM-0005tY-83
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 23:13:04 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:46889)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <pizhenwei@bytedance.com>)
- id 1kKvDF-0007gJ-8t
- for qemu-devel@nongnu.org; Tue, 22 Sep 2020 23:13:00 -0400
-Received: by mail-pg1-x543.google.com with SMTP id 34so13474467pgo.13
- for <qemu-devel@nongnu.org>; Tue, 22 Sep 2020 20:12:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bytedance-com.20150623.gappssmtp.com; s=20150623;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=plzlo3709EalLAixaGiVhGPWAijq6aDS+pD50YzgiD4=;
- b=qDfZRAhJ6/dDSy76RrBm8VId0YNMclgSaVVigHukqSaUpGysVxwrxsQt0Dy/aNuVO+
- ArxbIzObco6itV4Sq1NQoFoHsSFMJywnwdMEdTvouu9rgXT9eCzppLVtPvy/L9FUQazL
- YQtl+qndKXIAScfmFNuJEg/8DNwRLHcyBYOkX0TTPpidI0QHRFY6wh21dDTihtEKEwsU
- 61rPB6D6y6sRJhAwDkeqEIDzIq3bfCA15sa/TNSJR/tOpIoHtahWpPv/9Tatvg6yAhzT
- aO+XQHxEq68bgzlc/lLaUHgETBWHKJfsBiV4pznJfCMxrrjXBg40lD4vLpWA6xRsBsEE
- 8OMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=plzlo3709EalLAixaGiVhGPWAijq6aDS+pD50YzgiD4=;
- b=MuV+s5dkZvuRPc8iBFsDnxUv9pVS/Cx54zSOaaw2TRtbSfYEKco0IZXxluZN3QJB35
- GF18PaNHjzk4Yvv2vYoBiM0krR9JpmDLhMZeKOMaviXMSwuWzTz3QRYj9JqeLlRbu2bv
- 0V3pBHyv4oZhLwFBA8xmFzPjWjNuY83PyKn/2GHcDyOYEb4/htbDcqgS+vkYgHGeGthZ
- 9H4Hp9DbXm+ITXGqjg5XwS9YKjXmYpcr3chWkB80vHuiBAuRtzR9VtngAM+vXqZ0kQY/
- QQqOYZO11x4N4p2lzXTPcVqm4g6MfeuFcSROAHy/IePL6LGT30iX0wlM8vZNuIDYNs8x
- HUoQ==
-X-Gm-Message-State: AOAM532OYW8vB3FjCD8ApmEFRT8awpKN8WB4vw6nWR4EYuMFXfHbD6Co
- UKK6m2Gg/T5l+EbF8D+aD0iSQe+W3EXv+asx
-X-Google-Smtp-Source: ABdhPJyoAmvPiGxMgEyUkIGn2eclaW7KmgJhIb+ywetncUSSqX24A7QIvikgc62bKRgC0hkWYfl97A==
-X-Received: by 2002:a65:6104:: with SMTP id z4mr6173491pgu.184.1600830774531; 
- Tue, 22 Sep 2020 20:12:54 -0700 (PDT)
-Received: from [10.2.24.220] ([61.120.150.77])
- by smtp.gmail.com with ESMTPSA id a15sm16546333pfi.119.2020.09.22.20.12.50
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 22 Sep 2020 20:12:54 -0700 (PDT)
-Subject: Re: [External] Re: [PATCH v2 3/3] target-i386: post memory failure
- event to uplayer
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- pbonzini@redhat.com, peter.maydell@linaro.org
-References: <20200922095630.394893-1-pizhenwei@bytedance.com>
- <20200922095630.394893-4-pizhenwei@bytedance.com>
- <776b6afe-022e-f304-4bc9-f1f486d75af2@redhat.com>
-From: zhenwei pi <pizhenwei@bytedance.com>
-Message-ID: <1d31682f-e42a-2674-1122-65eaea474488@bytedance.com>
-Date: Wed, 23 Sep 2020 11:12:47 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ (Exim 4.90_1) (envelope-from <erich.mcmillan@hp.com>)
+ id 1kKvOe-0008OS-LM
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 23:24:45 -0400
+Received: from us-smtp-delivery-162.mimecast.com ([216.205.24.162]:23058)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <erich.mcmillan@hp.com>)
+ id 1kKvOb-0000cu-Ga
+ for qemu-devel@nongnu.org; Tue, 22 Sep 2020 23:24:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hp.com;
+ s=mimecast20180716; t=1600831479;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=vFzubtP6NCNJ7WgIc2SLQGcneRkzxeIf1U9SqeX520w=;
+ b=cbVhX6TjnC0RKKvmG+IMVnx7Gg6zWndhr2s+e4CSGhgo5gzE3bgR0TPkg3AAHIe06jlSUy
+ uA1Lv9uvX4mfXLPLdt7hDQuKadc0lTHMuPDQe30WvujD03iRCzPvgWWfPdLAvP7ZrLrVWR
+ YQRVWqjUQDGqcyNWx6+HshCboEgR1Ac=
+Received: from g2t4623.austin.hp.com (g2t4623.austin.hp.com [15.73.212.78])
+ (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-149-_nxqT8YZMH-rXIDFtbIQcg-1; Tue, 22 Sep 2020 23:24:37 -0400
+X-MC-Unique: _nxqT8YZMH-rXIDFtbIQcg-1
+Received: from g2t4689.austin.hpicorp.net (g2t4689.austin.hpicorp.net
+ [15.94.10.175])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by g2t4623.austin.hp.com (Postfix) with ESMTPS id 594431C7;
+ Wed, 23 Sep 2020 03:24:36 +0000 (UTC)
+Received: from localhost.localdomain (unknown [15.75.17.249])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by g2t4689.austin.hpicorp.net (Postfix) with ESMTPS id 0ECD8143;
+ Wed, 23 Sep 2020 03:24:35 +0000 (UTC)
+From: Erich Mcmillan <erich.mcmillan@hp.com>
+To: qemu-devel@nongnu.org
+Cc: lersek@redhat.com, dgilbert@redhat.com, mst@redhat.com,
+ marcel.apfelbaum@gmail.com, imammedo@redhat.com,
+ Erich McMillan <erich.mcmillan@hp.com>
+Subject: [PATCH] add maximum combined fw size as machine configuration option
+Date: Wed, 23 Sep 2020 03:24:33 +0000
+Message-Id: <20200923032433.3799-1-erich.mcmillan@hp.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <776b6afe-022e-f304-4bc9-f1f486d75af2@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=pizhenwei@bytedance.com; helo=mail-pg1-x543.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA62A171 smtp.mailfrom=erich.mcmillan@hp.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: hp.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=216.205.24.162;
+ envelope-from=erich.mcmillan@hp.com; helo=us-smtp-delivery-162.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:24:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,138 +97,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mtosatti@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Erich McMillan <erich.mcmillan@hp.com>
 
+Signed-off-by: Erich McMillan <erich.mcmillan@hp.com>
+---
+ hw/i386/pc.c         | 50 ++++++++++++++++++++++++++++++++++++++++++++
+ hw/i386/pc_sysfw.c   | 13 ++----------
+ include/hw/i386/pc.h |  2 ++
+ 3 files changed, 54 insertions(+), 11 deletions(-)
 
-On 9/22/20 6:30 PM, Philippe Mathieu-Daudé wrote:
-> On 9/22/20 11:56 AM, zhenwei pi wrote:
->> Post memory failure event to uplayer to handle hardware memory
->> corrupted event. Rather than simple QEMU log, QEMU could report more
->> effective message to uplayer. For example, guest crashes by MCE,
->> selecting another host server is a better choice.
->>
->> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
->> ---
->>   target/i386/helper.c | 15 +++++++++++++++
->>   target/i386/kvm.c    |  7 ++++++-
->>   2 files changed, 21 insertions(+), 1 deletion(-)
->>
->> diff --git a/target/i386/helper.c b/target/i386/helper.c
->> index 0c7fd32491..47823c29e4 100644
->> --- a/target/i386/helper.c
->> +++ b/target/i386/helper.c
->> @@ -18,6 +18,7 @@
->>    */
->>   
->>   #include "qemu/osdep.h"
->> +#include "qapi/qapi-events-run-state.h"
->>   #include "cpu.h"
->>   #include "exec/exec-all.h"
->>   #include "qemu/qemu-print.h"
->> @@ -858,6 +859,7 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
->>       CPUX86State *cenv = &cpu->env;
->>       uint64_t *banks = cenv->mce_banks + 4 * params->bank;
->>       char msg[64];
->> +    MemoryFailureFlags mf_flags = {0};
->>       bool need_reset = false;
->>   
->>       cpu_synchronize_state(cs);
->> @@ -869,6 +871,12 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
->>       if (!(params->flags & MCE_INJECT_UNCOND_AO)
->>           && !(params->status & MCI_STATUS_AR)
->>           && (cenv->mcg_status & MCG_STATUS_MCIP)) {
->> +        mf_flags.has_action_required = true;
->> +        mf_flags.action_required = false;
->> +        mf_flags.has_recursive = true;
->> +        mf_flags.recursive = true;
->> +        qapi_event_send_memory_failure(MEMORY_FAILURE_ACTION_GUEST_MCE_INJECT,
->> +                                       true, &mf_flags);
-> 
-> Can you extract a function such:
-> 
-> static void emit_guest_mce_failure(bool action_required, bool recursive)
-> {
->    ...
-> }
-> 
-> To use as:
-> 
->             emit_guest_mce_failure(true, true);
-> 
->>           return;
->>       }
->>
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index d11daacc23..89775e7d5b 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1869,6 +1869,49 @@ static void pc_machine_set_max_ram_below_4g(Object *=
+obj, Visitor *v,
+     pcms->max_ram_below_4g =3D value;
+ }
+=20
++static void pc_machine_get_max_fw_size(Object *obj, Visitor *v,
++                                       const char *name, void *opaque,
++                                       Error **errp)
++{
++    PCMachineState *pcms =3D PC_MACHINE(obj);
++    uint64_t value =3D pcms->max_fw_size;
++
++    visit_type_size(v, name, &value, errp);
++}
++
++static void pc_machine_set_max_fw_size(Object *obj, Visitor *v,
++                                       const char *name, void *opaque,
++                                       Error **errp)
++{
++    PCMachineState *pcms =3D PC_MACHINE(obj);
++    Error *error =3D NULL;
++    uint64_t value;
++
++    visit_type_size(v, name, &value, &error);
++    if (error) {
++        error_propagate(errp, error);
++        return;
++    }
++
++    /*
++    * We don't have a theoretically justifiable exact lower bound on the b=
+ase
++    * address of any flash mapping. In practice, the IO-APIC MMIO range is
++    * [0xFEE00000..0xFEE01000] -- see IO_APIC_DEFAULT_ADDRESS --, leaving =
+free
++    * only 18MB-4KB below 4G. For now, restrict the cumulative mapping to =
+8MB in
++    * size.
++    */
++    if (value > 16 * MiB) {
++        error_setg(errp,
++                   "User specified max allowed firmware size %" PRIu64 " i=
+s "
++                   "greater than 16MiB. If combined firwmare size exceeds =
+"
++                   "16MiB the system may not boot, or experience intermitt=
+ent"
++                   "stability issues.",
++                   value);
++    }
++
++    pcms->max_fw_size =3D value;
++}
++
+ static void pc_machine_initfn(Object *obj)
+ {
+     PCMachineState *pcms =3D PC_MACHINE(obj);
+@@ -1884,6 +1927,7 @@ static void pc_machine_initfn(Object *obj)
+     pcms->smbus_enabled =3D true;
+     pcms->sata_enabled =3D true;
+     pcms->pit_enabled =3D true;
++    pcms->max_fw_size =3D 8 * MiB; /* use default */
+=20
+     pc_system_flash_create(pcms);
+     pcms->pcspk =3D isa_new(TYPE_PC_SPEAKER);
+@@ -2004,6 +2048,12 @@ static void pc_machine_class_init(ObjectClass *oc, v=
+oid *data)
+=20
+     object_class_property_add_bool(oc, PC_MACHINE_PIT,
+         pc_machine_get_pit, pc_machine_set_pit);
++
++    object_class_property_add(oc, PC_MACHINE_MAX_FW_SIZE, "size",
++        pc_machine_get_max_fw_size, pc_machine_set_max_fw_size,
++        NULL, NULL);
++    object_class_property_set_description(oc, PC_MACHINE_MAX_FW_SIZE,
++        "Maximum combined firmware size");
+ }
+=20
+ static const TypeInfo pc_machine_info =3D {
+diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+index b6c0822fe3..22450ba0ef 100644
+--- a/hw/i386/pc_sysfw.c
++++ b/hw/i386/pc_sysfw.c
+@@ -39,15 +39,6 @@
+ #include "hw/block/flash.h"
+ #include "sysemu/kvm.h"
+=20
+-/*
+- * We don't have a theoretically justifiable exact lower bound on the base
+- * address of any flash mapping. In practice, the IO-APIC MMIO range is
+- * [0xFEE00000..0xFEE01000] -- see IO_APIC_DEFAULT_ADDRESS --, leaving fre=
+e
+- * only 18MB-4KB below 4G. For now, restrict the cumulative mapping to 8MB=
+ in
+- * size.
+- */
+-#define FLASH_SIZE_LIMIT (8 * MiB)
+-
+ #define FLASH_SECTOR_SIZE 4096
+=20
+ static void pc_isa_bios_init(MemoryRegion *rom_memory,
+@@ -182,10 +173,10 @@ static void pc_system_flash_map(PCMachineState *pcms,
+         }
+         if ((hwaddr)size !=3D size
+             || total_size > HWADDR_MAX - size
+-            || total_size + size > FLASH_SIZE_LIMIT) {
++            || total_size + size > pcms->max_fw_size) {
+             error_report("combined size of system firmware exceeds "
+                          "%" PRIu64 " bytes",
+-                         FLASH_SIZE_LIMIT);
++                         pcms->max_fw_size);
+             exit(1);
+         }
+=20
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index fe52e165b2..f7c8e7cbfe 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -43,6 +43,7 @@ struct PCMachineState {
+     bool smbus_enabled;
+     bool sata_enabled;
+     bool pit_enabled;
++    uint64_t max_fw_size;
+=20
+     /* NUMA information: */
+     uint64_t numa_nodes;
+@@ -59,6 +60,7 @@ struct PCMachineState {
+ #define PC_MACHINE_SMBUS            "smbus"
+ #define PC_MACHINE_SATA             "sata"
+ #define PC_MACHINE_PIT              "pit"
++#define PC_MACHINE_MAX_FW_SIZE      "max-fw-size"
+=20
+ /**
+  * PCMachineClass:
+--=20
+2.25.1
 
-There are 2 field in struct MemoryFailureFlags currently, maybe more 
-fields need to be added in the future, and emit_guest_mce_failure need 
-more arguments too. So is it worth wrapping a function now?
-
-
->> @@ -909,6 +917,8 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
->>           }
->>   
->>           if (need_reset) {
->> +            qapi_event_send_memory_failure(
->> +                 MEMORY_FAILURE_ACTION_GUEST_MCE_FATAL, false, NULL);
->>               monitor_printf(params->mon, "%s", msg);
->>               qemu_log_mask(CPU_LOG_RESET, "%s\n", msg);
->>               qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
->> @@ -934,6 +944,11 @@ static void do_inject_x86_mce(CPUState *cs, run_on_cpu_data data)
->>       } else {
->>           banks[1] |= MCI_STATUS_OVER;
->>       }
->> +
->> +    mf_flags.has_action_required = true;
->> +    mf_flags.action_required = !!(params->status & MCI_STATUS_AR);
->> +    qapi_event_send_memory_failure(MEMORY_FAILURE_ACTION_GUEST_MCE_INJECT,
->> +                                   true, &mf_flags);
-> 
-> And here:
-> 
->         emit_guest_mce_failure(params->status & MCI_STATUS_AR, false);
-> 
->>   }
->>   
->>   void cpu_x86_inject_mce(Monitor *mon, X86CPU *cpu, int bank,
->> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->> index 9efb07e7c8..989889c291 100644
->> --- a/target/i386/kvm.c
->> +++ b/target/i386/kvm.c
->> @@ -14,6 +14,7 @@
->>   
->>   #include "qemu/osdep.h"
->>   #include "qapi/error.h"
->> +#include "qapi/qapi-events-run-state.h"
->>   #include <sys/ioctl.h>
->>   #include <sys/utsname.h>
->>   
->> @@ -577,6 +578,8 @@ static void kvm_mce_inject(X86CPU *cpu, hwaddr paddr, int code)
->>   
->>   static void hardware_memory_error(void *host_addr)
->>   {
->> +    qapi_event_send_memory_failure(MEMORY_FAILURE_ACTION_HYPERVISOR_FATAL,
->> +                                   false, NULL);
->>       error_report("QEMU got Hardware memory error at addr %p", host_addr);
->>       exit(1);
->>   }
->> @@ -631,7 +634,9 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
->>           hardware_memory_error(addr);
->>       }
->>   
->> -    /* Hope we are lucky for AO MCE */
->> +    /* Hope we are lucky for AO MCE, just notify a event */
->> +    qapi_event_send_memory_failure(MEMORY_FAILURE_ACTION_HYPERVISOR_IGNORE,
->> +                                   false, NULL);
->>   }
->>   
->>   static void kvm_reset_exception(CPUX86State *env)
->>
-> 
-
--- 
-zhenwei pi
 
