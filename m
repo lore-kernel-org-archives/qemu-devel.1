@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F354C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:15:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F15C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:15:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0E6321BE5
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:15:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0E6321BE5
+	by mail.kernel.org (Postfix) with ESMTPS id 27B6721BE5
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:15:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27B6721BE5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL8Mk-0002Nf-Mi
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 13:15:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37352)
+	id 1kL8Mo-0002Wg-0W
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 13:15:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37604)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kL8KV-0007wV-5a; Wed, 23 Sep 2020 13:13:20 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:55677)
+ id 1kL8LS-00014j-KT; Wed, 23 Sep 2020 13:14:18 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:46437)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kL8KT-0007rb-AZ; Wed, 23 Sep 2020 13:13:18 -0400
+ id 1kL8LQ-0007wk-P8; Wed, 23 Sep 2020 13:14:18 -0400
 Received: from [192.168.100.1] ([82.252.129.222]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1M8hR1-1kPHCL1Ztx-004i8G; Wed, 23 Sep 2020 19:13:12 +0200
-Subject: Re: [PATCH] timer: Fix timer_mod_anticipate() documentation
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1Mg6uW-1kwyL630FK-00hdJM; Wed, 23 Sep 2020 19:14:10 +0200
+Subject: Re: [PATCH] migration/multifd: Remove superfluous semicolons
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
-References: <20200920155042.400737-1-f4bug@amsat.org>
+References: <20200921040231.437653-1-f4bug@amsat.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -80,35 +80,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <3cee22bf-d0c9-8942-7206-397fa167930f@vivier.eu>
-Date: Wed, 23 Sep 2020 19:13:11 +0200
+Message-ID: <235225dd-1df6-2ea9-bf03-cbccadd59e9c@vivier.eu>
+Date: Wed, 23 Sep 2020 19:14:08 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200920155042.400737-1-f4bug@amsat.org>
+In-Reply-To: <20200921040231.437653-1-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:oowgM6vervFQZPxnNLLj8qoPU7U0eYm+HLFTZk0yU+8iCtnpc/z
- U2Ayc5kQ32ZVbhs/zD6G7EoQepLo+qMsPOrfscjOtovhODjjCyRMw59V15GapZltynjGW0B
- q6Di5Ovby2NlY6Tt39y75QUZ8zcMjzjJSz2TUwEYcFIUPQYTVGeme/oETE6BOnLLZybDjqq
- v0aA2eNo/+o/Z16Lj2dUA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Czx3L65lFqE=:TM/RusTtVzP8igZxz+vcce
- LUk/S+9EBa8UNWQr7oQpCsdkPzJt1ZPeR96dqkICTtDxGnqSLYnulkGHKk8spNRVmoA3he2+1
- wBjz5FHXuycbm/QQCgID3/mFApgnWpCs+xPwgwIFhQixC2kIDY43m7MwHB2feoczVTXlfp9kT
- 8yYwXAtGWcPz6Ii9SntrhLWT+tYrmBZ03ZLtLrVmd7wdEVjvqKsxbnS7XOK0vl0joVLnMcBDX
- /EdgPQQwxEjOKN+IK0HBS+bIdpDvOiNJJWHqYk8RZ2braJIgYTtsn6Nm7pcsOOEmgzgWaxgmN
- MpIVXDTkc7NL1dwwcRBWR3BsEhwkOElve0YITnzZCoDKwTOIdKdW6UBQYdhSReN3ew3N/mxzX
- Shgw1K3Gpo03XX4ChWBHzUMgxq2Y94obkhsdsK5sHRCVGgF9MjM0zIAyWqSvOufyb4iJ1Zfy2
- YKdwCmzXekDIcs2/SHuaQ/1jabNRmUltuHlRNLN18KOej8Bi/1RA4+LRBDLn2A4PKrQ+Ifhkv
- jGcR4PSQVjEZ6MU67jC25wu9q2h2sSsh54CKgF1CdUYLp49nNhKJGnX/wZhD5bYPuJdLI8K7x
- X2dpmFVL8Plte47wRqlchYHjhIPnV/nDXFZix6APX2NhyT8GE33YvNR/n9X8R9xXz05Jt8p3Q
- JJS9rFkh40MmhQ3LOidM37bBJ30KfO6pb0kP3Rm1gKxFlbUbaH7kBKZ0lqQYI1yCRyjmatWVH
- ve+ROSl5755EEWeYJ8VuVbwqaXaepa6q7FDz31hMq9EBu2YZHfxKVsu0sSjuwnrBecKW7QkXV
- pR/DMlZZTyeVi0PRuzoVx+PCCwYHIwXfF0xlwG6+XT9sVUbJ4eEpTfZAMb/1xDqmcMQ3Utb
-Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:PxDe1KEihUTav/UDfK3KH7FBBaP48UIeLESgREdF4wFWzUuM1K/
+ 9QPRdFvo9BSsCMvmQ2mMUZq5xZMl70muT7RNSEACilo9JawsT3LipQ0VF3tFOErn8+LyG3L
+ Gc2FzdROixU8YoLoRios5UutknyTghUdyvAChw2X+CfZYFBqsvxPzy5tsZdBZnJ9zIx0kgH
+ UBW8+RE9JV8JRcX+QANxw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Fm9On0pZrWg=:FMRG3o9VKcnHPkpo4ToWCh
+ pe0+B9VY9AxTYkgEG9+O0TOlYFVocPI+5iNceLmlWrrsOY9qZdCjQKdXjZC3XbUQcadvFGWu+
+ BLNqIhxCd+2XuINEzZzxN9xyT08tzeMEw416J7WR1Xu4/udpmmHv5uCUtwOAP4hBCj2vthqzp
+ j8ktd4VigI9ZaJ5/U3hVKhOdN2UwcqCoCEIEWuz+SkKoePaV3QExeb3XFDo6fj/VDC67/fDf0
+ eg1AqHqevpcbbgTevefwvZlY8Ug7GsJqH6JoPpTKNq08OIrK2XTkp1AU4PgCnxIcuw9IsbuWE
+ UkAtyDfkMbiXqSMS/k9LXgr+3aE61hZM5Fs4uMLfaWYQvShfz6RCjrwr51obieH+3nXRQTKCs
+ yVEu/j8CNvkq8eGcGtC6CXEZqilJYVfzI7xN5IxxLqSvrO/DGE+O6yJesRAWcjM6KNfetx13r
+ HqMugn50VK8XMdJy3H40J1u+tZU1Cf7GAzhUlEwOZPxbF1h4EPUbz88Oy4zE80+g/8vpbLptd
+ 2bVOxwcDbW32jkp7mPJ9ug1rGHMHPZVzv1YiINrt4JjZU3ktO5n7VF1wSHBP/SJSkvQe9FUmy
+ t4sE+jU2I1ZXJhox/MWUtvHjRsNnjXIxGNlobwKSTCW3JT+CwkCdxgkOSokoVEHG6Umx4eJXC
+ Ru0GijZrrPDOi3xTPNNE+9oC7JOm6ykyo+3835V6fvgJSXDutVa6GnYMnx0HoYGjrG9u56WNn
+ Wzmj1wDWREdJ5rM3pD4odjviJK04ILcrJxEW2XlzIvdVJP+30Rf5l7cfU+E6E6Bl9fQyaD+zs
+ hvgWvnW0h0dF8D+tIH0BEZvJtUvzt40J5JRGjWVRqaZDbCD3d9uXC1Je5bet07Ad4EILh77
+Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 13:09:05
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 13:14:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -128,34 +128,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-trivial@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 20/09/2020 à 17:50, Philippe Mathieu-Daudé a écrit :
-> timer_mod_anticipate() will be scaled to the timer unit,
-> which is not always nanosecond. Fix the documentation.
+Le 21/09/2020 à 06:02, Philippe Mathieu-Daudé a écrit :
+> checkpatch.pl report superfluous semicolons since commit
+> ee0f3c09e01, but this one was missed:
 > 
-> Fixes: add40e9777d ("timer: add timer_mod_anticipate*")
+>   scripts/checkpatch.pl d32ca5ad798~..d32ca5ad798
+>   ERROR: superfluous trailing semicolon
+>   #498: FILE: migration/multifd.c:308:
+>   +    ram_counters.transferred += transferred;;
+>   total: 1 errors, 1 warnings, 2073 lines checked
+> 
+> Fixes: d32ca5ad798 ("multifd: Split multifd code into its own file")
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  include/qemu/timer.h | 2 +-
+>  migration/multifd.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/include/qemu/timer.h b/include/qemu/timer.h
-> index 6a8b48b5a9d..1dc880e94e7 100644
-> --- a/include/qemu/timer.h
-> +++ b/include/qemu/timer.h
-> @@ -679,7 +679,7 @@ void timer_mod(QEMUTimer *ts, int64_t expire_timer);
->  /**
->   * timer_mod_anticipate:
->   * @ts: the timer
-> - * @expire_time: the expiry time in nanoseconds
-> + * @expire_time: the expire time in the units associated with the timer
->   *
->   * Modify a timer to expire at @expire_time or the current time, whichever
->   * comes earlier, taking into account the scale associated with the timer.
+> diff --git a/migration/multifd.c b/migration/multifd.c
+> index d0441202aae..8aaa2f9ade1 100644
+> --- a/migration/multifd.c
+> +++ b/migration/multifd.c
+> @@ -447,7 +447,7 @@ static int multifd_send_pages(QEMUFile *f)
+>                  + p->packet_len;
+>      qemu_file_update_transfer(f, transferred);
+>      ram_counters.multifd_bytes += transferred;
+> -    ram_counters.transferred += transferred;;
+> +    ram_counters.transferred += transferred;
+>      qemu_mutex_unlock(&p->mutex);
+>      qemu_sem_post(&p->sem);
+>  
 > 
 
 Applied to my trivial-patches branch.
