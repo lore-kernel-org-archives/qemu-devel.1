@@ -2,99 +2,91 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC62BC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 16:59:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 989DEC4727E
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:08:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00FAC20BED
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 16:59:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB9AA20C09
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:08:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iOsPqxjq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00FAC20BED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OUhsVPkC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB9AA20C09
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL871-0005uP-3q
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 12:59:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33378)
+	id 1kL8FP-0001ZO-P4
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 13:08:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kL85K-0004UQ-Lr; Wed, 23 Sep 2020 12:57:38 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34367)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kL85J-000650-7m; Wed, 23 Sep 2020 12:57:38 -0400
-Received: by mail-wm1-x341.google.com with SMTP id l15so4951196wmh.1;
- Wed, 23 Sep 2020 09:57:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=eTOwXgcDvf0qJPusx8+dn0NqJdcIT1vyPwxo//UMpeU=;
- b=iOsPqxjq6yhExkvFp0zLC0Pp5DvwnvJPxdvOdXm1QTB17AT5WrEDLc6jdFIavEPQ8P
- q8BtHC7SyhqjHo536L/v/WZbrR1FbUdpjv2rs4A5b9pWPorNdNZ7JUX4agHQdGCjTdyN
- +1TZazAu7hjt5dKVAl3N3ZG8doNpOz0Ng/liRjl9exUMBVjJnaSLwbh9+w2cKUmZVXYt
- 89jRpabnC4o7IPULuoeYYunaLONKw8L4GklZ2x1svtGfDodRzoVDzOGHa5EcMPaUsd44
- pRGmRBtmmIB0mNJf6bP/jVmOjijR9AF8flKEiSfjdqef0ebjob8He4f6pfUiEeWjJRx3
- zDIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=eTOwXgcDvf0qJPusx8+dn0NqJdcIT1vyPwxo//UMpeU=;
- b=P3XVMcW+uATzMUX/smCxHOhd/D1YpEIFRHtb4oWjTM+uBsODvoYh9gocrQn7yZe+Eg
- MuLQ6Ufmd+EY7qJrqBppiVxcITdQfnFOyCneMT7rdc3nBVk5ZErIjp7gX8yLD/2xUf5Q
- 7AT2Dg6GphnL/ouwwUneu3hJG5QFzcW5ZGQ2EBX4StJuozAPiBaHXaKI1YZaQdW9DNkx
- itRdeprAwlhnTpDZHPm6b/Uf5+ZtP6WB62Tke4MHM9hLjD72IJepa2Q5Lp4B3p0yCquI
- vKj5qSvi3i0oimejTFujEys8hmmGFeYAevAKGug+O9+jxLiPp8VurO+vewX46mT/ctLC
- qNkQ==
-X-Gm-Message-State: AOAM532kQLf283nxHBbr12gfPvqP5/TPR372PVe10akjMkwai9S4lDHN
- KRDV+M40dkVP4TTUj1tYRNc=
-X-Google-Smtp-Source: ABdhPJwMTR0YKsbCfqrf891xH0g+aAIN6MbgCzqHCBBkAje4TdSNsaI7Vw1bsdpXCcINjLrcQBH4lg==
-X-Received: by 2002:a1c:e904:: with SMTP id q4mr480668wmc.151.1600880254818;
- Wed, 23 Sep 2020 09:57:34 -0700 (PDT)
-Received: from [192.168.1.34] (234.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.234])
- by smtp.gmail.com with ESMTPSA id a81sm416099wmf.32.2020.09.23.09.57.33
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 23 Sep 2020 09:57:33 -0700 (PDT)
-Subject: Re: [PATCH 3/7] hw/ide/core: Replace magic '512' value by
- BDRV_SECTOR_SIZE
-To: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-References: <20200814082841.27000-1-f4bug@amsat.org>
- <20200814082841.27000-4-f4bug@amsat.org>
- <20200817111745.GG11402@linux.fritz.box>
- <2347d8f7-5632-f7a4-6b81-bee179241da4@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c5669c37-6727-89fd-a68f-518e56f39884@amsat.org>
-Date: Wed, 23 Sep 2020 18:57:33 +0200
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kL8DY-0000z5-Jq
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 13:06:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43173)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kL8DV-00078d-Oa
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 13:06:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600880763;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=xv4fJvwcsuFYStcoTWCzUFo0EuYYWPNewfgTX/m+rDU=;
+ b=OUhsVPkCubi/ua/rXiUeRtFgBZg5RmWLQGbq9bDw1vwM7sEE7jdpYti6OQl15FOioyqzjY
+ HwrsIQpBjLrbY95cmbbgi/ZxPkVY9ye/C1ap8OZvPBdeD+APhoK6sSrlUqoRl5/PqwRCxS
+ BUt0bZP2iid2AXLi8RbVmvr3pMouaO4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-108-WvjsGDxJPdSIVCtqFs3Klg-1; Wed, 23 Sep 2020 13:05:50 -0400
+X-MC-Unique: WvjsGDxJPdSIVCtqFs3Klg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87B1E1084C80;
+ Wed, 23 Sep 2020 17:05:49 +0000 (UTC)
+Received: from [10.10.119.140] (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1E1AB19728;
+ Wed, 23 Sep 2020 17:05:48 +0000 (UTC)
+Subject: Re: [PATCH v2 02/38] qapi-gen: Separate arg-parsing from generation
+To: Cleber Rosa <crosa@redhat.com>
+References: <20200922210101.4081073-1-jsnow@redhat.com>
+ <20200922210101.4081073-3-jsnow@redhat.com>
+ <20200923000031.GB191229@localhost.localdomain>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <7920bff4-dd4b-4ef6-ce85-90e693efc749@redhat.com>
+Date: Wed, 23 Sep 2020 13:05:47 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <2347d8f7-5632-f7a4-6b81-bee179241da4@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200923000031.GB191229@localhost.localdomain>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.248,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 00:53:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,60 +99,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org, qemu-trivial@nongnu.org,
- Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/23/20 4:53 PM, John Snow wrote:
-> On 8/17/20 7:17 AM, Kevin Wolf wrote:
->> Am 14.08.2020 um 10:28 hat Philippe Mathieu-Daudé geschrieben:
->>> Use self-explicit definitions instead of magic '512' value.
->>>
->>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On 9/22/20 8:00 PM, Cleber Rosa wrote:
+> On Tue, Sep 22, 2020 at 05:00:25PM -0400, John Snow wrote:
+>> This is a minor re-work of the entrypoint script. It isolates a
+>> generate() method from the actual command-line mechanism.
 >>
->> BDRV_SECTOR_SIZE is the arbitrary unit in which some block layer
->> functions and variables work (such as bs->total_sectors). It happens to
->> be 512.
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>   scripts/qapi-gen.py | 87 ++++++++++++++++++++++++++++++++-------------
+>>   1 file changed, 63 insertions(+), 24 deletions(-)
 >>
->> IDE disks have a sector size, too. Actually, two of them, a physical and
->> a logical one. The more important one is the logical one. We happen to
->> emulate only IDE devices for which the logical block size is 512 bytes
->> (ide_dev_initfn() errors out otherwise).
->>
->> But just because two constants both happen to be 512 in practice, they
->> are not the same thing.
->>
->> So if we want to replace all magic 512 values, we should probably
->> introduce a new IDE_SECTOR_SIZE and then decide case by case whether
->> IDE_SECTOR_SIZE or BDRV_SECTOR_SIZE is meant. I think most (if not all)
->> of the places you converted in this patch need to be IDE_SECTOR_SIZE.
->>
->> Kevin
->>
+>> diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
+>> index 4b03f7d53b..59becba3e1 100644
+>> --- a/scripts/qapi-gen.py
+>> +++ b/scripts/qapi-gen.py
+>> @@ -1,9 +1,13 @@
+>>   #!/usr/bin/env python3
+>> -# QAPI generator
+>> -#
+>> +
+>>   # This work is licensed under the terms of the GNU GPL, version 2 or later.
+>>   # See the COPYING file in the top-level directory.
+>>   
+>> +"""
+>> +QAPI Generator
+>> +
+>> +This script is the main entry point for generating C code from the QAPI schema.
+>> +"""
+>>   
+>>   import argparse
+>>   import re
+>> @@ -11,21 +15,65 @@
+>>   
+>>   from qapi.commands import gen_commands
+>>   from qapi.doc import gen_doc
+>> +from qapi.error import QAPIError
+>>   from qapi.events import gen_events
+>>   from qapi.introspect import gen_introspect
+>> -from qapi.schema import QAPIError, QAPISchema
+>> +from qapi.schema import QAPISchema
+>>   from qapi.types import gen_types
+>>   from qapi.visit import gen_visit
+>>   
+>>   
+>> -def main(argv):
+>> +DEFAULT_OUTPUT_DIR = ''
+>> +DEFAULT_PREFIX = ''
 > 
-> I didn't audit the other patches, but be mindful of the distinction that
-> Kevin is pointing out.
+> I did not understand the purpose of these.  If they're used only as
+> the default value for the command line option parsing, I'd suggest
+> dropping them.
 > 
-> Luckily, I think we're low risk for deciding to change the
-> BDRV_SECTOR_SIZE default any time soon, so it probably won't matter in
-> the near future ...
 
-TBO my only concern was code readability while reviewing
-(improve code readability).
+The alternative is setting default='' inline below, which is fine, but 
+found them kind of buried; and looking a bit too much like a weird magic 
+constant. Aesthetically, I liked making them obvious.
 
-I'll address Kevin's review comment at some point, but this is
-a low priority.
+You found them! My plan worked.
 
-Thanks both for having a look,
-
-Phil.
-
+>> +
+>> +
+>> +def generate(schema_file: str,
+>> +             output_dir: str,
+>> +             prefix: str,
+>> +             unmask: bool = False,
+>> +             builtins: bool = False) -> None:
+>> +    """
+>> +    generate uses a given schema to produce C code in the target directory.
+>> +
+>> +    :param schema_file: The primary QAPI schema file.
+>> +    :param output_dir: The output directory to store generated code.
+>> +    :param prefix: Optional C-code prefix for symbol names.
+>> +    :param unmask: Expose non-ABI names through introspection?
+>> +    :param builtins: Generate code for built-in types?
+>> +
+>> +    :raise QAPIError: On failures.
+>> +    """
+>> +    match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', prefix)
+>> +    if match and match.end() != len(prefix):
 > 
-> --js
+> Nice catch with the extra check here.  Maybe worth mentioning and/or
+> splitting the change?
 > 
+
+If you review all 125 patches, I will do this for you ;)
+
+>> +        msg = "funny character '{:s}' in prefix '{:s}'".format(
+>> +            prefix[match.end()], prefix)
+>> +        raise QAPIError('', None, msg)
+>> +
+>> +    schema = QAPISchema(schema_file)
+>> +    gen_types(schema, output_dir, prefix, builtins)
+>> +    gen_visit(schema, output_dir, prefix, builtins)
+>> +    gen_commands(schema, output_dir, prefix)
+>> +    gen_events(schema, output_dir, prefix)
+>> +    gen_introspect(schema, output_dir, prefix, unmask)
+>> +    gen_doc(schema, output_dir, prefix)
+>> +
+>> +
+>> +def main() -> int:
 > 
+> One extra Pythonic touch would be to use a bool here, and then:
+> 
+>    sys.exit(0 if main() else 1)
+> 
+> But that's probably overkill.
+> 
+
+I think a function named main() is fair enough to return int -- we are 
+declaring that this is a shell script pretty explicitly, and it is 
+allowed to return a status code.
+
+Shifting the knowledge of how shell codes work up one more layer is 
+probably not ... urgent.
+
+>> +    """
+>> +    gapi-gen shell script entrypoint.
+>> +    Expects arguments via sys.argv, see --help for details.
+>> +
+>> +    :return: int, 0 on success, 1 on failure.
+>> +    """
+>>       parser = argparse.ArgumentParser(
+>>           description='Generate code from a QAPI schema')
+>>       parser.add_argument('-b', '--builtins', action='store_true',
+>>                           help="generate code for built-in types")
+>> -    parser.add_argument('-o', '--output-dir', action='store', default='',
+>> +    parser.add_argument('-o', '--output-dir', action='store',
+>> +                        default=DEFAULT_OUTPUT_DIR,
+>>                           help="write output to directory OUTPUT_DIR")
+>> -    parser.add_argument('-p', '--prefix', action='store', default='',
+>> +    parser.add_argument('-p', '--prefix', action='store',
+>> +                        default=DEFAULT_PREFIX,
+>>                           help="prefix for symbols")
+>>       parser.add_argument('-u', '--unmask-non-abi-names', action='store_true',
+>>                           dest='unmask',
+>> @@ -33,26 +81,17 @@ def main(argv):
+>>       parser.add_argument('schema', action='store')
+>>       args = parser.parse_args()
+>>   
+>> -    match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', args.prefix)
+>> -    if match.end() != len(args.prefix):
+>> -        print("%s: 'funny character '%s' in argument of --prefix"
+>> -              % (sys.argv[0], args.prefix[match.end()]),
+>> -              file=sys.stderr)
+>> -        sys.exit(1)
+>> -
+>>       try:
+>> -        schema = QAPISchema(args.schema)
+>> +        generate(args.schema,
+>> +                 output_dir=args.output_dir,
+>> +                 prefix=args.prefix,
+>> +                 unmask=args.unmask,
+>> +                 builtins=args.builtins)
+>>       except QAPIError as err:
+>> -        print(err, file=sys.stderr)
+>> -        exit(1)
+>> -
+> 
+> Glad to see that this "quitter" is gone in favor of one and only
+> sys.exit().
+> 
+> - Cleber.
+> 
+>> -    gen_types(schema, args.output_dir, args.prefix, args.builtins)
+>> -    gen_visit(schema, args.output_dir, args.prefix, args.builtins)
+>> -    gen_commands(schema, args.output_dir, args.prefix)
+>> -    gen_events(schema, args.output_dir, args.prefix)
+>> -    gen_introspect(schema, args.output_dir, args.prefix, args.unmask)
+>> -    gen_doc(schema, args.output_dir, args.prefix)
+>> +        print(f"{sys.argv[0]}: {str(err)}", file=sys.stderr)
+>> +        return 1
+>> +    return 0
+>>   
+>>   
+>>   if __name__ == '__main__':
+>> -    main(sys.argv)
+>> +    sys.exit(main())
+>> -- 
+>> 2.26.2
+>>
+
 
