@@ -8,75 +8,75 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6323C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 19:37:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3401BC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 19:37:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AB76235FD
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 19:37:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 82792235FD
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 19:37:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tEix+9XX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AB76235FD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mmAPIDtk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82792235FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLAZZ-0004NW-7A
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 15:37:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39658)
+	id 1kLAZk-0004Vq-Ck
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 15:37:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39654)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kLAY0-0002fm-Nb; Wed, 23 Sep 2020 15:35:24 -0400
-Received: from mail-qv1-xf42.google.com ([2607:f8b0:4864:20::f42]:43341)
+ id 1kLAXz-0002fA-Ua; Wed, 23 Sep 2020 15:35:24 -0400
+Received: from mail-qv1-xf44.google.com ([2607:f8b0:4864:20::f44]:33335)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kLAXy-0008WP-Ki; Wed, 23 Sep 2020 15:35:24 -0400
-Received: by mail-qv1-xf42.google.com with SMTP id cr8so589691qvb.10;
- Wed, 23 Sep 2020 12:35:21 -0700 (PDT)
+ id 1kLAXw-0008Vt-ET; Wed, 23 Sep 2020 15:35:23 -0400
+Received: by mail-qv1-xf44.google.com with SMTP id cy2so629021qvb.0;
+ Wed, 23 Sep 2020 12:35:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=XcKpR+WmJ49fFEjtlAWzJFbmoZJR2cMvUq//la+WRc4=;
- b=tEix+9XXmwcpRRdu9Cu3TRTSjDPYJHM7Vp/gnGVPW3uYx1oGeRcsjsziwy8Hk0zwZg
- N+fR+3GQhpRQmkN2d83EpWE2tthMgLn9YdHlJ3cjRvupjPrSTqrrz+u2CiS7CGFPEBZw
- P3GVTlFrKinUeeAXRMxytcj48tk27Zg0E1PK+zws0rjZxeniRUZkIoQ2S0y6poS3KHtO
- wbm0j2NeMh6XM+1L6tqARvLyS9jUsjXN4Ci8PXs6JO8da/T/Jc19MScFYQr4oEBVfJs4
- mk95WDYZ3JnAILHWGMLLjvZuLQKcGIeuaItLqIBwRYn4S16Yu7dk2I+YDFOjzb3Z9KJy
- Ivyw==
+ bh=SwOEQO9kfmA7oDtZYIo2rP0M5TYu31XtL4UeyeKcFpc=;
+ b=mmAPIDtkKngGrxtBlFhT2+YqOx45oxRGI1Osh0+Lp5aqJ8e3l3QlI7SE9ozZZuSBIf
+ cCk5uca/ZFpEElObLnyeG5gU3zjRn1UoF5fjfWB01/ESia3/JLzGpDVoSS8ESwL/6fcb
+ C2QvmAofIIoE5Us/bbleEG3iZTlmOkrnzJcjSqfNmnowXTv8IAgOrcl0DREfGREkwh3W
+ 2Uc1YhRUVf2ctYvpGx0IRESgbB9QxJtUJVYTZKod9iXGmrl7mgWDNS3a5pBPAcDtzWrd
+ LcH6qY3K6q6yg6E/DhXSHtxEG4AtLpdn8jfZNO/R0bG+EwJ/3mgESNOW8MkddnDyIyJB
+ LjYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=XcKpR+WmJ49fFEjtlAWzJFbmoZJR2cMvUq//la+WRc4=;
- b=uXLPzLz9y4kpmxuVc4iFeNDtW1j0++/76+l91kiEWN1/lPFOuWfYCif0AOvgp4BDQC
- v8rW6GwplJNiyvYhhTywbT27wbWwLNmg6Axgoe4GBP1EuaRVBbVsi/aDIheaI9XdrnUR
- bUpyD6FAdiLMecWfTMAbwp0sAVASzGIstdfSuEutL6F7txuITZTtczikESaksIuU4vSs
- 93EM7JF0YVsg/VT3vnchjpAnCGs4J9e7BLz041mmh6naccQeawjW501wjwShEcknZrf/
- vVC5P3gG6amHN33dT6zgcv2OgySZDyq37tk3XrlT7Z15zWM/HHDO3dyP1ONOSgwI0REC
- mfjQ==
-X-Gm-Message-State: AOAM5316Yv0hO2y13rHy3lXSrJi4EOR+m2sPRhDgh/qIDaPEzRG0uiD7
- glIqyesFL8V1lwb/8DxeIYDmicFQqbwg1g==
-X-Google-Smtp-Source: ABdhPJxio3jZS59c8Ja6iOc8PY8nPFQgJDbWTykpw00TYkVXFJxOP5BtUbj1E1kSme+sjTRIhDQ8sw==
-X-Received: by 2002:a0c:e294:: with SMTP id r20mr1518845qvl.60.1600889720932; 
- Wed, 23 Sep 2020 12:35:20 -0700 (PDT)
+ bh=SwOEQO9kfmA7oDtZYIo2rP0M5TYu31XtL4UeyeKcFpc=;
+ b=JumQjohF8HRDfNtV6C/kat0LWZDjHbeESzzaFfp3SuKv2KOSNPUA/E0G/+9tA6waNs
+ il6q2LmVU3QAbyEGppoT5CJDzgOBQ9jJhO/40+Uq2VwOEcKgWD4TJmXAbxnOh9GIV0HZ
+ V0pSb6cEJ80lCGipXj3GWpj/l/ZejZ418gS5UjcJwMb4a79fVyBmuKqym61kB3wm8pqi
+ a8pPuRqAoEFn2KZ4/zK8o7Tq8X8L4SWI46Uutj2OXn3jxX6dcoEFVLEv6jV1xhFIuaU7
+ xebg//GZ9LUW4LGb3k7Kjz3Y+uNLjaD96hudOj09EGubxCUD59q0A29lYbPlez8oyWBT
+ bw5w==
+X-Gm-Message-State: AOAM532vuPGTb3J5JPIqxhktFyUkhaANovYMxXyfo3YHPTX7RX/rO8J+
+ TPYewbhZV0Rzv63LXVYL0MKCfbVjvm+5Jw==
+X-Google-Smtp-Source: ABdhPJzTEhh56p2Boz2N56BdY0D+nuWeHd4fC5j/JNAAltllKilcPgYZsaqsJ4/UaHrYs59XnOEJcg==
+X-Received: by 2002:ad4:5387:: with SMTP id i7mr1611045qvv.43.1600889716798;
+ Wed, 23 Sep 2020 12:35:16 -0700 (PDT)
 Received: from rekt.ibmuc.com ([2804:431:c7c7:9e50:6b84:53b8:5d9d:d408])
- by smtp.gmail.com with ESMTPSA id u4sm612362qkk.68.2020.09.23.12.35.19
+ by smtp.gmail.com with ESMTPSA id u4sm612362qkk.68.2020.09.23.12.35.12
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 23 Sep 2020 12:35:20 -0700 (PDT)
+ Wed, 23 Sep 2020 12:35:13 -0700 (PDT)
 From: Daniel Henrique Barboza <danielhb413@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 4/6] spapr_numa: change reference-points and maxdomain settings
-Date: Wed, 23 Sep 2020 16:34:56 -0300
-Message-Id: <20200923193458.203186-5-danielhb413@gmail.com>
+Subject: [PATCH 2/6] spapr_numa: forbid asymmetrical NUMA setups
+Date: Wed, 23 Sep 2020 16:34:54 -0300
+Message-Id: <20200923193458.203186-3-danielhb413@gmail.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200923193458.203186-1-danielhb413@gmail.com>
 References: <20200923193458.203186-1-danielhb413@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::f42;
- envelope-from=danielhb413@gmail.com; helo=mail-qv1-xf42.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::f44;
+ envelope-from=danielhb413@gmail.com; helo=mail-qv1-xf44.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -105,69 +105,71 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is the first guest visible change introduced in
-spapr_numa.c. The previous settings of both reference-points
-and maxdomains were too restrictive, but enough for the
-existing associativity we're setting in the resources.
+The pSeries machine does not support asymmetrical NUMA
+configurations. This doesn't make much of a different
+since we're not using user input for pSeries NUMA setup,
+but this will change in the next patches.
 
-We'll change that in the following patches, populating the
-associativity arrays based on user input. For those changes
-to be effective, reference-points and maxdomains must be
-more flexible. After this patch, we'll have 4 distinct
-levels of NUMA (0x4, 0x3, 0x2, 0x1) and maxdomains will
-allow for any type of configuration the user intends to
-do - under the scope and limitations of PAPR itself, of
-course.
+To avoid breaking existing setups, gate this change by
+checking for legacy NUMA support.
 
 Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 ---
- hw/ppc/spapr_numa.c | 27 ++++++++++++++++++---------
- 1 file changed, 18 insertions(+), 9 deletions(-)
+ hw/ppc/spapr_numa.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
 diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
-index 180800b2f3..688391278e 100644
+index 64fe567f5d..36aaa273ee 100644
 --- a/hw/ppc/spapr_numa.c
 +++ b/hw/ppc/spapr_numa.c
-@@ -222,21 +222,30 @@ int spapr_numa_write_assoc_lookup_arrays(SpaprMachineState *spapr, void *fdt,
-  */
- void spapr_numa_write_rtas_dt(SpaprMachineState *spapr, void *fdt, int rtas)
- {
-+    MachineState *ms = MACHINE(spapr);
-     SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
-     uint32_t refpoints[] = {
-         cpu_to_be32(0x4),
--        cpu_to_be32(0x4),
-+        cpu_to_be32(0x3),
-         cpu_to_be32(0x2),
-+        cpu_to_be32(0x1),
-     };
-     uint32_t nr_refpoints = ARRAY_SIZE(refpoints);
--    uint32_t maxdomain = cpu_to_be32(spapr->gpu_numa_id > 1 ? 1 : 0);
--    uint32_t maxdomains[] = {
--        cpu_to_be32(4),
--        maxdomain,
--        maxdomain,
--        maxdomain,
--        cpu_to_be32(spapr->gpu_numa_id),
--    };
-+    uint32_t maxdomain = cpu_to_be32(ms->numa_state->num_nodes +
-+                                     spapr->gpu_numa_id);
-+    uint32_t maxdomains[] = {0x4, maxdomain, maxdomain, maxdomain, maxdomain};
-+
-+    if (spapr_machine_using_legacy_numa(spapr)) {
-+        refpoints[1] =  cpu_to_be32(0x4);
-+        refpoints[2] =  cpu_to_be32(0x2);
-+        nr_refpoints = 3;
-+
-+        maxdomain = cpu_to_be32(spapr->gpu_numa_id > 1 ? 1 : 0);
-+        maxdomains[1] = maxdomain;
-+        maxdomains[2] = maxdomain;
-+        maxdomains[3] = maxdomain;
-+        maxdomains[4] = cpu_to_be32(spapr->gpu_numa_id);
-+    }
+@@ -19,6 +19,24 @@
+ /* Moved from hw/ppc/spapr_pci_nvlink2.c */
+ #define SPAPR_GPU_NUMA_ID           (cpu_to_be32(1))
  
-     if (smc->pre_5_1_assoc_refpoints) {
-         nr_refpoints = 2;
++static bool spapr_numa_is_symmetrical(MachineState *ms)
++{
++    int src, dst;
++    int nb_numa_nodes = ms->numa_state->num_nodes;
++    NodeInfo *numa_info = ms->numa_state->nodes;
++
++    for (src = 0; src < nb_numa_nodes; src++) {
++        for (dst = src; dst < nb_numa_nodes; dst++) {
++            if (numa_info[src].distance[dst] !=
++                numa_info[dst].distance[src]) {
++                return false;
++            }
++        }
++    }
++
++    return true;
++}
++
+ void spapr_numa_associativity_init(SpaprMachineState *spapr,
+                                    MachineState *machine)
+ {
+@@ -61,6 +79,22 @@ void spapr_numa_associativity_init(SpaprMachineState *spapr,
+ 
+         spapr->numa_assoc_array[i][MAX_DISTANCE_REF_POINTS] = cpu_to_be32(i);
+     }
++
++    /*
++     * Legacy NUMA guests (pseries-5.1 and order, or guests with only
++     * 1 NUMA node) will not benefit from anything we're going to do
++     * after this point.
++     */
++    if (spapr_machine_using_legacy_numa(spapr)) {
++        return;
++    }
++
++    if (!spapr_numa_is_symmetrical(machine)) {
++        error_report("Asymmetrical NUMA topologies aren't supported "
++                     "in the pSeries machine");
++        exit(1);
++    }
++
+ }
+ 
+ void spapr_numa_write_associativity_dt(SpaprMachineState *spapr, void *fdt,
 -- 
 2.26.2
 
