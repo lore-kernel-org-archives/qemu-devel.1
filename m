@@ -2,86 +2,81 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFE22C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 10:39:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CDB7C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 10:39:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6144821D7D
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 10:39:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 786B621D7D
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 10:39:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PylZCCC1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6144821D7D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="iLJ/0kpW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 786B621D7D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL2B0-0006aC-He
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 06:39:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49790)
+	id 1kL2B3-0006fQ-J9
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 06:39:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49740)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kL29j-0005hS-Dk
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 06:37:47 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31287
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kL29g-0006RG-Mb
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 06:37:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600857461;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=mvX5xugWIEjJw4+F8rmiVRDRWdJAKWxSfuR8Mm9ndJg=;
- b=PylZCCC1Oc1B2UYiSkNZICgXVtmUftMrKUfKNlG5XW25+uJ40SdfDlY+Dw6Op75gq55I4W
- vB8py+rOga1oCdYGRSmGr2qlRW20cio0AQPednFIiPZwcWKd13FF+/29f5iHCPr71yKod9
- DMo0AR0vOVKHcchWEHMY0varG9KVEC0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-555-yJmIiC6xNH-k3L42caSaGA-1; Wed, 23 Sep 2020 06:37:39 -0400
-X-MC-Unique: yJmIiC6xNH-k3L42caSaGA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFE141006707
- for <qemu-devel@nongnu.org>; Wed, 23 Sep 2020 10:37:38 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
- [10.36.112.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A49935D9CC;
- Wed, 23 Sep 2020 10:37:35 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id C3E719D5A; Wed, 23 Sep 2020 12:37:34 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] modules: update qom object module comment
-Date: Wed, 23 Sep 2020 12:37:28 +0200
-Message-Id: <20200923103728.12026-1-kraxel@redhat.com>
+ (Exim 4.90_1) (envelope-from <anthony.perard@citrix.com>)
+ id 1kL29Y-0005dX-VR
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 06:37:37 -0400
+Received: from esa1.hc3370-68.iphmx.com ([216.71.145.142]:25836)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <anthony.perard@citrix.com>)
+ id 1kL29W-0006QK-Mx
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 06:37:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=citrix.com; s=securemail; t=1600857455;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=msUig27mTYZE9KmmEugMa0dsch9CglyKdJI6a0SK5RE=;
+ b=iLJ/0kpWGUy7ee9/VW3a/JVikftvVUmXO/gzkIg+JPYYVPiWxJpeKpPm
+ kyS2qnJv2rES63Hl5leAt3e1ofkCaYD7qAzSf5F9idmQ2BeJA5SxBFJXz
+ forOXDSf52fd8Bq8VERJGCq05NsBJXKgsoNn0VbL9AkyNf4MODeUbqtIP 0=;
+Authentication-Results: esa1.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none
+IronPort-SDR: 1jQZJ8I2e9ARIcKICOUOiIMqfTW6KquCVcg+7/S+Pd4cKZzrMEnmzX27GjqqZqyBeMVZ6JwJRK
+ i2RaGw0MPQnsrbpjsoExmIeJ82GqwnnWY2rYzGLkLKqbETmrCs/AHzOt0dpzQoZy9fpgWWJtUz
+ RSyBl2x3CZW2O7tPeLZTEjU5qK0ODYUjHlIgvh4XNde9JacA68LChnZZd20VJsIk0D/CZ/h82Z
+ D/mfu41gnLzfITodaCYp8kiOIb7e4CETT6aIH8suJ3vadloPrDSckjI7Tb4U6ENq6JCQ6SqrH4
+ lE4=
+X-SBRS: 2.7
+X-MesageID: 27694055
+X-Ironport-Server: esa1.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.77,293,1596513600"; d="scan'208";a="27694055"
+To: <qemu-devel@nongnu.org>
+CC: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost
+ <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa
+ <crosa@redhat.com>, Anthony PERARD <anthony.perard@citrix.com>
+Subject: [PATCH] Add execute bit back to scripts/tracetool.py
+Date: Wed, 23 Sep 2020 11:36:20 +0100
+Message-ID: <20200923103620.1980151-1-anthony.perard@citrix.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 06:37:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+Content-Type: text/plain
+Received-SPF: pass client-ip=216.71.145.142;
+ envelope-from=anthony.perard@citrix.com; helo=esa1.hc3370-68.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 06:37:31
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,33 +89,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: Anthony PERARD <anthony.perard@citrix.com>
+From: Anthony PERARD via <qemu-devel@nongnu.org>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Commit a81df1b68b65 ("libqemuutil, qapi, trace: convert to meson")
+removed it without explanation and it is useful to be able to run a
+script without having to figure out which interpreter to use.
+
+Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
 ---
- util/module.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ scripts/tracetool.py | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ mode change 100644 => 100755 scripts/tracetool.py
 
-diff --git a/util/module.c b/util/module.c
-index 520986bd70ff..6eb1e917860e 100644
---- a/util/module.c
-+++ b/util/module.c
-@@ -255,8 +255,10 @@ bool module_load_one(const char *prefix, const char *lib_name)
-  * only a very few devices & objects.
-  *
-  * So with the expectation that this will be rather the exception than
-- * to rule and the list will not gain that many entries go with a
-+ * the rule and the list will not gain that many entries, go with a
-  * simple manually maintained list for now.
-+ *
-+ * The list must be sorted by module (module_load_qom_all() needs this).
-  */
- static struct {
-     const char *type;
+diff --git a/scripts/tracetool.py b/scripts/tracetool.py
+old mode 100644
+new mode 100755
 -- 
-2.27.0
+Anthony PERARD
 
 
