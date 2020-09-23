@@ -2,89 +2,71 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84CC5C4727E
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 13:19:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0B2EC2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 13:21:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3D3C221F0
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 13:19:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=hp.com header.i=@hp.com header.b="GjmMKfaS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3D3C221F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=hp.com
+	by mail.kernel.org (Postfix) with ESMTPS id 30E3421BE5
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 13:21:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30E3421BE5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL4gQ-0004Yq-HY
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 09:19:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59776)
+	id 1kL4hx-0006dx-5f
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 09:21:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60264)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <erich.mcmillan@hp.com>)
- id 1kL4fP-0003af-5q
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 09:18:39 -0400
-Received: from us-smtp-delivery-162.mimecast.com ([216.205.24.162]:59426)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <erich.mcmillan@hp.com>)
- id 1kL4fL-0003Iw-Un
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 09:18:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hp.com;
- s=mimecast20180716; t=1600867114;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=0//gJFj44pzYxKFgtFoM8uzZT9n30sQ8tvDMhX2Msp8=;
- b=GjmMKfaS1TGYg2dAWxxuwCRH0UM5P4NoBrClShgCGrIW09Ff/rcr3biebx+j0BcZE9yBnJ
- kyl9d+Gmcr2W8fihRWx8kDblxv6PQzYprB1HN94wZqdFy5yUgH/kxt3Cu8vbNVX6Xxy3bR
- IWacPMq+FulRjXQVPrlx6QrYxwD9qfM=
-Received: from g1t6223.austin.hp.com (g1t6223.austin.hp.com [15.73.96.124])
- (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-429-ORX7tn8gPR-00yQYL2QQhw-1; Wed, 23 Sep 2020 09:18:32 -0400
-X-MC-Unique: ORX7tn8gPR-00yQYL2QQhw-1
-Received: from g1t6215.austin.hpicorp.net (g1t6215.austin.hpicorp.net
- [15.67.1.191])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by g1t6223.austin.hp.com (Postfix) with ESMTPS id 78CD6231;
- Wed, 23 Sep 2020 13:18:31 +0000 (UTC)
-Received: from localhost.localdomain (unknown [15.75.17.249])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by g1t6215.austin.hpicorp.net (Postfix) with ESMTPS id 23928EA;
- Wed, 23 Sep 2020 13:18:31 +0000 (UTC)
-From: Erich Mcmillan <erich.mcmillan@hp.com>
-To: qemu-devel@nongnu.org
-Cc: lersek@redhat.com, dgilbert@redhat.com, mst@redhat.com,
- marcel.apfelbaum@gmail.com, imammedo@redhat.com,
- Erich McMillan <erich.mcmillan@hp.com>
-Subject: [PATCH v4] hw/i386/pc: add max combined fw size as machine
- configuration option
-Date: Wed, 23 Sep 2020 13:18:29 +0000
-Message-Id: <20200923131829.3849-1-erich.mcmillan@hp.com>
-X-Mailer: git-send-email 2.25.1
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kL4gq-0005YM-P8; Wed, 23 Sep 2020 09:20:08 -0400
+Resent-Date: Wed, 23 Sep 2020 09:20:08 -0400
+Resent-Message-Id: <E1kL4gq-0005YM-P8@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21782)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kL4go-0003Ra-0D; Wed, 23 Sep 2020 09:20:08 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1600867190; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=YAscWlQslsYO5xWyC+KwnCTFce0gf7vEohKbOF4RfU5UHKXLxpJkLa7/ct4+VGscxP+Sr5O0IMn9f4ebfmT2PiaoVKZSWQ0x+5EFaV9jcWpDc/a8vet7NXUE6bkMmZJhv6szUDMKcUJMLxHgwNl637uoZZpVE8bXaIFtGO4Cj8w=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1600867190;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=K+YOu8w9XoDhdx1qeMSyb62OUDOBtrAG9DlY5gPNhyA=; 
+ b=gJTrHa66foTnCxoq3uhk3pt0ESjCOKhf4XO/RESM2hMWUHygLFiWPewdMys1UPpyBT8JgMMvA3ZzkNd0WBnVnSNxHsfNQ5CCJpFcLRND2QsTiTTGN7NmuffkRvVqFEps0NiE5dM+fReowvqgQ/O1p7hoF8iUaeLfa1vIS5HnjZ8=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1600867188650167.82748159333482;
+ Wed, 23 Sep 2020 06:19:48 -0700 (PDT)
+Subject: Re: [PATCH v2 0/3] Add support for loading SMBIOS OEM strings from a
+ file
+Message-ID: <160086718660.23158.14368998722153069203@66eaa9a8a123>
+In-Reply-To: <20200923104102.2068416-1-berrange@redhat.com>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA62A171 smtp.mailfrom=erich.mcmillan@hp.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: hp.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=216.205.24.162;
- envelope-from=erich.mcmillan@hp.com; helo=us-smtp-delivery-162.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 09:18:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: berrange@redhat.com
+Date: Wed, 23 Sep 2020 06:19:48 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 09:20:02
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,161 +80,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
+ mst@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, qemu-arm@nongnu.org,
+ imammedo@redhat.com, pbonzini@redhat.com, lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Erich McMillan <erich.mcmillan@hp.com>
-
-At HPi we have a need for increased fw size to enable testing of our custom=
- fw.
-
-Signed-off-by: Erich McMillan <erich.mcmillan@hp.com>
----
- hw/i386/pc.c         | 50 ++++++++++++++++++++++++++++++++++++++++++++
- hw/i386/pc_sysfw.c   | 13 ++----------
- include/hw/i386/pc.h |  2 ++
- 3 files changed, 54 insertions(+), 11 deletions(-)
-
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index d11daacc23..89775e7d5b 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1869,6 +1869,49 @@ static void pc_machine_set_max_ram_below_4g(Object *=
-obj, Visitor *v,
-     pcms->max_ram_below_4g =3D value;
- }
-=20
-+static void pc_machine_get_max_fw_size(Object *obj, Visitor *v,
-+                                       const char *name, void *opaque,
-+                                       Error **errp)
-+{
-+    PCMachineState *pcms =3D PC_MACHINE(obj);
-+    uint64_t value =3D pcms->max_fw_size;
-+
-+    visit_type_size(v, name, &value, errp);
-+}
-+
-+static void pc_machine_set_max_fw_size(Object *obj, Visitor *v,
-+                                       const char *name, void *opaque,
-+                                       Error **errp)
-+{
-+    PCMachineState *pcms =3D PC_MACHINE(obj);
-+    Error *error =3D NULL;
-+    uint64_t value;
-+
-+    visit_type_size(v, name, &value, &error);
-+    if (error) {
-+        error_propagate(errp, error);
-+        return;
-+    }
-+
-+    /*
-+    * We don't have a theoretically justifiable exact lower bound on the b=
-ase
-+    * address of any flash mapping. In practice, the IO-APIC MMIO range is
-+    * [0xFEE00000..0xFEE01000] -- see IO_APIC_DEFAULT_ADDRESS --, leaving =
-free
-+    * only 18MB-4KB below 4G. For now, restrict the cumulative mapping to =
-8MB in
-+    * size.
-+    */
-+    if (value > 16 * MiB) {
-+        error_setg(errp,
-+                   "User specified max allowed firmware size %" PRIu64 " i=
-s "
-+                   "greater than 16MiB. If combined firwmare size exceeds =
-"
-+                   "16MiB the system may not boot, or experience intermitt=
-ent"
-+                   "stability issues.",
-+                   value);
-+    }
-+
-+    pcms->max_fw_size =3D value;
-+}
-+
- static void pc_machine_initfn(Object *obj)
- {
-     PCMachineState *pcms =3D PC_MACHINE(obj);
-@@ -1884,6 +1927,7 @@ static void pc_machine_initfn(Object *obj)
-     pcms->smbus_enabled =3D true;
-     pcms->sata_enabled =3D true;
-     pcms->pit_enabled =3D true;
-+    pcms->max_fw_size =3D 8 * MiB; /* use default */
-=20
-     pc_system_flash_create(pcms);
-     pcms->pcspk =3D isa_new(TYPE_PC_SPEAKER);
-@@ -2004,6 +2048,12 @@ static void pc_machine_class_init(ObjectClass *oc, v=
-oid *data)
-=20
-     object_class_property_add_bool(oc, PC_MACHINE_PIT,
-         pc_machine_get_pit, pc_machine_set_pit);
-+
-+    object_class_property_add(oc, PC_MACHINE_MAX_FW_SIZE, "size",
-+        pc_machine_get_max_fw_size, pc_machine_set_max_fw_size,
-+        NULL, NULL);
-+    object_class_property_set_description(oc, PC_MACHINE_MAX_FW_SIZE,
-+        "Maximum combined firmware size");
- }
-=20
- static const TypeInfo pc_machine_info =3D {
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index b6c0822fe3..22450ba0ef 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -39,15 +39,6 @@
- #include "hw/block/flash.h"
- #include "sysemu/kvm.h"
-=20
--/*
-- * We don't have a theoretically justifiable exact lower bound on the base
-- * address of any flash mapping. In practice, the IO-APIC MMIO range is
-- * [0xFEE00000..0xFEE01000] -- see IO_APIC_DEFAULT_ADDRESS --, leaving fre=
-e
-- * only 18MB-4KB below 4G. For now, restrict the cumulative mapping to 8MB=
- in
-- * size.
-- */
--#define FLASH_SIZE_LIMIT (8 * MiB)
--
- #define FLASH_SECTOR_SIZE 4096
-=20
- static void pc_isa_bios_init(MemoryRegion *rom_memory,
-@@ -182,10 +173,10 @@ static void pc_system_flash_map(PCMachineState *pcms,
-         }
-         if ((hwaddr)size !=3D size
-             || total_size > HWADDR_MAX - size
--            || total_size + size > FLASH_SIZE_LIMIT) {
-+            || total_size + size > pcms->max_fw_size) {
-             error_report("combined size of system firmware exceeds "
-                          "%" PRIu64 " bytes",
--                         FLASH_SIZE_LIMIT);
-+                         pcms->max_fw_size);
-             exit(1);
-         }
-=20
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index fe52e165b2..f7c8e7cbfe 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -43,6 +43,7 @@ struct PCMachineState {
-     bool smbus_enabled;
-     bool sata_enabled;
-     bool pit_enabled;
-+    uint64_t max_fw_size;
-=20
-     /* NUMA information: */
-     uint64_t numa_nodes;
-@@ -59,6 +60,7 @@ struct PCMachineState {
- #define PC_MACHINE_SMBUS            "smbus"
- #define PC_MACHINE_SATA             "sata"
- #define PC_MACHINE_PIT              "pit"
-+#define PC_MACHINE_MAX_FW_SIZE      "max-fw-size"
-=20
- /**
-  * PCMachineClass:
---=20
-2.25.1
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkyMzEwNDEwMi4yMDY4
+NDE2LTEtYmVycmFuZ2VAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
+IGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rpbmcg
+Y29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3Rh
+bGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEgL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4Nl82NAptYWtlIGRvY2tl
+ci1pbWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dA
+ZmVkb3JhIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpIb3N0IG1hY2hp
+bmUgY3B1OiB4ODZfNjQKVGFyZ2V0IG1hY2hpbmUgY3B1IGZhbWlseTogeDg2ClRhcmdldCBtYWNo
+aW5lIGNwdTogeDg2XzY0Ci4uL3NyYy9tZXNvbi5idWlsZDoxMDogV0FSTklORzogTW9kdWxlIHVu
+c3RhYmxlLWtleXZhbCBoYXMgbm8gYmFja3dhcmRzIG9yIGZvcndhcmRzIGNvbXBhdGliaWxpdHkg
+YW5kIG1pZ2h0IG5vdCBleGlzdCBpbiBmdXR1cmUgcmVsZWFzZXMuClByb2dyYW0gc2ggZm91bmQ6
+IFlFUwpQcm9ncmFtIHB5dGhvbjMgZm91bmQ6IFlFUyAoL3Vzci9iaW4vcHl0aG9uMykKQ29uZmln
+dXJpbmcgbmluamF0b29sIHVzaW5nIGNvbmZpZ3VyYXRpb24KLS0tCmRvbmUKY29weWluZyBzdGF0
+aWMgZmlsZXMuLi4gLi4uIENvbXBpbGluZyBDIG9iamVjdCBsaWJxZW11LXg4Nl82NC1zb2Z0bW11
+LmZhLnAvdGFyZ2V0X2kzODZfc2VnX2hlbHBlci5jLm9iagouLi9zcmMvaHcvc21iaW9zL3NtYmlv
+cy5jOiBJbiBmdW5jdGlvbiAnc2F2ZV9vcHRfb25lJzoKLi4vc3JjL2h3L3NtYmlvcy9zbWJpb3Mu
+Yzo5Nzg6MTg6IGVycm9yOiB0b28gZmV3IGFyZ3VtZW50cyB0byBmdW5jdGlvbiAncWVtdV9vcGVu
+JwogIDk3OCB8ICAgICAgICAgaW50IGZkID0gcWVtdV9vcGVuKHZhbHVlLCBPX1JET05MWSk7CiAg
+ICAgIHwgICAgICAgICAgICAgICAgICBefn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC4u
+L3NyYy9ody9zbWJpb3Mvc21iaW9zLmM6MTg6Ci90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL3Fl
+bXUvb3NkZXAuaDo1MDU6NTogbm90ZTogZGVjbGFyZWQgaGVyZQogIDUwNSB8IGludCBxZW11X29w
+ZW4oY29uc3QgY2hhciAqbmFtZSwgaW50IGZsYWdzLCBFcnJvciAqKmVycnApOwogICAgICB8ICAg
+ICBefn5+fn5+fn4KbWFrZTogKioqIFtNYWtlZmlsZS5uaW5qYToxMzkxOiBsaWJjb21tb24uZmEu
+cC9od19zbWJpb3Nfc21iaW9zLmMub2JqXSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1
+bmZpbmlzaGVkIGpvYnMuLi4uCmRvbmUKY29weWluZyBleHRyYSBmaWxlcy4uLiBkb25lCi0tLQog
+ICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxs
+ZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywg
+Jy0tcm0nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTJhNjgxN2QxMjEzMTRl
+NTVhMmY4YWU4MGY2NDFmOGQ4JywgJy11JywgJzEwMDMnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2Vj
+Y29tcD11bmNvbmZpbmVkJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05G
+SUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAn
+LWUnLCAnU0hPV19FTlY9JywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12
+JywgJy9ob21lL3BhdGNoZXcyLy5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2Nh
+Y2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLV91aWJtZXl0L3NyYy9k
+b2NrZXItc3JjLjIwMjAtMDktMjMtMDkuMTYuMTkuMTI3NTM6L3Zhci90bXAvcWVtdTp6LHJvJywg
+J3FlbXUvZmVkb3JhJywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtbWluZ3cnXScgcmV0dXJu
+ZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11
+Lmluc3RhbmNlLnV1aWQ9MmE2ODE3ZDEyMTMxNGU1NWEyZjhhZTgwZjY0MWY4ZDgKbWFrZVsxXTog
+KioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFy
+L3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtX3VpYm1leXQvc3JjJwptYWtlOiAqKiogW2RvY2tlci1y
+dW4tdGVzdC1taW5nd0BmZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgM20yNi41ODVzCnVzZXIgICAg
+MG0yMS42OTZzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5v
+cmcvbG9ncy8yMDIwMDkyMzEwNDEwMi4yMDY4NDE2LTEtYmVycmFuZ2VAcmVkaGF0LmNvbS90ZXN0
+aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRl
+ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
+IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
