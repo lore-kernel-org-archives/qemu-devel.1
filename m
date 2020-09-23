@@ -2,97 +2,72 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6150C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 15:58:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CDD6C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 15:58:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B40C20897
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 15:58:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E0B720897
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 15:58:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fV/SmvVA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B40C20897
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=xen.org header.i=@xen.org header.b="loko2sDO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E0B720897
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xen.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL7AR-0008MP-3Y
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 11:58:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43926)
+	id 1kL7AX-0008RI-Ou
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 11:58:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43946)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsuvorov@redhat.com>)
- id 1kL79D-0007Hm-G8
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 11:57:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32625)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsuvorov@redhat.com>)
- id 1kL79B-0003Fi-PH
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 11:57:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600876652;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=NAeE5WCTF+/VqlEOdbW/VE65ZlxE0/+/Y+hXM5K2Ifs=;
- b=fV/SmvVA8eeGDfI+7ephbYAaVZemMZEz1wYEDUeJLnfNpO6XDpfK7FBcl5amouBL1AdKhu
- uD+NfO55oX+kj5MwjPqYpmeiNtiQdjhOURhK93cvbtV3JDcRg7z16k3FTdasjrDdOyJ6RW
- +7FGBTCwDsIgJlrbnPEbpRZpg98Tac4=
-Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
- [209.85.219.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-590-6509nZT4OT23yq01O9wabQ-1; Wed, 23 Sep 2020 11:57:30 -0400
-X-MC-Unique: 6509nZT4OT23yq01O9wabQ-1
-Received: by mail-yb1-f197.google.com with SMTP id l67so148052ybb.7
- for <qemu-devel@nongnu.org>; Wed, 23 Sep 2020 08:57:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=NAeE5WCTF+/VqlEOdbW/VE65ZlxE0/+/Y+hXM5K2Ifs=;
- b=uaPmZUKIGfIpG9TaoNvDYegjZjIELzcFJI7ol6wdcQP/hpsXkYZVVVEdyPDe0uzfuj
- Zvr3LO6jCqNTb7QupsQ3saype9lu1obLjgqbE567rRmou+dvHz5HGrGXOoAWJyCy3tm+
- E3wtVSPAi3lI2jdnXsiOVODC8Ym8i0QQ3d3Glctx8tzeR7gESpSvLvKqqRdYUVWl3T59
- B//Fx3qZq1srrJMGP7GAKXVNrm7Xl2q5Fq2eYLEFJU32sNqZRePeQB87fSU2/0ya8pk+
- CwWN6Uz1tOey3wp3GQE5YyHhclHY2kEv4UEvqbAIhKwukCrHcz7/dKfos9AaKodM8xWe
- /v1Q==
-X-Gm-Message-State: AOAM531IVPx88qaFynOfEHgoLwiVfZ9J4YFaaa6KRGeevC4Hwy6zOvrc
- Lz46cbi4Vvl9CfJAPfKBK1Te6IT0+UEjFWoNatDZonyUXv4eKPxozKv6V5ni3G3F+uRn1UMg+un
- 51sIxUZK9uq2ky4eSfVH3Ryu4CYBAFR4=
-X-Received: by 2002:a25:4ac2:: with SMTP id x185mr944544yba.81.1600876650434; 
- Wed, 23 Sep 2020 08:57:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwvvLWt3d1wl+O0qL2Qa7Z5x5zpx8hgaMgaP49A4WTtUJGiyjFv0tewJghrtYpGX1T8lBnf6FbTl9Uy/ce/VR8=
-X-Received: by 2002:a25:4ac2:: with SMTP id x185mr944518yba.81.1600876650183; 
- Wed, 23 Sep 2020 08:57:30 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <paul@xen.org>) id 1kL79G-0007Kp-P7
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 11:57:38 -0400
+Received: from mail.xenproject.org ([104.130.215.37]:54706)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <paul@xen.org>) id 1kL79E-0003Fw-Ld
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 11:57:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
+ s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:
+ Subject:Cc:To:From; bh=IoG8+u5DO3QTJ8mTEeCRhU9y1whcnebb+jEmucWmQMM=; b=loko2s
+ DO/2tVDvNW6Zm+rjDG09IjiEI2ZvTLljwR8NnUILuFC3rJhcsmKdqbQ6q/GBoZPZ/FWJ7VmeBlpKi
+ PMzsStxiE1y6YQAiq+1n2SYXexHE4/LD24AtmcQfChLTajUl21ZRqSbTYIHOh1hs5ZMl0O+QtuA8a
+ oFR6CmAvYzs=;
+Received: from xenbits.xenproject.org ([104.239.192.120])
+ by mail.xenproject.org with esmtp (Exim 4.92)
+ (envelope-from <paul@xen.org>)
+ id 1kL79B-0005sh-T6; Wed, 23 Sep 2020 15:57:33 +0000
+Received: from host86-176-94-160.range86-176.btcentralplus.com
+ ([86.176.94.160] helo=u2f063a87eabd5f.home)
+ by xenbits.xenproject.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <paul@xen.org>)
+ id 1kL79B-0003sW-G2; Wed, 23 Sep 2020 15:57:33 +0000
+From: Paul Durrant <paul@xen.org>
+To: xen-devel@lists.xenproject.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH] xen-bus: reduce scope of backend watch
+Date: Wed, 23 Sep 2020 16:57:31 +0100
+Message-Id: <20200923155731.29528-1-paul@xen.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20200923092636.118676-1-jusual@redhat.com>
- <20200923110141-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200923110141-mutt-send-email-mst@kernel.org>
-From: Julia Suvorova <jusual@redhat.com>
-Date: Wed, 23 Sep 2020 17:57:19 +0200
-Message-ID: <CAMDeoFUaUNPvGJ1ohADdiptH0PGK8rBBRKQUUwhKEFMxqu0Crg@mail.gmail.com>
-Subject: Re: [PATCH] hw/pci/pci: Fix slot check for plugged devices
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsuvorov@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsuvorov@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 00:53:58
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=104.130.215.37; envelope-from=paul@xen.org;
+ helo=mail.xenproject.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 11:57:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,52 +80,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>,
+ Paul Durrant <pdurrant@amazon.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Edwin Torok <edvin.torok@citrix.com>,
+ Jerome Leseinne <jerome.leseinne@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 23, 2020 at 5:03 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Wed, Sep 23, 2020 at 11:26:36AM +0200, Julia Suvorova wrote:
-> > If devfn is assigned automatically, 'else' clauses will never be
-> > executed. And if it does not matter for the reserved and available
-> > devfn, because we have already checked it, the check for function0
-> > needs to be done again.
-> >
-> > Signed-off-by: Julia Suvorova <jusual@redhat.com>
->
-> This is just cosmetics right? I wouldn't describe this as
-> a "fix" then - "simplify" would be clearer.
+From: Paul Durrant <pdurrant@amazon.com>
 
-No, this is a bug fix. For example, if you had a root port with a
-device on it already, and you do
-'device_add new_device,bus=the_same_root_port', then it will miss the
-last 'if' and will be added to slot 1.
+Currently a single watch on /local/domain/X/backend is registered by each
+QEMU process running in service domain X (where X is usually 0). The purpose
+of this watch is to ensure that QEMU is notified when the Xen toolstack
+creates a new device backend area.
+Such a backend area is specific to a single frontend area created for a
+specific guest domain and, since each QEMU process is also created to service
+a specfic guest domain, it is unnecessary and inefficient to notify all QEMU
+processes.
+Only the QEMU process associated with the same guest domain need
+receive the notification. This patch re-factors the watch registration code
+such that notifications are targetted appropriately.
 
-> > ---
-> >  hw/pci/pci.c | 5 +++--
-> >  1 file changed, 3 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> > index de0fae10ab..ae132b0b52 100644
-> > --- a/hw/pci/pci.c
-> > +++ b/hw/pci/pci.c
-> > @@ -1034,8 +1034,9 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev,
-> >                     PCI_SLOT(devfn), PCI_FUNC(devfn), name,
-> >                     bus->devices[devfn]->name);
-> >          return NULL;
-> > -    } else if (dev->hotplugged &&
-> > -               pci_get_function_0(pci_dev)) {
-> > +    };
-> > +
-> > +    if (dev->hotplugged && pci_get_function_0(pci_dev)) {
-> >          error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
-> >                     " new func %s cannot be exposed to guest.",
-> >                     PCI_SLOT(pci_get_function_0(pci_dev)->devfn),
-> > --
-> > 2.25.4
->
+Reported-by: Jerome Leseinne <jerome.leseinne@gmail.com>
+Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+---
+Cc: Edwin Torok <edvin.torok@citrix.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
+---
+ hw/xen/xen-backend.c         | 10 ++++++++++
+ hw/xen/xen-bus.c             | 38 ++++++++++++++++++++++++++++--------
+ include/hw/xen/xen-backend.h |  1 +
+ include/hw/xen/xen-bus.h     |  3 ++-
+ 4 files changed, 43 insertions(+), 9 deletions(-)
+
+diff --git a/hw/xen/xen-backend.c b/hw/xen/xen-backend.c
+index 10199fb58d..f2711fe4a7 100644
+--- a/hw/xen/xen-backend.c
++++ b/hw/xen/xen-backend.c
+@@ -41,6 +41,11 @@ static void xen_backend_table_add(XenBackendImpl *impl)
+     g_hash_table_insert(xen_backend_table_get(), (void *)impl->type, impl);
+ }
+ 
++static void **xen_backend_table_keys(unsigned int *count)
++{
++    return g_hash_table_get_keys_as_array(xen_backend_table_get(), count);
++}
++
+ static const XenBackendImpl *xen_backend_table_lookup(const char *type)
+ {
+     return g_hash_table_lookup(xen_backend_table_get(), type);
+@@ -70,6 +75,11 @@ void xen_backend_register(const XenBackendInfo *info)
+     xen_backend_table_add(impl);
+ }
+ 
++const char **xen_backend_get_types(unsigned int *count)
++{
++    return (const char **)xen_backend_table_keys(count);
++}
++
+ static QLIST_HEAD(, XenBackendInstance) backend_list;
+ 
+ static void xen_backend_list_add(XenBackendInstance *backend)
+diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+index 9ce1c9540b..c83da93bf3 100644
+--- a/hw/xen/xen-bus.c
++++ b/hw/xen/xen-bus.c
+@@ -430,7 +430,13 @@ static void xen_bus_unrealize(BusState *bus)
+     trace_xen_bus_unrealize();
+ 
+     if (xenbus->backend_watch) {
+-        xen_bus_remove_watch(xenbus, xenbus->backend_watch, NULL);
++        unsigned int i;
++
++        for (i = 0; i < xenbus->backend_types; i++) {
++            xen_bus_remove_watch(xenbus, xenbus->backend_watch[i], NULL);
++        }
++
++        g_free(xenbus->backend_watch);
+         xenbus->backend_watch = NULL;
+     }
+ 
+@@ -446,8 +452,11 @@ static void xen_bus_unrealize(BusState *bus)
+ 
+ static void xen_bus_realize(BusState *bus, Error **errp)
+ {
++    char *key = g_strdup_printf("%u", xen_domid);
+     XenBus *xenbus = XEN_BUS(bus);
+     unsigned int domid;
++    const char **type;
++    unsigned int i;
+     Error *local_err = NULL;
+ 
+     trace_xen_bus_realize();
+@@ -469,19 +478,32 @@ static void xen_bus_realize(BusState *bus, Error **errp)
+ 
+     module_call_init(MODULE_INIT_XEN_BACKEND);
+ 
+-    xenbus->backend_watch =
+-        xen_bus_add_watch(xenbus, "", /* domain root node */
+-                          "backend", xen_bus_backend_changed, &local_err);
+-    if (local_err) {
+-        /* This need not be treated as a hard error so don't propagate */
+-        error_reportf_err(local_err,
+-                          "failed to set up enumeration watch: ");
++    type = xen_backend_get_types(&xenbus->backend_types);
++    xenbus->backend_watch = g_new(XenWatch *, xenbus->backend_types);
++
++    for (i = 0; i < xenbus->backend_types; i++) {
++        char *node = g_strdup_printf("backend/%s", type[i]);
++
++        xenbus->backend_watch[i] =
++            xen_bus_add_watch(xenbus, node, key, xen_bus_backend_changed,
++                              &local_err);
++        if (local_err) {
++            /* This need not be treated as a hard error so don't propagate */
++            error_reportf_err(local_err,
++                              "failed to set up '%s' enumeration watch: ",
++                              type[i]);
++        }
++
++        g_free(node);
+     }
+ 
++    g_free(type);
++    g_free(key);
+     return;
+ 
+ fail:
+     xen_bus_unrealize(bus);
++    g_free(key);
+ }
+ 
+ static void xen_bus_unplug_request(HotplugHandler *hotplug,
+diff --git a/include/hw/xen/xen-backend.h b/include/hw/xen/xen-backend.h
+index 010d712638..aac2fd454d 100644
+--- a/include/hw/xen/xen-backend.h
++++ b/include/hw/xen/xen-backend.h
+@@ -31,6 +31,7 @@ void xen_backend_set_device(XenBackendInstance *backend,
+ XenDevice *xen_backend_get_device(XenBackendInstance *backend);
+ 
+ void xen_backend_register(const XenBackendInfo *info);
++const char **xen_backend_get_types(unsigned int *nr);
+ 
+ void xen_backend_device_create(XenBus *xenbus, const char *type,
+                                const char *name, QDict *opts, Error **errp);
+diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
+index 3df696136f..6bdbf3ff82 100644
+--- a/include/hw/xen/xen-bus.h
++++ b/include/hw/xen/xen-bus.h
+@@ -66,7 +66,8 @@ struct XenBus {
+     domid_t backend_id;
+     struct xs_handle *xsh;
+     XenWatchList *watch_list;
+-    XenWatch *backend_watch;
++    unsigned int backend_types;
++    XenWatch **backend_watch;
+     QLIST_HEAD(, XenDevice) inactive_devices;
+ };
+ 
+-- 
+2.20.1
 
 
