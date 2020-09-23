@@ -2,68 +2,67 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NORMAL_HTTP_TO_IP,NUMERIC_HTTP_ADDR,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5342FC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:20:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F5CEC4727E
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:22:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D38E6206C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:20:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D3F2206C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 09:22:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UO8ZcUCr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D38E6206C3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gYFk/p2c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D3F2206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL0x5-0004Wg-VD
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 05:20:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53090)
+	id 1kL0ya-0006Za-LV
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 05:22:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53158)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kL0oW-0001Bt-Fn
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:11:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20534)
+ id 1kL0od-0001IN-BR
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:11:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37013)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kL0oP-0002Ml-DM
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:11:48 -0400
+ id 1kL0oS-0002Mn-LK
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 05:11:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1600852297;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=csQxNiFZcnC9TBP3b4tvHjusdp7fACDXz4/V7nvvILU=;
- b=UO8ZcUCrqEqJIMRRlwu+rxf15oPD/c7TS0MdTq7vCEfwXZlk3s+unKpJF4Ymce3rWY2VkX
- uMm6rQKNNs/cuMuqOrCiprTu3iFJbjc88DR6NUEm7lDPnK0ZGN/oL6kUu93Go4AkARxYhq
- 9brGTM2BGHW4AGEbBgjslp481cQxIVI=
+ bh=0wOGO/ltGBbQBSaNWqVHMmSsQRLrJuuk2JQz2s3rCbI=;
+ b=gYFk/p2cUdrILfNiheyct05GLRUQMNY20kdCn2sSRm0MEHpOMlIAXkpy96sQ5VGRt7Comr
+ OjWfuK4GB9U5wH3FWwMpxd3kqHYJn4/Oow2W4yY8wSlmsiQ9nOO1NqJwDZ3tdnh1xSM1Kz
+ lt4YOnIKAD0XJmaUMaolcFGj/TKbggc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-7wHGC4N5MKC1zuZ_z7hQhA-1; Wed, 23 Sep 2020 05:11:35 -0400
-X-MC-Unique: 7wHGC4N5MKC1zuZ_z7hQhA-1
+ us-mta-458-QEF4gCLuNee9kxjmgGjiZw-1; Wed, 23 Sep 2020 05:11:33 -0400
+X-MC-Unique: QEF4gCLuNee9kxjmgGjiZw-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89EBC1005E76;
- Wed, 23 Sep 2020 09:11:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EBD66801AEB;
+ Wed, 23 Sep 2020 09:11:32 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2F0805D9CC;
- Wed, 23 Sep 2020 09:11:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 902D15D9CC;
+ Wed, 23 Sep 2020 09:11:32 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 04/12] configure: move accelerator logic to meson
-Date: Wed, 23 Sep 2020 05:11:23 -0400
-Message-Id: <20200923091131.1591563-5-pbonzini@redhat.com>
+Subject: [PATCH 01/12] default-configs: move files to default-configs/devices/
+Date: Wed, 23 Sep 2020 05:11:20 -0400
+Message-Id: <20200923091131.1591563-2-pbonzini@redhat.com>
 In-Reply-To: <20200923091131.1591563-1-pbonzini@redhat.com>
 References: <20200923091131.1591563-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -102,214 +101,487 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move to meson the code to detect the presence of accelerators, and
-to define accelerator-specific config-target.h symbols.
+Make room for target files in default-configs/targets/
 
-The logic for now is duplicated in configure because it is still
-in use to build the list of targets (which is in turn used to
-create the config-target.mak files).  The next patches remove it.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure   |  19 ---------
- meson.build | 108 ++++++++++++++++++++++++++++++++++++++++++++--------
- 2 files changed, 93 insertions(+), 34 deletions(-)
+ configure                                                 | 6 +++---
+ default-configs/{ => devices}/aarch64-linux-user.mak      | 0
+ default-configs/{ => devices}/aarch64-softmmu.mak         | 0
+ default-configs/{ => devices}/aarch64_be-linux-user.mak   | 0
+ default-configs/{ => devices}/alpha-linux-user.mak        | 0
+ default-configs/{ => devices}/alpha-softmmu.mak           | 0
+ default-configs/{ => devices}/arm-linux-user.mak          | 0
+ default-configs/{ => devices}/arm-softmmu.mak             | 0
+ default-configs/{ => devices}/armeb-linux-user.mak        | 0
+ default-configs/{ => devices}/avr-softmmu.mak             | 0
+ default-configs/{ => devices}/cris-linux-user.mak         | 0
+ default-configs/{ => devices}/cris-softmmu.mak            | 0
+ default-configs/{ => devices}/hppa-linux-user.mak         | 0
+ default-configs/{ => devices}/hppa-softmmu.mak            | 0
+ default-configs/{ => devices}/i386-bsd-user.mak           | 0
+ default-configs/{ => devices}/i386-linux-user.mak         | 0
+ default-configs/{ => devices}/i386-softmmu.mak            | 0
+ default-configs/{ => devices}/lm32-softmmu.mak            | 0
+ default-configs/{ => devices}/m68k-linux-user.mak         | 0
+ default-configs/{ => devices}/m68k-softmmu.mak            | 0
+ default-configs/{ => devices}/microblaze-linux-user.mak   | 0
+ default-configs/{ => devices}/microblaze-softmmu.mak      | 0
+ default-configs/{ => devices}/microblazeel-linux-user.mak | 0
+ default-configs/{ => devices}/microblazeel-softmmu.mak    | 0
+ default-configs/{ => devices}/mips-linux-user.mak         | 0
+ default-configs/{ => devices}/mips-softmmu-common.mak     | 0
+ default-configs/{ => devices}/mips-softmmu.mak            | 0
+ default-configs/{ => devices}/mips64-linux-user.mak       | 0
+ default-configs/{ => devices}/mips64-softmmu.mak          | 0
+ default-configs/{ => devices}/mips64el-linux-user.mak     | 0
+ default-configs/{ => devices}/mips64el-softmmu.mak        | 0
+ default-configs/{ => devices}/mipsel-linux-user.mak       | 0
+ default-configs/{ => devices}/mipsel-softmmu.mak          | 0
+ default-configs/{ => devices}/mipsn32-linux-user.mak      | 0
+ default-configs/{ => devices}/mipsn32el-linux-user.mak    | 0
+ default-configs/{ => devices}/moxie-softmmu.mak           | 0
+ default-configs/{ => devices}/nios2-linux-user.mak        | 0
+ default-configs/{ => devices}/nios2-softmmu.mak           | 0
+ default-configs/{ => devices}/or1k-linux-user.mak         | 0
+ default-configs/{ => devices}/or1k-softmmu.mak            | 0
+ default-configs/{ => devices}/ppc-linux-user.mak          | 0
+ default-configs/{ => devices}/ppc-softmmu.mak             | 0
+ default-configs/{ => devices}/ppc64-linux-user.mak        | 0
+ default-configs/{ => devices}/ppc64-softmmu.mak           | 0
+ default-configs/{ => devices}/ppc64abi32-linux-user.mak   | 0
+ default-configs/{ => devices}/ppc64le-linux-user.mak      | 0
+ default-configs/{ => devices}/riscv32-linux-user.mak      | 0
+ default-configs/{ => devices}/riscv32-softmmu.mak         | 0
+ default-configs/{ => devices}/riscv64-linux-user.mak      | 0
+ default-configs/{ => devices}/riscv64-softmmu.mak         | 0
+ default-configs/{ => devices}/rx-softmmu.mak              | 0
+ default-configs/{ => devices}/s390x-linux-user.mak        | 0
+ default-configs/{ => devices}/s390x-softmmu.mak           | 0
+ default-configs/{ => devices}/sh4-linux-user.mak          | 0
+ default-configs/{ => devices}/sh4-softmmu.mak             | 0
+ default-configs/{ => devices}/sh4eb-linux-user.mak        | 0
+ default-configs/{ => devices}/sh4eb-softmmu.mak           | 0
+ default-configs/{ => devices}/sparc-bsd-user.mak          | 0
+ default-configs/{ => devices}/sparc-linux-user.mak        | 0
+ default-configs/{ => devices}/sparc-softmmu.mak           | 0
+ default-configs/{ => devices}/sparc32plus-linux-user.mak  | 0
+ default-configs/{ => devices}/sparc64-bsd-user.mak        | 0
+ default-configs/{ => devices}/sparc64-linux-user.mak      | 0
+ default-configs/{ => devices}/sparc64-softmmu.mak         | 0
+ default-configs/{ => devices}/tilegx-linux-user.mak       | 0
+ default-configs/{ => devices}/tricore-softmmu.mak         | 0
+ default-configs/{ => devices}/unicore32-softmmu.mak       | 0
+ default-configs/{ => devices}/x86_64-bsd-user.mak         | 0
+ default-configs/{ => devices}/x86_64-linux-user.mak       | 0
+ default-configs/{ => devices}/x86_64-softmmu.mak          | 0
+ default-configs/{ => devices}/xtensa-linux-user.mak       | 0
+ default-configs/{ => devices}/xtensa-softmmu.mak          | 0
+ default-configs/{ => devices}/xtensaeb-linux-user.mak     | 0
+ default-configs/{ => devices}/xtensaeb-softmmu.mak        | 0
+ meson.build                                               | 2 +-
+ 75 files changed, 4 insertions(+), 4 deletions(-)
+ rename default-configs/{ => devices}/aarch64-linux-user.mak (100%)
+ rename default-configs/{ => devices}/aarch64-softmmu.mak (100%)
+ rename default-configs/{ => devices}/aarch64_be-linux-user.mak (100%)
+ rename default-configs/{ => devices}/alpha-linux-user.mak (100%)
+ rename default-configs/{ => devices}/alpha-softmmu.mak (100%)
+ rename default-configs/{ => devices}/arm-linux-user.mak (100%)
+ rename default-configs/{ => devices}/arm-softmmu.mak (100%)
+ rename default-configs/{ => devices}/armeb-linux-user.mak (100%)
+ rename default-configs/{ => devices}/avr-softmmu.mak (100%)
+ rename default-configs/{ => devices}/cris-linux-user.mak (100%)
+ rename default-configs/{ => devices}/cris-softmmu.mak (100%)
+ rename default-configs/{ => devices}/hppa-linux-user.mak (100%)
+ rename default-configs/{ => devices}/hppa-softmmu.mak (100%)
+ rename default-configs/{ => devices}/i386-bsd-user.mak (100%)
+ rename default-configs/{ => devices}/i386-linux-user.mak (100%)
+ rename default-configs/{ => devices}/i386-softmmu.mak (100%)
+ rename default-configs/{ => devices}/lm32-softmmu.mak (100%)
+ rename default-configs/{ => devices}/m68k-linux-user.mak (100%)
+ rename default-configs/{ => devices}/m68k-softmmu.mak (100%)
+ rename default-configs/{ => devices}/microblaze-linux-user.mak (100%)
+ rename default-configs/{ => devices}/microblaze-softmmu.mak (100%)
+ rename default-configs/{ => devices}/microblazeel-linux-user.mak (100%)
+ rename default-configs/{ => devices}/microblazeel-softmmu.mak (100%)
+ rename default-configs/{ => devices}/mips-linux-user.mak (100%)
+ rename default-configs/{ => devices}/mips-softmmu-common.mak (100%)
+ rename default-configs/{ => devices}/mips-softmmu.mak (100%)
+ rename default-configs/{ => devices}/mips64-linux-user.mak (100%)
+ rename default-configs/{ => devices}/mips64-softmmu.mak (100%)
+ rename default-configs/{ => devices}/mips64el-linux-user.mak (100%)
+ rename default-configs/{ => devices}/mips64el-softmmu.mak (100%)
+ rename default-configs/{ => devices}/mipsel-linux-user.mak (100%)
+ rename default-configs/{ => devices}/mipsel-softmmu.mak (100%)
+ rename default-configs/{ => devices}/mipsn32-linux-user.mak (100%)
+ rename default-configs/{ => devices}/mipsn32el-linux-user.mak (100%)
+ rename default-configs/{ => devices}/moxie-softmmu.mak (100%)
+ rename default-configs/{ => devices}/nios2-linux-user.mak (100%)
+ rename default-configs/{ => devices}/nios2-softmmu.mak (100%)
+ rename default-configs/{ => devices}/or1k-linux-user.mak (100%)
+ rename default-configs/{ => devices}/or1k-softmmu.mak (100%)
+ rename default-configs/{ => devices}/ppc-linux-user.mak (100%)
+ rename default-configs/{ => devices}/ppc-softmmu.mak (100%)
+ rename default-configs/{ => devices}/ppc64-linux-user.mak (100%)
+ rename default-configs/{ => devices}/ppc64-softmmu.mak (100%)
+ rename default-configs/{ => devices}/ppc64abi32-linux-user.mak (100%)
+ rename default-configs/{ => devices}/ppc64le-linux-user.mak (100%)
+ rename default-configs/{ => devices}/riscv32-linux-user.mak (100%)
+ rename default-configs/{ => devices}/riscv32-softmmu.mak (100%)
+ rename default-configs/{ => devices}/riscv64-linux-user.mak (100%)
+ rename default-configs/{ => devices}/riscv64-softmmu.mak (100%)
+ rename default-configs/{ => devices}/rx-softmmu.mak (100%)
+ rename default-configs/{ => devices}/s390x-linux-user.mak (100%)
+ rename default-configs/{ => devices}/s390x-softmmu.mak (100%)
+ rename default-configs/{ => devices}/sh4-linux-user.mak (100%)
+ rename default-configs/{ => devices}/sh4-softmmu.mak (100%)
+ rename default-configs/{ => devices}/sh4eb-linux-user.mak (100%)
+ rename default-configs/{ => devices}/sh4eb-softmmu.mak (100%)
+ rename default-configs/{ => devices}/sparc-bsd-user.mak (100%)
+ rename default-configs/{ => devices}/sparc-linux-user.mak (100%)
+ rename default-configs/{ => devices}/sparc-softmmu.mak (100%)
+ rename default-configs/{ => devices}/sparc32plus-linux-user.mak (100%)
+ rename default-configs/{ => devices}/sparc64-bsd-user.mak (100%)
+ rename default-configs/{ => devices}/sparc64-linux-user.mak (100%)
+ rename default-configs/{ => devices}/sparc64-softmmu.mak (100%)
+ rename default-configs/{ => devices}/tilegx-linux-user.mak (100%)
+ rename default-configs/{ => devices}/tricore-softmmu.mak (100%)
+ rename default-configs/{ => devices}/unicore32-softmmu.mak (100%)
+ rename default-configs/{ => devices}/x86_64-bsd-user.mak (100%)
+ rename default-configs/{ => devices}/x86_64-linux-user.mak (100%)
+ rename default-configs/{ => devices}/x86_64-softmmu.mak (100%)
+ rename default-configs/{ => devices}/xtensa-linux-user.mak (100%)
+ rename default-configs/{ => devices}/xtensa-softmmu.mak (100%)
+ rename default-configs/{ => devices}/xtensaeb-linux-user.mak (100%)
+ rename default-configs/{ => devices}/xtensaeb-softmmu.mak (100%)
 
 diff --git a/configure b/configure
-index 04cc25f7c8..5df58c4b89 100755
+index c2aa1885c3..a23364c30d 100755
 --- a/configure
 +++ b/configure
-@@ -6863,7 +6863,6 @@ if test "$optreset" = "yes" ; then
-   echo "HAVE_OPTRESET=y" >> $config_host_mak
+@@ -1723,13 +1723,13 @@ default_target_list=""
+ mak_wilds=""
+ 
+ if [ "$softmmu" = "yes" ]; then
+-    mak_wilds="${mak_wilds} $source_path/default-configs/*-softmmu.mak"
++    mak_wilds="${mak_wilds} $source_path/default-configs/devices/*-softmmu.mak"
  fi
- if test "$tcg" = "enabled"; then
--  echo "CONFIG_TCG=y" >> $config_host_mak
-   if test "$tcg_interpreter" = "yes" ; then
-     echo "CONFIG_TCG_INTERPRETER=y" >> $config_host_mak
-   fi
-@@ -7645,24 +7644,6 @@ if [ "$TARGET_SYSTBL_ABI" != "" ]; then
-     echo "TARGET_SYSTBL=$TARGET_SYSTBL" >> $config_target_mak
+ if [ "$linux_user" = "yes" ]; then
+-    mak_wilds="${mak_wilds} $source_path/default-configs/*-linux-user.mak"
++    mak_wilds="${mak_wilds} $source_path/default-configs/devices/*-linux-user.mak"
+ fi
+ if [ "$bsd_user" = "yes" ]; then
+-    mak_wilds="${mak_wilds} $source_path/default-configs/*-bsd-user.mak"
++    mak_wilds="${mak_wilds} $source_path/default-configs/devices/*-bsd-user.mak"
  fi
  
--if supported_xen_target $target; then
--    echo "CONFIG_XEN=y" >> $config_target_mak
--    if test "$xen_pci_passthrough" = enabled; then
--        echo "CONFIG_XEN_PCI_PASSTHROUGH=y" >> "$config_target_mak"
--    fi
--fi
--if supported_kvm_target $target; then
--    echo "CONFIG_KVM=y" >> $config_target_mak
--fi
--if supported_hax_target $target; then
--    echo "CONFIG_HAX=y" >> $config_target_mak
--fi
--if supported_hvf_target $target; then
--    echo "CONFIG_HVF=y" >> $config_target_mak
--fi
--if supported_whpx_target $target; then
--    echo "CONFIG_WHPX=y" >> $config_target_mak
--fi
- if test "$target_aligned_only" = "yes" ; then
-   echo "TARGET_ALIGNED_ONLY=y" >> $config_target_mak
- fi
+ # If the user doesn't explicitly specify a deprecated target we will
+diff --git a/default-configs/aarch64-linux-user.mak b/default-configs/devices/aarch64-linux-user.mak
+similarity index 100%
+rename from default-configs/aarch64-linux-user.mak
+rename to default-configs/devices/aarch64-linux-user.mak
+diff --git a/default-configs/aarch64-softmmu.mak b/default-configs/devices/aarch64-softmmu.mak
+similarity index 100%
+rename from default-configs/aarch64-softmmu.mak
+rename to default-configs/devices/aarch64-softmmu.mak
+diff --git a/default-configs/aarch64_be-linux-user.mak b/default-configs/devices/aarch64_be-linux-user.mak
+similarity index 100%
+rename from default-configs/aarch64_be-linux-user.mak
+rename to default-configs/devices/aarch64_be-linux-user.mak
+diff --git a/default-configs/alpha-linux-user.mak b/default-configs/devices/alpha-linux-user.mak
+similarity index 100%
+rename from default-configs/alpha-linux-user.mak
+rename to default-configs/devices/alpha-linux-user.mak
+diff --git a/default-configs/alpha-softmmu.mak b/default-configs/devices/alpha-softmmu.mak
+similarity index 100%
+rename from default-configs/alpha-softmmu.mak
+rename to default-configs/devices/alpha-softmmu.mak
+diff --git a/default-configs/arm-linux-user.mak b/default-configs/devices/arm-linux-user.mak
+similarity index 100%
+rename from default-configs/arm-linux-user.mak
+rename to default-configs/devices/arm-linux-user.mak
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/devices/arm-softmmu.mak
+similarity index 100%
+rename from default-configs/arm-softmmu.mak
+rename to default-configs/devices/arm-softmmu.mak
+diff --git a/default-configs/armeb-linux-user.mak b/default-configs/devices/armeb-linux-user.mak
+similarity index 100%
+rename from default-configs/armeb-linux-user.mak
+rename to default-configs/devices/armeb-linux-user.mak
+diff --git a/default-configs/avr-softmmu.mak b/default-configs/devices/avr-softmmu.mak
+similarity index 100%
+rename from default-configs/avr-softmmu.mak
+rename to default-configs/devices/avr-softmmu.mak
+diff --git a/default-configs/cris-linux-user.mak b/default-configs/devices/cris-linux-user.mak
+similarity index 100%
+rename from default-configs/cris-linux-user.mak
+rename to default-configs/devices/cris-linux-user.mak
+diff --git a/default-configs/cris-softmmu.mak b/default-configs/devices/cris-softmmu.mak
+similarity index 100%
+rename from default-configs/cris-softmmu.mak
+rename to default-configs/devices/cris-softmmu.mak
+diff --git a/default-configs/hppa-linux-user.mak b/default-configs/devices/hppa-linux-user.mak
+similarity index 100%
+rename from default-configs/hppa-linux-user.mak
+rename to default-configs/devices/hppa-linux-user.mak
+diff --git a/default-configs/hppa-softmmu.mak b/default-configs/devices/hppa-softmmu.mak
+similarity index 100%
+rename from default-configs/hppa-softmmu.mak
+rename to default-configs/devices/hppa-softmmu.mak
+diff --git a/default-configs/i386-bsd-user.mak b/default-configs/devices/i386-bsd-user.mak
+similarity index 100%
+rename from default-configs/i386-bsd-user.mak
+rename to default-configs/devices/i386-bsd-user.mak
+diff --git a/default-configs/i386-linux-user.mak b/default-configs/devices/i386-linux-user.mak
+similarity index 100%
+rename from default-configs/i386-linux-user.mak
+rename to default-configs/devices/i386-linux-user.mak
+diff --git a/default-configs/i386-softmmu.mak b/default-configs/devices/i386-softmmu.mak
+similarity index 100%
+rename from default-configs/i386-softmmu.mak
+rename to default-configs/devices/i386-softmmu.mak
+diff --git a/default-configs/lm32-softmmu.mak b/default-configs/devices/lm32-softmmu.mak
+similarity index 100%
+rename from default-configs/lm32-softmmu.mak
+rename to default-configs/devices/lm32-softmmu.mak
+diff --git a/default-configs/m68k-linux-user.mak b/default-configs/devices/m68k-linux-user.mak
+similarity index 100%
+rename from default-configs/m68k-linux-user.mak
+rename to default-configs/devices/m68k-linux-user.mak
+diff --git a/default-configs/m68k-softmmu.mak b/default-configs/devices/m68k-softmmu.mak
+similarity index 100%
+rename from default-configs/m68k-softmmu.mak
+rename to default-configs/devices/m68k-softmmu.mak
+diff --git a/default-configs/microblaze-linux-user.mak b/default-configs/devices/microblaze-linux-user.mak
+similarity index 100%
+rename from default-configs/microblaze-linux-user.mak
+rename to default-configs/devices/microblaze-linux-user.mak
+diff --git a/default-configs/microblaze-softmmu.mak b/default-configs/devices/microblaze-softmmu.mak
+similarity index 100%
+rename from default-configs/microblaze-softmmu.mak
+rename to default-configs/devices/microblaze-softmmu.mak
+diff --git a/default-configs/microblazeel-linux-user.mak b/default-configs/devices/microblazeel-linux-user.mak
+similarity index 100%
+rename from default-configs/microblazeel-linux-user.mak
+rename to default-configs/devices/microblazeel-linux-user.mak
+diff --git a/default-configs/microblazeel-softmmu.mak b/default-configs/devices/microblazeel-softmmu.mak
+similarity index 100%
+rename from default-configs/microblazeel-softmmu.mak
+rename to default-configs/devices/microblazeel-softmmu.mak
+diff --git a/default-configs/mips-linux-user.mak b/default-configs/devices/mips-linux-user.mak
+similarity index 100%
+rename from default-configs/mips-linux-user.mak
+rename to default-configs/devices/mips-linux-user.mak
+diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/devices/mips-softmmu-common.mak
+similarity index 100%
+rename from default-configs/mips-softmmu-common.mak
+rename to default-configs/devices/mips-softmmu-common.mak
+diff --git a/default-configs/mips-softmmu.mak b/default-configs/devices/mips-softmmu.mak
+similarity index 100%
+rename from default-configs/mips-softmmu.mak
+rename to default-configs/devices/mips-softmmu.mak
+diff --git a/default-configs/mips64-linux-user.mak b/default-configs/devices/mips64-linux-user.mak
+similarity index 100%
+rename from default-configs/mips64-linux-user.mak
+rename to default-configs/devices/mips64-linux-user.mak
+diff --git a/default-configs/mips64-softmmu.mak b/default-configs/devices/mips64-softmmu.mak
+similarity index 100%
+rename from default-configs/mips64-softmmu.mak
+rename to default-configs/devices/mips64-softmmu.mak
+diff --git a/default-configs/mips64el-linux-user.mak b/default-configs/devices/mips64el-linux-user.mak
+similarity index 100%
+rename from default-configs/mips64el-linux-user.mak
+rename to default-configs/devices/mips64el-linux-user.mak
+diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/devices/mips64el-softmmu.mak
+similarity index 100%
+rename from default-configs/mips64el-softmmu.mak
+rename to default-configs/devices/mips64el-softmmu.mak
+diff --git a/default-configs/mipsel-linux-user.mak b/default-configs/devices/mipsel-linux-user.mak
+similarity index 100%
+rename from default-configs/mipsel-linux-user.mak
+rename to default-configs/devices/mipsel-linux-user.mak
+diff --git a/default-configs/mipsel-softmmu.mak b/default-configs/devices/mipsel-softmmu.mak
+similarity index 100%
+rename from default-configs/mipsel-softmmu.mak
+rename to default-configs/devices/mipsel-softmmu.mak
+diff --git a/default-configs/mipsn32-linux-user.mak b/default-configs/devices/mipsn32-linux-user.mak
+similarity index 100%
+rename from default-configs/mipsn32-linux-user.mak
+rename to default-configs/devices/mipsn32-linux-user.mak
+diff --git a/default-configs/mipsn32el-linux-user.mak b/default-configs/devices/mipsn32el-linux-user.mak
+similarity index 100%
+rename from default-configs/mipsn32el-linux-user.mak
+rename to default-configs/devices/mipsn32el-linux-user.mak
+diff --git a/default-configs/moxie-softmmu.mak b/default-configs/devices/moxie-softmmu.mak
+similarity index 100%
+rename from default-configs/moxie-softmmu.mak
+rename to default-configs/devices/moxie-softmmu.mak
+diff --git a/default-configs/nios2-linux-user.mak b/default-configs/devices/nios2-linux-user.mak
+similarity index 100%
+rename from default-configs/nios2-linux-user.mak
+rename to default-configs/devices/nios2-linux-user.mak
+diff --git a/default-configs/nios2-softmmu.mak b/default-configs/devices/nios2-softmmu.mak
+similarity index 100%
+rename from default-configs/nios2-softmmu.mak
+rename to default-configs/devices/nios2-softmmu.mak
+diff --git a/default-configs/or1k-linux-user.mak b/default-configs/devices/or1k-linux-user.mak
+similarity index 100%
+rename from default-configs/or1k-linux-user.mak
+rename to default-configs/devices/or1k-linux-user.mak
+diff --git a/default-configs/or1k-softmmu.mak b/default-configs/devices/or1k-softmmu.mak
+similarity index 100%
+rename from default-configs/or1k-softmmu.mak
+rename to default-configs/devices/or1k-softmmu.mak
+diff --git a/default-configs/ppc-linux-user.mak b/default-configs/devices/ppc-linux-user.mak
+similarity index 100%
+rename from default-configs/ppc-linux-user.mak
+rename to default-configs/devices/ppc-linux-user.mak
+diff --git a/default-configs/ppc-softmmu.mak b/default-configs/devices/ppc-softmmu.mak
+similarity index 100%
+rename from default-configs/ppc-softmmu.mak
+rename to default-configs/devices/ppc-softmmu.mak
+diff --git a/default-configs/ppc64-linux-user.mak b/default-configs/devices/ppc64-linux-user.mak
+similarity index 100%
+rename from default-configs/ppc64-linux-user.mak
+rename to default-configs/devices/ppc64-linux-user.mak
+diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/devices/ppc64-softmmu.mak
+similarity index 100%
+rename from default-configs/ppc64-softmmu.mak
+rename to default-configs/devices/ppc64-softmmu.mak
+diff --git a/default-configs/ppc64abi32-linux-user.mak b/default-configs/devices/ppc64abi32-linux-user.mak
+similarity index 100%
+rename from default-configs/ppc64abi32-linux-user.mak
+rename to default-configs/devices/ppc64abi32-linux-user.mak
+diff --git a/default-configs/ppc64le-linux-user.mak b/default-configs/devices/ppc64le-linux-user.mak
+similarity index 100%
+rename from default-configs/ppc64le-linux-user.mak
+rename to default-configs/devices/ppc64le-linux-user.mak
+diff --git a/default-configs/riscv32-linux-user.mak b/default-configs/devices/riscv32-linux-user.mak
+similarity index 100%
+rename from default-configs/riscv32-linux-user.mak
+rename to default-configs/devices/riscv32-linux-user.mak
+diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/devices/riscv32-softmmu.mak
+similarity index 100%
+rename from default-configs/riscv32-softmmu.mak
+rename to default-configs/devices/riscv32-softmmu.mak
+diff --git a/default-configs/riscv64-linux-user.mak b/default-configs/devices/riscv64-linux-user.mak
+similarity index 100%
+rename from default-configs/riscv64-linux-user.mak
+rename to default-configs/devices/riscv64-linux-user.mak
+diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/devices/riscv64-softmmu.mak
+similarity index 100%
+rename from default-configs/riscv64-softmmu.mak
+rename to default-configs/devices/riscv64-softmmu.mak
+diff --git a/default-configs/rx-softmmu.mak b/default-configs/devices/rx-softmmu.mak
+similarity index 100%
+rename from default-configs/rx-softmmu.mak
+rename to default-configs/devices/rx-softmmu.mak
+diff --git a/default-configs/s390x-linux-user.mak b/default-configs/devices/s390x-linux-user.mak
+similarity index 100%
+rename from default-configs/s390x-linux-user.mak
+rename to default-configs/devices/s390x-linux-user.mak
+diff --git a/default-configs/s390x-softmmu.mak b/default-configs/devices/s390x-softmmu.mak
+similarity index 100%
+rename from default-configs/s390x-softmmu.mak
+rename to default-configs/devices/s390x-softmmu.mak
+diff --git a/default-configs/sh4-linux-user.mak b/default-configs/devices/sh4-linux-user.mak
+similarity index 100%
+rename from default-configs/sh4-linux-user.mak
+rename to default-configs/devices/sh4-linux-user.mak
+diff --git a/default-configs/sh4-softmmu.mak b/default-configs/devices/sh4-softmmu.mak
+similarity index 100%
+rename from default-configs/sh4-softmmu.mak
+rename to default-configs/devices/sh4-softmmu.mak
+diff --git a/default-configs/sh4eb-linux-user.mak b/default-configs/devices/sh4eb-linux-user.mak
+similarity index 100%
+rename from default-configs/sh4eb-linux-user.mak
+rename to default-configs/devices/sh4eb-linux-user.mak
+diff --git a/default-configs/sh4eb-softmmu.mak b/default-configs/devices/sh4eb-softmmu.mak
+similarity index 100%
+rename from default-configs/sh4eb-softmmu.mak
+rename to default-configs/devices/sh4eb-softmmu.mak
+diff --git a/default-configs/sparc-bsd-user.mak b/default-configs/devices/sparc-bsd-user.mak
+similarity index 100%
+rename from default-configs/sparc-bsd-user.mak
+rename to default-configs/devices/sparc-bsd-user.mak
+diff --git a/default-configs/sparc-linux-user.mak b/default-configs/devices/sparc-linux-user.mak
+similarity index 100%
+rename from default-configs/sparc-linux-user.mak
+rename to default-configs/devices/sparc-linux-user.mak
+diff --git a/default-configs/sparc-softmmu.mak b/default-configs/devices/sparc-softmmu.mak
+similarity index 100%
+rename from default-configs/sparc-softmmu.mak
+rename to default-configs/devices/sparc-softmmu.mak
+diff --git a/default-configs/sparc32plus-linux-user.mak b/default-configs/devices/sparc32plus-linux-user.mak
+similarity index 100%
+rename from default-configs/sparc32plus-linux-user.mak
+rename to default-configs/devices/sparc32plus-linux-user.mak
+diff --git a/default-configs/sparc64-bsd-user.mak b/default-configs/devices/sparc64-bsd-user.mak
+similarity index 100%
+rename from default-configs/sparc64-bsd-user.mak
+rename to default-configs/devices/sparc64-bsd-user.mak
+diff --git a/default-configs/sparc64-linux-user.mak b/default-configs/devices/sparc64-linux-user.mak
+similarity index 100%
+rename from default-configs/sparc64-linux-user.mak
+rename to default-configs/devices/sparc64-linux-user.mak
+diff --git a/default-configs/sparc64-softmmu.mak b/default-configs/devices/sparc64-softmmu.mak
+similarity index 100%
+rename from default-configs/sparc64-softmmu.mak
+rename to default-configs/devices/sparc64-softmmu.mak
+diff --git a/default-configs/tilegx-linux-user.mak b/default-configs/devices/tilegx-linux-user.mak
+similarity index 100%
+rename from default-configs/tilegx-linux-user.mak
+rename to default-configs/devices/tilegx-linux-user.mak
+diff --git a/default-configs/tricore-softmmu.mak b/default-configs/devices/tricore-softmmu.mak
+similarity index 100%
+rename from default-configs/tricore-softmmu.mak
+rename to default-configs/devices/tricore-softmmu.mak
+diff --git a/default-configs/unicore32-softmmu.mak b/default-configs/devices/unicore32-softmmu.mak
+similarity index 100%
+rename from default-configs/unicore32-softmmu.mak
+rename to default-configs/devices/unicore32-softmmu.mak
+diff --git a/default-configs/x86_64-bsd-user.mak b/default-configs/devices/x86_64-bsd-user.mak
+similarity index 100%
+rename from default-configs/x86_64-bsd-user.mak
+rename to default-configs/devices/x86_64-bsd-user.mak
+diff --git a/default-configs/x86_64-linux-user.mak b/default-configs/devices/x86_64-linux-user.mak
+similarity index 100%
+rename from default-configs/x86_64-linux-user.mak
+rename to default-configs/devices/x86_64-linux-user.mak
+diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/devices/x86_64-softmmu.mak
+similarity index 100%
+rename from default-configs/x86_64-softmmu.mak
+rename to default-configs/devices/x86_64-softmmu.mak
+diff --git a/default-configs/xtensa-linux-user.mak b/default-configs/devices/xtensa-linux-user.mak
+similarity index 100%
+rename from default-configs/xtensa-linux-user.mak
+rename to default-configs/devices/xtensa-linux-user.mak
+diff --git a/default-configs/xtensa-softmmu.mak b/default-configs/devices/xtensa-softmmu.mak
+similarity index 100%
+rename from default-configs/xtensa-softmmu.mak
+rename to default-configs/devices/xtensa-softmmu.mak
+diff --git a/default-configs/xtensaeb-linux-user.mak b/default-configs/devices/xtensaeb-linux-user.mak
+similarity index 100%
+rename from default-configs/xtensaeb-linux-user.mak
+rename to default-configs/devices/xtensaeb-linux-user.mak
+diff --git a/default-configs/xtensaeb-softmmu.mak b/default-configs/devices/xtensaeb-softmmu.mak
+similarity index 100%
+rename from default-configs/xtensaeb-softmmu.mak
+rename to default-configs/devices/xtensaeb-softmmu.mak
 diff --git a/meson.build b/meson.build
-index 02593bc787..641378c1d9 100644
+index 4c73f4093a..02593bc787 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -50,6 +50,28 @@ configure_file(input: files('scripts/ninjatool.py'),
-                output: 'ninjatool',
-                configuration: config_host)
+@@ -694,7 +694,7 @@ foreach target : target_dirs
  
-+if cpu in ['x86', 'x86_64']
-+  kvm_targets = ['i386-softmmu', 'x86_64-softmmu']
-+elif cpu == 'aarch64'
-+  kvm_targets = ['aarch64-softmmu']
-+elif cpu == 's390x'
-+  kvm_targets = ['s390x-softmmu']
-+elif cpu in ['ppc', 'ppc64']
-+  kvm_targets = ['ppc-softmmu', 'ppc64-softmmu']
-+else
-+  kvm_targets = []
-+endif
-+
-+accelerator_targets = { 'CONFIG_KVM': kvm_targets }
-+if cpu in ['x86', 'x86_64']
-+  accelerator_targets += {
-+    'CONFIG_HAX': ['i386-softmmu', 'x86_64-softmmu'],
-+    'CONFIG_XEN': ['i386-softmmu', 'x86_64-softmmu'],
-+    'CONFIG_HVF': ['x86_64-softmmu'],
-+    'CONFIG_WHPX': ['i386-softmmu', 'x86_64-softmmu'],
-+  }
-+endif
-+
- ##################
- # Compiler flags #
- ##################
-@@ -103,7 +125,7 @@ version_res = []
- coref = []
- iokit = []
- cocoa = not_found
--hvf = []
-+hvf = not_found
- if targetos == 'windows'
-   socket = cc.find_library('ws2_32')
-   winmm = cc.find_library('winmm')
-@@ -116,7 +138,6 @@ elif targetos == 'darwin'
-   coref = dependency('appleframeworks', modules: 'CoreFoundation')
-   iokit = dependency('appleframeworks', modules: 'IOKit')
-   cocoa = dependency('appleframeworks', modules: 'Cocoa', required: get_option('cocoa'))
--  hvf = dependency('appleframeworks', modules: 'Hypervisor')
- elif targetos == 'sunos'
-   socket = [cc.find_library('socket'),
-             cc.find_library('nsl'),
-@@ -127,6 +148,63 @@ elif targetos == 'haiku'
-             cc.find_library('bsd')]
- endif
- 
-+accelerators = []
-+if not get_option('kvm').disabled() and targetos == 'linux'
-+  accelerators += 'CONFIG_KVM'
-+endif
-+if not get_option('xen').disabled() and 'CONFIG_XEN_BACKEND' in config_host
-+  accelerators += 'CONFIG_XEN'
-+  have_xen_pci_passthrough = not get_option('xen_pci_passthrough').disabled() and targetos == 'linux'
-+else
-+  have_xen_pci_passthrough = false
-+endif
-+if not get_option('whpx').disabled() and targetos == 'windows'
-+  if get_option('whpx').enabled() and cpu != 'x86_64'
-+    error('WHPX requires 64-bit host')
-+  elif cc.has_header('WinHvPlatform.h', required: get_option('whpx')) and \
-+       cc.has_header('WinHvEmulation.h', required: get_option('whpx'))
-+    accelerators += 'CONFIG_WHPX'
-+  endif
-+endif
-+if not get_option('hvf').disabled()
-+  hvf = dependency('appleframeworks', modules: 'Hypervisor',
-+                   required: get_option('hvf'))
-+  if hvf.found()
-+    accelerators += 'CONFIG_HVF'
-+  endif
-+endif
-+if not get_option('hax').disabled()
-+  if get_option('hax').enabled() or targetos in ['windows', 'darwin', 'netbsd']
-+    accelerators += 'CONFIG_HAX'
-+  endif
-+endif
-+if not get_option('tcg').disabled()
-+  if cpu not in supported_cpus
-+    if 'CONFIG_TCG_INTERPRETER' in config_host
-+      warning('Unsupported CPU @0@, will use TCG with TCI (experimental)'.format(cpu))
-+    else
-+      error('Unsupported CPU @0@, try --enable-tcg-interpreter'.format(cpu))
-+    endif
-+  endif
-+  accelerators += 'CONFIG_TCG'
-+endif
-+
-+if 'CONFIG_KVM' not in accelerators and get_option('kvm').enabled()
-+  error('KVM not available on this platform')
-+endif
-+if 'CONFIG_HVF' not in accelerators and get_option('hvf').enabled()
-+  error('HVF not available on this platform')
-+endif
-+if 'CONFIG_WHPX' not in accelerators and get_option('whpx').enabled()
-+  error('WHPX not available on this platform')
-+endif
-+if not have_xen_pci_passthrough and get_option('xen_pci_passthrough').enabled()
-+  if 'CONFIG_XEN' in accelerators
-+    error('Xen PCI passthrough not available on this platform')
-+  else
-+    error('Xen PCI passthrough requested but Xen not enabled')
-+  endif
-+endif
- if not cocoa.found() and get_option('cocoa').enabled()
-   error('Cocoa not available on this platform')
- endif
-@@ -640,17 +718,22 @@ kconfig_external_symbols = [
- ]
- ignored = ['TARGET_XML_FILES', 'TARGET_ABI_DIR', 'TARGET_DIRS']
- 
--accel_symbols = [
--  'CONFIG_KVM',
--  'CONFIG_HAX',
--  'CONFIG_HVF',
--  'CONFIG_TCG',
--  'CONFIG_WHPX'
--]
--
- foreach target : target_dirs
-   config_target = keyval.load(meson.current_build_dir() / target / 'config-target.mak')
- 
-+  have_accel = false
-+  foreach sym: accelerators
-+    if sym == 'CONFIG_TCG' or target in accelerator_targets[sym]
-+      config_target += { sym: 'y' }
-+      config_all += { sym: 'y' }
-+      if sym == 'CONFIG_XEN' and have_xen_pci_passthrough
-+        config_target += { 'CONFIG_XEN_PCI_PASSTHROUGH': 'y' }
-+      endif
-+    endif
-+    have_accel = true
-+  endforeach
-+  assert(have_accel)
-+
-   foreach k, v: disassemblers
-     if config_host['ARCH'].startswith(k) or config_target['TARGET_BASE_ARCH'].startswith(k)
-       foreach sym: v
-@@ -676,11 +759,6 @@ foreach target : target_dirs
-       config_target_data.set(k, v)
-     endif
-   endforeach
--  foreach sym: accel_symbols
--    if config_target.has_key(sym)
--      config_all += { sym: 'y' }
--    endif
--  endforeach
-   config_target_h += {target: configure_file(output: target + '-config-target.h',
-                                                configuration: config_target_data)}
- 
+     config_devices_mak = target + '-config-devices.mak'
+     config_devices_mak = configure_file(
+-      input: ['default-configs' / target + '.mak', 'Kconfig'],
++      input: ['default-configs/devices' / target + '.mak', 'Kconfig'],
+       output: config_devices_mak,
+       depfile: config_devices_mak + '.d',
+       capture: true,
 -- 
 2.26.2
 
