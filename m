@@ -2,76 +2,96 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EEB3C4363D
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 15:28:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47CE3C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 15:29:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D58532220D
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 15:28:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C7EAA2137B
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 15:29:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NUScX0P7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D58532220D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GkvZCmPB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7EAA2137B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL6gj-0007Fb-1S
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 11:28:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36674)
+	id 1kL6hw-0008EB-Ty
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 11:29:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35586)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kL6dH-0001wu-Vo
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 11:24:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39166)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kL6YK-00037z-7O
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 11:19:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24481)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kL6dE-0005fD-VG
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 11:24:35 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kL6YH-0004wi-57
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 11:19:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600874671;
+ s=mimecast20190719; t=1600874362;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QalOxNYLBeiWlh/wkzhtACyyqBSI3QfS3e2W10Q+vRs=;
- b=NUScX0P7z0+x21hmO2LepzSG46O3kwc1JJ0fJAU07l7NaOOmbYe/bp+0O5Zl2BOwLDfpmW
- +ZEBG2FzqXPmucO8BLIWtSejU400/r8M0Jof/IAcKjoseY3oj0l26ruiCZwbS0irCHbLLG
- 16yt4pbYUc6+CxkqjeWMvNrtDFBvtXM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-jjVOBjCWP6mKcpev62q7tA-1; Wed, 23 Sep 2020 11:24:26 -0400
-X-MC-Unique: jjVOBjCWP6mKcpev62q7tA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E52D110219E3;
- Wed, 23 Sep 2020 15:23:48 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-112-239.ams2.redhat.com [10.36.112.239])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C71F65C1C7;
- Wed, 23 Sep 2020 15:23:47 +0000 (UTC)
-Date: Wed, 23 Sep 2020 17:23:46 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v2] tests/check-block: Do not run the iotests with old
- versions of bash
-Message-ID: <20200923152346.GE6912@linux.fritz.box>
-References: <20200918153514.330705-1-thuth@redhat.com>
+ bh=eNqHAQasEpOK1KuycqWmfpHDwWuhMI6riKpROkw+oro=;
+ b=GkvZCmPB+GCLx43Gwjh+aJFwy9oIN3XfFPgPQQ6X3YmC7Tso/091ZM/a4Mr9MWW3sBecQm
+ LzWQC+bLm2TIERMEomfOM4n2YDi858+5QqehC2sh/JrEEkG/pUElY/TKdtUpb+i3+r14DG
+ ekeY/hSHLWhO+RFpfOtC1F1ty2t6Aa8=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-472-Uqj5iZUpOUiAeBylzZzVmw-1; Wed, 23 Sep 2020 11:19:20 -0400
+X-MC-Unique: Uqj5iZUpOUiAeBylzZzVmw-1
+Received: by mail-wr1-f71.google.com with SMTP id s8so8930395wrb.15
+ for <qemu-devel@nongnu.org>; Wed, 23 Sep 2020 08:19:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=eNqHAQasEpOK1KuycqWmfpHDwWuhMI6riKpROkw+oro=;
+ b=ELohEaaGDH+2dq1g2FGkoe3f+s2WQiWMaF9MoCmomWZAYPn3RiJcLQ/iUkJGe7aEfR
+ y8Icabf9PtfCENLBEI5m7te8tJoN85L/Fq8v9cz1AQk0pTwWUnuW8mSTANBtDGiGk+hz
+ wBV/0qgPpnDXULdFIbycJXWyfBu2IUhxZtx8mkP5/Pot/rCeqhw3A8DhJv3r0bM+iHLa
+ y04UbWtVgFcwLMP8Lx6+oguE9pB7FZvR6ZrS570fnbBpScyE+dC0ZztUES7jbiCGOKfN
+ 5UXQ8WRCXapk1vuKx53IePe5DqrPPts8JwchR2n+tsCNYm2NOqeA85cyjX3Cg+nufIHU
+ YxtA==
+X-Gm-Message-State: AOAM530TUd5DB/E9cqQkBbVn4r7FiUTQYIus1HCnyqNBN+mIoI6PNDCF
+ w3UIA3iS9a77RcUav9FY8Yx+NOEGR5Xngjw8MXw1btLK1UQWFZ6VhNRAfq/o3E8OV6FcSfUxAos
+ u/vNN5XykMfPC8m0=
+X-Received: by 2002:a1c:e087:: with SMTP id x129mr74238wmg.160.1600874358942; 
+ Wed, 23 Sep 2020 08:19:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxrXzZCUiN8oSkYWfYWeqZPSESHCThuL0H5m8AItskpz2Z9omZeyWhD81lEuOripbj+xRu5FQ==
+X-Received: by 2002:a1c:e087:: with SMTP id x129mr74215wmg.160.1600874358700; 
+ Wed, 23 Sep 2020 08:19:18 -0700 (PDT)
+Received: from x1w.redhat.com (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id o15sm112536wmh.29.2020.09.23.08.19.15
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 23 Sep 2020 08:19:17 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 1/2] qemu/atomic: Update coding style to make checkpatch.pl
+ happier
+Date: Wed, 23 Sep 2020 17:19:00 +0200
+Message-Id: <20200923151901.745277-2-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200923151901.745277-1-philmd@redhat.com>
+References: <20200923151901.745277-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200918153514.330705-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 00:53:58
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -92,24 +112,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 18.09.2020 um 17:35 hat Thomas Huth geschrieben:
-> macOS is shipped with a very old version of the bash (3.2), which
-> is currently not suitable for running the iotests anymore (e.g.
-> it is missing support for "readarray" which is used in the file
-> tests/qemu-iotests/common.filter). Add a check to skip the iotests
-> in this case - if someone still wants to run the iotests on macOS,
-> they can install a newer version from homebrew, for example.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+To limit the number of checkpatch errors in the next commit,
+clean coding style issues first.
 
-Thanks, applied to the block branch.
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+False positive:
 
-Kevin
+ ERROR: Use of volatile is usually wrong, please add a comment
+ #11: FILE: include/qemu/atomic.h:328:
+ +#define atomic_read__nocheck(p)   (*(__typeof__(*(p)) volatile *) (p))
+
+ ERROR: Use of volatile is usually wrong, please add a comment
+ #12: FILE: include/qemu/atomic.h:329:
+ +#define atomic_set__nocheck(p, i) ((*(__typeof__(*(p)) volatile *) (p)) = (i))
+---
+ include/qemu/atomic.h | 9 +++++----
+ util/bitmap.c         | 3 ++-
+ util/rcu.c            | 6 ++++--
+ 3 files changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/include/qemu/atomic.h b/include/qemu/atomic.h
+index ff72db51154..1774133e5d0 100644
+--- a/include/qemu/atomic.h
++++ b/include/qemu/atomic.h
+@@ -325,11 +325,11 @@
+ /* These will only be atomic if the processor does the fetch or store
+  * in a single issue memory operation
+  */
+-#define atomic_read__nocheck(p)   (*(__typeof__(*(p)) volatile*) (p))
+-#define atomic_set__nocheck(p, i) ((*(__typeof__(*(p)) volatile*) (p)) = (i))
++#define atomic_read__nocheck(p)   (*(__typeof__(*(p)) volatile *) (p))
++#define atomic_set__nocheck(p, i) ((*(__typeof__(*(p)) volatile *) (p)) = (i))
+ 
+ #define atomic_read(ptr)       atomic_read__nocheck(ptr)
+-#define atomic_set(ptr, i)     atomic_set__nocheck(ptr,i)
++#define atomic_set(ptr, i)     atomic_set__nocheck(ptr, i)
+ 
+ /**
+  * atomic_rcu_read - reads a RCU-protected pointer to a local variable
+@@ -440,7 +440,8 @@
+ #endif
+ #endif
+ 
+-/* atomic_mb_read/set semantics map Java volatile variables. They are
++/*
++ * atomic_mb_read/set semantics map Java volatile variables. They are
+  * less expensive on some platforms (notably POWER) than fully
+  * sequentially consistent operations.
+  *
+diff --git a/util/bitmap.c b/util/bitmap.c
+index 1753ff7f5bd..c4fb86db72a 100644
+--- a/util/bitmap.c
++++ b/util/bitmap.c
+@@ -211,7 +211,8 @@ void bitmap_set_atomic(unsigned long *map, long start, long nr)
+         mask_to_set &= BITMAP_LAST_WORD_MASK(size);
+         atomic_or(p, mask_to_set);
+     } else {
+-        /* If we avoided the full barrier in atomic_or(), issue a
++        /*
++         * If we avoided the full barrier in atomic_or(), issue a
+          * barrier to account for the assignments in the while loop.
+          */
+         smp_mb();
+diff --git a/util/rcu.c b/util/rcu.c
+index c4fefa9333e..b5238b8ed02 100644
+--- a/util/rcu.c
++++ b/util/rcu.c
+@@ -82,7 +82,8 @@ static void wait_for_readers(void)
+          */
+         qemu_event_reset(&rcu_gp_event);
+ 
+-        /* Instead of using atomic_mb_set for index->waiting, and
++        /*
++         * Instead of using atomic_mb_set for index->waiting, and
+          * atomic_mb_read for index->ctr, memory barriers are placed
+          * manually since writes to different threads are independent.
+          * qemu_event_reset has acquire semantics, so no memory barrier
+@@ -151,7 +152,8 @@ void synchronize_rcu(void)
+ 
+     QEMU_LOCK_GUARD(&rcu_registry_lock);
+     if (!QLIST_EMPTY(&registry)) {
+-        /* In either case, the atomic_mb_set below blocks stores that free
++        /*
++         * In either case, the atomic_mb_set below blocks stores that free
+          * old RCU-protected pointers.
+          */
+         if (sizeof(rcu_gp_ctr) < 8) {
+-- 
+2.26.2
 
 
