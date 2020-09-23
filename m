@@ -4,39 +4,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F15C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:15:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A503C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:18:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27B6721BE5
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:15:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27B6721BE5
+	by mail.kernel.org (Postfix) with ESMTPS id 7D48C21BE5
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 17:18:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D48C21BE5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kL8Mo-0002Wg-0W
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 13:15:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37604)
+	id 1kL8P9-0004vl-Jo
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 13:18:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37040)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kL8LS-00014j-KT; Wed, 23 Sep 2020 13:14:18 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:46437)
+ id 1kL8JI-0006Dx-9D; Wed, 23 Sep 2020 13:12:04 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:59147)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kL8LQ-0007wk-P8; Wed, 23 Sep 2020 13:14:18 -0400
+ id 1kL8JF-0007jl-T6; Wed, 23 Sep 2020 13:12:03 -0400
 Received: from [192.168.100.1] ([82.252.129.222]) by mrelayeu.kundenserver.de
- (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1Mg6uW-1kwyL630FK-00hdJM; Wed, 23 Sep 2020 19:14:10 +0200
-Subject: Re: [PATCH] migration/multifd: Remove superfluous semicolons
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200921040231.437653-1-f4bug@amsat.org>
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1Mq2rM-1kpISs0xNq-00n76b; Wed, 23 Sep 2020 19:11:56 +0200
+Subject: Re: [PATCH] vhost-vdpa: remove useless variable
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+References: <20200920152024.860172-1-lvivier@redhat.com>
+ <8793d489-3961-f53a-df69-21a7eda85f22@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -80,35 +81,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <235225dd-1df6-2ea9-bf03-cbccadd59e9c@vivier.eu>
-Date: Wed, 23 Sep 2020 19:14:08 +0200
+Message-ID: <eef04a11-7c32-45d0-bbc8-ee9eff4c02b1@vivier.eu>
+Date: Wed, 23 Sep 2020 19:11:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200921040231.437653-1-f4bug@amsat.org>
+In-Reply-To: <8793d489-3961-f53a-df69-21a7eda85f22@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:PxDe1KEihUTav/UDfK3KH7FBBaP48UIeLESgREdF4wFWzUuM1K/
- 9QPRdFvo9BSsCMvmQ2mMUZq5xZMl70muT7RNSEACilo9JawsT3LipQ0VF3tFOErn8+LyG3L
- Gc2FzdROixU8YoLoRios5UutknyTghUdyvAChw2X+CfZYFBqsvxPzy5tsZdBZnJ9zIx0kgH
- UBW8+RE9JV8JRcX+QANxw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Fm9On0pZrWg=:FMRG3o9VKcnHPkpo4ToWCh
- pe0+B9VY9AxTYkgEG9+O0TOlYFVocPI+5iNceLmlWrrsOY9qZdCjQKdXjZC3XbUQcadvFGWu+
- BLNqIhxCd+2XuINEzZzxN9xyT08tzeMEw416J7WR1Xu4/udpmmHv5uCUtwOAP4hBCj2vthqzp
- j8ktd4VigI9ZaJ5/U3hVKhOdN2UwcqCoCEIEWuz+SkKoePaV3QExeb3XFDo6fj/VDC67/fDf0
- eg1AqHqevpcbbgTevefwvZlY8Ug7GsJqH6JoPpTKNq08OIrK2XTkp1AU4PgCnxIcuw9IsbuWE
- UkAtyDfkMbiXqSMS/k9LXgr+3aE61hZM5Fs4uMLfaWYQvShfz6RCjrwr51obieH+3nXRQTKCs
- yVEu/j8CNvkq8eGcGtC6CXEZqilJYVfzI7xN5IxxLqSvrO/DGE+O6yJesRAWcjM6KNfetx13r
- HqMugn50VK8XMdJy3H40J1u+tZU1Cf7GAzhUlEwOZPxbF1h4EPUbz88Oy4zE80+g/8vpbLptd
- 2bVOxwcDbW32jkp7mPJ9ug1rGHMHPZVzv1YiINrt4JjZU3ktO5n7VF1wSHBP/SJSkvQe9FUmy
- t4sE+jU2I1ZXJhox/MWUtvHjRsNnjXIxGNlobwKSTCW3JT+CwkCdxgkOSokoVEHG6Umx4eJXC
- Ru0GijZrrPDOi3xTPNNE+9oC7JOm6ykyo+3835V6fvgJSXDutVa6GnYMnx0HoYGjrG9u56WNn
- Wzmj1wDWREdJ5rM3pD4odjviJK04ILcrJxEW2XlzIvdVJP+30Rf5l7cfU+E6E6Bl9fQyaD+zs
- hvgWvnW0h0dF8D+tIH0BEZvJtUvzt40J5JRGjWVRqaZDbCD3d9uXC1Je5bet07Ad4EILh77
-Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:stFfRJz8uXAOqVndLOwK9Fzm4+KC7e5zLfWEb8U1rbuW0bRAy0b
+ nzAcXL6rW9J+X6UdSHslCoL8MTqttYTl7O+KiEN8iho/PIS7VCHbnmDVeHthM86REBcO90A
+ eUbiEoM5F6vda24L5zzDmNEoZV4CqSog6AJuujhyRVIcYEjHxuK5KhFF3NutEzV/56HhoTR
+ e3L470OKdLwDWD50OE4mg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:/Eb1zGyHL10=:0jsE3dFdaOz2A6zjChtcrm
+ FxQKwctxXADq3LGZF3ybvoWFboJb90LNpajaPx//cD2Qqp2nC838pmlzGpihxYa6i1HBMwwqB
+ 5pz83WgbF3qUIDYKd5RcBG02s+vDrff1aEAPPdHNSNiRjCSfs/4c0BFe25tWarBPOLraIeBr3
+ KS2ikKrQnFIRVx1wnQ1/+xXHgHUCSDFyZU8tzXW6pr147B2QQuG1ErZtGyXNyWYJuCQ72nUBV
+ wFnhCuY6fB/vQv9GYo3CDBn+q+py4Jt/xt8YjyxW0bFxfrSxvBWKQv8FDwucNLx5P/rM3GGds
+ cx+1oOKoVnPHgHB21vwOOlUHC7Uu5vohzvcbiDlSz1AD0XtPtkeiu0MGimLjRBkxHolYm5quF
+ o4GIr0EXjNGbb0OSiYElwxKaqgW3XdpZ2IuR5ITOCfNbzNx539Bn7uhzgSIrtetB5BglzBZaT
+ 63eRt4MDtEXHi00VqG0KPA/7oBb/8OBWlSLBVGNAnRYWT986sU8sV2QjNIBYV7f2sI7hmFKa0
+ ZLhh2o8KRafqlBR/h4pk3dBZvosnFbtFOV4mx3WCLGUQn8BVnP+4YiemD4J9/vjUx4rYgaMyy
+ dD17biosMDIu9t1HWsUwHzQ089z2I57pIeYZgLbtKnXVWF0RQouTXUOPs8qjWNuxwjrmgotjf
+ ayV7Gj7wIw+srkvaocLnJ0F0qV6UQ0omfsYYgn8zuWRwiaAX21NJldAybahqyqgLMnnY09K9o
+ a8qN01OsNxhNtGRRAl3v+qc8hmD3JDE3sJG8pqEK2zdcQw0e/aStsMNeyK3C2LMd1UDJnFiW/
+ JbogJVIdlYF+2rrSNxhHbCm8mWWxcPJwjQEItXmtW6njd551uqM6Q+qDH/JHFwdtjjgc0px
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 13:14:14
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 13:10:06
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -128,41 +129,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Juan Quintela <quintela@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Jason Wang <jasowang@redhat.com>,
+ Cindy Lu <lulu@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 21/09/2020 à 06:02, Philippe Mathieu-Daudé a écrit :
-> checkpatch.pl report superfluous semicolons since commit
-> ee0f3c09e01, but this one was missed:
+Le 20/09/2020 à 17:59, Philippe Mathieu-Daudé a écrit :
+> Cc'ing qemu-trivial@
 > 
->   scripts/checkpatch.pl d32ca5ad798~..d32ca5ad798
->   ERROR: superfluous trailing semicolon
->   #498: FILE: migration/multifd.c:308:
->   +    ram_counters.transferred += transferred;;
->   total: 1 errors, 1 warnings, 2073 lines checked
+> On 9/20/20 5:20 PM, Laurent Vivier wrote:
+>> in vhost_vdpa_listener_region_del(), try_unmap is always true and so,
+>> vhost_vdpa_dma_unmap() is always called. We can remove the variable
+>>
+>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 > 
-> Fixes: d32ca5ad798 ("multifd: Split multifd code into its own file")
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  migration/multifd.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > 
-> diff --git a/migration/multifd.c b/migration/multifd.c
-> index d0441202aae..8aaa2f9ade1 100644
-> --- a/migration/multifd.c
-> +++ b/migration/multifd.c
-> @@ -447,7 +447,7 @@ static int multifd_send_pages(QEMUFile *f)
->                  + p->packet_len;
->      qemu_file_update_transfer(f, transferred);
->      ram_counters.multifd_bytes += transferred;
-> -    ram_counters.transferred += transferred;;
-> +    ram_counters.transferred += transferred;
->      qemu_mutex_unlock(&p->mutex);
->      qemu_sem_post(&p->sem);
->  
+>> ---
+>>  hw/virtio/vhost-vdpa.c | 9 +++------
+>>  1 file changed, 3 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
+>> index 4580f3efd8a2..c6cae6a6cabf 100644
+>> --- a/hw/virtio/vhost-vdpa.c
+>> +++ b/hw/virtio/vhost-vdpa.c
+>> @@ -153,7 +153,6 @@ static void vhost_vdpa_listener_region_del(MemoryListener *listener,
+>>      hwaddr iova;
+>>      Int128 llend, llsize;
+>>      int ret;
+>> -    bool try_unmap = true;
+>>  
+>>      if (vhost_vdpa_listener_skipped_section(section)) {
+>>          return;
+>> @@ -176,11 +175,9 @@ static void vhost_vdpa_listener_region_del(MemoryListener *listener,
+>>  
+>>      llsize = int128_sub(llend, int128_make64(iova));
+>>  
+>> -    if (try_unmap) {
+>> -        ret = vhost_vdpa_dma_unmap(v, iova, int128_get64(llsize));
+>> -        if (ret) {
+>> -            error_report("vhost_vdpa dma unmap error!");
+>> -        }
+>> +    ret = vhost_vdpa_dma_unmap(v, iova, int128_get64(llsize));
+>> +    if (ret) {
+>> +        error_report("vhost_vdpa dma unmap error!");
+>>      }
+>>  
+>>      memory_region_unref(section->mr);
+>>
+> 
 > 
 
 Applied to my trivial-patches branch.
