@@ -2,77 +2,76 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECA3AC2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 20:05:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86C31C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 20:07:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60C19206C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 20:05:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B79A6206DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 20:07:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N1L7yBrh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60C19206C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SDEr2S2b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B79A6206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLB1a-0006PH-6F
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 16:05:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45864)
+	id 1kLB2v-0007fK-Fg
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 16:07:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46332)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLB03-0005uR-5k
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 16:04:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34598)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kLB1t-0006rg-EJ
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 16:06:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55668)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLB01-0003nW-Ja
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 16:04:22 -0400
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kLB1p-00047Z-M6
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 16:06:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600891460;
+ s=mimecast20190719; t=1600891572;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=HagUY02YwUYtC+M+8yHFtrondOg11UbYsZiKYqFz4wc=;
- b=N1L7yBrhKLOT7hG5uY/+SGDBZ2vxHQeGP1OoAPBkY8OIpSrkyMUCpdiRXoFQXOkvz5ypW0
- 8Gao6P5j/mMZIUycDFVUkw08TSpJJSWwxTiPaxhuE90AUR6NYkTGnSJNBPfCZwFYIy9g61
- aHdEODwTa8v056OV7BHQezvU4ArZNgw=
+ bh=JxTw8JQ9Q79IeymNHFiU3z8EiEnLMM0g1ROLY09ieSM=;
+ b=SDEr2S2bWV2iVlW+LRxoYoTnfi77+sIZuIqXjC4K6QUgYue84/ObzpmwvC8L/N4ciHXEeg
+ Ohf7EC4pfKGgfsN4UnELyoPLkpdwYOhqPAmBtuPSeH8Af2pi8NQc2LF90QfGJnr5XeSHK0
+ vY+Ktk+OjnfeRiOifw7NNsR0ZtKK59g=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-500-v4sx3MR8ObyBuWjphSGJbQ-1; Wed, 23 Sep 2020 16:04:17 -0400
-X-MC-Unique: v4sx3MR8ObyBuWjphSGJbQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-566-RVaIXFa5PtiI2h_ZAndoeg-1; Wed, 23 Sep 2020 16:06:11 -0400
+X-MC-Unique: RVaIXFa5PtiI2h_ZAndoeg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D8AC801E53;
- Wed, 23 Sep 2020 20:04:16 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
- [10.10.119.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B9BD5C1DC;
- Wed, 23 Sep 2020 20:04:15 +0000 (UTC)
-Date: Wed, 23 Sep 2020 16:04:13 -0400
-From: Cleber Rosa <crosa@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B7AE1084C91;
+ Wed, 23 Sep 2020 20:06:10 +0000 (UTC)
+Received: from localhost (unknown [10.10.67.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B531D1002388;
+ Wed, 23 Sep 2020 20:06:09 +0000 (UTC)
+Date: Wed, 23 Sep 2020 16:06:09 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
 To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v2 15/38] qapi/common.py: move build_params into gen.py
-Message-ID: <20200923200413.GO191229@localhost.localdomain>
-References: <20200922210101.4081073-1-jsnow@redhat.com>
- <20200922210101.4081073-16-jsnow@redhat.com>
+Subject: Re: [PATCH 08/16] qapi/expr.py: add type hint annotations
+Message-ID: <20200923200609.GD3717385@habkost.net>
+References: <20200922211313.4082880-1-jsnow@redhat.com>
+ <20200922211313.4082880-9-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200922210101.4081073-16-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200922211313.4082880-9-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="FilwpOHBrTVNlmJ3"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=crosa@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 00:53:58
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -95,50 +94,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Markus Armbruster <armbru@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Cleber Rosa <crosa@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---FilwpOHBrTVNlmJ3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Sep 22, 2020 at 05:00:38PM -0400, John Snow wrote:
-> Including it in common.py creates a circular import dependency; schema
-> relies on common, but common.build_params requires a type annotation
-> from schema. To type this properly, it needs to be moved outside the
-> cycle.
->=20
+On Tue, Sep 22, 2020 at 05:13:05PM -0400, John Snow wrote:
+> Annotations do not change runtime behavior.
+> This commit *only* adds annotations.
+> 
 > Signed-off-by: John Snow <jsnow@redhat.com>
 
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
---FilwpOHBrTVNlmJ3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl9rqjsACgkQZX6NM6Xy
-CfOdwhAAz+xRxDDjSN9xc411OTWbXCw1G6fvlqKEjRfkCX5H8BXSlWApntjydKfK
-gl8095pg3Nr35P+riLzt22+k591VNYFK002fRGWYQamAXtzyLBXZtaRgJWykzk0X
-ZNr2W6g6KkmfW40hqXc2tFgKGiwHLUQ4iwpbIFdcdFv62h7IAfFSl7LFlmF8z55X
-F9j4YBKKpO3eEUn+xlaTYYUeDFxCiP0oGzRK14ger/rZimGewgxpi8CUZleK2G+q
-ilcpiB36btSeZi0zqvYVTmtw8NW4UQLUrMpyOYf3EQd8Tns379bh1bN5O+SrfdjF
-T/OOdo6xjqHc/SGE4EWcXXhJ6XuIXahmiqKjSbsXc5MChHl6KSb8yZ47ewXhEaJa
-tXj1Ba6SvmYeXkGGq0UsZOdUXkWRlUnUVvecTxzggnQuAL/VC/AIASLFRtxrfMbh
-kQdxLjsRq8cauKqbOqLXfcOC2IGDAbRpgq4y4fSy4TVh26rYFVoO15PULcIUlBir
-my9w/uERmtFOnZLVVaGoCzj4c3PNb7tQ7MHYCDw9v+vPX/tIqXk+Y2Hr2jh9YDrQ
-uyPi20mNGVMHfpfjNUZ0X7dbhnpl71w5m7Luqv7n7EUGfdenmPOR/UHJMFODIF6h
-WmPGtGAzJLfLwWTELFXB2+Nxh1FZUyRqja2dGdbmM87jdy4cP7Q=
-=kPap
------END PGP SIGNATURE-----
-
---FilwpOHBrTVNlmJ3--
+-- 
+Eduardo
 
 
