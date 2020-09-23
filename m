@@ -2,61 +2,89 @@ Return-Path: <SRS0=UzyQ=DA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64483C4363D
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 06:23:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 750D1C4363D
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 06:37:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6080B21D43
-	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 06:23:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6080B21D43
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id B8AE721D43
+	for <qemu-devel@archiver.kernel.org>; Wed, 23 Sep 2020 06:37:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AEEIndql"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8AE721D43
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kKyBd-0000Vs-2f
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 02:23:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42516)
+	id 1kKyP2-0003fh-UY
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 02:37:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kKyB6-00005O-Sk
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 02:22:56 -0400
-Received: from mail.ispras.ru ([83.149.199.84]:48456)
- by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kKyB4-0006Om-Px
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 02:22:56 -0400
-Received: from [192.168.0.183] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 2E71640A207D;
- Wed, 23 Sep 2020 06:22:51 +0000 (UTC)
-Subject: Re: [PATCH v5 13/15] docs: convert replay.txt to rst
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <160077693745.10249.9707329107813662236.stgit@pasha-ThinkPad-X280>
- <160077701288.10249.16846150592069982759.stgit@pasha-ThinkPad-X280>
- <2c0c42c8-8dd7-b208-2430-a241ba5f938e@redhat.com>
-From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
-Message-ID: <eb4cd4e4-6111-1640-a551-e83c2903dd14@ispras.ru>
-Date: Wed, 23 Sep 2020 09:22:50 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kKyNx-0003Ev-W5
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 02:36:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20533)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kKyNv-0007uI-Ul
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 02:36:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600842970;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=E7c4tWx9wXUnvmHhQXm5dLsewzfiAd7BFG4MOE8nPyw=;
+ b=AEEIndqlCsuwR/ZN4CDBiSF6uyRLACpEgpdRe9oNEam7A0lAP7WuAkfiThT3S6SlxzPAuq
+ MOoMF9zAodlTF8Yzhsd59ND6ANxnrWlF5DypFpNoRYpuEmuhw1UCJ9+ICjPsnW1mn9tPvN
+ qLDQ4P6nyV/eUdDgd9yeLGvRYtNmykk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-487-uTkUwxhYO22WTyNPgAJVtw-1; Wed, 23 Sep 2020 02:36:07 -0400
+X-MC-Unique: uTkUwxhYO22WTyNPgAJVtw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F403802B46;
+ Wed, 23 Sep 2020 06:36:06 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
+ [10.36.112.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CDB7960BF1;
+ Wed, 23 Sep 2020 06:36:05 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 17D8416E16; Wed, 23 Sep 2020 08:36:05 +0200 (CEST)
+Date: Wed, 23 Sep 2020 08:36:05 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Volker =?utf-8?Q?R=C3=BCmelin?= <vr_qemu@t-online.de>
+Subject: Re: [PATCH 8/9] audio: restore mixing-engine playback buffer size
+Message-ID: <20200923063605.hatwdgbnvaxcgmn7@sirius.home.kraxel.org>
+References: <84f1c61a-8399-c75e-96c2-febfc2dd5fab@t-online.de>
+ <20200920171729.15861-8-vr_qemu@t-online.de>
 MIME-Version: 1.0
-In-Reply-To: <2c0c42c8-8dd7-b208-2430-a241ba5f938e@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=83.149.199.84;
- envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/23 02:22:51
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+In-Reply-To: <20200920171729.15861-8-vr_qemu@t-online.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.455,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -70,34 +98,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, wrampazz@redhat.com, ehabkost@redhat.com,
- alex.bennee@linaro.org, mtosatti@redhat.com, armbru@redhat.com,
- mreitz@redhat.com, stefanha@redhat.com, crosa@redhat.com, philmd@redhat.com,
- zhiwei_liu@c-sky.com, rth@twiddle.net
+Cc: qemu-devel <qemu-devel@nongnu.org>,
+ =?utf-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22.09.2020 16:13, Paolo Bonzini wrote:
-> On 22/09/20 14:16, Pavel Dovgalyuk wrote:
->> +
->> +When you need to use snapshots with diskless virtual machine,
->> +it must be started with 'orphan' qcow2 image. This image will be used
->> +for storing VM snapshots. Here is the example of the command line for this:
->> +
->> +  qemu-system-i386 -icount shift=3,rr=replay,rrfile=record.bin,rrsnapshot=init \
->> +    -net none -drive file=empty.qcow2,if=none,id=rr
->> +
->> +empty.qcow2 drive does not connected to any virtual block device and used
->> +for VM snapshots only.
-> 
-> This is not rST.  Are you sure you included the right patch.
-> 
-> No problem though, I can just skip it.
+> diff --git a/audio/sdlaudio.c b/audio/sdlaudio.c
+> index 21b7a0484b..cb931d0fda 100644
+> --- a/audio/sdlaudio.c
+> +++ b/audio/sdlaudio.c
+> @@ -253,6 +253,7 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
+>          return ret;                                                     \
+>      }
+>  
+> +SDL_WRAPPER_FUNC(buffer_get_free, size_t, (HWVoiceOut *hw), (hw))
+>  SDL_WRAPPER_FUNC(get_buffer_out, void *, (HWVoiceOut *hw, size_t *size),
+>                   (hw, size), *size = 0, sdl_unlock)
+>  SDL_WRAPPER_FUNC(put_buffer_out, size_t,
 
-Ok, please skip it, I'll update it later.
+Compiling C object libcommon.fa.p/audio_sdlaudio.c.o
+../../audio/sdlaudio.c:256:65: error: macro "SDL_WRAPPER_FUNC" requires 6 arguments, but only 4 given
+  256 | SDL_WRAPPER_FUNC(buffer_get_free, size_t, (HWVoiceOut *hw), (hw))
+      |                                                                 ^
+../../audio/sdlaudio.c:243: note: macro "SDL_WRAPPER_FUNC" defined here
+  243 | #define SDL_WRAPPER_FUNC(name, ret_type, args_decl, args, fail, unlock) \
+      | 
+../../audio/sdlaudio.c:256:17: error: expected ‘;’ before ‘static’
+  256 | SDL_WRAPPER_FUNC(buffer_get_free, size_t, (HWVoiceOut *hw), (hw))
+      |                 ^
+      |                 ;
+../../audio/sdlaudio.c:355:24: error: ‘sdl_buffer_get_free’ undeclared here (not in a function)
+  355 |     .buffer_get_free = sdl_buffer_get_free,
+      |                        ^~~~~~~~~~~~~~~~~~~
+make: *** [Makefile.ninja:1113: libcommon.fa.p/audio_sdlaudio.c.o] Error 1
 
-Pavel Dovgalyuk
+(I think coreaudio has the same problem ...).
 
+take care,
+  Gerd
 
 
