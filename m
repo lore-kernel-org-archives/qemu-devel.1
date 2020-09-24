@@ -7,60 +7,59 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 725F4C4346E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:04:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8BD3C4346E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:05:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D16E82388A
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:04:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 027E02395B
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:05:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S6MkpSYX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D16E82388A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VDWv/GJX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 027E02395B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLLJ5-0004dy-TH
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 03:04:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34516)
+	id 1kLLJi-00053c-Ow
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 03:05:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34592)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jusual@redhat.com>) id 1kLLFB-0000cb-Mw
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:00:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40964)
+ (Exim 4.90_1) (envelope-from <jusual@redhat.com>) id 1kLLFN-0000rf-Gc
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:00:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58007)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jusual@redhat.com>) id 1kLLF9-0005HC-8i
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:00:41 -0400
+ (Exim 4.90_1) (envelope-from <jusual@redhat.com>) id 1kLLFL-0005I2-6R
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:00:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600930838;
+ s=mimecast20190719; t=1600930850;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ZQFwmbZ4VN7pHz4afY3coYkBHA9Q3kTDJur7/45jT3U=;
- b=S6MkpSYXpY/sx/FExkwLi/88imRKjWw8jZr39+4fBjTzi7dQTWHOi+u1GN99ukvxShCq2K
- r71tLVHBIi8PBhbDYR1I+Kk4+4KeUCCCY6w0I7Ui1pKnoRKL0c1ZbAD/iF2AAra1b7fwW1
- e+GRJE/zVJQpoqM7+q8QaAWLG8ZWi14=
+ bh=4HsZKWB1ml7V0h856im4DRe/N7mUj7BSaI1tUFfOCkQ=;
+ b=VDWv/GJXmpkXnsqw1ODc3mrp0OklqrpttPPnzMQNvXZWt+fM0dBXyooAK8Z48qSJi6/XFq
+ 5JN8DWpHf6i5w1/hbAv6f0aiG8ak6sKgg5GsrLv9E939LPj9u05igQScfYJtm39pU6P6Q0
+ j+eIqQCNCi+ya3uCLg7bCjwAncxvkO8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-582-3TQS8U39O5m6Xhy5BsBOFQ-1; Thu, 24 Sep 2020 03:00:36 -0400
-X-MC-Unique: 3TQS8U39O5m6Xhy5BsBOFQ-1
+ us-mta-271-JCz1oyE3NkK_1l1L0KYr8g-1; Thu, 24 Sep 2020 03:00:48 -0400
+X-MC-Unique: JCz1oyE3NkK_1l1L0KYr8g-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 943FD807341;
- Thu, 24 Sep 2020 07:00:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2DD2410BBEC8;
+ Thu, 24 Sep 2020 07:00:47 +0000 (UTC)
 Received: from pc-72.home.com (unknown [10.40.194.10])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CBFF173668;
- Thu, 24 Sep 2020 07:00:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7AC7273668;
+ Thu, 24 Sep 2020 07:00:45 +0000 (UTC)
 From: Julia Suvorova <jusual@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v3 2/7] hw/i386/acpi-build: Add ACPI PCI hot-plug methods
- to Q35
-Date: Thu, 24 Sep 2020 09:00:08 +0200
-Message-Id: <20200924070013.165026-3-jusual@redhat.com>
+Subject: [RFC PATCH v3 4/7] hw/acpi/ich9: Enable ACPI PCI hot-plug
+Date: Thu, 24 Sep 2020 09:00:10 +0200
+Message-Id: <20200924070013.165026-5-jusual@redhat.com>
 In-Reply-To: <20200924070013.165026-1-jusual@redhat.com>
 References: <20200924070013.165026-1-jusual@redhat.com>
 MIME-Version: 1.0
@@ -71,9 +70,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jusual@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jusual@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -100,210 +99,242 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implement notifications and gpe to support q35 ACPI PCI hot-plug.
-Use 0xcc4 - 0xcd7 range for 'acpi-pci-hotplug' io ports.
+Add acpi_pcihp to ich9_pm as part of
+'acpi-pci-hotplug-with-bridge-support' option. Set default to false.
 
 Signed-off-by: Julia Suvorova <jusual@redhat.com>
 ---
- hw/i386/acpi-build.h    |  4 ++++
- include/hw/acpi/ich9.h  |  2 ++
- include/hw/acpi/pcihp.h |  3 ++-
- hw/acpi/pcihp.c         |  8 ++++----
- hw/acpi/piix4.c         |  4 +++-
- hw/i386/acpi-build.c    | 27 ++++++++++++++++-----------
- 6 files changed, 31 insertions(+), 17 deletions(-)
+ hw/i386/acpi-build.h   |  1 +
+ include/hw/acpi/ich9.h |  3 ++
+ hw/acpi/ich9.c         | 67 ++++++++++++++++++++++++++++++++++++++++++
+ hw/acpi/pcihp.c        |  5 +++-
+ hw/i386/acpi-build.c   |  2 +-
+ 5 files changed, 76 insertions(+), 2 deletions(-)
 
 diff --git a/hw/i386/acpi-build.h b/hw/i386/acpi-build.h
-index 74df5fc612..487ec7710f 100644
+index 4c5bfb3d0b..39f143830a 100644
 --- a/hw/i386/acpi-build.h
 +++ b/hw/i386/acpi-build.h
-@@ -5,6 +5,10 @@
+@@ -10,6 +10,7 @@ extern const struct AcpiGenericAddress x86_nvdimm_acpi_dsmio;
+ #define ACPI_PCIHP_BNMR_BASE 0x10
  
- extern const struct AcpiGenericAddress x86_nvdimm_acpi_dsmio;
- 
-+/* PCI Hot-plug registers bases. See docs/spec/acpi_pci_hotplug.txt */
-+#define ACPI_PCIHP_SEJ_BASE 0x8
-+#define ACPI_PCIHP_BNMR_BASE 0x10
-+
  void acpi_setup(void);
++Object *acpi_get_i386_pci_host(void);
  
- #endif
+ Object *object_resolve_type_unambiguous(const char *typename);
+ 
 diff --git a/include/hw/acpi/ich9.h b/include/hw/acpi/ich9.h
-index 28a53181cb..4d19571ed7 100644
+index 4d19571ed7..833e62fefe 100644
 --- a/include/hw/acpi/ich9.h
 +++ b/include/hw/acpi/ich9.h
-@@ -28,6 +28,8 @@
+@@ -24,6 +24,7 @@
+ #include "hw/acpi/acpi.h"
+ #include "hw/acpi/cpu_hotplug.h"
+ #include "hw/acpi/cpu.h"
++#include "hw/acpi/pcihp.h"
+ #include "hw/acpi/memory_hotplug.h"
  #include "hw/acpi/acpi_dev_interface.h"
  #include "hw/acpi/tco.h"
+@@ -55,6 +56,8 @@ typedef struct ICH9LPCPMRegs {
+     AcpiCpuHotplug gpe_cpu;
+     CPUHotplugState cpuhp_state;
  
-+#define ACPI_PCIHP_ADDR_ICH9 0x0cc4
-+
- typedef struct ICH9LPCPMRegs {
-     /*
-      * In ich9 spec says that pm1_cnt register is 32bit width and
-diff --git a/include/hw/acpi/pcihp.h b/include/hw/acpi/pcihp.h
-index 02f4665767..ce49fb03b9 100644
---- a/include/hw/acpi/pcihp.h
-+++ b/include/hw/acpi/pcihp.h
-@@ -54,7 +54,8 @@ typedef struct AcpiPciHpState {
- } AcpiPciHpState;
++    bool use_acpi_hotplug_bridge;
++    AcpiPciHpState acpi_pci_hotplug;
+     MemHotplugState acpi_memory_hotplug;
  
- void acpi_pcihp_init(Object *owner, AcpiPciHpState *, PCIBus *root,
--                     MemoryRegion *address_space_io, bool bridges_enabled);
-+                     MemoryRegion *address_space_io, bool bridges_enabled,
-+                     uint16_t io_base);
- 
- void acpi_pcihp_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-                                    DeviceState *dev, Error **errp);
-diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-index ff23104aea..bb457bc279 100644
---- a/hw/acpi/pcihp.c
-+++ b/hw/acpi/pcihp.c
-@@ -38,7 +38,6 @@
- #include "qom/qom-qobject.h"
- #include "trace.h"
- 
--#define ACPI_PCIHP_ADDR 0xae00
- #define ACPI_PCIHP_SIZE 0x0014
- #define PCI_UP_BASE 0x0000
- #define PCI_DOWN_BASE 0x0004
-@@ -381,12 +380,13 @@ static const MemoryRegionOps acpi_pcihp_io_ops = {
+     uint8_t disable_s3;
+diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
+index 6a19070cec..987f23e388 100644
+--- a/hw/acpi/ich9.c
++++ b/hw/acpi/ich9.c
+@@ -218,6 +218,26 @@ static const VMStateDescription vmstate_cpuhp_state = {
+     }
  };
  
- void acpi_pcihp_init(Object *owner, AcpiPciHpState *s, PCIBus *root_bus,
--                     MemoryRegion *address_space_io, bool bridges_enabled)
-+                     MemoryRegion *address_space_io, bool bridges_enabled,
-+                     uint16_t io_base)
- {
-     s->io_len = ACPI_PCIHP_SIZE;
--    s->io_base = ACPI_PCIHP_ADDR;
-+    s->io_base = io_base;
- 
--    s->root= root_bus;
-+    s->root = root_bus;
-     s->legacy_piix = !bridges_enabled;
- 
-     memory_region_init_io(&s->io, owner, &acpi_pcihp_io_ops, s,
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index 832f8fba82..a505ab5bcf 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -50,6 +50,8 @@
- #define GPE_BASE 0xafe0
- #define GPE_LEN 4
- 
-+#define ACPI_PCIHP_ADDR_PIIX4 0xae00
++static bool vmstate_test_use_pcihp(void *opaque)
++{
++    ICH9LPCPMRegs *s = opaque;
 +
- struct pci_status {
-     uint32_t up; /* deprecated, maintained for migration compatibility */
-     uint32_t down;
-@@ -597,7 +599,7 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
-     memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
- 
-     acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
--                    s->use_acpi_hotplug_bridge);
-+                    s->use_acpi_hotplug_bridge, ACPI_PCIHP_ADDR_PIIX4);
- 
-     s->cpu_hotplug_legacy = true;
-     object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 0e0535d2e3..cf503b16af 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -201,10 +201,6 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
-         /* w2k requires FADT(rev1) or it won't boot, keep PC compatible */
-         pm->fadt.rev = 1;
-         pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
--        pm->pcihp_io_base =
--            object_property_get_uint(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
--        pm->pcihp_io_len =
--            object_property_get_uint(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
++    return s->use_acpi_hotplug_bridge;
++}
++
++static const VMStateDescription vmstate_pcihp_state = {
++    .name = "ich9_pm/pcihp",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = vmstate_test_use_pcihp,
++    .fields      = (VMStateField[]) {
++        VMSTATE_PCI_HOTPLUG(acpi_pci_hotplug,
++                            ICH9LPCPMRegs,
++                            NULL),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ const VMStateDescription vmstate_ich9_pm = {
+     .name = "ich9_pm",
+     .version_id = 1,
+@@ -239,6 +259,7 @@ const VMStateDescription vmstate_ich9_pm = {
+         &vmstate_memhp_state,
+         &vmstate_tco_io_state,
+         &vmstate_cpuhp_state,
++        &vmstate_pcihp_state,
+         NULL
      }
-     if (lpc) {
-         struct AcpiGenericAddress r = { .space_id = AML_AS_SYSTEM_IO,
-@@ -214,6 +210,10 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
-         pm->fadt.flags |= 1 << ACPI_FADT_F_RESET_REG_SUP;
-         pm->cpu_hp_io_base = ICH9_CPU_HOTPLUG_IO_BASE;
+ };
+@@ -260,6 +281,7 @@ static void pm_reset(void *opaque)
      }
-+    pm->pcihp_io_base =
-+        object_property_get_uint(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
-+    pm->pcihp_io_len =
-+        object_property_get_uint(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
+     pm->smi_en_wmask = ~0;
  
-     /* The above need not be conditional on machine type because the reset port
-      * happens to be the same on PIIX (pc) and ICH9 (q35). */
-@@ -472,7 +472,7 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-         QLIST_FOREACH(sec, &bus->child, sibling) {
-             int32_t devfn = sec->parent_dev->devfn;
- 
--            if (pci_bus_is_root(sec) || pci_bus_is_express(sec)) {
-+            if (pci_bus_is_root(sec)) {
-                 continue;
-             }
- 
-@@ -1368,7 +1368,7 @@ static void build_piix4_isa_bridge(Aml *table)
-     aml_append(table, scope);
++    acpi_pcihp_reset(&pm->acpi_pci_hotplug, true);
+     acpi_update_sci(&pm->acpi_regs, pm->irq);
  }
  
--static void build_piix4_pci_hotplug(Aml *table)
-+static void build_x86_pci_hotplug(Aml *table, uint64_t pcihp_addr)
+@@ -298,6 +320,18 @@ void ich9_pm_init(PCIDevice *lpc_pci, ICH9LPCPMRegs *pm,
+     pm->enable_tco = true;
+     acpi_pm_tco_init(&pm->tco_regs, &pm->io);
+ 
++    if (pm->use_acpi_hotplug_bridge) {
++        acpi_pcihp_init(OBJECT(lpc_pci),
++                        &pm->acpi_pci_hotplug,
++                        pci_get_bus(lpc_pci),
++                        pci_address_space_io(lpc_pci),
++                        true,
++                        ACPI_PCIHP_ADDR_ICH9);
++
++        qbus_set_hotplug_handler(BUS(pci_get_bus(lpc_pci)),
++                                 OBJECT(lpc_pci));
++    }
++
+     pm->irq = sci_irq;
+     qemu_register_reset(pm_reset, pm);
+     pm->powerdown_notifier.notify = pm_powerdown_req;
+@@ -369,6 +403,20 @@ static void ich9_pm_set_enable_tco(Object *obj, bool value, Error **errp)
+     s->pm.enable_tco = value;
+ }
+ 
++static bool ich9_pm_get_acpi_pci_hotplug(Object *obj, Error **errp)
++{
++    ICH9LPCState *s = ICH9_LPC_DEVICE(obj);
++
++    return s->pm.use_acpi_hotplug_bridge;
++}
++
++static void ich9_pm_set_acpi_pci_hotplug(Object *obj, bool value,
++                                               Error **errp)
++{
++    ICH9LPCState *s = ICH9_LPC_DEVICE(obj);
++
++    s->pm.use_acpi_hotplug_bridge = value;
++}
+ void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm)
  {
-     Aml *scope;
-     Aml *field;
-@@ -1377,20 +1377,22 @@ static void build_piix4_pci_hotplug(Aml *table)
-     scope =  aml_scope("_SB.PCI0");
+     static const uint32_t gpe0_len = ICH9_PMIO_GPE0_LEN;
+@@ -377,6 +425,7 @@ void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm)
+     pm->disable_s3 = 0;
+     pm->disable_s4 = 0;
+     pm->s4_val = 2;
++    pm->use_acpi_hotplug_bridge = false;
  
-     aml_append(scope,
--        aml_operation_region("PCST", AML_SYSTEM_IO, aml_int(0xae00), 0x08));
-+        aml_operation_region("PCST", AML_SYSTEM_IO, aml_int(pcihp_addr), 0x08));
-     field = aml_field("PCST", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
-     aml_append(field, aml_named_field("PCIU", 32));
-     aml_append(field, aml_named_field("PCID", 32));
-     aml_append(scope, field);
+     object_property_add_uint32_ptr(obj, ACPI_PM_PROP_PM_IO_BASE,
+                                    &pm->pm_io_base, OBJ_PROP_FLAG_READ);
+@@ -400,6 +449,9 @@ void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm)
+     object_property_add_bool(obj, ACPI_PM_PROP_TCO_ENABLED,
+                              ich9_pm_get_enable_tco,
+                              ich9_pm_set_enable_tco);
++    object_property_add_bool(obj, "acpi-pci-hotplug-with-bridge-support",
++                             ich9_pm_get_acpi_pci_hotplug,
++                             ich9_pm_set_acpi_pci_hotplug);
+ }
  
-     aml_append(scope,
--        aml_operation_region("SEJ", AML_SYSTEM_IO, aml_int(0xae08), 0x04));
-+    aml_operation_region("SEJ", AML_SYSTEM_IO,
-+                         aml_int(pcihp_addr + ACPI_PCIHP_SEJ_BASE), 0x04));
-     field = aml_field("SEJ", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
-     aml_append(field, aml_named_field("B0EJ", 32));
-     aml_append(scope, field);
+ void ich9_pm_device_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+@@ -407,6 +459,11 @@ void ich9_pm_device_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+ {
+     ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
  
-     aml_append(scope,
--        aml_operation_region("BNMR", AML_SYSTEM_IO, aml_int(0xae10), 0x04));
-+        aml_operation_region("BNMR", AML_SYSTEM_IO,
-+                             aml_int(pcihp_addr + ACPI_PCIHP_BNMR_BASE), 0x04));
-     field = aml_field("BNMR", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
-     aml_append(field, aml_named_field("BNUM", 32));
-     aml_append(scope, field);
-@@ -1504,7 +1506,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         build_hpet_aml(dsdt);
-         build_piix4_isa_bridge(dsdt);
-         build_isa_devices_aml(dsdt);
--        build_piix4_pci_hotplug(dsdt);
-+        build_x86_pci_hotplug(dsdt, pm->pcihp_io_base);
-         build_piix4_pci0_int(dsdt);
++    if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
++        acpi_pcihp_device_pre_plug_cb(hotplug_dev, dev, errp);
++        return;
++    }
++
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
+         !lpc->pm.acpi_memory_hotplug.is_enabled)
+         error_setg(errp,
+@@ -432,6 +489,9 @@ void ich9_pm_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+         } else {
+             acpi_cpu_plug_cb(hotplug_dev, &lpc->pm.cpuhp_state, dev, errp);
+         }
++    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
++        acpi_pcihp_device_plug_cb(hotplug_dev, &lpc->pm.acpi_pci_hotplug,
++                                  dev, errp);
      } else {
-         sb_scope = aml_scope("_SB");
-@@ -1520,6 +1522,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         build_hpet_aml(dsdt);
-         build_q35_isa_bridge(dsdt);
-         build_isa_devices_aml(dsdt);
-+        if (pm->pcihp_bridge_en) {
-+            build_x86_pci_hotplug(dsdt, pm->pcihp_io_base);
-+        }
-         build_q35_pci0_int(dsdt);
-         if (pcms->smbus && !pcmc->do_not_add_smb_acpi) {
-             build_smb0(dsdt, pcms->smbus, ICH9_SMB_DEV, ICH9_SMB_FUNC);
-@@ -1546,7 +1551,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-     {
-         aml_append(scope, aml_name_decl("_HID", aml_string("ACPI0006")));
+         error_setg(errp, "acpi: device plug request for not supported device"
+                    " type: %s", object_get_typename(OBJECT(dev)));
+@@ -452,6 +512,10 @@ void ich9_pm_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+                !lpc->pm.cpu_hotplug_legacy) {
+         acpi_cpu_unplug_request_cb(hotplug_dev, &lpc->pm.cpuhp_state,
+                                    dev, errp);
++    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
++        acpi_pcihp_device_unplug_request_cb(hotplug_dev,
++                                            &lpc->pm.acpi_pci_hotplug,
++                                            dev, errp);
+     } else {
+         error_setg(errp, "acpi: device unplug request for not supported device"
+                    " type: %s", object_get_typename(OBJECT(dev)));
+@@ -469,6 +533,9 @@ void ich9_pm_device_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
+                !lpc->pm.cpu_hotplug_legacy) {
+         acpi_cpu_unplug_cb(&lpc->pm.cpuhp_state, dev, errp);
++    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
++        acpi_pcihp_device_unplug_cb(hotplug_dev, &lpc->pm.acpi_pci_hotplug,
++                                    dev, errp);
+     } else {
+         error_setg(errp, "acpi: device unplug for not supported device"
+                    " type: %s", object_get_typename(OBJECT(dev)));
+diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
+index bb457bc279..8ab65502ce 100644
+--- a/hw/acpi/pcihp.c
++++ b/hw/acpi/pcihp.c
+@@ -30,6 +30,8 @@
+ #include "hw/pci-host/i440fx.h"
+ #include "hw/pci/pci.h"
+ #include "hw/pci/pci_bridge.h"
++#include "hw/pci/pci_host.h"
++#include "hw/i386/acpi-build.h"
+ #include "hw/acpi/acpi.h"
+ #include "exec/address-spaces.h"
+ #include "hw/pci/pci_bus.h"
+@@ -88,6 +90,7 @@ static void *acpi_set_bsel(PCIBus *bus, void *opaque)
+ static void acpi_set_pci_info(void)
+ {
+     static bool bsel_is_set;
++    Object *host = acpi_get_i386_pci_host();
+     PCIBus *bus;
+     unsigned bsel_alloc = ACPI_PCIHP_BSEL_DEFAULT;
  
--        if (misc->is_piix4) {
-+        if (misc->is_piix4 || pm->pcihp_bridge_en) {
-             method = aml_method("_E01", 0, AML_NOTSERIALIZED);
-             aml_append(method,
-                 aml_acquire(aml_name("\\_SB.PCI0.BLCK"), 0xFFFF));
+@@ -96,7 +99,7 @@ static void acpi_set_pci_info(void)
+     }
+     bsel_is_set = true;
+ 
+-    bus = find_i440fx(); /* TODO: Q35 support */
++    bus = PCI_HOST_BRIDGE(host)->bus;
+     if (bus) {
+         /* Scan all PCI buses. Set property to enable acpi based hotplug. */
+         pci_for_each_bus_depth_first(bus, acpi_set_bsel, NULL, &bsel_alloc);
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index b7811a8912..8787b6fb33 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -270,7 +270,7 @@ static void acpi_get_misc_info(AcpiMiscInfo *info)
+  * Because of the PXB hosts we cannot simply query TYPE_PCI_HOST_BRIDGE.
+  * On i386 arch we only have two pci hosts, so we can look only for them.
+  */
+-static Object *acpi_get_i386_pci_host(void)
++Object *acpi_get_i386_pci_host(void)
+ {
+     PCIHostState *host;
+ 
 -- 
 2.25.4
 
