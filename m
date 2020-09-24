@@ -2,99 +2,110 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F000C4727E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 21:32:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE5AC4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 21:45:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 768DF23899
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 21:32:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 768DF23899
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 69233239E5
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 21:45:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="mClRdSzU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69233239E5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLYrG-0005c8-3z
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 17:32:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47102)
+	id 1kLZ3B-0003IW-2z
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 17:45:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49992)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kLYn1-0004Vh-Eq; Thu, 24 Sep 2020 17:28:31 -0400
-Received: from new4-smtp.messagingengine.com ([66.111.4.230]:55339)
+ (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
+ id 1kLZ1z-0002dJ-F9
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 17:43:59 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:46966)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kLYmz-0004R5-Lj; Thu, 24 Sep 2020 17:28:31 -0400
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
- by mailnew.nyi.internal (Postfix) with ESMTP id B0DCC58050A;
- Thu, 24 Sep 2020 17:28:27 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
- by compute7.internal (MEProxy); Thu, 24 Sep 2020 17:28:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-type:in-reply-to; s=fm1; bh=b5j6O22zdlYFku8IXP+EugfOdy1
- bSw8E2++dm/cCCKc=; b=QyUGGWON/BTDDCBUZ4GgwAnTdqRPyh+KqMMqmsjgFId
- pGXSO1sSb4l+J6DR+WlrIIU8ZHSQ6ge0g+SdnbJKDiM/hiVNeoib3EDptwPIA1d+
- 2YNRrYSTjOdR7qkGtj8+1vAr/9KQM2BF8OSOviogvkD43xM7Hd7ryo3qbaKlsOG9
- 6aJd2U/CKklWWo+39xbFPTvexgKLHkaSVQSoqLsGs5DAAyVY307Bkqitt715CFrs
- BGcKf/7cTg0qfWRPfrTE95H6SMbdPUky+xNBTw6SPIh/R+IATHhT9/3f0rfd2ZA1
- ZgalO7UTIq1dLps6UHgfdBjp+rfYXFSe8EBY0UPSRWA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=b5j6O2
- 2zdlYFku8IXP+EugfOdy1bSw8E2++dm/cCCKc=; b=IKIE5onK9tkdb5JgNQUJB1
- bAOTLLKcWRu7ew8W636JV/k21e9ekkTtkVwDURU9HoQErmLAF5kk7lO1G/DwrPom
- togLpy9CftIJK6AXTy2+Gp+OpVMXmRaa1PY6y8w5uSYppMcrF9Cx+0RBbQis4Eph
- zXq+ZqJ1ZN+gi2igagF8lv8cXuxmcAV6R1Y9btQ071vdLURgdjhDJFjZIxaQeni1
- 5Lff0PXj1OWI85ih3zwjBoNeYuqwx7iIv6efvQqDvrXxWUT96LdW4ny0Waof3opB
- Xdo4CuSuPTIl4vbsnf7aYbCB6qnJnEr/o9CJcxmD6TnywIw8qZwzB2sEnLObJtOg
- ==
-X-ME-Sender: <xms:eg9tXwJ7lD7TAwBi3zmfURAr8Nl6I8ZOQSeR_TlYrjBKkOYpIKmueg>
- <xme:eg9tXwJIinWM_XuOYYskMk80phgS2fOzOqO7oghqWr4YJIRRJdb04IhHLovWu55do
- Kpc-IyyaMiP7lAnSII>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrudekgdduiedtucetufdoteggodetrfdotf
- fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
- cujfgurhepfffhvffukfhfgggtuggjsehgtderredttdejnecuhfhrohhmpefmlhgruhhs
- ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
- gvrhhnpeejgeduffeuieetkeeileekvdeuleetveejudeileduffefjeegfffhuddvudff
- keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtne
- curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
-X-ME-Proxy: <xmx:eg9tXwvNyl2PfBmQ2AY-l3eAx5g113PTT2r0agMyLGRxoleKIhGDmg>
- <xmx:eg9tX9abmPhB1Bae0gKTQ_bkk6cjAzyVztpnBQzSMZk3pzYFBtShPw>
- <xmx:eg9tX3ZiiG6Ht_SdOnMIfhZ4X6lEBjY0RQOCO4TAJIbYMNRK5n65Fg>
- <xmx:ew9tXzH0zQBi-1r5bI5NeNHqVB9lOLd8iuXxmwbTESsYqvqFKt8vKw>
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id 3DB84328005D;
- Thu, 24 Sep 2020 17:28:25 -0400 (EDT)
-Date: Thu, 24 Sep 2020 23:28:23 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: About TODO in nvme emulation
-Message-ID: <20200924212823.GA1884805@apples.localdomain>
-References: <20200924142537.xctoxv7xdr2nab7o@archlinux>
- <87imc38bwa.fsf@dusky.pond.sub.org>
+ (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
+ id 1kLZ1w-0006P5-VO
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 17:43:58 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+ by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08OLTvix120150;
+ Thu, 24 Sep 2020 21:43:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=DaXCwH5/z1d0WeDJgUg+xx4kUQkoUZuQu+lLOfwtsm0=;
+ b=mClRdSzUdRYHS+7jtnWJlimNsTjguF7+vGpK/zzC1uV6XYTAwAOF/Ll8vKat7US2Fiu2
+ 6xe/w4ZOTKOBmkAPhHLZqqjk4lCrjIGzq0viliW19Wr+keMm5Lh+5s4FWmaFsp3oi8Oh
+ EhO7xdgCxN0rp4OizbOIWT3UYX8QgYfrJv9O6RcE4AtlSskbzoteaE8AFr6U2dNf0Ngl
+ LXa7kTF/smVpzFECg56fL5L7BfseUF325gpPiYzLZWXmzQoNbOryvlvS6APcITT/gVEI
+ Q6XbW5NRLNA9e5G2Ai+oKgWYm3DR03gJMENnTnZeOjxsiiVzufMI8wP/XEI2qshO2mAb /A== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2130.oracle.com with ESMTP id 33qcpu7m94-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Thu, 24 Sep 2020 21:43:49 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08OLUYA4160540;
+ Thu, 24 Sep 2020 21:43:49 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3030.oracle.com with ESMTP id 33nujreqh3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 24 Sep 2020 21:43:49 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 08OLhmjR014202;
+ Thu, 24 Sep 2020 21:43:48 GMT
+Received: from [10.39.244.100] (/10.39.244.100)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 24 Sep 2020 14:43:48 -0700
+Subject: Re: [PATCH V1 01/32] savevm: add vmstate handler iterators
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
+ <1596122076-341293-2-git-send-email-steven.sistare@oracle.com>
+ <20200911162441.GJ3310@work-vm>
+From: Steven Sistare <steven.sistare@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <9d029ce0-0e07-e81b-4fb0-a2b934c0dc11@oracle.com>
+Date: Thu, 24 Sep 2020 17:43:45 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="IS0zKkzwUGydFO0o"
-Content-Disposition: inline
-In-Reply-To: <87imc38bwa.fsf@dusky.pond.sub.org>
-Received-SPF: pass client-ip=66.111.4.230; envelope-from=its@irrelevant.dk;
- helo=new4-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 17:13:16
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
+In-Reply-To: <20200911162441.GJ3310@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9754
+ signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ malwarescore=0
+ mlxlogscore=999 phishscore=0 adultscore=0 spamscore=0 suspectscore=2
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009240155
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9754
+ signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2
+ mlxlogscore=999
+ adultscore=0 bulkscore=0 mlxscore=0 lowpriorityscore=0 priorityscore=1501
+ phishscore=0 spamscore=0 malwarescore=0 clxscore=1015 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009240155
+Received-SPF: pass client-ip=141.146.126.79;
+ envelope-from=steven.sistare@oracle.com; helo=aserp2130.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 17:43:55
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,57 +119,269 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Keith Busch <kbusch@kernel.org>, Amey Narkhede <ameynarkhede03@gmail.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 9/11/2020 12:24 PM, Dr. David Alan Gilbert wrote:
+> Apologies for taking a while to get around to this, 
+> 
+> * Steve Sistare (steven.sistare@oracle.com) wrote:
+>> Provide the SAVEVM_FOREACH and SAVEVM_FORALL macros to loop over all save
+>> VM state handlers.  The former will filter handlers based on the operation
+>> in the later patch "savevm: VM handlers mode mask".  The latter loops over
+>> all handlers.
+>>
+>> No functional change.
+>>
+>> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+>> ---
+>>  migration/savevm.c | 57 ++++++++++++++++++++++++++++++++++++------------------
+>>  1 file changed, 38 insertions(+), 19 deletions(-)
+>>
+>> diff --git a/migration/savevm.c b/migration/savevm.c
+>> index 45c9dd9..a07fcad 100644
+>> --- a/migration/savevm.c
+>> +++ b/migration/savevm.c
+>> @@ -266,6 +266,25 @@ static SaveState savevm_state = {
+>>      .global_section_id = 0,
+>>  };
+>>  
+>> +/*
+>> + * The FOREACH macros will filter handlers based on the current operation when
+>> + * additional conditions are added in a subsequent patch.
+>> + */
+>> +
+>> +#define SAVEVM_FOREACH(se, entry)                                    \
+>> +    QTAILQ_FOREACH(se, &savevm_state.handlers, entry)                \
+>> +
+>> +#define SAVEVM_FOREACH_SAFE(se, entry, new_se)                       \
+>> +    QTAILQ_FOREACH_SAFE(se, &savevm_state.handlers, entry, new_se)   \
+>> +
+>> +/* The FORALL macros unconditionally loop over all handlers. */
+>> +
+>> +#define SAVEVM_FORALL(se, entry)                                     \
+>> +    QTAILQ_FOREACH(se, &savevm_state.handlers, entry)
+>> +
+>> +#define SAVEVM_FORALL_SAFE(se, entry, new_se)                        \
+>> +    QTAILQ_FOREACH_SAFE(se, &savevm_state.handlers, entry, new_se)
+>> +
+> 
+> OK, can I ask you to merge this with the next patch but to spin it the
+> other way, so that we have:
+> 
+>   SAVEVM_FOR(se, entry, mask)
+> 
+> and the places you use SAVEVM_FORALL_SAFE would become
+> 
+>   SAVEVM_FOR(se, entry, VMS_MODE_ALL)
+> 
+> I'm thinking at some point in the future we could merge a bunch of the
+> other flag checks in there.
 
---IS0zKkzwUGydFO0o
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Sure.  Is this what you have in mind?
 
-On Sep 24 16:52, Markus Armbruster wrote:
-> Cc'ing nvme maintainers.
->=20
-> Amey Narkhede <ameynarkhede03@gmail.com> writes:
->=20
-> > Is there any TODO file/wiki for nvme emulation code?
-> > I'm a beginner who is interested in getting into
-> > nvme emulation. I have read nvme v1.4a specification
-> > and some code in hw/block/nvme.
-> >
-> > Regards,
-> > Amey
->=20
->=20
+#define SAVEVM_FOR(se, entry, mask)                    \
+    QTAILQ_FOREACH(se, &savevm_state.handlers, entry)  \
+        if (savevm_state.mode & mask)
 
-Hi Amey,
+#define SAVEVM_FOR_SAFE(se, entry, new_se, mask)                    \
+    QTAILQ_FOREACH_SAFE(se, &savevm_state.handlers, entry, new_se)  \
+        if (savevm_state.mode & mask)
 
-No, not yet at least. But we should definitely consider making a page
-like that to keep track of nice-to-haves.
+Callers:
+  SAVEVM_FOR(se, entry, mode_mask(se))
+  SAVEVM_FOR(se, entry, VMS_MODE_ALL)
+  SAVEVM_FOR_SAFE(se, entry, mode_mask(se))
+  SAVEVM_FOR_SAFE(se, entry, VMS_MODE_ALL)
 
-But I guess any v1.4 stuff you wanna do is probably gonna be
-appreciated! :)
+- Steve
 
-Someone needs to look at the changes to CMB in v1.4.
-
---IS0zKkzwUGydFO0o
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9tD3QACgkQTeGvMW1P
-DelT9Qf/T9hlaNvSFY9ryV4hNsjRWosxl9d5Hm36309/Iw67FcgSAkJf3j1QyTPg
-C+suVE6VK4RoDftliNjLQB7SJ8h0Ss822r2nAtmje3QDSljZnMELtTu6xHLcci1L
-6Y+GAB8K+8Dlr8Eu86W6F7knV1ZuAJseDdVYB+umB7qZK1VlEBN28hnn7mpTCPP9
-H8eqxvLu6u1R/MuiJXcFlvFchGpIOUnztVbIDypESYDBATeKN0gXZo0PUx+qejyC
-HglMZfdg7UD6PYs9t9tvkYAo/6/9V38kg73bvt+Q5qMgVbnsyNYa9lGaWrfrCLCO
-eTh+TYzlVba+xwrNRWkkS5R+JoGFQQ==
-=Q0xr
------END PGP SIGNATURE-----
-
---IS0zKkzwUGydFO0o--
+>>  static bool should_validate_capability(int capability)
+>>  {
+>>      assert(capability >= 0 && capability < MIGRATION_CAPABILITY__MAX);
+>> @@ -673,7 +692,7 @@ static uint32_t calculate_new_instance_id(const char *idstr)
+>>      SaveStateEntry *se;
+>>      uint32_t instance_id = 0;
+>>  
+>> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>> +    SAVEVM_FORALL(se, entry) {
+>>          if (strcmp(idstr, se->idstr) == 0
+>>              && instance_id <= se->instance_id) {
+>>              instance_id = se->instance_id + 1;
+>> @@ -689,7 +708,7 @@ static int calculate_compat_instance_id(const char *idstr)
+>>      SaveStateEntry *se;
+>>      int instance_id = 0;
+>>  
+>> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>> +    SAVEVM_FORALL(se, entry) {
+>>          if (!se->compat) {
+>>              continue;
+>>          }
+>> @@ -803,7 +822,7 @@ void unregister_savevm(VMStateIf *obj, const char *idstr, void *opaque)
+>>      }
+>>      pstrcat(id, sizeof(id), idstr);
+>>  
+>> -    QTAILQ_FOREACH_SAFE(se, &savevm_state.handlers, entry, new_se) {
+>> +    SAVEVM_FORALL_SAFE(se, entry, new_se) {
+>>          if (strcmp(se->idstr, id) == 0 && se->opaque == opaque) {
+>>              savevm_state_handler_remove(se);
+>>              g_free(se->compat);
+>> @@ -867,7 +886,7 @@ void vmstate_unregister(VMStateIf *obj, const VMStateDescription *vmsd,
+>>  {
+>>      SaveStateEntry *se, *new_se;
+>>  
+>> -    QTAILQ_FOREACH_SAFE(se, &savevm_state.handlers, entry, new_se) {
+>> +    SAVEVM_FORALL_SAFE(se, entry, new_se) {
+>>          if (se->vmsd == vmsd && se->opaque == opaque) {
+>>              savevm_state_handler_remove(se);
+>>              g_free(se->compat);
+>> @@ -1119,7 +1138,7 @@ bool qemu_savevm_state_blocked(Error **errp)
+>>  {
+>>      SaveStateEntry *se;
+>>  
+>> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>> +    SAVEVM_FORALL(se, entry) {
+>>          if (se->vmsd && se->vmsd->unmigratable) {
+>>              error_setg(errp, "State blocked by non-migratable device '%s'",
+>>                         se->idstr);
+>> @@ -1145,7 +1164,7 @@ bool qemu_savevm_state_guest_unplug_pending(void)
+>>  {
+>>      SaveStateEntry *se;
+>>  
+>> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>> +    SAVEVM_FOREACH(se, entry) {
+>>          if (se->vmsd && se->vmsd->dev_unplug_pending &&
+>>              se->vmsd->dev_unplug_pending(se->opaque)) {
+>>              return true;
+>> @@ -1162,7 +1181,7 @@ void qemu_savevm_state_setup(QEMUFile *f)
+>>      int ret;
+>>  
+>>      trace_savevm_state_setup();
+>> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>> +    SAVEVM_FOREACH(se, entry) {
+>>          if (!se->ops || !se->ops->save_setup) {
+>>              continue;
+>>          }
+>> @@ -1193,7 +1212,7 @@ int qemu_savevm_state_resume_prepare(MigrationState *s)
+>>  
+>>      trace_savevm_state_resume_prepare();
+>>  
+>> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>> +    SAVEVM_FOREACH(se, entry) {
+>>          if (!se->ops || !se->ops->resume_prepare) {
+>>              continue;
+>>          }
+>> @@ -1223,7 +1242,7 @@ int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy)
+>>      int ret = 1;
+>>  
+>>      trace_savevm_state_iterate();
+>> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>> +    SAVEVM_FOREACH(se, entry) {
+>>          if (!se->ops || !se->ops->save_live_iterate) {
+>>              continue;
+>>          }
+>> @@ -1291,7 +1310,7 @@ void qemu_savevm_state_complete_postcopy(QEMUFile *f)
+>>      SaveStateEntry *se;
+>>      int ret;
+>>  
+>> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>> +    SAVEVM_FOREACH(se, entry) {
+>>          if (!se->ops || !se->ops->save_live_complete_postcopy) {
+>>              continue;
+>>          }
+>> @@ -1324,7 +1343,7 @@ int qemu_savevm_state_complete_precopy_iterable(QEMUFile *f, bool in_postcopy)
+>>      SaveStateEntry *se;
+>>      int ret;
+>>  
+>> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>> +    SAVEVM_FOREACH(se, entry) {
+>>          if (!se->ops ||
+>>              (in_postcopy && se->ops->has_postcopy &&
+>>               se->ops->has_postcopy(se->opaque)) ||
+>> @@ -1366,7 +1385,7 @@ int qemu_savevm_state_complete_precopy_non_iterable(QEMUFile *f,
+>>      vmdesc = qjson_new();
+>>      json_prop_int(vmdesc, "page_size", qemu_target_page_size());
+>>      json_start_array(vmdesc, "devices");
+>> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>> +    SAVEVM_FOREACH(se, entry) {
+>>  
+>>          if ((!se->ops || !se->ops->save_state) && !se->vmsd) {
+>>              continue;
+>> @@ -1476,7 +1495,7 @@ void qemu_savevm_state_pending(QEMUFile *f, uint64_t threshold_size,
+>>      *res_postcopy_only = 0;
+>>  
+>>  
+>> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>> +    SAVEVM_FOREACH(se, entry) {
+>>          if (!se->ops || !se->ops->save_live_pending) {
+>>              continue;
+>>          }
+>> @@ -1501,7 +1520,7 @@ void qemu_savevm_state_cleanup(void)
+>>      }
+>>  
+>>      trace_savevm_state_cleanup();
+>> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>> +    SAVEVM_FOREACH(se, entry) {
+>>          if (se->ops && se->ops->save_cleanup) {
+>>              se->ops->save_cleanup(se->opaque);
+>>          }
+>> @@ -1580,7 +1599,7 @@ int qemu_save_device_state(QEMUFile *f)
+>>      }
+>>      cpu_synchronize_all_states();
+>>  
+>> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>> +    SAVEVM_FOREACH(se, entry) {
+>>          int ret;
+>>  
+>>          if (se->is_ram) {
+>> @@ -1612,7 +1631,7 @@ static SaveStateEntry *find_se(const char *idstr, uint32_t instance_id)
+>>  {
+>>      SaveStateEntry *se;
+>>  
+>> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>> +    SAVEVM_FORALL(se, entry) {
+>>          if (!strcmp(se->idstr, idstr) &&
+>>              (instance_id == se->instance_id ||
+>>               instance_id == se->alias_id))
+>> @@ -2334,7 +2353,7 @@ qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
+>>      }
+>>  
+>>      trace_qemu_loadvm_state_section_partend(section_id);
+>> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>> +    SAVEVM_FOREACH(se, entry) {
+>>          if (se->load_section_id == section_id) {
+>>              break;
+>>          }
+>> @@ -2400,7 +2419,7 @@ static int qemu_loadvm_state_setup(QEMUFile *f)
+>>      int ret;
+>>  
+>>      trace_loadvm_state_setup();
+>> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>> +    SAVEVM_FOREACH(se, entry) {
+>>          if (!se->ops || !se->ops->load_setup) {
+>>              continue;
+>>          }
+>> @@ -2425,7 +2444,7 @@ void qemu_loadvm_state_cleanup(void)
+>>      SaveStateEntry *se;
+>>  
+>>      trace_loadvm_state_cleanup();
+>> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>> +    SAVEVM_FOREACH(se, entry) {
+>>          if (se->ops && se->ops->load_cleanup) {
+>>              se->ops->load_cleanup(se->opaque);
+>>          }
+>> -- 
+>> 1.8.3.1
+>>
 
