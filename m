@@ -7,63 +7,62 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACE81C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:31:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E3CAC4727F
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:31:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40781206B6
+	by mail.kernel.org (Postfix) with ESMTPS id 8EC502376F
 	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:31:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BuVHJDbh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40781206B6
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bRheyjnk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EC502376F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLNbM-0004Fc-4y
+	id 1kLNbM-0004HZ-G1
 	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:31:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38620)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38608)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTS-0000V0-G6
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48110)
+ id 1kLNTR-0000Sm-Jj
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26740)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTP-0005zk-Bg
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:34 -0400
+ id 1kLNTP-0005zo-Kd
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1600939410;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=SMwIRTvAsZv05t/Z/v1VSWCCvEEsjq5LkWRrPd5aQvI=;
- b=BuVHJDbhVHsCQsu3flQepBGD4rfg2net8O8hZkylfLLW+EZPcdN23R7wfpU4gqcdRBnWR7
- lqfMersa+Wv/CromRNN4WmmpLxJaE/mR+meseBJImeEMJevZNzwXBJQ5lh3SzhYlzF7zD3
- tV5hEVna+Qyt1hiv1IF/tsT3/PF/LpA=
+ bh=qPGBDRWzNPEJeb+ZkX8dUDQ6P3CC5kzoM+bMM7X804o=;
+ b=bRheyjnkmBEZwsgRK6jUcy5d0dy2P2eFeeN3BJTUtmWRNZypB+wkw08kIubMlcniaGxWaB
+ PH2xyH2piXAJn7PiWetc5b0bXrt2lE8bQrWWMvJXW23LigcZW42uk8hIUZV11MIlnkFDB8
+ O8MWyuWXcqrh8YHoATgM52oDwAKd1jE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-496-Id6LJKdUPwei4zcffabIIw-1; Thu, 24 Sep 2020 05:23:28 -0400
-X-MC-Unique: Id6LJKdUPwei4zcffabIIw-1
+ us-mta-179-26dNmfGDN0mngVipBqCU5g-1; Thu, 24 Sep 2020 05:23:29 -0400
+X-MC-Unique: 26dNmfGDN0mngVipBqCU5g-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB05D104D3E3
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54748104D3E4
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:28 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8D9CB7881A;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 074E29CBA;
  Thu, 24 Sep 2020 09:23:27 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/92] doc: Cleanup "'-mem-path' fallback to RAM" deprecation
- text
-Date: Thu, 24 Sep 2020 05:21:56 -0400
-Message-Id: <20200924092314.1722645-15-pbonzini@redhat.com>
+Subject: [PULL 15/92] numa: remove fixup numa_state->num_nodes to MAX_NODES
+Date: Thu, 24 Sep 2020 05:21:57 -0400
+Message-Id: <20200924092314.1722645-16-pbonzini@redhat.com>
 In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
 References: <20200924092314.1722645-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -74,9 +73,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -104,56 +103,37 @@ Sender: "Qemu-devel"
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-it was actually removed in 5.0,
-commit 68a86dc15c (numa: remove deprecated -mem-path fallback to anonymous RAM)
-clean up forgotten remnants in docs.
+current code permits only nodeids in [0..MAX_NODES) range
+due to nodeid check in
+
+  parse_numa_node()
+      if (nodenr >= MAX_NODES) {
+          error_setg(errp, "Max number of NUMA nodes reached: %"
+
+so subj fixup is not reachable, drop it.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <20200911084410.788171-3-imammedo@redhat.com>
+Message-Id: <20200911084410.788171-4-imammedo@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- docs/system/deprecated.rst | 21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
+ hw/core/numa.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-index 6422230fe2..e78d03038f 100644
---- a/docs/system/deprecated.rst
-+++ b/docs/system/deprecated.rst
-@@ -104,17 +104,6 @@ error in the future.
- The ``-realtime mlock=on|off`` argument has been replaced by the
- ``-overcommit mem-lock=on|off`` argument.
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 706c1e84c6..7d5d413001 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -677,10 +677,6 @@ void numa_complete_configuration(MachineState *ms)
+     if (ms->numa_state->num_nodes > 0) {
+         uint64_t numa_total;
  
--``-mem-path`` fallback to RAM (since 4.1)
--'''''''''''''''''''''''''''''''''''''''''
+-        if (ms->numa_state->num_nodes > MAX_NODES) {
+-            ms->numa_state->num_nodes = MAX_NODES;
+-        }
 -
--Currently if guest RAM allocation from file pointed by ``mem-path``
--fails, QEMU falls back to allocating from RAM, which might result
--in unpredictable behavior since the backing file specified by the user
--is ignored. In the future, users will be responsible for making sure
--the backing storage specified with ``-mem-path`` can actually provide
--the guest RAM configured with ``-m`` and QEMU will fail to start up if
--RAM allocation is unsuccessful.
--
- RISC-V ``-bios`` (since 5.1)
- ''''''''''''''''''''''''''''
- 
-@@ -647,6 +636,16 @@ New machine versions (since 5.1) will not accept the option but it will still
- work with old machine types. User can check the QAPI schema to see if the legacy
- option is supported by looking at MachineInfo::numa-mem-supported property.
- 
-+``-mem-path`` fallback to RAM (removed in 5.0)
-+''''''''''''''''''''''''''''''''''''''''''''''
-+
-+If guest RAM allocation from file pointed by ``mem-path`` failed,
-+QEMU was falling back to allocating from RAM, which might have resulted
-+in unpredictable behavior since the backing file specified by the user
-+as ignored. Currently, users are responsible for making sure the backing storage
-+specified with ``-mem-path`` can actually provide the guest RAM configured with
-+``-m`` and QEMU fails to start up if RAM allocation is unsuccessful.
-+
- Block devices
- -------------
- 
+         numa_total = 0;
+         for (i = 0; i < ms->numa_state->num_nodes; i++) {
+             numa_total += numa_info[i].node_mem;
 -- 
 2.26.2
 
