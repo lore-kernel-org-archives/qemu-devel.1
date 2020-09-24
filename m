@@ -7,59 +7,60 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1900EC4346E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:02:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A87A2C4346E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:03:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 994342388A
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:02:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 15D532388A
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:03:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S3LIt5HX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 994342388A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aMl57rKC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15D532388A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLLH9-0002EO-KN
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 03:02:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34626)
+	id 1kLLHu-0003BW-3I
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 03:03:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jusual@redhat.com>) id 1kLLFS-0000xM-1w
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:00:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25359)
+ (Exim 4.90_1) (envelope-from <jusual@redhat.com>) id 1kLLF8-0000Z2-VW
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:00:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44783)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jusual@redhat.com>) id 1kLLFQ-0005Je-8v
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:00:57 -0400
+ (Exim 4.90_1) (envelope-from <jusual@redhat.com>) id 1kLLF6-0005H2-V0
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:00:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600930855;
+ s=mimecast20190719; t=1600930835;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ymlR3AzWDukUaAx+Ufl+5dNMAPyM0Z+N8lzBqbv7xvE=;
- b=S3LIt5HXxCcY1X+dYdh5ZYs7Lx/6aZCnWVmraPwdiUVW1t5cEAc5UoCVADaDc4RNu2sGq3
- z9XP5c5bX/GbM6ccKbtErzIyjWyDUB8dsFveTyCRLcRiT817gKp66JARArRYYx968NgQsv
- 0yyfQNjrcCD6WnUSDadqpKDLqDoJOMY=
+ bh=JQLMvXv0mUTil+NTyNbK8XITxK8lzlUehkO/ZxdRbFw=;
+ b=aMl57rKCQH5JDVitz8GwMjj85yGpR1I/iOhJxw3Doi3EYziXYTs0FRmUFgxcBMWg35t5hX
+ xXJD6/L4WbOVgt39in9ZcuEAQFf7Guiot8QZ+xJiK9dXohZw9lxZaT53O9ySVHw3vLEtXh
+ 3o5LavSkx07qxH9eHjyFP65vwzAREls=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-185-vIO8BAEIOvmTxKtI3qx0iQ-1; Thu, 24 Sep 2020 03:00:51 -0400
-X-MC-Unique: vIO8BAEIOvmTxKtI3qx0iQ-1
+ us-mta-534-F3VBvfzJN9yoivFLgfIQag-1; Thu, 24 Sep 2020 03:00:33 -0400
+X-MC-Unique: F3VBvfzJN9yoivFLgfIQag-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 12091800462;
- Thu, 24 Sep 2020 07:00:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C383510BBED7;
+ Thu, 24 Sep 2020 07:00:32 +0000 (UTC)
 Received: from pc-72.home.com (unknown [10.40.194.10])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 535D273668;
- Thu, 24 Sep 2020 07:00:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1192573668;
+ Thu, 24 Sep 2020 07:00:30 +0000 (UTC)
 From: Julia Suvorova <jusual@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v3 5/7] bios-tables-test: Allow changes in DSDT ACPI tables
-Date: Thu, 24 Sep 2020 09:00:11 +0200
-Message-Id: <20200924070013.165026-6-jusual@redhat.com>
+Subject: [RFC PATCH v3 1/7] hw/acpi/pcihp: Enhance
+ acpi_pcihp_disable_root_bus() to support Q35
+Date: Thu, 24 Sep 2020 09:00:07 +0200
+Message-Id: <20200924070013.165026-2-jusual@redhat.com>
 In-Reply-To: <20200924070013.165026-1-jusual@redhat.com>
 References: <20200924070013.165026-1-jusual@redhat.com>
 MIME-Version: 1.0
@@ -70,9 +71,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jusual@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jusual@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -99,30 +100,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-All DSDT Q35 tables will be modified because ACPI hot-plug is enabled
-by default.
+PCI Express does not allow hot-plug on pcie.0. Check for Q35 in
+acpi_pcihp_disable_root_bus() to be able to forbid hot-plug using the
+'acpi-root-pci-hotplug' flag.
 
 Signed-off-by: Julia Suvorova <jusual@redhat.com>
 ---
- tests/qtest/bios-tables-test-allowed-diff.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ hw/acpi/pcihp.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
-index dfb8523c8b..84f56b14db 100644
---- a/tests/qtest/bios-tables-test-allowed-diff.h
-+++ b/tests/qtest/bios-tables-test-allowed-diff.h
-@@ -1 +1,11 @@
- /* List of comma-separated changed AML files to ignore */
-+"tests/data/acpi/q35/DSDT",
-+"tests/data/acpi/q35/DSDT.tis",
-+"tests/data/acpi/q35/DSDT.bridge",
-+"tests/data/acpi/q35/DSDT.mmio64",
-+"tests/data/acpi/q35/DSDT.ipmibt",
-+"tests/data/acpi/q35/DSDT.cphp",
-+"tests/data/acpi/q35/DSDT.memhp",
-+"tests/data/acpi/q35/DSDT.acpihmat",
-+"tests/data/acpi/q35/DSDT.numamem",
-+"tests/data/acpi/q35/DSDT.dimmpxm",
+diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
+index 39b1f74442..ff23104aea 100644
+--- a/hw/acpi/pcihp.c
++++ b/hw/acpi/pcihp.c
+@@ -107,13 +107,14 @@ static void acpi_set_pci_info(void)
+ static void acpi_pcihp_disable_root_bus(void)
+ {
+     static bool root_hp_disabled;
++    Object *host = acpi_get_i386_pci_host();
+     PCIBus *bus;
+ 
+     if (root_hp_disabled) {
+         return;
+     }
+ 
+-    bus = find_i440fx();
++    bus = PCI_HOST_BRIDGE(host)->bus;
+     if (bus) {
+         /* setting the hotplug handler to NULL makes the bus non-hotpluggable */
+         qbus_set_hotplug_handler(BUS(bus), NULL);
 -- 
 2.25.4
 
