@@ -2,124 +2,91 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF871C4346E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:36:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84AB7C4346E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:38:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECE1423741
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:36:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1CED23741
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:37:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CWTXSj6k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECE1423741
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CNjnpnVV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1CED23741
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLLoA-0005H6-UB
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 03:36:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41666)
+	id 1kLLpH-0006e6-17
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 03:37:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41948)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kLLnI-0004gZ-8N
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:35:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60470)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kLLoE-0005Tk-47
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:36:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28267)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kLLnG-0000pY-IN
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:35:55 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kLLoC-0000zJ-CH
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:36:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600932953;
+ s=mimecast20190719; t=1600933011;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=TBfoO4a/BibRwhs6HvcOqjn/6dg0UNcYAbdNY+loaAA=;
- b=CWTXSj6k5CwmfoDmg27FYAfbzeHMKR5wuNmp8ZvG1uSgeS5rqADuY5IgqtHGHTuJ9pxQS3
- WVrMSq4Lgy85M20ZE20IRBT0z3jG2NjGcyzLF1YpJFNxNVpP3Q+39usjsqx3lU4+r9JfCv
- 2t0ctZVmciiwGVwAnZpGnhtRQ/Y/01k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-554-v7Jstv67Mt2yNlGcgkzXoQ-1; Thu, 24 Sep 2020 03:35:51 -0400
-X-MC-Unique: v7Jstv67Mt2yNlGcgkzXoQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 575D7800400;
- Thu, 24 Sep 2020 07:35:50 +0000 (UTC)
-Received: from [10.36.114.4] (ovpn-114-4.ams2.redhat.com [10.36.114.4])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4891A1002C01;
- Thu, 24 Sep 2020 07:35:49 +0000 (UTC)
-Subject: Re: [PATCH 2/8] softfloat: Use int128.h for some operations
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200924012453.659757-1-richard.henderson@linaro.org>
- <20200924012453.659757-3-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat GmbH
-Message-ID: <736e0808-615a-f522-6f4e-43c6d540e0ca@redhat.com>
-Date: Thu, 24 Sep 2020 09:35:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ in-reply-to:in-reply-to:references:references;
+ bh=r9GtGVoTQ0/MY6cgdfeB49vf0VeY+yejuyU1vVF4xEs=;
+ b=CNjnpnVVcUh/ebXW4hdSoVQZAp+ciLw6Qh+7hZvLIUYE8bGLwmWWTDv5vMyj+twAVpWDRh
+ tHYmtAFrpgE74NbNn2sLOGpx31fxR6bF30rj1SCbFHofHFA+dtpEzqj16hYFzULm9kp3MR
+ iYDrYug+VLT88pQGtXd6YsmCbGd3g8g=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-326-eLl6CnyyOjOGRw1R27HUtQ-1; Thu, 24 Sep 2020 03:36:49 -0400
+X-MC-Unique: eLl6CnyyOjOGRw1R27HUtQ-1
+Received: by mail-wm1-f69.google.com with SMTP id b20so3232887wmj.1
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 00:36:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=r9GtGVoTQ0/MY6cgdfeB49vf0VeY+yejuyU1vVF4xEs=;
+ b=cO8E6vlXqTqdPSQw2ZvgIMnXZKApAySUEJ1p6LhsVlbeerhzDtm9HlY8zHFAqfWog6
+ QiZASnsSobz6T4PIRKgeH0xP2GSBNVL5lnhBrHTwuW7H7+IBSn7mK/atxi76OsWHHgbc
+ 5zBGXP3vvRnFKaL/vexCcuSABK/TDxnLRG2acTKfwvmjz3UFD7Kw7g2cOn+vFUEcHGyl
+ rtDTSERkhkwVPrH7qQkRLlXw5Ly/09DCTyNfly/LgXNAU+AUuC0y8To4afYY8n/6A7g5
+ rKRP76m/tJ8ifjaXnzRhOjV/+W1mHBv9HzaQNgp3AIT0nLMjcJyOzNzr5RMMIczcz/Sv
+ VHwg==
+X-Gm-Message-State: AOAM533382HtuRnaxY5mzkbxbovKuj/BTVQ2vQTcGWteCfJT+LKq0xMe
+ zPqXFa/qlL8LkWQieOslbYsVgIT0HmRz661KQuqnfiCon64x4g6zTKT2ytOz1ed1/FnEnjz6+hn
+ 7S04Lrw60nwdJQYA=
+X-Received: by 2002:a1c:2905:: with SMTP id p5mr3360205wmp.187.1600933008417; 
+ Thu, 24 Sep 2020 00:36:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJynf7tJE45KY7VafKekmTY/EI1tIhWGNMOBjgl/oT3gij9RQt9e0Kf0Xk+kY864V5UpBb302g==
+X-Received: by 2002:a1c:2905:: with SMTP id p5mr3360184wmp.187.1600933008142; 
+ Thu, 24 Sep 2020 00:36:48 -0700 (PDT)
+Received: from redhat.com (bzq-79-179-71-128.red.bezeqint.net. [79.179.71.128])
+ by smtp.gmail.com with ESMTPSA id o4sm2418668wrv.86.2020.09.24.00.36.46
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 24 Sep 2020 00:36:47 -0700 (PDT)
+Date: Thu, 24 Sep 2020 03:36:45 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Julia Suvorova <jusual@redhat.com>
+Subject: Re: [RFC PATCH v3 3/7] hw/pci/pcie: Do not initialize slot
+ capability if acpihp is used
+Message-ID: <20200924033305-mutt-send-email-mst@kernel.org>
+References: <20200924070013.165026-1-jusual@redhat.com>
+ <20200924070013.165026-4-jusual@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200924012453.659757-3-richard.henderson@linaro.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200924070013.165026-4-jusual@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=david@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -128,9 +95,8 @@ X-Spam_score: -3.3
 X-Spam_bar: ---
 X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -143,104 +109,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org, bharata@linux.ibm.com
+Cc: Ani Sinha <ani@anisinha.ca>, Igor Mammedov <imammedo@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24.09.20 03:24, Richard Henderson wrote:
-> Use our Int128, which wraps the compiler's __int128_t,
-> instead of open-coding left shifts and arithmetic.
-> We'd need to extend Int128 to have unsigned operations
-> to replace more than these three.
+On Thu, Sep 24, 2020 at 09:00:09AM +0200, Julia Suvorova wrote:
+> Instead of changing the hot-plug type in _OSC register, do not
+> initialize the slot capability or set the 'Slot Implemented' flag.
+> This way guest will choose ACPI hot-plug if it is preferred and leave
+> the option to use SHPC with pcie-pci-bridge.
 > 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Julia Suvorova <jusual@redhat.com>
 > ---
->  include/fpu/softfloat-macros.h | 39 +++++++++++++++++-----------------
->  1 file changed, 20 insertions(+), 19 deletions(-)
+>  hw/i386/acpi-build.h |  2 ++
+>  hw/i386/acpi-build.c |  2 +-
+>  hw/pci/pcie.c        | 16 ++++++++++++++++
+>  3 files changed, 19 insertions(+), 1 deletion(-)
 > 
-> diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
-> index 57845f8af0..95d88d05b8 100644
-> --- a/include/fpu/softfloat-macros.h
-> +++ b/include/fpu/softfloat-macros.h
-> @@ -84,6 +84,7 @@ this code that are retained.
+> diff --git a/hw/i386/acpi-build.h b/hw/i386/acpi-build.h
+> index 487ec7710f..4c5bfb3d0b 100644
+> --- a/hw/i386/acpi-build.h
+> +++ b/hw/i386/acpi-build.h
+> @@ -11,4 +11,6 @@ extern const struct AcpiGenericAddress x86_nvdimm_acpi_dsmio;
 >  
->  #include "fpu/softfloat-types.h"
->  #include "qemu/host-utils.h"
-> +#include "qemu/int128.h"
+>  void acpi_setup(void);
 >  
->  /*----------------------------------------------------------------------------
->  | Shifts `a' right by the number of bits given in `count'.  If any nonzero
-> @@ -352,13 +353,11 @@ static inline void shortShift128Left(uint64_t a0, uint64_t a1, int count,
->  static inline void shift128Left(uint64_t a0, uint64_t a1, int count,
->                                  uint64_t *z0Ptr, uint64_t *z1Ptr)
->  {
-> -    if (count < 64) {
-> -        *z1Ptr = a1 << count;
-> -        *z0Ptr = count == 0 ? a0 : (a0 << count) | (a1 >> (-count & 63));
-> -    } else {
-> -        *z1Ptr = 0;
-> -        *z0Ptr = a1 << (count - 64);
-> -    }
-> +    Int128 a = int128_make128(a1, a0);
-> +    Int128 z = int128_lshift(a, count);
+> +Object *object_resolve_type_unambiguous(const char *typename);
 > +
-> +    *z0Ptr = int128_gethi(z);
-> +    *z1Ptr = int128_getlo(z);
+>  #endif
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index cf503b16af..b7811a8912 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -174,7 +174,7 @@ static void init_common_fadt_data(MachineState *ms, Object *o,
+>      *data = fadt;
 >  }
 >  
->  /*----------------------------------------------------------------------------
-> @@ -405,15 +404,15 @@ static inline void
->  *----------------------------------------------------------------------------*/
->  
->  static inline void
-> - add128(
-> -     uint64_t a0, uint64_t a1, uint64_t b0, uint64_t b1, uint64_t *z0Ptr, uint64_t *z1Ptr )
-> +add128(uint64_t a0, uint64_t a1, uint64_t b0, uint64_t b1,
-> +       uint64_t *z0Ptr, uint64_t *z1Ptr)
+> -static Object *object_resolve_type_unambiguous(const char *typename)
+> +Object *object_resolve_type_unambiguous(const char *typename)
 >  {
-> -    uint64_t z1;
-> -
-> -    z1 = a1 + b1;
-> -    *z1Ptr = z1;
-> -    *z0Ptr = a0 + b0 + ( z1 < a1 );
-> +    Int128 a = int128_make128(a1, a0);
-> +    Int128 b = int128_make128(b1, b0);
-> +    Int128 z = int128_add(a, b);
+>      bool ambig;
+>      Object *o = object_resolve_path_type("", typename, &ambig);
+> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> index 5b48bae0f6..c1a082e8b9 100644
+> --- a/hw/pci/pcie.c
+> +++ b/hw/pci/pcie.c
+> @@ -27,6 +27,8 @@
+>  #include "hw/pci/pci_bus.h"
+>  #include "hw/pci/pcie_regs.h"
+>  #include "hw/pci/pcie_port.h"
+> +#include "hw/i386/ich9.h"
+> +#include "hw/i386/acpi-build.h"
+>  #include "qemu/range.h"
 >  
-> +    *z0Ptr = int128_gethi(z);
-> +    *z1Ptr = int128_getlo(z);
+>  //#define DEBUG_PCIE
+
+
+Not really happy with pcie.c getting an i386 dependency.
+
+
+
+> @@ -515,12 +517,26 @@ void pcie_cap_slot_unplug_request_cb(HotplugHandler *hotplug_dev,
+>      pcie_cap_slot_push_attention_button(hotplug_pdev);
 >  }
 >  
->  /*----------------------------------------------------------------------------
-> @@ -463,13 +462,15 @@ static inline void
->  *----------------------------------------------------------------------------*/
->  
->  static inline void
-> - sub128(
-> -     uint64_t a0, uint64_t a1, uint64_t b0, uint64_t b1, uint64_t *z0Ptr, uint64_t *z1Ptr )
-> +sub128(uint64_t a0, uint64_t a1, uint64_t b0, uint64_t b1,
-> +       uint64_t *z0Ptr, uint64_t *z1Ptr)
+> +static bool acpi_pcihp_enabled(void)
+> +{
+> +    Object *lpc = object_resolve_type_unambiguous(TYPE_ICH9_LPC_DEVICE);
+> +
+> +    return lpc &&
+> +           object_property_get_bool(lpc, "acpi-pci-hotplug-with-bridge-support",
+> +                                    NULL);
+> +
+> +}
+> +
+
+Why not just check the property unconditionally?
+
+
+>  /* pci express slot for pci express root/downstream port
+>     PCI express capability slot registers */
+>  void pcie_cap_slot_init(PCIDevice *dev, PCIESlot *s)
 >  {
-> +    Int128 a = int128_make128(a1, a0);
-> +    Int128 b = int128_make128(b1, b0);
-> +    Int128 z = int128_sub(a, b);
+>      uint32_t pos = dev->exp.exp_cap;
 >  
-> -    *z1Ptr = a1 - b1;
-> -    *z0Ptr = a0 - b0 - ( a1 < b1 );
-> -
-> +    *z0Ptr = int128_gethi(z);
-> +    *z1Ptr = int128_getlo(z);
->  }
+> +    if (acpi_pcihp_enabled()) {
+> +        return;
+> +    }
+> +
+
+I think I would rather not teach pcie about acpi. How about we
+change the polarity, name the property
+"pci-native-hotplug" or whatever makes sense.
+
+>      pci_word_test_and_set_mask(dev->config + pos + PCI_EXP_FLAGS,
+>                                 PCI_EXP_FLAGS_SLOT);
 >  
->  /*----------------------------------------------------------------------------
-> 
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
--- 
-Thanks,
-
-David / dhildenb
+> -- 
+> 2.25.4
 
 
