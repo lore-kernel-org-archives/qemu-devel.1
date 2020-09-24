@@ -2,67 +2,67 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74380C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:47:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0A36C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:48:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED8872396E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:47:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4EE442396E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:48:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DpnpFlue"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED8872396E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G0bibakU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EE442396E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLNr3-0000VO-Tb
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:47:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39012)
+	id 1kLNr6-0000cc-7b
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:48:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39102)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTo-00017t-Jk
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45376)
+ id 1kLNTr-0001GS-TM
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24317)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTl-00064K-PB
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:56 -0400
+ id 1kLNTn-00066E-To
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600939432;
+ s=mimecast20190719; t=1600939435;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QP/tfe6eEhE2lmX3KaDtFebzNyOg1zq1GEHNjimZdqQ=;
- b=DpnpFlueqIl+V3ArQV2Dp9zIBfjLLFlxh5Hhzy3l2YXqzg6TD+o2ZCWNgwx1B9bDU0rU8c
- pSqfeNKAN+98bYqQT7QfE+ZokXkNoTnr67yN2iZnujeWH7trcVjKJyqvciPh7+SCQDNIbx
- Z1YSGOjeEYDBFr7cjxYU+bxrUBH4Plw=
+ bh=pq35pprjY9O0C9/iJtey6JbSoVcKHmRAr2UADQ5C67Q=;
+ b=G0bibakUsISx+PnQxNM6lM3fk7NvNIOEsHUGlOmGdrVu6vt5OQlPjAye8xLsuX/li/9UjP
+ 0PwGCTJsnLBrcKF+RKEfSmScgp5hjnRl2qrWeJWrcwho29PUKXkXAAatNkY6UlkGdzzRDV
+ zgSwy75FWtCf08a1JU3ysNbRMM2o+4U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-571-nH3JdTfeNeGNA95BQkxk3g-1; Thu, 24 Sep 2020 05:23:51 -0400
-X-MC-Unique: nH3JdTfeNeGNA95BQkxk3g-1
+ us-mta-37-vK5cOywWMiO47aX_orQL8Q-1; Thu, 24 Sep 2020 05:23:53 -0400
+X-MC-Unique: vK5cOywWMiO47aX_orQL8Q-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3135F85B686
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E58A800475
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:52 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F2B5660C15
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5B00860E1C
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:52 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 42/92] cutils: introduce get_relocated_path
-Date: Thu, 24 Sep 2020 05:22:24 -0400
-Message-Id: <20200924092314.1722645-43-pbonzini@redhat.com>
+Subject: [PULL 49/92] qga: relocate path to default configuration and hook
+Date: Thu, 24 Sep 2020 05:22:31 -0400
+Message-Id: <20200924092314.1722645-50-pbonzini@redhat.com>
 In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
 References: <20200924092314.1722645-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -71,8 +71,8 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
@@ -100,122 +100,58 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add the function that will compute a relocated version of the
-directories in CONFIG_QEMU_*DIR and CONFIG_QEMU_*PATH.
-
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qemu/cutils.h | 12 +++++++++
- meson.build           |  4 +--
- util/cutils.c         | 61 +++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 75 insertions(+), 2 deletions(-)
+ qga/main.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-index eb59852dfd..3a86ec0321 100644
---- a/include/qemu/cutils.h
-+++ b/include/qemu/cutils.h
-@@ -184,4 +184,16 @@ int uleb128_decode_small(const uint8_t *in, uint32_t *n);
-  */
- int qemu_pstrcmp0(const char **str1, const char **str2);
- 
-+
-+/**
-+ * get_relocated_path:
-+ * @dir: the directory (typically a `CONFIG_*DIR` variable) to be relocated.
-+ *
-+ * Returns a path for @dir that uses the directory of the running executable
-+ * as the prefix.  For example, if `bindir` is `/usr/bin` and @dir is
-+ * `/usr/share/qemu`, the function will append `../share/qemu` to the
-+ * directory that contains the running executable and return the result.
-+ */
-+char *get_relocated_path(const char *dir);
-+
- #endif
-diff --git a/meson.build b/meson.build
-index 9a4ade7f98..ace15dc8c0 100644
---- a/meson.build
-+++ b/meson.build
-@@ -560,9 +560,9 @@ config_host_data.set('QEMU_VERSION_MINOR', meson.project_version().split('.')[1]
- config_host_data.set('QEMU_VERSION_MICRO', meson.project_version().split('.')[2])
- 
- arrays = ['CONFIG_AUDIO_DRIVERS', 'CONFIG_BDRV_RW_WHITELIST', 'CONFIG_BDRV_RO_WHITELIST']
--strings = ['HOST_DSOSUF', 'CONFIG_IASL', 'bindir', 'qemu_confdir', 'qemu_datadir',
-+strings = ['HOST_DSOSUF', 'CONFIG_IASL', 'bindir', 'prefix', 'qemu_confdir', 'qemu_datadir',
-            'qemu_moddir', 'qemu_localstatedir', 'qemu_helperdir', 'qemu_localedir',
--           'qemu_icondir', 'qemu_desktopdir', 'qemu_firmwarepath']
-+           'qemu_icondir', 'qemu_desktopdir', 'qemu_firmwarepath', 'sysconfdir']
- foreach k, v: config_host
-   if arrays.contains(k)
-     if v != ''
-diff --git a/util/cutils.c b/util/cutils.c
-index 36ce712271..8da34e04b0 100644
---- a/util/cutils.c
-+++ b/util/cutils.c
-@@ -889,3 +889,64 @@ int qemu_pstrcmp0(const char **str1, const char **str2)
+diff --git a/qga/main.c b/qga/main.c
+index 3febf3b0fd..740f5f7303 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -29,6 +29,7 @@
+ #include "qapi/error.h"
+ #include "channel.h"
+ #include "qemu/bswap.h"
++#include "qemu/cutils.h"
+ #include "qemu/help_option.h"
+ #include "qemu/sockets.h"
+ #include "qemu/systemd.h"
+@@ -968,7 +969,7 @@ static void config_load(GAConfig *config)
  {
-     return g_strcmp0(*str1, *str2);
- }
-+
-+static inline bool starts_with_prefix(const char *dir)
-+{
-+    size_t prefix_len = strlen(CONFIG_PREFIX);
-+    return !memcmp(dir, CONFIG_PREFIX, prefix_len) &&
-+        (!dir[prefix_len] || G_IS_DIR_SEPARATOR(dir[prefix_len]));
-+}
-+
-+/* Return the next path component in dir, and store its length in *p_len.  */
-+static inline const char *next_component(const char *dir, int *p_len)
-+{
-+    int len;
-+    while (*dir && G_IS_DIR_SEPARATOR(*dir)) {
-+        dir++;
-+    }
-+    len = 0;
-+    while (dir[len] && !G_IS_DIR_SEPARATOR(dir[len])) {
-+        len++;
-+    }
-+    *p_len = len;
-+    return dir;
-+}
-+
-+char *get_relocated_path(const char *dir)
-+{
-+    size_t prefix_len = strlen(CONFIG_PREFIX);
-+    const char *bindir = CONFIG_BINDIR;
-+    const char *exec_dir = qemu_get_exec_dir();
-+    GString *result;
-+    int len_dir, len_bindir;
-+
-+    /* Fail if qemu_init_exec_dir was not called.  */
-+    assert(exec_dir[0]);
-+    if (!starts_with_prefix(dir) || !starts_with_prefix(bindir)) {
-+        return strdup(dir);
-+    }
-+
-+    result = g_string_new(exec_dir);
-+
-+    /* Advance over common components.  */
-+    len_dir = len_bindir = prefix_len;
-+    do {
-+        dir += len_dir;
-+        bindir += len_bindir;
-+        dir = next_component(dir, &len_dir);
-+        bindir = next_component(bindir, &len_bindir);
-+    } while (len_dir == len_bindir && !memcmp(dir, bindir, len_dir));
-+
-+    /* Ascend from bindir to the common prefix with dir.  */
-+    while (len_bindir) {
-+        bindir += len_bindir;
-+        g_string_append(result, "/..");
-+        bindir = next_component(bindir, &len_bindir);
-+    }
-+
-+    if (*dir) {
-+        assert(G_IS_DIR_SEPARATOR(dir[-1]));
-+        g_string_append(result, dir - 1);
-+    }
-+    return result->str;
-+}
+     GError *gerr = NULL;
+     GKeyFile *keyfile;
+-    const char *conf = g_getenv("QGA_CONF") ?: QGA_CONF_DEFAULT;
++    g_autofree char *conf = g_strdup(g_getenv("QGA_CONF")) ?: get_relocated_path(QGA_CONF_DEFAULT);
+ 
+     /* read system config */
+     keyfile = g_key_file_new();
+@@ -1027,7 +1028,7 @@ end:
+     if (gerr &&
+         !(gerr->domain == G_FILE_ERROR && gerr->code == G_FILE_ERROR_NOENT)) {
+         g_critical("error loading configuration from path: %s, %s",
+-                   QGA_CONF_DEFAULT, gerr->message);
++                   conf, gerr->message);
+         exit(EXIT_FAILURE);
+     }
+     g_clear_error(&gerr);
+@@ -1141,7 +1142,7 @@ static void config_parse(GAConfig *config, int argc, char **argv)
+ #ifdef CONFIG_FSFREEZE
+         case 'F':
+             g_free(config->fsfreeze_hook);
+-            config->fsfreeze_hook = g_strdup(optarg ?: QGA_FSFREEZE_HOOK_DEFAULT);
++            config->fsfreeze_hook = optarg ? g_strdup(optarg) : get_relocated_path(QGA_FSFREEZE_HOOK_DEFAULT);
+             break;
+ #endif
+         case 't':
+@@ -1463,6 +1464,7 @@ int main(int argc, char **argv)
+ 
+     config->log_level = G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL;
+ 
++    qemu_init_exec_dir(argv[0]);
+     qga_qmp_init_marshal(&ga_commands);
+ 
+     init_dfl_pathnames();
 -- 
 2.26.2
 
