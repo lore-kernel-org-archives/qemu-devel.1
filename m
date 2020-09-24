@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 927DCC4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:43:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D20B7C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:43:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 014C923787
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:43:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3FB912388A
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:43:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hq2vLMzP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 014C923787
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BbgWzpUN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FB912388A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLNmP-0001uH-Pz
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:43:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38850)
+	id 1kLNmU-00026I-6r
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:43:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTi-0000vF-S4
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24207)
+ id 1kLNTn-00014m-Fu
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27480)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTe-00062W-2p
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:50 -0400
+ id 1kLNTl-000646-2I
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600939425;
+ s=mimecast20190719; t=1600939432;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=X2KEkKvC7F01fXyfLLGue0vUN88l5fDuNo2sR8Vx1r8=;
- b=Hq2vLMzPL/Ox4EWX9flQMKpp3pu++akTnQWLMYr+1E5VvMLGlrqTq97XTD+CoeiOl4zDLg
- TmjZ/0LIqAAWxQIiytvDWo4DCRVAI5aF/yEF4KIyqw36FiVViV377fhFLPEWd3czuKBS1a
- nttPS94ZlML3keuT4o4/JLRUOK8xgmQ=
+ bh=gGviLxAw+vrWTwDuFaNJGcXznT4SMxFyivIgoPBHBAc=;
+ b=BbgWzpUNLEhvB/gIoTnASzfId9KJz621H5atTEvBFnHcQlZCvEPlu6kenvkEjqBu632eDr
+ +szzTqjLdF4YniQLO3aCeDLxvL9E9+A8Yfevb5rXGH4bMj8yeyPW0N6LCOrcnwoVkrAl4z
+ LRNAefoefSUJEcBa+YyCAwl5PekDl6I=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-432-mQrinHRgP5qnvos5xMZ1Vw-1; Thu, 24 Sep 2020 05:23:43 -0400
-X-MC-Unique: mQrinHRgP5qnvos5xMZ1Vw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-585-kdCJo4FZNTScJxVvZhEbDA-1; Thu, 24 Sep 2020 05:23:50 -0400
+X-MC-Unique: kdCJo4FZNTScJxVvZhEbDA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92A061DE19
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:42 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7770805EE5
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:49 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 73E215576C;
- Thu, 24 Sep 2020 09:23:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A43F860C15
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:49 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 32/92] configure: move malloc_trim/tcmalloc/jemalloc to meson
-Date: Thu, 24 Sep 2020 05:22:14 -0400
-Message-Id: <20200924092314.1722645-33-pbonzini@redhat.com>
+Subject: [PULL 41/92] oslib-posix: default exec_dir to bindir
+Date: Thu, 24 Sep 2020 05:22:23 -0400
+Message-Id: <20200924092314.1722645-42-pbonzini@redhat.com>
 In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
 References: <20200924092314.1722645-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -96,238 +96,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Because LIBS is not used anymore, tcmalloc/jemalloc does
-not work with binaries whose description is in Meson.
-The fix is simply to move them to Meson too.
+If the exec_dir cannot be retrieved, just assume it's the installation
+directory that was specified at configure time.  This makes it simpler
+to reason about what the callers will do if they get back an empty
+path.
 
-For consistency with other configure options, specifying
---enable-malloc-trim together with --enable-{tc,je}malloc
-becomes a fatal error.
-
-Reported-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure         | 84 +++++------------------------------------------
- meson.build       | 28 +++++++++++++---
- meson_options.txt |  5 +++
- 3 files changed, 38 insertions(+), 79 deletions(-)
+ meson.build        |  2 +-
+ util/oslib-posix.c | 23 ++++++++---------------
+ util/oslib-win32.c |  4 +++-
+ 3 files changed, 12 insertions(+), 17 deletions(-)
 
-diff --git a/configure b/configure
-index 6cffe0fde8..a65663d531 100755
---- a/configure
-+++ b/configure
-@@ -549,7 +549,7 @@ skip_meson=no
- gettext=""
- 
- bogus_os="no"
--malloc_trim=""
-+malloc_trim="auto"
- 
- # parse CC options first
- for opt do
-@@ -1228,9 +1228,9 @@ for opt do
-   ;;
-   --enable-tcg) tcg="yes"
-   ;;
--  --disable-malloc-trim) malloc_trim="no"
-+  --disable-malloc-trim) malloc_trim="disabled"
-   ;;
--  --enable-malloc-trim) malloc_trim="yes"
-+  --enable-malloc-trim) malloc_trim="enabled"
-   ;;
-   --disable-spice) spice="no"
-   ;;
-@@ -4383,77 +4383,14 @@ EOF
-   fi
- fi
- 
-+malloc=system
- if test "$tcmalloc" = "yes" && test "$jemalloc" = "yes" ; then
-     echo "ERROR: tcmalloc && jemalloc can't be used at the same time"
-     exit 1
--fi
--
--# Even if malloc_trim() is available, these non-libc memory allocators
--# do not support it.
--if test "$tcmalloc" = "yes" || test "$jemalloc" = "yes" ; then
--    if test "$malloc_trim" = "yes" ; then
--        echo "Disabling malloc_trim with non-libc memory allocator"
--    fi
--    malloc_trim="no"
--fi
--
--#######################################
--# malloc_trim
--
--if test "$malloc_trim" != "no" ; then
--    cat > $TMPC << EOF
--#include <malloc.h>
--int main(void) { malloc_trim(0); return 0; }
--EOF
--    if compile_prog "" "" ; then
--        malloc_trim="yes"
--    else
--        malloc_trim="no"
--    fi
--fi
--
--##########################################
--# tcmalloc probe
--
--if test "$tcmalloc" = "yes" ; then
--  cat > $TMPC << EOF
--#include <stdlib.h>
--int main(void) {
--    void *tmp = malloc(1);
--    if (tmp != NULL) {
--        return 0;
--    }
--    return 1;
--}
--EOF
--
--  if compile_prog "" "-ltcmalloc" ; then
--    LIBS="-ltcmalloc $LIBS"
--  else
--    feature_not_found "tcmalloc" "install gperftools devel"
--  fi
--fi
--
--##########################################
--# jemalloc probe
--
--if test "$jemalloc" = "yes" ; then
--  cat > $TMPC << EOF
--#include <stdlib.h>
--int main(void) {
--    void *tmp = malloc(1);
--    if (tmp != NULL) {
--        return 0;
--    }
--    return 1;
--}
--EOF
--
--  if compile_prog "" "-ljemalloc" ; then
--    LIBS="-ljemalloc $LIBS"
--  else
--    feature_not_found "jemalloc" "install jemalloc devel"
--  fi
-+elif test "$tcmalloc" = "yes" ; then
-+    malloc=tcmalloc
-+elif test "$jemalloc" = "yes" ; then
-+    malloc=jemalloc
- fi
- 
- ##########################################
-@@ -6951,10 +6888,6 @@ if test "$gbm" = "yes" ; then
- fi
- 
- 
--if test "$malloc_trim" = "yes" ; then
--  echo "CONFIG_MALLOC_TRIM=y" >> $config_host_mak
--fi
--
- if test "$avx2_opt" = "yes" ; then
-   echo "CONFIG_AVX2_OPT=y" >> $config_host_mak
- fi
-@@ -7926,6 +7859,7 @@ NINJA=${ninja:-$PWD/ninjatool} $meson setup \
-         -Dstrip=$(if test "$strip_opt" = yes; then echo true; else echo false; fi) \
-         -Db_pie=$(if test "$pie" = yes; then echo true; else echo false; fi) \
-         -Db_coverage=$(if test "$gcov" = yes; then echo true; else echo false; fi) \
-+	-Dmalloc=$malloc -Dmalloc_trim=$malloc_trim \
- 	-Dmpath=$mpath -Dsdl=$sdl -Dsdl_image=$sdl_image \
- 	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
- 	-Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f\
 diff --git a/meson.build b/meson.build
-index eff3fb0f72..08ebfca6d0 100644
+index fedf44ed79..9a4ade7f98 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -514,6 +514,26 @@ keyutils = dependency('libkeyutils', required: false,
+@@ -560,7 +560,7 @@ config_host_data.set('QEMU_VERSION_MINOR', meson.project_version().split('.')[1]
+ config_host_data.set('QEMU_VERSION_MICRO', meson.project_version().split('.')[2])
  
- has_gettid = cc.has_function('gettid')
+ arrays = ['CONFIG_AUDIO_DRIVERS', 'CONFIG_BDRV_RW_WHITELIST', 'CONFIG_BDRV_RO_WHITELIST']
+-strings = ['HOST_DSOSUF', 'CONFIG_IASL', 'qemu_confdir', 'qemu_datadir',
++strings = ['HOST_DSOSUF', 'CONFIG_IASL', 'bindir', 'qemu_confdir', 'qemu_datadir',
+            'qemu_moddir', 'qemu_localstatedir', 'qemu_helperdir', 'qemu_localedir',
+            'qemu_icondir', 'qemu_desktopdir', 'qemu_firmwarepath']
+ foreach k, v: config_host
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index 18531fc859..1739930e65 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -358,15 +358,14 @@ void qemu_set_tty_echo(int fd, bool echo)
+     tcsetattr(fd, TCSANOW, &tty);
+ }
  
-+# Malloc tests
-+
-+malloc = []
-+if get_option('malloc') == 'system'
-+  has_malloc_trim = \
-+    not get_option('malloc_trim').disabled() and \
-+    cc.links('''#include <malloc.h>
-+                int main(void) { malloc_trim(0); return 0; }''')
-+else
-+  has_malloc_trim = false
-+  malloc = cc.find_library(get_option('malloc'), required: true)
-+endif
-+if not has_malloc_trim and get_option('malloc_trim').enabled()
-+  if get_option('malloc') == 'system'
-+    error('malloc_trim not available on this platform.')
-+  else
-+    error('malloc_trim not available with non-libc memory allocator')
-+  endif
-+endif
-+
- # Create config-host.h
+-static char exec_dir[PATH_MAX];
++static const char *exec_dir;
  
- config_host_data.set('CONFIG_LIBUDEV', libudev.found())
-@@ -528,6 +548,7 @@ config_host_data.set('CONFIG_VNC_SASL', sasl.found())
- config_host_data.set('CONFIG_XKBCOMMON', xkbcommon.found())
- config_host_data.set('CONFIG_KEYUTILS', keyutils.found())
- config_host_data.set('CONFIG_GETTID', has_gettid)
-+config_host_data.set('CONFIG_MALLOC_TRIM', has_malloc_trim)
- config_host_data.set('QEMU_VERSION', '"@0@"'.format(meson.project_version()))
- config_host_data.set('QEMU_VERSION_MAJOR', meson.project_version().split('.')[0])
- config_host_data.set('QEMU_VERSION_MINOR', meson.project_version().split('.')[1])
-@@ -896,7 +917,7 @@ util_ss.add_all(trace_ss)
- util_ss = util_ss.apply(config_all, strict: false)
- libqemuutil = static_library('qemuutil',
-                              sources: util_ss.sources() + stub_ss.sources() + genh,
--                             dependencies: [util_ss.dependencies(), m, glib, socket])
-+                             dependencies: [util_ss.dependencies(), m, glib, socket, malloc])
- qemuutil = declare_dependency(link_with: libqemuutil,
-                               sources: genh + version_res)
+ void qemu_init_exec_dir(const char *argv0)
+ {
+-    char *dir;
+     char *p = NULL;
+     char buf[PATH_MAX];
  
-@@ -1520,7 +1541,7 @@ summary_info += {'Install blobs':     config_host.has_key('INSTALL_BLOBS')}
- #  summary_info += {'TCG debug enabled': config_host.has_key('CONFIG_DEBUG_TCG')}
- #  summary_info += {'TCG interpreter':   config_host.has_key('CONFIG_TCG_INTERPRETER')}
+-    if (exec_dir[0]) {
++    if (exec_dir) {
+         return;
+     }
+ 
+@@ -425,20 +424,14 @@ void qemu_init_exec_dir(const char *argv0)
  #endif
--summary_info += {'malloc trim support': config_host.has_key('CONFIG_MALLOC_TRIM')}
-+summary_info += {'malloc trim support': has_malloc_trim}
- summary_info += {'RDMA support':      config_host.has_key('CONFIG_RDMA')}
- summary_info += {'PVRDMA support':    config_host.has_key('CONFIG_PVRDMA')}
- summary_info += {'fdt support':       config_host.has_key('CONFIG_FDT')}
-@@ -1582,8 +1603,7 @@ summary_info += {'lzfse support':     config_host.has_key('CONFIG_LZFSE')}
- summary_info += {'zstd support':      config_host.has_key('CONFIG_ZSTD')}
- summary_info += {'NUMA host support': config_host.has_key('CONFIG_NUMA')}
- summary_info += {'libxml2':           config_host.has_key('CONFIG_LIBXML2')}
--summary_info += {'tcmalloc support':  config_host.has_key('CONFIG_TCMALLOC')}
--summary_info += {'jemalloc support':  config_host.has_key('CONFIG_JEMALLOC')}
-+summary_info += {'memory allocator':  get_option('malloc')}
- summary_info += {'avx2 optimization': config_host.has_key('CONFIG_AVX2_OPT')}
- summary_info += {'avx512f optimization': config_host.has_key('CONFIG_AVX512F_OPT')}
- summary_info += {'replication support': config_host.has_key('CONFIG_REPLICATION')}
-diff --git a/meson_options.txt b/meson_options.txt
-index b38a6ae92a..8a59ec263d 100644
---- a/meson_options.txt
-+++ b/meson_options.txt
-@@ -6,6 +6,11 @@ option('docdir', type : 'string', value : 'doc',
- option('gettext', type : 'boolean', value : true,
-        description: 'Localization of the GTK+ user interface')
+     /* If we don't have any way of figuring out the actual executable
+        location then try argv[0].  */
+-    if (!p) {
+-        if (!argv0) {
+-            return;
+-        }
++    if (!p && argv0) {
+         p = realpath(argv0, buf);
+-        if (!p) {
+-            return;
+-        }
+     }
+-    dir = g_path_get_dirname(p);
+-
+-    pstrcpy(exec_dir, sizeof(exec_dir), dir);
+-
+-    g_free(dir);
++    if (p) {
++        exec_dir = g_path_get_dirname(p);
++    } else {
++        exec_dir = CONFIG_BINDIR;
++    }
+ }
  
-+option('malloc_trim', type : 'feature', value : 'auto',
-+       description: 'enable libc malloc_trim() for memory optimization')
-+option('malloc', type : 'combo', choices : ['system', 'tcmalloc', 'jemalloc'],
-+       value: 'system', description: 'choose memory allocator to use')
-+
- option('mpath', type : 'feature', value : 'auto',
-        description: 'Multipath persistent reservation passthrough')
- option('sdl', type : 'feature', value : 'auto',
+ const char *qemu_get_exec_dir(void)
+diff --git a/util/oslib-win32.c b/util/oslib-win32.c
+index 1a33912944..051afb217b 100644
+--- a/util/oslib-win32.c
++++ b/util/oslib-win32.c
+@@ -315,7 +315,7 @@ void qemu_set_tty_echo(int fd, bool echo)
+     }
+ }
+ 
+-static char *exec_dir;
++static const char *exec_dir;
+ 
+ void qemu_init_exec_dir(const char *argv0)
+ {
+@@ -341,6 +341,8 @@ void qemu_init_exec_dir(const char *argv0)
+     *p = 0;
+     if (access(buf, R_OK) == 0) {
+         exec_dir = g_strdup(buf);
++    } else {
++        exec_dir = CONFIG_BINDIR;
+     }
+ }
+ 
 -- 
 2.26.2
 
