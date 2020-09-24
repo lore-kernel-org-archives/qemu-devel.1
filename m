@@ -2,79 +2,89 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A4CAC4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 13:55:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFA8FC47427
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 13:59:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB69C206F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 13:55:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C30523741
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 13:59:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UQLiNp/V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB69C206F7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ehWBbgMe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C30523741
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLRiG-0008Ne-Jk
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 09:55:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49402)
+	id 1kLRmQ-0002LM-My
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 09:59:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLRhF-0007Ad-38
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 09:54:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22701)
+ (Exim 4.90_1) (envelope-from <jsuvorov@redhat.com>)
+ id 1kLRlR-0001nW-OR
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 09:58:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47283)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLRhD-0007Oy-1p
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 09:54:04 -0400
+ (Exim 4.90_1) (envelope-from <jsuvorov@redhat.com>)
+ id 1kLRlP-0008Cy-0b
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 09:58:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600955642;
+ s=mimecast20190719; t=1600955901;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=CAu9/I54QJluDwpEoNQeVkCOoQ/IokLD7lWxreHcAS4=;
- b=UQLiNp/VX+/rNSJYt5owjzeHFJWTyvCl7a6gd71iohWZZqOViOJENs0yhQKDrnzPoP6X7l
- WAwun3/c5JPldMo1MGAPoRPdMVd6voN8XDh275NDNb3lmbQvNOntTAi4PRaUB0+Hcudper
- bxoGelUtCbFJ2jpXk98Xlfwu91F/HME=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-457-Uevu38hXP6uDrtVTbSkGAg-1; Thu, 24 Sep 2020 09:53:48 -0400
-X-MC-Unique: Uevu38hXP6uDrtVTbSkGAg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 076A01891E80;
- Thu, 24 Sep 2020 13:53:47 +0000 (UTC)
-Received: from work-vm (ovpn-114-250.ams2.redhat.com [10.36.114.250])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9EE3B60BF3;
- Thu, 24 Sep 2020 13:53:45 +0000 (UTC)
-Date: Thu, 24 Sep 2020 14:53:42 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Ashish Kalra <ashish.kalra@amd.com>
-Subject: Re: SEV guest debugging support for Qemu
-Message-ID: <20200924135342.GE2792@work-vm>
-References: <20200922201124.GA6606@ashkalra_ubuntu_server>
+ bh=8/jbRuHXe++4Vg7xkGQyszi6Ui3P/210nwnmRIquNoo=;
+ b=ehWBbgMeRjSbA/j1+s2UpcJRPGoP1T3puIzcFiOFDep2Gf6F8AyoAxTGC5aryNM1+ulkKp
+ 36m9Pi4e/uKazZY77Z8dNq+z0by5/afaOcjo4csEIWOsSiMiDrkUXS6VKDGW22rdQedNfG
+ /G6XNLW6pUECzgOD0wI7kI2XqeB6Dus=
+Received: from mail-yb1-f199.google.com (mail-yb1-f199.google.com
+ [209.85.219.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-403-PB1S9OBDMA20lQrI0yzmlw-1; Thu, 24 Sep 2020 09:58:20 -0400
+X-MC-Unique: PB1S9OBDMA20lQrI0yzmlw-1
+Received: by mail-yb1-f199.google.com with SMTP id r9so2951432ybd.20
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 06:58:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=8/jbRuHXe++4Vg7xkGQyszi6Ui3P/210nwnmRIquNoo=;
+ b=AZFUZ6nGXGLtWwUGncGqDSyazrrZ4ZQsxNQkFOEEONojIxO126pWbClvnGR+jnaUWj
+ e7p0VLIzV4lcD/nzDNx4n9K4jQoFr0TfVshxHERUMBB5F1xjMhmph+fthxX0ZsHpSdIe
+ wFRaVOR7s1BC+Iz/qXNaXCITZ/t4o1e0GZFg0gte0iHsAXGm6RN5TtMNaoeG8kRvowCK
+ 5je18wOb51c/lvyI8CCIgBKx7FKuL55v2QZgbVeom0q6xyGaU61XW6ALGDn6D6SvN51i
+ oDg4e8LUyoIwPSoXoU5fTz+96C5iwcEsuQ7Y8Til3dCOgiX8SXs6BQayGjfPX6ivglRt
+ RwVw==
+X-Gm-Message-State: AOAM533UjkY5FCZqWbt5k9UK8PvOweiWTVGqyMEXIUNn9WqAjC5eD7WF
+ kPntyC+EcY8QNoLG8Hm0mvWatsZVOh8aENMD0ravuGnXR+L0XK3vOoj5oN7c+jJz4O7FDC4CXd1
+ BlFkRR8vMqBkT/+K8LDcViiIXLV5unAk=
+X-Received: by 2002:a25:198b:: with SMTP id 133mr6862080ybz.102.1600955899415; 
+ Thu, 24 Sep 2020 06:58:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzlbaJ0UCJsvJGqFKlmWKCfkIpjijl+0Cwa4luAHnGQf8M9Dm5iYry+KVQDp4fZwmkg4bFOGXjAqlCA4sElZJc=
+X-Received: by 2002:a25:198b:: with SMTP id 133mr6862030ybz.102.1600955898978; 
+ Thu, 24 Sep 2020 06:58:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200922201124.GA6606@ashkalra_ubuntu_server>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+References: <20200924070013.165026-1-jusual@redhat.com>
+ <20200924070013.165026-3-jusual@redhat.com>
+ <alpine.DEB.2.21.2009241831140.17687@ani-ubuntu>
+In-Reply-To: <alpine.DEB.2.21.2009241831140.17687@ani-ubuntu>
+From: Julia Suvorova <jusual@redhat.com>
+Date: Thu, 24 Sep 2020 15:58:07 +0200
+Message-ID: <CAMDeoFXVBOm=Wmta4O7xD6zo+bhfK_sA7TtEHbBHhF010k8QMw@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 2/7] hw/i386/acpi-build: Add ACPI PCI hot-plug
+ methods to Q35
+To: Ani Sinha <ani@anisinha.ca>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsuvorov@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsuvorov@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -97,81 +107,258 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, jon.grimm@amd.com, brijesh.singh@amd.com,
- qemu-devel@nongnu.org, thomas.lendacky@amd.com
+Cc: Igor Mammedov <imammedo@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Ashish Kalra (ashish.kalra@amd.com) wrote:
-> Hello Alan, Paolo,
-> 
-> I am following up on Brijesh’s patches for SEV guest debugging support for Qemu using gdb and/or qemu monitor.
-> I believe that last time, Qemu SEV debug patches were not applied and have attached the link to the email thread and Paolo’s feedback below for reference [1].
-> I wanted to re-start a discussion on the same here with the Qemu community and seek the feedback on the approaches which we are considering :
-> Looking at Qemu code, I see the following interface is defined, for virtual memory access for debug : cpu_memory_rw_debug(). 
-> Both gdbstub (target_memory_rw_debug() ) and QMP/HMP (monitor/misc.c : memory_dump() ) use this standard and well-defined interface to access guest memory for debugging purposes. 
-> 
-> This internally invokes the address_space_rw() accessor functions which we had  "fixed" internally (as part of the earlier patch) to invoke memory region specific debug ops. 
-> In our earlier approach we were adding debug ops/callbacks to memory regions and as per comments on our earlier patches, Paolo was not happy with this debug API for
-> MemoryRegions and hence the SEV support for Qemu was merged without the debug support.
-> 
-> Now, we want to reuse this cpu_memory_rw_debug() interface or alternatively introduce a new generic debug interface/object in the Qemu. This 
-> debug interface should be controlled through the global machine policy.
+On Thu, Sep 24, 2020 at 3:15 PM Ani Sinha <ani@anisinha.ca> wrote:
+>
+>
+>
+> On Thu, 24 Sep 2020, Julia Suvorova wrote:
+>
+> > Implement notifications and gpe to support q35 ACPI PCI hot-plug.
+> > Use 0xcc4 - 0xcd7 range for 'acpi-pci-hotplug' io ports.
+> >
+>
+> For this patch, I would suggest maybe you can also add a diff of the
+> disassembly of the DSDT table so that we know what changes exactly we
+> shall see in the table as a result of this patch.
+> Add the diff to this commit message as it will be helpful for anyone
+> to take a look at it when they look at this patch.
 
-Let me leave the question of how the memory_rw_debug interface should
-work to Paolo.
+There is no difference in golden DSDT, because this is an option,
+which is disabled by default.
+The diff is placed in the patch where it actually makes a difference.
+But I agree that a list of changed registers would be a nice addition
+to the commit message.
 
-> For e.g., 
-> # $QEMU -machine -debug=<a debug object>
-> or
-> # $QEMU -machine -debug=sev-guest-debug
-> 
-> The QMP and GDB access will be updated to use the generic debug  interface. The generic debug interface or the cpu_memory_rw_debug() interace will introduce hooks to call a 
-> vendor specific debug object to delegate accessing the data. The vendor specific debug object may do a further checks before and after accessing the memory.
+> > Signed-off-by: Julia Suvorova <jusual@redhat.com>
+> > ---
+> > hw/i386/acpi-build.h    |  4 ++++
+> > include/hw/acpi/ich9.h  |  2 ++
+> > include/hw/acpi/pcihp.h |  3 ++-
+> > hw/acpi/pcihp.c         |  8 ++++----
+> > hw/acpi/piix4.c         |  4 +++-
+> > hw/i386/acpi-build.c    | 27 ++++++++++++++++-----------
+> > 6 files changed, 31 insertions(+), 17 deletions(-)
+> >
+> > diff --git a/hw/i386/acpi-build.h b/hw/i386/acpi-build.h
+> > index 74df5fc612..487ec7710f 100644
+> > --- a/hw/i386/acpi-build.h
+> > +++ b/hw/i386/acpi-build.h
+> > @@ -5,6 +5,10 @@
+> >
+> > extern const struct AcpiGenericAddress x86_nvdimm_acpi_dsmio;
+> >
+> > +/* PCI Hot-plug registers bases. See docs/spec/acpi_pci_hotplug.txt */
+> > +#define ACPI_PCIHP_SEJ_BASE 0x8
+> > +#define ACPI_PCIHP_BNMR_BASE 0x10
+> > +
+> > void acpi_setup(void);
+> >
+> > #endif
+> > diff --git a/include/hw/acpi/ich9.h b/include/hw/acpi/ich9.h
+> > index 28a53181cb..4d19571ed7 100644
+> > --- a/include/hw/acpi/ich9.h
+> > +++ b/include/hw/acpi/ich9.h
+> > @@ -28,6 +28,8 @@
+> > #include "hw/acpi/acpi_dev_interface.h"
+> > #include "hw/acpi/tco.h"
+> >
+> > +#define ACPI_PCIHP_ADDR_ICH9 0x0cc4
+> > +
+> > typedef struct ICH9LPCPMRegs {
+> >     /*
+> >      * In ich9 spec says that pm1_cnt register is 32bit width and
+> > diff --git a/include/hw/acpi/pcihp.h b/include/hw/acpi/pcihp.h
+> > index 02f4665767..ce49fb03b9 100644
+> > --- a/include/hw/acpi/pcihp.h
+> > +++ b/include/hw/acpi/pcihp.h
+> > @@ -54,7 +54,8 @@ typedef struct AcpiPciHpState {
+> > } AcpiPciHpState;
+> >
+> > void acpi_pcihp_init(Object *owner, AcpiPciHpState *, PCIBus *root,
+> > -                     MemoryRegion *address_space_io, bool bridges_enabled);
+> > +                     MemoryRegion *address_space_io, bool bridges_enabled,
+> > +                     uint16_t io_base);
+> >
+> > void acpi_pcihp_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+> >                                    DeviceState *dev, Error **errp);
+> > diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
+> > index ff23104aea..bb457bc279 100644
+> > --- a/hw/acpi/pcihp.c
+> > +++ b/hw/acpi/pcihp.c
+> > @@ -38,7 +38,6 @@
+> > #include "qom/qom-qobject.h"
+> > #include "trace.h"
+> >
+> > -#define ACPI_PCIHP_ADDR 0xae00
+> > #define ACPI_PCIHP_SIZE 0x0014
+> > #define PCI_UP_BASE 0x0000
+> > #define PCI_DOWN_BASE 0x0004
+> > @@ -381,12 +380,13 @@ static const MemoryRegionOps acpi_pcihp_io_ops = {
+> > };
+> >
+> > void acpi_pcihp_init(Object *owner, AcpiPciHpState *s, PCIBus *root_bus,
+> > -                     MemoryRegion *address_space_io, bool bridges_enabled)
+> > +                     MemoryRegion *address_space_io, bool bridges_enabled,
+> > +                     uint16_t io_base)
+> > {
+> >     s->io_len = ACPI_PCIHP_SIZE;
+> > -    s->io_base = ACPI_PCIHP_ADDR;
+> > +    s->io_base = io_base;
+>
+> Maybe you want to remove ACPI_PCIHP_ADDR ?
 
-I'm not sure that needs a commandline switch for it; since you can
-already get it from the guest policy in the sev object and I can't think
-of any other cases that would need something similar.
+It is removed (a bit higher in this patch).
 
-> Now, looking specifically at cpu_memory_rw_debug() interface, this interface is invoked for all guest memory accesses for debugging purposes and it also does 
-> guest VA to GPA translation via cpu_get_phys_page_attrs_debug(), so we can again add a vendor specific callback here to do guest VA to GPA translations specific
-> to SEV as SEV guest debugging will also require accessing guest page table entries and decrypting them via the SEV DBG_DECRYPT APIs and additionally clearing
-> the C-bit on page table entries (PxEs) before using them further for page table walks.
-> 
-> There is still an issue with the generic cpu_memory_rw_debug() interface, though it is used for all guest memory accesses for debugging and we can also handle
-> guest page table walks via it (as mentioned above), there are still other gdb/monitor commands such as tlb_info_xx() and mem_info_xx() which also do guest page
-> table walks, but they don’t go through any generic guest memory access/debug interface, so these commands will need to be handled additionally for SEV.
+> > -    s->root= root_bus;
+> > +    s->root = root_bus;
+> >     s->legacy_piix = !bridges_enabled;
+> >
+> >     memory_region_init_io(&s->io, owner, &acpi_pcihp_io_ops, s,
+> > diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> > index 832f8fba82..a505ab5bcf 100644
+> > --- a/hw/acpi/piix4.c
+> > +++ b/hw/acpi/piix4.c
+> > @@ -50,6 +50,8 @@
+> > #define GPE_BASE 0xafe0
+> > #define GPE_LEN 4
+> >
+> > +#define ACPI_PCIHP_ADDR_PIIX4 0xae00
+> > +
+> > struct pci_status {
+> >     uint32_t up; /* deprecated, maintained for migration compatibility */
+> >     uint32_t down;
+> > @@ -597,7 +599,7 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
+> >     memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
+> >
+> >     acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
+> > -                    s->use_acpi_hotplug_bridge);
+> > +                    s->use_acpi_hotplug_bridge, ACPI_PCIHP_ADDR_PIIX4);
+> >
+> >     s->cpu_hotplug_legacy = true;
+> >     object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
+> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > index 0e0535d2e3..cf503b16af 100644
+> > --- a/hw/i386/acpi-build.c
+> > +++ b/hw/i386/acpi-build.c
+> > @@ -201,10 +201,6 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
+> >         /* w2k requires FADT(rev1) or it won't boot, keep PC compatible */
+> >         pm->fadt.rev = 1;
+> >         pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
+> > -        pm->pcihp_io_base =
+> > -            object_property_get_uint(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
+> > -        pm->pcihp_io_len =
+> > -            object_property_get_uint(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
+> >     }
+> >     if (lpc) {
+> >         struct AcpiGenericAddress r = { .space_id = AML_AS_SYSTEM_IO,
+> > @@ -214,6 +210,10 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
+> >         pm->fadt.flags |= 1 << ACPI_FADT_F_RESET_REG_SUP;
+> >         pm->cpu_hp_io_base = ICH9_CPU_HOTPLUG_IO_BASE;
+> >     }
+> > +    pm->pcihp_io_base =
+> > +        object_property_get_uint(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
+> > +    pm->pcihp_io_len =
+> > +        object_property_get_uint(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
+> >
+> >     /* The above need not be conditional on machine type because the reset port
+> >      * happens to be the same on PIIX (pc) and ICH9 (q35). */
+> > @@ -472,7 +472,7 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+> >         QLIST_FOREACH(sec, &bus->child, sibling) {
+> >             int32_t devfn = sec->parent_dev->devfn;
+> >
+> > -            if (pci_bus_is_root(sec) || pci_bus_is_express(sec)) {
+> > +            if (pci_bus_is_root(sec)) {
+> >                 continue;
+> >             }
+> >
+> > @@ -1368,7 +1368,7 @@ static void build_piix4_isa_bridge(Aml *table)
+> >     aml_append(table, scope);
+> > }
+> >
+> > -static void build_piix4_pci_hotplug(Aml *table)
+> > +static void build_x86_pci_hotplug(Aml *table, uint64_t pcihp_addr)
+> > {
+> >     Aml *scope;
+> >     Aml *field;
+> > @@ -1377,20 +1377,22 @@ static void build_piix4_pci_hotplug(Aml *table)
+> >     scope =  aml_scope("_SB.PCI0");
+> >
+> >     aml_append(scope,
+> > -        aml_operation_region("PCST", AML_SYSTEM_IO, aml_int(0xae00), 0x08));
+> > +        aml_operation_region("PCST", AML_SYSTEM_IO, aml_int(pcihp_addr), 0x08));
+> >     field = aml_field("PCST", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
+> >     aml_append(field, aml_named_field("PCIU", 32));
+> >     aml_append(field, aml_named_field("PCID", 32));
+> >     aml_append(scope, field);
+> >
+> >     aml_append(scope,
+> > -        aml_operation_region("SEJ", AML_SYSTEM_IO, aml_int(0xae08), 0x04));
+> > +    aml_operation_region("SEJ", AML_SYSTEM_IO,
+> > +                         aml_int(pcihp_addr + ACPI_PCIHP_SEJ_BASE), 0x04));
+> >     field = aml_field("SEJ", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
+> >     aml_append(field, aml_named_field("B0EJ", 32));
+> >     aml_append(scope, field);
+> >
+> >     aml_append(scope,
+> > -        aml_operation_region("BNMR", AML_SYSTEM_IO, aml_int(0xae10), 0x04));
+> > +        aml_operation_region("BNMR", AML_SYSTEM_IO,
+> > +                             aml_int(pcihp_addr + ACPI_PCIHP_BNMR_BASE), 0x04));
+> >     field = aml_field("BNMR", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
+> >     aml_append(field, aml_named_field("BNUM", 32));
+> >     aml_append(scope, field);
+> > @@ -1504,7 +1506,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> >         build_hpet_aml(dsdt);
+> >         build_piix4_isa_bridge(dsdt);
+> >         build_isa_devices_aml(dsdt);
+> > -        build_piix4_pci_hotplug(dsdt);
+> > +        build_x86_pci_hotplug(dsdt, pm->pcihp_io_base);
+>
+> This will conflict here with my patch. I think you need to do something
+> like this:
+>
+>    if (pm->pcihp_bridge_en || pm->pcihp_root_en) {
 
-If some of those should be using the debug interface and aren't then
-please fix them anyway.
+Yes, and I change it if your patch set gets merged first. Otherwise,
+you will need to rebase.
 
-> The vendor specific debug object (added as a hook to generic debug object or the generic cpu_memory_rw_debug() interface) will do further checks before and after accessing the memory.
-> 
-> e.g., in the case of SEV,
-> 
-> 1. Check the guest policy, if guest policy does not allow debug then return an error.
-> 
-> 2. If its an MMIO region then access the data.
-> 
-> 3. If its RAM region then call the PSP commands to decrypt the data.
-> 
-> 4. If caller asked to read the PTE entry then probably clear the C-bits after reading the PTE entry.
 
-Does that work if the guest is currently running?
 
-Dave
-
-> 5. many more checks
-> 
-> Looking fwd. to your feedback/comments on the above approach or other any other suggestions.
-> 
-> Thanks,
-> Ashish
-> 
-> [1] -> http://next.patchew.org/QEMU/20180308124901.83533-1-brijesh.singh@amd.com/20180308124901.83533-29-brijesh.singh@amd.com/
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> You'll get this from my patch.
+> >         build_piix4_pci0_int(dsdt);
+> >     } else {
+> >         sb_scope = aml_scope("_SB");
+> > @@ -1520,6 +1522,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> >         build_hpet_aml(dsdt);
+> >         build_q35_isa_bridge(dsdt);
+> >         build_isa_devices_aml(dsdt);
+> > +        if (pm->pcihp_bridge_en) {
+> > +            build_x86_pci_hotplug(dsdt, pm->pcihp_io_base);
+> > +        }
+>
+> ditto as above.
+>
+> >         build_q35_pci0_int(dsdt);
+> >         if (pcms->smbus && !pcmc->do_not_add_smb_acpi) {
+> >             build_smb0(dsdt, pcms->smbus, ICH9_SMB_DEV, ICH9_SMB_FUNC);
+> > @@ -1546,7 +1551,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> >     {
+> >         aml_append(scope, aml_name_decl("_HID", aml_string("ACPI0006")));
+> >
+> > -        if (misc->is_piix4) {
+> > +        if (misc->is_piix4 || pm->pcihp_bridge_en) {
+> >             method = aml_method("_E01", 0, AML_NOTSERIALIZED);
+> >             aml_append(method,
+> >                 aml_acquire(aml_name("\\_SB.PCI0.BLCK"), 0xFFFF));
+> > --
+> > 2.25.4
+> >
+> >
+>
 
 
