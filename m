@@ -2,84 +2,86 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
 	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52531C4346E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:41:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1700DC4346E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:42:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B50E223741
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:41:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71E6923741
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:42:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M0UvG7YV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B50E223741
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="On4cnCpW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71E6923741
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLLt7-0003Va-Q7
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 03:41:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42368)
+	id 1kLLtF-0003n3-Ce
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 03:42:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42712)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1kLLqK-00008Y-Vg
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:39:05 -0400
-Received: from mail-pl1-x635.google.com ([2607:f8b0:4864:20::635]:41147)
+ id 1kLLrj-000269-8p
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:40:31 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:33254)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1kLLqI-00019i-OW
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:39:04 -0400
-Received: by mail-pl1-x635.google.com with SMTP id m15so1217952pls.8
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 00:39:02 -0700 (PDT)
+ id 1kLLrh-0001Fn-8Z
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:40:30 -0400
+Received: by mail-pg1-x544.google.com with SMTP id o25so1408873pgm.0
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 00:40:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=WXLXYQ9d4Tzt73oSxxh6tX2JXjHfMG59HkeMaBIff1w=;
- b=M0UvG7YVUdOgw4iLxDGxjFg+gy4j4cI09mv22I4UjsuLhSfAIb1xXIJRYeEucJhw1A
- MF2ekk7s/YVePC6L14NpHTHGDcVj75fGF4N6ey68/CcrD7VqxcJoKeHv+G2fHgZCSix6
- S7FHmj5BuvWYvyUvz6LerkZ2CvCrf1Cl8NmAaLLtvCDqeKgM+KTnp7jjWWApbQRy228p
- 75bBdIESE+F1koQ3N4eDGcVBjGonrgCTNqUepjaA1y/O3oPtxJhG/eDyEWFfzWC4GA7J
- kuHMhgV0RB3rwGCmav7DblPFzLvQ74rceO27dYfRFpHhZM1N4X4WHG20wFE0LYdukfSg
- 7SKg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=OY9FgndC5NCT/kJU4s296hBSZjcokEukKyx3eYnf/rg=;
+ b=On4cnCpWAmrTEzs4VwxE7Nt96cC6ihwYKCh/s3DCkjNUJ8LbYJ9Puzf4S2CMs3WtyC
+ D1RNky4WdrGmhQ4bil1CO3qaMxlGT5lV6udDzC6XxjOe9rHcad/zsKfVMl+qRc5CubWY
+ EidPMtIJDYbtHBM07a5qJTeIkUpqRNUaZoJj0EJ9+/GCgHjU1ceoOywzN+t/dDcL91Qa
+ lwcth9xzjkR+Nr4KunGwjOPHZ7ptRoBPTThOqCfQJmXasZFhhIUNVzxjquEtJL+VNrpu
+ Soma8yQe38H6Kg2yuvLbcNjbbw8/PpijbWzLaaDLRFgKmVBGq0E+Hu6qcmUYxhNSgS+o
+ cODg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=WXLXYQ9d4Tzt73oSxxh6tX2JXjHfMG59HkeMaBIff1w=;
- b=W+Ig7yJrqb5wWxzOAZ7/bLusuCDUPmoOFYTqweLW/hl9pNu5kf61UvWKA5VZRnbYUV
- w4IIr6L1pr6dP+RExM7KQCFg5t9H0JSN10sZZqq1ZPm5MVd5yMh5/gBKfC+GFMgCa/Bj
- pqFqTkU1hURX2XRhKRm2oUgVoahZv0xqpT7ppX8CGp6X88Irwf/qhOf0yI3kuMR/68Fu
- VNNNlCGhvEyzQwId+uD8uw6OrJVbaOZzhNycWgg/GR+fWPX8kyMRPukTG7/B+lvOXAoU
- KgC8g5uEbU0T2v8k3QiNFvQua054dGZ4/3t2aC29gejnEY/2AttfRmERmx7D65kx90UH
- p8Wg==
-X-Gm-Message-State: AOAM530S1bZSZp/1l/pYHeDo455HOQA5kSPJ4wYEw/4E60T104vC+1Cd
- k1zoz1mR5sKGt/jqOtzONeY=
-X-Google-Smtp-Source: ABdhPJxuCG8LVvukC5Rrdiktq+GxtaXT9PXL+Teg42JJikBdFtefRs0jpvx9GSKJbyX8TOSnV8WUOg==
-X-Received: by 2002:a17:90a:648d:: with SMTP id
- h13mr2749469pjj.151.1600933141508; 
- Thu, 24 Sep 2020 00:39:01 -0700 (PDT)
+ :references:mime-version:content-transfer-encoding;
+ bh=OY9FgndC5NCT/kJU4s296hBSZjcokEukKyx3eYnf/rg=;
+ b=O39tQ1PRKtsR3stUMfcuUZN1Oh9GKD0Z8YOu6+Mgl8DYBIznYgmskKmzEEAqQv8X57
+ jNP8+naCRzkNWoEFSDFi5ZCR69586idcTXcF7t20LRJxU5EBWxqdhf8ceNJdMjHC3ktK
+ RmhemrxMwqRGbDZ9oJBH7UrPjuSeqQW4ErAWat7CPoIFsjdXvGBnYkNtRINSh4iRTfiN
+ Yq7ViWXgokufh8rXfXZK9jy3kz2NT9vUVKJ43wEGMJP2rfAthDLsu4baMkuxJx8LITLP
+ APPaFISvDEcNRmtFWnOGc/WveZunSEGnkYNXm+IvpmhziAFpn1Lrih7HqVJ606Ic9nTo
+ i+wg==
+X-Gm-Message-State: AOAM533PpRQVh6dmSpoOInxhtq/LohzpDjIQIy8qUXERKe47x+Nm28nu
+ n6v6E5HLrn3aHHv7+aBM0LQ=
+X-Google-Smtp-Source: ABdhPJzZYa3E9r2YTKNbp4Qx6b3mXt2zSSLG3zrzVxB9LJmyMdj2glXl154Wun3SUli8mU2Cw7ahQQ==
+X-Received: by 2002:a65:4689:: with SMTP id h9mr2888601pgr.50.1600933227918;
+ Thu, 24 Sep 2020 00:40:27 -0700 (PDT)
 Received: from software.domain.org ([45.77.13.216])
- by smtp.gmail.com with ESMTPSA id x13sm1777864pfj.199.2020.09.24.00.38.56
+ by smtp.gmail.com with ESMTPSA id x13sm1777864pfj.199.2020.09.24.00.40.23
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 24 Sep 2020 00:39:00 -0700 (PDT)
+ Thu, 24 Sep 2020 00:40:27 -0700 (PDT)
 From: Huacai Chen <zltjiangshi@gmail.com>
 X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
 To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: [PATCH V11 4/8] target/mips: Add loongson-ext lswc2 group of
- instructions (Part 2)
-Date: Thu, 24 Sep 2020 15:35:52 +0800
-Message-Id: <1600932956-11642-5-git-send-email-chenhc@lemote.com>
+Subject: [PATCH V11 6/8] hw/mips: Implement fw_cfg_arch_key_name()
+Date: Thu, 24 Sep 2020 15:35:54 +0800
+Message-Id: <1600932956-11642-7-git-send-email-chenhc@lemote.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1600932956-11642-1-git-send-email-chenhc@lemote.com>
 References: <1600932956-11642-1-git-send-email-chenhc@lemote.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::635;
- envelope-from=zltjiangshi@gmail.com; helo=mail-pl1-x635.google.com
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-pg1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -108,226 +110,97 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Implement fw_cfg_arch_key_name(), which returns the name of a
+mips-specific key.
 
-LWC2 & SWC2 have been rewritten by Loongson EXT vendor ASE
-as "load/store quad word" and "shifted load/store" groups of
-instructions.
-
-This patch add implementation of these instructions:
-gslwlc1: similar to lwl but RT is FPR instead of GPR
-gslwrc1: similar to lwr but RT is FPR instead of GPR
-gsldlc1: similar to ldl but RT is FPR instead of GPR
-gsldrc1: similar to ldr but RT is FPR instead of GPR
-gsswlc1: similar to swl but RT is FPR instead of GPR
-gsswrc1: similar to swr but RT is FPR instead of GPR
-gssdlc1: similar to sdl but RT is FPR instead of GPR
-gssdrc1: similar to sdr but RT is FPR instead of GPR
-
-Details of Loongson-EXT is here:
-https://github.com/FlyGoat/loongson-insn/blob/master/loongson-ext.md
-
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Huacai Chen <chenhc@lemote.com>
-Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- target/mips/translate.c | 177 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 177 insertions(+)
+ hw/mips/fw_cfg.c    | 35 +++++++++++++++++++++++++++++++++++
+ hw/mips/fw_cfg.h    | 19 +++++++++++++++++++
+ hw/mips/meson.build |  2 +-
+ 3 files changed, 55 insertions(+), 1 deletion(-)
+ create mode 100644 hw/mips/fw_cfg.c
+ create mode 100644 hw/mips/fw_cfg.h
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index cb0adde310..916b57f293 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -471,6 +471,19 @@ enum {
-     OPC_GSSHFS      = OPC_SWC2,
- };
- 
-+/* Loongson EXT shifted load/store opcodes */
-+#define MASK_LOONGSON_GSSHFLS(op)         (MASK_OP_MAJOR(op) | (op & 0xc03f))
-+enum {
-+    OPC_GSLWLC1     = 0x4 | OPC_GSSHFL,
-+    OPC_GSLWRC1     = 0x5 | OPC_GSSHFL,
-+    OPC_GSLDLC1     = 0x6 | OPC_GSSHFL,
-+    OPC_GSLDRC1     = 0x7 | OPC_GSSHFL,
-+    OPC_GSSWLC1     = 0x4 | OPC_GSSHFS,
-+    OPC_GSSWRC1     = 0x5 | OPC_GSSHFS,
-+    OPC_GSSDLC1     = 0x6 | OPC_GSSHFS,
-+    OPC_GSSDRC1     = 0x7 | OPC_GSSHFS,
-+};
+diff --git a/hw/mips/fw_cfg.c b/hw/mips/fw_cfg.c
+new file mode 100644
+index 0000000000..67c4a74f4b
+--- /dev/null
++++ b/hw/mips/fw_cfg.c
+@@ -0,0 +1,35 @@
++/*
++ * QEMU fw_cfg helpers (MIPS specific)
++ *
++ * Copyright (c) 2020 Lemote, Inc.
++ *
++ * Author:
++ *   Huacai Chen (chenhc@lemote.com)
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
- /* BSHFL opcodes */
- #define MASK_BSHFL(op)              (MASK_SPECIAL3(op) | (op & (0x1F << 6)))
- 
-@@ -5987,6 +6000,170 @@ static void gen_loongson_lswc2(DisasContext *ctx, int rt,
-         tcg_temp_free(t1);
-         break;
- #endif
-+    case OPC_GSSHFL:
-+        switch (MASK_LOONGSON_GSSHFLS(ctx->opcode)) {
-+        case OPC_GSLWLC1:
-+            check_cp1_enabled(ctx);
-+            gen_base_offset_addr(ctx, t0, rs, shf_offset);
-+            t1 = tcg_temp_new();
-+            tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-+            tcg_gen_andi_tl(t1, t0, 3);
-+#ifndef TARGET_WORDS_BIGENDIAN
-+            tcg_gen_xori_tl(t1, t1, 3);
-+#endif
-+            tcg_gen_shli_tl(t1, t1, 3);
-+            tcg_gen_andi_tl(t0, t0, ~3);
-+            tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEUL);
-+            tcg_gen_shl_tl(t0, t0, t1);
-+            t2 = tcg_const_tl(-1);
-+            tcg_gen_shl_tl(t2, t2, t1);
-+            fp0 = tcg_temp_new_i32();
-+            gen_load_fpr32(ctx, fp0, rt);
-+            tcg_gen_ext_i32_tl(t1, fp0);
-+            tcg_gen_andc_tl(t1, t1, t2);
-+            tcg_temp_free(t2);
-+            tcg_gen_or_tl(t0, t0, t1);
-+            tcg_temp_free(t1);
-+#if defined(TARGET_MIPS64)
-+            tcg_gen_extrl_i64_i32(fp0, t0);
-+#else
-+            tcg_gen_ext32s_tl(fp0, t0);
-+#endif
-+            gen_store_fpr32(ctx, fp0, rt);
-+            tcg_temp_free_i32(fp0);
-+            break;
-+        case OPC_GSLWRC1:
-+            check_cp1_enabled(ctx);
-+            gen_base_offset_addr(ctx, t0, rs, shf_offset);
-+            t1 = tcg_temp_new();
-+            tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-+            tcg_gen_andi_tl(t1, t0, 3);
-+#ifdef TARGET_WORDS_BIGENDIAN
-+            tcg_gen_xori_tl(t1, t1, 3);
-+#endif
-+            tcg_gen_shli_tl(t1, t1, 3);
-+            tcg_gen_andi_tl(t0, t0, ~3);
-+            tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEUL);
-+            tcg_gen_shr_tl(t0, t0, t1);
-+            tcg_gen_xori_tl(t1, t1, 31);
-+            t2 = tcg_const_tl(0xfffffffeull);
-+            tcg_gen_shl_tl(t2, t2, t1);
-+            fp0 = tcg_temp_new_i32();
-+            gen_load_fpr32(ctx, fp0, rt);
-+            tcg_gen_ext_i32_tl(t1, fp0);
-+            tcg_gen_and_tl(t1, t1, t2);
-+            tcg_temp_free(t2);
-+            tcg_gen_or_tl(t0, t0, t1);
-+            tcg_temp_free(t1);
-+#if defined(TARGET_MIPS64)
-+            tcg_gen_extrl_i64_i32(fp0, t0);
-+#else
-+            tcg_gen_ext32s_tl(fp0, t0);
-+#endif
-+            gen_store_fpr32(ctx, fp0, rt);
-+            tcg_temp_free_i32(fp0);
-+            break;
-+#if defined(TARGET_MIPS64)
-+        case OPC_GSLDLC1:
-+            check_cp1_enabled(ctx);
-+            gen_base_offset_addr(ctx, t0, rs, shf_offset);
-+            t1 = tcg_temp_new();
-+            tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-+            tcg_gen_andi_tl(t1, t0, 7);
-+#ifndef TARGET_WORDS_BIGENDIAN
-+            tcg_gen_xori_tl(t1, t1, 7);
-+#endif
-+            tcg_gen_shli_tl(t1, t1, 3);
-+            tcg_gen_andi_tl(t0, t0, ~7);
-+            tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEQ);
-+            tcg_gen_shl_tl(t0, t0, t1);
-+            t2 = tcg_const_tl(-1);
-+            tcg_gen_shl_tl(t2, t2, t1);
-+            gen_load_fpr64(ctx, t1, rt);
-+            tcg_gen_andc_tl(t1, t1, t2);
-+            tcg_temp_free(t2);
-+            tcg_gen_or_tl(t0, t0, t1);
-+            tcg_temp_free(t1);
-+            gen_store_fpr64(ctx, t0, rt);
-+            break;
-+        case OPC_GSLDRC1:
-+            check_cp1_enabled(ctx);
-+            gen_base_offset_addr(ctx, t0, rs, shf_offset);
-+            t1 = tcg_temp_new();
-+            tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-+            tcg_gen_andi_tl(t1, t0, 7);
-+#ifdef TARGET_WORDS_BIGENDIAN
-+            tcg_gen_xori_tl(t1, t1, 7);
-+#endif
-+            tcg_gen_shli_tl(t1, t1, 3);
-+            tcg_gen_andi_tl(t0, t0, ~7);
-+            tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEQ);
-+            tcg_gen_shr_tl(t0, t0, t1);
-+            tcg_gen_xori_tl(t1, t1, 63);
-+            t2 = tcg_const_tl(0xfffffffffffffffeull);
-+            tcg_gen_shl_tl(t2, t2, t1);
-+            gen_load_fpr64(ctx, t1, rt);
-+            tcg_gen_and_tl(t1, t1, t2);
-+            tcg_temp_free(t2);
-+            tcg_gen_or_tl(t0, t0, t1);
-+            tcg_temp_free(t1);
-+            gen_store_fpr64(ctx, t0, rt);
-+            break;
-+#endif
-+        default:
-+            MIPS_INVAL("loongson_gsshfl");
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
++#include "qemu/osdep.h"
++#include "hw/mips/fw_cfg.h"
++#include "hw/nvram/fw_cfg.h"
++
++const char *fw_cfg_arch_key_name(uint16_t key)
++{
++    static const struct {
++        uint16_t key;
++        const char *name;
++    } fw_cfg_arch_wellknown_keys[] = {
++        {FW_CFG_MACHINE_VERSION, "machine_version"},
++        {FW_CFG_CPU_FREQ, "cpu_frequency"},
++    };
++
++    for (size_t i = 0; i < ARRAY_SIZE(fw_cfg_arch_wellknown_keys); i++) {
++        if (fw_cfg_arch_wellknown_keys[i].key == key) {
++            return fw_cfg_arch_wellknown_keys[i].name;
 +        }
-+        break;
-+    case OPC_GSSHFS:
-+        switch (MASK_LOONGSON_GSSHFLS(ctx->opcode)) {
-+        case OPC_GSSWLC1:
-+            check_cp1_enabled(ctx);
-+            t1 = tcg_temp_new();
-+            gen_base_offset_addr(ctx, t0, rs, shf_offset);
-+            fp0 = tcg_temp_new_i32();
-+            gen_load_fpr32(ctx, fp0, rt);
-+            tcg_gen_ext_i32_tl(t1, fp0);
-+            gen_helper_0e2i(swl, t1, t0, ctx->mem_idx);
-+            tcg_temp_free_i32(fp0);
-+            tcg_temp_free(t1);
-+            break;
-+        case OPC_GSSWRC1:
-+            check_cp1_enabled(ctx);
-+            t1 = tcg_temp_new();
-+            gen_base_offset_addr(ctx, t0, rs, shf_offset);
-+            fp0 = tcg_temp_new_i32();
-+            gen_load_fpr32(ctx, fp0, rt);
-+            tcg_gen_ext_i32_tl(t1, fp0);
-+            gen_helper_0e2i(swr, t1, t0, ctx->mem_idx);
-+            tcg_temp_free_i32(fp0);
-+            tcg_temp_free(t1);
-+            break;
-+#if defined(TARGET_MIPS64)
-+        case OPC_GSSDLC1:
-+            check_cp1_enabled(ctx);
-+            t1 = tcg_temp_new();
-+            gen_base_offset_addr(ctx, t0, rs, shf_offset);
-+            gen_load_fpr64(ctx, t1, rt);
-+            gen_helper_0e2i(sdl, t1, t0, ctx->mem_idx);
-+            tcg_temp_free(t1);
-+            break;
-+        case OPC_GSSDRC1:
-+            check_cp1_enabled(ctx);
-+            t1 = tcg_temp_new();
-+            gen_base_offset_addr(ctx, t0, rs, shf_offset);
-+            gen_load_fpr64(ctx, t1, rt);
-+            gen_helper_0e2i(sdr, t1, t0, ctx->mem_idx);
-+            tcg_temp_free(t1);
-+            break;
++    }
++    return NULL;
++}
+diff --git a/hw/mips/fw_cfg.h b/hw/mips/fw_cfg.h
+new file mode 100644
+index 0000000000..e317d5b9a3
+--- /dev/null
++++ b/hw/mips/fw_cfg.h
+@@ -0,0 +1,19 @@
++/*
++ * QEMU fw_cfg helpers (MIPS specific)
++ *
++ * Copyright (c) 2020 Huacai Chen
++ *
++ * SPDX-License-Identifier: MIT
++ */
++
++#ifndef HW_MIPS_FW_CFG_H
++#define HW_MIPS_FW_CFG_H
++
++#include "hw/boards.h"
++#include "hw/nvram/fw_cfg.h"
++
++/* Data for BIOS to identify machine */
++#define FW_CFG_MACHINE_VERSION  (FW_CFG_ARCH_LOCAL + 0)
++#define FW_CFG_CPU_FREQ         (FW_CFG_ARCH_LOCAL + 1)
++
 +#endif
-+        default:
-+            MIPS_INVAL("loongson_gsshfs");
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-     default:
-         MIPS_INVAL("loongson_gslsq");
-         generate_exception_end(ctx, EXCP_RI);
+diff --git a/hw/mips/meson.build b/hw/mips/meson.build
+index 46294b7382..c98391ce99 100644
+--- a/hw/mips/meson.build
++++ b/hw/mips/meson.build
+@@ -1,5 +1,5 @@
+ mips_ss = ss.source_set()
+-mips_ss.add(files('addr.c', 'mips_int.c'))
++mips_ss.add(files('addr.c', 'mips_int.c', 'fw_cfg.c'))
+ mips_ss.add(when: 'CONFIG_FULOONG', if_true: files('fuloong2e.c'))
+ mips_ss.add(when: 'CONFIG_JAZZ', if_true: files('jazz.c'))
+ mips_ss.add(when: 'CONFIG_MALTA', if_true: files('gt64xxx_pci.c', 'malta.c'))
 -- 
 2.17.2
 
