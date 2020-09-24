@@ -2,81 +2,78 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 549C5C4346E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 08:37:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 259B9C4346E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 08:40:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9933D2137B
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 08:37:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9456D23600
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 08:40:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="guUZctLh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9933D2137B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eCI4nLV9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9456D23600
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLMkj-00013E-F9
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 04:37:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53964)
+	id 1kLMnR-0002v4-MX
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 04:40:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55960)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kLMgU-0004q1-Ed
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 04:33:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51956)
+ id 1kLMmF-00026H-LL
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 04:38:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30168)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kLMgR-0007kD-Mr
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 04:32:58 -0400
+ id 1kLMmE-00006H-4Q
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 04:38:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600936374;
+ s=mimecast20190719; t=1600936733;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=27BdpAHCEwbi3+lj+YLtwQPW3pPzxcdC0KQzdL3Sx4Y=;
- b=guUZctLhrcyXv8IW62+kYNgRBynDt5d5uWkL0qYKTx4eROtvZCjxs0NnrqcPaoetDI1Lip
- BCA7yXxQTUB//1t+8yDlmOlycRUrB3uVSJGIwkvouZDSxNaY1jwQcKos5siyywpyj7VQ9l
- +13qvvuT2J1KwyAKm7yu5Pei56BI54g=
+ bh=WLdzcM+E42ThiHQBIhDSXJ90qzg8Wk0cdYHGj6Z7n6w=;
+ b=eCI4nLV9BTZaoD1NRJepBkTbnjzy0yrTn9XoLK4k6JhKiHhvgEeSnL0giRD5ihvOpjCxZy
+ UGQNuySB1EuVYeARrgHD4TfrnrrY3Evu8xZR3tDCHOVr+Y8UAhB1WKIeINFMUGGXmS7VfA
+ N4uWgnByx/e5k9k+c/j0M5BYQTVAk9E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-96-XY2g6B_TMtOAETcIfhjh5A-1; Thu, 24 Sep 2020 04:32:50 -0400
-X-MC-Unique: XY2g6B_TMtOAETcIfhjh5A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-555-R1ewerxZNauVXWn_NpLHBA-1; Thu, 24 Sep 2020 04:38:51 -0400
+X-MC-Unique: R1ewerxZNauVXWn_NpLHBA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B66771084D76;
- Thu, 24 Sep 2020 08:32:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 211EF802B49;
+ Thu, 24 Sep 2020 08:38:49 +0000 (UTC)
 Received: from localhost (ovpn-114-133.ams2.redhat.com [10.36.114.133])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 408609CBA;
- Thu, 24 Sep 2020 08:32:42 +0000 (UTC)
-Date: Thu, 24 Sep 2020 09:32:41 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F138E5D990;
+ Thu, 24 Sep 2020 08:38:42 +0000 (UTC)
+Date: Thu, 24 Sep 2020 09:38:41 +0100
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: elena.ufimtseva@oracle.com
-Subject: Re: [PATCH v9 20/20] multi-process: add configure and usage
- information
-Message-ID: <20200924083241.GP62770@stefanha-x1.localdomain>
+Subject: Re: [PATCH v9 00/20] Initial support for multi-process Qemu
+Message-ID: <20200924083841.GQ62770@stefanha-x1.localdomain>
 References: <20200827181231.22778-1-elena.ufimtseva@oracle.com>
- <20200827181231.22778-21-elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20200827181231.22778-21-elena.ufimtseva@oracle.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200827181231.22778-1-elena.ufimtseva@oracle.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="SavPGzlo48F1Gxyz"
+ protocol="application/pgp-signature"; boundary="NEaRsfQExFH3jWtg"
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -108,42 +105,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---SavPGzlo48F1Gxyz
+--NEaRsfQExFH3jWtg
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 27, 2020 at 11:12:31AM -0700, elena.ufimtseva@oracle.com wrote:
-> From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
->=20
-> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-> ---
->  MAINTAINERS                |  2 ++
->  docs/multi-process.rst     | 67 ++++++++++++++++++++++++++++++++++++++
->  scripts/mpqemu-launcher.py | 49 ++++++++++++++++++++++++++++
->  3 files changed, 118 insertions(+)
->  create mode 100644 docs/multi-process.rst
->  create mode 100755 scripts/mpqemu-launcher.py
+On Thu, Aug 27, 2020 at 11:12:11AM -0700, elena.ufimtseva@oracle.com wrote:
+> The v9 has the following changes:
+> - Communication channel. Qemu side uses blocking call to send
+>   and receive the message from the remote and cannot progress
+>   further until the remote side replies. Enhanced the
+>   communication channel by dropping iothread lock before blocking
+>   on Qemu end. Use the co-routines on the remote end to avoid
+>   blocking QMP monitor;
+> - removed the heartbeat functionality, it will be added later
+>   in a full extent;
+> - fixed leaked errors and similar fixes;
+> - eliminated bytestream passing over the channel;
+> - The build system had to be changed in order to accomodate the
+>   latest changes in Qemu to use Kconfig/mason.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Thanks, I left comments but I'm happy with most patches now.
 
---SavPGzlo48F1Gxyz
+Stefan
+
+--NEaRsfQExFH3jWtg
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9sWakACgkQnKSrs4Gr
-c8hQ/wf7B+NwwQ+oz4LJN/iazwV56sEUi4zJnf63WJElU12yVKijOcO4g2uf63j1
-3/brEbCDXX8VN5vBlMSzgrdtTRWbQzSLmyIsclXDiwaXIQ85Nu2w5uzJMLq57Has
-Ni0EMZXc154Hh0Qi0eazhJLM+s6VTeB1G+cNDOYXtoc8jWP6ZiN375jz82LPRYjo
-iuflmuFIcK015lswe3G8ZdRWKAZSmLCHkWKeJp6HDGMDRBQvwM2XrQuK+/h/NDW8
-p1EkOkeM5AEglbOL+cGfhHOWq9yrZ+PIJn1xb35UFbqjid0y7PZswCcjEAOwy+0G
-Gv2d5js/iWA9Hq3C5urtGfm/+KGsEw==
-=tW/+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9sWxEACgkQnKSrs4Gr
+c8iFIwf+PZ+h1wDvauzbQ0TG8w9zuIRmtbcagb1gIpWDKyqfkqAZRO3pdxo1+rcJ
+ggihaCyFEaQCr3VAf/qBlINSqda+hAeVJHjEGAwN/sG1APuucwytAVJ2wCakjtMq
+h9p+vGpnH182b789bh/AVv9K5A7BOyKdi8xSSjGDh2+S6NKuHgmQ6ZULwMjFRHuJ
+1EkFJN0GmKMKwCqUCzKzLRxKph+xLku2kVv0/MU5XSr8fkIAWaGwoijlpSYt9nYw
+HPptsJV0xnm3r9iejfGJLKKidFl4WjZImkpfjkcHuRVQHxrr5EpCcJatnFFgE+F8
+pL5rDwqqI7cCtL+51zBvYnC1mAnWIw==
+=IHsu
 -----END PGP SIGNATURE-----
 
---SavPGzlo48F1Gxyz--
+--NEaRsfQExFH3jWtg--
 
 
