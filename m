@@ -2,96 +2,89 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79320C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 19:35:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87625C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 19:37:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB00A22208
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 19:34:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C8312311B
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 19:37:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Edln/4lj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB00A22208
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MK1V/27u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C8312311B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLX18-0006wO-VT
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 15:34:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50976)
+	id 1kLX35-0008Et-3X
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 15:36:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kLWw7-0002FO-3X
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 15:29:48 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:35133)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kLX04-0005yc-LS
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 15:33:52 -0400
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:37587)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kLWw5-0006kc-9E
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 15:29:46 -0400
-Received: by mail-pf1-x444.google.com with SMTP id k8so378330pfk.2
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 12:29:44 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kLX00-0007HY-JE
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 15:33:52 -0400
+Received: by mail-ed1-x543.google.com with SMTP id n22so116473edt.4
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 12:33:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=NCytGQGmjWFcOdd3bWSEdLErliyS4JMKDrthtWMFdzo=;
- b=Edln/4ljlxro7T6tIBhfCKjcnoyd4C+kBmFYEWhKRtPWROaJyUgAI3NbLQPgiTHfkZ
- WNd36hhliiFk0FCyq59V/iAVOCY3ZdPZw3LXfVzCWdMm58auWcIqyAREHlt2W+plAa9S
- kqZ3U1Ik+1TscNzZtm80ke1LLr9+wOpVsPHszSspgaYFwk3VONDh+oZHA+iqetlDbY58
- 0zlyu3zxPUhgYzrNWEcHL1u7aeOLjxZ2hSNbKaUMlc36dP6xonbN42SQRfmz8KkgHDHK
- WFVRwm3Hda8N4ZIJJ49Fk2aqF4B9E9vqNCEBsJEDTWkaQ0AZSGKU6Qr3ycdSubBa7wr1
- aUzw==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=6Btl4FPZQgdO78dzpd+d4Ko721XLDPeypchuq83fgFw=;
+ b=MK1V/27u+7+RUV3t+oObtYiBFS1mO+Nxsc1bJff4XX8eqPrjo1aFQtu5IBrM5jBIY5
+ mQUvdsyHjVtufgYBLPBJy7tA5CwDnTh0SsFn2l6erEQ+LmxRTLrn8xQzcZmt5U4c68AB
+ 5JiHUaDalYcF+SDf9RVudFL00nNAf1le1rfsnY8Y1bfGfR7mN5k1qYhWH1ZX/pjPgEPl
+ /ef3EUxvjARpfmdfn+CPY0Oj/8Mk/YaH0lLfOj00a9QA2TcrwAriK2YOBGkKQoh/2JSO
+ +w9yC70wKXScY24Zy4Te/HYC+xb3hwEIE0B21vECy2XidXAW8b6PjhTEgWL7w7Q4rzfu
+ SxHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=NCytGQGmjWFcOdd3bWSEdLErliyS4JMKDrthtWMFdzo=;
- b=CfH5AZcFARUp5ej4LWcJCCVeTlphHOSwADEZ1yo9sjfujYDKgCljnS8bwh6N8yoBnZ
- UmeTDH10d8BLEqWwOUrkH5d3/wi4eVp4JygBMvfzM2c+br+BSf8ygyVEbPxL/VfKV0op
- D0qsDzshiIfSY0Fbcq5h5GKaCiS9akTUrBW5JW+ozDO5rbViQ7Sk/pvRqXSizvsT4Akq
- KdHeD8UERyzxHWHXfJRCk7hTbNCNKEES065BE2AcLi7Rg1XhN08cgjSOS+/JwVNoZ01O
- 9YEM7QlGVJOjHW5KBHcftiUgeE4MYlGpBGcBR32XS+ayWBHjuT2+9FgNGb0bs4ljDTIo
- zApg==
-X-Gm-Message-State: AOAM530/VjWn0RfRQp9/RxcmWja9c+0q29XvmxJXevH1UD8wRVzwEU33
- 4O+6ora1OZd7BSNJcHjsyjUCLFj1gJfhjA==
-X-Google-Smtp-Source: ABdhPJzN5iOEjn5v1iJ1kpObxx3toAgTp1wY1zDBij7eb/SwMN9mLVGsiKgcG3ctR2cMwxdTScNePQ==
-X-Received: by 2002:a17:902:267:b029:d2:6180:4a46 with SMTP id
- 94-20020a1709020267b02900d261804a46mr703053plc.26.1600975783137; 
- Thu, 24 Sep 2020 12:29:43 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id y25sm259790pfn.71.2020.09.24.12.29.42
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 24 Sep 2020 12:29:42 -0700 (PDT)
-Subject: Re: [PATCH 4/4] qemu/bswap: Remove <byteswap.h> dependency
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=6Btl4FPZQgdO78dzpd+d4Ko721XLDPeypchuq83fgFw=;
+ b=heRbfXWIQEvonxHAVCKX/Bq5W7O32i/UsatobNJGz8MrJqzhzNmtG4fwbY8oA9F6Zh
+ 22pzB5q0ONLVc7jvDVPMipsZ7IpKmVeItYD2FF8XYxxpqJ3U9LewMnU9t1kPdi35lyUX
+ AfHshn6RcmDYXAfcd72clKlwm8bcJzZldg/J8RS8+IYKMkQR7UBFOl+Jg+gNh0xxrurd
+ RzzD1OiEJJMsNldAHR+iB9jSOgckoFkLOV8Jo8o2o1Bcs75uRtHgXbbkz1++20TkeSMl
+ BWqQBY8YSt2YY+ggxIaCKD/9Mwnaex0JO1WlfcjJutS/LOzXCHKEtylOMwvrh/beR8z6
+ SzXw==
+X-Gm-Message-State: AOAM53252liJEvpfSr1t7uOEghavceK0jPpsoy4u9iZWokJnhpjzskiR
+ 8nTr/j4HpI266vR6FpOp1CGx0F9AoW2B48VAyLF1rg==
+X-Google-Smtp-Source: ABdhPJzAzq2CZ6V0oWRSDqhDyMTkUxMwZrFQMmw/XnMylbzSUK7zldWVYjvlxY5bB2OD2KeGjic+vzonTEZ3GX9TQcs=
+X-Received: by 2002:aa7:dd4b:: with SMTP id o11mr347616edw.251.1600976026577; 
+ Thu, 24 Sep 2020 12:33:46 -0700 (PDT)
+MIME-Version: 1.0
 References: <20200923100220.674903-1-philmd@redhat.com>
  <20200923100220.674903-5-philmd@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <8e5a49ca-bf95-078f-5a28-e7682297ce43@linaro.org>
-Date: Thu, 24 Sep 2020 12:29:40 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20200923100220.674903-5-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
+ <CAFEAcA9XOpCyWr0QXn6T_y9nh4ZX5Op2ztonefr-pV2oQfU3iw@mail.gmail.com>
+ <fd8a9c3e-45f2-caae-25ab-5e1365fd9298@redhat.com>
+ <2a2cc60d-2d30-eb38-369e-0a26f0eac9bd@linaro.org>
+In-Reply-To: <2a2cc60d-2d30-eb38-369e-0a26f0eac9bd@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 24 Sep 2020 20:33:35 +0100
+Message-ID: <CAFEAcA-+ssh05EdeYLSoF=m8Yvg_ENoChrV6vT6H=NVSPUPFAw@mail.gmail.com>
+Subject: Re: [PATCH 4/4] qemu/bswap: Remove <byteswap.h> dependency
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::543;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -22
-X-Spam_score: -2.3
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.214,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -106,22 +99,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/23/20 3:02 AM, Philippe Mathieu-Daudé wrote:
-> All our supported compilers provide the __builtin_bswap()
-> functions. Drop the <byteswap.h> dependency.
-> 
-> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  configure            | 13 -------------
->  include/qemu/bswap.h | 17 -----------------
->  2 files changed, 30 deletions(-)
+On Thu, 24 Sep 2020 at 20:30, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 9/23/20 3:30 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> > On 9/23/20 12:16 PM, Peter Maydell wrote:
+> >> I suppose if we wanted to just use the __builtin_bswap*
+> >> implementation on all hosts (ie drop the special casing
+> >> of CONFIG_MACHINE_BSWAP_H/FreeBSD/Haiku) we'd need to
+> >> rename our macros to avoid potential conflicts with the
+> >> versions in the system headers there in case they were
+> >> pulled in via some other path ?
+> >
+> > Yes, this is why I couldn't get ride of everything
+> >
+> > After reading Paolo's suggestion to use qatomic*, I
+> > am tempted to suggest qbswap* but I am still looking
+> > for better alternatives...
+>
+> Hum, maybe.  It's pretty ugly.  We could just leave those alone and hope =
+the
+> system version is decent enough.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Mostly what I would like is to be able to be rid of the
+configure machinery so we could just use a single
+portable implementation.
 
-r~
+thanks
+-- PMM
 
