@@ -2,84 +2,82 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBEE9C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 11:21:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1842C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 11:22:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1267F2395B
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 11:21:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 317662395B
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 11:22:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FXeim/rJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1267F2395B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Is6odIUB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 317662395B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLPJo-00005V-3K
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 07:21:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37968)
+	id 1kLPK9-0000zK-Vw
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 07:22:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37938)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kLPGT-0004DV-L5; Thu, 24 Sep 2020 07:18:17 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43437)
+ id 1kLPGS-0004C0-3l; Thu, 24 Sep 2020 07:18:16 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51071)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kLPGS-0003ux-2X; Thu, 24 Sep 2020 07:18:17 -0400
-Received: by mail-wr1-x443.google.com with SMTP id k15so3346338wrn.10;
- Thu, 24 Sep 2020 04:18:15 -0700 (PDT)
+ id 1kLPGP-0003uJ-Lf; Thu, 24 Sep 2020 07:18:15 -0400
+Received: by mail-wm1-x341.google.com with SMTP id e17so3140458wme.0;
+ Thu, 24 Sep 2020 04:18:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=pqQjOUWtcLPC8L4qk6a3pit1FoREjeT8r9pPsJuQ7/Y=;
- b=FXeim/rJjWU6LkaUraj/OoBym0yEzXqTPieMK9tHHjSOzEQb4IVlZKcCes8QtjQVGF
- coLEr1oIzD6NLF1oFsxIqrAWiyiCCA3RFVFUKQ25Q5dG3N/aq/AVixM8aQSP76y/xgzk
- OtExW5qE/a77oralWtAM3yz+Opn9ujWzP4EC2I6y/apiB/MYmW8b5eDNHWTXPwuQMMRv
- KQPZQ3XDkvoah+i3FpeoZ2hdqngRANDw45IcfDEeEthXuu7jvWMYtg2cxwq+uxShqgAn
- Vd2S/bmXX+yLECac5G4XHxN5FjTFEi9sXpH8Hn+NahPg194rEnx1/HawTIhwI9EjHfOL
- 6pMg==
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=jRYBbPZdjZNqhsxNCbQU/40Ab/DhwUD75yfurRb+dzI=;
+ b=Is6odIUBW44SU+LOw24Ds41ytKCpjyYfE5RPQtYIYtm+eQ4P9Cf/DgLI/wI7IRQ0Jm
+ VFaTWi/irZbMVVGWzMKlZIw1MIqIRy7xS/25LD9pBV1regbR1Cp8uoDo5ZQz/l5rPwee
+ Jgcj1EhTXNVncjoaZ+OcPryas61G5V97go3najE+iOLO87Gih1Pxa19AoTQ2TK/GjZ14
+ GAEWI0cHsfAmtjci5Dr2fNcBAcjil2jCbtYWAm+t2N8SEBx/nXb+GgOsU7z7s0N6tuOS
+ UITzH2A55p/X4JdgLfznvCesXdYbIiD3buXZVD0xWMmCgde6np0F8jTq4sqPHm3qXxr5
+ K3Ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=pqQjOUWtcLPC8L4qk6a3pit1FoREjeT8r9pPsJuQ7/Y=;
- b=hZlB8psHxeaANN0rcZo1K9ERYwDP6+rRMmr8H5X1SJlt48/F3iZzdOZlj5KHGfpVWW
- O6wrZGAQirK+CCdrvFJobjs/wAgyV4bxH9e4li5blN2Kc97OqYLCP48LEZOTUHxkDtGF
- oxKWWxlGy/CTUx3lQe41vFHpuJQW9A4uhtk191vuY9xCDCW4LCU6AxLR1A42C7+Eo8d5
- wvCeooLKoltXsclV/SM31wv77jYmf5+C/z6ZgyWkpb7NWeYzcZLGLSOtSkYGt6JlVZk3
- COhzNrhnhr7KCKpuL2u5i4Kq3mgPqDvaTeoWjOR8QjNc4BBGx2SDHsTadNWTETMSETBH
- tC1A==
-X-Gm-Message-State: AOAM532ZgkkZDSPSw9C2lxojuMHTl3ul9vFoV4tLHNUCTp5n4/4Rur6k
- r12crMJybspDVfPDUT4p7XL4T+oLjpE=
-X-Google-Smtp-Source: ABdhPJzXu6MVOW9JpbhEogq2CCgBkbw5OI7/ALbN7FusoM1q3D7GcSYGftg7P6h2NfXXCn4xii0J8g==
-X-Received: by 2002:adf:f544:: with SMTP id j4mr4506941wrp.74.1600946294118;
- Thu, 24 Sep 2020 04:18:14 -0700 (PDT)
+ :mime-version:content-transfer-encoding;
+ bh=jRYBbPZdjZNqhsxNCbQU/40Ab/DhwUD75yfurRb+dzI=;
+ b=KALP18+Wq25nxYa+13jBYShlFnUhT/eMkQKa0eDxYhCdJGrHjar8sq+UAm66V5Ldm9
+ MggrP8RnJG9aH+W8rV5W7qPNbqe8AHbclK5S/+xfnCcBx50FnQgGitqu2x1LAtXTcuPC
+ gyfFp+kQKC0ZHVsMEXdUOIbKcvmdN9F77qCd+Cd9uwxnsLBwVsYND5f+0mpH4EOIPPho
+ 18RRzFLJPBh7Q8+ZHZci5rFi9HRqRprbosuuEsMGMyFrzaqMPhPrKaudlq30KWCeTqU8
+ fbFs1DCw7iF+kpe/Wxro1jQkzAGHV4C4U/qR7FdjXyUbR0aEzfm62tLBCnLfjrwoX3Bn
+ aYSg==
+X-Gm-Message-State: AOAM532XEtLjmdgW3muoSwT8kZ7idlnbb2wqec9BygIkkNiq6NRD+d2F
+ ihgfbSdUODh3yDEXJdPksMP0VxJSlGI=
+X-Google-Smtp-Source: ABdhPJw17Fq2a3ojds4TXZkNc+PNFxTRUe/BPZmN6b8dxI1kquU71E+U1lsh9K+nD5R0cHSXBX6WyA==
+X-Received: by 2002:a05:600c:216:: with SMTP id
+ 22mr4004200wmi.149.1600946290374; 
+ Thu, 24 Sep 2020 04:18:10 -0700 (PDT)
 Received: from x1w.redhat.com (234.red-88-10-103.dynamicip.rima-tde.net.
  [88.10.103.234])
- by smtp.gmail.com with ESMTPSA id h76sm3400363wme.10.2020.09.24.04.18.12
+ by smtp.gmail.com with ESMTPSA id h76sm3400363wme.10.2020.09.24.04.18.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Sep 2020 04:18:13 -0700 (PDT)
+ Thu, 24 Sep 2020 04:18:09 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 3/8] hw/arm/raspi: Move arm_boot_info structure to
- RaspiMachineState
-Date: Thu, 24 Sep 2020 13:18:03 +0200
-Message-Id: <20200924111808.77168-4-f4bug@amsat.org>
+Subject: [PATCH v4 0/8] hw/arm/raspi: QOM housekeeping to be able to add more
+ machines
+Date: Thu, 24 Sep 2020 13:18:00 +0200
+Message-Id: <20200924111808.77168-1-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200924111808.77168-1-f4bug@amsat.org>
-References: <20200924111808.77168-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -103,95 +101,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- Luc Michel <luc.michel@greensocs.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Andrew Baumann <Andrew.Baumann@microsoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The arm_boot_info structure belong to the machine,
-move it to RaspiMachineState.
+Machine-specific patches extracted from v2 [*] and rebased.
 
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/arm/raspi.c | 30 +++++++++++++++---------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
+Series now fully reviewed.
 
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index 8716a80a75e..16e6c83c925 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -41,6 +41,7 @@ struct RaspiMachineState {
-     MachineState parent_obj;
-     /*< public >*/
-     BCM283XState soc;
-+    struct arm_boot_info binfo;
- };
- typedef struct RaspiMachineState RaspiMachineState;
- 
-@@ -206,12 +207,11 @@ static void reset_secondary(ARMCPU *cpu, const struct arm_boot_info *info)
- static void setup_boot(MachineState *machine, int version, size_t ram_size)
- {
-     RaspiMachineState *s = RASPI_MACHINE(machine);
--    static struct arm_boot_info binfo;
-     int r;
- 
--    binfo.board_id = MACH_TYPE_BCM2708;
--    binfo.ram_size = ram_size;
--    binfo.nb_cpus = machine->smp.cpus;
-+    s->binfo.board_id = MACH_TYPE_BCM2708;
-+    s->binfo.ram_size = ram_size;
-+    s->binfo.nb_cpus = machine->smp.cpus;
- 
-     if (version <= 2) {
-         /* The rpi1 and 2 require some custom setup code to run in Secure
-@@ -220,21 +220,21 @@ static void setup_boot(MachineState *machine, int version, size_t ram_size)
-          * firmware for some cache maintenance operations.
-          * The rpi3 doesn't need this.
-          */
--        binfo.board_setup_addr = BOARDSETUP_ADDR;
--        binfo.write_board_setup = write_board_setup;
--        binfo.secure_board_setup = true;
--        binfo.secure_boot = true;
-+        s->binfo.board_setup_addr = BOARDSETUP_ADDR;
-+        s->binfo.write_board_setup = write_board_setup;
-+        s->binfo.secure_board_setup = true;
-+        s->binfo.secure_boot = true;
-     }
- 
-     /* Pi2 and Pi3 requires SMP setup */
-     if (version >= 2) {
--        binfo.smp_loader_start = SMPBOOT_ADDR;
-+        s->binfo.smp_loader_start = SMPBOOT_ADDR;
-         if (version == 2) {
--            binfo.write_secondary_boot = write_smpboot;
-+            s->binfo.write_secondary_boot = write_smpboot;
-         } else {
--            binfo.write_secondary_boot = write_smpboot64;
-+            s->binfo.write_secondary_boot = write_smpboot64;
-         }
--        binfo.secondary_cpu_reset_hook = reset_secondary;
-+        s->binfo.secondary_cpu_reset_hook = reset_secondary;
-     }
- 
-     /* If the user specified a "firmware" image (e.g. UEFI), we bypass
-@@ -250,11 +250,11 @@ static void setup_boot(MachineState *machine, int version, size_t ram_size)
-             exit(1);
-         }
- 
--        binfo.entry = firmware_addr;
--        binfo.firmware_loaded = true;
-+        s->binfo.entry = firmware_addr;
-+        s->binfo.firmware_loaded = true;
-     }
- 
--    arm_load_kernel(&s->soc.cpu[0].core, machine, &binfo);
-+    arm_load_kernel(&s->soc.cpu[0].core, machine, &s->binfo);
- }
- 
- static void raspi_machine_init(MachineState *machine)
+Since v3:
+- Fixed typos (Luc)
+- Added Luc tags
+
+[*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg680135.html
+
+Based-on: <20200921034729.432931-1-f4bug@amsat.org>
+"hw/arm/raspi: Remove ignore_memory_transaction_failures on the raspi2"
+
+Philippe Mathieu-Daudé (8):
+  hw/arm/raspi: Display the board revision in the machine description
+  hw/arm/raspi: Load the firmware on the first core
+  hw/arm/raspi: Move arm_boot_info structure to RaspiMachineState
+  hw/arm/raspi: Avoid using TypeInfo::class_data pointer
+  hw/arm/raspi: Use more specific machine names
+  hw/arm/raspi: Introduce RaspiProcessorId enum
+  hw/arm/raspi: Use RaspiProcessorId to set the firmware load address
+  hw/arm/raspi: Remove use of the 'version' value in the board code
+
+ hw/arm/raspi.c | 152 +++++++++++++++++++++++++++----------------------
+ 1 file changed, 83 insertions(+), 69 deletions(-)
+
 -- 
 2.26.2
 
