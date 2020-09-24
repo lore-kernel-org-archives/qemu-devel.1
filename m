@@ -2,125 +2,118 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99757C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 17:33:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45458C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 17:37:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D00A123899
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 17:33:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 51FBD23899
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 17:37:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="f72b1ds4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D00A123899
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="LTsNLAnU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51FBD23899
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLV7o-0003uG-Oo
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 13:33:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51494)
+	id 1kLVBb-000659-El
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 13:37:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52878)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kLV4M-00028V-VE; Thu, 24 Sep 2020 13:30:19 -0400
-Received: from mail-eopbgr80121.outbound.protection.outlook.com
- ([40.107.8.121]:42308 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kLVAg-0005T0-Uj; Thu, 24 Sep 2020 13:36:43 -0400
+Received: from mail-eopbgr130120.outbound.protection.outlook.com
+ ([40.107.13.120]:53950 helo=EUR01-HE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kLV4J-00081n-D0; Thu, 24 Sep 2020 13:30:10 -0400
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kLVAb-0000Xk-U2; Thu, 24 Sep 2020 13:36:42 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OwL1talpBUrpMg9AfUwkvjq6QfHgLhb6uHxV23WbM6jyTAyh/RRmi3aFeg2DHJUjm6GZvWV96ft/BtqPwOlMUfQ/s+f6IFHZsr4wVwgpm3AuKI2diqFl01Kff6btPNgfI4wOhGEE0cArTbURceWMT/7dcUldiGOFUHbi//c6xNMnSxT20QvxchTXP6G3PYf2a6BqsYqVm2MqXC6EuuaSDr1zRaWF25BnLaJ3Ruyr7duBM8v2eR/kRQD4hUxxY/SK9ftYizfVo4EkMWwOHZMyJRZFHqMnMh3hh/ZBe/o6JS4v62qdO8vRblyZIUC8wGjwId5EtIV8eJ1t5a2ESeuEdw==
+ b=fyST/M3etstkroAzdz5OX0B1Dnz29DHCkYT+5ZWVx56S0ERNRkEPDIo63pyW02zPa+n35bIKtpKdQ0Bh4PG5sYvnQxH4XVd022vzTl1NdJyebQHkkwoSOEURs6PuOt2MLFlEpKWWFCklp7ZI8JxAQDkQ0USoOLl19rR+ERkf9mXWb1t4IU1ArARTeXVZrr8YFKy7BEIfO/rGCFAg4v1PvBl9dyeXLqdgECAavy6PqcBgEeFsNrwVJT2TvGjpHDJpXIDzXvVVX1PsxwOqg10o8heeXN2sOT2Pa/SUZKPHoQbSS7pTTe8GkvqUYJbFFG31Wzc5p0xaP5lBBqgNR4u8gA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ERVP3jZ2POLqnxMUfEvtMRHQp/tAvEPGatR5AA5URfw=;
- b=aTVBYMC3o3LVySCwaXNHl1hk/e7GSmr+p6HLBn+Uw2RfH0EmflbhJGzc403UW2dRMqGWZL0lIGO5At+3bQi5bxElWNF3enfu3053L6Myq1qz+CkozOsokBLdAkxX7xUNr9lFZGHbbCN7FPyNOCJUoMjO/oA8joCJ3cJJoxLS2NOgznjvQRc8h1dy37MQU7Zq8v+CwTSqcA5xTKSdcK5DzM7USvBeGM98oWqWgtIgCyastlB2FoylOFrr060i18eWPGqlR+VyBtyerW703gstzT1VPaF4zuMrxYeMAuJty+WIkKYQH5W1Nj8YBTnUdQbK8qql9Xw0NCqfMnXqkBrKMQ==
+ bh=BBKKqSRZlbZ+71DPBgAoI8YYQqmCsAs5BC+c3nXwLmc=;
+ b=BoeR89n/6OtypnB0U7x8QATkpcynZxy8xDZy4puLeIcLQD0YcxAVj3+kVnBCnXhsq3rJej8BTrNzC1OZE9wMmVsyDuj/yNi61r4M5wniySIHKl2mmLHFAtUifgNpKrQHpfyfy3L0xU7H1jVT9t0oMZvz2syj4sFcUcb8vbvQ1VW7l4q7FMFpxJn9buCIbB8FBAFDpsWUmxOQKhR8jn3GUv4At8WeyktYdY5XxPdzWlqU+kHP+BkjGF6IzUHV3/ITHYt7uwhwcyStc3AYER6PyGCjUjz1U88gEMz0fxQM4GUuMK1EbisOF31UpBZQ+6qOPQPyp510OXUXm//22m5cAA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ERVP3jZ2POLqnxMUfEvtMRHQp/tAvEPGatR5AA5URfw=;
- b=f72b1ds4956omYjM2qFmd+nnTd/vYZHUQqRoPBDxrL5sUTuEN0R+I594duXoKJeqQkWomeCEQgcBUKtPUtShZUsQFXPO4lQH/WJQWKyPoTM9XAWJZswsr0ravBDXca3FIutHXHc49JnbMHPpgpneehKhzwPSU/8ZYAH27NBX+48=
+ bh=BBKKqSRZlbZ+71DPBgAoI8YYQqmCsAs5BC+c3nXwLmc=;
+ b=LTsNLAnUTDmokfqXjnejgutYh1NdTyiOMA8gs7VzXcYcxVPGAcPGhXkD7EvUacx+lBPimsxaHI69STH4aL0sgUpNASWMQhEQ7c5qRcJWKwwwq/cOMgTKvW9s+dSWFUHbPLBaAY6mf2ouf4Hg8499g04n5y31hnBxXJ2u5I1qlkw=
 Authentication-Results: openvz.org; dkim=none (message not signed)
  header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com (2603:10a6:3:89::22)
- by HE1PR0802MB2412.eurprd08.prod.outlook.com (2603:10a6:3:de::17)
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB3094.eurprd08.prod.outlook.com (2603:10a6:209:48::22)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.11; Thu, 24 Sep
- 2020 17:29:59 +0000
-Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com
- ([fe80::fd10:fc33:1bb0:1036]) by HE1PR0801MB2124.eurprd08.prod.outlook.com
- ([fe80::fd10:fc33:1bb0:1036%6]) with mapi id 15.20.3391.027; Thu, 24 Sep 2020
- 17:29:59 +0000
-Subject: Re: [PATCH v8 2/7] copy-on-read: add filter append/drop functions
-To: Max Reitz <mreitz@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, armbru@redhat.com,
- jsnow@redhat.com, eblake@redhat.com, den@openvz.org
-References: <1598633579-221780-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1598633579-221780-3-git-send-email-andrey.shinkevich@virtuozzo.com>
- <9733a257-b864-e8db-7379-f94fbd21045a@redhat.com>
- <25a087d0-0306-574d-432b-0b5635ee7873@virtuozzo.com>
- <1508198c-d52b-08b3-602f-97ff3e83eaef@virtuozzo.com>
- <9fd6c10b-0d37-30fe-5aad-bc50a0bbdc55@redhat.com>
- <b0481dc9-ff26-25ca-ecb0-ea5c0fb4dc06@virtuozzo.com>
- <f06a1ce5-4ae1-2af3-ab19-61061b8091ec@redhat.com>
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-ID: <6388180f-ec96-d0e2-63b7-7308e6ec5bce@virtuozzo.com>
-Date: Thu, 24 Sep 2020 20:29:55 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <f06a1ce5-4ae1-2af3-ab19-61061b8091ec@redhat.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.20; Thu, 24 Sep
+ 2020 17:36:34 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692%8]) with mapi id 15.20.3370.033; Thu, 24 Sep 2020
+ 17:36:34 +0000
+Subject: Re: [PATCH v6 08/15] block: introduce preallocate filter
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, eblake@redhat.com,
+ fam@euphon.net, stefanha@redhat.com, kwolf@redhat.com, den@openvz.org
+References: <20200918181951.21752-1-vsementsov@virtuozzo.com>
+ <20200918181951.21752-9-vsementsov@virtuozzo.com>
+ <73b1b0eb-5ca3-a436-5783-695d62fe337e@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <fd9c5668-5f4e-a56b-b14d-a169ff97411f@virtuozzo.com>
+Date: Thu, 24 Sep 2020 20:36:32 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
+In-Reply-To: <73b1b0eb-5ca3-a436-5783-695d62fe337e@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-X-ClientProxiedBy: AM4PR0302CA0025.eurprd03.prod.outlook.com
- (2603:10a6:205:2::38) To HE1PR0801MB2124.eurprd08.prod.outlook.com
- (2603:10a6:3:89::22)
+X-ClientProxiedBy: AM3PR07CA0085.eurprd07.prod.outlook.com
+ (2603:10a6:207:6::19) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Admins-MacBook-Pro.local (109.252.114.22) by
- AM4PR0302CA0025.eurprd03.prod.outlook.com (2603:10a6:205:2::38) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.21 via Frontend
- Transport; Thu, 24 Sep 2020 17:29:57 +0000
-X-Originating-IP: [109.252.114.22]
+Received: from [192.168.100.5] (185.215.60.94) by
+ AM3PR07CA0085.eurprd07.prod.outlook.com (2603:10a6:207:6::19) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3433.13 via Frontend Transport; Thu, 24 Sep 2020 17:36:33 +0000
+X-Originating-IP: [185.215.60.94]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: dd171efc-52fc-4137-02a6-08d860af75e1
-X-MS-TrafficTypeDiagnostic: HE1PR0802MB2412:
+X-MS-Office365-Filtering-Correlation-Id: 4f6a0d19-a4cd-46d3-d118-08d860b06155
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3094:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <HE1PR0802MB241260AA48D8A36503BBBD39F4390@HE1PR0802MB2412.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Microsoft-Antispam-PRVS: <AM6PR08MB309412F8D9D724CBA9FEE149C1390@AM6PR08MB3094.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4303;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Dg3oZxehN2ZQov31nEC930mCA7szTHsn8tq/GQqXQVQxIvaekWj2xb4IuzIrdqP1djJfSNl7IEALgzImYJupvFEhNVVPuDNgNhtDoH5o10R5b5rlDTMvNRcXzmmcxk/jEQ0TpIyEWcTgg9m2tpbhcBbgpg5TtvqN7ubl3sq6oL/CE1ZltdkfUnv99yVBMP6dax+7/VjShmB4eEKgA4jsptKo1vqIfH4r3MGUOT2iZoKDytg7FAtpZrT/wuI6p4r8c/wMK7gbpjtxtrUrIyE3YSM1vS0+nHohu2T+nJd8y6I48BEB+1BFyuS5yVhkJy8JJsv+IAEUuyysjjwffUiIrA/AsAtymRKBir+JgD0mlHW4/n1uN1B3gWObHZ8H96RZhf7yzL9o77HW4OktG+8sKALk5ZjG78v1JcjI1U37CX8A+eOos4f6OmfmkzQjMnsO
+X-Microsoft-Antispam-Message-Info: rAb9EulB8QFbctS7cBMqvpOG7munrDxvQ5RVrYH36WCoWWU/WTt7KY3Qk5hyb4AmVUouyjHcDLqSmALwrkFmUjgnWWgCEswUlFLuw8hsBMYwardGtqvep4NKnmINEw6oj30LYpBPr5c4VxZH3lv3Ic68kz3iFCjEV6i9pEn+ZD+UHw36I2iWpZJDmnTmEs3PTEDprq0ShK8DK3PLD2mMi1UBWgKGQRJ40uz8NViGDqyRXKk7klSyMuOrflWkwz31a3H0DwyIUbREBi2of1fX23EzxOmV3ISMtSqyP9JIy4EMyPQL+BSJ5LBE/Jtp4Msq+Gw2HYB+BcgEWM1OGtJssbUbs9vK8rIACRGuyvFYRCrlV4Ul93czhsYvnB57LNd6cmqGyB34icHPC1jMVhYp56jrTX3vLLm1GSc2LiB1BZfqDXXvoEy1csdL7RWcwCOg
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:HE1PR0801MB2124.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(376002)(39840400004)(346002)(136003)(396003)(366004)(6506007)(186003)(36756003)(8936002)(86362001)(110136005)(83380400001)(44832011)(16526019)(2906002)(26005)(31686004)(316002)(53546011)(6512007)(478600001)(52116002)(4326008)(107886003)(2616005)(31696002)(6486002)(66476007)(956004)(66556008)(5660300002)(8676002)(66946007)(43740500002);
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(39840400004)(396003)(376002)(346002)(136003)(31686004)(956004)(2616005)(86362001)(66946007)(26005)(478600001)(53546011)(83380400001)(186003)(66476007)(16526019)(6486002)(8936002)(66556008)(107886003)(5660300002)(4326008)(36756003)(31696002)(8676002)(52116002)(316002)(2906002)(16576012)(30864003)(43740500002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: V3N7Wre/OPzT1pWXDeBCP2GQPd6UxBGOYZ3ns5SVr+KCusYIT3vNpYlamYHkdgVUwGuBp/hT3AAKGekCedXKxBOpl/PwVVUz/ScRJnvCIQO6sOozDQZ+QHwcUQ4vKvE8lFHy6u4nHeyLntzMC7PzhnwEFL+i8o6FWGiodrJifkVyR78ffg9nopNyYHZhQoCfkVUki4cMCwMgv/lNBt1t8vtyFnObjjpBtooHF8jpy4T4BJgNXLjR6aAxAoAkntbtBEkxvnfat1yKrCW8tdArowQdJRvPJxI+pZEMrgfM9XM49EtcJxzr9zNY1ISkNRarow2R5fZI3VDhkV5dIxmw5D/NAcERjpXqEtc1LXpzhnRD1ncrDiWKRRjhVnlm7EJKG1X9Cor3IKhfDIP7Al8fkUQSjLembCqCdb3jar6mQHeAqg7Xpj7RyEYr3BSW2+E18EUHiztQ2lHZCaLUDaFMe4isKDuECQrN6+dZWL3x1k3FOMHTKJnrlkxp1D9v1Fwzg6KU5raqE44CaXRPvmJaIWsZ8njaEDJDXesZXnBn6Y+ap8tCv/Razpk8qeYGKN8zELZBpA3B/5EeLmkYTEAp9Kp6Vtnve8qUNUPoU6OPoWtrZfxxHLEUTHFZZ5R0JEzNCAGnJdtcBJKZh5+R7UfBoQ==
+X-MS-Exchange-AntiSpam-MessageData: c9J43hcBOlUlKou7t+vx0oX0z2fzbJB5ci/PTD+AOaHyHKGpHW7yv7idORg21jGMnN5B7Td56swZaGEDZpz6EoAgXVbnVJ1oj3CjXkbqIiprgm8xwQJynHOLDuoC6Sm7roeRPRI0xZRPoeFNs2wDSHKnCA56RRaOvQnVuwYT6eVfZ//z3KvnKch6oHWsDOLg6U0OsG3AaxZ752LeGjNbP+RwXmISwwAoaudq5QJAplOIpb2T92deP6F2Y8uRdmO8dmfVcLmR/v8FAJbHYf/i1LVYCw2MzxUcib+szVOA3AB2zWrsphnR4H+MO6UJ4uoDhu/q5mUqvrhD2ZVzQdqdHghh0+ydunLKZx8R1XRiYdqfdLArmTK43JOaDgjmytUN10t+Y6wqXFDNAf0+9dsS212ksRaXQ47NF7sVxeFrugsKO9hFIPiix/uiv9z7owafGDvVUHXW+id4+WXpC/Frv5RkzmrMjH6xyq512zbxOaeRgWknqbdNmFUNlyqF7HMpJFhHAegTDSpjYTQdndYy0AAdgTDXgMrbPgYP+XhS6H0kc31CT1W3aCK418FXZAGh8eJsqfYzAx+TpHr8Ap4EuCBNAxRRenkvYarpZqg7jh/SXeQFf8XPG9Jk40FyTm5Uv1V8LWIleriQa1rXL5LDtw==
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dd171efc-52fc-4137-02a6-08d860af75e1
-X-MS-Exchange-CrossTenant-AuthSource: HE1PR0801MB2124.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f6a0d19-a4cd-46d3-d118-08d860b06155
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Sep 2020 17:29:58.9287 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Sep 2020 17:36:33.9416 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: U+kqeIYGb7Hsdl8Kl7Gt/qCTkHRBJ3RWDlenVwJR5/SLx0Me+yMnLkf1znnVjxxk69dBqW+Go8QjXyo4qElscxBSjePnRWk8KEdPr3nxjFQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2412
-Received-SPF: pass client-ip=40.107.8.121;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR04-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 13:30:01
+X-MS-Exchange-CrossTenant-UserPrincipalName: c8qZ4o8lYHwkhpf5wcpW+CHCWWNsBG46jT04muYwa1PXe79xnWLvEdGHcjIpKY/iTw+imwsz7i9qVzzWPE1Hg5HOLOEefU8nMi3RPDINRKE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3094
+Received-SPF: pass client-ip=40.107.13.120;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR01-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 13:36:34
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -22
 X-Spam_score: -2.3
@@ -146,101 +139,359 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24.09.2020 18:00, Max Reitz wrote:
-> On 24.09.20 16:51, Vladimir Sementsov-Ogievskiy wrote:
->> 24.09.2020 16:25, Max Reitz wrote:
->>> On 23.09.20 16:38, Vladimir Sementsov-Ogievskiy wrote:
->>>> 17.09.2020 19:09, Andrey Shinkevich wrote:
->>>>> On 04.09.2020 14:22, Max Reitz wrote:
->>>>>> On 28.08.20 18:52, Andrey Shinkevich wrote:
->>>>>>> Provide API for the COR-filter insertion/removal.
->>>>> ...
->>>>>>> Also, drop the filter child permissions for an inactive state when
->>>>>>> the
->>>>>>> filter node is being removed.
->>>>>> Do we need .active for that?  Shouldn’t it be sufficient to just not
->>>>>> require BLK_PERM_WRITE_UNCHANGED when no permissions are taken on the
->>>>>> node (i.e. perm == 0 in cor_child_perm())?
->>>>>>
->>>>>> Of course, using an .active field works, too.  But Vladimir wanted a
->>>>>> similar field in the preallocate filter, and there already is in
->>>>>> backup-top.  I feel like there shouldn’t be a need for this.
->>>>>>
->>>>>> .bdrv_child_perm() should generally be able to decide what permissions
->>>>>> it needs based on the information it gets.  If every driver needs to
->>>>>> keep track of whether it has any parents and feed that information
->>>>>> into
->>>>>> .bdrv_child_perm() as external state, then something feels wrong.
->>>>>>
->>>>>> If perm == 0 is not sufficient to rule out any parents, we should just
->>>>>> explicitly add a boolean that tells .bdrv_child_perm() whether
->>>>>> there are
->>>>>> any parents or not – shouldn’t be too difficult.
->>>>>
->>>>> The issue is that we fail in the bdrv_check_update_perm() with
->>>>> ""Conflicts with use by..." if the *nperm = 0 and the *nshared =
->>>>> BLK_PERM_ALL are not set before the call to the bdrv_replace_node().
->>>>> The filter is still in the backing chain by that moment and has a
->>>>> parent with child->perm != 0.
->>>>>
->>>>> The implementation of  the .bdrv_child_perm()in the given patch is
->>>>> similar to one in the block/mirror.c.
->>>>>
->>>>> How could we resolve the issue at the generic layer?
->>>>>
->>>>>
->>>> The problem is that when we update permissions in bdrv_replace_node, we
->>>> consider new placement for "to" node, but old placement for "from" node.
->>>> So, during update, we may consider stricter permission requirements for
->>>> "from" than needed and they conflict with new "to" permissions.
->>>>
->>>> We should consider all graph changes for permission update
->>>> simultaneously, in same transaction. For this, we need refactor
->>>> permission update system to work on queue of nodes instead of simple DFS
->>>> recursion. And in the queue all the nodes to update should  be
->>>> toplogically sorted. In this way, when we update node N, all its parents
->>>> are already updated. And of course, we should make no-perm graph update
->>>> before permission update, and rollback no-perm movement if permission
->>>> update failed.
->>> OK, you’ve convinced me, .active is good enough for now. O:)
->>>
->>>> And we need topological sort anyway. Consider the following example:
->>>>
->>>> A -
->>>> |  \
->>>> |  v
->>>> |  B
->>>> |  |
->>>> v  /
->>>> C<-
->>>>
->>>> A is parent for B and C, B is parent for C.
->>>>
->>>> Obviously, to update permissions, we should go in order A B C, so, when
->>>> we update C, all it's parents permission already updated. But with
->>>> current approach (simple recursion) we can update in sequence A C B C (C
->>>> is updated twice). On first update of C, we consider old B permissions,
->>>> so doing wrong thing. If it succeed, all is OK, on second C update we
->>>> will finish with correct graph. But if the wrong thing failed, we break
->>>> the whole process for no reason (it's possible that updated B permission
->>>> will be less strict, but we will never check it).
->>> True.
->>>
->>>> I'll work on a patch for it.
->>> Sounds great, though I fear for the complexity.  I’ll just wait and see
->>> for now.
->>>
->> If you are OK with .active for now, then I think, Andrey can resend with
->> .active and I'll dig into permissions in parallel. If Andrey's series
->> go first, I'll just drop .active later if my idea works.
-> Sure, that works for me.
->
+24.09.2020 19:50, Max Reitz wrote:
+> On 18.09.20 20:19, Vladimir Sementsov-Ogievskiy wrote:
+>> It's intended to be inserted between format and protocol nodes to
+>> preallocate additional space (expanding protocol file) on writes
+>> crossing EOF. It improves performance for file-systems with slow
+>> allocation.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   docs/system/qemu-block-drivers.rst.inc |  26 ++
+>>   qapi/block-core.json                   |  20 +-
+>>   block/preallocate.c                    | 556 +++++++++++++++++++++++++
+>>   block/meson.build                      |   1 +
+>>   4 files changed, 602 insertions(+), 1 deletion(-)
+>>   create mode 100644 block/preallocate.c
+> 
+> Looks good to me in general.
+> 
+> [...]
+> 
+>> diff --git a/block/preallocate.c b/block/preallocate.c
+>> new file mode 100644
+>> index 0000000000..6510ad0149
+>> --- /dev/null
+>> +++ b/block/preallocate.c
+> 
+> [...]
+> 
+>> +/*
+>> + * Handle reopen.
+>> + *
+>> + * We must implement reopen handlers, otherwise reopen just don't work. Handle
+>> + * new options and don't care about preallocation state, as it is handled in
+>> + * set/check permission handlers.
+>> + */
+>> +
+>> +static int preallocate_reopen_prepare(BDRVReopenState *reopen_state,
+>> +                                      BlockReopenQueue *queue, Error **errp)
+>> +{
+>> +    PreallocateOpts *opts = g_new0(PreallocateOpts, 1);
+>> +
+>> +    if (!preallocate_absorb_opts(opts, reopen_state->options,
+>> +                                 reopen_state->bs->file->bs, errp)) {
+> 
+> I tried to find out whether this refers to the old file child, or the
+> post-reopen one.
+
+Note, that it's needed only to check request_alignment. Probably it's better to pass request_alignment to preallocate_absorb_opts, not the whole child.
+
+>  As far as I could find out, there is no generic
+> implementation for changing the file child as part of x-blockdev-reopen:
+> 
+> {"error": {"class": "GenericError", "desc": "Cannot change the option
+> 'file'"}}
+> 
+> Now that’s a shame.  That means you can’t reasonably integrate a
+> preallocate filter into an existing node graph unless the format driver
+> checks for the respective child option and issues a replace_node on
+> commit or something, right?  I suppose any driver who’d want to
+> implement child replacement would need to attach the new node in
+> prepare() as some pseudo-child, and then drop the old one and rename the
+> new one in commit().  I don’t think any driver does that yet, so I
+> suppose no format driver allows replacement of children yet (except for
+> quorum...).
+> 
+> Does anyone know what the status on that is?  Are there any plans for
+> implementing child replacement in reopen, or did I just miss something?
+> 
+> (It looks like the backing child can be replaced, but that’s probably
+> not a child where the preallocate filter would be placed on top...).
+
+Hm. I didn't care about it, because main use case is to insert the filter at start, specifying it in -drive or in -blockdev options.
+
+Probably, we need a separate API which will insert/remove filters like it is done in block jobs code, not reopening the block device.
+
+> 
+>> +        g_free(opts);
+>> +        return -EINVAL;
+>> +    }
+>> +
+>> +    reopen_state->opaque = opts;
+>> +
+>> +    return 0;
+>> +}
+> 
+> [...]
+> 
+>> +/*
+>> + * Call on each write. Returns true if @want_merge_zero is true and the region
+>> + * [offset, offset + bytes) is zeroed (as a result of this call or earlier
+>> + * preallocation).
+>> + *
+>> + * want_merge_zero is used to merge write-zero request with preallocation in
+>> + * one bdrv_co_pwrite_zeroes() call.
+>> + */
+>> +static bool coroutine_fn handle_write(BlockDriverState *bs, int64_t offset,
+>> +                                      int64_t bytes, bool want_merge_zero)
+>> +{
+>> +    BDRVPreallocateState *s = bs->opaque;
+>> +    int64_t end = offset + bytes;
+>> +    int64_t prealloc_start, prealloc_end;
+>> +    int ret;
+>> +
+>> +    if (!has_prealloc_perms(bs)) {
+> 
+> Took me a bit to figure out, because it takes a trip to
+> preallocate_child_perm() to figure out exactly when we’re going to have
+> the necessary permissions for this to pass.
+> 
+> Then it turns out that this is going to be the case exactly when the
+> parents collectively have the same permissions (WRITE+RESIZE) on the
+> preallocate node.
+> 
+> Then I had to wonder whether it’s appropriate not to preallocate if
+> WRITE is taken, but RESIZE isn’t.  But that seems entirely correct, yes.
+>   If noone is going to grow the file, then there is no need for
+> preallocation.  (Vice versa, if noone is going to write, but only
+> resize, then there is no need for preallocation either.)
+> 
+> So this seems correct, yes.
+> 
+> (It could be argued that if one parent has WRITE, and another has RESIZE
+> (but neither has both), then we probably don’t need preallocation
+> either.  But in such an arcane case (which is impossible to figure out
+> in .bdrv_child_perm() anyway), we might as well just do preallocation.
+> Won’t hurt.)
+> 
+>> +        /* We don't have state neither should try to recover it */
+>> +        return false;
+>> +    }
+>> +
+>> +    if (s->data_end < 0) {
+>> +        s->data_end = bdrv_getlength(bs->file->bs);
+>> +        if (s->data_end < 0) {
+>> +            return false;
+>> +        }
+>> +
+>> +        if (s->file_end < 0) {
+>> +            s->file_end = s->data_end;
+>> +        }
+>> +    }
+>> +
+>> +    if (end <= s->data_end) {
+>> +        return false;
+>> +    }
+>> +
+>> +    /* We have valid s->data_end, and request writes beyond it. */
+>> +
+>> +    s->data_end = end;
+>> +    if (s->zero_start < 0 || !want_merge_zero) {
+>> +        s->zero_start = end;
+> 
+> Skipping this on want_merge_zero == true means that zero writes can be
+> cached; if you repeatedly perform zero writes into the preallocated
+> area, then none of those will actually be executed.  I legitimately
+> don’t know whether that’s OK.
+> 
+> I suppose until someone tells me it isn’t OK, I’ll believe it is.
+
+Skipping zero-writes to preallocated area is significant for performance.
+If I remember correctly, handle_alloc_space() in qcow2 will otherwise do extra write-zeroes, which reduces performance.
+
+So, we assume that zero-write after EOF is a kind of preallocation. And avoid preallocating same region twice.
+
+Using zero_start instead of data_end is probably less significant, I'm not sure.
+
+> 
+>> +    }
+>> +
+>> +    if (s->file_end < 0) {
+>> +        s->file_end = bdrv_getlength(bs->file->bs);
+>> +        if (s->file_end < 0) {
+>> +            return false;
+>> +        }
+>> +    }
+>> +
+>> +    /* Now s->data_end, s->zero_start and s->file_end are valid. */
+>> +
+>> +    if (end <= s->file_end) {
+>> +        /* No preallocation needed. */
+>> +        return want_merge_zero && offset >= s->zero_start;
+>> +    }
+>> +
+>> +    /* Now we want new preallocation, as request writes beyond s->data_end. */
+> 
+> s/data_end/file_end/> 
+>> +
+>> +    prealloc_start = want_merge_zero ? MIN(offset, s->file_end) : s->file_end;
+> 
+> I suppose you intentionally use s->file_end here instead of @end, even
+> if offset <= s->file_end.  I just mention it because I wonder whether
+> it’s really better to effectively write twice to the same area in such
+> cases (once zeroes for preallocation, then immediately the data) instead
+> of only writing the data and then preallocating past it.
+> 
+> (Though if it were the same code just with @end instead of s->file_end
+> for offset <= s->file_end, then the order would be to preallocate past
+> @end, and then to write the data.  Which might be suboptimal in terms of
+> how the blocks are then ordered in the filesystem.)
+
+Yes, I think it's better to preallocate from file_end, in this way we do our best for good file blocks location in filesystem. And writing twice shouldn't really matter with big enough preallocation size (a lot larger than usual guest write operation).
+
+> 
+>> +    prealloc_end = QEMU_ALIGN_UP(offset + bytes + s->opts.prealloc_size,
+> 
+> s/offset + bytes/end/?
+
+yes
+
+> 
+>> +                                 s->opts.prealloc_align);
+>> +    s->file_end = end;
+> 
+> Why is this set here, when it’s always overwritten after
+> bdrv_co_pwrite_zeroes() anyway?
+> 
+> (It also seems a bit wrong, because at this point we don’t know yet
+> whether the data write is going to succeed, so we don’t know for sure
+> whether the file end is really going to be @end without the preallocation.)
+
+Agree, that's strange and seems wrong. Will drop.
+
+> 
+>> +
+>> +    ret = bdrv_co_pwrite_zeroes(
+>> +            bs->file, prealloc_start, prealloc_end - prealloc_start,
+>> +            BDRV_REQ_NO_FALLBACK | BDRV_REQ_SERIALISING | BDRV_REQ_NO_WAIT);
+>> +    if (ret < 0) {
+>> +        s->file_end = ret;
+>> +        return false;
+>> +    }
+>> +
+>> +    s->file_end = prealloc_end;
+>> +    return want_merge_zero;
+>> +}
+>> +
+>> +static int coroutine_fn preallocate_co_pwrite_zeroes(BlockDriverState *bs,
+>> +        int64_t offset, int bytes, BdrvRequestFlags flags)
+>> +{
+>> +    bool want_merge_zero =
+>> +        (flags & (BDRV_REQ_ZERO_WRITE | BDRV_REQ_NO_FALLBACK)) == flags;
+> 
+> Isn’t this the same as !(flags & ~(ZERO_WRITE | NO_FALLBACK))?  (Maybe
+> only I would find that simpler to understand, though.)
+
+Actually, I think yours is more usual notation and it uses "flags" once. Will change.
+
+> 
+>> +    if (handle_write(bs, offset, bytes, want_merge_zero)) {
+>> +        return 0;
+>> +    }
+>> +
+>> +    return bdrv_co_pwrite_zeroes(bs->file, offset, bytes, flags);
+>> +}
+> 
+> [...]
+> 
+>> +static int coroutine_fn
+>> +preallocate_co_truncate(BlockDriverState *bs, int64_t offset,
+>> +                        bool exact, PreallocMode prealloc,
+>> +                        BdrvRequestFlags flags, Error **errp)
+>> +{
+>> +    ERRP_GUARD();
+>> +    BDRVPreallocateState *s = bs->opaque;
+>> +    int ret;
+>> +
+>> +    if (s->data_end >= 0 && offset > s->data_end) {
+>> +        if (s->file_end < 0) {
+>> +            s->file_end = bdrv_getlength(bs->file->bs);
+>> +            if (s->file_end < 0) {
+>> +                error_setg(errp, "failed to get file length");
+>> +                return s->file_end;
+>> +            }
+>> +        }
+>> +
+>> +        if (prealloc == PREALLOC_MODE_FALLOC) {
+>> +            /*
+>> +             * If offset <= s->file_end, the task is already done, just
+>> +             * update s->file_end, to move part of "filter preallocation"
+> 
+> s/file_end/data_end/
+> 
+>> +             * to "preallocation requested by user".
+>> +             * Otherwise just proceed to preallocate missing part.
+>> +             */
+>> +            if (offset <= s->file_end) {
+>> +                s->data_end = offset;
+>> +                return 0;
+>> +            }
+> 
+> [...]
+> 
+>> +static int preallocate_check_perm(BlockDriverState *bs,
+>> +                                  uint64_t perm, uint64_t shared, Error **errp)
+>> +{
+>> +    BDRVPreallocateState *s = bs->opaque;
+>> +
+>> +    if (s->data_end >= 0 && !can_write_resize(perm)) {
+>> +        /*
+>> +         * Loose permissions.
+> 
+> *Lose
+> 
+> (I assume)
+
+Oops)
+
+> 
+>> +         * We should truncate in check_perm, as in set_perm bs->file->perm will
+>> +         * be already changed, and we should not violate it.
+>> +         */
+>> +        if (s->file_end < 0) {
+>> +            s->file_end = bdrv_getlength(bs->file->bs);
+>> +            if (s->file_end < 0) {
+>> +                error_setg(errp, "Failed to get file length");
+>> +                return s->file_end;
+>> +            }
+>> +        }
+>> +
+>> +        if (s->data_end < s->file_end) {
+>> +            int ret = bdrv_truncate(bs->file, s->data_end, true,
+>> +                                    PREALLOC_MODE_OFF, 0, NULL);
+>> +            if (ret < 0) {
+>> +                error_setg(errp, "Failed to drop preallocation");
+>> +                s->file_end = ret;
+>> +                return ret;
+>> +            }
+>> +        }
+>> +        /*
+>> +         * We will drop our permissions, as well as allow shared
+>> +         * permissions, anyone will be able to change the child, so mark
+>> +         * all states invalid. We'll regain control if get good permissions
+>> +         * back.
+>> +         */
+>> +        s->data_end = s->file_end = s->zero_start = -EINVAL;
+> 
+> Shouldn’t we clear these variables whenever !can_write_resize(perm), not
+> just if also s->data_end >= 0?
+
+Yes, will fix.
+
+> 
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+> 
 > Max
+> 
 
+Thanks!
 
-So, I am keeping the filter insert/remove functions in the COR-driver 
-code for now rather than moving them to the block generic layer, aren't I?
-
-Andrey
-
+-- 
+Best regards,
+Vladimir
 
