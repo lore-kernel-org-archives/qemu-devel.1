@@ -2,79 +2,79 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY
-	autolearn=ham autolearn_force=no version=3.4.0
+	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8650CC4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 15:21:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6943CC4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 15:21:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6C0521D24
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 15:21:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C8C9220BED
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 15:21:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JVA6SlzU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6C0521D24
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H0X7fepV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8C9220BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLT42-0002zA-UU
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 11:21:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45208)
+	id 1kLT4D-0003Op-Sj
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 11:21:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45296)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kLSye-0005v9-2B
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 11:16:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44768)
+ id 1kLSyj-00067v-PF
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 11:16:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56908)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kLSyc-0003t1-I4
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 11:16:07 -0400
+ id 1kLSyh-0003ty-CO
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 11:16:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600960565;
+ s=mimecast20190719; t=1600960570;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=cySJN7dpuz/Va7hJwVhgUr/eA+8gkNc8rx9Q59fpqDE=;
- b=JVA6SlzUBuO1/JKAGWH41rw2XuQPDlH5zNgNn0f5zPchaWrus0PtTK3ptNTPYRgBQnw9eu
- DL6p4Q6quh1eL8BEjBGrw52oC5oEZSL7K9uMKhnWbHfFX97LTZwL1rPVJzy8JuXARJ3MD3
- bqHtS/YEwWR0xJBzLECiwQ64FgxRW4c=
+ bh=/LX/tRWhvQdbHE+td9jJrkcTKAjU6Xk+V7/V7qmQ1XQ=;
+ b=H0X7fepVHoyyN9lDv0Zzo3Z03C7zc0yimfyM0cLNWRuIo0UltET9ld5eIcrs5d9v7Bl6ce
+ hzUzWAeKHphDd5t84QYk3PT/4JOczzQ59DlfXfZboNF2t0i3B9YQSyZ6SgFKP8ygZdWRIJ
+ FgfJtzt9bU1Z9fcgCRYWOU8T09qVl70=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205--Fol4fNbNJ6WvbOtk_cMZw-1; Thu, 24 Sep 2020 11:16:02 -0400
-X-MC-Unique: -Fol4fNbNJ6WvbOtk_cMZw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-76-sLGXg1tuNVemjALdia9cbw-1; Thu, 24 Sep 2020 11:16:06 -0400
+X-MC-Unique: sLGXg1tuNVemjALdia9cbw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C440664142;
- Thu, 24 Sep 2020 15:16:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 695F5188C125;
+ Thu, 24 Sep 2020 15:16:05 +0000 (UTC)
 Received: from localhost (ovpn-114-5.ams2.redhat.com [10.36.114.5])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 62F455C1C7;
- Thu, 24 Sep 2020 15:16:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1A5141002C00;
+ Thu, 24 Sep 2020 15:16:01 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 02/13] util/vhost-user-server: s/fileds/fields/ typo fix
-Date: Thu, 24 Sep 2020 16:15:38 +0100
-Message-Id: <20200924151549.913737-3-stefanha@redhat.com>
+Subject: [PATCH v2 03/13] util/vhost-user-server: drop unnecessary QOM cast
+Date: Thu, 24 Sep 2020 16:15:39 +0100
+Message-Id: <20200924151549.913737-4-stefanha@redhat.com>
 In-Reply-To: <20200924151549.913737-1-stefanha@redhat.com>
 References: <20200924151549.913737-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: base64
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -15
 X-Spam_score: -1.6
@@ -105,16 +105,20 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-U2lnbmVkLW9mZi1ieTogU3RlZmFuIEhham5vY3ppIDxzdGVmYW5oYUByZWRoYXQuY29tPgotLS0K
-IHV0aWwvdmhvc3QtdXNlci1zZXJ2ZXIuYyB8IDIgKy0KIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2Vy
-dGlvbigrKSwgMSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL3V0aWwvdmhvc3QtdXNlci1zZXJ2
-ZXIuYyBiL3V0aWwvdmhvc3QtdXNlci1zZXJ2ZXIuYwppbmRleCA3YjUwYTJiMWZkLi4yY2QwY2Y4
-Mjc3IDEwMDY0NAotLS0gYS91dGlsL3Zob3N0LXVzZXItc2VydmVyLmMKKysrIGIvdXRpbC92aG9z
-dC11c2VyLXNlcnZlci5jCkBAIC00MDcsNyArNDA3LDcgQEAgYm9vbCB2aG9zdF91c2VyX3NlcnZl
-cl9zdGFydChWdVNlcnZlciAqc2VydmVyLAogICAgICAgICByZXR1cm4gZmFsc2U7CiAgICAgfQog
-Ci0gICAgLyogemVybyBvdXQgdW5zcGVjaWZpZWQgZmlsZWRzICovCisgICAgLyogemVybyBvdXQg
-dW5zcGVjaWZpZWQgZmllbGRzICovCiAgICAgKnNlcnZlciA9IChWdVNlcnZlcikgewogICAgICAg
-ICAubGlzdGVuZXIgICAgICAgICAgICAgID0gbGlzdGVuZXIsCiAgICAgICAgIC52dV9pZmFjZSAg
-ICAgICAgICAgICAgPSB2dV9pZmFjZSwKLS0gCjIuMjYuMgoK
+V2UgYWxyZWFkeSBoYXZlIGFjY2VzcyB0byB0aGUgdmFsdWUgd2l0aCB0aGUgY29ycmVjdCB0eXBl
+IChpb2MgYW5kIHNpb2MKYXJlIHRoZSBzYW1lIFFJT0NoYW5uZWwpLgoKU2lnbmVkLW9mZi1ieTog
+U3RlZmFuIEhham5vY3ppIDxzdGVmYW5oYUByZWRoYXQuY29tPgotLS0KIHV0aWwvdmhvc3QtdXNl
+ci1zZXJ2ZXIuYyB8IDIgKy0KIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxl
+dGlvbigtKQoKZGlmZiAtLWdpdCBhL3V0aWwvdmhvc3QtdXNlci1zZXJ2ZXIuYyBiL3V0aWwvdmhv
+c3QtdXNlci1zZXJ2ZXIuYwppbmRleCAyY2QwY2Y4Mjc3Li5lYmU0Nzg4NWY1IDEwMDY0NAotLS0g
+YS91dGlsL3Zob3N0LXVzZXItc2VydmVyLmMKKysrIGIvdXRpbC92aG9zdC11c2VyLXNlcnZlci5j
+CkBAIC0zMzcsNyArMzM3LDcgQEAgc3RhdGljIHZvaWQgdnVfYWNjZXB0KFFJT05ldExpc3RlbmVy
+ICpsaXN0ZW5lciwgUUlPQ2hhbm5lbFNvY2tldCAqc2lvYywKICAgICBzZXJ2ZXItPmlvYyA9IFFJ
+T19DSEFOTkVMKHNpb2MpOwogICAgIG9iamVjdF9yZWYoT0JKRUNUKHNlcnZlci0+aW9jKSk7CiAg
+ICAgcWlvX2NoYW5uZWxfYXR0YWNoX2Fpb19jb250ZXh0KHNlcnZlci0+aW9jLCBzZXJ2ZXItPmN0
+eCk7Ci0gICAgcWlvX2NoYW5uZWxfc2V0X2Jsb2NraW5nKFFJT19DSEFOTkVMKHNlcnZlci0+c2lv
+YyksIGZhbHNlLCBOVUxMKTsKKyAgICBxaW9fY2hhbm5lbF9zZXRfYmxvY2tpbmcoc2VydmVyLT5p
+b2MsIGZhbHNlLCBOVUxMKTsKICAgICB2dV9jbGllbnRfc3RhcnQoc2VydmVyKTsKIH0KIAotLSAK
+Mi4yNi4yCgo=
 
 
