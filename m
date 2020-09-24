@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE35AC4346E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:33:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF871C4346E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:36:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05A0721D91
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:33:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ECE1423741
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:36:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VO0Zul7D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05A0721D91
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CWTXSj6k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECE1423741
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLLlC-00040Y-2D
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 03:33:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41002)
+	id 1kLLoA-0005H6-UB
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 03:36:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41666)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kLLk1-00038i-Ig
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:32:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32278)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kLLnI-0004gZ-8N
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:35:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60470)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kLLjz-0000V8-74
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:32:32 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kLLnG-0000pY-IN
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:35:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600932750;
+ s=mimecast20190719; t=1600932953;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=Z/mZVKI3U+tsnmisHqbscjyCdPv/uVWKxaAds/A7sm4=;
- b=VO0Zul7Dfd1QTwBUf0ic1Y6+zTxv2LT/BaTiJEiW1m8AdUif7gzbt38zlBh1y8x7saujsP
- bM14nEssri0BMHrzjUPpIUdYNrrNAwd2EqO0XWneBRz1YOnH/OJHhNNpN4y4S7hUA/B4YL
- tf5FybVjXKzRTV7o2KAbXidF2p6wBnM=
+ bh=TBfoO4a/BibRwhs6HvcOqjn/6dg0UNcYAbdNY+loaAA=;
+ b=CWTXSj6k5CwmfoDmg27FYAfbzeHMKR5wuNmp8ZvG1uSgeS5rqADuY5IgqtHGHTuJ9pxQS3
+ WVrMSq4Lgy85M20ZE20IRBT0z3jG2NjGcyzLF1YpJFNxNVpP3Q+39usjsqx3lU4+r9JfCv
+ 2t0ctZVmciiwGVwAnZpGnhtRQ/Y/01k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-132-EeLqvYb0OMiCd5jasTS52A-1; Thu, 24 Sep 2020 03:32:28 -0400
-X-MC-Unique: EeLqvYb0OMiCd5jasTS52A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-554-v7Jstv67Mt2yNlGcgkzXoQ-1; Thu, 24 Sep 2020 03:35:51 -0400
+X-MC-Unique: v7Jstv67Mt2yNlGcgkzXoQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 297C164091;
- Thu, 24 Sep 2020 07:32:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 575D7800400;
+ Thu, 24 Sep 2020 07:35:50 +0000 (UTC)
 Received: from [10.36.114.4] (ovpn-114-4.ams2.redhat.com [10.36.114.4])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 12B975D990;
- Thu, 24 Sep 2020 07:32:25 +0000 (UTC)
-Subject: Re: [PATCH 1/8] softfloat: Use mulu64 for mul64To128
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4891A1002C01;
+ Thu, 24 Sep 2020 07:35:49 +0000 (UTC)
+Subject: Re: [PATCH 2/8] softfloat: Use int128.h for some operations
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20200924012453.659757-1-richard.henderson@linaro.org>
- <20200924012453.659757-2-richard.henderson@linaro.org>
+ <20200924012453.659757-3-richard.henderson@linaro.org>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -105,20 +105,20 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat GmbH
-Message-ID: <6e246c0f-212a-3da7-1959-ae72d0669191@redhat.com>
-Date: Thu, 24 Sep 2020 09:32:25 +0200
+Message-ID: <736e0808-615a-f522-6f4e-43c6d540e0ca@redhat.com>
+Date: Thu, 24 Sep 2020 09:35:48 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200924012453.659757-2-richard.henderson@linaro.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200924012453.659757-3-richard.henderson@linaro.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=david@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
@@ -149,54 +149,88 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 24.09.20 03:24, Richard Henderson wrote:
-> Via host-utils.h, we use a host widening multiply for
-> 64-bit hosts, and a common subroutine for 32-bit hosts.
+> Use our Int128, which wraps the compiler's __int128_t,
+> instead of open-coding left shifts and arithmetic.
+> We'd need to extend Int128 to have unsigned operations
+> to replace more than these three.
 > 
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  include/fpu/softfloat-macros.h | 24 ++++--------------------
->  1 file changed, 4 insertions(+), 20 deletions(-)
+>  include/fpu/softfloat-macros.h | 39 +++++++++++++++++-----------------
+>  1 file changed, 20 insertions(+), 19 deletions(-)
 > 
 > diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
-> index a35ec2893a..57845f8af0 100644
+> index 57845f8af0..95d88d05b8 100644
 > --- a/include/fpu/softfloat-macros.h
 > +++ b/include/fpu/softfloat-macros.h
-> @@ -83,6 +83,7 @@ this code that are retained.
->  #define FPU_SOFTFLOAT_MACROS_H
+> @@ -84,6 +84,7 @@ this code that are retained.
 >  
 >  #include "fpu/softfloat-types.h"
-> +#include "qemu/host-utils.h"
+>  #include "qemu/host-utils.h"
+> +#include "qemu/int128.h"
 >  
 >  /*----------------------------------------------------------------------------
 >  | Shifts `a' right by the number of bits given in `count'.  If any nonzero
-> @@ -515,27 +516,10 @@ static inline void
->  | `z0Ptr' and `z1Ptr'.
+> @@ -352,13 +353,11 @@ static inline void shortShift128Left(uint64_t a0, uint64_t a1, int count,
+>  static inline void shift128Left(uint64_t a0, uint64_t a1, int count,
+>                                  uint64_t *z0Ptr, uint64_t *z1Ptr)
+>  {
+> -    if (count < 64) {
+> -        *z1Ptr = a1 << count;
+> -        *z0Ptr = count == 0 ? a0 : (a0 << count) | (a1 >> (-count & 63));
+> -    } else {
+> -        *z1Ptr = 0;
+> -        *z0Ptr = a1 << (count - 64);
+> -    }
+> +    Int128 a = int128_make128(a1, a0);
+> +    Int128 z = int128_lshift(a, count);
+> +
+> +    *z0Ptr = int128_gethi(z);
+> +    *z1Ptr = int128_getlo(z);
+>  }
+>  
+>  /*----------------------------------------------------------------------------
+> @@ -405,15 +404,15 @@ static inline void
 >  *----------------------------------------------------------------------------*/
 >  
-> -static inline void mul64To128( uint64_t a, uint64_t b, uint64_t *z0Ptr, uint64_t *z1Ptr )
-> +static inline void
-> +mul64To128(uint64_t a, uint64_t b, uint64_t *z0Ptr, uint64_t *z1Ptr)
+>  static inline void
+> - add128(
+> -     uint64_t a0, uint64_t a1, uint64_t b0, uint64_t b1, uint64_t *z0Ptr, uint64_t *z1Ptr )
+> +add128(uint64_t a0, uint64_t a1, uint64_t b0, uint64_t b1,
+> +       uint64_t *z0Ptr, uint64_t *z1Ptr)
 >  {
-> -    uint32_t aHigh, aLow, bHigh, bLow;
-> -    uint64_t z0, zMiddleA, zMiddleB, z1;
+> -    uint64_t z1;
 > -
-> -    aLow = a;
-> -    aHigh = a>>32;
-> -    bLow = b;
-> -    bHigh = b>>32;
-> -    z1 = ( (uint64_t) aLow ) * bLow;
-> -    zMiddleA = ( (uint64_t) aLow ) * bHigh;
-> -    zMiddleB = ( (uint64_t) aHigh ) * bLow;
-> -    z0 = ( (uint64_t) aHigh ) * bHigh;
-> -    zMiddleA += zMiddleB;
-> -    z0 += ( ( (uint64_t) ( zMiddleA < zMiddleB ) )<<32 ) + ( zMiddleA>>32 );
-> -    zMiddleA <<= 32;
-> -    z1 += zMiddleA;
-> -    z0 += ( z1 < zMiddleA );
+> -    z1 = a1 + b1;
 > -    *z1Ptr = z1;
-> -    *z0Ptr = z0;
+> -    *z0Ptr = a0 + b0 + ( z1 < a1 );
+> +    Int128 a = int128_make128(a1, a0);
+> +    Int128 b = int128_make128(b1, b0);
+> +    Int128 z = int128_add(a, b);
+>  
+> +    *z0Ptr = int128_gethi(z);
+> +    *z1Ptr = int128_getlo(z);
+>  }
+>  
+>  /*----------------------------------------------------------------------------
+> @@ -463,13 +462,15 @@ static inline void
+>  *----------------------------------------------------------------------------*/
+>  
+>  static inline void
+> - sub128(
+> -     uint64_t a0, uint64_t a1, uint64_t b0, uint64_t b1, uint64_t *z0Ptr, uint64_t *z1Ptr )
+> +sub128(uint64_t a0, uint64_t a1, uint64_t b0, uint64_t b1,
+> +       uint64_t *z0Ptr, uint64_t *z1Ptr)
+>  {
+> +    Int128 a = int128_make128(a1, a0);
+> +    Int128 b = int128_make128(b1, b0);
+> +    Int128 z = int128_sub(a, b);
+>  
+> -    *z1Ptr = a1 - b1;
+> -    *z0Ptr = a0 - b0 - ( a1 < b1 );
 > -
-> +    mulu64(z1Ptr, z0Ptr, a, b);
+> +    *z0Ptr = int128_gethi(z);
+> +    *z1Ptr = int128_getlo(z);
 >  }
 >  
 >  /*----------------------------------------------------------------------------
