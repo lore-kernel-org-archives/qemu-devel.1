@@ -2,134 +2,73 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECAFAC4346E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:48:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8E55C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:49:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EFAA206B2
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:48:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LyTycKbp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EFAA206B2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3F63D23787
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:49:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F63D23787
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLLyy-0002Wx-9K
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 03:48:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43152)
+	id 1kLM01-0003Xs-BD
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 03:49:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44084)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kLLtz-0005QU-Su
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:42:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23071)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kLLtx-0001ZW-44
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:42:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600933368;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=7QY63p3KnxMKXWrqLsF+U9HgSX0+VbykYuyEoUfzOFw=;
- b=LyTycKbppTb0FInfwKwGYxtUn275pcEC8t+c+y4zad60pwFkbVN3f6a3BbMLiQ5fnIZWn5
- qraihdcsAvJnk2i0y9q+VaSjB4Xl9eL8AH7OdqSi7ltaQsiP5cW8EMXE+U1YuUtpiidCws
- ZAFRC9OG9LJuPXQryX4nf4/g8XAcqyk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-294-yDj4eFtsPR2O1Q1QgHel9A-1; Thu, 24 Sep 2020 03:42:46 -0400
-X-MC-Unique: yDj4eFtsPR2O1Q1QgHel9A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C68D801E53;
- Thu, 24 Sep 2020 07:42:45 +0000 (UTC)
-Received: from [10.36.114.4] (ovpn-114-4.ams2.redhat.com [10.36.114.4])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 68DA555788;
- Thu, 24 Sep 2020 07:42:44 +0000 (UTC)
-Subject: Re: [PATCH 5/8] softfloat: Inline pick_nan_muladd into its caller
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200924012453.659757-1-richard.henderson@linaro.org>
- <20200924012453.659757-6-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat GmbH
-Message-ID: <9f382d1d-800f-43c8-7dca-ddd961b527e2@redhat.com>
-Date: Thu, 24 Sep 2020 09:42:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>)
+ id 1kLLyq-0002cY-D5; Thu, 24 Sep 2020 03:47:52 -0400
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:44193)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>)
+ id 1kLLyo-00025X-1X; Thu, 24 Sep 2020 03:47:52 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.108.1.237])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 509F964F0276;
+ Thu, 24 Sep 2020 09:47:38 +0200 (CEST)
+Received: from kaod.org (37.59.142.96) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 24 Sep
+ 2020 09:47:37 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-96R001c2756683-ff4d-428b-860b-431edabd94c2,
+ 85AEC8A2294FDACAA0F214F2A1981C2CEEF9973D) smtp.auth=groug@kaod.org
+Date: Thu, 24 Sep 2020 09:47:36 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Daniel Henrique Barboza <danielhb413@gmail.com>
+Subject: Re: [PATCH 1/6] spapr: add spapr_machine_using_legacy_numa() helper
+Message-ID: <20200924094736.1937083c@bahia.lan>
+In-Reply-To: <20200923193458.203186-2-danielhb413@gmail.com>
+References: <20200923193458.203186-1-danielhb413@gmail.com>
+ <20200923193458.203186-2-danielhb413@gmail.com>
+X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200924012453.659757-6-richard.henderson@linaro.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Originating-IP: [37.59.142.96]
+X-ClientProxiedBy: DAG9EX2.mxp5.local (172.16.2.82) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: 7b51a125-1b28-414b-ac20-0efdf107ea87
+X-Ovh-Tracer-Id: 5699868280138799584
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrudejgdduvddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefuddtieejjeevheekieeltefgleetkeetheettdeifeffvefhffelffdtfeeljeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegurghvihgusehgihgsshhonhdrughrohhpsggvrghrrdhiugdrrghu
+Received-SPF: pass client-ip=79.137.123.220; envelope-from=groug@kaod.org;
+ helo=smtpout1.mo804.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 03:47:39
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -143,126 +82,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org, bharata@linux.ibm.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24.09.20 03:24, Richard Henderson wrote:
-> Because of FloatParts, there will only ever be one caller.
-> Inlining allows us to re-use abc_mask for the snan test.
+On Wed, 23 Sep 2020 16:34:53 -0300
+Daniel Henrique Barboza <danielhb413@gmail.com> wrote:
+
+> The changes to come to NUMA support are all guest visible. In
+> theory we could just create a new 5_1 class option flag to
+> avoid the changes to cascade to 5.1 and under. The reality is that
+> these changes are only relevant if the machine has more than one
+> NUMA node. There is no need to change guest behavior that has
+> been around for years needlesly.
 > 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> This new helper will be used by the next patches to determine
+> whether we should retain the (soon to be) legacy NUMA behavior
+> in the pSeries machine. The new behavior will only be exposed
+> if:
+> 
+> - machine is pseries-5.2 and newer;
+> - more than one NUMA node is declared in NUMA state.
+> 
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 > ---
->  fpu/softfloat.c | 75 +++++++++++++++++++++++--------------------------
->  1 file changed, 35 insertions(+), 40 deletions(-)
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/ppc/spapr.c         | 12 ++++++++++++
+>  include/hw/ppc/spapr.h |  2 ++
+>  2 files changed, 14 insertions(+)
 > 
-> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-> index 3e625c47cd..e038434a07 100644
-> --- a/fpu/softfloat.c
-> +++ b/fpu/softfloat.c
-> @@ -929,45 +929,6 @@ static FloatParts pick_nan(FloatParts a, FloatParts b, float_status *s)
->      return a;
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index e813c7cfb9..c5d8910a74 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -294,6 +294,15 @@ static hwaddr spapr_node0_size(MachineState *machine)
+>      return machine->ram_size;
 >  }
 >  
-> -static FloatParts pick_nan_muladd(FloatParts a, FloatParts b, FloatParts c,
-> -                                  bool inf_zero, float_status *s)
-> -{
-> -    int which;
-> -
-> -    if (is_snan(a.cls) || is_snan(b.cls) || is_snan(c.cls)) {
-> -        s->float_exception_flags |= float_flag_invalid;
-> -    }
-> -
-> -    which = pickNaNMulAdd(a.cls, b.cls, c.cls, inf_zero, s);
-> -
-> -    if (s->default_nan_mode) {
-> -        /* Note that this check is after pickNaNMulAdd so that function
-> -         * has an opportunity to set the Invalid flag.
-> -         */
-> -        which = 3;
-> -    }
-> -
-> -    switch (which) {
-> -    case 0:
-> -        break;
-> -    case 1:
-> -        a = b;
-> -        break;
-> -    case 2:
-> -        a = c;
-> -        break;
-> -    case 3:
-> -        return parts_default_nan(s);
-> -    default:
-> -        g_assert_not_reached();
-> -    }
-> -
-> -    if (is_snan(a.cls)) {
-> -        return parts_silence_nan(a, s);
-> -    }
-> -    return a;
-> -}
-> -
->  /*
->   * Returns the result of adding or subtracting the values of the
->   * floating-point values `a' and `b'. The operation is performed
-> @@ -1366,7 +1327,41 @@ static FloatParts muladd_floats(FloatParts a, FloatParts b, FloatParts c,
->       * off to the target-specific pick-a-NaN routine.
->       */
->      if (unlikely(abc_mask & float_cmask_anynan)) {
-> -        return pick_nan_muladd(a, b, c, inf_zero, s);
-> +        int which;
+> +bool spapr_machine_using_legacy_numa(SpaprMachineState *spapr)
+> +{
+> +    MachineState *machine = MACHINE(spapr);
+> +    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
 > +
-> +        if (unlikely(abc_mask & float_cmask_snan)) {
-> +            float_raise(float_flag_invalid, s);
-> +        }
+> +    return smc->pre_5_2_numa_associativity ||
+> +           machine->numa_state->num_nodes <= 1;
+> +}
 > +
-> +        which = pickNaNMulAdd(a.cls, b.cls, c.cls, inf_zero, s);
+>  static void add_str(GString *s, const gchar *s1)
+>  {
+>      g_string_append_len(s, s1, strlen(s1) + 1);
+> @@ -4522,8 +4531,11 @@ DEFINE_SPAPR_MACHINE(5_2, "5.2", true);
+>   */
+>  static void spapr_machine_5_1_class_options(MachineClass *mc)
+>  {
+> +    SpaprMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
 > +
-> +        if (s->default_nan_mode) {
-> +            /*
-> +             * Note that this check is after pickNaNMulAdd so that function
-> +             * has an opportunity to set the Invalid flag for inf_zero.
-> +             */
-> +            which = 3;
-> +        }
-> +
-> +        switch (which) {
-> +        case 0:
-> +            break;
-> +        case 1:
-> +            a = b;
-> +            break;
-> +        case 2:
-> +            a = c;
-> +            break;
-> +        case 3:
-> +            return parts_default_nan(s);
-> +        default:
-> +            g_assert_not_reached();
-> +        }
-> +
-> +        if (is_snan(a.cls)) {
-> +            return parts_silence_nan(a, s);
-> +        }
-> +        return a;
->      }
+>      spapr_machine_5_2_class_options(mc);
+>      compat_props_add(mc->compat_props, hw_compat_5_1, hw_compat_5_1_len);
+> +    smc->pre_5_2_numa_associativity = true;
+>  }
 >  
->      if (unlikely(inf_zero)) {
-> 
-
-Not sure if that increases readability of muladd_floats() ... sometimes
-there is good reason to factor out stuff into subfunctions to improve
-readability.
-
-But the change itself looks good to me
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
--- 
-Thanks,
-
-David / dhildenb
+>  DEFINE_SPAPR_MACHINE(5_1, "5.1", false);
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 114e819969..d1aae03b97 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -143,6 +143,7 @@ struct SpaprMachineClass {
+>      bool smp_threads_vsmt; /* set VSMT to smp_threads by default */
+>      hwaddr rma_limit;          /* clamp the RMA to this size */
+>      bool pre_5_1_assoc_refpoints;
+> +    bool pre_5_2_numa_associativity;
+>  
+>      void (*phb_placement)(SpaprMachineState *spapr, uint32_t index,
+>                            uint64_t *buid, hwaddr *pio, 
+> @@ -860,6 +861,7 @@ int spapr_max_server_number(SpaprMachineState *spapr);
+>  void spapr_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
+>                        uint64_t pte0, uint64_t pte1);
+>  void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered);
+> +bool spapr_machine_using_legacy_numa(SpaprMachineState *spapr);
+>  
+>  /* DRC callbacks. */
+>  void spapr_core_release(DeviceState *dev);
 
 
