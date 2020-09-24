@@ -2,67 +2,68 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UPPERCASE_50_75,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2921C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:59:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9F5EC4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:00:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75E932396E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:59:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 35E4E21D91
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:00:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SKxjpazL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75E932396E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eoUy5FZ0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35E4E21D91
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLO1r-00014f-Jf
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:59:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39284)
+	id 1kLO2m-0002mO-52
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 06:00:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39726)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNU1-0001fF-D4
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50628)
+ id 1kLNUm-0003Is-Jo
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31205)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTy-00068L-3z
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:09 -0400
+ id 1kLNUh-0006Do-42
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600939445;
+ s=mimecast20190719; t=1600939488;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qosqWaVCW70nHPj7Njwr2XC/xGhCuEevp3Y/Mal6D+I=;
- b=SKxjpazLejS8Adg1972jJ55BRtaFKaxC89qocl0Gx12cuPWWMbfN5PEJagd3b8+f6xa57F
- SU7lFG2m70YSPYxW/ZOwbfvsYlrjIGHmPojeQc+q7GDhtOuImTAcm5HWIrs8xZRgBsuC96
- eWfPT7qg9BGXtmjOI6DGkhLONjeafJo=
+ bh=hQHdGaPRPiSSz7YlmIfS8lnsMcDdBc0lyN6LcIl/4c0=;
+ b=eoUy5FZ0yA42s1enjKFGN5EeOaHt6nx6ISNkqt6Y35Oi7hgWN732WJocLIszQ2ZzfFoWLN
+ /8ryB3p0+bnrswQET2skNjPvGs7Xxc6g/PCqcJy9uOzMJIHTZC+HS8+n1FlRNd93STD68b
+ FJXwrPGUS7i1TYjBKH2QIgtQwcZBTj4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-590-gxMX46t_P1K2j1TyLSzX8A-1; Thu, 24 Sep 2020 05:24:03 -0400
-X-MC-Unique: gxMX46t_P1K2j1TyLSzX8A-1
+ us-mta-428-xImUNCQbP4SfK-l9Qjy2bg-1; Thu, 24 Sep 2020 05:24:46 -0400
+X-MC-Unique: xImUNCQbP4SfK-l9Qjy2bg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 63B94801001;
- Thu, 24 Sep 2020 09:24:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 191D185B66C
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:24:46 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2354A5C1DC;
- Thu, 24 Sep 2020 09:24:02 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BF1AD5C1C7;
+ Thu, 24 Sep 2020 09:24:45 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 59/92] configure: cleanup invocation of submodule Make
-Date: Thu, 24 Sep 2020 05:22:41 -0400
-Message-Id: <20200924092314.1722645-60-pbonzini@redhat.com>
+Subject: [PULL 76/92] sysemu/xen: Add missing 'exec/cpu-common.h' header for
+ ram_addr_t type
+Date: Thu, 24 Sep 2020 05:22:58 -0400
+Message-Id: <20200924092314.1722645-77-pbonzini@redhat.com>
 In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
 References: <20200924092314.1722645-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -71,7 +72,7 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
@@ -83,8 +84,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- UPPERCASE_50_75=0.008 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,86 +97,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move common command line options to SUBDIR_MAKEFLAGS, thus simplifying
-the rules themselves.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+As this header use the ram_addr_t type, it has to include
+"exec/cpu-common.h" to avoid odd errors such:
+
+  include/sysemu/xen.h:35:44: error: unknown type name 'ram_addr_t'; did you mean 'in_addr_t'?
+   35 | static inline void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length)
+      |                                            ^~~~~~~~~~
+      |                                            in_addr_t
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200908155530.249806-4-philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile | 25 ++++++++++++++++---------
- 1 file changed, 16 insertions(+), 9 deletions(-)
+ include/sysemu/xen.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index 897246d77c..f83226e0e1 100644
---- a/Makefile
-+++ b/Makefile
-@@ -137,7 +137,13 @@ configure: ;
- .PHONY: all clean distclean install \
- 	recurse-all dist msi FORCE
+diff --git a/include/sysemu/xen.h b/include/sysemu/xen.h
+index 2c2c429ea8..0ca25697e4 100644
+--- a/include/sysemu/xen.h
++++ b/include/sysemu/xen.h
+@@ -8,6 +8,8 @@
+ #ifndef SYSEMU_XEN_H
+ #define SYSEMU_XEN_H
  
--SUBDIR_MAKEFLAGS=$(if $(V),,--no-print-directory --quiet)
-+SUBMODULE_CFLAGS = $(QEMU_CFLAGS) $(CFLAGS)
-+SUBDIR_MAKEFLAGS = $(if $(V),,--no-print-directory --quiet)
-+SUBDIR_HOST_VARS = 							\
-+	PKG_CONFIG="$(PKG_CONFIG)" 					\
-+	CC="$(CC)" AR="$(AR)" LD="$(LD)" RANLIB="$(RANLIB)"		\
-+	CFLAGS="$(SUBMODULE_CFLAGS)" LDFLAGS="$(SUBMODULE_LDFLAGS)"	\
-+	ARFLAGS="$(ARFLAGS)"
- 
- include $(SRC_PATH)/tests/Makefile.include
- 
-@@ -146,12 +152,12 @@ Makefile: $(addsuffix /all, $(SUBDIRS))
- 
- # LIBFDT_lib="": avoid breaking existing trees with objects requiring -fPIC
- DTC_MAKE_ARGS=-I$(SRC_PATH)/dtc VPATH=$(SRC_PATH)/dtc -C dtc V="$(V)" LIBFDT_lib=""
--DTC_CFLAGS=$(CFLAGS) $(QEMU_CFLAGS)
- DTC_CPPFLAGS=-I$(SRC_PATH)/dtc/libfdt
- 
- .PHONY: dtc/all
- dtc/all: .git-submodule-status dtc/libfdt
--	$(call quiet-command,$(MAKE) $(DTC_MAKE_ARGS) CPPFLAGS="$(DTC_CPPFLAGS)" CFLAGS="$(DTC_CFLAGS)" LDFLAGS="$(QEMU_LDFLAGS)" ARFLAGS="$(ARFLAGS)" CC="$(CC)" AR="$(AR)" LD="$(LD)" $(SUBDIR_MAKEFLAGS) libfdt,)
-+	$(call quiet-command,$(MAKE) $(DTC_MAKE_ARGS)			\
-+            CPPFLAGS="$(DTC_CPPFLAGS)" $(SUBDIR_MAKEFLAGS) $(SUBDIR_HOST_VARS) libfdt,)
- 
- dtc/%: .git-submodule-status
- 	@mkdir -p $@
-@@ -161,7 +167,7 @@ dtc/%: .git-submodule-status
- # Therefore we replicate some of the logic in the sub-makefile.
- # Remove all the extra -Warning flags that QEMU uses that Capstone doesn't;
- # no need to annoy QEMU developers with such things.
--CAP_CFLAGS = $(patsubst -W%,,$(CFLAGS) $(QEMU_CFLAGS)) $(CAPSTONE_CFLAGS)
-+CAP_CFLAGS := $(patsubst -W%,,$(SUBMODULE_CFLAGS)) $(CAPSTONE_CFLAGS)
- CAP_CFLAGS += -DCAPSTONE_USE_SYS_DYN_MEM
- CAP_CFLAGS += -DCAPSTONE_HAS_ARM
- CAP_CFLAGS += -DCAPSTONE_HAS_ARM64
-@@ -169,16 +175,17 @@ CAP_CFLAGS += -DCAPSTONE_HAS_POWERPC
- CAP_CFLAGS += -DCAPSTONE_HAS_X86
- 
- .PHONY: capstone/all
-+capstone/all: SUBMODULE_CFLAGS = $(CAP_CFLAGS)
- capstone/all: .git-submodule-status
--	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=no BUILDDIR="$(BUILD_DIR)/capstone" CC="$(CC)" AR="$(AR)" LD="$(LD)" RANLIB="$(RANLIB)" CFLAGS="$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(BUILD_DIR)/capstone/$(LIBCAPSTONE))
-+	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone 		\
-+            CAPSTONE_SHARED=no BUILDDIR="$(BUILD_DIR)/capstone" 	\
-+            $(SUBDIR_MAKEFLAGS) $(SUBDIR_HOST_VARS) $(BUILD_DIR)/capstone/$(LIBCAPSTONE))
- 
- .PHONY: slirp/all
- slirp/all: .git-submodule-status
- 	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/slirp		\
--		BUILD_DIR="$(BUILD_DIR)/slirp" 			\
--		PKG_CONFIG="$(PKG_CONFIG)" 				\
--		CC="$(CC)" AR="$(AR)" 	LD="$(LD)" RANLIB="$(RANLIB)"	\
--		CFLAGS="$(QEMU_CFLAGS) $(CFLAGS)" LDFLAGS="$(QEMU_LDFLAGS)")
-+		BUILD_DIR="$(BUILD_DIR)/slirp" 				\
-+		$(SUBDIR_MAKEFLAGS) $(SUBDIR_HOST_VARS))
- 
- ROM_DIRS = $(addprefix pc-bios/, $(ROMS))
- ROM_DIRS_RULES=$(foreach t, all clean, $(addsuffix /$(t), $(ROM_DIRS)))
++#include "exec/cpu-common.h"
++
+ #ifdef NEED_CPU_H
+ # ifdef CONFIG_XEN
+ #  define CONFIG_XEN_IS_POSSIBLE
 -- 
 2.26.2
 
