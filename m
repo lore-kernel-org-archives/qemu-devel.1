@@ -6,75 +6,76 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71AAEC4346E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 08:30:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C4E2C4346E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 08:32:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2967206FC
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 08:30:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 85B2C206FC
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 08:32:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GTf8vVwd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2967206FC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PGmJEXU9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85B2C206FC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLMe7-0002h0-Vz
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 04:30:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52968)
+	id 1kLMgM-0004QS-88
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 04:32:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53342)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kLMdI-0001nb-Gd
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 04:29:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41515)
+ id 1kLMeh-0003OG-5b
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 04:31:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30950)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kLMdG-0007EL-QK
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 04:29:40 -0400
+ id 1kLMee-0007Xx-Ov
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 04:31:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600936177;
+ s=mimecast20190719; t=1600936263;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=7MuHi5bcfXTpUMqymUVFtcsRHiqYfnVOsPUuYRXZRNk=;
- b=GTf8vVwdeP0K+a+qiKaT4Git5WUO8D+YIQkn56AFq4SybjkVjmpv2hr6c9UZcfL0gF/B0C
- nPWYGhBimqKiC44CTZxUuDUnjN5wx4G2fsA8QXd2Xfd/QveTxbK/qeTgKqs+CylNB17GoD
- X0zeHSmSzOpXg03HtPEmMIfKdtsbAMk=
+ bh=5GIGTqRX7PElpnEgI9NFkzIsp71UVk0t290OJmsq4/s=;
+ b=PGmJEXU96XOb0gZCEqamhdE4DTqfz4WVtgCAhzeK/BJcYTXUcdS4EzEgADYT/1LGVOqGdU
+ UTP/GX684oQU9VE0OmHoASMeX2XvX9a59hkCrHhiVW4ugPE8q/pc8tynmPzVkby4SiJVdH
+ gxtFDEG433D4icmtaOUXGz3SW8a7/QE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-IwNEEgJKMOiNQIhwgMa1Zg-1; Thu, 24 Sep 2020 04:29:34 -0400
-X-MC-Unique: IwNEEgJKMOiNQIhwgMa1Zg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-468-GOSE-9NkO0ij6RRdIcVAMQ-1; Thu, 24 Sep 2020 04:30:59 -0400
+X-MC-Unique: GOSE-9NkO0ij6RRdIcVAMQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B31F11084C8A;
- Thu, 24 Sep 2020 08:29:31 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D602A6408A;
+ Thu, 24 Sep 2020 08:30:57 +0000 (UTC)
 Received: from localhost (ovpn-114-133.ams2.redhat.com [10.36.114.133])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9FFC219728;
- Thu, 24 Sep 2020 08:29:25 +0000 (UTC)
-Date: Thu, 24 Sep 2020 09:29:24 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4CF175C1C7;
+ Thu, 24 Sep 2020 08:30:50 +0000 (UTC)
+Date: Thu, 24 Sep 2020 09:30:49 +0100
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: elena.ufimtseva@oracle.com
-Subject: Re: [PATCH v9 16/20] multi-process: create IOHUB object to handle irq
-Message-ID: <20200924082924.GL62770@stefanha-x1.localdomain>
+Subject: Re: [PATCH v9 17/20] multi-process: Retrieve PCI info from remote
+ process
+Message-ID: <20200924083049.GM62770@stefanha-x1.localdomain>
 References: <20200827181231.22778-1-elena.ufimtseva@oracle.com>
- <20200827181231.22778-17-elena.ufimtseva@oracle.com>
+ <20200827181231.22778-18-elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20200827181231.22778-17-elena.ufimtseva@oracle.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200827181231.22778-18-elena.ufimtseva@oracle.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="lR6P3/j+HGelbRkf"
+ protocol="application/pgp-signature"; boundary="UeXZ3FjlYZvuln/G"
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -106,56 +107,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---lR6P3/j+HGelbRkf
+--UeXZ3FjlYZvuln/G
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 27, 2020 at 11:12:27AM -0700, elena.ufimtseva@oracle.com wrote:
+On Thu, Aug 27, 2020 at 11:12:28AM -0700, elena.ufimtseva@oracle.com wrote:
 > From: Jagannathan Raman <jag.raman@oracle.com>
 >=20
-> IOHUB object is added to manage PCI IRQs. It uses KVM_IRQFD
-> ioctl to create irqfd to injecting PCI interrupts to the guest.
-> IOHUB object forwards the irqfd to the remote process. Remote process
-> uses this fd to directly send interrupts to the guest, bypassing QEMU.
+> Retrieve PCI configuration info about the remote device and
+> configure the Proxy PCI object based on the returned information
 >=20
+> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 > Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 > Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 > ---
->  MAINTAINERS                    |   2 +
->  hw/i386/meson.build            |   1 +
->  hw/i386/remote-iohub.c         | 123 +++++++++++++++++++++++++++++++++
->  hw/i386/remote-msg.c           |   4 ++
->  hw/i386/remote.c               |  10 +++
->  hw/pci/proxy.c                 |  58 ++++++++++++++++
->  include/hw/i386/remote-iohub.h |  42 +++++++++++
->  include/hw/i386/remote.h       |   3 +
->  include/hw/pci/pci_ids.h       |   3 +
->  include/hw/pci/proxy.h         |   5 ++
->  include/io/mpqemu-link.h       |   1 +
->  io/mpqemu-link.c               |   5 ++
->  12 files changed, 257 insertions(+)
->  create mode 100644 hw/i386/remote-iohub.c
->  create mode 100644 include/hw/i386/remote-iohub.h
+>  hw/pci/proxy.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 85 insertions(+)
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---lR6P3/j+HGelbRkf
+--UeXZ3FjlYZvuln/G
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9sWOQACgkQnKSrs4Gr
-c8ib9wgAsnV6goYTX8YShrijrvy9hZt33E57diHTQNn21XgJBBPETNqpMkdukD+4
-noVctYYAkjZS7TqDq2S+I4qUIuLZgu2i3Uflni9R0bJSl2FLvyW208Qc5obus+OV
-0C7E0XuMfc/0Wbwqx8x0CTz0FjMtBZaqH+kW0qTPUFSERfiYBSQ48U6Q7gBCl2Y3
-xlrmo/K4W3NVdZ9mvJFGgBoMmPK4NPzkv/u2VmjgoP1XVtbBEl6oVZM5RwKLGIj+
-CtHbqkeN0okYsYFGbZBRiqTf+HzNiWrzjKaZF0gbUghJoqoSPwx6+8LO5OVIn7Ps
-eoduFoR3EHganJqqtoh/4DrU8qddZg==
-=VKQ7
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9sWTkACgkQnKSrs4Gr
+c8gNAggAjCb0vvP289i/P2++7nrBfwL3jyiMGn3B6XnamYvfjh0tQmLSfmC5513i
+xsc0p5SHo/1ECZh9otVQ1xxgFeMufkFVbvL/ozHghMVKmvR6FeI8RjkzgDw/Zv9t
+AZDUWIlpiTQbltVx958BYMQAs1KAi+a66D0Wk2NO1Bl9WoCyyxg9kHSztjanxgyL
+RLeu9zMdeJBih2mKeO19CUFVEjmf/kCzvTvsE5YuKKdG4nSIwugjJM1+2gysZr1b
+GGmoibnfL/KRiUyE/v5GNjV6I++dokDuKMau7Xz9mYYyXdqvm28PPUjlb2OJLqGt
+JsWSnhvQ8q4ErqlCQKgr5fYv3hIqug==
+=+rFE
 -----END PGP SIGNATURE-----
 
---lR6P3/j+HGelbRkf--
+--UeXZ3FjlYZvuln/G--
 
 
