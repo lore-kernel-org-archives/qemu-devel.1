@@ -4,65 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CE3AC4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:01:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 796BBC2D0E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:01:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B50E5221EB
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:01:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 05E3E221EB
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:01:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="goz1sLc1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B50E5221EB
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LdGhpvAH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05E3E221EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLO4D-0004pW-LF
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 06:01:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39432)
+	id 1kLO4E-0004p0-Rz
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 06:01:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39296)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNUF-0002GC-9h
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30912)
+ id 1kLNU1-0001g3-MA
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30950)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNUD-0006Ap-MG
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:23 -0400
+ id 1kLNTz-00068T-10
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600939460;
+ s=mimecast20190719; t=1600939446;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RBG1ZGgAoLoIXzfTRD9TPMnTRDIWPXDgcxH722TtDY8=;
- b=goz1sLc1V1W+e9oFgo5n656oOjK0aSzBCXPhJNuOhfHFE5mnPESeXwRiwUOALjBOH1xJIv
- QRrzX0iQLMSYv/rCdN8C4ixkwmIN8l/iJbnRGYk+kKbgz5jga5sMhZ4Rw2A5P1Ix0CsIpa
- i+oMz9crNpTvV7G6M1OyxeNvixnjylg=
+ bh=A9GAarQACy/SRCigdCgdYO8cBaYR+icDiSYLnZam1UQ=;
+ b=LdGhpvAHom/bQnyBunf7qHJqaQCDb2GURB1E9RvNrf3wIJ7cN51fV400Wn82l8Qo4qLWAA
+ B+EtCJkkyr7IIKHC1nNN94FcPhdV6uu/87/dFlM1Ww7M27k6VrhQC5wqNpIS5Jy4YMQOSg
+ Sw7LLa7zV4CQqiw30txGx2UAmNDSe+o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-232-I7XYTYygPNWgVjof1tw9wg-1; Thu, 24 Sep 2020 05:24:18 -0400
-X-MC-Unique: I7XYTYygPNWgVjof1tw9wg-1
+ us-mta-596-87Tlr4MKMX-s6jAOr8PXDg-1; Thu, 24 Sep 2020 05:24:04 -0400
+X-MC-Unique: 87Tlr4MKMX-s6jAOr8PXDg-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 11DEB1891E9C
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:24:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 60DD4104D3E3;
+ Thu, 24 Sep 2020 09:24:03 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8CF2F61983;
- Thu, 24 Sep 2020 09:24:12 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 20BF460C15;
+ Thu, 24 Sep 2020 09:24:03 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 67/92] qom: Use kernel-doc private/public tags in structs
-Date: Thu, 24 Sep 2020 05:22:49 -0400
-Message-Id: <20200924092314.1722645-68-pbonzini@redhat.com>
+Subject: [PULL 61/92] configure: do not clobber environment
+ CFLAGS/CXXFLAGS/LDFLAGS
+Date: Thu, 24 Sep 2020 05:22:43 -0400
+Message-Id: <20200924092314.1722645-62-pbonzini@redhat.com>
 In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
 References: <20200924092314.1722645-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -96,54 +97,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eduardo Habkost <ehabkost@redhat.com>
+If the CFLAGS, CXXFLAGS or LDFLAGS variables are present in the environment,
+any modification made within the configure script is passed down to Meson.
+This is particularly undesirable for the "-pie" option, since it overrides
+"-shared" and thus messes up the linker flags for shared modules.
 
-Use kernel-doc syntax for indicating private and public struct
-fields.
+Using a separate variable therefore fixes the bug, while clarifying that
+the scope of these CFLAGS is just the configure script.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20200910221526.10041-3-ehabkost@redhat.com>
+Reported-by: Frederic Bezies
+Analyzed-by: Toolybird
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qom/object.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ configure | 30 +++++++++++++++++-------------
+ 1 file changed, 17 insertions(+), 13 deletions(-)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index fe0c9b7735..473dc21bf4 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -520,7 +520,7 @@ typedef void (ObjectFree)(void *obj);
-  */
- struct ObjectClass
- {
--    /*< private >*/
-+    /* private: */
-     Type type;
-     GSList *interfaces;
+diff --git a/configure b/configure
+index 9b7232f9d2..a0575f1db1 100755
+--- a/configure
++++ b/configure
+@@ -155,7 +155,7 @@ update_cxxflags() {
+     # options which some versions of GCC's C++ compiler complain about
+     # because they only make sense for C programs.
+     QEMU_CXXFLAGS="$QEMU_CXXFLAGS -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS"
+-    CXXFLAGS=$(echo "$CFLAGS" | sed s/-std=gnu99/-std=gnu++11/)
++    CONFIGURE_CXXFLAGS=$(echo "$CONFIGURE_CFLAGS" | sed s/-std=gnu99/-std=gnu++11/)
+     for arg in $QEMU_CFLAGS; do
+         case $arg in
+             -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-externs|\
+@@ -170,13 +170,14 @@ update_cxxflags() {
  
-@@ -546,7 +546,7 @@ struct ObjectClass
-  */
- struct Object
- {
--    /*< private >*/
-+    /* private: */
-     ObjectClass *class;
-     ObjectFree *free;
-     GHashTable *properties;
-@@ -908,7 +908,7 @@ struct InterfaceInfo {
- struct InterfaceClass
- {
-     ObjectClass parent_class;
--    /*< private >*/
-+    /* private: */
-     ObjectClass *concrete_class;
-     Type interface_type;
- };
+ compile_object() {
+   local_cflags="$1"
+-  do_cc $CFLAGS $QEMU_CFLAGS $local_cflags -c -o $TMPO $TMPC
++  do_cc $CFLAGS $CONFIGURE_CFLAGS $QEMU_CFLAGS $local_cflags -c -o $TMPO $TMPC
+ }
+ 
+ compile_prog() {
+   local_cflags="$1"
+   local_ldflags="$2"
+-  do_cc $CFLAGS $QEMU_CFLAGS $local_cflags -o $TMPE $TMPC $LDFLAGS $QEMU_LDFLAGS $local_ldflags
++  do_cc $CFLAGS $CONFIGURE_CFLAGS $QEMU_CFLAGS $local_cflags -o $TMPE $TMPC \
++      $LDFLAGS $CONFIGURE_LDFLAGS $QEMU_LDFLAGS $local_ldflags
+ }
+ 
+ # symbolically link $1 to $2.  Portable version of "ln -sf".
+@@ -639,7 +640,10 @@ QEMU_CFLAGS="-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
+ QEMU_CFLAGS="-D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE $QEMU_CFLAGS"
+ QEMU_INCLUDES="-iquote . -iquote ${source_path} -iquote ${source_path}/accel/tcg -iquote ${source_path}/include"
+ QEMU_INCLUDES="$QEMU_INCLUDES -iquote ${source_path}/disas/libvixl"
+-CFLAGS="-std=gnu99 -Wall"
++
++# Flags that are needed during configure but later taken care of by Meson
++CONFIGURE_CFLAGS="-std=gnu99 -Wall"
++CONFIGURE_LDFLAGS=
+ 
+ 
+ check_define() {
+@@ -967,7 +971,7 @@ if test "$mingw32" = "yes" ; then
+   EXESUF=".exe"
+   HOST_DSOSUF=".dll"
+   # MinGW needs -mthreads for TLS and macro _MT.
+-  CFLAGS="-mthreads $CFLAGS"
++  CONFIGURE_CFLAGS="-mthreads $CONFIGURE_CFLAGS"
+   write_c_skeleton;
+   prefix="/qemu"
+   qemu_suffix=""
+@@ -2234,7 +2238,7 @@ fi
+ 
+ if test "$static" = "yes"; then
+   if test "$pie" != "no" && compile_prog "-Werror -fPIE -DPIE" "-static-pie"; then
+-    CFLAGS="-fPIE -DPIE $CFLAGS"
++    CONFIGURE_CFLAGS="-fPIE -DPIE $CONFIGURE_CFLAGS"
+     QEMU_LDFLAGS="-static-pie $QEMU_LDFLAGS"
+     pie="yes"
+   elif test "$pie" = "yes"; then
+@@ -2244,11 +2248,11 @@ if test "$static" = "yes"; then
+     pie="no"
+   fi
+ elif test "$pie" = "no"; then
+-  CFLAGS="$CFLAGS_NOPIE $CFLAGS"
+-  LDFLAGS="$LDFLAGS_NOPIE $LDFLAGS"
++  CONFIGURE_CFLAGS="$CFLAGS_NOPIE $CONFIGURE_CFLAGS"
++  CONFIGURE_LDFLAGS="$LDFLAGS_NOPIE $CONFIGURE_LDFLAGS"
+ elif compile_prog "-Werror -fPIE -DPIE" "-pie"; then
+-  CFLAGS="-fPIE -DPIE $CFLAGS"
+-  LDFLAGS="-pie $LDFLAGS"
++  CONFIGURE_CFLAGS="-fPIE -DPIE $CONFIGURE_CFLAGS"
++  CONFIGURE_LDFLAGS="-pie $CONFIGURE_LDFLAGS"
+   pie="yes"
+ elif test "$pie" = "yes"; then
+   error_exit "PIE not available due to missing toolchain support"
+@@ -3812,7 +3816,7 @@ EOF
+ if ! compile_prog "$glib_cflags -Werror" "$glib_libs" ; then
+     if cc_has_warning_flag "-Wno-unknown-attributes"; then
+         glib_cflags="-Wno-unknown-attributes $glib_cflags"
+-        CFLAGS="-Wno-unknown-attributes $CFLAGS"
++        CONFIGURE_CFLAGS="-Wno-unknown-attributes $CONFIGURE_CFLAGS"
+     fi
+ fi
+ 
+@@ -3832,7 +3836,7 @@ EOF
+ if ! compile_prog "$glib_cflags -Werror" "$glib_libs" ; then
+     if cc_has_warning_flag "-Wno-unused-function"; then
+         glib_cflags="$glib_cflags -Wno-unused-function"
+-        CFLAGS="$CFLAGS -Wno-unused-function"
++        CONFIGURE_CFLAGS="$CONFIGURE_CFLAGS -Wno-unused-function"
+     fi
+ fi
+ 
+@@ -6370,7 +6374,7 @@ EOF
+ 
+     update_cxxflags
+ 
+-    if do_cxx $CXXFLAGS $QEMU_CXXFLAGS -o $TMPE $TMPCXX $TMPO $QEMU_LDFLAGS; then
++    if do_cxx $CXXFLAGS $CONFIGURE_CXXFLAGS $QEMU_CXXFLAGS -o $TMPE $TMPCXX $TMPO $QEMU_LDFLAGS; then
+         # C++ compiler $cxx works ok with C compiler $cc
+         :
+     else
 -- 
 2.26.2
 
