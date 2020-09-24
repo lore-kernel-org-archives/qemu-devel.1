@@ -2,86 +2,100 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8B2BC4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:18:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6A0FC4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:18:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 444392311B
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:18:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3907F2311B
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:18:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X9CaJBko"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 444392311B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WCAcymBK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3907F2311B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLTws-0004gl-6V
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 12:18:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49014)
+	id 1kLTx2-00054m-2z
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 12:18:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51928)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kLTAG-0001Zn-5V
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 11:28:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60052)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kLTAC-0005XS-UR
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 11:28:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600961284;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HbqVe6JGkNq+PJJ48CcAI3Q247uYJgPwb4VmaUhxqSY=;
- b=X9CaJBkofeUSSburHNYOGsU1QFtRR2tx9B6ekFV9yod9zbKtetduphGe0ZFQCeMfWLM+HU
- COr/ZZtTGpxjzCmi/JoAAANR1n6HLe+mR5CQxBrYZQqO3SXVko2gc08tCv/wXn2k4Iw/Ce
- ITvfIA15YBG9UdSrmQBu5OGogR7Icl0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-6cFOhNa5MvKj7UuOb74qMw-1; Thu, 24 Sep 2020 11:28:02 -0400
-X-MC-Unique: 6cFOhNa5MvKj7UuOb74qMw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ACCC2EA359;
- Thu, 24 Sep 2020 15:27:54 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-114-72.ams2.redhat.com [10.36.114.72])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6CF0760C04;
- Thu, 24 Sep 2020 15:27:53 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 13/31] block/export: Move refcount from NBDExport to
- BlockExport
-Date: Thu, 24 Sep 2020 17:26:59 +0200
-Message-Id: <20200924152717.287415-14-kwolf@redhat.com>
-In-Reply-To: <20200924152717.287415-1-kwolf@redhat.com>
-References: <20200924152717.287415-1-kwolf@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kLTLv-0000Kt-O6
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 11:40:12 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37626)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kLTLr-0007Xc-Lg
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 11:40:11 -0400
+Received: by mail-wm1-x343.google.com with SMTP id a9so4092635wmm.2
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 08:40:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Gka7nXcDbZ00olQHSXjZzQSruXAZ5zUcfMCetjN9ozw=;
+ b=WCAcymBKHqZykwWGtJPECq7IqIpjawKpPY0B2r2EAdLcCwlj90U5Ddo7lyMeSGxIua
+ R0zYQrSFYnNtF/AZe9fzL9nqF4AQGtQWNPo3lc/feQ0fM02zs1OkwPW81+8225qLcyn9
+ y491vm+Q14aBSILFBvCC7LOj+H3IlAOerAavGuoy0zoiYp+Hj4zJglWwZqQQVeGMDLL/
+ Y12IxtMj4/VSriFu0fnFY1G8jUdWjIMkSYf0o8+In3Xf+30Lla5cSQ0gJq7VHNpOyxFO
+ PHT3/7Tu7fRHC0aIjvjuTjhCc+Bl96sVk5XBuokDCH4x2Mu4adMJU9UC2RZy0aqlxq9K
+ JZ7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Gka7nXcDbZ00olQHSXjZzQSruXAZ5zUcfMCetjN9ozw=;
+ b=hxkGYNsPqMaxXsmt9Anniat0vws28ReS/y9q4hOUsYcZlOxv+b32AHKxdrI8iqo2BE
+ /VLoNi/I9FZ7xTYln9k0IWohWvI1zPswNb3IHZr7Aq1rVFSNYCe1+eG/5to20jboFRxT
+ jbkQAjYxjBmH3RP5bLtHRPvS34ZsrIVJEKEGzqDqMN74wfL6J+MSGnPToZsEtvg24g6+
+ ohsww9R4loi6Bjf2CWHyTqrwTrJUa/MYThd/XqZqQaN7qlkFTjAW53Jd2kKhUhhoOk2u
+ WhSJVpL0VXOCAD104PdL9vGJZYlOUTECdXdjSV2Ihz3lVkfHg3N1TXocu+5d+X7nZGjR
+ 5+1g==
+X-Gm-Message-State: AOAM533hKjKetj/HGWNoO4Xu8/YrjvQJ8xHuDeSCvmwDd1QEI/nx5LIc
+ ZJ6ZwyiFA1mF0aVc9U0SRHA=
+X-Google-Smtp-Source: ABdhPJzsppPKrIC351GdrWfngqCPAF9cW9fO3wnwZIHvaX3t8X9wOfxUhdFH69IpW9ircbqin+4+Aw==
+X-Received: by 2002:a1c:63c1:: with SMTP id x184mr5464069wmb.138.1600962004954; 
+ Thu, 24 Sep 2020 08:40:04 -0700 (PDT)
+Received: from [192.168.1.34] (234.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.234])
+ by smtp.gmail.com with ESMTPSA id 9sm3813041wmf.7.2020.09.24.08.40.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 24 Sep 2020 08:40:04 -0700 (PDT)
+Subject: Re: [PATCH V9 6/6] hw/mips: Add Loongson-3 machine support
+To: Huacai Chen <chenhuacai@gmail.com>
+References: <1600222344-16808-1-git-send-email-chenhc@lemote.com>
+ <1600222344-16808-7-git-send-email-chenhc@lemote.com>
+ <c3804617-7c65-4082-de76-81e718f6d139@amsat.org>
+ <CAAhV-H5OysVNvGzD066eVqA+-k2+GJDjwSGR0hJT0VUh3Ld83A@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <4a461bbc-3765-4d3c-7e7b-952dab564af1@amsat.org>
+Date: Thu, 24 Sep 2020 17:40:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <CAAhV-H5OysVNvGzD066eVqA+-k2+GJDjwSGR0hJT0VUh3Ld83A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -19
+X-Spam_score: -2.0
+X-Spam_bar: --
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.248, NICE_REPLY_A=-0.214,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,274 +108,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
- mreitz@redhat.com
+Cc: Huacai Chen <zltjiangshi@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Having a refcount makes sense for all types of block exports. It is also
-a prerequisite for keeping a list of all exports at the BlockExport
-level.
+On 9/16/20 11:49 AM, Huacai Chen wrote:
+> Hi, Philippe,
+> 
+> On Wed, Sep 16, 2020 at 3:56 PM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>
+>> Hi Huacai,
+>>
+>> On 9/16/20 4:12 AM, Huacai Chen wrote:
+...
+>> hw/mips/loongson3_virt.c:373:15: note: each undeclared identifier is
+>> reported only once for each function it appears in
+>> hw/mips/loongson3_virt.c:373:15: error: excess elements in struct
+>> initializer [-Werror]
+>> hw/mips/loongson3_virt.c:373:15: note: (near initialization for 'freq_reg')
+>> hw/mips/loongson3_virt.c:374:9: error: unknown field 'addr' specified in
+>> initializer
+>>          .addr = (uintptr_t)(&freq)
+>>          ^
+>> hw/mips/loongson3_virt.c:374:17: error: excess elements in struct
+>> initializer [-Werror]
+>>          .addr = (uintptr_t)(&freq)
+>>                  ^
+>> hw/mips/loongson3_virt.c:374:17: note: (near initialization for 'freq_reg')
+>> hw/mips/loongson3_virt.c:372:24: error: storage size of 'freq_reg' isn't
+>> known
+>>      struct kvm_one_reg freq_reg = {
+>>                         ^
+>> hw/mips/loongson3_virt.c:380:41: error: 'KVM_GET_ONE_REG' undeclared
+>> (first use in this function)
+>>          ret = kvm_vcpu_ioctl(first_cpu, KVM_GET_ONE_REG, &freq_reg);
+>>                                          ^
+>> hw/mips/loongson3_virt.c:372:24: error: unused variable 'freq_reg'
+>> [-Werror=unused-variable]
+>>      struct kvm_one_reg freq_reg = {
+>>                         ^
+>> hw/mips/loongson3_virt.c: In function 'init_loongson_params':
+>> hw/mips/loongson3_virt.c:467:25: error: cast from pointer to integer of
+>> different size [-Werror=pointer-to-int-cast]
+>>      lp->memory_offset = (unsigned long long)init_memory_map(p)
+>>                          ^
+> I guess this happens on a 32bit platform where pointer is 32bit, and
+> could you please suggest a best solution for this? Maybe use uintptr_t
+> instead of unsigned long long?
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- include/block/export.h | 15 +++++++++
- include/block/nbd.h    |  2 --
- block/export/export.c  | 14 ++++++++
- blockdev-nbd.c         |  2 +-
- nbd/server.c           | 72 +++++++++++++++++++-----------------------
- 5 files changed, 63 insertions(+), 42 deletions(-)
+Since the machine doesn't have to know the EFI structures
+layout, I'd change your method to fill EFI structures as i.e.:
 
-diff --git a/include/block/export.h b/include/block/export.h
-index e7af2c7687..5236a35e12 100644
---- a/include/block/export.h
-+++ b/include/block/export.h
-@@ -24,12 +24,27 @@ typedef struct BlockExportDriver {
- 
-     /* Creates and starts a new block export */
-     BlockExport *(*create)(BlockExportOptions *, Error **);
-+
-+    /*
-+     * Frees a removed block export. This function is only called after all
-+     * references have been dropped.
-+     */
-+    void (*delete)(BlockExport *);
- } BlockExportDriver;
- 
- struct BlockExport {
-     const BlockExportDriver *drv;
-+
-+    /*
-+     * Reference count for this block export. This includes strong references
-+     * both from the owner (qemu-nbd or the monitor) and clients connected to
-+     * the export.
-+     */
-+    int refcount;
- };
- 
- BlockExport *blk_exp_add(BlockExportOptions *export, Error **errp);
-+void blk_exp_ref(BlockExport *exp);
-+void blk_exp_unref(BlockExport *exp);
- 
- #endif
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 1dafe70615..e3bd112227 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -338,8 +338,6 @@ NBDExport *nbd_export_new(BlockDriverState *bs,
- void nbd_export_set_on_eject_blk(BlockExport *exp, BlockBackend *blk);
- void nbd_export_close(NBDExport *exp);
- void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error **errp);
--void nbd_export_get(NBDExport *exp);
--void nbd_export_put(NBDExport *exp);
- 
- AioContext *nbd_export_aio_context(NBDExport *exp);
- NBDExport *nbd_export_find(const char *name);
-diff --git a/block/export/export.c b/block/export/export.c
-index 05bc5e3744..baba4e94ff 100644
---- a/block/export/export.c
-+++ b/block/export/export.c
-@@ -49,6 +49,20 @@ BlockExport *blk_exp_add(BlockExportOptions *export, Error **errp)
-     return drv->create(export, errp);
- }
- 
-+void blk_exp_ref(BlockExport *exp)
-+{
-+    assert(exp->refcount > 0);
-+    exp->refcount++;
-+}
-+
-+void blk_exp_unref(BlockExport *exp)
-+{
-+    assert(exp->refcount > 0);
-+    if (--exp->refcount == 0) {
-+        exp->drv->delete(exp);
-+    }
-+}
-+
- void qmp_block_export_add(BlockExportOptions *export, Error **errp)
- {
-     blk_exp_add(export, errp);
-diff --git a/blockdev-nbd.c b/blockdev-nbd.c
-index 7bb0b09697..e208324d42 100644
---- a/blockdev-nbd.c
-+++ b/blockdev-nbd.c
-@@ -236,7 +236,7 @@ BlockExport *nbd_export_create(BlockExportOptions *exp_args, Error **errp)
-     /* The list of named exports has a strong reference to this export now and
-      * our only way of accessing it is through nbd_export_find(), so we can drop
-      * the strong reference that is @exp. */
--    nbd_export_put(exp);
-+    blk_exp_unref((BlockExport*) exp);
- 
-  out:
-     aio_context_release(aio_context);
-diff --git a/nbd/server.c b/nbd/server.c
-index fb70374df5..7be81c7bda 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -83,7 +83,6 @@ struct NBDRequestData {
- 
- struct NBDExport {
-     BlockExport common;
--    int refcount;
- 
-     BlockBackend *blk;
-     char *name;
-@@ -499,7 +498,7 @@ static int nbd_negotiate_handle_export_name(NBDClient *client, bool no_zeroes,
-     }
- 
-     QTAILQ_INSERT_TAIL(&client->exp->clients, client, next);
--    nbd_export_get(client->exp);
-+    blk_exp_ref(&client->exp->common);
-     nbd_check_meta_export(client);
- 
-     return 0;
-@@ -707,7 +706,7 @@ static int nbd_negotiate_handle_info(NBDClient *client, Error **errp)
-         client->exp = exp;
-         client->check_align = check_align;
-         QTAILQ_INSERT_TAIL(&client->exp->clients, client, next);
--        nbd_export_get(client->exp);
-+        blk_exp_ref(&client->exp->common);
-         nbd_check_meta_export(client);
-         rc = 1;
-     }
-@@ -1406,7 +1405,7 @@ void nbd_client_put(NBDClient *client)
-         g_free(client->tlsauthz);
-         if (client->exp) {
-             QTAILQ_REMOVE(&client->exp->clients, client, next);
--            nbd_export_put(client->exp);
-+            blk_exp_unref(&client->exp->common);
-         }
-         g_free(client);
-     }
-@@ -1538,7 +1537,8 @@ NBDExport *nbd_export_new(BlockDriverState *bs,
- 
-     exp = g_new0(NBDExport, 1);
-     exp->common = (BlockExport) {
--        .drv = &blk_exp_nbd,
-+        .drv        = &blk_exp_nbd,
-+        .refcount   = 1,
-     };
- 
-     /*
-@@ -1567,7 +1567,6 @@ NBDExport *nbd_export_new(BlockDriverState *bs,
-     blk_set_enable_write_cache(blk, !writethrough);
-     blk_set_allow_aio_context_change(blk, true);
- 
--    exp->refcount = 1;
-     QTAILQ_INIT(&exp->clients);
-     exp->blk = blk;
-     exp->name = g_strdup(name);
-@@ -1626,8 +1625,9 @@ NBDExport *nbd_export_new(BlockDriverState *bs,
-     exp->ctx = ctx;
-     blk_add_aio_context_notifier(blk, blk_aio_attached, blk_aio_detach, exp);
- 
-+    blk_exp_ref(&exp->common);
-     QTAILQ_INSERT_TAIL(&exports, exp, next);
--    nbd_export_get(exp);
-+
-     return exp;
- 
- fail:
-@@ -1660,7 +1660,7 @@ void nbd_export_close(NBDExport *exp)
- {
-     NBDClient *client, *next;
- 
--    nbd_export_get(exp);
-+    blk_exp_ref(&exp->common);
-     /*
-      * TODO: Should we expand QMP NbdServerRemoveNode enum to allow a
-      * close mode that stops advertising the export to new clients but
-@@ -1672,13 +1672,13 @@ void nbd_export_close(NBDExport *exp)
-         client_close(client, true);
-     }
-     if (exp->name) {
--        nbd_export_put(exp);
-+        blk_exp_unref(&exp->common);
-         g_free(exp->name);
-         exp->name = NULL;
-         QTAILQ_REMOVE(&exports, exp, next);
-         QTAILQ_INSERT_TAIL(&closed_exports, exp, next);
-     }
--    nbd_export_put(exp);
-+    blk_exp_unref(&exp->common);
- }
- 
- void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error **errp)
-@@ -1695,47 +1695,41 @@ void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error **errp)
-     error_append_hint(errp, "Use mode='hard' to force client disconnect\n");
- }
- 
--void nbd_export_get(NBDExport *exp)
--{
--    assert(exp->refcount > 0);
--    exp->refcount++;
--}
--
--void nbd_export_put(NBDExport *exp)
-+static void nbd_export_delete(BlockExport *blk_exp)
- {
--    assert(exp->refcount > 0);
--    if (--exp->refcount == 0) {
--        assert(exp->name == NULL);
--        assert(QTAILQ_EMPTY(&exp->clients));
-+    NBDExport *exp = container_of(blk_exp, NBDExport, common);
- 
--        g_free(exp->description);
--        exp->description = NULL;
-+    assert(exp->name == NULL);
-+    assert(QTAILQ_EMPTY(&exp->clients));
- 
--        if (exp->blk) {
--            if (exp->eject_notifier_blk) {
--                notifier_remove(&exp->eject_notifier);
--                blk_unref(exp->eject_notifier_blk);
--            }
--            blk_remove_aio_context_notifier(exp->blk, blk_aio_attached,
--                                            blk_aio_detach, exp);
--            blk_unref(exp->blk);
--            exp->blk = NULL;
--        }
-+    g_free(exp->description);
-+    exp->description = NULL;
- 
--        if (exp->export_bitmap) {
--            bdrv_dirty_bitmap_set_busy(exp->export_bitmap, false);
--            g_free(exp->export_bitmap_context);
-+    if (exp->blk) {
-+        if (exp->eject_notifier_blk) {
-+            notifier_remove(&exp->eject_notifier);
-+            blk_unref(exp->eject_notifier_blk);
-         }
-+        blk_remove_aio_context_notifier(exp->blk, blk_aio_attached,
-+                                        blk_aio_detach, exp);
-+        blk_unref(exp->blk);
-+        exp->blk = NULL;
-+    }
- 
--        QTAILQ_REMOVE(&closed_exports, exp, next);
--        g_free(exp);
--        aio_wait_kick();
-+    if (exp->export_bitmap) {
-+        bdrv_dirty_bitmap_set_busy(exp->export_bitmap, false);
-+        g_free(exp->export_bitmap_context);
-     }
-+
-+    QTAILQ_REMOVE(&closed_exports, exp, next);
-+    g_free(exp);
-+    aio_wait_kick();
- }
- 
- const BlockExportDriver blk_exp_nbd = {
-     .type               = BLOCK_EXPORT_TYPE_NBD,
-     .create             = nbd_export_create,
-+    .delete             = nbd_export_delete,
- };
- 
- void nbd_export_close_all(void)
--- 
-2.25.4
+/*
+ * @ptr: Pointer to fill
+ * @size: Buffer size available at @ptr
+ * Returns: Structure size filled on success, -1 on error.
+ */
+size_t fill_efi_memory_map_loongson(char *ptr, size_t size);
 
+And move that to hw/mips/loongson_efi.{c,h}.
+
+Then you don't need to worry about host pointer size, you just
+exchange buffer/size, then caller can round up and increment an
+offset.
+
+BTW the EFI helpers are not endian safe.
+
+You should use the helpers described in docs/devel/loads-stores.rst:
+
+stw_le_p, stl_le_p(), ... (as I don't expect big-endian guests).
+
+Regards,
+
+Phil.
 
