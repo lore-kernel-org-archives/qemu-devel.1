@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47A4EC4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:47:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74380C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:47:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5ADD2396E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:47:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED8872396E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:47:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ucd/h9+6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5ADD2396E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DpnpFlue"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED8872396E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLNr2-0000Tv-MN
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:47:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38954)
+	id 1kLNr3-0000VO-Tb
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:47:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39012)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTm-00012R-NL
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28807)
+ id 1kLNTo-00017t-Jk
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45376)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTk-00063m-Bx
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:54 -0400
+ id 1kLNTl-00064K-PB
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600939431;
+ s=mimecast20190719; t=1600939432;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=y/53xVh7G30Os6e+dT38eFz5BUFYErz+wYhkiPlCSDY=;
- b=Ucd/h9+6JBayEgy8v6Z8QhEvdVODezTr/LWgmc+fGrHMKu8fOe1WvvBFwlMWcGn/G08LFm
- Y8gUc5M3uV3U3z6k4AzySqZruL3+3/r5ikNxC3OuYPDEsZaPsQS5vah5NNUuMcsQazHVjr
- crFYyxINKUQXlUW3Ke0P+D7k1eduzG0=
+ bh=QP/tfe6eEhE2lmX3KaDtFebzNyOg1zq1GEHNjimZdqQ=;
+ b=DpnpFlueqIl+V3ArQV2Dp9zIBfjLLFlxh5Hhzy3l2YXqzg6TD+o2ZCWNgwx1B9bDU0rU8c
+ pSqfeNKAN+98bYqQT7QfE+ZokXkNoTnr67yN2iZnujeWH7trcVjKJyqvciPh7+SCQDNIbx
+ Z1YSGOjeEYDBFr7cjxYU+bxrUBH4Plw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-567-stz3QAvqN_GPhM47Hh-MdQ-1; Thu, 24 Sep 2020 05:23:49 -0400
-X-MC-Unique: stz3QAvqN_GPhM47Hh-MdQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-571-nH3JdTfeNeGNA95BQkxk3g-1; Thu, 24 Sep 2020 05:23:51 -0400
+X-MC-Unique: nH3JdTfeNeGNA95BQkxk3g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD726393BE
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3135F85B686
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:50 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 70FB755764
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F2B5660C15
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:49 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 39/92] oslib: do not call g_strdup from qemu_get_exec_dir
-Date: Thu, 24 Sep 2020 05:22:21 -0400
-Message-Id: <20200924092314.1722645-40-pbonzini@redhat.com>
+Subject: [PULL 42/92] cutils: introduce get_relocated_path
+Date: Thu, 24 Sep 2020 05:22:24 -0400
+Message-Id: <20200924092314.1722645-43-pbonzini@redhat.com>
 In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
 References: <20200924092314.1722645-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -100,199 +100,122 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Just return the directory without requiring the caller to free it.
-This also removes a bogus check for NULL in os_find_datadir and
-module_load_one; g_strdup of a static variable cannot return NULL.
+Add the function that will compute a relocated version of the
+directories in CONFIG_QEMU_*DIR and CONFIG_QEMU_*PATH.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qemu/osdep.h    |  8 ++------
- os-posix.c              |  6 +-----
- os-win32.c              |  2 +-
- tests/qtest/fuzz/fuzz.c |  4 ++--
- util/module.c           |  7 +------
- util/oslib-posix.c      |  8 +++++---
- util/oslib-win32.c      | 12 ++++++++----
- 7 files changed, 20 insertions(+), 27 deletions(-)
+ include/qemu/cutils.h | 12 +++++++++
+ meson.build           |  4 +--
+ util/cutils.c         | 61 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 75 insertions(+), 2 deletions(-)
 
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index dad44be043..f9ec8c84e9 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -597,12 +597,8 @@ char *qemu_get_local_state_pathname(const char *relative_pathname);
-  * Try OS specific API first, if not working, parse from argv0. */
- void qemu_init_exec_dir(const char *argv0);
- 
--/* Get the saved exec dir.
-- *
-- * The caller is responsible for releasing the value returned with g_free()
-- * after use.
-- */
--char *qemu_get_exec_dir(void);
-+/* Get the saved exec dir.  */
-+const char *qemu_get_exec_dir(void);
- 
- /**
-  * qemu_getauxval:
-diff --git a/os-posix.c b/os-posix.c
-index 0bfd8e2d3c..36e344c544 100644
---- a/os-posix.c
-+++ b/os-posix.c
-@@ -90,13 +90,9 @@ void os_setup_signal_handling(void)
+diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+index eb59852dfd..3a86ec0321 100644
+--- a/include/qemu/cutils.h
++++ b/include/qemu/cutils.h
+@@ -184,4 +184,16 @@ int uleb128_decode_small(const uint8_t *in, uint32_t *n);
   */
- char *os_find_datadir(void)
- {
--    g_autofree char *exec_dir = NULL;
-     g_autofree char *dir = NULL;
+ int qemu_pstrcmp0(const char **str1, const char **str2);
  
--    exec_dir = qemu_get_exec_dir();
--    g_return_val_if_fail(exec_dir != NULL, NULL);
--
--    dir = g_build_filename(exec_dir, "pc-bios", NULL);
-+    dir = g_build_filename(qemu_get_exec_dir(), "pc-bios", NULL);
-     if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {
-         return g_steal_pointer(&dir);
-     }
-diff --git a/os-win32.c b/os-win32.c
-index c9c3afe648..eb8501b9e5 100644
---- a/os-win32.c
-+++ b/os-win32.c
-@@ -65,7 +65,7 @@ void os_setup_early_signal_handling(void)
-  */
- char *os_find_datadir(void)
- {
--    return qemu_get_exec_dir();
-+    return g_strdup(qemu_get_exec_dir());
- }
- 
- void os_set_line_buffering(void)
-diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
-index 7f266ffc63..d3a3ccdec9 100644
---- a/tests/qtest/fuzz/fuzz.c
-+++ b/tests/qtest/fuzz/fuzz.c
-@@ -143,7 +143,8 @@ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
- {
- 
-     char *target_name;
--    char *bindir, *datadir;
-+    const char *bindir;
-+    char *datadir;
-     bool serialize = false;
- 
-     /* Initialize qgraph and modules */
-@@ -166,7 +167,6 @@ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
-          */
-         bindir = g_path_get_dirname(**argv);
-         datadir = g_build_filename(bindir, "pc-bios", NULL);
--        g_free(bindir);
-         if (g_file_test(datadir, G_FILE_TEST_IS_DIR)) {
-             qemu_add_data_dir(datadir);
-         }
-diff --git a/util/module.c b/util/module.c
-index 34772e7d87..9ffe83bb32 100644
---- a/util/module.c
-+++ b/util/module.c
-@@ -172,7 +172,6 @@ bool module_load_one(const char *prefix, const char *lib_name)
- 
- #ifdef CONFIG_MODULES
-     char *fname = NULL;
--    char *exec_dir;
- #ifdef CONFIG_MODULE_UPGRADES
-     char *version_dir;
++
++/**
++ * get_relocated_path:
++ * @dir: the directory (typically a `CONFIG_*DIR` variable) to be relocated.
++ *
++ * Returns a path for @dir that uses the directory of the running executable
++ * as the prefix.  For example, if `bindir` is `/usr/bin` and @dir is
++ * `/usr/share/qemu`, the function will append `../share/qemu` to the
++ * directory that contains the running executable and return the result.
++ */
++char *get_relocated_path(const char *dir);
++
  #endif
-@@ -199,13 +198,12 @@ bool module_load_one(const char *prefix, const char *lib_name)
-         return true;
-     }
+diff --git a/meson.build b/meson.build
+index 9a4ade7f98..ace15dc8c0 100644
+--- a/meson.build
++++ b/meson.build
+@@ -560,9 +560,9 @@ config_host_data.set('QEMU_VERSION_MINOR', meson.project_version().split('.')[1]
+ config_host_data.set('QEMU_VERSION_MICRO', meson.project_version().split('.')[2])
  
--    exec_dir = qemu_get_exec_dir();
-     search_dir = getenv("QEMU_MODULE_DIR");
-     if (search_dir != NULL) {
-         dirs[n_dirs++] = g_strdup_printf("%s", search_dir);
-     }
-     dirs[n_dirs++] = g_strdup_printf("%s", CONFIG_QEMU_MODDIR);
--    dirs[n_dirs++] = g_strdup_printf("%s", exec_dir ? : "");
-+    dirs[n_dirs++] = g_strdup(qemu_get_exec_dir());
- 
- #ifdef CONFIG_MODULE_UPGRADES
-     version_dir = g_strcanon(g_strdup(QEMU_PKGVERSION),
-@@ -216,9 +214,6 @@ bool module_load_one(const char *prefix, const char *lib_name)
- 
-     assert(n_dirs <= ARRAY_SIZE(dirs));
- 
--    g_free(exec_dir);
--    exec_dir = NULL;
--
-     for (i = 0; i < n_dirs; i++) {
-         fname = g_strdup_printf("%s/%s%s",
-                 dirs[i], module_name, CONFIG_HOST_DSOSUF);
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index f5f676f079..18531fc859 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -366,7 +366,9 @@ void qemu_init_exec_dir(const char *argv0)
-     char *p = NULL;
-     char buf[PATH_MAX];
- 
--    assert(!exec_dir[0]);
-+    if (exec_dir[0]) {
-+        return;
+ arrays = ['CONFIG_AUDIO_DRIVERS', 'CONFIG_BDRV_RW_WHITELIST', 'CONFIG_BDRV_RO_WHITELIST']
+-strings = ['HOST_DSOSUF', 'CONFIG_IASL', 'bindir', 'qemu_confdir', 'qemu_datadir',
++strings = ['HOST_DSOSUF', 'CONFIG_IASL', 'bindir', 'prefix', 'qemu_confdir', 'qemu_datadir',
+            'qemu_moddir', 'qemu_localstatedir', 'qemu_helperdir', 'qemu_localedir',
+-           'qemu_icondir', 'qemu_desktopdir', 'qemu_firmwarepath']
++           'qemu_icondir', 'qemu_desktopdir', 'qemu_firmwarepath', 'sysconfdir']
+ foreach k, v: config_host
+   if arrays.contains(k)
+     if v != ''
+diff --git a/util/cutils.c b/util/cutils.c
+index 36ce712271..8da34e04b0 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -889,3 +889,64 @@ int qemu_pstrcmp0(const char **str1, const char **str2)
+ {
+     return g_strcmp0(*str1, *str2);
+ }
++
++static inline bool starts_with_prefix(const char *dir)
++{
++    size_t prefix_len = strlen(CONFIG_PREFIX);
++    return !memcmp(dir, CONFIG_PREFIX, prefix_len) &&
++        (!dir[prefix_len] || G_IS_DIR_SEPARATOR(dir[prefix_len]));
++}
++
++/* Return the next path component in dir, and store its length in *p_len.  */
++static inline const char *next_component(const char *dir, int *p_len)
++{
++    int len;
++    while (*dir && G_IS_DIR_SEPARATOR(*dir)) {
++        dir++;
 +    }
- 
- #if defined(__linux__)
-     {
-@@ -439,9 +441,9 @@ void qemu_init_exec_dir(const char *argv0)
-     g_free(dir);
- }
- 
--char *qemu_get_exec_dir(void)
-+const char *qemu_get_exec_dir(void)
- {
--    return g_strdup(exec_dir);
-+    return exec_dir;
- }
- 
- static void sigbus_handler(int signal)
-diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-index c654dafd93..1a33912944 100644
---- a/util/oslib-win32.c
-+++ b/util/oslib-win32.c
-@@ -315,7 +315,7 @@ void qemu_set_tty_echo(int fd, bool echo)
-     }
- }
- 
--static char exec_dir[PATH_MAX];
-+static char *exec_dir;
- 
- void qemu_init_exec_dir(const char *argv0)
- {
-@@ -324,6 +324,10 @@ void qemu_init_exec_dir(const char *argv0)
-     char buf[MAX_PATH];
-     DWORD len;
- 
-+    if (exec_dir) {
-+        return;
++    len = 0;
++    while (dir[len] && !G_IS_DIR_SEPARATOR(dir[len])) {
++        len++;
++    }
++    *p_len = len;
++    return dir;
++}
++
++char *get_relocated_path(const char *dir)
++{
++    size_t prefix_len = strlen(CONFIG_PREFIX);
++    const char *bindir = CONFIG_BINDIR;
++    const char *exec_dir = qemu_get_exec_dir();
++    GString *result;
++    int len_dir, len_bindir;
++
++    /* Fail if qemu_init_exec_dir was not called.  */
++    assert(exec_dir[0]);
++    if (!starts_with_prefix(dir) || !starts_with_prefix(bindir)) {
++        return strdup(dir);
 +    }
 +
-     len = GetModuleFileName(NULL, buf, sizeof(buf) - 1);
-     if (len == 0) {
-         return;
-@@ -336,13 +340,13 @@ void qemu_init_exec_dir(const char *argv0)
-     }
-     *p = 0;
-     if (access(buf, R_OK) == 0) {
--        pstrcpy(exec_dir, sizeof(exec_dir), buf);
-+        exec_dir = g_strdup(buf);
-     }
- }
- 
--char *qemu_get_exec_dir(void)
-+const char *qemu_get_exec_dir(void)
- {
--    return g_strdup(exec_dir);
-+    return exec_dir;
- }
- 
- #if !GLIB_CHECK_VERSION(2, 50, 0)
++    result = g_string_new(exec_dir);
++
++    /* Advance over common components.  */
++    len_dir = len_bindir = prefix_len;
++    do {
++        dir += len_dir;
++        bindir += len_bindir;
++        dir = next_component(dir, &len_dir);
++        bindir = next_component(bindir, &len_bindir);
++    } while (len_dir == len_bindir && !memcmp(dir, bindir, len_dir));
++
++    /* Ascend from bindir to the common prefix with dir.  */
++    while (len_bindir) {
++        bindir += len_bindir;
++        g_string_append(result, "/..");
++        bindir = next_component(bindir, &len_bindir);
++    }
++
++    if (*dir) {
++        assert(G_IS_DIR_SEPARATOR(dir[-1]));
++        g_string_append(result, dir - 1);
++    }
++    return result->str;
++}
 -- 
 2.26.2
 
