@@ -2,74 +2,74 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A54D3C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 11:22:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22729C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 11:22:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2904A23A1B
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 11:22:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 84A3A2395B
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 11:22:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="teHC3bGi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2904A23A1B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ShotNMr6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84A3A2395B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLPKG-0001ID-4o
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 07:22:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38006)
+	id 1kLPKP-0001VK-FJ
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 07:22:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38016)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kLPGW-0004KZ-JQ; Thu, 24 Sep 2020 07:18:20 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39110)
+ id 1kLPGX-0004Mz-FB; Thu, 24 Sep 2020 07:18:21 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40182)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kLPGU-0003vg-Eu; Thu, 24 Sep 2020 07:18:20 -0400
-Received: by mail-wm1-x341.google.com with SMTP id b79so3169373wmb.4;
- Thu, 24 Sep 2020 04:18:17 -0700 (PDT)
+ id 1kLPGV-0003vv-Mw; Thu, 24 Sep 2020 07:18:21 -0400
+Received: by mail-wm1-x342.google.com with SMTP id k18so3160624wmj.5;
+ Thu, 24 Sep 2020 04:18:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ic/xY7slvI0DSSOiTKsUuGtbaH5pAUlsTrPjkrl/0T0=;
- b=teHC3bGiY98HfGXrepDW2gdO8nfj9B311vXkwv9f/s9VfnsH37bfHLe5De9SVxJewP
- /d9JnF9XzCXjjeqxTdVarYZbUw/g8PlO/tSGb7OBPn7yLZWNMfCaMQBJdYGGK3+6+OBQ
- QDJwjFLz5v0yY8wkOX/p7UXmleLA1A+htHL9hLJdXhz99nAwpmVn6Qj5FAjyUr6ZUJXb
- BCqPhnt6oYcdTjhWn7yms9CGxUWF+XA76n8EtOWxmm9xuQCx99d8eAuJHAZNbeUCZhdY
- lDMP5KhLOsnDXvZCr+kKdb4W9VwV5Wi1mYeyj8Vf6BhJRpp/B/vMZt2P7pBzNBC2zmny
- aQ5g==
+ bh=PocNKqZn4p1bTkwGmp+nEPuAjYmk0VY+dPd4muqyYJI=;
+ b=ShotNMr6DAnlxQtldQDuMt5c4YW74YxTLbKH1//mF+LUqs6vJxHj0RjtrplEGcL19j
+ sRAxHfiFeQrRPVCWuEb1IGrMWuvv/g/yCamgsv/zbp3ginzFAcVZ5F9SkUnTcp5Biu6y
+ yiDEYrwVsp8IABGxBROqCBwN3MnptKgxyZ5SThaBE7FQ8s8fMy6d3TaQh/kyUNNlQILj
+ BAdfyG92NXa2WKrdbmUNaugWUh0ZqrnhyMHLtvGDaqo//lcMpCdbDrf6V9MtQJ4oLYJd
+ upgLlI7gBQmjvPvrUHHxR9GnJed0r/jnJGGuTc9EKaDMqOfgETjRpgt7qVguClf+N2LH
+ y5Og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=ic/xY7slvI0DSSOiTKsUuGtbaH5pAUlsTrPjkrl/0T0=;
- b=Mdh05pebUlagYyGn06I9T57+wW1GOioNY0YgWRFRmBE2WUdvDgY53rqwv0iQMTEs+7
- NBF/k9PuWjsDrj4pac/dZ8vrX3NCIhh3Ey0JPdipcyDaj11kN7jtJhRE4wQM31DHCOfP
- liTmi2/+MuqVANuCCG5y88yFXZyAq3hzXkc19IePnJnX1RcnaD2AsKQAqihk2AmeKQiD
- xfGAzgQK0ESEWJ+UfgYVeu5vm3+9DTVUb34hVLuRmhdzXPq/7GxIkZyjzyw9E5tW3eDG
- L6IDRXlX9srTWkUfGlIqPCiM4s1WP2VlZlpJ8ANNp+GMWMRANl7ja3nD8IfBXkx62UvH
- P4FA==
-X-Gm-Message-State: AOAM533qOG2oWKuG5BnpjHEK4RABq2a3s8hA+QEO62S7lAy+a0D+eMFk
- dqN5CzOB5EqfT+PAhp9PbzYP+PP+wPQ=
-X-Google-Smtp-Source: ABdhPJyRnY1hWsgCbw/Nw8Y70OTeIYRdDUYfKOUoK9nrQ6bmQ58KyEkIcvDkSCi/MAuk1tZ8F3GqYA==
-X-Received: by 2002:a1c:18e:: with SMTP id 136mr4226272wmb.22.1600946296745;
- Thu, 24 Sep 2020 04:18:16 -0700 (PDT)
+ bh=PocNKqZn4p1bTkwGmp+nEPuAjYmk0VY+dPd4muqyYJI=;
+ b=mOL4yuDjhf9/VO8ShnGZOKkinhgPRK1RerDpmPq8Lu2zjwToP2lSqIqyy66PrzLpw9
+ NoK+2dabB0h+T6WdQPpRQ74rKzHV01YIa38AnDjMYJg6JJ0Wcm+USwl7ctBktHct36U1
+ PtaL379lUWqu0FrcjHgD/W+POKeUAuuaLR1BaL0N2Uc9dYBbiRJ7Vf5c5LIjOiOARfRv
+ RrMUQIHZ+KyuRX4ULRqLc02LRmBjH1hNmgKp3xr4xI8GsqjFfijjB/tp1R5X/YFNxcVd
+ AQaf/wp0quT1LatWrEi5OmAZkzJY3CNOlqFpYdcMzJMjnCS10WFujCdrFepb0wxFPZ0L
+ hZ9Q==
+X-Gm-Message-State: AOAM530DnkOrI52/iu8hLHBABuvsjtfBoNX5EsnwSbhcWQZnFFyK4Zdc
+ WANVShM3JyyzBR/5swWftHVlo7ZMYwA=
+X-Google-Smtp-Source: ABdhPJwiIBjKw1WHonGQh/aBe4NDBJJ6f1zBukZR8FP06cuTY1aGAS11ckgQxAAmXZ7ptqAUsSQwGA==
+X-Received: by 2002:a1c:8f:: with SMTP id 137mr4232847wma.158.1600946297860;
+ Thu, 24 Sep 2020 04:18:17 -0700 (PDT)
 Received: from x1w.redhat.com (234.red-88-10-103.dynamicip.rima-tde.net.
  [88.10.103.234])
- by smtp.gmail.com with ESMTPSA id h76sm3400363wme.10.2020.09.24.04.18.15
+ by smtp.gmail.com with ESMTPSA id h76sm3400363wme.10.2020.09.24.04.18.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Sep 2020 04:18:16 -0700 (PDT)
+ Thu, 24 Sep 2020 04:18:17 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 5/8] hw/arm/raspi: Use more specific machine names
-Date: Thu, 24 Sep 2020 13:18:05 +0200
-Message-Id: <20200924111808.77168-6-f4bug@amsat.org>
+Subject: [PATCH v4 6/8] hw/arm/raspi: Introduce RaspiProcessorId enum
+Date: Thu, 24 Sep 2020 13:18:06 +0200
+Message-Id: <20200924111808.77168-7-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200924111808.77168-1-f4bug@amsat.org>
 References: <20200924111808.77168-1-f4bug@amsat.org>
@@ -77,8 +77,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -109,54 +109,92 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that we can instantiate different machines based on their
-board_rev register value, we can have various raspi2 and raspi3.
-
-In commit fc78a990ec103 we corrected the machine description.
-Correct the machine names too. For backward compatibility, add
-an alias to the previous generic name.
+As we only support a reduced set of the REV_CODE_PROCESSOR id
+encoded in the board revision, define the PROCESSOR_ID values
+as an enum. We can simplify the board_soc_type and cores_count
+methods.
 
 Reviewed-by: Luc Michel <luc.michel@greensocs.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/raspi.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ hw/arm/raspi.c | 45 +++++++++++++++++++++------------------------
+ 1 file changed, 21 insertions(+), 24 deletions(-)
 
 diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index 3000e6d57e6..3426521379e 100644
+index 3426521379e..0d8e5a34c78 100644
 --- a/hw/arm/raspi.c
 +++ b/hw/arm/raspi.c
-@@ -327,6 +327,7 @@ static void raspi2b_machine_class_init(ObjectClass *oc, void *data)
-     MachineClass *mc = MACHINE_CLASS(oc);
-     RaspiMachineClass *rmc = RASPI_MACHINE_CLASS(oc);
+@@ -69,16 +69,33 @@ FIELD(REV_CODE, MANUFACTURER,      16, 4);
+ FIELD(REV_CODE, MEMORY_SIZE,       20, 3);
+ FIELD(REV_CODE, STYLE,             23, 1);
  
-+    mc->alias = "raspi2";
-     rmc->board_rev = 0xa21041;
-     raspi_machine_class_common_init(mc, rmc->board_rev);
- };
-@@ -337,6 +338,7 @@ static void raspi3b_machine_class_init(ObjectClass *oc, void *data)
-     MachineClass *mc = MACHINE_CLASS(oc);
-     RaspiMachineClass *rmc = RASPI_MACHINE_CLASS(oc);
++typedef enum RaspiProcessorId {
++    PROCESSOR_ID_BCM2836 = 1,
++    PROCESSOR_ID_BCM2837 = 2,
++} RaspiProcessorId;
++
++static const struct {
++    const char *type;
++    int cores_count;
++} soc_property[] = {
++    [PROCESSOR_ID_BCM2836] = {TYPE_BCM2836, BCM283X_NCPUS},
++    [PROCESSOR_ID_BCM2837] = {TYPE_BCM2837, BCM283X_NCPUS},
++};
++
+ static uint64_t board_ram_size(uint32_t board_rev)
+ {
+     assert(FIELD_EX32(board_rev, REV_CODE, STYLE)); /* Only new style */
+     return 256 * MiB << FIELD_EX32(board_rev, REV_CODE, MEMORY_SIZE);
+ }
  
-+    mc->alias = "raspi3";
-     rmc->board_rev = 0xa02082;
-     raspi_machine_class_common_init(mc, rmc->board_rev);
- };
-@@ -344,12 +346,12 @@ static void raspi3b_machine_class_init(ObjectClass *oc, void *data)
+-static int board_processor_id(uint32_t board_rev)
++static RaspiProcessorId board_processor_id(uint32_t board_rev)
+ {
++    int proc_id = FIELD_EX32(board_rev, REV_CODE, PROCESSOR);
++
+     assert(FIELD_EX32(board_rev, REV_CODE, STYLE)); /* Only new style */
+-    return FIELD_EX32(board_rev, REV_CODE, PROCESSOR);
++    assert(proc_id < ARRAY_SIZE(soc_property) && soc_property[proc_id].type);
++
++    return proc_id;
+ }
  
- static const TypeInfo raspi_machine_types[] = {
-     {
--        .name           = MACHINE_TYPE_NAME("raspi2"),
-+        .name           = MACHINE_TYPE_NAME("raspi2b"),
-         .parent         = TYPE_RASPI_MACHINE,
-         .class_init     = raspi2b_machine_class_init,
- #ifdef TARGET_AARCH64
-     }, {
--        .name           = MACHINE_TYPE_NAME("raspi3"),
-+        .name           = MACHINE_TYPE_NAME("raspi3b"),
-         .parent         = TYPE_RASPI_MACHINE,
-         .class_init     = raspi3b_machine_class_init,
- #endif
+ static int board_version(uint32_t board_rev)
+@@ -88,32 +105,12 @@ static int board_version(uint32_t board_rev)
+ 
+ static const char *board_soc_type(uint32_t board_rev)
+ {
+-    static const char *soc_types[] = {
+-        NULL, TYPE_BCM2836, TYPE_BCM2837,
+-    };
+-    int proc_id = board_processor_id(board_rev);
+-
+-    if (proc_id >= ARRAY_SIZE(soc_types) || !soc_types[proc_id]) {
+-        error_report("Unsupported processor id '%d' (board revision: 0x%x)",
+-                     proc_id, board_rev);
+-        exit(1);
+-    }
+-    return soc_types[proc_id];
++    return soc_property[board_processor_id(board_rev)].type;
+ }
+ 
+ static int cores_count(uint32_t board_rev)
+ {
+-    static const int soc_cores_count[] = {
+-        0, BCM283X_NCPUS, BCM283X_NCPUS,
+-    };
+-    int proc_id = board_processor_id(board_rev);
+-
+-    if (proc_id >= ARRAY_SIZE(soc_cores_count) || !soc_cores_count[proc_id]) {
+-        error_report("Unsupported processor id '%d' (board revision: 0x%x)",
+-                     proc_id, board_rev);
+-        exit(1);
+-    }
+-    return soc_cores_count[proc_id];
++    return soc_property[board_processor_id(board_rev)].cores_count;
+ }
+ 
+ static const char *board_type(uint32_t board_rev)
 -- 
 2.26.2
 
