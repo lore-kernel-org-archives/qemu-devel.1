@@ -2,72 +2,86 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 309A9C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 17:24:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E305C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 17:30:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A880E238A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 17:24:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A880E238A1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9EA12206BE
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 17:30:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aNL0OCYt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EA12206BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLUz7-0007kv-Hs
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 13:24:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50030)
+	id 1kLV4h-0001oF-HG
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 13:30:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51254)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kLUwf-0005Oa-3F; Thu, 24 Sep 2020 13:22:14 -0400
-Resent-Date: Thu, 24 Sep 2020 13:22:13 -0400
-Resent-Message-Id: <E1kLUwf-0005Oa-3F@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21389)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kLUwb-0006zP-Cf; Thu, 24 Sep 2020 13:22:12 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1600968119; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=BYNcCHUZVUQUple7UfieEa1cnXUyRqnQuPIm/wqvtxJT0K+Wvx1rTacf0ylMN6eP6Azfb8ZjrmSVPn491v+WkCBSf2siX+oUur7RhyAQ7F0oNr8k/wuYk+5LExKATo+Ot93emcEAbKlD2sx844ASGQWMI9Fi/qgIKuEV+Wjvu6M=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1600968119;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=fYIzcoobED7P9q5y9ytGc62KCWzsLeHUBpKF8YFDry8=; 
- b=c9swWbNWnOKdQN0hfrR4HGXSP/Mr0kVSi0/lIRt0U6zEbU6Jy4qlmeJYccxO1hp4jK2v7o0b0mmSM2i7f1t8JF6VBhcQHnHJlItbS8rXQ6waPBkSVXsiRd8ydClCsak5JKUYcqlm82rWh4m5ucB+inGUVgdIFGr13zGBESOC9P8=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1600968116933122.13651751262842;
- Thu, 24 Sep 2020 10:21:56 -0700 (PDT)
-Subject: Re: [PATCH v2 00/31] block/export: Add infrastructure and QAPI for
- block exports
-Message-ID: <160096811541.10265.13762738300010781996@66eaa9a8a123>
-In-Reply-To: <20200924152717.287415-1-kwolf@redhat.com>
+ (Exim 4.90_1) (envelope-from <pankaj.gupta.linux@gmail.com>)
+ id 1kLV2v-00018J-7I
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 13:28:41 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:40696)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <pankaj.gupta.linux@gmail.com>)
+ id 1kLV2t-0007wz-CK
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 13:28:40 -0400
+Received: by mail-il1-x141.google.com with SMTP id x18so3951719ila.7
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 10:28:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=/JNVzFbIczKq1615Ie9PDyolrTJKGZy+z75BSc6Xa2Y=;
+ b=aNL0OCYtAijFPTCaqMxhxOAJ9/9foQBxJoRDbD9CQoCTOGxP4F2eD/Kx8AoeTSW/Qn
+ 0zvGsP5kFXY+q6UaQ/GS8SxfRiDGRLLb4vhq4iwPYMCcaSBulsWSZaWVCIEJ09fH34aj
+ lhm8YhD5s7lqqC3S9Ej41lem4JCMZMeAkgEf9NvQso4uyUvc+7D2l+ifKbhVfoH/LAnU
+ 1lHO3ZlE21VVLun3xAXRb8UMfBqQne/E6N13OLeYXz9gbx/V9dhhrZ1tAKr3O7ut3TLA
+ UkZEc7EZp/sN96W6vUyjeyPgkE717LcsW4V9bkJQ/ly+HeqOmIefccwRjEL5m15aZkNZ
+ e3fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=/JNVzFbIczKq1615Ie9PDyolrTJKGZy+z75BSc6Xa2Y=;
+ b=g/OaZQ7Vq87fYvk1XAoK33bZUdssGJHTujDVYa9Gzlqepoa2VJONYXRQ7SXYMyKQTY
+ Msv1zXEB18tqkqGH3Tm5oqOYZkxbcVGHNc2slmvq84D1A3gUiCDamkoexkahQ6IbTHbG
+ lICjr5R9MaAzZybGisR4nzrphgGjvliZJmY7ccIRjypkYW+Wm0ZpK5KGvR2/xeEAlrQe
+ SlfQRSZtUp8Ma/cIeu89uc73mmzwrpowi3TK1lBHaGiCKTa1PVJOWTVl0/vS4uM8cy+u
+ i82/xXLJU0+WYjs550qDSEAAgTy+WElAg5y9yE7BfRaEzFK4zd0KWj4tkMcSOji1WpIW
+ mwEA==
+X-Gm-Message-State: AOAM532g378s+aTOVZbSHMbbQ+q7cUbSaMT3nY4n2zVLh6XWdclFQw0n
+ /cCvrdVhV6Dtd5FDhrvtsIHm/5k8ou7kfVXeb4U=
+X-Google-Smtp-Source: ABdhPJzEilo3i4u/PHvUZXC0s7wY57o4LBZOydet+wfzeg9GIDkN9WMNtNLij+bcrEKFlLtI/Wg5v/dR37lgHGwEGYY=
+X-Received: by 2002:a92:d68d:: with SMTP id p13mr365395iln.32.1600968515866;
+ Thu, 24 Sep 2020 10:28:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: kwolf@redhat.com
-Date: Thu, 24 Sep 2020 10:21:56 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 13:22:06
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+References: <20200924151511.131471-1-sgarzare@redhat.com>
+In-Reply-To: <20200924151511.131471-1-sgarzare@redhat.com>
+From: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Date: Thu, 24 Sep 2020 19:28:25 +0200
+Message-ID: <CAM9Jb+jOdy7zZ0Q1da-BXn665jxxOW6sBVF2CJXAz+JnxquwpQ@mail.gmail.com>
+Subject: Re: [PATCH] docs: add 'io_uring' option to 'aio' param in
+ qemu-options.hx
+To: Stefano Garzarella <sgarzare@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000af54a305b0128717"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
+ envelope-from=pankaj.gupta.linux@gmail.com; helo=mail-il1-x141.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,131 +95,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, mreitz@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Julia Suvorova <jusual@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Aarushi Mehta <mehta.aaru20@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkyNDE1MjcxNy4yODc0
-MTUtMS1rd29sZkByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDA5MjQxNTI3MTcuMjg3NDE1
-LTEta3dvbGZAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUEFUQ0ggdjIgMDAvMzFdIGJsb2NrL2V4cG9y
-dDogQWRkIGluZnJhc3RydWN0dXJlIGFuZCBRQVBJIGZvciBibG9jayBleHBvcnRzCgo9PT0gVEVT
-VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYv
-bnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-YWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJh
-c2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0
-Y2hldy1wcm9qZWN0L3FlbXUKICAgYzEyMmJjYS4uZjdmMWQ5MSAgbWFzdGVyICAgICAtPiBtYXN0
-ZXIKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0
-YWddICAgICAgICAgcGF0Y2hldy8yMDIwMDkyNDE1MjcxNy4yODc0MTUtMS1rd29sZkByZWRoYXQu
-Y29tIC0+IHBhdGNoZXcvMjAyMDA5MjQxNTI3MTcuMjg3NDE1LTEta3dvbGZAcmVkaGF0LmNvbQpT
-d2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjc3MmJiODkgaW90ZXN0czogVGVzdCBibG9j
-ay1leHBvcnQtKiBRTVAgaW50ZXJmYWNlCmE4OWE4YjcgaW90ZXN0czogQWxsb3cgc3VwcG9ydGVk
-IGFuZCB1bnN1cHBvcnRlZCBmb3JtYXRzIGF0IHRoZSBzYW1lIHRpbWUKZmQxNWRmNiBpb3Rlc3Rz
-OiBJbnRyb2R1Y2UgcWVtdV9uYmRfbGlzdF9sb2coKQo3ZmU2YWY1IGlvdGVzdHM6IEZhY3RvciBv
-dXQgcWVtdV90b29sX3BpcGVfYW5kX3N0YXR1cygpCjY3MTQ0ZDggbmJkOiBEZXByZWNhdGUgbmJk
-LXNlcnZlci1hZGQvcmVtb3ZlCjgxMTcwZWIgbmJkOiBNZXJnZSBuYmRfZXhwb3J0X25ldygpIGFu
-ZCBuYmRfZXhwb3J0X2NyZWF0ZSgpCjJjODg2OWIgYmxvY2svZXhwb3J0OiBNb3ZlIHdyaXRhYmxl
-IHRvIEJsb2NrRXhwb3J0T3B0aW9ucwo2Mzk1MWM0IGJsb2NrL2V4cG9ydDogQWRkIHF1ZXJ5LWJs
-b2NrLWV4cG9ydHMKN2YxOTQwYSBibG9jay9leHBvcnQ6IENyZWF0ZSBCbG9ja0JhY2tlbmQgaW4g
-YmxrX2V4cF9hZGQoKQpjMjBmNWYwIGJsb2NrL2V4cG9ydDogTW92ZSBibGsgdG8gQmxvY2tFeHBv
-cnQKNDZjNDVlZCBibG9jay9leHBvcnQ6IEFkZCBCTE9DS19FWFBPUlRfREVMRVRFRCBldmVudAo1
-NDk1MjViIGJsb2NrL2V4cG9ydDogQWRkIGJsb2NrLWV4cG9ydC1kZWwKZGViOThlMCBibG9jay9l
-eHBvcnQ6IE1vdmUgc3Ryb25nIHVzZXIgcmVmZXJlbmNlIHRvIGJsb2NrX2V4cG9ydHMKYWQ3NWIy
-MiBibG9jay9leHBvcnQ6IEFkZCAnaWQnIG9wdGlvbiB0byBibG9jay1leHBvcnQtYWRkCmZmYWRm
-MzggYmxvY2svZXhwb3J0OiBBZGQgYmxrX2V4cF9jbG9zZV9hbGwoX3R5cGUpCjFkYTIxMjQgYmxv
-Y2svZXhwb3J0OiBBbGxvY2F0ZSBCbG9ja0V4cG9ydCBpbiBibGtfZXhwX2FkZCgpCjYwMmRmMjgg
-YmxvY2svZXhwb3J0OiBBZGQgbm9kZS1uYW1lIHRvIEJsb2NrRXhwb3J0T3B0aW9ucwpiMWZjM2Zm
-IGJsb2NrL2V4cG9ydDogTW92ZSBBaW9Db250ZXh0IGZyb20gTkJERXhwb3J0IHRvIEJsb2NrRXhw
-b3J0CmE1ZDI3NWYgYmxvY2svZXhwb3J0OiBNb3ZlIHJlZmNvdW50IGZyb20gTkJERXhwb3J0IHRv
-IEJsb2NrRXhwb3J0CjY1MGYyZWIgbmJkL3NlcnZlcjogU2ltcGxpZnkgZXhwb3J0IHNodXRkb3du
-CjYzNGRjMmYgcWVtdS1uYmQ6IFVzZSBibGtfZXhwX2FkZCgpIHRvIGNyZWF0ZSB0aGUgZXhwb3J0
-CjNlMWY3Y2YgbmJkOiBSZW1vdmUgTkJERXhwb3J0LmNsb3NlIGNhbGxiYWNrCjNhNDE4ODAgbmJk
-OiBBZGQgd3JpdGV0aHJvdWdoIHRvIGJsb2NrLWV4cG9ydC1hZGQKZjk5MDgzMyBuYmQ6IEFkZCBt
-YXgtY29ubmVjdGlvbnMgdG8gbmJkLXNlcnZlci1zdGFydApkZTFjMzk3IGJsb2NrL2V4cG9ydDog
-UmVtb3ZlIG1hZ2ljIGZyb20gYmxvY2stZXhwb3J0LWFkZAo5YmMxM2I4IHFlbXUtbmJkOiBVc2Ug
-cmF3IGJsb2NrIGRyaXZlciBmb3IgLS1vZmZzZXQKOGViOTMzZSBxZW11LXN0b3JhZ2UtZGFlbW9u
-OiBVc2UgcW1wX2Jsb2NrX2V4cG9ydF9hZGQoKQozOGE0YjAxIGJsb2NrL2V4cG9ydDogQWRkIEJs
-b2NrRXhwb3J0IGluZnJhc3RydWN0dXJlIGFuZCBibG9jay1leHBvcnQtYWRkCjY2YWZmMTQgcWFw
-aTogUmVuYW1lIEJsb2NrRXhwb3J0IHRvIEJsb2NrRXhwb3J0T3B0aW9ucwowMjZhYzVkIHFhcGk6
-IENyZWF0ZSBibG9jay1leHBvcnQgbW9kdWxlCmIxNzE1ZjYgbmJkOiBSZW1vdmUgdW51c2VkIG5i
-ZF9leHBvcnRfZ2V0X2Jsb2NrZGV2KCkKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMzEgQ2hlY2tp
-bmcgY29tbWl0IGIxNzE1ZjYyODE5OSAobmJkOiBSZW1vdmUgdW51c2VkIG5iZF9leHBvcnRfZ2V0
-X2Jsb2NrZGV2KCkpCjIvMzEgQ2hlY2tpbmcgY29tbWl0IDAyNmFjNWRkYTY3OCAocWFwaTogQ3Jl
-YXRlIGJsb2NrLWV4cG9ydCBtb2R1bGUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVk
-IGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzIzMTogCm5ldyBmaWxl
-IG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQxMCBsaW5lcyBjaGVj
-a2VkCgpQYXRjaCAyLzMxIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjMvMzEgQ2hlY2tpbmcg
-Y29tbWl0IDY2YWZmMTQzMDhjYiAocWFwaTogUmVuYW1lIEJsb2NrRXhwb3J0IHRvIEJsb2NrRXhw
-b3J0T3B0aW9ucykKNC8zMSBDaGVja2luZyBjb21taXQgMzhhNGIwMTdlYzcyIChibG9jay9leHBv
-cnQ6IEFkZCBCbG9ja0V4cG9ydCBpbmZyYXN0cnVjdHVyZSBhbmQgYmxvY2stZXhwb3J0LWFkZCkK
-V0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVS
-UyBuZWVkIHVwZGF0aW5nPwojMjE6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6ICIoZm9v
-KikiIHNob3VsZCBiZSAiKGZvbyAqKSIKIzE1NjogRklMRTogYmxvY2tkZXYtbmJkLmM6MjI0Ogor
-ICAgIHJldHVybiAoQmxvY2tFeHBvcnQqKSBleHA7Cgp0b3RhbDogMSBlcnJvcnMsIDEgd2Fybmlu
-Z3MsIDI0NyBsaW5lcyBjaGVja2VkCgpQYXRjaCA0LzMxIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
-YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
-ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
-UlMuCgo1LzMxIENoZWNraW5nIGNvbW1pdCA4ZWI5MzNlMWUzZjcgKHFlbXUtc3RvcmFnZS1kYWVt
-b246IFVzZSBxbXBfYmxvY2tfZXhwb3J0X2FkZCgpKQo2LzMxIENoZWNraW5nIGNvbW1pdCA5YmMx
-M2I4ZGJhNDYgKHFlbXUtbmJkOiBVc2UgcmF3IGJsb2NrIGRyaXZlciBmb3IgLS1vZmZzZXQpCjcv
-MzEgQ2hlY2tpbmcgY29tbWl0IGRlMWMzOTcyNGQ5ZSAoYmxvY2svZXhwb3J0OiBSZW1vdmUgbWFn
-aWMgZnJvbSBibG9jay1leHBvcnQtYWRkKQo4LzMxIENoZWNraW5nIGNvbW1pdCBmOTkwODMzMTk4
-OTIgKG5iZDogQWRkIG1heC1jb25uZWN0aW9ucyB0byBuYmQtc2VydmVyLXN0YXJ0KQo5LzMxIENo
-ZWNraW5nIGNvbW1pdCAzYTQxODgwN2ZjMTQgKG5iZDogQWRkIHdyaXRldGhyb3VnaCB0byBibG9j
-ay1leHBvcnQtYWRkKQoxMC8zMSBDaGVja2luZyBjb21taXQgM2UxZjdjZjgwNDg4IChuYmQ6IFJl
-bW92ZSBOQkRFeHBvcnQuY2xvc2UgY2FsbGJhY2spCjExLzMxIENoZWNraW5nIGNvbW1pdCA2MzRk
-YzJmNmYyZWMgKHFlbXUtbmJkOiBVc2UgYmxrX2V4cF9hZGQoKSB0byBjcmVhdGUgdGhlIGV4cG9y
-dCkKMTIvMzEgQ2hlY2tpbmcgY29tbWl0IDY1MGYyZWJhMGRiOCAobmJkL3NlcnZlcjogU2ltcGxp
-ZnkgZXhwb3J0IHNodXRkb3duKQoxMy8zMSBDaGVja2luZyBjb21taXQgYTVkMjc1ZjRjNTM4IChi
-bG9jay9leHBvcnQ6IE1vdmUgcmVmY291bnQgZnJvbSBOQkRFeHBvcnQgdG8gQmxvY2tFeHBvcnQp
-CkVSUk9SOiAiKGZvbyopIiBzaG91bGQgYmUgIihmb28gKikiCiM0OTogRklMRTogYmxvY2tkZXYt
-bmJkLmM6MjM5OgorICAgIGJsa19leHBfdW5yZWYoKEJsb2NrRXhwb3J0KikgZXhwKTsKCnRvdGFs
-OiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjE0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEzLzMxIGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoxNC8zMSBDaGVja2luZyBjb21taXQgYjFmYzNmZmMw
-Y2NkIChibG9jay9leHBvcnQ6IE1vdmUgQWlvQ29udGV4dCBmcm9tIE5CREV4cG9ydCB0byBCbG9j
-a0V4cG9ydCkKMTUvMzEgQ2hlY2tpbmcgY29tbWl0IDYwMmRmMjg2ODgxYyAoYmxvY2svZXhwb3J0
-OiBBZGQgbm9kZS1uYW1lIHRvIEJsb2NrRXhwb3J0T3B0aW9ucykKMTYvMzEgQ2hlY2tpbmcgY29t
-bWl0IDFkYTIxMjRlMTY0ZSAoYmxvY2svZXhwb3J0OiBBbGxvY2F0ZSBCbG9ja0V4cG9ydCBpbiBi
-bGtfZXhwX2FkZCgpKQoxNy8zMSBDaGVja2luZyBjb21taXQgZmZhZGYzOGRkNmMzIChibG9jay9l
-eHBvcnQ6IEFkZCBibGtfZXhwX2Nsb3NlX2FsbChfdHlwZSkpCjE4LzMxIENoZWNraW5nIGNvbW1p
-dCBhZDc1YjIyNjg4ZjUgKGJsb2NrL2V4cG9ydDogQWRkICdpZCcgb3B0aW9uIHRvIGJsb2NrLWV4
-cG9ydC1hZGQpCjE5LzMxIENoZWNraW5nIGNvbW1pdCBkZWI5OGUwMDYyMWQgKGJsb2NrL2V4cG9y
-dDogTW92ZSBzdHJvbmcgdXNlciByZWZlcmVuY2UgdG8gYmxvY2tfZXhwb3J0cykKMjAvMzEgQ2hl
-Y2tpbmcgY29tbWl0IDU0OTUyNWJiOTQ5NyAoYmxvY2svZXhwb3J0OiBBZGQgYmxvY2stZXhwb3J0
-LWRlbCkKMjEvMzEgQ2hlY2tpbmcgY29tbWl0IDQ2YzQ1ZWQ2MmE4ZCAoYmxvY2svZXhwb3J0OiBB
-ZGQgQkxPQ0tfRVhQT1JUX0RFTEVURUQgZXZlbnQpCjIyLzMxIENoZWNraW5nIGNvbW1pdCBjMjBm
-NWYwY2JhOTEgKGJsb2NrL2V4cG9ydDogTW92ZSBibGsgdG8gQmxvY2tFeHBvcnQpCjIzLzMxIENo
-ZWNraW5nIGNvbW1pdCA3ZjE5NDBhYzcwYzUgKGJsb2NrL2V4cG9ydDogQ3JlYXRlIEJsb2NrQmFj
-a2VuZCBpbiBibGtfZXhwX2FkZCgpKQoyNC8zMSBDaGVja2luZyBjb21taXQgNjM5NTFjNGQyZmJk
-IChibG9jay9leHBvcnQ6IEFkZCBxdWVyeS1ibG9jay1leHBvcnRzKQoyNS8zMSBDaGVja2luZyBj
-b21taXQgMmM4ODY5YmQ4NmZiIChibG9jay9leHBvcnQ6IE1vdmUgd3JpdGFibGUgdG8gQmxvY2tF
-eHBvcnRPcHRpb25zKQoyNi8zMSBDaGVja2luZyBjb21taXQgODExNzBlYjAzMGJlIChuYmQ6IE1l
-cmdlIG5iZF9leHBvcnRfbmV3KCkgYW5kIG5iZF9leHBvcnRfY3JlYXRlKCkpCjI3LzMxIENoZWNr
-aW5nIGNvbW1pdCA2NzE0NGQ4Y2EyMmQgKG5iZDogRGVwcmVjYXRlIG5iZC1zZXJ2ZXItYWRkL3Jl
-bW92ZSkKMjgvMzEgQ2hlY2tpbmcgY29tbWl0IDdmZTZhZjVkMTM1YyAoaW90ZXN0czogRmFjdG9y
-IG91dCBxZW11X3Rvb2xfcGlwZV9hbmRfc3RhdHVzKCkpCjI5LzMxIENoZWNraW5nIGNvbW1pdCBm
-ZDE1ZGY2MjNhODQgKGlvdGVzdHM6IEludHJvZHVjZSBxZW11X25iZF9saXN0X2xvZygpKQozMC8z
-MSBDaGVja2luZyBjb21taXQgYTg5YThiNzc0YjgxIChpb3Rlc3RzOiBBbGxvdyBzdXBwb3J0ZWQg
-YW5kIHVuc3VwcG9ydGVkIGZvcm1hdHMgYXQgdGhlIHNhbWUgdGltZSkKMzEvMzEgQ2hlY2tpbmcg
-Y29tbWl0IDc3MmJiODkxNGQzOSAoaW90ZXN0czogVGVzdCBibG9jay1leHBvcnQtKiBRTVAgaW50
-ZXJmYWNlKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
-SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxMTogCm5ldyBmaWxlIG1vZGUgMTAwNzU1Cgp0b3Rh
-bDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDI2MCBsaW5lcyBjaGVja2VkCgpQYXRjaCAzMS8zMSBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRw
-Oi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDkyNDE1MjcxNy4yODc0MTUtMS1rd29sZkByZWRoYXQu
-Y29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVk
-IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
-c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+--000000000000af54a305b0128717
+Content-Type: text/plain; charset="UTF-8"
+
+> When we added io_uring AIO engine, we forgot to update qemu-options.hx,
+> so qemu(1) man page and qemu help were outdated.
+>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  qemu-options.hx | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+>
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 47f64be0c0..5b098577fe 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -1053,7 +1053,8 @@ SRST
+>              The path to the image file in the local filesystem
+>
+>          ``aio``
+> -            Specifies the AIO backend (threads/native, default: threads)
+> +            Specifies the AIO backend (threads/native/io_uring,
+> +            default: threads)
+>
+>          ``locking``
+>              Specifies whether the image file is protected with Linux OFD
+> @@ -1175,7 +1176,8 @@ DEF("drive", HAS_ARG, QEMU_OPTION_drive,
+>      "-drive [file=file][,if=type][,bus=n][,unit=m][,media=d][,index=i]\n"
+>      "
+>  [,cache=writethrough|writeback|none|directsync|unsafe][,format=f]\n"
+>      "       [,snapshot=on|off][,rerror=ignore|stop|report]\n"
+> -    "
+>  [,werror=ignore|stop|report|enospc][,id=name][,aio=threads|native]\n"
+> +    "       [,werror=ignore|stop|report|enospc][,id=name]\n"
+> +    "       [,aio=threads|native|io_uring]\n"
+>      "       [,readonly=on|off][,copy-on-read=on|off]\n"
+>      "       [,discard=ignore|unmap][,detect-zeroes=on|off|unmap]\n"
+>      "       [[,bps=b]|[[,bps_rd=r][,bps_wr=w]]]\n"
+> @@ -1247,8 +1249,8 @@ SRST
+>          The default mode is ``cache=writeback``.
+>
+>      ``aio=aio``
+> -        aio is "threads", or "native" and selects between pthread based
+> -        disk I/O and native Linux AIO.
+> +        aio is "threads", "native", or "io_uring" and selects between
+> pthread
+> +        based disk I/O, native Linux AIO, or Linux io_uring API.
+>
+>      ``format=format``
+>          Specify which disk format will be used rather than detecting the
+>
+
+Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+
+-- 
+> 2.26.2
+>
+>
+>
+
+--000000000000af54a305b0128717
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"auto"><div><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D=
+"gmail_attr"><br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 =
+0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">When we added io_urin=
+g AIO engine, we forgot to update qemu-options.hx,<br>
+so qemu(1) man page and qemu help were outdated.<br>
+<br>
+Signed-off-by: Stefano Garzarella &lt;<a href=3D"mailto:sgarzare@redhat.com=
+" target=3D"_blank" rel=3D"noreferrer">sgarzare@redhat.com</a>&gt;<br>
+---<br>
+=C2=A0qemu-options.hx | 10 ++++++----<br>
+=C2=A01 file changed, 6 insertions(+), 4 deletions(-)<br>
+<br>
+diff --git a/qemu-options.hx b/qemu-options.hx<br>
+index 47f64be0c0..5b098577fe 100644<br>
+--- a/qemu-options.hx<br>
++++ b/qemu-options.hx<br>
+@@ -1053,7 +1053,8 @@ SRST<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0The path to the image file =
+in the local filesystem<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0``aio``<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Specifies the AIO backend (threa=
+ds/native, default: threads)<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Specifies the AIO backend (threa=
+ds/native/io_uring,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 default: threads)<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0``locking``<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Specifies whether the image=
+ file is protected with Linux OFD<br>
+@@ -1175,7 +1176,8 @@ DEF(&quot;drive&quot;, HAS_ARG, QEMU_OPTION_drive,<br=
+>
+=C2=A0 =C2=A0 =C2=A0&quot;-drive [file=3Dfile][,if=3Dtype][,bus=3Dn][,unit=
+=3Dm][,media=3Dd][,index=3Di]\n&quot;<br>
+=C2=A0 =C2=A0 =C2=A0&quot;=C2=A0 =C2=A0 =C2=A0 =C2=A0[,cache=3Dwritethrough=
+|writeback|none|directsync|unsafe][,format=3Df]\n&quot;<br>
+=C2=A0 =C2=A0 =C2=A0&quot;=C2=A0 =C2=A0 =C2=A0 =C2=A0[,snapshot=3Don|off][,=
+rerror=3Dignore|stop|report]\n&quot;<br>
+-=C2=A0 =C2=A0 &quot;=C2=A0 =C2=A0 =C2=A0 =C2=A0[,werror=3Dignore|stop|repo=
+rt|enospc][,id=3Dname][,aio=3Dthreads|native]\n&quot;<br>
++=C2=A0 =C2=A0 &quot;=C2=A0 =C2=A0 =C2=A0 =C2=A0[,werror=3Dignore|stop|repo=
+rt|enospc][,id=3Dname]\n&quot;<br>
++=C2=A0 =C2=A0 &quot;=C2=A0 =C2=A0 =C2=A0 =C2=A0[,aio=3Dthreads|native|io_u=
+ring]\n&quot;<br>
+=C2=A0 =C2=A0 =C2=A0&quot;=C2=A0 =C2=A0 =C2=A0 =C2=A0[,readonly=3Don|off][,=
+copy-on-read=3Don|off]\n&quot;<br>
+=C2=A0 =C2=A0 =C2=A0&quot;=C2=A0 =C2=A0 =C2=A0 =C2=A0[,discard=3Dignore|unm=
+ap][,detect-zeroes=3Don|off|unmap]\n&quot;<br>
+=C2=A0 =C2=A0 =C2=A0&quot;=C2=A0 =C2=A0 =C2=A0 =C2=A0[[,bps=3Db]|[[,bps_rd=
+=3Dr][,bps_wr=3Dw]]]\n&quot;<br>
+@@ -1247,8 +1249,8 @@ SRST<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0The default mode is ``cache=3Dwriteback``=
+.<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0``aio=3Daio``<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 aio is &quot;threads&quot;, or &quot;native&qu=
+ot; and selects between pthread based<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 disk I/O and native Linux AIO.<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 aio is &quot;threads&quot;, &quot;native&quot;=
+, or &quot;io_uring&quot; and selects between pthread<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 based disk I/O, native Linux AIO, or Linux io_=
+uring API.<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0``format=3Dformat``<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Specify which disk format will be used ra=
+ther than detecting the<br></blockquote></div></div><div dir=3D"auto"><br><=
+/div><div dir=3D"auto"><pre style=3D"font-family:&quot;courier new&quot;,co=
+urier,monospace;font-size:16px;font-weight:600">Reviewed-by: Pankaj Gupta &=
+lt;<a href=3D"mailto:pankaj.gupta.linux@gmail.com">pankaj.gupta.linux@gmail=
+.com</a>&gt;</pre></div><div dir=3D"auto"><div class=3D"gmail_quote"><block=
+quote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc=
+ solid;padding-left:1ex">
+-- <br>
+2.26.2<br>
+<br>
+<br>
+</blockquote></div></div></div>
+
+--000000000000af54a305b0128717--
 
