@@ -4,69 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 953E8C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:10:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D740C4727D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:11:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3301C2396E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:10:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E8F9F21D24
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:11:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P8/Gt2Mr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3301C2396E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EgxAeZht"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8F9F21D24
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLOCR-00013Z-Sb
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 06:10:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39316)
+	id 1kLODN-00029Z-W4
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 06:11:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39928)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNU2-0001i5-Fj
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38276)
+ id 1kLNV3-0003Ug-Po
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:25:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42957)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTz-00068i-K6
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:10 -0400
+ id 1kLNUo-0006Hn-1p
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:25:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600939447;
+ s=mimecast20190719; t=1600939496;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=SNkXRfzI2m9zu5mdND3zfbCZifO5DM42yhn0HW0HIF0=;
- b=P8/Gt2Mr8Z5jbuw1p7tO0cSwcJGKGYUSESvFCGMIQ1cURXcPD7qhXrGFRKjH30O/wv06F/
- 44n5hFw1o7HSQeCBUTuQ+cHBJWeA0CZxI5zfJ4Bcu7yYh9qKwNfTmryEuBPLoQtfPw/txo
- vugMX+vjPLRtX7WIn5LCph2oSdjagCw=
+ bh=fCbXzKbX+672u5C2RfeVeIhHaht7A+MYCvhZQ6XVKkM=;
+ b=EgxAeZhtJUZ4twGaMUSKp6F9EjYcP6j0QvHwlu6iOjGiwcFPZUSnR+w3VfaneuQjfB2HNE
+ vhYymJEPpKCb1THXOHifTqKUqPPxUO67Y9aVCGDsBpLfNS2dBAiKCW74VL4aJBOP24amLH
+ tdmVZHt9UPs5nnhBg/EfvMawp4jtDLw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-497-8VVAG9TPMkmT5R4IOBco2Q-1; Thu, 24 Sep 2020 05:24:05 -0400
-X-MC-Unique: 8VVAG9TPMkmT5R4IOBco2Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-363-Pz3WvosBN6W19VLTrkbeWg-1; Thu, 24 Sep 2020 05:24:51 -0400
+X-MC-Unique: Pz3WvosBN6W19VLTrkbeWg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20FAB1891E83
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:24:04 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAEA8104D3E3
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:24:50 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D564260E1C;
- Thu, 24 Sep 2020 09:24:03 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6DBC855764;
+ Thu, 24 Sep 2020 09:24:50 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 63/92] smp: drop support for deprecated (invalid topologies)
-Date: Thu, 24 Sep 2020 05:22:45 -0400
-Message-Id: <20200924092314.1722645-64-pbonzini@redhat.com>
+Subject: [PULL 84/92] bios-tables-test: Remove kernel-irqchip=off option
+Date: Thu, 24 Sep 2020 05:23:06 -0400
+Message-Id: <20200924092314.1722645-85-pbonzini@redhat.com>
 In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
 References: <20200924092314.1722645-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -96,138 +96,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
+From: Eduardo Habkost <ehabkost@redhat.com>
 
-it's was deprecated since 3.1
+We don't need to use kernel-irqchip=off for irq0 override if IRQ
+routing is supported by the host, which is the case since 2009
+(IRQ routing was added to KVM in Linux v2.6.30).
 
-Support for invalid topologies is removed, the user must ensure
-that topologies described with -smp include all possible cpus,
-i.e. (sockets * cores * threads) == maxcpus or QEMU will
-exit with error.
+This is a more straightforward fix for Launchpad bug #1896263, as
+it doesn't require increasing the complexity of the MSR code.
+kernel-irqchip=off is for debugging only and there's no need to
+increase the complexity of the code just to work around an issue
+that was already fixed in the kernel.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by:
-Message-Id: <20200911133202.938754-1-imammedo@redhat.com>
+Fixes: https://bugs.launchpad.net/bugs/1896263
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20200922194732.2100510-1-ehabkost@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- docs/system/deprecated.rst | 26 +++++++++++++-------------
- hw/core/machine.c          | 16 ++++------------
- hw/i386/pc.c               | 16 ++++------------
- 3 files changed, 21 insertions(+), 37 deletions(-)
+ tests/qtest/bios-tables-test.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-index e78d03038f..17703d18fd 100644
---- a/docs/system/deprecated.rst
-+++ b/docs/system/deprecated.rst
-@@ -47,19 +47,6 @@ The 'file' driver for drives is no longer appropriate for character or host
- devices and will only accept regular files (S_IFREG). The correct driver
- for these file types is 'host_cdrom' or 'host_device' as appropriate.
+diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
+index a9c8d478ae..27e8f0a1cb 100644
+--- a/tests/qtest/bios-tables-test.c
++++ b/tests/qtest/bios-tables-test.c
+@@ -663,8 +663,7 @@ static void test_acpi_one(const char *params, test_data *data)
+             data->uefi_fl1, data->uefi_fl2, data->cd, params ? params : "");
  
--``-smp`` (invalid topologies) (since 3.1)
--'''''''''''''''''''''''''''''''''''''''''
--
--CPU topology properties should describe whole machine topology including
--possible CPUs.
--
--However, historically it was possible to start QEMU with an incorrect topology
--where *n* <= *sockets* * *cores* * *threads* < *maxcpus*,
--which could lead to an incorrect topology enumeration by the guest.
--Support for invalid topologies will be removed, the user must ensure
--topologies described with -smp include all possible cpus, i.e.
--*sockets* * *cores* * *threads* = *maxcpus*.
--
- ``-vnc acl`` (since 4.0.0)
- ''''''''''''''''''''''''''
- 
-@@ -646,6 +633,19 @@ as ignored. Currently, users are responsible for making sure the backing storage
- specified with ``-mem-path`` can actually provide the guest RAM configured with
- ``-m`` and QEMU fails to start up if RAM allocation is unsuccessful.
- 
-+``-smp`` (invalid topologies) (removed 5.2)
-+'''''''''''''''''''''''''''''''''''''''''''
-+
-+CPU topology properties should describe whole machine topology including
-+possible CPUs.
-+
-+However, historically it was possible to start QEMU with an incorrect topology
-+where *n* <= *sockets* * *cores* * *threads* < *maxcpus*,
-+which could lead to an incorrect topology enumeration by the guest.
-+Support for invalid topologies is removed, the user must ensure
-+topologies described with -smp include all possible cpus, i.e.
-+*sockets* * *cores* * *threads* = *maxcpus*.
-+
- Block devices
- -------------
- 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index f70d388e86..d25149685e 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -754,23 +754,15 @@ static void smp_parse(MachineState *ms, QemuOpts *opts)
-             exit(1);
-         }
- 
--        if (sockets * cores * threads > ms->smp.max_cpus) {
--            error_report("cpu topology: "
--                         "sockets (%u) * cores (%u) * threads (%u) > "
--                         "maxcpus (%u)",
-+        if (sockets * cores * threads != ms->smp.max_cpus) {
-+            error_report("Invalid CPU topology: "
-+                         "sockets (%u) * cores (%u) * threads (%u) "
-+                         "!= maxcpus (%u)",
-                          sockets, cores, threads,
-                          ms->smp.max_cpus);
-             exit(1);
-         }
- 
--        if (sockets * cores * threads != ms->smp.max_cpus) {
--            warn_report("Invalid CPU topology deprecated: "
--                        "sockets (%u) * cores (%u) * threads (%u) "
--                        "!= maxcpus (%u)",
--                        sockets, cores, threads,
--                        ms->smp.max_cpus);
--        }
--
-         ms->smp.cpus = cpus;
-         ms->smp.cores = cores;
-         ms->smp.threads = threads;
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index b55369357e..1e2ab5ebe7 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -746,23 +746,15 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
-             exit(1);
-         }
- 
--        if (sockets * dies * cores * threads > ms->smp.max_cpus) {
--            error_report("cpu topology: "
--                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) > "
--                         "maxcpus (%u)",
-+        if (sockets * dies * cores * threads != ms->smp.max_cpus) {
-+            error_report("Invalid CPU topology deprecated: "
-+                         "sockets (%u) * dies (%u) * cores (%u) * threads (%u) "
-+                         "!= maxcpus (%u)",
-                          sockets, dies, cores, threads,
-                          ms->smp.max_cpus);
-             exit(1);
-         }
- 
--        if (sockets * dies * cores * threads != ms->smp.max_cpus) {
--            warn_report("Invalid CPU topology deprecated: "
--                        "sockets (%u) * dies (%u) * cores (%u) * threads (%u) "
--                        "!= maxcpus (%u)",
--                        sockets, dies, cores, threads,
--                        ms->smp.max_cpus);
--        }
--
-         ms->smp.cpus = cpus;
-         ms->smp.cores = cores;
-         ms->smp.threads = threads;
+     } else {
+-        /* Disable kernel irqchip to be able to override apic irq0. */
+-        args = g_strdup_printf("-machine %s,kernel-irqchip=off %s -accel tcg "
++        args = g_strdup_printf("-machine %s %s -accel tcg "
+             "-net none -display none %s "
+             "-drive id=hd0,if=none,file=%s,format=raw "
+             "-device %s,drive=hd0 ",
 -- 
 2.26.2
 
