@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50E95C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:57:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB71BC4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:58:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C47AC21D91
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:57:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE35E235FD
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:58:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nue7uU4a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C47AC21D91
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="czI4u78K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE35E235FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLO0R-0007Vt-Pp
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:57:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39652)
+	id 1kLO16-0008P8-2V
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:58:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39070)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNUh-0003Fq-DH
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47602)
+ id 1kLNTq-0001Du-Sc
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24655)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNUd-0006DW-L6
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:51 -0400
+ id 1kLNTm-00065o-QL
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600939485;
+ s=mimecast20190719; t=1600939434;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OLAKqL1m1PZfleNbUpWIHaKkhJlBka0cIAGQUl4V9yM=;
- b=Nue7uU4a+vGQjFtcaJUE4MExwMleSXCSTTrYSlw8kUoTvES5VerBS8oYH+6RzGZy2JkbD4
- J3/6yDWqLwxsw8VGFpoi+6OkMlxDDTgsIoHxZ1UkjMpfrKjyuuv8/2UfXSsmaPnXJbmpeN
- uyHTLPd4Y2K7tJ8s+61c250OTymfmm4=
+ bh=w8CvE9kAxYtIRve+39sdvjANpNKhXew6psQEJPG103A=;
+ b=czI4u78KnbwIqiS7xOlB4b5GcYC/oKd9pYsTc+EVdJSEIgH/EzoO/cwAj6x7qPwLcy4nv1
+ tpSVUffqs7WxMYk4GOCbDirKRiY3b6OaxuQpKdj7Ak4ZAaBATf/Bg5QYaPxE7P1eh4LKkd
+ aI1dV4w5b6J1XtmRjMMRinz6itYSsJ0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-376-96IvbB5HMbep14Wh6-S78g-1; Thu, 24 Sep 2020 05:24:43 -0400
-X-MC-Unique: 96IvbB5HMbep14Wh6-S78g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-62-8iZKrLuTM42pPzAxrUxB9A-1; Thu, 24 Sep 2020 05:23:52 -0400
+X-MC-Unique: 8iZKrLuTM42pPzAxrUxB9A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B53964177
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:24:42 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 878FE81F00B
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:51 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 90ACB5C1C7;
- Thu, 24 Sep 2020 09:24:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5460A60C15
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:51 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 74/92] docs: Move object.h overview doc comment to qom.rst
-Date: Thu, 24 Sep 2020 05:22:56 -0400
-Message-Id: <20200924092314.1722645-75-pbonzini@redhat.com>
+Subject: [PULL 46/92] vl: relocate paths to data directories
+Date: Thu, 24 Sep 2020 05:22:28 -0400
+Message-Id: <20200924092314.1722645-47-pbonzini@redhat.com>
 In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
 References: <20200924092314.1722645-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
@@ -96,796 +96,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move the whole contents of the overview doc comment from object.h
-to qom.rst.
+As an additional advantage, the logic is now unified between
+POSIX and Win32 systems.
 
-This makes the documentation source easier to read and edit, and
-also solves the backslash escaping issue at the typecasting macro
-examples.
-
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20200910221526.10041-10-ehabkost@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- docs/devel/qom.rst   | 373 ++++++++++++++++++++++++++++++++++++++++++
- include/qom/object.h | 377 -------------------------------------------
- 2 files changed, 373 insertions(+), 377 deletions(-)
+ include/qemu-common.h   |  1 -
+ include/sysemu/sysemu.h |  2 +-
+ os-posix.c              | 20 --------------------
+ os-win32.c              | 11 -----------
+ softmmu/vl.c            | 40 ++++++++++++++++++++++++++++------------
+ tests/qtest/fuzz/fuzz.c |  5 +++--
+ 6 files changed, 32 insertions(+), 47 deletions(-)
 
-diff --git a/docs/devel/qom.rst b/docs/devel/qom.rst
-index dc5be79a4a..0b943b2a1a 100644
---- a/docs/devel/qom.rst
-+++ b/docs/devel/qom.rst
-@@ -2,4 +2,377 @@
- The QEMU Object Model (QOM)
- ===========================
+diff --git a/include/qemu-common.h b/include/qemu-common.h
+index 9cfd62669b..a9b11f59c4 100644
+--- a/include/qemu-common.h
++++ b/include/qemu-common.h
+@@ -131,7 +131,6 @@ char *qemu_find_file(int type, const char *name);
  
-+.. highlight:: c
-+
-+The QEMU Object Model provides a framework for registering user creatable
-+types and instantiating objects from those types.  QOM provides the following
-+features:
-+
-+ - System for dynamically registering types
-+ - Support for single-inheritance of types
-+ - Multiple inheritance of stateless interfaces
-+
-+.. code-block:: c
-+   :caption: Creating a minimal type
-+
-+   #include "qdev.h"
-+
-+   #define TYPE_MY_DEVICE "my-device"
-+
-+   // No new virtual functions: we can reuse the typedef for the
-+   // superclass.
-+   typedef DeviceClass MyDeviceClass;
-+   typedef struct MyDevice
-+   {
-+       DeviceState parent;
-+
-+       int reg0, reg1, reg2;
-+   } MyDevice;
-+
-+   static const TypeInfo my_device_info = {
-+       .name = TYPE_MY_DEVICE,
-+       .parent = TYPE_DEVICE,
-+       .instance_size = sizeof(MyDevice),
-+   };
-+
-+   static void my_device_register_types(void)
-+   {
-+       type_register_static(&my_device_info);
-+   }
-+
-+   type_init(my_device_register_types)
-+
-+In the above example, we create a simple type that is described by #TypeInfo.
-+#TypeInfo describes information about the type including what it inherits
-+from, the instance and class size, and constructor/destructor hooks.
-+
-+Alternatively several static types could be registered using helper macro
-+DEFINE_TYPES()
-+
-+.. code-block:: c
-+
-+   static const TypeInfo device_types_info[] = {
-+       {
-+           .name = TYPE_MY_DEVICE_A,
-+           .parent = TYPE_DEVICE,
-+           .instance_size = sizeof(MyDeviceA),
-+       },
-+       {
-+           .name = TYPE_MY_DEVICE_B,
-+           .parent = TYPE_DEVICE,
-+           .instance_size = sizeof(MyDeviceB),
-+       },
-+   };
-+
-+   DEFINE_TYPES(device_types_info)
-+
-+Every type has an #ObjectClass associated with it.  #ObjectClass derivatives
-+are instantiated dynamically but there is only ever one instance for any
-+given type.  The #ObjectClass typically holds a table of function pointers
-+for the virtual methods implemented by this type.
-+
-+Using object_new(), a new #Object derivative will be instantiated.  You can
-+cast an #Object to a subclass (or base-class) type using
-+object_dynamic_cast().  You typically want to define macro wrappers around
-+OBJECT_CHECK() and OBJECT_CLASS_CHECK() to make it easier to convert to a
-+specific type:
-+
-+.. code-block:: c
-+   :caption: Typecasting macros
-+
-+   #define MY_DEVICE_GET_CLASS(obj) \
-+      OBJECT_GET_CLASS(MyDeviceClass, obj, TYPE_MY_DEVICE)
-+   #define MY_DEVICE_CLASS(klass) \
-+      OBJECT_CLASS_CHECK(MyDeviceClass, klass, TYPE_MY_DEVICE)
-+   #define MY_DEVICE(obj) \
-+      OBJECT_CHECK(MyDevice, obj, TYPE_MY_DEVICE)
-+
-+Class Initialization
-+====================
-+
-+Before an object is initialized, the class for the object must be
-+initialized.  There is only one class object for all instance objects
-+that is created lazily.
-+
-+Classes are initialized by first initializing any parent classes (if
-+necessary).  After the parent class object has initialized, it will be
-+copied into the current class object and any additional storage in the
-+class object is zero filled.
-+
-+The effect of this is that classes automatically inherit any virtual
-+function pointers that the parent class has already initialized.  All
-+other fields will be zero filled.
-+
-+Once all of the parent classes have been initialized, #TypeInfo::class_init
-+is called to let the class being instantiated provide default initialize for
-+its virtual functions.  Here is how the above example might be modified
-+to introduce an overridden virtual function:
-+
-+.. code-block:: c
-+   :caption: Overriding a virtual function
-+
-+   #include "qdev.h"
-+
-+   void my_device_class_init(ObjectClass *klass, void *class_data)
-+   {
-+       DeviceClass *dc = DEVICE_CLASS(klass);
-+       dc->reset = my_device_reset;
-+   }
-+
-+   static const TypeInfo my_device_info = {
-+       .name = TYPE_MY_DEVICE,
-+       .parent = TYPE_DEVICE,
-+       .instance_size = sizeof(MyDevice),
-+       .class_init = my_device_class_init,
-+   };
-+
-+Introducing new virtual methods requires a class to define its own
-+struct and to add a .class_size member to the #TypeInfo.  Each method
-+will also have a wrapper function to call it easily:
-+
-+.. code-block:: c
-+   :caption: Defining an abstract class
-+
-+   #include "qdev.h"
-+
-+   typedef struct MyDeviceClass
-+   {
-+       DeviceClass parent;
-+
-+       void (*frobnicate) (MyDevice *obj);
-+   } MyDeviceClass;
-+
-+   static const TypeInfo my_device_info = {
-+       .name = TYPE_MY_DEVICE,
-+       .parent = TYPE_DEVICE,
-+       .instance_size = sizeof(MyDevice),
-+       .abstract = true, // or set a default in my_device_class_init
-+       .class_size = sizeof(MyDeviceClass),
-+   };
-+
-+   void my_device_frobnicate(MyDevice *obj)
-+   {
-+       MyDeviceClass *klass = MY_DEVICE_GET_CLASS(obj);
-+
-+       klass->frobnicate(obj);
-+   }
-+
-+Interfaces
-+==========
-+
-+Interfaces allow a limited form of multiple inheritance.  Instances are
-+similar to normal types except for the fact that are only defined by
-+their classes and never carry any state.  As a consequence, a pointer to
-+an interface instance should always be of incomplete type in order to be
-+sure it cannot be dereferenced.  That is, you should define the
-+'typedef struct SomethingIf SomethingIf' so that you can pass around
-+``SomethingIf *si`` arguments, but not define a ``struct SomethingIf { ... }``.
-+The only things you can validly do with a ``SomethingIf *`` are to pass it as
-+an argument to a method on its corresponding SomethingIfClass, or to
-+dynamically cast it to an object that implements the interface.
-+
-+Methods
-+=======
-+
-+A <emphasis>method</emphasis> is a function within the namespace scope of
-+a class. It usually operates on the object instance by passing it as a
-+strongly-typed first argument.
-+If it does not operate on an object instance, it is dubbed
-+<emphasis>class method</emphasis>.
-+
-+Methods cannot be overloaded. That is, the #ObjectClass and method name
-+uniquely identity the function to be called; the signature does not vary
-+except for trailing varargs.
-+
-+Methods are always <emphasis>virtual</emphasis>. Overriding a method in
-+#TypeInfo.class_init of a subclass leads to any user of the class obtained
-+via OBJECT_GET_CLASS() accessing the overridden function.
-+The original function is not automatically invoked. It is the responsibility
-+of the overriding class to determine whether and when to invoke the method
-+being overridden.
-+
-+To invoke the method being overridden, the preferred solution is to store
-+the original value in the overriding class before overriding the method.
-+This corresponds to ``{super,base}.method(...)`` in Java and C#
-+respectively; this frees the overriding class from hardcoding its parent
-+class, which someone might choose to change at some point.
-+
-+.. code-block:: c
-+   :caption: Overriding a virtual method
-+
-+   typedef struct MyState MyState;
-+
-+   typedef void (*MyDoSomething)(MyState *obj);
-+
-+   typedef struct MyClass {
-+       ObjectClass parent_class;
-+
-+       MyDoSomething do_something;
-+   } MyClass;
-+
-+   static void my_do_something(MyState *obj)
-+   {
-+       // do something
-+   }
-+
-+   static void my_class_init(ObjectClass *oc, void *data)
-+   {
-+       MyClass *mc = MY_CLASS(oc);
-+
-+       mc->do_something = my_do_something;
-+   }
-+
-+   static const TypeInfo my_type_info = {
-+       .name = TYPE_MY,
-+       .parent = TYPE_OBJECT,
-+       .instance_size = sizeof(MyState),
-+       .class_size = sizeof(MyClass),
-+       .class_init = my_class_init,
-+   };
-+
-+   typedef struct DerivedClass {
-+       MyClass parent_class;
-+
-+       MyDoSomething parent_do_something;
-+   } DerivedClass;
-+
-+   static void derived_do_something(MyState *obj)
-+   {
-+       DerivedClass *dc = DERIVED_GET_CLASS(obj);
-+
-+       // do something here
-+       dc->parent_do_something(obj);
-+       // do something else here
-+   }
-+
-+   static void derived_class_init(ObjectClass *oc, void *data)
-+   {
-+       MyClass *mc = MY_CLASS(oc);
-+       DerivedClass *dc = DERIVED_CLASS(oc);
-+
-+       dc->parent_do_something = mc->do_something;
-+       mc->do_something = derived_do_something;
-+   }
-+
-+   static const TypeInfo derived_type_info = {
-+       .name = TYPE_DERIVED,
-+       .parent = TYPE_MY,
-+       .class_size = sizeof(DerivedClass),
-+       .class_init = derived_class_init,
-+   };
-+
-+Alternatively, object_class_by_name() can be used to obtain the class and
-+its non-overridden methods for a specific type. This would correspond to
-+``MyClass::method(...)`` in C++.
-+
-+The first example of such a QOM method was #CPUClass.reset,
-+another example is #DeviceClass.realize.
-+
-+Standard type declaration and definition macros
-+===============================================
-+
-+A lot of the code outlined above follows a standard pattern and naming
-+convention. To reduce the amount of boilerplate code that needs to be
-+written for a new type there are two sets of macros to generate the
-+common parts in a standard format.
-+
-+A type is declared using the OBJECT_DECLARE macro family. In types
-+which do not require any virtual functions in the class, the
-+OBJECT_DECLARE_SIMPLE_TYPE macro is suitable, and is commonly placed
-+in the header file:
-+
-+.. code-block:: c
-+   :caption: Declaring a simple type
-+
-+    OBJECT_DECLARE_SIMPLE_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
-+
-+This is equivalent to the following:
-+
-+.. code-block:: c
-+   :caption: Expansion from declaring a simple type
-+
-+    typedef struct MyDevice MyDevice;
-+    typedef struct MyDeviceClass MyDeviceClass;
-+
-+    G_DEFINE_AUTOPTR_CLEANUP_FUNC(MyDeviceClass, object_unref)
-+
-+    #define MY_DEVICE_GET_CLASS(void *obj) \
-+            OBJECT_GET_CLASS(MyDeviceClass, obj, TYPE_MY_DEVICE)
-+    #define MY_DEVICE_CLASS(void *klass) \
-+            OBJECT_CLASS_CHECK(MyDeviceClass, klass, TYPE_MY_DEVICE)
-+    #define MY_DEVICE(void *obj)
-+            OBJECT_CHECK(MyDevice, obj, TYPE_MY_DEVICE)
-+
-+    struct MyDeviceClass {
-+        DeviceClass parent_class;
-+    };
-+
-+The 'struct MyDevice' needs to be declared separately.
-+If the type requires virtual functions to be declared in the class
-+struct, then the alternative OBJECT_DECLARE_TYPE() macro can be
-+used. This does the same as OBJECT_DECLARE_SIMPLE_TYPE(), but without
-+the 'struct MyDeviceClass' definition.
-+
-+To implement the type, the OBJECT_DEFINE macro family is available.
-+In the simple case the OBJECT_DEFINE_TYPE macro is suitable:
-+
-+.. code-block:: c
-+   :caption: Defining a simple type
-+
-+    OBJECT_DEFINE_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
-+
-+This is equivalent to the following:
-+
-+.. code-block:: c
-+   :caption: Expansion from defining a simple type
-+
-+    static void my_device_finalize(Object *obj);
-+    static void my_device_class_init(ObjectClass *oc, void *data);
-+    static void my_device_init(Object *obj);
-+
-+    static const TypeInfo my_device_info = {
-+        .parent = TYPE_DEVICE,
-+        .name = TYPE_MY_DEVICE,
-+        .instance_size = sizeof(MyDevice),
-+        .instance_init = my_device_init,
-+        .instance_finalize = my_device_finalize,
-+        .class_size = sizeof(MyDeviceClass),
-+        .class_init = my_device_class_init,
-+    };
-+
-+    static void
-+    my_device_register_types(void)
-+    {
-+        type_register_static(&my_device_info);
-+    }
-+    type_init(my_device_register_types);
-+
-+This is sufficient to get the type registered with the type
-+system, and the three standard methods now need to be implemented
-+along with any other logic required for the type.
-+
-+If the type needs to implement one or more interfaces, then the
-+OBJECT_DEFINE_TYPE_WITH_INTERFACES() macro can be used instead.
-+This accepts an array of interface type names.
-+
-+.. code-block:: c
-+   :caption: Defining a simple type implementing interfaces
-+
-+    OBJECT_DEFINE_TYPE_WITH_INTERFACES(MyDevice, my_device,
-+                                       MY_DEVICE, DEVICE,
-+                                       { TYPE_USER_CREATABLE }, { NULL })
-+
-+If the type is not intended to be instantiated, then then
-+the OBJECT_DEFINE_ABSTRACT_TYPE() macro can be used instead:
-+
-+.. code-block:: c
-+   :caption: Defining a simple abstract type
-+
-+    OBJECT_DEFINE_ABSTRACT_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
-+
-+
-+
-+API Reference
-+-------------
-+
- .. kernel-doc:: include/qom/object.h
-diff --git a/include/qom/object.h b/include/qom/object.h
-index d839a2c39f..93b6418dbc 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -28,383 +28,6 @@ typedef struct InterfaceInfo InterfaceInfo;
+ /* OS specific functions */
+ void os_setup_early_signal_handling(void);
+-char *os_find_datadir(void);
+ int os_parse_cmd_args(int index, const char *optarg);
  
- #define TYPE_OBJECT "object"
+ /*
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 4b6a5c459c..817ff4cf75 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -14,7 +14,7 @@ extern const char *qemu_name;
+ extern QemuUUID qemu_uuid;
+ extern bool qemu_uuid_set;
  
--/**
-- * DOC:
-- *
-- * .. highlight:: c
-- *
-- * The QEMU Object Model provides a framework for registering user creatable
-- * types and instantiating objects from those types.  QOM provides the following
-- * features:
-- *
-- *  - System for dynamically registering types
-- *  - Support for single-inheritance of types
-- *  - Multiple inheritance of stateless interfaces
-- *
-- * .. code-block:: c
-- *    :caption: Creating a minimal type
-- *
-- *    #include "qdev.h"
-- *
-- *    #define TYPE_MY_DEVICE "my-device"
-- *
-- *    // No new virtual functions: we can reuse the typedef for the
-- *    // superclass.
-- *    typedef DeviceClass MyDeviceClass;
-- *    typedef struct MyDevice
-- *    {
-- *        DeviceState parent;
-- *
-- *        int reg0, reg1, reg2;
-- *    } MyDevice;
-- *
-- *    static const TypeInfo my_device_info = {
-- *        .name = TYPE_MY_DEVICE,
-- *        .parent = TYPE_DEVICE,
-- *        .instance_size = sizeof(MyDevice),
-- *    };
-- *
-- *    static void my_device_register_types(void)
-- *    {
-- *        type_register_static(&my_device_info);
-- *    }
-- *
-- *    type_init(my_device_register_types)
-- *
-- * In the above example, we create a simple type that is described by #TypeInfo.
-- * #TypeInfo describes information about the type including what it inherits
-- * from, the instance and class size, and constructor/destructor hooks.
-- *
-- * Alternatively several static types could be registered using helper macro
-- * DEFINE_TYPES()
-- *
-- * .. code-block:: c
-- *
-- *    static const TypeInfo device_types_info[] = {
-- *        {
-- *            .name = TYPE_MY_DEVICE_A,
-- *            .parent = TYPE_DEVICE,
-- *            .instance_size = sizeof(MyDeviceA),
-- *        },
-- *        {
-- *            .name = TYPE_MY_DEVICE_B,
-- *            .parent = TYPE_DEVICE,
-- *            .instance_size = sizeof(MyDeviceB),
-- *        },
-- *    };
-- *
-- *    DEFINE_TYPES(device_types_info)
-- *
-- * Every type has an #ObjectClass associated with it.  #ObjectClass derivatives
-- * are instantiated dynamically but there is only ever one instance for any
-- * given type.  The #ObjectClass typically holds a table of function pointers
-- * for the virtual methods implemented by this type.
-- *
-- * Using object_new(), a new #Object derivative will be instantiated.  You can
-- * cast an #Object to a subclass (or base-class) type using
-- * object_dynamic_cast().  You typically want to define macro wrappers around
-- * OBJECT_CHECK() and OBJECT_CLASS_CHECK() to make it easier to convert to a
-- * specific type:
-- *
-- * .. kernel-doc messes up with the code block below because of the
-- *    backslash at the end of lines.  This will be fixes if we move this
-- *    content to qom.rst.
-- *
-- * .. code-block:: c
-- *    :caption: Typecasting macros
-- *
-- *    #define MY_DEVICE_GET_CLASS(obj) \
-- *       OBJECT_GET_CLASS(MyDeviceClass, obj, TYPE_MY_DEVICE)
-- *    #define MY_DEVICE_CLASS(klass) \
-- *       OBJECT_CLASS_CHECK(MyDeviceClass, klass, TYPE_MY_DEVICE)
-- *    #define MY_DEVICE(obj) \
-- *       OBJECT_CHECK(MyDevice, obj, TYPE_MY_DEVICE)
-- *
-- * Class Initialization
-- * ====================
-- *
-- * Before an object is initialized, the class for the object must be
-- * initialized.  There is only one class object for all instance objects
-- * that is created lazily.
-- *
-- * Classes are initialized by first initializing any parent classes (if
-- * necessary).  After the parent class object has initialized, it will be
-- * copied into the current class object and any additional storage in the
-- * class object is zero filled.
-- *
-- * The effect of this is that classes automatically inherit any virtual
-- * function pointers that the parent class has already initialized.  All
-- * other fields will be zero filled.
-- *
-- * Once all of the parent classes have been initialized, #TypeInfo::class_init
-- * is called to let the class being instantiated provide default initialize for
-- * its virtual functions.  Here is how the above example might be modified
-- * to introduce an overridden virtual function:
-- *
-- * .. code-block:: c
-- *    :caption: Overriding a virtual function
-- *
-- *    #include "qdev.h"
-- *
-- *    void my_device_class_init(ObjectClass *klass, void *class_data)
-- *    {
-- *        DeviceClass *dc = DEVICE_CLASS(klass);
-- *        dc->reset = my_device_reset;
-- *    }
-- *
-- *    static const TypeInfo my_device_info = {
-- *        .name = TYPE_MY_DEVICE,
-- *        .parent = TYPE_DEVICE,
-- *        .instance_size = sizeof(MyDevice),
-- *        .class_init = my_device_class_init,
-- *    };
-- *
-- * Introducing new virtual methods requires a class to define its own
-- * struct and to add a .class_size member to the #TypeInfo.  Each method
-- * will also have a wrapper function to call it easily:
-- *
-- * .. code-block:: c
-- *    :caption: Defining an abstract class
-- *
-- *    #include "qdev.h"
-- *
-- *    typedef struct MyDeviceClass
-- *    {
-- *        DeviceClass parent;
-- *
-- *        void (*frobnicate) (MyDevice *obj);
-- *    } MyDeviceClass;
-- *
-- *    static const TypeInfo my_device_info = {
-- *        .name = TYPE_MY_DEVICE,
-- *        .parent = TYPE_DEVICE,
-- *        .instance_size = sizeof(MyDevice),
-- *        .abstract = true, // or set a default in my_device_class_init
-- *        .class_size = sizeof(MyDeviceClass),
-- *    };
-- *
-- *    void my_device_frobnicate(MyDevice *obj)
-- *    {
-- *        MyDeviceClass *klass = MY_DEVICE_GET_CLASS(obj);
-- *
-- *        klass->frobnicate(obj);
-- *    }
-- *
-- * Interfaces
-- * ==========
-- *
-- * Interfaces allow a limited form of multiple inheritance.  Instances are
-- * similar to normal types except for the fact that are only defined by
-- * their classes and never carry any state.  As a consequence, a pointer to
-- * an interface instance should always be of incomplete type in order to be
-- * sure it cannot be dereferenced.  That is, you should define the
-- * 'typedef struct SomethingIf SomethingIf' so that you can pass around
-- * ``SomethingIf *si`` arguments, but not define a ``struct SomethingIf { ... }``.
-- * The only things you can validly do with a ``SomethingIf *`` are to pass it as
-- * an argument to a method on its corresponding SomethingIfClass, or to
-- * dynamically cast it to an object that implements the interface.
-- *
-- * Methods
-- * =======
-- *
-- * A <emphasis>method</emphasis> is a function within the namespace scope of
-- * a class. It usually operates on the object instance by passing it as a
-- * strongly-typed first argument.
-- * If it does not operate on an object instance, it is dubbed
-- * <emphasis>class method</emphasis>.
-- *
-- * Methods cannot be overloaded. That is, the #ObjectClass and method name
-- * uniquely identity the function to be called; the signature does not vary
-- * except for trailing varargs.
-- *
-- * Methods are always <emphasis>virtual</emphasis>. Overriding a method in
-- * #TypeInfo.class_init of a subclass leads to any user of the class obtained
-- * via OBJECT_GET_CLASS() accessing the overridden function.
-- * The original function is not automatically invoked. It is the responsibility
-- * of the overriding class to determine whether and when to invoke the method
-- * being overridden.
-- *
-- * To invoke the method being overridden, the preferred solution is to store
-- * the original value in the overriding class before overriding the method.
-- * This corresponds to ``{super,base}.method(...)`` in Java and C#
-- * respectively; this frees the overriding class from hardcoding its parent
-- * class, which someone might choose to change at some point.
-- *
-- * .. code-block:: c
-- *    :caption: Overriding a virtual method
-- *
-- *    typedef struct MyState MyState;
-- *
-- *    typedef void (*MyDoSomething)(MyState *obj);
-- *
-- *    typedef struct MyClass {
-- *        ObjectClass parent_class;
-- *
-- *        MyDoSomething do_something;
-- *    } MyClass;
-- *
-- *    static void my_do_something(MyState *obj)
-- *    {
-- *        // do something
-- *    }
-- *
-- *    static void my_class_init(ObjectClass *oc, void *data)
-- *    {
-- *        MyClass *mc = MY_CLASS(oc);
-- *
-- *        mc->do_something = my_do_something;
-- *    }
-- *
-- *    static const TypeInfo my_type_info = {
-- *        .name = TYPE_MY,
-- *        .parent = TYPE_OBJECT,
-- *        .instance_size = sizeof(MyState),
-- *        .class_size = sizeof(MyClass),
-- *        .class_init = my_class_init,
-- *    };
-- *
-- *    typedef struct DerivedClass {
-- *        MyClass parent_class;
-- *
-- *        MyDoSomething parent_do_something;
-- *    } DerivedClass;
-- *
-- *    static void derived_do_something(MyState *obj)
-- *    {
-- *        DerivedClass *dc = DERIVED_GET_CLASS(obj);
-- *
-- *        // do something here
-- *        dc->parent_do_something(obj);
-- *        // do something else here
-- *    }
-- *
-- *    static void derived_class_init(ObjectClass *oc, void *data)
-- *    {
-- *        MyClass *mc = MY_CLASS(oc);
-- *        DerivedClass *dc = DERIVED_CLASS(oc);
-- *
-- *        dc->parent_do_something = mc->do_something;
-- *        mc->do_something = derived_do_something;
-- *    }
-- *
-- *    static const TypeInfo derived_type_info = {
-- *        .name = TYPE_DERIVED,
-- *        .parent = TYPE_MY,
-- *        .class_size = sizeof(DerivedClass),
-- *        .class_init = derived_class_init,
-- *    };
-- *
-- * Alternatively, object_class_by_name() can be used to obtain the class and
-- * its non-overridden methods for a specific type. This would correspond to
-- * ``MyClass::method(...)`` in C++.
-- *
-- * The first example of such a QOM method was #CPUClass.reset,
-- * another example is #DeviceClass.realize.
-- *
-- * Standard type declaration and definition macros
-- * ===============================================
-- *
-- * A lot of the code outlined above follows a standard pattern and naming
-- * convention. To reduce the amount of boilerplate code that needs to be
-- * written for a new type there are two sets of macros to generate the
-- * common parts in a standard format.
-- *
-- * A type is declared using the OBJECT_DECLARE macro family. In types
-- * which do not require any virtual functions in the class, the
-- * OBJECT_DECLARE_SIMPLE_TYPE macro is suitable, and is commonly placed
-- * in the header file:
-- *
-- * .. code-block:: c
-- *    :caption: Declaring a simple type
-- *
-- *     OBJECT_DECLARE_SIMPLE_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
-- *
-- * This is equivalent to the following:
-- *
-- * .. code-block:: c
-- *    :caption: Expansion from declaring a simple type
-- *
-- *     typedef struct MyDevice MyDevice;
-- *     typedef struct MyDeviceClass MyDeviceClass;
-- *
-- *     G_DEFINE_AUTOPTR_CLEANUP_FUNC(MyDeviceClass, object_unref)
-- *
-- *     #define MY_DEVICE_GET_CLASS(void *obj) \
-- *             OBJECT_GET_CLASS(MyDeviceClass, obj, TYPE_MY_DEVICE)
-- *     #define MY_DEVICE_CLASS(void *klass) \
-- *             OBJECT_CLASS_CHECK(MyDeviceClass, klass, TYPE_MY_DEVICE)
-- *     #define MY_DEVICE(void *obj)
-- *             OBJECT_CHECK(MyDevice, obj, TYPE_MY_DEVICE)
-- *
-- *     struct MyDeviceClass {
-- *         DeviceClass parent_class;
-- *     };
-- *
-- * The 'struct MyDevice' needs to be declared separately.
-- * If the type requires virtual functions to be declared in the class
-- * struct, then the alternative OBJECT_DECLARE_TYPE() macro can be
-- * used. This does the same as OBJECT_DECLARE_SIMPLE_TYPE(), but without
-- * the 'struct MyDeviceClass' definition.
-- *
-- * To implement the type, the OBJECT_DEFINE macro family is available.
-- * In the simple case the OBJECT_DEFINE_TYPE macro is suitable:
-- *
-- * .. code-block:: c
-- *    :caption: Defining a simple type
-- *
-- *     OBJECT_DEFINE_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
-- *
-- * This is equivalent to the following:
-- *
-- * .. code-block:: c
-- *    :caption: Expansion from defining a simple type
-- *
-- *     static void my_device_finalize(Object *obj);
-- *     static void my_device_class_init(ObjectClass *oc, void *data);
-- *     static void my_device_init(Object *obj);
-- *
-- *     static const TypeInfo my_device_info = {
-- *         .parent = TYPE_DEVICE,
-- *         .name = TYPE_MY_DEVICE,
-- *         .instance_size = sizeof(MyDevice),
-- *         .instance_init = my_device_init,
-- *         .instance_finalize = my_device_finalize,
-- *         .class_size = sizeof(MyDeviceClass),
-- *         .class_init = my_device_class_init,
-- *     };
-- *
-- *     static void
-- *     my_device_register_types(void)
-- *     {
-- *         type_register_static(&my_device_info);
-- *     }
-- *     type_init(my_device_register_types);
-- *
-- * This is sufficient to get the type registered with the type
-- * system, and the three standard methods now need to be implemented
-- * along with any other logic required for the type.
-- *
-- * If the type needs to implement one or more interfaces, then the
-- * OBJECT_DEFINE_TYPE_WITH_INTERFACES() macro can be used instead.
-- * This accepts an array of interface type names.
-- *
-- * .. code-block:: c
-- *    :caption: Defining a simple type implementing interfaces
-- *
-- *     OBJECT_DEFINE_TYPE_WITH_INTERFACES(MyDevice, my_device,
-- *                                        MY_DEVICE, DEVICE,
-- *                                        { TYPE_USER_CREATABLE }, { NULL })
-- *
-- * If the type is not intended to be instantiated, then then
-- * the OBJECT_DEFINE_ABSTRACT_TYPE() macro can be used instead:
-- *
-- * .. code-block:: c
-- *    :caption: Defining a simple abstract type
-- *
-- *     OBJECT_DEFINE_ABSTRACT_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
+-void qemu_add_data_dir(const char *path);
++void qemu_add_data_dir(char *path);
+ 
+ void qemu_add_exit_notifier(Notifier *notify);
+ void qemu_remove_exit_notifier(Notifier *notify);
+diff --git a/os-posix.c b/os-posix.c
+index 36e344c544..1de2839554 100644
+--- a/os-posix.c
++++ b/os-posix.c
+@@ -80,26 +80,6 @@ void os_setup_signal_handling(void)
+     sigaction(SIGTERM, &act, NULL);
+ }
+ 
+-/*
+- * Find a likely location for support files using the location of the binary.
+- * When running from the build tree this will be "$bindir/pc-bios".
+- * Otherwise, this is CONFIG_QEMU_DATADIR.
+- *
+- * The caller must use g_free() to free the returned data when it is
+- * no longer required.
 - */
+-char *os_find_datadir(void)
+-{
+-    g_autofree char *dir = NULL;
 -
+-    dir = g_build_filename(qemu_get_exec_dir(), "pc-bios", NULL);
+-    if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {
+-        return g_steal_pointer(&dir);
+-    }
 -
- typedef struct ObjectProperty ObjectProperty;
+-    return g_strdup(CONFIG_QEMU_DATADIR);
+-}
+-
+ void os_set_proc_name(const char *s)
+ {
+ #if defined(PR_SET_NAME)
+diff --git a/os-win32.c b/os-win32.c
+index eb8501b9e5..fd1137bab1 100644
+--- a/os-win32.c
++++ b/os-win32.c
+@@ -57,17 +57,6 @@ void os_setup_early_signal_handling(void)
+     atexit(os_undo_timer_resolution);
+ }
  
- /**
+-/*
+- * Look for support files in the same directory as the executable.
+- *
+- * The caller must use g_free() to free the returned data when it is
+- * no longer required.
+- */
+-char *os_find_datadir(void)
+-{
+-    return g_strdup(qemu_get_exec_dir());
+-}
+-
+ void os_set_line_buffering(void)
+ {
+     setbuf(stdout, NULL);
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index f7b103467c..c872657e60 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -2005,7 +2005,7 @@ char *qemu_find_file(int type, const char *name)
+     return NULL;
+ }
+ 
+-void qemu_add_data_dir(const char *path)
++void qemu_add_data_dir(char *path)
+ {
+     int i;
+ 
+@@ -2017,10 +2017,11 @@ void qemu_add_data_dir(const char *path)
+     }
+     for (i = 0; i < data_dir_idx; i++) {
+         if (strcmp(data_dir[i], path) == 0) {
+-            return; /* duplicate */
++            g_free(path); /* duplicate */
++            return;
+         }
+     }
+-    data_dir[data_dir_idx++] = g_strdup(path);
++    data_dir[data_dir_idx++] = path;
+ }
+ 
+ static inline bool nonempty_str(const char *str)
+@@ -2829,6 +2830,26 @@ static void create_default_memdev(MachineState *ms, const char *path)
+                             &error_fatal);
+ }
+ 
++/*
++ * Find a likely location for support files using the location of the binary.
++ * When running from the build tree this will be "$bindir/pc-bios".
++ * Otherwise, this is CONFIG_QEMU_DATADIR (possibly relocated).
++ *
++ * The caller must use g_free() to free the returned data when it is
++ * no longer required.
++ */
++static char *find_datadir(void)
++{
++    g_autofree char *dir = NULL;
++
++    dir = g_build_filename(qemu_get_exec_dir(), "pc-bios", NULL);
++    if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {
++        return g_steal_pointer(&dir);
++    }
++
++    return get_relocated_path(CONFIG_QEMU_DATADIR);
++}
++
+ void qemu_init(int argc, char **argv, char **envp)
+ {
+     int i;
+@@ -2862,7 +2883,7 @@ void qemu_init(int argc, char **argv, char **envp)
+     Error *main_loop_err = NULL;
+     Error *err = NULL;
+     bool list_data_dirs = false;
+-    char *dir, **dirs;
++    char **dirs;
+     const char *mem_path = NULL;
+     bool have_custom_ram_size;
+     BlockdevOptionsQueue bdo_queue = QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
+@@ -3195,7 +3216,7 @@ void qemu_init(int argc, char **argv, char **envp)
+                 if (is_help_option(optarg)) {
+                     list_data_dirs = true;
+                 } else {
+-                    qemu_add_data_dir(optarg);
++                    qemu_add_data_dir(g_strdup(optarg));
+                 }
+                 break;
+             case QEMU_OPTION_bios:
+@@ -3927,17 +3948,12 @@ void qemu_init(int argc, char **argv, char **envp)
+     /* add configured firmware directories */
+     dirs = g_strsplit(CONFIG_QEMU_FIRMWAREPATH, G_SEARCHPATH_SEPARATOR_S, 0);
+     for (i = 0; dirs[i] != NULL; i++) {
+-        qemu_add_data_dir(dirs[i]);
++        qemu_add_data_dir(get_relocated_path(dirs[i]));
+     }
+     g_strfreev(dirs);
+ 
+     /* try to find datadir relative to the executable path */
+-    dir = os_find_datadir();
+-    qemu_add_data_dir(dir);
+-    g_free(dir);
+-
+-    /* add the datadir specified when building */
+-    qemu_add_data_dir(CONFIG_QEMU_DATADIR);
++    qemu_add_data_dir(find_datadir());
+ 
+     /* -L help lists the data directories and exits. */
+     if (list_data_dirs) {
+diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
+index c4dc5fa629..d926c490c5 100644
+--- a/tests/qtest/fuzz/fuzz.c
++++ b/tests/qtest/fuzz/fuzz.c
+@@ -170,8 +170,9 @@ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
+         datadir = g_build_filename(bindir, "pc-bios", NULL);
+         if (g_file_test(datadir, G_FILE_TEST_IS_DIR)) {
+             qemu_add_data_dir(datadir);
+-        }
+-        g_free(datadir);
++        } else {
++            g_free(datadir);
++	}
+     } else if (*argc > 1) {  /* The target is specified as an argument */
+         target_name = (*argv)[1];
+         if (!strstr(target_name, "--fuzz-target=")) {
 -- 
 2.26.2
 
