@@ -7,90 +7,89 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E774C4727F
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 21:55:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 670B3C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 21:55:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F00E621D20
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 21:55:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 021772399A
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 21:55:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="CMvqGan6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F00E621D20
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JSmGnyHT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 021772399A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLZCe-0003V8-58
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 17:55:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52286)
+	id 1kLZD1-0004A9-VY
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 17:55:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
- id 1kLZBa-0002E4-Nw
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 17:53:54 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:55364)
+ id 1kLZAT-0000x3-Dz
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 17:52:45 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:54280)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
- id 1kLZBY-0007Z9-Sv
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 17:53:54 -0400
+ id 1kLZAR-0007Ta-Jx
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 17:52:45 -0400
 Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
- by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08OLoPc4154795;
- Thu, 24 Sep 2020 21:53:50 GMT
+ by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08OLo3ET154391;
+ Thu, 24 Sep 2020 21:52:41 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=B+7p1ec6eOXjsctlyNFkiV7VpoeUHraxRUYBIEAtB+Q=;
- b=CMvqGan6qellP15SYHn96eVZR/N0la8aMzA+bx7G8GnNdJz+1/ss9vZCLUWFkmnj2KLE
- B7GDSjE2fFej5V+RlPDYzM/OmURifvSFTCU6UmPWqkQIsPLy8O8xOlXZ0EkBa+z+53Th
- LOTkPecPdiDxWeKzF09/Qov5B/fOLBsaDglKFg4YkSjw2XT6Y1vjTbHeAo2v5vkVzkgU
- anVyPDASphf5cgt+PLjMMYa1uhMDLN1CRKjbNRsWo0U0MA2S+g5VdIvQaRNMohUv4gmL
- 5uEIbnxZQRudU8IyH8qwFvk3ZkrIpanZJuPN7i5xQwKhixIM4QFyYFwjMJMu4BqqcESG oA== 
+ bh=WYF/qeYkttnU8RjYrk+qgjHK/vum9vcISwLimyeJyts=;
+ b=JSmGnyHTEyegJsvWTeqaoACayrWMffRAT5oFOMeGzUfCVTUCrEwutViiZvNlZpV1KLW+
+ eSHpCeUk+OyDg2r4Bz3uRfHjwY3kB7DjU2I4PvCv5zZKBaiPFpzFEgM6qL92qdqmtOIi
+ ws3seKQ1sOURAqKxyBrlz4ceUYmTjvWLmpUgbFI4/3A3qclEupm33OzfuZZizKvjbnom
+ eeDnlTkIO4Lr3IPjEyq7yM19vAu62gyBWtaoxO9Hsm6GNqeb3hW5uYArWNdFMcZQf0mA
+ CllHW88H/fZn00ytpt1HI8WWt060DOXKbLwSspXOanH+5eNq3GOMOgPTrutsYNJJmhIm Fg== 
 Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by aserp2130.oracle.com with ESMTP id 33qcpu7nrj-1
+ by aserp2130.oracle.com with ESMTP id 33qcpu7njy-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Thu, 24 Sep 2020 21:53:50 +0000
+ Thu, 24 Sep 2020 21:52:41 +0000
 Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08OLoBrI050370;
- Thu, 24 Sep 2020 21:51:50 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3020.oracle.com with ESMTP id 33r28xj8du-1
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08OLoCR8050509;
+ Thu, 24 Sep 2020 21:50:41 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3020.oracle.com with ESMTP id 33r28xj7ea-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 24 Sep 2020 21:51:50 +0000
-Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 08OLpnru020497;
- Thu, 24 Sep 2020 21:51:49 GMT
+ Thu, 24 Sep 2020 21:50:40 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 08OLoe0T017524;
+ Thu, 24 Sep 2020 21:50:40 GMT
 Received: from [10.39.244.100] (/10.39.244.100)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 24 Sep 2020 14:51:49 -0700
-Subject: Re: [PATCH V1 12/32] vl: pause option
+ with ESMTP ; Thu, 24 Sep 2020 14:50:39 -0700
+Subject: Re: [PATCH V1 08/32] savevm: HMP command for cprinfo
 To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
- <1596122076-341293-13-git-send-email-steven.sistare@oracle.com>
- <87r1stdjes.fsf@linaro.org> <b18f2181-902b-a091-9711-93d49ab8aec8@oracle.com>
- <20200911175934.GR3310@work-vm>
+ <1596122076-341293-9-git-send-email-steven.sistare@oracle.com>
+ <20200911172729.GN3310@work-vm>
 From: Steven Sistare <steven.sistare@oracle.com>
 Organization: Oracle Corporation
-Message-ID: <0c4c4e76-f869-b70f-83b2-11381890972c@oracle.com>
-Date: Thu, 24 Sep 2020 17:51:46 -0400
+Message-ID: <bba478b7-5d11-7607-f205-daabd7fe1314@oracle.com>
+Date: Thu, 24 Sep 2020 17:50:37 -0400
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20200911175934.GR3310@work-vm>
+In-Reply-To: <20200911172729.GN3310@work-vm>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9754
  signatures=668680
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
  mlxlogscore=999
- suspectscore=0 adultscore=0 bulkscore=0 malwarescore=0 spamscore=0
+ suspectscore=2 adultscore=0 bulkscore=0 malwarescore=0 spamscore=0
  phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2006250000 definitions=main-2009240156
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9754
  signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2
  mlxlogscore=999
  adultscore=0 bulkscore=0 mlxscore=0 lowpriorityscore=0 priorityscore=1501
  phishscore=0 spamscore=0 malwarescore=0 clxscore=1015 impostorscore=0
@@ -134,110 +133,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/11/2020 1:59 PM, Dr. David Alan Gilbert wrote:
-> * Steven Sistare (steven.sistare@oracle.com) wrote:
->> On 7/30/2020 1:03 PM, Alex BennÃ©e wrote:
->>>
->>> Steve Sistare <steven.sistare@oracle.com> writes:
->>>
->>>> Provide the -pause command-line parameter and the QEMU_PAUSE environment
->>>> variable to briefly pause QEMU in main and allow a developer to attach gdb.
->>>> Useful when the developer does not invoke QEMU directly, such as when using
->>>> libvirt.
->>>
->>> How does this differ from -S?
+On 9/11/2020 1:27 PM, Dr. David Alan Gilbert wrote:
+> * Steve Sistare (steven.sistare@oracle.com) wrote:
+>> Enable HMP access to the cprinfo QMP command.
 >>
->> The -S flag runs qemu to the main loop but does not start the guest.  Lots of code
->> that you may need to debug runs before you get there.
+>> Usage: cprinfo
+>>
+>> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
 > 
-> You might try the '--preconfig' option - that's pretty early on.
-> The other one is adding a chardev and telling it to wait for a server;
-> that'll wait until you telnet to the port.
-> 
-> (Either way, this patch shouldn't really be part of this series, it's a
-> separate discussion)
+> As with Eric's comment on the qemp I don't think you need it;
+> for HMP alll you really need is something that lists it in the help.
 
-Sure, I will pull it from the series.
+We need an architected stable interface to know that a qemu instance supports
+cpr.  I don't think parsing help is good enough.  The hmp interface is great
+for use in bash; easy to use and efficient.
+
+> (Also I'd expect an info  cpr   to be a possibility that could give
+> some information about it - e.g. if you've just saved/can save/loaded a
+> CPR image)
+
+Yes, that occurred to me.  We could add some flags in the future and remain
+backwards compatible.  I should start now with a sub-command schema to make future 
+expansion cleaner:
+  "cprinfo modes" - return supported modes, eg "reboot restart"
 
 - Steve
 
->> - Steve
->>>> Usage:
->>>>   qemu -pause <seconds>
->>>>   or
->>>>   export QEMU_PAUSE=<seconds>
->>>>
->>>> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
->>>> ---
->>>>  qemu-options.hx |  9 +++++++++
->>>>  softmmu/vl.c    | 15 ++++++++++++++-
->>>>  2 files changed, 23 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/qemu-options.hx b/qemu-options.hx
->>>> index 708583b..8505cf2 100644
->>>> --- a/qemu-options.hx
->>>> +++ b/qemu-options.hx
->>>> @@ -3668,6 +3668,15 @@ SRST
->>>>      option is experimental.
->>>>  ERST
->>>>  
->>>> +DEF("pause", HAS_ARG, QEMU_OPTION_pause, \
->>>> +    "-pause secs    Pause for secs seconds on entry to main.\n", QEMU_ARCH_ALL)
->>>> +
->>>> +SRST
->>>> +``--pause secs``
->>>> +    Pause for a number of seconds on entry to main.  Useful for attaching
->>>> +    a debugger after QEMU has been launched by some other entity.
->>>> +ERST
->>>> +
->>>
->>> It seems like having an option to race with the debugger is just asking
->>> for trouble.
->>>
->>>>  DEF("S", 0, QEMU_OPTION_S, \
->>>>      "-S              freeze CPU at startup (use 'c' to start execution)\n",
->>>>      QEMU_ARCH_ALL)
->>>> diff --git a/softmmu/vl.c b/softmmu/vl.c
->>>> index 8478778..951994f 100644
->>>> --- a/softmmu/vl.c
->>>> +++ b/softmmu/vl.c
->>>> @@ -2844,7 +2844,7 @@ static void create_default_memdev(MachineState *ms, const char *path)
->>>>  
->>>>  void qemu_init(int argc, char **argv, char **envp)
->>>>  {
->>>> -    int i;
->>>> +    int i, seconds;
->>>>      int snapshot, linux_boot;
->>>>      const char *initrd_filename;
->>>>      const char *kernel_filename, *kernel_cmdline;
->>>> @@ -2882,6 +2882,13 @@ void qemu_init(int argc, char **argv, char **envp)
->>>>      QemuPluginList plugin_list = QTAILQ_HEAD_INITIALIZER(plugin_list);
->>>>      int mem_prealloc = 0; /* force preallocation of physical target memory */
->>>>  
->>>> +    if (getenv("QEMU_PAUSE")) {
->>>> +        seconds = atoi(getenv("QEMU_PAUSE"));
->>>> +        printf("Pausing %d seconds for debugger. QEMU PID is %d\n",
->>>> +               seconds, getpid());
->>>> +        sleep(seconds);
->>>> +    }
->>>> +
->>>>      os_set_line_buffering();
->>>>  
->>>>      error_init(argv[0]);
->>>> @@ -3204,6 +3211,12 @@ void qemu_init(int argc, char **argv, char **envp)
->>>>              case QEMU_OPTION_gdb:
->>>>                  add_device_config(DEV_GDB, optarg);
->>>>                  break;
->>>> +            case QEMU_OPTION_pause:
->>>> +                seconds = atoi(optarg);
->>>> +                printf("Pausing %d seconds for debugger. QEMU PID is %d\n",
->>>> +                            seconds, getpid());
->>>> +                sleep(seconds);
->>>> +                break;
->>>>              case QEMU_OPTION_L:
->>>>                  if (is_help_option(optarg)) {
->>>>                      list_data_dirs = true;
->>>
->>>
+>> ---
+>>  hmp-commands.hx       | 13 +++++++++++++
+>>  include/monitor/hmp.h |  1 +
+>>  monitor/hmp-cmds.c    | 10 ++++++++++
+>>  3 files changed, 24 insertions(+)
+>>
+>> diff --git a/hmp-commands.hx b/hmp-commands.hx
+>> index cb67150..7517876 100644
+>> --- a/hmp-commands.hx
+>> +++ b/hmp-commands.hx
+>> @@ -354,6 +354,19 @@ SRST
+>>  ERST
+>>  
+>>      {
+>> +        .name       = "cprinfo",
+>> +        .args_type  = "",
+>> +        .params     = "",
+>> +        .help       = "return list of modes supported by cprsave",
+>> +        .cmd        = hmp_cprinfo,
+>> +    },
+>> +
+>> +SRST
+>> +``cprinfo`` *tag*
+>> +  Return a space-delimited list of modes supported by cprsave.
+>> +ERST
+>> +
+>> +    {
+>>          .name       = "cprsave",
+>>          .args_type  = "file:s,mode:s",
+>>          .params     = "file 'reboot'",
+>> diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
+>> index 7b8cdfd..919b9a9 100644
+>> --- a/include/monitor/hmp.h
+>> +++ b/include/monitor/hmp.h
+>> @@ -59,6 +59,7 @@ void hmp_balloon(Monitor *mon, const QDict *qdict);
+>>  void hmp_loadvm(Monitor *mon, const QDict *qdict);
+>>  void hmp_savevm(Monitor *mon, const QDict *qdict);
+>>  void hmp_delvm(Monitor *mon, const QDict *qdict);
+>> +void hmp_cprinfo(Monitor *mon, const QDict *qdict);
+>>  void hmp_cprsave(Monitor *mon, const QDict *qdict);
+>>  void hmp_cprload(Monitor *mon, const QDict *qdict);
+>>  void hmp_migrate_cancel(Monitor *mon, const QDict *qdict);
+>> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+>> index ba95737..2f6af07 100644
+>> --- a/monitor/hmp-cmds.c
+>> +++ b/monitor/hmp-cmds.c
+>> @@ -1139,6 +1139,16 @@ void hmp_announce_self(Monitor *mon, const QDict *qdict)
+>>      qapi_free_AnnounceParameters(params);
+>>  }
+>>  
+>> +void hmp_cprinfo(Monitor *mon, const QDict *qdict)
+>> +{
+>> +    Error *err = NULL;
+>> +    char *res = qmp_cprinfo(&err);
+>> +
+>> +    monitor_printf(mon, "%s\n", res);
+>> +    g_free(res);
+>> +    hmp_handle_error(mon, err);
+>> +}
+>> +
+>>  void hmp_cprsave(Monitor *mon, const QDict *qdict)
+>>  {
+>>      Error *err = NULL;
+>> -- 
+>> 1.8.3.1
 >>
 
