@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66DD0C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 01:28:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D76C2C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 01:28:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC3F821534
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 01:28:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E78A21534
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 01:28:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lYyMbrpd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC3F821534
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UNmGmyxe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E78A21534
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLG3P-000168-Sv
-	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 21:28:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43712)
+	id 1kLG3T-0001E0-Jw
+	for qemu-devel@archiver.kernel.org; Wed, 23 Sep 2020 21:28:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43750)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kLG0K-0004lw-LG
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 21:25:00 -0400
-Received: from mail-pl1-x62b.google.com ([2607:f8b0:4864:20::62b]:36704)
+ id 1kLG0O-0004tY-JT
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 21:25:04 -0400
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:36357)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kLG0I-0005hC-UQ
- for qemu-devel@nongnu.org; Wed, 23 Sep 2020 21:25:00 -0400
-Received: by mail-pl1-x62b.google.com with SMTP id s19so747350plp.3
- for <qemu-devel@nongnu.org>; Wed, 23 Sep 2020 18:24:58 -0700 (PDT)
+ id 1kLG0M-0005hq-Q8
+ for qemu-devel@nongnu.org; Wed, 23 Sep 2020 21:25:04 -0400
+Received: by mail-pj1-x1042.google.com with SMTP id b17so695682pji.1
+ for <qemu-devel@nongnu.org>; Wed, 23 Sep 2020 18:25:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=PUkREiDac/4ZH7kWY/xK+XNOCt1EYwSejvDGxYtWXc4=;
- b=lYyMbrpdc++53vlc3q+IWdBjzU9XkySvfkNS25W7dv13bKR38I535+EFHodl0X2XKc
- lbSxON3zFzUjwB3x/exjzHAyOKfinuh3LTZNeuVAxOly1yEVplmqcWEes7dIBIYdy+mw
- FvdOn1tIDasH6lGX9xnL1N4fHeU1wpmwu942Rc3gegE1AmxSBUVzPkTx+n7Tb+0Kp+rV
- d5DPBpAcMjVbchVwccgSOZltEBlKHrFIL6lWa9+kYamANQnWiMyDKmeK3BX/GkXdcI9D
- nwhy1lS4+ryyGDN+VBdpqbWVp6ns+sqNWA1uOo9k271fwGDNVilV4vmMZmO8DnP1vfk2
- pgww==
+ bh=+yuwP80qij/nuD82ane1l2a4D7zi8BJkB3dvAAaGtzw=;
+ b=UNmGmyxeiXfK+0oAEpdRfj5RvWB+jjKuC0YK++ypXm+2tOLj+hNuu7I+8CpIXsCDTS
+ oDHOrG3TU6xOlc2TuN/eKG2ztUVd12CN2FiduN54hAge5ZoTTNGVAyHd6zMQlvb+LHvE
+ oWx6AhCx7EACdxVF/dvqKsr1yJ14DeQkBmCnOCA5w40SuJ9BBr24LGGvtdbGaoS/Tk/O
+ sgu6O2oz21xWUvKFSOb0u94BO2TxaFpRmT0AdMOpf14ACyOTVVdJNfCparFSXDNqIwG5
+ +9Sp05QD35xi0SVnKljkbZXGDE022dyHYIIzlPa3iz0sR50tef8VNball/Vc/hLrYnL8
+ 1pIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=PUkREiDac/4ZH7kWY/xK+XNOCt1EYwSejvDGxYtWXc4=;
- b=s4PPcncvi4fK4Ur6ILgU6eLs70iYhS0dxTBDdL+Rg2ooH9HN4L/y3lYK2jYpiXHP8l
- raluBbYcuGs99zrHsyOT6SdPmaRZa+qBTrdton4h71irMIoV+8EcWPb/pMbdp1UB2qJ9
- EYI6/xuDwDqxLwYtyeREBhKjvKwCFxEB8hWX8KOwSP5zbfCa33AsO6gCANHkOXjwTguF
- +KzPfaLJfhkGot/xq4XhjCkqI3q7lUkzWYRm6qtOv1IAp6CfFQiVv4/Kq887d8HJ5V5P
- wnqw1HLBUsu4+vjyTqwF2o/JgV2CtAJK4XrTKSYp0VAd7AauebA6WX277fAx9GDUYxr/
- tcZA==
-X-Gm-Message-State: AOAM531DJZY9GsDZpMXRUw7ybZ1MVugvIsYzITlD9ZKGoao7LXYW0mKI
- YOz82rH/rcXMD15kDfFQK/qzZYJLYQSzeA==
-X-Google-Smtp-Source: ABdhPJzMOS2FmZyIbfQ/ARz6qZ2hW4CRiVsy9YvfmzBRFRZT4WZh1M9cpHzQIbdeziR+SB/WeyuOcA==
-X-Received: by 2002:a17:902:9697:b029:d1:e598:4001 with SMTP id
- n23-20020a1709029697b02900d1e5984001mr2288681plp.59.1600910697202; 
- Wed, 23 Sep 2020 18:24:57 -0700 (PDT)
+ bh=+yuwP80qij/nuD82ane1l2a4D7zi8BJkB3dvAAaGtzw=;
+ b=Gsibhts93Qd0uA1JpsSuNd+sxaUNiuWoTJ1xmuf70q5DemxCTekkdtjvSnH+iyvmRC
+ Dm6h+upHoS7qCNqAlVN3BiYxWjbjLgWJalJjspAeCXpOHrKddUBdsZtD3wevWp/SEFyb
+ q84uT2RJ5hMrgeife2TgAgaHq3Z/lSGejOKGaLUuQLXKvJkw7CdKYUZi7AsOFTcB2q4P
+ 1cxBORpXtvC+Ict/F3MkLlzv125KFl6N/QtyUy1SH4eWW2J77XmZpUQFQjglW0MQmIZW
+ ZTOT+WsgAm4q41TVU/WcL5HCsQTUOE4dvxu6zlMyycfHlPACz664MoQ7V8c1o8hTLhx4
+ F0rQ==
+X-Gm-Message-State: AOAM532KNcnDr7L+nU798mCFkqipBV5b4c1StIeund3PPWM0EnhSJLZ8
+ gY9ApZ7IfR/r9yAAs8VdNZmzEJCGWJAkpw==
+X-Google-Smtp-Source: ABdhPJyb+MmvOlKUd6ouRwQjKyW8bAqvU8adzSllui5uj4vj9dqe+ehivfzJQ5PcKtVX7xgEnIZwtw==
+X-Received: by 2002:a17:902:e9d2:b029:d1:e5e7:be63 with SMTP id
+ 18-20020a170902e9d2b02900d1e5e7be63mr2253409plk.61.1600910701132; 
+ Wed, 23 Sep 2020 18:25:01 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id k27sm938432pgm.29.2020.09.23.18.24.56
+ by smtp.gmail.com with ESMTPSA id k27sm938432pgm.29.2020.09.23.18.25.00
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 23 Sep 2020 18:24:56 -0700 (PDT)
+ Wed, 23 Sep 2020 18:25:00 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/8] softfloat: Use int128.h for some operations
-Date: Wed, 23 Sep 2020 18:24:47 -0700
-Message-Id: <20200924012453.659757-3-richard.henderson@linaro.org>
+Subject: [PATCH 5/8] softfloat: Inline pick_nan_muladd into its caller
+Date: Wed, 23 Sep 2020 18:24:50 -0700
+Message-Id: <20200924012453.659757-6-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200924012453.659757-1-richard.henderson@linaro.org>
 References: <20200924012453.659757-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::62b;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x62b.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,91 +105,107 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use our Int128, which wraps the compiler's __int128_t,
-instead of open-coding left shifts and arithmetic.
-We'd need to extend Int128 to have unsigned operations
-to replace more than these three.
+Because of FloatParts, there will only ever be one caller.
+Inlining allows us to re-use abc_mask for the snan test.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/fpu/softfloat-macros.h | 39 +++++++++++++++++-----------------
- 1 file changed, 20 insertions(+), 19 deletions(-)
+ fpu/softfloat.c | 75 +++++++++++++++++++++++--------------------------
+ 1 file changed, 35 insertions(+), 40 deletions(-)
 
-diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
-index 57845f8af0..95d88d05b8 100644
---- a/include/fpu/softfloat-macros.h
-+++ b/include/fpu/softfloat-macros.h
-@@ -84,6 +84,7 @@ this code that are retained.
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 3e625c47cd..e038434a07 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -929,45 +929,6 @@ static FloatParts pick_nan(FloatParts a, FloatParts b, float_status *s)
+     return a;
+ }
  
- #include "fpu/softfloat-types.h"
- #include "qemu/host-utils.h"
-+#include "qemu/int128.h"
- 
- /*----------------------------------------------------------------------------
- | Shifts `a' right by the number of bits given in `count'.  If any nonzero
-@@ -352,13 +353,11 @@ static inline void shortShift128Left(uint64_t a0, uint64_t a1, int count,
- static inline void shift128Left(uint64_t a0, uint64_t a1, int count,
-                                 uint64_t *z0Ptr, uint64_t *z1Ptr)
- {
--    if (count < 64) {
--        *z1Ptr = a1 << count;
--        *z0Ptr = count == 0 ? a0 : (a0 << count) | (a1 >> (-count & 63));
--    } else {
--        *z1Ptr = 0;
--        *z0Ptr = a1 << (count - 64);
+-static FloatParts pick_nan_muladd(FloatParts a, FloatParts b, FloatParts c,
+-                                  bool inf_zero, float_status *s)
+-{
+-    int which;
+-
+-    if (is_snan(a.cls) || is_snan(b.cls) || is_snan(c.cls)) {
+-        s->float_exception_flags |= float_flag_invalid;
 -    }
-+    Int128 a = int128_make128(a1, a0);
-+    Int128 z = int128_lshift(a, count);
+-
+-    which = pickNaNMulAdd(a.cls, b.cls, c.cls, inf_zero, s);
+-
+-    if (s->default_nan_mode) {
+-        /* Note that this check is after pickNaNMulAdd so that function
+-         * has an opportunity to set the Invalid flag.
+-         */
+-        which = 3;
+-    }
+-
+-    switch (which) {
+-    case 0:
+-        break;
+-    case 1:
+-        a = b;
+-        break;
+-    case 2:
+-        a = c;
+-        break;
+-    case 3:
+-        return parts_default_nan(s);
+-    default:
+-        g_assert_not_reached();
+-    }
+-
+-    if (is_snan(a.cls)) {
+-        return parts_silence_nan(a, s);
+-    }
+-    return a;
+-}
+-
+ /*
+  * Returns the result of adding or subtracting the values of the
+  * floating-point values `a' and `b'. The operation is performed
+@@ -1366,7 +1327,41 @@ static FloatParts muladd_floats(FloatParts a, FloatParts b, FloatParts c,
+      * off to the target-specific pick-a-NaN routine.
+      */
+     if (unlikely(abc_mask & float_cmask_anynan)) {
+-        return pick_nan_muladd(a, b, c, inf_zero, s);
++        int which;
 +
-+    *z0Ptr = int128_gethi(z);
-+    *z1Ptr = int128_getlo(z);
- }
++        if (unlikely(abc_mask & float_cmask_snan)) {
++            float_raise(float_flag_invalid, s);
++        }
++
++        which = pickNaNMulAdd(a.cls, b.cls, c.cls, inf_zero, s);
++
++        if (s->default_nan_mode) {
++            /*
++             * Note that this check is after pickNaNMulAdd so that function
++             * has an opportunity to set the Invalid flag for inf_zero.
++             */
++            which = 3;
++        }
++
++        switch (which) {
++        case 0:
++            break;
++        case 1:
++            a = b;
++            break;
++        case 2:
++            a = c;
++            break;
++        case 3:
++            return parts_default_nan(s);
++        default:
++            g_assert_not_reached();
++        }
++
++        if (is_snan(a.cls)) {
++            return parts_silence_nan(a, s);
++        }
++        return a;
+     }
  
- /*----------------------------------------------------------------------------
-@@ -405,15 +404,15 @@ static inline void
- *----------------------------------------------------------------------------*/
- 
- static inline void
-- add128(
--     uint64_t a0, uint64_t a1, uint64_t b0, uint64_t b1, uint64_t *z0Ptr, uint64_t *z1Ptr )
-+add128(uint64_t a0, uint64_t a1, uint64_t b0, uint64_t b1,
-+       uint64_t *z0Ptr, uint64_t *z1Ptr)
- {
--    uint64_t z1;
--
--    z1 = a1 + b1;
--    *z1Ptr = z1;
--    *z0Ptr = a0 + b0 + ( z1 < a1 );
-+    Int128 a = int128_make128(a1, a0);
-+    Int128 b = int128_make128(b1, b0);
-+    Int128 z = int128_add(a, b);
- 
-+    *z0Ptr = int128_gethi(z);
-+    *z1Ptr = int128_getlo(z);
- }
- 
- /*----------------------------------------------------------------------------
-@@ -463,13 +462,15 @@ static inline void
- *----------------------------------------------------------------------------*/
- 
- static inline void
-- sub128(
--     uint64_t a0, uint64_t a1, uint64_t b0, uint64_t b1, uint64_t *z0Ptr, uint64_t *z1Ptr )
-+sub128(uint64_t a0, uint64_t a1, uint64_t b0, uint64_t b1,
-+       uint64_t *z0Ptr, uint64_t *z1Ptr)
- {
-+    Int128 a = int128_make128(a1, a0);
-+    Int128 b = int128_make128(b1, b0);
-+    Int128 z = int128_sub(a, b);
- 
--    *z1Ptr = a1 - b1;
--    *z0Ptr = a0 - b0 - ( a1 < b1 );
--
-+    *z0Ptr = int128_gethi(z);
-+    *z1Ptr = int128_getlo(z);
- }
- 
- /*----------------------------------------------------------------------------
+     if (unlikely(inf_zero)) {
 -- 
 2.25.1
 
