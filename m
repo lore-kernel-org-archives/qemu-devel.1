@@ -4,75 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB75AC4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:56:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAC3AC4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:58:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 359D123977
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:56:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 36AB12395B
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:58:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="AkaG2Xmf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 359D123977
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="Orn7MyRi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36AB12395B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLOv4-0001tb-C5
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 06:56:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60462)
+	id 1kLOxM-00030j-8u
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 06:58:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60898)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kLOu8-00014U-5y
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 06:55:12 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52648)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kLOwU-0002Va-EW
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 06:57:39 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:56220)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kLOu6-00011k-63
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 06:55:11 -0400
-Received: by mail-wm1-x342.google.com with SMTP id q9so3060865wmj.2
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 03:55:09 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kLOwS-0001T4-Ta
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 06:57:38 -0400
+Received: by mail-wm1-x341.google.com with SMTP id d4so3046223wmd.5
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 03:57:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=zxe1VZ8qHXPjfPzjZqksD+WKb0tl9KAVcqEEYDz3VXM=;
- b=AkaG2Xmf5i9Gycb7WrxMMKJpVaCEGfnLqKomKOnFzRLb0BufFKQ0Z/Q97872L/K3lU
- E2Ix1kQeT/IEhHNU1Mp5R/tPdCOPVbtc8SfBPJpJ1ksPo3iP7h19GMhgS8G23C6sXW42
- 7oarQlPQ7OZMfsZCYHIuIwIBTfXBgerv9o4NB0yyJ1e3XGa+jVkX6r1B0kdgk3vIKgcE
- /e7dNaOnY+6fzsdZzbAhvbtD6B8CffV/UKc58BkMJdFxWPH1M1RkzspM4UQnHAFOABaN
- QwipfAcK+CKlkppx/aogSYWxouUeu4JYKxlYggzDRcR4PtrH2DbRBtkbkKceXjOsOlr3
- 7e4Q==
+ :cc; bh=ZlOuwbtOWVJiGOliwwdL5ozUyfgjCDoic0NbitpJN4M=;
+ b=Orn7MyRiv/6VvOsWoaS3wXpVS+NU2+kuEsYUkGCsv/0Co4gojhy1wlQZqt9O4ze6G2
+ 3iWaNZnsggeQoOF80JTO4NWzTPUmJKvkAT9SH3ExVmVTIVfV9eM3UZHNdJgvvDSEFz7X
+ OB5UPBa+tEsobbaQGWyLHGwIwas096vn6UEw9kTRVtlG0zkLGgcxamAf8AvlqGtoG/bV
+ llN+KJdrLxRnEJym2LnHJ/Ki72irMSQj+DdBpoSGceL4Cgrtp/Ufr/iBPbE6u3TXOfq+
+ eRM/5uGY/y3FQs9mq9PyoKEvLNkPoiJ94/5dOO3zWD8JrtNCLYaFO++XijTGxDSim58N
+ TMBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=zxe1VZ8qHXPjfPzjZqksD+WKb0tl9KAVcqEEYDz3VXM=;
- b=IMVAK2fjr5IfovP9LKqXHBUplyFJPJXTBrBXwKjqlVx4A6gcLdSd8DiYXvfAH1kyRm
- JRDzBzyuRqsrsnvygzYzy7kkx68UggeMllHaRIMt9R7x/JuI8U9zEgye/r9622HtP2Oi
- BBeFd1Uz1E+p1T1m8tabgPoMpjnFcD4hwlPVtAJpoJEAzjTt0H73PaiXhWO7F3BQuyxw
- oSbU714klqCmHEgjJ7O7S9HaQ3hxSdHqcyn5b1OfIi3ThwpH+M8bwD/PWwmNJn2BM/po
- wDZeRZsknOAkJAEjGFMOam08m7nboTXTQn16p6Ukon1n5UgdjMuEyD2X7c6hNcePZ1r1
- HcKQ==
-X-Gm-Message-State: AOAM5317b3PTZOEHPplKXp3TzZ78qvYlcaS5GfkosBUl8NIUgsNSB66N
- c+H0upuyJ7BNd9IM0qty6St8w/3hZj2zbd6dDwMCDA==
-X-Google-Smtp-Source: ABdhPJxVxhOFf+eUONx/ClkSIl6MgE0GHgM5agHTLc58z5q4A0mrzh/l/Ik81vjAWdEKgGKqAX0ByxeaEBlTN2HkAPA=
-X-Received: by 2002:a1c:7405:: with SMTP id p5mr4109307wmc.35.1600944908576;
- Thu, 24 Sep 2020 03:55:08 -0700 (PDT)
+ bh=ZlOuwbtOWVJiGOliwwdL5ozUyfgjCDoic0NbitpJN4M=;
+ b=OenhDAoW6N/vfz8M5tq+OxPM9a/W2zlBSoV2H1asSL3my1E+r1ihJYOl0afPcTjPV0
+ 7PHNtOb/oFGHRVO1iKbeBxfdH/s861xavg/N7NM4+wT4sGrGebvtgH4YfrL5qAx3Pp9S
+ 38mS7a6ZJnMs+A4XmTcTR0W93rZXdF56b03FRHJA7Jv/jRdrnGMr73q4RdmowhtUII3D
+ xTCZM9IxaXBPU/hVCxiqx0j9/vBYKkx9lBFc7051QFu6nx9EVS3UiCqRTprwUF0T9ZPu
+ LyvoeA8fPYQVw1k+eJXtXsvo4wkCBVHHY5m7X1fBgo/2L9TpE4iPb4YruSEWnnkon4gh
+ HFww==
+X-Gm-Message-State: AOAM533eQzXnBbSq0DQmhIhdVS1BGM4WBvcotZEXI5zAiNAd76gAMS+M
+ 4oScSgR7j/Ung8l29pwIKi23mn7H1ZykOiJe+D5ygw==
+X-Google-Smtp-Source: ABdhPJyac0HTau6QQcXGnT1rPC/QgG39CrOxeSdyy2zZDksctfpJANtzV6jEPkpnEO4v7N7Djr2Izw7TcW8BXycTPpk=
+X-Received: by 2002:a1c:ba0b:: with SMTP id k11mr4129375wmf.20.1600945051051; 
+ Thu, 24 Sep 2020 03:57:31 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200924070013.165026-1-jusual@redhat.com>
- <20200924070013.165026-2-jusual@redhat.com>
-In-Reply-To: <20200924070013.165026-2-jusual@redhat.com>
+ <20200924070013.165026-6-jusual@redhat.com>
+In-Reply-To: <20200924070013.165026-6-jusual@redhat.com>
 From: Ani Sinha <ani@anisinha.ca>
-Date: Thu, 24 Sep 2020 16:24:57 +0530
-Message-ID: <CAARzgwyt4uK5cLo_+xHmM4RB+HsKRzY0D-8hR_C02vBXRoQ+BA@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 1/7] hw/acpi/pcihp: Enhance
- acpi_pcihp_disable_root_bus() to support Q35
+Date: Thu, 24 Sep 2020 16:27:19 +0530
+Message-ID: <CAARzgwzq3mTXS9ESeHP0JCOUD=9Xfa6W+R5Q76QFvbZ0cj4yNQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 5/7] bios-tables-test: Allow changes in DSDT ACPI
+ tables
 To: Julia Suvorova <jusual@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: none client-ip=2a00:1450:4864:20::342;
- envelope-from=ani@anisinha.ca; helo=mail-wm1-x342.google.com
+Received-SPF: none client-ip=2a00:1450:4864:20::341;
+ envelope-from=ani@anisinha.ca; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -18
@@ -101,39 +101,32 @@ Sender: "Qemu-devel"
 
 On Thu, Sep 24, 2020 at 12:30 PM Julia Suvorova <jusual@redhat.com> wrote:
 >
-> PCI Express does not allow hot-plug on pcie.0. Check for Q35 in
-> acpi_pcihp_disable_root_bus() to be able to forbid hot-plug using the
-> 'acpi-root-pci-hotplug' flag.
-
-I think what this change is doing here is making
-acpi_pcihp_disable_root_bus() function compatible with q35 as well.
-
+> All DSDT Q35 tables will be modified because ACPI hot-plug is enabled
+> by default.
 >
 > Signed-off-by: Julia Suvorova <jusual@redhat.com>
+Acked-by: Ani Sinha <ani@anisinha.ca>
+
 > ---
->  hw/acpi/pcihp.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  tests/qtest/bios-tables-test-allowed-diff.h | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 >
-> diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-> index 39b1f74442..ff23104aea 100644
-> --- a/hw/acpi/pcihp.c
-> +++ b/hw/acpi/pcihp.c
-> @@ -107,13 +107,14 @@ static void acpi_set_pci_info(void)
->  static void acpi_pcihp_disable_root_bus(void)
->  {
->      static bool root_hp_disabled;
-> +    Object *host = acpi_get_i386_pci_host();
->      PCIBus *bus;
->
->      if (root_hp_disabled) {
->          return;
->      }
->
-> -    bus = find_i440fx();
-> +    bus = PCI_HOST_BRIDGE(host)->bus;
->      if (bus) {
->          /* setting the hotplug handler to NULL makes the bus non-hotpluggable */
->          qbus_set_hotplug_handler(BUS(bus), NULL);
+> diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+> index dfb8523c8b..84f56b14db 100644
+> --- a/tests/qtest/bios-tables-test-allowed-diff.h
+> +++ b/tests/qtest/bios-tables-test-allowed-diff.h
+> @@ -1 +1,11 @@
+>  /* List of comma-separated changed AML files to ignore */
+> +"tests/data/acpi/q35/DSDT",
+> +"tests/data/acpi/q35/DSDT.tis",
+> +"tests/data/acpi/q35/DSDT.bridge",
+> +"tests/data/acpi/q35/DSDT.mmio64",
+> +"tests/data/acpi/q35/DSDT.ipmibt",
+> +"tests/data/acpi/q35/DSDT.cphp",
+> +"tests/data/acpi/q35/DSDT.memhp",
+> +"tests/data/acpi/q35/DSDT.acpihmat",
+> +"tests/data/acpi/q35/DSDT.numamem",
+> +"tests/data/acpi/q35/DSDT.dimmpxm",
 > --
 > 2.25.4
 >
