@@ -2,77 +2,80 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 022B3C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:35:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BDA3C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:38:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60BB923741
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:35:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6EA3D23741
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:38:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YS4Ji3Ef"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60BB923741
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QvAv8ztK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EA3D23741
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLUCw-000366-Tk
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 12:34:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49488)
+	id 1kLUG6-00062M-B0
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 12:38:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kLTB2-00027y-Uw
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 11:28:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57832)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kLTuU-00039d-9n
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 12:15:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27388)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kLTAj-0005cY-MS
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 11:28:54 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kLTuQ-0005tm-8K
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 12:15:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600961304;
+ s=mimecast20190719; t=1600964148;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Qf9yvx1boVo/GvVmvjUVrZxqT2C4W+eevMnB2eYhUCU=;
- b=YS4Ji3Ef/h7nA2q6Iit8e95eVpC4YObL5Lfd6Pfkw93F13KBv1alZTB8uANooKD44F/KnK
- TrNCFddX1NAlO7GvWoEaAPhwBrGOmDqaQBbK8o9fZl7f7i7fvVi6nGqXbmH9QbAkQuAoCu
- qkCnNbYhY5M7RibRQWoe/ZAriacSNCg=
+ bh=Do8uA0sevsJAHsT4aXHQnTzq5FT+FriRFTq+cYRFu9o=;
+ b=QvAv8ztKsiE0LR8p8gHFRQ30pCdWHlzlHmCGqcKk7Z+uSVI4Id8rQgLp79sT3RYa1HKqKo
+ +G3w4WEhv+6Rx4u6XepJulQ4P/MH4HjPOivcpQ2cwl650q3fO61WzBgmack8DbpZDonI65
+ ZZYgUXvfjsMyKMOH3//gxRkbOQtZgg0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-537-vTW8VS6ZPgaMWmvhpX58Iw-1; Thu, 24 Sep 2020 11:28:20 -0400
-X-MC-Unique: vTW8VS6ZPgaMWmvhpX58Iw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-186-CbM_HpeWNB-St8APFS7MHQ-1; Thu, 24 Sep 2020 12:15:41 -0400
+X-MC-Unique: CbM_HpeWNB-St8APFS7MHQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F3CF104FC8A;
- Thu, 24 Sep 2020 15:28:19 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-114-72.ams2.redhat.com [10.36.114.72])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5940C60C04;
- Thu, 24 Sep 2020 15:28:18 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 29/31] iotests: Introduce qemu_nbd_list_log()
-Date: Thu, 24 Sep 2020 17:27:15 +0200
-Message-Id: <20200924152717.287415-30-kwolf@redhat.com>
-In-Reply-To: <20200924152717.287415-1-kwolf@redhat.com>
-References: <20200924152717.287415-1-kwolf@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A0C0800475;
+ Thu, 24 Sep 2020 16:15:40 +0000 (UTC)
+Received: from localhost (ovpn-114-5.ams2.redhat.com [10.36.114.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1BDFC55786;
+ Thu, 24 Sep 2020 16:15:39 +0000 (UTC)
+Date: Thu, 24 Sep 2020 17:15:39 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Jon Maloy <jmaloy@redhat.com>
+Subject: Re: Problems with building using meson and fuzzing
+Message-ID: <20200924161539.GA929935@stefanha-x1.localdomain>
+References: <3d188586-5301-30ba-1a19-db34a273cbb0@redhat.com>
+ <615f663c-f935-1401-5042-4436da257a96@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <615f663c-f935-1401-5042-4436da257a96@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="huq684BweRXVnRxX"
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -80,7 +83,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,58 +96,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
- mreitz@redhat.com
+Cc: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a function to list the NBD exports offered by an NBD server.
+--huq684BweRXVnRxX
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- tests/qemu-iotests/iotests.py | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+On Thu, Sep 24, 2020 at 10:36:20AM -0400, Jon Maloy wrote:
+> Alex, Stefan & al
+> I am trying to build and run Marc-Andr=E9s Lureaus libslirp code with fuz=
+zing
+> activated, but I am running into build issues.
+> https://gitlab.freedesktop.org/elmarco/libslirp/-/commit/9fba8af484ec6bc1=
+0b22e3f49d9e34d95c28b086
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 81edf8adbf..cb9f90f737 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -67,7 +67,8 @@ if os.environ.get('QEMU_IO_OPTIONS_NO_FMT'):
-     qemu_io_args_no_fmt += \
-         os.environ['QEMU_IO_OPTIONS_NO_FMT'].strip().split(' ')
- 
--qemu_nbd_args = [os.environ.get('QEMU_NBD_PROG', 'qemu-nbd')]
-+qemu_nbd_prog = os.environ.get('QEMU_NBD_PROG', 'qemu-nbd')
-+qemu_nbd_args = [qemu_nbd_prog]
- if os.environ.get('QEMU_NBD_OPTIONS'):
-     qemu_nbd_args += os.environ['QEMU_NBD_OPTIONS'].strip().split(' ')
- 
-@@ -282,6 +283,13 @@ def qemu_nbd_early_pipe(*args: str) -> Tuple[int, str]:
-                                                    connect_stderr=False)
-     return returncode, output if returncode else ''
- 
-+def qemu_nbd_list_log(*args: str) -> str:
-+    '''Run qemu-nbd to list remote exports'''
-+    full_args = [qemu_nbd_prog, '-L'] + list(args)
-+    output, _ = qemu_tool_pipe_and_status('qemu-nbd', full_args)
-+    log(output, filters=[filter_testfiles, filter_nbd_exports])
-+    return output
-+
- @contextmanager
- def qemu_nbd_popen(*args):
-     '''Context manager running qemu-nbd within the context'''
-@@ -415,6 +423,9 @@ def filter_qmp_imgfmt(qmsg):
-         return value
-     return filter_qmp(qmsg, _filter)
- 
-+def filter_nbd_exports(output: str) -> str:
-+    return re.sub(r'((min|opt|max) block): [0-9]+', r'\1: XXX', output)
-+
- 
- Msg = TypeVar('Msg', Dict[str, Any], List[Any], str)
- 
--- 
-2.25.4
+Discussion happening here:
+https://github.com/mesonbuild/meson/issues/7761
+
+--huq684BweRXVnRxX
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9sxisACgkQnKSrs4Gr
+c8gweQf8DarVEqeGBbQZy7J7Pfi9ml92n2Zk+J2suzEPNq5vDBtVjFi9tYYWmO6y
+GDaqBJEdFShgf4ickI8VrLq532zqz0FwdUTWF+XhMtMbmLkOhhJXJ8/tCDR9kGRk
+0hojpyh9n9zuCV5LMd6Zs1oIpJLcoAW/k/zupusLFxiyXY5ghjgRlhz0Xabbf6CY
+IXd1ddVMNYuVf2ipJSiXAqq680x43V10jwXblqX/wqUemActAyIs0aozofNQiawV
+ulkXLepbjR1heZBlexDs+sJ43XQYmXoor+luYp5DxvuW9K/9NKNAI3Vb0TW1WLGE
+48gtsHByXx56X4u5RJ6du9R8XKgQhA==
+=SZQ9
+-----END PGP SIGNATURE-----
+
+--huq684BweRXVnRxX--
 
 
