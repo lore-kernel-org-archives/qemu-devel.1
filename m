@@ -2,80 +2,80 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B9D1C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:37:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D17A7C4727D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:37:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A79E206B6
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:37:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20011206B6
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:37:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N7XKnCjY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A79E206B6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GANcq/8D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20011206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLNh7-0002oV-7b
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:37:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38794)
+	id 1kLNh9-0002sM-4v
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:37:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38710)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTf-0000os-BM
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24008)
+ id 1kLNTa-0000iS-IN
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32733)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTX-00060v-45
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:47 -0400
+ id 1kLNTX-00060t-0v
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1600939418;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ntPmSBCfbzMvBnQ7AeL6nrkcCAwUFiK5wJ+BZs89mls=;
- b=N7XKnCjYf1k32qaRQp0fdCOLFY6jqibFl2qnh1VXqpQKdTvPBYEJIjSLq9km3NsL1Lbpxz
- 7hHFNYqpycyTFLwvSH+HAbWCrzNfQcEwIkPitNLXj9uIojiZFzq/rkWJ6naMQbddu2kjq+
- NSU5Iae4g5/KxitmR9TEYlLo3jhK2gU=
+ bh=EPROH+rhHGc+CfF7H9/smITvRehkFbJS47wGwzU6KXY=;
+ b=GANcq/8DtxpoUiYVfsXw7yyVBeqk6X4ZmIgNo5uyStr3dGcbBJ3MeId5AW9PoFhOGPQC8M
+ uG2axjEd/HuXTQXKoA3KxHZkzENlQ2hjitOkoVH/XKAsqLQvCaL8zdewwo0qZx/fUYF+h8
+ addqOxKqp5iTsIsNo09sj3zcQe2VvtY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-208-cjHQbwpgNzmgN-qpH9x01w-1; Thu, 24 Sep 2020 05:23:33 -0400
-X-MC-Unique: cjHQbwpgNzmgN-qpH9x01w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-17-JmC51qrhMcaa_PtejuCHwQ-1; Thu, 24 Sep 2020 05:23:36 -0400
+X-MC-Unique: JmC51qrhMcaa_PtejuCHwQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CAE1802EA3
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE35B64144;
+ Thu, 24 Sep 2020 09:23:34 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A81667881A;
- Thu, 24 Sep 2020 09:23:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6B0C173672;
+ Thu, 24 Sep 2020 09:23:34 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 18/92] configure: rename QEMU_GA_MSI_ENABLED to CONFIG_QGA_MSI
-Date: Thu, 24 Sep 2020 05:22:00 -0400
-Message-Id: <20200924092314.1722645-19-pbonzini@redhat.com>
+Subject: [PULL 21/92] hw/char/serial: Remove old DEBUG_SERIAL commented code
+Date: Thu, 24 Sep 2020 05:22:03 -0400
+Message-Id: <20200924092314.1722645-22-pbonzini@redhat.com>
 In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
 References: <20200924092314.1722645-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -96,71 +96,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-The QEMU_GA_MSI_ENABLED config-host.mak variable is emitted by
-./configure. meson.build actually checks for CONFIG_QGA_MSI_ENABLED:
+All useful DPRINTF() calls have been converted to trace
+events.  Remove a pointless one in the IOEventHandler,
+and drop the DEBUG_SERIAL ifdef'ry.
 
-  summary_info += {'QGA MSI support':   config_host.has_key('CONFIG_QGA_MSI_ENABLED')}
-
-Rename QEMU_GA_MSI_ENABLED to CONFIG_QGA_MSI for consistency with
-CONFIG_QGA_VSS. Also use 'y' instead of 'yes' for consistency.
-
-This fixes the feature summary printed by meson.build.
-
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20200914095231.621068-4-stefanha@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20200907015535.827885-4-f4bug@amsat.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile    | 2 +-
- configure   | 2 +-
- meson.build | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ hw/char/serial.c | 11 -----------
+ 1 file changed, 11 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 7c60b9dcb8..42d90cb597 100644
---- a/Makefile
-+++ b/Makefile
-@@ -285,7 +285,7 @@ endif
- ifdef CONFIG_WIN32
- 	@echo  'Windows targets:'
- 	$(call print-help,installer,Build NSIS-based installer for QEMU)
--ifdef QEMU_GA_MSI_ENABLED
-+ifdef CONFIG_QGA_MSI
- 	$(call print-help,msi,Build MSI-based installer for qemu-ga)
- endif
- 	@echo  ''
-diff --git a/configure b/configure
-index db9ec3231f..01fce2e94b 100755
---- a/configure
-+++ b/configure
-@@ -6576,7 +6576,7 @@ if test "$mingw32" = "yes" ; then
-     echo "CONFIG_QGA_NTDDSCSI=y" >> $config_host_mak
-   fi
-   if test "$guest_agent_msi" = "yes"; then
--    echo "QEMU_GA_MSI_ENABLED=yes" >> $config_host_mak
-+    echo "CONFIG_QGA_MSI=y" >> $config_host_mak
-     echo "QEMU_GA_MSI_MINGW_DLL_PATH=${QEMU_GA_MSI_MINGW_DLL_PATH}" >> $config_host_mak
-     echo "QEMU_GA_MSI_WITH_VSS=${QEMU_GA_MSI_WITH_VSS}" >> $config_host_mak
-     echo "QEMU_GA_MSI_ARCH=${QEMU_GA_MSI_ARCH}" >> $config_host_mak
-diff --git a/meson.build b/meson.build
-index bb4259e7f0..c48ca0d12a 100644
---- a/meson.build
-+++ b/meson.build
-@@ -1482,7 +1482,7 @@ if targetos == 'windows'
-   endif
-   summary_info += {'QGA VSS support':   config_host.has_key('CONFIG_QGA_VSS')}
-   summary_info += {'QGA w32 disk info': config_host.has_key('CONFIG_QGA_NTDDSCSI')}
--  summary_info += {'QGA MSI support':   config_host.has_key('CONFIG_QGA_MSI_ENABLED')}
-+  summary_info += {'QGA MSI support':   config_host.has_key('CONFIG_QGA_MSI')}
- endif
- summary_info += {'seccomp support':   config_host.has_key('CONFIG_SECCOMP')}
- summary_info += {'coroutine backend': config_host['CONFIG_COROUTINE_BACKEND']}
+diff --git a/hw/char/serial.c b/hw/char/serial.c
+index e8029f840a..26f7fa8a21 100644
+--- a/hw/char/serial.c
++++ b/hw/char/serial.c
+@@ -36,8 +36,6 @@
+ #include "trace.h"
+ #include "hw/qdev-properties.h"
+ 
+-//#define DEBUG_SERIAL
+-
+ #define UART_LCR_DLAB	0x80	/* Divisor latch access bit */
+ 
+ #define UART_IER_MSI	0x08	/* Enable Modem status interrupt */
+@@ -102,14 +100,6 @@
+ 
+ #define MAX_XMIT_RETRY      4
+ 
+-#ifdef DEBUG_SERIAL
+-#define DPRINTF(fmt, ...) \
+-do { fprintf(stderr, "serial: " fmt , ## __VA_ARGS__); } while (0)
+-#else
+-#define DPRINTF(fmt, ...) \
+-do {} while (0)
+-#endif
+-
+ static void serial_receive1(void *opaque, const uint8_t *buf, int size);
+ static void serial_xmit(SerialState *s);
+ 
+@@ -636,7 +626,6 @@ static void serial_receive1(void *opaque, const uint8_t *buf, int size)
+ static void serial_event(void *opaque, QEMUChrEvent event)
+ {
+     SerialState *s = opaque;
+-    DPRINTF("event %x\n", event);
+     if (event == CHR_EVENT_BREAK)
+         serial_receive_break(s);
+ }
 -- 
 2.26.2
 
