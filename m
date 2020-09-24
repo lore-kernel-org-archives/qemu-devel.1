@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 919A5C4727F
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:53:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2680C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:53:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 138472396E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:53:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E9EB2396E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:53:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QPH61UQc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 138472396E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b696snEz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E9EB2396E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLNw5-0008UB-Vt
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:53:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38928)
+	id 1kLNwG-0000TF-0g
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:53:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39258)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTl-0000zI-NJ
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36495)
+ id 1kLNU0-0001cc-DE
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60196)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTi-00063C-Gt
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:53 -0400
+ id 1kLNTx-00068B-KZ
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600939429;
+ s=mimecast20190719; t=1600939444;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gbo7gzC2MwAbl/Dhbi5ZHn/0npw+hvkZLuIoMrXzkMk=;
- b=QPH61UQc/wAH+N8CKsVYDoqj8H0diYfpYEBLvrvZs6tHdl/La9/KsEUKBwnIYs590B9Vva
- p7SB17mEm2l83mj8zXuA2z6ckoHOmXTL0mCyE/qQVdcUu0MxEzyz8zymV0DnGBYmYsdHHD
- 6UfyXAKOgFnHNxPaHRu5rtPQvr49lP8=
+ bh=mxyU2UsYIapLWeI/m9pnErkY5BZXXfsVIe9axCDHUxk=;
+ b=b696snEzJJZuHXOB6m4MK9dt9bxXQa8tUe6bqRqL/m3xLAQXk9D9xYF8fPw/5WWu7AQEoN
+ EvJfL5cQjq3lUbOc84QX8Ep0iY+Xi+n2ZYnjco9xJpu66Q7j2o0Xa9aaXZmK6fD2WuAuxh
+ BW1MLeR5qPczyAf+5jEe+gUgDJ0hC8w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-238-SS-NXv-EPdelx4S99Q3ECQ-1; Thu, 24 Sep 2020 05:23:48 -0400
-X-MC-Unique: SS-NXv-EPdelx4S99Q3ECQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-580-ubHXz8zSPzqVS_2AJf7cqQ-1; Thu, 24 Sep 2020 05:24:03 -0400
+X-MC-Unique: ubHXz8zSPzqVS_2AJf7cqQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC559801002;
- Thu, 24 Sep 2020 09:23:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A7021007471;
+ Thu, 24 Sep 2020 09:24:02 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8AC9C55764;
- Thu, 24 Sep 2020 09:23:46 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BC23C5C1DC;
+ Thu, 24 Sep 2020 09:24:01 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 35/92] configure: do not limit Hypervisor.framework test to
- Darwin
-Date: Thu, 24 Sep 2020 05:22:17 -0400
-Message-Id: <20200924092314.1722645-36-pbonzini@redhat.com>
+Subject: [PULL 58/92] tests/tcg: reinstate or replace desired parts of
+ rules.mak
+Date: Thu, 24 Sep 2020 05:22:40 -0400
+Message-Id: <20200924092314.1722645-59-pbonzini@redhat.com>
 In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
 References: <20200924092314.1722645-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
@@ -97,57 +97,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Christophe de Dinechin <dinechin@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Because the target/i386/hvf/meson.build rule culls hvf support
-on non-Darwin systems, a --enable-hvf build is succeeding.
-To fix this, just try the compilation test every time someone
-passes --enable-hvf.
+Commit 660f79309303d696531ffb394719dfab3e0c42c0 was a bit overzealous
+with respect to tests/tcg, which needed quiet-command and $(BUILD_DIR).
+Reinstate quiet-command, and replace $(BUILD_DIR) with just the
+current directory.
 
-Reported-by: Christophe de Dinechin <dinechin@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reported-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ tests/tcg/Makefile.qemu | 13 ++++++++++++-
+ tests/tcg/configure.sh  |  4 ++--
+ 2 files changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/configure b/configure
-index f3a2f43250..161d0604bb 100755
---- a/configure
-+++ b/configure
-@@ -870,7 +870,7 @@ Darwin)
-   bsd="yes"
-   darwin="yes"
-   hax="yes"
--  hvf="yes"
-+  hvf=""
-   if [ "$cpu" = "x86_64" ] ; then
-     QEMU_CFLAGS="-arch x86_64 $QEMU_CFLAGS"
-     QEMU_LDFLAGS="-arch x86_64 $QEMU_LDFLAGS"
-@@ -5822,16 +5822,18 @@ fi
+diff --git a/tests/tcg/Makefile.qemu b/tests/tcg/Makefile.qemu
+index 0332bad10f..c096c611a2 100644
+--- a/tests/tcg/Makefile.qemu
++++ b/tests/tcg/Makefile.qemu
+@@ -11,9 +11,20 @@
+ # The configure script fills in extra information about
+ # useful docker images or alternative compiler flags.
  
- #################################################
- # Check to see if we have the Hypervisor framework
--if [ "$darwin" = "yes" ] ; then
-+if [ "$hvf" != "no" ] ; then
-   cat > $TMPC << EOF
- #include <Hypervisor/hv.h>
- int main() { return 0;}
- EOF
-   if ! compile_object ""; then
-+    if test "$hvf" = "yes"; then
-+	error_exit "Hypervisor.framework not available"
-+    fi
-     hvf='no'
-   else
-     hvf='yes'
--    QEMU_LDFLAGS="-framework Hypervisor $QEMU_LDFLAGS"
-   fi
- fi
++# Usage: $(call quiet-command,command and args,"NAME","args to print")
++# This will run "command and args", and either:
++#  if V=1 just print the whole command and args
++#  otherwise print the 'quiet' output in the format "  NAME     args to print"
++# NAME should be a short name of the command, 7 letters or fewer.
++# If called with only a single argument, will print nothing in quiet mode.
++quiet-command-run = $(if $(V),,$(if $2,printf "  %-7s %s\n" $2 $3 && ))$1
++quiet-@ = $(if $(V),,@)
++quiet-command = $(quiet-@)$(call quiet-command-run,$1,$2,$3)
++
+ CROSS_CC_GUEST:=
+ DOCKER_IMAGE:=
+--include $(BUILD_DIR)/tests/tcg/config-$(TARGET).mak
++
++-include tests/tcg/config-$(TARGET).mak
+ 
+ GUEST_BUILD=
+ TCG_MAKE=../Makefile.target
+diff --git a/tests/tcg/configure.sh b/tests/tcg/configure.sh
+index 598a50cd4f..be51bdb5a4 100755
+--- a/tests/tcg/configure.sh
++++ b/tests/tcg/configure.sh
+@@ -193,11 +193,11 @@ for target in $target_list; do
+   case $target in
+     *-linux-user | *-bsd-user)
+       echo "CONFIG_USER_ONLY=y" >> $config_target_mak
+-      echo "QEMU=\$(BUILD_DIR)/qemu-$arch" >> $config_target_mak
++      echo "QEMU=$PWD/qemu-$arch" >> $config_target_mak
+       ;;
+     *-softmmu)
+       echo "CONFIG_SOFTMMU=y" >> $config_target_mak
+-      echo "QEMU=\$(BUILD_DIR)/qemu-system-$arch" >> $config_target_mak
++      echo "QEMU=$PWD/qemu-system-$arch" >> $config_target_mak
+       ;;
+   esac
  
 -- 
 2.26.2
