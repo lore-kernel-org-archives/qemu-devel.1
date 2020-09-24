@@ -2,89 +2,98 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EBE0C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 19:25:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56360C4727D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 19:26:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 949D320878
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 19:25:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE8AD221EB
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 19:26:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W+AzgMyP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 949D320878
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t8Iug7xF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE8AD221EB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLWrt-0006bT-G1
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 15:25:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49944)
+	id 1kLWsx-0007QE-O4
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 15:26:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50032)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLWqp-00068A-DD
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 15:24:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28524)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLWqn-00066x-0y
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 15:24:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600975455;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=0CQ/dz5WfuuIv731DvM5gHhK+Rs5mXbX8GWISC3eNQo=;
- b=W+AzgMyPdVJi4Nv9BWuqzF6h9NB2mcOOuwRFJ14QH23JSPC2CunsHfhBDMD8V99RXUX707
- cHmsjPHtcqLJXIW/j/VLAtbG63moqMkPK7lTKf4Iv2XAD9PQdB2DcEEBQZuCr/Ihzv9kSh
- OhtzlpX9zlop39/+lobZKs0p9+qwJvg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-592-fkAZ6-YFN0Kt2JTGBDM80A-1; Thu, 24 Sep 2020 15:24:11 -0400
-X-MC-Unique: fkAZ6-YFN0Kt2JTGBDM80A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9055E10066FE;
- Thu, 24 Sep 2020 19:24:10 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
- [10.10.119.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B545319D7C;
- Thu, 24 Sep 2020 19:24:09 +0000 (UTC)
-Date: Thu, 24 Sep 2020 15:24:07 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v2 02/38] qapi-gen: Separate arg-parsing from generation
-Message-ID: <20200924192407.GA347036@localhost.localdomain>
-References: <20200922210101.4081073-1-jsnow@redhat.com>
- <20200922210101.4081073-3-jsnow@redhat.com>
- <20200923000031.GB191229@localhost.localdomain>
- <7920bff4-dd4b-4ef6-ce85-90e693efc749@redhat.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kLWrW-0006Ua-HH
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 15:25:02 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:46328)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kLWrS-00069P-Qs
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 15:25:02 -0400
+Received: by mail-pf1-x443.google.com with SMTP id b124so317259pfg.13
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 12:24:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=HEj65C3KLyf8BwTjs+zoI4GIWetVf0bs5jRBh9sqQHs=;
+ b=t8Iug7xFPQFzAWMyTO+ZWjcBo/5ZlRQDSNGIIKnaJdhhB9sbyogYL+8bs19voodLxG
+ UeB9xNOn/0EKCfl4q530d4bvao681pjamsKue0hQVgjl+qVwHbrWZ0GZHzZeQ0e3T6mQ
+ QgymhNmPWDlbQbYVpNp1ikpR3Nphw+zvpQjs6tJjzGXArBwyl19SkzBDVxY9TV8aVPfy
+ pBVNqWumIn7NmB/vLHt3drvH4b32KgDasgm443oKogM/52jM7GMx1QEEZW5yxnUS67h0
+ 5nB4eg4/j3f2w2b1+GBbxIDfOvoweLXkgnKMRu8/5zg432SPk5EOj5NSI2E6zNs+gSPE
+ j1Gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=HEj65C3KLyf8BwTjs+zoI4GIWetVf0bs5jRBh9sqQHs=;
+ b=o8om4coF8QUyNKNpZ/WWMkN9Nu49z6P56XSqhwQ0SqM1H4TPLLLQmrtq2YFLkAEG2v
+ HxZxbCCuM89U82hmCtoASwRkyo7MO5VyzIRsdZjZHmflvxCn71sIi46P+dC0POLQwBhL
+ FkCXiWv4ZU80HkoMWQLmtSO0mOQxKCuggV9g0aoWa8a5rzAfoEBcjqaZ1NqJAkZZQxjI
+ d5tV8CiyDLnO5fEa1lf8dsKs1HJlGMoi6OKqiBdbCTuhXMogzTGyim5YzihUZDIAscYE
+ eyVJJiJqGRMy35EsuAbuGwaKWfqUuZpw4GDqvYzHy8FOjHe8ruu84e/eZh77Ik40aiTr
+ 6Oyw==
+X-Gm-Message-State: AOAM533QCIIG2FPyUA8jjYZa3K/eEF8CtqoP/f1MBnUdf6vBHkAcS7UB
+ ovyXQstmao9qE8hCaCvUxPrlLjgfsK03eA==
+X-Google-Smtp-Source: ABdhPJy2m7+VecA9sHB+9F3B3Uoc4a1X/9z3NY+no/6uskp1MFDPIauSY9tRYHusoGHhK1d1RBRQXQ==
+X-Received: by 2002:a62:52d3:0:b029:142:2501:3a00 with SMTP id
+ g202-20020a6252d30000b029014225013a00mr521830pfb.79.1600975496336; 
+ Thu, 24 Sep 2020 12:24:56 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id f19sm250695pfj.25.2020.09.24.12.24.54
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 24 Sep 2020 12:24:55 -0700 (PDT)
+Subject: Re: [PATCH 1/4] qemu/bswap: Remove unused qemu_bswap_len()
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200923100220.674903-1-philmd@redhat.com>
+ <20200923100220.674903-2-philmd@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <195f22a4-7e28-a674-018d-b5dc05f69625@linaro.org>
+Date: Thu, 24 Sep 2020 12:24:53 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <7920bff4-dd4b-4ef6-ce85-90e693efc749@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="qMm9M+Fa2AknHoGS"
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=crosa@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200923100220.674903-2-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -22
+X-Spam_score: -2.3
+X-Spam_bar: --
+X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.214,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,110 +106,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Markus Armbruster <armbru@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---qMm9M+Fa2AknHoGS
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 9/23/20 3:02 AM, Philippe Mathieu-Daudé wrote:
+> Last use of qemu_bswap_len() has been removed in commit
+> e5fd1eb05ec ("apb: add busA qdev property to PBM PCI bridge").
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  include/qemu/bswap.h | 6 ------
+>  1 file changed, 6 deletions(-)
 
-On Wed, Sep 23, 2020 at 01:05:47PM -0400, John Snow wrote:
-> On 9/22/20 8:00 PM, Cleber Rosa wrote:
-> > On Tue, Sep 22, 2020 at 05:00:25PM -0400, John Snow wrote:
-> > > This is a minor re-work of the entrypoint script. It isolates a
-> > > generate() method from the actual command-line mechanism.
-> > >=20
-> > > Signed-off-by: John Snow <jsnow@redhat.com>
-> > > ---
-> > >   scripts/qapi-gen.py | 87 ++++++++++++++++++++++++++++++++----------=
----
-> > >   1 file changed, 63 insertions(+), 24 deletions(-)
-> > >=20
-> > > diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
-> > > index 4b03f7d53b..59becba3e1 100644
-> > > --- a/scripts/qapi-gen.py
-> > > +++ b/scripts/qapi-gen.py
-> > > @@ -1,9 +1,13 @@
-> > >   #!/usr/bin/env python3
-> > > -# QAPI generator
-> > > -#
-> > > +
-> > >   # This work is licensed under the terms of the GNU GPL, version 2 o=
-r later.
-> > >   # See the COPYING file in the top-level directory.
-> > > +"""
-> > > +QAPI Generator
-> > > +
-> > > +This script is the main entry point for generating C code from the Q=
-API schema.
-> > > +"""
-> > >   import argparse
-> > >   import re
-> > > @@ -11,21 +15,65 @@
-> > >   from qapi.commands import gen_commands
-> > >   from qapi.doc import gen_doc
-> > > +from qapi.error import QAPIError
-> > >   from qapi.events import gen_events
-> > >   from qapi.introspect import gen_introspect
-> > > -from qapi.schema import QAPIError, QAPISchema
-> > > +from qapi.schema import QAPISchema
-> > >   from qapi.types import gen_types
-> > >   from qapi.visit import gen_visit
-> > > -def main(argv):
-> > > +DEFAULT_OUTPUT_DIR =3D ''
-> > > +DEFAULT_PREFIX =3D ''
-> >=20
-> > I did not understand the purpose of these.  If they're used only as
-> > the default value for the command line option parsing, I'd suggest
-> > dropping them.
-> >=20
->=20
-> The alternative is setting default=3D'' inline below, which is fine, but =
-found
-> them kind of buried; and looking a bit too much like a weird magic consta=
-nt.
-> Aesthetically, I liked making them obvious.
->
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-I differ in opinion and style, and I don't think you should adopt
-mine.  Just for the record, though, consider if would do the same for
-dozens of command line options... IMO it'd be fine to declare them for
-extra explicitness, but I see no reason for them to be module globals.
-
-> You found them! My plan worked.
->
-
-:)
-
-- Cleber.
-
---qMm9M+Fa2AknHoGS
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl9s8lMACgkQZX6NM6Xy
-CfPx4w/+MDgPLeiQ75hGmjgdRKqsmKrkJMJ8WEIgTd2VT5UHO4DHQbgg1hvAq0Xk
-JflcykcqQro5l/ErHpb8YG2yF6+x3Nm3RKqC5VR8AXKjyPrKxZ6o4ayK4wkWdMVB
-dSll2yet2hMX0czK0kygkYHhzlGJGNk7sOZH7oEeZ/k7slhKLyjHUFLGzdO/66pD
-FSh9fQIECsoUolyuk3J06U7DjhvL/sG8W0zjF4QZ9WePbhx+3ojGR0UNF/T4don6
-NqMZf+YuCPBaTLW2EZuu/aeFRe4e01TdAs0Oo7nw51eiqngtfXaKzogJ0uirC6cT
-rqLlQAujkDfHBAMuPFobhLD/Jn8JywSJbyBUD5f0pe5uag8FBVfHZOG4Nuo/FPqt
-CZgm2w5bRGbnDjPheZavjr1RbrOcii7cDcPP3MfJZG2GkA9MN4nC8ezcLl4mP4Ee
-YpynMlNxK15snj1O0ZjHS1m2MXPF5DMi0Y/ygLlQWLuNqZnYGvHjU3kUGukQflBA
-l+lVQdBm1jJ0REvh5WpGfsZB1T/sqy+cQHYMaE2KOBfU339d0ggHq31NT6GNhTJY
-pmko5rZxchwYmE1wLLfDXdBFkcjiXuUTXCgh/JUbfeLszOijjDk4GbnUSm4CXbZG
-+QceowTLuoFuUILGsWXYyYYi1n9ZAqSyPFBYMGA9ze3zA7sISOo=
-=FOzl
------END PGP SIGNATURE-----
-
---qMm9M+Fa2AknHoGS--
-
+r~
 
