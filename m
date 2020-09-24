@@ -2,111 +2,72 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9C3CC4727D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:05:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89038C4346E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:07:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B02C2376F
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:05:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nBVorUaS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B02C2376F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 19C31206CD
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:07:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19C31206CD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLNBg-0006QM-Gl
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:05:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60634)
+	id 1kLNDS-0008UU-40
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:07:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33916)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mhartmay@linux.ibm.com>)
- id 1kLN6Z-0001pO-LO; Thu, 24 Sep 2020 04:59:55 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63036)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kLNAd-0005N3-Um
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:04:08 -0400
+Resent-Date: Thu, 24 Sep 2020 05:04:07 -0400
+Resent-Message-Id: <E1kLNAd-0005N3-Um@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21336)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mhartmay@linux.ibm.com>)
- id 1kLN6U-0002fQ-TG; Thu, 24 Sep 2020 04:59:55 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 08O8RuII177142; Thu, 24 Sep 2020 04:59:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=Zvj8C4onBmEwqW8yzzE32mGeDza3Urhl1rCElcvmUgc=;
- b=nBVorUaSQTgJ0VZUmbdmOvSNBDhDPAe0XkypxG5oNV07GxBLaYTY8srqgVW6pPnWSHRS
- EjATPxcDkwNfvZymnzlboXUvZj8s5O2kAV+6HC7jqyQblrgv3q6EvnTXk76DRXELkDmd
- r4fCvXzc9wCR6Z/nPcsEublDyNyvTXVkg0QT2tsGyYk4dfFdt/1Q4WtTgIY925RedJ7C
- y/aaj9czlqr09BjNKFAtTMGKE0sCT0ZDmqRyr3p8UA51XueqQ+XTuz7rXsLc3p5ODEHc
- kIBEGnSGRk+Lz6V+l5swZKyksntqoVj1MGKrtJfR90hYd5b8x1FCnHlZdyZdW3FlDbWq Ew== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33rqyggt2w-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 24 Sep 2020 04:59:46 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08O8Rrfk176784;
- Thu, 24 Sep 2020 04:59:46 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com
- [159.122.73.72])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33rqyggt1u-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 24 Sep 2020 04:59:45 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
- by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08O8wPiL020756;
- Thu, 24 Sep 2020 08:59:43 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com
- (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
- by ppma06fra.de.ibm.com with ESMTP id 33n98gtmtu-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 24 Sep 2020 08:59:43 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 08O8xeG134603460
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 24 Sep 2020 08:59:40 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A31A64C040;
- Thu, 24 Sep 2020 08:59:40 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 431CB4C044;
- Thu, 24 Sep 2020 08:59:40 +0000 (GMT)
-Received: from marcibm.ibmuc.com (unknown [9.145.161.19])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 24 Sep 2020 08:59:40 +0000 (GMT)
-From: Marc Hartmayer <mhartmay@linux.ibm.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH 0/3] pc-bios: s390x: fix corner cases in booting from ECKD
-Date: Thu, 24 Sep 2020 10:59:23 +0200
-Message-Id: <20200924085926.21709-1-mhartmay@linux.ibm.com>
-X-Mailer: git-send-email 2.26.2
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kLNAW-0003JP-RD
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:04:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1600938231; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=TWd25W6wWXngp+PWwZOsUiAbalDapkP00AW7zho3w898uoHG/ZXyyVgneKKtkVRaytUjhC8mX48kG5TyhuW2zewWJDjov2upuY/NiZdk1jG5CYTmWGBQmPQJxPj+qx4TvD/wKODmsotWf6SSowfxu1b1UABL+LmgiGiZX2oMHUs=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1600938231;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=LESyqMO+YynnZBqjzGxs1ZIXGrio6kIRTOhh0Kmke9U=; 
+ b=MK24Hr6IMtYjhYgojg/Dbks1YSB7GrvJA3p7lI8RP3Hq3U7XwlQRTl6QS1JUjSnz1STgwwGJGQ10o9QzktaSwAodAJPqFU73PbW4o1D9cMQiW9Ppq7PKKAvCguzUOWiQF4sE/gniohk8dBQEJCZDM0aJzqrDXqB8Dw3QTEelfHU=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1600938230784668.4938155603958;
+ Thu, 24 Sep 2020 02:03:50 -0700 (PDT)
+Subject: Re: [RFC PATCH v3 0/7] Use ACPI PCI hot-plug for Q35
+Message-ID: <160093822936.759.17698136551159882588@66eaa9a8a123>
+In-Reply-To: <20200924070013.165026-1-jusual@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-09-24_05:2020-09-24,
- 2020-09-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 mlxscore=0
- suspectscore=0 adultscore=0 lowpriorityscore=0 phishscore=0
- mlxlogscore=675 bulkscore=0 spamscore=0 malwarescore=0 priorityscore=1501
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009240062
-Received-SPF: pass client-ip=148.163.156.1;
- envelope-from=mhartmay@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 04:59:47
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
-X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: jusual@redhat.com
+Date: Thu, 24 Sep 2020 02:03:50 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 04:58:01
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -120,31 +81,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Janosch Frank <frankja@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
- Thomas Huth <thuth@redhat.com>, "Collin L. Walling" <walling@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: ani@anisinha.ca, imammedo@redhat.com, jusual@redhat.com,
+ qemu-devel@nongnu.org, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The first patch fixes the scan for the string "zIPL" (which is used to
-detect the start of the boot menu banner) in
-`find_zipl_boot_menu_banner`. The second patch fixes the bug of not
-booting the default entry if no zipl boot menu data was found.
-
-For everybody's convenience there is a branch:
-https://gitlab.com/mhartmay/qemu/-/tree/bios_fixes
-
-Marc Hartmayer (3):
-  pc-bios/s390-ccw: fix off-by-one error
-  pc-bios/s390-ccw: break loop if a null block number is reached
-  pc-bios/s390-ccw: Update s390-ccw.img bios binary
-
- pc-bios/s390-ccw.img       | Bin 42608 -> 42608 bytes
- pc-bios/s390-ccw/bootmap.c |   4 ++--
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
--- 
-2.25.4
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkyNDA3MDAxMy4xNjUw
+MjYtMS1qdXN1YWxAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRv
+Y2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNv
+bW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxs
+ZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0xIE5F
+VFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0xIEo9
+MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpDIGxpbmtlciBmb3IgdGhlIGhv
+c3QgbWFjaGluZTogY2MgbGQuYmZkIDIuMjctNDMKSG9zdCBtYWNoaW5lIGNwdSBmYW1pbHk6IHg4
+Nl82NApIb3N0IG1hY2hpbmUgY3B1OiB4ODZfNjQKLi4vc3JjL21lc29uLmJ1aWxkOjEwOiBXQVJO
+SU5HOiBNb2R1bGUgdW5zdGFibGUta2V5dmFsIGhhcyBubyBiYWNrd2FyZHMgb3IgZm9yd2FyZHMg
+Y29tcGF0aWJpbGl0eSBhbmQgbWlnaHQgbm90IGV4aXN0IGluIGZ1dHVyZSByZWxlYXNlcy4KUHJv
+Z3JhbSBzaCBmb3VuZDogWUVTClByb2dyYW0gcHl0aG9uMyBmb3VuZDogWUVTICgvdXNyL2Jpbi9w
+eXRob24zKQpDb25maWd1cmluZyBuaW5qYXRvb2wgdXNpbmcgY29uZmlndXJhdGlvbgotLS0KTGlu
+a2luZyB0YXJnZXQgdGVzdHMvdGVzdC1yZXBsaWNhdGlvbgpsaWJjb21tb24uZmEucC9od19wY2lf
+cGNpZS5jLm86IEluIGZ1bmN0aW9uIGBhY3BpX3BjaWhwX2VuYWJsZWQnOgovdG1wL3FlbXUtdGVz
+dC9idWlsZC8uLi9zcmMvaHcvcGNpL3BjaWUuYzo1MjI6IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8g
+YG9iamVjdF9yZXNvbHZlX3R5cGVfdW5hbWJpZ3VvdXMnCmNvbGxlY3QyOiBlcnJvcjogbGQgcmV0
+dXJuZWQgMSBleGl0IHN0YXR1cwptYWtlOiAqKiogW3FlbXUtc3lzdGVtLWFhcmNoNjRdIEVycm9y
+IDEKbWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KVHJhY2ViYWNrICht
+b3N0IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIs
+IGxpbmUgNzA5LCBpbiA8bW9kdWxlPgotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihy
+ZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1
+ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLXJtJywgJy0tbGFiZWwnLCAnY29tLnFlbXUu
+aW5zdGFuY2UudXVpZD0zODY0NDY5MGE5OTM0MjI2YjdlNzEwOGVhNDM5MDUzMCcsICctdScsICcx
+MDAzJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctZScsICdUQVJH
+RVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1l
+JywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPTEnLCAnLWUnLCAnQ0NB
+Q0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldzIvLmNhY2hlL3Fl
+bXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRj
+aGV3LXRlc3Rlci10bXAtMmpxcWV4MGovc3JjL2RvY2tlci1zcmMuMjAyMC0wOS0yNC0wNC41OS4w
+Ni40NjYyOi92YXIvdG1wL3FlbXU6eixybycsICdxZW11L2NlbnRvczcnLCAnL3Zhci90bXAvcWVt
+dS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpm
+aWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD0zODY0NDY5MGE5OTM0
+MjI2YjdlNzEwOGVhNDM5MDUzMAptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFr
+ZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0yanFx
+ZXgwai9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRvczddIEVycm9y
+IDIKCnJlYWwgICAgNG00My4yMzdzCnVzZXIgICAgMG0yMC42MDNzCgoKVGhlIGZ1bGwgbG9nIGlz
+IGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDkyNDA3MDAxMy4xNjUw
+MjYtMS1qdXN1YWxAcmVkaGF0LmNvbS90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBl
+PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
+dy1kZXZlbEByZWRoYXQuY29t
 
