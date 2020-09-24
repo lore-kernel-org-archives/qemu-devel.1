@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D17A7C4727D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:37:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D948C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:37:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20011206B6
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:37:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B146A206B6
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:37:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GANcq/8D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20011206B6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U0D5PTAq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B146A206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLNh9-0002sM-4v
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:37:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38710)
+	id 1kLNhB-00031q-Lb
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:37:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTa-0000iS-IN
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32733)
+ id 1kLNTe-0000oD-Vr
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35716)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTX-00060t-0v
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:42 -0400
+ id 1kLNTa-00061P-8a
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600939418;
+ s=mimecast20190719; t=1600939420;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=EPROH+rhHGc+CfF7H9/smITvRehkFbJS47wGwzU6KXY=;
- b=GANcq/8DtxpoUiYVfsXw7yyVBeqk6X4ZmIgNo5uyStr3dGcbBJ3MeId5AW9PoFhOGPQC8M
- uG2axjEd/HuXTQXKoA3KxHZkzENlQ2hjitOkoVH/XKAsqLQvCaL8zdewwo0qZx/fUYF+h8
- addqOxKqp5iTsIsNo09sj3zcQe2VvtY=
+ bh=Igs+H3Iu0y3nrqYjBGkuLRkYdP2VeERkZHr5KyQDBvA=;
+ b=U0D5PTAqclxW91Xhq1eQqxhaTpKFJvYlZqHyG/R2jwhEV7mnYqK9s2+eUAhy8wqFsi9o2E
+ qGr0oY4URtGhmjWFCOkYTNXXHtEoVtGvPN00hn4yulIP08xnOBVHRnIQqRP9u54CYt8YIL
+ MfNh4Cw+7KtXCY0CYlO3Uo5uiWEMQ8E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17-JmC51qrhMcaa_PtejuCHwQ-1; Thu, 24 Sep 2020 05:23:36 -0400
-X-MC-Unique: JmC51qrhMcaa_PtejuCHwQ-1
+ us-mta-321-hsua_SiDNXuETOu8me3dSw-1; Thu, 24 Sep 2020 05:23:36 -0400
+X-MC-Unique: hsua_SiDNXuETOu8me3dSw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE35B64144;
- Thu, 24 Sep 2020 09:23:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 378EA1891E83;
+ Thu, 24 Sep 2020 09:23:35 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6B0C173672;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D971173662;
  Thu, 24 Sep 2020 09:23:34 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 21/92] hw/char/serial: Remove old DEBUG_SERIAL commented code
-Date: Thu, 24 Sep 2020 05:22:03 -0400
-Message-Id: <20200924092314.1722645-22-pbonzini@redhat.com>
+Subject: [PULL 22/92] hw/char/serial: Rename I/O read/write trace events
+Date: Thu, 24 Sep 2020 05:22:04 -0400
+Message-Id: <20200924092314.1722645-23-pbonzini@redhat.com>
 In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
 References: <20200924092314.1722645-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -104,54 +104,59 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-All useful DPRINTF() calls have been converted to trace
-events.  Remove a pointless one in the IOEventHandler,
-and drop the DEBUG_SERIAL ifdef'ry.
+The serial_mm_read/write() handlers from the TYPE_SERIAL_MM device
+call the serial_ioport_read/write() handlers with shifted offset.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+When looking at the trace events from this MMIO device, it is
+confusing to read the accesses as I/O. Simplify using generic
+trace event names which make sense the various uses.
+
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20200907015535.827885-4-f4bug@amsat.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200907015535.827885-5-f4bug@amsat.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/char/serial.c | 11 -----------
- 1 file changed, 11 deletions(-)
+ hw/char/serial.c     | 4 ++--
+ hw/char/trace-events | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/hw/char/serial.c b/hw/char/serial.c
-index e8029f840a..26f7fa8a21 100644
+index 26f7fa8a21..7b5ef872bd 100644
 --- a/hw/char/serial.c
 +++ b/hw/char/serial.c
-@@ -36,8 +36,6 @@
- #include "trace.h"
- #include "hw/qdev-properties.h"
- 
--//#define DEBUG_SERIAL
--
- #define UART_LCR_DLAB	0x80	/* Divisor latch access bit */
- 
- #define UART_IER_MSI	0x08	/* Enable Modem status interrupt */
-@@ -102,14 +100,6 @@
- 
- #define MAX_XMIT_RETRY      4
- 
--#ifdef DEBUG_SERIAL
--#define DPRINTF(fmt, ...) \
--do { fprintf(stderr, "serial: " fmt , ## __VA_ARGS__); } while (0)
--#else
--#define DPRINTF(fmt, ...) \
--do {} while (0)
--#endif
--
- static void serial_receive1(void *opaque, const uint8_t *buf, int size);
- static void serial_xmit(SerialState *s);
- 
-@@ -636,7 +626,6 @@ static void serial_receive1(void *opaque, const uint8_t *buf, int size)
- static void serial_event(void *opaque, QEMUChrEvent event)
- {
+@@ -333,7 +333,7 @@ static void serial_ioport_write(void *opaque, hwaddr addr, uint64_t val,
      SerialState *s = opaque;
--    DPRINTF("event %x\n", event);
-     if (event == CHR_EVENT_BREAK)
-         serial_receive_break(s);
+ 
+     assert(size == 1 && addr < 8);
+-    trace_serial_ioport_write(addr, val);
++    trace_serial_write(addr, val);
+     switch(addr) {
+     default:
+     case 0:
+@@ -550,7 +550,7 @@ static uint64_t serial_ioport_read(void *opaque, hwaddr addr, unsigned size)
+         ret = s->scr;
+         break;
+     }
+-    trace_serial_ioport_read(addr, ret);
++    trace_serial_read(addr, ret);
+     return ret;
  }
+ 
+diff --git a/hw/char/trace-events b/hw/char/trace-events
+index 17304bef26..609df10fed 100644
+--- a/hw/char/trace-events
++++ b/hw/char/trace-events
+@@ -5,8 +5,8 @@ parallel_ioport_read(const char *desc, uint16_t addr, uint8_t value) "read [%s]
+ parallel_ioport_write(const char *desc, uint16_t addr, uint8_t value) "write [%s] addr 0x%02x val 0x%02x"
+ 
+ # serial.c
+-serial_ioport_read(uint16_t addr, uint8_t value) "read addr 0x%02x val 0x%02x"
+-serial_ioport_write(uint16_t addr, uint8_t value) "write addr 0x%02x val 0x%02x"
++serial_read(uint16_t addr, uint8_t value) "read addr 0x%02x val 0x%02x"
++serial_write(uint16_t addr, uint8_t value) "write addr 0x%02x val 0x%02x"
+ serial_update_parameters(uint64_t baudrate, char parity, int data_bits, int stop_bits) "baudrate=%"PRIu64" parity='%c' data=%d stop=%d"
+ 
+ # virtio-serial-bus.c
 -- 
 2.26.2
 
