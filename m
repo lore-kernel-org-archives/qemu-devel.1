@@ -2,94 +2,88 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC367C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 11:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53A34C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 11:27:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27D8F2395B
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 11:27:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BD16A2395B
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 11:27:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PjIW+Bmg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27D8F2395B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hA+5/RhN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD16A2395B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLPPX-00009A-67
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 07:27:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38038)
+	id 1kLPPc-0000R8-Qj
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 07:27:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39528)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kLPGZ-0004TG-Ol; Thu, 24 Sep 2020 07:18:23 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33029)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kLPGY-0003wH-6Z; Thu, 24 Sep 2020 07:18:23 -0400
-Received: by mail-wr1-x442.google.com with SMTP id m6so3416564wrn.0;
- Thu, 24 Sep 2020 04:18:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=3cUAmcXEySvZuiPUDhUwrBrWEw0aliYA7aOM+n1UWOI=;
- b=PjIW+BmgLsKEZY9qkfmsSor2H6j+T9xbonpSLJspIo4y+RTfBJMul+RxYn7a4He+4w
- Ld24PDO5BYIypImJBU/eFoYoPY/2uuP2Bs1smRGvb2HjzWDnoTM+ANM1lPTdiG7QqsKh
- pJlDjhWHINAuZuB5FmExPCJqKtdgOY8I0CVznXDzM2W28Tipjov1U4hm5LeQDQ5kwN5v
- 0pNbsOuY2UCAMsD3DInDcDGmE6n/QSiA+miMXoLDJMA9QcUxqXoPWzm/3SpjDXgAg/uO
- 6CayQHcGRqsP+j2DKN6wrL9rvgcE5MkYuMRos1lf7eZbMKM5VlVl537oqENNPiWb/lPF
- HCFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=3cUAmcXEySvZuiPUDhUwrBrWEw0aliYA7aOM+n1UWOI=;
- b=QG36ae7IMA3CJEPdoAHlpMN+If9L8ILPBkSRsNkPm7QQLoNLu5qDQQtwnMAf4DO9IA
- k+zF0tePBrMklbMlhIizZ3B1XSw9vOv6AsOk+ZwUJ5FPYUxtOOCdxq2JrY/v21VH4x47
- 4bjvoaAV1JvhNnJQmWwJZg7M2mTv4kUjdGpVwrb8hhEwA5+vCJU/K9O19V6+LO8bX98y
- uMuWYgsN0aCmt+ZVwzHj415ua39guFGi6/OlErNCWNBEskk0PelS83Hw5dLlxT51KtNb
- zMt8iBVHF2R3dgzbr5l3JSEZHHr+YFdQFP+qh65XTu26NdoBHktEH725ZQtzKujPu1uN
- MKhA==
-X-Gm-Message-State: AOAM530Rhi07kX1toI27HCRUCnOc7FrQuMAyGE0i621DsQl7h0Drju5s
- 2jAjSco4UukFhv5kPX7RpOwLTC5ytEE=
-X-Google-Smtp-Source: ABdhPJw9RQ3k2RuaETV+Qs200DJcOncAxypTluLRxCKJ70WlPG1KXYtGtRGmS1oNylqNNeiSriak4g==
-X-Received: by 2002:adf:eb86:: with SMTP id t6mr4494533wrn.411.1600946300289; 
- Thu, 24 Sep 2020 04:18:20 -0700 (PDT)
-Received: from x1w.redhat.com (234.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.234])
- by smtp.gmail.com with ESMTPSA id h76sm3400363wme.10.2020.09.24.04.18.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Sep 2020 04:18:19 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 8/8] hw/arm/raspi: Remove use of the 'version' value in the
- board code
-Date: Thu, 24 Sep 2020 13:18:08 +0200
-Message-Id: <20200924111808.77168-9-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200924111808.77168-1-f4bug@amsat.org>
-References: <20200924111808.77168-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kLPMd-0004pv-29
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 07:24:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60193)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kLPMB-0004ZT-FT
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 07:24:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600946650;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=lbjEMjmXxh9sGQhB/+Im41pv1jla9LL6zlkMThvXYP0=;
+ b=hA+5/RhNfLBs1pKrr0URlogCUA6/x122Ov4DGASnkgGlhJ2cDCvRUNkSI0eyJHslk2PSXV
+ yFYZ7viSOtzmkRWNo1L3n5ERgcJFzffHrr+aHH757MGhVkSESSX6JBGzMqELRcQ9G4NDaM
+ WGtG7jzxbNnBnbHhTvcKkJB9JdyHvy0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-163-Su90VoSPPK-EeXuUowqgFw-1; Thu, 24 Sep 2020 07:24:06 -0400
+X-MC-Unique: Su90VoSPPK-EeXuUowqgFw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD0DD1091068;
+ Thu, 24 Sep 2020 11:24:04 +0000 (UTC)
+Received: from localhost (ovpn-114-5.ams2.redhat.com [10.36.114.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7908578827;
+ Thu, 24 Sep 2020 11:24:04 +0000 (UTC)
+Date: Thu, 24 Sep 2020 12:24:03 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v8 2/7] block/io: refactor coroutine wrappers
+Message-ID: <20200924112403.GU62770@stefanha-x1.localdomain>
+References: <20200915164411.20590-1-vsementsov@virtuozzo.com>
+ <20200915164411.20590-3-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.248,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+In-Reply-To: <20200915164411.20590-3-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="8Tx+BDMK09J610+l"
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,107 +96,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- Luc Michel <luc.michel@greensocs.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>
+Cc: fam@euphon.net, kwolf@redhat.com, ehabkost@redhat.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
+ crosa@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We expected the 'version' ID to match the board processor ID,
-but this is not always true (for example boards with revision
-id 0xa02042/0xa22042 are Raspberry Pi 2 with a BCM2837 SoC).
-This was not important because we were not modelling them, but
-since the recent refactor now allow to model these boards, it
-is safer to check the processor id directly. Remove the version
-check.
+--8Tx+BDMK09J610+l
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/arm/raspi.c | 29 +++++++++++++----------------
- 1 file changed, 13 insertions(+), 16 deletions(-)
+On Tue, Sep 15, 2020 at 07:44:06PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> Most of our coroutine wrappers already follow this convention:
+>=20
+> We have 'coroutine_fn bdrv_co_<something>(<normal argument list>)' as
+> the core function, and a wrapper 'bdrv_<something>(<same argument
+> list>)' which does parameters packing and call bdrv_run_co().
+>=20
+> The only outsiders are the bdrv_prwv_co and
+> bdrv_common_block_status_above wrappers. Let's refactor them to behave
+> as the others, it simplifies further conversion of coroutine wrappers.
+>=20
+> This patch adds indirection layer, but it will be compensated by
+> further commit, which will drop bdrv_co_prwv together with is_write
+> logic, to keep read and write path separate.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+>  block/io.c | 60 +++++++++++++++++++++++++++++-------------------------
+>  1 file changed, 32 insertions(+), 28 deletions(-)
 
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index ae98a2fbfca..b5b30f0f38f 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -98,11 +98,6 @@ static RaspiProcessorId board_processor_id(uint32_t board_rev)
-     return proc_id;
- }
- 
--static int board_version(uint32_t board_rev)
--{
--    return board_processor_id(board_rev) + 1;
--}
--
- static const char *board_soc_type(uint32_t board_rev)
- {
-     return soc_property[board_processor_id(board_rev)].type;
-@@ -201,7 +196,8 @@ static void reset_secondary(ARMCPU *cpu, const struct arm_boot_info *info)
-     cpu_set_pc(cs, info->smp_loader_start);
- }
- 
--static void setup_boot(MachineState *machine, int version, size_t ram_size)
-+static void setup_boot(MachineState *machine, RaspiProcessorId processor_id,
-+                       size_t ram_size)
- {
-     RaspiMachineState *s = RASPI_MACHINE(machine);
-     int r;
-@@ -210,12 +206,13 @@ static void setup_boot(MachineState *machine, int version, size_t ram_size)
-     s->binfo.ram_size = ram_size;
-     s->binfo.nb_cpus = machine->smp.cpus;
- 
--    if (version <= 2) {
--        /* The rpi1 and 2 require some custom setup code to run in Secure
--         * mode before booting a kernel (to set up the SMC vectors so
--         * that we get a no-op SMC; this is used by Linux to call the
-+    if (processor_id <= PROCESSOR_ID_BCM2836) {
-+        /*
-+         * The BCM2835 and BCM2836 require some custom setup code to run
-+         * in Secure mode before booting a kernel (to set up the SMC vectors
-+         * so that we get a no-op SMC; this is used by Linux to call the
-          * firmware for some cache maintenance operations.
--         * The rpi3 doesn't need this.
-+         * The BCM2837 doesn't need this.
-          */
-         s->binfo.board_setup_addr = BOARDSETUP_ADDR;
-         s->binfo.write_board_setup = write_board_setup;
-@@ -223,10 +220,10 @@ static void setup_boot(MachineState *machine, int version, size_t ram_size)
-         s->binfo.secure_boot = true;
-     }
- 
--    /* Pi2 and Pi3 requires SMP setup */
--    if (version >= 2) {
-+    /* BCM2836 and BCM2837 requires SMP setup */
-+    if (processor_id >= PROCESSOR_ID_BCM2836) {
-         s->binfo.smp_loader_start = SMPBOOT_ADDR;
--        if (version == 2) {
-+        if (processor_id == PROCESSOR_ID_BCM2836) {
-             s->binfo.write_secondary_boot = write_smpboot;
-         } else {
-             s->binfo.write_secondary_boot = write_smpboot64;
-@@ -260,7 +257,6 @@ static void raspi_machine_init(MachineState *machine)
-     RaspiMachineClass *mc = RASPI_MACHINE_GET_CLASS(machine);
-     RaspiMachineState *s = RASPI_MACHINE(machine);
-     uint32_t board_rev = mc->board_rev;
--    int version = board_version(board_rev);
-     uint64_t ram_size = board_ram_size(board_rev);
-     uint32_t vcram_size;
-     DriveInfo *di;
-@@ -301,7 +297,8 @@ static void raspi_machine_init(MachineState *machine)
- 
-     vcram_size = object_property_get_uint(OBJECT(&s->soc), "vcram-size",
-                                           &error_abort);
--    setup_boot(machine, version, machine->ram_size - vcram_size);
-+    setup_boot(machine, board_processor_id(mc->board_rev),
-+               machine->ram_size - vcram_size);
- }
- 
- static void raspi_machine_class_common_init(MachineClass *mc,
--- 
-2.26.2
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--8Tx+BDMK09J610+l
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9sgdMACgkQnKSrs4Gr
+c8hi6gf9E8GXn8H8iEJ5L2+Dt96y7PmdzawX78o756UUfmfBiOYPc2+OCxnunFQ6
+79qB9N8VMO/iTjpIyDuQ1FXtZk5v1uZ6nvSjW4MZXWHOXrXeNooQ1GVKs/Aoql9j
+++t7tkJXu6Zw3mohCULjtluyiDHpNyQRv4xn1XfFLziLVfSIA3B0+g8Mdw74ccQ0
+hjUcV17bwBcBWcx+l+5jejSBNZFRw4SbSDGUYOWRhLBIYgy+lH9JiH82uScPUYBj
+07BQQYm9JjoMU8rLJTHH7dQIT+XEER/rYZQB0LbpJaqzyYpXn7i7KfnyP9oMy2Vx
+jhoCZDcHjR/nZEQDMZSYyTofZfd8cw==
+=31Hw
+-----END PGP SIGNATURE-----
+
+--8Tx+BDMK09J610+l--
 
 
