@@ -2,80 +2,93 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1DC4C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:05:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5FC5C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:06:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30D392067B
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:05:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 131622399A
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:06:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A3Xp9N1K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30D392067B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CPZdJiSO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 131622399A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLO8Q-0002W4-16
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 06:05:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39188)
+	id 1kLO9A-0003YJ-27
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 06:06:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39902)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTx-0001Wo-W6
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24318)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kLNV2-0003Rw-Pp
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:25:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46819)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTw-00067o-27
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:05 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kLNUs-0006IV-5o
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:25:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600939443;
+ s=mimecast20190719; t=1600939501;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0oqdwKIol3TeyBC9JBnbi8HPeCxqWfu6IT9P7TbZoq0=;
- b=A3Xp9N1K0C5XAbOtvroixgkf+JUSVnmDExxpScqofm4+zAcDOPlf7HwQCZO7bx29PpHBDf
- OEoyFrcq6nCnC0uoxOaJqVLeLjXE7pp53fq81XZ5GFJdOtD2HREzE+Hj1YB0DK9ba5ew4u
- Pp0aizgvuXKFvVkjBBZsbK18chnWq3w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-341-pBiIW4bVN2WJY6-9mV_49g-1; Thu, 24 Sep 2020 05:24:01 -0400
-X-MC-Unique: pBiIW4bVN2WJY6-9mV_49g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BD2581F00B;
- Thu, 24 Sep 2020 09:24:00 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 111775C269;
- Thu, 24 Sep 2020 09:23:54 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 53/92] exec: Remove MemoryRegion::global_locking field
-Date: Thu, 24 Sep 2020 05:22:35 -0400
-Message-Id: <20200924092314.1722645-54-pbonzini@redhat.com>
-In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
-References: <20200924092314.1722645-1-pbonzini@redhat.com>
+ bh=WOj0UoCbyhYx+K0KBG0mqBosqIEqtatBdEFIdAs4yCY=;
+ b=CPZdJiSODJXyHL9inbJ9cf+D7lzKeXJWfPd9U0kYwH7pXUSMJfv+J4o5EKID8iDwoxeCFh
+ 6Q+suKuOhp9frpsUURtMzqDHaAX9i41T938SDvoa8e9OuO+VRtBv16QrSNfL01l9+vr/LX
+ 5WiEYqQ0GYvreYjFmQMBv4HudFZs2gU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-382-PQ2GF-dROyGvItMjbA4i6g-1; Thu, 24 Sep 2020 05:24:59 -0400
+X-MC-Unique: PQ2GF-dROyGvItMjbA4i6g-1
+Received: by mail-wm1-f70.google.com with SMTP id a7so1011331wmc.2
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 02:24:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=WOj0UoCbyhYx+K0KBG0mqBosqIEqtatBdEFIdAs4yCY=;
+ b=qpKvnnzlJQv6v3Ebsk79s+ZOcHx6flO2cZx0poLTXza1vtZMska80ZY1UG5VMYkVcU
+ e3Bav8LqhhoLMZ6fMqnYr/M5H8YlZhLPQJbaXaBMm/yKm+Z4NnuXSgMKDFgtPGdIGyRJ
+ MVEsPEGgAzHVYCFOwCQvm/KNA0trlI+KvFM+k8k8JrYVNFnPyMv7nFwW9fh0bOMxDRJ/
+ CeV5za6Nx8Irf8n8PjLV608u1+m3fnXM6ltAn2eArVine5Gd4kgV/bvLwIVp4BArfjAR
+ hEruyhJ+6ugPHd2B6Mbfgd8LkObf5gojpTO/CaaeyOt17bQLWIgdL7TCIHUv0AJ3YjYw
+ xtvA==
+X-Gm-Message-State: AOAM531YE38b8YAMBnpt+P0ca8T+HwQEJW8J34LwaKXy9nRcU39cBeOs
+ Qth+N/WYZ2fEZE4TDIrZwGFsp9PrxRqDEV3qpSI9T8yLK6AJGlg7s2rT+tGkI5h1zqR7M+9YfHL
+ EqawO5p0C6b52xIE=
+X-Received: by 2002:a7b:c359:: with SMTP id l25mr3586019wmj.125.1600939498247; 
+ Thu, 24 Sep 2020 02:24:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxvn5veaSLw8HLXeovR9GN1g/+kpEDCZsU6VXY8NuXNKZ2fiY2PxMjogmq175AySoHH/WFIFw==
+X-Received: by 2002:a7b:c359:: with SMTP id l25mr3585984wmj.125.1600939498044; 
+ Thu, 24 Sep 2020 02:24:58 -0700 (PDT)
+Received: from redhat.com (bzq-79-179-71-128.red.bezeqint.net. [79.179.71.128])
+ by smtp.gmail.com with ESMTPSA id t202sm2899634wmt.14.2020.09.24.02.24.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 24 Sep 2020 02:24:57 -0700 (PDT)
+Date: Thu, 24 Sep 2020 05:24:53 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH v4] introduce vfio-user protocol specification
+Message-ID: <20200924052051-mutt-send-email-mst@kernel.org>
+References: <1594984851-59327-1-git-send-email-thanos.makatos@nutanix.com>
+ <1600180157-74760-1-git-send-email-thanos.makatos@nutanix.com>
+ <20200924082132.GJ62770@stefanha-x1.localdomain>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200924082132.GJ62770@stefanha-x1.localdomain>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -96,128 +109,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: benjamin.walker@intel.com, elena.ufimtseva@oracle.com,
+ tomassetti.andrea@gmail.com, John G Johnson <john.g.johnson@oracle.com>,
+ jag.raman@oracle.com, james.r.harris@intel.com, swapnil.ingle@nutanix.com,
+ konrad.wilk@oracle.com, yuvalkashtan@gmail.com, felipe@nutanix.com,
+ qemu-devel@nongnu.org, raphael.norwitz@nutanix.com, ismael@linux.com,
+ alex.williamson@redhat.com, Kanth.Ghatraju@oracle.com,
+ marcandre.lureau@redhat.com, xiuchun.lu@intel.com,
+ Thanos Makatos <thanos.makatos@nutanix.com>, tina.zhang@intel.com,
+ changpeng.liu@intel.com, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Thu, Sep 24, 2020 at 09:21:32AM +0100, Stefan Hajnoczi wrote:
+> On Tue, Sep 15, 2020 at 07:29:17AM -0700, Thanos Makatos wrote:
+> > This patch introduces the vfio-user protocol specification (formerly
+> > known as VFIO-over-socket), which is designed to allow devices to be
+> > emulated outside QEMU, in a separate process. vfio-user reuses the
+> > existing VFIO defines, structs and concepts.
+> > 
+> > It has been earlier discussed as an RFC in:
+> > "RFC: use VFIO over a UNIX domain socket to implement device offloading"
+> > 
+> > Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> > Signed-off-by: Thanos Makatos <thanos.makatos@nutanix.com>
+> 
+> The approach looks promising. It's hard to know what changes will be
+> required when this is implemented, so let's not worry about getting
+> every detail of the spec right.
+> 
+> Now that there is a spec to start from, the next step is patches
+> implementing --device vfio-user-pci,chardev=<chardev> in
+> hw/vfio-user/pci.c (mirroring hw/vfio/).
+> 
+> It should be accompanied by a test in tests/. PCI-level testing APIS for
+> BARs, configuration space, interrupts, etc are available in
+> tests/qtest/libqos/pci.h. The test case needs to include a vfio-user
+> device backend interact with QEMU's vfio-user-pci implementation.
+> 
+> I think this spec can be merged in docs/devel/ now and marked as
+> "subject to change (not a stable public interface)".
+> 
+> After the details have been proven and any necessary changes have been
+> made the spec can be promoted to docs/interop/ as a stable public
+> interface. This gives the freedom to make changes discovered when
+> figuring out issues like disconnect/reconnect, live migration, etc that
+> can be hard to get right without a working implementation.
+> 
+> Does this approach sound good?
+> 
+> Also please let us know who is working on what so additional people can
+> get involved in areas that need work!
+> 
+> Stefan
 
-Last uses of memory_region_clear_global_locking() have been
-removed in commit 7070e085d4 ("acpi: mark PMTIMER as unlocked")
-and commit 08565552f7 ("cputlb: Move NOTDIRTY handling from I/O
-path to TLB path").
-Remove memory_region_clear_global_locking() and the now unused
-'global_locking' field in MemoryRegion.
+Problem we discovered with e.g. vhost is once you ship a management
+interface, people start using it immediately and it does not matter
+that you never promised stability.
 
-Reported-by: Alexander Bulekov <alxndr@bu.edu>
-Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20200806150726.962-1-philmd@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- accel/tcg/cputlb.c    |  4 ++--
- exec.c                |  2 +-
- include/exec/memory.h | 14 --------------
- softmmu/memory.c      |  6 ------
- 4 files changed, 3 insertions(+), 23 deletions(-)
+So I feel a good first step would be to limit this to only allow known
+in-tree devices, started/destroyed automatically by qemu when device is
+created.  This way lots of reconnect etc issues go away, and we don't
+commit to a stable protocol until we have a decent handle on how things
+will work in production.
 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index 6489abbf8c..4657a3b8a6 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -1053,7 +1053,7 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
-         cpu_io_recompile(cpu, retaddr);
-     }
- 
--    if (mr->global_locking && !qemu_mutex_iothread_locked()) {
-+    if (!qemu_mutex_iothread_locked()) {
-         qemu_mutex_lock_iothread();
-         locked = true;
-     }
-@@ -1114,7 +1114,7 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
-      */
-     save_iotlb_data(cpu, iotlbentry->addr, section, mr_offset);
- 
--    if (mr->global_locking && !qemu_mutex_iothread_locked()) {
-+    if (!qemu_mutex_iothread_locked()) {
-         qemu_mutex_lock_iothread();
-         locked = true;
-     }
-diff --git a/exec.c b/exec.c
-index e34b602bdf..bc55a92292 100644
---- a/exec.c
-+++ b/exec.c
-@@ -3136,7 +3136,7 @@ static bool prepare_mmio_access(MemoryRegion *mr)
-     bool unlocked = !qemu_mutex_iothread_locked();
-     bool release_lock = false;
- 
--    if (unlocked && mr->global_locking) {
-+    if (unlocked) {
-         qemu_mutex_lock_iothread();
-         unlocked = false;
-         release_lock = true;
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index ec9edee742..9f6468f346 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -404,7 +404,6 @@ struct MemoryRegion {
-     bool nonvolatile;
-     bool rom_device;
-     bool flush_coalesced_mmio;
--    bool global_locking;
-     uint8_t dirty_log_mask;
-     bool is_iommu;
-     RAMBlock *ram_block;
-@@ -1738,19 +1737,6 @@ void memory_region_set_flush_coalesced(MemoryRegion *mr);
-  */
- void memory_region_clear_flush_coalesced(MemoryRegion *mr);
- 
--/**
-- * memory_region_clear_global_locking: Declares that access processing does
-- *                                     not depend on the QEMU global lock.
-- *
-- * By clearing this property, accesses to the memory region will be processed
-- * outside of QEMU's global lock (unless the lock is held on when issuing the
-- * access request). In this case, the device model implementing the access
-- * handlers is responsible for synchronization of concurrency.
-- *
-- * @mr: the memory region to be updated.
-- */
--void memory_region_clear_global_locking(MemoryRegion *mr);
--
- /**
-  * memory_region_add_eventfd: Request an eventfd to be triggered when a word
-  *                            is written to a location.
-diff --git a/softmmu/memory.c b/softmmu/memory.c
-index d030eb6f7c..31b0c5250e 100644
---- a/softmmu/memory.c
-+++ b/softmmu/memory.c
-@@ -1221,7 +1221,6 @@ static void memory_region_initfn(Object *obj)
-     mr->ops = &unassigned_mem_ops;
-     mr->enabled = true;
-     mr->romd_mode = true;
--    mr->global_locking = true;
-     mr->destructor = memory_region_destructor_none;
-     QTAILQ_INIT(&mr->subregions);
-     QTAILQ_INIT(&mr->coalesced);
-@@ -2277,11 +2276,6 @@ void memory_region_clear_flush_coalesced(MemoryRegion *mr)
-     }
- }
- 
--void memory_region_clear_global_locking(MemoryRegion *mr)
--{
--    mr->global_locking = false;
--}
--
- static bool userspace_eventfd_warning;
- 
- void memory_region_add_eventfd(MemoryRegion *mr,
 -- 
-2.26.2
-
+MST
 
 
