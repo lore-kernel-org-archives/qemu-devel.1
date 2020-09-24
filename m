@@ -4,76 +4,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2C8AC4346E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 06:39:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BFCAC4727D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 06:41:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37F8D2311A
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 06:39:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6291C2376F
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 06:41:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a7wrk8n1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37F8D2311A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="StFRA6op"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6291C2376F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLKun-0003cc-BO
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 02:39:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57820)
+	id 1kLKwl-0004iZ-CT
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 02:41:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kLKje-0000KB-Ed
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 02:28:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38187)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kLKnt-000585-7E
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 02:32:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37871)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kLKjW-0001ib-Pz
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 02:28:02 -0400
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kLKnr-0002F1-AT
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 02:32:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600928878;
+ s=mimecast20190719; t=1600929146;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1mXW4YbhE8P8wqeut/V/y0A0w6VnjkPD/xM+kYr67uo=;
- b=a7wrk8n1NMN01WfFLyZWifjuunMoZ/UDwqM2vYDNRcv+iLbMgHGQ592+8sVy2jNTxKgnRs
- LtSpkVg31Khy+Lc8kJ4ey7PEHK1kxCE6rgvOXH4B0RZ444HNXL0ra/4P6YLhi9TdCCnRXN
- BB+/MV9qbaNMMdpa7G0kxCeCqUX4E2Y=
+ bh=1P+dtOg2XnFDEwzLxr1Z4bkSa2XUSWCRYOxeJYhs2As=;
+ b=StFRA6opg/viwqbr4cDGPajHkI0AcdrVpG+2tD8lvemc67V2iBiENU3zSEvHxj7j0M4TQu
+ 6uRwrvnBSzapHe423/cJPNmsOqnSd/YVs2TZlzTKzPpFY0LOsqcnSCPbEUvob7Nn4empf9
+ UA7+VxmDqo5MVPlTtdneDYZ/rMvWzSs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-128-nHoY7tMjMQyDgi0HBaz6fg-1; Thu, 24 Sep 2020 02:27:56 -0400
-X-MC-Unique: nHoY7tMjMQyDgi0HBaz6fg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-116-hFEAGNOMM2aNhD1k0v-QrQ-1; Thu, 24 Sep 2020 02:32:22 -0400
+X-MC-Unique: hFEAGNOMM2aNhD1k0v-QrQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8FD04801AC5;
- Thu, 24 Sep 2020 06:27:54 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
- [10.36.112.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9C8DC60E1C;
- Thu, 24 Sep 2020 06:27:45 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 4A5EB31F09; Thu, 24 Sep 2020 08:27:35 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 10/11] acpi/gpex: no reason to use a method for _CRS
-Date: Thu, 24 Sep 2020 08:27:33 +0200
-Message-Id: <20200924062734.22978-11-kraxel@redhat.com>
-In-Reply-To: <20200924062734.22978-1-kraxel@redhat.com>
-References: <20200924062734.22978-1-kraxel@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B88B9805EE8;
+ Thu, 24 Sep 2020 06:32:21 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6EFAD5D990;
+ Thu, 24 Sep 2020 06:32:17 +0000 (UTC)
+Date: Thu, 24 Sep 2020 08:32:15 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Ani Sinha <ani@anisinha.ca>
+Subject: Re: [PATCH v3] Add a comment in bios-tables-test.c to clarify the
+ reason behind approach
+Message-ID: <20200924083215.3ea5fd08@redhat.com>
+In-Reply-To: <CAARzgwxKJHAQr3SgzN7UHVxPjzu+sh14P7B22wBniJ0qcpJ-vQ@mail.gmail.com>
+References: <20200922100918.4200-1-ani@anisinha.ca>
+ <20200922132744.2faf4eea@redhat.com>
+ <CAARzgwxKJHAQr3SgzN7UHVxPjzu+sh14P7B22wBniJ0qcpJ-vQ@mail.gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=imammedo@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -96,60 +98,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Radoslaw Biernacki <rad@semihalf.com>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Leif Lindholm <leif@nuviainc.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-... just to return something which is constant anyway.
+On Tue, 22 Sep 2020 17:06:42 +0530
+Ani Sinha <ani@anisinha.ca> wrote:
 
--            Method (_CRS, 0, NotSerialized)  // _CRS: Current Resource Settings
--            {
--                Return (ResourceTemplate ()
--                {
--                    WordBusNumber (ResourceProducer, MinFixed, MaxFixed, PosDecode,
-[ ... ]
+> On Tue, Sep 22, 2020 at 4:57 PM Igor Mammedov <imammedo@redhat.com> wrote:
+> >
+> > On Tue, 22 Sep 2020 15:39:18 +0530
+> > Ani Sinha <ani@anisinha.ca> wrote:
+> >  
+> > > A comment blob is added in bios-tables-test.c that explains the reasoning
+> > > behind the process of updating the ACPI table blobs when new tests are added
+> > > or old tests are modified or code is committed that affect tests. The
+> > > explanation would help future contributors follow the correct process when
+> > > making code changes that affect ACPI tables.
+> > >
+> > > Signed-off-by: Ani Sinha <ani@anisinha.ca>  
+> >
+> > My English is not good enough for writing documentation.
+> > Maybe Eric will have something to suggest.
+> >  
+> > > ---
+> > >  tests/qtest/bios-tables-test.c | 13 ++++++++++++-
+> > >  1 file changed, 12 insertions(+), 1 deletion(-)
+> > >
+> > > Changelog:
+> > > v2: cosmetic - commit log reworded.
+> > > v3: review feedback incorporared and actual comment in the code reworded.
+> > >
+> > > diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
+> > > index b514b70b62..1e8838c8c6 100644
+> > > --- a/tests/qtest/bios-tables-test.c
+> > > +++ b/tests/qtest/bios-tables-test.c
+> > > @@ -11,7 +11,7 @@
+> > >   */
+> > >
+> > >  /*
+> > > - * How to add or update the tests:
+> > > + * How to add or update the tests or commit changes that affect ACPI tables:
+> > >   * Contributor:
+> > >   * 1. add empty files for new tables, if any, under tests/data/acpi
+> > >   * 2. list any changed files in tests/qtest/bios-tables-test-allowed-diff.h
+> > > @@ -38,6 +38,17 @@
+> > >   *      $(SRC_PATH)/tests/data/acpi/rebuild-expected-aml.sh
+> > >   * 6. Now commit any changes to the expected binary, include diff from step 4
+> > >   *    in commit log.
+> > > + *    The reason why we follow the above process is described below:
+> > > + *    After every commit we make sure that the unit tests are not broken. To do
+> > > + *    that, we could have committed the table updates along with the patches.  
+> > I'd drop upto here, it's obvious that that no patch should break build intentionally.  
+> 
+> I prefer to make this explicit. Build breakage != unit test breakage
+> all the time :-)
+when it comes to merge, broken test == broken build,
+in addition I don't like negative example.
+what we are missing currently is answer to "why" #is there,
+and that's is answered by below the rest is just distraction to me.
 
-+            Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
-+            {
-+                WordBusNumber (ResourceProducer, MinFixed, MaxFixed, PosDecode,
-[ ... ]
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/pci-host/gpex-acpi.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+> > Writing docs is hard, try to minimize amount of not really needed
+> > information.
+> >  
+> > > + *    However, expected binary updates needs to be a separate patch from the  
+> > s/However,//
+> >  
+> > > + *    code that introduces changes to ACPI tables. It lets maintainer to drop
+> > > + *    and regenerate binary updates in case of merge conflicts. Further, a code
+> > > + *    change is easily reviewable but a binary blob is not (without doing a
+> > > + *    diassemly).  
+> >  
+> > > + * Listing the modified table files additionally helps in
 
-diff --git a/hw/pci-host/gpex-acpi.c b/hw/pci-host/gpex-acpi.c
-index 6fb951a0c19f..dbb350a837f8 100644
---- a/hw/pci-host/gpex-acpi.c
-+++ b/hw/pci-host/gpex-acpi.c
-@@ -57,7 +57,6 @@ void acpi_dsdt_add_gpex(Aml *scope, struct GPEXConfig *cfg)
-     aml_append(method, aml_return(aml_int(cfg->ecam.base)));
-     aml_append(dev, method);
- 
--    method = aml_method("_CRS", 0, AML_NOTSERIALIZED);
-     Aml *rbuf = aml_resource_template();
-     aml_append(rbuf,
-         aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
-@@ -89,8 +88,7 @@ void acpi_dsdt_add_gpex(Aml *scope, struct GPEXConfig *cfg)
-                                     0x0000,
-                                     cfg->mmio64.size));
-     }
--    aml_append(method, aml_return(rbuf));
--    aml_append(dev, method);
-+    aml_append(dev, aml_name_decl("_CRS", rbuf));
- 
-     /* Declare an _OSC (OS Control Handoff) method */
-     aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
--- 
-2.27.0
+> > > + *    bisection in case things are broken.
+> > > + *    Hence, we have a multi-step process and at each step unit tests continue
+> > > + *    to pass.  
+> > I'd drop this part as well  
+> Why?
+
+It doesn't belong to #6 and most of it is just one of the possible
+justifications we can make up.
+#1 is about turning hard error into warning to let test pass while
+code being changed.
+Try to concise and do not add extra sentences unless you have to.
+
+> 
+> >
+> > with above corrections, I'm more or less fine with text so on that condition
+> > Acked-by: Igor Mammedov <imammedo@redhat.com>
+> > the rest is upto Michael.
+> >  
+> > >   * 7. Before sending patches to the list (Contributor)
+> > >   *    or before doing a pull request (Maintainer), make sure
+> > >   *    tests/qtest/bios-tables-test-allowed-diff.h is empty - this will ensure  
+> >  
+> 
 
 
