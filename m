@@ -2,88 +2,118 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 980C6C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 14:10:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15071C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 14:12:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC156212CC
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 14:10:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EEF14212CC
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 14:12:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BmPj/ibg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC156212CC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="msoKs9mM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEF14212CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLRx4-0006l9-T5
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 10:10:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53746)
+	id 1kLRyd-00005e-Ql
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 10:12:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53930)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kLRw1-0005um-0J
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 10:09:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59617)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kLRvy-0001Ge-JY
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 10:09:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600956556;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=sJQtHgOyLWYK80fTmZRzuLxHaHw+KZcYJByzDKwyuBk=;
- b=BmPj/ibg+Jz9xIm+Mzr8dMoF8WDBNlRkKHqtLfCnNcFLIhZUftyK2MBJAZHZDX9jpFLWQd
- 9blvWVQ+vncX7yAm8i0bsTZsCs2Nu3Rkr3q4NjM/oPRkoyF7DzUgbgZCZPjPtbuq+MJmQy
- JmPf7MMHvZnUOj/kTGEZ5654P8EtR4o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410--ylz-KWBODGLN5ERA4bwGQ-1; Thu, 24 Sep 2020 10:09:14 -0400
-X-MC-Unique: -ylz-KWBODGLN5ERA4bwGQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10059188C128;
- Thu, 24 Sep 2020 14:09:12 +0000 (UTC)
-Received: from gondolin (ovpn-112-247.ams2.redhat.com [10.36.112.247])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E342B1002C06;
- Thu, 24 Sep 2020 14:08:58 +0000 (UTC)
-Date: Thu, 24 Sep 2020 16:08:56 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v26 04/17] vfio: Add migration region initialization and
- finalize function
-Message-ID: <20200924160856.1308e6f5.cohuck@redhat.com>
-In-Reply-To: <1600817059-26721-5-git-send-email-kwankhede@nvidia.com>
-References: <1600817059-26721-1-git-send-email-kwankhede@nvidia.com>
- <1600817059-26721-5-git-send-email-kwankhede@nvidia.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <mhartmay@linux.ibm.com>)
+ id 1kLRwq-0006kT-At; Thu, 24 Sep 2020 10:10:14 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36868)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mhartmay@linux.ibm.com>)
+ id 1kLRwn-0001L7-VR; Thu, 24 Sep 2020 10:10:12 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 08OE2POb021727; Thu, 24 Sep 2020 10:10:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=CdVjKfKvUT64WRt79Q8UFmeZpAXQnilOuwjpHg/OGAw=;
+ b=msoKs9mMSsJRy0DFh3ZZBuLb2l9/De1+pY1xXEeMv7wLHeskAFJgbXjkbGV7/xjrcZxX
+ RxJyWpugifv3Rc22BoycUm2icD4hk05bsLpecVqpAFgTqyVi4bfrpui5EIFjpwxuSz7H
+ /2I1hsBs5Ss6yisGLxUG5H3Qu8lKKaEJXEPfsadDIM5UuwlMsm2hXb9uSJi9JaErJOCW
+ w1M6bxWzsgKG9Wk3NAJo/9th12vaLBvMmNk6vYObMNpyM+2M6uLbsjTvfXwHj81CZX2Z
+ pQffdbdmjLLXwid9mWPeUmYAOWt2Epmz2ClKFcgI8oIbHJlFBoaA4tkWtocYfaFNfB2k lg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33rvur8cc4-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 24 Sep 2020 10:10:07 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08OE3Ywh026980;
+ Thu, 24 Sep 2020 10:10:06 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.107])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33rvur8cae-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 24 Sep 2020 10:10:06 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+ by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08OE9AAd011009;
+ Thu, 24 Sep 2020 14:10:04 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com
+ (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+ by ppma03fra.de.ibm.com with ESMTP id 33p1f3ta12-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 24 Sep 2020 14:10:04 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 08OEA1oF32113070
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 24 Sep 2020 14:10:01 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 21D58AE056;
+ Thu, 24 Sep 2020 14:10:01 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A9593AE051;
+ Thu, 24 Sep 2020 14:10:00 +0000 (GMT)
+Received: from marcibm (unknown [9.145.161.105])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+ Thu, 24 Sep 2020 14:10:00 +0000 (GMT)
+From: Marc Hartmayer <mhartmay@linux.ibm.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Marc Hartmayer
+ <mhartmay@linux.ibm.com>, qemu-devel@nongnu.org
+Subject: Re: [PATCH 1/3] pc-bios/s390-ccw: fix off-by-one error
+In-Reply-To: <1382e6fb-4af4-00ff-958a-c109cadfad43@redhat.com>
+References: <20200924085926.21709-1-mhartmay@linux.ibm.com>
+ <20200924085926.21709-2-mhartmay@linux.ibm.com>
+ <1382e6fb-4af4-00ff-958a-c109cadfad43@redhat.com>
+Date: Thu, 24 Sep 2020 16:09:59 +0200
+Message-ID: <87o8lvnu4o.fsf@linux.ibm.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-24_08:2020-09-24,
+ 2020-09-24 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ lowpriorityscore=0 bulkscore=0 phishscore=0 clxscore=1015 impostorscore=0
+ spamscore=0 adultscore=0 mlxscore=0 malwarescore=0 mlxlogscore=999
+ suspectscore=1 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009240102
+Received-SPF: pass client-ip=148.163.156.1;
+ envelope-from=mhartmay@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 10:10:08
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
+X-Spam_bar: --
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,80 +126,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cjia@nvidia.com, aik@ozlabs.ru, Zhengxiao.zx@Alibaba-inc.com,
- shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, peterx@redhat.com,
- eauger@redhat.com, yi.l.liu@intel.com, quintela@redhat.com,
- ziye.yang@intel.com, armbru@redhat.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, felipe@nutanix.com, zhi.a.wang@intel.com,
- kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
- alex.williamson@redhat.com, changpeng.liu@intel.com, eskultet@redhat.com,
- Ken.Xue@amd.com, jonathan.davies@nutanix.com, pbonzini@redhat.com
+Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ Janosch Frank <frankja@linux.ibm.com>, "Collin L.
+ Walling" <walling@linux.ibm.com>, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 23 Sep 2020 04:54:06 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+On Thu, Sep 24, 2020 at 12:02 PM +0200, Philippe Mathieu-Daud=C3=A9 <philmd=
+@redhat.com> wrote:
+> Hi Marc,
+>
+> On 9/24/20 10:59 AM, Marc Hartmayer wrote:
+>> This error takes effect when the magic value "zIPL" is located at the
+>> end of a block. For example if s2_cur_blk =3D 0x7fe18000 and the magic
+>> value "zIPL" is located at 0x7fe18ffc - 0x7fe18fff.
+>>=20
+>> Fixes: ba831b25262a ("s390-ccw: read stage2 boot loader data to find men=
+u")
+>> Reviewed-by: Collin Walling <walling@linux.ibm.com>
+>> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+>> ---
+>>  pc-bios/s390-ccw/bootmap.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>=20
+>> diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+>> index 97205674e59a..0d29dceaa3cc 100644
+>> --- a/pc-bios/s390-ccw/bootmap.c
+>> +++ b/pc-bios/s390-ccw/bootmap.c
+>> @@ -163,7 +163,7 @@ static bool find_zipl_boot_menu_banner(int *offset)
+>>      int i;
+>>=20=20
+>>      /* Menu banner starts with "zIPL" */
+>> -    for (i =3D 0; i < virtio_get_block_size() - 4; i++) {
+>> +    for (i =3D 0; i < virtio_get_block_size() - 3; i++) {
+>
+> Easier to review as:
+>
+>        for (i =3D 0; i <=3D virtio_get_block_size() - 4; i++) {
 
-> Whether the VFIO device supports migration or not is decided based of
-> migration region query. If migration region query is successful and migration
-> region initialization is successful then migration is supported else
-> migration is blocked.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  hw/vfio/meson.build           |   1 +
->  hw/vfio/migration.c           | 142 ++++++++++++++++++++++++++++++++++++++++++
->  hw/vfio/trace-events          |   5 ++
->  include/hw/vfio/vfio-common.h |   9 +++
->  4 files changed, 157 insertions(+)
->  create mode 100644 hw/vfio/migration.c
+Yep.
 
-(...)
+>
+> Even easier defining ZIPL_MAGIC_SIZE instead of the magic '4'.
 
-> +static int vfio_migration_region_init(VFIODevice *vbasedev, int index)
-> +{
-> +    VFIOMigration *migration = vbasedev->migration;
-> +    Object *obj = NULL;
-> +    int ret = -EINVAL;
-> +
-> +    obj = vbasedev->ops->vfio_get_object(vbasedev);
-> +    if (!obj) {
-> +        return ret;
-> +    }
-> +
-> +    ret = vfio_region_setup(obj, vbasedev, &migration->region, index,
-> +                            "migration");
-> +    if (ret) {
-> +        error_report("%s: Failed to setup VFIO migration region %d: %s",
-> +                     vbasedev->name, index, strerror(-ret));
-> +        goto err;
-> +    }
-> +
-> +    if (!migration->region.size) {
-> +        ret = -EINVAL;
-> +        error_report("%s: Invalid region size of VFIO migration region %d: %s",
-> +                     vbasedev->name, index, strerror(-ret));
+I thought about adding such a macro as well. Makes even more sense with
+your proposed change.
 
-Using strerror on a hardcoded error value is probably not terribly
-helpful. I think printing either region.size (if you plan to extend
-this check later) or something like "Invalid zero-sized VFIO migration
-region" would make more sense.
+>
+>>          if (magic_match(s2_cur_blk + i, ZIPL_MAGIC_EBCDIC)) {
+>>              *offset =3D i;
+>>              return true;
+>>=20
+>
+--=20
+Kind regards / Beste Gr=C3=BC=C3=9Fe
+   Marc Hartmayer
 
-> +        goto err;
-> +    }
-> +
-> +    return 0;
-> +
-> +err:
-> +    vfio_migration_region_exit(vbasedev);
-> +    return ret;
-> +}
-
-(...)
-
-Apart from that, looks good to me.
-
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Gregor Pillen=20
+Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
+Sitz der Gesellschaft: B=C3=B6blingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
 
