@@ -7,84 +7,86 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11160C4346E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:02:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0620FC4346E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:02:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86AA723741
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:02:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B38A2376F
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:02:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="My+2JVKY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86AA723741
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="o4ABAH6c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B38A2376F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLN92-0003az-LZ
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:02:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60612)
+	id 1kLN95-0003ec-7U
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:02:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60624)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mhartmay@linux.ibm.com>)
- id 1kLN6W-0001lY-SV; Thu, 24 Sep 2020 04:59:52 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43544)
+ id 1kLN6Y-0001nY-OF; Thu, 24 Sep 2020 04:59:54 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10758
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mhartmay@linux.ibm.com>)
- id 1kLN6U-0002fN-T8; Thu, 24 Sep 2020 04:59:52 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 08O8XRm7055783; Thu, 24 Sep 2020 04:59:46 -0400
+ id 1kLN6U-0002fT-TP; Thu, 24 Sep 2020 04:59:54 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 08O8oriX099442; Thu, 24 Sep 2020 04:59:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
  h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=d/14tOMkclL/7K4bt99vOOKxWSHoeGHFY3cYi66loV0=;
- b=My+2JVKY61bzrA0vgy8QAzZhGEVBtmdlTBiKvEqTJKicGz2ATwBAmk6X3lKxbu1Tga0l
- CxVu9m+09WWuyHSMJjVfiZ5QyusNRvo7kTjy8T+UxFWQjNun0e1ucjggFIH8EMkz4LXn
- 1oXZYR7eGPM/cyY6+yYoc/7BpHTTXBPUQ/tKoaP3U3A1Hwyy9NvQPsNWL4vlnMv4CYxo
- NoDVDkCdCX4J4dYqS4q9L5yEhr7/mmqRQ80+xtSs91saIsDeTrbTz6jFLZEhf7UnjQyf
- 1HRxfD0xunZWZsMHSFsNnzz559aX4qZooqANuihhntUT2MXV3MI0y3iQCqxIA+63A8W3 3Q== 
+ bh=RoN7jbObmC/hYbajugHHJ1gxrL6CO7IzsXmN4aj5Olc=;
+ b=o4ABAH6cndhie0LmXk3BAgiOL3QoLxl7ImHIqPMn0ShJ84Vu2kcJKRYEjhHOGhLYXtz9
+ LMc5lZdWWqzOb+3ncTs6A7fcJC7kVB96BoOwQr/dJNqhVh5WkdPXMiStLGFnkpIf+QGR
+ LoFe5IvyZu4NAXYVZkeikiIgjUbipd0bS/WThd34gLXdh+hLGQWTMfXwsTBhfMqlUxGG
+ PVs0Df5Wsv9t5lBtn3JiDiBK65HyeOws8wVcDz9y0l/0B9jTCJsMC/GoSuvcebiWn65l
+ QgU7/RgpF77BXRNP+rFNXaOwW7/tXrXM1AGUqLHIbUBicTX9reeRg2uO2d/54QNzQe7R Pg== 
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33rqc221pj-1
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33rra206ew-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
  Thu, 24 Sep 2020 04:59:46 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08O8XjMw057237;
- Thu, 24 Sep 2020 04:59:45 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.102])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33rqc221np-1
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08O8ub8E114023;
+ Thu, 24 Sep 2020 04:59:46 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com
+ [159.122.73.71])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33rra206e3-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 24 Sep 2020 04:59:45 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
- by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08O8wDx1025345;
+ Thu, 24 Sep 2020 04:59:46 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+ by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08O8w4Ke026222;
  Thu, 24 Sep 2020 08:59:44 GMT
 Received: from b06avi18626390.portsmouth.uk.ibm.com
  (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
- by ppma06ams.nl.ibm.com with ESMTP id 33n98gw2xx-1
+ by ppma02fra.de.ibm.com with ESMTP id 33n9m82m7g-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 24 Sep 2020 08:59:43 +0000
+ Thu, 24 Sep 2020 08:59:44 +0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
  [9.149.105.58])
  by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 08O8w5qc16712022
+ id 08O8w6O623724332
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 24 Sep 2020 08:58:05 GMT
+ Thu, 24 Sep 2020 08:58:06 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 221FD4C040;
+ by IMSVA (Postfix) with ESMTP id 936184C040;
  Thu, 24 Sep 2020 08:59:41 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id B62084C04A;
- Thu, 24 Sep 2020 08:59:40 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 34B2B4C046;
+ Thu, 24 Sep 2020 08:59:41 +0000 (GMT)
 Received: from marcibm.ibmuc.com (unknown [9.145.161.19])
  by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 24 Sep 2020 08:59:40 +0000 (GMT)
+ Thu, 24 Sep 2020 08:59:41 +0000 (GMT)
 From: Marc Hartmayer <mhartmay@linux.ibm.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH 1/3] pc-bios/s390-ccw: fix off-by-one error
-Date: Thu, 24 Sep 2020 10:59:24 +0200
-Message-Id: <20200924085926.21709-2-mhartmay@linux.ibm.com>
+Subject: [PATCH 2/3] pc-bios/s390-ccw: break loop if a null block number is
+ reached
+Date: Thu, 24 Sep 2020 10:59:25 +0200
+Message-Id: <20200924085926.21709-3-mhartmay@linux.ibm.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200924085926.21709-1-mhartmay@linux.ibm.com>
 References: <20200924085926.21709-1-mhartmay@linux.ibm.com>
@@ -95,13 +97,13 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
  definitions=2020-09-24_05:2020-09-24,
  2020-09-24 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 spamscore=0
- bulkscore=0 adultscore=0 lowpriorityscore=0 priorityscore=1501
- clxscore=1011 phishscore=0 mlxlogscore=992 suspectscore=1 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009240067
+ malwarescore=0 bulkscore=0
+ mlxlogscore=923 phishscore=0 spamscore=0 impostorscore=0 suspectscore=1
+ lowpriorityscore=0 adultscore=0 priorityscore=1501 mlxscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009240062
 Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=mhartmay@linux.ibm.com; helo=mx0b-001b2d01.pphosted.com
+ envelope-from=mhartmay@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 04:59:46
 X-ACL-Warn: Detected OS   = Linux 3.x [generic]
 X-Spam_score_int: -26
@@ -130,9 +132,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This error takes effect when the magic value "zIPL" is located at the
-end of a block. For example if s2_cur_blk = 0x7fe18000 and the magic
-value "zIPL" is located at 0x7fe18ffc - 0x7fe18fff.
+Break the loop if `cur_block_nr` is a null block number because this
+means that the end of chunk is reached. In this case we will try to
+boot the default entry.
 
 Fixes: ba831b25262a ("s390-ccw: read stage2 boot loader data to find menu")
 Reviewed-by: Collin Walling <walling@linux.ibm.com>
@@ -142,18 +144,18 @@ Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index 97205674e59a..0d29dceaa3cc 100644
+index 0d29dceaa3cc..08f16c5595a3 100644
 --- a/pc-bios/s390-ccw/bootmap.c
 +++ b/pc-bios/s390-ccw/bootmap.c
-@@ -163,7 +163,7 @@ static bool find_zipl_boot_menu_banner(int *offset)
-     int i;
+@@ -192,7 +192,7 @@ static int eckd_get_boot_menu_index(block_number_t s1b_block_nr)
+     for (i = 0; i < STAGE2_BLK_CNT_MAX; i++) {
+         cur_block_nr = eckd_block_num(&s1b->seek[i].chs);
  
-     /* Menu banner starts with "zIPL" */
--    for (i = 0; i < virtio_get_block_size() - 4; i++) {
-+    for (i = 0; i < virtio_get_block_size() - 3; i++) {
-         if (magic_match(s2_cur_blk + i, ZIPL_MAGIC_EBCDIC)) {
-             *offset = i;
-             return true;
+-        if (!cur_block_nr) {
++        if (!cur_block_nr || is_null_block_number(cur_block_nr)) {
+             break;
+         }
+ 
 -- 
 2.25.4
 
