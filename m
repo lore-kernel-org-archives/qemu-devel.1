@@ -2,110 +2,83 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1154C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 21:58:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A400EC4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 22:06:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D8B6239CF
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 21:58:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CCD61208E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 22:06:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="hdL4mxcK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D8B6239CF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A+zwyeMN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCD61208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLZFm-0006yT-P6
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 17:58:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52670)
+	id 1kLZNo-0000dc-J1
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 18:06:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54396)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
- id 1kLZED-0005ih-Ov
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 17:56:38 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:45772)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
- id 1kLZEB-0007vg-JR
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 17:56:37 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08OLnHc2086498;
- Thu, 24 Sep 2020 21:56:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=PO/+MPSFsfrcY8TXay9YRNNGGYNKzkEY3zxqqURHpIg=;
- b=hdL4mxcKd6OD2q63cVb0bZOXCCIZHAYiv/eAXU6ksEMSynusO1Flrv6llUp82tbWqeIg
- mw0bPiCJ8R4x2bKbQQ8+BB9P3rZKJ91CtBZb1v9Crg9UwE/Ndn90C2jcpJfPHKLWKcL7
- Nz0iSNZgk4mBIl7BFpxRSVFfSYJIgiDXUDkRghsuVMpqJirWF4XTaqUZGYlpDCqmcaWu
- khaF6V530GK1OegHxZQ74F/QaROD1bqJT0IXfEivA5fDgS98HqF1ISp38vWqKCFVVvjw
- nGgIk2T7CNQZqemhtTNfBeMc+Ye0ysDTvMSS8gSvs2Tncv+Y+rnzIW+C5N+NaJ45EHxo Ag== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by aserp2120.oracle.com with ESMTP id 33q5rgs3k1-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Thu, 24 Sep 2020 21:56:32 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08OLoU6n046312;
- Thu, 24 Sep 2020 21:54:31 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by userp3020.oracle.com with ESMTP id 33nurwtsnd-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 24 Sep 2020 21:54:31 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 08OLsTD7028759;
- Thu, 24 Sep 2020 21:54:30 GMT
-Received: from [10.39.244.100] (/10.39.244.100)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 24 Sep 2020 14:54:29 -0700
-Subject: Re: [PATCH V1 22/32] char: qio_channel_socket_accept reuse fd
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
- <1596122076-341293-23-git-send-email-steven.sistare@oracle.com>
- <20200915173334.GD2922@work-vm>
-From: Steven Sistare <steven.sistare@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <1fe5d582-52a0-dad1-583f-8b11ffb56ec7@oracle.com>
-Date: Thu, 24 Sep 2020 17:54:27 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kLZMu-0000Bl-JA
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 18:05:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41263)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kLZMr-0000WE-Jr
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 18:05:36 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600985132;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Fs3wJJGyIxu2aX1oZyQ+y5r3HUlKJWiU+62dzNfwU+Y=;
+ b=A+zwyeMNzz7eIDhVkgev8dbmDypTI8QsdUf6S75+6/84XUe2fa8PiVwfI+gj9I85wzCVsr
+ QwT02kZUMpQUYkv1oSNfeGhp9xNAKKmkFsXRdIa7Mn3+ojp6snItl0HDKxp+6b2nNttsSA
+ 88h/flzjXmCWIJfSQopU1qogzo9IBr8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-46-ldLb1JMJO-e0rHXJPC5gtw-1; Thu, 24 Sep 2020 18:05:30 -0400
+X-MC-Unique: ldLb1JMJO-e0rHXJPC5gtw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B89A1091062;
+ Thu, 24 Sep 2020 22:05:28 +0000 (UTC)
+Received: from localhost (unknown [10.10.67.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 94C487882F;
+ Thu, 24 Sep 2020 22:05:24 +0000 (UTC)
+Date: Thu, 24 Sep 2020 18:05:23 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Like Xu <like.xu@linux.intel.com>
+Subject: Re: [PATCH] target/i386: add -cpu,lbr=true support to enable guest LBR
+Message-ID: <20200924220523.GL3717385@habkost.net>
+References: <20200726153229.27149-1-like.xu@linux.intel.com>
+ <20200726153229.27149-3-like.xu@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200915173334.GD2922@work-vm>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9754
- signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- malwarescore=0
- phishscore=0 mlxlogscore=999 bulkscore=0 mlxscore=0 suspectscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009240156
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9754
- signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
- impostorscore=0
- clxscore=1015 suspectscore=0 phishscore=0 malwarescore=0
- priorityscore=1501 mlxlogscore=999 adultscore=0 bulkscore=0 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009240156
-Received-SPF: pass client-ip=141.146.126.78;
- envelope-from=steven.sistare@oracle.com; helo=aserp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 16:42:31
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -57
-X-Spam_score: -5.8
-X-Spam_bar: -----
-X-Spam_report: (-5.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+Content-Disposition: inline
+In-Reply-To: <20200726153229.27149-3-like.xu@linux.intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,185 +91,236 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Joerg Roedel <joro@8bytes.org>,
+ Marcelo Tosatti <mtosatti@redhat.com>, linux-kernel@vger.kernel.org,
+ Sean Christopherson <sean.j.christopherson@intel.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Jim Mattson <jmattson@google.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/15/2020 1:33 PM, Dr. David Alan Gilbert wrote:
-> * Steve Sistare (steven.sistare@oracle.com) wrote:
->> From: Mark Kanda <mark.kanda@oracle.com>
->>
->> Add an fd argument to qio_channel_socket_accept.  If not -1, the channel
->> uses that fd instead of accepting a new socket connection.  All callers
->> pass -1 in this patch, so no functional change.
+I've just noticed this on my review queue (apologies for the long
+delay).  Comments below:
+
+On Sun, Jul 26, 2020 at 11:32:20PM +0800, Like Xu wrote:
+> The LBR feature would be enabled on the guest if:
+> - the KVM is enabled and the PMU is enabled and,
+> - the msr-based-feature IA32_PERF_CAPABILITIES is supporterd and,
+> - the supported returned value for lbr_fmt from this msr is not zero.
 > 
-> Doesn't some of this just come from the fact you're insisting on reusing
-> the command line?   We should be able to open a chardev on an fd
-> shouldn't we?
+> The LBR feature would be disabled on the guest if:
+> - the msr-based-feature IA32_PERF_CAPABILITIES is unsupporterd OR,
+> - qemu set the IA32_PERF_CAPABILITIES msr feature without lbr_fmt values OR,
+> - the requested guest vcpu model doesn't support PDCM.
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Cc: Marcelo Tosatti <mtosatti@redhat.com>
+> Cc: qemu-devel@nongnu.org
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> ---
+>  hw/i386/pc.c      |  1 +
+>  target/i386/cpu.c | 24 ++++++++++++++++++++++--
+>  target/i386/cpu.h |  2 ++
+>  target/i386/kvm.c |  7 ++++++-
+>  4 files changed, 31 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 3d419d5991..857aff75bb 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -318,6 +318,7 @@ GlobalProperty pc_compat_1_5[] = {
+>      { "Nehalem-" TYPE_X86_CPU, "min-level", "2" },
+>      { "virtio-net-pci", "any_layout", "off" },
+>      { TYPE_X86_CPU, "pmu", "on" },
+> +    { TYPE_X86_CPU, "lbr", "on" },
 
-If the management layer originally added the char device via hot plug, then
-we expect it to do so again after restart, following the typical practice for
-live migration.  The device has no presence on the command line.
+Why is this line here?
 
-- Steve
+>      { "i440FX-pcihost", "short_root_bus", "0" },
+>      { "q35-pcihost", "short_root_bus", "0" },
+>  };
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 588f32e136..c803994887 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -1142,8 +1142,8 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>      [FEAT_PERF_CAPABILITIES] = {
+>          .type = MSR_FEATURE_WORD,
+>          .feat_names = {
+> -            NULL, NULL, NULL, NULL,
+> -            NULL, NULL, NULL, NULL,
+> +            "lbr-fmt-bit-0", "lbr-fmt-bit-1", "lbr-fmt-bit-2", "lbr-fmt-bit-3",
+> +            "lbr-fmt-bit-4", "lbr-fmt-bit-5", NULL, NULL,
 
->> Signed-off-by: Mark Kanda <mark.kanda@oracle.com>
->> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
->> ---
->>  include/io/channel-socket.h    |  3 ++-
->>  io/channel-socket.c            | 12 +++++++++---
->>  io/net-listener.c              |  4 ++--
->>  scsi/qemu-pr-helper.c          |  2 +-
->>  tests/qtest/tpm-emu.c          |  2 +-
->>  tests/test-char.c              |  2 +-
->>  tests/test-io-channel-socket.c |  4 ++--
->>  7 files changed, 18 insertions(+), 11 deletions(-)
->>
->> diff --git a/include/io/channel-socket.h b/include/io/channel-socket.h
->> index 777ff59..0ffc560 100644
->> --- a/include/io/channel-socket.h
->> +++ b/include/io/channel-socket.h
->> @@ -248,6 +248,7 @@ qio_channel_socket_get_remote_address(QIOChannelSocket *ioc,
->>  /**
->>   * qio_channel_socket_accept:
->>   * @ioc: the socket channel object
->> + * @reuse_fd: fd to reuse; -1 otherwise
->>   * @errp: pointer to a NULL-initialized error object
->>   *
->>   * If the socket represents a server, then this accepts
->> @@ -258,7 +259,7 @@ qio_channel_socket_get_remote_address(QIOChannelSocket *ioc,
->>   */
->>  QIOChannelSocket *
->>  qio_channel_socket_accept(QIOChannelSocket *ioc,
->> -                          Error **errp);
->> +                          int reuse_fd, Error **errp);
->>  
->>  
->>  #endif /* QIO_CHANNEL_SOCKET_H */
->> diff --git a/io/channel-socket.c b/io/channel-socket.c
->> index e1b4667..dde12bf 100644
->> --- a/io/channel-socket.c
->> +++ b/io/channel-socket.c
->> @@ -352,7 +352,7 @@ void qio_channel_socket_dgram_async(QIOChannelSocket *ioc,
->>  
->>  QIOChannelSocket *
->>  qio_channel_socket_accept(QIOChannelSocket *ioc,
->> -                          Error **errp)
->> +                          int reuse_fd, Error **errp)
->>  {
->>      QIOChannelSocket *cioc;
->>  
->> @@ -362,8 +362,14 @@ qio_channel_socket_accept(QIOChannelSocket *ioc,
->>  
->>   retry:
->>      trace_qio_channel_socket_accept(ioc);
->> -    cioc->fd = qemu_accept(ioc->fd, (struct sockaddr *)&cioc->remoteAddr,
->> -                           &cioc->remoteAddrLen);
->> +
->> +    if (reuse_fd != -1) {
->> +        cioc->fd = reuse_fd;
->> +    } else {
->> +        cioc->fd = qemu_accept(ioc->fd, (struct sockaddr *)&cioc->remoteAddr,
->> +                               &cioc->remoteAddrLen);
->> +    }
->> +
->>      if (cioc->fd < 0) {
->>          if (errno == EINTR) {
->>              goto retry;
->> diff --git a/io/net-listener.c b/io/net-listener.c
->> index 5d8a226..bbdea1e 100644
->> --- a/io/net-listener.c
->> +++ b/io/net-listener.c
->> @@ -45,7 +45,7 @@ static gboolean qio_net_listener_channel_func(QIOChannel *ioc,
->>      QIOChannelSocket *sioc;
->>  
->>      sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
->> -                                     NULL);
->> +                                     -1, NULL);
->>      if (!sioc) {
->>          return TRUE;
->>      }
->> @@ -194,7 +194,7 @@ static gboolean qio_net_listener_wait_client_func(QIOChannel *ioc,
->>      QIOChannelSocket *sioc;
->>  
->>      sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
->> -                                     NULL);
->> +                                     -1, NULL);
->>      if (!sioc) {
->>          return TRUE;
->>      }
->> diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
->> index 57ad830..0e6d683 100644
->> --- a/scsi/qemu-pr-helper.c
->> +++ b/scsi/qemu-pr-helper.c
->> @@ -800,7 +800,7 @@ static gboolean accept_client(QIOChannel *ioc, GIOCondition cond, gpointer opaqu
->>      PRHelperClient *prh;
->>  
->>      cioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
->> -                                     NULL);
->> +                                     -1, NULL);
->>      if (!cioc) {
->>          return TRUE;
->>      }
->> diff --git a/tests/qtest/tpm-emu.c b/tests/qtest/tpm-emu.c
->> index 2e8eb7b..19e5dab 100644
->> --- a/tests/qtest/tpm-emu.c
->> +++ b/tests/qtest/tpm-emu.c
->> @@ -83,7 +83,7 @@ void *tpm_emu_ctrl_thread(void *data)
->>      g_cond_signal(&s->data_cond);
->>  
->>      qio_channel_wait(QIO_CHANNEL(lioc), G_IO_IN);
->> -    ioc = QIO_CHANNEL(qio_channel_socket_accept(lioc, &error_abort));
->> +    ioc = QIO_CHANNEL(qio_channel_socket_accept(lioc, -1, &error_abort));
->>      g_assert(ioc);
->>  
->>      {
->> diff --git a/tests/test-char.c b/tests/test-char.c
->> index 614bdac..1bb6ae0 100644
->> --- a/tests/test-char.c
->> +++ b/tests/test-char.c
->> @@ -884,7 +884,7 @@ char_socket_client_server_thread(gpointer data)
->>      QIOChannelSocket *cioc;
->>  
->>  retry:
->> -    cioc = qio_channel_socket_accept(ioc, &error_abort);
->> +    cioc = qio_channel_socket_accept(ioc, -1, &error_abort);
->>      g_assert_nonnull(cioc);
->>  
->>      if (char_socket_ping_pong(QIO_CHANNEL(cioc), NULL) != 0) {
->> diff --git a/tests/test-io-channel-socket.c b/tests/test-io-channel-socket.c
->> index d43083a..0d410cf 100644
->> --- a/tests/test-io-channel-socket.c
->> +++ b/tests/test-io-channel-socket.c
->> @@ -75,7 +75,7 @@ static void test_io_channel_setup_sync(SocketAddress *listen_addr,
->>      qio_channel_set_delay(*src, false);
->>  
->>      qio_channel_wait(QIO_CHANNEL(lioc), G_IO_IN);
->> -    *dst = QIO_CHANNEL(qio_channel_socket_accept(lioc, &error_abort));
->> +    *dst = QIO_CHANNEL(qio_channel_socket_accept(lioc, -1, &error_abort));
->>      g_assert(*dst);
->>  
->>      test_io_channel_set_socket_bufs(*src, *dst);
->> @@ -143,7 +143,7 @@ static void test_io_channel_setup_async(SocketAddress *listen_addr,
->>      g_assert(!data.err);
->>  
->>      qio_channel_wait(QIO_CHANNEL(lioc), G_IO_IN);
->> -    *dst = QIO_CHANNEL(qio_channel_socket_accept(lioc, &error_abort));
->> +    *dst = QIO_CHANNEL(qio_channel_socket_accept(lioc, -1, &error_abort));
->>      g_assert(*dst);
->>  
->>      qio_channel_set_delay(*src, false);
->> -- 
->> 1.8.3.1
->>
+What about a separate "lbr-fmt" int property instead of
+individual bit properties?
+
+What happens if LBR_FMT on the host (returned by
+kvm_arch_get_supported_msr_feature(MSR_IA32_PERF_CAPABILITIES) is
+different than the one configured for the guest?  Can KVM emulate
+a CPU with different LBR_FMT, or it must match the host?
+
+If LBR_FMT must always match the host, the feature needs to block
+live migration.  I guess this is already the case because PDCM is
+cleared if !cpu->enable_pmu.  Adding PDCM to .unmigratable_flags
+is probably a good idea, though.
+
+
+
+>              NULL, NULL, NULL, NULL,
+>              NULL, "full-width-write", NULL, NULL,
+>              NULL, NULL, NULL, NULL,
+> @@ -4224,6 +4224,12 @@ static bool lmce_supported(void)
+>      return !!(mce_cap & MCG_LMCE_P);
+>  }
+>  
+> +static inline bool lbr_supported(void)
+> +{
+> +    return kvm_enabled() && (kvm_arch_get_supported_msr_feature(kvm_state,
+> +        MSR_IA32_PERF_CAPABILITIES) & PERF_CAP_LBR_FMT);
+> +}
+
+You can rewrite this is an accelerator-independent way as:
+  (x86_cpu_get_supported_feature_word(FEAT_PERF_CAPABILITIES) & PERF_CAP_LBR_FMT)
+
+However, is this really supposed to return false if LBR_FMT is 000000?
+
+> +
+>  #define CPUID_MODEL_ID_SZ 48
+>  
+>  /**
+> @@ -4327,6 +4333,9 @@ static void max_x86_cpu_initfn(Object *obj)
+>      }
+>  
+>      object_property_set_bool(OBJECT(cpu), "pmu", true, &error_abort);
+> +    if (lbr_supported()) {
+> +        object_property_set_bool(OBJECT(cpu), "lbr", true, &error_abort);
+
+Why is this necessary?
+
+If kvm_arch_get_supported_msr_feature(MSR_IA32_PERF_CAPABILITIES)
+return the PERF_CAP_LBR_FMT bits set,
+x86_cpu_get_supported_feature_word() will return those bits, and
+they will be automatically set at
+env->features[FEAT_PERF_CAPABILITIES].
+
+> +    }
+>  }
+>  
+>  static const TypeInfo max_x86_cpu_type_info = {
+> @@ -5535,6 +5544,10 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>          }
+>          if (!cpu->enable_pmu) {
+>              *ecx &= ~CPUID_EXT_PDCM;
+> +            if (cpu->enable_lbr) {
+> +                warn_report("LBR is unsupported since guest PMU is disabled.");
+> +                exit(1);
+> +            }
+>          }
+>          break;
+>      case 2:
+> @@ -6553,6 +6566,12 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+>          }
+>      }
+> +    if (!cpu->max_features && cpu->enable_lbr &&
+
+Why do we need to check for !cpu->max_features here?
+
+> +        !(env->features[FEAT_1_ECX] & CPUID_EXT_PDCM)) {
+> +        warn_report("requested vcpu model doesn't support PDCM for LBR.");
+> +        exit(1);
+
+Please report errors using error_setg(errp, ...) instead.
+
+> +    }
+> +
+>      if (cpu->ucode_rev == 0) {
+>          /* The default is the same as KVM's.  */
+>          if (IS_AMD_CPU(env)) {
+> @@ -7187,6 +7206,7 @@ static Property x86_cpu_properties[] = {
+>  #endif
+>      DEFINE_PROP_INT32("node-id", X86CPU, node_id, CPU_UNSET_NUMA_NODE_ID),
+>      DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
+> +    DEFINE_PROP_BOOL("lbr", X86CPU, enable_lbr, false),
+
+When exactly do we want to set lbr=off explicitly?  What's the
+expected outcome when lbr=off?
+
+
+>  
+>      DEFINE_PROP_UINT32("hv-spinlocks", X86CPU, hyperv_spinlock_attempts,
+>                         HYPERV_SPINLOCK_NEVER_RETRY),
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index e1a5c174dc..a059913e26 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -357,6 +357,7 @@ typedef enum X86Seg {
+>  #define ARCH_CAP_TSX_CTRL_MSR		(1<<7)
+>  
+>  #define MSR_IA32_PERF_CAPABILITIES      0x345
+> +#define PERF_CAP_LBR_FMT      0x3f
+>  
+>  #define MSR_IA32_TSX_CTRL		0x122
+>  #define MSR_IA32_TSCDEADLINE            0x6e0
+> @@ -1702,6 +1703,7 @@ struct X86CPU {
+>       * capabilities) directly to the guest.
+>       */
+>      bool enable_pmu;
+> +    bool enable_lbr;
+
+This is a good place to document what enable_lbr=true|false
+means (see questions above).
+
+
+>  
+>      /* LMCE support can be enabled/disabled via cpu option 'lmce=on/off'. It is
+>       * disabled by default to avoid breaking migration between QEMU with
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index b8455c89ed..feb33d5472 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -2690,8 +2690,10 @@ static void kvm_msr_entry_add_perf(X86CPU *cpu, FeatureWordArray f)
+>      uint64_t kvm_perf_cap =
+>          kvm_arch_get_supported_msr_feature(kvm_state,
+>                                             MSR_IA32_PERF_CAPABILITIES);
+> -
+>      if (kvm_perf_cap) {
+> +        if (!cpu->enable_lbr) {
+> +            kvm_perf_cap &= ~PERF_CAP_LBR_FMT;
+> +        }
+
+Why is this necessary?  If enable_lbr is false,
+f[FEAT_PERF_CAPABILITIES] should not have those bits set at all.
+
+>          kvm_msr_entry_add(cpu, MSR_IA32_PERF_CAPABILITIES,
+>                          kvm_perf_cap & f[FEAT_PERF_CAPABILITIES]);
+>      }
+> @@ -2731,6 +2733,9 @@ static void kvm_init_msrs(X86CPU *cpu)
+>  
+>      if (has_msr_perf_capabs && cpu->enable_pmu) {
+>          kvm_msr_entry_add_perf(cpu, env->features);
+> +    } else if (!has_msr_perf_capabs && cpu->enable_lbr) {
+> +        warn_report("KVM doesn't support MSR_IA32_PERF_CAPABILITIES for LBR.");
+> +        exit(1);
+
+This is not the appropriate place to check for unsupported
+features.  x86_cpu_realizefn() and/or x86_cpu_filter_features()
+is.
+
+>      }
+>  
+>      if (has_msr_ucode_rev) {
+> -- 
+> 2.21.3
+> 
+
+-- 
+Eduardo
+
 
