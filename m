@@ -4,70 +4,70 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 796BBC2D0E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:01:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82382C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:03:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05E3E221EB
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:01:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0DAE3221EB
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:03:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LdGhpvAH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05E3E221EB
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DknfTQrn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DAE3221EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLO4E-0004p0-Rz
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 06:01:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39296)
+	id 1kLO5t-0006Xb-2r
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 06:03:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39812)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNU1-0001g3-MA
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30950)
+ id 1kLNUv-0003Nh-4S
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:25:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53738)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTz-00068T-10
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:09 -0400
+ id 1kLNUm-0006HW-Bv
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:25:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600939446;
+ s=mimecast20190719; t=1600939494;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=A9GAarQACy/SRCigdCgdYO8cBaYR+icDiSYLnZam1UQ=;
- b=LdGhpvAHom/bQnyBunf7qHJqaQCDb2GURB1E9RvNrf3wIJ7cN51fV400Wn82l8Qo4qLWAA
- B+EtCJkkyr7IIKHC1nNN94FcPhdV6uu/87/dFlM1Ww7M27k6VrhQC5wqNpIS5Jy4YMQOSg
- Sw7LLa7zV4CQqiw30txGx2UAmNDSe+o=
+ bh=gUhoTZ0x3F+69mKQh+X9V4uzzg/R6UFDfUeQRh/ugYg=;
+ b=DknfTQrnJQTKsZ0uaHb/Gy0fPAWCMmuR1uCTlV/t+puVVKa9QTJO+ZD1g1nCvDZHUKQeak
+ nM0m4p4PNy9bYn0TE6y+00CsCYTAXvaMwAzmD3NRI6sSV48CCZ75A4WvZsFK7jXvFtqxNK
+ 4ktZ4+oxaAAj2gQ5jbImhEtnQAOETQw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-596-87Tlr4MKMX-s6jAOr8PXDg-1; Thu, 24 Sep 2020 05:24:04 -0400
-X-MC-Unique: 87Tlr4MKMX-s6jAOr8PXDg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-232-YknI5lcXPn6Z87h938HYaQ-1; Thu, 24 Sep 2020 05:24:52 -0400
+X-MC-Unique: YknI5lcXPn6Z87h938HYaQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 60DD4104D3E3;
- Thu, 24 Sep 2020 09:24:03 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 225DB81F00F
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:24:51 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 20BF460C15;
- Thu, 24 Sep 2020 09:24:03 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DBD6B55764
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:24:50 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 61/92] configure: do not clobber environment
- CFLAGS/CXXFLAGS/LDFLAGS
-Date: Thu, 24 Sep 2020 05:22:43 -0400
-Message-Id: <20200924092314.1722645-62-pbonzini@redhat.com>
+Subject: [PULL 85/92] target/i386: kvm: do not use kvm_check_extension to find
+ paravirtual capabilities
+Date: Thu, 24 Sep 2020 05:23:07 -0400
+Message-Id: <20200924092314.1722645-86-pbonzini@redhat.com>
 In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
 References: <20200924092314.1722645-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -97,130 +97,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the CFLAGS, CXXFLAGS or LDFLAGS variables are present in the environment,
-any modification made within the configure script is passed down to Meson.
-This is particularly undesirable for the "-pie" option, since it overrides
-"-shared" and thus messes up the linker flags for shared modules.
+Paravirtualized features have been listed in KVM_GET_SUPPORTED_CPUID since
+Linux 2.6.35 (commit 84478c829d0f, "KVM: x86: export paravirtual cpuid flags
+in KVM_GET_SUPPORTED_CPUID", 2010-05-19).  It has been more than 10 years,
+so remove the fallback code.
 
-Using a separate variable therefore fixes the bug, while clarifying that
-the scope of these CFLAGS is just the configure script.
-
-Reported-by: Frederic Bezies
-Analyzed-by: Toolybird
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure | 30 +++++++++++++++++-------------
- 1 file changed, 17 insertions(+), 13 deletions(-)
+ target/i386/kvm.c | 32 --------------------------------
+ 1 file changed, 32 deletions(-)
 
-diff --git a/configure b/configure
-index 9b7232f9d2..a0575f1db1 100755
---- a/configure
-+++ b/configure
-@@ -155,7 +155,7 @@ update_cxxflags() {
-     # options which some versions of GCC's C++ compiler complain about
-     # because they only make sense for C programs.
-     QEMU_CXXFLAGS="$QEMU_CXXFLAGS -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS"
--    CXXFLAGS=$(echo "$CFLAGS" | sed s/-std=gnu99/-std=gnu++11/)
-+    CONFIGURE_CXXFLAGS=$(echo "$CONFIGURE_CFLAGS" | sed s/-std=gnu99/-std=gnu++11/)
-     for arg in $QEMU_CFLAGS; do
-         case $arg in
-             -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-externs|\
-@@ -170,13 +170,14 @@ update_cxxflags() {
- 
- compile_object() {
-   local_cflags="$1"
--  do_cc $CFLAGS $QEMU_CFLAGS $local_cflags -c -o $TMPO $TMPC
-+  do_cc $CFLAGS $CONFIGURE_CFLAGS $QEMU_CFLAGS $local_cflags -c -o $TMPO $TMPC
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 4fc6e8b9d5..f6dae4cfb6 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -284,30 +284,6 @@ static struct kvm_cpuid2 *get_supported_cpuid(KVMState *s)
+     return cpuid;
  }
  
- compile_prog() {
-   local_cflags="$1"
-   local_ldflags="$2"
--  do_cc $CFLAGS $QEMU_CFLAGS $local_cflags -o $TMPE $TMPC $LDFLAGS $QEMU_LDFLAGS $local_ldflags
-+  do_cc $CFLAGS $CONFIGURE_CFLAGS $QEMU_CFLAGS $local_cflags -o $TMPE $TMPC \
-+      $LDFLAGS $CONFIGURE_LDFLAGS $QEMU_LDFLAGS $local_ldflags
- }
+-static const struct kvm_para_features {
+-    int cap;
+-    int feature;
+-} para_features[] = {
+-    { KVM_CAP_CLOCKSOURCE, KVM_FEATURE_CLOCKSOURCE },
+-    { KVM_CAP_NOP_IO_DELAY, KVM_FEATURE_NOP_IO_DELAY },
+-    { KVM_CAP_PV_MMU, KVM_FEATURE_MMU_OP },
+-    { KVM_CAP_ASYNC_PF, KVM_FEATURE_ASYNC_PF },
+-    { KVM_CAP_ASYNC_PF_INT, KVM_FEATURE_ASYNC_PF_INT },
+-};
+-
+-static int get_para_features(KVMState *s)
+-{
+-    int i, features = 0;
+-
+-    for (i = 0; i < ARRAY_SIZE(para_features); i++) {
+-        if (kvm_check_extension(s, para_features[i].cap)) {
+-            features |= (1 << para_features[i].feature);
+-        }
+-    }
+-
+-    return features;
+-}
+-
+ static bool host_tsx_broken(void)
+ {
+     int family, model, stepping;\
+@@ -367,13 +343,11 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
+     struct kvm_cpuid2 *cpuid;
+     uint32_t ret = 0;
+     uint32_t cpuid_1_edx;
+-    bool found = false;
  
- # symbolically link $1 to $2.  Portable version of "ln -sf".
-@@ -639,7 +640,10 @@ QEMU_CFLAGS="-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
- QEMU_CFLAGS="-D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE $QEMU_CFLAGS"
- QEMU_INCLUDES="-iquote . -iquote ${source_path} -iquote ${source_path}/accel/tcg -iquote ${source_path}/include"
- QEMU_INCLUDES="$QEMU_INCLUDES -iquote ${source_path}/disas/libvixl"
--CFLAGS="-std=gnu99 -Wall"
-+
-+# Flags that are needed during configure but later taken care of by Meson
-+CONFIGURE_CFLAGS="-std=gnu99 -Wall"
-+CONFIGURE_LDFLAGS=
+     cpuid = get_supported_cpuid(s);
  
+     struct kvm_cpuid_entry2 *entry = cpuid_find_entry(cpuid, function, index);
+     if (entry) {
+-        found = true;
+         ret = cpuid_entry_get_reg(entry, reg);
+     }
  
- check_define() {
-@@ -967,7 +971,7 @@ if test "$mingw32" = "yes" ; then
-   EXESUF=".exe"
-   HOST_DSOSUF=".dll"
-   # MinGW needs -mthreads for TLS and macro _MT.
--  CFLAGS="-mthreads $CFLAGS"
-+  CONFIGURE_CFLAGS="-mthreads $CONFIGURE_CFLAGS"
-   write_c_skeleton;
-   prefix="/qemu"
-   qemu_suffix=""
-@@ -2234,7 +2238,7 @@ fi
+@@ -448,12 +422,6 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
+         }
+     } else if (function == KVM_CPUID_FEATURES && reg == R_EDX) {
+         ret |= 1U << KVM_HINTS_REALTIME;
+-        found = 1;
+-    }
+-
+-    /* fallback for older kernels */
+-    if ((function == KVM_CPUID_FEATURES) && !found) {
+-        ret = get_para_features(s);
+     }
  
- if test "$static" = "yes"; then
-   if test "$pie" != "no" && compile_prog "-Werror -fPIE -DPIE" "-static-pie"; then
--    CFLAGS="-fPIE -DPIE $CFLAGS"
-+    CONFIGURE_CFLAGS="-fPIE -DPIE $CONFIGURE_CFLAGS"
-     QEMU_LDFLAGS="-static-pie $QEMU_LDFLAGS"
-     pie="yes"
-   elif test "$pie" = "yes"; then
-@@ -2244,11 +2248,11 @@ if test "$static" = "yes"; then
-     pie="no"
-   fi
- elif test "$pie" = "no"; then
--  CFLAGS="$CFLAGS_NOPIE $CFLAGS"
--  LDFLAGS="$LDFLAGS_NOPIE $LDFLAGS"
-+  CONFIGURE_CFLAGS="$CFLAGS_NOPIE $CONFIGURE_CFLAGS"
-+  CONFIGURE_LDFLAGS="$LDFLAGS_NOPIE $CONFIGURE_LDFLAGS"
- elif compile_prog "-Werror -fPIE -DPIE" "-pie"; then
--  CFLAGS="-fPIE -DPIE $CFLAGS"
--  LDFLAGS="-pie $LDFLAGS"
-+  CONFIGURE_CFLAGS="-fPIE -DPIE $CONFIGURE_CFLAGS"
-+  CONFIGURE_LDFLAGS="-pie $CONFIGURE_LDFLAGS"
-   pie="yes"
- elif test "$pie" = "yes"; then
-   error_exit "PIE not available due to missing toolchain support"
-@@ -3812,7 +3816,7 @@ EOF
- if ! compile_prog "$glib_cflags -Werror" "$glib_libs" ; then
-     if cc_has_warning_flag "-Wno-unknown-attributes"; then
-         glib_cflags="-Wno-unknown-attributes $glib_cflags"
--        CFLAGS="-Wno-unknown-attributes $CFLAGS"
-+        CONFIGURE_CFLAGS="-Wno-unknown-attributes $CONFIGURE_CFLAGS"
-     fi
- fi
- 
-@@ -3832,7 +3836,7 @@ EOF
- if ! compile_prog "$glib_cflags -Werror" "$glib_libs" ; then
-     if cc_has_warning_flag "-Wno-unused-function"; then
-         glib_cflags="$glib_cflags -Wno-unused-function"
--        CFLAGS="$CFLAGS -Wno-unused-function"
-+        CONFIGURE_CFLAGS="$CONFIGURE_CFLAGS -Wno-unused-function"
-     fi
- fi
- 
-@@ -6370,7 +6374,7 @@ EOF
- 
-     update_cxxflags
- 
--    if do_cxx $CXXFLAGS $QEMU_CXXFLAGS -o $TMPE $TMPCXX $TMPO $QEMU_LDFLAGS; then
-+    if do_cxx $CXXFLAGS $CONFIGURE_CXXFLAGS $QEMU_CXXFLAGS -o $TMPE $TMPCXX $TMPO $QEMU_LDFLAGS; then
-         # C++ compiler $cxx works ok with C compiler $cc
-         :
-     else
+     return ret;
 -- 
 2.26.2
 
