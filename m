@@ -2,92 +2,88 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E23FC4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:30:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 463ECC2D0E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:32:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BA3720BED
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:30:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JN34Eytc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BA3720BED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 83FEE23741
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:32:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83FEE23741
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLOWc-0001vp-I8
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 06:30:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39946)
+	id 1kLOYR-0003Ek-Io
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 06:32:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54140)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNV4-0003XP-SR
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:25:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54465)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNUr-0006IJ-VY
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:25:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600939499;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=AnbN1tU+LbEekM4KaSMGfWoudxEyyn4ams8c8AOn0AA=;
- b=JN34EytcjZidAaZ/QKNP1JIK90nlSYjQRXl6EaGO9e2ocRCu9PMNS4e4pPQI4nmOHz3lmS
- BIuJhZnNQ08sPbliCR9LXsnKwqoduW7SBvSSW5t79Eldl+FphIVLYkTqIENmYoD3fIgAwM
- anYqVgFSkiv1o/8O29wS6L7N4RFoWlQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-569-_-VxsRL0MXKPTHogUpPejQ-1; Thu, 24 Sep 2020 05:24:57 -0400
-X-MC-Unique: _-VxsRL0MXKPTHogUpPejQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF7A6104D3E4;
- Thu, 24 Sep 2020 09:24:56 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6219455778;
- Thu, 24 Sep 2020 09:24:56 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 92/92] hw/net/can: Correct Kconfig dependencies
-Date: Thu, 24 Sep 2020 05:23:14 -0400
-Message-Id: <20200924092314.1722645-93-pbonzini@redhat.com>
-In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
-References: <20200924092314.1722645-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kLOWk-0002D3-Jd
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 06:31:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45476)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kLOWi-0006R9-Ed
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 06:31:02 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kLOWg-0004id-G2
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 10:30:58 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 6E84E2E8107
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 10:30:58 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 24 Sep 2020 10:22:19 -0000
+From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1849644@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Fix Released; importance=Undecided; assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
+ component=main; status=Confirmed; importance=Low;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange laurent-vivier npes87184 paelzer samuel-t
+X-Launchpad-Bug-Reporter: Samuel (samuel-t)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
+ =?utf-8?q?=29?=
+References: <157191258679.29920.9268940625941119092.malonedeb@soybean.canonical.com>
+Message-Id: <160094293985.12352.10107400503055684655.malone@soybean.canonical.com>
+Subject: [Bug 1849644] Re: QEMU VNC websocket proxy requires non-standard
+ 'binary' subprotocol
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a314d157ca9be8d00eae0214fc0d7dff1cd406e4"; Instance="production"
+X-Launchpad-Hash: 96539456fee7988709bc9d4ac3d58ee1e7cb3fde
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 05:35:55
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -96,49 +92,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+Reply-To: Bug 1849644 <1849644@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+Repro steps:
+$ sudo apt install qemu-system-x86 novnc
+/usr/share/novnc
+python3 -m http.server
 
-The original CAN_PCI config option enables multiple SJA1000 PCI boards
-emulation build. These boards bridge SJA1000 into I/O or memory
-address space of the host CPU and depend on SJA1000 emulation.
+Connect browser to http://<IP>:8000/vnc.html
+  Click "Settings"
+  Open "advanced"
+  Open "websocket"
+  Set port 5700
+  Clear path
+  Click "Connect"
 
-Signed-off-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
-Message-Id: <dd332de687bfe52bbec37f5de1d861fb8e620d74.1600069689.git.pisa@cmp.felk.cvut.cz>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/net/Kconfig | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+And it works ...
 
-diff --git a/hw/net/Kconfig b/hw/net/Kconfig
-index 225d948841..6d795ec752 100644
---- a/hw/net/Kconfig
-+++ b/hw/net/Kconfig
-@@ -132,16 +132,15 @@ config ROCKER
- config CAN_BUS
-     bool
- 
--config CAN_PCI
-+config CAN_SJA1000
-     bool
-     default y if PCI_DEVICES
--    depends on PCI
-     select CAN_BUS
- 
--config CAN_SJA1000
-+config CAN_PCI
-     bool
-     default y if PCI_DEVICES
--    depends on PCI
-+    depends on PCI && CAN_SJA1000
-     select CAN_BUS
- 
- config CAN_CTUCANFD
--- 
-2.26.2
+Turns out my former check on the offending noVNC commit was wrong.
+There are
+https://github.com/novnc/noVNC/commit/f8318361b1b62c4d76b091132d4a8ccfdd295=
+7e4 (referenced on this bug before)
+$ git tag --contains f8318361b1b62c4d76b091132d4a8ccfdd2957e4
+v1.0.0
+But only really gone later with:
+https://github.com/novnc/noVNC/commit/c912230309806aacbae4295faf7ad6406da97=
+617
+$ git tag --contains c912230309806aacbae4295faf7ad6406da97617
+v1.2.0
 
+So the novnc of Focal isn't affected but anyone who uses a newer noVNC >=3D=
+1.2 would be.
+=3D> lower SRU priority
+=3D> Modify above repro steps to not use noVNC from Focal via apt but use 1=
+.2 from snaps
+
+
+Repro steps:
+$ snap install novnc
+$ novnc --vnc localhost:5700
+Connect browser to http://<IP>:6080/vnc.html
+Click "Connect"
+
+TODO: repro steps to be verified with a qemu that has the fix applied
+
+** Changed in: qemu (Ubuntu Focal)
+   Importance: Undecided =3D> Low
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1849644
+
+Title:
+  QEMU VNC websocket proxy requires non-standard 'binary' subprotocol
+
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Focal:
+  Confirmed
+
+Bug description:
+  When running a machine using "-vnc" and the "websocket" option QEMU
+  seems to require the subprotocol called 'binary'. This subprotocol
+  does not exist in the WebSocket specification. In fact it has never
+  existed in the spec, in one of the very early drafts of WebSockets it
+  was briefly mentioned but it never made it to a final version.
+
+  When the WebSocket server requires a non-standard subprotocol any
+  WebSocket client that works correctly won't be able to connect.
+
+  One example of such a client is noVNC, it tells the server that it
+  doesn't want to use any subprotocol. QEMU's WebSocket proxy doesn't
+  let noVNC connect. If noVNC is modified to ask for 'binary' it will
+  work, this is, however, incorrect behavior.
+
+  Looking at the code in "io/channel-websock.c" it seems it's quite
+  hard-coded to binary:
+
+  Look at line 58 and 433 here:
+  https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dio/channel-websock.c
+
+  This code has to be made more dynamic, and shouldn't require binary.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1849644/+subscriptions
 
