@@ -2,86 +2,94 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E33C4346E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:10:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 953D2C4346E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:14:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51F0B206FB
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:10:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 98CCD2376F
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:14:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="u1AZlqL9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51F0B206FB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M0oxymrE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98CCD2376F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLNGd-0001gE-Bg
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:10:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35142)
+	id 1kLNL6-0002rz-Io
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:14:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36194)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kLNG1-0001G7-Gy
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:09:41 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:36165)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kLNFz-00040m-Q3
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:09:41 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id b17so1283191pji.1
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 02:09:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id;
- bh=B0uxJ07z57G4A0Wf5srUqB/iSb9zi30R6BwAFVRDubA=;
- b=u1AZlqL9y3F1STfTso9hW+jUBO4on5Hme5DxSsnEcbUq3iwTTLyyec3idaIsmoMn+R
- i7meU7tYNOMc2UvRDWI/cB1DLnq3iyDwUqQo8s/20BY9LIHaBozDYnKMMrO5sAKPG6Ps
- TnE49B01ZvKNzj7oRrbr8WKYNEnhsKOlttoAIKu4xyw0A6QAxGdXBxvjd2u4YFuAt8/G
- FMZSwpIWO3CtoKM+0/PkOxK1dOU1+QtvSzMyg+WSFnTVdVdtzzW2QxCShPR00k6amFqv
- Q4J2fTLYj6IKtSaRJYDPXZQjG3SmlxN8DrvdmPz8fU/2pNCZjIfrfYn6I02wQQwIARNQ
- V8sA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=B0uxJ07z57G4A0Wf5srUqB/iSb9zi30R6BwAFVRDubA=;
- b=G1xi/+4Wv0LO/YuHlLO7zd+LPd/q3QdMyb+3s1Y2bVLA0Y4THJarogAbz35tBa8q+T
- vbIUYhOXMuvqMKVjLxv1a3Coj0tIDUvdGTz4dxAcFwUtxaRFIf7pq+IdPC8rrwqrFXwF
- s1IzZSX8GslU/FCVpf70HwUovOKiZpUjbwO4vgLwaDQ+VRMVxzif0Bp3VzzUh/NmSNhF
- /yyidU7nAomAFNDf5wagPypx31XBAWqWITzDOZQejMGpZQzbQjRC+wIYy1uhlZoOE1uE
- o+Jy/5nVP2gzlNc0j3NKoBMZHxSpP4H0iV2L2SEAHdz4EPuUSHi+a16s85RsSVtJ1OTM
- l4lg==
-X-Gm-Message-State: AOAM531TUjkuwAoJ036itjDvlQrb9IAQ9uRk6GghZloPfde4mJ8Ym7Mt
- UkZhvc8NnW6t/MQi/o/BJfSm8FPOlSEHi1G1
-X-Google-Smtp-Source: ABdhPJxFqV0rz2NmUzHX65J+eOn0nPOoMqJJFIv2hnz2p95kYfh9wfSxqUmtZR0O7TUYWuC3rOIVcQ==
-X-Received: by 2002:a17:90b:f14:: with SMTP id
- br20mr3024135pjb.24.1600938576929; 
- Thu, 24 Sep 2020 02:09:36 -0700 (PDT)
-Received: from localhost.localdomain ([115.96.139.162])
- by smtp.googlemail.com with ESMTPSA id
- y197sm2127478pfc.220.2020.09.24.02.09.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Sep 2020 02:09:35 -0700 (PDT)
-From: Ani Sinha <ani@anisinha.ca>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4] Add a comment in bios-tables-test.c to clarify the reason
- behind approach
-Date: Thu, 24 Sep 2020 14:39:25 +0530
-Message-Id: <20200924090925.18915-1-ani@anisinha.ca>
-X-Mailer: git-send-email 2.17.1
-Received-SPF: none client-ip=2607:f8b0:4864:20::1043;
- envelope-from=ani@anisinha.ca; helo=mail-pj1-x1043.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kLNJd-0002NX-Ra
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:13:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36834)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kLNJa-0004hK-4v
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:13:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600938798;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=RfuBZ4yWke5rFshYOFEf/zCh7KMRtSxHQNbUKZ+Dqpo=;
+ b=M0oxymrERe5gNRcL6jNGRF0QHHoTnXIQ36GuWtr/dHELSw2yG6NXj0+AnJjcXCs4oGaNyG
+ I9iyr1ty6+J4L7E/Ok/Fn9V2eSGQn0dfZ1+nev5QbM/TzbuVkcsOR+DlvB1G/6Xm0s6xsw
+ erDq6WR6Ecv0iu8kro5/M3yoOBle8fw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-22-ljBV2VxFMrKmPvIiRplQHA-1; Thu, 24 Sep 2020 05:13:17 -0400
+X-MC-Unique: ljBV2VxFMrKmPvIiRplQHA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C8AE1091062
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:13:16 +0000 (UTC)
+Received: from [10.72.13.109] (ovpn-13-109.pek2.redhat.com [10.72.13.109])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 68B9A5C1DC;
+ Thu, 24 Sep 2020 09:13:05 +0000 (UTC)
+Subject: Re: [PATCH v2 2/2] vhost-vdpa: add trace-events
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+References: <20200921130406.941363-1-lvivier@redhat.com>
+ <20200921130406.941363-3-lvivier@redhat.com>
+ <eeb7aee3-b15e-919c-d378-5cc3b2f9ff08@redhat.com>
+ <0622a2db-98e8-6378-9bc4-6119de7042ae@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <2bf402e0-cdef-9ab8-b09c-d7f5768afaf8@redhat.com>
+Date: Thu, 24 Sep 2020 17:13:03 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <0622a2db-98e8-6378-9bc4-6119de7042ae@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,57 +102,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Ani Sinha <ani@anisinha.ca>, Igor Mammedov <imammedo@redhat.com>
+Cc: Cindy Lu <lulu@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A comment is added in bios-tables-test.c that explains the reasoning
-behind the process of updating the ACPI table blobs when new tests are added
-or old tests are modified or code is committed that affect tests. The
-explanation would help future contributors follow the correct process when
-making code changes that affect ACPI tables.
 
-Signed-off-by: Ani Sinha <ani@anisinha.ca>
-Acked-by: Igor Mammedov <imammedo@redhat.com>
----
- tests/qtest/bios-tables-test.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+On 2020/9/24 下午4:42, Laurent Vivier wrote:
+> On 22/09/2020 04:09, Jason Wang wrote:
+>> On 2020/9/21 下午9:04, Laurent Vivier wrote:
+>>> Add trace functionis in vhost-vdpa.c.
+>>>
+>>> All traces from this file can be enabled with '-trace vhost_vdpa*'.
+>>>
+>>> Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+>>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+>>> ---
+>>>    hw/virtio/trace-events | 29 ++++++++++++++
+>>>    hw/virtio/vhost-vdpa.c | 86 +++++++++++++++++++++++++++++++++++++++---
+>>>    2 files changed, 110 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+>>> index 845200bf109d..2b453f77a4e3 100644
+>>> --- a/hw/virtio/trace-events
+>>> +++ b/hw/virtio/trace-events
+>>> @@ -22,6 +22,35 @@ vhost_user_postcopy_waker(const char *rb, uint64_t
+>>> rb_offset) "%s + 0x%"PRIx64
+>>>    vhost_user_postcopy_waker_found(uint64_t client_addr) "0x%"PRIx64
+>>>    vhost_user_postcopy_waker_nomatch(const char *rb, uint64_t
+>>> rb_offset) "%s + 0x%"PRIx64
+>>>    +# vhost-vdpa.c
+>>> +vhost_vdpa_listener_region_add(void *vdpa, uint64_t iova, uint64_t
+>>> llend, void *vaddr, bool readonly) "vdpa: %p iova 0x%"PRIx64" llend
+>>> 0x%"PRIx64" vaddr: %p read-only: %d"
+>>> +vhost_vdpa_listener_region_del(void *vdpa, uint64_t iova, uint64_t
+>>> llend) "vdpa: %p iova 0x%"PRIx64" llend 0x%"PRIx64
+>>> +vhost_vdpa_add_status(void *dev, uint8_t status) "dev: %p status:
+>>> 0x%"PRIx8
+>>> +vhost_vdpa_init(void *dev, void *vdpa) "dev: %p vdpa: %p"
+>>> +vhost_vdpa_cleanup(void *dev, void *vdpa) "dev: %p vdpa: %p"
+>>> +vhost_vdpa_memslots_limit(void *dev, int ret) "dev: %p = 0x%x"
+>>> +vhost_vdpa_set_mem_table(void *dev, uint32_t nregions, uint32_t
+>>> padding) "dev: %p nregions: %"PRIu32" padding: 0x%"PRIx32
+>>> +vhost_vdpa_dump_regions(void *dev, int i, uint64_t guest_phys_addr,
+>>> uint64_t memory_size, uint64_t userspace_addr, uint64_t flags_padding)
+>>> "dev: %p %d: guest_phys_addr: 0x%"PRIx64" memory_size: 0x%"PRIx64"
+>>> userspace_addr: 0x%"PRIx64" flags_padding: 0x%"PRIx64
+>>> +vhost_vdpa_set_features(void *dev, uint64_t features) "dev: %p
+>>> features: 0x%"PRIx64
+>>> +vhost_vdpa_get_device_id(void *dev, uint32_t device_id) "dev: %p
+>>> device_id %"PRIu32
+>>> +vhost_vdpa_reset_device(void *dev, uint8_t status) "dev: %p status:
+>>> 0x%"PRIx8
+>>> +vhost_vdpa_get_vq_index(void *dev, int idx, int vq_idx) "dev: %p idx:
+>>> %d vq idx: %d"
+>>> +vhost_vdpa_set_vring_ready(void *dev) "dev: %p"
+>>> +vhost_vdpa_dump_config(void *dev, const char *line) "dev: %p %s"
+>>> +vhost_vdpa_set_config(void *dev, uint32_t offset, uint32_t size,
+>>> uint32_t flags) "dev: %p offset: %"PRIu32" size: %"PRIu32" flags:
+>>> 0x%"PRIx32
+>>> +vhost_vdpa_get_config(void *dev, void *config, uint32_t config_len)
+>>> "dev: %p config: %p config_len: %"PRIu32
+>>> +vhost_vdpa_dev_start(void *dev, bool started) "dev: %p started: %d"
+>>> +vhost_vdpa_set_log_base(void *dev, uint64_t base, unsigned long long
+>>> size, int refcnt, int fd, void *log) "dev: %p base: 0x%"PRIx64" size:
+>>> %llu refcnt: %d fd: %d log: %p"
+>>> +vhost_vdpa_set_vring_addr(void *dev, unsigned int index, unsigned int
+>>> flags, uint64_t desc_user_addr, uint64_t used_user_addr, uint64_t
+>>> avail_user_addr, uint64_t log_guest_addr) "dev: %p index: %u flags:
+>>> 0x%x desc_user_addr: 0x%"PRIx64" used_user_addr: 0x%"PRIx64"
+>>> avail_user_addr: 0x%"PRIx64" log_guest_addr: 0x%"PRIx64
+>>> +vhost_vdpa_set_vring_num(void *dev, unsigned int index, unsigned int
+>>> num) "dev: %p index: %u num: %u"
+>>> +vhost_vdpa_set_vring_base(void *dev, unsigned int index, unsigned int
+>>> num) "dev: %p index: %u num: %u"
+>>> +vhost_vdpa_get_vring_base(void *dev, unsigned int index, unsigned int
+>>> num) "dev: %p index: %u num: %u"
+>>> +vhost_vdpa_set_vring_kick(void *dev, unsigned int index, int fd)
+>>> "dev: %p index: %u fd: %d"
+>>> +vhost_vdpa_set_vring_call(void *dev, unsigned int index, int fd)
+>>> "dev: %p index: %u fd: %d"
+>>
+>> It's better to add set/get_vring_addr() and dma_map()/dma_unmap().
+> I'm adding dma_map()/dma_unmap().
+>
+> set_vring_addr() is already in the list, and get_vring_addr() doesn't
+> exist.
 
-Changelog:
-v2: cosmetic - commit log reworded.
-v3: review feedback incorporared and actual comment in the code reworded.
-v4: more updates as per Igor's suggestion. Dropped some comment lines. added
-    ack'd by line.
 
-diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-index b514b70b62..34e2e1c55b 100644
---- a/tests/qtest/bios-tables-test.c
-+++ b/tests/qtest/bios-tables-test.c
-@@ -11,7 +11,7 @@
-  */
- 
- /*
-- * How to add or update the tests:
-+ * How to add or update the tests or commit changes that affect ACPI tables:
-  * Contributor:
-  * 1. add empty files for new tables, if any, under tests/data/acpi
-  * 2. list any changed files in tests/qtest/bios-tables-test-allowed-diff.h
-@@ -38,6 +38,11 @@
-  *      $(SRC_PATH)/tests/data/acpi/rebuild-expected-aml.sh
-  * 6. Now commit any changes to the expected binary, include diff from step 4
-  *    in commit log.
-+ *    Expected binary updates needs to be a separate patch from the code that
-+ *    introduces changes to ACPI tables. It lets maintainer to drop
-+ *    and regenerate binary updates in case of merge conflicts. Further, a code
-+ *    change is easily reviewable but a binary blob is not (without doing a
-+ *    diassemly).
-  * 7. Before sending patches to the list (Contributor)
-  *    or before doing a pull request (Maintainer), make sure
-  *    tests/qtest/bios-tables-test-allowed-diff.h is empty - this will ensure
--- 
-2.17.1
+Your are right. We don't have get_vring_addr() actually.
+
+
+> As I don't see the link with vhost_vdpa_set_vring_call() I would
+> keep it.
+>
+> Did I miss something?
+
+
+Nope, there's no link.
+
+Please keep that.
+
+Thanks
+
+
+>
+> Thanks,
+> Laurent
+>
+>
 
 
