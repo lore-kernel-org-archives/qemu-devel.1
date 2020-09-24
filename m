@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ABD4C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 19:01:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5140C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 19:04:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D80A623600
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 19:01:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 024702396E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 19:04:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="og8ZMLeG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D80A623600
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="H1ygsUK5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 024702396E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLWUz-0007Mc-PT
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 15:01:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43820)
+	id 1kLWXQ-0000Tm-K1
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 15:04:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43886)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kLWOL-0001GM-36; Thu, 24 Sep 2020 14:54:53 -0400
-Received: from mail-eopbgr80115.outbound.protection.outlook.com
- ([40.107.8.115]:8199 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ id 1kLWOY-0001TH-AN; Thu, 24 Sep 2020 14:55:06 -0400
+Received: from mail-eopbgr130114.outbound.protection.outlook.com
+ ([40.107.13.114]:8257 helo=EUR01-HE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kLWOA-0002OV-IY; Thu, 24 Sep 2020 14:54:52 -0400
+ id 1kLWOV-0002O2-8F; Thu, 24 Sep 2020 14:55:05 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XjnaKG99EMpdVUOnwEbDq7SmCDg3/tY86KdwbRNnkQFzXGzG/CH/lHluXlx8K6eOTF1pvyOLlFQR1+ndzS9SR//fjjDD8sTwzkRLzxNBLaNjF2Ax8i9x0qUjvmZ0og/Tqn760vltrMNqzDr9sv9iEpye8NU81Vm49ALBncHTtQD4Yl2hFdt5wu4FswLLkbLBFwybVXadEeAEAzmVBEX7INzBCf24JzrpWunzt7aFKKTIhzdeMAwmfMl46KMASa/hp7gJ3dAmSvTrZoqSYg8/mIVmeI+n6aL1UQ0pr6/C0+qzc9MAO51qWCZQU5gm31vxYKzfZK51uf9acVgsVlWtGA==
+ b=CMSorFXEletaDkiglIcqvIeMAq2gFo/HrmJRY3xKsYfvu4CYRAKe1hhKayVMqZ68WjRzde89/gOKoIAx6fqgmBeyXFXtl7EJh1BWBl+1rlk+wMo4tfjvXEhWlgBUDfD+Vt5HZkENl1xukj4Ub8fs+9wnsyY2+fQ7rHf2cTQI5SLg5YUAdhlykV9Mlf+niBuTh9jU+rg9jUtAkpR0lxLbzuakootOs273w2ha6E2StA7o9MdbQBLOnj+26AKi44o5iXW5DfMasNppTqeu/+V1xwlLAQI0ZInFE+jFPlQge5nmjKo6sarYcAIK4sO5/ngf2yPswHAXTUbOLAcx54g6pw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HiHebYqNrRrCRFM5FZXBKZhy6PdvbjnSnTkFrQlzjC4=;
- b=Sz3TJaUNFciJLpqvZAw/SNXTtSDNdR1YhMO82jLV38NObpC3UeJdwqxXvGBCJYY0QhSf1j2q0P/AUAebkCdRwtDzYyk7NZHkzyg6M0Ua4tZ1FQs4u6BWsISF4sgrDXW+Gu2dXeItzx8PRk43RNtmy6QUJSygvAHHgOtGqOaaIsCAW00qP265/aYu0RfuAgSOMjyfwF2LY7Pm8FhHrw/efWMbQ666W+6R+3AGDsVP9NN+s3mzLlTZAKpoEGVMoU7tzHGrksAGT2XYDdPBQtm8yV9deDbdQdm4AmT/q787OO8mMlzZuo415hUy9BZVsLs01jlMNzAjLhhW2f1QNJnv7w==
+ bh=VbaM5n3KLXdAwn6sS+GyjAMrwvGQDJwjtDo5Psu5LYY=;
+ b=S3pD4ZXmX4PIARa17P3Tdchyv2T9YsyzXJmKwFY0hLsElxceuED09GvkFhnLJlQ499y1rnk3xIvPgOkE801tDoL7oQL6D5vVgJ/QxPkPiV0QC3ckO0r7JXK4htal/mvoofxZLObKy30FS39K2jpEvXdI5xOqvc2XixoEJ0yOKBsXc2Q/WHEJxB64oI5ucQubsizsmupbHkc+PU1ziGt84m9TlD+zXjGwPufvthMcAfor/RzDc1fOaIompI/czqycrUsQ+HzTL9xh4Yqt9uQnS6s7S6ZSTT0vWxGZdAVS+JQr3KVxqHH71kOuXWuROlGC0miRRcDwiWJ4IK+V31OzVA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HiHebYqNrRrCRFM5FZXBKZhy6PdvbjnSnTkFrQlzjC4=;
- b=og8ZMLeGnPggnSOMGoewURM8+ir/PqjmOYOjQBsvF96b5Qsm9EgHU1IghzQf19gNWX2PPLEYhUhcwBueA+BVEe8sFNmiKArWQRuMYPu9pWMzsEu1CPc4DGUFqNwJdiWTvmjVsGMjAn5XQNXQXw549ngttQqBmqSTGh73HzXKB/E=
+ bh=VbaM5n3KLXdAwn6sS+GyjAMrwvGQDJwjtDo5Psu5LYY=;
+ b=H1ygsUK5rNJsG9UwN6yMJpSstv7EqL6IdIfN0wErZQVcLHP1yL39ZhH6otuVbFSpvlaHh+H9NWWVxwmHbmLwUoxG4UeyXhfBjSn/XK39eADLGtwKSu4kXGuiuFd9oZzSV0nqvGC80k3npNGdt+QNuzAIUIWxq51kYKUgpyc2muY=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB3159.eurprd08.prod.outlook.com (2603:10a6:209:46::20)
+ by AM6PR08MB4341.eurprd08.prod.outlook.com (2603:10a6:20b:b9::22)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.20; Thu, 24 Sep
- 2020 18:54:39 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.14; Thu, 24 Sep
+ 2020 18:54:37 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::b179:9641:7589:d692%8]) with mapi id 15.20.3370.033; Thu, 24 Sep 2020
- 18:54:39 +0000
+ 18:54:37 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, crosa@redhat.com, ehabkost@redhat.com,
  fam@euphon.net, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com,
  den@openvz.org, vsementsov@virtuozzo.com, eblake@redhat.com
-Subject: [PATCH v9 7/7] block/io: refactor save/load vmstate
-Date: Thu, 24 Sep 2020 21:54:14 +0300
-Message-Id: <20200924185414.28642-8-vsementsov@virtuozzo.com>
+Subject: [PATCH v9 4/7] scripts: add block-coroutine-wrapper.py
+Date: Thu, 24 Sep 2020 21:54:11 +0300
+Message-Id: <20200924185414.28642-5-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200924185414.28642-1-vsementsov@virtuozzo.com>
 References: <20200924185414.28642-1-vsementsov@virtuozzo.com>
@@ -81,37 +81,37 @@ Received: from kvm.sw.ru (185.215.60.94) by
  AM0PR05CA0082.eurprd05.prod.outlook.com (2603:10a6:208:136::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.20 via Frontend
- Transport; Thu, 24 Sep 2020 18:54:39 +0000
+ Transport; Thu, 24 Sep 2020 18:54:36 +0000
 X-Mailer: git-send-email 2.21.3
 X-Originating-IP: [185.215.60.94]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2e114505-b03f-402c-c271-08d860bb4a77
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3159:
+X-MS-Office365-Filtering-Correlation-Id: b5474063-a302-4865-de55-08d860bb48c5
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4341:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB31590386EBFDF9F3F63C7BECC1390@AM6PR08MB3159.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:153;
+X-Microsoft-Antispam-PRVS: <AM6PR08MB4341131CC58CF0E608E4DBF1C1390@AM6PR08MB4341.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4714;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: lhMMUmRQObUsY79OaP/4s98N5toVOPOwX5kpCBOUvRO75kkyYC9g7MueJWXAXs5l3nh59sZ9twCm+TUt88AZ+5RDs3Q8peRrBusFKi6zf2QSDgOHhbH/Tz0nXpztk4Y7Qdktp2qPz0F2BxP9xW1PQJ7VdZX56VwDui+rvM0ynhpYlbp2l6/eGNENujisQpcBKPmmhWoznGdxKiHCGw6lvU+wyCbVBlgmadt5nR4BZOS9TDlwnEZf2WnLmrinH+sbsQ28/VwPwmW3UHoHUiCSj5d4ZpQpPX/txvLWzI/C88l3WKeo7P/IV6jbOl9wESe7oBEIMzZXQlT21ijOKmuDxAbAdSn0DRsoEaceIapceAiqvNpROfRt+w4z/3s3CkFa
+X-Microsoft-Antispam-Message-Info: 0CL9I4sVrqT9S1RujFaCyr7GINwL0pBZgP05CINRVgjgPSQiWFOXdM7dMFLKTeIK0oSEBBZ+7D/IkTD4f4g7FymoEIE2iqgALVBKizYe9gIZapsrDh7RWNl7g4DwmTMOHq1WDhuwBp6XnxmqvJl9XrBGZAi9lsayFZm5Pe/ZoLyvHjqLM/QGbGqYSSaetmrKPjh94eGG/kQRbtuioHzL9+vjwHm23RNVEOCozAUsbYiWO9R8CvXkDKC5kgis3d6bdovv3Pvgej8sYHMK+R2QpNzAcjx9e+1nyrxUQkXCijyok6hCMx9SscLmRwfwrnsOUNNHvITCv2dWH4cuRuL3sd/oZ3slJucHWlvD8oSTtAVHSfLfZR/DikfUZSQzS1KxQIySyB/ybfmWi5K4/cMt/c09ypRPm2YAZGtnxnnug4NBCXMg2NRgaZbFGtA8ag9xrBFaILhzeVgj/qO8kk9SAU90DGrTch5vwyNxWXD5s6sgWNlkedhCbwvW0RyYlZrp
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(136003)(396003)(39850400004)(346002)(376002)(8676002)(186003)(86362001)(6916009)(66556008)(8936002)(478600001)(36756003)(83380400001)(956004)(6512007)(4326008)(16526019)(66476007)(5660300002)(66946007)(2906002)(6486002)(6666004)(6506007)(52116002)(26005)(1076003)(2616005)(316002);
+ SFS:(4636009)(376002)(136003)(396003)(346002)(366004)(39840400004)(316002)(83380400001)(66476007)(6506007)(186003)(16526019)(5660300002)(2906002)(36756003)(6666004)(8936002)(8676002)(66946007)(2616005)(956004)(52116002)(6512007)(66556008)(86362001)(26005)(4326008)(478600001)(6916009)(1076003)(6486002)(30864003)(2004002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: IL28E+BINdBW8pXf5CGkXicf/5x3VFOCmTkdUcEuJjMupCXJwFMVPpFCcsV4TOx7abXDcVSm7rXnHQ5GUZG1l8qxdXxMA68LHL6UAAu69nT+EJrhTZ9h7WFh3HrsNltEiMVwnOJskxqBeXFReHr/eBtgaFScRQXPYn2CQTGfXAfveE0QVU5bScebOeXcLxwUivj9wP7FpbjtfM5HEuptw/weA1YS2xrqRTFCWrNxs50jw45wnRUTYVKgNqLitsjL70+tIl8hnJoDJlUTWYDB4Ea/RZNKwiravxpb4E+ih0w1ehuHmAj5u+HuW3UgE2KtRAIMgKU3abUxLV5F6N9ojpWJAL8RhLulnJuavmJ6YnwNXbRuAawyjgGkeXFbqv5N0e//DH08lupB0pOBrG99rzA4mWWXWd6Fc5O8BScmt+SA/FtHihudV26euNpVzMsuYpLFees6fPuJoNgijrKXPi+XsYNNkI/zBYfWcl4u5cyRiPMc5rHIsBokwvuhu3tpOEU9UgUB9U6l3Mq/B9WFwAD8XbpGfLCjaama1CV6z2Upr+yj8P7yPpiUOgKf769l18nxSFyTDrYViHzx5SDiJsT0JBC5yL2mrf0ORw5pgddCpXe0e3MklSc1xDWBETC/CXRfGywVBqgZPe9bC7hRsQ==
+X-MS-Exchange-AntiSpam-MessageData: Y80rEh/FGLuaXoAEfaKkatJKsSEsnLOHIT9yQAibUtxfaphlmcLNeJvuQ4zoGS0m5FPUnpAKfTF5K2Ahod68USt1M4obhp3WvDoJXmU7DzbbLlhIQaUEmyi1i15Ty5SHhVE4IoYhGW6TpJAoMxjUlIZds6YrH8waM3wgnQnusbjdYKIJwvVASWiQJGBQfxzRDaaEVL2/4zU4jiAQpB+9z6hUg/TkcaXeCVQXBq2QInmfdoKphMvfkbROaRjxIvA16sROYbiTVHMm9ozLLhRuhI2XEfBWsj7fYQJyxEgZ/BvnbtUP0n3giv1hQlRMo+G9q5I5mfCzEynd+ZCBM7DFggms9qNKlRLFffVhk21TzeGfTO4ekwaAeJzIrisV7gJDP8H+oQwBJ6qW+wF6lWASkuTWBqoMkjKCZkb69oVSWDGdO0CedQOSkTzIdt0h+Ppf4C8+IRgGbR2m7Hrkesl0PuKNL0zECaXXt7GN76dbJvNK5f+F24kbdKYt1Afl0vr9xxzAvO3VeOT3kMsoS0hiO2s1PF1m7vzgiRwFgXVNFHfTB+jX0TA6cLZWgwzXSS+9hK4DrxK2r+ndbpRi5uM1W0WkTYRSCsKwCelhkPprqvOjkCG/yULG47NLnZJBstD4wpMQeL2EZBmFmQhAdCOZHg==
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2e114505-b03f-402c-c271-08d860bb4a77
+X-MS-Exchange-CrossTenant-Network-Message-Id: b5474063-a302-4865-de55-08d860bb48c5
 X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Sep 2020 18:54:39.8573 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Sep 2020 18:54:37.1004 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: q4T3pjo66Y0AjvsUwUTwrwATiWqVdSNQsI4Wfj/bp79fmczF4GILKbWAjodnHmLcYBc4Mac7VbHvHWIvU8vlyr+ZrhrSzyEhcmv4JW7SE10=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3159
-Received-SPF: pass client-ip=40.107.8.115;
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2kK/FAq98eK8P45dR+Qif8lC1uSrsYPTSkBzTGrfjFCMstOlS1DPLj48yfdemV+t2F9o09y0HawoJjrRDkKcYFqZRJacN54gORWU/oSC8o0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4341
+Received-SPF: pass client-ip=40.107.13.114;
  envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 14:54:40
+ helo=EUR01-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 14:54:34
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -136,162 +136,414 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Like for read/write in a previous commit, drop extra indirection layer,
-generate directly bdrv_readv_vmstate() and bdrv_writev_vmstate().
+We have a very frequent pattern of creating a coroutine from a function
+with several arguments:
+
+  - create a structure to pack parameters
+  - create _entry function to call original function taking parameters
+    from struct
+  - do different magic to handle completion: set ret to NOT_DONE or
+    EINPROGRESS or use separate bool field
+  - fill the struct and create coroutine from _entry function with this
+    struct as a parameter
+  - do coroutine enter and BDRV_POLL_WHILE loop
+
+Let's reduce code duplication by generating coroutine wrappers.
+
+This patch adds scripts/block-coroutine-wrapper.py together with some
+friends, which will generate functions with declared prototypes marked
+by the 'generated_co_wrapper' specifier.
+
+The usage of new code generation is as follows:
+
+    1. define the coroutine function somewhere
+
+        int coroutine_fn bdrv_co_NAME(...) {...}
+
+    2. declare in some header file
+
+        int generated_co_wrapper bdrv_NAME(...);
+
+       with same list of parameters (generated_co_wrapper is
+       defined in "include/block/block.h").
+
+    3. Make sure the block_gen_c delaration in block/meson.build
+       mentions the file with your marker function.
+
+Still, no function is now marked, this work is for the following
+commit.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/coroutines.h    | 10 +++----
- include/block/block.h |  6 ++--
- block/io.c            | 68 ++++++++++++++++++++++---------------------
- 3 files changed, 43 insertions(+), 41 deletions(-)
+ docs/devel/block-coroutine-wrapper.rst |  54 +++++++
+ docs/devel/index.rst                   |   1 +
+ block/block-gen.h                      |  49 +++++++
+ include/block/block.h                  |  10 ++
+ block/meson.build                      |   8 ++
+ scripts/block-coroutine-wrapper.py     | 188 +++++++++++++++++++++++++
+ 6 files changed, 310 insertions(+)
+ create mode 100644 docs/devel/block-coroutine-wrapper.rst
+ create mode 100644 block/block-gen.h
+ create mode 100644 scripts/block-coroutine-wrapper.py
 
-diff --git a/block/coroutines.h b/block/coroutines.h
-index 6c63a819c9..f69179f5ef 100644
---- a/block/coroutines.h
-+++ b/block/coroutines.h
-@@ -57,11 +57,9 @@ bdrv_common_block_status_above(BlockDriverState *bs,
-                                int64_t *map,
-                                BlockDriverState **file);
- 
--int coroutine_fn
--bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
--                   bool is_read);
--int generated_co_wrapper
--bdrv_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
--                bool is_read);
-+int coroutine_fn bdrv_co_readv_vmstate(BlockDriverState *bs,
-+                                       QEMUIOVector *qiov, int64_t pos);
-+int coroutine_fn bdrv_co_writev_vmstate(BlockDriverState *bs,
-+                                        QEMUIOVector *qiov, int64_t pos);
- 
- #endif /* BLOCK_COROUTINES_INT_H */
+diff --git a/docs/devel/block-coroutine-wrapper.rst b/docs/devel/block-coroutine-wrapper.rst
+new file mode 100644
+index 0000000000..d09fff2cc5
+--- /dev/null
++++ b/docs/devel/block-coroutine-wrapper.rst
+@@ -0,0 +1,54 @@
++=======================
++block-coroutine-wrapper
++=======================
++
++A lot of functions in QEMU block layer (see ``block/*``) can only be
++called in coroutine context. Such functions are normally marked by the
++coroutine_fn specifier. Still, sometimes we need to call them from
++non-coroutine context; for this we need to start a coroutine, run the
++needed function from it and wait for coroutine finish in
++BDRV_POLL_WHILE() loop. To run a coroutine we need a function with one
++void* argument. So for each coroutine_fn function which needs a
++non-coroutine interface, we should define a structure to pack the
++parameters, define a separate function to unpack the parameters and
++call the original function and finally define a new interface function
++with same list of arguments as original one, which will pack the
++parameters into a struct, create a coroutine, run it and wait in
++BDRV_POLL_WHILE() loop. It's boring to create such wrappers by hand,
++so we have a script to generate them.
++
++Usage
++=====
++
++Assume we have defined the ``coroutine_fn`` function
++``bdrv_co_foo(<some args>)`` and need a non-coroutine interface for it,
++called ``bdrv_foo(<same args>)``. In this case the script can help. To
++trigger the generation:
++
++1. You need ``bdrv_foo`` declaration somewhere (for example, in
++   ``block/coroutines.h``) with the ``generated_co_wrapper`` mark,
++   like this:
++
++.. code-block:: c
++
++    int generated_co_wrapper bdrv_foo(<some args>);
++
++2. You need to feed this declaration to block-coroutine-wrapper script.
++   For this, add the .h (or .c) file with the declaration to the
++   ``input: files(...)`` list of ``block_gen_c`` target declaration in
++   ``block/meson.build``
++
++You are done. During the build, coroutine wrappers will be generated in
++``<BUILD_DIR>/block/block-gen.c``.
++
++Links
++=====
++
++1. The script location is ``scripts/block-coroutine-wrapper.py``.
++
++2. Generic place for private ``generated_co_wrapper`` declarations is
++   ``block/coroutines.h``, for public declarations:
++   ``include/block/block.h``
++
++3. The core API of generated coroutine wrappers is placed in
++   (not generated) ``block/block-gen.h``
+diff --git a/docs/devel/index.rst b/docs/devel/index.rst
+index 04773ce076..cb0abe1e69 100644
+--- a/docs/devel/index.rst
++++ b/docs/devel/index.rst
+@@ -31,3 +31,4 @@ Contents:
+    reset
+    s390-dasd-ipl
+    clocks
++   block-coroutine-wrapper
+diff --git a/block/block-gen.h b/block/block-gen.h
+new file mode 100644
+index 0000000000..f80cf4897d
+--- /dev/null
++++ b/block/block-gen.h
+@@ -0,0 +1,49 @@
++/*
++ * Block coroutine wrapping core, used by auto-generated block/block-gen.c
++ *
++ * Copyright (c) 2003 Fabrice Bellard
++ * Copyright (c) 2020 Virtuozzo International GmbH
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef BLOCK_BLOCK_GEN_H
++#define BLOCK_BLOCK_GEN_H
++
++#include "block/block_int.h"
++
++/* Base structure for argument packing structures */
++typedef struct BdrvPollCo {
++    BlockDriverState *bs;
++    bool in_progress;
++    int ret;
++    Coroutine *co; /* Keep pointer here for debugging */
++} BdrvPollCo;
++
++static inline int bdrv_poll_co(BdrvPollCo *s)
++{
++    assert(!qemu_in_coroutine());
++
++    bdrv_coroutine_enter(s->bs, s->co);
++    BDRV_POLL_WHILE(s->bs, s->in_progress);
++
++    return s->ret;
++}
++
++#endif /* BLOCK_BLOCK_GEN_H */
 diff --git a/include/block/block.h b/include/block/block.h
-index eef4cceaf0..8b87df69a1 100644
+index 81d591dd4c..0f0ddc51b4 100644
 --- a/include/block/block.h
 +++ b/include/block/block.h
-@@ -572,8 +572,10 @@ int path_has_protocol(const char *path);
- int path_is_absolute(const char *path);
- char *path_combine(const char *base_path, const char *filename);
+@@ -10,6 +10,16 @@
+ #include "block/blockjob.h"
+ #include "qemu/hbitmap.h"
  
--int bdrv_readv_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos);
--int bdrv_writev_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos);
-+int generated_co_wrapper
-+bdrv_readv_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos);
-+int generated_co_wrapper
-+bdrv_writev_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos);
- int bdrv_save_vmstate(BlockDriverState *bs, const uint8_t *buf,
-                       int64_t pos, int size);
- 
-diff --git a/block/io.c b/block/io.c
-index cd5b689473..449b99b92c 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2475,67 +2475,69 @@ int bdrv_is_allocated_above(BlockDriverState *top,
- }
- 
- int coroutine_fn
--bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
--                   bool is_read)
-+bdrv_co_readv_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos)
- {
-     BlockDriver *drv = bs->drv;
-     BlockDriverState *child_bs = bdrv_primary_bs(bs);
-     int ret = -ENOTSUP;
- 
-+    if (!drv) {
-+        return -ENOMEDIUM;
-+    }
++/*
++ * generated_co_wrapper
++ *
++ * Function specifier, which does nothing but mark functions to be
++ * generated by scripts/block-coroutine-wrapper.py
++ *
++ * Read more in docs/devel/block-coroutine-wrapper.rst
++ */
++#define generated_co_wrapper
 +
-     bdrv_inc_in_flight(bs);
+ /* block.c */
+ typedef struct BlockDriver BlockDriver;
+ typedef struct BdrvChild BdrvChild;
+diff --git a/block/meson.build b/block/meson.build
+index a3e56b7cd1..88ad73583a 100644
+--- a/block/meson.build
++++ b/block/meson.build
+@@ -107,6 +107,14 @@ module_block_h = custom_target('module_block.h',
+                                command: [module_block_py, '@OUTPUT0@', modsrc])
+ block_ss.add(module_block_h)
  
--    if (!drv) {
--        ret = -ENOMEDIUM;
--    } else if (drv->bdrv_load_vmstate) {
--        if (is_read) {
--            ret = drv->bdrv_load_vmstate(bs, qiov, pos);
--        } else {
--            ret = drv->bdrv_save_vmstate(bs, qiov, pos);
--        }
-+    if (drv->bdrv_load_vmstate) {
-+        ret = drv->bdrv_load_vmstate(bs, qiov, pos);
-     } else if (child_bs) {
--        ret = bdrv_co_rw_vmstate(child_bs, qiov, pos, is_read);
-+        ret = bdrv_co_readv_vmstate(child_bs, qiov, pos);
-     }
- 
-     bdrv_dec_in_flight(bs);
++wrapper_py = find_program('../scripts/block-coroutine-wrapper.py')
++block_gen_c = custom_target('block-gen.c',
++                            output: 'block-gen.c',
++                            input: files('../include/block/block.h',
++                                         'coroutines.h'),
++                            command: [wrapper_py, '@OUTPUT@', '@INPUT@'])
++block_ss.add(block_gen_c)
 +
-     return ret;
- }
+ block_ss.add(files('stream.c'))
  
--int bdrv_save_vmstate(BlockDriverState *bs, const uint8_t *buf,
--                      int64_t pos, int size)
-+int coroutine_fn
-+bdrv_co_writev_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos)
- {
--    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, size);
--    int ret;
-+    BlockDriver *drv = bs->drv;
-+    BlockDriverState *child_bs = bdrv_primary_bs(bs);
-+    int ret = -ENOTSUP;
- 
--    ret = bdrv_writev_vmstate(bs, &qiov, pos);
--    if (ret < 0) {
--        return ret;
-+    if (!drv) {
-+        return -ENOMEDIUM;
-     }
- 
--    return size;
--}
-+    bdrv_inc_in_flight(bs);
- 
--int bdrv_writev_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos)
--{
--    return bdrv_rw_vmstate(bs, qiov, pos, false);
-+    if (drv->bdrv_save_vmstate) {
-+        ret = drv->bdrv_save_vmstate(bs, qiov, pos);
-+    } else if (child_bs) {
-+        ret = bdrv_co_writev_vmstate(child_bs, qiov, pos);
-+    }
+ softmmu_ss.add(files('qapi-sysemu.c'))
+diff --git a/scripts/block-coroutine-wrapper.py b/scripts/block-coroutine-wrapper.py
+new file mode 100644
+index 0000000000..505e070660
+--- /dev/null
++++ b/scripts/block-coroutine-wrapper.py
+@@ -0,0 +1,188 @@
++#! /usr/bin/env python3
++"""Generate coroutine wrappers for block subsystem.
 +
-+    bdrv_dec_in_flight(bs);
++The program parses one or several concatenated c files from stdin,
++searches for functions with the 'generated_co_wrapper' specifier
++and generates corresponding wrappers on stdout.
 +
-+    return ret;
- }
- 
--int bdrv_load_vmstate(BlockDriverState *bs, uint8_t *buf,
-+int bdrv_save_vmstate(BlockDriverState *bs, const uint8_t *buf,
-                       int64_t pos, int size)
- {
-     QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, size);
--    int ret;
--
--    ret = bdrv_readv_vmstate(bs, &qiov, pos);
--    if (ret < 0) {
--        return ret;
--    }
-+    int ret = bdrv_writev_vmstate(bs, &qiov, pos);
- 
--    return size;
-+    return ret < 0 ? ret : size;
- }
- 
--int bdrv_readv_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos)
-+int bdrv_load_vmstate(BlockDriverState *bs, uint8_t *buf,
-+                      int64_t pos, int size)
- {
--    return bdrv_rw_vmstate(bs, qiov, pos, true);
-+    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, size);
-+    int ret = bdrv_readv_vmstate(bs, &qiov, pos);
++Usage: block-coroutine-wrapper.py generated-file.c FILE.[ch]...
 +
-+    return ret < 0 ? ret : size;
- }
- 
- /**************************************************************/
++Copyright (c) 2020 Virtuozzo International GmbH.
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program.  If not, see <http://www.gnu.org/licenses/>.
++"""
++
++import sys
++import re
++import subprocess
++import json
++from typing import Iterator
++
++
++def prettify(code: str) -> str:
++    """Prettify code using clang-format if available"""
++
++    try:
++        style = json.dumps({
++            'IndentWidth': 4,
++            'BraceWrapping': {'AfterFunction': True},
++            'BreakBeforeBraces': 'Custom',
++            'SortIncludes': False,
++            'MaxEmptyLinesToKeep': 2,
++        })
++        p = subprocess.run(['clang-format', f'-style={style}'], check=True,
++                           encoding='utf-8', input=code,
++                           stdout=subprocess.PIPE)
++        return p.stdout
++    except FileNotFoundError:
++        return code
++
++
++def gen_header():
++    copyright = re.sub('^.*Copyright', 'Copyright', __doc__, flags=re.DOTALL)
++    copyright = re.sub('^(?=.)', ' * ', copyright.strip(), flags=re.MULTILINE)
++    copyright = re.sub('^$', ' *', copyright, flags=re.MULTILINE)
++    return f"""\
++/*
++ * File is generated by scripts/block-coroutine-wrapper.py
++ *
++{copyright}
++ */
++
++#include "qemu/osdep.h"
++#include "block/coroutines.h"
++#include "block/block-gen.h"
++#include "block/block_int.h"\
++"""
++
++
++class ParamDecl:
++    param_re = re.compile(r'(?P<decl>'
++                          r'(?P<type>.*[ *])'
++                          r'(?P<name>[a-z][a-z0-9_]*)'
++                          r')')
++
++    def __init__(self, param_decl: str) -> None:
++        m = self.param_re.match(param_decl.strip())
++        if m is None:
++            raise ValueError(f'Wrong parameter declaration: "{param_decl}"')
++        self.decl = m.group('decl')
++        self.type = m.group('type')
++        self.name = m.group('name')
++
++
++class FuncDecl:
++    def __init__(self, return_type: str, name: str, args: str) -> None:
++        self.return_type = return_type.strip()
++        self.name = name.strip()
++        self.args = [ParamDecl(arg.strip()) for arg in args.split(',')]
++
++    def gen_list(self, format: str) -> str:
++        return ', '.join(format.format_map(arg.__dict__) for arg in self.args)
++
++    def gen_block(self, format: str) -> str:
++        return '\n'.join(format.format_map(arg.__dict__) for arg in self.args)
++
++
++# Match wrappers declared with a generated_co_wrapper mark
++func_decl_re = re.compile(r'^int\s*generated_co_wrapper\s*'
++                          r'(?P<wrapper_name>[a-z][a-z0-9_]*)'
++                          r'\((?P<args>[^)]*)\);$', re.MULTILINE)
++
++
++def func_decl_iter(text: str) -> Iterator:
++    for m in func_decl_re.finditer(text):
++        yield FuncDecl(return_type='int',
++                       name=m.group('wrapper_name'),
++                       args=m.group('args'))
++
++
++def snake_to_camel(func_name: str) -> str:
++    """
++    Convert underscore names like 'some_function_name' to camel-case like
++    'SomeFunctionName'
++    """
++    words = func_name.split('_')
++    words = [w[0].upper() + w[1:] for w in words]
++    return ''.join(words)
++
++
++def gen_wrapper(func: FuncDecl) -> str:
++    assert func.name.startswith('bdrv_')
++    assert not func.name.startswith('bdrv_co_')
++    assert func.return_type == 'int'
++    assert func.args[0].type in ['BlockDriverState *', 'BdrvChild *']
++
++    name = 'bdrv_co_' + func.name[5:]
++    bs = 'bs' if func.args[0].type == 'BlockDriverState *' else 'child->bs'
++    struct_name = snake_to_camel(name)
++
++    return f"""\
++/*
++ * Wrappers for {name}
++ */
++
++typedef struct {struct_name} {{
++    BdrvPollCo poll_state;
++{ func.gen_block('    {decl};') }
++}} {struct_name};
++
++static void coroutine_fn {name}_entry(void *opaque)
++{{
++    {struct_name} *s = opaque;
++
++    s->poll_state.ret = {name}({ func.gen_list('s->{name}') });
++    s->poll_state.in_progress = false;
++
++    aio_wait_kick();
++}}
++
++int {func.name}({ func.gen_list('{decl}') })
++{{
++    if (qemu_in_coroutine()) {{
++        return {name}({ func.gen_list('{name}') });
++    }} else {{
++        {struct_name} s = {{
++            .poll_state.bs = {bs},
++            .poll_state.in_progress = true,
++
++{ func.gen_block('            .{name} = {name},') }
++        }};
++
++        s.poll_state.co = qemu_coroutine_create({name}_entry, &s);
++
++        return bdrv_poll_co(&s.poll_state);
++    }}
++}}"""
++
++
++def gen_wrappers(input_code: str) -> str:
++    res = ''
++    for func in func_decl_iter(input_code):
++        res += '\n\n\n'
++        res += gen_wrapper(func)
++
++    return prettify(res)  # prettify to wrap long lines
++
++
++if __name__ == '__main__':
++    if len(sys.argv) < 3:
++        exit(f'Usage: {sys.argv[0]} OUT_FILE.c IN_FILE.[ch]...')
++
++    with open(sys.argv[1], 'w') as f_out:
++        f_out.write(gen_header())
++        for fname in sys.argv[2:]:
++            with open(fname) as f_in:
++                f_out.write(gen_wrappers(f_in.read()))
++                f_out.write('\n')
 -- 
 2.21.3
 
