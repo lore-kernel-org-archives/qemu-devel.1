@@ -2,71 +2,71 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DED67C4727D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:04:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6A5EC4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:05:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65AC3221EB
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:04:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F2CB2067B
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:05:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="esTEjMgt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65AC3221EB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hH94C2HV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F2CB2067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLO74-0008Sd-D1
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 06:04:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39530)
+	id 1kLO85-0001ds-Un
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 06:05:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39878)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNUS-0002nP-Bf
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22363)
+ id 1kLNUz-0003Oc-S7
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:25:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60444)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNUP-0006Bx-GM
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:36 -0400
+ id 1kLNUq-0006I0-0a
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:25:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600939472;
+ s=mimecast20190719; t=1600939498;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=FRpFA2P7IfC6WfO047C+ygVzFYlCMRb/VByphnkkYsQ=;
- b=esTEjMgt3so/C20LNtFxLp8H40XdqkhxiThhhHWnYKrX9mEVdRyzqc9YPAAAZ3aweEb74+
- sWKN0dERzlJj6QjxEllVO7bQbXnbJCqX8xtF7unuxSIhth2XRJKbS4HmHSZfPMpRvm2Mo6
- 51ora6AGG2f0itJ1Kzv+gACfpB0cqcc=
+ bh=f8IF91sjN25lbtFmQe6SfV4tAQBciSF2GxvmgEJFKxE=;
+ b=hH94C2HVkLWAHTeN9qTvW/X43EbuHT7jpWzimEzlWhtV1swQQOSOQWDy0yHIowSvY+YaPQ
+ o1sHd7DUytV/d8NwOTEbKvuhVAr9Z+H5sPaMrxyU4luQ3PqM9oYYfzXT0HpSFK8HJzNQ1T
+ Aw0XOw3nos6ipEqs/ixhKZbYh2FL+rE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337--6AYhX73M6O4BgfTPw0wgw-1; Thu, 24 Sep 2020 05:24:31 -0400
-X-MC-Unique: -6AYhX73M6O4BgfTPw0wgw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-521-ATeukPI1NvuzkaV6HuHQVg-1; Thu, 24 Sep 2020 05:24:55 -0400
+X-MC-Unique: ATeukPI1NvuzkaV6HuHQVg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21558104D3F3
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:24:30 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 446771882FC6;
+ Thu, 24 Sep 2020 09:24:54 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D74F15C1C7;
- Thu, 24 Sep 2020 09:24:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C6EC455764;
+ Thu, 24 Sep 2020 09:24:53 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 70/92] qom: Reformat section titles using Sphinx syntax
-Date: Thu, 24 Sep 2020 05:22:52 -0400
-Message-Id: <20200924092314.1722645-71-pbonzini@redhat.com>
+Subject: [PULL 88/92] net/can: Add can_dlc2len and can_len2dlc for CAN FD.
+Date: Thu, 24 Sep 2020 05:23:10 -0400
+Message-Id: <20200924092314.1722645-89-pbonzini@redhat.com>
 In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
 References: <20200924092314.1722645-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -96,64 +96,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Vikram Garhwal <fnu.vikram@xilinx.com>, Jan Charvat <charvj10@fel.cvut.cz>,
+ Pavel Pisa <pisa@cmp.felk.cvut.cz>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eduardo Habkost <ehabkost@redhat.com>
+From: Jan Charvat <charvj10@fel.cvut.cz>
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20200910221526.10041-6-ehabkost@redhat.com>
+Signed-off-by: Jan Charvat <charvj10@fel.cvut.cz>
+Signed-off-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+Reviewed-by: Vikram Garhwal <fnu.vikram@xilinx.com>
+Message-Id: <0a2efc6ef9c458505952ed230e49ae25cad7f324.1600069689.git.pisa@cmp.felk.cvut.cz>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qom/object.h | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ include/net/can_emu.h |  4 ++++
+ net/can/can_core.c    | 36 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 40 insertions(+)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index c6e3d5d80c..5418464de4 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -120,7 +120,8 @@ typedef struct InterfaceInfo InterfaceInfo;
-  *   </programlisting>
-  * </example>
-  *
-- * # Class Initialization #
-+ * Class Initialization
-+ * ====================
-  *
-  * Before an object is initialized, the class for the object must be
-  * initialized.  There is only one class object for all instance objects
-@@ -193,7 +194,8 @@ typedef struct InterfaceInfo InterfaceInfo;
-  *   </programlisting>
-  * </example>
-  *
-- * # Interfaces #
-+ * Interfaces
-+ * ==========
-  *
-  * Interfaces allow a limited form of multiple inheritance.  Instances are
-  * similar to normal types except for the fact that are only defined by
-@@ -206,7 +208,8 @@ typedef struct InterfaceInfo InterfaceInfo;
-  * an argument to a method on its corresponding SomethingIfClass, or to
-  * dynamically cast it to an object that implements the interface.
-  *
-- * # Methods #
-+ * Methods
-+ * =======
-  *
-  * A <emphasis>method</emphasis> is a function within the namespace scope of
-  * a class. It usually operates on the object instance by passing it as a
-@@ -304,7 +307,8 @@ typedef struct InterfaceInfo InterfaceInfo;
-  * The first example of such a QOM method was #CPUClass.reset,
-  * another example is #DeviceClass.realize.
-  *
-- * # Standard type declaration and definition macros #
-+ * Standard type declaration and definition macros
-+ * ===============================================
-  *
-  * A lot of the code outlined above follows a standard pattern and naming
-  * convention. To reduce the amount of boilerplate code that needs to be
+diff --git a/include/net/can_emu.h b/include/net/can_emu.h
+index cab98ee8ec..6f9b206bb5 100644
+--- a/include/net/can_emu.h
++++ b/include/net/can_emu.h
+@@ -122,4 +122,8 @@ int can_bus_client_set_filters(CanBusClientState *,
+                                const struct qemu_can_filter *filters,
+                                size_t filters_cnt);
+ 
++uint8_t can_dlc2len(uint8_t can_dlc);
++
++uint8_t can_len2dlc(uint8_t len);
++
+ #endif
+diff --git a/net/can/can_core.c b/net/can/can_core.c
+index 90f4d8576a..0115d78794 100644
+--- a/net/can/can_core.c
++++ b/net/can/can_core.c
+@@ -33,6 +33,42 @@
+ #include "net/can_emu.h"
+ #include "qom/object_interfaces.h"
+ 
++/* CAN DLC to real data length conversion helpers */
++
++static const uint8_t dlc2len[] = {
++    0, 1, 2, 3, 4, 5, 6, 7,
++    8, 12, 16, 20, 24, 32, 48, 64
++};
++
++/* get data length from can_dlc with sanitized can_dlc */
++uint8_t can_dlc2len(uint8_t can_dlc)
++{
++    return dlc2len[can_dlc & 0x0F];
++}
++
++static const uint8_t len2dlc[] = {
++    0, 1, 2, 3, 4, 5, 6, 7, 8,                              /* 0 - 8 */
++    9, 9, 9, 9,                                             /* 9 - 12 */
++    10, 10, 10, 10,                                         /* 13 - 16 */
++    11, 11, 11, 11,                                         /* 17 - 20 */
++    12, 12, 12, 12,                                         /* 21 - 24 */
++    13, 13, 13, 13, 13, 13, 13, 13,                         /* 25 - 32 */
++    14, 14, 14, 14, 14, 14, 14, 14,                         /* 33 - 40 */
++    14, 14, 14, 14, 14, 14, 14, 14,                         /* 41 - 48 */
++    15, 15, 15, 15, 15, 15, 15, 15,                         /* 49 - 56 */
++    15, 15, 15, 15, 15, 15, 15, 15                          /* 57 - 64 */
++};
++
++/* map the sanitized data length to an appropriate data length code */
++uint8_t can_len2dlc(uint8_t len)
++{
++    if (unlikely(len > 64)) {
++        return 0xF;
++    }
++
++    return len2dlc[len];
++}
++
+ struct CanBusState {
+     Object object;
+ 
 -- 
 2.26.2
 
