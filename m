@@ -2,88 +2,102 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A6AAC4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 12:14:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C62C2D0E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 12:15:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 924DF23772
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 12:14:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZPvHc1X/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 924DF23772
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 737D823772
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 12:15:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 737D823772
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLQ9A-0007Ty-FD
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 08:14:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51304)
+	id 1kLQ9X-00079C-Aq
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 08:15:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50840)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kLQ8X-0006oY-Aw
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 08:14:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42594)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kLQ8V-0002OQ-Dt
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 08:14:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600949646;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=1DuwRiiDD6FKlwMUp1JEva/SPhkPCebn4fJiMfY5feI=;
- b=ZPvHc1X/n23UO+4poSqUpeZLN17jZajvNfFoyhyMKNEnfBN0+5S17KuOEGHJYrs9TUMX0H
- 5MiFy9Bw0yqPgIQ6NSAb8Qy5SXJUqW/bRMzNGhM1Uo4NkJhQAarg59FXzELWpfh5jSTk1A
- 54ieQb/71Uos3DMK2qhFIz0oAhjev0o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-558-g3s_FbwoMyOA_aeZf3z4ew-1; Thu, 24 Sep 2020 08:14:03 -0400
-X-MC-Unique: g3s_FbwoMyOA_aeZf3z4ew-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 856EF1008550;
- Thu, 24 Sep 2020 12:14:02 +0000 (UTC)
-Received: from localhost (ovpn-114-5.ams2.redhat.com [10.36.114.5])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E97661002C0B;
- Thu, 24 Sep 2020 12:14:01 +0000 (UTC)
-Date: Thu, 24 Sep 2020 13:14:00 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v8 5/7] block: generate coroutine-wrapper code
-Message-ID: <20200924121400.GX62770@stefanha-x1.localdomain>
-References: <20200915164411.20590-1-vsementsov@virtuozzo.com>
- <20200915164411.20590-6-vsementsov@virtuozzo.com>
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kLQ6i-0006Ar-Dp; Thu, 24 Sep 2020 08:12:16 -0400
+Received: from wnew4-smtp.messagingengine.com ([64.147.123.18]:58049)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kLQ6f-0002CX-WE; Thu, 24 Sep 2020 08:12:16 -0400
+Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
+ by mailnew.west.internal (Postfix) with ESMTP id E78AA871;
+ Thu, 24 Sep 2020 08:12:09 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+ by compute7.internal (MEProxy); Thu, 24 Sep 2020 08:12:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-type:in-reply-to; s=fm1; bh=6IK7TzQXElnByGPtTxW84d34Hwf
+ xTEA7wiw3tbKOkTY=; b=qQ0GbubkjbhyAEaFufrOoX1RVBcJYr4vwGx0XihY6KM
+ 9Ognhi9YB24gLYTdGqK1VzD9YNOixfKfKehGJooM7jOo0LGd01FfAWqU0nDHezyy
+ DVNgD0qPzHODWAlH9gPI8gCaw9wm9NeZY2ILCadjuURNKqrykUTUgWL7UloQhbwD
+ VDVPpmK2DvnCESQ1iSVxv2NBbMDX/8aLe49XtlarH03ntNbk07mhFJZx5Kl6QQMy
+ +8YKcZbFaa0qpb4tvhmnjq394cvz/lRi8knK5JDdMtju/DWpO9gS4bowCedUFsH5
+ MB1rBIvFQOZd8ZNHvtPuAmaAxySdiGIN/bzcpZPXUTg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=6IK7Tz
+ QXElnByGPtTxW84d34HwfxTEA7wiw3tbKOkTY=; b=jNqdiRODgojbdNqu5x1EDw
+ 5eP3dGmjWOrkgcIfmU31SUYa8mG5NswpSkOdcVmKS8bdNnLr07sTnvySH9UjNhJQ
+ zq9ZOKuYdlbj6wT0V1d6eDlOb+7nrNNQaC3O8XNhhYKrENenkDkvimydnkJiK+nN
+ QlzPTkXgGe4bv1JibXEqBrzu+55qGxwmf+uPlUDbNMjHltIQMTELH5mi3wIIJVkh
+ aCL9sPHpLNZuH78tpYZJVyvj+yLwOPbz4wT0VCd1QEKBEV6dnO2gjJv5Kxb/fSbJ
+ I/88nqZNBhTodnQ8qmqPZ2XASP+m2CNz2Ub7gefqlZGMbcV/9mJZX3LFKjKScCgQ
+ ==
+X-ME-Sender: <xms:F41sX2apODXyvbisYxr-fClpH5RHnUBep6ka6FUgOjV2IaZQcyfR4w>
+ <xme:F41sX5bgT3e7BQ4WyLm4se_JYhr6UaQ-QKfeHNHaYDx3hZlzM5pgJHjZHWy3gfbRA
+ TMGfkQPjdHwWZ5Re9M>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrudekgdehudcutefuodetggdotefrodftvf
+ curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+ uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+ fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepmfhlrghushcu
+ lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
+ hrnheptdeggeevleevffevtdeuffehgeevhfeiudetheeuvdegueejkeelueekgedvieeh
+ necuffhomhgrihhnpehophgtohguvgdrmhihnecukfhppeektddrudeijedrleekrddule
+ dtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihht
+ shesihhrrhgvlhgvvhgrnhhtrdgukh
+X-ME-Proxy: <xmx:F41sXw-8caYoe_kdb2p3AAG_kQAq8U5kUYuq2vtEUmqDxqiYWnrERA>
+ <xmx:F41sX4r4GbKHd6DBhSwp3jzGWkheBnIq7dLcgHZFyr0PTwSrWvX3xg>
+ <xmx:F41sXxqT1jEmQWbOiMkU9_QVX1i5T07ep8pSn2iV9JIQFOiElc3Ccw>
+ <xmx:GY1sXyQOpn_u_yZeXzw3gngsJPhFJPGyRwuguKN1BPyf29iPvN6sb7oAomzLvTlb>
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by mail.messagingengine.com (Postfix) with ESMTPA id B17A33064680;
+ Thu, 24 Sep 2020 08:12:05 -0400 (EDT)
+Date: Thu, 24 Sep 2020 14:12:03 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Subject: Re: [PATCH v4 06/14] hw/block/nvme: Add support for active/inactive
+ namespaces
+Message-ID: <20200924121203.GA1738917@apples.localdomain>
+References: <20200923182021.3724-1-dmitry.fomichev@wdc.com>
+ <20200923182021.3724-7-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <20200915164411.20590-6-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="zuE2pCA56U4I9Fhk"
+ protocol="application/pgp-signature"; boundary="7JfCtLOvnd9MIVvH"
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
+In-Reply-To: <20200923182021.3724-7-dmitry.fomichev@wdc.com>
+Received-SPF: pass client-ip=64.147.123.18; envelope-from=its@irrelevant.dk;
+ helo=wnew4-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 08:12:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,51 +110,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, ehabkost@redhat.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
- crosa@redhat.com, den@openvz.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
+ Niklas Cassel <niklas.cassel@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
+ qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>, Keith Busch <kbusch@kernel.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---zuE2pCA56U4I9Fhk
-Content-Type: text/plain; charset=us-ascii
+
+--7JfCtLOvnd9MIVvH
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 15, 2020 at 07:44:09PM +0300, Vladimir Sementsov-Ogievskiy wrot=
-e:
-> Use code generation implemented in previous commit to generated
-> coroutine wrappers in block.c and block/io.c
+On Sep 24 03:20, Dmitry Fomichev wrote:
+> From: Niklas Cassel <niklas.cassel@wdc.com>
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
->  block/coroutines.h    |   6 +-
->  include/block/block.h |  16 ++--
->  block.c               |  73 ---------------
->  block/io.c            | 212 ------------------------------------------
->  4 files changed, 13 insertions(+), 294 deletions(-)
+> In NVMe, a namespace is active if it exists and is attached to the
+> controller.
+>=20
+> CAP.CSS (together with the I/O Command Set data structure) defines what
+> command sets are supported by the controller.
+>=20
+> CC.CSS (together with Set Profile) can be set to enable a subset of the
+> available command sets. The namespaces belonging to a disabled command set
+> will not be able to attach to the controller, and will thus be inactive.
+>=20
+> E.g., if the user sets CC.CSS to Admin Only, NVM namespaces should be
+> marked as inactive.
+>=20
 
-Nice
+Hmm. I'm not convinced that this is correct. Can you reference the spec?
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+On the specific case you mention the spec is actually pretty clear:
 
---zuE2pCA56U4I9Fhk
+  "When only the Admin Command Set is supported, any command submitted
+  on an I/O Submission Queue and any I/O Command Set Specific Admin
+  command submitted on the Admin Submission Queue is completed with
+  status Invalid Command Opcode."
+
+My /interpretation/ (because the spec is vague on this point) is that
+with TP 4056, if the host writes 0x0 to CC.CSS, you will (should) just
+see Invalid Command Opcode for namespaces not supporting the NVM command
+set since we are operating in a backward compatible way.
+
+Now, if the host sets CC.CSS to 0x6, then it is obviously aware of
+namespaces and other rules apply. For instance, it may set the I/O
+Command Set Combination Index through a Set Features command, but TP
+4056 is clear that the host will not be allowed to choose a combination
+that leaves an attached namespace unsupported.
+
+For this device, that does not implement namespace management and thus
+has no notion of attaching/detaching namespaces, the controller should
+by default choose an I/O Command Set Combination that indicates support
+for all I/O command sets that are required to support the namespaces
+configured.
+
+--7JfCtLOvnd9MIVvH
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9sjYgACgkQnKSrs4Gr
-c8ghmQf+IBBCHcX8c+2cR3WiY5pmHzk3xWdXkiO0Jc5+wmm5YlzwaV0NwQKmFoW0
-vqxX+cvvrGzenE/jSLv66FslGyXTqw+qu+c9fGabIbX7+f1hWILo5/aY0RqT1xJJ
-qSN24Kug+mWyiMlCBbHeYnBij1s9MjZF01x/TMfNswtO+UtJqxgs4vq1sCYaXsro
-6X0Yi9H9SI8a+h6esTIxN/mKPr6hMXPZP2ji3+gbVnMFGB+TGc10PyqGRdgJMAPN
-jcUdAWQRE4TLO86EoMfYDTMj/zKqR1L3Dh5mP0MFszmLt/EXihS3U8wpUxCzDbDP
-aAWSdFuiJJQPugUvjobfO5GPSF0AfA==
-=jVh2
+iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9sjREACgkQTeGvMW1P
+DenvHgf+J/Ao3Ir2iWKvH7JFI02/cKsaSuamIpmF6UlXwKFtdc9QzXZTOscnmsh5
+vmnLRA1NpTOk0bFZShlUP3zCJyMf1goT6CCMEkVLA3g1dIDpul/tWnahXG0agj7l
+57bvhfhJBKFaThAAMKJyIYygI1SZgFvBmLn/7dxUKmD10FrLL+mptZ0Urh5VxNKg
+b3V6WEdhj7Vm+LjXEkOnV/RS8PxaCpgCmS3ay1cL/4Rp5vwICFypFXc2Y6obCAvq
+d/KUYF5/JRrclsYFqNOZ7h1M9SzGwrVd3YoJgetF9Zx8Yse/D0LTr5vOxCpnZokS
+uUfExFm2TpKUYWpaSfFXlvHT89xf7Q==
+=rePr
 -----END PGP SIGNATURE-----
 
---zuE2pCA56U4I9Fhk--
-
+--7JfCtLOvnd9MIVvH--
 
