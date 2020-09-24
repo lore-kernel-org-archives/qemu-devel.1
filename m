@@ -2,99 +2,99 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCBD9C4727E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 11:31:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB91EC4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 11:32:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F80D2388A
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 11:31:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1EC2E2311B
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 11:32:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G1vuuZGO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F80D2388A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y/f4n5qS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EC2E2311B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLPSu-0005sZ-0x
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 07:31:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40124)
+	id 1kLPUf-0007k5-7L
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 07:32:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39404)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kLPOM-0007j7-Du
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 07:26:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43639)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kLPOJ-0004xa-T5
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 07:26:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600946782;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=WuLgQ8YVGBV38U6Y+yuzMjXipQ4CSzdPz2uLs+7OmYs=;
- b=G1vuuZGOYUPPFEMKqmUe98imRUAjhq2FJMmQmEYxBYgHU3v5pazBRTzrAEkUvQ91TvjS9H
- Swc87HxJlBABEDQuPZ+I44p/9VdXVCkHyU8Va4yV90RsD5ywtxnzoGiKiYcmcK/HHtMrTn
- Hqkc4za3YO1jWnkaUAkd5O43QgsLq9s=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-334-pFLkF5J1OV2HrmQVs3UKqg-1; Thu, 24 Sep 2020 07:26:19 -0400
-X-MC-Unique: pFLkF5J1OV2HrmQVs3UKqg-1
-Received: by mail-wm1-f72.google.com with SMTP id l26so749249wmg.7
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 04:26:19 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
+ id 1kLPLj-0004BY-TY; Thu, 24 Sep 2020 07:23:44 -0400
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:37765)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
+ id 1kLPLh-0004WO-FG; Thu, 24 Sep 2020 07:23:43 -0400
+Received: by mail-qk1-x743.google.com with SMTP id 16so2857029qkf.4;
+ Thu, 24 Sep 2020 04:23:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=ZW0Amdtus0PuLVY7U3dcrUU7eiue+aXgSdxhhLiZA2g=;
+ b=Y/f4n5qSBGY4HIsFO7Bg/2wMn6srmQodt23hXUPLa+SAW4qbD/3wAgv/xp57Vq2WjX
+ jxpOoK6q8tBiqjz3uU69D0xxKuopOKe6/uB+SW7ijzaPsgsCwKXSM1LyzrL+ofQg2PLr
+ kuRugaTXI7Z1glE1tCg4HFctv42zJyqOB73k+KIXj8iu8JAYhwlUUeTL004UZ/VvpjNg
+ Mde/s2ULGYt4DXxOd5592o9VU2QWoQEEfiQPhhyMaC1dCGo9DD+2isS/Opd9XkEX9vXR
+ vkxCn0sSwlCPCe9caGSkszKgxIt4AJuj7qP7Lm7wU1BLOZMREHdmxHjsfCofOmezbPT/
+ onNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=WuLgQ8YVGBV38U6Y+yuzMjXipQ4CSzdPz2uLs+7OmYs=;
- b=E1xiXK6H+IHxmMxQrFZnkaVNREl5fjkz2EUdrbfd9gJabivDCtzqhWwey0QAxB5C3b
- WRXh8dgQJ/xkIGHcAoUUEdiTsaEyze8n59D7hit0kdYqoUWeM6tUC0JYDPqykmF3rHSB
- d9GYu5TrGforcV2+o5sH3m2qrG136lNOOCyLlfdoooDr9ZsLANh/POVT2fdCs4jY8rMh
- KDnjLQyzUC4HhrGSb+XGP2QprIsQulIrpQL9DxYeo5lcIkVB3tfbauMWVRpDlphwmovJ
- QZQdsHqtJ5w+BWjCg+oghEAxzOZxJSwCA/pQarCKr/U2FgvQh4RpJRAZMYDR2upLKRCb
- 1AbA==
-X-Gm-Message-State: AOAM531DlWZLXPlSRuLWCa8Qrqg/CUOH3LtYkk1FA8313NoP18p3Idi1
- CvL5XvVXbBx4k1pTaWI24Uj15yTyKuLidF8njbVJ3/iiBt+qOitMZT3rajzbKxGWDcbtyujKpXL
- JzyvNAQgkHEjWFOU=
-X-Received: by 2002:a5d:4910:: with SMTP id x16mr5035795wrq.204.1600946778378; 
- Thu, 24 Sep 2020 04:26:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyYdTGZLQtDauRixVP5ckhZtYtit2ENm606+ym6SamkGFv0hBq8+e8LVof9Dlry0v9BLc0Csw==
-X-Received: by 2002:a5d:4910:: with SMTP id x16mr5035766wrq.204.1600946778142; 
- Thu, 24 Sep 2020 04:26:18 -0700 (PDT)
-Received: from redhat.com (bzq-79-179-71-128.red.bezeqint.net. [79.179.71.128])
- by smtp.gmail.com with ESMTPSA id t10sm3028133wmi.1.2020.09.24.04.26.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Sep 2020 04:26:17 -0700 (PDT)
-Date: Thu, 24 Sep 2020 07:26:14 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Dima Stepanov <dimastep@yandex-team.ru>
-Subject: Re: [PATCH v5 0/7] vhost-user-blk: fix the migration issue and
- enhance qtests
-Message-ID: <20200924072506-mutt-send-email-mst@kernel.org>
-References: <cover.1599813294.git.dimastep@yandex-team.ru>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ZW0Amdtus0PuLVY7U3dcrUU7eiue+aXgSdxhhLiZA2g=;
+ b=f3F+5Iq8JKpSKbBgQ1ZqmqfbzgX6eC2yfcNb6TjR7YmX4sAEtO6iLpeNj054cdttD2
+ dC/YjqlBAT2CuSpnEMqh90ave3xEq+Qzbzz9XODqOo8DSv84DS5ijwCFwSvCGpvKPA8Q
+ zKQ2ppQhLEWXHYfh06JtFp+HmYgR2wwBj4brl8GprVP3x+ln+i0/EpqHef869ychzJ2/
+ 8ReH9xOCbH6BlAm6Tacrl5ghJnEdphmg6Fxuqm740G/3engM39D8SskcyIsCKHSIxyhl
+ cRosLmUaDul/7tPayx7DNCA8ZcIUojGRWf0vdwwquMlqyKXzDZqWuNLCup7k1ZUXTrMN
+ +7+w==
+X-Gm-Message-State: AOAM530x4VERDF3TWboDRMYxbOB9yAq69BRMAGdY2pAnQqUKdygroACa
+ Om9WnrnFQeyw5u473ZsFl84=
+X-Google-Smtp-Source: ABdhPJzocPiVfbQ8LngNIW5GfSzEirt9Fh5VOJzI0GyzBOasOs4jUx+Utr9PUE0PKV/pu6pF7T7LOg==
+X-Received: by 2002:a05:620a:211b:: with SMTP id
+ l27mr4037560qkl.56.1600946619295; 
+ Thu, 24 Sep 2020 04:23:39 -0700 (PDT)
+Received: from ?IPv6:2804:431:c7c7:c625:6c0e:4720:8228:5f68?
+ ([2804:431:c7c7:c625:6c0e:4720:8228:5f68])
+ by smtp.gmail.com with ESMTPSA id r21sm1957884qtj.80.2020.09.24.04.23.29
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 24 Sep 2020 04:23:30 -0700 (PDT)
+Subject: Re: [PATCH 2/6] spapr_numa: forbid asymmetrical NUMA setups
+To: Greg Kurz <groug@kaod.org>
+References: <20200923193458.203186-1-danielhb413@gmail.com>
+ <20200923193458.203186-3-danielhb413@gmail.com>
+ <20200924100106.45e49a84@bahia.lan>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <d7521aa3-85db-b6b4-810e-ac8a3303003c@gmail.com>
+Date: Thu, 24 Sep 2020 08:23:28 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <cover.1599813294.git.dimastep@yandex-team.ru>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <20200924100106.45e49a84@bahia.lan>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::743;
+ envelope-from=danielhb413@gmail.com; helo=mail-qk1-x743.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, NICE_REPLY_A=-0.214,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,108 +107,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, lvivier@redhat.com, thuth@redhat.com,
- qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- stefanha@gmail.com, jasowang@redhat.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, fengli@smartx.com, yc-core@yandex-team.ru,
- pbonzini@redhat.com, raphael.norwitz@nutanix.com, dgilbert@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 11, 2020 at 11:39:42AM +0300, Dima Stepanov wrote:
-> v4 -> v5:
->   - vhost: check queue state in the vhost_dev_set_log routine
->     tests/qtest/vhost-user-test: prepare the tests for adding new
->     dev class
->     tests/qtest/vhost-user-test: add support for the
->     vhost-user-blk device
->     tests/qtest/vhost-user-test: add migrate_reconnect test
->     Reviewed-by: Raphael Norwitz
->   - Update qtest, by merging vhost-user-blk "if" case with the
->     virtio-blk case.
-
-I dropped patches 3-7 since they were stalling on some systems.
-Pls work with Peter Maydell (cc'd) to figure it out.
 
 
-> v3 -> v4:
->   - vhost: recheck dev state in the vhost_migration_log routine
->     Reviewed-by: Raphael Norwitz
->   - vhost: check queue state in the vhost_dev_set_log routine
->     Use "continue" instead of "break" to handle non-initialized
->     virtqueue case.
+On 9/24/20 5:01 AM, Greg Kurz wrote:
+> On Wed, 23 Sep 2020 16:34:54 -0300
+> Daniel Henrique Barboza <danielhb413@gmail.com> wrote:
 > 
-> v2 -> v3:
->   - update commit message for the 
->     "vhost: recheck dev state in the vhost_migration_log routine" commit
->   - rename "started" field of the VhostUserBlk structure to
->     "started_vu", so there will be no confustion with the VHOST started
->     field
->   - update vhost-user-test.c to always initialize nq local variable
->     (spotted by patchew)
+>> The pSeries machine does not support asymmetrical NUMA
+>> configurations. This doesn't make much of a different
+>> since we're not using user input for pSeries NUMA setup,
+>> but this will change in the next patches.
+>>
+>> To avoid breaking existing setups, gate this change by
+>> checking for legacy NUMA support.
+>>
+>> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+>> ---
+>>   hw/ppc/spapr_numa.c | 34 ++++++++++++++++++++++++++++++++++
+>>   1 file changed, 34 insertions(+)
+>>
+>> diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
+>> index 64fe567f5d..36aaa273ee 100644
+>> --- a/hw/ppc/spapr_numa.c
+>> +++ b/hw/ppc/spapr_numa.c
+>> @@ -19,6 +19,24 @@
+>>   /* Moved from hw/ppc/spapr_pci_nvlink2.c */
+>>   #define SPAPR_GPU_NUMA_ID           (cpu_to_be32(1))
+>>   
+>> +static bool spapr_numa_is_symmetrical(MachineState *ms)
+>> +{
+>> +    int src, dst;
+>> +    int nb_numa_nodes = ms->numa_state->num_nodes;
+>> +    NodeInfo *numa_info = ms->numa_state->nodes;
+>> +
+>> +    for (src = 0; src < nb_numa_nodes; src++) {
+>> +        for (dst = src; dst < nb_numa_nodes; dst++) {
+>> +            if (numa_info[src].distance[dst] !=
+>> +                numa_info[dst].distance[src]) {
+>> +                return false;
+>> +            }
+>> +        }
+>> +    }
+>> +
+>> +    return true;
+>> +}
+>> +
+>>   void spapr_numa_associativity_init(SpaprMachineState *spapr,
+>>                                      MachineState *machine)
+>>   {
+>> @@ -61,6 +79,22 @@ void spapr_numa_associativity_init(SpaprMachineState *spapr,
+>>   
+>>           spapr->numa_assoc_array[i][MAX_DISTANCE_REF_POINTS] = cpu_to_be32(i);
+>>       }
+>> +
+>> +    /*
+>> +     * Legacy NUMA guests (pseries-5.1 and order, or guests with only
 > 
-> v1 -> v2:
->   - add comments to connected/started fields in the header file
->   - move the "s->started" logic from the vhost_user_blk_disconnect
->     routine to the vhost_user_blk_stop routine
+> s/order/older
 > 
-> Reference e-mail threads:
->   - https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg01509.html
->   - https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg05241.html
+>> +     * 1 NUMA node) will not benefit from anything we're going to do
+>> +     * after this point.
+>> +     */
+>> +    if (spapr_machine_using_legacy_numa(spapr)) {
+>> +        return;
+>> +    }
+>> +
+>> +    if (!spapr_numa_is_symmetrical(machine)) {
+>> +        error_report("Asymmetrical NUMA topologies aren't supported "
+>> +                     "in the pSeries machine");
+>> +        exit(1);
 > 
-> If vhost-user daemon is used as a backend for the vhost device, then we
-> should consider a possibility of disconnect at any moment. There was a general
-> question here: should we consider it as an error or okay state for the vhost-user
-> devices during migration process?
-> I think the disconnect event for the vhost-user devices should not break the
-> migration process, because:
->   - the device will be in the stopped state, so it will not be changed
->     during migration
->   - if reconnect will be made the migration log will be reinitialized as
->     part of reconnect/init process:
->     #0  vhost_log_global_start (listener=0x563989cf7be0)
->     at hw/virtio/vhost.c:920
->     #1  0x000056398603d8bc in listener_add_address_space (listener=0x563989cf7be0,
->         as=0x563986ea4340 <address_space_memory>)
->     at softmmu/memory.c:2664
->     #2  0x000056398603dd30 in memory_listener_register (listener=0x563989cf7be0,
->         as=0x563986ea4340 <address_space_memory>)
->     at softmmu/memory.c:2740
->     #3  0x0000563985fd6956 in vhost_dev_init (hdev=0x563989cf7bd8,
->         opaque=0x563989cf7e30, backend_type=VHOST_BACKEND_TYPE_USER,
->         busyloop_timeout=0)
->     at hw/virtio/vhost.c:1385
->     #4  0x0000563985f7d0b8 in vhost_user_blk_connect (dev=0x563989cf7990)
->     at hw/block/vhost-user-blk.c:315
->     #5  0x0000563985f7d3f6 in vhost_user_blk_event (opaque=0x563989cf7990,
->         event=CHR_EVENT_OPENED)
->     at hw/block/vhost-user-blk.c:379
-> The first patch in the patchset fixes this issue by setting vhost device to the
-> stopped state in the disconnect handler and check it the vhost_migration_log()
-> routine before returning from the function.
-> qtest framework was updated to test vhost-user-blk functionality. The
-> vhost-user-blk/vhost-user-blk-tests/migrate_reconnect test was added to reproduce
-> the original issue found.
+> Even if the code base is still heavily populated with exit(1), it seems
+> that exit(EXIT_FAILURE) is preferred.
 > 
-> Dima Stepanov (7):
->   vhost: recheck dev state in the vhost_migration_log routine
->   vhost: check queue state in the vhost_dev_set_log routine
->   tests/qtest/vhost-user-test: prepare the tests for adding new dev
->     class
->   tests/qtest/libqos/virtio-blk: add support for vhost-user-blk
->   tests/qtest/vhost-user-test: add support for the vhost-user-blk device
->   tests/qtest/vhost-user-test: add migrate_reconnect test
->   tests/qtest/vhost-user-test: enable the reconnect tests
+> Anyway,
 > 
->  hw/block/vhost-user-blk.c          |  19 ++-
->  hw/virtio/vhost.c                  |  39 ++++-
->  include/hw/virtio/vhost-user-blk.h |  10 ++
->  tests/qtest/libqos/virtio-blk.c    |  14 +-
->  tests/qtest/vhost-user-test.c      | 290 +++++++++++++++++++++++++++++++------
->  5 files changed, 322 insertions(+), 50 deletions(-)
-> 
-> -- 
-> 2.7.4
+> Reviewed-by: Greg Kurz <groug@kaod.org>
 
+
+Given that a new spin of this series is required, I'll change this to
+exit(EXIT_FAILURE) there as well.
+
+
+Thanks,
+
+
+DHB
+
+> 
+>> +    }
+>> +
+>>   }
+>>   
+>>   void spapr_numa_write_associativity_dt(SpaprMachineState *spapr, void *fdt,
+> 
 
