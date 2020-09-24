@@ -2,100 +2,88 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6A0FC4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:18:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB42AC4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:18:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3907F2311B
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:18:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 702102311B
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:18:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WCAcymBK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3907F2311B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HLWdGIEl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 702102311B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLTx2-00054m-2z
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 12:18:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51928)
+	id 1kLTxO-0005GI-8H
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 12:18:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56134)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kLTLv-0000Kt-O6
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 11:40:12 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37626)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kLTLr-0007Xc-Lg
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 11:40:11 -0400
-Received: by mail-wm1-x343.google.com with SMTP id a9so4092635wmm.2
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 08:40:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Gka7nXcDbZ00olQHSXjZzQSruXAZ5zUcfMCetjN9ozw=;
- b=WCAcymBKHqZykwWGtJPECq7IqIpjawKpPY0B2r2EAdLcCwlj90U5Ddo7lyMeSGxIua
- R0zYQrSFYnNtF/AZe9fzL9nqF4AQGtQWNPo3lc/feQ0fM02zs1OkwPW81+8225qLcyn9
- y491vm+Q14aBSILFBvCC7LOj+H3IlAOerAavGuoy0zoiYp+Hj4zJglWwZqQQVeGMDLL/
- Y12IxtMj4/VSriFu0fnFY1G8jUdWjIMkSYf0o8+In3Xf+30Lla5cSQ0gJq7VHNpOyxFO
- PHT3/7Tu7fRHC0aIjvjuTjhCc+Bl96sVk5XBuokDCH4x2Mu4adMJU9UC2RZy0aqlxq9K
- JZ7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Gka7nXcDbZ00olQHSXjZzQSruXAZ5zUcfMCetjN9ozw=;
- b=hxkGYNsPqMaxXsmt9Anniat0vws28ReS/y9q4hOUsYcZlOxv+b32AHKxdrI8iqo2BE
- /VLoNi/I9FZ7xTYln9k0IWohWvI1zPswNb3IHZr7Aq1rVFSNYCe1+eG/5to20jboFRxT
- jbkQAjYxjBmH3RP5bLtHRPvS34ZsrIVJEKEGzqDqMN74wfL6J+MSGnPToZsEtvg24g6+
- ohsww9R4loi6Bjf2CWHyTqrwTrJUa/MYThd/XqZqQaN7qlkFTjAW53Jd2kKhUhhoOk2u
- WhSJVpL0VXOCAD104PdL9vGJZYlOUTECdXdjSV2Ihz3lVkfHg3N1TXocu+5d+X7nZGjR
- 5+1g==
-X-Gm-Message-State: AOAM533hKjKetj/HGWNoO4Xu8/YrjvQJ8xHuDeSCvmwDd1QEI/nx5LIc
- ZJ6ZwyiFA1mF0aVc9U0SRHA=
-X-Google-Smtp-Source: ABdhPJzsppPKrIC351GdrWfngqCPAF9cW9fO3wnwZIHvaX3t8X9wOfxUhdFH69IpW9ircbqin+4+Aw==
-X-Received: by 2002:a1c:63c1:: with SMTP id x184mr5464069wmb.138.1600962004954; 
- Thu, 24 Sep 2020 08:40:04 -0700 (PDT)
-Received: from [192.168.1.34] (234.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.234])
- by smtp.gmail.com with ESMTPSA id 9sm3813041wmf.7.2020.09.24.08.40.03
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 24 Sep 2020 08:40:04 -0700 (PDT)
-Subject: Re: [PATCH V9 6/6] hw/mips: Add Loongson-3 machine support
-To: Huacai Chen <chenhuacai@gmail.com>
-References: <1600222344-16808-1-git-send-email-chenhc@lemote.com>
- <1600222344-16808-7-git-send-email-chenhc@lemote.com>
- <c3804617-7c65-4082-de76-81e718f6d139@amsat.org>
- <CAAhV-H5OysVNvGzD066eVqA+-k2+GJDjwSGR0hJT0VUh3Ld83A@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4a461bbc-3765-4d3c-7e7b-952dab564af1@amsat.org>
-Date: Thu, 24 Sep 2020 17:40:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLTfI-0007Uz-I5
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 12:00:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47040)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLTfF-00022I-62
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 12:00:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600963208;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=bAMK/dB8jZthQoTWM/mw6JbrxdBvg45iuh/fuNz1PYI=;
+ b=HLWdGIEl+j24M3VntThozK+D8E5zaFV9aY6ml30QYvlnUHWghuPaFkjjW+A34vSWW6ZUQW
+ anhcZwc4wd75r0LmNwEGIp7FefCECfs1vLbUlAHDRBj5SSKlqObVZSl5m7LbPTH8pipy66
+ WMUuM7+eOCvQ5U24owJoUjX6vwmdsO4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-472-lHjE8xA4M3Gv9c0_5ZQGSw-1; Thu, 24 Sep 2020 12:00:04 -0400
+X-MC-Unique: lHjE8xA4M3Gv9c0_5ZQGSw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 884981021209;
+ Thu, 24 Sep 2020 16:00:02 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
+ [10.10.119.55])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A8FBA55771;
+ Thu, 24 Sep 2020 16:00:01 +0000 (UTC)
+Date: Thu, 24 Sep 2020 11:59:59 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH v2 28/38] qapi/gen.py: update write() to be more idiomatic
+Message-ID: <20200924155959.GC191229@localhost.localdomain>
+References: <20200922210101.4081073-1-jsnow@redhat.com>
+ <20200922210101.4081073-29-jsnow@redhat.com>
+ <20200923152624.GO3312949@habkost.net>
+ <c0b8ed9e-c66a-a6fa-43e1-c3c61581d928@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H5OysVNvGzD066eVqA+-k2+GJDjwSGR0hJT0VUh3Ld83A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -19
-X-Spam_score: -2.0
-X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.248, NICE_REPLY_A=-0.214,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <c0b8ed9e-c66a-a6fa-43e1-c3c61581d928@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="IdQYvU5iz1n5pUC3"
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=crosa@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,82 +96,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <zltjiangshi@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/16/20 11:49 AM, Huacai Chen wrote:
-> Hi, Philippe,
-> 
-> On Wed, Sep 16, 2020 at 3:56 PM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>
->> Hi Huacai,
->>
->> On 9/16/20 4:12 AM, Huacai Chen wrote:
-...
->> hw/mips/loongson3_virt.c:373:15: note: each undeclared identifier is
->> reported only once for each function it appears in
->> hw/mips/loongson3_virt.c:373:15: error: excess elements in struct
->> initializer [-Werror]
->> hw/mips/loongson3_virt.c:373:15: note: (near initialization for 'freq_reg')
->> hw/mips/loongson3_virt.c:374:9: error: unknown field 'addr' specified in
->> initializer
->>          .addr = (uintptr_t)(&freq)
->>          ^
->> hw/mips/loongson3_virt.c:374:17: error: excess elements in struct
->> initializer [-Werror]
->>          .addr = (uintptr_t)(&freq)
->>                  ^
->> hw/mips/loongson3_virt.c:374:17: note: (near initialization for 'freq_reg')
->> hw/mips/loongson3_virt.c:372:24: error: storage size of 'freq_reg' isn't
->> known
->>      struct kvm_one_reg freq_reg = {
->>                         ^
->> hw/mips/loongson3_virt.c:380:41: error: 'KVM_GET_ONE_REG' undeclared
->> (first use in this function)
->>          ret = kvm_vcpu_ioctl(first_cpu, KVM_GET_ONE_REG, &freq_reg);
->>                                          ^
->> hw/mips/loongson3_virt.c:372:24: error: unused variable 'freq_reg'
->> [-Werror=unused-variable]
->>      struct kvm_one_reg freq_reg = {
->>                         ^
->> hw/mips/loongson3_virt.c: In function 'init_loongson_params':
->> hw/mips/loongson3_virt.c:467:25: error: cast from pointer to integer of
->> different size [-Werror=pointer-to-int-cast]
->>      lp->memory_offset = (unsigned long long)init_memory_map(p)
->>                          ^
-> I guess this happens on a 32bit platform where pointer is 32bit, and
-> could you please suggest a best solution for this? Maybe use uintptr_t
-> instead of unsigned long long?
+--IdQYvU5iz1n5pUC3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Since the machine doesn't have to know the EFI structures
-layout, I'd change your method to fill EFI structures as i.e.:
+On Wed, Sep 23, 2020 at 02:37:27PM -0400, John Snow wrote:
+> On 9/23/20 11:26 AM, Eduardo Habkost wrote:
+> > On Tue, Sep 22, 2020 at 05:00:51PM -0400, John Snow wrote:
+> > > Make the file handling here just a tiny bit more idiomatic.
+> > > (I realize this is heavily subjective.)
+> > >=20
+> > > Use exist_ok=3DTrue for os.makedirs and remove the exception,
+> > > use fdopen() to wrap the file descriptor in a File-like object,
+> > > and use a context manager for managing the file pointer.
+> > >=20
+> > > Signed-off-by: John Snow <jsnow@redhat.com>
+> >=20
+> > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> >=20
+> > I really miss a comment below explaining why we use
+> > open(os.open(pathname, ...), ...) instead of open(pathname, ...).
+> >=20
+>=20
+> Not known to me. It was introduced in 907b846653 as part of an effort to
+> reduce rebuild times. Maybe this avoids a modification time change if the
+> file already exists?
+>=20
+> Markus?
 
-/*
- * @ptr: Pointer to fill
- * @size: Buffer size available at @ptr
- * Returns: Structure size filled on success, -1 on error.
- */
-size_t fill_efi_memory_map_loongson(char *ptr, size_t size);
+AFACIT the change on 907b846653 is effective because of the "is new
+text different from old text?" conditional.  I can not see how the
+separate/duplicate open/fdopen would contribute to that.
 
-And move that to hw/mips/loongson_efi.{c,h}.
+But, let's hear from Markus.
 
-Then you don't need to worry about host pointer size, you just
-exchange buffer/size, then caller can round up and increment an
-offset.
+- Cleber.
 
-BTW the EFI helpers are not endian safe.
+--IdQYvU5iz1n5pUC3
+Content-Type: application/pgp-signature; name="signature.asc"
 
-You should use the helpers described in docs/devel/loads-stores.rst:
+-----BEGIN PGP SIGNATURE-----
 
-stw_le_p, stl_le_p(), ... (as I don't expect big-endian guests).
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl9swn0ACgkQZX6NM6Xy
+CfPHeQ//VDqVs1/tGbNS6xgRfNFBSXp85lh3WadXpt0BSeoDpn7vHW+7aU0eY7jA
+oJQQ0eAIQ38cP+3bwUNO9BDbNCrZnc7Ldw/1ndBiMvjrpp6r3AgYp3XUXZeyeppl
+8kcY5FuM92K9br1JtwPukoLuWgegCje130dAY2z3Qx2ea3MVmYc5mPWn6AjvRQFQ
+La3w8f9PptiC4VnuP+zPMMyE5NY6qbM3pahI7dpXX8JVCYOskK9NnhNTDdtmEixw
+6nbIVClEJ9G6cs5qNEFf/yXt6YBARL0Mo3UpYFONtr7pWmpFVfBb1p7syVhBvMX7
+pQ5lrUQweHWPLcv0Ig5Bm8V/S8ZNiyfD8VrbNdfgjWzkD8oLBd/EyiexlgkvAB+a
+CqjQBV8gFp90U8ht7gtomG9yzPUcvJOqJcHiUrrej56t6H77ekh2RUAf/N4f6h2Z
+Ys0P7HHsx5coDcmxdY/WKB8R1CicaURsVZLMsmJURIYRAvNcaSxivzStAMumvWUU
+lkZgVqRdkKz/Z7koWUe8tGxvWiWf0oRHvqBVzv0scO2PENn5579fu78zoHdPddXE
+M5xO9p65TBK6+4+PHIO44FxlPvD78U39yiLwN0W8sguxWUZpqtQL5BR2CeHoHRmg
+S6dZ96Bn1gNFNVOMTL2JksAF7aU/+oiP53QBgfmqc+vCFhFCZng=
+=53aw
+-----END PGP SIGNATURE-----
 
-Regards,
+--IdQYvU5iz1n5pUC3--
 
-Phil.
 
