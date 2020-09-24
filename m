@@ -2,81 +2,80 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0EC3C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:50:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C375BC2D0E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:50:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A5EA2396E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:50:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E8532396E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:50:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EOLLIzc+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A5EA2396E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CU3tdKLn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E8532396E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLNt7-0003td-4p
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:50:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38984)
+	id 1kLNt9-0003xb-B7
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:50:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTn-00015e-Qu
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40961)
+ id 1kLNTp-0001AV-Kh
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58945)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTi-00063H-KA
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:55 -0400
+ id 1kLNTm-00064V-16
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600939429;
+ s=mimecast20190719; t=1600939433;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=HzrBGtJp5HYgKEGPS65H9c5wxTSREV/KWJ3YU9/vw+0=;
- b=EOLLIzc+uP/sgdtdl8WAwqRqt8CxTBZ4bEmPtduSXhlPcq3gHFS10TKrNs8raKE1jAkXBl
- cCMWPc+u3f5AyTa67XrKkF2Anq9dZ3RaIJBUDb14o8FZMwDoLjVOzpOdhQrkUHm3FLt/Jm
- Ru67acOdBF6KTLC1X6NJPGMUZlTeIv8=
+ bh=L7IQhlxDlQ6tnGMtVP/eWhhIqHqsY/EV3sGCp/cUHfk=;
+ b=CU3tdKLnnceQ0rfIrp/6IxnnAaI7BWp3+Ev/SJMAm3yg6cJljEs+uRZGINlQCqHbvyaLrX
+ fMD8FytHFJNWQx404IUiLM2NB/rFJgE8BbyHQ7DpTdUWOX4dhrdrpl3TqV7u78skvxaIe1
+ HTxRgEQ+nuhH2PBJM+DQzDaocX51bP0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-4-819HxMAUPT6ioalw6aT21g-1; Thu, 24 Sep 2020 05:23:37 -0400
-X-MC-Unique: 819HxMAUPT6ioalw6aT21g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-591-yOGIVaC9MxCX5gXW6wzudA-1; Thu, 24 Sep 2020 05:23:51 -0400
+X-MC-Unique: yOGIVaC9MxCX5gXW6wzudA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1FE421891E89;
- Thu, 24 Sep 2020 09:23:36 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9098F1891E80
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:50 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C1E3873662;
- Thu, 24 Sep 2020 09:23:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4CD4260E1C;
+ Thu, 24 Sep 2020 09:23:50 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 24/92] hw/char/serial-{isa,
- pci}: Alias QDEV properties from generic serial object
-Date: Thu, 24 Sep 2020 05:22:06 -0400
-Message-Id: <20200924092314.1722645-25-pbonzini@redhat.com>
+Subject: [PULL 43/92] oslib-posix: relocate path to /var
+Date: Thu, 24 Sep 2020 05:22:25 -0400
+Message-Id: <20200924092314.1722645-44-pbonzini@redhat.com>
 In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
 References: <20200924092314.1722645-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -97,70 +96,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-Instead of overwritting the properties of the generic 'state'
-object, alias them.
-Note we can now propagate the "baudbase" property.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200907015535.827885-7-f4bug@amsat.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/char/serial-isa.c | 4 ++--
- hw/char/serial-pci.c | 3 ++-
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ util/oslib-posix.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/hw/char/serial-isa.c b/hw/char/serial-isa.c
-index fc8ff7823a..1b8b303079 100644
---- a/hw/char/serial-isa.c
-+++ b/hw/char/serial-isa.c
-@@ -116,8 +116,6 @@ static Property serial_isa_properties[] = {
-     DEFINE_PROP_UINT32("index",  ISASerialState, index,   -1),
-     DEFINE_PROP_UINT32("iobase",  ISASerialState, iobase,  -1),
-     DEFINE_PROP_UINT32("irq",    ISASerialState, isairq,  -1),
--    DEFINE_PROP_CHR("chardev",   ISASerialState, state.chr),
--    DEFINE_PROP_BOOL("wakeup",   ISASerialState, state.wakeup, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-@@ -138,6 +136,8 @@ static void serial_isa_initfn(Object *o)
-     ISASerialState *self = ISA_SERIAL(o);
- 
-     object_initialize_child(o, "serial", &self->state, TYPE_SERIAL);
-+
-+    qdev_alias_all_properties(DEVICE(&self->state), o);
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index 1739930e65..f15234b5c0 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -339,8 +339,10 @@ int qemu_pipe(int pipefd[2])
+ char *
+ qemu_get_local_state_pathname(const char *relative_pathname)
+ {
+-    return g_strdup_printf("%s/%s", CONFIG_QEMU_LOCALSTATEDIR,
+-                           relative_pathname);
++    g_autofree char *dir = g_strdup_printf("%s/%s",
++                                           CONFIG_QEMU_LOCALSTATEDIR,
++                                           relative_pathname);
++    return get_relocated_path(dir);
  }
  
- static const TypeInfo serial_isa_info = {
-diff --git a/hw/char/serial-pci.c b/hw/char/serial-pci.c
-index b0520a5a09..93d6f99244 100644
---- a/hw/char/serial-pci.c
-+++ b/hw/char/serial-pci.c
-@@ -82,7 +82,6 @@ static const VMStateDescription vmstate_pci_serial = {
- };
- 
- static Property serial_pci_properties[] = {
--    DEFINE_PROP_CHR("chardev",  PCISerialState, state.chr),
-     DEFINE_PROP_UINT8("prog_if",  PCISerialState, prog_if, 0x02),
-     DEFINE_PROP_END_OF_LIST(),
- };
-@@ -107,6 +106,8 @@ static void serial_pci_init(Object *o)
-     PCISerialState *ps = PCI_SERIAL(o);
- 
-     object_initialize_child(o, "serial", &ps->state, TYPE_SERIAL);
-+
-+    qdev_alias_all_properties(DEVICE(&ps->state), o);
- }
- 
- static const TypeInfo serial_pci_info = {
+ void qemu_set_tty_echo(int fd, bool echo)
 -- 
 2.26.2
 
