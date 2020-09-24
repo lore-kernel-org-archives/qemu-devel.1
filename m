@@ -2,109 +2,87 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BBF5C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 05:40:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9E3EC4346E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 06:16:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F4FB235FD
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 05:40:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1587720702
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 06:16:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NCSD06rn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F4FB235FD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XvpwGy6d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1587720702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLJzJ-0000Fl-8g
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 01:40:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50880)
+	id 1kLKXw-00048X-O7
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 02:16:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55864)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLJyG-0008I3-VB
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 01:39:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30341)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kLKXH-0003ef-Pk
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 02:15:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45728)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLJyE-00051F-FU
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 01:39:08 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kLKXF-0000Iv-I9
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 02:15:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600925944;
+ s=mimecast20190719; t=1600928116;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=h4dW7uoZyL5heEVUAkzmqyJHjMLLA6+l5Q3XC7+YfoU=;
- b=NCSD06rnvYnKYDRQLH2mXdcgYAl8CKu/4+LCFbvBNFPYCXTdHVbUFj1qYQwEoeRx9AGkSJ
- MJ1l9fbsV636ZM8aY3+F3yJ4HOblHSM9H/GihjGo8Ot+5xKdtEqUQaIELq+uwxcWTxrSUq
- ZD+FO0Zj5OeX9oIeR4AwuRLrn3FZjXs=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-546-OujkNTb5NQ-mp5DjCRU1GQ-1; Thu, 24 Sep 2020 01:39:00 -0400
-X-MC-Unique: OujkNTb5NQ-mp5DjCRU1GQ-1
-Received: by mail-wm1-f71.google.com with SMTP id 23so436513wmk.8
- for <qemu-devel@nongnu.org>; Wed, 23 Sep 2020 22:39:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=h4dW7uoZyL5heEVUAkzmqyJHjMLLA6+l5Q3XC7+YfoU=;
- b=NdiZ7c27E0rXx/JVYNcBuhQSHCSg/dq/Yaansp4PktG3T1hkw0Vh4MOe2K531tWB/s
- VJ6+ApHoMghlLI0+yj2zyJjod7k+jnHzonJsT+F+Hcju9N3LMAEls/PsAfiRZjBkHwx6
- AdVPhKki6BRchfWSnJtmylhy3uZ6MikoLJZVk6c/FPzt6q7EhEy9OM35gTKEHo/btJh7
- vp7Uh+M+007aM0nFj+bZTNXF27h8nPCUBdtUIoG0wTRAsFFkdhgh0fr5MhmvxdzNwdsf
- Djf3JbjEO7BUNv8CjweOZ9fnE6tGWvP6tGLS0o/cS8hr0nYk673olfH7lAP0XJEn3Jd+
- Hx1Q==
-X-Gm-Message-State: AOAM533Vogdx+7VJTdun0QTEzDOldRxuTmdTYCuQDPgo86GqVG40eAHX
- fbJGM8wklZopwoPa71+ZXXrcgQpSS+MDLvvVD/IQYaryWrwqe7gEcsp0S83QcFqn+gZvtlLWSL4
- roSL/19ealZt1MPM=
-X-Received: by 2002:a1c:7c1a:: with SMTP id x26mr2944407wmc.112.1600925939426; 
- Wed, 23 Sep 2020 22:38:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJynKbmWs0pjqGawS5nT5bdUZHZIP/IdkzL03OtDo4dlbSa3l9jWhHp5uRyk5lUYDIrCrGwMKQ==
-X-Received: by 2002:a1c:7c1a:: with SMTP id x26mr2944395wmc.112.1600925939113; 
- Wed, 23 Sep 2020 22:38:59 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ec8f:2b97:1838:78bf?
- ([2001:b07:6468:f312:ec8f:2b97:1838:78bf])
- by smtp.gmail.com with ESMTPSA id a81sm2131350wmf.32.2020.09.23.22.38.58
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 23 Sep 2020 22:38:58 -0700 (PDT)
-Subject: Re: [PULL 00/11] capstone + disassembler patch queue
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200922174741.475876-1-richard.henderson@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b4d02599-7d96-d589-c827-1d97e8e282ef@redhat.com>
-Date: Thu, 24 Sep 2020 07:38:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ bh=G9MK7cRlHJoHIT3YOvSd4305gUAxG1HQ781S9JnjNio=;
+ b=XvpwGy6dcSSjFP7xj5Xk4i8Vp5Log8Ujn2uoU71F8KN/MOc8z0gPkBB94HKoAPXP/GmlG5
+ e3Q77yxyCT8bo4ORkgv8O9X8Cy3YNG2K8EPpbFg2Iteuw7UkmBlkLNRocMvI7hzLJOECOb
+ p/d+OTya1Hzoidl7yF7Wi+TeqiUZoVQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-263-paWm8-5SMr6RDL_BAmHolA-1; Thu, 24 Sep 2020 02:15:14 -0400
+X-MC-Unique: paWm8-5SMr6RDL_BAmHolA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 635F610074C5;
+ Thu, 24 Sep 2020 06:15:12 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com
+ [10.36.112.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 793D17882B;
+ Thu, 24 Sep 2020 06:15:08 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id A5A4B9D78; Thu, 24 Sep 2020 08:15:07 +0200 (CEST)
+Date: Thu, 24 Sep 2020 08:15:07 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Subject: Re: [PATCH v9 3/7] usb/hcd-xhci: Split pci wrapper for xhci base model
+Message-ID: <20200924061507.2ztaxii76f6gvmfm@sirius.home.kraxel.org>
+References: <1600883407-15147-1-git-send-email-sai.pavan.boddu@xilinx.com>
+ <1600883407-15147-4-git-send-email-sai.pavan.boddu@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <20200922174741.475876-1-richard.henderson@linaro.org>
+In-Reply-To: <1600883407-15147-4-git-send-email-sai.pavan.boddu@xilinx.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
 X-Spam_bar: ---
 X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,65 +95,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: Francisco Eduardo Iglesias <figlesia@xilinx.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Vikram Garhwal <fnuv@xilinx.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ =?utf-8?Q?'Marc-Andr=C3=A9?= Lureau' <marcandre.lureau@redhat.com>,
+ Ying Fang <fangying1@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Paul Zimmerman <pauldzim@gmail.com>,
+ 'Philippe =?utf-8?Q?Mathieu-Daud=C3=A9'?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22/09/20 19:47, Richard Henderson wrote:
-> The following changes since commit 834b9273d5cdab68180dc8c84d641aaa4344b057:
-> 
->   Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-for-5.2-pull-request' into staging (2020-09-22 15:42:23 +0100)
-> 
-> are available in the Git repository at:
-> 
->   https://github.com/rth7680/qemu.git tags/pull-cap-20200922
-> 
-> for you to fetch changes up to fcfea6ced053045beb1dc8d22bdeaacc9c03d0b9:
-> 
->   disas/capstone: Add skipdata hook for s390x (2020-09-22 08:59:28 -0700)
-> 
-> ----------------------------------------------------------------
-> Update capstone submodule from v3.0.5 to v5 ("next").
-> Convert submodule build to meson.
-> Enable capstone disassembly for s390x.
-> Code cleanups in disas.c
-> 
-> ----------------------------------------------------------------
-> Richard Henderson (11):
->       capstone: Convert Makefile bits to meson bits
->       capstone: Update to upstream "next" branch
->       capstone: Require version 4.0 from a system library
->       disas: Move host asm annotations to tb_gen_code
->       disas: Clean up CPUDebug initialization
->       disas: Use qemu/bswap.h for bfd endian loads
->       disas: Cleanup plugin_disas
->       disas: Configure capstone for aarch64 host without libvixl
->       disas: Split out capstone code to disas/capstone.c
->       disas: Enable capstone disassembly for s390x
->       disas/capstone: Add skipdata hook for s390x
-> 
->  configure                 |  64 +----
->  Makefile                  |  16 --
->  meson.build               | 124 +++++++-
->  include/disas/dis-asm.h   | 104 +++----
->  include/disas/disas.h     |   2 +-
->  include/exec/log.h        |   4 +-
->  accel/tcg/translate-all.c |  24 +-
->  disas.c                   | 707 +++++++++++-----------------------------------
->  disas/capstone.c          | 326 +++++++++++++++++++++
->  target/s390x/cpu.c        |   4 +
->  tcg/tcg.c                 |   4 +-
->  capstone                  |   2 +-
->  disas/meson.build         |   1 +
->  meson_options.txt         |   4 +
->  14 files changed, 681 insertions(+), 705 deletions(-)
->  create mode 100644 disas/capstone.c
-> 
+  Hi,
 
-I will pull this as well into my branch (as a kind of topic branch) to
-avoid further conflicts.
+> @@ -203,8 +202,10 @@ struct XHCIState {
+>      uint32_t numslots;
+>      uint32_t flags;
+>      uint32_t max_pstreams_mask;
+> -    OnOffAuto msi;
+> -    OnOffAuto msix;
+> +    void (*intr_update)(XHCIState *s, int n, bool enable);
+> +    void (*intr_raise)(XHCIState *s, int n, bool level);
+> +    void (*vmstate_post_load)(XHCIState *xhci);
 
-Paolo
+No need to create your own post_load hook, there is one in
+VMStateDescription ready for use ;)
+
+take care,
+  Gerd
+
+[ I can squash that into 3/7 if you have no objections ]
+
+diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
+index 294bdc62aeaf..f859a17e73ee 100644
+--- a/hw/usb/hcd-xhci.h
++++ b/hw/usb/hcd-xhci.h
+@@ -205,7 +205,6 @@ typedef struct XHCIState {
+     uint32_t max_pstreams_mask;
+     void (*intr_update)(XHCIState *s, int n, bool enable);
+     void (*intr_raise)(XHCIState *s, int n, bool level);
+-    void (*vmstate_post_load)(XHCIState *xhci);
+     DeviceState *hostOpaque;
+ 
+     /* Operational Registers */
+diff --git a/hw/usb/hcd-xhci-pci.c b/hw/usb/hcd-xhci-pci.c
+index f06a2b7f4c57..77608fb78def 100644
+--- a/hw/usb/hcd-xhci-pci.c
++++ b/hw/usb/hcd-xhci-pci.c
+@@ -85,19 +85,21 @@ static void xhci_pci_reset(DeviceState *dev)
+     device_legacy_reset(DEVICE(&s->xhci));
+ }
+ 
+-static void xhci_pci_vmstate_post_load(XHCIState *xhci)
++static int xhci_pci_post_load(void *opaque, int version_id)
+ {
+-    XHCIPciState *s = container_of(xhci, XHCIPciState, xhci);
++    XHCIPciState *s = opaque;
++    XHCIState *xhci = &s->xhci;
+     PCIDevice *pci_dev = PCI_DEVICE(s);
+     int intr;
+ 
+-   for (intr = 0; intr < xhci->numintrs; intr++) {
++    for (intr = 0; intr < xhci->numintrs; intr++) {
+         if (xhci->intr[intr].msix_used) {
+             msix_vector_use(pci_dev, intr);
+         } else {
+             msix_vector_unuse(pci_dev, intr);
+         }
+     }
++    return 0;
+ }
+ 
+ static void usb_xhci_pci_realize(struct PCIDevice *dev, Error **errp)
+@@ -114,7 +116,6 @@ static void usb_xhci_pci_realize(struct PCIDevice *dev, Error **errp)
+     object_property_set_link(OBJECT(&s->xhci), "host", OBJECT(s), NULL);
+     s->xhci.intr_update = xhci_pci_intr_update;
+     s->xhci.intr_raise = xhci_pci_intr_raise;
+-    s->xhci.vmstate_post_load = xhci_pci_vmstate_post_load;
+     object_property_set_bool(OBJECT(&s->xhci), "realized", true, &err);
+     if (err) {
+         error_propagate(errp, err);
+@@ -176,6 +177,7 @@ static void usb_xhci_pci_exit(PCIDevice *dev)
+ static const VMStateDescription vmstate_xhci_pci = {
+     .name = "xhci",
+     .version_id = 1,
++    .post_load = xhci_pci_post_load,
+     .fields = (VMStateField[]) {
+         VMSTATE_PCI_DEVICE(parent_obj, XHCIPciState),
+         VMSTATE_MSIX(parent_obj, XHCIPciState),
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index 4a6c0e7edb1a..b1b95abb9b29 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -3457,9 +3457,6 @@ static int usb_xhci_post_load(void *opaque, int version_id)
+         }
+     }
+ 
+-    if (xhci->vmstate_post_load) {
+-        xhci->vmstate_post_load(xhci);
+-    }
+     return 0;
+ }
+ 
 
 
