@@ -2,131 +2,87 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B48B0C4346E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 08:29:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71AAEC4346E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 08:30:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31E55221EB
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 08:29:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F2967206FC
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 08:30:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G/LMP4NR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31E55221EB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GTf8vVwd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2967206FC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLMdV-0001ql-7G
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 04:29:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52544)
+	id 1kLMe7-0002h0-Vz
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 04:30:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52968)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kLMbi-0000FU-Je
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 04:28:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54454)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kLMdI-0001nb-Gd
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 04:29:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41515)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kLMbg-00076G-Uz
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 04:28:02 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kLMdG-0007EL-QK
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 04:29:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600936080;
+ s=mimecast20190719; t=1600936177;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=GeJu9KMXd2w25b0YsMvMw5QnWIc//ZUzyGTvD/T+HHI=;
- b=G/LMP4NR9aJ2rsGhVCLkWSuDuWy8eQ/kNUfXhSCjhpVKyAhzBMCJB953wI+W0qYAfwtq96
- 3OVKEgvxOlgZxQzTPqMXzFSIiPUs6x+dInKDkUPbl/dtzNyKPic6/fiVO4uGhQ80m2F+s3
- IMXIiAAPrrHMJsqvLKnSFD0TEsQdalU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-36-eY5wDQJxO1iMYHlxQOHBqg-1; Thu, 24 Sep 2020 04:27:58 -0400
-X-MC-Unique: eY5wDQJxO1iMYHlxQOHBqg-1
-Received: by mail-wr1-f71.google.com with SMTP id l9so923935wrq.20
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 01:27:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=GeJu9KMXd2w25b0YsMvMw5QnWIc//ZUzyGTvD/T+HHI=;
- b=sQUqgFV2wsXjOspUorxdekrh9njlyCQVBZpnJNV0GsvOXNooNdJunbLUG512G9BB4j
- 8a3ji5FXfMnIqdL9cq8TlkGuddGVg3LPZdQM+518uQeC1iUURjfu8JFJAdkeCL7po637
- H/o9QTKvzpH50WVJ96yXG3m68PRI24AnoGgtw94xgAT0io5l9tDZDp2EnJYx6z/9qLjt
- 0yDr7K4SqGc052TtgcoN77/UaWEqVdv4ZEEOcXDmgjQ27tn1Y42e8uUJGvFdb2ofaIwm
- VKPxPNOen5/cycR73fJHMuWLyhsee1LjcdlUlvEn8yYCkS536uul2U6nia+q5mO2xxk1
- 9Evg==
-X-Gm-Message-State: AOAM530hOAQMXYZus4zhv3Yl6blrvFJRw6pXo7vc1c7y+Th9bwwXMJ7V
- wp5ajja6a+4K2lWlsmoS+02f3uFCPyPaEkNiQYwPxW3A05OwAHJz9dmXDt0lRbd4XIpb5yB2BZV
- wt7L5C24NbjRUogo=
-X-Received: by 2002:a1c:4b0e:: with SMTP id y14mr3440200wma.156.1600936077455; 
- Thu, 24 Sep 2020 01:27:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxXOlhYHsmHTDDcZSQ27wvuAek6824n/LLdmXy6GhMKRis7f0mwX+uaBVcmUcMwB5HKDjsdoQ==
-X-Received: by 2002:a1c:4b0e:: with SMTP id y14mr3440189wma.156.1600936077303; 
- Thu, 24 Sep 2020 01:27:57 -0700 (PDT)
-Received: from [192.168.1.34] (234.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.234])
- by smtp.gmail.com with ESMTPSA id u8sm2399395wmj.45.2020.09.24.01.27.56
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 24 Sep 2020 01:27:56 -0700 (PDT)
-Subject: Re: [PATCH v8 2/7] block/io: refactor coroutine wrappers
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200915164411.20590-1-vsementsov@virtuozzo.com>
- <20200915164411.20590-3-vsementsov@virtuozzo.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <6416a3cf-c8c8-7488-0fe0-39c5286df9a3@redhat.com>
-Date: Thu, 24 Sep 2020 10:27:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ in-reply-to:in-reply-to:references:references;
+ bh=7MuHi5bcfXTpUMqymUVFtcsRHiqYfnVOsPUuYRXZRNk=;
+ b=GTf8vVwdeP0K+a+qiKaT4Git5WUO8D+YIQkn56AFq4SybjkVjmpv2hr6c9UZcfL0gF/B0C
+ nPWYGhBimqKiC44CTZxUuDUnjN5wx4G2fsA8QXd2Xfd/QveTxbK/qeTgKqs+CylNB17GoD
+ X0zeHSmSzOpXg03HtPEmMIfKdtsbAMk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-417-IwNEEgJKMOiNQIhwgMa1Zg-1; Thu, 24 Sep 2020 04:29:34 -0400
+X-MC-Unique: IwNEEgJKMOiNQIhwgMa1Zg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B31F11084C8A;
+ Thu, 24 Sep 2020 08:29:31 +0000 (UTC)
+Received: from localhost (ovpn-114-133.ams2.redhat.com [10.36.114.133])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9FFC219728;
+ Thu, 24 Sep 2020 08:29:25 +0000 (UTC)
+Date: Thu, 24 Sep 2020 09:29:24 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: elena.ufimtseva@oracle.com
+Subject: Re: [PATCH v9 16/20] multi-process: create IOHUB object to handle irq
+Message-ID: <20200924082924.GL62770@stefanha-x1.localdomain>
+References: <20200827181231.22778-1-elena.ufimtseva@oracle.com>
+ <20200827181231.22778-17-elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20200915164411.20590-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20200827181231.22778-17-elena.ufimtseva@oracle.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="lR6P3/j+HGelbRkf"
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
 X-Spam_bar: ---
 X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,34 +95,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, ehabkost@redhat.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com,
- crosa@redhat.com, den@openvz.org
+Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
+ mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, jag.raman@oracle.com,
+ quintela@redhat.com, armbru@redhat.com, kanth.ghatraju@oracle.com,
+ felipe@nutanix.com, thuth@redhat.com, ehabkost@redhat.com,
+ konrad.wilk@oracle.com, dgilbert@redhat.com, thanos.makatos@nutanix.com,
+ rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/15/20 6:44 PM, Vladimir Sementsov-Ogievskiy wrote:
-> Most of our coroutine wrappers already follow this convention:
-> 
-> We have 'coroutine_fn bdrv_co_<something>(<normal argument list>)' as
-> the core function, and a wrapper 'bdrv_<something>(<same argument
-> list>)' which does parameters packing and call bdrv_run_co().
-> 
-> The only outsiders are the bdrv_prwv_co and
-> bdrv_common_block_status_above wrappers. Let's refactor them to behave
-> as the others, it simplifies further conversion of coroutine wrappers.
-> 
-> This patch adds indirection layer, but it will be compensated by
-> further commit, which will drop bdrv_co_prwv together with is_write
-> logic, to keep read and write path separate.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
->  block/io.c | 60 +++++++++++++++++++++++++++++-------------------------
->  1 file changed, 32 insertions(+), 28 deletions(-)
+--lR6P3/j+HGelbRkf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Thu, Aug 27, 2020 at 11:12:27AM -0700, elena.ufimtseva@oracle.com wrote:
+> From: Jagannathan Raman <jag.raman@oracle.com>
+>=20
+> IOHUB object is added to manage PCI IRQs. It uses KVM_IRQFD
+> ioctl to create irqfd to injecting PCI interrupts to the guest.
+> IOHUB object forwards the irqfd to the remote process. Remote process
+> uses this fd to directly send interrupts to the guest, bypassing QEMU.
+>=20
+> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> ---
+>  MAINTAINERS                    |   2 +
+>  hw/i386/meson.build            |   1 +
+>  hw/i386/remote-iohub.c         | 123 +++++++++++++++++++++++++++++++++
+>  hw/i386/remote-msg.c           |   4 ++
+>  hw/i386/remote.c               |  10 +++
+>  hw/pci/proxy.c                 |  58 ++++++++++++++++
+>  include/hw/i386/remote-iohub.h |  42 +++++++++++
+>  include/hw/i386/remote.h       |   3 +
+>  include/hw/pci/pci_ids.h       |   3 +
+>  include/hw/pci/proxy.h         |   5 ++
+>  include/io/mpqemu-link.h       |   1 +
+>  io/mpqemu-link.c               |   5 ++
+>  12 files changed, 257 insertions(+)
+>  create mode 100644 hw/i386/remote-iohub.c
+>  create mode 100644 include/hw/i386/remote-iohub.h
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--lR6P3/j+HGelbRkf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9sWOQACgkQnKSrs4Gr
+c8ib9wgAsnV6goYTX8YShrijrvy9hZt33E57diHTQNn21XgJBBPETNqpMkdukD+4
+noVctYYAkjZS7TqDq2S+I4qUIuLZgu2i3Uflni9R0bJSl2FLvyW208Qc5obus+OV
+0C7E0XuMfc/0Wbwqx8x0CTz0FjMtBZaqH+kW0qTPUFSERfiYBSQ48U6Q7gBCl2Y3
+xlrmo/K4W3NVdZ9mvJFGgBoMmPK4NPzkv/u2VmjgoP1XVtbBEl6oVZM5RwKLGIj+
+CtHbqkeN0okYsYFGbZBRiqTf+HzNiWrzjKaZF0gbUghJoqoSPwx6+8LO5OVIn7Ps
+eoduFoR3EHganJqqtoh/4DrU8qddZg==
+=VKQ7
+-----END PGP SIGNATURE-----
+
+--lR6P3/j+HGelbRkf--
 
 
