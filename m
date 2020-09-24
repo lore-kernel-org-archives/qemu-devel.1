@@ -2,89 +2,110 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 145A1C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 20:39:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DBE6C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 20:44:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FF2221D7F
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 20:39:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9EF3E21D7F
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 20:44:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ntgi9pUn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FF2221D7F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="CLKWv3lZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EF3E21D7F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLY1J-0008TD-R4
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 16:39:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37094)
+	id 1kLY61-0003VS-N9
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 16:44:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37890)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLY0L-00081G-C3
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 16:38:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20787)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLY0J-0006yQ-B7
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 16:38:12 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600979890;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/41G/CRs3da4bp62ceMEK7KFJEIw39QGC5vjYuHIlUg=;
- b=Ntgi9pUnaDvCa0gkk77z1Ja0T9f5HWfIleWddvo1COhNm9mvjhG8MzTbL4psFD3NQqZxdr
- tZo0aQkTOLG+Tmro8lTDPX+lq4uA9Z4357RYPg1MGuXgUevsQdKA5hNui2PHmUiCh0ZTdH
- gfBZxsl1OlIcGR5HTjCEiH7kln4ivac=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-268-I2DIshKkP8WUXyEgsnwMzA-1; Thu, 24 Sep 2020 16:38:01 -0400
-X-MC-Unique: I2DIshKkP8WUXyEgsnwMzA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BFFC1017DE8;
- Thu, 24 Sep 2020 20:38:00 +0000 (UTC)
-Received: from [10.10.119.140] (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 065225E25F;
- Thu, 24 Sep 2020 20:37:58 +0000 (UTC)
-Subject: Re: [PATCH v2 00/38] qapi: static typing conversion, pt1
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200922210101.4081073-1-jsnow@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <12d40064-5735-5acc-18dd-5f6fdd94beed@redhat.com>
-Date: Thu, 24 Sep 2020 16:37:58 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
+ id 1kLY4c-0002WB-UJ
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 16:42:40 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:40816)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
+ id 1kLY4a-0007Sn-7g
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 16:42:38 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08OKdMso141605;
+ Thu, 24 Sep 2020 20:42:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=PRfuYakB0fWApPGo/AgAWPmvBPJQyHklWcGUA/0lSIo=;
+ b=CLKWv3lZ78MRG2N48Id/W90q8AzhhmMOvvBUoeXveStsBbs8BPTWejf/CVBqB+ycOOxl
+ 1hi2gRCPJ9HgDidyQvIA3egy80U/RJkdBmvBCII7rLbBwKbOE18GiTaONpe3JIyd5Rao
+ 0jWjwwmbO/75iwprJJzYdIu6wA8ApmXxcKtoJrYYZS3YTKL+kbsWV/fxGWcbyj7RPyfG
+ wBJza0sdbIkoVB9uJyIoNt4x7Vg8yV61SgmvY9px16n9Qkw/9MyRMTFe9OLxgwR3BbNb
+ piOoFyMEpXxd+MKFXrOcjGOij0qQoKW2klIs6wZ/L0AV8gopV0cDUloTpQh7PmsPoKEt ew== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by aserp2120.oracle.com with ESMTP id 33q5rgrt4f-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Thu, 24 Sep 2020 20:42:30 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08OKfUJi047070;
+ Thu, 24 Sep 2020 20:42:29 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3030.oracle.com with ESMTP id 33nux3djuc-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 24 Sep 2020 20:42:29 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 08OKgRoF015092;
+ Thu, 24 Sep 2020 20:42:27 GMT
+Received: from [10.39.244.100] (/10.39.244.100)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 24 Sep 2020 13:42:27 -0700
+Subject: Re: [PATCH V1 11/32] cpu: disable ticks when suspended
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
+ <1596122076-341293-12-git-send-email-steven.sistare@oracle.com>
+ <20200911175318.GQ3310@work-vm>
+From: Steven Sistare <steven.sistare@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <9b3fa2f8-2457-6c67-dd6e-c861cbd6f309@oracle.com>
+Date: Thu, 24 Sep 2020 16:42:25 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20200922210101.4081073-1-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200911175318.GQ3310@work-vm>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -34
-X-Spam_score: -3.5
-X-Spam_bar: ---
-X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9754
+ signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
+ mlxscore=0 adultscore=0
+ bulkscore=0 mlxlogscore=999 phishscore=0 suspectscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009240151
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9754
+ signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ impostorscore=0
+ clxscore=1011 suspectscore=0 phishscore=0 malwarescore=0
+ priorityscore=1501 mlxlogscore=999 adultscore=0 bulkscore=0 mlxscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009240151
+Received-SPF: pass client-ip=141.146.126.78;
+ envelope-from=steven.sistare@oracle.com; helo=aserp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 16:42:31
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -57
+X-Spam_score: -5.8
+X-Spam_bar: -----
+X-Spam_report: (-5.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,68 +118,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <crosa@redhat.com>,
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
  =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/22/20 5:00 PM, John Snow wrote:
-> Hi, this series adds static type hints to the QAPI module.
-> This is part one!
+On 9/11/2020 1:53 PM, Dr. David Alan Gilbert wrote:
+> * Steve Sistare (steven.sistare@oracle.com) wrote:
+>> After cprload, the guest console misbehaves.  You must type 8 characters
+>> before any are echoed to the terminal.  Qemu was not sending interrupts
+>> to the guest because the QEMU_CLOCK_VIRTUAL timers_state.cpu_clock_offset
+>> was bad.  The offset is usually updated at cprsave time by the path
+>>
+>>   save_cpr_snapshot()
+>>     vm_stop()
+>>       do_vm_stop()
+>>         if (runstate_is_running())
+>>           cpu_disable_ticks();
+>>             timers_state.cpu_clock_offset = cpu_get_clock_locked();
+>>
+>> However, if the guest is in RUN_STATE_SUSPENDED, then cpu_disable_ticks is
+>> not called.  Further, the earlier transition to suspended in
+>> qemu_system_suspend did not disable ticks.  To fix, call cpu_disable_ticks
+>> from save_cpr_snapshot.
+>>
+>> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
 > 
+> Are you saying this is really a more generic bug with migrating when
+> suspended and we should fix this anyway?
 
-Hi, I will be sending out a v3 shortly.
+Yes.  Or when suspended and calling save_vmstate(), or qmp_xen_save_devices_state().
+Each of those functions needs the same fix unless someone identifies a more
+centralized way in the state transition logic to disable ticks.
 
-The status of this series is presently as follows:
+- Steve
 
-+ [01] do-not-merge-qapi-add          #
-+ [02] qapi-gen-separate-arg-parsing  # [SOB] JS [RB] EH
-+ [03] qapi-move-generator-entrypoint # [SOB] JS [RB] CR,EH [TB] CR
-+ [04] qapi-prefer-explicit-relative  # [SOB] JS [RB] CR,EH
-+ [05] qapi-remove-wildcard-includes  # [SOB] JS [RB] CR,EH
-+ [06] qapi-enforce-import-order      # [SOB] JS
-+ [07] qapi-delint-using-flake8       # [SOB] JS [RB] CR,EH
-+ [08] qapi-add-pylintrc              # [SOB] JS [TB] CR,EH [RB] CR
-+ [09] qapi-common-py-remove-python   # [SOB] JS [RB] CR,EH
-+ [10] qapi-common-add-indent-manager # [SOB] JS [RB] CR,EH
-+ [11] qapi-common-py-delint-with     # [SOB] JS [RB] CR,EH
-+ [12] replace-c-by-char              # [SOB] JS [RB] CR,EH
-+ [13] qapi-common-py-check-with      # [SOB] JS [RB] CR [TB] CR,EH
-+ [14] qapi-common-py-add-notational  # [SOB] JS [RB] CR,EH
-+ [15] qapi-common-move-comments-into # [SOB] JS [RB] CR,EH
-+ [16] qapi-split-build_params-into   # [SOB] JS [RB] CR,EH
-+ [17] qapi-establish-mypy-type       # [SOB] JS [TB] EH
-+ [18] qapi-events-py-add-notational  # [SOB] JS [RB] CR,EH
-+ [19] qapi-events-move-comments-into # [SOB] JS [RB] CR,EH
-+ [20] qapi-commands-py-don-t-re-bind # [SOB] JS [RB] CR,EH
-+ [21] qapi-commands-py-add           # [SOB] JS [RB] CR,EH
-+ [22] qapi-commands-py-enable        # [SOB] JS [RB] CR,EH
-+ [23] qapi-source-py-add-notational  # [SOB] JS [RB] EH
-+ [24] qapi-source-py-delint-with     # [SOB] JS [RB] CR,EH [TB] CR
-+ [25] qapi-gen-py-fix-edge-case-of   #
-+ [26] qapi-gen-py-add-notational     # [SOB] JS [RB] CR,EH
-+ [27] qapi-gen-py-enable-checking    # [SOB] JS [RB] CR,EH [TB] CR
-+ [28] qapi-gen-py-remove-unused      # [SOB] JS [RB] CR,EH
-+ [29] qapi-gen-py-update-write-to-be # [SOB] JS [RB] CR,EH
-+ [30] qapi-gen-py-delint-with-pylint # [SOB] JS [RB] CR,EH
-+ [31] qapi-introspect-py-assert-obj  #
-+ [32] qapi-introspect-py-create-a    # [SOB] EH,JS
-+ [33] qapi-introspect-py-add         #
-+ [34] qapi-introspect-py-unify       #
-+ [35] qapi-introspect-py-replace     #
-+ [36] qapi-introspect-py-create-a-0  #
-+ [37] qapi-types-py-add-type-hint    # [SOB] JS [RB] CR,EH
-+ [38] qapi-types-py-remove-one       # [SOB] JS [RB] CR,EH
-+ [39] qapi-visit-py-assert           # [SOB] JS [RB] CR,EH
-+ [40] qapi-visit-py-remove-unused    # [SOB] JS [RB] CR,EH [TB] CR
- > [41] qapi-visit-py-add-notational   # [SOB] JS [RB] CR,EH [TB] CR
-
-
-Thank you for your help so far, everyone!
-
---js
-
+>> ---
+>>  migration/savevm.c | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>
+>> diff --git a/migration/savevm.c b/migration/savevm.c
+>> index f101039..00f493b 100644
+>> --- a/migration/savevm.c
+>> +++ b/migration/savevm.c
+>> @@ -2729,6 +2729,11 @@ void save_cpr_snapshot(const char *file, const char *mode, Error **errp)
+>>          return;
+>>      }
+>>  
+>> +    /* Update timers_state before saving.  Suspend did not so do. */
+>> +    if (runstate_check(RUN_STATE_SUSPENDED)) {
+>> +        cpu_disable_ticks();
+>> +    }
+>> +
+>>      vm_stop(RUN_STATE_SAVE_VM);
+>>  
+>>      ret = qemu_savevm_state(f, op, errp);
+>> -- 
+>> 1.8.3.1
+>>
 
