@@ -2,86 +2,72 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 259B9C4346E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 08:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 583CBC4346E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 08:43:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9456D23600
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 08:40:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eCI4nLV9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9456D23600
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C066B23600
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 08:43:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C066B23600
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLMnR-0002v4-MX
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 04:40:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55960)
+	id 1kLMqr-0004jM-Us
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 04:43:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56850)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kLMmF-00026H-LL
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 04:38:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30168)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kLMmE-00006H-4Q
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 04:38:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600936733;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=WLdzcM+E42ThiHQBIhDSXJ90qzg8Wk0cdYHGj6Z7n6w=;
- b=eCI4nLV9BTZaoD1NRJepBkTbnjzy0yrTn9XoLK4k6JhKiHhvgEeSnL0giRD5ihvOpjCxZy
- UGQNuySB1EuVYeARrgHD4TfrnrrY3Evu8xZR3tDCHOVr+Y8UAhB1WKIeINFMUGGXmS7VfA
- N4uWgnByx/e5k9k+c/j0M5BYQTVAk9E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-555-R1ewerxZNauVXWn_NpLHBA-1; Thu, 24 Sep 2020 04:38:51 -0400
-X-MC-Unique: R1ewerxZNauVXWn_NpLHBA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 211EF802B49;
- Thu, 24 Sep 2020 08:38:49 +0000 (UTC)
-Received: from localhost (ovpn-114-133.ams2.redhat.com [10.36.114.133])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F138E5D990;
- Thu, 24 Sep 2020 08:38:42 +0000 (UTC)
-Date: Thu, 24 Sep 2020 09:38:41 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: elena.ufimtseva@oracle.com
-Subject: Re: [PATCH v9 00/20] Initial support for multi-process Qemu
-Message-ID: <20200924083841.GQ62770@stefanha-x1.localdomain>
-References: <20200827181231.22778-1-elena.ufimtseva@oracle.com>
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1kLMpo-0004GZ-B9
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 04:42:36 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:44494 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1kLMpk-0000kg-DQ
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 04:42:36 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 61783134449C1E2B627E;
+ Thu, 24 Sep 2020 16:42:13 +0800 (CST)
+Received: from [10.174.186.4] (10.174.186.4) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0;
+ Thu, 24 Sep 2020 16:42:04 +0800
+Subject: Re: [PATCH v10 11/12] migration/dirtyrate: Implement
+ qmp_cal_dirty_rate()/qmp_get_dirty_rate() function
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake
+ <eblake@redhat.com>
+References: <1600237327-33618-1-git-send-email-zhengchuan@huawei.com>
+ <1600237327-33618-12-git-send-email-zhengchuan@huawei.com>
+ <1c8647f5-62d4-bda6-df12-a60c6d0fc4db@redhat.com>
+ <20200923190355.GD2780@work-vm>
+From: Zheng Chuan <zhengchuan@huawei.com>
+Message-ID: <2135c7e9-495e-e38b-a5a9-c82f8bba42d3@huawei.com>
+Date: Thu, 24 Sep 2020 16:42:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200827181231.22778-1-elena.ufimtseva@oracle.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="NEaRsfQExFH3jWtg"
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200923190355.GD2780@work-vm>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.186.4]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.32; envelope-from=zhengchuan@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 04:42:14
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,55 +80,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
- mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, jag.raman@oracle.com,
- quintela@redhat.com, armbru@redhat.com, kanth.ghatraju@oracle.com,
- felipe@nutanix.com, thuth@redhat.com, ehabkost@redhat.com,
- konrad.wilk@oracle.com, dgilbert@redhat.com, thanos.makatos@nutanix.com,
- rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: berrange@redhat.com, zhang.zhanghailiang@huawei.com, quintela@redhat.com,
+ liq3ea@gmail.com, qemu-devel@nongnu.org, xiexiangyou@huawei.com,
+ alex.chen@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---NEaRsfQExFH3jWtg
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-On Thu, Aug 27, 2020 at 11:12:11AM -0700, elena.ufimtseva@oracle.com wrote:
-> The v9 has the following changes:
-> - Communication channel. Qemu side uses blocking call to send
->   and receive the message from the remote and cannot progress
->   further until the remote side replies. Enhanced the
->   communication channel by dropping iothread lock before blocking
->   on Qemu end. Use the co-routines on the remote end to avoid
->   blocking QMP monitor;
-> - removed the heartbeat functionality, it will be added later
->   in a full extent;
-> - fixed leaked errors and similar fixes;
-> - eliminated bytestream passing over the channel;
-> - The build system had to be changed in order to accomodate the
->   latest changes in Qemu to use Kconfig/mason.
 
-Thanks, I left comments but I'm happy with most patches now.
+On 2020/9/24 3:03, Dr. David Alan Gilbert wrote:
+> * Eric Blake (eblake@redhat.com) wrote:
+>> On 9/16/20 1:22 AM, Chuan Zheng wrote:
+>>> Implement qmp_cal_dirty_rate()/qmp_get_dirty_rate() function which could be called
+>>>
+>>> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+>>> ---
+>>
+>>> +++ b/qapi/migration.json
+>>> @@ -1737,3 +1737,53 @@
+>>>   ##
+>>>   { 'enum': 'DirtyRateStatus',
+>>>     'data': [ 'unstarted', 'measuring', 'measured'] }
+>>> +
+>>> +##
+>>> +# @DirtyRateInfo:
+>>> +#
+>>> +# Information about current dirty page rate of vm.
+>>> +#
+>>> +# @dirty-rate: @dirtyrate describing the dirty page rate of vm
+>>> +#          in units of MB/s.
+>>> +#          If this field return '-1', it means querying is not
+>>> +#          start or not complete.
+>>
+>> Grammar:
+>>
+>> it means querying has not yet started or completed.
+>>
+>> Should this field instead be optional, and omitted for those cases?  In
+>> which case, I'd suggest:
+>>
+>> ...in units of MB/s, present only when querying the rate has completed.
+> 
+Hi, Eric.
+Thanks for your review.
+Yeah, it could be optional.
+and should it need keep start-time and calc-time when omit dirtyrate?
+like:
+{"return":{"status":"measuring","start-time":3718293,"calc-time":1},"id":"libvirt-15"}
+or
+{"return":{"status":"unstarted","start-time":3718293,"calc-time":1},"id":"libvirt-15"}
 
-Stefan
-
---NEaRsfQExFH3jWtg
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9sWxEACgkQnKSrs4Gr
-c8iFIwf+PZ+h1wDvauzbQ0TG8w9zuIRmtbcagb1gIpWDKyqfkqAZRO3pdxo1+rcJ
-ggihaCyFEaQCr3VAf/qBlINSqda+hAeVJHjEGAwN/sG1APuucwytAVJ2wCakjtMq
-h9p+vGpnH182b789bh/AVv9K5A7BOyKdi8xSSjGDh2+S6NKuHgmQ6ZULwMjFRHuJ
-1EkFJN0GmKMKwCqUCzKzLRxKph+xLku2kVv0/MU5XSr8fkIAWaGwoijlpSYt9nYw
-HPptsJV0xnm3r9iejfGJLKKidFl4WjZImkpfjkcHuRVQHxrr5EpCcJatnFFgE+F8
-pL5rDwqqI7cCtL+51zBvYnC1mAnWIw==
-=IHsu
------END PGP SIGNATURE-----
-
---NEaRsfQExFH3jWtg--
-
+> I've already got it queued; I'll fix up the grammar; if someone wants to
+> send a change to make it optional before this version freezes that's OK.
+> 
+> Dave
+> 
+>>
+>>> +#
+>>> +# @status: status containing dirtyrate query status includes
+>>> +#          'unstarted' or 'measuring' or 'measured'
+>>> +#
+>>> +# @start-time: start time in units of second for calculation
+>>> +#
+>>> +# @calc-time: time in units of second for sample dirty pages
+>>> +#
+>>> +# Since: 5.2
+>>> +#
+>>> +##
+>>> +{ 'struct': 'DirtyRateInfo',
+>>> +  'data': {'dirty-rate': 'int64',
+>>> +           'status': 'DirtyRateStatus',
+>>> +           'start-time': 'int64',
+>>> +           'calc-time': 'int64'} }
+>>> +
+>>> +##
+>>> +# @calc-dirty-rate:
+>>> +#
+>>> +# start calculating dirty page rate for vm
+>>> +#
+>>> +# @calc-time: time in units of second for sample dirty pages
+>>> +#
+>>> +# Since: 5.2
+>>> +#
+>>> +# Example:
+>>> +#   {"command": "calc-dirty-rate", "data": {"calc-time": 1} }
+>>> +#
+>>> +##
+>>> +{ 'command': 'calc-dirty-rate', 'data': {'calc-time': 'int64'} }
+>>> +
+>>> +##
+>>> +# @query-dirty-rate:
+>>> +#
+>>> +# query dirty page rate in units of MB/s for vm
+>>> +#
+>>> +# Since: 5.2
+>>> +##
+>>> +{ 'command': 'query-dirty-rate', 'returns': 'DirtyRateInfo' }
+>>>
+>>
+>> -- 
+>> Eric Blake, Principal Software Engineer
+>> Red Hat, Inc.           +1-919-301-3226
+>> Virtualization:  qemu.org | libvirt.org
 
