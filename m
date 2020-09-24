@@ -2,90 +2,91 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7CE9C4727E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 20:00:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC289C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 20:04:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1294D21707
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 20:00:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C816B23899
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 20:04:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m1EgYW0U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1294D21707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FAtcbRuX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C816B23899
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLXPy-0001q2-Vg
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 16:00:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55668)
+	id 1kLXTt-0003h5-L9
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 16:04:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58078)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kLXH5-0001vp-FI; Thu, 24 Sep 2020 15:51:27 -0400
-Received: from mail-qk1-x72a.google.com ([2607:f8b0:4864:20::72a]:45493)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kLXGz-00019R-JL; Thu, 24 Sep 2020 15:51:27 -0400
-Received: by mail-qk1-x72a.google.com with SMTP id o5so637325qke.12;
- Thu, 24 Sep 2020 12:51:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=foegIg+R6xGelzocg1qpmzjKagMlOEuwe5qYOlr3pzs=;
- b=m1EgYW0UMjTFPHBaZXMXeioNJYGgT1lnTtsaPw8GKhljZjg5mgMdOFUq7uf75NLMTG
- lqIhNTz3neel07A5ljYZpReBYoNrtjGE9EjZd0W94c2wcpPD8GB9J8lAJVypfFTQBBbm
- E7ncMzAWicOVOTEsuFILpQ2NclI2xtuDdWv2Hk9tJ3kDd7TktLx7+kkojCKyqSCsim5Q
- qgAw3+LrMFRL+geOlzKauPadJWrP26aagfzV8u8qS4uUo0Fetm2Zi459Ye8pXLmXs1Gd
- WuAALdIfz3F8vzuutJtKmNhWM0oM9xy8Zvy9edY8n015/zcERj6EF5hlr2HnFqFSnKPj
- EU/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=foegIg+R6xGelzocg1qpmzjKagMlOEuwe5qYOlr3pzs=;
- b=QJK0T1SDtKk9bMVvO5XVsodmCHwpAGmZhbqVdFu++U6ruiYdMxRNp/JmeQdcNf9sN0
- reRQIVAFPafQj+xerAl0iKRBdq7P+1N43bNkpbNuzWjmlUDxV7R9c0RHgt2XWsnWBVga
- eo3r6V20+aCrwRixrE+lNzAM/8Gh8vg19fLqBFAaR4pnKQz4c1YlyvN35YJGMvbynu60
- l3Ukieoy0nPhopgmqpebgZETW929kk1McqbTSSHpPa5qQZmmfZ7Q2LsvSt6iMZW7nDXB
- Q9jHV6UUlOdu781E8tBe4HjEMf81nriCAiUCbdijPHd6QwMnn+FYiR1gz+6jCV2P8lhj
- fLhg==
-X-Gm-Message-State: AOAM532Nx8rkMwBOKYRklBsbZhmMyp65nnEZLhkSTasV8Nx+WAQJAWWL
- 3dPpf2snziK40C9k2eCxPiVD7Z6WLA9hpA==
-X-Google-Smtp-Source: ABdhPJwq5fB/A2adMRjfGCljoriV8GAYYbapbt4V7sChyJ36gsYa/6C34LAXcK/22vKohdks+KXRxQ==
-X-Received: by 2002:a37:64d4:: with SMTP id y203mr727666qkb.359.1600977079396; 
- Thu, 24 Sep 2020 12:51:19 -0700 (PDT)
-Received: from rekt.ibmuc.com ([2804:431:c7c7:c625:6c0e:4720:8228:5f68])
- by smtp.gmail.com with ESMTPSA id f3sm381613qtg.71.2020.09.24.12.51.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Sep 2020 12:51:18 -0700 (PDT)
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 6/6] specs/ppc-spapr-numa: update with new NUMA support
-Date: Thu, 24 Sep 2020 16:50:58 -0300
-Message-Id: <20200924195058.362984-7-danielhb413@gmail.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200924195058.362984-1-danielhb413@gmail.com>
-References: <20200924195058.362984-1-danielhb413@gmail.com>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kLXRO-0002aQ-LH
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 16:02:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33198)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kLXRM-0002bY-83
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 16:02:06 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600977723;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=y85ZHlPSu0LbWcyK0kASihR4L/4cljs70hwchn0FjHc=;
+ b=FAtcbRuXi1JdzMGXbxl9aOYnGejMFziZK/aHjCzSMLvV+LuyIZ8rGFnSGV44pqTVRWAlPa
+ DxxyBPbeYOvZbQ+YyEQn0nQvyIOLoZTXn6P5Q8rLmrFXdJa1ICZwsKB7HY2BTqC+ZZUaLY
+ ygab7byaUmmGIzfP69oi3qO83vy5uG8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-263-voM5z1hWN1CaFfCZ6R9eEA-1; Thu, 24 Sep 2020 16:01:58 -0400
+X-MC-Unique: voM5z1hWN1CaFfCZ6R9eEA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 14A42801002;
+ Thu, 24 Sep 2020 20:01:57 +0000 (UTC)
+Received: from [10.3.114.148] (ovpn-114-148.phx2.redhat.com [10.3.114.148])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B3487368C;
+ Thu, 24 Sep 2020 20:01:52 +0000 (UTC)
+Subject: Re: [PATCH v7 1/5] block/io: fix bdrv_co_block_status_above
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200924194003.22080-1-vsementsov@virtuozzo.com>
+ <20200924194003.22080-2-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <5dc62204-a1fe-1a94-144d-86c89a5f2bc8@redhat.com>
+Date: Thu, 24 Sep 2020 15:01:51 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::72a;
- envelope-from=danielhb413@gmail.com; helo=mail-qk1-x72a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200924194003.22080-2-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -34
+X-Spam_score: -3.5
+X-Spam_bar: ---
+X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.214, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,243 +100,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-ppc@nongnu.org,
- groug@kaod.org, david@gibson.dropbear.id.au
+Cc: fam@euphon.net, kwolf@redhat.com, Alberto Garcia <berto@igalia.com>,
+ qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This update provides more in depth information about the
-choices and drawbacks of the new NUMA support for the
-spapr machine.
+On 9/24/20 2:39 PM, Vladimir Sementsov-Ogievskiy wrote:
+> bdrv_co_block_status_above has several design problems with handling
+> short backing files:
+> 
+> 1. With want_zeros=true, it may return ret with BDRV_BLOCK_ZERO but
+> without BDRV_BLOCK_ALLOCATED flag, when actually short backing file
+> which produces these after-EOF zeros is inside requested backing
+> sequence.
+> 
+> 2. With want_zero=false, it may return pnum=0 prior to actual EOF,
+> because of EOF of short backing file.
+> 
+> Fix these things, making logic about short backing files clearer.
+> 
+> With fixed bdrv_block_status_above we also have to improve is_zero in
+> qcow2 code, otherwise iotest 154 will fail, because with this patch we
+> stop to merge zeros of different types (produced by fully unallocated
+> in the whole backing chain regions vs produced by short backing files).
+> 
+> Note also, that this patch leaves for another day the general problem
+> around block-status: misuse of BDRV_BLOCK_ALLOCATED as is-fs-allocated
+> vs go-to-backing.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> ---
+>   block/io.c    | 68 ++++++++++++++++++++++++++++++++++++++++-----------
+>   block/qcow2.c | 16 ++++++++++--
+>   2 files changed, 68 insertions(+), 16 deletions(-)
+> 
+> diff --git a/block/io.c b/block/io.c
+> index 449b99b92c..4697e67a85 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -2350,34 +2350,74 @@ bdrv_co_common_block_status_above(BlockDriverState *bs,
+>                                     int64_t *map,
+>                                     BlockDriverState **file)
+>   {
+> +    int ret;
+>       BlockDriverState *p;
+> -    int ret = 0;
 
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
----
- docs/specs/ppc-spapr-numa.rst | 213 ++++++++++++++++++++++++++++++++++
- 1 file changed, 213 insertions(+)
+The shuffle of these lines is odd, but not a show-stopper.
 
-diff --git a/docs/specs/ppc-spapr-numa.rst b/docs/specs/ppc-spapr-numa.rst
-index e762038022..994bfb996f 100644
---- a/docs/specs/ppc-spapr-numa.rst
-+++ b/docs/specs/ppc-spapr-numa.rst
-@@ -189,3 +189,216 @@ QEMU up to 5.1, as follows:
- 
- This also means that user input in QEMU command line does not change the
- NUMA distancing inside the guest for the pseries machine.
-+
-+New NUMA mechanics for pseries in QEMU 5.2
-+==========================================
-+
-+Starting in QEMU 5.2, the pseries machine now considers user input when
-+setting NUMA topology of the guest. The following changes were made:
-+
-+* ibm,associativity-reference-points was changed to {0x4, 0x3, 0x2, 0x1}, allowing
-+  for 4 distinct NUMA distance values based on the NUMA levels
-+
-+* ibm,max-associativity-domains was changed to support multiple associativity
-+  domains in all NUMA levels. This is needed to ensure user flexibility
-+
-+* ibm,associativity for all resources now varies with user input
-+
-+These changes are only effective for pseries-5.2 and newer machines that are
-+created with more than one NUMA node (disconsidering NUMA nodes created by
-+the machine itself, e.g. NVLink 2 GPUs). The now legacy support has been
-+around for such a long time, with users seeing NUMA distances 10 and 40
-+(and 80 if using NVLink2 GPUs), and there is no need to disrupt the
-+existing experience of those guests.
-+
-+To bring the user experience x86 users have when tuning up NUMA, we had
-+to operate under the current pseries Linux kernel logic described in
-+`How the pseries Linux guest calculates NUMA distances`_. The result
-+is that we needed to translate NUMA distance user input to pseries
-+Linux kernel input.
-+
-+Translating user distance to kernel distance
-+--------------------------------------------
-+
-+User input for NUMA distance can vary from 10 to 254. We need to translate
-+that to the values that the Linux kernel operates on (10, 20, 40, 80, 160).
-+This is how it is being done:
-+
-+* user distance 11 to 30 will be interpreted as 20
-+* user distance 31 to 60 will be interpreted as 40
-+* user distance 61 to 120 will be interpreted as 80
-+* user distance 121 and beyond will be interpreted as 160
-+* user distance 10 stays 10
-+
-+The reasoning behind this aproximation is to avoid any round up to the local
-+distance (10), keeping it exclusive to the 4th NUMA level (which is still
-+exclusive to the node_id). All other ranges were chosen under the developer
-+discretion of what would be (somewhat) sensible considering the user input.
-+Any other strategy can be used here, but in the end the reality is that we'll
-+have to accept that a large array of values will be translated to the same
-+NUMA topology in the guest, e.g. this user input:
-+
-+::
-+
-+      0   1   2
-+  0  10  31 120
-+  1  31  10  30
-+  2 120  30  10
-+
-+And this other user input:
-+
-+::
-+
-+      0   1   2
-+  0  10  60  61
-+  1  60  10  11
-+  2  61  11  10
-+
-+Will both be translated to the same values internally:
-+
-+::
-+
-+      0   1   2
-+  0  10  40  80
-+  1  40  10  20
-+  2  80  20  10
-+
-+Users are encouraged to use only the kernel values in the NUMA definition to
-+avoid being taken by surprise with that the guest is actually seeing in the
-+topology. There are enough potential surprises that are inherent to the
-+associativity domain assignment process, discussed below.
-+
-+
-+How associativity domains are assigned
-+--------------------------------------
-+
-+LOPAPR allows more than one associativity array (or 'string') per allocated
-+resource. This would be used to represent that the resource has multiple
-+connections with the board, and then the operational system, when deciding
-+NUMA distancing, should consider the associativity information that provides
-+the shortest distance.
-+
-+The spapr implementation does not support multiple associativity arrays per
-+resource, neither does the pseries Linux kernel. We'll have to represent the
-+NUMA topology using one associativity per resource, which means that choices
-+and compromises are going to be made.
-+
-+Consider the following NUMA topology entered by user input:
-+
-+::
-+
-+      0   1   2   3
-+  0  10  20  20  40
-+  1  20  10  80  40
-+  2  20  80  10  20
-+  3  40  40  20  10
-+
-+Honoring just the relative distances of node 0 to every other node, one possible
-+value for all associativity arrays would be:
-+
-+* node 0: 0 B A 0
-+* node 1: 0 0 A 1
-+* node 2: 0 0 A 2
-+* node 3: 0 B 0 3
-+
-+With the reference points {0x4, 0x3, 0x2, 0x1}, for node 0:
-+
-+* distance from 0 to 1 is 20 (no match at 0x4, will match at 0x3)
-+* distance from 0 to 2 is 20 (no match at 0x4, will match at 0x3)
-+* distance from 0 to 3 is 40 (no match at 0x4 and 0x3, will match
-+  at 0x2)
-+
-+The distances related to node 0 are well represented. Doing for node 1, and keeping
-+in mind that we don't need to revisit node 0 again, the distance from node 1 to
-+2 is 80, matching at 0x4:
-+
-+* node 1: C 0 A 1
-+* node 2: C 0 A 2
-+
-+Over here we already have the first conflict. Even if we assign a new associativity
-+domain at 0x4 for 1 and 2, and we do that in the code, the kernel will define
-+the distance between 1 and 2 as 20, not 80, because both 1 and 2 have the "A"
-+associativity domain from the previous step. If we decide to discard the
-+associativity with "A" then the node 0 distances are compromised.
-+
-+Following up with the distance from 1 to 3 being 40 (a match in 0x2) we have another
-+decision to make. These are the current associativity domains of each:
-+
-+* node 1: C 0 A 1
-+* node 3: 0 B 0 3
-+
-+There is already an associativity domain at 0x2 in node 3, "B", which was assigned
-+by the node 0 distances. If we define a new associativity domain at this level
-+for 1 and 3 we will overwrite the existing associativity between 0 and 3. What
-+the code is doing in this case is to assign the existing domain to the
-+current associativity, in this case, "B" is now assigned to the 0x2 of node 1,
-+resulting in the following associativity arrays:
-+
-+* node 0: 0 B A 0
-+* node 1: C 0 A 1
-+* node 2: C B A 2
-+* node 3: 0 B 0 3
-+
-+In the last step we will analyze just nodes 2 and 3. The desired distance between
-+2 and 3 is 20, i.e. a match in 0x3. Node 2 already has a domain assigned in 0x3,
-+A, so we do the same as we did in the previous case and assign it to node 3
-+at 0x3. This is the end result for the associativity arrays:
-+
-+* node 0: 0 B A 0
-+* node 1: C 0 A 1
-+* node 2: C B A 2
-+* node 3: 0 B A 3
-+
-+The kernel will read these arrays and will calculate the following NUMA topology for
-+the guest:
-+
-+::
-+
-+      0   1   2   3
-+  0  10  20  20  20
-+  1  20  10  20  20
-+  2  20  20  10  20
-+  3  20  20  20  10
-+
-+Which is not what the user wanted, but it is what the current logic and implementation
-+constraints of the kernel and QEMU will provide inside the LOPAPR specification.
-+
-+Changing a single value, specially a low distance value, makes for drastic changes
-+in the result. For example, with the same user input from above, but changing the
-+node distance from 0 to 1 to 40:
-+
-+::
-+
-+      0   1   2   3
-+  0  10  40  20  40
-+  1  40  10  80  40
-+  2  20  80  10  20
-+  3  40  40  20  10
-+
-+This is the result inside the guest, applying the same heuristics:
-+
-+::
-+
-+  $ numactl -H
-+  available: 4 nodes (0-3)
-+  (...)
-+  node distances:
-+  node   0   1   2   3
-+    0:  10  40  20  20
-+    1:  40  10  80  40
-+    2:  20  80  10  20
-+    3:  20  40  20  10
-+
-+This result is much closer to the user input and only a single distance was changed
-+from the original.
-+
-+The kernel will always match with the shortest associativity domain possible, and we're
-+attempting to retain the previous established relations between the nodes. This means
-+that a distance equal to 20 between nodes A and B and the same distance 20 between nodes
-+A and F will cause the distance between B and F to also be 20. The same will happen to
-+other distances, but shorter distances has precedent over it to the distance calculation.
-+
-+Users are welcome to use this knowledge and experiment with the input to get the
-+NUMA topology they want, or as closer as they want. The important thing is to keep
-+expectations up to par with what we are capable of provide at this moment: an
-+approximation.
+The new flow is definitely easier to read.  Thanks for doing this!
+
+> +++ b/block/qcow2.c
+> @@ -3860,8 +3860,20 @@ static bool is_zero(BlockDriverState *bs, int64_t offset, int64_t bytes)
+>       if (!bytes) {
+>           return true;
+>       }
+> -    res = bdrv_block_status_above(bs, NULL, offset, bytes, &nr, NULL, NULL);
+> -    return res >= 0 && (res & BDRV_BLOCK_ZERO) && nr == bytes;
+> +
+> +    /*
+> +     * bdrv_block_status_above doesn't merge different types of zeros, for
+
+We're inconsistent on whether we spell the noun 'zeros' or 'zeroes'; but 
+I don't care enough to make you change this.
+
+> +     * example, zeros which come from the region which is unallocated in
+> +     * the whole backing chain, and zeros which comes because of a short
+
+s/comes/come/
+
+> +     * backing file. So, we need a loop.
+> +     */
+> +    do {
+> +        res = bdrv_block_status_above(bs, NULL, offset, bytes, &nr, NULL, NULL);
+> +        offset += nr;
+> +        bytes -= nr;
+> +    } while (res >= 0 && (res & BDRV_BLOCK_ZERO) && nr && bytes);
+> +
+> +    return res >= 0 && (res & BDRV_BLOCK_ZERO) && bytes == 0;
+>   }
+>   
+>   static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
+> 
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
 -- 
-2.26.2
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
