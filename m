@@ -4,77 +4,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEC20C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 22:11:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F185C4346E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 22:37:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CC2323A1B
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 22:11:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E69321481
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 22:37:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RC4ojBKO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CC2323A1B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EVJpaP67"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E69321481
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLZSw-0002tM-Sk
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 18:11:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55210)
+	id 1kLZs1-0007M0-Fw
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 18:37:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59262)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kLZRo-0002FI-5K
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 18:10:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30520)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLZrC-0006vM-03
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 18:36:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56327)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kLZRl-0001He-Mv
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 18:10:39 -0400
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kLZr7-00047O-N0
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 18:36:53 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600985436;
+ s=mimecast20190719; t=1600987007;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=gbs9h17fz2LLgWdKJt9SGupF/V10Wb8z2l5HvirAdmg=;
- b=RC4ojBKOUeTxDr57ldwVTAAeUlzJ3iA2JvOEGwGGd6bnekJmtFQQHX8NmDX8XBVvjDsPay
- 3QYMz4v7UodMRNUi895LnXQ6DUJY3cNXIWBtjW6SxRGzJxHyTnKqxwSdYpCVoiPbQmI0/U
- 2uANUW95Gu63V+2Dxh2FQ5tpxIHSSdg=
+ bh=ROKQhyQGrDSrxxieCcSLGnfC/PGVtBz+fe05lwQ3z/A=;
+ b=EVJpaP67HvLK5/TTM4mBjad8TnTStsTZ9GqNk1Q+L9X0MkAj5Ti14szl4c9BThUKiD20Sm
+ fl6Rgu43JKs/6CrkDm/eTXmrffNXz14WtVMcQh//OnxA4mF2nMWS01qqL3FtsC77iYDmFs
+ tAYAn65cqWV9aYu58vcU/48KvlaA/tI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-588-s9BURt0KNlqm-5fB4NnYGg-1; Thu, 24 Sep 2020 18:10:31 -0400
-X-MC-Unique: s9BURt0KNlqm-5fB4NnYGg-1
+ us-mta-480-QC6zkqMLOf6ciZsRfAoDbQ-1; Thu, 24 Sep 2020 18:36:43 -0400
+X-MC-Unique: QC6zkqMLOf6ciZsRfAoDbQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF180186DD3D;
- Thu, 24 Sep 2020 22:10:30 +0000 (UTC)
-Received: from horse.redhat.com (ovpn-116-53.rdu2.redhat.com [10.10.116.53])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 381DB78830;
- Thu, 24 Sep 2020 22:10:24 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
- id A3F35222FC0; Thu, 24 Sep 2020 18:10:23 -0400 (EDT)
-Date: Thu, 24 Sep 2020 18:10:23 -0400
-From: Vivek Goyal <vgoyal@redhat.com>
-To: "Venegas Munoz, Jose Carlos" <jose.carlos.venegas.munoz@intel.com>
-Subject: virtiofs vs 9p performance(Re: tools/virtiofs: Multi threading seems
- to hurt performance)
-Message-ID: <20200924221023.GB132653@redhat.com>
-References: <20200918213436.GA3520@redhat.com> <20200921153243.GK3221@work-vm>
- <20200922102531.GA2837@work-vm> <20200922174733.GD57620@redhat.com>
- <46D726A6-72F3-40FE-9382-A189513F783D@intel.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 60B5C186DD39;
+ Thu, 24 Sep 2020 22:36:42 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
+ [10.10.119.55])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A1749CBA;
+ Thu, 24 Sep 2020 22:36:41 +0000 (UTC)
+Date: Thu, 24 Sep 2020 18:36:39 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: Beraldo Leal <bleal@redhat.com>
+Subject: Re: [PATCH v2 04/38] qapi: Prefer explicit relative imports
+Message-ID: <20200924223639.GA347918@localhost.localdomain>
+References: <20200922210101.4081073-1-jsnow@redhat.com>
+ <20200922210101.4081073-5-jsnow@redhat.com>
+ <20200923131825.GD191229@localhost.localdomain>
+ <294a050e-9c8a-952e-b58f-8c11f2e75570@redhat.com>
+ <20200924192550.GB347036@localhost.localdomain>
+ <20200924221747.mxs56b5inzblu7ui@laptop.redhat>
 MIME-Version: 1.0
-In-Reply-To: <46D726A6-72F3-40FE-9382-A189513F783D@intel.com>
+In-Reply-To: <20200924221747.mxs56b5inzblu7ui@laptop.redhat>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vgoyal@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="+HP7ph2BbKc20aGI"
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=vgoyal@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=crosa@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -97,79 +99,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cdupontd@redhat.com" <cdupontd@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- virtio-fs-list <virtio-fs@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- "Shinde, Archana M" <archana.m.shinde@intel.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ John Snow <jsnow@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 24, 2020 at 09:33:01PM +0000, Venegas Munoz, Jose Carlos wrote:
-> Hi Folks,
-> 
-> Sorry for the delay about how to reproduce `fio` data.
-> 
-> I have some code to automate testing for multiple kata configs and collect info like:
-> - Kata-env, kata configuration.toml, qemu command, virtiofsd command.
-> 
-> See: 
-> https://github.com/jcvenegas/mrunner/
-> 
-> 
-> Last time we agreed to narrow the cases and configs to compare virtiofs and 9pfs
-> 
-> The configs where the following:
-> 
-> - qemu + virtiofs(cache=auto, dax=0) a.ka. `kata-qemu-virtiofs` WITOUT xattr
-> - qemu + 9pfs a.k.a `kata-qemu`
-> 
-> Please take a look to the html and raw results I attach in this mail.
+--+HP7ph2BbKc20aGI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hi Carlos,
+On Thu, Sep 24, 2020 at 07:17:47PM -0300, Beraldo Leal wrote:
+> On Thu, Sep 24, 2020 at 03:25:50PM -0400, Cleber Rosa wrote:
+> > On Wed, Sep 23, 2020 at 01:12:09PM -0400, John Snow wrote:
+> > > On 9/23/20 9:18 AM, Cleber Rosa wrote:
+> > > > Relative imports are a source of heated debates, but when properly
+> > > > used in a self contained module like here, they are very posititive
+> > > > IMO.
+> > >=20
+> > > Still? I know they were loathed pre-3.5, but in my subjective experie=
+nce
+> > > they behave the nicest overall in the modern python dialect.
+> > >=20
+> > > What are the downsides?
+> > >=20
+> > > --js
+> >=20
+> > I'll just invite Beraldo to the discussion and let the fun begin :).
+>=20
+> Nice try, Cleber! ;)
+>
 
-So you are running following test.
+C'mon... I was hoping for nothing less than an emacs .vs. vi kind of
+discussion.
 
-fio --direct=1 --gtod_reduce=1 --name=test --filename=random_read_write.fio --bs=4k --iodepth=64 --size=4G --readwrite=randrw --rwmixread=75 --output=/output/fio.txt
+> Well, relative imports are supported by Guido, so I'm not here to say
+> different. There are some use-cases.
+>=20
+> I'm not fully aware of the qapi context and big picture here, but I
+> guess that depends on how you would like to use your package/scripts.
+>=20
+> Some may say that one "downside" is that relative imports are not as
+> readable as absolute ones. But reading the 04/38 PATH description by
+> jsnow, yes, looks like using relative imports is one valid option here.
+>=20
+> I prefer to use my scripts as packages inside venvs, and I use to have a
+> setup.py, with absolute imports whenever possible, and when in
+> development mode, make use of `python3 setup.py develop` which will
+> create the "links" for me.=20
+>
 
-And following are your results.
+Now seriously, these are good point, thanks.  John, I invited Beraldo
+to give his take on the subject here because he started this issue
+on Avocado land:
 
-9p
---
-READ: bw=211MiB/s (222MB/s), 211MiB/s-211MiB/s (222MB/s-222MB/s), io=3070MiB (3219MB), run=14532-14532msec
+  https://github.com/avocado-framework/avocado/issues/3525
 
-WRITE: bw=70.6MiB/s (74.0MB/s), 70.6MiB/s-70.6MiB/s (74.0MB/s-74.0MB/s), io=1026MiB (1076MB), run=14532-14532msec
+So far on Avocado we've kept the relative imports on most places.  We do
+have some occurences of "triple upper level" imports that don't look
+very nice IMO though:
 
-virtiofs
---------
-Run status group 0 (all jobs):
-   READ: bw=159MiB/s (167MB/s), 159MiB/s-159MiB/s (167MB/s-167MB/s), io=3070MiB (3219MB), run=19321-19321msec
-  WRITE: bw=53.1MiB/s (55.7MB/s), 53.1MiB/s-53.1MiB/s (55.7MB/s-55.7MB/s), io=1026MiB (1076MB), run=19321-19321msec
+  https://github.com/avocado-framework/avocado/blob/master/avocado/utils/so=
+ftware_manager/backends/rpm.py#L5
 
-So looks like you are getting better performance with 9p in this case.
+> --
+> Beraldo
+>=20
 
-Can you apply "shared pool" patch to qemu for virtiofsd and re-run this
-test and see if you see any better results.
+Anyway, I think we're all in agreement with the approach taken here.
 
-In my testing, with cache=none, virtiofs performed better than 9p in 
-all the fio jobs I was running. For the case of cache=auto  for virtiofs
-(with xattr enabled), 9p performed better in certain write workloads. I
-have identified root cause of that problem and working on
-HANDLE_KILLPRIV_V2 patches to improve WRITE performance of virtiofs
-with cache=auto and xattr enabled.
+- Cleber.
 
-I will post my 9p and virtiofs comparison numbers next week. In the
-mean time will be great if you could apply following qemu patch, rebuild
-qemu and re-run above test.
+--+HP7ph2BbKc20aGI
+Content-Type: application/pgp-signature; name="signature.asc"
 
-https://www.redhat.com/archives/virtio-fs/2020-September/msg00081.html
+-----BEGIN PGP SIGNATURE-----
 
-Also what's the status of file cache on host in both the cases. Are
-you booting host fresh for these tests so that cache is cold on host
-or cache is warm?
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl9tH3MACgkQZX6NM6Xy
+CfP6CA/+IFppcHAQxmqKNuPqQLyi/sXKwqQL0Ob/PzaRl35JkepZd5cx7nVi3Aqj
+jVj2bF6+bcd6BiKVgSNoa2OKQm3QYsNj2L8/30uZWxlu128TyaRK2dYcP+c+ZL9B
+vyQf/Pg/M98NldImr/tRcnxFOEZwm7XqPAB1TOYKexqMcvIGLOq63OwhK2P3J+OL
+mvEV9/I/G1pAhz33u+lBBWzhhkNQsltzjWFtydUHeQYoFU5wH9wrVm4T+Wpl1Zy1
+utEj0FYwVNZV10cAnhBisfdwG/I/BEKrz1+qzi21HjEgiK4wbnS93OfHhBErguTj
+RNmaCeFynmx1TndarRwk2I7yi9+3cv9dfvydX8asZZyM2zJTbrCmBIp9ijSgqGmc
+gpVi2hgG6BRJaOHXUFSP3RGcHOJjhtbCSLVkLAOTaGhr+oColfA6egOui1RyOv1S
+lhBr1Blxg6L1CNT57jIdFVDG0fluj94DJn/EcE8gdzvmaHbBZbBwtx1L0HWTfQd1
+1jD8ofeIFtDPOPE7ZDkox67btAwneUyNC6YljoB7pcDMDhyDPJ2szzj9LAZseLXI
+XLjXqPvWVHMSNSxbO6DJu2e1IiAX9ItO6m7xj/lt/JxCXWfjbTHE9MlvXdDylmxh
+O3LBKU/bCSA42FeDn9nIyHuaVNGZw3rA/1V9ugpnKLTHzbgQC10=
+=jLSC
+-----END PGP SIGNATURE-----
 
-Thanks
-Vivek
+--+HP7ph2BbKc20aGI--
 
 
