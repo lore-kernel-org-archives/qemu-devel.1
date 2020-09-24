@@ -2,88 +2,88 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60F7DC4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:44:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB8CFC4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:45:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BF9023772
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:43:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3207A23772
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 10:45:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LmmW08ZL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BF9023772
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oURGcw9L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3207A23772
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLOjF-00046L-KP
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 06:43:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47058)
+	id 1kLOkq-0005I5-2Q
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 06:45:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57400)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kele.hwang@gmail.com>)
- id 1kLO4a-0005ms-6x
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 06:01:56 -0400
-Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:41892)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kLOib-0003nT-Jb
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 06:43:17 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:36872)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <kele.hwang@gmail.com>)
- id 1kLO4X-0002Ta-QE
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 06:01:55 -0400
-Received: by mail-ej1-x644.google.com with SMTP id lo4so3604405ejb.8
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 03:01:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=cp0a7EI7vYUuf2cCjOUKWoU5wMo2vFRTH49WaDkjhro=;
- b=LmmW08ZLSRFexvsjHCma9KOCWaN+OyIMmZOPfxQvazgjZTSWNY5QO6lQ8guRTyn6tS
- 6g9vvtxyYEryXFPG1CDADDXcur3r4GrHc52rgWACun1dUuMLNUi3O+qcb1Ky7okUGK2i
- mX262oQx7SlBE/pwwUWAhFpLORi9IvkpP3VvfuwpNASY/gxv579MTQg9DM7Yhoxp0aED
- 793TwO3LZyQzLhsxk5av+kuawp6QxYKaaCBB/jtdv1P+GFTg6c7/Eyvj/l+m24SajDA9
- VBmTtvJyAD7FCmd96yW7h34UQxhwClJFkpb/fgkUHxXysphlBLR3LQTIozaBUczGyigK
- f6fw==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kLOiZ-00082b-TW
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 06:43:17 -0400
+Received: by mail-ej1-x641.google.com with SMTP id nw23so3805500ejb.4
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 03:43:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Sh7M5NS4+o6Psd1IX4zqHH5fadgKtT/RV5sq9T9V4zc=;
+ b=oURGcw9Lgoup0jNohXYOWT3Jg69hNsBs/DwBmOaoJuYSSPoL5dQvs+84EQmkVtGw7c
+ j615+vPltK1gVre0FmykOYmdNfR7baXXtXJx7w7OiKYvQ6AuFhbK+PYCo9X/YQnKA9w9
+ WDJJiqBkOWu6/giX/if6x6J/FIluvUlhdR/EtBxCSpSxzPk891a6ELPIlAWQ6RlKhdcm
+ ydOvia4p3rK7PiCDsT7A5LywGc3B47mtS+IM8wSNnQwZ2ictrY/dOYiGWCaxNpn2FiHP
+ 1DLcvMMEWayzPqTXGSTIPeZb2vZRcuXl20IqQOh525BJM8o1xfUaT0IQ3v8mY9An/XYr
+ AmnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=cp0a7EI7vYUuf2cCjOUKWoU5wMo2vFRTH49WaDkjhro=;
- b=l+2eWZuqvETG099lWNChlkmj8zhRwzgL0OnfIT5eSSia5N3xCCPTbrJlpTVsjLmcio
- ZPpWqDWFeb2fbiR55/L1xGy/JYQtBZ9gK5LRFi/fifWwxtginwIRDV9PnBoCFyeXV3Sj
- hofbOWZLHHosCr+szgTmJftFncebZjT9duoWJNz4BacWjk3TyMSnpdoCxQrWV28/IaJE
- lz1IhTDjCkYAB0345EUXd6tQva0Tyk8gwOTuobZa8aDhx11LLYfSmTnCrAc+y9Xv0bm+
- gmyZyZ9+2TKx53tQP1lWYMLHLnRnvIRaokrM/OQLrtwF2dEKydEysGxaWX12ztUFBLGX
- Lq4w==
-X-Gm-Message-State: AOAM531njjFXz0Xu57nQ0C4VDgXnA6LqYUXftK7utowuC1JGy1QkTMBO
- ebHPrSZ/Wuf+riWAC5eEQ2WOiNi1BZLR0nii0N4=
-X-Google-Smtp-Source: ABdhPJwkRKq62FJk51bU+2zZ50b6g3F6uAW7LdgCMxaKwd6eTDHxSLyD3bXZ0+TAZGM58wYSjCD7e1sfly9USZP0UcU=
-X-Received: by 2002:a17:907:374:: with SMTP id
- rs20mr151156ejb.135.1600941711677; 
- Thu, 24 Sep 2020 03:01:51 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=Sh7M5NS4+o6Psd1IX4zqHH5fadgKtT/RV5sq9T9V4zc=;
+ b=jmZyBCZpoR8+pgdpg9cwPOkrQIRMG90c6RmHseDQeJ9pccOFcRdoHxK4IAx5TzQfDQ
+ bP08C3zf11Bdb+V61BQzRX9wkJafBi5X8a0kKYi66nk2674n3g6RdEkWacxq2VeYmegA
+ QDrYtbk/x8Ha+HJ+P9oLmtt3Xq1O63Sg3DJY1zzwr88Tj5FA4suKWd1a1PW7JF1CiAeP
+ qniaw0ZOQAqMbWCbgBBxaSQ2EQVgH0buW4Zd8V9occRJXNs/DCZuh+pDqAkd8VhQcWxR
+ FfKNb2wUKlhu6JKRPwY27kvWQaRz/FNldvsYZ33FHUxsLxAWCbboP6X/eOKFN18+n9Yg
+ 9WMw==
+X-Gm-Message-State: AOAM532+uV8E7gKpomwIw9ztTXIpw7Woy9ZVU4Xcli3YC1rgCYlshnEy
+ QbDChAWEBPuKKnEBW/wKtltxidc7P9CyiYUxlPiQKw==
+X-Google-Smtp-Source: ABdhPJyk2Y7N6/bnXgTNA9T7PL1js7MULhfx5UUYpXfuWuYbPYW61ZOVUWtY4rgyQ4T57yaHT+Y9KDkiZscY/x79560=
+X-Received: by 2002:a17:906:552:: with SMTP id
+ k18mr305797eja.482.1600944194213; 
+ Thu, 24 Sep 2020 03:43:14 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200923093800.9845-1-kele.hwang@gmail.com>
- <25889d77-4de0-6f5a-2b60-ab3e474e7c50@amsat.org>
-In-Reply-To: <25889d77-4de0-6f5a-2b60-ab3e474e7c50@amsat.org>
-From: Kele Huang <kele.hwang@gmail.com>
-Date: Thu, 24 Sep 2020 18:01:40 +0800
-Message-ID: <CA+FBGNcDKUH=_QMstO6+XDvzUMDwQaEGVxfBEUSG-=hHO0nVrg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/1] accel/tcg: Fix computing of is_write for mips
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, 
- qemu-devel@nongnu.org
-Content-Type: multipart/alternative; boundary="00000000000007de7105b00c4a2d"
-Received-SPF: pass client-ip=2a00:1450:4864:20::644;
- envelope-from=kele.hwang@gmail.com; helo=mail-ej1-x644.google.com
+References: <20200921112913.555392-1-mst@redhat.com>
+ <CAKXe6SLYL0DDWTbPEwa7y47BOpagg8HkUf+nfgzz_3Or_ebUqQ@mail.gmail.com>
+ <20200921083052-mutt-send-email-mst@kernel.org>
+ <20200923164029-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200923164029-mutt-send-email-mst@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 24 Sep 2020 11:43:03 +0100
+Message-ID: <CAFEAcA8WSbvG9Cgp6J4fqp4AX-rCR2F3vjPsAVegv3axAFUiMA@mail.gmail.com>
+Subject: Re: [PULL v3 00/15] virtio,pc,acpi: fixes, tests
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,231 +97,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Li Qiang <liq3ea@gmail.com>, Qemu Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000007de7105b00c4a2d
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Wed, 23 Sep 2020 at 21:41, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> Peter, you said you see issues on some systems.
+> I pushed a tag:
+>     git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream_test
+> which drops some patches I suspect.
+> If that helps, pls let me know.
 
-Sorry about my misunderstanding of your guidelines.
-What is more, I have resend a new v2 patch as a new top-level thread and CC
-to TCG MIPS maintainers and Richard.
+Yes, the original tag seems to just cause 'make check' to stall
+out (the logfiles simply stop) for OSX, NetBSD, OpenBSD and
+s390x. I'll try your test tag...
 
-On Wed, 23 Sep 2020 at 19:08, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-wrote:
-
-> Cc'ing the TCG MIPS maintainers, and also
-> Cc'ing Richard who made a comment in v1.
->
-> On 9/23/20 11:38 AM, Kele Huang wrote:
-> > Detect mips store instructions in cpu_signal_handler for all MIPS
-> > versions, and set is_write if encountering such store instructions.
-> >
-> > This fixed the error while dealing with self-modifed code for MIPS.
->
-> Quoting Eric Blake:
->
-> "It's better to post a v2 as a new top-level thread rather
-> than buried in-reply-to the v1 thread; among other things,
-> burying a reply can cause automated patch tooling to miss
-> the updated series."
->
-> >
-> > Signed-off-by: Kele Huang <kele.hwang@gmail.com>
-> > Signed-off-by: Xu Zou <iwatchnima@gmail.com>
-> > ---
-> >  accel/tcg/user-exec.c | 51 ++++++++++++++++++++++++++++++++++++++++++-
-> >  1 file changed, 50 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-> > index bb039eb32d..18784516e5 100644
-> > --- a/accel/tcg/user-exec.c
-> > +++ b/accel/tcg/user-exec.c
-> > @@ -710,11 +710,60 @@ int cpu_signal_handler(int host_signum, void
-> *pinfo,
-> >      greg_t pc =3D uc->uc_mcontext.pc;
-> >      int is_write;
-> >
-> > -    /* XXX: compute is_write */
-> >      is_write =3D 0;
-> > +
-> > +    /* Detect store by reading the instruction at the program counter.
-> */
-> > +    uint32_t insn =3D *(uint32_t *)pc;
-> > +    switch(insn>>29) {
-> > +    case 0x5:
-> > +        switch((insn>>26) & 0x7) {
-> > +        case 0x0: /* SB */
-> > +        case 0x1: /* SH */
-> > +        case 0x2: /* SWL */
-> > +        case 0x3: /* SW */
-> > +        case 0x4: /* SDL */
-> > +        case 0x5: /* SDR */
-> > +        case 0x6: /* SWR */
-> > +            is_write =3D 1;
-> > +        }
-> > +        break;
-> > +    case 0x7:
-> > +        switch((insn>>26) & 0x7) {
-> > +        case 0x0: /* SC */
-> > +        case 0x1: /* SWC1 */
-> > +        case 0x4: /* SCD */
-> > +        case 0x5: /* SDC1 */
-> > +        case 0x7: /* SD */
-> > +#if !defined(__mips_isa_rev) || __mips_isa_rev < 6
-> > +        case 0x2: /* SWC2 */
-> > +        case 0x6: /* SDC2 */
-> > +#endif
-> > +            is_write =3D 1;
-> > +        }
-> > +        break;
-> > +    }
-> > +
-> > +    /*
-> > +     * Required in all versions of MIPS64 since MIPS64r1. Not availabl=
-e
-> > +     * in MIPS32r1. Required by MIPS32r2 and subsequent versions of
-> MIPS32.
-> > +     */
-> > +    switch ((insn >> 3) & 0x7) {
-> > +    case 0x1:
-> > +        switch (insn & 0x7) {
-> > +        case 0x0: /* SWXC1 */
-> > +        case 0x1: /* SDXC1 */
-> > +            is_write =3D 1;
-> > +        }
-> > +        break;
-> > +    }
-> > +
-> >      return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
-> >  }
-> >
-> > +#elif defined(__misp16) || defined(__mips_micromips)
-> > +
-> > +#error "Unsupported encoding"
-> > +
-> >  #elif defined(__riscv)
-> >
-> >  int cpu_signal_handler(int host_signum, void *pinfo,
-> >
->
->
-
---00000000000007de7105b00c4a2d
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Sorry about my misunderstanding of your guidelines.<div>Wh=
-at is more, I have resend a new v2 patch as a new top-level thread and CC t=
-o TCG MIPS maintainers and Richard.</div></div><br><div class=3D"gmail_quot=
-e"><div dir=3D"ltr" class=3D"gmail_attr">On Wed, 23 Sep 2020 at 19:08, Phil=
-ippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsat.org">f4bug@amsat.=
-org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"marg=
-in:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1e=
-x">Cc&#39;ing the TCG MIPS maintainers, and also<br>
-Cc&#39;ing Richard who made a comment in v1.<br>
-<br>
-On 9/23/20 11:38 AM, Kele Huang wrote:<br>
-&gt; Detect mips store instructions in cpu_signal_handler for all MIPS<br>
-&gt; versions, and set is_write if encountering such store instructions.<br=
->
-&gt; <br>
-&gt; This fixed the error while dealing with self-modifed code for MIPS.<br=
->
-<br>
-Quoting Eric Blake:<br>
-<br>
-&quot;It&#39;s better to post a v2 as a new top-level thread rather<br>
-than buried in-reply-to the v1 thread; among other things,<br>
-burying a reply can cause automated patch tooling to miss<br>
-the updated series.&quot;<br>
-<br>
-&gt; <br>
-&gt; Signed-off-by: Kele Huang &lt;<a href=3D"mailto:kele.hwang@gmail.com" =
-target=3D"_blank">kele.hwang@gmail.com</a>&gt;<br>
-&gt; Signed-off-by: Xu Zou &lt;<a href=3D"mailto:iwatchnima@gmail.com" targ=
-et=3D"_blank">iwatchnima@gmail.com</a>&gt;<br>
-&gt; ---<br>
-&gt;=C2=A0 accel/tcg/user-exec.c | 51 +++++++++++++++++++++++++++++++++++++=
-+++++-<br>
-&gt;=C2=A0 1 file changed, 50 insertions(+), 1 deletion(-)<br>
-&gt; <br>
-&gt; diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c<br>
-&gt; index bb039eb32d..18784516e5 100644<br>
-&gt; --- a/accel/tcg/user-exec.c<br>
-&gt; +++ b/accel/tcg/user-exec.c<br>
-&gt; @@ -710,11 +710,60 @@ int cpu_signal_handler(int host_signum, void *pi=
-nfo,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 greg_t pc =3D uc-&gt;uc_mcontext.pc;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 int is_write;<br>
-&gt;=C2=A0 <br>
-&gt; -=C2=A0 =C2=A0 /* XXX: compute is_write */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 is_write =3D 0;<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 /* Detect store by reading the instruction at the progr=
-am counter. */<br>
-&gt; +=C2=A0 =C2=A0 uint32_t insn =3D *(uint32_t *)pc;<br>
-&gt; +=C2=A0 =C2=A0 switch(insn&gt;&gt;29) {<br>
-&gt; +=C2=A0 =C2=A0 case 0x5:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 switch((insn&gt;&gt;26) &amp; 0x7) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 0x0: /* SB */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 0x1: /* SH */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 0x2: /* SWL */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 0x3: /* SW */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 0x4: /* SDL */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 0x5: /* SDR */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 0x6: /* SWR */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 is_write =3D 1;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 case 0x7:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 switch((insn&gt;&gt;26) &amp; 0x7) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 0x0: /* SC */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 0x1: /* SWC1 */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 0x4: /* SCD */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 0x5: /* SDC1 */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 0x7: /* SD */<br>
-&gt; +#if !defined(__mips_isa_rev) || __mips_isa_rev &lt; 6<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 0x2: /* SWC2 */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 0x6: /* SDC2 */<br>
-&gt; +#endif<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 is_write =3D 1;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 }<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 /*<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0* Required in all versions of MIPS64 since MIPS64=
-r1. Not available<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0* in MIPS32r1. Required by MIPS32r2 and subsequen=
-t versions of MIPS32.<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0*/<br>
-&gt; +=C2=A0 =C2=A0 switch ((insn &gt;&gt; 3) &amp; 0x7) {<br>
-&gt; +=C2=A0 =C2=A0 case 0x1:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 switch (insn &amp; 0x7) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 0x0: /* SWXC1 */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 0x1: /* SDXC1 */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 is_write =3D 1;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 }<br>
-&gt; +<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 return handle_cpu_signal(pc, info, is_write, &amp;=
-uc-&gt;uc_sigmask);<br>
-&gt;=C2=A0 }<br>
-&gt;=C2=A0 <br>
-&gt; +#elif defined(__misp16) || defined(__mips_micromips)<br>
-&gt; +<br>
-&gt; +#error &quot;Unsupported encoding&quot;<br>
-&gt; +<br>
-&gt;=C2=A0 #elif defined(__riscv)<br>
-&gt;=C2=A0 <br>
-&gt;=C2=A0 int cpu_signal_handler(int host_signum, void *pinfo,<br>
-&gt; <br>
-<br>
-</blockquote></div>
-
---00000000000007de7105b00c4a2d--
+thanks
+-- PMM
 
