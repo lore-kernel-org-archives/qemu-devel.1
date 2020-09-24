@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70851C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:22:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C438C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:23:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE0B82311B
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:22:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E54A02311B
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:23:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Icjlwd7a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE0B82311B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h74LQ/fZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E54A02311B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLU18-00009e-H4
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 12:22:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49102)
+	id 1kLU1f-00010j-Qo
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 12:23:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49418)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kLTAL-0001p3-KN
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 11:28:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29095)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kLTAp-00025D-OJ
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 11:28:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48458)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kLTAJ-0005Yt-Ad
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 11:28:13 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kLTAj-0005cE-CW
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 11:28:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600961290;
+ s=mimecast20190719; t=1600961303;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=k0b3rfhxwo8ug8btayCSnrjNRUUacnvpiy0azXs+AJg=;
- b=Icjlwd7awJrPUAsT+bPFhwppQW9x66DailtEkWJ0hv72Y+OieJMBQbl4oKxn4qm7kZ+tqo
- A2nTs24ySV22hJn02mtTruv8egh0XNIPumjCJm+YrFnc8I5BEXWsVwd0JWuEehhuEangOw
- 2ePtNFSzyXSq/cl3iuy0HzxHUqw7Tb0=
+ bh=2vtAwkx6Ac6RtCGipau0FOuUrS26ng5ynJS079mcJkU=;
+ b=h74LQ/fZL8u0u+crgaiz3YZojDbgXIXqgNT12LD/UrbGiEg6AiL3Jc04qnWMpR2tu3AVlQ
+ LPtDXtsXkcAxdkn41DLc6fkj0Ngn+d/WwS4za2yfIyf2yFv/1AuniijQOoajUwOJGBN2iE
+ Lk/vqpYvg8MOln3WnUNfz/XAL9xSSjQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487-weQUIWkjMmiWg0Sm7vbYiQ-1; Thu, 24 Sep 2020 11:28:08 -0400
-X-MC-Unique: weQUIWkjMmiWg0Sm7vbYiQ-1
+ us-mta-298-0g88eIFoPtW0w24BjIHEbg-1; Thu, 24 Sep 2020 11:28:21 -0400
+X-MC-Unique: 0g88eIFoPtW0w24BjIHEbg-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F08FB64144;
- Thu, 24 Sep 2020 15:28:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC1F681CBE3;
+ Thu, 24 Sep 2020 15:28:14 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-114-72.ams2.redhat.com [10.36.114.72])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A466160C04;
- Thu, 24 Sep 2020 15:27:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AA71A60C04;
+ Thu, 24 Sep 2020 15:28:13 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 17/31] block/export: Add blk_exp_close_all(_type)
-Date: Thu, 24 Sep 2020 17:27:03 +0200
-Message-Id: <20200924152717.287415-18-kwolf@redhat.com>
+Subject: [PATCH v2 26/31] nbd: Merge nbd_export_new() and nbd_export_create()
+Date: Thu, 24 Sep 2020 17:27:12 +0200
+Message-Id: <20200924152717.287415-27-kwolf@redhat.com>
 In-Reply-To: <20200924152717.287415-1-kwolf@redhat.com>
 References: <20200924152717.287415-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -70,9 +70,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -80,7 +80,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,335 +99,226 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds a function to shut down all block exports, and another one to
-shut down the block exports of a single type. The latter is used for now
-when stopping the NBD server. As soon as we implement support for
-multiple NBD servers, we'll need a per-server list of exports and it
-will be replaced by a function using that.
+There is no real reason any more why nbd_export_new() and
+nbd_export_create() should be separate functions. The latter only
+performs a few checks before it calls the former.
 
-As a side effect, the BlockExport layer has a list tracking all existing
-exports now. closed_exports loses its only user and can go away.
+What makes the current state stand out is that it's the only function in
+BlockExportDriver that is not a static function inside nbd/server.c, but
+a small wrapper in blockdev-nbd.c that then calls back into nbd/server.c
+for the real functionality.
+
+Move all the checks to nbd/server.c and make the resulting function
+static to improve readability.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/export.h | 15 ++++++++
- include/block/nbd.h    |  2 -
- block.c                |  2 +-
- block/export/export.c  | 86 +++++++++++++++++++++++++++++++++++++++++-
- blockdev-nbd.c         |  2 +-
- nbd/server.c           | 34 +++--------------
- qemu-nbd.c             |  2 +-
- 7 files changed, 107 insertions(+), 36 deletions(-)
+ include/block/nbd.h |  7 +-----
+ blockdev-nbd.c      | 40 +++++----------------------------
+ nbd/server.c        | 54 ++++++++++++++++++++++++++++++++-------------
+ 3 files changed, 45 insertions(+), 56 deletions(-)
 
-diff --git a/include/block/export.h b/include/block/export.h
-index cf9b1c9dad..6fffcb5651 100644
---- a/include/block/export.h
-+++ b/include/block/export.h
-@@ -15,6 +15,7 @@
- #define BLOCK_EXPORT_H
- 
- #include "qapi/qapi-types-block-export.h"
-+#include "qemu/queue.h"
- 
- typedef struct BlockExport BlockExport;
- 
-@@ -36,6 +37,14 @@ typedef struct BlockExportDriver {
-      * references have been dropped.
-      */
-     void (*delete)(BlockExport *);
-+
-+    /*
-+     * Start to disconnect all clients and drop other references held
-+     * internally by the export driver. When the function returns, there may
-+     * still be active references while the export is in the process of
-+     * shutting down.
-+     */
-+    void (*request_shutdown)(BlockExport *);
- } BlockExportDriver;
- 
- struct BlockExport {
-@@ -50,10 +59,16 @@ struct BlockExport {
- 
-     /* The AioContext whose lock protects this BlockExport object. */
-     AioContext *ctx;
-+
-+    /* List entry for block_exports */
-+    QLIST_ENTRY(BlockExport) next;
- };
- 
- BlockExport *blk_exp_add(BlockExportOptions *export, Error **errp);
- void blk_exp_ref(BlockExport *exp);
- void blk_exp_unref(BlockExport *exp);
-+void blk_exp_request_shutdown(BlockExport *exp);
-+void blk_exp_close_all(void);
-+void blk_exp_close_all_type(BlockExportType type);
- 
- #endif
 diff --git a/include/block/nbd.h b/include/block/nbd.h
-index fc2c153d5b..0b9f3e5d4e 100644
+index 5270b7eadd..3dd9a04546 100644
 --- a/include/block/nbd.h
 +++ b/include/block/nbd.h
-@@ -337,12 +337,10 @@ int nbd_export_new(BlockExport *blk_exp, BlockDriverState *bs,
-                    const char *bitmap, bool readonly, bool shared,
-                    bool writethrough, Error **errp);
+@@ -330,12 +330,6 @@ int nbd_errno_to_system_errno(int err);
+ typedef struct NBDExport NBDExport;
+ typedef struct NBDClient NBDClient;
+ 
+-int nbd_export_create(BlockExport *exp, BlockExportOptions *exp_args,
+-                      Error **errp);
+-int nbd_export_new(BlockExport *blk_exp,
+-                   const char *name, const char *desc,
+-                   const char *bitmap, bool readonly, bool shared,
+-                   Error **errp);
  void nbd_export_set_on_eject_blk(BlockExport *exp, BlockBackend *blk);
--void nbd_export_close(NBDExport *exp);
- void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error **errp);
  
  AioContext *nbd_export_aio_context(NBDExport *exp);
- NBDExport *nbd_export_find(const char *name);
--void nbd_export_close_all(void);
+@@ -349,6 +343,7 @@ void nbd_client_get(NBDClient *client);
+ void nbd_client_put(NBDClient *client);
  
- void nbd_client_new(QIOChannelSocket *sioc,
-                     QCryptoTLSCreds *tlscreds,
-diff --git a/block.c b/block.c
-index 11ab55f80b..47a9d91fb4 100644
---- a/block.c
-+++ b/block.c
-@@ -4462,7 +4462,7 @@ static void bdrv_close(BlockDriverState *bs)
- void bdrv_close_all(void)
- {
-     assert(job_next(NULL) == NULL);
--    nbd_export_close_all();
-+    blk_exp_close_all();
- 
-     /* Drop references from requests still in flight, such as canceled block
-      * jobs whose AIO context has not been polled yet */
-diff --git a/block/export/export.c b/block/export/export.c
-index 6b2b29078b..e94a68c183 100644
---- a/block/export/export.c
-+++ b/block/export/export.c
-@@ -24,6 +24,10 @@ static const BlockExportDriver *blk_exp_drivers[] = {
-     &blk_exp_nbd,
- };
- 
-+/* Only accessed from the main thread */
-+static QLIST_HEAD(, BlockExport) block_exports =
-+    QLIST_HEAD_INITIALIZER(block_exports);
-+
- static const BlockExportDriver *blk_exp_find_driver(BlockExportType type)
- {
-     int i;
-@@ -61,6 +65,7 @@ BlockExport *blk_exp_add(BlockExportOptions *export, Error **errp)
-         return NULL;
-     }
- 
-+    QLIST_INSERT_HEAD(&block_exports, exp, next);
-     return exp;
- }
- 
-@@ -71,14 +76,91 @@ void blk_exp_ref(BlockExport *exp)
-     exp->refcount++;
- }
- 
-+/* Runs in the main thread */
-+static void blk_exp_delete_bh(void *opaque)
-+{
-+    BlockExport *exp = opaque;
-+    AioContext *aio_context = exp->ctx;
-+
-+    aio_context_acquire(aio_context);
-+
-+    assert(exp->refcount == 0);
-+    QLIST_REMOVE(exp, next);
-+    exp->drv->delete(exp);
-+    g_free(exp);
-+
-+    aio_context_release(aio_context);
-+}
-+
- /* Callers must hold exp->ctx lock */
- void blk_exp_unref(BlockExport *exp)
- {
-     assert(exp->refcount > 0);
-     if (--exp->refcount == 0) {
--        exp->drv->delete(exp);
--        g_free(exp);
-+        /* Touch the block_exports list only in the main thread */
-+        aio_bh_schedule_oneshot(qemu_get_aio_context(), blk_exp_delete_bh,
-+                                exp);
-+    }
-+}
-+
-+/*
-+ * Drops the user reference to the export and requests that all client
-+ * connections and other internally held references start to shut down. When
-+ * the function returns, there may still be active references while the export
-+ * is in the process of shutting down.
-+ *
-+ * Acquires exp->ctx internally. Callers must *not* hold the lock.
-+ */
-+void blk_exp_request_shutdown(BlockExport *exp)
-+{
-+    AioContext *aio_context = exp->ctx;
-+
-+    aio_context_acquire(aio_context);
-+    exp->drv->request_shutdown(exp);
-+    aio_context_release(aio_context);
-+}
-+
-+/*
-+ * Returns whether a block export of the given type exists.
-+ * type == BLOCK_EXPORT_TYPE__MAX checks for an export of any type.
-+ */
-+static bool blk_exp_has_type(BlockExportType type)
-+{
-+    BlockExport *exp;
-+
-+    if (type == BLOCK_EXPORT_TYPE__MAX) {
-+        return !QLIST_EMPTY(&block_exports);
-+    }
-+
-+    QLIST_FOREACH(exp, &block_exports, next) {
-+        if (exp->drv->type == type) {
-+            return true;
-+        }
-     }
-+
-+    return false;
-+}
-+
-+/* type == BLOCK_EXPORT_TYPE__MAX for all types */
-+void blk_exp_close_all_type(BlockExportType type)
-+{
-+    BlockExport *exp, *next;
-+
-+    assert(in_aio_context_home_thread(qemu_get_aio_context()));
-+
-+    QLIST_FOREACH_SAFE(exp, &block_exports, next, next) {
-+        if (type != BLOCK_EXPORT_TYPE__MAX && exp->drv->type != type) {
-+            continue;
-+        }
-+        blk_exp_request_shutdown(exp);
-+    }
-+
-+    AIO_WAIT_WHILE(NULL, blk_exp_has_type(type));
-+}
-+
-+void blk_exp_close_all(void)
-+{
-+    blk_exp_close_all_type(BLOCK_EXPORT_TYPE__MAX);
- }
- 
- void qmp_block_export_add(BlockExportOptions *export, Error **errp)
+ void nbd_server_is_qemu_nbd(bool value);
++bool nbd_server_is_running(void);
+ void nbd_server_start(SocketAddress *addr, const char *tls_creds,
+                       const char *tls_authz, uint32_t max_connections,
+                       Error **errp);
 diff --git a/blockdev-nbd.c b/blockdev-nbd.c
-index b34f159888..f927264777 100644
+index 30e165c23f..8174023e5c 100644
 --- a/blockdev-nbd.c
 +++ b/blockdev-nbd.c
-@@ -345,7 +345,7 @@ void qmp_nbd_server_stop(Error **errp)
-         return;
-     }
+@@ -37,6 +37,11 @@ void nbd_server_is_qemu_nbd(bool value)
+     is_qemu_nbd = value;
+ }
  
--    nbd_export_close_all();
-+    blk_exp_close_all_type(BLOCK_EXPORT_TYPE_NBD);
- 
-     nbd_server_free(nbd_server);
-     nbd_server = NULL;
-diff --git a/nbd/server.c b/nbd/server.c
-index f31d8bbb60..32147e4871 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -100,8 +100,6 @@ struct NBDExport {
- };
- 
- static QTAILQ_HEAD(, NBDExport) exports = QTAILQ_HEAD_INITIALIZER(exports);
--static QTAILQ_HEAD(, NBDExport) closed_exports =
--        QTAILQ_HEAD_INITIALIZER(closed_exports);
- 
- /* NBDExportMetaContexts represents a list of contexts to be exported,
-  * as selected by NBD_OPT_SET_META_CONTEXT. Also used for
-@@ -1494,12 +1492,8 @@ static void blk_aio_detach(void *opaque)
- static void nbd_eject_notifier(Notifier *n, void *data)
++bool nbd_server_is_running(void)
++{
++    return nbd_server || is_qemu_nbd;
++}
++
+ static void nbd_blockdev_client_closed(NBDClient *client, bool ignored)
  {
-     NBDExport *exp = container_of(n, NBDExport, eject_notifier);
--    AioContext *aio_context;
- 
--    aio_context = exp->common.ctx;
--    aio_context_acquire(aio_context);
--    nbd_export_close(exp);
--    aio_context_release(aio_context);
-+    blk_exp_request_shutdown(&exp->common);
+     nbd_client_put(client);
+@@ -173,41 +178,6 @@ void qmp_nbd_server_start(SocketAddressLegacy *addr,
+     qapi_free_SocketAddress(addr_flat);
  }
  
- void nbd_export_set_on_eject_blk(BlockExport *exp, BlockBackend *blk)
-@@ -1652,8 +1646,9 @@ nbd_export_aio_context(NBDExport *exp)
-     return exp->common.ctx;
- }
- 
--void nbd_export_close(NBDExport *exp)
-+static void nbd_export_request_shutdown(BlockExport *blk_exp)
- {
-+    NBDExport *exp = container_of(blk_exp, NBDExport, common);
-     NBDClient *client, *next;
- 
-     blk_exp_ref(&exp->common);
-@@ -1672,7 +1667,6 @@ void nbd_export_close(NBDExport *exp)
-         g_free(exp->name);
-         exp->name = NULL;
-         QTAILQ_REMOVE(&exports, exp, next);
--        QTAILQ_INSERT_TAIL(&closed_exports, exp, next);
-     }
-     blk_exp_unref(&exp->common);
- }
-@@ -1681,7 +1675,7 @@ void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error **errp)
- {
-     ERRP_GUARD();
-     if (mode == NBD_SERVER_REMOVE_MODE_HARD || QTAILQ_EMPTY(&exp->clients)) {
--        nbd_export_close(exp);
-+        nbd_export_request_shutdown(&exp->common);
-         return;
-     }
- 
-@@ -1716,9 +1710,6 @@ static void nbd_export_delete(BlockExport *blk_exp)
-         bdrv_dirty_bitmap_set_busy(exp->export_bitmap, false);
-         g_free(exp->export_bitmap_context);
-     }
--
--    QTAILQ_REMOVE(&closed_exports, exp, next);
--    aio_wait_kick();
- }
- 
- const BlockExportDriver blk_exp_nbd = {
-@@ -1726,24 +1717,9 @@ const BlockExportDriver blk_exp_nbd = {
-     .instance_size      = sizeof(NBDExport),
-     .create             = nbd_export_create,
-     .delete             = nbd_export_delete,
-+    .request_shutdown   = nbd_export_request_shutdown,
- };
- 
--void nbd_export_close_all(void)
+-int nbd_export_create(BlockExport *exp, BlockExportOptions *exp_args,
+-                      Error **errp)
 -{
--    NBDExport *exp, *next;
--    AioContext *aio_context;
+-    BlockExportOptionsNbd *arg = &exp_args->u.nbd;
 -
--    QTAILQ_FOREACH_SAFE(exp, &exports, next, next) {
--        aio_context = exp->common.ctx;
--        aio_context_acquire(aio_context);
--        nbd_export_close(exp);
--        aio_context_release(aio_context);
+-    assert(exp_args->type == BLOCK_EXPORT_TYPE_NBD);
+-
+-    if (!nbd_server && !is_qemu_nbd) {
+-        error_setg(errp, "NBD server not running");
+-        return -EINVAL;
 -    }
 -
--    AIO_WAIT_WHILE(NULL, !(QTAILQ_EMPTY(&exports) &&
--                           QTAILQ_EMPTY(&closed_exports)));
+-    if (!arg->has_name) {
+-        arg->name = exp_args->node_name;
+-    }
+-
+-    if (strlen(arg->name) > NBD_MAX_STRING_SIZE) {
+-        error_setg(errp, "export name '%s' too long", arg->name);
+-        return -EINVAL;
+-    }
+-
+-    if (arg->description && strlen(arg->description) > NBD_MAX_STRING_SIZE) {
+-        error_setg(errp, "description '%s' too long", arg->description);
+-        return -EINVAL;
+-    }
+-
+-    if (nbd_export_find(arg->name)) {
+-        error_setg(errp, "NBD server already has export named '%s'", arg->name);
+-        return -EEXIST;
+-    }
+-
+-    return nbd_export_new(exp, arg->name, arg->description, arg->bitmap,
+-                          !exp_args->writable, !exp_args->writable, errp);
 -}
 -
- static int coroutine_fn nbd_co_send_iov(NBDClient *client, struct iovec *iov,
-                                         unsigned niov, Error **errp)
+ void qmp_nbd_server_add(NbdServerAddOptions *arg, Error **errp)
  {
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index 23c2b7da8e..c64f83618b 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -1119,7 +1119,7 @@ int main(int argc, char **argv)
-     do {
-         main_loop_wait(false);
-         if (state == TERMINATE) {
--            nbd_export_close_all();
-+            blk_exp_close_all();
-             state = TERMINATED;
+     BlockExport *export;
+diff --git a/nbd/server.c b/nbd/server.c
+index 465ec9e762..f74766add7 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1507,17 +1507,44 @@ void nbd_export_set_on_eject_blk(BlockExport *exp, BlockBackend *blk)
+     blk_add_remove_bs_notifier(blk, &nbd_exp->eject_notifier);
+ }
+ 
+-int nbd_export_new(BlockExport *blk_exp,
+-                   const char *name, const char *desc,
+-                   const char *bitmap, bool readonly, bool shared,
+-                   Error **errp)
++static int nbd_export_create(BlockExport *blk_exp, BlockExportOptions *exp_args,
++                             Error **errp)
+ {
+     NBDExport *exp = container_of(blk_exp, NBDExport, common);
++    BlockExportOptionsNbd *arg = &exp_args->u.nbd;
+     BlockBackend *blk = blk_exp->blk;
+     int64_t size;
+     uint64_t perm, shared_perm;
++    bool readonly = !exp_args->writable;
++    bool shared = !exp_args->writable;
+     int ret;
+ 
++    assert(exp_args->type == BLOCK_EXPORT_TYPE_NBD);
++
++    if (!nbd_server_is_running()) {
++        error_setg(errp, "NBD server not running");
++        return -EINVAL;
++    }
++
++    if (!arg->has_name) {
++        arg->name = exp_args->node_name;
++    }
++
++    if (strlen(arg->name) > NBD_MAX_STRING_SIZE) {
++        error_setg(errp, "export name '%s' too long", arg->name);
++        return -EINVAL;
++    }
++
++    if (arg->description && strlen(arg->description) > NBD_MAX_STRING_SIZE) {
++        error_setg(errp, "description '%s' too long", arg->description);
++        return -EINVAL;
++    }
++
++    if (nbd_export_find(arg->name)) {
++        error_setg(errp, "NBD server already has export named '%s'", arg->name);
++        return -EEXIST;
++    }
++
+     size = blk_getlength(blk);
+     if (size < 0) {
+         error_setg_errno(errp, -size,
+@@ -1525,8 +1552,6 @@ int nbd_export_new(BlockExport *blk_exp,
+         return size;
+     }
+ 
+-    assert(name && strlen(name) <= NBD_MAX_STRING_SIZE);
+-
+     /* Don't allow resize while the NBD server is running, otherwise we don't
+      * care what happens with the node. */
+     blk_get_perm(blk, &perm, &shared_perm);
+@@ -1538,9 +1563,8 @@ int nbd_export_new(BlockExport *blk_exp,
+     blk_set_allow_aio_context_change(blk, true);
+ 
+     QTAILQ_INIT(&exp->clients);
+-    exp->name = g_strdup(name);
+-    assert(!desc || strlen(desc) <= NBD_MAX_STRING_SIZE);
+-    exp->description = g_strdup(desc);
++    exp->name = g_strdup(arg->name);
++    exp->description = g_strdup(arg->description);
+     exp->nbdflags = (NBD_FLAG_HAS_FLAGS | NBD_FLAG_SEND_FLUSH |
+                      NBD_FLAG_SEND_FUA | NBD_FLAG_SEND_CACHE);
+     if (readonly) {
+@@ -1554,12 +1578,12 @@ int nbd_export_new(BlockExport *blk_exp,
+     }
+     exp->size = QEMU_ALIGN_DOWN(size, BDRV_SECTOR_SIZE);
+ 
+-    if (bitmap) {
++    if (arg->bitmap) {
+         BlockDriverState *bs = blk_bs(blk);
+         BdrvDirtyBitmap *bm = NULL;
+ 
+         while (bs) {
+-            bm = bdrv_find_dirty_bitmap(bs, bitmap);
++            bm = bdrv_find_dirty_bitmap(bs, arg->bitmap);
+             if (bm != NULL) {
+                 break;
+             }
+@@ -1569,7 +1593,7 @@ int nbd_export_new(BlockExport *blk_exp,
+ 
+         if (bm == NULL) {
+             ret = -ENOENT;
+-            error_setg(errp, "Bitmap '%s' is not found", bitmap);
++            error_setg(errp, "Bitmap '%s' is not found", arg->bitmap);
+             goto fail;
          }
-     } while (state != TERMINATED);
+ 
+@@ -1583,15 +1607,15 @@ int nbd_export_new(BlockExport *blk_exp,
+             ret = -EINVAL;
+             error_setg(errp,
+                        "Enabled bitmap '%s' incompatible with readonly export",
+-                       bitmap);
++                       arg->bitmap);
+             goto fail;
+         }
+ 
+         bdrv_dirty_bitmap_set_busy(bm, true);
+         exp->export_bitmap = bm;
+-        assert(strlen(bitmap) <= BDRV_BITMAP_MAX_NAME_SIZE);
++        assert(strlen(arg->bitmap) <= BDRV_BITMAP_MAX_NAME_SIZE);
+         exp->export_bitmap_context = g_strdup_printf("qemu:dirty-bitmap:%s",
+-                                                     bitmap);
++                                                     arg->bitmap);
+         assert(strlen(exp->export_bitmap_context) < NBD_MAX_STRING_SIZE);
+     }
+ 
 -- 
 2.25.4
 
