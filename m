@@ -2,80 +2,80 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 994C4C4727D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:29:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 175E5C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:29:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01A3022208
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:29:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9262722208
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:29:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y1ZF1MdW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01A3022208
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NZqeWw1K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9262722208
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLNYw-0000i8-NB
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:29:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38528)
+	id 1kLNZ1-0000vp-LO
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:29:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38606)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTN-0000Ia-Lu
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46921)
+ id 1kLNTR-0000Sj-IV
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57495)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTM-0005zC-0H
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:29 -0400
+ id 1kLNTO-0005zc-R3
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600939407;
+ s=mimecast20190719; t=1600939410;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=onQMoCCAGls0VB8cHuzv+FYOkPBuZIpvYqOxHWyox8c=;
- b=Y1ZF1MdWkLzTrMsqpaAd0zo6okge/MHGxlBd2QDb4dnrFMAYpGp1jJWCtz0GzGHlFNuz9c
- PlTRr5WrRDLpvZE9wf6mLkymW8RHei8M8lIKQtPmIHecol5H8mEEvCfSvPYS2XKV/goyn+
- kwLcGsKvy8abduTZGHtCRGHTFhHO7EI=
+ bh=BVUtANjjJAOUj+sApXU7EHfxl0s2tDWXVLBvDDF3Az8=;
+ b=NZqeWw1K2aNsbZKb3OYcm5lUDg4THp2MuZkign/ACR4xV8W1OuQ9VLGTI0dneGiHZXUc9T
+ IdpofUdO8tKZIGCxPbL5eFqeEI7xemjAe8AZdTwg+bYSYvpbdnjFXNE33z/QoTCp/9OHBG
+ nVInAwqBF+v+WbMB2JPqKfZnOmBekd4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-sbgw9wenN1i4EZbVtZI7ow-1; Thu, 24 Sep 2020 05:23:25 -0400
-X-MC-Unique: sbgw9wenN1i4EZbVtZI7ow-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-446-Wvku3orlPCWAHcZ-EycUbA-1; Thu, 24 Sep 2020 05:23:27 -0400
+X-MC-Unique: Wvku3orlPCWAHcZ-EycUbA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7AC0F64142
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1AD31891E80;
+ Thu, 24 Sep 2020 09:23:26 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 70C5C73662;
- Thu, 24 Sep 2020 09:23:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 919D69CBA;
+ Thu, 24 Sep 2020 09:23:26 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 08/92] MAINTAINERS: add Paolo Bonzini as RCU maintainer
-Date: Thu, 24 Sep 2020 05:21:50 -0400
-Message-Id: <20200924092314.1722645-9-pbonzini@redhat.com>
+Subject: [PULL 12/92] acpi: i386: Move VMBus DSDT entry to SB
+Date: Thu, 24 Sep 2020 05:21:54 -0400
+Message-Id: <20200924092314.1722645-13-pbonzini@redhat.com>
 In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
 References: <20200924092314.1722645-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -96,41 +96,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+From: Jon Doron <arilou@gmail.com>
 
-The RCU code that Paolo maintains is missing a MAINTAINERS file entry.
-
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20200909090851.14458-1-stefanha@redhat.com>
+Signed-off-by: Jon Doron <arilou@gmail.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <20200715084326.678715-2-arilou@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- MAINTAINERS | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ hw/i386/acpi-build.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 3d17cad19a..9b01385484 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2310,6 +2310,14 @@ F: softmmu/cpus.c
- F: softmmu/cpu-throttle.c
- F: qapi/run-state.json
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 0e0535d2e3..60722fb8b0 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -975,7 +975,6 @@ static Aml *build_vmbus_device_aml(VMBusBridge *vmbus_bridge)
  
-+Read, Copy, Update (RCU)
-+M: Paolo Bonzini <pbonzini@redhat.com>
-+S: Maintained
-+F: include/qemu/rcu*.h
-+F: tests/rcutorture.c
-+F: tests/test-rcu-*.c
-+F: util/rcu.c
+ static void build_isa_devices_aml(Aml *table)
+ {
+-    VMBusBridge *vmbus_bridge = vmbus_bridge_find();
+     bool ambiguous;
+     Object *obj = object_resolve_path_type("", TYPE_ISA_BUS, &ambiguous);
+     Aml *scope;
+@@ -986,10 +985,6 @@ static void build_isa_devices_aml(Aml *table)
+     build_acpi_ipmi_devices(scope, BUS(obj), "\\_SB.PCI0.ISA");
+     isa_build_aml(ISA_BUS(obj), scope);
+ 
+-    if (vmbus_bridge) {
+-        aml_append(scope, build_vmbus_device_aml(vmbus_bridge));
+-    }
+-
+     aml_append(table, scope);
+ }
+ 
+@@ -1485,6 +1480,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+     PCIBus *bus = NULL;
+     TPMIf *tpm = tpm_find();
+     int i;
++    VMBusBridge *vmbus_bridge = vmbus_bridge_find();
+ 
+     dsdt = init_aml_allocator();
+ 
+@@ -1526,6 +1522,12 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+         }
+     }
+ 
++    if (vmbus_bridge) {
++        sb_scope = aml_scope("_SB");
++        aml_append(sb_scope, build_vmbus_device_aml(vmbus_bridge));
++        aml_append(dsdt, sb_scope);
++    }
 +
- Human Monitor (HMP)
- M: Dr. David Alan Gilbert <dgilbert@redhat.com>
- S: Maintained
+     if (pcmc->legacy_cpu_hotplug) {
+         build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
+     } else {
 -- 
 2.26.2
 
