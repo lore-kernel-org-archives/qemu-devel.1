@@ -2,110 +2,87 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3795DC4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 19:06:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74CCCC4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 19:07:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98E1421D91
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 19:06:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B48042137B
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 19:07:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d/N8xGoE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98E1421D91
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XJSgAIbq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B48042137B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLWZP-0002WY-DO
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 15:06:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46022)
+	id 1kLWa9-0003T8-Lc
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 15:07:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45490)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kLWXj-000122-JA
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 15:04:35 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:39943)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kLWXg-0003hr-CC
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 15:04:35 -0400
-Received: by mail-pf1-x442.google.com with SMTP id x123so262514pfc.7
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 12:04:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=afxaCANzAkYhgT68z/vBr25c7T4kJTQy02kHhSi3G3c=;
- b=d/N8xGoEX334oCviSkuGjxsFMQVQL4Ve4QBpwHn3mQjEKykcwXSAvcZ/97Qor6ZgJK
- 6hduevzubhQkPP+eFWNFG6evLEiYnTvYLbQ1iF7Ohu8QY3LbIe9R/Uqm0iffrNEjiKoV
- gK0Ts+p2RAHfExxfyK8Iz2YnsuAqR1OoL3K6cXIu/lz1mSfCuSEy16KSXwfbvu+7XKop
- R77LqVsSFplEtcL8cUhc2vpoRnWoLZYDsh4maKjH7xtBGSFmfK4xkkw7PzK7NtXmu1Y2
- waYC8MV8XTdlPq9pd6nohL+2kBLuu+EQP//qN1r9ToxvdYR2HPBV//tS/U4hlh1u3ROk
- iGDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=afxaCANzAkYhgT68z/vBr25c7T4kJTQy02kHhSi3G3c=;
- b=m/JU/sUKv5ilDyEcaKu+qLM/aAk5UZL2NA59WQ1rsj/y9S8TN0xAfr4VNeDGTb2RXK
- 9RQkqhVzKGGYBoJZm+oo+KqsIpeDYQ/A08BoDUvUzmw9/o9hRbCh8YP+H72fUkkaq/N6
- 2mf10juM/2Pz7sFEqB5kSiYlxDqvshGthEN84DMO+YLVOCEJMqnnLIkAASYEUEV3i9lf
- eGI2dmRzbw5k4WVBOvaJW9TiSxiEoZ8VNscj3ylFz/p5QPEeowik+6neJBSDDSO3Kjie
- YemzpIAvsHoGE67jadWO+f/6A3qHdoxefKXM9/IoRvScNtFSQGu2tI1DajP51UoKnnbI
- LKhA==
-X-Gm-Message-State: AOAM533KC60L3ZUtSxGToCSRhNSvTc2ktE5aV473B2v9vdj6sK2UaONs
- XVzBYl7Xyzs22q5V5vSG11UZCw==
-X-Google-Smtp-Source: ABdhPJzXqJwmaQEtDJCbBVfBy54W7xl4kjYr2YXq4mCb04TK4u/M1QFtt1coTTgarYn/jaAbWOgL1A==
-X-Received: by 2002:a65:5786:: with SMTP id b6mr446585pgr.114.1600974269760;
- Thu, 24 Sep 2020 12:04:29 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id c186sm125209pga.61.2020.09.24.12.04.28
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 24 Sep 2020 12:04:28 -0700 (PDT)
-Subject: Re: [RFC PATCH v3 30/34] Hexagon (target/hexagon) TCG for
- instructions with multiple definitions
-To: Taylor Simpson <tsimpson@quicinc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <1597765847-16637-1-git-send-email-tsimpson@quicinc.com>
- <a0987bce-409b-cd14-7559-c63413ff2b6f@linaro.org>
- <BYAPR02MB4886985CC5CBF78F7D5DBFE5DE500@BYAPR02MB4886.namprd02.prod.outlook.com>
- <fca34122-160d-8c13-d237-a87a917f341b@linaro.org>
- <BYAPR02MB4886D48EDC604CEEF65FDAA7DE510@BYAPR02MB4886.namprd02.prod.outlook.com>
- <1cf57f2b-a2c8-6fbc-2c1c-9945a5d77dd8@linaro.org>
- <BYAPR02MB4886F055CBD52DBEE5F269AEDE510@BYAPR02MB4886.namprd02.prod.outlook.com>
- <0241f731-61de-41bc-9f58-bc43725eef74@linaro.org>
- <BYAPR02MB4886B33025BE2B65D6F5F5A8DE510@BYAPR02MB4886.namprd02.prod.outlook.com>
- <f0011ef6-014c-748b-7fc1-ea0f7878c281@linaro.org>
- <BYAPR02MB488667B684F8CEC755CBFD72DE2E0@BYAPR02MB4886.namprd02.prod.outlook.com>
- <BYAPR02MB48865179810F9248DE1280F8DE390@BYAPR02MB4886.namprd02.prod.outlook.com>
- <e279b41a-a815-ec0e-46e2-2adf8f0b3398@linaro.org>
- <BYAPR02MB4886EA66077760A6B43FC388DE390@BYAPR02MB4886.namprd02.prod.outlook.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <aff8ebf6-2c1d-f3d4-014a-421940fd72b5@linaro.org>
-Date: Thu, 24 Sep 2020 12:04:26 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kLWV1-0007wF-2j
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 15:01:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47755)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kLWUy-0003W2-4L
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 15:01:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600974102;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=gqLmGCuTZuXJgKV8uPFxnv3RXWmllnwQRQkuGgvWA5I=;
+ b=XJSgAIbqEshrGDFVLBZvuqsITaRvtRM2ZBpdBh9WID3JPepXjhI/dxbAxEAgMumgNH7S5r
+ EZmSmibE7ttyKLrBqUIPlA2j0X3Z25pmJOBtwYlN3uKajOo9hMqHMEDSDXyYHVTx7redil
+ bypi22VKEFuf3dkQ7E5q/rLLUX1XDl8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-445-rF0EAbeuOVerztevM4SXJg-1; Thu, 24 Sep 2020 15:01:40 -0400
+X-MC-Unique: rF0EAbeuOVerztevM4SXJg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A63A188C125;
+ Thu, 24 Sep 2020 19:01:39 +0000 (UTC)
+Received: from work-vm (ovpn-114-250.ams2.redhat.com [10.36.114.250])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 67AF273692;
+ Thu, 24 Sep 2020 19:01:37 +0000 (UTC)
+Date: Thu, 24 Sep 2020 20:01:34 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH v2] target/i386: always create kvmclock device
+Message-ID: <20200924190134.GL2792@work-vm>
+References: <20200922151934.899555-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <BYAPR02MB4886EA66077760A6B43FC388DE390@BYAPR02MB4886.namprd02.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -22
-X-Spam_score: -2.3
-X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.214,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200922151934.899555-1-vkuznets@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,45 +95,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ale@rev.ng" <ale@rev.ng>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
- "philmd@redhat.com" <philmd@redhat.com>,
- "laurent@vivier.eu" <laurent@vivier.eu>,
- "aleksandar.m.mail@gmail.com" <aleksandar.m.mail@gmail.com>
+Cc: Antoine Damhet <antoine.damhet@blade-group.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/24/20 10:18 AM, Taylor Simpson wrote:
->> You've got a script generating stuff.  It can just as easily generate two
->> different lists.  You're trying to do too much with the C preprocessor and too
->> little with python.
+* Vitaly Kuznetsov (vkuznets@redhat.com) wrote:
+> QEMU's kvmclock device is only created when KVM PV feature bits for
+> kvmclock (KVM_FEATURE_CLOCKSOURCE/KVM_FEATURE_CLOCKSOURCE2) are
+> exposed to the guest. With 'kvm=off' cpu flag the device is not
+> created and we don't call KVM_GET_CLOCK/KVM_SET_CLOCK upon migration.
+> It was reported that without these call at least Hyper-V TSC page
+> clocksouce (which can be enabled independently) gets broken after
+> migration.
 > 
-> Sure, generating two lists was also suggested by Alessandro (ale@rev.ng).  Although doing more in python and less with the C preprocessor would lead to the conclusion we shouldn't define the function prototype in a macro.  If we generate two lists, what is the advantage of putting the function signature in a macro vs generating?
-
-None, because...
-
->> At some point in the v3 thread, I had suggested grepping for some macro in
->> order to indicate to the python script which tags are implemented manually.
->> My
->> definition above is easy to look for: exactly one thing on the line, easy
->> regexp.
+> Switch to creating kvmclock QEMU device unconditionally, it seems
+> to always make sense to call KVM_GET_CLOCK/KVM_SET_CLOCK on migration.
+> Use KVM_CAP_ADJUST_CLOCK check instead of CPUID feature bits.
 > 
-> This is already done as well.  As you may recall, we were previously generating
->     #ifdef fGEN_TCG_A2_add
->     fGEN_TCG_A2_add({ RdV=RsV+RtV;});
->     #else
->     do {
->     gen_helper_A2_add(RdV, cpu_env, RsV, RtV);
->     } while (0);
+> Reported-by: Antoine Damhet <antoine.damhet@blade-group.com>
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  hw/i386/kvm/clock.c    | 7 +++++--
+>  hw/i386/microvm.c      | 2 +-
+>  hw/i386/pc.c           | 1 +
+>  hw/i386/pc_piix.c      | 7 +++++--
+>  hw/i386/pc_q35.c       | 5 ++++-
+>  include/hw/i386/pc.h   | 3 +++
+>  include/hw/kvm/clock.h | 4 ++--
+>  target/i386/kvm.c      | 5 +++++
+>  target/i386/kvm_i386.h | 1 +
+>  9 files changed, 27 insertions(+), 8 deletions(-)
 > 
-> The generator now searches for "#define fGEN_TCG_<tag>" ...
+> diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
+> index 64283358f91d..30cf53393ee1 100644
+> --- a/hw/i386/kvm/clock.c
+> +++ b/hw/i386/kvm/clock.c
+> @@ -328,11 +328,14 @@ static const TypeInfo kvmclock_info = {
+>  };
+>  
+>  /* Note: Must be called after VCPU initialization. */
+> -void kvmclock_create(void)
+> +void kvmclock_create(bool create_always)
+>  {
+>      X86CPU *cpu = X86_CPU(first_cpu);
+>  
+> -    if (kvm_enabled() &&
+> +    if (!kvm_enabled() || !kvm_has_adjust_clock())
+> +        return;
+> +
+> +    if (create_always ||
+>          cpu->env.features[FEAT_KVM] & ((1ULL << KVM_FEATURE_CLOCKSOURCE) |
+>                                         (1ULL << KVM_FEATURE_CLOCKSOURCE2))) {
+>          sysbus_create_simple(TYPE_KVM_CLOCK, -1, NULL);
+> diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
+> index 81d0888930d1..fd0b84109154 100644
+> --- a/hw/i386/microvm.c
+> +++ b/hw/i386/microvm.c
+> @@ -119,7 +119,7 @@ static void microvm_devices_init(MicrovmMachineState *mms)
+>  
+>      ioapic_init_gsi(gsi_state, "machine");
+>  
+> -    kvmclock_create();
+> +    kvmclock_create(true);
+>  
+>      for (i = 0; i < VIRTIO_NUM_TRANSPORTS; i++) {
+>          sysbus_create_simple("virtio-mmio",
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index d11daacc23cf..0e036ef9c15f 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1956,6 +1956,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+>      pcmc->acpi_data_size = 0x20000 + 0x8000;
+>      pcmc->linuxboot_dma_enabled = true;
+>      pcmc->pvh_enabled = true;
+> +    pcmc->kvmclock_create_always = true;
+>      assert(!mc->get_hotplug_handler);
+>      mc->get_hotplug_handler = pc_get_hotplug_handler;
+>      mc->hotplug_allowed = pc_hotplug_allowed;
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 32b1453e6a82..1a68338c737b 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -158,8 +158,8 @@ static void pc_init1(MachineState *machine,
+>  
+>      x86_cpus_init(x86ms, pcmc->default_cpu_version);
+>  
+> -    if (kvm_enabled() && pcmc->kvmclock_enabled) {
+> -        kvmclock_create();
+> +    if (pcmc->kvmclock_enabled) {
+> +        kvmclock_create(pcmc->kvmclock_create_always);
+>      }
+>  
+>      if (pcmc->pci_enabled) {
+> @@ -440,11 +440,14 @@ DEFINE_I440FX_MACHINE(v5_2, "pc-i440fx-5.2", NULL,
+>  
+>  static void pc_i440fx_5_1_machine_options(MachineClass *m)
+>  {
+> +    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+> +
+>      pc_i440fx_5_2_machine_options(m);
+>      m->alias = NULL;
+>      m->is_default = false;
+>      compat_props_add(m->compat_props, hw_compat_5_1, hw_compat_5_1_len);
+>      compat_props_add(m->compat_props, pc_compat_5_1, pc_compat_5_1_len);
+> +    pcmc->kvmclock_create_always = false;
 
-... I'd forgotten that they were two different macros.
+Thanks; yes that should keep backwards migration happy.
 
-> Also, if it finds the override, it doesn't generate the DEF_HELPER or the helper function.  That means we don't include tcg_gen.h in helper.h as you suggested.
+Dave
 
-Excellent.
+>  }
+>  
+>  DEFINE_I440FX_MACHINE(v5_1, "pc-i440fx-5.1", NULL,
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 0cb9c18cd44d..0dd59bd765b1 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -185,7 +185,7 @@ static void pc_q35_init(MachineState *machine)
+>  
+>      x86_cpus_init(x86ms, pcmc->default_cpu_version);
+>  
+> -    kvmclock_create();
+> +    kvmclock_create(pcmc->kvmclock_create_always);
+>  
+>      /* pci enabled */
+>      if (pcmc->pci_enabled) {
+> @@ -366,10 +366,13 @@ DEFINE_Q35_MACHINE(v5_2, "pc-q35-5.2", NULL,
+>  
+>  static void pc_q35_5_1_machine_options(MachineClass *m)
+>  {
+> +    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+> +
+>      pc_q35_5_2_machine_options(m);
+>      m->alias = NULL;
+>      compat_props_add(m->compat_props, hw_compat_5_1, hw_compat_5_1_len);
+>      compat_props_add(m->compat_props, pc_compat_5_1, pc_compat_5_1_len);
+> +    pcmc->kvmclock_create_always = false;
+>  }
+>  
+>  DEFINE_Q35_MACHINE(v5_1, "pc-q35-5.1", NULL,
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index fe52e165b27c..6b22671434b9 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -118,6 +118,9 @@ typedef struct PCMachineClass {
+>  
+>      /* use PVH to load kernels that support this feature */
+>      bool pvh_enabled;
+> +
+> +    /* create kvmclock device even when KVM PV features are not exposed */
+> +    bool kvmclock_create_always;
+>  } PCMachineClass;
+>  
+>  #define TYPE_PC_MACHINE "generic-pc-machine"
+> diff --git a/include/hw/kvm/clock.h b/include/hw/kvm/clock.h
+> index 81c66b230207..7994071c4fee 100644
+> --- a/include/hw/kvm/clock.h
+> +++ b/include/hw/kvm/clock.h
+> @@ -15,11 +15,11 @@
+>  
+>  #ifdef CONFIG_KVM
+>  
+> -void kvmclock_create(void);
+> +void kvmclock_create(bool create_always);
+>  
+>  #else /* CONFIG_KVM */
+>  
+> -static inline void kvmclock_create(void)
+> +static inline void kvmclock_create(bool create_always)
+>  {
+>  }
+>  
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 4a8b3a41c1bc..20b31b65307b 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -143,6 +143,11 @@ bool kvm_has_adjust_clock_stable(void)
+>      return (ret == KVM_CLOCK_TSC_STABLE);
+>  }
+>  
+> +bool kvm_has_adjust_clock(void)
+> +{
+> +    return kvm_check_extension(kvm_state, KVM_CAP_ADJUST_CLOCK);
+> +}
+> +
+>  bool kvm_has_exception_payload(void)
+>  {
+>      return has_exception_payload;
+> diff --git a/target/i386/kvm_i386.h b/target/i386/kvm_i386.h
+> index 064b8798a26c..0fce4e51d2d6 100644
+> --- a/target/i386/kvm_i386.h
+> +++ b/target/i386/kvm_i386.h
+> @@ -34,6 +34,7 @@
+>  
+>  bool kvm_allows_irq0_override(void);
+>  bool kvm_has_smm(void);
+> +bool kvm_has_adjust_clock(void);
+>  bool kvm_has_adjust_clock_stable(void);
+>  bool kvm_has_exception_payload(void);
+>  void kvm_synchronize_all_tsc(void);
+> -- 
+> 2.25.4
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-
-r~
 
