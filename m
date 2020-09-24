@@ -2,90 +2,95 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3564C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 14:44:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA9C9C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 14:44:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DB9B2220D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 14:44:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 37C8C2220D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 14:44:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gdiokUOu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DB9B2220D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ASu7C9zA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37C8C2220D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLSUA-0001sx-9m
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 10:44:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34920)
+	id 1kLSUE-0001zA-BZ
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 10:44:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kLSSp-0000uG-G4
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 10:43:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42803)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kLSSn-00068l-OR
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 10:43:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600958593;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mMJuAGc3u2xeY4r6normhGUoYgh0VmL2S3JQz+VytTg=;
- b=gdiokUOuKKJ21/trTMjU6RJN8bIRhjqYiBenjMms1c4rs/7RJYmj8H2JLg0DHmPFNg5yWd
- FNERT2b/DMkgx3vzLbarYYwSaMBA3t+np0mCbNL4q9sJMXUOkxsks+tT9WYOwNqtu36CuL
- VxSB5cx4iKNcho5cvuGMf7qSuzC7mS8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-Xs0pAUQ5NGO0Xl-YDfYizA-1; Thu, 24 Sep 2020 10:42:57 -0400
-X-MC-Unique: Xs0pAUQ5NGO0Xl-YDfYizA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F9098B7CD0;
- Thu, 24 Sep 2020 14:42:45 +0000 (UTC)
-Received: from redhat.com (ovpn-115-25.ams2.redhat.com [10.36.115.25])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 202CA702E7;
- Thu, 24 Sep 2020 14:42:43 +0000 (UTC)
-Date: Thu, 24 Sep 2020 15:42:41 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH] hw/scsi/lsi53c895a: Sanitize some trace events format
-Message-ID: <20200924144241.GH2097005@redhat.com>
-References: <20200915174639.1366226-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kLST1-00016G-Oh
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 10:43:27 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:40587)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kLSSz-0006C2-He
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 10:43:27 -0400
+Received: by mail-pg1-x544.google.com with SMTP id k133so2025356pgc.7
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 07:43:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=e+S5H9YRCKCRPdtkn0opnwFQTZcF99Dbx+Xe/IpZy18=;
+ b=ASu7C9zAR+LGUS6L02AZ/y/NG7ncmESjKyVnm+fwBC8JGYlggLquvwyAgOEfZ5fy8w
+ hHhn2B2N2yQPP5E3uZOvDE0yH7vZp5DJSJd/vvt9MHsemv6Bt4HUAKxjwNfU5MpcHYqA
+ kRybNCNjq+uUzavSHZSJ5i13dGrfIqexGRjOdOS7Bt/iL/Fynp/Nk3FwT4b6yqv0BUhh
+ v3WHaQNka+Iv4dMsuFgJT2dzSZ7mIga+WwwJeA1InGjDqyz+n49+J7t48qbuCitJ6j8q
+ Xh2BgLgSN3tYDP/WYcI4uwaXZfZksiDKjzDPeCD01zddo2BeXWPq05KjbJXnxkZECC3h
+ kXOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=e+S5H9YRCKCRPdtkn0opnwFQTZcF99Dbx+Xe/IpZy18=;
+ b=V5HmpTNfc2vfnQQFvVSBWZInWlFdY3BSQnmENMrQcpatniPQe2M+AiZr9WXKGPRd8g
+ AgkQOeso3Jbfxa2rguGj6/7xl6qzGuxPA5WjFmRGE9syeX7r+WOsyYC2SQsuwSgDbiCE
+ RGPM9JJ6mIh6/0gn+H8STiVrx/Y4m2zCYqWkmo66eTfnIPKv5NmdjDoY3mfPdt8X+fdm
+ m4J615W3FdbP8W9A6CGQAp8brFi7RGTWoAW/BgQnA3LLv/1plTupfGp9VkiowtZxBP7z
+ iqqhHTsOmln9Xhyjmn/9xHXOI5rzP1hJ8voLJRy2LQGcBhg9YboeISuhq7Mp5JXIcxiL
+ SwMQ==
+X-Gm-Message-State: AOAM5314qc6YNR3LY2zYqgQgdw/QhGxkcZKJIrjKEa2S1ivrfYffF1uI
+ XO7V5tfpgFBksO5oYY96MIvMiA==
+X-Google-Smtp-Source: ABdhPJzc6yQpi7OKms/86fdlPPmRP3OMS1PS9eFspRSwcUARWSD5jkUjdIyAzo7+KEV6Tm+txhwlqA==
+X-Received: by 2002:a63:e709:: with SMTP id b9mr4249845pgi.425.1600958603972; 
+ Thu, 24 Sep 2020 07:43:23 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id m21sm3141412pfo.13.2020.09.24.07.43.22
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 24 Sep 2020 07:43:23 -0700 (PDT)
+Subject: Re: [PATCH] docs/system/deprecated: Mark the 'moxie' CPU as deprecated
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20200923171815.97801-1-thuth@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a4c8c2b6-a0c5-19cc-3317-93e646759dcb@linaro.org>
+Date: Thu, 24 Sep 2020 07:43:21 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200915174639.1366226-1-philmd@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200923171815.97801-1-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -22
+X-Spam_score: -2.3
+X-Spam_bar: --
+X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.214,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,29 +103,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Anthony Green <green@moxielogic.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 15, 2020 at 07:46:39PM +0200, Philippe Mathieu-Daudé wrote:
-> Make some lsi53c895a trace events more understandable.
+On 9/23/20 10:18 AM, Thomas Huth wrote:
+> It is currently unclear whether anybody is still using the 'moxie' CPU,
+> and there are no images for testing available this CPU, so the code has
+> likely bit-rotten in the course of time. When I asked the maintainer
+> for information, I did not get a reply within four weeks yet (see
+> https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg07201.html).
+> The last Signed-off-by line from Anthony in our repo is from 2013,
+> so it seems like this code is rather unmaintained. Time to put it onto
+> the deprecation list to see whether somebody is still interested in this
+> code or whether we could remove it in a couple of releases.
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  hw/scsi/trace-events | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  docs/system/deprecated.rst | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+r~
 
