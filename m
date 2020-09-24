@@ -2,80 +2,81 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C459C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:48:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0EC3C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:50:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 021242396E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:48:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A5EA2396E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:50:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eqGU+nS6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 021242396E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EOLLIzc+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A5EA2396E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLNrY-0001Y3-VD
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:48:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38896)
+	id 1kLNt7-0003td-4p
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:50:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38984)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTk-0000vb-KV
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54690)
+ id 1kLNTn-00015e-Qu
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40961)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTb-00061u-3M
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:52 -0400
+ id 1kLNTi-00063H-KA
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:23:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600939422;
+ s=mimecast20190719; t=1600939429;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=SMbLWkx++SRjJTxVHc7OGdAT7b6LdYR09l6M084Hgjs=;
- b=eqGU+nS6buxnKbT7RXMLE1jlSa1ds2C6w/tB8mmFbmHHp2kYKPwouk4a/f1/ngUOYg3Ggh
- jGvxHZwxK9hsxJuVUC3fajKtBuXq/QbciEXrHeunhoQqrkRuFFeJHWuu4UPB9ZtsXGfHA5
- hTtgwkfyPVMNelNiWqIUwgkxcstTtFw=
+ bh=HzrBGtJp5HYgKEGPS65H9c5wxTSREV/KWJ3YU9/vw+0=;
+ b=EOLLIzc+uP/sgdtdl8WAwqRqt8CxTBZ4bEmPtduSXhlPcq3gHFS10TKrNs8raKE1jAkXBl
+ cCMWPc+u3f5AyTa67XrKkF2Anq9dZ3RaIJBUDb14o8FZMwDoLjVOzpOdhQrkUHm3FLt/Jm
+ Ru67acOdBF6KTLC1X6NJPGMUZlTeIv8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-383-rX2aqHD_OfSYtTrq8hsZhA-1; Thu, 24 Sep 2020 05:23:38 -0400
-X-MC-Unique: rX2aqHD_OfSYtTrq8hsZhA-1
+ us-mta-4-819HxMAUPT6ioalw6aT21g-1; Thu, 24 Sep 2020 05:23:37 -0400
+X-MC-Unique: 819HxMAUPT6ioalw6aT21g-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10645104D3E3;
- Thu, 24 Sep 2020 09:23:37 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1FE421891E89;
+ Thu, 24 Sep 2020 09:23:36 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C0B1473662;
- Thu, 24 Sep 2020 09:23:36 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C1E3873662;
+ Thu, 24 Sep 2020 09:23:35 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 26/92] hw: megasas: return -1 when 'megasas_map_sgl' fails
-Date: Thu, 24 Sep 2020 05:22:08 -0400
-Message-Id: <20200924092314.1722645-27-pbonzini@redhat.com>
+Subject: [PULL 24/92] hw/char/serial-{isa,
+ pci}: Alias QDEV properties from generic serial object
+Date: Thu, 24 Sep 2020 05:22:06 -0400
+Message-Id: <20200924092314.1722645-25-pbonzini@redhat.com>
 In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
 References: <20200924092314.1722645-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 01:10:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -96,47 +97,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Qiang <liq3ea@163.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Li Qiang <liq3ea@163.com>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-The caller of 'megasas_map_sgl' will only check if the return
-is zero or not. If it return 0 it means success, as in the next
-patch we will consider 'iov_count=0' is an error, so let's
-return -1 to indicate a failure.
+Instead of overwritting the properties of the generic 'state'
+object, alias them.
+Note we can now propagate the "baudbase" property.
 
-Signed-off-by: Li Qiang <liq3ea@163.com>
-Message-Id: <20200815141940.44025-2-liq3ea@163.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200907015535.827885-7-f4bug@amsat.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/megasas.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/char/serial-isa.c | 4 ++--
+ hw/char/serial-pci.c | 3 ++-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
-index e90c00823a..4cc709d2c6 100644
---- a/hw/scsi/megasas.c
-+++ b/hw/scsi/megasas.c
-@@ -280,7 +280,7 @@ static int megasas_map_sgl(MegasasState *s, MegasasCmd *cmd, union mfi_sgl *sgl)
-     if (iov_count > MEGASAS_MAX_SGE) {
-         trace_megasas_iovec_sgl_overflow(cmd->index, iov_count,
-                                          MEGASAS_MAX_SGE);
--        return iov_count;
-+        return -1;
-     }
-     pci_dma_sglist_init(&cmd->qsg, PCI_DEVICE(s), iov_count);
-     for (i = 0; i < iov_count; i++) {
-@@ -310,7 +310,7 @@ static int megasas_map_sgl(MegasasState *s, MegasasCmd *cmd, union mfi_sgl *sgl)
-     return 0;
- unmap:
-     qemu_sglist_destroy(&cmd->qsg);
--    return iov_count - i;
-+    return -1;
+diff --git a/hw/char/serial-isa.c b/hw/char/serial-isa.c
+index fc8ff7823a..1b8b303079 100644
+--- a/hw/char/serial-isa.c
++++ b/hw/char/serial-isa.c
+@@ -116,8 +116,6 @@ static Property serial_isa_properties[] = {
+     DEFINE_PROP_UINT32("index",  ISASerialState, index,   -1),
+     DEFINE_PROP_UINT32("iobase",  ISASerialState, iobase,  -1),
+     DEFINE_PROP_UINT32("irq",    ISASerialState, isairq,  -1),
+-    DEFINE_PROP_CHR("chardev",   ISASerialState, state.chr),
+-    DEFINE_PROP_BOOL("wakeup",   ISASerialState, state.wakeup, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+@@ -138,6 +136,8 @@ static void serial_isa_initfn(Object *o)
+     ISASerialState *self = ISA_SERIAL(o);
+ 
+     object_initialize_child(o, "serial", &self->state, TYPE_SERIAL);
++
++    qdev_alias_all_properties(DEVICE(&self->state), o);
  }
  
- /*
+ static const TypeInfo serial_isa_info = {
+diff --git a/hw/char/serial-pci.c b/hw/char/serial-pci.c
+index b0520a5a09..93d6f99244 100644
+--- a/hw/char/serial-pci.c
++++ b/hw/char/serial-pci.c
+@@ -82,7 +82,6 @@ static const VMStateDescription vmstate_pci_serial = {
+ };
+ 
+ static Property serial_pci_properties[] = {
+-    DEFINE_PROP_CHR("chardev",  PCISerialState, state.chr),
+     DEFINE_PROP_UINT8("prog_if",  PCISerialState, prog_if, 0x02),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+@@ -107,6 +106,8 @@ static void serial_pci_init(Object *o)
+     PCISerialState *ps = PCI_SERIAL(o);
+ 
+     object_initialize_child(o, "serial", &ps->state, TYPE_SERIAL);
++
++    qdev_alias_all_properties(DEVICE(&ps->state), o);
+ }
+ 
+ static const TypeInfo serial_pci_info = {
 -- 
 2.26.2
 
