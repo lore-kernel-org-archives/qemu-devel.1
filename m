@@ -2,86 +2,88 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F87AC4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:42:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D445BC4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:45:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8ECD20738
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:42:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5533820738
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 16:45:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EI5hfHcj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8ECD20738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mpw3dBJW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5533820738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLUK1-0002F7-Rf
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 12:42:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57464)
+	id 1kLUMd-0004nH-39
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 12:44:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33732)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kLTkU-0002S9-K5
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 12:05:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35151)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kLTkS-0003oV-DZ
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 12:05:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600963531;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3N5IgJYqkCr1hw868wwfOZv+LThV2WpVpRBD9vwnCeQ=;
- b=EI5hfHcjpPi++V+6SR8yvLH8VXYV7mBGnuOfLmBD+7Kl1j81+h2tShz40crKKnXXGYj3Q9
- mfL41fZewoLBLYVgVkMsbbjWbhpo18EIntXSuUPb0qxnAeLKeTCNJW/UUMPb+t1LKBbaMo
- oAIRVLk3WqXgice4mgbNmfWjfgtSbDA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-243-KPUqA1oKPsiww6_mqYbP7w-1; Thu, 24 Sep 2020 12:05:27 -0400
-X-MC-Unique: KPUqA1oKPsiww6_mqYbP7w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F72B8010C7;
- Thu, 24 Sep 2020 16:05:26 +0000 (UTC)
-Received: from t480s.redhat.com (ovpn-114-4.ams2.redhat.com [10.36.114.4])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 323E119C66;
- Thu, 24 Sep 2020 16:05:12 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH PROTOTYPE 3/6] vfio: Implement support for sparse RAM memory
- regions
-Date: Thu, 24 Sep 2020 18:04:20 +0200
-Message-Id: <20200924160423.106747-4-david@redhat.com>
-In-Reply-To: <20200924160423.106747-1-david@redhat.com>
-References: <20200924160423.106747-1-david@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kLU0g-0000Au-8d
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 12:22:18 -0400
+Received: from mail-ej1-x62a.google.com ([2a00:1450:4864:20::62a]:46352)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kLU0e-0006eT-0H
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 12:22:17 -0400
+Received: by mail-ej1-x62a.google.com with SMTP id z23so5251067ejr.13
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:22:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=slPG/S0MtQpwq1K+pNBL57CNsqF+eiWE7QulASXCjhs=;
+ b=Mpw3dBJWrEgaqXw6gpVt3iONa9kZZY9vI6y3XL9B6hQZHeWqksW83516JwEThnv4Ek
+ HjGSPclv5/0uEgUrCl37ezKbQs4SS5RQQH9HEFYf5VcFkzpr761s/FN7z3XXo7WsDNVe
+ YXR5z6l2/wpc1w+MieJJQqfx2MHqpbvWMK1dvfZwfgE68rnCN9ulu4htJqARAmpEU8Vf
+ 5XYgcvIm/ee0Q+DGxivsFzF2u5udeTnxhjWQ7fETsMlNgF/C+eZbRfC0oD8YQjf65P4a
+ 7KNHUCkxFh4k5jxnNPq7gUx67QSYW/DsoKLhn37LDed52wkgnbWSXhLNkSgzgJ8UNtbZ
+ kxCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=slPG/S0MtQpwq1K+pNBL57CNsqF+eiWE7QulASXCjhs=;
+ b=PUMlmdd472I6MLPrJV1ap+ggY8q0OfgD62XxrItYudyY7j2O6OxW81O9FUgb9xHdFW
+ 9A9uSlIsGAFxC0m8mCfQbRJtn4BbYeqFsON0mPg8Mn5v4OAcwK5Xc4xffEBTkfdPo45K
+ zN3ERW5DNbAFeaUU+pUMReTMBKh1xNI+mExcGcFQ/ExSI49jokopMy2AqLcTqnoQFYgo
+ SjL3HcTUnuJ6o8pAMNhB5/Khn28Iitjp9SLGZWI+9l/5ih+8Ul6IvMmn3OIH8TJRwsre
+ HKwc3Exh/vcQ/NdPgypNYRKiMwWaicu+QYQfhjmjrgf2Ni/EtCt2BESPIy8Yz6tyhLZj
+ Miaw==
+X-Gm-Message-State: AOAM531IoWTvaCNLb3hTCVttlj4t1KFjfaJwbjQ8gTmkYt/qxQ/3BVs8
+ GDD8/OJXY+5VaYHFGhZXNI45aBbLCXYP1wsGDRPpeg==
+X-Google-Smtp-Source: ABdhPJyCRzUHcFV31dGPj8rk2j/K6jQFCtmAX9MTTC9glRkI6rzlikrt8SKW1zMSSWZR+2KcaUXfMrWqL+t086xEU28=
+X-Received: by 2002:a17:906:d936:: with SMTP id
+ rn22mr742249ejb.4.1600964533615; 
+ Thu, 24 Sep 2020 09:22:13 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.199,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200922222542.2354748-1-ehabkost@redhat.com>
+In-Reply-To: <20200922222542.2354748-1-ehabkost@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 24 Sep 2020 17:22:02 +0100
+Message-ID: <CAFEAcA-n7Wk_je_WQVnE3RR+V1xfAujyCzjZq6JxBUg2OTZBQQ@mail.gmail.com>
+Subject: Re: [PULL 00/11] machine + QOM queue, 2020-09-22
+To: Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::62a;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x62a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,263 +96,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
- David Hildenbrand <david@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
- Luiz Capitulino <lcapitulino@redhat.com>, Auger Eric <eric.auger@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Wei Yang <richardw.yang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implement support for sparse RAM, to be used by virtio-mem. Handling
-is somewhat-similar to memory_region_is_iommu() handling, which also
-notifies on changes.
+On Tue, 22 Sep 2020 at 23:25, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>
+> The following changes since commit 834b9273d5cdab68180dc8c84d641aaa4344b0=
+57:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-for-5=
+.2-pull-request' into staging (2020-09-22 15:42:23 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
+>
+> for you to fetch changes up to 418b473e8f586247475e8adc5d048598e5721361:
+>
+>   sifive_u: Register "start-in-flash" as class property (2020-09-22 16:48=
+:29 -0400)
+>
+> ----------------------------------------------------------------
+> machine + QOM queue, 2020-09-22
+>
+> QOM cleanups:
+> * Convert instance properties to class properties
+>   (Eduardo Habkost)
+> * simplify object_find_property / object_class_find_property
+>   (Daniel P. Berrang=C3=A9)
+>
+> Deprecated feature removal:
+> * Drop support for invalid topologies (Igor Mammedov)
 
-Instead of mapping the whole region, we only map selected pieces (and
-unmap previously selected pieces) when notified by the SparseRAMHandler.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Wei Yang <richardw.yang@linux.intel.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Cc: Peter Xu <peterx@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/vfio/common.c              | 155 ++++++++++++++++++++++++++++++++++
- include/hw/vfio/vfio-common.h |  12 +++
- 2 files changed, 167 insertions(+)
+Applied, thanks.
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 13471ae294..a3aaf70dd8 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -37,6 +37,7 @@
- #include "sysemu/reset.h"
- #include "trace.h"
- #include "qapi/error.h"
-+#include "qemu/units.h"
- 
- VFIOGroupList vfio_group_list =
-     QLIST_HEAD_INITIALIZER(vfio_group_list);
-@@ -498,6 +499,143 @@ out:
-     rcu_read_unlock();
- }
- 
-+static int vfio_sparse_ram_notify(SparseRAMNotifier *n, const MemoryRegion *mr,
-+                                  uint64_t mr_offset, uint64_t size,
-+                                  bool map)
-+{
-+    VFIOSparseRAM *sram = container_of(n, VFIOSparseRAM, notifier);
-+    const hwaddr mr_start = MAX(mr_offset, sram->offset_within_region);
-+    const hwaddr mr_end = MIN(mr_offset + size,
-+                              sram->offset_within_region + sram->size);
-+    const hwaddr iova_start = mr_start + sram->offset_within_address_space;
-+    const hwaddr iova_end = mr_end + sram->offset_within_address_space;
-+    hwaddr mr_cur, iova_cur, mr_next;
-+    void *vaddr;
-+    int ret, ret2;
-+
-+    g_assert(mr == sram->mr);
-+
-+    /* We get notified about everything, ignore range we don't care about. */
-+    if (mr_start >= mr_end) {
-+        return 0;
-+    }
-+
-+    /* Unmap everything with a single call. */
-+    if (!map) {
-+        ret = vfio_dma_unmap(sram->container, iova_start,
-+                             iova_end - iova_start);
-+        if (ret) {
-+            error_report("%s: vfio_dma_unmap() failed: %s", __func__,
-+                         strerror(-ret));
-+        }
-+        return 0;
-+    }
-+
-+    /* TODO: fail early if we would exceed a specified number of mappings. */
-+
-+    /* Map in (aligned within MR) granularity, so we can unmap later. */
-+    for (mr_cur = mr_start; mr_cur < mr_end; mr_cur = mr_next) {
-+        iova_cur = mr_cur + sram->offset_within_address_space;
-+        mr_next = QEMU_ALIGN_UP(mr_cur + 1, sram->granularity);
-+        mr_next = MIN(mr_next, mr_end);
-+
-+        vaddr = memory_region_get_ram_ptr(sram->mr) + mr_cur;
-+        ret = vfio_dma_map(sram->container, iova_cur, mr_next - mr_cur,
-+                           vaddr, mr->readonly);
-+        if (ret) {
-+            /* Rollback in case of error. */
-+            if (mr_cur != mr_start) {
-+                ret2 = vfio_dma_unmap(sram->container, iova_start,
-+                                      iova_end - iova_start);
-+                if (ret2) {
-+                    error_report("%s: vfio_dma_unmap() failed: %s", __func__,
-+                                  strerror(-ret));
-+                }
-+            }
-+            return ret;
-+        }
-+    }
-+    return 0;
-+}
-+
-+static int vfio_sparse_ram_notify_map(SparseRAMNotifier *n,
-+                                      const MemoryRegion *mr,
-+                                      uint64_t mr_offset, uint64_t size)
-+{
-+    return vfio_sparse_ram_notify(n, mr, mr_offset, size, true);
-+}
-+
-+static void vfio_sparse_ram_notify_unmap(SparseRAMNotifier *n,
-+                                         const MemoryRegion *mr,
-+                                         uint64_t mr_offset, uint64_t size)
-+{
-+    vfio_sparse_ram_notify(n, mr, mr_offset, size, false);
-+}
-+
-+static void vfio_register_sparse_ram(VFIOContainer *container,
-+                                     MemoryRegionSection *section)
-+{
-+    VFIOSparseRAM *sram;
-+    int ret;
-+
-+    sram = g_new0(VFIOSparseRAM, 1);
-+    sram->container = container;
-+    sram->mr = section->mr;
-+    sram->offset_within_region = section->offset_within_region;
-+    sram->offset_within_address_space = section->offset_within_address_space;
-+    sram->size = int128_get64(section->size);
-+    sram->granularity = memory_region_sparse_ram_get_granularity(section->mr);
-+
-+    /*
-+     * TODO: We usually want a bigger granularity (for a lot of addded memory,
-+     * as we need quite a lot of mappings) - however, this has to be configured
-+     * by the user.
-+     */
-+    g_assert(sram->granularity >= 1 * MiB &&
-+             is_power_of_2(sram->granularity));
-+
-+    /* Register the notifier */
-+    sparse_ram_notifier_init(&sram->notifier, vfio_sparse_ram_notify_map,
-+                             vfio_sparse_ram_notify_unmap);
-+    memory_region_register_sparse_ram_notifier(section->mr, &sram->notifier);
-+    QLIST_INSERT_HEAD(&container->sram_list, sram, next);
-+    /*
-+     * Replay mapped blocks - if anything goes wrong (only when hotplugging
-+     * vfio devices), report the error for now.
-+     *
-+     * TODO: Can we catch this earlier?
-+     */
-+    ret = memory_region_sparse_ram_replay_mapped(section->mr, &sram->notifier);
-+    if (ret) {
-+        error_report("%s: failed to replay mappings: %s", __func__,
-+                     strerror(-ret));
-+    }
-+}
-+
-+static void vfio_unregister_sparse_ram(VFIOContainer *container,
-+                                       MemoryRegionSection *section)
-+{
-+    VFIOSparseRAM *sram = NULL;
-+
-+    QLIST_FOREACH(sram, &container->sram_list, next) {
-+        if (sram->mr == section->mr &&
-+            sram->offset_within_region == section->offset_within_region &&
-+            sram->offset_within_address_space ==
-+            section->offset_within_address_space) {
-+            break;
-+        }
-+    }
-+
-+    if (!sram) {
-+        hw_error("vfio: Trying to unregister non-existant sparse RAM");
-+    }
-+
-+    memory_region_unregister_sparse_ram_notifier(section->mr, &sram->notifier);
-+    QLIST_REMOVE(sram, next);
-+    g_free(sram);
-+    /* The caller is expected to vfio_dma_unmap(). */
-+}
-+
- static void vfio_listener_region_add(MemoryListener *listener,
-                                      MemoryRegionSection *section)
- {
-@@ -650,6 +788,15 @@ static void vfio_listener_region_add(MemoryListener *listener,
- 
-     /* Here we assume that memory_region_is_ram(section->mr)==true */
- 
-+    /*
-+     * For sparse RAM, we only want to register the actually mapped
-+     * pieces - and update the mapping whenever we're notified about changes.
-+     */
-+    if (memory_region_is_sparse_ram(section->mr)) {
-+        vfio_register_sparse_ram(container, section);
-+        return;
-+    }
-+
-     vaddr = memory_region_get_ram_ptr(section->mr) +
-             section->offset_within_region +
-             (iova - section->offset_within_address_space);
-@@ -786,6 +933,13 @@ static void vfio_listener_region_del(MemoryListener *listener,
- 
-         pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
-         try_unmap = !((iova & pgmask) || (int128_get64(llsize) & pgmask));
-+    } else if (memory_region_is_sparse_ram(section->mr)) {
-+        vfio_unregister_sparse_ram(container, section);
-+        /*
-+         * We rely on a single vfio_dma_unmap() call below to clean the whole
-+         * region.
-+         */
-+        try_unmap = true;
-     }
- 
-     if (try_unmap) {
-@@ -1275,6 +1429,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-     container->error = NULL;
-     QLIST_INIT(&container->giommu_list);
-     QLIST_INIT(&container->hostwin_list);
-+    QLIST_INIT(&container->sram_list);
- 
-     ret = vfio_init_container(container, group->fd, errp);
-     if (ret) {
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index c78f3ff559..dfa18dbd8e 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -77,6 +77,7 @@ typedef struct VFIOContainer {
-     QLIST_HEAD(, VFIOGuestIOMMU) giommu_list;
-     QLIST_HEAD(, VFIOHostDMAWindow) hostwin_list;
-     QLIST_HEAD(, VFIOGroup) group_list;
-+    QLIST_HEAD(, VFIOSparseRAM) sram_list;
-     QLIST_ENTRY(VFIOContainer) next;
- } VFIOContainer;
- 
-@@ -88,6 +89,17 @@ typedef struct VFIOGuestIOMMU {
-     QLIST_ENTRY(VFIOGuestIOMMU) giommu_next;
- } VFIOGuestIOMMU;
- 
-+typedef struct VFIOSparseRAM {
-+    VFIOContainer *container;
-+    MemoryRegion *mr;
-+    hwaddr offset_within_region;
-+    hwaddr offset_within_address_space;
-+    hwaddr size;
-+    uint64_t granularity;
-+    SparseRAMNotifier notifier;
-+    QLIST_ENTRY(VFIOSparseRAM) next;
-+} VFIOSparseRAM;
-+
- typedef struct VFIOHostDMAWindow {
-     hwaddr min_iova;
-     hwaddr max_iova;
--- 
-2.26.2
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
 
+-- PMM
 
