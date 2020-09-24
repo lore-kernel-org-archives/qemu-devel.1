@@ -2,68 +2,67 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2680C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:53:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9301C4363D
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:54:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E9EB2396E
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:53:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6DEBA2396E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:54:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b696snEz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E9EB2396E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TAYPO/V8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DEBA2396E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLNwG-0000TF-0g
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:53:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39258)
+	id 1kLNxO-0002Ut-FZ
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:54:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39110)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNU0-0001cc-DE
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60196)
+ id 1kLNTs-0001I2-IP
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22001)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTx-00068B-KZ
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:08 -0400
+ id 1kLNTp-00066g-R3
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600939444;
+ s=mimecast20190719; t=1600939437;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mxyU2UsYIapLWeI/m9pnErkY5BZXXfsVIe9axCDHUxk=;
- b=b696snEzJJZuHXOB6m4MK9dt9bxXQa8tUe6bqRqL/m3xLAQXk9D9xYF8fPw/5WWu7AQEoN
- EvJfL5cQjq3lUbOc84QX8Ep0iY+Xi+n2ZYnjco9xJpu66Q7j2o0Xa9aaXZmK6fD2WuAuxh
- BW1MLeR5qPczyAf+5jEe+gUgDJ0hC8w=
+ bh=tHKjbusthXD3rtEvGDNcQcsWVkEAA+X2aPa+9QCB1N8=;
+ b=TAYPO/V8FuNmu0EEF+YNltTJ/T3WnHiBJv6V08/L5TVheNxjqfC0BM+kIq+GoMM70vSlik
+ rULHmX8cJVVx3VfIDy7/rVXp61QDEN2DwllpFNPjnWCMo7F8PbAbfNd5owO561nPCazzWf
+ fC1b2mzSoptI7w/RS+IATkVqEWYOvYc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-580-ubHXz8zSPzqVS_2AJf7cqQ-1; Thu, 24 Sep 2020 05:24:03 -0400
-X-MC-Unique: ubHXz8zSPzqVS_2AJf7cqQ-1
+ us-mta-226-7g1wqgNJP_iGjwF8S7qDEQ-1; Thu, 24 Sep 2020 05:23:54 -0400
+X-MC-Unique: 7g1wqgNJP_iGjwF8S7qDEQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A7021007471;
- Thu, 24 Sep 2020 09:24:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8162C81F00B
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:53 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BC23C5C1DC;
- Thu, 24 Sep 2020 09:24:01 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 50AA75C22B
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:53 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 58/92] tests/tcg: reinstate or replace desired parts of
- rules.mak
-Date: Thu, 24 Sep 2020 05:22:40 -0400
-Message-Id: <20200924092314.1722645-59-pbonzini@redhat.com>
+Subject: [PULL 51/92] configure: use a platform-neutral prefix
+Date: Thu, 24 Sep 2020 05:22:33 -0400
+Message-Id: <20200924092314.1722645-52-pbonzini@redhat.com>
 In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
 References: <20200924092314.1722645-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -72,7 +71,7 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
@@ -97,67 +96,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commit 660f79309303d696531ffb394719dfab3e0c42c0 was a bit overzealous
-with respect to tests/tcg, which needed quiet-command and $(BUILD_DIR).
-Reinstate quiet-command, and replace $(BUILD_DIR) with just the
-current directory.
+Now that the installation is relocatable, there is no need to compile a
+Windows-format prefix into Win32 binaries.  Instead, the prefix will
+only be used to compute installation-relative paths, and it can be
+any string.
 
-Reported-by: Alex Bennée <alex.bennee@linaro.org>
+Drop the "Program Files" path completely: it is only usable on English
+versions of Windows; therefore, using the NSIS installer to get the
+"correct" path to the Program Files folder is recommended, and NSIS
+works just as well with any prefix.
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/tcg/Makefile.qemu | 13 ++++++++++++-
- tests/tcg/configure.sh  |  4 ++--
- 2 files changed, 14 insertions(+), 3 deletions(-)
+ configure | 30 +++++++++++-------------------
+ 1 file changed, 11 insertions(+), 19 deletions(-)
 
-diff --git a/tests/tcg/Makefile.qemu b/tests/tcg/Makefile.qemu
-index 0332bad10f..c096c611a2 100644
---- a/tests/tcg/Makefile.qemu
-+++ b/tests/tcg/Makefile.qemu
-@@ -11,9 +11,20 @@
- # The configure script fills in extra information about
- # useful docker images or alternative compiler flags.
+diff --git a/configure b/configure
+index 161d0604bb..fee5faa054 100755
+--- a/configure
++++ b/configure
+@@ -969,7 +969,7 @@ if test "$mingw32" = "yes" ; then
+   # MinGW needs -mthreads for TLS and macro _MT.
+   CFLAGS="-mthreads $CFLAGS"
+   write_c_skeleton;
+-  prefix="c:/Program Files/QEMU"
++  prefix="/qemu"
+   qemu_suffix=""
+   libs_qga="-lws2_32 -lwinmm -lpowrprof -lwtsapi32 -lwininet -liphlpapi -lnetapi32 $libs_qga"
+ fi
+@@ -7802,17 +7802,9 @@ echo "strip = $(meson_quote $strip)" >> $cross
+ echo "windres = $(meson_quote $windres)" >> $cross
+ if test -n "$cross_prefix"; then
+     cross_arg="--cross-file config-meson.cross"
+-    # Hack: Meson expects an absolute path for the *build* machine
+-    # for the prefix, so add a slash in front of a Windows path that
+-    # includes a drive letter.
+-    #
+-    # See https://github.com/mesonbuild/meson/issues/7577.
+     echo "[host_machine]" >> $cross
+     if test "$mingw32" = "yes" ; then
+         echo "system = 'windows'" >> $cross
+-        case $prefix in
+-            ?:*) pre_prefix=/ ;;
+-        esac
+     fi
+     if test "$linux" = "yes" ; then
+         echo "system = 'linux'" >> $cross
+@@ -7841,16 +7833,16 @@ mv $cross config-meson.cross
  
-+# Usage: $(call quiet-command,command and args,"NAME","args to print")
-+# This will run "command and args", and either:
-+#  if V=1 just print the whole command and args
-+#  otherwise print the 'quiet' output in the format "  NAME     args to print"
-+# NAME should be a short name of the command, 7 letters or fewer.
-+# If called with only a single argument, will print nothing in quiet mode.
-+quiet-command-run = $(if $(V),,$(if $2,printf "  %-7s %s\n" $2 $3 && ))$1
-+quiet-@ = $(if $(V),,@)
-+quiet-command = $(quiet-@)$(call quiet-command-run,$1,$2,$3)
-+
- CROSS_CC_GUEST:=
- DOCKER_IMAGE:=
---include $(BUILD_DIR)/tests/tcg/config-$(TARGET).mak
-+
-+-include tests/tcg/config-$(TARGET).mak
- 
- GUEST_BUILD=
- TCG_MAKE=../Makefile.target
-diff --git a/tests/tcg/configure.sh b/tests/tcg/configure.sh
-index 598a50cd4f..be51bdb5a4 100755
---- a/tests/tcg/configure.sh
-+++ b/tests/tcg/configure.sh
-@@ -193,11 +193,11 @@ for target in $target_list; do
-   case $target in
-     *-linux-user | *-bsd-user)
-       echo "CONFIG_USER_ONLY=y" >> $config_target_mak
--      echo "QEMU=\$(BUILD_DIR)/qemu-$arch" >> $config_target_mak
-+      echo "QEMU=$PWD/qemu-$arch" >> $config_target_mak
-       ;;
-     *-softmmu)
-       echo "CONFIG_SOFTMMU=y" >> $config_target_mak
--      echo "QEMU=\$(BUILD_DIR)/qemu-system-$arch" >> $config_target_mak
-+      echo "QEMU=$PWD/qemu-system-$arch" >> $config_target_mak
-       ;;
-   esac
- 
+ rm -rf meson-private meson-info meson-logs
+ NINJA=${ninja:-$PWD/ninjatool} $meson setup \
+-        --prefix "${pre_prefix}$prefix" \
+-        --libdir "${pre_prefix}$libdir" \
+-        --libexecdir "${pre_prefix}$libexecdir" \
+-        --bindir "${pre_prefix}$bindir" \
+-        --includedir "${pre_prefix}$includedir" \
+-        --datadir "${pre_prefix}$datadir" \
+-        --mandir "${pre_prefix}$mandir" \
+-        --sysconfdir "${pre_prefix}$sysconfdir" \
+-        --localstatedir "${pre_prefix}$local_statedir" \
+-        -Ddocdir="${pre_prefix}$docdir" \
++        --prefix "$prefix" \
++        --libdir "$libdir" \
++        --libexecdir "$libexecdir" \
++        --bindir "$bindir" \
++        --includedir "$includedir" \
++        --datadir "$datadir" \
++        --mandir "$mandir" \
++        --sysconfdir "$sysconfdir" \
++        --localstatedir "$local_statedir" \
++        -Ddocdir="$docdir" \
+         -Dqemu_suffix="$qemu_suffix" \
+         -Doptimization=$(if test "$debug" = yes; then echo 0; else echo 2; fi) \
+         -Ddebug=$(if test "$debug_info" = yes; then echo true; else echo false; fi) \
 -- 
 2.26.2
 
