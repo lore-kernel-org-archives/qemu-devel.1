@@ -2,74 +2,88 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8E55C2D0E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:49:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A544BC4346E
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:52:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F63D23787
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:49:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F63D23787
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id F1CAA23787
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 07:52:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fMsmzRRY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1CAA23787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLM01-0003Xs-BD
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 03:49:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44084)
+	id 1kLM3B-0004eH-T1
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 03:52:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44934)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kLLyq-0002cY-D5; Thu, 24 Sep 2020 03:47:52 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:44193)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kLLyo-00025X-1X; Thu, 24 Sep 2020 03:47:52 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.1.237])
- by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 509F964F0276;
- Thu, 24 Sep 2020 09:47:38 +0200 (CEST)
-Received: from kaod.org (37.59.142.96) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 24 Sep
- 2020 09:47:37 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-96R001c2756683-ff4d-428b-860b-431edabd94c2,
- 85AEC8A2294FDACAA0F214F2A1981C2CEEF9973D) smtp.auth=groug@kaod.org
-Date: Thu, 24 Sep 2020 09:47:36 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Subject: Re: [PATCH 1/6] spapr: add spapr_machine_using_legacy_numa() helper
-Message-ID: <20200924094736.1937083c@bahia.lan>
-In-Reply-To: <20200923193458.203186-2-danielhb413@gmail.com>
-References: <20200923193458.203186-1-danielhb413@gmail.com>
- <20200923193458.203186-2-danielhb413@gmail.com>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kLM2C-0004DU-Dm
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:51:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44646)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kLM2A-0002ad-Jx
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 03:51:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600933877;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=IWzu9Ac/m+WVjpegV1L7KUI1AqR7XNsHgiyQyRf6xso=;
+ b=fMsmzRRYiWKuqbMRe9ixDp3htDTuvaQf9PwtnS++XRevRG15XIwAnYEFTdlGx2Dk7Tmm89
+ 9oD+krWvFlyZyGSOm2QLGP7nluPbmuD5cCAKyAhpsB2t60CHbYMMUaOfbw6Yndegote8m6
+ JYiqma0ssyl5ghbV5pV0MY7yJqz5ybY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-519-T6CNR8sEOX-fvpF8u9FEDg-1; Thu, 24 Sep 2020 03:51:14 -0400
+X-MC-Unique: T6CNR8sEOX-fvpF8u9FEDg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1E7E1007464;
+ Thu, 24 Sep 2020 07:51:12 +0000 (UTC)
+Received: from localhost (ovpn-114-133.ams2.redhat.com [10.36.114.133])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AFE9719930;
+ Thu, 24 Sep 2020 07:51:06 +0000 (UTC)
+Date: Thu, 24 Sep 2020 08:51:05 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: elena.ufimtseva@oracle.com
+Subject: Re: [PATCH v9 14/20] multi-process: PCI BAR read/write handling for
+ proxy & remote endpoints
+Message-ID: <20200924075105.GI62770@stefanha-x1.localdomain>
+References: <20200827181231.22778-1-elena.ufimtseva@oracle.com>
+ <20200827181231.22778-15-elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.96]
-X-ClientProxiedBy: DAG9EX2.mxp5.local (172.16.2.82) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: 7b51a125-1b28-414b-ac20-0efdf107ea87
-X-Ovh-Tracer-Id: 5699868280138799584
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrudejgdduvddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefuddtieejjeevheekieeltefgleetkeetheettdeifeffvefhffelffdtfeeljeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegurghvihgusehgihgsshhonhdrughrohhpsggvrghrrdhiugdrrghu
-Received-SPF: pass client-ip=79.137.123.220; envelope-from=groug@kaod.org;
- helo=smtpout1.mo804.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/24 03:47:39
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200827181231.22778-15-elena.ufimtseva@oracle.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="u/L2/WlOHZg+YGU4"
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/22 23:02:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1.228,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,90 +96,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
+ mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, jag.raman@oracle.com,
+ quintela@redhat.com, armbru@redhat.com, kanth.ghatraju@oracle.com,
+ felipe@nutanix.com, thuth@redhat.com, ehabkost@redhat.com,
+ konrad.wilk@oracle.com, dgilbert@redhat.com, thanos.makatos@nutanix.com,
+ rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 23 Sep 2020 16:34:53 -0300
-Daniel Henrique Barboza <danielhb413@gmail.com> wrote:
+--u/L2/WlOHZg+YGU4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> The changes to come to NUMA support are all guest visible. In
-> theory we could just create a new 5_1 class option flag to
-> avoid the changes to cascade to 5.1 and under. The reality is that
-> these changes are only relevant if the machine has more than one
-> NUMA node. There is no need to change guest behavior that has
-> been around for years needlesly.
-> 
-> This new helper will be used by the next patches to determine
-> whether we should retain the (soon to be) legacy NUMA behavior
-> in the pSeries machine. The new behavior will only be exposed
-> if:
-> 
-> - machine is pseries-5.2 and newer;
-> - more than one NUMA node is declared in NUMA state.
-> 
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-> ---
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  hw/ppc/spapr.c         | 12 ++++++++++++
->  include/hw/ppc/spapr.h |  2 ++
->  2 files changed, 14 insertions(+)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index e813c7cfb9..c5d8910a74 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -294,6 +294,15 @@ static hwaddr spapr_node0_size(MachineState *machine)
->      return machine->ram_size;
->  }
->  
-> +bool spapr_machine_using_legacy_numa(SpaprMachineState *spapr)
+On Thu, Aug 27, 2020 at 11:12:25AM -0700, elena.ufimtseva@oracle.com wrote:
+> +static void process_bar_read(QIOChannel *ioc, MPQemuMsg *msg, Error **er=
+rp)
 > +{
-> +    MachineState *machine = MACHINE(spapr);
-> +    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
+> +    BarAccessMsg *bar_access =3D &msg->data.bar_access;
+> +    MPQemuMsg ret =3D { 0 };
+> +    MPQemuRequest req =3D { 0 };
+> +    AddressSpace *as;
+> +    MemTxResult res;
+> +    uint64_t val =3D 0;
+> +    Error *local_err =3D NULL;
 > +
-> +    return smc->pre_5_2_numa_associativity ||
-> +           machine->numa_state->num_nodes <= 1;
-> +}
-> +
->  static void add_str(GString *s, const gchar *s1)
+> +    as =3D bar_access->memory ? &address_space_memory : &address_space_i=
+o;
+
+Doesn't need to be changed yet but eventually this should directly
+access BAR MemoryRegions instead of using global
+address_space_memory/address_space_io. Then bar_access->addr can be
+relative to the start of the BAR.
+
+Isolating the device from global address spaces makes it possible to
+support multiple devices running in the same device emulation process.
+
+> diff --git a/hw/pci/proxy.c b/hw/pci/proxy.c
+> index 23aab44d8e..d332c63bf3 100644
+> --- a/hw/pci/proxy.c
+> +++ b/hw/pci/proxy.c
+> @@ -61,7 +61,7 @@ static int config_op_send(PCIProxyDev *pdev, uint32_t a=
+ddr, uint32_t *val,
+>                            int l, unsigned int op)
 >  {
->      g_string_append_len(s, s1, strlen(s1) + 1);
-> @@ -4522,8 +4531,11 @@ DEFINE_SPAPR_MACHINE(5_2, "5.2", true);
->   */
->  static void spapr_machine_5_1_class_options(MachineClass *mc)
->  {
-> +    SpaprMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
-> +
->      spapr_machine_5_2_class_options(mc);
->      compat_props_add(mc->compat_props, hw_compat_5_1, hw_compat_5_1_len);
-> +    smc->pre_5_2_numa_associativity = true;
->  }
->  
->  DEFINE_SPAPR_MACHINE(5_1, "5.1", false);
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 114e819969..d1aae03b97 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -143,6 +143,7 @@ struct SpaprMachineClass {
->      bool smp_threads_vsmt; /* set VSMT to smp_threads by default */
->      hwaddr rma_limit;          /* clamp the RMA to this size */
->      bool pre_5_1_assoc_refpoints;
-> +    bool pre_5_2_numa_associativity;
->  
->      void (*phb_placement)(SpaprMachineState *spapr, uint32_t index,
->                            uint64_t *buid, hwaddr *pio, 
-> @@ -860,6 +861,7 @@ int spapr_max_server_number(SpaprMachineState *spapr);
->  void spapr_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
->                        uint64_t pte0, uint64_t pte1);
->  void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered);
-> +bool spapr_machine_using_legacy_numa(SpaprMachineState *spapr);
->  
->  /* DRC callbacks. */
->  void spapr_core_release(DeviceState *dev);
+>      MPQemuMsg msg =3D { 0 };
+> -    long ret =3D -EINVAL;
+> +    uint64_t ret =3D -EINVAL;
+>      Error *local_err =3D NULL;
+> =20
+>      msg.cmd =3D op;
+> @@ -72,7 +72,7 @@ static int config_op_send(PCIProxyDev *pdev, uint32_t a=
+ddr, uint32_t *val,
+> =20
+>      ret =3D mpqemu_msg_send_and_await_reply(&msg, pdev, &local_err);
+>      if (local_err) {
+> -        error_report("Failed to exchange PCI_CONFIG message with remote"=
+);
+> +        error_report_err(local_err);
+>      }
+>      if (op =3D=3D PCI_CONFIG_READ) {
+>          *val =3D (uint32_t)ret;
+
+Unrelated fixes. Please squash them into the PCI_CONFIG_READ patch.
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--u/L2/WlOHZg+YGU4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9sT+kACgkQnKSrs4Gr
+c8jqeggAiZa6R7LOhLpF/Qxn0ofvUTksrghXF+MDmKut2IvBMH6inXNbKeIoebF9
+3y93RG/Xkvwb0p8V5fGJ3Ri2frotUR4V0B6kvShUZZBn3bsdgcYzSTjog2lyldOo
+zV+1Mp3krAsAs35MA/qlx7J2CPCnHaigyKSW3tmtYiEIaRbggP1lvou6FXzP8rwT
+/2T9rMb1C2ZU0Yw16j0PEB3pG+Hj4wSFiRKQnoVCkIgxNg0HlKzTHgqa3j+oWrHb
+7b2R5xZLld7uMS58X7HDmUgc4Ld/Q+vTZQD0N+HdBhvEYxc55zdPOI5Y17WkxV1r
+n9r+Ll/n2zza5Zx8VicB0dvqJlfucA==
+=7A6A
+-----END PGP SIGNATURE-----
+
+--u/L2/WlOHZg+YGU4--
 
 
