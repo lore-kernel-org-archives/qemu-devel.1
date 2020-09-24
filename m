@@ -2,67 +2,67 @@ Return-Path: <SRS0=QZTr=DB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9301C4363D
-	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:54:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F36C4727F
+	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:54:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DEBA2396E
+	by mail.kernel.org (Postfix) with ESMTPS id CC26123977
 	for <qemu-devel@archiver.kernel.org>; Thu, 24 Sep 2020 09:54:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TAYPO/V8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DEBA2396E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Usg2TkNE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC26123977
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLNxO-0002Ut-FZ
+	id 1kLNxO-0002TV-Mo
 	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 05:54:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39110)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39234)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTs-0001I2-IP
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22001)
+ id 1kLNTz-0001aC-Ap
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36467)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kLNTp-00066g-R3
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:00 -0400
+ id 1kLNTw-000682-T6
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 05:24:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600939437;
+ s=mimecast20190719; t=1600939444;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=tHKjbusthXD3rtEvGDNcQcsWVkEAA+X2aPa+9QCB1N8=;
- b=TAYPO/V8FuNmu0EEF+YNltTJ/T3WnHiBJv6V08/L5TVheNxjqfC0BM+kIq+GoMM70vSlik
- rULHmX8cJVVx3VfIDy7/rVXp61QDEN2DwllpFNPjnWCMo7F8PbAbfNd5owO561nPCazzWf
- fC1b2mzSoptI7w/RS+IATkVqEWYOvYc=
+ bh=ilyjHoIWSmr+buo0m6gK2fqFJ7bn7M0gcIXCHz8WO7A=;
+ b=Usg2TkNEozE4xkwz6TO0TSaJUMT5ji+Mcw43dNnXo6Ginvr4QQjd5pe68tFwD/NeY/6/Le
+ EdyPCLrdaGLgxvOhDJeuoCee/8tX4H6adXlH4QjpTWy4JANVbg175AxgoaAG+kuilDfihN
+ +BZEtyb4t0uUYC3KiVmCrBfsXo1xvEE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-226-7g1wqgNJP_iGjwF8S7qDEQ-1; Thu, 24 Sep 2020 05:23:54 -0400
-X-MC-Unique: 7g1wqgNJP_iGjwF8S7qDEQ-1
+ us-mta-588-_pMMb7ehPXOa9N6ZR0KBXQ-1; Thu, 24 Sep 2020 05:24:01 -0400
+X-MC-Unique: _pMMb7ehPXOa9N6ZR0KBXQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8162C81F00B
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 875EF81F00F
+ for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:24:00 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 50AA75C22B
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 09:23:53 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 361CD5C1DC;
+ Thu, 24 Sep 2020 09:24:00 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 51/92] configure: use a platform-neutral prefix
-Date: Thu, 24 Sep 2020 05:22:33 -0400
-Message-Id: <20200924092314.1722645-52-pbonzini@redhat.com>
+Subject: [PULL 54/92] checkpatch: avoid error on cover letter files
+Date: Thu, 24 Sep 2020 05:22:36 -0400
+Message-Id: <20200924092314.1722645-55-pbonzini@redhat.com>
 In-Reply-To: <20200924092314.1722645-1-pbonzini@redhat.com>
 References: <20200924092314.1722645-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -71,7 +71,7 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
@@ -96,83 +96,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that the installation is relocatable, there is no need to compile a
-Windows-format prefix into Win32 binaries.  Instead, the prefix will
-only be used to compute installation-relative paths, and it can be
-any string.
+From: Stefano Garzarella <sgarzare@redhat.com>
 
-Drop the "Program Files" path completely: it is only usable on English
-versions of Windows; therefore, using the NSIS installer to get the
-"correct" path to the Program Files folder is recommended, and NSIS
-works just as well with any prefix.
+Running checkpatch on a directory that contains a cover letter reports
+this error:
 
+    Checking /tmp/tmpbnngauy3/0000-cover-letter.patch...
+    ERROR: Does not appear to be a unified-diff format patch
+
+    total: 1 errors, 0 warnings, 0 lines checked
+
+Let's skip cover letter as it is already done in the Linux kernel
+commits 06330fc40e3f ("checkpatch: avoid NOT_UNIFIED_DIFF errors
+on cover-letter.patch files") and a08ffbef4ab7 ("checkpatch: fix
+ignoring cover-letter logic").
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Message-Id: <20200917170212.92672-1-sgarzare@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure | 30 +++++++++++-------------------
- 1 file changed, 11 insertions(+), 19 deletions(-)
+ scripts/checkpatch.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/configure b/configure
-index 161d0604bb..fee5faa054 100755
---- a/configure
-+++ b/configure
-@@ -969,7 +969,7 @@ if test "$mingw32" = "yes" ; then
-   # MinGW needs -mthreads for TLS and macro _MT.
-   CFLAGS="-mthreads $CFLAGS"
-   write_c_skeleton;
--  prefix="c:/Program Files/QEMU"
-+  prefix="/qemu"
-   qemu_suffix=""
-   libs_qga="-lws2_32 -lwinmm -lpowrprof -lwtsapi32 -lwininet -liphlpapi -lnetapi32 $libs_qga"
- fi
-@@ -7802,17 +7802,9 @@ echo "strip = $(meson_quote $strip)" >> $cross
- echo "windres = $(meson_quote $windres)" >> $cross
- if test -n "$cross_prefix"; then
-     cross_arg="--cross-file config-meson.cross"
--    # Hack: Meson expects an absolute path for the *build* machine
--    # for the prefix, so add a slash in front of a Windows path that
--    # includes a drive letter.
--    #
--    # See https://github.com/mesonbuild/meson/issues/7577.
-     echo "[host_machine]" >> $cross
-     if test "$mingw32" = "yes" ; then
-         echo "system = 'windows'" >> $cross
--        case $prefix in
--            ?:*) pre_prefix=/ ;;
--        esac
-     fi
-     if test "$linux" = "yes" ; then
-         echo "system = 'linux'" >> $cross
-@@ -7841,16 +7833,16 @@ mv $cross config-meson.cross
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 50910899f2..22bb634c8e 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -3005,7 +3005,7 @@ sub process {
+ 		return 1;
+ 	}
  
- rm -rf meson-private meson-info meson-logs
- NINJA=${ninja:-$PWD/ninjatool} $meson setup \
--        --prefix "${pre_prefix}$prefix" \
--        --libdir "${pre_prefix}$libdir" \
--        --libexecdir "${pre_prefix}$libexecdir" \
--        --bindir "${pre_prefix}$bindir" \
--        --includedir "${pre_prefix}$includedir" \
--        --datadir "${pre_prefix}$datadir" \
--        --mandir "${pre_prefix}$mandir" \
--        --sysconfdir "${pre_prefix}$sysconfdir" \
--        --localstatedir "${pre_prefix}$local_statedir" \
--        -Ddocdir="${pre_prefix}$docdir" \
-+        --prefix "$prefix" \
-+        --libdir "$libdir" \
-+        --libexecdir "$libexecdir" \
-+        --bindir "$bindir" \
-+        --includedir "$includedir" \
-+        --datadir "$datadir" \
-+        --mandir "$mandir" \
-+        --sysconfdir "$sysconfdir" \
-+        --localstatedir "$local_statedir" \
-+        -Ddocdir="$docdir" \
-         -Dqemu_suffix="$qemu_suffix" \
-         -Doptimization=$(if test "$debug" = yes; then echo 0; else echo 2; fi) \
-         -Ddebug=$(if test "$debug_info" = yes; then echo true; else echo false; fi) \
+-	if (!$is_patch) {
++	if (!$is_patch && $filename !~ /cover-letter\.patch$/) {
+ 		ERROR("Does not appear to be a unified-diff format patch\n");
+ 	}
+ 
 -- 
 2.26.2
 
