@@ -2,91 +2,75 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AC0AC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 06:26:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B499BC4727E
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 06:32:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BA9E21D7F
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 06:26:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mv66V7Ns"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BA9E21D7F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8D8F9208B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 06:32:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D8F9208B6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLhC2-0002iN-7S
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 02:26:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45732)
+	id 1kLhHl-0004AQ-F1
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 02:32:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50646)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <maxim.cournoyer@gmail.com>)
- id 1kLdf9-0004L4-QK
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 22:40:43 -0400
-Received: from mail-qv1-xf2f.google.com ([2607:f8b0:4864:20::f2f]:40794)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <maxim.cournoyer@gmail.com>)
- id 1kLdf7-00088G-2Q
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 22:40:43 -0400
-Received: by mail-qv1-xf2f.google.com with SMTP id j3so616541qvi.7
- for <qemu-devel@nongnu.org>; Thu, 24 Sep 2020 19:40:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=+T7swFY/5OL/bQ/lM0AT9E0hq6eUNp+O81f0PcvH+qg=;
- b=mv66V7Nsnj9D4BwTmcKdiHEeKi5284zMdh46qe806P6R4RWSv/peZyeIGPsKeQFYPY
- S3mX4tYhMjnCOmvJD5H/UN57aHYTum+oJ2MOXP4ONeVMBdfTgWl0sEpCU74CIx1sGdHo
- tRX0Y9A9nctapterDIC0wBXQAHE9nRXTV0GuSn9P3x1qe7sBbVdxEELdBxldKVj8FU3L
- FEFt6EWMKCm+I8AB4gQnWXfB64K6uRWw0SkHJlM9Se1AReIie82dZk8GGeebB0ig6wXf
- lPozpxLMjxI9CCbeEydM7ft7iUAXaygLsxPy3RyjAq380v1jLbvcQGv9kc4sibkNew1E
- zkSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=+T7swFY/5OL/bQ/lM0AT9E0hq6eUNp+O81f0PcvH+qg=;
- b=B+CtODs2UcC8wsCUCR9PYxydv4UMbvhEWR0i12Jbc9NxPGEyq1kupmcIOMm6JQ0Znu
- 4su9kGF+Nxv4nPALfck6mqL2iJSviRVvkRi3ezRiyXS0Xrg4f42YkFj0QpwUvt8rJ0gk
- BFzv5aXv44Jy0A0iDTztgG225e5/NVvIDxMnVvcXHLBAqQBfD4Bqzt/NP1Z32EhWcFyU
- e2G78SOK2O6JEG+TN8d2AdGhksF0C3ArIbw62ySyqf2koprajQH3pOw2uDWYIePRZUED
- K1PvD9MVKFtfrpqIIboVo0k93Uw2tZvl8t8ujyU+MBcN4wBfagrJcvoSnBYNMks6UbjL
- nrxA==
-X-Gm-Message-State: AOAM530GOi51gOej0/G6JutTrNDm3fjB2wanoiUMw34dvisn9/FIVPnt
- 5nVm0SdilbzHkOlExRRtfJUmPJVA2pLkEw==
-X-Google-Smtp-Source: ABdhPJxTyp9cmanyeL0Hu9CIJoMO4u5Jgny/wU4sSQFdnoPeYIQlcoO1VQQhOjpLgcpwC8Qb2+3qjA==
-X-Received: by 2002:a0c:dd8d:: with SMTP id v13mr2315414qvk.22.1601001640093; 
- Thu, 24 Sep 2020 19:40:40 -0700 (PDT)
-Received: from localhost.localdomain (dsl-10-130-151.b2b2c.ca. [72.10.130.151])
- by smtp.gmail.com with ESMTPSA id f14sm841913qkh.134.2020.09.24.19.40.39
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Sep 2020 19:40:39 -0700 (PDT)
-From: Maxim Cournoyer <maxim.cournoyer@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] build: Build and install the info manual.
-Date: Thu, 24 Sep 2020 22:41:43 -0400
-Message-Id: <20200925024143.26492-1-maxim.cournoyer@gmail.com>
-X-Mailer: git-send-email 2.28.0
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kLhH1-0003gH-Ig
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 02:32:03 -0400
+Resent-Date: Fri, 25 Sep 2020 02:32:03 -0400
+Resent-Message-Id: <E1kLhH1-0003gH-Ig@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21312)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kLhGy-0005eV-Sg
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 02:32:03 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1601015513; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=kVnC8BLmw9kCoEP5yDK/RH12MPnvmbUSaGhiMkD8mDcfIGPAdZNn39yGHkQNiOoycMT2WNDkCdhyVQzY9Is0K4HM+BpYNgdEq6qwlt2Hu84guWum3g5D0JvYfvYn80qiupae0hybG3CgUIpGlbSNPzwhbPt770waL7eM6Kx0u9g=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1601015513;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=H0AgpsZzh6DpZEye894mwkdAI+Jv0oQs5ios2dq6aRQ=; 
+ b=f3s81+UaFyuN5kG2TSrPRo2C+q7LtE5IwJGcsi6hWawZ9Fpq2x/HFzLG4zLkysumWPf+I84mpG9h4tGpBgXKYYf+fJUNkPf1p378hSkbb8SIAYHJkO+pa9tdFcIHX2oEqPhUCaQ8qL9Xtb9eedudJQfKKugFMLTBuKmxKea+Tn8=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1601015512750511.81197669841856;
+ Thu, 24 Sep 2020 23:31:52 -0700 (PDT)
+Subject: Re: [PATCH] build: Build and install the info manual.
+Message-ID: <160101551113.12744.9174876092220033182@66eaa9a8a123>
+In-Reply-To: <20200925024143.26492-1-maxim.cournoyer@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::f2f;
- envelope-from=maxim.cournoyer@gmail.com; helo=mail-qv1-xf2f.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: maxim.cournoyer@gmail.com
+Date: Thu, 24 Sep 2020 23:31:52 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 02:31:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
-X-Mailman-Approved-At: Fri, 25 Sep 2020 02:23:46 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,122 +82,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Maxim Cournoyer <maxim.cournoyer@gmail.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, maxim.cournoyer@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Take advantage of the Sphinx texinfo backend to generate a QEMU info
-manual.  The texinfo format allows for more structure and info readers
-provide more advanced navigation capabilities compared to manpages
-readers.
-
-* configure (infodir): Add the --infodir option, which allows
-configuring the directory under which the info manuals are installed.
-* docs/index.rst: Include the top level documents to prevent
-warnings (treated as errors by sphinx-build).
-* docs/meson.build (sphinxinfo): Add new target.
----
- configure        |  3 +++
- docs/index.rst   |  2 ++
- docs/meson.build | 13 +++++++++++++
- meson.build      |  4 +++-
- 4 files changed, 21 insertions(+), 1 deletion(-)
-
-diff --git a/configure b/configure
-index e8e8e984f2..9dfd10e063 100755
---- a/configure
-+++ b/configure
-@@ -1069,6 +1069,8 @@ for opt do
-     static="yes"
-     QEMU_PKG_CONFIG_FLAGS="--static $QEMU_PKG_CONFIG_FLAGS"
-   ;;
-+  --infodir=*) infodir="$optarg"
-+  ;;
-   --mandir=*) mandir="$optarg"
-   ;;
-   --bindir=*) bindir="$optarg"
-@@ -1786,6 +1788,7 @@ Advanced options (experts only):
-   --smbd=SMBD              use specified smbd [$smbd]
-   --with-git=GIT           use specified git [$git]
-   --static                 enable static build [$static]
-+  --infodir=PATH           install info manual in PATH
-   --mandir=PATH            install man pages in PATH
-   --datadir=PATH           install firmware in PATH/$qemu_suffix
-   --docdir=PATH            install documentation in PATH/$qemu_suffix
-diff --git a/docs/index.rst b/docs/index.rst
-index 763e3d0426..4f155b51d7 100644
---- a/docs/index.rst
-+++ b/docs/index.rst
-@@ -9,6 +9,7 @@ Welcome to QEMU's documentation!
- .. toctree::
-    :maxdepth: 2
-    :caption: Contents:
-+   :glob:
- 
-    system/index
-    user/index
-@@ -16,3 +17,4 @@ Welcome to QEMU's documentation!
-    interop/index
-    specs/index
-    devel/index
-+   *
-diff --git a/docs/meson.build b/docs/meson.build
-index 50f367349b..eb94e4f3cf 100644
---- a/docs/meson.build
-+++ b/docs/meson.build
-@@ -32,10 +32,13 @@ if build_docs
- 
-   sphinxdocs = []
-   sphinxmans = []
-+  conf_py_files = [files('conf.py')]
-+
-   foreach manual : manuals
-     private_dir = meson.current_build_dir() / (manual + '.p')
-     output_dir = meson.current_build_dir() / manual
-     input_dir = meson.current_source_dir() / manual
-+    conf_py_files += files(manual / 'conf.py')
- 
-     this_manual = custom_target(manual + ' manual',
-                 build_by_default: build_docs,
-@@ -70,4 +73,14 @@ if build_docs
-   endforeach
-   alias_target('sphinxdocs', sphinxdocs)
-   alias_target('man', sphinxmans)
-+
-+  sphinxinfo = custom_target(
-+    'QEMU info manual generated source',
-+    output: ['QEMU.texi', 'sphinxinfo.stamp'],
-+    input: conf_py_files,
-+    depfile: 'sphinxinfo.d',
-+    command: [SPHINX_ARGS, '-Ddepfile=@DEPFILE@', '-Ddepfile_stamp=@OUTPUT1@',
-+             '-b', 'texinfo',
-+             meson.current_source_dir(), meson.current_build_dir()])
-+  alias_target('sphinxinfo', sphinxinfo)
- endif
-diff --git a/meson.build b/meson.build
-index f4d1ab1096..4156b585ba 100644
---- a/meson.build
-+++ b/meson.build
-@@ -1218,6 +1218,7 @@ if build_docs
-                                               'qemu_confdir': config_host['qemu_confdir']})
- 
-   texi = {
-+    'QEMU': sphinxinfo,
-     'qemu-qmp-ref': ['docs/interop/qemu-qmp-ref.texi', qapi_doc_texi, version_texi],
-   }
-   if 'CONFIG_GUEST_AGENT' in config_host
-@@ -1241,7 +1242,8 @@ if build_docs
-                       input: input,
-                       output: output,
-                       install: true,
--                      install_dir: qemu_docdir / 'interop',
-+                      install_dir: ext == 'info' ? get_option('infodir') \
-+                                                 : qemu_docdir / 'interop',
-                       command: cmd + args)
-       endforeach
-       alias_target(ext, t)
--- 
-2.28.0
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkyNTAyNDE0My4yNjQ5
+Mi0xLW1heGltLmNvdXJub3llckBnbWFpbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMg
+dG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IK
+bW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMDkyNTAyNDE0
+My4yNjQ5Mi0xLW1heGltLmNvdXJub3llckBnbWFpbC5jb20KU3ViamVjdDogW1BBVENIXSBidWls
+ZDogQnVpbGQgYW5kIGluc3RhbGwgdGhlIGluZm8gbWFudWFsLgoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhp
+dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBo
+aXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRF
+U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
+YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
+IC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDIwMDkyNDE5NTA1OC4zNjI5ODQtMS1kYW5p
+ZWxoYjQxM0BnbWFpbC5jb20gLT4gcGF0Y2hldy8yMDIwMDkyNDE5NTA1OC4zNjI5ODQtMS1kYW5p
+ZWxoYjQxM0BnbWFpbC5jb20KIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDIwMDkyNTAy
+MTgwOC4yNjQ3MS0xLWNvbGluLnh1QGludGVsLmNvbSAtPiBwYXRjaGV3LzIwMjAwOTI1MDIxODA4
+LjI2NDcxLTEtY29saW4ueHVAaW50ZWwuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcv
+MjAyMDA5MjUwMjQxNDMuMjY0OTItMS1tYXhpbS5jb3Vybm95ZXJAZ21haWwuY29tIC0+IHBhdGNo
+ZXcvMjAyMDA5MjUwMjQxNDMuMjY0OTItMS1tYXhpbS5jb3Vybm95ZXJAZ21haWwuY29tClN3aXRj
+aGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNzZhMjUyYyBidWlsZDogQnVpbGQgYW5kIGluc3Rh
+bGwgdGhlIGluZm8gbWFudWFsLgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KRVJST1I6IE1pc3Npbmcg
+U2lnbmVkLW9mZi1ieTogbGluZShzKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA2OSBs
+aW5lcyBjaGVja2VkCgpDb21taXQgNzZhMjUyYzI2YjI5IChidWlsZDogQnVpbGQgYW5kIGluc3Rh
+bGwgdGhlIGluZm8gbWFudWFsLikgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBV
+VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxv
+ZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA5MjUwMjQxNDMu
+MjY0OTItMS1tYXhpbS5jb3Vybm95ZXJAZ21haWwuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlw
+ZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
+aHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
+ZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
