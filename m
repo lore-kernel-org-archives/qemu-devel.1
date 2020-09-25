@@ -2,74 +2,88 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F23BC4727E
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 19:31:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A753C4727E
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 19:32:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E658206C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 19:31:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E658206C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7D491206C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 19:32:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lBHo+ttn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D491206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLtQw-0002as-Hb
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 15:31:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33648)
+	id 1kLtRu-0003HR-C8
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 15:32:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34376)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kLtMf-00089k-7o
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 15:26:41 -0400
-Resent-Date: Fri, 25 Sep 2020 15:26:41 -0400
-Resent-Message-Id: <E1kLtMf-00089k-7o@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21368)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kLtMY-0005R6-Qq
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 15:26:40 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1601061990; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=ieVvw++TNhQmRdWIC0qDPNtodK53WKyE3YDY2bbu6Qqh4hif9/vPr5z4BOUAbxGCawpX9hU8lSJU9Vp7AGKFT75+i8n+efJMuv/Zr+xg1YgTkXw/NSj0UqtKS3kLIQl7cB8oYLQKazDwBh4Oi0sYZMtyoUQhunmsn8heneoybi8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1601061990;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=AtJR+89X9hKtcVU3jCMVev8UvkUvgCfAurHbg8dfFME=; 
- b=AIjpI+o+jKtw1nbmsqBnkKOFxmFrW6b2NQ7TupjWdlT7YLU57dnHJZec06zV6xp10dOx70jS84CGdJyF3ZPManEs0Jt/ZBEqqPluBfYj1UGZ2q74W7xv00hLuHPhRPqg9KUdpmuQkg7eHUbjWVUCIEVL1IcB32U2su/KtYh3/pc=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1601061989610128.7778653117557;
- Fri, 25 Sep 2020 12:26:29 -0700 (PDT)
-Subject: Re: [PATCH 00/10] Fix scsi devices plug/unplug races w.r.t
- virtio-scsi iothread
-Message-ID: <160106198842.10465.14273020261352828708@66eaa9a8a123>
-In-Reply-To: <20200925172604.2142227-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kLtQI-0002Mx-OR
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 15:30:26 -0400
+Received: from mail-lf1-x136.google.com ([2a00:1450:4864:20::136]:44628)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kLtQ7-0005jJ-0X
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 15:30:23 -0400
+Received: by mail-lf1-x136.google.com with SMTP id d15so4013019lfq.11
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 12:30:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=bdRi0nTcZwSDZ30P5aCLH5kxQb59pnpqwySg1IGsk/A=;
+ b=lBHo+ttnWk8FZMKuT9xtRxUU6O7Rkvu+ssKGQkALEJaDLeofmCMJyV1gqZ9w7Xe+vc
+ /Ll7RClOfbG/c7e7awYm7FCj2Ndek4N/pSfAOLtFCkPy8w9tcehKWj3PpsoTWYcdHOwI
+ QTHBxJvkU7E3BneMbrpS5Ee5LcHsA8NrR/0RU513dFmq8gKLa5lGjYGlQmo9Q/+w095V
+ HXccq5+b+fS3PegiFFYjY7QRcxI4hHfmMSK9NYAL/CjwllG0lgLStdkQDRoeUWYvJRWU
+ hO6tWBrRSzKxhlpWWvMkR7lOeGUsCoRKiZR/EkugswHtcDbKwikYFeF6sPRBiQ+fWIxG
+ X5Yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=bdRi0nTcZwSDZ30P5aCLH5kxQb59pnpqwySg1IGsk/A=;
+ b=pfo8uQ0Lnzfdo4guGUB1vdNVUVIwIN8cWOS+mYYr+F3G2Z4VQ5r8cRFyRUT3UvAs6z
+ 2LzW4kw/ZoRugu1+jAL+zYuNvkc+gc/qcbkpK592hDSFrNEZr9gIb++9v4qmlNyyhzOb
+ H/4UOkwPdYWn61lXeMFaxe4tQkS6fr4/O699qWXl1W6Xd7SwnwFptWyylmD+S/ZQ77hU
+ UrjuZ8hjNrBzuw5G9/kFAvlLQWFDAMAvK6FnOzcsG5RlFkSO9Ms6JkL9Wfk95hu4g9QL
+ eq8Rf3rEEVz40a0i5FeUrxTY0JAfU+Kyhbf4YlQF1f0UXHqF2ZoTO9/wPpjs4+4byy7Z
+ +gCg==
+X-Gm-Message-State: AOAM530oD2YXBbEk/8U9FaABG3H+gKTJgO6ECdc8Y0SfFn3wpjGnDmoJ
+ NDVxnb6rf6KIvhrMUlk1XPMH/i68tVkDXSoqxG4=
+X-Google-Smtp-Source: ABdhPJx50qYgFZ6ObQIAIAfSLG4PeqWStwFD9BDxo3ZVC/iYqnYDVzS8ds1Fgtjgm5jAeKBWgLOTlJHRVbTeNm2Ay28=
+X-Received: by 2002:a19:a407:: with SMTP id q7mr105876lfc.377.1601062212652;
+ Fri, 25 Sep 2020 12:30:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: pbonzini@redhat.com
-Date: Fri, 25 Sep 2020 12:26:29 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 15:25:48
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+References: <CAE2XoE-PpsaqJOfEq0iUSkH6N8skkqFAY+2QkSbnENiszA0xQg@mail.gmail.com>
+ <a50bc12c-7aa1-19a3-c39e-02328aeaca38@redhat.com>
+ <CAE2XoE9F5_gGsiFutW99mbPUbUb2rmG+2+9pEDKrhvu9QRwYvw@mail.gmail.com>
+ <a808929b-f93c-f68d-da4e-02133b4fcb54@redhat.com>
+In-Reply-To: <a808929b-f93c-f68d-da4e-02133b4fcb54@redhat.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Sat, 26 Sep 2020 03:30:01 +0800
+Message-ID: <CAE2XoE_Qe9MBSJ_UAduLWX5xjBbj5Jqype-XT9Uh7muLbEeZLA@mail.gmail.com>
+Subject: Re: I wanna fixes plugin on windows, any suggestion
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: multipart/alternative; boundary="00000000000072d2e905b0285872"
+Received-SPF: pass client-ip=2a00:1450:4864:20::136;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x136.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,74 +97,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, mlevitsk@redhat.com
+Reply-To: luoyonggang@gmail.com
+Cc: qemu-level <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkyNTE3MjYwNC4yMTQy
-MjI3LTEtcGJvbnppbmlAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMjAwOTI1MTcyNjA0LjIx
-NDIyMjctMS1wYm9uemluaUByZWRoYXQuY29tClN1YmplY3Q6IFtQQVRDSCAwMC8xMF0gRml4IHNj
-c2kgZGV2aWNlcyBwbHVnL3VucGx1ZyByYWNlcyB3LnIudCB2aXJ0aW8tc2NzaSBpb3RocmVhZAoK
-PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2Ug
-PiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0
-IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
-YmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCkZyb20gaHR0cHM6Ly9naXRodWIu
-Y29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAy
-MDA5MjUxNzI2MDQuMjE0MjIyNy0xLXBib256aW5pQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDIw
-MDkyNTE3MjYwNC4yMTQyMjI3LTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5l
-dyBicmFuY2ggJ3Rlc3QnCjIxYzIzODAgc2NzaS9zY3NpX2J1czogZml4IHJhY2VzIGluIFJFUE9S
-VCBMVU5TCmFhY2QyMzAgdmlydGlvLXNjc2k6IHVzZSBzY3NpX2RldmljZV9nZXQKZjlmOGYwOCBz
-Y3NpL3Njc2lfYnVzOiBBZGQgc2NzaV9kZXZpY2VfZ2V0CmM2NjA1MGYgc2NzaS9zY3NpLWJ1czog
-c2NzaV9kZXZpY2VfZmluZDogZG9uJ3QgcmV0dXJuIHVucmVhbGl6ZWQgZGV2aWNlcwpiYjlmYmQz
-IGRldmljZS1jb3JlOiB1c2UgYXRvbWljX3NldCBvbiAucmVhbGl6ZWQgcHJvcGVydHkKYmQ4NzU5
-MyBkZXZpY2UtY29yZTogdXNlIFJDVSBmb3IgbGlzdCBvZiBjaGlsZHJlbiBvZiBhIGJ1cwo1MWE4
-ZWJlIGRldmljZV9jb3JlOiB1c2UgZHJhaW5fY2FsbF9yY3UgaW4gaW4gaG1wX2RldmljZV9kZWwv
-cW1wX2RldmljZV9hZGQKYTU5NWFhMiBzY3NpL3Njc2lfYnVzOiBzd2l0Y2ggc2VhcmNoIGRpcmVj
-dGlvbiBpbiBzY3NpX2RldmljZV9maW5kCjY3MzlhMjAgc2NzaTogc3dpdGNoIHRvIGJ1cy0+Y2hl
-Y2tfYWRkcmVzcwpjNGVkMDc5IHFkZXY6IGFkZCAiY2hlY2sgaWYgYWRkcmVzcyBmcmVlIiBjYWxs
-YmFjayBmb3IgYnVzZXMKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTAgQ2hlY2tpbmcgY29tbWl0
-IGM0ZWQwNzk1YTM2ZCAocWRldjogYWRkICJjaGVjayBpZiBhZGRyZXNzIGZyZWUiIGNhbGxiYWNr
-IGZvciBidXNlcykKMi8xMCBDaGVja2luZyBjb21taXQgNjczOWEyMDVlNjgzIChzY3NpOiBzd2l0
-Y2ggdG8gYnVzLT5jaGVja19hZGRyZXNzKQpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVy
-IHVzZSB0YWJzCiM1MzogRklMRTogaHcvc2NzaS9zY3NpLWJ1cy5jOjEzNzoKK15JXkleSV5JICAg
-ICBpbnQgY2hhbm5lbCwgaW50IHRhcmdldCwgaW50IGx1biwkCgpFUlJPUjogY29kZSBpbmRlbnQg
-c2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM1NDogRklMRTogaHcvc2NzaS9zY3NpLWJ1cy5jOjEzODoK
-K15JXkleSV5JICAgICBTQ1NJRGV2aWNlICoqcF9kZXYpJAoKV0FSTklORzogbGluZSBvdmVyIDgw
-IGNoYXJhY3RlcnMKIzY5OiBGSUxFOiBody9zY3NpL3Njc2ktYnVzLmM6MTUzOgorc3RhdGljIGJv
-b2wgc2NzaV9idXNfY2hlY2tfYWRkcmVzcyhCdXNTdGF0ZSAqcWJ1cywgRGV2aWNlU3RhdGUgKnFk
-ZXYsIEVycm9yICoqZXJycCkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4OTog
-RklMRTogaHcvc2NzaS9zY3NpLWJ1cy5jOjE3MzoKKyAgICAgICAgaWYgKCFzY3NpX2J1c19pc19h
-ZGRyZXNzX2ZyZWUoYnVzLCBkZXYtPmNoYW5uZWwsIGRldi0+aWQsIGRldi0+bHVuLCAmZCkpIHsK
-CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMjg6IEZJTEU6IGh3L3Njc2kvc2Nz
-aS1idXMuYzoxOTU6CisgICAgICAgICAgICBpc19mcmVlID0gc2NzaV9idXNfaXNfYWRkcmVzc19m
-cmVlKGJ1cywgZGV2LT5jaGFubmVsLCArK2lkLCBkZXYtPmx1biwgTlVMTCk7CgpXQVJOSU5HOiBs
-aW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTQxOiBGSUxFOiBody9zY3NpL3Njc2ktYnVzLmM6MjA1
-OgorICAgICAgICAgICAgaXNfZnJlZSA9IHNjc2lfYnVzX2lzX2FkZHJlc3NfZnJlZShidXMsIGRl
-di0+Y2hhbm5lbCwgZGV2LT5pZCwgKytsdW4sIE5VTEwpOwoKdG90YWw6IDIgZXJyb3JzLCA0IHdh
-cm5pbmdzLCAxODIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8xMCBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKMy8xMCBDaGVja2luZyBjb21taXQgYTU5NWFhMjg4ZjE5IChzY3NpL3Njc2lfYnVz
-OiBzd2l0Y2ggc2VhcmNoIGRpcmVjdGlvbiBpbiBzY3NpX2RldmljZV9maW5kKQo0LzEwIENoZWNr
-aW5nIGNvbW1pdCA1MWE4ZWJlNjRjNWYgKGRldmljZV9jb3JlOiB1c2UgZHJhaW5fY2FsbF9yY3Ug
-aW4gaW4gaG1wX2RldmljZV9kZWwvcW1wX2RldmljZV9hZGQpCjUvMTAgQ2hlY2tpbmcgY29tbWl0
-IGJkODc1OTNmZmI2ZSAoZGV2aWNlLWNvcmU6IHVzZSBSQ1UgZm9yIGxpc3Qgb2YgY2hpbGRyZW4g
-b2YgYSBidXMpCjYvMTAgQ2hlY2tpbmcgY29tbWl0IGJiOWZiZDNkN2EyNSAoZGV2aWNlLWNvcmU6
-IHVzZSBhdG9taWNfc2V0IG9uIC5yZWFsaXplZCBwcm9wZXJ0eSkKNy8xMCBDaGVja2luZyBjb21t
-aXQgYzY2MDUwZjY1N2FlIChzY3NpL3Njc2ktYnVzOiBzY3NpX2RldmljZV9maW5kOiBkb24ndCBy
-ZXR1cm4gdW5yZWFsaXplZCBkZXZpY2VzKQo4LzEwIENoZWNraW5nIGNvbW1pdCBmOWY4ZjA4ODhl
-NTggKHNjc2kvc2NzaV9idXM6IEFkZCBzY3NpX2RldmljZV9nZXQpCjkvMTAgQ2hlY2tpbmcgY29t
-bWl0IGFhY2QyMzAxY2VmOCAodmlydGlvLXNjc2k6IHVzZSBzY3NpX2RldmljZV9nZXQpCjEwLzEw
-IENoZWNraW5nIGNvbW1pdCAyMWMyMzgwNDJiZTcgKHNjc2kvc2NzaV9idXM6IGZpeCByYWNlcyBp
-biBSRVBPUlQgTFVOUykKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
-dGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcu
-b3JnL2xvZ3MvMjAyMDA5MjUxNzI2MDQuMjE0MjIyNy0xLXBib256aW5pQHJlZGhhdC5jb20vdGVz
-dGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+--00000000000072d2e905b0285872
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Sat, Sep 26, 2020 at 3:25 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 25/09/20 21:23, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
+> > That's what I am tring to fixes? what does  one import library per
+> > emulator, can we do this like NodeJS does?
+> >  NodeJS have NAPI support across platform. They create a windows .lib
+from
+> > node.exe
+>
+> You'd have to create a .lib for qemu-system-aarch64.exe, one for
+> qemu-system-arm.exe, etc.  On Linux the same plugin will work for all
+> emulators.
+>
+OK, this made the things clear, the possible solution is to using function
+pointer to expose
+all Plugin-API functions
+> Paolo
+>
+
+
+--
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
+
+--00000000000072d2e905b0285872
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><br><br>On Sat, Sep 26, 2020 at 3:25 AM Paolo Bonzini &lt;=
+<a href=3D"mailto:pbonzini@redhat.com">pbonzini@redhat.com</a>&gt; wrote:<b=
+r>&gt;<br>&gt; On 25/09/20 21:23, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo)=
+ wrote:<br>&gt; &gt; That&#39;s what I am tring to fixes? what does =C2=A0o=
+ne import library per<br>&gt; &gt; emulator, can we do this like NodeJS doe=
+s?<br>&gt; &gt; =C2=A0NodeJS have NAPI support across platform. They create=
+ a windows .lib from<br>&gt; &gt; node.exe<br>&gt;<br>&gt; You&#39;d have t=
+o create a .lib for qemu-system-aarch64.exe, one for<br>&gt; qemu-system-ar=
+m.exe, etc.=C2=A0 On Linux the same plugin will work for all<br>&gt; emulat=
+ors.<br>&gt;<div>OK, this made the things clear, the possible solution is t=
+o using function pointer to expose</div><div>all Plugin-API functions<br>&g=
+t; Paolo<br>&gt;<br><br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=
+=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0=
+ =C2=A0 sincerely,<br>Yonggang Luo</div></div>
+
+--00000000000072d2e905b0285872--
 
