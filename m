@@ -2,125 +2,83 @@ Return-Path: <SRS0=+pSw=DC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3FE4C4727E
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 19:10:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76EA3C4727E
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 19:13:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AF9A2075F
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 19:10:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C689221EC
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 19:13:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="OdrBuQW5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AF9A2075F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u/9fVV4u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C689221EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLt7F-0000GD-6i
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 15:10:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58090)
+	id 1kLt9W-0001Im-EI
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 15:13:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59064)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
- id 1kLt4q-0005ym-1V
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 15:08:17 -0400
-Received: from mail-eopbgr690082.outbound.protection.outlook.com
- ([40.107.69.82]:16384 helo=NAM04-CO1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
- id 1kLt4m-0003BR-De
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 15:08:15 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cX3un2RtJP7Gb74ciOXW4hsLYTVmdriAtf4Gywj1TN9OEXKWbmE+A/G9EBjKvbz81jwXEdFP3m3bZKyiNf1hFcKdj5KJT+mkYh/gDG/ay/W6BlzXvc9KBzJx+KY+5SM486n/4pc9gpWibOLfWRjZPMM1k2jf4KIANrnrK92fUSmAh4I1IOYCdKF93LpvWEfPou86tEmP9aMxMqR7CqYj7V2C3qap5O1Z743Q8qkJbZdMEAoYi64Nf30SPAClS6tHS9FVf8n1BRjRbl6qtKkDcQJg5z3EquVT8PINU5PIprVA0tygCrBfABhPXkqNEm57i9tY/z4ojKvQQAQfDd4WiA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=26Ajkwk8ZfNw+2As1OoFJ83ryAYsNiVQVxADN5aVOYU=;
- b=aBVANmqdbBUcvizH5LfpGzrXGF7X+Zq1r35c7u3sKb/AmxIzgAw0MjpcNhSbFJfgbeCHP7AydiX+ViZ3OWLU7OoyR6DWDqAabxUHt/9Pk0zezyCFuBog1Bc+ST61QIp6eCRXpVYRKj4sCvOvlRdd6TN/OCE8wyJZj0GPskwIyF8SHZMt89NxvocoN+GRmjPxsnZ1T8euksvKP5e+M+InE9wJLZIa0q4qGGwJrIY1JLjCo0FXORUSZTujPzE6HpU6t22nBYQTr3+whhrswejlKYUD+A6hkY0hiXimyxpZRnwNqV4TieFybyFMIBcFZdsvKDSG0d4uYHn7KxXSQgGr/A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=26Ajkwk8ZfNw+2As1OoFJ83ryAYsNiVQVxADN5aVOYU=;
- b=OdrBuQW5DvdhaN8lH8sT4lNkW/KfeHdpnjDrIV6vul6Rrr4n18Dm0fwCRBPhA7gj6LPZx+3yX1WK1BLxwMLsR+aXXT46GMFYEEQdqQ+gFgouIDV3LBnQlH18olkM9X9S22TEkxMUHrx5hwXIyJ3IA2bQc8dRtRu8f2Pjtx0aiUg=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM5PR12MB1835.namprd12.prod.outlook.com (2603:10b6:3:10c::9) with
- Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3391.15; Fri, 25 Sep 2020 19:08:06 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346%3]) with mapi id 15.20.3391.024; Fri, 25 Sep 2020
- 19:08:06 +0000
-Subject: Re: [PATCH v4 0/6] Qemu SEV-ES guest support
-From: Tom Lendacky <thomas.lendacky@amd.com>
-To: qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <cover.1601060620.git.thomas.lendacky@amd.com>
-Message-ID: <8632340c-f48f-bea4-39d8-101090c865a4@amd.com>
-Date: Fri, 25 Sep 2020 14:08:04 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <cover.1601060620.git.thomas.lendacky@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN6PR08CA0033.namprd08.prod.outlook.com
- (2603:10b6:805:66::46) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kLt8q-0000tj-RH
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 15:12:24 -0400
+Received: from mail-lj1-x236.google.com ([2a00:1450:4864:20::236]:43528)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kLt8o-0003hK-Di
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 15:12:24 -0400
+Received: by mail-lj1-x236.google.com with SMTP id u4so3315760ljd.10
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 12:12:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:reply-to:from:date:message-id:subject:to;
+ bh=FPA5oQ2I77fwQasas/gfaGSwOouPuAzUkhl+a7CQq7I=;
+ b=u/9fVV4udf1NushNEmHwd1UNnOoHXR7N6gSwkVT9Z7XQsinXGbGkZJvk2GAnVeL7o8
+ npWypg7O0sU4YJ/7GMrhEdDSu6DgqteGCErHMTnqmupxToeUYVWS1rHckbmtVhRTq7ol
+ uFHyAWeE8jomOODxv9aW1T8tAOYQVB1jFS2cZGTl8vwFrawcdzwp67zUQaM1dnP6aHJN
+ +8LW9v9jZt0HzAsvG6E8GP7nNAPVYuQH/JINSROuBPzYpu5vwqV4H4EqkLFGg0KdpVjh
+ W8Ix4wzPOQ+51qoSZgEp4n+6yHlIqMCirBbwvwepb17p89fDDKqoU+0Js91VGDGeJ6gZ
+ Op4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+ :subject:to;
+ bh=FPA5oQ2I77fwQasas/gfaGSwOouPuAzUkhl+a7CQq7I=;
+ b=V6/l3EAtJY/gRU88NsYjyUwsUTacgz0GDati3Bn5t44PIbnH//VjGwES5EQ0eZv+8h
+ S3GjneSOL6lSx8ZbmRNPbrQaP3K6XZHk+EKzmoEecVwcNk3B5c4HSCD+SkTZ3zmLOnU+
+ oDNiXk3zEcqY/oQH7UBVlf8L5cap06KsNrW2ZWfzbJANu+D4Yw/wOAwqQbtv5d9m4N+n
+ 7BNKYymRLTDRd4CsNyLpO0+0kF4aSbpKMu5RVESUZnd/rr8V7NX/qnf2kqpuI0qP+fqy
+ aupteDJkdww70Tpj1KWy/fBKkgAFzBNapvQuYX8W/DMSxqA+RBxVZZ0fkQE2HQYio+vH
+ r6Dw==
+X-Gm-Message-State: AOAM5307kAXV9ujP4ZOHsLZta3K+i61Ir+uxugHOdApG7AzJM6+sIQJM
+ 5AblW3jG8BemV0veDOsoxdZ/6G8QmmTeVabS3xbuNiE+Fsxm38WA
+X-Google-Smtp-Source: ABdhPJzbNFjuBuiyJO131W9VGOfLf2WJSOfm5RYRuCkw3oaaYxBInRW6Hgypfm83hydQqRwMHycsl/Jh7UF6EBDfXf8=
+X-Received: by 2002:a2e:854c:: with SMTP id u12mr1777102ljj.120.1601061139502; 
+ Fri, 25 Sep 2020 12:12:19 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from office-linux.texastahm.com (67.79.209.213) by
- SN6PR08CA0033.namprd08.prod.outlook.com (2603:10b6:805:66::46) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3326.20 via Frontend Transport; Fri, 25 Sep 2020 19:08:05 +0000
-X-Originating-IP: [67.79.209.213]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: acc314df-435c-45ef-4628-08d8618655aa
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1835:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB18357BE05044F277B6149359EC360@DM5PR12MB1835.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Inl2z4EN1LgOos65TeIjJcn6o5x8HM/JIEaz/qVDhUWYJq0i6gY7FiJInu+A2C1bRQ5nV4Dm6qUeOJpF/zxrpslF23MElInLJv0pLHRj2U8wbSz1X2Efg2IAIDPnxsdDaF8w4pCGQHAI/eZ9U2VnZa3m+Cdlrf2Mms9VE+jkkD2JBGm3lGxN5eMhqcwbuveAp9Pz/Volzt5P7AmNFfvN+oeJXIcDvK3QrFzixwz8QgIerzjRwdxmUPsKVSzHBOsKwlsuqtNq/zB9sndjLO6uj42BwnQaiioTXendQBin2ykpjHsmNlQX9vTP4/DYGhz0wRotPmQ8CcCObjDU/nZzjdZ3v8Apyjyi80vvmrc/T5Briu8Ruxh3NQURuLf+JB1/7UfzA7Jc8ARRQszUDT3JsiA8SBS7fG0a+tI0031uS7mp5SC+2vRf7Z3iFcqGhFmR6t3fA8zUpVeKOASFLh7exBlY30y5JGxQzNCKGB5gg6wzcbe/Fj8X0P2LjJ1J1Qme
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:DM5PR12MB1355.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(376002)(366004)(396003)(39860400002)(136003)(346002)(31686004)(26005)(4326008)(54906003)(8676002)(16526019)(66556008)(66476007)(53546011)(5660300002)(966005)(66946007)(186003)(52116002)(6506007)(8936002)(86362001)(956004)(316002)(31696002)(2616005)(36756003)(478600001)(2906002)(6486002)(7416002)(83380400001)(6512007)(43740500002);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: pN/nBNa6AG07sEl0ATpF85jbH5xVwdpnCuHHzblrE02tR3Iu1NXJCUYFUs+S0QIJTUCiVm4Ac6FX5COYHW1xcPsIfoCjAHtorU7K5b6/XDyXWiWif02lQPA6Gr05Thh6wS6fuPWV1AYekLqf8IR4Q7SPwPUVpGVI9Qy/wQ14g4Y+HyzYV7M7c1umFx4gXxRsGBgomrOzDf2BfvcVS6/EuHPxS7syMNQn5bBNFq5eydlHwx3HyseD5E9qLfChc69aKBZt12wNHNLJGw6QeWFABoJQVpEX5syhj45RGtH0Pt7nefQLJqZ5vh3tpSrea2OFuIGu3cj6ZTlIqLwKC8o3rQhwx63KuAiVMgxlrQOmlix1ixbb5HDn+TEXK718Rz/NsZrEMz5UAo8eTAUnNXOHNItKL5aJwmji4vkRUOPhqOER7h6/dJ00krDP7zihJpl6id03LKcey7pbuDAK0dXsMEizq0CBIWHbTVw2VnR7i7trMJKulu25WXMNTjcmNAfEGX141svfaz6srCUztkgKgRrMZ5QLwzvZO5JNwLqsNjBLV1sTipWWUoHSHAQyta9GLNeSDwWr048aiQyze5jDyGUQuvrAXc/WrDJxVllN6WbP19N5hiH8bOLk+fRCfOStHocM+ojNxps/C1+KJEG1KQ==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: acc314df-435c-45ef-4628-08d8618655aa
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2020 19:08:06.6778 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6WdyaGLo3RxVZIux3wfN+PHvkaz+ltdUfLBueUGgnbeiA9xA9UVO3MZaQJ+kgC4W8UF6qs716ZBHGJ27KinzAg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1835
-Received-SPF: none client-ip=40.107.69.82;
- envelope-from=Thomas.Lendacky@amd.com;
- helo=NAM04-CO1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 15:08:11
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001,
- NICE_REPLY_A=-0.238, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Sat, 26 Sep 2020 03:12:08 +0800
+Message-ID: <CAE2XoE-PpsaqJOfEq0iUSkH6N8skkqFAY+2QkSbnENiszA0xQg@mail.gmail.com>
+Subject: I wanna fixes plugin on windows, any suggestion
+To: qemu-level <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000007bd9c105b02818a6"
+Received-SPF: pass client-ip=2a00:1450:4864:20::236;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x236.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,127 +91,330 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Brijesh Singh <brijesh.singh@amd.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Connor Kuehl <ckuehl@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Jiri Slaby <jslaby@suse.cz>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: luoyonggang@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/25/20 2:03 PM, Tom Lendacky wrote:
-> From: Tom Lendacky <thomas.lendacky@amd.com>
-> 
-> This patch series provides support for launching an SEV-ES guest.
-> 
-> Secure Encrypted Virtualization - Encrypted State (SEV-ES) expands on the
-> SEV support to protect the guest register state from the hypervisor. See
-> "AMD64 Architecture Programmer's Manual Volume 2: System Programming",
-> section "15.35 Encrypted State (SEV-ES)" [1].
-> 
-> In order to allow a hypervisor to perform functions on behalf of a guest,
-> there is architectural support for notifying a guest's operating system
-> when certain types of VMEXITs are about to occur. This allows the guest to
-> selectively share information with the hypervisor to satisfy the requested
-> function. The notification is performed using a new exception, the VMM
-> Communication exception (#VC). The information is shared through the
-> Guest-Hypervisor Communication Block (GHCB) using the VMGEXIT instruction.
-> The GHCB format and the protocol for using it is documented in "SEV-ES
-> Guest-Hypervisor Communication Block Standardization" [2].
-> 
-> The main areas of the Qemu code that are updated to support SEV-ES are
-> around the SEV guest launch process and AP booting in order to support
-> booting multiple vCPUs.
-> 
-> There are no new command line switches required. Instead, the desire for
-> SEV-ES is presented using the SEV policy object. Bit 2 of the SEV policy
-> object indicates that SEV-ES is required.
-> 
-> The SEV launch process is updated in two ways. The first is that a the
-> KVM_SEV_ES_INIT ioctl is used to initialize the guest instead of the
-> standard KVM_SEV_INIT ioctl. The second is that before the SEV launch
-> measurement is calculated, the LAUNCH_UPDATE_VMSA SEV API is invoked for
-> each vCPU that Qemu has created. Once the LAUNCH_UPDATE_VMSA API has been
-> invoked, no direct changes to the guest register state can be made.
-> 
-> AP booting poses some interesting challenges. The INIT-SIPI-SIPI sequence
-> is typically used to boot the APs. However, the hypervisor is not allowed
-> to update the guest registers. For the APs, the reset vector must be known
-> in advance. An OVMF method to provide a known reset vector address exists
-> by providing an SEV information block, identified by UUID, near the end of
-> the firmware [3]. OVMF will program the jump to the actual reset vector in
-> this area of memory. Since the memory location is known in advance, an AP
-> can be created with the known reset vector address as its starting CS:IP.
-> The GHCB document [2] talks about how SMP booting under SEV-ES is
-> performed. SEV-ES also requires the use of the in-kernel irqchip support
-> in order to minimize the changes required to Qemu to support AP booting.
-> 
-> [1] https://www.amd.com/system/files/TechDocs/24593.pdf
-> [2] https://developer.amd.com/wp-content/resources/56421.pdf
-> [3] 30937f2f98c4 ("OvmfPkg: Use the SEV-ES work area for the SEV-ES AP reset vector")
->      https://github.com/tianocore/edk2/commit/30937f2f98c42496f2f143fe8374ae7f7e684847
-> 
-> ---
-> 
-> These patches are based on commit:
-> d0ed6a69d3 ("Update version for v5.1.0 release")
-> 
-> (I tried basing on the latest Qemu commit, but I was having build issues
-> that level)
+--0000000000007bd9c105b02818a6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Sorry, forgot to update this part...
+currently the empty.c plugin are failed of linkage error
 
-These patches are based on commit:
-1bd5556f66 ("Merge remote-tracking branch 'remotes/kraxel/tags/audio-20200923-pull-request' into staging")
+The fowlloing are the failing message:
+Compiling C object tests/plugin/libbb.dll.p/bb.c.obj
+Linking target tests/plugin/libempty.dll
+Linking target tests/plugin/libinsn.dll
+Linking target tests/plugin/libmem.dll
+../tests/plugin/bb.c: In function 'vcpu_tb_exec':
+../tests/plugin/bb.c:75:29: error: cast from pointer to integer of
+different size [-Werror=3Dpointer-to-int-cast]
+   75 |     unsigned long n_insns =3D (unsigned long)udata;
+      |                             ^
+../tests/plugin/bb.c: In function 'vcpu_tb_trans':
+../tests/plugin/bb.c:95:46: error: cast to pointer from integer of
+different size [-Werror=3Dint-to-pointer-cast]
+   95 |                                              (void *)n_insns);
+      |                                              ^
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+tests/plugin/libempty.dll.p/empty.c.obj: in function `qemu_plugin_install':
+C:\work\xemu\qemu\build/../tests/plugin/empty.c:30: undefined reference to
+`qemu_plugin_register_vcpu_tb_trans_cb'
+cc1.exe: all warnings being treated as errors
+collect2.exe: error: ld returned 1 exit status
+make: *** [Makefile.ninja:2433=EF=BC=9Atests/plugin/libempty.dll] =E9=94=99=
+=E8=AF=AF 1
+make: *** =E6=AD=A3=E5=9C=A8=E7=AD=89=E5=BE=85=E6=9C=AA=E5=AE=8C=E6=88=90=
+=E7=9A=84=E4=BB=BB=E5=8A=A1....
+make: *** [Makefile.ninja:2420=EF=BC=9Atests/plugin/libbb.dll.p/bb.c.obj] =
+=E9=94=99=E8=AF=AF 1
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+tests/plugin/libinsn.dll.p/insn.c.obj: in function `vcpu_tb_trans':
+C:\work\xemu\qemu\build/../tests/plugin/insn.c:29: undefined reference to
+`qemu_plugin_tb_n_insns'
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+C:\work\xemu\qemu\build/../tests/plugin/insn.c:33: undefined reference to
+`qemu_plugin_tb_get_insn'
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+C:\work\xemu\qemu\build/../tests/plugin/insn.c:36: undefined reference to
+`qemu_plugin_register_vcpu_insn_exec_inline'
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+C:\work\xemu\qemu\build/../tests/plugin/insn.c:39: undefined reference to
+`qemu_plugin_register_vcpu_insn_exec_cb'
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+tests/plugin/libinsn.dll.p/insn.c.obj: in function `plugin_exit':
+C:\work\xemu\qemu\build/../tests/plugin/insn.c:48: undefined reference to
+`qemu_plugin_outs'
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+tests/plugin/libinsn.dll.p/insn.c.obj: in function `qemu_plugin_install':
+C:\work\xemu\qemu\build/../tests/plugin/insn.c:59: undefined reference to
+`qemu_plugin_register_vcpu_tb_trans_cb'
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+C:\work\xemu\qemu\build/../tests/plugin/insn.c:60: undefined reference to
+`qemu_plugin_register_atexit_cb'
+collect2.exe: error: ld returned 1 exit status
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+tests/plugin/libmem.dll.p/mem.c.obj: in function `plugin_exit':
+C:\work\xemu\qemu\build/../tests/plugin/mem.c:33: undefined reference to
+`qemu_plugin_outs'
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+tests/plugin/libmem.dll.p/mem.c.obj: in function `vcpu_mem':
+C:\work\xemu\qemu\build/../tests/plugin/mem.c:41: undefined reference to
+`qemu_plugin_get_hwaddr'
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+C:\work\xemu\qemu\build/../tests/plugin/mem.c:42: undefined reference to
+`qemu_plugin_hwaddr_is_io'
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+tests/plugin/libmem.dll.p/mem.c.obj: in function `vcpu_tb_trans':
+C:\work\xemu\qemu\build/../tests/plugin/mem.c:54: undefined reference to
+`qemu_plugin_tb_n_insns'
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+C:\work\xemu\qemu\build/../tests/plugin/mem.c:58: undefined reference to
+`qemu_plugin_tb_get_insn'
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+C:\work\xemu\qemu\build/../tests/plugin/mem.c:61: undefined reference to
+`qemu_plugin_register_vcpu_mem_inline'
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+C:\work\xemu\qemu\build/../tests/plugin/mem.c:65: undefined reference to
+`qemu_plugin_register_vcpu_mem_cb'
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+tests/plugin/libmem.dll.p/mem.c.obj: in function `qemu_plugin_install':
+C:\work\xemu\qemu\build/../tests/plugin/mem.c:96: undefined reference to
+`qemu_plugin_register_vcpu_tb_trans_cb'
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe:
+C:\work\xemu\qemu\build/../tests/plugin/mem.c:97: undefined reference to
+`qemu_plugin_register_atexit_cb'
+make: *** [Makefile.ninja:2440=EF=BC=9Atests/plugin/libinsn.dll] =E9=94=99=
+=E8=AF=AF 1
+collect2.exe: error: ld returned 1 exit status
+make: *** [Makefile.ninja:2447=EF=BC=9Atests/plugin/libmem.dll] =E9=94=99=
+=E8=AF=AF 1
+make -C /c/work/xemu/qemu/slirp BUILD_DIR=3D"/c/work/xemu/qemu/build/slirp"
+PKG_CONFIG=3D"pkg-config" CC=3D"cc" AR=3D"ar" LD=3D"ld" RANLIB=3D"ranlib"
+CFLAGS=3D"-m64 -mcx16 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64
+-D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wundef
+-Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common
+-fwrapv  -Wold-style-declaration -Wold-style-definition -Wtype-limits
+-Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers
+-Wempty-body -Wnested-externs -Wendif-labels -Wexpansion-to-defined
+-Wno-missing-include-dirs -Wno-shift-negative-value -Wno-psabi
+-fstack-protector-strong -g -fno-pie -mthreads -std=3Dgnu99 -Wall"
+LDFLAGS=3D"-Wl,--warn-common -m64  -fstack-protector-strong"
+make[1]: =E8=BF=9B=E5=85=A5=E7=9B=AE=E5=BD=95=E2=80=9C/c/work/xemu/qemu/sli=
+rp=E2=80=9D
+make[1]: =E5=AF=B9=E2=80=9Call=E2=80=9D=E6=97=A0=E9=9C=80=E5=81=9A=E4=BB=BB=
+=E4=BD=95=E4=BA=8B=E3=80=82
+make[1]: =E7=A6=BB=E5=BC=80=E7=9B=AE=E5=BD=95=E2=80=9C/c/work/xemu/qemu/sli=
+rp=E2=80=9D
+make -I/c/work/xemu/qemu/dtc VPATH=3D/c/work/xemu/qemu/dtc -C dtc V=3D"1"
+LIBFDT_lib=3D"" CPPFLAGS=3D"-I/c/work/xemu/qemu/dtc/libfdt" CFLAGS=3D"-g -f=
+no-pie
+-mthreads -std=3Dgnu99 -Wall -m64 -mcx16 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=
+=3D64
+-D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wundef
+-Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common
+-fwrapv  -Wold-style-declaration -Wold-style-definition -Wtype-limits
+-Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers
+-Wempty-body -Wnested-externs -Wendif-labels -Wexpansion-to-defined
+-Wno-missing-include-dirs -Wno-shift-negative-value -Wno-psabi
+-fstack-protector-strong" LDFLAGS=3D"-Wl,--warn-common -m64
+ -fstack-protector-strong" ARFLAGS=3D"rv" CC=3D"cc" AR=3D"ar" LD=3D"ld"  li=
+bfdt
+make[1]: =E8=BF=9B=E5=85=A5=E7=9B=AE=E5=BD=95=E2=80=9C/c/work/xemu/qemu/bui=
+ld/dtc=E2=80=9D
+make[1]: =E5=AF=B9=E2=80=9Clibfdt=E2=80=9D=E6=97=A0=E9=9C=80=E5=81=9A=E4=BB=
+=BB=E4=BD=95=E4=BA=8B=E3=80=82
+make[1]: =E7=A6=BB=E5=BC=80=E7=9B=AE=E5=BD=95=E2=80=9C/c/work/xemu/qemu/bui=
+ld/dtc=E2=80=9D
+"C:/CI-Tools/msys64/mingw64/bin/python3.exe"
+"C:/work/xemu/qemu/meson/meson.py" "--internal" "exe" "--capture"
+"qemu-version.h" "--" "sh" "C:/work/xemu/qemu/scripts/qemu-version.sh"
+"C:/work/xemu/qemu" "" "5.1.50" && if test -e qemu-version.h; then printf
+'%s\n' qemu-version.h > qemu-version.h.stamp; fi
+"ar" csrD libqemuutil.a @libqemuutil.a.rsp
+"C:/CI-Tools/msys64/mingw64/bin/python3.exe"
+"C:/work/xemu/qemu/meson/meson.py" "--internal" "exe" "--unpickle"
+"C:/work/xemu/qemu/build/meson-private/meson_exe_python3.exe_2b18a272e12652=
+a9e7600847543c3524867d85d7.dat"
+&& if test -e block.syms; then printf '%s\n' block.syms > block.syms.stamp;
+fi
+"ar" csrD libblock.fa @libblock.fa.rsp
+"C:/CI-Tools/msys64/mingw64/bin/python3.exe"
+"C:/work/xemu/qemu/meson/meson.py" "--internal" "exe" "--unpickle"
+"C:/work/xemu/qemu/build/meson-private/meson_exe_python3.exe_269c5ec9ac7976=
+b6693320b9cb25885f5b2f71c7.dat"
+&& if test -e qemu.syms; then printf '%s\n' qemu.syms > qemu.syms.stamp; fi
+"c++" @qemu-system-ppc.exe.rsp
 
-Thanks,
-Tom
+--=20
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
 
-> 
-> A version of the tree can be found at:
-> https://github.com/AMDESE/qemu/tree/sev-es-v12
-> 
-> Changes since v3:
-> - Use the QemuUUID structure for GUID definitions
-> - Use SEV-ES policy bit definition from target/i386/sev_i386.h
-> - Update SMM support to a per-VM check in order to check SMM capability
->    at the VM level since SEV-ES guests don't currently support SMM
-> - Make the CPU resettable check an arch-specific check
-> 
-> Changes since v2:
-> - Add in-kernel irqchip requirement for SEV-ES guests
-> 
-> Changes since v1:
-> - Fixed checkpatch.pl errors/warnings
-> 
-> Tom Lendacky (6):
->    sev/i386: Add initial support for SEV-ES
->    sev/i386: Require in-kernel irqchip support for SEV-ES guests
->    sev/i386: Allow AP booting under SEV-ES
->    sev/i386: Don't allow a system reset under an SEV-ES guest
->    kvm/i386: Use a per-VM check for SMM capability
->    sev/i386: Enable an SEV-ES guest based on SEV policy
-> 
->   accel/kvm/kvm-all.c       |  69 ++++++++++++++++++++++++
->   accel/stubs/kvm-stub.c    |   5 ++
->   hw/i386/pc_sysfw.c        |  10 +++-
->   include/sysemu/cpus.h     |   2 +
->   include/sysemu/hw_accel.h |   5 ++
->   include/sysemu/kvm.h      |  26 +++++++++
->   include/sysemu/sev.h      |   3 ++
->   softmmu/cpus.c            |   5 ++
->   softmmu/vl.c              |   5 +-
->   target/arm/kvm.c          |   5 ++
->   target/i386/cpu.c         |   1 +
->   target/i386/kvm.c         |  10 +++-
->   target/i386/sev-stub.c    |   5 ++
->   target/i386/sev.c         | 109 +++++++++++++++++++++++++++++++++++++-
->   target/i386/sev_i386.h    |   1 +
->   target/mips/kvm.c         |   5 ++
->   target/ppc/kvm.c          |   5 ++
->   target/s390x/kvm.c        |   5 ++
->   18 files changed, 271 insertions(+), 5 deletions(-)
-> 
+--0000000000007bd9c105b02818a6
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><div dir=3D"ltr"><div dir=3D"ltr"><div di=
+r=3D"ltr"><div dir=3D"ltr"><div>currently the empty.c plugin are failed of =
+linkage error<br></div><div><br></div><div>The fowlloing are the failing me=
+ssage:</div><div>Compiling C object tests/plugin/libbb.dll.p/bb.c.obj<br>Li=
+nking target tests/plugin/libempty.dll<br>Linking target tests/plugin/libin=
+sn.dll<br>Linking target tests/plugin/libmem.dll<br>../tests/plugin/bb.c: I=
+n function &#39;vcpu_tb_exec&#39;:<br>../tests/plugin/bb.c:75:29: error: ca=
+st from pointer to integer of different size [-Werror=3Dpointer-to-int-cast=
+]<br>=C2=A0 =C2=A075 | =C2=A0 =C2=A0 unsigned long n_insns =3D (unsigned lo=
+ng)udata;<br>=C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^<br>../tests/p=
+lugin/bb.c: In function &#39;vcpu_tb_trans&#39;:<br>../tests/plugin/bb.c:95=
+:46: error: cast to pointer from integer of different size [-Werror=3Dint-t=
+o-pointer-cast]<br>=C2=A0 =C2=A095 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0(void *)n_insns);<br>=C2=A0=
+ =C2=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^<br>C:/CI-Tools/msys64/mingw64/bin/../lib/g=
+cc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: tes=
+ts/plugin/libempty.dll.p/empty.c.obj: in function `qemu_plugin_install&#39;=
+:<br>C:\work\xemu\qemu\build/../tests/plugin/empty.c:30: undefined referenc=
+e to `qemu_plugin_register_vcpu_tb_trans_cb&#39;<br>cc1.exe: all warnings b=
+eing treated as errors<br>collect2.exe: error: ld returned 1 exit status<br=
+>make: *** [Makefile.ninja:2433=EF=BC=9Atests/plugin/libempty.dll] =E9=94=
+=99=E8=AF=AF 1<br>make: *** =E6=AD=A3=E5=9C=A8=E7=AD=89=E5=BE=85=E6=9C=AA=
+=E5=AE=8C=E6=88=90=E7=9A=84=E4=BB=BB=E5=8A=A1....<br>make: *** [Makefile.ni=
+nja:2420=EF=BC=9Atests/plugin/libbb.dll.p/bb.c.obj] =E9=94=99=E8=AF=AF 1<br=
+>C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../=
+../../x86_64-w64-mingw32/bin/ld.exe: tests/plugin/libinsn.dll.p/insn.c.obj:=
+ in function `vcpu_tb_trans&#39;:<br>C:\work\xemu\qemu\build/../tests/plugi=
+n/insn.c:29: undefined reference to `qemu_plugin_tb_n_insns&#39;<br>C:/CI-T=
+ools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x8=
+6_64-w64-mingw32/bin/ld.exe: C:\work\xemu\qemu\build/../tests/plugin/insn.c=
+:33: undefined reference to `qemu_plugin_tb_get_insn&#39;<br>C:/CI-Tools/ms=
+ys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w6=
+4-mingw32/bin/ld.exe: C:\work\xemu\qemu\build/../tests/plugin/insn.c:36: un=
+defined reference to `qemu_plugin_register_vcpu_insn_exec_inline&#39;<br>C:=
+/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../=
+../x86_64-w64-mingw32/bin/ld.exe: C:\work\xemu\qemu\build/../tests/plugin/i=
+nsn.c:39: undefined reference to `qemu_plugin_register_vcpu_insn_exec_cb&#3=
+9;<br>C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/.=
+./../../../x86_64-w64-mingw32/bin/ld.exe: tests/plugin/libinsn.dll.p/insn.c=
+.obj: in function `plugin_exit&#39;:<br>C:\work\xemu\qemu\build/../tests/pl=
+ugin/insn.c:48: undefined reference to `qemu_plugin_outs&#39;<br>C:/CI-Tool=
+s/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86_6=
+4-w64-mingw32/bin/ld.exe: tests/plugin/libinsn.dll.p/insn.c.obj: in functio=
+n `qemu_plugin_install&#39;:<br>C:\work\xemu\qemu\build/../tests/plugin/ins=
+n.c:59: undefined reference to `qemu_plugin_register_vcpu_tb_trans_cb&#39;<=
+br>C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../.=
+./../../x86_64-w64-mingw32/bin/ld.exe: C:\work\xemu\qemu\build/../tests/plu=
+gin/insn.c:60: undefined reference to `qemu_plugin_register_atexit_cb&#39;<=
+br>collect2.exe: error: ld returned 1 exit status<br>C:/CI-Tools/msys64/min=
+gw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw3=
+2/bin/ld.exe: tests/plugin/libmem.dll.p/mem.c.obj: in function `plugin_exit=
+&#39;:<br>C:\work\xemu\qemu\build/../tests/plugin/mem.c:33: undefined refer=
+ence to `qemu_plugin_outs&#39;<br>C:/CI-Tools/msys64/mingw64/bin/../lib/gcc=
+/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: tests=
+/plugin/libmem.dll.p/mem.c.obj: in function `vcpu_mem&#39;:<br>C:\work\xemu=
+\qemu\build/../tests/plugin/mem.c:41: undefined reference to `qemu_plugin_g=
+et_hwaddr&#39;<br>C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-ming=
+w32/10.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\work\xemu\qemu\bui=
+ld/../tests/plugin/mem.c:42: undefined reference to `qemu_plugin_hwaddr_is_=
+io&#39;<br>C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.=
+2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: tests/plugin/libmem.dll.p/me=
+m.c.obj: in function `vcpu_tb_trans&#39;:<br>C:\work\xemu\qemu\build/../tes=
+ts/plugin/mem.c:54: undefined reference to `qemu_plugin_tb_n_insns&#39;<br>=
+C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
+./../x86_64-w64-mingw32/bin/ld.exe: C:\work\xemu\qemu\build/../tests/plugin=
+/mem.c:58: undefined reference to `qemu_plugin_tb_get_insn&#39;<br>C:/CI-To=
+ols/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86=
+_64-w64-mingw32/bin/ld.exe: C:\work\xemu\qemu\build/../tests/plugin/mem.c:6=
+1: undefined reference to `qemu_plugin_register_vcpu_mem_inline&#39;<br>C:/=
+CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../.=
+./x86_64-w64-mingw32/bin/ld.exe: C:\work\xemu\qemu\build/../tests/plugin/me=
+m.c:65: undefined reference to `qemu_plugin_register_vcpu_mem_cb&#39;<br>C:=
+/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../=
+../x86_64-w64-mingw32/bin/ld.exe: tests/plugin/libmem.dll.p/mem.c.obj: in f=
+unction `qemu_plugin_install&#39;:<br>C:\work\xemu\qemu\build/../tests/plug=
+in/mem.c:96: undefined reference to `qemu_plugin_register_vcpu_tb_trans_cb&=
+#39;<br>C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0=
+/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\work\xemu\qemu\build/../test=
+s/plugin/mem.c:97: undefined reference to `qemu_plugin_register_atexit_cb&#=
+39;<br>make: *** [Makefile.ninja:2440=EF=BC=9Atests/plugin/libinsn.dll] =E9=
+=94=99=E8=AF=AF 1<br>collect2.exe: error: ld returned 1 exit status<br>make=
+: *** [Makefile.ninja:2447=EF=BC=9Atests/plugin/libmem.dll] =E9=94=99=E8=AF=
+=AF 1<br>make -C /c/work/xemu/qemu/slirp BUILD_DIR=3D&quot;/c/work/xemu/qem=
+u/build/slirp&quot; PKG_CONFIG=3D&quot;pkg-config&quot; CC=3D&quot;cc&quot;=
+ AR=3D&quot;ar&quot; 	LD=3D&quot;ld&quot; RANLIB=3D&quot;ranlib&quot; CFLAG=
+S=3D&quot;-m64 -mcx16 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_S=
+OURCE -Wstrict-prototypes -Wredundant-decls -Wundef -Wwrite-strings -Wmissi=
+ng-prototypes -fno-strict-aliasing -fno-common -fwrapv =C2=A0-Wold-style-de=
+claration -Wold-style-definition -Wtype-limits -Wformat-security -Wformat-y=
+2k -Winit-self -Wignored-qualifiers -Wempty-body -Wnested-externs -Wendif-l=
+abels -Wexpansion-to-defined -Wno-missing-include-dirs -Wno-shift-negative-=
+value -Wno-psabi -fstack-protector-strong -g -fno-pie -mthreads -std=3Dgnu9=
+9 -Wall&quot; LDFLAGS=3D&quot;-Wl,--warn-common -m64 =C2=A0-fstack-protecto=
+r-strong&quot;<br>make[1]: =E8=BF=9B=E5=85=A5=E7=9B=AE=E5=BD=95=E2=80=9C/c/=
+work/xemu/qemu/slirp=E2=80=9D<br>make[1]: =E5=AF=B9=E2=80=9Call=E2=80=9D=E6=
+=97=A0=E9=9C=80=E5=81=9A=E4=BB=BB=E4=BD=95=E4=BA=8B=E3=80=82<br>make[1]: =
+=E7=A6=BB=E5=BC=80=E7=9B=AE=E5=BD=95=E2=80=9C/c/work/xemu/qemu/slirp=E2=80=
+=9D<br>make -I/c/work/xemu/qemu/dtc VPATH=3D/c/work/xemu/qemu/dtc -C dtc V=
+=3D&quot;1&quot; LIBFDT_lib=3D&quot;&quot; CPPFLAGS=3D&quot;-I/c/work/xemu/=
+qemu/dtc/libfdt&quot; CFLAGS=3D&quot;-g -fno-pie -mthreads -std=3Dgnu99 -Wa=
+ll -m64 -mcx16 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE -=
+Wstrict-prototypes -Wredundant-decls -Wundef -Wwrite-strings -Wmissing-prot=
+otypes -fno-strict-aliasing -fno-common -fwrapv =C2=A0-Wold-style-declarati=
+on -Wold-style-definition -Wtype-limits -Wformat-security -Wformat-y2k -Win=
+it-self -Wignored-qualifiers -Wempty-body -Wnested-externs -Wendif-labels -=
+Wexpansion-to-defined -Wno-missing-include-dirs -Wno-shift-negative-value -=
+Wno-psabi -fstack-protector-strong&quot; LDFLAGS=3D&quot;-Wl,--warn-common =
+-m64 =C2=A0-fstack-protector-strong&quot; ARFLAGS=3D&quot;rv&quot; CC=3D&qu=
+ot;cc&quot; AR=3D&quot;ar&quot; LD=3D&quot;ld&quot; =C2=A0libfdt<br>make[1]=
+: =E8=BF=9B=E5=85=A5=E7=9B=AE=E5=BD=95=E2=80=9C/c/work/xemu/qemu/build/dtc=
+=E2=80=9D<br>make[1]: =E5=AF=B9=E2=80=9Clibfdt=E2=80=9D=E6=97=A0=E9=9C=80=
+=E5=81=9A=E4=BB=BB=E4=BD=95=E4=BA=8B=E3=80=82<br>make[1]: =E7=A6=BB=E5=BC=
+=80=E7=9B=AE=E5=BD=95=E2=80=9C/c/work/xemu/qemu/build/dtc=E2=80=9D<br>&quot=
+;C:/CI-Tools/msys64/mingw64/bin/python3.exe&quot; &quot;C:/work/xemu/qemu/m=
+eson/meson.py&quot; &quot;--internal&quot; &quot;exe&quot; &quot;--capture&=
+quot; &quot;qemu-version.h&quot; &quot;--&quot; &quot;sh&quot; &quot;C:/wor=
+k/xemu/qemu/scripts/qemu-version.sh&quot; &quot;C:/work/xemu/qemu&quot; &qu=
+ot;&quot; &quot;5.1.50&quot; &amp;&amp; if test -e qemu-version.h; then pri=
+ntf &#39;%s\n&#39; qemu-version.h &gt; qemu-version.h.stamp; fi<br>&quot;ar=
+&quot; csrD libqemuutil.a @libqemuutil.a.rsp<br>&quot;C:/CI-Tools/msys64/mi=
+ngw64/bin/python3.exe&quot; &quot;C:/work/xemu/qemu/meson/meson.py&quot; &q=
+uot;--internal&quot; &quot;exe&quot; &quot;--unpickle&quot; &quot;C:/work/x=
+emu/qemu/build/meson-private/meson_exe_python3.exe_2b18a272e12652a9e7600847=
+543c3524867d85d7.dat&quot; &amp;&amp; if test -e block.syms; then printf &#=
+39;%s\n&#39; block.syms &gt; block.syms.stamp; fi<br>&quot;ar&quot; csrD li=
+bblock.fa @libblock.fa.rsp<br>&quot;C:/CI-Tools/msys64/mingw64/bin/python3.=
+exe&quot; &quot;C:/work/xemu/qemu/meson/meson.py&quot; &quot;--internal&quo=
+t; &quot;exe&quot; &quot;--unpickle&quot; &quot;C:/work/xemu/qemu/build/mes=
+on-private/meson_exe_python3.exe_269c5ec9ac7976b6693320b9cb25885f5b2f71c7.d=
+at&quot; &amp;&amp; if test -e qemu.syms; then printf &#39;%s\n&#39; qemu.s=
+yms &gt; qemu.syms.stamp; fi<br>&quot;c++&quot; @qemu-system-ppc.exe.rsp<br=
+></div><div><br></div>-- <br><div dir=3D"ltr" class=3D"gmail_signature">=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=
+=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo<br>=
+</div></div></div></div></div></div></div>
+
+--0000000000007bd9c105b02818a6--
 
