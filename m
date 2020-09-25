@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0140C4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:14:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66D1CC4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:14:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 555F22083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:14:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DBBF62083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 12:14:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KFMcCCwN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 555F22083B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IZSmJuLS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBBF62083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLmbv-00036g-80
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:13:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38208)
+	id 1kLmc1-0003Lz-TF
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 08:14:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38134)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLmVo-0002Yu-Sb
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53170)
+ id 1kLmVe-0002G8-Im
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51615)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kLmVm-0004Eh-Sm
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:40 -0400
+ id 1kLmVc-0004Dr-8m
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 08:07:30 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601035658;
+ s=mimecast20190719; t=1601035646;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rni6bUmwD3P+YAqyxuw4XH0MxQULNnL6YOVizGoMRjM=;
- b=KFMcCCwNFkubn6JeLD9UnW2uenHmndLbAopJseXscPRieljg6sM0RaU8Qj9U+nUFjZJpIx
- 34ZmbyfyBTT7Amits13nSii0pwaEYCA/xirZYrH5r9+arZPhxfZMbWuH7SZe6n7OOiz8QF
- BRGEOPrzkbNPBXBfCOfyyVqO0EGzsp4=
+ bh=5RtNjHNs3hEYTQX9+njr/qBDA45DXZrosh4HKnfGnHo=;
+ b=IZSmJuLS2DsLKZX0rT49klLiP5HEuGnh+C7Nt2v5mA1d7f1xmSOLcOq02SdA/tXCRvFetf
+ ofQZOEE6HkMzJiHp/EQk9C1ENCw+zYAkC4AtOXlyLCR9hMk4mejweKFh3xqAER3BraKXWc
+ AIo0atWm6n9rUaX+HyeV0G5Wj845h7Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-ynGf_mJAMk2j_w2Q9MUpLA-1; Fri, 25 Sep 2020 08:07:34 -0400
-X-MC-Unique: ynGf_mJAMk2j_w2Q9MUpLA-1
+ us-mta-433-rJDnEYYoN32iW2IG99GHQQ-1; Fri, 25 Sep 2020 08:07:22 -0400
+X-MC-Unique: rJDnEYYoN32iW2IG99GHQQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A903E81C463;
- Fri, 25 Sep 2020 12:07:32 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17ACF10066FC;
+ Fri, 25 Sep 2020 12:07:21 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-114-177.ams2.redhat.com
  [10.36.114.177])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5C25273695;
- Fri, 25 Sep 2020 12:07:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0AC5773692;
+ Fri, 25 Sep 2020 12:07:15 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, zhengchuan@huawei.com, dovmurik@linux.vnet.ibm.com,
  hgcoin@gmail.com, zhangjiachen.jaycee@bytedance.com, lvivier@redhat.com,
  peterx@redhat.com, stefanha@redhat.com, vgoyal@redhat.com,
  jinyan12@huawei.com, ann.zhuangyanying@huawei.com
-Subject: [PULL 08/26] migration/dirtyrate: Record hash results for each
- sampled page
-Date: Fri, 25 Sep 2020 13:06:37 +0100
-Message-Id: <20200925120655.295142-9-dgilbert@redhat.com>
+Subject: [PULL 05/26] migration/dirtyrate: Add RamblockDirtyInfo to store
+ sampled page info
+Date: Fri, 25 Sep 2020 13:06:34 +0100
+Message-Id: <20200925120655.295142-6-dgilbert@redhat.com>
 In-Reply-To: <20200925120655.295142-1-dgilbert@redhat.com>
 References: <20200925120655.295142-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -107,146 +107,51 @@ Sender: "Qemu-devel"
 
 From: Chuan Zheng <zhengchuan@huawei.com>
 
-Record hash results for each sampled page, crc32 is taken to calculate
-hash results for each sampled length in TARGET_PAGE_SIZE.
+Add RamblockDirtyInfo to store sampled page info of each ramblock.
 
 Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: David Edmondson <david.edmondson@oracle.com>
 Reviewed-by: Li Qiang <liq3ea@gmail.com>
-Message-Id: <1600237327-33618-7-git-send-email-zhengchuan@huawei.com>
+Message-Id: <1600237327-33618-4-git-send-email-zhengchuan@huawei.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/dirtyrate.c | 109 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 109 insertions(+)
+ migration/dirtyrate.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-index 10315f7a63..856d26dfe7 100644
---- a/migration/dirtyrate.c
-+++ b/migration/dirtyrate.c
-@@ -10,6 +10,7 @@
-  * See the COPYING file in the top-level directory.
+diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
+index 84ab9409ac..8707df852d 100644
+--- a/migration/dirtyrate.h
++++ b/migration/dirtyrate.h
+@@ -19,10 +19,28 @@
   */
- 
-+#include <zlib.h>
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "cpu.h"
-@@ -68,6 +69,114 @@ static void update_dirtyrate(uint64_t msec)
-     DirtyStat.dirty_rate = dirtyrate;
- }
+ #define DIRTYRATE_DEFAULT_SAMPLE_PAGES            512
  
 +/*
-+ * get hash result for the sampled memory with length of TARGET_PAGE_SIZE
-+ * in ramblock, which starts from ramblock base address.
++ * Record ramblock idstr
 + */
-+static uint32_t get_ramblock_vfn_hash(struct RamblockDirtyInfo *info,
-+                                      uint64_t vfn)
-+{
-+    uint32_t crc;
++#define RAMBLOCK_INFO_MAX_LEN                     256
 +
-+    crc = crc32(0, (info->ramblock_addr +
-+                vfn * TARGET_PAGE_SIZE), TARGET_PAGE_SIZE);
+ struct DirtyRateConfig {
+     uint64_t sample_pages_per_gigabytes; /* sample pages per GB */
+     int64_t sample_period_seconds; /* time duration between two sampling */
+ };
+ 
++/*
++ * Store dirtypage info for each ramblock.
++ */
++struct RamblockDirtyInfo {
++    char idstr[RAMBLOCK_INFO_MAX_LEN]; /* idstr for each ramblock */
++    uint8_t *ramblock_addr; /* base address of ramblock we measure */
++    uint64_t ramblock_pages; /* ramblock size in TARGET_PAGE_SIZE */
++    uint64_t *sample_page_vfn; /* relative offset address for sampled page */
++    uint64_t sample_pages_count; /* count of sampled pages */
++    uint64_t sample_dirty_count; /* count of dirty pages we measure */
++    uint32_t *hash_result; /* array of hash result for sampled pages */
++};
 +
-+    return crc;
-+}
-+
-+static bool save_ramblock_hash(struct RamblockDirtyInfo *info)
-+{
-+    unsigned int sample_pages_count;
-+    int i;
-+    GRand *rand;
-+
-+    sample_pages_count = info->sample_pages_count;
-+
-+    /* ramblock size less than one page, return success to skip this ramblock */
-+    if (unlikely(info->ramblock_pages == 0 || sample_pages_count == 0)) {
-+        return true;
-+    }
-+
-+    info->hash_result = g_try_malloc0_n(sample_pages_count,
-+                                        sizeof(uint32_t));
-+    if (!info->hash_result) {
-+        return false;
-+    }
-+
-+    info->sample_page_vfn = g_try_malloc0_n(sample_pages_count,
-+                                            sizeof(uint64_t));
-+    if (!info->sample_page_vfn) {
-+        g_free(info->hash_result);
-+        return false;
-+    }
-+
-+    rand  = g_rand_new();
-+    for (i = 0; i < sample_pages_count; i++) {
-+        info->sample_page_vfn[i] = g_rand_int_range(rand, 0,
-+                                                    info->ramblock_pages - 1);
-+        info->hash_result[i] = get_ramblock_vfn_hash(info,
-+                                                     info->sample_page_vfn[i]);
-+    }
-+    g_rand_free(rand);
-+
-+    return true;
-+}
-+
-+static void get_ramblock_dirty_info(RAMBlock *block,
-+                                    struct RamblockDirtyInfo *info,
-+                                    struct DirtyRateConfig *config)
-+{
-+    uint64_t sample_pages_per_gigabytes = config->sample_pages_per_gigabytes;
-+
-+    /* Right shift 30 bits to calc ramblock size in GB */
-+    info->sample_pages_count = (qemu_ram_get_used_length(block) *
-+                                sample_pages_per_gigabytes) >> 30;
-+    /* Right shift TARGET_PAGE_BITS to calc page count */
-+    info->ramblock_pages = qemu_ram_get_used_length(block) >>
-+                           TARGET_PAGE_BITS;
-+    info->ramblock_addr = qemu_ram_get_host_addr(block);
-+    strcpy(info->idstr, qemu_ram_get_idstr(block));
-+}
-+
-+static bool record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
-+                                      struct DirtyRateConfig config,
-+                                      int *block_count)
-+{
-+    struct RamblockDirtyInfo *info = NULL;
-+    struct RamblockDirtyInfo *dinfo = NULL;
-+    RAMBlock *block = NULL;
-+    int total_count = 0;
-+    int index = 0;
-+    bool ret = false;
-+
-+    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+        total_count++;
-+    }
-+
-+    dinfo = g_try_malloc0_n(total_count, sizeof(struct RamblockDirtyInfo));
-+    if (dinfo == NULL) {
-+        goto out;
-+    }
-+
-+    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+        if (index >= total_count) {
-+            break;
-+        }
-+        info = &dinfo[index];
-+        get_ramblock_dirty_info(block, info, &config);
-+        if (!save_ramblock_hash(info)) {
-+            goto out;
-+        }
-+        index++;
-+    }
-+    ret = true;
-+
-+out:
-+    *block_count = index;
-+    *block_dinfo = dinfo;
-+    return ret;
-+}
-+
- static void calculate_dirtyrate(struct DirtyRateConfig config)
- {
-     /* todo */
+ void *get_dirtyrate_thread(void *arg);
+ #endif
 -- 
 2.26.2
 
