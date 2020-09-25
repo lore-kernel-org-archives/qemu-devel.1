@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A2DFC4363D
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 14:01:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80E95C4363D
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 14:02:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 013CB208A9
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 14:01:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EAD8F208A9
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 14:02:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PyEDghOG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 013CB208A9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aw0R0fum"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAD8F208A9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLoIH-0001zX-45
-	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 10:01:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36160)
+	id 1kLoIw-0002kR-37
+	for qemu-devel@archiver.kernel.org; Fri, 25 Sep 2020 10:02:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36230)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kLo9f-0007Y5-QI
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:53:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20245)
+ id 1kLo9y-0007k0-QY
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:53:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40702)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kLo9d-0001FQ-Qg
- for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:52:55 -0400
+ id 1kLo9u-0001IS-0c
+ for qemu-devel@nongnu.org; Fri, 25 Sep 2020 09:53:14 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601041969;
+ s=mimecast20190719; t=1601041989;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=w4av3mu/X0bQUvY/Z1ZG8P/ZXnjDHHI0bCj1uOdx9N8=;
- b=PyEDghOGitirRu3E+YK3JaKBIy+N82IIlDEWgeLAg4mulf5E/FLfMRjTIcIvepZLmLhBWW
- jOwcHdnvywJfQtBqyHq980pGD5E89a+ArAi21U+VDvz6Ien/EtVWrSKh7xRU/TwQhwBGlU
- fZ0XynWIjwcipq0xk9bUD5wMygnXNog=
+ bh=PQD54WdAZS3iIKMslHPFTacgZs+8lfyKf4zASmwmDHo=;
+ b=aw0R0fum+7vvcsDbU1/I+zt6YD4nsjfx2Q79Tgq+DkPZNoJHL2C819/q+B305YAzOGvlYv
+ 6eZDYSX2CYVJCwtXMijHAWahdseSyr6ijJ18xiDFl3kP/z6PEr1+6WuQSnlpNO8xSrdE1f
+ ExdR9Nmbgmr5Pe4YV9c/4gP+nCKdrFU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-574-jNENJJaYNgO-RBv7uw8YKg-1; Fri, 25 Sep 2020 09:52:47 -0400
-X-MC-Unique: jNENJJaYNgO-RBv7uw8YKg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-371-MjvUL94UMTyXjLVelvq5eg-1; Fri, 25 Sep 2020 09:53:03 -0400
+X-MC-Unique: MjvUL94UMTyXjLVelvq5eg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97D4EAF20B;
- Fri, 25 Sep 2020 13:52:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AE0110BBED4;
+ Fri, 25 Sep 2020 13:53:02 +0000 (UTC)
 Received: from localhost (unknown [10.36.110.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 309E65C1C2;
- Fri, 25 Sep 2020 13:52:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B19D960CCC;
+ Fri, 25 Sep 2020 13:52:49 +0000 (UTC)
 From: marcandre.lureau@redhat.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 5/6] spice: get monitors physical dimension
-Date: Fri, 25 Sep 2020 17:50:56 +0400
-Message-Id: <20200925135057.291556-6-marcandre.lureau@redhat.com>
+Subject: [PATCH v2 6/6] virtio-gpu: set physical dimensions for EDID
+Date: Fri, 25 Sep 2020 17:50:57 +0400
+Message-Id: <20200925135057.291556-7-marcandre.lureau@redhat.com>
 In-Reply-To: <20200925135057.291556-1-marcandre.lureau@redhat.com>
 References: <20200925135057.291556-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124;
+Received-SPF: pass client-ip=216.205.24.124;
  envelope-from=marcandre.lureau@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 01:07:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/25 02:48:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -105,52 +105,51 @@ Sender: "Qemu-devel"
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Note that for consistency, we use the same logic as MonitorsConfig to
-figure out the associated monitor. However, I can't find traces of the
-discussion/patches about the "new spice-server" behaviour: it still uses
-the multiple-configurations path in git master.
-
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- include/ui/console.h | 3 +++
- ui/spice-display.c   | 9 +++++++++
- 2 files changed, 12 insertions(+)
+ hw/display/virtio-gpu-base.c   | 2 ++
+ hw/display/virtio-gpu.c        | 2 ++
+ include/hw/virtio/virtio-gpu.h | 1 +
+ 3 files changed, 5 insertions(+)
 
-diff --git a/include/ui/console.h b/include/ui/console.h
-index 353d2e49a1..e7303d8b98 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -119,6 +119,9 @@ typedef struct DisplaySurface {
- } DisplaySurface;
+diff --git a/hw/display/virtio-gpu-base.c b/hw/display/virtio-gpu-base.c
+index aeb8723542..40ccd00f94 100644
+--- a/hw/display/virtio-gpu-base.c
++++ b/hw/display/virtio-gpu-base.c
+@@ -82,6 +82,8 @@ static int virtio_gpu_ui_info(void *opaque, uint32_t idx, QemuUIInfo *info)
+     g->req_state[idx].y = info->yoff;
+     g->req_state[idx].width = info->width;
+     g->req_state[idx].height = info->height;
++    g->req_state[idx].width_mm = info->width_mm;
++    g->req_state[idx].height_mm = info->height_mm;
  
- typedef struct QemuUIInfo {
-+    /* physical dimension */
-+    uint16_t width_mm;
-+    uint16_t height_mm;
-     /* geometry */
-     int       xoff;
-     int       yoff;
-diff --git a/ui/spice-display.c b/ui/spice-display.c
-index b304c13149..a10f72bc5c 100644
---- a/ui/spice-display.c
-+++ b/ui/spice-display.c
-@@ -679,7 +679,16 @@ static int interface_client_monitors_config(QXLInstance *sin,
-         info.width  = mc->monitors[head].width;
-         info.height = mc->monitors[head].height;
-     }
-+#if SPICE_SERVER_VERSION >= 0x000e04 /* release 0.14.4 */
-+    if (mc->flags & VD_AGENT_CONFIG_MONITORS_FLAG_PHYSICAL_SIZE) {
-+        VDAgentMonitorMM *mm = (void *)&mc->monitors[mc->num_of_monitors];
+     if (info->width && info->height) {
+         g->enabled_output_bitmask |= (1 << idx);
+diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+index 90be4e3ed7..f3b71fa9c7 100644
+--- a/hw/display/virtio-gpu.c
++++ b/hw/display/virtio-gpu.c
+@@ -212,6 +212,8 @@ virtio_gpu_generate_edid(VirtIOGPU *g, int scanout,
+ {
+     VirtIOGPUBase *b = VIRTIO_GPU_BASE(g);
+     qemu_edid_info info = {
++        .width_mm = b->req_state[scanout].width_mm,
++        .height_mm = b->req_state[scanout].height_mm,
+         .prefx = b->req_state[scanout].width,
+         .prefy = b->req_state[scanout].height,
+     };
+diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gpu.h
+index 455e0a7433..1aed7275c8 100644
+--- a/include/hw/virtio/virtio-gpu.h
++++ b/include/hw/virtio/virtio-gpu.h
+@@ -62,6 +62,7 @@ struct virtio_gpu_scanout {
+ };
  
-+        if (mc->num_of_monitors > head) {
-+            info.width_mm = mm[head].width;
-+            info.height_mm = mm[head].height;
-+        }
-+    }
-+#endif
-     trace_qemu_spice_ui_info(ssd->qxl.id, info.width, info.height);
-     dpy_set_ui_info(ssd->dcl.con, &info);
-     return 1;
+ struct virtio_gpu_requested_state {
++    uint16_t width_mm, height_mm;
+     uint32_t width, height;
+     int x, y;
+ };
 -- 
 2.26.2
 
