@@ -7,60 +7,59 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AE36C4727E
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 00:42:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A591C4346E
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 00:42:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF5CA2371F
-	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 00:42:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B9B72371F
+	for <qemu-devel@archiver.kernel.org>; Fri, 25 Sep 2020 00:42:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MfYexGgr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF5CA2371F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="INvd7znI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B9B72371F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kLbos-0004tK-JA
-	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 20:42:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51062)
+	id 1kLboz-00054S-Od
+	for qemu-devel@archiver.kernel.org; Thu, 24 Sep 2020 20:42:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51292)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLbbx-0000nk-Dd
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 20:29:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59223)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLbcN-0001BB-LF
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 20:29:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28660)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLbbu-000097-IX
- for qemu-devel@nongnu.org; Thu, 24 Sep 2020 20:29:17 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kLbcG-0000Cx-QK
+ for qemu-devel@nongnu.org; Thu, 24 Sep 2020 20:29:43 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600993752;
+ s=mimecast20190719; t=1600993768;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=tX78Gui1r8r8XVVk/jpqqfWFRjIABe5ZP6Kta4p10bE=;
- b=MfYexGgrLg2waOlyTw+oTnWN7K6JPcz225I70nY/WQ40WlYG5sTzWPBeyZOJ7zhji7DrpV
- xhCuTb0chKO9w44DQiQnYS9q1yKHLWDxIeAswc/olcdJIrO2oguLz+pFpEkCyJD+RCGapY
- 0epcM8RAg+7MnlI49VZHWdgJECTwzPw=
+ bh=0UwIbjyB0chSx2kXG1CfAG0/PqtX/jJxxt9+SS423G8=;
+ b=INvd7znIRgLP0v9zcVkpo5YXtVVdLk3b13IEe3hSD1uxOuqW/gv0LgVoul5JalmIm+kBNz
+ e55xJCJQVbyADHRgJdzCsYfhNAb9DkVDvwuIV9K3osF/5EJTxOtnk05KL2vmhY57oLZ9pR
+ onmN8JCdCEXpHO2Hmgunu/2BB7qX/ig=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-529-6elhsRd4OBKOAceaYP-y1A-1; Thu, 24 Sep 2020 20:29:10 -0400
-X-MC-Unique: 6elhsRd4OBKOAceaYP-y1A-1
+ us-mta-425-o-c1e57zO6KEyy1ePmlZLA-1; Thu, 24 Sep 2020 20:29:26 -0400
+X-MC-Unique: o-c1e57zO6KEyy1ePmlZLA-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9C1D41091062
- for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 00:29:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 137031008550
+ for <qemu-devel@nongnu.org>; Fri, 25 Sep 2020 00:29:26 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-140.rdu2.redhat.com [10.10.119.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7DADD5D9DD;
- Fri, 25 Sep 2020 00:29:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 69EB75D9DD;
+ Fri, 25 Sep 2020 00:29:25 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 09/47] [DO-NOT-MERGE] docs: add scripts/qapi/main to python
- manual
-Date: Thu, 24 Sep 2020 20:28:22 -0400
-Message-Id: <20200925002900.465855-10-jsnow@redhat.com>
+Subject: [PATCH v3 28/47] qapi/commands.py: enable checking with mypy
+Date: Thu, 24 Sep 2020 20:28:41 -0400
+Message-Id: <20200925002900.465855-29-jsnow@redhat.com>
 In-Reply-To: <20200925002900.465855-1-jsnow@redhat.com>
 References: <20200925002900.465855-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -101,37 +100,28 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
 ---
- docs/devel/python/qapi.main.rst | 7 +++++++
- docs/devel/python/qapi.rst      | 1 +
- 2 files changed, 8 insertions(+)
- create mode 100644 docs/devel/python/qapi.main.rst
+ scripts/qapi/mypy.ini | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/docs/devel/python/qapi.main.rst b/docs/devel/python/qapi.main.rst
-new file mode 100644
-index 0000000000..1255fcda63
---- /dev/null
-+++ b/docs/devel/python/qapi.main.rst
-@@ -0,0 +1,7 @@
-+qapi.main module
-+================
-+
-+.. automodule:: qapi.main
-+   :members:
-+   :undoc-members:
-+   :show-inheritance:
-diff --git a/docs/devel/python/qapi.rst b/docs/devel/python/qapi.rst
-index 24fbf34981..1d73509e98 100644
---- a/docs/devel/python/qapi.rst
-+++ b/docs/devel/python/qapi.rst
-@@ -19,6 +19,7 @@ Submodules
-    qapi.expr
-    qapi.gen
-    qapi.introspect
-+   qapi.main
-    qapi.parser
-    qapi.schema
-    qapi.source
+diff --git a/scripts/qapi/mypy.ini b/scripts/qapi/mypy.ini
+index b668776d94..9da1dccef4 100644
+--- a/scripts/qapi/mypy.ini
++++ b/scripts/qapi/mypy.ini
+@@ -4,11 +4,6 @@ strict_optional = False
+ disallow_untyped_calls = False
+ python_version = 3.6
+ 
+-[mypy-qapi.commands]
+-disallow_untyped_defs = False
+-disallow_incomplete_defs = False
+-check_untyped_defs = False
+-
+ [mypy-qapi.doc]
+ disallow_subclassing_any = False
+ disallow_untyped_defs = False
 -- 
 2.26.2
 
